@@ -1,0 +1,6 @@
+author: Mykindos
+main: me.mykindos.betterpvp.core.Core
+name: Core
+load: postworld
+version: '1.0'
+api-version: 1.19
