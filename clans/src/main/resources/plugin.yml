@@ -1,0 +1,7 @@
+author: Mykindos
+main: me.mykindos.betterpvp.clans.Clans
+name: Clans
+load: postworld
+version: '1.0'
+depend: [Core]
+api-version: 1.19
