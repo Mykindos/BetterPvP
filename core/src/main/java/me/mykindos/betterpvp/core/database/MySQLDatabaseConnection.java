@@ -29,8 +29,8 @@ public class MySQLDatabaseConnection implements IDatabaseConnection {
     }
 
     @Override
-    public Connection getConnection() {
-        if(connection != null){
+    public Connection getDatabaseConnection() {
+        if(connection == null){
             var url = "jdbc:mysql://" + sqlServer + "/" + sqlDatabaseName + "?autoReconnect=true&characterEncoding=latin1&useConfigs=maxPerformance";
             try {
                 connection = DriverManager.getConnection(url, sqlUsername, sqlPassword);
