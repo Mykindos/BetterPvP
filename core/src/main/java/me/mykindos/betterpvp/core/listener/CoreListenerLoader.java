@@ -20,8 +20,10 @@ public record CoreListenerLoader(BPvPPlugin plugin) {
             if (Listener.class.isAssignableFrom(clazz)) {
                 try {
                     Listener listener = (Listener) clazz.getDeclaredConstructor().newInstance();
-                    Bukkit.getPluginManager().registerEvents(listener, plugin);
                     plugin.getInjector().injectMembers(listener);
+                    plugin.getListeners().add(listener);
+                    Bukkit.getPluginManager().registerEvents(listener, plugin);
+
                     count++;
                 } catch (Exception ex) {
                     ex.printStackTrace();
