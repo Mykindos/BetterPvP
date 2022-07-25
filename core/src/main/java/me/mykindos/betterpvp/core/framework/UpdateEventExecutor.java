@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.framework;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.SneakyThrows;
 import me.mykindos.betterpvp.core.Core;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -22,7 +23,7 @@ public class UpdateEventExecutor {
         this.core = core;
     }
 
-    public void initialize(){
+    public void initialize() {
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -36,35 +37,27 @@ public class UpdateEventExecutor {
         var updateTimers = new HashMap<Long, Long>();
 
         for (var plugin : Bukkit.getPluginManager().getPlugins()) {
-            if (plugin instanceof BPvPPlugin bPvPPlugin) {
-                var listeners = bPvPPlugin.getListeners();
-                for (var listener : listeners) {
-                    var methods = listener.getClass().getDeclaredMethods();
-                    for (var method : methods) {
-                        if (method.isAnnotationPresent(UpdateEvent.class)) {
-                            var updateEvent = method.getAnnotation(UpdateEvent.class);
 
-                            if(lastRunTimers.containsKey(updateEvent.delay())) {
-                                if (lastRunTimers.get(updateEvent.delay()) < System.currentTimeMillis()) {
+            if (!(plugin instanceof BPvPPlugin bPvPPlugin)) continue;
+            var listeners = bPvPPlugin.getListeners();
 
-                                    if (updateEvent.isAsync()) {
-                                        new BukkitRunnable() {
-                                            @Override
-                                            public void run() {
-                                                executeMethod(method, listener);
-                                            }
-                                        }.runTaskAsynchronously(core);
-                                    } else {
-                                        executeMethod(method, listener);
-                                    }
+            for (var listener : listeners) {
 
+                var methods = listener.getClass().getDeclaredMethods();
 
-                                    updateTimers.put(updateEvent.delay(), System.currentTimeMillis() + updateEvent.delay());
-                                }
-                            }else{
-                                lastRunTimers.put(updateEvent.delay(), System.currentTimeMillis() + updateEvent.delay());
-                            }
+                for (var method : methods) {
+
+                    var updateEvent = method.getAnnotation(UpdateEvent.class);
+                    if (updateEvent == null) continue;
+
+                    if (lastRunTimers.containsKey(updateEvent.delay())) {
+                        if (lastRunTimers.get(updateEvent.delay()) < System.currentTimeMillis()) {
+
+                            callUpdater(updateEvent, method, listener);
+                            updateTimers.put(updateEvent.delay(), System.currentTimeMillis() + updateEvent.delay());
                         }
+                    } else {
+                        lastRunTimers.put(updateEvent.delay(), System.currentTimeMillis() + updateEvent.delay());
                     }
                 }
             }
@@ -72,6 +65,20 @@ public class UpdateEventExecutor {
 
         for (var update : updateTimers.entrySet()) {
             lastRunTimers.put(update.getKey(), update.getValue());
+        }
+    }
+
+
+    private void callUpdater(UpdateEvent updateEvent, Method method, Object obj) {
+        if (updateEvent.isAsync()) {
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    executeMethod(method, obj);
+                }
+            }.runTaskAsynchronously(core);
+        } else {
+            executeMethod(method, obj);
         }
     }
 
