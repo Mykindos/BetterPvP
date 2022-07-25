@@ -12,7 +12,7 @@ public class ModuleLoadedEvent extends Event {
 
     private static final HandlerList handlers = new HandlerList();
 
-    private String moduleName;
+    String moduleName;
 
     public HandlerList getHandlers() {
         return handlers;

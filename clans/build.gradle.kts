@@ -16,6 +16,7 @@ shadowJar.apply {
         exclude(project(":core"))
         exclude(dependency("com.google.inject:guice:5.1.0"))
     }
+    mergeServiceFiles()
 }
 
 repositories {
