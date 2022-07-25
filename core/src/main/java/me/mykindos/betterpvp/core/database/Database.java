@@ -41,10 +41,9 @@ public class Database {
             @Override
             public void run() {
                 Connection connection = getConnection().getDatabaseConnection();
-                @Cleanup
-                PreparedStatement preparedStatement = null;
                 try {
-                    preparedStatement = connection.prepareStatement(statement.getQuery());
+                    @Cleanup
+                    PreparedStatement preparedStatement = connection.prepareStatement(statement.getQuery());
                     for (int i = 1; i <= statement.getValues().length; i++) {
                         StatementValue<?> val = statement.getValues()[i - 1];
                         preparedStatement.setObject(i, val.getValue(), val.getType());
@@ -64,14 +63,13 @@ public class Database {
             @Override
             public void run() {
                 Connection connection = getConnection().getDatabaseConnection();
-                @Cleanup
-                PreparedStatement preparedStatement = null;
                 if (statements.isEmpty()) {
                     return;
                 }
                 try {
                     // Assume all statement queries are the same
-                    preparedStatement = connection.prepareStatement(statements.get(0).getQuery());
+                    @Cleanup
+                    PreparedStatement preparedStatement = connection.prepareStatement(statements.get(0).getQuery());
                     for (Statement statement : statements) {
                         for (int i = 1; i <= statement.getValues().length; i++) {
                             StatementValue<?> val = statement.getValues()[i - 1];
@@ -99,14 +97,13 @@ public class Database {
     public CachedRowSet executeQuery(Statement statement) {
         Connection connection = getConnection().getDatabaseConnection();
 
-        @Cleanup
-        PreparedStatement preparedStatement = null;
         CachedRowSet rowset = null;
 
         try {
             RowSetFactory factory = RowSetProvider.newFactory();
             rowset = factory.createCachedRowSet();
-            preparedStatement = connection.prepareStatement(statement.getQuery());
+            @Cleanup
+            PreparedStatement preparedStatement = connection.prepareStatement(statement.getQuery());
             for (int i = 1; i <= statement.getValues().length; i++) {
                 StatementValue<?> val = statement.getValues()[i - 1];
                 preparedStatement.setObject(i, val.getValue(), val.getType());

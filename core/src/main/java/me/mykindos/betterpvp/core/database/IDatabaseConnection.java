@@ -6,4 +6,6 @@ public interface IDatabaseConnection {
 
     Connection getDatabaseConnection();
 
+    void runDatabaseMigrations();
+
 }
