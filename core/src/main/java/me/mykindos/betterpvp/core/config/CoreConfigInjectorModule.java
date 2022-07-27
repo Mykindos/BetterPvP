@@ -33,8 +33,16 @@ public class CoreConfigInjectorModule extends AbstractModule {
             }
 
             Config conf = new ConfigImpl(config.path(), config.defaultValue());
-            bind(String.class).annotatedWith(conf)
-                    .toInstance(core.getConfig().getString(config.path()));
+
+            if(field.getType().isAssignableFrom(String.class)) {
+                bind(String.class).annotatedWith(conf)
+                        .toInstance(core.getConfig().getString(config.path()));
+            }else if(field.getType().isAssignableFrom(Integer.class)){
+                bind(Integer.class).annotatedWith(conf)
+                        .toInstance(core.getConfig().getInt(config.path()));
+            }else if(field.getType().isAssignableFrom(Boolean.class)){
+                bind(Boolean.class).annotatedWith(conf).toInstance(core.getConfig().getBoolean(config.path()));
+            }
         }
 
         core.saveConfig();
