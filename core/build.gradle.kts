@@ -23,6 +23,10 @@ dependencies {
 
     implementation("org.flywaydb:flyway-core:9.0.1")
     implementation("org.flywaydb:flyway-mysql:9.0.1")
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+    implementation("org.apache.commons:commons-lang3:3.12.0")
+
+
     compileOnly("io.papermc.paper:paper-api:1.19-R0.1-SNAPSHOT")
     compileOnly("org.projectlombok:lombok:1.18.24")
 

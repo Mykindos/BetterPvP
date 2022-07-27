@@ -4,6 +4,7 @@ import com.google.inject.Singleton;
 import lombok.Cleanup;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.database.connection.IDatabaseConnection;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.StatementValue;
 import org.bukkit.scheduler.BukkitRunnable;
