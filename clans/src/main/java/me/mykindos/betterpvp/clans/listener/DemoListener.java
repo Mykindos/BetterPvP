@@ -15,7 +15,7 @@ public class DemoListener implements Listener {
 
     @Inject
     @Config(path = "someModule.test", defaultValue = "87")
-    private int test;
+    private Integer test;
 
     @UpdateEvent(delay = 250)
     public void onUpdate(){
