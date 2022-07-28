@@ -11,18 +11,71 @@ create unique index ${tablePrefix}gamers_UUID_uindex
 
 create table ${tablePrefix}clans
 (
-    Name      varchar(14) not null
-        primary key,
-    Created   mediumtext  null,
-    Leader    varchar(64) null,
+    id        int         auto_increment,
+    Name      varchar(32) not null,
+    Created   TIMESTAMP   null,
     Home      varchar(64) null,
-    Territory blob        null,
     Admin     tinyint     null,
     Safe      tinyint     null,
-    LastLogin bigint      null,
     Energy    int         null,
     Points    int         null,
-    Cooldown  mediumtext  null,
-    Level     int         null
+    Cooldown  long        null,
+    Level     int         null,
+    LastLogin bigint      null,
+    constraint clans_pk
+        primary key (id)
 );
 
+create unique index ${tablePrefix}clans_Name_uindex
+    on ${tablePrefix}clans (Name);
+
+create table ${tablePrefix}clan_territory
+(
+    id        int         auto_increment not null,
+    Clan      int         not null,
+    Chunk     varchar(64) not null,
+    constraint clan_territory_pk
+        primary key (id)
+);
+
+create unique index ${tablePrefix}clans_territory_Clan_Chunk_uindex
+    on ${tablePrefix}clan_territory (Clan, Chunk);
+
+create table ${tablePrefix}clan_members
+(
+    id        int         auto_increment not null,
+    Clan      int         not null,
+    Member    varchar(64) not null,
+    `Rank`    varchar(64) not null default 'RECRUIT',
+    constraint clan_members_pk
+        primary key (id)
+);
+
+create unique index ${tablePrefix}clans_members_Clan_Member_uindex
+    on ${tablePrefix}clan_members (Clan, Member);
+
+create table ${tablePrefix}clan_alliances
+(
+    id        int         auto_increment not null,
+    Clan      int         not null,
+    AllyClan  int         not null,
+    Trusted   tinyint     default 0,
+    constraint clan_alliances_pk
+        primary key (id)
+);
+
+create unique index ${tablePrefix}clans_alliances_Clan_AllyClan_uindex
+    on ${tablePrefix}clan_alliances (Clan, AllyClan);
+
+create table ${tablePrefix}clan_enemies
+(
+    id        int         auto_increment not null,
+    Clan      int         not null,
+    EnemyClan  int        not null,
+    Dominance  tinyint    default 0,
+    constraint clan_enemies_pk
+        primary key (id)
+);
+
+create unique index ${tablePrefix}clans_enemies_Clan_EnemyClan_uindex
+    on ${tablePrefix}clan_enemies (Clan, EnemyClan);
