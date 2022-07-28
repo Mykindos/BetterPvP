@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.clans.skills;
+package me.mykindos.betterpvp.clans.skills.listeners;
 
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.entity.Player;
