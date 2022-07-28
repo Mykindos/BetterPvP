@@ -9,7 +9,6 @@ import org.bukkit.event.Listener;
 @BPvPListener
 public class DemoListener implements Listener {
 
-
     @Inject
     public Clans clans;
 

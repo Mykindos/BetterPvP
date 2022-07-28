@@ -42,6 +42,8 @@ public class Clans extends BPvPPlugin {
                     new ClansConfigInjectorModule(this, PACKAGE));
             injector.injectMembers(this);
 
+            database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:clans-migrations", databasePrefix);
+
             Bukkit.getPluginManager().callEvent(new ModuleLoadedEvent("Clans"));
 
             ClansListenerLoader clansListenerLoader = new ClansListenerLoader(this);
@@ -49,8 +51,6 @@ public class Clans extends BPvPPlugin {
 
             SkillManager skillManager = injector.getInstance(SkillManager.class);
             skillManager.loadSkills();
-
-            database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:clans-migrations", databasePrefix);
 
         }
     }
