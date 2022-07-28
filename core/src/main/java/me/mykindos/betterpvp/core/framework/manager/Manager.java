@@ -23,6 +23,8 @@ public abstract class Manager<T> {
         objects.remove(identifier);
     }
 
-    public abstract void loadFromList(List<T> objects);
+    public void loadFromList(List<T> objects) {
+        objects.forEach(o -> addObject(String.valueOf(o.hashCode()), o));
+    }
 
 }

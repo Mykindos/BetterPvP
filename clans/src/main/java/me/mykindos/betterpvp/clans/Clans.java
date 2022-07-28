@@ -6,6 +6,7 @@ import lombok.Getter;
 import me.mykindos.betterpvp.clans.config.ClansConfigInjectorModule;
 import me.mykindos.betterpvp.clans.injector.ClansInjectorModule;
 import me.mykindos.betterpvp.clans.listener.ClansListenerLoader;
+import me.mykindos.betterpvp.clans.skills.SkillManager;
 import me.mykindos.betterpvp.core.Core;
 
 import me.mykindos.betterpvp.core.config.Config;
@@ -45,6 +46,9 @@ public class Clans extends BPvPPlugin {
 
             ClansListenerLoader clansListenerLoader = new ClansListenerLoader(this);
             clansListenerLoader.registerListeners(PACKAGE);
+
+            SkillManager skillManager = injector.getInstance(SkillManager.class);
+            skillManager.loadSkills();
 
             database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:clans-migrations", databasePrefix);
 

@@ -22,7 +22,7 @@ public record ClientListener(ClientManager clientManager) implements Listener {
         String uuid = event.getPlayer().getUniqueId().toString();
         Optional<Client> clientOptional = clientManager.getObject(uuid);
         if (clientOptional.isEmpty()) {
-            Client client = new Client(uuid);
+            Client client = new Client(uuid, event.getPlayer().getName());
             clientManager.addObject(uuid, client);
             clientManager.getRepository().save(client);
         }

@@ -12,13 +12,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ClientRepository implements IRepository<Client> {
-
-    private Database database;
+public record ClientRepository(Database database) implements IRepository<Client> {
 
     @Inject
-    public ClientRepository(Database database){
-        this.database = database;
+    public ClientRepository {
     }
 
     @Override
@@ -26,12 +23,13 @@ public class ClientRepository implements IRepository<Client> {
         List<Client> clients = new ArrayList<>();
         String query = "SELECT * FROM clients;";
         CachedRowSet result = database.executeQuery(new Statement(query));
-        try{
-            while(result.next()){
-                String uuid = result.getString(1);
-                clients.add(new Client(uuid));
+        try {
+            while (result.next()) {
+                String uuid = result.getString(2);
+                String name = result.getString(3);
+                clients.add(new Client(uuid, name));
             }
-        }catch(SQLException ex){
+        } catch (SQLException ex) {
             ex.printStackTrace();
         }
 
@@ -41,7 +39,10 @@ public class ClientRepository implements IRepository<Client> {
 
     @Override
     public void save(Client object) {
-        String query = "INSERT INTO clients (uuid) VALUES(?);";
-        database.executeUpdate(new Statement(query, new StringStatementValue(object.getUuid())));
+        String query = "INSERT INTO clients (UUID, Name) VALUES(?, ?);";
+        database.executeUpdate(new Statement(query,
+                new StringStatementValue(object.getUuid()),
+                new StringStatementValue(object.getName())
+        ));
     }
 }
