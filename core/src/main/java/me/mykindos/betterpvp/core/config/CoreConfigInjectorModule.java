@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.config.implementations.ConfigImpl;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 import java.lang.reflect.Field;
+import java.util.Objects;
 import java.util.Set;
 
 
@@ -37,11 +38,12 @@ public class CoreConfigInjectorModule extends AbstractModule {
             if(field.getType().isAssignableFrom(String.class)) {
                 bind(String.class).annotatedWith(conf)
                         .toInstance(core.getConfig().getString(config.path()));
-            }else if(field.getType().isAssignableFrom(Integer.class)){
-                bind(Integer.class).annotatedWith(conf)
-                        .toInstance(core.getConfig().getInt(config.path()));
-            }else if(field.getType().isAssignableFrom(Boolean.class)){
-                bind(Boolean.class).annotatedWith(conf).toInstance(core.getConfig().getBoolean(config.path()));
+            }else if(field.getType().isAssignableFrom(int.class)){
+                bind(int.class).annotatedWith(conf)
+                        .toInstance(Integer.parseInt(Objects.requireNonNull(core.getConfig().getString(config.path()))));
+            }else if(field.getType().isAssignableFrom(boolean.class)){
+                bind(boolean.class).annotatedWith(conf)
+                        .toInstance(Boolean.parseBoolean(core.getConfig().getString(config.path())));
             }
         }
 
