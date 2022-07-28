@@ -8,9 +8,15 @@ import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 
 import java.lang.reflect.Field;
+import java.util.Objects;
 import java.util.Set;
 
 
+/**
+ * Why is this code duplicated?
+ * Similar to the ClansListenerLoaded.java, reflection does not work in a predictable manner when each plugin is packaged
+ * as individual jar files. If both the Core and Clans were bundled in a single jar, this module could be deleted entirely
+ */
 public class ClansConfigInjectorModule extends AbstractModule {
 
     private final Clans clans;
@@ -39,11 +45,12 @@ public class ClansConfigInjectorModule extends AbstractModule {
             if(field.getType().isAssignableFrom(String.class)) {
                 bind(String.class).annotatedWith(conf)
                         .toInstance(clans.getConfig().getString(config.path()));
-            }else if(field.getType().isAssignableFrom(Integer.class)){
-                bind(Integer.class).annotatedWith(conf)
-                        .toInstance(clans.getConfig().getInt(config.path()));
-            }else if(field.getType().isAssignableFrom(Boolean.class)){
-                bind(Boolean.class).annotatedWith(conf).toInstance(clans.getConfig().getBoolean(config.path()));
+            }else if(field.getType().isAssignableFrom(int.class)){
+                bind(int.class).annotatedWith(conf)
+                        .toInstance(Integer.parseInt(Objects.requireNonNull(clans.getConfig().getString(config.path()))));
+            }else if(field.getType().isAssignableFrom(boolean.class)){
+                bind(boolean.class).annotatedWith(conf)
+                        .toInstance(Boolean.parseBoolean(clans.getConfig().getString(config.path())));
             }
 
         }
