@@ -13,7 +13,7 @@ public class DemoListener implements Listener {
     @Inject
     public Clans clans;
 
-    @UpdateEvent(delay = 250)
+    @UpdateEvent(delay = 1000)
     public void onUpdate(){
         clans.getLogger().info("UpdateEvent triggered");
     }

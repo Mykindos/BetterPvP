@@ -1,6 +1,14 @@
-/**
-  Demo
- */
+create table ${tablePrefix}gamers
+(
+    id   int auto_increment,
+    UUID varchar(255) not null,
+    constraint gamers_pk
+        primary key (id)
+);
+
+create unique index ${tablePrefix}gamers_UUID_uindex
+    on ${tablePrefix}gamers (UUID);
+
 create table ${tablePrefix}clans
 (
     Name      varchar(14) not null

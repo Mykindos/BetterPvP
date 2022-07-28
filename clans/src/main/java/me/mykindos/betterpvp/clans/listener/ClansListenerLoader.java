@@ -20,7 +20,7 @@ public record ClansListenerLoader(BPvPPlugin plugin) {
         for (var clazz : classes) {
             if (Listener.class.isAssignableFrom(clazz)) {
                 try {
-                    Listener listener = (Listener) clazz.getDeclaredConstructor().newInstance();
+                    Listener listener = (Listener) plugin.getInjector().getInstance(clazz);
                     plugin.getInjector().injectMembers(listener);
                     plugin.getListeners().add(listener);
                     Bukkit.getPluginManager().registerEvents(listener, plugin);
