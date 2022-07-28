@@ -25,7 +25,7 @@ repositories {
 }
 
 dependencies {
-    // https://mvnrepository.com/artifact/com.google.inject/guice
+
     implementation("com.google.inject:guice:5.1.0")
     implementation("org.reflections:reflections:0.10.2")
     implementation(project(":core"))

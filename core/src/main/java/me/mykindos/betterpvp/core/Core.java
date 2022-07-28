@@ -8,7 +8,7 @@ import me.mykindos.betterpvp.core.config.CoreConfigInjectorModule;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.injector.DatabaseInjectorModule;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
-import me.mykindos.betterpvp.core.framework.UpdateEventExecutor;
+import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
 import me.mykindos.betterpvp.core.injector.CoreInjectorModule;
 import me.mykindos.betterpvp.core.listener.CoreListenerLoader;
 

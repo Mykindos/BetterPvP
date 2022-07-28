@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.framework;
+package me.mykindos.betterpvp.core.framework.updater;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
