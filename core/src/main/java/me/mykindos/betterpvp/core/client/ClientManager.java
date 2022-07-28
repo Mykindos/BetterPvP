@@ -12,7 +12,7 @@ import java.util.List;
 public class ClientManager extends Manager<Client> {
 
     @Getter
-    private ClientRepository repository;
+    private final ClientRepository repository;
 
     @Inject
     public ClientManager(ClientRepository repository){
@@ -22,9 +22,7 @@ public class ClientManager extends Manager<Client> {
 
     @Override
     public void loadFromList(List<Client> objects) {
-        for(Client client : objects){
-            addObject(client.getUuid(), client);
-        }
+        objects.forEach(client -> addObject(client.getUuid(), client));
     }
 
 }
