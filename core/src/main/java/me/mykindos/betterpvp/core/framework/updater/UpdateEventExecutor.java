@@ -1,9 +1,9 @@
-package me.mykindos.betterpvp.core.framework;
+package me.mykindos.betterpvp.core.framework.updater;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.SneakyThrows;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 
