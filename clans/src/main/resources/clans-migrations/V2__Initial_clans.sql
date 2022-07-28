@@ -21,7 +21,7 @@ create table ${tablePrefix}clans
     Points    int         null,
     Cooldown  long        null,
     Level     int         null,
-    LastLogin bigint      null,
+    LastLogin TIMESTAMP   null,
     constraint clans_pk
         primary key (id)
 );
