@@ -42,6 +42,12 @@ dependencies {
     testAnnotationProcessor("org.projectlombok:lombok:1.18.24")
 }
 
+tasks {
+    assemble {
+        dependsOn(shadowJar)
+    }
+}
+
 tasks.getByName<Test>("test") {
     useJUnitPlatform()
 }
