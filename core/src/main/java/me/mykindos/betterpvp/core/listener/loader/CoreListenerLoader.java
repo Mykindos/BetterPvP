@@ -1,9 +1,8 @@
-package me.mykindos.betterpvp.clans.listener;
+package me.mykindos.betterpvp.core.listener.loader;
 
 import com.google.inject.Inject;
-import me.mykindos.betterpvp.clans.Clans;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.listener.loader.ListenerLoader;
 import org.bukkit.event.Listener;
 import org.reflections.Reflections;
 
@@ -12,10 +11,11 @@ import java.util.Set;
 /**
  * Due to the way spigot loads plugins, this code needs to be duplicated in order to use reflection properly
  */
-public class ClansListenerLoader extends ListenerLoader {
+public class CoreListenerLoader extends ListenerLoader{
+
 
     @Inject
-    public ClansListenerLoader(Clans plugin) {
+    public CoreListenerLoader(Core plugin) {
         super(plugin);
     }
 

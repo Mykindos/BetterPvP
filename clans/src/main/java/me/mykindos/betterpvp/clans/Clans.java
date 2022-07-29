@@ -6,6 +6,7 @@ import lombok.Getter;
 import me.mykindos.betterpvp.clans.config.ClansConfigInjectorModule;
 import me.mykindos.betterpvp.clans.injector.ClansInjectorModule;
 import me.mykindos.betterpvp.clans.listener.ClansListenerLoader;
+import me.mykindos.betterpvp.clans.commands.ClansCommandLoader;
 import me.mykindos.betterpvp.clans.skills.SkillManager;
 import me.mykindos.betterpvp.core.Core;
 
@@ -46,10 +47,13 @@ public class Clans extends BPvPPlugin {
 
             Bukkit.getPluginManager().callEvent(new ModuleLoadedEvent("Clans"));
 
-            ClansListenerLoader clansListenerLoader = new ClansListenerLoader(this);
+            var clansListenerLoader = injector.getInstance(ClansListenerLoader.class);
             clansListenerLoader.registerListeners(PACKAGE);
 
-            SkillManager skillManager = injector.getInstance(SkillManager.class);
+            var clansCommandLoader = injector.getInstance(ClansCommandLoader.class);
+            clansCommandLoader.loadCommands(PACKAGE);
+
+            var skillManager = injector.getInstance(SkillManager.class);
             skillManager.loadSkills();
 
         }

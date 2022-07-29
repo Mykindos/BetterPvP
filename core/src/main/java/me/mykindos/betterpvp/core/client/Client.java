@@ -7,5 +7,10 @@ public class Client {
 
     String uuid;
     String name;
+    Rank rank;
+
+    public boolean hasRank(Rank rank){
+        return this.rank.getId() >= rank.getId();
+    }
 
 }
