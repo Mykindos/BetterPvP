@@ -2,19 +2,20 @@ package me.mykindos.betterpvp.core.command.commands;
 
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
+import me.mykindos.betterpvp.core.framework.annotations.WithReflection;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 
 public class GamemodeCommand extends Command {
 
-    @Override
-    public String getName() {
-        return "gamemode";
+    @WithReflection
+    public GamemodeCommand() {
+        aliases.add("gm");
     }
 
     @Override
-    public String[] getAliases() {
-        return new String[]{"gm"};
+    public String getName() {
+        return "gamemode";
     }
 
     @Override
@@ -33,7 +34,6 @@ public class GamemodeCommand extends Command {
             } catch (IllegalArgumentException ex) {
                 player.sendMessage("Could not find gamemode: " + gamemode);
             }
-
 
         }
     }
