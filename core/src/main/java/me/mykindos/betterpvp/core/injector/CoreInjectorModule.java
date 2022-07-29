@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.core.injector;
 
 import com.google.inject.AbstractModule;
 import me.mykindos.betterpvp.core.Core;
-import org.bukkit.configuration.file.FileConfiguration;
 
 public class CoreInjectorModule extends AbstractModule {
 

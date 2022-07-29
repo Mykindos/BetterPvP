@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.client.repository;
 
 import com.google.inject.Inject;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
@@ -27,7 +28,8 @@ public record ClientRepository(Database database) implements IRepository<Client>
             while (result.next()) {
                 String uuid = result.getString(2);
                 String name = result.getString(3);
-                clients.add(new Client(uuid, name));
+                Rank rank = Rank.valueOf(result.getString(4));
+                clients.add(new Client(uuid, name, rank));
             }
         } catch (SQLException ex) {
             ex.printStackTrace();

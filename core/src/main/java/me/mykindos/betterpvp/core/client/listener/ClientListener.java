@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.client.listener;
 import com.google.inject.Inject;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.ClientManager;
+import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.events.ClientLoginEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.Bukkit;
@@ -25,7 +26,7 @@ public record ClientListener(ClientManager clientManager) implements Listener {
         Optional<Client> clientOptional = clientManager.getObject(uuid);
         Client client;
         if (clientOptional.isEmpty()) {
-            client = new Client(uuid, event.getPlayer().getName());
+            client = new Client(uuid, event.getPlayer().getName(), Rank.PLAYER);
             clientManager.addObject(uuid, client);
             clientManager.getRepository().save(client);
         }else{
