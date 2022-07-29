@@ -19,8 +19,8 @@ public class CommandLoader extends Loader {
         try {
             Command command = (Command) plugin.getInjector().getInstance(clazz);
             plugin.getInjector().injectMembers(command);
-            plugin.getListeners().add(command);
 
+            command.getSubCommands().forEach(sub -> plugin.getInjector().injectMembers(sub));
 
             var commandPath = "command." + command.getName() + ".enabled";
             var set = plugin.getConfig().isSet(commandPath.toLowerCase());

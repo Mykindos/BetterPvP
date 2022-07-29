@@ -1,18 +1,30 @@
 package me.mykindos.betterpvp.clans.clans.commands;
 
+import me.mykindos.betterpvp.clans.clans.ClanManager;
+import me.mykindos.betterpvp.clans.clans.commands.subcommands.CreateClanSubCommand;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
+import me.mykindos.betterpvp.core.framework.annotations.WithReflection;
 import org.bukkit.entity.Player;
 
+import java.util.List;
+
 public class ClanCommand extends Command {
-    @Override
-    public String getName() {
-        return "clan";
+
+    private final ClanManager clanManager;
+
+    @WithReflection
+    public ClanCommand(ClanManager clanManager) {
+        this.clanManager = clanManager;
+
+        aliases.addAll(List.of("c", "f", "faction"));
+
+        subCommands.add(new CreateClanSubCommand());
     }
 
     @Override
-    public String[] getAliases() {
-        return new String[]{"c"};
+    public String getName() {
+        return "clan";
     }
 
     @Override
