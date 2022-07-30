@@ -2,8 +2,10 @@ package me.mykindos.betterpvp.core.command.loader;
 
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.CommandManager;
+import me.mykindos.betterpvp.core.command.SpigotCommandWrapper;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.Loader;
+import org.bukkit.Bukkit;
 
 public class CommandLoader extends Loader {
 
@@ -19,6 +21,11 @@ public class CommandLoader extends Loader {
         try {
             Command command = (Command) plugin.getInjector().getInstance(clazz);
             plugin.getInjector().injectMembers(command);
+
+
+            SpigotCommandWrapper commandWrapper = new SpigotCommandWrapper(command, command.getName(),
+                    command.getDescription(), "", command.getAliases());
+            Bukkit.getCommandMap().register(command.getName(), commandWrapper);
 
             command.getSubCommands().forEach(sub -> plugin.getInjector().injectMembers(sub));
 

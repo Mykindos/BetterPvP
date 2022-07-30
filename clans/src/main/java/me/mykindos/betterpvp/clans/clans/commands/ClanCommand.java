@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.clans.clans.commands;
 
+import com.google.inject.Inject;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.subcommands.CreateClanSubCommand;
 import me.mykindos.betterpvp.core.client.Client;
@@ -14,6 +15,7 @@ public class ClanCommand extends Command {
     private final ClanManager clanManager;
 
     @WithReflection
+    @Inject
     public ClanCommand(ClanManager clanManager) {
         this.clanManager = clanManager;
 
