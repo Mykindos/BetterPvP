@@ -13,15 +13,15 @@ create table ${tablePrefix}clans
 (
     id        int         auto_increment,
     Name      varchar(32) not null,
-    Created   TIMESTAMP   null,
+    Created   TIMESTAMP   null default CURRENT_TIMESTAMP,
     Home      varchar(64) null,
-    Admin     tinyint     null,
-    Safe      tinyint     null,
-    Energy    int         null,
-    Points    int         null,
-    Cooldown  long        null,
-    Level     int         null,
-    LastLogin TIMESTAMP   null,
+    Admin     tinyint     null default 0,
+    Safe      tinyint     null default 0,
+    Energy    int         null default 0,
+    Points    int         null default 0,
+    Cooldown  bigint      null default 0,
+    Level     int         null default 1,
+    LastLogin TIMESTAMP   null default CURRENT_TIMESTAMP,
     constraint clans_pk
         primary key (id)
 );

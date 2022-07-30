@@ -4,7 +4,11 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.framework.annotations.WithReflection;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TeleportHereCommand extends Command {
 
@@ -31,5 +35,15 @@ public class TeleportHereCommand extends Command {
                 target.teleport(player.getLocation());
             }
         }
+    }
+
+    @Override
+    public List<String> processTabComplete(CommandSender sender, String[] args) {
+        List<String> completions = new ArrayList<>();
+        if (args.length == 1) {
+            Bukkit.getOnlinePlayers().forEach(player -> completions.add(player.getName()));
+        }
+
+        return completions;
     }
 }

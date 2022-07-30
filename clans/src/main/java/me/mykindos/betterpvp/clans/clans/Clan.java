@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.clans.clans;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.Singular;
 import me.mykindos.betterpvp.clans.clans.components.ClanAlliance;
 import me.mykindos.betterpvp.clans.clans.components.ClanEnemy;
 import me.mykindos.betterpvp.clans.clans.components.ClanMember;
@@ -9,6 +10,7 @@ import me.mykindos.betterpvp.clans.clans.components.ClanTerritory;
 import org.bukkit.Location;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -28,9 +30,16 @@ public class Clan {
     private boolean admin;
     private boolean safe;
 
-    private List<ClanMember> members;
-    private List<ClanAlliance> alliances;
-    private List<ClanEnemy> enemies;
-    private List<ClanTerritory> territory;
+    @Builder.Default
+    private List<ClanMember> members = new ArrayList<>();
+
+    @Builder.Default
+    private List<ClanAlliance> alliances = new ArrayList<>();
+
+    @Builder.Default
+    private List<ClanEnemy> enemies = new ArrayList<>();
+
+    @Builder.Default
+    private List<ClanTerritory> territory = new ArrayList<>();
 
 }

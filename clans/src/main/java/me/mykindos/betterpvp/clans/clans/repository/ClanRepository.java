@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
+import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.database.repository.IRepository;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import org.bukkit.Chunk;
@@ -27,16 +28,15 @@ import java.util.List;
 public class ClanRepository implements IRepository<Clan> {
 
     @Inject
-    @Config(path="database.prefix")
+    @Config(path = "database.prefix")
     private String databasePrefix;
 
-    private Database database;
-    private ClanManager clanManager;
+    private final Database database;
 
     @Inject
-    public ClanRepository(Database database, ClanManager clanManager) {
+    public ClanRepository(Database database) {
         this.database = database;
-        this.clanManager = clanManager;
+
     }
 
     @Override
@@ -72,85 +72,79 @@ public class ClanRepository implements IRepository<Clan> {
                         .build();
                 clans.add(clan);
             }
-        }catch(SQLException ex){
+        } catch (SQLException ex) {
             ex.printStackTrace();
         }
 
-        clans.forEach(clan -> {
-            clan.setTerritory(getTerritory(clan.getId()));
-            clan.setAlliances(getAlliances(clan.getId()));
-            clan.setEnemies(getEnemies(clan.getId()));
-            clan.setMembers(getMembers(clan.getId()));
-        });
 
         return clans;
     }
 
-    private List<ClanTerritory> getTerritory(int clanId) {
+    public List<ClanTerritory> getTerritory(ClanManager clanManager, Clan clan) {
         List<ClanTerritory> territory = new ArrayList<>();
         String query = "SELECT * FROM " + databasePrefix + "clan_territory WHERE Clan = ?;";
-        CachedRowSet result = database.executeQuery(new Statement(query, new IntegerStatementValue(clanId)));
+        CachedRowSet result = database.executeQuery(new Statement(query, new IntegerStatementValue(clan.getId())));
         try {
             while (result.next()) {
                 Chunk chunk = UtilWorld.stringToChunk(result.getString(3));
                 territory.add(new ClanTerritory(chunk));
             }
-        }catch(SQLException ex){
+        } catch (SQLException ex) {
             ex.printStackTrace();
         }
 
         return territory;
     }
 
-    private List<ClanMember> getMembers(int clanId){
+    public List<ClanMember> getMembers(ClanManager clanManager, Clan clan) {
         List<ClanMember> members = new ArrayList<>();
         String query = "SELECT * FROM " + databasePrefix + "clan_members WHERE Clan = ?;";
-        CachedRowSet result = database.executeQuery(new Statement(query, new IntegerStatementValue(clanId)));
+        CachedRowSet result = database.executeQuery(new Statement(query, new IntegerStatementValue(clan.getId())));
         try {
             while (result.next()) {
                 String uuid = result.getString(3);
                 ClanMember.MemberRank rank = ClanMember.MemberRank.valueOf(result.getString(4));
-                members.add(new ClanMember(uuid, rank)) ;
+                members.add(new ClanMember(uuid, rank));
             }
-        }catch(SQLException ex){
+        } catch (SQLException ex) {
             ex.printStackTrace();
         }
 
         return members;
     }
 
-    private List<ClanAlliance> getAlliances(int clanId){
+    public List<ClanAlliance> getAlliances(ClanManager clanManager, Clan clan) {
         List<ClanAlliance> alliances = new ArrayList<>();
         String query = "SELECT * FROM " + databasePrefix + "clan_alliances WHERE Clan = ?;";
-        CachedRowSet result = database.executeQuery(new Statement(query, new IntegerStatementValue(clanId)));
+        CachedRowSet result = database.executeQuery(new Statement(query, new IntegerStatementValue(clan.getId())));
         try {
             while (result.next()) {
                 var otherClan = clanManager.getClanById(result.getInt(3));
-                if(otherClan.isPresent()) {
+                if (otherClan.isPresent()) {
                     boolean trusted = result.getBoolean(4);
                     alliances.add(new ClanAlliance(otherClan.get().getName(), trusted));
                 }
             }
-        }catch(SQLException ex){
+        } catch (SQLException ex) {
             ex.printStackTrace();
         }
 
         return alliances;
     }
 
-    private List<ClanEnemy> getEnemies(int clanId){
+    public List<ClanEnemy> getEnemies(ClanManager clanManager, Clan clan) {
         List<ClanEnemy> enemies = new ArrayList<>();
         String query = "SELECT * FROM " + databasePrefix + "clan_enemies WHERE Clan = ?;";
-        CachedRowSet result = database.executeQuery(new Statement(query, new IntegerStatementValue(clanId)));
+        CachedRowSet result = database.executeQuery(new Statement(query, new IntegerStatementValue(clan.getId())));
         try {
             while (result.next()) {
                 var otherClan = clanManager.getClanById(result.getInt(3));
-                if(otherClan.isPresent()) {
+                if (otherClan.isPresent()) {
                     int dominance = result.getInt(4);
                     enemies.add(new ClanEnemy(otherClan.get().getName(), dominance));
                 }
             }
-        }catch(SQLException ex){
+        } catch (SQLException ex) {
             ex.printStackTrace();
         }
 
@@ -158,7 +152,29 @@ public class ClanRepository implements IRepository<Clan> {
     }
 
     @Override
-    public void save(Clan object) {
+    public void save(Clan clan) {
+        String saveClanQuery = "INSERT INTO " + databasePrefix + "clans (Name) VALUES (?);";
+        database.executeUpdate(new Statement(saveClanQuery, new StringStatementValue(clan.getName())));
+
+        int clanId = 0;
+        String getClanIdQuery = "SELECT id FROM " + databasePrefix + "clans WHERE Name = ?;";
+        CachedRowSet result = database.executeQuery(new Statement(getClanIdQuery, new StringStatementValue(clan.getName())));
+        try {
+            if(result.next()) {
+                clanId = result.getInt(1);
+                clan.setId(clanId);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        for (var member : clan.getMembers()) {
+            String saveMemberQuery = "INSERT INTO " + databasePrefix + "clan_members (Clan, Member, `Rank`) VALUES (?, ?, ?);";
+            database.executeUpdateAsync(new Statement(saveMemberQuery,
+                    new IntegerStatementValue(clanId),
+                    new StringStatementValue(member.getUuid()),
+                    new StringStatementValue(member.getRank().name())));
+        }
 
     }
 }

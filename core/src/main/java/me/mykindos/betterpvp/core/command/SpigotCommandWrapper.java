@@ -44,14 +44,6 @@ public class SpigotCommandWrapper extends org.bukkit.command.Command {
             }
         }
 
-        if (args.length == 1) {
-            this.command.getSubCommands().forEach(subCommand -> {
-                aliases.add(subCommand.getName());
-                aliases.addAll(subCommand.getAliases());
-            });
-
-        }
-
-        return aliases;
+        return this.command.processTabComplete(sender, args);
     }
 }

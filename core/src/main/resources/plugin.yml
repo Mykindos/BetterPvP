@@ -1,6 +1,8 @@
 author: Mykindos
 main: me.mykindos.betterpvp.core.Core
 name: Core
-load: postworld
+load: STARTUP
 version: '1.0'
 api-version: 1.19
+softdepend:
+  - ProtocolLib

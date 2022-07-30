@@ -56,7 +56,7 @@ public class GamerRepository implements IRepository<Gamer> {
     @Override
     public void save(Gamer object) {
         String query = "INSERT INTO " + databasePrefix + "gamers (UUID) VALUES(?);";
-        database.executeUpdate(new Statement(query,
+        database.executeUpdateAsync(new Statement(query,
                 new StringStatementValue(object.getUuid())
         ));
     }
