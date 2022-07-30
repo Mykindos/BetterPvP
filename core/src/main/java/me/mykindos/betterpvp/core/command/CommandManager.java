@@ -3,7 +3,6 @@ package me.mykindos.betterpvp.core.command;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,7 +10,7 @@ import java.util.Optional;
 public class CommandManager extends Manager<ICommand> {
 
     public Optional<ICommand> getCommandByAlias(String search) {
-        return objects.values().stream().filter(command -> Arrays.asList(command.getAliases()).contains(search)).findFirst();
+        return objects.values().stream().filter(command -> command.getAliases().contains(search)).findFirst();
     }
 
     @Override
