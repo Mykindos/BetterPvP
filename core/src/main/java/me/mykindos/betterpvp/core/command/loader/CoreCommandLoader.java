@@ -25,6 +25,9 @@ public class CoreCommandLoader extends CommandLoader{
             }
         }
 
+        plugin.saveConfig();
+
         System.out.println("Loaded " + count + " for Core");
     }
+
 }

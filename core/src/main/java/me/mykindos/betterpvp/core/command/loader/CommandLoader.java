@@ -25,20 +25,43 @@ public class CommandLoader extends Loader {
 
             SpigotCommandWrapper commandWrapper = new SpigotCommandWrapper(command, command.getName(),
                     command.getDescription(), "", command.getAliases());
+            plugin.getInjector().injectMembers(commandWrapper);
             Bukkit.getCommandMap().register(command.getName(), commandWrapper);
 
-            command.getSubCommands().forEach(sub -> plugin.getInjector().injectMembers(sub));
+            command.getSubCommands().forEach(sub -> {
+                plugin.getInjector().injectMembers(sub);
 
-            var commandPath = "command." + command.getName() + ".enabled";
-            var set = plugin.getConfig().isSet(commandPath.toLowerCase());
-            if (!set) {
-                plugin.getConfig().set(commandPath.toLowerCase(), true);
-            }
+                var subCommandPath = "command." + command.getName().toLowerCase() + "." + sub.getName().toLowerCase() + ".enabled";
+                addEnabledToConfig(subCommandPath);
+                sub.setEnabled(plugin.getConfig().getBoolean(subCommandPath));
+            });
 
-            command.setEnabled(plugin.getConfig().getBoolean(commandPath.toLowerCase()));
+            var commandPath = "command." + command.getName().toLowerCase() + ".enabled";
+            addEnabledToConfig(commandPath);
+
+            command.setEnabled(plugin.getConfig().getBoolean(commandPath));
             commandManager.addObject(command.getName().toLowerCase(), command);
         } catch (Exception ex) {
             ex.printStackTrace();
+        }
+    }
+
+    @Override
+    public void reload() {
+        commandManager.getObjects().values().forEach(command -> {
+            var commandPath = "command." + command.getName().toLowerCase() + ".enabled";
+            command.setEnabled(plugin.getConfig().getBoolean(commandPath));
+            plugin.getInjector().injectMembers(command);
+            command.getSubCommands().forEach(subCommand -> {
+                plugin.getInjector().injectMembers(plugin);
+            });
+        });
+    }
+
+    private void addEnabledToConfig(String path) {
+        var set = plugin.getConfig().isSet(path);
+        if (!set) {
+            plugin.getConfig().set(path, true);
         }
     }
 }

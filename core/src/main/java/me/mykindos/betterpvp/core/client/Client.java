@@ -1,13 +1,20 @@
 package me.mykindos.betterpvp.core.client;
 
-import lombok.Value;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
-@Value
+@Setter
+@Getter
+@Builder
 public class Client {
 
     String uuid;
     String name;
     Rank rank;
+
+
+    boolean administrating;
 
     public boolean hasRank(Rank rank){
         return this.rank.getId() >= rank.getId();

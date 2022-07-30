@@ -29,7 +29,9 @@ public record ClientRepository(Database database) implements IRepository<Client>
                 String uuid = result.getString(2);
                 String name = result.getString(3);
                 Rank rank = Rank.valueOf(result.getString(4));
-                clients.add(new Client(uuid, name, rank));
+
+                Client client = Client.builder().uuid(uuid).name(name).rank(rank).build();
+                clients.add(client);
             }
         } catch (SQLException ex) {
             ex.printStackTrace();

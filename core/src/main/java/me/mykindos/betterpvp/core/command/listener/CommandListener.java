@@ -4,10 +4,12 @@ import com.google.inject.Inject;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.ClientManager;
 import me.mykindos.betterpvp.core.client.Rank;
+import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.CommandManager;
 import me.mykindos.betterpvp.core.command.ICommand;
-import me.mykindos.betterpvp.core.command.ISubCommand;
+import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -45,7 +47,7 @@ public class CommandListener implements Listener {
         }
 
         String finalCommandName = commandName;
-        Optional<ICommand> commandOptional = commandManager.getObject(commandName)
+        Optional<Command> commandOptional = commandManager.getObject(commandName)
                 .or(() -> commandManager.getCommandByAlias(finalCommandName));
         if (commandOptional.isEmpty() && !client.hasRank(Rank.ADMIN) && !event.getPlayer().isOp()) {
             event.setCancelled(true);
@@ -58,21 +60,24 @@ public class CommandListener implements Listener {
                     String[] args = event.getMessage().substring(event.getMessage().indexOf(' ') + 1).split(" ");
 
                     // Execute a subcommand directly if available
-                    var subCommandOptional = getSubCommand(command, args);
-                    if(subCommandOptional.isEmpty()){
+                    var subCommandOptional = getSubCommand(command, args)
+                            .or(() -> getSubCommandByAlias(command, args));
+                    if (subCommandOptional.isEmpty()) {
                         command.execute(event.getPlayer(), client, args);
-                    } else{
-                        ISubCommand subCommand = subCommandOptional.get();
-                        String[] newArgs = args.length > 1 ? Arrays.copyOfRange(args, 1, args.length) : new String[]{};
-                        subCommand.execute(event.getPlayer(), client, newArgs);
+                    } else {
+                        SubCommand subCommand = subCommandOptional.get();
+                        if (client.hasRank(subCommand.getRequiredRank())) {
+                            String[] newArgs = args.length > 1 ? Arrays.copyOfRange(args, 1, args.length) : new String[]{};
+                            subCommand.execute(event.getPlayer(), client, newArgs);
+                        } else {
+                            promptInsufficientPrivileges(subCommand, event.getPlayer());
+                        }
                     }
-                    event.setCancelled(true);
                 } else {
-                    if (command.informInsufficientRank()) {
-                        System.out.println("Insufficient permissions for " + command.getName());
-                        // Message invalid permissions
-                    }
+                    promptInsufficientPrivileges(command, event.getPlayer());
                 }
+
+                event.setCancelled(true);
             } else {
                 System.out.println(command.getName() + " is disabled");
                 event.setCancelled(true);
@@ -81,12 +86,25 @@ public class CommandListener implements Listener {
 
     }
 
+    private void promptInsufficientPrivileges(ICommand command, Player player) {
+        if (command.informInsufficientRank()) {
+            UtilMessage.message(player, "Command", "You have insufficient privileges to perform this command.");
+        }
+    }
 
-    private Optional<ISubCommand> getSubCommand(ICommand command, String[] args) {
+    private Optional<SubCommand> getSubCommand(Command command, String[] args) {
         if (args.length > 0) {
             String arg = args[0];
             return command.getSubCommands().stream().filter(sub -> sub.getName().equalsIgnoreCase(arg)).findFirst();
         } else {
+            return Optional.empty();
+        }
+    }
+
+    private Optional<SubCommand> getSubCommandByAlias(Command command, String[] args) {
+        if(args.length > 0){
+            return command.getSubCommands().stream().filter(subCommand -> subCommand.getAliases().contains(args[0])).findFirst();
+        }else{
             return Optional.empty();
         }
     }

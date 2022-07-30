@@ -10,4 +10,6 @@ public interface ISkill {
 
     ClassType getClassType();
 
+    boolean isEnabled();
+
 }

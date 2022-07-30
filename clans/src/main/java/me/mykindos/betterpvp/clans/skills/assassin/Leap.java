@@ -1,15 +1,17 @@
 package me.mykindos.betterpvp.clans.skills.assassin;
 
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.clans.skills.Skill;
 import me.mykindos.betterpvp.clans.skills.types.ClassType;
-import me.mykindos.betterpvp.clans.skills.ISkill;
 import me.mykindos.betterpvp.clans.skills.types.InteractSkill;
 import me.mykindos.betterpvp.clans.skills.types.SkillActions;
+import me.mykindos.betterpvp.core.framework.annotations.WithReflection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 
 @Singleton
-public class Leap implements ISkill, InteractSkill {
+@WithReflection
+public class Leap extends Skill implements InteractSkill {
 
     @Override
     public String getName() {
