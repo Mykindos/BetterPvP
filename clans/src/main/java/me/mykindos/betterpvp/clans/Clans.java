@@ -3,18 +3,23 @@ package me.mykindos.betterpvp.clans;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import lombok.Getter;
-import me.mykindos.betterpvp.clans.config.ClansConfigInjectorModule;
+import lombok.Setter;
+import me.mykindos.betterpvp.clans.commands.ClansCommandLoader;
 import me.mykindos.betterpvp.clans.injector.ClansInjectorModule;
 import me.mykindos.betterpvp.clans.listener.ClansListenerLoader;
-import me.mykindos.betterpvp.clans.commands.ClansCommandLoader;
 import me.mykindos.betterpvp.clans.skills.SkillManager;
 import me.mykindos.betterpvp.core.Core;
-
 import me.mykindos.betterpvp.core.config.Config;
+import me.mykindos.betterpvp.core.config.ConfigInjectorModule;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.ModuleLoadedEvent;
 import org.bukkit.Bukkit;
+import org.reflections.Reflections;
+import org.reflections.scanners.Scanners;
+
+import java.lang.reflect.Field;
+import java.util.Set;
 
 
 public class Clans extends BPvPPlugin {
@@ -22,6 +27,7 @@ public class Clans extends BPvPPlugin {
     private final String PACKAGE = getClass().getPackageName();
 
     @Getter
+    @Setter
     private Injector injector;
 
     @Inject
@@ -39,8 +45,11 @@ public class Clans extends BPvPPlugin {
         var core = (Core) Bukkit.getPluginManager().getPlugin("Core");
         if (core != null) {
 
+            Reflections reflections = new Reflections(PACKAGE, Scanners.FieldsAnnotated);
+            Set<Field> fields = reflections.getFieldsAnnotatedWith(Config.class);
+
             injector = core.getInjector().createChildInjector(new ClansInjectorModule(this),
-                    new ClansConfigInjectorModule(this, PACKAGE));
+                    new ConfigInjectorModule(this, fields));
             injector.injectMembers(this);
 
             database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:clans-migrations", databasePrefix);

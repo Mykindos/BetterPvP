@@ -7,14 +7,14 @@ import java.util.List;
 import java.util.Optional;
 
 @Singleton
-public class CommandManager extends Manager<ICommand> {
+public class CommandManager extends Manager<Command> {
 
-    public Optional<ICommand> getCommandByAlias(String search) {
+    public Optional<Command> getCommandByAlias(String search) {
         return objects.values().stream().filter(command -> command.getAliases().contains(search)).findFirst();
     }
 
     @Override
-    public void loadFromList(List<ICommand> objects) {
+    public void loadFromList(List<Command> objects) {
         objects.forEach(command -> addObject(command.getName(), command));
     }
 }

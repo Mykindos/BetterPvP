@@ -24,22 +24,21 @@ public class SkillManager extends Manager<ISkill> {
      */
     public void loadSkills(){
         Reflections reflections = new Reflections(getClass().getPackageName());
-        Set<Class<? extends ISkill>> classes = reflections.getSubTypesOf(ISkill.class);
+        Set<Class<? extends Skill>> classes = reflections.getSubTypesOf(Skill.class);
         for (var clazz : classes) {
             if(clazz.isInterface()) continue;
-            ISkill skill = clans.getInjector().getInstance(clazz);
+            Skill skill = clans.getInjector().getInstance(clazz);
             clans.getInjector().injectMembers(skill);
 
             var skillPath = skill.getClassType() + "." + skill.getName() + ".enabled";
-            var enabled = clans.getConfig().get(skillPath.toLowerCase());
-            if(enabled == null){
+            var set = clans.getConfig().isSet(skillPath.toLowerCase());
+            if(!set){
                 clans.getConfig().set(skillPath.toLowerCase(), true);
-                enabled = true;
             }
 
-            if((Boolean) enabled) {
-                addObject(skill.getName(), skill);
-            }
+            skill.setEnabled(clans.getConfig().getBoolean(skillPath.toLowerCase()));
+            addObject(skill.getName(), skill);
+
         }
 
         System.out.println("Loaded " + objects.size() + " skills");
@@ -51,7 +50,8 @@ public class SkillManager extends Manager<ISkill> {
      * Useful if configuration has changed to change skill settings
      */
     public void reloadSkills(){
-        objects.clear();
-        loadSkills();
+        getObjects().values().forEach(skill -> {
+            clans.getInjector().injectMembers(skill);
+        });
     }
 }

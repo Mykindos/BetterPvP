@@ -23,4 +23,16 @@ public enum Rank {
     @Getter
     private final int id;
 
+    public String getTag(boolean bold) {
+        String tag = this.name;
+        if (bold) {
+            return this.color.toString() + ChatColor.BOLD + fixColors(tag);
+        }
+        return this.color + fixColors(tag);
+    }
+
+    private String fixColors(String s) {
+        return ChatColor.translateAlternateColorCodes('&', s);
+    }
+
 }

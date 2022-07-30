@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.command;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import org.bukkit.entity.Player;
+
 import java.util.List;
 
 public interface ICommand {
@@ -25,6 +26,5 @@ public interface ICommand {
 
     boolean isEnabled();
 
-    List<ISubCommand> getSubCommands();
 
 }

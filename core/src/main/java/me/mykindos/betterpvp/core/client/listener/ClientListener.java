@@ -26,7 +26,7 @@ public record ClientListener(ClientManager clientManager) implements Listener {
         Optional<Client> clientOptional = clientManager.getObject(uuid);
         Client client;
         if (clientOptional.isEmpty()) {
-            client = new Client(uuid, event.getPlayer().getName(), Rank.PLAYER);
+            client = Client.builder().uuid(uuid).name(event.getPlayer().getName()).rank(Rank.PLAYER).build();
             clientManager.addObject(uuid, client);
             clientManager.getRepository().save(client);
         }else{

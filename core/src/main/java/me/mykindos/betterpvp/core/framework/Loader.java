@@ -16,4 +16,6 @@ public abstract class Loader {
 
     public abstract void load(Class<?> clazz);
 
+    public abstract void reload();
+
 }

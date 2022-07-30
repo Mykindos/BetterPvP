@@ -26,6 +26,7 @@ public class ClansCommandLoader extends CommandLoader {
             }
         }
 
+        plugin.saveConfig();
         System.out.println("Loaded " + count + " commands for Clans");
     }
 }
