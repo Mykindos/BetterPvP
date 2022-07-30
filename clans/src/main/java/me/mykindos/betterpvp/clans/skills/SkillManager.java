@@ -9,7 +9,7 @@ import org.reflections.Reflections;
 import java.util.Set;
 
 @Singleton
-public class SkillManager extends Manager<ISkill> {
+public class SkillManager extends Manager<Skill> {
 
     private final Clans clans;
 
@@ -30,13 +30,6 @@ public class SkillManager extends Manager<ISkill> {
             Skill skill = clans.getInjector().getInstance(clazz);
             clans.getInjector().injectMembers(skill);
 
-            var skillPath = skill.getClassType() + "." + skill.getName() + ".enabled";
-            var set = clans.getConfig().isSet(skillPath.toLowerCase());
-            if(!set){
-                clans.getConfig().set(skillPath.toLowerCase(), true);
-            }
-
-            skill.setEnabled(clans.getConfig().getBoolean(skillPath.toLowerCase()));
             addObject(skill.getName(), skill);
 
         }
@@ -45,13 +38,11 @@ public class SkillManager extends Manager<ISkill> {
         clans.saveConfig();
     }
 
-    /**
-     * Reload all skills from the classpath
-     * Useful if configuration has changed to change skill settings
-     */
     public void reloadSkills(){
         getObjects().values().forEach(skill -> {
             clans.getInjector().injectMembers(skill);
+            skill.reload();
         });
     }
+
 }

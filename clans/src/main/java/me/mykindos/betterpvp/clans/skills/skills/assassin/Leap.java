@@ -1,17 +1,22 @@
-package me.mykindos.betterpvp.clans.skills.assassin;
+package me.mykindos.betterpvp.clans.skills.skills.assassin;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.skills.Skill;
-import me.mykindos.betterpvp.clans.skills.types.ClassType;
-import me.mykindos.betterpvp.clans.skills.types.InteractSkill;
-import me.mykindos.betterpvp.clans.skills.types.SkillActions;
+import me.mykindos.betterpvp.clans.skills.config.SkillConfigFactory;
+import me.mykindos.betterpvp.clans.skills.types.*;
 import me.mykindos.betterpvp.core.framework.annotations.WithReflection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 
 @Singleton
 @WithReflection
-public class Leap extends Skill implements InteractSkill {
+public class Leap extends Skill implements InteractSkill, CooldownSkill, EnergySkill {
+
+    @Inject
+    public Leap(SkillConfigFactory configFactory) {
+        super(configFactory);
+    }
 
     @Override
     public String getName() {
@@ -42,5 +47,15 @@ public class Leap extends Skill implements InteractSkill {
     @Override
     public Action[] getActions() {
         return SkillActions.RIGHT_CLICK;
+    }
+
+    @Override
+    public int getCooldown(int level) {
+        return getSkillConfig().getCooldown();
+    }
+
+    @Override
+    public int getEnergy(int level) {
+        return getSkillConfig().getEnergyCost();
     }
 }

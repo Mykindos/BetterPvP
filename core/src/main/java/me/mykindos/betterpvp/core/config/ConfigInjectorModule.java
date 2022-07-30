@@ -30,26 +30,14 @@ public class ConfigInjectorModule extends AbstractModule {
             Config config = field.getAnnotation(Config.class);
             if(config == null) continue;
 
-            // Make sure we save it as castable types
-            var set = plugin.getConfig().isSet(config.path());
-
             Config conf = new ConfigImpl(config.path(), config.defaultValue());
 
             if (field.getType().isAssignableFrom(String.class)) {
-                if(!set){
-                    plugin.getConfig().set(config.path(), config.defaultValue());
-                }
-                bind(String.class).annotatedWith(conf).toProvider(getProvider(config.path(), String.class));
+                bind(String.class).annotatedWith(conf).toProvider(getProvider(config.path(), config.defaultValue(), String.class));
             } else if (field.getType().isAssignableFrom(int.class)) {
-                if(!set){
-                    plugin.getConfig().set(config.path(), Integer.parseInt(config.defaultValue()));
-                }
-                bind(int.class).annotatedWith(conf).toProvider(getProvider(config.path(), Integer.class));
+                bind(int.class).annotatedWith(conf).toProvider(getProvider(config.path(), config.defaultValue(), Integer.class));
             } else if (field.getType().isAssignableFrom(boolean.class)) {
-                if(!set){
-                    plugin.getConfig().set(config.path(), Boolean.parseBoolean(config.defaultValue()));
-                }
-                bind(boolean.class).annotatedWith(conf).toProvider(getProvider(config.path(), Boolean.class));
+                bind(boolean.class).annotatedWith(conf).toProvider(getProvider(config.path(), config.defaultValue(), Boolean.class));
             }
 
         }
@@ -58,12 +46,12 @@ public class ConfigInjectorModule extends AbstractModule {
     }
 
     @SuppressWarnings("unchecked")
-    private <T> ConfigProvider<T> getProvider(String path, Class<?> type){
+    private <T> ConfigProvider<T> getProvider(String path, String defaultValue, Class<?> type){
         ConfigProvider<?> provider;
         if(providers.containsKey(path)){
             provider =  providers.get(path);
         }else{
-            provider = new ConfigProvider<>(plugin, path, type);
+            provider = new ConfigProvider<>(plugin, path, defaultValue, type);
             providers.put(path, provider);
         }
 

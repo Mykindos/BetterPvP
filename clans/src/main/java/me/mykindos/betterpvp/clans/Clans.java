@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.clans.commands.ClansCommandLoader;
 import me.mykindos.betterpvp.clans.injector.ClansInjectorModule;
 import me.mykindos.betterpvp.clans.listener.ClansListenerLoader;
 import me.mykindos.betterpvp.clans.skills.SkillManager;
+import me.mykindos.betterpvp.clans.skills.injector.SkillInjectorModule;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.config.ConfigInjectorModule;
@@ -49,7 +50,8 @@ public class Clans extends BPvPPlugin {
             Set<Field> fields = reflections.getFieldsAnnotatedWith(Config.class);
 
             injector = core.getInjector().createChildInjector(new ClansInjectorModule(this),
-                    new ConfigInjectorModule(this, fields));
+                    new ConfigInjectorModule(this, fields),
+                    new SkillInjectorModule(this));
             injector.injectMembers(this);
 
             database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:clans-migrations", databasePrefix);
