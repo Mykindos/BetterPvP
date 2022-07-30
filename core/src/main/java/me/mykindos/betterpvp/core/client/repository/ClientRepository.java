@@ -44,7 +44,7 @@ public record ClientRepository(Database database) implements IRepository<Client>
     @Override
     public void save(Client object) {
         String query = "INSERT INTO clients (UUID, Name) VALUES(?, ?);";
-        database.executeUpdate(new Statement(query,
+        database.executeUpdateAsync(new Statement(query,
                 new StringStatementValue(object.getUuid()),
                 new StringStatementValue(object.getName())
         ));

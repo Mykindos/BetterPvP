@@ -36,26 +36,32 @@ public class Database {
     /**
      * @param statement The statement and values
      */
-    public void executeUpdate(Statement statement) {
+    public void executeUpdateAsync(Statement statement) {
         new BukkitRunnable() {
-
             @Override
             public void run() {
-                Connection connection = getConnection().getDatabaseConnection();
-                try {
-                    @Cleanup
-                    PreparedStatement preparedStatement = connection.prepareStatement(statement.getQuery());
-                    for (int i = 1; i <= statement.getValues().length; i++) {
-                        StatementValue<?> val = statement.getValues()[i - 1];
-                        preparedStatement.setObject(i, val.getValue(), val.getType());
-                    }
-                    preparedStatement.executeUpdate();
-
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
+                executeUpdate(statement);
             }
         }.runTaskAsynchronously(getCore());
+    }
+
+    /**
+     * @param statement The statement and values
+     */
+    public void executeUpdate(Statement statement) {
+        Connection connection = getConnection().getDatabaseConnection();
+        try {
+            @Cleanup
+            PreparedStatement preparedStatement = connection.prepareStatement(statement.getQuery());
+            for (int i = 1; i <= statement.getValues().length; i++) {
+                StatementValue<?> val = statement.getValues()[i - 1];
+                preparedStatement.setObject(i, val.getValue(), val.getType());
+            }
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
     }
 
     public void executeBatch(List<Statement> statements) {

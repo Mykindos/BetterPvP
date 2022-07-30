@@ -1,6 +1,8 @@
 package me.mykindos.betterpvp.core.command;
 
 import lombok.Setter;
+import me.mykindos.betterpvp.core.client.Client;
+import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +27,12 @@ public abstract class SubCommand implements ICommand {
     @Override
     public List<String> getAliases() {
         return aliases;
+    }
+
+    @Override
+    public List<String> processTabComplete(CommandSender sender, String[] args) {
+        return new ArrayList<>();
+
     }
 
 }

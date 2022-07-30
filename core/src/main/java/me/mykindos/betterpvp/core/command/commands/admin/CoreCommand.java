@@ -66,5 +66,10 @@ public class CoreCommand extends Command {
             commandLoader.reload();
             listenerLoader.reload();
         }
+
+        @Override
+        public Rank getRequiredRank() {
+            return Rank.OWNER;
+        }
     }
 }

@@ -17,6 +17,7 @@ shadowJar.apply {
 repositories {
     mavenCentral()
     maven { url = uri("https://repo.papermc.io/repository/maven-public/") }
+    maven{ url = uri("https://repo.dmulloy2.net/repository/public/") }
 }
 
 dependencies {
@@ -29,6 +30,7 @@ dependencies {
 
     compileOnly("io.papermc.paper:paper-api:1.19-R0.1-SNAPSHOT")
     compileOnly("org.projectlombok:lombok:1.18.24")
+    compileOnly("com.comphenix.protocol:ProtocolLib:4.8.0")
 
     // https://mvnrepository.com/artifact/com.google.inject/guice
     implementation("com.google.inject:guice:5.1.0")
