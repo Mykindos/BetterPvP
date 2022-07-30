@@ -9,6 +9,7 @@ public class ClansInjectorModule extends AbstractModule {
 
     public ClansInjectorModule(Clans plugin) {
         this.plugin = plugin;
+
     }
 
     @Override
