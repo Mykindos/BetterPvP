@@ -29,7 +29,7 @@ public class CoreCommandLoader extends CommandLoader{
 
         plugin.saveConfig();
 
-        log.error("Loaded " + count + " for Core");
+        log.info("Loaded {} commands for Core", count);
     }
 
 }
