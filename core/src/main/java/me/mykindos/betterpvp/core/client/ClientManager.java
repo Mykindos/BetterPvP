@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Singleton
 public class ClientManager extends Manager<Client> {
@@ -21,6 +22,10 @@ public class ClientManager extends Manager<Client> {
     public ClientManager(ClientRepository repository){
         this.repository = repository;
         loadFromList(repository.getAll());
+    }
+
+    public Optional<Client> getObject(UUID uuid) {
+        return getObject(uuid.toString());
     }
 
     @Override

@@ -32,11 +32,11 @@ public class ClanRepository implements IRepository<Clan> {
     private String databasePrefix;
 
     private final Database database;
+    private int nextClanId = 1;
 
     @Inject
     public ClanRepository(Database database) {
         this.database = database;
-
     }
 
     @Override
@@ -71,6 +71,10 @@ public class ClanRepository implements IRepository<Clan> {
                         .lastLogin(lastLogin)
                         .build();
                 clans.add(clan);
+
+                if (clanId > nextClanId) {
+                    nextClanId = clanId + 1;
+                }
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -153,28 +157,39 @@ public class ClanRepository implements IRepository<Clan> {
 
     @Override
     public void save(Clan clan) {
-        String saveClanQuery = "INSERT INTO " + databasePrefix + "clans (Name) VALUES (?);";
-        database.executeUpdate(new Statement(saveClanQuery, new StringStatementValue(clan.getName())));
+        clan.setId(nextClanId);
+        nextClanId++;
 
-        int clanId = 0;
-        String getClanIdQuery = "SELECT id FROM " + databasePrefix + "clans WHERE Name = ?;";
-        CachedRowSet result = database.executeQuery(new Statement(getClanIdQuery, new StringStatementValue(clan.getName())));
-        try {
-            if(result.next()) {
-                clanId = result.getInt(1);
-                clan.setId(clanId);
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
+        String saveClanQuery = "INSERT INTO " + databasePrefix + "clans (id, Name) VALUES (?, ?);";
+        database.executeUpdate(new Statement(saveClanQuery,
+                new IntegerStatementValue(clan.getId()),
+                new StringStatementValue(clan.getName())));
 
         for (var member : clan.getMembers()) {
             String saveMemberQuery = "INSERT INTO " + databasePrefix + "clan_members (Clan, Member, `Rank`) VALUES (?, ?, ?);";
             database.executeUpdateAsync(new Statement(saveMemberQuery,
-                    new IntegerStatementValue(clanId),
+                    new IntegerStatementValue(clan.getId()),
                     new StringStatementValue(member.getUuid()),
                     new StringStatementValue(member.getRank().name())));
         }
+    }
 
+    public void delete(Clan clan) {
+        String deleteMembersQuery = "DELETE FROM " + databasePrefix + "clan_members WHERE Clan = ?;";
+        database.executeUpdateAsync(new Statement(deleteMembersQuery, new IntegerStatementValue(clan.getId())));
+
+        String deleteAllianceQuery = "DELETE FROM " + databasePrefix + "clan_alliances WHERE Clan = ? OR AllyClan = ?;";
+        database.executeUpdateAsync(new Statement(deleteAllianceQuery,
+                new IntegerStatementValue(clan.getId()), new IntegerStatementValue(clan.getId())));
+
+        String deleteEnemiesQuery = "DELETE FROM " + databasePrefix + "clan_enemies WHERE Clan = ? OR EnemyClan = ?;";
+        database.executeUpdateAsync(new Statement(deleteEnemiesQuery,
+                new IntegerStatementValue(clan.getId()), new IntegerStatementValue(clan.getId())));
+
+        String deleteTerritoryQuery = "DELETE FROM " + databasePrefix + "clan_territory WHERE Clan = ?;";
+        database.executeUpdateAsync(new Statement(deleteTerritoryQuery, new IntegerStatementValue(clan.getId())));
+
+        String deleteClanQuery = "DELETE FROM " + databasePrefix + "clans WHERE id = ?;";
+        database.executeUpdateAsync(new Statement(deleteClanQuery, new IntegerStatementValue(clan.getId())));
     }
 }

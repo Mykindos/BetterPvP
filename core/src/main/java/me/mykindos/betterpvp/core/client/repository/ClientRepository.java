@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.client.repository;
 
 import com.google.inject.Inject;
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.database.Database;
@@ -13,6 +14,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 public record ClientRepository(Database database) implements IRepository<Client> {
 
     @Inject
@@ -37,7 +39,7 @@ public record ClientRepository(Database database) implements IRepository<Client>
             ex.printStackTrace();
         }
 
-        System.out.println("Loaded " + clients.size() + " clients");
+        log.info("Loaded " + clients.size() + " clients");
         return clients;
     }
 

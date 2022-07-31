@@ -2,23 +2,24 @@ package me.mykindos.betterpvp.core.client;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.ChatColor;
 
 @AllArgsConstructor
 public enum Rank {
-    PLAYER("Player", ChatColor.YELLOW, 0),
-    HELPER("Helper", ChatColor.DARK_GREEN, 1),
-    TRIAL_MOD("Trial Mod", ChatColor.DARK_AQUA, 2),
-    MODERATOR("Mod", ChatColor.AQUA, 3),
-    ADMIN("Admin", ChatColor.RED, 4),
-    OWNER("Owner", ChatColor.DARK_RED, 5),
-    DEVELOPER("", ChatColor.WHITE, 6);
+    PLAYER("Player", NamedTextColor.YELLOW, 0),
+    HELPER("Helper", NamedTextColor.DARK_GREEN, 1),
+    TRIAL_MOD("Trial Mod", NamedTextColor.DARK_AQUA, 2),
+    MODERATOR("Mod", NamedTextColor.AQUA, 3),
+    ADMIN("Admin", NamedTextColor.RED, 4),
+    OWNER("Owner", NamedTextColor.DARK_RED, 5),
+    DEVELOPER("", NamedTextColor.WHITE, 6);
 
     @Getter
     private final String name;
 
     @Getter
-    private final ChatColor color;
+    private final NamedTextColor color;
 
     @Getter
     private final int id;
