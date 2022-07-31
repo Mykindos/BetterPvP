@@ -28,8 +28,12 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
 
     public boolean add(Player player, String ability, double duration, boolean inform, boolean removeOnDeath, boolean cancellable) {
 
-        var cooldownOptional = getObject(player.getUniqueId().toString());
-        if(cooldownOptional.isPresent()) {
+        var cooldownOptional = getObject(player.getUniqueId().toString()).or(() -> {
+            ConcurrentHashMap<String, Cooldown> cooldowns = new ConcurrentHashMap<>();
+            objects.put(player.getUniqueId().toString(), cooldowns);
+            return Optional.of(cooldowns);
+        });
+        if (cooldownOptional.isPresent()) {
             ConcurrentHashMap<String, Cooldown> cooldowns = cooldownOptional.get();
 
 
@@ -95,5 +99,7 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
                 return false;
             });
         });
+
+        objects.entrySet().removeIf(entry -> entry.getValue().isEmpty());
     }
 }
