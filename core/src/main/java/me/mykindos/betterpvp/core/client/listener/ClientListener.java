@@ -58,6 +58,7 @@ public class ClientListener implements Listener {
         }
 
         Bukkit.getPluginManager().callEvent(new ClientLoginEvent(client, event.getPlayer()));
+
     }
 
     @EventHandler
@@ -77,6 +78,7 @@ public class ClientListener implements Listener {
         }
 
         updateTab(event.getPlayer());
+
     }
 
     @UpdateEvent(delay = 5000)
@@ -102,5 +104,6 @@ public class ClientListener implements Listener {
             e1.printStackTrace();
         }
     }
+
 
 }

@@ -28,7 +28,7 @@ import java.util.List;
 public class ClanRepository implements IRepository<Clan> {
 
     @Inject
-    @Config(path = "database.prefix")
+    @Config(path = "clans.database.prefix")
     private String databasePrefix;
 
     private final Database database;

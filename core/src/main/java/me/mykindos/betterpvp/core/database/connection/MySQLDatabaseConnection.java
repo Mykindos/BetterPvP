@@ -14,19 +14,19 @@ import java.util.Map;
 public class MySQLDatabaseConnection implements IDatabaseConnection {
 
     @Inject
-    @Config(path = "database.ip", defaultValue = "127.0.0.1")
+    @Config(path = "core.database.ip", defaultValue = "127.0.0.1")
     private String sqlServer;
 
     @Inject
-    @Config(path = "database.username")
+    @Config(path = "core.database.username")
     private String sqlUsername;
 
     @Inject
-    @Config(path = "database.password")
+    @Config(path = "core.database.password")
     private String sqlPassword;
 
     @Inject
-    @Config(path = "database.databaseName")
+    @Config(path = "core.database.databaseName")
     private String sqlDatabaseName;
 
     private Connection connection;

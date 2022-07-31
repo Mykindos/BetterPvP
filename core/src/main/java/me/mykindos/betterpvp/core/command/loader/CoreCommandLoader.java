@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.CommandManager;
 import org.reflections.Reflections;
 
+import java.lang.reflect.Modifier;
 import java.util.Set;
 
 @Slf4j
@@ -23,7 +24,9 @@ public class CoreCommandLoader extends CommandLoader{
         Set<Class<? extends Command>> classes = reflections.getSubTypesOf(Command.class);
         for (var clazz : classes) {
             if (Command.class.isAssignableFrom(clazz)) {
-                load(clazz);
+                if(!Modifier.isAbstract(clazz.getModifiers())) {
+                    load(clazz);
+                }
             }
         }
 
