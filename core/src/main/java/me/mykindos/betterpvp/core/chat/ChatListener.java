@@ -8,12 +8,13 @@ import me.mykindos.betterpvp.core.chat.events.ChatSentEvent;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.ClientManager;
 import me.mykindos.betterpvp.core.client.Rank;
+import me.mykindos.betterpvp.core.config.Config;
+import me.mykindos.betterpvp.core.discord.DiscordMessage;
+import me.mykindos.betterpvp.core.discord.DiscordWebhook;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -21,13 +22,15 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
-import java.util.ArrayList;
 import java.util.Optional;
-import java.util.UUID;
 
 @Slf4j
 @BPvPListener
 public class ChatListener implements Listener {
+
+    @Inject
+    @Config(path = "discord.chatWebhook", defaultValue = "")
+    private String discordChatWebhook;
 
     private final ClientManager clientManager;
 
@@ -51,6 +54,7 @@ public class ChatListener implements Listener {
             log.info("ChatSentEvent cancelled for {} - {}", chatSent.getPlayer().getName(), chatSent.getCancelReason());
         }
 
+        logChatToDiscord(event.getPlayer(), message);
 
     }
 
@@ -71,6 +75,7 @@ public class ChatListener implements Listener {
                     log.info("ChatReceivedEvent cancelled for {} - {}", onlinePlayer.getName(), event.getCancelReason());
                 }
             }
+
         }else{
             log.error("ChatReceivedEvent could not be called as the sending client does not exist - {}", event.getPlayer().getName());
         }
@@ -89,5 +94,16 @@ public class ChatListener implements Listener {
 
         Component finalMessage = event.getPrefix().append(event.getMessage());
         event.getTarget().sendMessage(finalMessage);
+
+    }
+
+    private void logChatToDiscord(Player player, Component message) {
+        if(!discordChatWebhook.equals("")){
+            DiscordWebhook webhook = new DiscordWebhook(discordChatWebhook);
+            webhook.send(DiscordMessage.builder()
+                    .username(player.getName())
+                    .messageContent(PlainTextComponentSerializer.plainText().serialize(message))
+                    .build());
+        }
     }
 }
