@@ -133,11 +133,7 @@ public class Clan {
 
             Player player = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
             if(player != null) {
-                if (prefix) {
-                    UtilMessage.message(player, "Clans", message);
-                } else {
-                    UtilMessage.message(player, message);
-                }
+                UtilMessage.message(player, prefix ? "Clans" : "", message);
             }
 
         });
