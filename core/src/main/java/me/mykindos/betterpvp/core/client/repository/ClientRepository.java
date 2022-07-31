@@ -1,9 +1,11 @@
 package me.mykindos.betterpvp.core.client.repository;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
+import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
@@ -15,10 +17,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
-public record ClientRepository(Database database) implements IRepository<Client> {
+@Singleton
+public class ClientRepository implements IRepository<Client> {
 
     @Inject
-    public ClientRepository {
+    @Config(path = "core.database.prefix")
+    private String databasePrefix;
+
+    private final Database database;
+
+    @Inject
+    public ClientRepository(Database database) {
+        this.database = database;
     }
 
     @Override
@@ -33,6 +43,7 @@ public record ClientRepository(Database database) implements IRepository<Client>
                 Rank rank = Rank.valueOf(result.getString(4));
 
                 Client client = Client.builder().uuid(uuid).name(name).rank(rank).build();
+                loadProperties(client);
                 clients.add(client);
             }
         } catch (SQLException ex) {
@@ -41,6 +52,27 @@ public record ClientRepository(Database database) implements IRepository<Client>
 
         log.info("Loaded " + clients.size() + " clients");
         return clients;
+    }
+
+    private void loadProperties(Client client) {
+        String query = "SELECT properties.Property, Value, Type FROM " + databasePrefix + "client_properties properties INNER JOIN "
+                + "property_map map on properties.Property = map.Property WHERE Client = ?";
+        CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(client.getUuid())));
+        try {
+            while (result.next()) {
+                String value = result.getString(1);
+                String type = result.getString(3);
+                Object property = switch (type) {
+                    case "java.lang.Integer" -> result.getInt(2);
+                    case "java.lang.Boolean" -> result.getBoolean(2);
+                    default -> Class.forName(type).cast(result.getObject(2));
+                };
+
+                client.putProperty(value, property);
+            }
+        } catch (SQLException | ClassNotFoundException ex) {
+            ex.printStackTrace();
+        }
     }
 
     @Override

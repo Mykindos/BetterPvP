@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.clans;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.clans.commands.ClansCommandLoader;
@@ -22,7 +23,7 @@ import org.reflections.scanners.Scanners;
 import java.lang.reflect.Field;
 import java.util.Set;
 
-
+@Singleton
 public class Clans extends BPvPPlugin {
 
     private final String PACKAGE = getClass().getPackageName();
@@ -35,7 +36,7 @@ public class Clans extends BPvPPlugin {
     private Database database;
 
     @Inject
-    @Config(path = "database.prefix", defaultValue = "clans_")
+    @Config(path = "clans.database.prefix", defaultValue = "clans_")
     private String databasePrefix;
 
     @Override

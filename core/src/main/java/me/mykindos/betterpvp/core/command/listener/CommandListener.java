@@ -60,10 +60,12 @@ public class CommandListener implements Listener {
             if (command.isEnabled()) {
                 if (client.hasRank(command.getRequiredRank()) || event.getPlayer().isOp()) {
                     String[] args = event.getMessage().substring(event.getMessage().indexOf(' ') + 1).split(" ");
+                    if(args[0].equalsIgnoreCase(event.getMessage())) args = new String[]{};
 
                     // Execute a subcommand directly if available
+                    String[] finalArgs = args;
                     var subCommandOptional = getSubCommand(command, args)
-                            .or(() -> getSubCommandByAlias(command, args));
+                            .or(() -> getSubCommandByAlias(command, finalArgs));
                     if (subCommandOptional.isEmpty()) {
                         command.execute(event.getPlayer(), client, args);
                     } else {

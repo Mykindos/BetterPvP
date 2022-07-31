@@ -4,15 +4,14 @@ import com.google.inject.Inject;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
-import me.mykindos.betterpvp.clans.gamer.Gamer;
-import me.mykindos.betterpvp.clans.gamer.GamerManager;
 import me.mykindos.betterpvp.clans.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.chat.events.ChatReceivedEvent;
 import me.mykindos.betterpvp.core.chat.events.ChatSentEvent;
+import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.ClientManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
@@ -25,12 +24,12 @@ import java.util.Optional;
 public class ClanChatListener implements Listener {
 
     private final ClanManager clanManager;
-    private final GamerManager gamerManager;
+    private final ClientManager clientManager;
 
     @Inject
-    public ClanChatListener(ClanManager clanManager, GamerManager gamerManager) {
+    public ClanChatListener(ClanManager clanManager, ClientManager clientManager) {
         this.clanManager = clanManager;
-        this.gamerManager = gamerManager;
+        this.clientManager = clientManager;
     }
 
     @EventHandler(priority = EventPriority.LOW)
@@ -57,16 +56,16 @@ public class ClanChatListener implements Listener {
     public void onChatSent(ChatSentEvent event) {
         if (event.isCancelled()) return;
 
-        Optional<Gamer> gamerOptional = gamerManager.getObject(event.getPlayer().getUniqueId().toString());
-        if (gamerOptional.isEmpty()) return;
+        Optional<Client> clientOptional = clientManager.getObject(event.getPlayer().getUniqueId().toString());
+        if (clientOptional.isEmpty()) return;
 
         Optional<Clan> clanOptional = clanManager.getClanByPlayer(event.getPlayer());
         if (clanOptional.isEmpty()) return;
 
-        Gamer gamer = gamerOptional.get();
+        Client client = clientOptional.get();
         Clan clan = clanOptional.get();
 
-        Optional<Boolean> clanChatEnabledOptional = gamer.getProperty(GamerProperty.CLAN_CHAT);
+        Optional<Boolean> clanChatEnabledOptional = client.getProperty(GamerProperty.CLAN_CHAT);
         clanChatEnabledOptional.ifPresent(clanChat -> {
             if (clanChat) {
                 event.setCancelled(true, "Player has clan chat enabled");
@@ -78,7 +77,7 @@ public class ClanChatListener implements Listener {
             }
         });
 
-        Optional<Boolean> allyChatEnabledOptional = gamer.getProperty(GamerProperty.ALLY_CHAT);
+        Optional<Boolean> allyChatEnabledOptional = client.getProperty(GamerProperty.ALLY_CHAT);
         allyChatEnabledOptional.ifPresent(allyChat -> {
             if (allyChat) {
                 event.setCancelled(true, "Player has ally chat enabled");

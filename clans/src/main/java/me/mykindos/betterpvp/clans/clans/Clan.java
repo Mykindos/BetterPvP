@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.clans.clans.components.ClanEnemy;
 import me.mykindos.betterpvp.clans.clans.components.ClanMember;
 import me.mykindos.betterpvp.clans.clans.components.ClanTerritory;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -137,6 +138,15 @@ public class Clan {
             }
 
         });
+    }
+
+    public String getEnergyTimeRemaining() {
+
+        if (getTerritory().isEmpty()) {
+            return "∞";
+        }
+        return UtilTime.getTime((getEnergy() / (float) (getTerritory().size() * 25)) * 3600000, UtilTime.TimeUnit.BEST, 2);
+
     }
 
 }

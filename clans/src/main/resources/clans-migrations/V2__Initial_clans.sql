@@ -1,4 +1,4 @@
-create table ${tablePrefix}gamers
+create table if not exists ${tablePrefix}gamers
 (
     id   int auto_increment,
     UUID varchar(255) not null,
@@ -9,7 +9,19 @@ create table ${tablePrefix}gamers
 create unique index ${tablePrefix}gamers_UUID_uindex
     on ${tablePrefix}gamers (UUID);
 
-create table ${tablePrefix}clans
+create table if not exists ${tablePrefix}gamer_properties
+(
+    id       int          not null auto_increment,
+    Gamer    varchar(255) not null,
+    Property varchar(255) not null,
+    Value    varchar(255) null,
+    constraint ${tablePrefix}gamer_properties_pk
+        primary key (id),
+    constraint ${tablePrefix}gamer_properties_uk
+        unique (Gamer, Property)
+);
+
+create table if not exists ${tablePrefix}clans
 (
     id        int         auto_increment,
     Name      varchar(32) not null,
@@ -29,7 +41,7 @@ create table ${tablePrefix}clans
 create unique index ${tablePrefix}clans_Name_uindex
     on ${tablePrefix}clans (Name);
 
-create table ${tablePrefix}clan_territory
+create table if not exists ${tablePrefix}clan_territory
 (
     id        int         auto_increment not null,
     Clan      int         not null,
@@ -41,7 +53,7 @@ create table ${tablePrefix}clan_territory
 create unique index ${tablePrefix}clans_territory_Clan_Chunk_uindex
     on ${tablePrefix}clan_territory (Clan, Chunk);
 
-create table ${tablePrefix}clan_members
+create table if not exists ${tablePrefix}clan_members
 (
     id        int         auto_increment not null,
     Clan      int         not null,
@@ -54,7 +66,7 @@ create table ${tablePrefix}clan_members
 create unique index ${tablePrefix}clans_members_Clan_Member_uindex
     on ${tablePrefix}clan_members (Clan, Member);
 
-create table ${tablePrefix}clan_alliances
+create table if not exists ${tablePrefix}clan_alliances
 (
     id        int         auto_increment not null,
     Clan      int         not null,
@@ -67,7 +79,7 @@ create table ${tablePrefix}clan_alliances
 create unique index ${tablePrefix}clans_alliances_Clan_AllyClan_uindex
     on ${tablePrefix}clan_alliances (Clan, AllyClan);
 
-create table ${tablePrefix}clan_enemies
+create table if not exists ${tablePrefix}clan_enemies
 (
     id        int         auto_increment not null,
     Clan      int         not null,
@@ -79,3 +91,8 @@ create table ${tablePrefix}clan_enemies
 
 create unique index ${tablePrefix}clans_enemies_Clan_EnemyClan_uindex
     on ${tablePrefix}clan_enemies (Clan, EnemyClan);
+
+# noinspection SqlResolve
+INSERT IGNORE INTO property_map VALUES ("COINS", "java.lang.Integer");
+# noinspection SqlResolve
+INSERT IGNORE INTO property_map VALUES ("FRAGMENTS", "java.lang.Integer");
