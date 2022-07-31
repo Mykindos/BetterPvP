@@ -2,12 +2,14 @@ package me.mykindos.betterpvp.clans.skills;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 import org.reflections.Reflections;
 
 import java.util.Set;
 
+@Slf4j
 @Singleton
 public class SkillManager extends Manager<Skill> {
 
@@ -34,7 +36,7 @@ public class SkillManager extends Manager<Skill> {
 
         }
 
-        System.out.println("Loaded " + objects.size() + " skills");
+        log.info("Loaded " + objects.size() + " skills");
         clans.saveConfig();
     }
 

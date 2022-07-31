@@ -67,6 +67,7 @@ public class ClientListener implements Listener {
             if (attribute != null) {
                 double baseValue = attribute.getBaseValue();
 
+                // Setting this higher than the usual actually force removes the 1.9 attack indicator
                 if (baseValue != 100000000) {
                     attribute.setBaseValue(100000000);
                     event.getPlayer().saveData();
@@ -87,10 +88,14 @@ public class ClientListener implements Listener {
 
         PacketContainer pc = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.PLAYER_LIST_HEADER_FOOTER);
 
-        pc.getChatComponents().write(0, WrappedChatComponent.fromText(ChatColor.RED + "" + ChatColor.BOLD + "Welcome to BetterPvP Clans!\n"
-                + ChatColor.RED + "" + ChatColor.BOLD + "Visit our website at: " + ChatColor.YELLOW + ChatColor.BOLD + "http://betterpvp.net"))
-                .write(1, WrappedChatComponent.fromText(ChatColor.GOLD.toString() + ChatColor.BOLD + "Ping: " + ChatColor.YELLOW + UtilPlayer.getPing(player)
-                        + ChatColor.GOLD.toString() + ChatColor.BOLD + " Online: " + ChatColor.YELLOW + Bukkit.getOnlinePlayers().size()));
+        var title = WrappedChatComponent.fromText(ChatColor.RED.toString() + ChatColor.BOLD + "Welcome to BetterPvP Clans!\n"
+                + ChatColor.RED + ChatColor.BOLD + "Visit our website at: " + ChatColor.YELLOW + ChatColor.BOLD + "https://betterpvp.net");
+
+        var info = WrappedChatComponent.fromText(ChatColor.GOLD.toString() + ChatColor.BOLD + "Ping: "
+                + ChatColor.YELLOW + UtilPlayer.getPing(player) + ChatColor.GOLD + ChatColor.BOLD
+                + " Online: " + ChatColor.YELLOW + Bukkit.getOnlinePlayers().size());
+
+        pc.getChatComponents().write(0, title).write(1, info);
         try {
             ProtocolLibrary.getProtocolManager().sendServerPacket(player, pc);
         } catch (InvocationTargetException e1) {

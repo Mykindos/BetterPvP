@@ -41,6 +41,8 @@ public class CommandLoader extends Loader {
 
             command.setEnabled(plugin.getConfig().getBoolean(commandPath));
             commandManager.addObject(command.getName().toLowerCase(), command);
+
+            count++;
         } catch (Exception ex) {
             ex.printStackTrace();
         }

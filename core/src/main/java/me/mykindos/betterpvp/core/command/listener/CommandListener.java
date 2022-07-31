@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.command.listener;
 
 import com.google.inject.Inject;
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.ClientManager;
 import me.mykindos.betterpvp.core.client.Rank;
@@ -18,6 +19,7 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import java.util.Arrays;
 import java.util.Optional;
 
+@Slf4j
 @BPvPListener
 public class CommandListener implements Listener {
 
@@ -77,11 +79,10 @@ public class CommandListener implements Listener {
                     promptInsufficientPrivileges(command, event.getPlayer());
                 }
 
-                event.setCancelled(true);
             } else {
-                System.out.println(command.getName() + " is disabled");
-                event.setCancelled(true);
+                log.info(event.getPlayer().getName() + " attempted to use " + command.getName() + " but it is disabled");
             }
+            event.setCancelled(true);
         });
 
     }

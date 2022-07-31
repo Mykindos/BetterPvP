@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.command.loader;
 
 import com.google.inject.Inject;
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.CommandManager;
@@ -8,6 +9,7 @@ import org.reflections.Reflections;
 
 import java.util.Set;
 
+@Slf4j
 public class CoreCommandLoader extends CommandLoader{
 
 
@@ -27,7 +29,7 @@ public class CoreCommandLoader extends CommandLoader{
 
         plugin.saveConfig();
 
-        System.out.println("Loaded " + count + " for Core");
+        log.error("Loaded " + count + " for Core");
     }
 
 }

@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.clans.gamer.repository;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.clans.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.ClientManager;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Singleton
 public class GamerRepository implements IRepository<Gamer> {
 
@@ -49,7 +51,7 @@ public class GamerRepository implements IRepository<Gamer> {
             ex.printStackTrace();
         }
 
-        System.out.println("Loaded " + gamers.size() + " gamers");
+        log.info("Loaded " + gamers.size() + " gamers");
         return gamers;
     }
 
