@@ -2,6 +2,8 @@ package me.mykindos.betterpvp.clans.gamer.properties;
 
 public class GamerProperty {
 
+    public static final String SIDEBAR_ENABLED = "CLANS_SIDEBAR_ENABLED";
+
     // Chat stuff
     public static final String CLAN_CHAT = "CLAN_CHAT";
     public static final String ALLY_CHAT = "ALLY_CHAT";
