@@ -7,13 +7,13 @@ import org.bukkit.ChatColor;
 
 @AllArgsConstructor
 public enum Rank {
-    PLAYER("Player", NamedTextColor.YELLOW, 0),
-    HELPER("Helper", NamedTextColor.DARK_GREEN, 1),
-    TRIAL_MOD("Trial Mod", NamedTextColor.DARK_AQUA, 2),
-    MODERATOR("Mod", NamedTextColor.AQUA, 3),
-    ADMIN("Admin", NamedTextColor.RED, 4),
-    OWNER("Owner", NamedTextColor.DARK_RED, 5),
-    DEVELOPER("", NamedTextColor.WHITE, 6);
+    PLAYER("Player", NamedTextColor.YELLOW,false, 0),
+    HELPER("Helper", NamedTextColor.DARK_GREEN, true,1),
+    TRIAL_MOD("Trial Mod", NamedTextColor.DARK_AQUA, true,2),
+    MODERATOR("Mod", NamedTextColor.AQUA, true,3),
+    ADMIN("Admin", NamedTextColor.RED, true,4),
+    OWNER("Owner", NamedTextColor.DARK_RED, true,5),
+    DEVELOPER("Developer", NamedTextColor.WHITE, false,6);
 
     @Getter
     private final String name;
@@ -22,7 +22,11 @@ public enum Rank {
     private final NamedTextColor color;
 
     @Getter
+    private final boolean displayPrefix;
+
+    @Getter
     private final int id;
+
 
     public String getTag(boolean bold) {
         String tag = this.name;

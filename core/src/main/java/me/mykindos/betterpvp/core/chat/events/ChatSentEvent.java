@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.chat.events;
 
 import lombok.Getter;
 import lombok.Setter;
+import me.mykindos.betterpvp.core.framework.events.CustomEvent;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
@@ -13,9 +14,7 @@ import java.util.Collection;
 
 @Getter
 @Setter
-public class ChatSentEvent extends Event implements Cancellable {
-
-    private static final HandlerList HANDLERS = new HandlerList();
+public class ChatSentEvent extends CustomEvent {
 
     private final Player player;
     private Collection<? extends Player> targets;
@@ -34,19 +33,4 @@ public class ChatSentEvent extends Event implements Cancellable {
         this.cancelReason = "";
     }
 
-    @NotNull
-    @Override
-    public HandlerList getHandlers() {
-        return HANDLERS;
-    }
-
-    @NotNull
-    public static HandlerList getHandlerList() {
-        return HANDLERS;
-    }
-
-    public void setCancelled(boolean cancelled, String reason) {
-        this.cancelled = cancelled;
-        this.cancelReason = reason;
-    }
 }

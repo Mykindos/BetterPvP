@@ -1,24 +1,14 @@
 package me.mykindos.betterpvp.core.framework;
 
 
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Value;
-import org.bukkit.event.Event;
-import org.bukkit.event.HandlerList;
+import me.mykindos.betterpvp.core.framework.events.CustomEvent;
 
 @EqualsAndHashCode(callSuper = true)
-@Value
-public class ModuleLoadedEvent extends Event {
+@Data
+public class ModuleLoadedEvent extends CustomEvent {
 
-    private static final HandlerList handlers = new HandlerList();
+    private final String moduleName;
 
-    String moduleName;
-
-    public HandlerList getHandlers() {
-        return handlers;
-    }
-
-    public static HandlerList getHandlerList() {
-        return handlers;
-    }
 }
