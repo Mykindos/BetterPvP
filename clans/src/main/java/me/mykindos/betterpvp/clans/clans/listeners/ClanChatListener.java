@@ -68,7 +68,7 @@ public class ClanChatListener implements Listener {
         Optional<Boolean> clanChatEnabledOptional = client.getProperty(GamerProperty.CLAN_CHAT);
         clanChatEnabledOptional.ifPresent(clanChat -> {
             if (clanChat) {
-                event.setCancelled(true, "Player has clan chat enabled");
+                event.cancel("Player has clan chat enabled");
 
                 String message = ChatColor.AQUA + event.getPlayer().getName() + " "
                         + ChatColor.DARK_AQUA + PlainTextComponentSerializer.plainText().serialize(event.getMessage());
@@ -80,7 +80,7 @@ public class ClanChatListener implements Listener {
         Optional<Boolean> allyChatEnabledOptional = client.getProperty(GamerProperty.ALLY_CHAT);
         allyChatEnabledOptional.ifPresent(allyChat -> {
             if (allyChat) {
-                event.setCancelled(true, "Player has ally chat enabled");
+                event.cancel("Player has ally chat enabled");
 
                 String message = ChatColor.DARK_GREEN + event.getPlayer().getName() + " "
                         + ChatColor.GREEN + PlainTextComponentSerializer.plainText().serialize(event.getMessage());

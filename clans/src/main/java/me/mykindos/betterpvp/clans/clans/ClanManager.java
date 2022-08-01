@@ -77,6 +77,7 @@ public class ClanManager extends Manager<Clan> {
 
     }
 
+    // TODO implement pillaging
     public ClanRelation getRelation(Clan clanA, Clan clanB) {
         if (clanA == null || clanB == null) {
             return ClanRelation.NEUTRAL;
@@ -88,7 +89,7 @@ public class ClanManager extends Manager<Clan> {
             return ClanRelation.ALLY;
         } else if (clanA.isEnemy(clanB)) {
             return ClanRelation.ENEMY;
-            // TODO implement pillaging
+
             // } else if (Pillage.isPillaging(clanA, clanB)) {
             //    return ClanRelation.PILLAGE;
             //} else if (Pillage.isPillaging(clanB, clanA)) {

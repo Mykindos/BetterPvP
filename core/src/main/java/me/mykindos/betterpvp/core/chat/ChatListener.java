@@ -87,10 +87,10 @@ public class ChatListener implements Listener {
         if (event.isCancelled()) return;
 
         Rank rank = event.getClient().getRank();
-
-        Component rankPrefix = Component.text(ChatColor.BOLD + rank.getName() + " ", rank.getColor());
-
-        event.setPrefix(rankPrefix.append(event.getPrefix()));
+        if(rank.isDisplayPrefix()) {
+            Component rankPrefix = Component.text(ChatColor.BOLD + rank.getName() + " ", rank.getColor());
+            event.setPrefix(rankPrefix.append(event.getPrefix()));
+        }
 
         Component finalMessage = event.getPrefix().append(event.getMessage());
         event.getTarget().sendMessage(finalMessage);

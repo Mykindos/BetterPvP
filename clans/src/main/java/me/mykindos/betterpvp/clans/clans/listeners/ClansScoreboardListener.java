@@ -8,7 +8,7 @@ import me.mykindos.betterpvp.clans.gamer.GamerManager;
 import me.mykindos.betterpvp.clans.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.events.ClientLoginEvent;
 import me.mykindos.betterpvp.core.config.Config;
-import me.mykindos.betterpvp.core.framework.scoreboard.ScoreboardUpdateEvent;
+import me.mykindos.betterpvp.core.framework.events.scoreboard.ScoreboardUpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import net.kyori.adventure.text.Component;
@@ -17,6 +17,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.scoreboard.Criterias;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
@@ -49,9 +50,10 @@ public class ClansScoreboardListener implements Listener {
         Player player = event.getPlayer();
         Scoreboard scoreboard = player.getScoreboard();
 
-        Objective healthObjective = scoreboard.getObjective("healthDisplay");
+        Objective healthObjective = scoreboard.getObjective("showhealth");
         if (healthObjective == null) {
-            healthObjective = scoreboard.registerNewObjective("healthDisplay", "dummy", Component.text(ChatColor.RED + "\u2764"));
+            healthObjective = scoreboard.registerNewObjective("showhealth", "health", Component.text(ChatColor.RED + "\u2764"));
+
             healthObjective.setDisplaySlot(DisplaySlot.BELOW_NAME);
         }
     }
