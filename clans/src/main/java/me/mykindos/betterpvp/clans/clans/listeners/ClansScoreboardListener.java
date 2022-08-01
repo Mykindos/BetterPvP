@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.clans.gamer.Gamer;
 import me.mykindos.betterpvp.clans.gamer.GamerManager;
 import me.mykindos.betterpvp.clans.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.events.ClientLoginEvent;
+import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.scoreboard.ScoreboardUpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
@@ -24,6 +25,10 @@ import java.util.Optional;
 
 @BPvPListener
 public class ClansScoreboardListener implements Listener {
+
+    @Inject
+    @Config(path = "server.sidebar.title", defaultValue = "BetterPvP")
+    private String sidebarTitle;
 
     private final ClanManager clanManager;
     private final GamerManager gamerManager;
@@ -46,8 +51,7 @@ public class ClansScoreboardListener implements Listener {
 
         Objective healthObjective = scoreboard.getObjective("healthDisplay");
         if (healthObjective == null) {
-            healthObjective = scoreboard.registerNewObjective("healthDisplay", "dummy", Component.text("BetterPvP"));
-            healthObjective.displayName(Component.text(ChatColor.RED + "\u2764"));
+            healthObjective = scoreboard.registerNewObjective("healthDisplay", "dummy", Component.text(ChatColor.RED + "\u2764"));
             healthObjective.setDisplaySlot(DisplaySlot.BELOW_NAME);
         }
     }
@@ -59,11 +63,11 @@ public class ClansScoreboardListener implements Listener {
         // TODO check if sidebar enabled
         // TODO check if in hub
 
-        Objective sidebarObjective = scoreboard.getObjective("BetterPvP");
+        Objective sidebarObjective = scoreboard.getObjective("sidebar");
         if (sidebarObjective == null) {
-            sidebarObjective = scoreboard.registerNewObjective("BetterPvP", "dummy", Component.text("BetterPvP"));
+            Component title = Component.text(ChatColor.GOLD.toString() + ChatColor.BOLD + "  " + sidebarTitle + "  ");
+            sidebarObjective = scoreboard.registerNewObjective("sidebar", "dummy", title);
             sidebarObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
-            sidebarObjective.displayName(Component.text(ChatColor.GOLD.toString() + ChatColor.BOLD + "  Season 6  "));
         }
 
         for (String s : scoreboard.getEntries()) {
@@ -89,7 +93,6 @@ public class ClansScoreboardListener implements Listener {
             }
         }
 
-        // TODO display coins
         Optional<Gamer> gamerOptional = gamerManager.getObject(player.getUniqueId().toString());
         if(gamerOptional.isPresent()) {
             Gamer gamer = gamerOptional.get();
