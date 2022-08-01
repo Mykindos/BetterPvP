@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.core.command.commands.admin;
 
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
-import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.types.PlayerArgCommand;
 import me.mykindos.betterpvp.core.framework.annotations.WithReflection;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;

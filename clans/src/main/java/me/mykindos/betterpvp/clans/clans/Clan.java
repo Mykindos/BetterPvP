@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.clans.clans;
 
 import lombok.Builder;
 import lombok.Data;
-import lombok.Singular;
 import me.mykindos.betterpvp.clans.clans.components.ClanAlliance;
 import me.mykindos.betterpvp.clans.clans.components.ClanEnemy;
 import me.mykindos.betterpvp.clans.clans.components.ClanMember;
