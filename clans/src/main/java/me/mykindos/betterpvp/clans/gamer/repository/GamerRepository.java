@@ -18,6 +18,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Singleton
@@ -31,10 +32,13 @@ public class GamerRepository implements IRepository<Gamer> {
     private final Database database;
     private final ClientManager clientManager;
 
+    private final ConcurrentHashMap<String, Statement> queuedStatUpdates;
+
     @Inject
     public GamerRepository(Database database, ClientManager clientManager) {
         this.database = database;
         this.clientManager = clientManager;
+        queuedStatUpdates = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -98,11 +102,22 @@ public class GamerRepository implements IRepository<Gamer> {
     public void saveProperty(Gamer gamer, String property, Object value) {
         String savePropertyQuery = "INSERT INTO " + databasePrefix + "gamer_properties (Gamer, Property, Value) VALUES (?, ?, ?)"
                 + " ON DUPLICATE KEY UPDATE Value = ?";
-        database.executeUpdateAsync(new Statement(savePropertyQuery,
+        Statement statement = new Statement(savePropertyQuery,
                 new StringStatementValue(gamer.getUuid()),
                 new StringStatementValue(property),
                 new StringStatementValue(value.toString()),
-                new StringStatementValue(value.toString())));
+                new StringStatementValue(value.toString()));
+        queuedStatUpdates.put(gamer.getUuid() + property, statement);
+    }
+
+    public void processStatUpdates(boolean async){
+        ConcurrentHashMap<String, Statement> statements = new ConcurrentHashMap<>(queuedStatUpdates);
+        queuedStatUpdates.clear();
+
+        List<Statement> statementList = statements.values().stream().toList();
+        database.executeBatch(statementList, async);
+
+        log.info("Updated gamer stats with {} queries", statements.size());
     }
 
 }

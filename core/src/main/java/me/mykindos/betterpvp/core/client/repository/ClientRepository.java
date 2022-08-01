@@ -14,7 +14,9 @@ import me.mykindos.betterpvp.core.database.repository.IRepository;
 import javax.sql.rowset.CachedRowSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Singleton
@@ -26,9 +28,12 @@ public class ClientRepository implements IRepository<Client> {
 
     private final Database database;
 
+    private final ConcurrentHashMap<String, Statement> queuedStatUpdates;
+
     @Inject
     public ClientRepository(Database database) {
         this.database = database;
+        this.queuedStatUpdates = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -64,7 +69,7 @@ public class ClientRepository implements IRepository<Client> {
                 String type = result.getString(3);
                 Object property = switch (type) {
                     case "java.lang.Integer" -> result.getInt(2);
-                    case "java.lang.Boolean" -> result.getBoolean(2);
+                    case "java.lang.Boolean" -> Boolean.parseBoolean(result.getString(2));
                     default -> Class.forName(type).cast(result.getObject(2));
                 };
 
@@ -82,5 +87,26 @@ public class ClientRepository implements IRepository<Client> {
                 new StringStatementValue(object.getUuid()),
                 new StringStatementValue(object.getName())
         ));
+    }
+
+    public void saveProperty(Client client, String property, Object value) {
+        String savePropertyQuery = "INSERT INTO " + databasePrefix + "client_properties (Client, Property, Value) VALUES (?, ?, ?)"
+                + " ON DUPLICATE KEY UPDATE Value = ?";
+        Statement statement = new Statement(savePropertyQuery,
+                new StringStatementValue(client.getUuid()),
+                new StringStatementValue(property),
+                new StringStatementValue(value.toString()),
+                new StringStatementValue(value.toString()));
+        queuedStatUpdates.put(client.getUuid() + property, statement);
+    }
+
+    public void processStatUpdates(boolean async){
+        ConcurrentHashMap<String, Statement> statements = new ConcurrentHashMap<>(queuedStatUpdates);
+        queuedStatUpdates.clear();
+
+        List<Statement> statementList = statements.values().stream().toList();
+        database.executeBatch(statementList, async);
+
+        log.info("Updated client stats with {} queries", statements.size());
     }
 }

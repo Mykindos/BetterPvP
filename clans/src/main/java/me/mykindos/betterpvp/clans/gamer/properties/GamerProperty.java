@@ -1,16 +1,32 @@
 package me.mykindos.betterpvp.clans.gamer.properties;
 
-public class GamerProperty {
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-    public static final String SIDEBAR_ENABLED = "CLANS_SIDEBAR_ENABLED";
 
-    // Chat stuff
-    public static final String CLAN_CHAT = "CLAN_CHAT";
-    public static final String ALLY_CHAT = "ALLY_CHAT";
-    public static final String STAFF_CHAT = "STAFF_CHAT";
+@Getter
+@AllArgsConstructor
+public enum GamerProperty {
 
-    // Currency stuff
-    public static final String COINS = "COINS";
-    public static final String FRAGMENTS = "FRAGMENTS";
+    SIDEBAR_ENABLED("CLANS_SIDEBAR_ENABLED"),
+    CLAN_CHAT("CLAN_CHAT"),
+    ALLY_CHAT("ALLY_CHAT"),
+    STAFF_CHAT("STAFF_CHAT"),
+
+    COINS("COINS"),
+    FRAGMENTS("FRAGMENTS"),
+
+    BLOCKS_PLACED("BLOCKS_PLACED"),
+    BLOCKS_BROKEN("BLOCKS_BROKEN");
+
+
+    private final String key;
+
+
+    @Override
+    public String toString(){
+        return key;
+    }
+
 
 }

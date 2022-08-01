@@ -54,7 +54,7 @@ public class ClansSidebarListener implements Listener {
         if (gamerOptional.isPresent()) {
             Gamer gamer = gamerOptional.get();
 
-            Optional<Boolean> sideBarEnabled = gamer.getProperty(GamerProperty.SIDEBAR_ENABLED);
+            Optional<Boolean> sideBarEnabled = gamer.getProperty(GamerProperty.SIDEBAR_ENABLED.toString());
             if (sideBarEnabled.isPresent()) {
                 if (!sideBarEnabled.get()) {
                     player.getScoreboard().clearSlot(DisplaySlot.SIDEBAR);
@@ -98,7 +98,7 @@ public class ClansSidebarListener implements Listener {
             }
 
 
-            Optional<Integer> coinsOptional = gamer.getProperty(GamerProperty.COINS);
+            Optional<Integer> coinsOptional = gamer.getProperty(GamerProperty.COINS.toString());
             if (coinsOptional.isPresent()) {
                 sidebarObjective.getScore(ChatColor.YELLOW.toString() + ChatColor.BOLD + "Coins").setScore(9);
                 sidebarObjective.getScore(ChatColor.GOLD.toString() + ChatColor.BOLD + UtilFormat.formatNumber(coinsOptional.get())).setScore(8);

@@ -11,14 +11,10 @@ create unique index ${tablePrefix}gamers_UUID_uindex
 
 create table if not exists ${tablePrefix}gamer_properties
 (
-    id       int          not null auto_increment,
     Gamer    varchar(255) not null,
     Property varchar(255) not null,
     Value    varchar(255) null,
-    constraint ${tablePrefix}gamer_properties_pk
-        primary key (id),
-    constraint ${tablePrefix}gamer_properties_uk
-        unique (Gamer, Property)
+    primary key (Gamer, Property)
 );
 
 create table if not exists ${tablePrefix}clans
@@ -104,3 +100,7 @@ INSERT IGNORE INTO property_map VALUES ("ALLY_CHAT", "java.lang.Boolean");
 INSERT IGNORE INTO property_map VALUES ("CLAN_CHAT", "java.lang.Boolean");
 # noinspection SqlResolve
 INSERT IGNORE INTO property_map VALUES ("STAFF_CHAT", "java.lang.Boolean");
+# noinspection SqlResolve
+INSERT IGNORE INTO property_map VALUES ("BLOCKS_PLACED", "java.lang.Boolean");
+# noinspection SqlResolve
+INSERT IGNORE INTO property_map VALUES ("BLOCKS_BROKEN", "java.lang.Boolean");

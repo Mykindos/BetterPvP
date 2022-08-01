@@ -1,14 +1,19 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 plugins {
     java
+
     id("com.github.johnrengelman.shadow") version "7.1.2"
     id("org.flywaydb.flyway") version "9.0.1"
 }
+
+version = 1.0
 
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(17))
 }
 
-val shadowJar: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar by tasks
+val shadowJar: ShadowJar by tasks
 shadowJar.apply {
     mergeServiceFiles()
 }
@@ -21,10 +26,10 @@ repositories {
 }
 
 dependencies {
+    paperweightDevelopmentBundle("io.papermc.paper:dev-bundle:1.19.1-R0.1-SNAPSHOT")
 
     implementation("org.flywaydb:flyway-core:9.0.1")
     implementation("org.flywaydb:flyway-mysql:9.0.1")
-    // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
     implementation("org.apache.commons:commons-lang3:3.12.0")
     implementation("com.squareup.okhttp3:okhttp:4.5.0")
 
@@ -32,7 +37,6 @@ dependencies {
     compileOnly("org.projectlombok:lombok:1.18.24")
     compileOnly("com.comphenix.protocol:ProtocolLib:4.8.0")
 
-    // https://mvnrepository.com/artifact/com.google.inject/guice
     implementation("com.google.inject:guice:5.1.0")
     implementation("org.reflections:reflections:0.10.2")
 
@@ -46,7 +50,7 @@ dependencies {
 
 tasks {
     assemble {
-        dependsOn(shadowJar)
+        dependsOn(reobfJar)
     }
 }
 

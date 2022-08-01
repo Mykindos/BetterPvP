@@ -9,10 +9,14 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.ClientManager;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.events.ClientLoginEvent;
+import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.config.Config;
+import me.mykindos.betterpvp.core.framework.events.scoreboard.ScoreboardUpdateEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.settings.events.SettingsUpdatedEvent;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -25,6 +29,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.Optional;
 
 @BPvPListener
@@ -56,6 +61,8 @@ public class ClientListener implements Listener {
             event.joinMessage(Component.text(ChatColor.GREEN + "Login> " + ChatColor.GRAY + event.getPlayer().getName()));
             client = clientOptional.get();
         }
+
+        checkUnsetProperties(client);
 
         Bukkit.getPluginManager().callEvent(new ClientLoginEvent(client, event.getPlayer()));
 
@@ -105,5 +112,32 @@ public class ClientListener implements Listener {
         }
     }
 
+    @EventHandler
+    public void onSettingsUpdated(SettingsUpdatedEvent event) {
+        Optional<Client> clientOptional = clientManager.getObject(event.getClient().getUuid());
+        clientOptional.ifPresent(client -> {
+            if(Arrays.stream(ClientProperty.values()).anyMatch(prop -> prop.getKey().equalsIgnoreCase(event.getSetting()))) {
+                clientManager.getRepository().saveProperty(client, event.getSetting(), client.getProperties().get(event.getSetting()));
+            }
+        });
+
+        UtilServer.callEvent(new ScoreboardUpdateEvent(event.getPlayer()));
+    }
+
+    private void checkUnsetProperties(Client client) {
+
+        String chatEnabledProperty = ClientProperty.CHAT_ENABLED.toString();
+        Optional<Integer> chatEnabledOptional = client.getProperty(chatEnabledProperty);
+        if(chatEnabledOptional.isEmpty()){
+            client.putProperty(chatEnabledProperty, true);
+            clientManager.getRepository().saveProperty(client, chatEnabledProperty, true);
+        }
+
+    }
+
+    @UpdateEvent(delay = 120_000)
+    public void processStatUpdates(){
+        clientManager.getRepository().processStatUpdates(true);
+    }
 
 }
