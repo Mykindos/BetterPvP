@@ -3,18 +3,14 @@ package me.mykindos.betterpvp.clans.clans.commands.subcommands;
 import com.google.inject.Inject;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
-import me.mykindos.betterpvp.clans.clans.components.ClanMember;
 import me.mykindos.betterpvp.clans.clans.events.ClanCreateEvent;
-import me.mykindos.betterpvp.clans.clans.repository.ClanRepository;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
-import java.sql.Timestamp;
 import java.util.Optional;
 
 

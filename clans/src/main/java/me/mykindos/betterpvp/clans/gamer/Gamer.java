@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.clans.gamer;
 
 import lombok.Data;
 import me.mykindos.betterpvp.core.client.Client;
+
 import java.util.HashMap;
 import java.util.Optional;
 

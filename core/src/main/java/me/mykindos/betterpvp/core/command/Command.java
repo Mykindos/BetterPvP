@@ -1,8 +1,6 @@
 package me.mykindos.betterpvp.core.command;
 
 import lombok.Setter;
-import me.mykindos.betterpvp.core.client.Client;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;

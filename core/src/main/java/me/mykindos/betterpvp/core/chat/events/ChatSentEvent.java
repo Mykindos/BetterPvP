@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.core.chat.events;
 
 import lombok.Getter;
 import lombok.Setter;
-import me.mykindos.betterpvp.core.client.Client;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;

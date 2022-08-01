@@ -3,7 +3,6 @@ package me.mykindos.betterpvp.core.cooldowns;
 import com.google.inject.Inject;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-
 import org.bukkit.event.Listener;
 
 

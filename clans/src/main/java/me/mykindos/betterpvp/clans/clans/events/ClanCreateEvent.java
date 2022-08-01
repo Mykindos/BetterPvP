@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.clans.clans.events;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Value;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
