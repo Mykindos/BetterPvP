@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import lombok.Getter;
 import lombok.Setter;
+import me.mykindos.betterpvp.core.client.ClientManager;
 import me.mykindos.betterpvp.core.command.loader.CoreCommandLoader;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.config.ConfigInjectorModule;
@@ -32,6 +33,9 @@ public class Core extends BPvPPlugin {
     private Database database;
 
     @Inject
+    private ClientManager clientManager;
+
+    @Inject
     private UpdateEventExecutor updateEventExecutor;
 
     public void onEnable(){
@@ -54,6 +58,11 @@ public class Core extends BPvPPlugin {
         coreCommandLoader.loadCommands(PACKAGE);
 
         updateEventExecutor.initialize();
+    }
+
+    @Override
+    public void onDisable() {
+        clientManager.getRepository().processStatUpdates(false);
     }
 
 }

@@ -64,41 +64,47 @@ public class Database {
         }
     }
 
-    public void executeBatch(List<Statement> statements) {
-        new BukkitRunnable() {
+    public void executeBatch(List<Statement> statements, boolean async) {
+        if (async) {
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    executeBatch(statements);
+                }
+            }.runTaskAsynchronously(getCore());
+        } else {
+            executeBatch(statements);
+        }
+    }
 
-            @Override
-            public void run() {
-                Connection connection = getConnection().getDatabaseConnection();
-                if (statements.isEmpty()) {
-                    return;
+    private void executeBatch(List<Statement> statements) {
+        Connection connection = getConnection().getDatabaseConnection();
+        if (statements.isEmpty()) {
+            return;
+        }
+        try {
+            // Assume all statement queries are the same
+            @Cleanup
+            PreparedStatement preparedStatement = connection.prepareStatement(statements.get(0).getQuery());
+            for (Statement statement : statements) {
+                for (int i = 1; i <= statement.getValues().length; i++) {
+                    StatementValue<?> val = statement.getValues()[i - 1];
+                    preparedStatement.setObject(i, val.getValue(), val.getType());
                 }
-                try {
-                    // Assume all statement queries are the same
-                    @Cleanup
-                    PreparedStatement preparedStatement = connection.prepareStatement(statements.get(0).getQuery());
-                    for (Statement statement : statements) {
-                        for (int i = 1; i <= statement.getValues().length; i++) {
-                            StatementValue<?> val = statement.getValues()[i - 1];
-                            preparedStatement.setObject(i, val.getValue(), val.getType());
-                        }
-                        preparedStatement.addBatch();
-                    }
-                    preparedStatement.executeBatch();
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                    try {
-                        connection.rollback();
-                    } catch (SQLException rollbackException) {
-                        ex.printStackTrace();
-                    }
-                }
+                preparedStatement.addBatch();
             }
-        }.runTaskAsynchronously(getCore());
+            preparedStatement.executeBatch();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            try {
+                connection.rollback();
+            } catch (SQLException rollbackException) {
+                ex.printStackTrace();
+            }
+        }
     }
 
     /**
-     *
      * @param statement The statement and values
      */
     public CachedRowSet executeQuery(Statement statement) {
