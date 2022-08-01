@@ -2,6 +2,8 @@ package me.mykindos.betterpvp.core.menu;
 
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
+import me.mykindos.betterpvp.core.menu.events.MenuOpenEvent;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -35,7 +37,11 @@ public class MenuManager extends Manager<HashMap<String, Menu>> {
     }
 
     public void openMenu(Player player, Menu menu) {
-        player.openInventory(menu.getInventory());
-        addMenu(player, menu);
+        MenuOpenEvent menuOpenEvent = new MenuOpenEvent(player, menu);
+        UtilServer.callEvent(menuOpenEvent);
+        if (!menuOpenEvent.isCancelled()) {
+            player.openInventory(menu.getInventory());
+            addMenu(player, menu);
+        }
     }
 }

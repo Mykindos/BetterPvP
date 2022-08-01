@@ -7,6 +7,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 
 public class DemoMenu extends Menu {
@@ -23,7 +24,7 @@ public class DemoMenu extends Menu {
         }
 
         @Override
-        public void onClick(Player player) {
+        public void onClick(Player player, ClickType clickType) {
             player.setHealth(0);
             UtilSound.playSound(player, Sound.ITEM_GOAT_HORN_SOUND_5, 0.1f, 1, false);
             UtilSound.playSound(player.getWorld(), player.getLocation(), Sound.MUSIC_DISC_PIGSTEP, 0.1f, 1);
@@ -38,7 +39,7 @@ public class DemoMenu extends Menu {
         }
 
         @Override
-        public void onClick(Player player) {
+        public void onClick(Player player, ClickType clickType) {
 
             UtilSound.playSound(player, Sound.MUSIC_DISC_OTHERSIDE, 0.1f, 1, true);
         }

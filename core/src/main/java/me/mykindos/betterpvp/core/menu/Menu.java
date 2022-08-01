@@ -31,10 +31,7 @@ public abstract class Menu {
         this.openTime = System.currentTimeMillis();
 
         fillInventoryWithAir();
-
-        for (Button button : buttons) {
-            inventory.setItem(button.getSlot(), button.getItemStack());
-        }
+        construct();
 
     }
 
@@ -47,6 +44,12 @@ public abstract class Menu {
         this.openTime = System.currentTimeMillis();
 
         fillInventoryWithAir();
+    }
+
+    public void construct(){
+        for (Button button : buttons) {
+            inventory.setItem(button.getSlot(), button.getItemStack());
+        }
     }
 
     public void addButton(Button button) {

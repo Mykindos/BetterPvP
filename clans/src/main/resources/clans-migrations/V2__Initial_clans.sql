@@ -96,3 +96,11 @@ create unique index ${tablePrefix}clans_enemies_Clan_EnemyClan_uindex
 INSERT IGNORE INTO property_map VALUES ("COINS", "java.lang.Integer");
 # noinspection SqlResolve
 INSERT IGNORE INTO property_map VALUES ("FRAGMENTS", "java.lang.Integer");
+# noinspection SqlResolve
+INSERT IGNORE INTO property_map VALUES ("CLANS_SIDEBAR_ENABLED", "java.lang.Boolean");
+# noinspection SqlResolve
+INSERT IGNORE INTO property_map VALUES ("ALLY_CHAT", "java.lang.Boolean");
+# noinspection SqlResolve
+INSERT IGNORE INTO property_map VALUES ("CLAN_CHAT", "java.lang.Boolean");
+# noinspection SqlResolve
+INSERT IGNORE INTO property_map VALUES ("STAFF_CHAT", "java.lang.Boolean");

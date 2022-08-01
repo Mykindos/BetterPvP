@@ -6,7 +6,11 @@ import me.mykindos.betterpvp.clans.gamer.GamerManager;
 import me.mykindos.betterpvp.clans.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.events.ClientLoginEvent;
 import me.mykindos.betterpvp.core.config.Config;
+import me.mykindos.betterpvp.core.framework.events.scoreboard.ScoreboardUpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.settings.events.SettingsUpdatedEvent;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
@@ -31,23 +35,26 @@ public class GamerListener implements Listener {
     }
 
     @EventHandler
-    public void onClientLogin(ClientLoginEvent e) {
-        Optional<Gamer> gamerOptional = gamerManager.getObject(e.getClient().getUuid());
+    public void onClientLogin(ClientLoginEvent event) {
+        Optional<Gamer> gamerOptional = gamerManager.getObject(event.getClient().getUuid());
         if(gamerOptional.isEmpty()){
-            Gamer gamer = new Gamer(e.getClient(), e.getClient().getUuid());
+            Gamer gamer = new Gamer(event.getClient(), event.getClient().getUuid());
 
             setDefaultProperties(gamer);
 
-            gamerManager.addObject(e.getClient().getUuid(), gamer);
+            gamerManager.addObject(event.getClient().getUuid(), gamer);
             gamerManager.getGamerRepository().save(gamer);
         }else{
             checkUnsetProperties(gamerOptional.get());
         }
+
+        Bukkit.getPluginManager().callEvent(new ScoreboardUpdateEvent(event.getPlayer()));
     }
 
     private void setDefaultProperties(Gamer gamer) {
         gamer.putProperty(GamerProperty.COINS, defaultCoins);
         gamer.putProperty(GamerProperty.FRAGMENTS, defaultFragments);
+        gamer.putProperty(GamerProperty.SIDEBAR_ENABLED, true);
     }
 
     private void checkUnsetProperties(Gamer gamer) {
@@ -62,5 +69,21 @@ public class GamerListener implements Listener {
             gamer.putProperty(GamerProperty.FRAGMENTS, defaultFragments);
             gamerManager.getGamerRepository().saveProperty(gamer, GamerProperty.FRAGMENTS, defaultFragments);
         }
+
+        Optional<Boolean> sidebarOptional = gamer.getProperty(GamerProperty.SIDEBAR_ENABLED);
+        if(sidebarOptional.isEmpty()){
+            gamer.putProperty(GamerProperty.SIDEBAR_ENABLED, true);
+            gamerManager.getGamerRepository().saveProperty(gamer, GamerProperty.SIDEBAR_ENABLED, true);
+        }
+    }
+
+    @EventHandler
+    public void onSettingsUpdated(SettingsUpdatedEvent event) {
+        Optional<Gamer> gamerOptional = gamerManager.getObject(event.getClient().getUuid());
+        gamerOptional.ifPresent(gamer -> {
+            gamerManager.getGamerRepository().saveProperty(gamer, event.getSetting(), gamer.getProperties().get(event.getSetting()));
+        });
+
+        UtilServer.callEvent(new ScoreboardUpdateEvent(event.getPlayer()));
     }
 }

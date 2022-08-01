@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.clans.gamer.repository;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.clans.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.Client;
@@ -9,7 +10,6 @@ import me.mykindos.betterpvp.core.client.ClientManager;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
-import me.mykindos.betterpvp.core.database.query.values.ObjectStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.database.repository.IRepository;
 
@@ -24,6 +24,7 @@ import java.util.Optional;
 public class GamerRepository implements IRepository<Gamer> {
 
     @Inject
+    @Getter
     @Config(path = "clans.database.prefix")
     private String databasePrefix;
 
@@ -72,7 +73,7 @@ public class GamerRepository implements IRepository<Gamer> {
                 String type = result.getString(3);
                 Object property = switch (type) {
                     case "java.lang.Integer" -> result.getInt(2);
-                    case "java.lang.Boolean" -> result.getBoolean(2);
+                    case "java.lang.Boolean" -> Boolean.parseBoolean(result.getString(2));
                     default -> Class.forName(type).cast(result.getObject(2));
                 };
 
@@ -95,8 +96,13 @@ public class GamerRepository implements IRepository<Gamer> {
     }
 
     public void saveProperty(Gamer gamer, String property, Object value) {
-        String savePropertyQuery = "INSERT INTO " + databasePrefix + "gamer_properties (Gamer, Property, Value) VALUES (?, ?, ?)";
-        database.executeUpdateAsync(new Statement(savePropertyQuery, new StringStatementValue(gamer.getUuid()),
-                new StringStatementValue(property), new ObjectStatementValue(value)));
+        String savePropertyQuery = "INSERT INTO " + databasePrefix + "gamer_properties (Gamer, Property, Value) VALUES (?, ?, ?)"
+                + " ON DUPLICATE KEY UPDATE Value = ?";
+        database.executeUpdateAsync(new Statement(savePropertyQuery,
+                new StringStatementValue(gamer.getUuid()),
+                new StringStatementValue(property),
+                new StringStatementValue(value.toString()),
+                new StringStatementValue(value.toString())));
     }
+
 }
