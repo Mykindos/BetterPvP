@@ -54,7 +54,7 @@ public class ClansSidebarListener implements Listener {
         if (gamerOptional.isPresent()) {
             Gamer gamer = gamerOptional.get();
 
-            Optional<Boolean> sideBarEnabled = gamer.getProperty(GamerProperty.SIDEBAR_ENABLED.toString());
+            Optional<Boolean> sideBarEnabled = gamer.getProperty(GamerProperty.SIDEBAR_ENABLED);
             if (sideBarEnabled.isPresent()) {
                 if (!sideBarEnabled.get()) {
                     player.getScoreboard().clearSlot(DisplaySlot.SIDEBAR);
@@ -87,7 +87,7 @@ public class ClansSidebarListener implements Listener {
                 sidebarObjective.getScore(ChatColor.YELLOW.toString() + ChatColor.BOLD + "Clan").setScore(15);
                 String name = clan.getName();
 
-                sidebarObjective.getScore(ChatColor.AQUA.toString() + ChatColor.BOLD + name + "").setScore(14);
+                sidebarObjective.getScore(ChatColor.AQUA.toString() + ChatColor.BOLD + name + ChatColor.RESET).setScore(14);
                 sidebarObjective.getScore(ChatColor.RED + "").setScore(13);
 
                 if (clan.getTerritory().size() > 0) {
@@ -98,7 +98,7 @@ public class ClansSidebarListener implements Listener {
             }
 
 
-            Optional<Integer> coinsOptional = gamer.getProperty(GamerProperty.COINS.toString());
+            Optional<Integer> coinsOptional = gamer.getProperty(GamerProperty.COINS);
             if (coinsOptional.isPresent()) {
                 sidebarObjective.getScore(ChatColor.YELLOW.toString() + ChatColor.BOLD + "Coins").setScore(9);
                 sidebarObjective.getScore(ChatColor.GOLD.toString() + ChatColor.BOLD + UtilFormat.formatNumber(coinsOptional.get())).setScore(8);
@@ -110,7 +110,8 @@ public class ClansSidebarListener implements Listener {
             Optional<Clan> standingOptional = clanManager.getClanByLocation(player.getLocation());
             if (standingOptional.isPresent()) {
                 Clan standing = standingOptional.get();
-                sidebarObjective.getScore(clanManager.getRelation(clan, standing).getPrimary(true) + standing.getName()).setScore(5);
+                sidebarObjective.getScore(clanManager.getRelation(clan, standing).getPrimaryAsChatColor().toString()
+                        + ChatColor.BOLD + standing.getName()).setScore(5);
             } else {
                 sidebarObjective.getScore(ChatColor.GREEN.toString() + ChatColor.BOLD + "Wilderness").setScore(5);
             }

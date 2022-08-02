@@ -17,18 +17,18 @@ public class Client {
     Rank rank;
     boolean administrating;
 
-    private final HashMap<String, Object> properties = new HashMap<>();
+    private final HashMap<Enum<?>, Object> properties = new HashMap<>();
 
     @SuppressWarnings("unchecked")
-    public <T> Optional<T> getProperty(String key) {
+    public <T> Optional<T> getProperty(Enum<?> key) {
         return Optional.ofNullable((T) properties.getOrDefault(key, null));
     }
 
-    public <T> Optional<T> getProperty(String key, Class<T> type) {
+    public <T> Optional<T> getProperty(Enum<?> key, Class<T> type) {
         return Optional.ofNullable(type.cast(properties.getOrDefault(key, null)));
     }
 
-    public void putProperty(String key, Object object){
+    public void putProperty(Enum<?> key, Object object){
         properties.put(key, object);
     }
 

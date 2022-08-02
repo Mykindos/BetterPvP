@@ -3,21 +3,21 @@ package me.mykindos.betterpvp.clans.clans.commands.subcommands;
 import com.google.inject.Inject;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
+import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
 import me.mykindos.betterpvp.clans.clans.events.ClanCreateEvent;
 import me.mykindos.betterpvp.core.client.Client;
-import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.sql.Timestamp;
 import java.util.Optional;
 
 
-public class CreateClanSubCommand extends SubCommand {
+public class CreateClanSubCommand extends ClanSubCommand {
 
-    @Inject
-    private ClanManager clanManager;
+
 
     @Inject
     @Config(path = "command.clan.create.maxCharactersInClanName", defaultValue = "13")
@@ -26,6 +26,10 @@ public class CreateClanSubCommand extends SubCommand {
     @Inject
     @Config(path = "command.clan.create.minCharactersInClanName", defaultValue = "3")
     private int minCharactersInClanName;
+
+    public CreateClanSubCommand(ClanManager clanManager) {
+        super(clanManager);
+    }
 
     @Override
     public String getName() {
@@ -67,7 +71,11 @@ public class CreateClanSubCommand extends SubCommand {
 
         Optional<Clan> clanOptional = clanManager.getObject(clanName);
         if (clanOptional.isEmpty()) {
-            Bukkit.getPluginManager().callEvent(new ClanCreateEvent(player, clanName));
+            var timestamp = new Timestamp(System.currentTimeMillis());
+            Clan clan = Clan.builder().name(clanName).level(1)
+                    .timeCreated(timestamp).lastLogin(timestamp)
+                    .build();
+            Bukkit.getPluginManager().callEvent(new ClanCreateEvent(player, clan));
         } else {
             UtilMessage.message(player, "Command", "A clan with that name already exists.");
         }

@@ -29,7 +29,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
 import java.util.Optional;
 
 @BPvPListener
@@ -116,8 +115,8 @@ public class ClientListener implements Listener {
     public void onSettingsUpdated(SettingsUpdatedEvent event) {
         Optional<Client> clientOptional = clientManager.getObject(event.getClient().getUuid());
         clientOptional.ifPresent(client -> {
-            if(Arrays.stream(ClientProperty.values()).anyMatch(prop -> prop.getKey().equalsIgnoreCase(event.getSetting()))) {
-                clientManager.getRepository().saveProperty(client, event.getSetting(), client.getProperties().get(event.getSetting()));
+            if(event.getSetting() instanceof ClientProperty key) {
+                clientManager.getRepository().saveProperty(client, key, client.getProperties().get(key));
             }
         });
 
@@ -126,7 +125,7 @@ public class ClientListener implements Listener {
 
     private void checkUnsetProperties(Client client) {
 
-        String chatEnabledProperty = ClientProperty.CHAT_ENABLED.toString();
+        ClientProperty chatEnabledProperty = ClientProperty.CHAT_ENABLED;
         Optional<Integer> chatEnabledOptional = client.getProperty(chatEnabledProperty);
         if(chatEnabledOptional.isEmpty()){
             client.putProperty(chatEnabledProperty, true);

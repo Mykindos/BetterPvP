@@ -8,25 +8,17 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum GamerProperty {
 
-    SIDEBAR_ENABLED("CLANS_SIDEBAR_ENABLED"),
-    CLAN_CHAT("CLAN_CHAT"),
-    ALLY_CHAT("ALLY_CHAT"),
-    STAFF_CHAT("STAFF_CHAT"),
+    SIDEBAR_ENABLED,
 
-    COINS("COINS"),
-    FRAGMENTS("FRAGMENTS"),
+    CLAN_CHAT,
+    ALLY_CHAT,
+    STAFF_CHAT,
 
-    BLOCKS_PLACED("BLOCKS_PLACED"),
-    BLOCKS_BROKEN("BLOCKS_BROKEN");
+    COINS,
+    FRAGMENTS,
 
-
-    private final String key;
-
-
-    @Override
-    public String toString(){
-        return key;
-    }
+    BLOCKS_PLACED,
+    BLOCKS_BROKEN
 
 
 }

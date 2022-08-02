@@ -12,7 +12,7 @@ public class ClansSettingButton extends SettingsButton {
 
     private final Gamer gamer;
 
-    public ClansSettingButton(Gamer gamer, String setting, boolean settingEnabled, int slot, ItemStack item, String name, String... lore) {
+    public ClansSettingButton(Gamer gamer, Enum<?> setting, boolean settingEnabled, int slot, ItemStack item, String name, String... lore) {
         super(setting, settingEnabled, slot, item, name, lore);
         this.gamer = gamer;
     }

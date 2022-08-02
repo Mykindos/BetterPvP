@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.listener.loader.ListenerLoader;
 import org.bukkit.event.Listener;
 import org.reflections.Reflections;
 
+import java.lang.reflect.Modifier;
 import java.util.Set;
 
 /**
@@ -24,7 +25,9 @@ public class ClansListenerLoader extends ListenerLoader {
         Set<Class<?>> classes = reflections.getTypesAnnotatedWith(BPvPListener.class);
         for (var clazz : classes) {
             if (Listener.class.isAssignableFrom(clazz)) {
-                load(clazz);
+                if(!Modifier.isAbstract(clazz.getModifiers())) {
+                    load(clazz);
+                }
             }
         }
 

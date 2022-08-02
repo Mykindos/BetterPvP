@@ -12,6 +12,6 @@ public class SettingsUpdatedEvent extends CustomEvent {
 
     private final Player player;
     private final Client client;
-    private final String setting;
+    private final Enum<?> setting;
 
 }

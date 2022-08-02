@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
+import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
@@ -14,7 +15,6 @@ import me.mykindos.betterpvp.core.database.repository.IRepository;
 import javax.sql.rowset.CachedRowSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -73,7 +73,7 @@ public class ClientRepository implements IRepository<Client> {
                     default -> Class.forName(type).cast(result.getObject(2));
                 };
 
-                client.putProperty(value, property);
+                client.putProperty(ClientProperty.valueOf(value), property);
             }
         } catch (SQLException | ClassNotFoundException ex) {
             ex.printStackTrace();
@@ -89,15 +89,15 @@ public class ClientRepository implements IRepository<Client> {
         ));
     }
 
-    public void saveProperty(Client client, String property, Object value) {
+    public void saveProperty(Client client, Enum<?> property, Object value) {
         String savePropertyQuery = "INSERT INTO " + databasePrefix + "client_properties (Client, Property, Value) VALUES (?, ?, ?)"
                 + " ON DUPLICATE KEY UPDATE Value = ?";
         Statement statement = new Statement(savePropertyQuery,
                 new StringStatementValue(client.getUuid()),
-                new StringStatementValue(property),
+                new StringStatementValue(property.name()),
                 new StringStatementValue(value.toString()),
                 new StringStatementValue(value.toString()));
-        queuedStatUpdates.put(client.getUuid() + property, statement);
+        queuedStatUpdates.put(client.getUuid() + property.name(), statement);
     }
 
     public void processStatUpdates(boolean async){

@@ -6,12 +6,14 @@ import me.mykindos.betterpvp.clans.clans.components.ClanAlliance;
 import me.mykindos.betterpvp.clans.clans.components.ClanEnemy;
 import me.mykindos.betterpvp.clans.clans.components.ClanMember;
 import me.mykindos.betterpvp.clans.clans.components.ClanTerritory;
+import me.mykindos.betterpvp.core.framework.inviting.Invitable;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -21,7 +23,7 @@ import java.util.UUID;
 
 @Data
 @Builder
-public class Clan {
+public class Clan implements Invitable {
 
     private int id;
     private String name;
@@ -51,19 +53,53 @@ public class Clan {
     private List<ClanTerritory> territory = new ArrayList<>();
 
     public Optional<ClanMember> getLeader() {
-        return members.stream().filter(clanMember -> clanMember.getRank() == ClanMember.MemberRank.OWNER).findFirst();
+        return members.stream().filter(clanMember -> clanMember.getRank() == ClanMember.MemberRank.LEADER).findFirst();
+    }
+
+    public String getAge() {
+        return UtilTime.getTime(System.currentTimeMillis() - timeCreated.getTime(), UtilTime.TimeUnit.BEST, 1);
+    }
+
+    /**
+     * Only use this method if you already acquired the Clan using the player
+     * @param uuid UUID of the member
+     * @return ClanMember
+     */
+    @NotNull
+    public ClanMember getMember(UUID uuid){
+        return getMemberByUUID(uuid).orElseThrow();
+    }
+
+    public Optional<ClanMember> getMemberByUUID(UUID uuid){
+        return getMemberByUUID(uuid.toString());
     }
 
     public Optional<ClanMember> getMemberByUUID(String uuid){
         return members.stream().filter(clanMember -> clanMember.getUuid().equalsIgnoreCase(uuid)).findFirst();
     }
 
+
     public boolean isAllied(Clan clan) {
-        return alliances.stream().anyMatch(ally -> ally.getOtherClan().equalsIgnoreCase(clan.getName()));
+        return alliances.stream().anyMatch(ally -> ally.getClan().getName().equalsIgnoreCase(clan.getName()));
     }
 
     public Optional<ClanAlliance> getAlliance(Clan clan) {
-        return alliances.stream().filter(ally -> ally.getOtherClan().equalsIgnoreCase(clan.getName())).findFirst();
+        return alliances.stream().filter(ally -> ally.getClan().getName().equalsIgnoreCase(clan.getName())).findFirst();
+    }
+
+    /**
+     * @return The total amount of members in an entire alliance
+     */
+    public int getSquadCount() {
+        int count = 0;
+
+        count += getMembers().size();
+
+        for (ClanAlliance alliance : getAlliances()) {
+            count += alliance.getClan().getMembers().size();
+        }
+
+        return count;
     }
 
     public boolean hasTrust(Clan clan) {
@@ -73,7 +109,7 @@ public class Clan {
 
     public boolean isEnemy(Clan clan) {
         for (ClanEnemy enemy : getEnemies()) {
-            if (enemy.getOtherClan().equalsIgnoreCase(clan.getName())) {
+            if (enemy.getClan().equals(clan)) {
                 return true;
             }
 
@@ -83,7 +119,7 @@ public class Clan {
 
     public ClanEnemy getEnemy(Clan clan) {
         for (ClanEnemy enemy : getEnemies()) {
-            if (enemy.getOtherClan().equalsIgnoreCase(clan.getName())) {
+            if (enemy.getClan().equals(clan)) {
                 return enemy;
             }
 

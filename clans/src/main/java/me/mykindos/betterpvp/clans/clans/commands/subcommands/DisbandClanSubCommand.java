@@ -1,13 +1,12 @@
 package me.mykindos.betterpvp.clans.clans.commands.subcommands;
 
-import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
+import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
 import me.mykindos.betterpvp.clans.clans.components.ClanMember;
 import me.mykindos.betterpvp.clans.clans.events.ClanDisbandEvent;
 import me.mykindos.betterpvp.core.client.Client;
-import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
@@ -18,10 +17,12 @@ import org.slf4j.MDC;
 import java.util.Optional;
 
 @Slf4j
-public class DisbandClanSubCommand extends SubCommand {
+public class DisbandClanSubCommand extends ClanSubCommand {
 
-    @Inject
-    private ClanManager clanManager;
+
+    public DisbandClanSubCommand(ClanManager clanManager) {
+        super(clanManager);
+    }
 
     @Override
     public String getName() {

@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.clans.gamer.Gamer;
+import me.mykindos.betterpvp.clans.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.ClientManager;
 import me.mykindos.betterpvp.core.config.Config;
@@ -81,7 +82,7 @@ public class GamerRepository implements IRepository<Gamer> {
                     default -> Class.forName(type).cast(result.getObject(2));
                 };
 
-                gamer.putProperty(value, property);
+                gamer.putProperty(GamerProperty.valueOf(value), property);
             }
         } catch (SQLException | ClassNotFoundException ex) {
             ex.printStackTrace();
@@ -99,15 +100,15 @@ public class GamerRepository implements IRepository<Gamer> {
         gamer.getProperties().forEach((key, value) -> saveProperty(gamer, key, value));
     }
 
-    public void saveProperty(Gamer gamer, String property, Object value) {
+    public void saveProperty(Gamer gamer, Enum<?> property, Object value) {
         String savePropertyQuery = "INSERT INTO " + databasePrefix + "gamer_properties (Gamer, Property, Value) VALUES (?, ?, ?)"
                 + " ON DUPLICATE KEY UPDATE Value = ?";
         Statement statement = new Statement(savePropertyQuery,
                 new StringStatementValue(gamer.getUuid()),
-                new StringStatementValue(property),
+                new StringStatementValue(property.name()),
                 new StringStatementValue(value.toString()),
                 new StringStatementValue(value.toString()));
-        queuedStatUpdates.put(gamer.getUuid() + property, statement);
+        queuedStatUpdates.put(gamer.getUuid() + property.name(), statement);
     }
 
     public void processStatUpdates(boolean async){

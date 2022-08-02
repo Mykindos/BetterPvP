@@ -39,13 +39,13 @@ public class AllyChatCommand extends Command {
         if(gamerOptional.isPresent()) {
             boolean allyChatEnabled = true;
             Gamer gamer = gamerOptional.get();
-            Optional<Boolean> clanChatEnabledOptional = gamer.getProperty(GamerProperty.ALLY_CHAT.toString());
+            Optional<Boolean> clanChatEnabledOptional = gamer.getProperty(GamerProperty.ALLY_CHAT);
             if(clanChatEnabledOptional.isPresent()){
                 allyChatEnabled = !clanChatEnabledOptional.get();
             }
 
-            gamer.putProperty(GamerProperty.ALLY_CHAT.toString(), allyChatEnabled);
-            gamer.putProperty(GamerProperty.CLAN_CHAT.toString(), false);
+            gamer.putProperty(GamerProperty.ALLY_CHAT, allyChatEnabled);
+            gamer.putProperty(GamerProperty.CLAN_CHAT, false);
             UtilMessage.message(player, "Command", "Ally Chat: "
                     + (allyChatEnabled ? ChatColor.GREEN + "enabled" : ChatColor.RED + "disabled"));
         }

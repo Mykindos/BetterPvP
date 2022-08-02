@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
+import me.mykindos.betterpvp.clans.gamer.GamerManager;
 import me.mykindos.betterpvp.clans.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.chat.events.ChatReceivedEvent;
 import me.mykindos.betterpvp.core.chat.events.ChatSentEvent;
@@ -16,19 +17,17 @@ import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 
 import java.util.Optional;
 
 @BPvPListener
-public class ClanChatListener implements Listener {
+public class ClansChatListener extends ClanListener {
 
-    private final ClanManager clanManager;
     private final ClientManager clientManager;
 
     @Inject
-    public ClanChatListener(ClanManager clanManager, ClientManager clientManager) {
-        this.clanManager = clanManager;
+    public ClansChatListener(ClanManager clanManager, GamerManager gamerManager, ClientManager clientManager) {
+        super(clanManager, gamerManager);
         this.clientManager = clientManager;
     }
 
@@ -65,7 +64,7 @@ public class ClanChatListener implements Listener {
         Client client = clientOptional.get();
         Clan clan = clanOptional.get();
 
-        Optional<Boolean> clanChatEnabledOptional = client.getProperty(GamerProperty.CLAN_CHAT.toString());
+        Optional<Boolean> clanChatEnabledOptional = client.getProperty(GamerProperty.CLAN_CHAT);
         clanChatEnabledOptional.ifPresent(clanChat -> {
             if (clanChat) {
                 event.cancel("Player has clan chat enabled");
@@ -77,7 +76,7 @@ public class ClanChatListener implements Listener {
             }
         });
 
-        Optional<Boolean> allyChatEnabledOptional = client.getProperty(GamerProperty.ALLY_CHAT.toString());
+        Optional<Boolean> allyChatEnabledOptional = client.getProperty(GamerProperty.ALLY_CHAT);
         allyChatEnabledOptional.ifPresent(allyChat -> {
             if (allyChat) {
                 event.cancel("Player has ally chat enabled");
@@ -86,8 +85,7 @@ public class ClanChatListener implements Listener {
                         + ChatColor.GREEN + PlainTextComponentSerializer.plainText().serialize(event.getMessage());
 
                 clan.getAlliances().forEach(alliance -> {
-                    Optional<Clan> allianceOptional = clanManager.getObject(alliance.getOtherClan());
-                    allianceOptional.ifPresent(allyClan -> allyClan.messageClan(message, null, false));
+                  alliance.getClan().messageClan(message, null, false);
                 });
 
                 clan.messageClan(message, null, false);

@@ -26,9 +26,9 @@ public class ClansSettingsMenu extends SettingSubMenu implements IRefreshingMenu
     @Override
     public void refresh() {
 
-        Optional<Boolean> sidebarSettingOptional = gamer.getProperty(GamerProperty.SIDEBAR_ENABLED.toString());
+        Optional<Boolean> sidebarSettingOptional = gamer.getProperty(GamerProperty.SIDEBAR_ENABLED);
         sidebarSettingOptional.ifPresent(sidebarSetting -> {
-            addButton(new ClansSettingButton(gamer, GamerProperty.SIDEBAR_ENABLED.toString(), sidebarSetting,
+            addButton(new ClansSettingButton(gamer, GamerProperty.SIDEBAR_ENABLED, sidebarSetting,
                     0, new ItemStack(Material.IRON_BARS), "Sidebar", ChatColor.GRAY + "Whether to display the sidebar or not"));
         });
 

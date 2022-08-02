@@ -39,13 +39,13 @@ public class ClanChatCommand extends Command {
         if(gamerOptional.isPresent()) {
             boolean clanChatEnabled = true;
             Gamer gamer = gamerOptional.get();
-            Optional<Boolean> clanChatEnabledOptional = gamer.getProperty(GamerProperty.CLAN_CHAT.toString());
+            Optional<Boolean> clanChatEnabledOptional = gamer.getProperty(GamerProperty.CLAN_CHAT);
             if(clanChatEnabledOptional.isPresent()){
                 clanChatEnabled = !clanChatEnabledOptional.get();
             }
 
-            gamer.putProperty(GamerProperty.CLAN_CHAT.toString(), clanChatEnabled);
-            gamer.putProperty(GamerProperty.ALLY_CHAT.toString(), false);
+            gamer.putProperty(GamerProperty.CLAN_CHAT, clanChatEnabled);
+            gamer.putProperty(GamerProperty.ALLY_CHAT, false);
             UtilMessage.message(player, "Command", "Clan Chat: "
                     + (clanChatEnabled ? ChatColor.GREEN + "enabled" : ChatColor.RED + "disabled"));
         }
