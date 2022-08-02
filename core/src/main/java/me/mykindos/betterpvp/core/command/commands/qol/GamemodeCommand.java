@@ -35,32 +35,11 @@ public class GamemodeCommand extends Command {
         UtilMessage.message(player, "Command", "Please specify a valid gamemode");
     }
 
-    private static class CreativeSubCommand extends SubCommand {
-
-        public CreativeSubCommand() {
-            aliases.add("c");
-        }
-
-        @Override
-        public String getName() {
-            return "creative";
-        }
-
-        @Override
-        public String getDescription() {
-            return "Swap to creative mode";
-        }
-
-        @Override
-        public void execute(Player player, Client client, String[] args) {
-            player.setGameMode(GameMode.CREATIVE);
-        }
-    }
-
     private static class SurvivalSubCommand extends SubCommand {
 
         public SurvivalSubCommand() {
             aliases.add("s");
+            aliases.add("0");
         }
 
         @Override
@@ -79,10 +58,34 @@ public class GamemodeCommand extends Command {
         }
     }
 
+    private static class CreativeSubCommand extends SubCommand {
+
+        public CreativeSubCommand() {
+            aliases.add("c");
+            aliases.add("1");
+        }
+
+        @Override
+        public String getName() {
+            return "creative";
+        }
+
+        @Override
+        public String getDescription() {
+            return "Swap to creative mode";
+        }
+
+        @Override
+        public void execute(Player player, Client client, String[] args) {
+            player.setGameMode(GameMode.CREATIVE);
+        }
+    }
+
     private static class AdventureSubCommand extends SubCommand {
 
         public AdventureSubCommand() {
             aliases.add("a");
+            aliases.add("2");
         }
 
         @Override
@@ -105,6 +108,7 @@ public class GamemodeCommand extends Command {
 
         public SpectatorSubCommand() {
             aliases.add("sp");
+            aliases.add("3");
         }
 
         @Override

@@ -9,6 +9,10 @@ import java.util.Iterator;
 
 public class UtilWorld {
 
+    public static String chunkToPrettyString(Chunk chunk) {
+        return "(" + chunk.getX() + ", " + chunk.getZ() + ")";
+    }
+
     public static String chunkToFile(Chunk chunk) {
         return chunk.getWorld().getName() + "/ " + chunk.getX() + "/ " + chunk.getZ();
     }

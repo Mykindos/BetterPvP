@@ -17,6 +17,18 @@ public class UtilMessage {
      * @param prefix  The message
      * @param message Message to send to a player
      */
+    public static void message(Player player, String prefix, Component message) {
+        Component prefixComponent = Component.text(ChatColor.BLUE + prefix + "> ");
+        player.sendMessage(prefixComponent.append(message));
+    }
+
+    /**
+     * Sends a message to a player with appropriate formatting
+     *
+     * @param player  The player
+     * @param prefix  The message
+     * @param message Message to send to a player
+     */
     public static void message(Player player, String prefix, String message) {
         player.sendMessage(ChatColor.BLUE + prefix + "> " + ChatColor.GRAY + message);
     }

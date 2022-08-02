@@ -28,4 +28,8 @@ public enum ClanRelation {
         return primary.toString() + ChatColor.BOLD;
     }
 
+    public ChatColor getPrimaryAsChatColor(){
+        return ChatColor.valueOf(primary.toString().toUpperCase());
+    }
+
 }

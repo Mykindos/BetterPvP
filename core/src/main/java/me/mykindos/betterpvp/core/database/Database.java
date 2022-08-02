@@ -7,7 +7,7 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.database.connection.IDatabaseConnection;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.StatementValue;
-import org.bukkit.scheduler.BukkitRunnable;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 
 import javax.inject.Inject;
 import javax.sql.rowset.CachedRowSet;
@@ -37,12 +37,8 @@ public class Database {
      * @param statement The statement and values
      */
     public void executeUpdateAsync(Statement statement) {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                executeUpdate(statement);
-            }
-        }.runTaskAsynchronously(getCore());
+        UtilServer.runTaskAsync(core, () -> executeUpdate(statement));
+
     }
 
     /**
@@ -65,16 +61,7 @@ public class Database {
     }
 
     public void executeBatch(List<Statement> statements, boolean async) {
-        if (async) {
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    executeBatch(statements);
-                }
-            }.runTaskAsynchronously(getCore());
-        } else {
-            executeBatch(statements);
-        }
+        UtilServer.runTask(core, async, () -> executeBatch(statements));
     }
 
     private void executeBatch(List<Statement> statements) {

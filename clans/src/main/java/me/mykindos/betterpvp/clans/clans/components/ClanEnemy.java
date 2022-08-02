@@ -1,15 +1,16 @@
 package me.mykindos.betterpvp.clans.clans.components;
 
 import lombok.Data;
+import me.mykindos.betterpvp.clans.clans.Clan;
 
 @Data
 public class ClanEnemy {
 
-    private final String otherClan;
+    private final Clan clan;
     private int dominance;
 
-    public ClanEnemy(String otherClan, int dominance) {
-        this.otherClan = otherClan;
+    public ClanEnemy(Clan clan, int dominance) {
+        this.clan = clan;
         this.dominance = dominance;
     }
 

@@ -29,5 +29,19 @@ public interface ICommand {
 
     List<String> processTabComplete(CommandSender sender, String[] args);
 
+    default ArgumentType getArgumentType(int argCount) {
+        return ArgumentType.SUBCOMMAND;
+    }
+
+
+    enum ArgumentType {
+        NONE,
+        SUBCOMMAND,
+        PLAYER,
+        POSITION_X,
+        POSITION_Y,
+        POSITION_Z,
+        CLAN
+    }
 
 }
