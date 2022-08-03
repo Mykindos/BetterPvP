@@ -1,6 +1,8 @@
-author: Mykindos
+author: Moonsworth LLC Development Team, Mykindos
 main: me.mykindos.betterpvp.lunar.LunarClientAPI
 name: Lunar
 load: STARTUP
 version: '1.0'
 api-version: 1.19
+depend: [Core]
+website: https://www.lunarclient.com/

@@ -6,11 +6,12 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.clans.commands.ClansCommandLoader;
+import me.mykindos.betterpvp.clans.gamer.Gamer;
 import me.mykindos.betterpvp.clans.gamer.GamerManager;
 import me.mykindos.betterpvp.clans.injector.ClansInjectorModule;
 import me.mykindos.betterpvp.clans.listener.ClansListenerLoader;
-import me.mykindos.betterpvp.clans.skills.SkillManager;
-import me.mykindos.betterpvp.clans.skills.injector.SkillInjectorModule;
+import me.mykindos.betterpvp.clans.champions.skills.SkillManager;
+import me.mykindos.betterpvp.clans.champions.skills.injector.SkillInjectorModule;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.config.ConfigInjectorModule;
@@ -37,11 +38,10 @@ public class Clans extends BPvPPlugin {
     private Database database;
 
     @Inject
-    private GamerManager gamerManager;
-
-    @Inject
     @Config(path = "clans.database.prefix", defaultValue = "clans_")
     private String databasePrefix;
+
+    private GamerManager gamerManager;
 
     @Override
     public void onEnable() {
@@ -72,6 +72,8 @@ public class Clans extends BPvPPlugin {
             var skillManager = injector.getInstance(SkillManager.class);
             skillManager.loadSkills();
 
+            gamerManager = injector.getInstance(GamerManager.class);
+            gamerManager.loadFromList(gamerManager.getGamerRepository().getAll());
         }
     }
 

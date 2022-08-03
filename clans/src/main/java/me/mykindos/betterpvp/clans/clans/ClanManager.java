@@ -14,6 +14,8 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import net.kyori.adventure.text.Component;
 import org.bukkit.ChatColor;
@@ -172,7 +174,7 @@ public class ClanManager extends Manager<Clan> {
         list.add(" Members: " + ChatColor.YELLOW + getMembersList(target));
 
         Component textComponent = Component.text().build();
-        for(String text : list) {
+        for (String text : list) {
             textComponent = textComponent.append(Component.text(text + "\n"));
         }
         return textComponent;
@@ -226,6 +228,42 @@ public class ClanManager extends Manager<Clan> {
         ClanRelation relation = getRelation(playerClan, targetClan);
 
         return relation != ClanRelation.SELF && relation != ClanRelation.ALLY && relation != ClanRelation.ALLY_TRUST;
+    }
+
+    public boolean canCast(Player p) {
+
+
+        return canCast(p, true);
+    }
+
+    public boolean canCast(Player player, boolean message) {
+        Optional<Clan> locationClanOptional = getClanByLocation(player.getLocation());
+        if (locationClanOptional.isPresent()) {
+            Clan locationClan = locationClanOptional.get();
+            if (locationClan.isAdmin()) {
+
+                if (locationClan.isSafe()) {
+
+                    Optional<Gamer> gamerOptional = gamerManager.getObject(player.getUniqueId().toString());
+                    if (gamerOptional.isPresent()) {
+                        Gamer gamer = gamerOptional.get();
+                        // Allow skills if player is combat tagged
+                        if (!UtilTime.elapsed(gamer.getLastDamaged(), 15000)) {
+                            return true;
+
+                        }
+                    }
+
+
+                    if (message) {
+                        UtilMessage.message(player, "Restriction", "You are not allowed to cast abilities here!");
+                    }
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
 

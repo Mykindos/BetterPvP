@@ -5,6 +5,7 @@ import lombok.Getter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public abstract class Manager<T> {
 
@@ -15,8 +16,16 @@ public abstract class Manager<T> {
         objects.put(identifier, object);
     }
 
+    public void addObject(UUID identifier, T object){
+        addObject(identifier.toString(), object);
+    }
+
     public Optional<T> getObject(String identifier){
         return Optional.ofNullable(objects.get(identifier));
+    }
+
+    public Optional<T> getObject(UUID identifier){
+        return getObject(identifier.toString());
     }
 
     public void removeObject(String identifier) {

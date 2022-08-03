@@ -17,9 +17,8 @@ import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.events.scoreboard.ScoreboardUpdateEvent;
 import me.mykindos.betterpvp.core.framework.inviting.InviteHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
-import me.mykindos.betterpvp.core.utilities.UtilWorld;
+import me.mykindos.betterpvp.core.utilities.*;
+import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import org.bukkit.Bukkit;
@@ -34,6 +33,7 @@ import java.util.Optional;
 public class ClanEventListener extends ClanListener {
 
     private final InviteHandler inviteHandler;
+    private final WorldBlockHandler blockHandler;
     private final Clans clans;
 
     @Inject
@@ -41,10 +41,12 @@ public class ClanEventListener extends ClanListener {
     private int maxClanMembers;
 
     @Inject
-    public ClanEventListener(ClanManager clanManager, GamerManager gamerManager, InviteHandler inviteHandler, Clans clans) {
+    public ClanEventListener(Clans clans, ClanManager clanManager, GamerManager gamerManager, InviteHandler inviteHandler,
+                             WorldBlockHandler blockHandler) {
         super(clanManager, gamerManager);
-        this.inviteHandler = inviteHandler;
         this.clans = clans;
+        this.inviteHandler = inviteHandler;
+        this.blockHandler = blockHandler;
     }
 
     @EventHandler
@@ -74,6 +76,7 @@ public class ClanEventListener extends ClanListener {
         clan.messageClan(ChatColor.YELLOW + player.getName() + ChatColor.GRAY + " claimed Territory " + ChatColor.YELLOW
                 + UtilWorld.chunkToPrettyString(player.getLocation().getChunk()) + ChatColor.GRAY + ".", player.getUniqueId(), true);
 
+        blockHandler.outlineChunk(player.getLocation().getChunk());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
