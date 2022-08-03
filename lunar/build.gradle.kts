@@ -36,7 +36,7 @@ dependencies {
     compileOnly("io.papermc.paper:paper-api:1.19-R0.1-SNAPSHOT")
     compileOnly("org.projectlombok:lombok:1.18.24")
     compileOnly("com.comphenix.protocol:ProtocolLib:4.8.0")
-
+    compileOnly(project(":core"))
     annotationProcessor("org.projectlombok:lombok:1.18.24")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")

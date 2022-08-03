@@ -1,6 +1,8 @@
 package me.mykindos.betterpvp.lunar.listener;
 
 import lombok.RequiredArgsConstructor;
+import me.mykindos.betterpvp.core.framework.events.lunar.LunarClientEvent;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.lunar.LunarClientAPI;
 import me.mykindos.betterpvp.lunar.event.LCPlayerRegisterEvent;
 import me.mykindos.betterpvp.lunar.nethandler.client.LCPacketUpdateWorld;
@@ -37,6 +39,10 @@ public class LunarClientLoginListener implements Listener {
         lunarClientAPI.registerPlayer(player);
 
         lunarClientAPI.getServer().getPluginManager().callEvent(new LCPlayerRegisterEvent(event.getPlayer()));
+        UtilServer.callEvent(new LunarClientEvent(event.getPlayer(), true));
+
+        // TODO remove this
+        lunarClientAPI.giveAllStaffModules(player);
         updateWorld(event.getPlayer());
     }
 
@@ -44,6 +50,7 @@ public class LunarClientLoginListener implements Listener {
     public void onUnregister(PlayerUnregisterChannelEvent event) {
         if (event.getChannel().equalsIgnoreCase(LunarClientAPI.MESSAGE_CHANNEL)) {
             lunarClientAPI.unregisterPlayer(event.getPlayer(), false);
+            UtilServer.callEvent(new LunarClientEvent(event.getPlayer(), false));
         }
     }
 

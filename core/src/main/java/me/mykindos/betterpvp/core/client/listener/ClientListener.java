@@ -11,14 +11,13 @@ import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.events.ClientLoginEvent;
 import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.config.Config;
+import me.mykindos.betterpvp.core.framework.events.lunar.LunarClientEvent;
 import me.mykindos.betterpvp.core.framework.events.scoreboard.ScoreboardUpdateEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.settings.events.SettingsUpdatedEvent;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import me.mykindos.betterpvp.lunar.event.LCPlayerRegisterEvent;
-import me.mykindos.betterpvp.lunar.event.LCPlayerUnregisterEvent;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -91,20 +90,13 @@ public class ClientListener implements Listener {
 
 
     @EventHandler
-    public void onLunarClientRegister(LCPlayerRegisterEvent event){
+    public void onLunarEvent(LunarClientEvent event){
         Optional<Client> clientOptional = clientManager.getObject(event.getPlayer().getUniqueId().toString());
         clientOptional.ifPresent(client -> {
-            client.putProperty(ClientProperty.LUNAR, true);
+            client.putProperty(ClientProperty.LUNAR, event.isRegistered());
         });
     }
 
-    @EventHandler
-    public void onLunarClientUnregister(LCPlayerUnregisterEvent event) {
-        Optional<Client> clientOptional = clientManager.getObject(event.getPlayer().getUniqueId().toString());
-        clientOptional.ifPresent(client -> {
-            client.putProperty(ClientProperty.LUNAR, false);
-        });
-    }
 
     @UpdateEvent(delay = 5000)
     public void updateTabAllPlayers(){
