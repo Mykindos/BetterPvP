@@ -9,4 +9,8 @@ public interface InteractSkill {
 
     Action[] getActions();
 
+    default boolean canUseSlowed(){
+        return true;
+    }
+
 }
