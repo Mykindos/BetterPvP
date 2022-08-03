@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.chat.events.ChatSentEvent;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.ClientManager;
 import me.mykindos.betterpvp.core.client.Rank;
+import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.discord.DiscordMessage;
 import me.mykindos.betterpvp.core.discord.DiscordWebhook;
@@ -85,6 +86,11 @@ public class ChatListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onChatReceived(ChatReceivedEvent event) {
         if (event.isCancelled()) return;
+
+        Optional<Boolean> lunarClientOptional = event.getClient().getProperty(ClientProperty.LUNAR);
+        if(lunarClientOptional.isPresent()) {
+            event.setPrefix(Component.text(ChatColor.GREEN + "* ").append(event.getPrefix()));
+        }
 
         Rank rank = event.getClient().getRank();
         if(rank.isDisplayPrefix()) {

@@ -1,0 +1,16 @@
+{
+  "header": {
+    "pack_id": "91544175-6c2f-4f75-96d8-7db32ebae7d6",
+    "name": "BetterPvP",
+    "packs_version": "1.0.1",
+    "description": "BetterPvP resource pack",
+    "modules": [
+      {
+        "description": "Legendaries and more",
+        "version": "1.0.2",
+        "uuid": "0d522d40-38d5-4a41-b2e4-5d2e3b3fd0af4",
+        "type": "resources"
+      }
+    ]
+  }
+}
