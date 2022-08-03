@@ -40,6 +40,8 @@ public class Clan implements Invitable {
 
     private long lastTnted;
 
+    private boolean online;
+
     @Builder.Default
     private List<ClanMember> members = new ArrayList<>();
 
@@ -76,6 +78,18 @@ public class Clan implements Invitable {
 
     public Optional<ClanMember> getMemberByUUID(String uuid){
         return members.stream().filter(clanMember -> clanMember.getUuid().equalsIgnoreCase(uuid)).findFirst();
+    }
+
+    public List<Player> getMembersAsPlayers(){
+        List<Player> players = new ArrayList<>();
+        for(ClanMember member : getMembers()){
+            Player player = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
+            if(player != null){
+                players.add(player);
+            }
+        }
+
+        return players;
     }
 
 

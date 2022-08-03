@@ -17,7 +17,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerMoveEvent;
 
-import java.util.List;
 import java.util.Optional;
 
 @BPvPListener
@@ -98,14 +97,9 @@ public class ClansMovementListener extends ClanListener{
                         + ChatColor.GRAY.toString() + ChatColor.BOLD + "PvP Hotspot";
             }
 
-            Component textComponent = Component.text().build();
-            List<String> tooltipList = clanManager.getClanTooltip(player, locationClan);
-            for(String text : tooltipList) {
-                textComponent = textComponent.append(Component.text(text + "\n"));
-            }
-            UtilMessage.message(player, "Territory", Component.text(ownerString + append).hoverEvent(HoverEvent.showText(textComponent)));
-            //
-            //new FancyMessage(ChatColor.BLUE + "Territory> " + ownerString + " " + append).tooltip(ClanUtilities.getClanTooltip(p, locationClan)).send(p);
+            UtilMessage.message(player, "Territory", Component.text(ownerString + append)
+                    .hoverEvent(HoverEvent.showText(clanManager.getClanTooltip(player, locationClan))));
+
         } else {
             UtilMessage.message(player, "Territory", ownerString + " " + append);
         }

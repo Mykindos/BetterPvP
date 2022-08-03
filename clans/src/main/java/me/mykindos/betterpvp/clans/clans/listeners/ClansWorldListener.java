@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.clans.clans.components.ClanMember;
 import me.mykindos.betterpvp.clans.gamer.Gamer;
 import me.mykindos.betterpvp.clans.gamer.GamerManager;
 import me.mykindos.betterpvp.clans.gamer.exceptions.NoSuchGamerException;
+import me.mykindos.betterpvp.core.client.events.ClientLoginEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
@@ -31,9 +32,11 @@ import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @BPvPListener
@@ -43,6 +46,27 @@ public class ClansWorldListener extends ClanListener {
     @Inject
     public ClansWorldListener(ClanManager clanManager, GamerManager gamerManager) {
         super(clanManager, gamerManager);
+    }
+
+    @EventHandler
+    public void onLogin(ClientLoginEvent event) {
+        Optional<Clan> clanOptional = clanManager.getClanByClient(event.getClient());
+        clanOptional.ifPresent(clan -> clan.setOnline(true));
+    }
+
+    @EventHandler
+    public void onLogout(PlayerQuitEvent event) {
+        Optional<Clan> clanOptional = clanManager.getClanByPlayer(event.getPlayer());
+        clanOptional.ifPresent(clan -> {
+            for (ClanMember member : clan.getMembers()) {
+                Player player = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
+                if(player != null){
+                    return;
+                }
+            }
+
+            clan.setOnline(false);
+        });
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -168,12 +192,12 @@ public class ClansWorldListener extends ClanListener {
         Player player = event.getPlayer();
         Block block = event.getClickedBlock();
 
-        if(block == null) return;
-        if(UtilBlock.isTutorial(block.getLocation())) return;
+        if (block == null) return;
+        if (UtilBlock.isTutorial(block.getLocation())) return;
 
         Gamer gamer = gamerManager.getObject(player.getUniqueId().toString()).orElseThrow(() -> new NoSuchGamerException(player.getName()));
 
-        if(gamer.getClient().isAdministrating()) return;
+        if (gamer.getClient().isAdministrating()) return;
 
         Clan clan = clanManager.getClanByPlayer(player).orElse(null);
         Optional<Clan> locationClanOptional = clanManager.getClanByLocation(block.getLocation());
@@ -197,7 +221,6 @@ public class ClansWorldListener extends ClanListener {
                 //if (Pillage.isPillaging(clan, locationClan)) {
                 //    return;
                 //}
-
 
 
                 if (block.getType() == Material.CHEST || block.getType() == Material.TRAPPED_CHEST || block.getType() == Material.LEVER

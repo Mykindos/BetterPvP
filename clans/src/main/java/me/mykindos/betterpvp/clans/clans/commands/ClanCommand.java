@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.clans.clans.commands;
 import com.google.inject.Inject;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.subcommands.*;
+import me.mykindos.betterpvp.clans.gamer.GamerManager;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.framework.annotations.WithReflection;
@@ -13,20 +14,24 @@ import java.util.List;
 public class ClanCommand extends Command {
 
     private final ClanManager clanManager;
+    private final GamerManager gamerManager;
 
     @WithReflection
     @Inject
-    public ClanCommand(ClanManager clanManager) {
+    public ClanCommand(ClanManager clanManager, GamerManager gamerManager) {
         this.clanManager = clanManager;
+        this.gamerManager = gamerManager;
 
         aliases.addAll(List.of("c", "f", "faction"));
 
-        subCommands.add(new InfoSubCommand(clanManager));
-        subCommands.add(new CreateClanSubCommand(clanManager));
-        subCommands.add(new DisbandClanSubCommand(clanManager));
-        subCommands.add(new ClaimSubCommand(clanManager));
-        subCommands.add(new InviteSubCommand(clanManager));
-        subCommands.add(new JoinSubCommand(clanManager));
+        subCommands.add(new InfoSubCommand(clanManager, gamerManager));
+        subCommands.add(new CreateClanSubCommand(clanManager, gamerManager));
+        subCommands.add(new DisbandClanSubCommand(clanManager, gamerManager));
+        subCommands.add(new ClaimSubCommand(clanManager, gamerManager));
+        subCommands.add(new InviteSubCommand(clanManager, gamerManager));
+        subCommands.add(new JoinSubCommand(clanManager, gamerManager));
+        subCommands.add(new LeaveSubCommand(clanManager, gamerManager));
+        subCommands.add(new KickSubCommand(clanManager, gamerManager));
     }
 
     @Override

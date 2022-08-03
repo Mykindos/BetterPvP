@@ -2,12 +2,13 @@ package me.mykindos.betterpvp.clans.clans.commands.subcommands;
 
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
+import me.mykindos.betterpvp.clans.gamer.GamerManager;
 import me.mykindos.betterpvp.core.client.Client;
 import org.bukkit.entity.Player;
 
 public class InfoSubCommand extends ClanSubCommand {
-    public InfoSubCommand(ClanManager clanManager) {
-        super(clanManager);
+    public InfoSubCommand(ClanManager clanManager, GamerManager gamerManager) {
+        super(clanManager, gamerManager);
     }
 
     @Override
@@ -26,11 +27,11 @@ public class InfoSubCommand extends ClanSubCommand {
     }
 
     @Override
-    public ArgumentType getArgumentType(int arg) {
+    public String getArgumentType(int arg) {
         if (arg == 1) {
-            return ArgumentType.CLAN;
+            return ClanArgumentType.CLAN.name();
         }
 
-        return ArgumentType.NONE;
+        return ArgumentType.NONE.name();
     }
 }

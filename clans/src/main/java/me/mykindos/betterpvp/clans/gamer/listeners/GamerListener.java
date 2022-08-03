@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.clans.gamer.listeners;
 
 import com.google.inject.Inject;
+import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.gamer.Gamer;
 import me.mykindos.betterpvp.clans.gamer.GamerManager;
 import me.mykindos.betterpvp.clans.gamer.properties.GamerProperty;
@@ -8,6 +9,7 @@ import me.mykindos.betterpvp.core.client.events.ClientLoginEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.events.scoreboard.ScoreboardUpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -25,10 +27,12 @@ public class GamerListener implements Listener {
     @Config(path="gamer.default.fragments", defaultValue = "0")
     private int defaultFragments;
 
+    private final Clans clans;
     private final GamerManager gamerManager;
 
     @Inject
-    public GamerListener(GamerManager gamerManager){
+    public GamerListener(Clans clans, GamerManager gamerManager){
+        this.clans = clans;
         this.gamerManager = gamerManager;
     }
 
@@ -46,7 +50,8 @@ public class GamerListener implements Listener {
 
         }
         checkUnsetProperties(gamer);
-        Bukkit.getPluginManager().callEvent(new ScoreboardUpdateEvent(event.getPlayer()));
+
+        Bukkit.getOnlinePlayers().forEach(player -> UtilServer.callEvent(new ScoreboardUpdateEvent(player)));
     }
 
 

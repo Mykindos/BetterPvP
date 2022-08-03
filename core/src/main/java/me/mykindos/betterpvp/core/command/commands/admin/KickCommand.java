@@ -52,12 +52,12 @@ public class KickCommand extends Command implements IConsoleCommand {
     }
 
     @Override
-    public ArgumentType getArgumentType(int argCount) {
+    public String getArgumentType(int argCount) {
         if(argCount == 1){
-            return ArgumentType.PLAYER;
+            return ArgumentType.PLAYER.name();
         }
 
-        return ArgumentType.NONE;
+        return ArgumentType.NONE.name();
     }
 
 

@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.ClientManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.ChatColor;
@@ -33,16 +34,16 @@ public class ClansChatListener extends ClanListener {
 
     @EventHandler(priority = EventPriority.LOW)
     public void onChatReceived(ChatReceivedEvent event) {
-        Optional<Clan> targetClanOptional = clanManager.getClanByPlayer(event.getTarget());
+        Clan targetClan = clanManager.getClanByPlayer(event.getTarget()).orElse(null);
         Optional<Clan> senderClanOptional = clanManager.getClanByPlayer(event.getPlayer());
 
-        if (targetClanOptional.isPresent() && senderClanOptional.isPresent()) {
-            Clan targetClan = targetClanOptional.get();
+        if (senderClanOptional.isPresent()) {
             Clan senderClan = senderClanOptional.get();
 
             ClanRelation relation = clanManager.getRelation(senderClan, targetClan);
 
             Component clanPrefix = Component.text(senderClan.getName() + " ", relation.getSecondary())
+                    .hoverEvent(HoverEvent.showText(clanManager.getClanTooltip(event.getTarget(), senderClan)))
                     .append(Component.text(event.getPlayer().getName() + ": ", relation.getPrimary()));
 
             event.setPrefix(clanPrefix);

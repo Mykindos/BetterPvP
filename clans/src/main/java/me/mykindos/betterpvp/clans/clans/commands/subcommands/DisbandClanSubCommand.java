@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
 import me.mykindos.betterpvp.clans.clans.components.ClanMember;
 import me.mykindos.betterpvp.clans.clans.events.ClanDisbandEvent;
+import me.mykindos.betterpvp.clans.gamer.GamerManager;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
@@ -20,8 +21,8 @@ import java.util.Optional;
 public class DisbandClanSubCommand extends ClanSubCommand {
 
 
-    public DisbandClanSubCommand(ClanManager clanManager) {
-        super(clanManager);
+    public DisbandClanSubCommand(ClanManager clanManager, GamerManager gamerManager) {
+        super(clanManager, gamerManager);
     }
 
     @Override
