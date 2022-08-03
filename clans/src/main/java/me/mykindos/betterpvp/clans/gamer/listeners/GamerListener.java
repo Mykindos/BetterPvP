@@ -52,8 +52,9 @@ public class GamerListener implements Listener {
         checkUnsetProperties(gamer);
 
         Bukkit.getOnlinePlayers().forEach(player -> UtilServer.callEvent(new ScoreboardUpdateEvent(player)));
-    }
 
+
+    }
 
     private void checkUnsetProperties(Gamer gamer) {
         Optional<Integer> coinsOptional = gamer.getProperty(GamerProperty.COINS);

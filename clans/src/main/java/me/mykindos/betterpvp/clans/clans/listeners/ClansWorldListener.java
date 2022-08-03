@@ -176,7 +176,7 @@ public class ClansWorldListener extends ClanListener {
                 event.setCancelled(true);
             } else {
                 if (clan.getMember(player.getUniqueId()).getRank() == ClanMember.MemberRank.RECRUIT) {
-                    UtilMessage.message(player, "Clans", "Clan Recruits cannot break blocks" + ChatColor.GRAY + ".");
+                    UtilMessage.message(player, "Clans", "Clan Recruits cannot place blocks" + ChatColor.GRAY + ".");
                     event.setCancelled(true);
                 }
             }

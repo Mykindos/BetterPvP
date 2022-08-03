@@ -7,7 +7,8 @@ import lombok.Getter;
 @Getter
 public enum ClientProperty {
 
-    CHAT_ENABLED("CHAT_ENABLED");
+    CHAT_ENABLED("CHAT_ENABLED"),
+    LUNAR("LUNAR");
 
     private final String key;
 

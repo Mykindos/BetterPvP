@@ -17,6 +17,8 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.settings.events.SettingsUpdatedEvent;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.lunar.event.LCPlayerRegisterEvent;
+import me.mykindos.betterpvp.lunar.event.LCPlayerUnregisterEvent;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -85,6 +87,23 @@ public class ClientListener implements Listener {
 
         updateTab(event.getPlayer());
 
+    }
+
+
+    @EventHandler
+    public void onLunarClientRegister(LCPlayerRegisterEvent event){
+        Optional<Client> clientOptional = clientManager.getObject(event.getPlayer().getUniqueId().toString());
+        clientOptional.ifPresent(client -> {
+            client.putProperty(ClientProperty.LUNAR, true);
+        });
+    }
+
+    @EventHandler
+    public void onLunarClientUnregister(LCPlayerUnregisterEvent event) {
+        Optional<Client> clientOptional = clientManager.getObject(event.getPlayer().getUniqueId().toString());
+        clientOptional.ifPresent(client -> {
+            client.putProperty(ClientProperty.LUNAR, false);
+        });
     }
 
     @UpdateEvent(delay = 5000)
