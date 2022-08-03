@@ -19,16 +19,12 @@ import java.util.Optional;
 
 public class InviteSubCommand extends ClanSubCommand {
 
-
-    @Inject
-    private GamerManager gamerManager;
-
     @Inject
     @Config(path="clans.members.max", defaultValue = "6")
     private int maxClanmMembers;
 
-    public InviteSubCommand(ClanManager clanManager) {
-        super(clanManager);
+    public InviteSubCommand(ClanManager clanManager, GamerManager gamerManager) {
+        super(clanManager, gamerManager);
     }
 
     @Override
@@ -86,11 +82,11 @@ public class InviteSubCommand extends ClanSubCommand {
     }
 
     @Override
-    public ArgumentType getArgumentType(int arg) {
+    public String getArgumentType(int arg) {
         if (arg == 1) {
-            return ArgumentType.PLAYER;
+            return ArgumentType.PLAYER.name();
         }
 
-        return ArgumentType.NONE;
+        return ArgumentType.NONE.name();
     }
 }

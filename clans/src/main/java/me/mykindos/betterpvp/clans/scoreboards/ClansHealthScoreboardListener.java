@@ -24,7 +24,6 @@ public class ClansHealthScoreboardListener implements Listener {
         Objective healthObjective = scoreboard.getObjective("healthDisplay");
         if (healthObjective == null) {
             healthObjective = scoreboard.registerNewObjective("healthDisplay", "dummy", Component.text(ChatColor.RED + "\u2764"));
-
             healthObjective.setDisplaySlot(DisplaySlot.BELOW_NAME);
         }
     }

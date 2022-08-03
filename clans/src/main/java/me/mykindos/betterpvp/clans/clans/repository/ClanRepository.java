@@ -195,6 +195,12 @@ public class ClanRepository implements IRepository<Clan> {
                 new StringStatementValue(member.getRank().name())));
     }
 
+    public void deleteClanMember(Clan clan, ClanMember member) {
+        String deleteMembersQuery = "DELETE FROM " + databasePrefix + "clan_members WHERE Clan = ? AND Member = ?;";
+        database.executeUpdateAsync(new Statement(deleteMembersQuery, new IntegerStatementValue(clan.getId()),
+                new StringStatementValue(member.getUuid())));
+    }
+
     public void delete(Clan clan) {
         String deleteMembersQuery = "DELETE FROM " + databasePrefix + "clan_members WHERE Clan = ?;";
         database.executeUpdateAsync(new Statement(deleteMembersQuery, new IntegerStatementValue(clan.getId())));

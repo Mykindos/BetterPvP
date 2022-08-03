@@ -4,6 +4,7 @@ import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
 import me.mykindos.betterpvp.clans.clans.events.MemberJoinClanEvent;
+import me.mykindos.betterpvp.clans.gamer.GamerManager;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -13,8 +14,8 @@ import java.util.Optional;
 
 public class JoinSubCommand extends ClanSubCommand {
 
-    public JoinSubCommand(ClanManager clanManager) {
-        super(clanManager);
+    public JoinSubCommand(ClanManager clanManager, GamerManager gamerManager) {
+        super(clanManager, gamerManager);
     }
 
     @Override
@@ -39,9 +40,14 @@ public class JoinSubCommand extends ClanSubCommand {
             return;
         }
 
-        Optional<Clan> targetClanOptional = clanManager.getObject(args[0]);
+        Optional<Clan> targetClanOptional = clanManager.getObject(args[0].toLowerCase());
         targetClanOptional.ifPresent(targetClan -> {
             UtilServer.callEvent(new MemberJoinClanEvent(player, targetClan));
         });
+    }
+
+    @Override
+    public String getArgumentType(int arg) {
+        return ClanArgumentType.CLAN.name();
     }
 }

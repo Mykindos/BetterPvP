@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
+import net.kyori.adventure.text.Component;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -160,7 +161,7 @@ public class ClanManager extends Manager<Clan> {
 
     }
 
-    public List<String> getClanTooltip(Player player, Clan target) {
+    public Component getClanTooltip(Player player, Clan target) {
         List<String> list = new ArrayList<>();
         Clan clan = getClanByPlayer(player).orElse(null);
         list.add(ChatColor.RED + "[Clans] " + getRelation(clan, target).getPrimaryAsChatColor() + target.getName() + " Information:");
@@ -169,7 +170,12 @@ public class ClanManager extends Manager<Clan> {
         list.add(" Allies: " + ChatColor.YELLOW + getAllianceList(player, target));
         list.add(" Enemies: " + ChatColor.YELLOW + getEnemyList(player, target));
         list.add(" Members: " + ChatColor.YELLOW + getMembersList(target));
-        return list;
+
+        Component textComponent = Component.text().build();
+        for(String text : list) {
+            textComponent = textComponent.append(Component.text(text + "\n"));
+        }
+        return textComponent;
     }
 
     public String getAllianceList(Player player, Clan clan) {
@@ -225,6 +231,6 @@ public class ClanManager extends Manager<Clan> {
 
     @Override
     public void loadFromList(List<Clan> objects) {
-        objects.forEach(clan -> addObject(clan.getName(), clan));
+        objects.forEach(clan -> addObject(clan.getName().toLowerCase(), clan));
     }
 }

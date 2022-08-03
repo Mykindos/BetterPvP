@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.command.loader;
 
+import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.CommandManager;
 import me.mykindos.betterpvp.core.command.SpigotCommandWrapper;
@@ -31,15 +32,26 @@ public class CommandLoader extends Loader {
             command.getSubCommands().forEach(sub -> {
                 plugin.getInjector().injectMembers(sub);
 
-                var subCommandPath = "command." + command.getName().toLowerCase() + "." + sub.getName().toLowerCase() + ".enabled";
-                addEnabledToConfig(subCommandPath);
-                sub.setEnabled(plugin.getConfig().getBoolean(subCommandPath));
+                String enabledPath = "command." + command.getName().toLowerCase() + "." + sub.getName().toLowerCase() + ".enabled";
+                String rankPath = "command." + command.getName().toLowerCase() + "." + sub.getName().toLowerCase() + ".requiredRank";
+
+                boolean enabled = plugin.getConfig().getOrSaveBoolean(enabledPath, true);
+                Rank rank = Rank.valueOf(plugin.getConfig().getOrSaveString(rankPath, "ADMIN").toUpperCase());
+
+                sub.setEnabled(enabled);
+                sub.setRequiredRank(rank);
+
             });
 
-            var commandPath = "command." + command.getName().toLowerCase() + ".enabled";
-            addEnabledToConfig(commandPath);
+            String enabledPath = "command." + command.getName().toLowerCase() + ".enabled";
+            String rankPath = "command." + command.getName().toLowerCase() + ".requiredRank";
 
-            command.setEnabled(plugin.getConfig().getBoolean(commandPath));
+            boolean enabled = plugin.getConfig().getOrSaveBoolean(enabledPath, true);
+            Rank rank = Rank.valueOf(plugin.getConfig().getOrSaveString(rankPath, "ADMIN").toUpperCase());
+
+            command.setEnabled(enabled);
+            command.setRequiredRank(rank);
+
             commandManager.addObject(command.getName().toLowerCase(), command);
 
             count++;
@@ -51,19 +63,20 @@ public class CommandLoader extends Loader {
     @Override
     public void reload() {
         commandManager.getObjects().values().forEach(command -> {
-            var commandPath = "command." + command.getName().toLowerCase() + ".enabled";
-            command.setEnabled(plugin.getConfig().getBoolean(commandPath));
+            String enabledPath = "command." + command.getName().toLowerCase() + ".enabled";
+            String rankPath = "command." + command.getName().toLowerCase() + ".requiredRank";
+            command.setEnabled(plugin.getConfig().getOrSaveBoolean(enabledPath, true));
+            command.setRequiredRank(Rank.valueOf(plugin.getConfig().getOrSaveString(rankPath, "ADMIN").toUpperCase()));
+
             plugin.getInjector().injectMembers(command);
             command.getSubCommands().forEach(subCommand -> {
+                String subEnabledPath = "command." + command.getName().toLowerCase() + "." + subCommand.getName().toLowerCase() + ".enabled";
+                String subRankPath = "command." + command.getName().toLowerCase() + "." + subCommand.getName().toLowerCase() + ".requiredRank";
+                subCommand.setEnabled(plugin.getConfig().getOrSaveBoolean(subEnabledPath, true));
+                subCommand.setRequiredRank(Rank.valueOf(plugin.getConfig().getOrSaveString(subRankPath, "ADMIN").toUpperCase()));
+
                 plugin.getInjector().injectMembers(plugin);
             });
         });
-    }
-
-    private void addEnabledToConfig(String path) {
-        var set = plugin.getConfig().isSet(path);
-        if (!set) {
-            plugin.getConfig().set(path, true);
-        }
     }
 }

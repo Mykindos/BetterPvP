@@ -4,11 +4,7 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.framework.annotations.WithReflection;
 import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class TeleportCommand extends Command {
 
@@ -47,12 +43,7 @@ public class TeleportCommand extends Command {
     }
 
     @Override
-    public List<String> processTabComplete(CommandSender sender, String[] args) {
-        List<String> completions = new ArrayList<>();
-        if (args.length < 3) {
-            Bukkit.getOnlinePlayers().forEach(player -> completions.add(player.getName()));
-        }
-
-        return completions;
+    public String getArgumentType(int arg) {
+        return ArgumentType.PLAYER.name();
     }
 }

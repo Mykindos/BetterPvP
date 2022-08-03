@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
 import me.mykindos.betterpvp.clans.clans.components.ClanMember;
 import me.mykindos.betterpvp.clans.clans.events.ChunkClaimEvent;
+import me.mykindos.betterpvp.clans.gamer.GamerManager;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -24,8 +25,8 @@ public class ClaimSubCommand extends ClanSubCommand {
     @Config(path = "clans.claims.additional", defaultValue = "3")
     private int additionalClaims;
 
-    public ClaimSubCommand(ClanManager clanManager) {
-        super(clanManager);
+    public ClaimSubCommand(ClanManager clanManager, GamerManager gamerManager) {
+        super(clanManager, gamerManager);
     }
 
     @Override
@@ -122,7 +123,7 @@ public class ClaimSubCommand extends ClanSubCommand {
             }
 
 
-            UtilServer.callEvent(new ChunkClaimEvent(player, clan, chunk));
+            UtilServer.callEvent(new ChunkClaimEvent(player, clan));
 
 
         } else {

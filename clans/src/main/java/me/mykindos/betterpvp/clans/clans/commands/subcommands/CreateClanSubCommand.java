@@ -5,6 +5,7 @@ import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
 import me.mykindos.betterpvp.clans.clans.events.ClanCreateEvent;
+import me.mykindos.betterpvp.clans.gamer.GamerManager;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -27,8 +28,8 @@ public class CreateClanSubCommand extends ClanSubCommand {
     @Config(path = "command.clan.create.minCharactersInClanName", defaultValue = "3")
     private int minCharactersInClanName;
 
-    public CreateClanSubCommand(ClanManager clanManager) {
-        super(clanManager);
+    public CreateClanSubCommand(ClanManager clanManager, GamerManager gamerManager) {
+        super(clanManager, gamerManager);
     }
 
     @Override
@@ -69,11 +70,12 @@ public class CreateClanSubCommand extends ClanSubCommand {
             return;
         }
 
-        Optional<Clan> clanOptional = clanManager.getObject(clanName);
+        Optional<Clan> clanOptional = clanManager.getObject(clanName.toLowerCase());
         if (clanOptional.isEmpty()) {
             var timestamp = new Timestamp(System.currentTimeMillis());
             Clan clan = Clan.builder().name(clanName).level(1)
                     .timeCreated(timestamp).lastLogin(timestamp)
+                    .online(true)
                     .build();
             Bukkit.getPluginManager().callEvent(new ClanCreateEvent(player, clan));
         } else {
