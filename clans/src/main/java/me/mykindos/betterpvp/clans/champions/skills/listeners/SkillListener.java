@@ -76,7 +76,7 @@ public class SkillListener implements Listener {
 
         if (hasNegativeEffect(player)) return;
 
-        if (!skill.canUse(player))  return;
+        if (!skill.canUse(player)) return;
 
         if (skill instanceof CooldownSkill cooldownSkill) {
             if (!cooldownManager.add(player, skill.getName(), cooldownSkill.getCooldown(level),
@@ -208,6 +208,34 @@ public class SkillListener implements Listener {
 
     }
 
+    @EventHandler (priority = EventPriority.LOWEST)
+    public void onUseSkillDisabled(PlayerUseSkillEvent event) {
+        Player player = event.getPlayer();
+        Skill skill = event.getSkill();
+
+        if (!skill.isEnabled()) {
+            UtilMessage.message(player, skill.getClassType().getName(), ChatColor.GREEN + skill.getName() + ChatColor.GRAY + " has been disabled by the server.");
+            event.setCancelled(true);
+
+        }
+    }
+
+    @EventHandler
+    public void onUseSkillWhileSlowed(PlayerUseInteractSkillEvent event) {
+        if(event.isCancelled()) return;
+
+        Player player = event.getPlayer();
+        InteractSkill interactSkill = (InteractSkill) event.getSkill();
+
+        if(interactSkill.canUseSlowed()) return;
+
+        if(player.hasPotionEffect(PotionEffectType.SLOW)){
+            UtilMessage.message(player, event.getSkill().getClassType().getName(), "You cannot use "
+                    + ChatColor.GREEN + event.getSkill().getName() + ChatColor.GRAY + " while slowed.");
+            event.setCancelled(true);
+        }
+    }
+
     @EventHandler
     public void onUseSkillInLiquid(PlayerUseSkillEvent event) {
         if (event.isCancelled()) return;
@@ -221,8 +249,6 @@ public class SkillListener implements Listener {
             event.setCancelled(true);
         }
     }
-
-
 
 
     private int getLevel(Player player, BuildSkill buildSkill) {

@@ -22,6 +22,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 @Singleton
@@ -156,17 +157,18 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, EnergyS
 
     @Override
     public boolean canUse(Player player) {
+
         return !wallKick(player, 1);
     }
 
 
     @Override
-    public int getCooldown(int level) {
-        return getSkillConfig().getCooldown();
+    public double getCooldown(int level) {
+        return getSkillConfig().getCooldown() - ((level - 1) * 0.5);
     }
 
     @Override
-    public int getEnergy(int level) {
+    public float getEnergy(int level) {
         return getSkillConfig().getEnergyCost();
     }
 
@@ -183,5 +185,10 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, EnergyS
     @Override
     public Action[] getActions() {
         return SkillActions.RIGHT_CLICK;
+    }
+
+    @Override
+    public boolean canUseSlowed() {
+        return false;
     }
 }
