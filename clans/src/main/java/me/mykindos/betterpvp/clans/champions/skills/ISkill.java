@@ -12,7 +12,11 @@ public interface ISkill {
 
     Role getClassType();
 
-    SkillType getSkillType();
+    SkillType getType();
+
+    default int getMaxLevel() {
+        return 5;
+    }
 
     boolean isEnabled();
 

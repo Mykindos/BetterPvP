@@ -1,9 +1,9 @@
 package me.mykindos.betterpvp.lunar.nethandler.server;
 
+import lombok.Getter;
 import me.mykindos.betterpvp.lunar.nethandler.ByteBufWrapper;
 import me.mykindos.betterpvp.lunar.nethandler.LCPacket;
 import me.mykindos.betterpvp.lunar.nethandler.shared.LCNetHandler;
-import lombok.Getter;
 
 import java.io.IOException;
 import java.util.HashSet;

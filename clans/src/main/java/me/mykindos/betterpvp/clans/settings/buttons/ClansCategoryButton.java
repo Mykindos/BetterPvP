@@ -17,13 +17,11 @@ import java.util.Optional;
 
 public class ClansCategoryButton extends Button {
 
-    private final MenuManager menuManager;
     private final GamerManager gamerManager;
 
-    public ClansCategoryButton(MenuManager menuManager, GamerManager gamerManager) {
+    public ClansCategoryButton(GamerManager gamerManager) {
         super(1, new ItemStack(Material.DIAMOND_HELMET), ChatColor.GREEN.toString() + ChatColor.BOLD + "Clans Settings",
                 ChatColor.GRAY + "View generic settings related to the clans gamemode");
-        this.menuManager = menuManager;
         this.gamerManager = gamerManager;
     }
 
@@ -33,7 +31,7 @@ public class ClansCategoryButton extends Button {
         gamerOptional.ifPresent(gamer -> {
 
             ClansSettingsMenu clansSettingsMenu = new ClansSettingsMenu(player, gamer);
-            menuManager.openMenu(player, clansSettingsMenu);
+            MenuManager.openMenu(player, clansSettingsMenu);
             UtilSound.playSound(player, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1, false);
         });
 

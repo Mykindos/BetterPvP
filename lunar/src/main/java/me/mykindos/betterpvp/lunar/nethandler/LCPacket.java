@@ -3,8 +3,14 @@ package me.mykindos.betterpvp.lunar.nethandler;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import me.mykindos.betterpvp.lunar.nethandler.client.*;
-import me.mykindos.betterpvp.lunar.nethandler.server.*;
-import me.mykindos.betterpvp.lunar.nethandler.shared.*;
+import me.mykindos.betterpvp.lunar.nethandler.server.LCPacketVoice;
+import me.mykindos.betterpvp.lunar.nethandler.server.LCPacketVoiceChannel;
+import me.mykindos.betterpvp.lunar.nethandler.server.LCPacketVoiceChannelRemove;
+import me.mykindos.betterpvp.lunar.nethandler.server.LCPacketVoiceChannelUpdate;
+import me.mykindos.betterpvp.lunar.nethandler.shared.LCNetHandler;
+import me.mykindos.betterpvp.lunar.nethandler.shared.LCPacketEmoteBroadcast;
+import me.mykindos.betterpvp.lunar.nethandler.shared.LCPacketWaypointAdd;
+import me.mykindos.betterpvp.lunar.nethandler.shared.LCPacketWaypointRemove;
 
 import java.io.IOException;
 import java.util.HashMap;

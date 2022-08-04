@@ -7,8 +7,10 @@ import me.mykindos.betterpvp.clans.champions.roles.RoleManager;
 import me.mykindos.betterpvp.clans.champions.roles.events.RoleChangeEvent;
 import me.mykindos.betterpvp.clans.gamer.Gamer;
 import me.mykindos.betterpvp.clans.gamer.GamerManager;
+import me.mykindos.betterpvp.core.combat.events.CustomDamageDurabilityEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
@@ -87,6 +89,34 @@ public class RoleListener implements Listener {
                 equipRole(player, null);
             }
 
+        }
+    }
+
+    @EventHandler
+    public void reduceDurability(CustomDamageDurabilityEvent event) {
+        if (event.getCustomDamageEvent().getDamagee() instanceof Player player) {
+            Optional<Role> roleOptional = roleManager.getObject(player.getUniqueId());
+            if(roleOptional.isPresent()){
+                Role role = roleOptional.get();
+                if(role != Role.WARLOCK) {
+                    double chance = (float) Role.WARLOCK.getChestplate().getMaxDurability() / (float) role.getChestplate().getMaxDurability();
+                    if(UtilMath.randDouble(0, chance) >= 1) {
+                        event.setDamageeTakeDurability(false);
+                    }
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onGoldSwordDamage(CustomDamageDurabilityEvent event) {
+        if(event.getCustomDamageEvent().getDamager() instanceof Player player) {
+            Material weapon = player.getInventory().getItemInMainHand().getType();
+            if(weapon == Material.GOLDEN_SWORD){
+                if(UtilMath.randomInt(0, 10) <= 6) {
+                    event.setDamagerTakeDurability(false);
+                }
+            }
         }
     }
 

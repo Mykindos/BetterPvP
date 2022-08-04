@@ -16,13 +16,13 @@ import org.bukkit.event.Listener;
 import java.util.Optional;
 
 @BPvPListener
-public class CombatListener implements Listener {
+public class CombatTagListener implements Listener {
 
     private final GamerManager gamerManager;
     private final EffectManager effectManager;
 
     @Inject
-    public CombatListener(GamerManager gamerManager, EffectManager effectManager) {
+    public CombatTagListener(GamerManager gamerManager, EffectManager effectManager) {
         this.gamerManager = gamerManager;
         this.effectManager = effectManager;
     }

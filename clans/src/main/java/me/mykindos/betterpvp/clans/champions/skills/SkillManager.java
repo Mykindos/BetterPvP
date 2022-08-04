@@ -4,10 +4,12 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.clans.Clans;
+import me.mykindos.betterpvp.clans.champions.roles.Role;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 import org.reflections.Reflections;
 
 import java.lang.reflect.Modifier;
+import java.util.List;
 import java.util.Set;
 
 @Slf4j
@@ -46,6 +48,10 @@ public class SkillManager extends Manager<Skill> {
             clans.getInjector().injectMembers(skill);
             skill.reload();
         });
+    }
+
+    public List<Skill> getSkillsForRole(Role role) {
+        return objects.values().stream().filter(skill -> skill.getClassType() == role).toList();
     }
 
 }

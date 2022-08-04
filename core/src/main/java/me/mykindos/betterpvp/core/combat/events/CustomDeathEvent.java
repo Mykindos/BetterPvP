@@ -2,14 +2,12 @@ package me.mykindos.betterpvp.core.combat.events;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import me.mykindos.betterpvp.core.framework.events.CustomEvent;
+import me.mykindos.betterpvp.core.framework.events.CustomCancellableEvent;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
-import org.bukkit.event.HandlerList;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class CustomDeathEvent extends CustomEvent {
+public class CustomDeathEvent extends CustomCancellableEvent {
 
     private final Player killed;
     private final Player killer;

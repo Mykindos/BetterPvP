@@ -1,17 +1,22 @@
 package me.mykindos.betterpvp.core.combat.events;
 
-import me.mykindos.betterpvp.core.framework.events.CustomEvent;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import me.mykindos.betterpvp.core.framework.events.CustomCancellableEvent;
 import org.bukkit.entity.LightningStrike;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Projectile;
-
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.jetbrains.annotations.NotNull;
 
-public class CustomDamageEvent extends CustomEvent {
+@EqualsAndHashCode(callSuper = true)
+@Data
+public class CustomDamageEvent extends CustomCancellableEvent {
 
+    @NotNull
     private final LivingEntity damagee;
     private final LivingEntity damager;
-    private final Projectile proj;
+    private final Projectile projectile;
     private final DamageCause cause;
     private double damage;
     private boolean knockback;
@@ -32,7 +37,7 @@ public class CustomDamageEvent extends CustomEvent {
     public CustomDamageEvent(LivingEntity damagee, LivingEntity damager, Projectile proj, DamageCause cause, double damage, boolean knockback) {
         this.damagee = damagee;
         this.damager = damager;
-        this.proj = proj;
+        this.projectile = proj;
         this.cause = cause;
         this.damage = damage;
         this.knockback = knockback;
@@ -65,7 +70,7 @@ public class CustomDamageEvent extends CustomEvent {
     public CustomDamageEvent(LivingEntity damagee, LivingEntity damager, Projectile proj, LightningStrike lightning, DamageCause cause, double damage, boolean knockback) {
         this.damagee = damagee;
         this.damager = damager;
-        this.proj = proj;
+        this.projectile = proj;
         this.cause = cause;
         this.damage = damage;
         this.knockback = knockback;
@@ -73,59 +78,6 @@ public class CustomDamageEvent extends CustomEvent {
 
     }
 
-    public void setIgnoreArmour(boolean b) {
-        this.ignoreArmour = b;
-    }
-
-    public String getReason() {
-        return reason;
-    }
-
-    public void setReason(String reason) {
-        this.reason = reason;
-    }
-
-    public boolean isIgnoreArmour() {
-        return ignoreArmour;
-    }
-
-    public long getDamageDelay() {
-        return damageDelay;
-    }
-
-    public void setDamageDelay(long l) {
-        this.damageDelay = l;
-    }
-
-
-    public LivingEntity getDamagee() {
-        return damagee;
-    }
-
-
-    public LivingEntity getDamager() {
-        return damager;
-    }
-
-    public LightningStrike getLightning() {
-        return lightning;
-    }
-
-    public Projectile getProjectile() {
-        return proj;
-    }
-
-    public DamageCause getCause() {
-        return cause;
-    }
-
-    public double getDamage() {
-        return damage;
-    }
-
-    public boolean getKnockback() {
-        return knockback;
-    }
 
     /**
      * Sets the damage of the event
@@ -153,15 +105,5 @@ public class CustomDamageEvent extends CustomEvent {
     public void removeDamage(double dam) {
         this.damage -= dam;
     }
-
-    /**
-     * Decides whether or not a player takes knockback from an attack.
-     *
-     * @param bool True = Knockback, False = No knockback
-     */
-    public void setKnockback(boolean bool) {
-        this.knockback = bool;
-    }
-
 
 }

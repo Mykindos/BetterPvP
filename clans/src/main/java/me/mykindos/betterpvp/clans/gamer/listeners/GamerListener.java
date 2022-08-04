@@ -38,6 +38,7 @@ public class GamerListener implements Listener {
 
     @EventHandler
     public void onClientLogin(ClientLoginEvent event) {
+
         Optional<Gamer> gamerOptional = gamerManager.getObject(event.getClient().getUuid());
         Gamer gamer;
         if(gamerOptional.isEmpty()){
@@ -45,14 +46,16 @@ public class GamerListener implements Listener {
 
             gamerManager.addObject(event.getClient().getUuid(), gamer);
             gamerManager.getGamerRepository().save(gamer);
+            gamerManager.getBuildRepository().loadDefaultBuilds(gamer);
         }else{
             gamer = gamerOptional.get();
+            gamerManager.getBuildRepository().loadBuilds(gamer);
+            gamerManager.getBuildRepository().loadDefaultBuilds(gamer);
 
         }
         checkUnsetProperties(gamer);
 
         Bukkit.getOnlinePlayers().forEach(player -> UtilServer.callEvent(new ScoreboardUpdateEvent(player)));
-
 
     }
 

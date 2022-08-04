@@ -12,6 +12,7 @@ public class BuildSkill {
     private int level;
 
     public String getString() {
-        return skill.getName() + " " + getLevel();
+
+        return skill == null ? "" : skill.getName() + " " + getLevel();
     }
 }

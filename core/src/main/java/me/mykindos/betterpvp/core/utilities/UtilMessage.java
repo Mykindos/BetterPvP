@@ -23,17 +23,6 @@ public class UtilMessage {
     }
 
     /**
-     * Sends a message to a player with appropriate formatting
-     *
-     * @param player  The player
-     * @param prefix  The message
-     * @param message Message to send to a player
-     */
-    public static void message(Player player, String prefix, String message) {
-        player.sendMessage(ChatColor.BLUE + prefix + "> " + ChatColor.GRAY + message);
-    }
-
-    /**
      * Sends a message to a CommandSender with appropriate formatting
      * Can also send to players
      *

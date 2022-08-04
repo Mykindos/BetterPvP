@@ -1,8 +1,8 @@
 package me.mykindos.betterpvp.lunar.nethandler.shared;
 
+import lombok.Getter;
 import me.mykindos.betterpvp.lunar.nethandler.ByteBufWrapper;
 import me.mykindos.betterpvp.lunar.nethandler.LCPacket;
-import lombok.Getter;
 
 import java.io.IOException;
 

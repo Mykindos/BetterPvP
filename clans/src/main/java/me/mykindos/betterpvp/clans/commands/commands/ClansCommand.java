@@ -2,9 +2,9 @@ package me.mykindos.betterpvp.clans.commands.commands;
 
 import com.google.inject.Inject;
 import me.mykindos.betterpvp.clans.Clans;
+import me.mykindos.betterpvp.clans.champions.skills.SkillManager;
 import me.mykindos.betterpvp.clans.commands.ClansCommandLoader;
 import me.mykindos.betterpvp.clans.listener.ClansListenerLoader;
-import me.mykindos.betterpvp.clans.champions.skills.SkillManager;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.Command;

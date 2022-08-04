@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.core.chat.events;
 
 import lombok.Getter;
 import lombok.Setter;
-import me.mykindos.betterpvp.core.framework.events.CustomEvent;
+import me.mykindos.betterpvp.core.framework.events.CustomCancellableEvent;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 
@@ -10,7 +10,7 @@ import java.util.Collection;
 
 @Getter
 @Setter
-public class ChatSentEvent extends CustomEvent {
+public class ChatSentEvent extends CustomCancellableEvent {
 
     private final Player player;
     private Collection<? extends Player> targets;
