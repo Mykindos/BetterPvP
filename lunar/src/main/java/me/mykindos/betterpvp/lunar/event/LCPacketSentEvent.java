@@ -1,7 +1,7 @@
 package me.mykindos.betterpvp.lunar.event;
 
-import me.mykindos.betterpvp.lunar.nethandler.LCPacket;
 import lombok.Getter;
+import me.mykindos.betterpvp.lunar.nethandler.LCPacket;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerEvent;

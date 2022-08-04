@@ -6,8 +6,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.List;
+
 @Data
-public abstract class Button {
+public class Button {
 
     private final int slot;
     private final ItemStack itemStack;
@@ -21,7 +23,16 @@ public abstract class Button {
         this.itemStack = UtilItem.removeAttributes(UtilItem.setItemNameAndLore(item, name, lore));
     }
 
-    public abstract void onClick(Player player, ClickType clickType);
+    public Button(int slot, ItemStack item, String name, List<String> lore) {
+        this.lore = lore.toArray(new String[0]);
+        this.slot = slot;
+        this.name = name;
+        this.itemStack = UtilItem.removeAttributes(UtilItem.setItemNameAndLore(item, name, lore));
+    }
+
+    public void onClick(Player player, ClickType clickType) {
+
+    }
 
     public double getClickCooldown(){
         return 0.05;

@@ -1,0 +1,482 @@
+package me.mykindos.betterpvp.core.combat.listeners;
+
+import me.mykindos.betterpvp.core.combat.data.DamageData;
+import me.mykindos.betterpvp.core.combat.events.*;
+import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
+import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.*;
+import org.bukkit.*;
+import org.bukkit.entity.*;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.util.Vector;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@BPvPListener
+public class CombatListener implements Listener {
+
+    private final List<DamageData> damageDataList;
+
+    public CombatListener() {
+        damageDataList = new ArrayList<>();
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void damageEvent(CustomDamageEvent event) {
+        if (event.isCancelled()) {
+            //System.out.println(event.getCancelReason());
+            return;
+        }
+
+        // TODO cancel this elsewhere...
+        if (event.getDamagee() instanceof ArmorStand) {
+            return;
+        }
+
+
+        // TODO handle this elsewhere, or not at all
+        //if (!(event.getDamager() instanceof Player) && event.getDamagee() instanceof Player) {
+        //    Gamer gamer = GamerManager.getOnlineGamer((Player) event.getDamagee());
+        //    if (gamer != null) {
+        //        gamer.setLastDamaged(System.currentTimeMillis());
+        //    }
+        //}
+        //if (event.getDamagee() instanceof Player && event.getDamager() instanceof Player) {
+        //    if (ClanUtilities.canHurt((Player) event.getDamager(), (Player) event.getDamagee())) {
+        //        Gamer gamer = GamerManager.getOnlineGamer((Player) event.getDamager());
+        //        if (gamer != null) {
+        //            gamer.setLastDamaged(System.currentTimeMillis());
+        //            gamer.setLastDamagedByPlayer(System.currentTimeMillis());
+        //            gamer.setStatValue("Damage dealt", gamer.getStatValue("Damage dealt") + event.getDamage());
+        //        }
+//
+//
+        //        Gamer xGamer = GamerManager.getOnlineGamer((Player) event.getDamagee());
+        //        if (xGamer != null) {
+        //            xGamer.setLastDamaged(System.currentTimeMillis());
+        //            xGamer.setLastDamagedByPlayer(System.currentTimeMillis());
+        //        }
+//
+//
+        //    } else {
+        //        return;
+        //    }
+//
+//
+        //}
+
+
+        damage(event);
+    }
+
+    private void damage(CustomDamageEvent event) {
+
+
+        // TODO this shouldn't be necessary, we check it before the custom damage event is called
+        // Maybe when we call CustomDamageEvent ourselves
+        if (hasDamageData(event.getDamagee().getUniqueId().toString(), event.getCause())) {
+            return;
+//
+        }
+
+        // TODO handle this elsewhere
+        //if (event.getDamagee() instanceof Sheep) {
+        //    Sheep sheep = (Sheep) event.getDamagee();
+        //    if (sheep.getCustomName() != null) {
+        //        event.setCancelled("Combat Log Sheep");
+        //        return;
+        //    }
+        //}
+
+        // TODO we should just cancel this before the custom damage event is called
+        //if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
+        //    if (event.getDamager() != null) {
+        //        if (event.getDamager().getHealth() <= 0) {
+        //            return;
+        //        }
+        //    }
+        //}
+
+        if (event.getDamagee().getHealth() > 0) {
+            if (event.getDamage() >= 0) {
+
+                damageDataList.add(new DamageData(event.getDamagee().getUniqueId().toString(), event.getCause(), event.getDamageDelay()));
+
+                if (event.isKnockback()) {
+                    if (event.getDamager() != null) {
+                        CustomKnockbackEvent cke = new CustomKnockbackEvent(event.getDamagee(), event.getDamager(), event.getDamage(), event);
+                        Bukkit.getPluginManager().callEvent(cke);
+                    }
+                }
+
+                CustomDamageReductionEvent customDamageReductionEvent = new CustomDamageReductionEvent(event, event.getDamage());
+                UtilServer.callEvent(customDamageReductionEvent);
+
+                double damage = event.isIgnoreArmour() ? event.getDamage() : customDamageReductionEvent.getDamage();
+
+                //if (event.getDamager() != null) {
+                //    LogManager.addLog(event.getDamagee(), event.getDamager(), event.getReason(), damage);
+                //}
+                playDamageEffect(event);
+                updateDurability(event);
+
+                if (!event.getDamagee().isDead()) {
+
+
+                    if (event.getDamagee().getHealth() - damage < 1.0) {
+                        //if (Clans.getOptions().isFNG()) {
+                        //    return;
+                        //}
+
+                        event.getDamagee().setHealth(0);
+
+
+                    } else {
+
+                        event.getDamagee().setHealth(event.getDamagee().getHealth() - damage);
+                    }
+
+
+                }
+
+            }
+
+
+            // TODO handle this elsewhere
+            //if (event.getDamagee() instanceof Player) {
+            //    Player p = (Player) event.getDamagee();
+            //    if (p.getInventory().getItemInMainHand().getType() == Material.BOOK) {
+            //        p.sendMessage("");
+            //        p.sendMessage("Damage: " + event.getDamage());
+            //        p.sendMessage("Damage Reduced: " + UtilGamer.getDamageReduced(event.getDamage(), event.getDamagee()));
+            //        p.sendMessage("Delay: " + event.getDamageDelay());
+            //        p.sendMessage("Cause: " + event.getCause().name());
+//
+            //    }
+            //}
+        }
+
+
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPreDamage(PreCustomDamageEvent event) {
+        CustomDamageEvent cde = event.getCustomDamageEvent();
+
+        if(cde.getDamager() != null) {
+            if (cde.getDamager().equals(cde.getDamagee())) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+
+        if(UtilPlayer.isCreativeOrSpectator(cde.getDamagee())){
+            event.setCancelled(true);
+        }
+
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void startCustomDamageEvent(EntityDamageEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
+
+        if (!(event.getEntity() instanceof LivingEntity damagee)) {
+            return;
+        }
+        if ((event instanceof EntityDamageByEntityEvent ev)) {
+
+            if (ev.getDamager() instanceof EvokerFangs) {
+                event.setCancelled(true);
+            }
+
+            if (ev.getDamager() instanceof FishHook fishHook) {
+                if (fishHook.getShooter() instanceof Player) {
+                    return;
+                }
+
+            }
+        }
+
+        if (event.getCause() == EntityDamageEvent.DamageCause.POISON) {
+            if (damagee.getHealth() < 2) {
+                event.setCancelled(true);
+            }
+        }
+
+        if (event.getCause() == EntityDamageEvent.DamageCause.LIGHTNING) {
+            event.setCancelled(true);
+        }
+
+        if (event.getCause() == EntityDamageEvent.DamageCause.WITHER) {
+            event.setCancelled(true);
+        }
+
+
+        // TODO move elsewhere
+
+        //if (event.getEntity() instanceof Sheep sheep) {
+        //    if (sheep.customName() != null) {
+        //        event.setCancelled(true);
+        //    }
+        //}
+//
+        //if (ShopManager.isShop((LivingEntity) event.getEntity())) {
+        //    event.setCancelled(true);
+        //}
+
+        if (event.isCancelled()) {
+            return;
+        }
+
+        LivingEntity damager = getDamagerEntity(event);
+        Projectile proj = getProjectile(event);
+
+        CustomDamageEvent cde = new CustomDamageEvent(damagee, damager, proj, event.getCause(), event.getDamage(), true);
+        UtilDamage.doCustomDamage(cde);
+
+        event.setCancelled(true);
+
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void handleCauseTimers(CustomDamageEvent e) {
+
+        if (e.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK
+                || e.getCause() == EntityDamageEvent.DamageCause.PROJECTILE
+                || e.getCause() == EntityDamageEvent.DamageCause.CUSTOM) {
+            e.setDamageDelay(400);
+        }
+
+        if (e.getCause() == EntityDamageEvent.DamageCause.POISON) {
+            e.setDamageDelay(1000);
+        }
+
+        if (e.getCause() == EntityDamageEvent.DamageCause.LAVA) {
+            e.setDamageDelay(400);
+        }
+
+        if (e.getDamagee().getLocation().getBlock().isLiquid()) {
+            if (e.getCause() == EntityDamageEvent.DamageCause.FIRE || e.getCause() == EntityDamageEvent.DamageCause.FIRE_TICK) {
+                e.cancel("Already in lava / liquid");
+            }
+        }
+
+
+    }
+
+    @EventHandler
+    public void onKnockbackSprintBonus(CustomKnockbackEvent event) {
+        double knockback = event.getDamage();
+        if (event.getDamager() instanceof Player player) {
+            if (player.isSprinting()) {
+                if (event.getCustomDamageEvent().getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
+                    knockback += 3;
+                }
+            }
+        }
+
+        if (knockback < 2.0D) knockback = 2.0D;
+        knockback = Math.log10(knockback);
+
+        event.setDamage(knockback);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onFinalKB(CustomKnockbackEvent event) {
+
+        double knockback = event.getDamage();
+        if (knockback < 2.0D) knockback = 2.0D;
+        knockback = Math.log10(knockback);
+
+        Vector trajectory = UtilVelocity.getTrajectory2d(event.getDamager(), event.getDamagee());
+        trajectory.multiply(0.8D * knockback);
+        trajectory.setY(Math.abs(trajectory.getY()));
+
+        UtilVelocity.velocity(event.getDamagee(),
+                trajectory, 0.3D + trajectory.length() * 0.8D, false, 0.0D, Math.abs(0.2D * knockback), 0.4D + 0.04D * knockback, true);
+    }
+
+    @UpdateEvent
+    public void delayUpdater() {
+        damageDataList.removeIf(damageData -> UtilTime.elapsed(damageData.getTimeOfDamage(), damageData.getDamageDelay()));
+    }
+
+    public boolean hasDamageData(String uuid, EntityDamageEvent.DamageCause cause) {
+        return damageDataList.stream().anyMatch(damageData -> damageData.getUuid().equalsIgnoreCase(uuid) && damageData.getCause() == cause);
+    }
+
+    private Projectile getProjectile(EntityDamageEvent event) {
+        if (!(event instanceof EntityDamageByEntityEvent ev)) {
+            return null;
+        }
+
+        if ((ev.getDamager() instanceof Projectile)) {
+            return (Projectile) ev.getDamager();
+        }
+        return null;
+    }
+
+    public static LivingEntity getDamagerEntity(EntityDamageEvent event) {
+
+        if (!(event instanceof EntityDamageByEntityEvent ev)) {
+            return null;
+        }
+
+        if ((ev.getDamager() instanceof LivingEntity)) {
+            return (LivingEntity) ev.getDamager();
+        }
+
+        if (!(ev.getDamager() instanceof Projectile projectile)) {
+            return null;
+        }
+
+        if (projectile.getShooter() == null) {
+            return null;
+        }
+        if (!(projectile.getShooter() instanceof LivingEntity)) {
+            return null;
+        }
+        return (LivingEntity) projectile.getShooter();
+    }
+
+    private void playDamageEffect(CustomDamageEvent event) {
+        event.getDamagee().playEffect(EntityEffect.HURT);
+        if (event.getProjectile() instanceof Arrow) {
+            if (event.getDamager() instanceof Player player) {
+
+                player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.5f, 0.7f);
+                event.getDamager().getWorld().playSound(event.getDamagee().getLocation(), Sound.ENTITY_ARROW_HIT, 0.5f, 1.0f);
+
+            }
+        } else {
+
+            event.getDamagee().getWorld().playSound(event.getDamagee().getLocation(),
+                    getDamageSound(event.getDamagee().getType()), 1.0F, 1.0F);
+
+        }
+    }
+
+    public Sound getDamageSound(EntityType entityType) {
+        try {
+            String entName = entityType.name().toUpperCase();
+            return Sound.valueOf("ENTITY_" + entName + "_HURT");
+        } catch (IllegalArgumentException ignore) {
+        }
+
+        return Sound.ENTITY_PLAYER_HURT;
+    }
+
+    private void updateDurability(CustomDamageEvent event) {
+
+        CustomDamageDurabilityEvent durabilityEvent = new CustomDamageDurabilityEvent(event);
+        UtilServer.callEvent(durabilityEvent);
+
+        if (durabilityEvent.isDamageeTakeDurability()) {
+            if (event.getDamagee() instanceof Player damagee) {
+
+                for (ItemStack armour : damagee.getEquipment().getArmorContents()) {
+                    if (armour == null) continue;
+                    ItemMeta meta = armour.getItemMeta();
+                    if (meta instanceof Damageable armourMeta) {
+                        armourMeta.setDamage(armourMeta.getDamage() + 1);
+                        armour.setItemMeta(armourMeta);
+
+                        // TODO move this somewhere else
+                        //    if (armour.getType() == Material.TURTLE_HELMET) {
+                        //        takeDura = false;
+                        //    }
+                        //}
+
+                        if (armourMeta.getDamage() > armour.getType().getMaxDurability()) {
+                            if (armour.getType().name().contains("HELMET")) {
+                                damagee.getEquipment().setHelmet(null);
+                            }
+                            if (armour.getType().name().contains("CHESTPLATE")) {
+                                damagee.getEquipment().setChestplate(null);
+                            }
+                            if (armour.getType().name().contains("LEGGINGS")) {
+                                damagee.getEquipment().setLeggings(null);
+                            }
+                            if (armour.getType().name().contains("BOOTS")) {
+                                damagee.getEquipment().setBoots(null);
+                            }
+
+                            damagee.playSound(damagee.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
+                        }
+                    }
+
+                }
+
+                damagee.updateInventory();
+            }
+        }
+
+        if (durabilityEvent.isDamagerTakeDurability()) {
+            if (event.getDamager() instanceof Player damager) {
+                if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
+
+
+                ItemStack weapon = damager.getInventory().getItemInMainHand();
+                if (weapon.getType() == Material.AIR) return;
+                ItemMeta meta = weapon.getItemMeta();
+                if (meta instanceof Damageable weaponMeta) {
+                    weaponMeta.setDamage(weaponMeta.getDamage() + 1);
+                    weapon.setItemMeta(weaponMeta);
+
+                    damager.updateInventory();
+                }
+
+
+            }
+        }
+
+        // TODO handle elsewhere
+        //if (event.getDamager() instanceof Player) {
+        //    if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
+        //        Player p = (Player) event.getDamager();
+        //        ItemStack hand = p.getInventory().getItemInMainHand();
+        //        if (hand != null) {
+        //            if (UtilItem.isAxe(hand.getType()) || UtilItem.isSword(hand.getType())
+        //                    || UtilItem.isPickAxe(hand.getType()) || UtilItem.isHoe(hand.getType())
+        //                    || UtilItem.isShovel(hand.getType())) {
+//
+//
+        //                if (p.getInventory().getItemInMainHand().getType() == Material.GOLDEN_SWORD) {
+        //                    if (UtilMath.randomInt(10) > 6) {
+        //                        hand.setDurability((short) (hand.getDurability() + 1));
+//
+        //                    }
+        //                    p.updateInventory();
+        //                } else {
+//
+        //                    Weapon w = WeaponManager.getWeapon(hand);
+        //                    if (w != null && w instanceof ILegendary) {
+        //                        return;
+        //                    }
+//
+        //                    hand.setDurability((short) (hand.getDurability() + 1));
+        //                }
+        //                if (hand.getDurability() > hand.getType().getMaxDurability()) {
+        //                    p.getInventory().setItemInMainHand(new ItemStack(Material.AIR));
+        //                    p.playSound(p.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
+//
+        //                }
+        //            }
+        //        }
+//
+//
+        //    }
+        //}
+    }
+
+}

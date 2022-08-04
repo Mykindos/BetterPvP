@@ -16,6 +16,11 @@ public class Gamer implements Invitable {
     private final Client client;
     private final String uuid;
 
+    public Gamer(Client client, String uuid){
+        this.client = client;
+        this.uuid = uuid;
+    }
+
     private HashMap<String, RoleBuild> activeBuilds = new HashMap<>();
     private List<RoleBuild> builds = new ArrayList<>();
     private HashMap<Enum<?>, Object> properties = new HashMap<>();

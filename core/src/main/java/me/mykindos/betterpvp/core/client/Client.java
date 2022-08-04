@@ -17,6 +17,8 @@ public class Client {
     Rank rank;
     boolean administrating;
 
+    public int test = 1;
+
     private final HashMap<Enum<?>, Object> properties = new HashMap<>();
 
     @SuppressWarnings("unchecked")

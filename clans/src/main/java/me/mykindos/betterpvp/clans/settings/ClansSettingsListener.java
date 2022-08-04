@@ -4,7 +4,6 @@ import com.google.inject.Inject;
 import me.mykindos.betterpvp.clans.gamer.GamerManager;
 import me.mykindos.betterpvp.clans.settings.buttons.ClansCategoryButton;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.menu.MenuManager;
 import me.mykindos.betterpvp.core.menu.events.MenuOpenEvent;
 import me.mykindos.betterpvp.core.settings.menus.SettingsMenu;
 import org.bukkit.event.EventHandler;
@@ -14,12 +13,10 @@ import org.bukkit.event.Listener;
 @BPvPListener
 public class ClansSettingsListener implements Listener {
 
-    private final MenuManager menuManager;
     private final GamerManager gamerManager;
 
     @Inject
-    public ClansSettingsListener(MenuManager menuManager, GamerManager gamerManager){
-        this.menuManager = menuManager;
+    public ClansSettingsListener(GamerManager gamerManager){
         this.gamerManager = gamerManager;
     }
 
@@ -27,7 +24,7 @@ public class ClansSettingsListener implements Listener {
     public void onMenuOpen(MenuOpenEvent event){
         if(!(event.getMenu() instanceof SettingsMenu menu)) return;
 
-        menu.addButton(new ClansCategoryButton(menuManager, gamerManager));
+        menu.addButton(new ClansCategoryButton(gamerManager));
 
     }
 

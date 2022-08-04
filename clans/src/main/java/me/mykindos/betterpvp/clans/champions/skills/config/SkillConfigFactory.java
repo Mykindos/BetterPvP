@@ -18,7 +18,7 @@ public class SkillConfigFactory implements ISkillConfigFactory {
     public SkillConfig create(Skill skill) {
         var config = clans.getConfig();
 
-        String path = "skills." + skill.getClassType().toString().toLowerCase() + "." + skill.getName().toLowerCase();
+        String path = "skills." + skill.getClassType().toString().toLowerCase() + "." + skill.getName().replace(" ", "").toLowerCase();
 
         boolean enabled = config.getOrSaveBoolean(path + ".enabled", true);
         int cooldown = config.getOrSaveInt(path + ".cooldown", 0);

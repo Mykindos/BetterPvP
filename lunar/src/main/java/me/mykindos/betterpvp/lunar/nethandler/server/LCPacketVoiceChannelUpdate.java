@@ -1,12 +1,12 @@
 package me.mykindos.betterpvp.lunar.nethandler.server;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.lunar.nethandler.ByteBufWrapper;
 import me.mykindos.betterpvp.lunar.nethandler.LCPacket;
 import me.mykindos.betterpvp.lunar.nethandler.client.LCNetHandlerClient;
 import me.mykindos.betterpvp.lunar.nethandler.shared.LCNetHandler;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 

@@ -11,7 +11,10 @@ import me.mykindos.betterpvp.clans.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.clans.champions.skills.events.PlayerUseInteractSkillEvent;
 import me.mykindos.betterpvp.clans.champions.skills.events.PlayerUseSkillEvent;
 import me.mykindos.betterpvp.clans.champions.skills.events.PlayerUseToggleSkillEvent;
-import me.mykindos.betterpvp.clans.champions.skills.types.*;
+import me.mykindos.betterpvp.clans.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.clans.champions.skills.types.EnergySkill;
+import me.mykindos.betterpvp.clans.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.clans.champions.skills.types.ToggleSkill;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.energy.EnergyHandler;
 import me.mykindos.betterpvp.clans.gamer.Gamer;
@@ -96,9 +99,11 @@ public class SkillListener implements Listener {
 
         if (skill instanceof InteractSkill interactSkill) {
             interactSkill.activate(player, level);
+            sendSkillUsed(player, skill, level);
         } else if (skill instanceof ToggleSkill toggleSkill) {
             toggleSkill.toggle(player, level);
         }
+
     }
 
     @EventHandler
@@ -145,6 +150,10 @@ public class SkillListener implements Listener {
     @EventHandler
     public void onSkillActivate(PlayerInteractEvent event) {
 
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK && event.getAction() != Action.RIGHT_CLICK_AIR) {
+            return;
+        }
+
         if (event.getHand() == EquipmentSlot.OFF_HAND) return;
 
         Player player = event.getPlayer();
@@ -160,9 +169,8 @@ public class SkillListener implements Listener {
             }
         }
 
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.LEFT_CLICK_BLOCK) {
-            if (UtilBlock.usable(event.getClickedBlock())) return;
-        }
+        if (UtilBlock.usable(event.getClickedBlock())) return;
+
 
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             Block block = event.getClickedBlock();
@@ -190,7 +198,7 @@ public class SkillListener implements Listener {
                 if (build == null) return;
 
                 Optional<Skill> skillOptional = build.getActiveSkills().stream().filter(skill -> {
-                    return skill instanceof InteractSkill && skill.getSkillType() == skillType;
+                    return skill instanceof InteractSkill && skill.getType() == skillType;
                 }).findFirst();
 
                 if (skillOptional.isPresent()) {
@@ -208,7 +216,12 @@ public class SkillListener implements Listener {
 
     }
 
-    @EventHandler (priority = EventPriority.LOWEST)
+    private void sendSkillUsed(Player player, Skill skill, int level){
+        UtilMessage.message(player, skill.getClassType().getName(),
+                "You used " + ChatColor.GREEN + skill.getName() + " " + level + ChatColor.GRAY + ".");
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onUseSkillDisabled(PlayerUseSkillEvent event) {
         Player player = event.getPlayer();
         Skill skill = event.getSkill();
@@ -222,14 +235,14 @@ public class SkillListener implements Listener {
 
     @EventHandler
     public void onUseSkillWhileSlowed(PlayerUseInteractSkillEvent event) {
-        if(event.isCancelled()) return;
+        if (event.isCancelled()) return;
 
         Player player = event.getPlayer();
         InteractSkill interactSkill = (InteractSkill) event.getSkill();
 
-        if(interactSkill.canUseSlowed()) return;
+        if (interactSkill.canUseSlowed()) return;
 
-        if(player.hasPotionEffect(PotionEffectType.SLOW)){
+        if (player.hasPotionEffect(PotionEffectType.SLOW)) {
             UtilMessage.message(player, event.getSkill().getClassType().getName(), "You cannot use "
                     + ChatColor.GREEN + event.getSkill().getName() + ChatColor.GRAY + " while slowed.");
             event.setCancelled(true);
@@ -254,7 +267,7 @@ public class SkillListener implements Listener {
     private int getLevel(Player player, BuildSkill buildSkill) {
         int level = buildSkill.getLevel();
 
-        SkillType skillType = buildSkill.getSkill().getSkillType();
+        SkillType skillType = buildSkill.getSkill().getType();
         if (skillType == SkillType.AXE || skillType == SkillType.SWORD || skillType == SkillType.BOW) {
             ItemStack mainHand = player.getInventory().getItemInMainHand();
             if (mainHand.getType() == Material.DIAMOND_SWORD || mainHand.getType() == Material.DIAMOND_AXE

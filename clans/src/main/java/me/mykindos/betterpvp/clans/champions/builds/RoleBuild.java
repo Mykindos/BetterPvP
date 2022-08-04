@@ -19,7 +19,7 @@ public class RoleBuild {
     private BuildSkill axeSkill;
     private BuildSkill passiveA, passiveB, global;
     private BuildSkill bow;
-    private int points;
+    private int points = 12;
 
     public void addPoint() {
         points++;

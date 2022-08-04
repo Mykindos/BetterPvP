@@ -7,7 +7,9 @@ import me.mykindos.betterpvp.clans.champions.skills.Skill;
 import me.mykindos.betterpvp.clans.champions.skills.config.SkillConfigFactory;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillType;
-import me.mykindos.betterpvp.clans.champions.skills.types.*;
+import me.mykindos.betterpvp.clans.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.clans.champions.skills.types.EnergySkill;
+import me.mykindos.betterpvp.clans.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
@@ -22,7 +24,6 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 @Singleton
@@ -63,7 +64,6 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, EnergyS
 
         if (!wallkick) {
             UtilVelocity.velocity(player, 1.3D, 0.2D, 1.0D, true);
-            UtilMessage.message(player, getClassType().getName(), "You used " + ChatColor.GREEN + getName() + " " + level + ChatColor.GRAY + ".");
         } else {
             Vector vec = player.getLocation().getDirection();
             vec.setY(0);
@@ -178,7 +178,7 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, EnergyS
     }
 
     @Override
-    public SkillType getSkillType() {
+    public SkillType getType() {
         return SkillType.AXE;
     }
 

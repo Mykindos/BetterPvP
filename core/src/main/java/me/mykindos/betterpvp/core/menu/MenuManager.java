@@ -36,12 +36,8 @@ public class MenuManager extends Manager<HashMap<String, Menu>> {
         menusOptional.ifPresent(menus -> menus.put(menu.getTitle(), menu));
     }
 
-    public void openMenu(Player player, Menu menu) {
+    public static void openMenu(Player player, Menu menu) {
         MenuOpenEvent menuOpenEvent = new MenuOpenEvent(player, menu);
         UtilServer.callEvent(menuOpenEvent);
-        if (!menuOpenEvent.isCancelled()) {
-            player.openInventory(menu.getInventory());
-            addMenu(player, menu);
-        }
     }
 }

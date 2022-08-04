@@ -29,7 +29,6 @@ public class GamerManager extends Manager<Gamer> {
     public void loadFromList(List<Gamer> objects) {
         objects.forEach(gamer -> {
             addObject(gamer.getUuid(), gamer);
-            buildRepository.loadBuilds(gamer);
         });
     }
 }

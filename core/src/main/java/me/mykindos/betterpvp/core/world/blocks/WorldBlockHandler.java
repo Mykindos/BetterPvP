@@ -1,9 +1,7 @@
 package me.mykindos.betterpvp.core.world.blocks;
 
-import com.destroystokyo.paper.HeightmapType;
 import com.google.inject.Singleton;
 import lombok.Getter;
-import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import org.bukkit.Chunk;
 import org.bukkit.HeightMap;
 import org.bukkit.Location;
