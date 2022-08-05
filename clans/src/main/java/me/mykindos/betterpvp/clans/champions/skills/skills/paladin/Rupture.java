@@ -37,7 +37,6 @@ import org.bukkit.util.Vector;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.WeakHashMap;
 
 @Singleton

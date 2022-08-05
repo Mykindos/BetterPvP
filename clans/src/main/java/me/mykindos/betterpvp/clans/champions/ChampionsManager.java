@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.clans.champions;
 import lombok.Getter;
 import me.mykindos.betterpvp.clans.champions.roles.RoleManager;
 import me.mykindos.betterpvp.clans.champions.skills.SkillManager;
+import me.mykindos.betterpvp.clans.energy.EnergyHandler;
 import me.mykindos.betterpvp.clans.gamer.GamerManager;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
@@ -22,13 +23,15 @@ public class ChampionsManager {
     private final RoleManager roles;
     private final CooldownManager cooldowns;
     private final EffectManager effects;
+    private final EnergyHandler energy;
 
     @Inject
-    public ChampionsManager(GamerManager gamers, SkillManager skills, RoleManager roles, CooldownManager cooldowns, EffectManager effects) {
+    public ChampionsManager(GamerManager gamers, SkillManager skills, RoleManager roles, CooldownManager cooldowns, EffectManager effects, EnergyHandler energy) {
         this.gamers = gamers;
         this.skills = skills;
         this.roles = roles;
         this.cooldowns = cooldowns;
         this.effects = effects;
+        this.energy = energy;
     }
 }

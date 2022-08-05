@@ -22,8 +22,11 @@ import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -31,12 +34,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.InventoryView;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.Arrays;
@@ -221,12 +221,12 @@ public class SkillListener implements Listener {
 
     private void sendSkillUsed(Player player, Skill skill, int level) {
         if (skill instanceof PrepareSkill) {
-            UtilMessage.message(player, skill.getClassType().getName(),
-                    "You prepared " + ChatColor.GREEN + skill.getName() + " " + level + ChatColor.GRAY + ".");
+            UtilMessage.message(player, skill.getClassType().getName(), "You prepared %s.",
+                    ChatColor.GREEN + skill.getName() + " " + level + ChatColor.GRAY);
 
         } else {
-            UtilMessage.message(player, skill.getClassType().getName(),
-                    "You used " + ChatColor.GREEN + skill.getName() + " " + level + ChatColor.GRAY + ".");
+            UtilMessage.message(player, skill.getClassType().getName(), "You used %s.",
+                    ChatColor.GREEN + skill.getName() + " " + level + ChatColor.GRAY);
         }
     }
 
@@ -236,7 +236,8 @@ public class SkillListener implements Listener {
         Skill skill = event.getSkill();
 
         if (!skill.isEnabled()) {
-            UtilMessage.message(player, skill.getClassType().getName(), ChatColor.GREEN + skill.getName() + ChatColor.GRAY + " has been disabled by the server.");
+            UtilMessage.message(player, skill.getClassType().getName(), "%s has been disabled by the server.",
+                    ChatColor.GREEN + skill.getName() + ChatColor.GRAY);
             event.setCancelled(true);
 
         }
@@ -252,8 +253,8 @@ public class SkillListener implements Listener {
         if (interactSkill.canUseSlowed()) return;
 
         if (player.hasPotionEffect(PotionEffectType.SLOW)) {
-            UtilMessage.message(player, event.getSkill().getClassType().getName(), "You cannot use "
-                    + ChatColor.GREEN + event.getSkill().getName() + ChatColor.GRAY + " while slowed.");
+            UtilMessage.message(player, event.getSkill().getClassType().getName(), "You cannot use %s while slowed.",
+                    ChatColor.GREEN + event.getSkill().getName() + ChatColor.GRAY);
             event.setCancelled(true);
         }
     }
@@ -266,8 +267,8 @@ public class SkillListener implements Listener {
         Skill skill = event.getSkill();
 
         if (UtilBlock.isInLiquid(player)) {
-            UtilMessage.message(player, skill.getClassType().getName(), "You cannot use " + ChatColor.GREEN
-                    + skill.getName() + ChatColor.GRAY + " in water.");
+            UtilMessage.message(player, skill.getClassType().getName(), "You cannot use %s in water.",
+                    ChatColor.GREEN + skill.getName() + ChatColor.GRAY);
             event.setCancelled(true);
         }
     }
@@ -278,10 +279,7 @@ public class SkillListener implements Listener {
 
         SkillType skillType = buildSkill.getSkill().getType();
         if (skillType == SkillType.AXE || skillType == SkillType.SWORD || skillType == SkillType.BOW) {
-            ItemStack mainHand = player.getInventory().getItemInMainHand();
-            if (mainHand.getType() == Material.DIAMOND_SWORD || mainHand.getType() == Material.DIAMOND_AXE
-                    || mainHand.getType() == Material.NETHERITE_SWORD || mainHand.getType() == Material.NETHERITE_AXE
-                    || mainHand.getType() == Material.CROSSBOW) {
+            if (UtilPlayer.isHoldingItem(player, SkillWeapons.BOOSTERS)) {
                 level++;
             }
         }
@@ -308,6 +306,18 @@ public class SkillListener implements Listener {
             return true;
         }
         return false;
+    }
+
+    @EventHandler
+    public void onFetchNearbyEntity(FetchNearbyEntityEvent<?> event) {
+        System.out.println("EVENT FIRED, POG");
+        event.getEntities().removeIf(entity -> {
+            if(entity instanceof Player player) {
+                return !clanManager.canHurt(event.getPlayer(), player)
+                        || player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR;
+            }
+            return false;
+        });
     }
 
 }
