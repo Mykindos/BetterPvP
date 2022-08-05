@@ -82,6 +82,20 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
         return null;
     }
 
+    public void removeCooldown(Player player, String ability, boolean silent) {
+        Optional<ConcurrentHashMap<String, Cooldown>> cooldownOptional = getObject(player.getUniqueId().toString());
+        if (cooldownOptional.isPresent()) {
+            var cooldowns = cooldownOptional.get();
+            if (cooldowns.containsKey(ability)) {
+                cooldowns.remove(ability);
+                if (!silent) {
+                    player.sendMessage(ChatColor.BLUE + "Recharge> " + ChatColor.GREEN + ability + ChatColor.GRAY + " has been recharged.");
+                }
+            }
+
+        }
+    }
+
     @Synchronized
     public void processCooldowns() {
         objects.forEach((key, value) -> {

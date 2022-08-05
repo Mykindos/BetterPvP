@@ -23,11 +23,13 @@ public class SkillConfigFactory implements ISkillConfigFactory {
         boolean enabled = config.getOrSaveBoolean(path + ".enabled", true);
         int cooldown = config.getOrSaveInt(path + ".cooldown", 0);
         int energy = config.getOrSaveInt(path + ".energy", 0);
+        int maxLevel = config.getOrSaveInt(path + ".maxlevel", 5);
 
         return SkillConfig.builder()
                 .enabled(enabled)
                 .cooldown(cooldown)
                 .energyCost(energy)
+                .maxlevel(maxLevel)
                 .build();
     }
 }

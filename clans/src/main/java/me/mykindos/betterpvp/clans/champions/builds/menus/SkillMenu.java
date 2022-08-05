@@ -1,12 +1,14 @@
 package me.mykindos.betterpvp.clans.champions.builds.menus;
 
-import com.google.inject.Inject;
+import lombok.Getter;
+import me.mykindos.betterpvp.clans.champions.builds.BuildSkill;
 import me.mykindos.betterpvp.clans.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.clans.champions.builds.menus.buttons.SkillButton;
+import me.mykindos.betterpvp.clans.champions.roles.Role;
 import me.mykindos.betterpvp.clans.champions.skills.Skill;
 import me.mykindos.betterpvp.clans.champions.skills.SkillManager;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillType;
-import me.mykindos.betterpvp.clans.menu.InjectableMenu;
+import me.mykindos.betterpvp.clans.gamer.Gamer;
 import me.mykindos.betterpvp.core.menu.Button;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.interfaces.IRefreshingMenu;
@@ -18,17 +20,22 @@ import org.bukkit.inventory.ItemStack;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SkillMenu extends Menu implements IRefreshingMenu, InjectableMenu {
+public class SkillMenu extends Menu implements IRefreshingMenu {
 
-    @Inject
-    private SkillManager skillManager;
+    private final Role role;
 
+    private final SkillManager skillManager;
+    @Getter
     private final RoleBuild roleBuild;
 
-    public SkillMenu(Player player, RoleBuild roleBuild) {
+    public SkillMenu(Player player, Gamer gamer, Role role, int buildNumber, SkillManager skillManager) {
         super(player, 54, "Skill Page");
-        this.roleBuild = roleBuild;
+        this.role = role;
+        this.skillManager = skillManager;
 
+        roleBuild = gamer.getBuilds().stream().filter(build -> build.getRole() == role && build.getId() == buildNumber)
+                .findFirst().orElseThrow();
+        refresh();
     }
 
     @Override
@@ -43,7 +50,7 @@ public class SkillMenu extends Menu implements IRefreshingMenu, InjectableMenu {
 
         addDefaultButtons();
 
-        for (Skill skill : skillManager.getSkillsForRole(roleBuild.getRole())) {
+        for (Skill skill : skillManager.getSkillsForRole(role)) {
             if (skill == null) continue;
             if (skill.getType() == null) continue;
             if (skill.getType() == SkillType.SWORD) {
@@ -65,8 +72,11 @@ public class SkillMenu extends Menu implements IRefreshingMenu, InjectableMenu {
                 slotNumber = globalSlotNumber;
                 globalSlotNumber++;
             }
-            if (roleBuild.getBuildSkill(skill.getType()) != null) {
-                addButton(buildButton(skill, slotNumber, roleBuild.getBuildSkill(skill.getType()).getLevel()));
+
+
+            BuildSkill buildSkill = roleBuild.getBuildSkill(skill.getType());
+            if (buildSkill != null) {
+                addButton(buildButton(skill, slotNumber, buildSkill.getLevel()));
             } else {
                 addButton(buildButton(skill, slotNumber, 1));
             }
@@ -107,7 +117,7 @@ public class SkillMenu extends Menu implements IRefreshingMenu, InjectableMenu {
         return false;
     }
 
-    private void addDefaultButtons(){
+    private void addDefaultButtons() {
         addButton(new Button(0, new ItemStack(Material.IRON_SWORD), ChatColor.GREEN.toString() + ChatColor.BOLD + "Sword Skills"));
         addButton(new Button(9, new ItemStack(Material.IRON_AXE), ChatColor.GREEN.toString() + ChatColor.BOLD + "Axe Skills"));
         addButton(new Button(18, new ItemStack(Material.BOW), ChatColor.GREEN.toString() + ChatColor.BOLD + "Bow Skills"));
@@ -117,8 +127,4 @@ public class SkillMenu extends Menu implements IRefreshingMenu, InjectableMenu {
         addButton(new Button(8, new ItemStack(Material.EMERALD, roleBuild.getPoints()), ChatColor.GREEN.toString() + ChatColor.BOLD + "Skill Points"));
     }
 
-    @Override
-    public void postInjection() {
-        refresh();
-    }
 }

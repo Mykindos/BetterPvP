@@ -9,6 +9,7 @@ public class SkillConfig {
 
     private final int cooldown;
     private final int energyCost;
+    private final int maxlevel;
     private final boolean enabled;
 
 }

@@ -1,7 +1,9 @@
-package me.mykindos.betterpvp.clans.champions.skills.skills.assassin;
+package me.mykindos.betterpvp.clans.champions.skills.skills.assassin.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.clans.Clans;
+import me.mykindos.betterpvp.clans.champions.ChampionsManager;
 import me.mykindos.betterpvp.clans.champions.roles.Role;
 import me.mykindos.betterpvp.clans.champions.skills.Skill;
 import me.mykindos.betterpvp.clans.champions.skills.config.SkillConfigFactory;
@@ -10,7 +12,6 @@ import me.mykindos.betterpvp.clans.champions.skills.data.SkillType;
 import me.mykindos.betterpvp.clans.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.clans.champions.skills.types.EnergySkill;
 import me.mykindos.betterpvp.clans.champions.skills.types.InteractSkill;
-import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -30,12 +31,10 @@ import org.bukkit.util.Vector;
 @BPvPListener
 public class Leap extends Skill implements InteractSkill, CooldownSkill, EnergySkill, Listener {
 
-    @Inject
-    private CooldownManager cooldownManager;
 
     @Inject
-    public Leap(SkillConfigFactory configFactory) {
-        super(configFactory);
+    public Leap(Clans clans, ChampionsManager championsManager, SkillConfigFactory configFactory) {
+        super(clans, championsManager, configFactory);
     }
 
     @Override
@@ -78,8 +77,7 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, EnergyS
 
     public boolean wallKick(Player player, int level) {
 
-
-        if (cooldownManager.add(player, "Wall Kick", 0.25, false)) {
+        if (championsManager.getCooldowns().add(player, "Wall Kick", 0.25, false)) {
             Vector vec = player.getLocation().getDirection();
 
             boolean xPos = true;

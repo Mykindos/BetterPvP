@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.clans.champions.skills.skills.knight;
 
+import me.mykindos.betterpvp.clans.Clans;
+import me.mykindos.betterpvp.clans.champions.ChampionsManager;
 import me.mykindos.betterpvp.clans.champions.roles.Role;
 import me.mykindos.betterpvp.clans.champions.skills.Skill;
 import me.mykindos.betterpvp.clans.champions.skills.config.SkillConfigFactory;
@@ -36,8 +38,8 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
     private final HashMap<String, Long> running = new HashMap<>();
 
     @Inject
-    public BullsCharge(SkillConfigFactory configFactory) {
-        super(configFactory);
+    public BullsCharge(Clans clans, ChampionsManager championsManager, SkillConfigFactory configFactory) {
+        super(clans, championsManager, configFactory);
     }
 
     @Override

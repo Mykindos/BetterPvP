@@ -5,6 +5,7 @@ import me.mykindos.betterpvp.clans.champions.builds.menus.buttons.ApplyBuildButt
 import me.mykindos.betterpvp.clans.champions.builds.menus.buttons.DeleteBuildButton;
 import me.mykindos.betterpvp.clans.champions.builds.menus.buttons.EditBuildButton;
 import me.mykindos.betterpvp.clans.champions.roles.Role;
+import me.mykindos.betterpvp.clans.champions.skills.SkillManager;
 import me.mykindos.betterpvp.clans.gamer.Gamer;
 import me.mykindos.betterpvp.core.menu.Button;
 import me.mykindos.betterpvp.core.menu.Menu;
@@ -20,54 +21,50 @@ public class BuildMenu extends Menu implements IRefreshingMenu {
 
     private final Gamer gamer;
     private final Role role;
+    private final SkillManager skillManager;
 
-    public BuildMenu(Player player, Gamer gamer, Role role) {
+    public BuildMenu(Player player, Gamer gamer, Role role, SkillManager skillManager) {
         super(player, 54, ChatColor.GREEN.toString() + ChatColor.BOLD + role.getName() + " builds");
         this.gamer = gamer;
         this.role = role;
-
+        this.skillManager = skillManager;
         refresh();
     }
 
     @Override
     public void refresh() {
         addButton(new Button(0, new ItemStack(Material.EMERALD_BLOCK), ChatColor.GREEN.toString() + ChatColor.BOLD + "Back"));
-        addButton(new Button(18, new ItemStack(role.getHelmet()), ChatColor.GREEN.toString() + ChatColor.BOLD + role + " Helmet"));
-        addButton(new Button(27, new ItemStack(role.getChestplate()), ChatColor.GREEN.toString() + ChatColor.BOLD + role + " Chestplate"));
-        addButton(new Button(36, new ItemStack(role.getLeggings()), ChatColor.GREEN.toString() + ChatColor.BOLD + role + " Leggings"));
-        addButton(new Button(45, new ItemStack(role.getBoots()), ChatColor.GREEN.toString() + ChatColor.BOLD + role + " Boots"));
+        addButton(new Button(18, new ItemStack(role.getHelmet()), ChatColor.GREEN.toString() + ChatColor.BOLD + role.getName() + " Helmet"));
+        addButton(new Button(27, new ItemStack(role.getChestplate()), ChatColor.GREEN.toString() + ChatColor.BOLD + role.getName() + " Chestplate"));
+        addButton(new Button(36, new ItemStack(role.getLeggings()), ChatColor.GREEN.toString() + ChatColor.BOLD + role.getName() + " Leggings"));
+        addButton(new Button(45, new ItemStack(role.getBoots()), ChatColor.GREEN.toString() + ChatColor.BOLD + role.getName() + " Boots"));
 
         int slot = 9;
 
 
-        for (int i = 0; i < 4; i++) {
+        for (int i = 1; i < 5; i++) {
 
             RoleBuild activeBuild = gamer.getActiveBuilds().get(role.getName());
-            if (activeBuild == null) {
-                activeBuild = new RoleBuild(gamer.getUuid(), role, i+1);
-            }
-            if (activeBuild.getId() == i + 1) {
-                addButton(new ApplyBuildButton(gamer, slot + 11, UtilItem.addGlow(getApplyBuildItem(i + 1)), ChatColor.GREEN.toString() + ChatColor.BOLD + "Apply Build - " + (i + 1)));
-            } else {
-                addButton(new ApplyBuildButton(gamer, slot + 11, getApplyBuildItem(i + 1), ChatColor.GREEN.toString() + ChatColor.BOLD + "Apply Build - " + (i + 1)));
-            }
-            addButton(new EditBuildButton(activeBuild, slot + 20, new ItemStack(Material.ANVIL), ChatColor.GREEN.toString() + ChatColor.BOLD + "Edit & Save Build - " + (i + 1)));
-            addButton(new DeleteBuildButton(gamer, activeBuild, slot + 38, new ItemStack(Material.TNT), ChatColor.GREEN.toString() + ChatColor.BOLD + "Delete Build - " + (i + 1)));
+            addButton(new ApplyBuildButton(gamer, role, i, slot + 11, getApplyBuildItem(i, activeBuild.getId() == i)));
+            addButton(new EditBuildButton(gamer, role, i, skillManager, slot + 20));
+            addButton(new DeleteBuildButton(gamer, role, i, slot + 38));
 
             slot += 2;
         }
     }
 
     @NotNull
-    private ItemStack getApplyBuildItem(int id) {
+    private ItemStack getApplyBuildItem(int id, boolean addGlow) {
 
-        return switch (id) {
-            case 1 -> new ItemStack(Material.INK_SAC, 1);
-            case 2 -> new ItemStack(Material.RED_DYE, 1);
-            case 3 -> new ItemStack(Material.GREEN_DYE, 1);
-            case 4 -> new ItemStack(Material.CYAN_DYE, 1);
+        ItemStack itemStack;
+        switch (id) {
+            case 1 -> itemStack = new ItemStack(Material.INK_SAC, 1);
+            case 2 -> itemStack = new ItemStack(Material.RED_DYE, 1);
+            case 3 -> itemStack = new ItemStack(Material.GREEN_DYE, 1);
+            case 4 -> itemStack = new ItemStack(Material.CYAN_DYE, 1);
             default -> throw new IllegalStateException("Unexpected value: " + id);
-        };
+        }
 
+        return addGlow ? UtilItem.addGlow(itemStack) : itemStack;
     }
 }

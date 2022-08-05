@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.clans.gamer;
 
 import lombok.Data;
 import me.mykindos.betterpvp.clans.champions.builds.RoleBuild;
+import me.mykindos.betterpvp.clans.champions.roles.Role;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.framework.inviting.Invitable;
 
@@ -40,5 +41,10 @@ public class Gamer implements Invitable {
     public void putProperty(Enum<?> key, Object object){
         properties.put(key, object);
     }
+
+    public Optional<RoleBuild> getBuild(Role role, int id){
+        return builds.stream().filter(build -> build.getRole() == role && build.getId() == id).findFirst();
+    }
+
 
 }

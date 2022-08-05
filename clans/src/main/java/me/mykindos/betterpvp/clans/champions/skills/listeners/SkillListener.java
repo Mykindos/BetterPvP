@@ -11,10 +11,7 @@ import me.mykindos.betterpvp.clans.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.clans.champions.skills.events.PlayerUseInteractSkillEvent;
 import me.mykindos.betterpvp.clans.champions.skills.events.PlayerUseSkillEvent;
 import me.mykindos.betterpvp.clans.champions.skills.events.PlayerUseToggleSkillEvent;
-import me.mykindos.betterpvp.clans.champions.skills.types.CooldownSkill;
-import me.mykindos.betterpvp.clans.champions.skills.types.EnergySkill;
-import me.mykindos.betterpvp.clans.champions.skills.types.InteractSkill;
-import me.mykindos.betterpvp.clans.champions.skills.types.ToggleSkill;
+import me.mykindos.betterpvp.clans.champions.skills.types.*;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.energy.EnergyHandler;
 import me.mykindos.betterpvp.clans.gamer.Gamer;
@@ -217,8 +214,14 @@ public class SkillListener implements Listener {
     }
 
     private void sendSkillUsed(Player player, Skill skill, int level){
-        UtilMessage.message(player, skill.getClassType().getName(),
-                "You used " + ChatColor.GREEN + skill.getName() + " " + level + ChatColor.GRAY + ".");
+        if(skill instanceof PrepareSkill) {
+            UtilMessage.message(player, skill.getClassType().getName(),
+                    "You prepared " + ChatColor.GREEN + skill.getName() + " " + level + ChatColor.GRAY + ".");
+
+        }else{
+            UtilMessage.message(player, skill.getClassType().getName(),
+                    "You used " + ChatColor.GREEN + skill.getName() + " " + level + ChatColor.GRAY + ".");
+        }
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -300,4 +303,5 @@ public class SkillListener implements Listener {
         }
         return false;
     }
+
 }
