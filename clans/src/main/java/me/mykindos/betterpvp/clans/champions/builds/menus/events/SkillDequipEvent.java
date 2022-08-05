@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.clans.champions.skills.events;
+package me.mykindos.betterpvp.clans.champions.builds.menus.events;
 
 
 import me.mykindos.betterpvp.clans.champions.builds.RoleBuild;

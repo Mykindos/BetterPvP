@@ -2,6 +2,8 @@ package me.mykindos.betterpvp.clans.champions.roles.listeners;
 
 import com.google.inject.Inject;
 import me.mykindos.betterpvp.clans.champions.builds.RoleBuild;
+import me.mykindos.betterpvp.clans.champions.builds.menus.events.ApplyBuildEvent;
+import me.mykindos.betterpvp.clans.champions.builds.menus.events.DeleteBuildEvent;
 import me.mykindos.betterpvp.clans.champions.roles.Role;
 import me.mykindos.betterpvp.clans.champions.roles.RoleManager;
 import me.mykindos.betterpvp.clans.champions.roles.events.RoleChangeEvent;
@@ -96,11 +98,11 @@ public class RoleListener implements Listener {
     public void reduceDurability(CustomDamageDurabilityEvent event) {
         if (event.getCustomDamageEvent().getDamagee() instanceof Player player) {
             Optional<Role> roleOptional = roleManager.getObject(player.getUniqueId());
-            if(roleOptional.isPresent()){
+            if (roleOptional.isPresent()) {
                 Role role = roleOptional.get();
-                if(role != Role.WARLOCK) {
+                if (role != Role.WARLOCK) {
                     double chance = (float) Role.WARLOCK.getChestplate().getMaxDurability() / (float) role.getChestplate().getMaxDurability();
-                    if(UtilMath.randDouble(0, chance) >= 1) {
+                    if (UtilMath.randDouble(0, chance) >= 1) {
                         event.setDamageeTakeDurability(false);
                     }
                 }
@@ -110,14 +112,37 @@ public class RoleListener implements Listener {
 
     @EventHandler
     public void onGoldSwordDamage(CustomDamageDurabilityEvent event) {
-        if(event.getCustomDamageEvent().getDamager() instanceof Player player) {
+        if (event.getCustomDamageEvent().getDamager() instanceof Player player) {
             Material weapon = player.getInventory().getItemInMainHand().getType();
-            if(weapon == Material.GOLDEN_SWORD){
-                if(UtilMath.randomInt(0, 10) <= 6) {
+            if (weapon == Material.GOLDEN_SWORD) {
+                if (UtilMath.randomInt(0, 10) <= 6) {
                     event.setDamagerTakeDurability(false);
                 }
             }
         }
+    }
+
+    @EventHandler
+    public void onApplyBuild(ApplyBuildEvent event) {
+        Player player = event.getPlayer();
+        Optional<Role> roleOptional = roleManager.getObject(event.getPlayer().getUniqueId());
+        roleOptional.ifPresent(role -> {
+            if (event.getNewBuild().getRole() == role) {
+                UtilMessage.message(player, equipMessage(player, role));
+            }
+        });
+
+    }
+
+    @EventHandler
+    public void onDeleteBuild(DeleteBuildEvent event) {
+        Player player = event.getPlayer();
+        Optional<Role> roleOptional = roleManager.getObject(event.getPlayer().getUniqueId());
+        roleOptional.ifPresent(role -> {
+            if (event.getRoleBuild().getRole() == role) {
+                UtilMessage.message(player, equipMessage(player, role));
+            }
+        });
     }
 
     private void equipRole(Player player, Role role) {

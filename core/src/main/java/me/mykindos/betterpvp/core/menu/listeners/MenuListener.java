@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.MenuManager;
 import me.mykindos.betterpvp.core.menu.events.ButtonPostClickEvent;
 import me.mykindos.betterpvp.core.menu.events.ButtonPreClickEvent;
+import me.mykindos.betterpvp.core.menu.events.MenuCloseEvent;
 import me.mykindos.betterpvp.core.menu.events.MenuOpenEvent;
 import me.mykindos.betterpvp.core.menu.interfaces.IRefreshingMenu;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -17,6 +18,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.Optional;
@@ -63,6 +65,15 @@ public class MenuListener implements Listener {
                 }
             });
 
+        }
+    }
+
+    @EventHandler
+    public void onInventoryClose(InventoryCloseEvent event){
+        if(event.getPlayer() instanceof Player player) {
+            String menuTitle = PlainTextComponentSerializer.plainText().serialize(event.getView().title());
+            Optional<Menu> menuOptional = menuManager.getMenu(player, menuTitle);
+            menuOptional.ifPresent(menu -> UtilServer.callEvent(new MenuCloseEvent(player, menu)));
         }
     }
 

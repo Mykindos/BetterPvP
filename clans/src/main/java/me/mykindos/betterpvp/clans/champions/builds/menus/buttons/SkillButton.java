@@ -2,10 +2,10 @@ package me.mykindos.betterpvp.clans.champions.builds.menus.buttons;
 
 import me.mykindos.betterpvp.clans.champions.builds.BuildSkill;
 import me.mykindos.betterpvp.clans.champions.builds.RoleBuild;
+import me.mykindos.betterpvp.clans.champions.builds.menus.events.SkillDequipEvent;
+import me.mykindos.betterpvp.clans.champions.builds.menus.events.SkillEquipEvent;
+import me.mykindos.betterpvp.clans.champions.builds.menus.events.SkillUpdateEvent;
 import me.mykindos.betterpvp.clans.champions.skills.Skill;
-import me.mykindos.betterpvp.clans.champions.skills.events.SkillDequipEvent;
-import me.mykindos.betterpvp.clans.champions.skills.events.SkillEquipEvent;
-import me.mykindos.betterpvp.clans.champions.skills.events.SkillUpdateEvent;
 import me.mykindos.betterpvp.core.menu.Button;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Sound;

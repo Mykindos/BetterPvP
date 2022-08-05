@@ -1,11 +1,13 @@
 package me.mykindos.betterpvp.core.utilities;
 
 import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
 public class UtilPlayer {
 
@@ -30,6 +32,10 @@ public class UtilPlayer {
             return player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR;
         }
         return false;
+    }
+
+    public static boolean isHoldingItem(Player player, Material[] items) {
+        return Arrays.stream(items).anyMatch(item -> item == player.getInventory().getItemInMainHand().getType());
     }
 
 

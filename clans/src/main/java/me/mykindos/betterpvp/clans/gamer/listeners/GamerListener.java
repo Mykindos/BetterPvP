@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.Optional;
 
@@ -57,6 +58,15 @@ public class GamerListener implements Listener {
 
         Bukkit.getOnlinePlayers().forEach(player -> UtilServer.callEvent(new ScoreboardUpdateEvent(player)));
 
+    }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event){
+        Optional<Gamer> gamerOptional = gamerManager.getObject(event.getPlayer().getUniqueId());
+        gamerOptional.ifPresent(gamer -> {
+            gamer.getBuilds().clear();
+            gamer.getActiveBuilds().clear();
+        });
     }
 
     private void checkUnsetProperties(Gamer gamer) {

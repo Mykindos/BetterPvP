@@ -114,6 +114,8 @@ public class EffectListener implements Listener {
                             UtilMessage.message(player, "Condition", "Your vulnerability has worn off!");
                         }
                     }
+
+                    return true;
                 }
 
                 return false;

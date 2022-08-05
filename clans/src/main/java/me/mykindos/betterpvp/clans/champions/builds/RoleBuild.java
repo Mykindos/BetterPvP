@@ -84,4 +84,15 @@ public class RoleBuild {
         setSkill(type, new BuildSkill(skill, level));
     }
 
+    public void deleteBuild() {
+        swordSkill = null;
+        axeSkill = null;
+        passiveA = null;
+        passiveB = null;
+        global = null;
+        bow = null;
+        points = 12;
+
+    }
+
 }

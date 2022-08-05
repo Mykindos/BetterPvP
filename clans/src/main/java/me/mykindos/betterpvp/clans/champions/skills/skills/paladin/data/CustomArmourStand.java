@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.clans.champions.skills.skills.data;
+package me.mykindos.betterpvp.clans.champions.skills.skills.paladin.data;
 
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageSource;

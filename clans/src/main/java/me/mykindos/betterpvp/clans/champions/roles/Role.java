@@ -24,4 +24,8 @@ public enum Role {
     public String getPrefix() {
         return name.substring(0, 1);
     }
+
+    public String getName() {
+        return name;
+    }
 }

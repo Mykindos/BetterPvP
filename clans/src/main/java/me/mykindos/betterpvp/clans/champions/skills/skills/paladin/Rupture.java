@@ -1,19 +1,22 @@
 package me.mykindos.betterpvp.clans.champions.skills.skills.paladin;
 
-import com.comphenix.protocol.PacketType;
 import me.mykindos.betterpvp.clans.Clans;
+import me.mykindos.betterpvp.clans.champions.ChampionsManager;
 import me.mykindos.betterpvp.clans.champions.roles.Role;
 import me.mykindos.betterpvp.clans.champions.skills.Skill;
 import me.mykindos.betterpvp.clans.champions.skills.config.SkillConfigFactory;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillType;
-import me.mykindos.betterpvp.clans.champions.skills.skills.data.CustomArmourStand;
+import me.mykindos.betterpvp.clans.champions.skills.skills.paladin.data.CustomArmourStand;
 import me.mykindos.betterpvp.clans.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.clans.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.*;
-import org.bukkit.*;
+import org.bukkit.ChatColor;
+import org.bukkit.Effect;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_19_R1.CraftWorld;
 import org.bukkit.entity.ArmorStand;
@@ -41,15 +44,12 @@ import java.util.WeakHashMap;
 @BPvPListener
 public class Rupture extends Skill implements Listener, InteractSkill, CooldownSkill {
 
-
-    private final Clans clans;
     private final WeakHashMap<Player, ArrayList<LivingEntity>> cooldownJump = new WeakHashMap<>();
     private final HashMap<ArmorStand, Long> stands = new HashMap<>();
 
     @Inject
-    public Rupture(Clans clans, SkillConfigFactory configFactory) {
-        super(configFactory);
-        this.clans = clans;
+    public Rupture(Clans clans, ChampionsManager championsManager, SkillConfigFactory configFactory) {
+        super(clans, championsManager, configFactory);
     }
 
 
@@ -155,8 +155,8 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
                     stands.put(test, System.currentTimeMillis() + 4000);
 
                     for (Entity ent : test.getNearbyEntities(0.5D, 0.5D, 0.5D)) {
-                        if(ent.equals(player)) continue;
-                        if(UtilPlayer.isCreativeOrSpectator(ent)) continue;
+                        if (ent.equals(player)) continue;
+                        if (UtilPlayer.isCreativeOrSpectator(ent)) continue;
                         if (ent instanceof LivingEntity ed) {
 
                             if (!cooldownJump.get(player).contains(ed)) {
