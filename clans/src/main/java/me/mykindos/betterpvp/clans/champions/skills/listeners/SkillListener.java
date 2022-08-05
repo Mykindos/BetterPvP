@@ -31,9 +31,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
@@ -81,6 +83,9 @@ public class SkillListener implements Listener {
         if (skill instanceof CooldownSkill cooldownSkill) {
             if (!cooldownManager.add(player, skill.getName(), cooldownSkill.getCooldown(level),
                     cooldownSkill.showCooldownFinished(), true, cooldownSkill.isCancellable())) {
+                if (skill instanceof ToggleSkill) {
+                    event.setCancelled(true);
+                }
                 return;
             }
         }
@@ -96,21 +101,20 @@ public class SkillListener implements Listener {
 
         if (skill instanceof InteractSkill interactSkill) {
             interactSkill.activate(player, level);
-            sendSkillUsed(player, skill, level);
         } else if (skill instanceof ToggleSkill toggleSkill) {
             toggleSkill.toggle(player, level);
         }
 
+        sendSkillUsed(player, skill, level);
+
     }
 
     @EventHandler
-    public void onDrop(PlayerDropItemEvent e) {
+    public void onDrop(PlayerDropItemEvent event) {
 
-        Player player = e.getPlayer();
-        Material material = player.getInventory().getItemInMainHand().getType();
-        if (material == Material.AIR) return;
+        Player player = event.getPlayer();
 
-        Material droppedItem = e.getItemDrop().getItemStack().getType();
+        Material droppedItem = event.getItemDrop().getItemStack().getType();
         if (!Arrays.asList(SkillWeapons.AXES).contains(droppedItem) && !Arrays.asList(SkillWeapons.SWORDS).contains(droppedItem)) {
             return;
         }
@@ -137,6 +141,7 @@ public class SkillListener implements Listener {
                 int level = getLevel(player, build.getBuildSkill(SkillType.PASSIVE_B));
 
                 UtilServer.callEvent(new PlayerUseToggleSkillEvent(player, skill, level));
+                event.setCancelled(true);
 
             }
         }
@@ -146,15 +151,10 @@ public class SkillListener implements Listener {
 
     @EventHandler
     public void onSkillActivate(PlayerInteractEvent event) {
-
-        if (event.getAction() != Action.RIGHT_CLICK_BLOCK && event.getAction() != Action.RIGHT_CLICK_AIR) {
-            return;
-        }
-
+        if (event.getAction() == Action.PHYSICAL) return;
         if (event.getHand() == EquipmentSlot.OFF_HAND) return;
 
         Player player = event.getPlayer();
-
         Material mainHand = player.getInventory().getItemInMainHand().getType();
 
         SkillType skillType = getSkillTypeByWeapon(mainHand);
@@ -201,6 +201,12 @@ public class SkillListener implements Listener {
                 if (skillOptional.isPresent()) {
                     Skill skill = skillOptional.get();
 
+                    if (skill instanceof InteractSkill interactSkill) {
+                        if (!Arrays.asList(interactSkill.getActions()).contains(event.getAction())) {
+                            return;
+                        }
+                    }
+
                     int level = getLevel(player, build.getBuildSkill(skillType));
 
                     UtilServer.callEvent(new PlayerUseInteractSkillEvent(player, skill, level));
@@ -213,12 +219,12 @@ public class SkillListener implements Listener {
 
     }
 
-    private void sendSkillUsed(Player player, Skill skill, int level){
-        if(skill instanceof PrepareSkill) {
+    private void sendSkillUsed(Player player, Skill skill, int level) {
+        if (skill instanceof PrepareSkill) {
             UtilMessage.message(player, skill.getClassType().getName(),
                     "You prepared " + ChatColor.GREEN + skill.getName() + " " + level + ChatColor.GRAY + ".");
 
-        }else{
+        } else {
             UtilMessage.message(player, skill.getClassType().getName(),
                     "You used " + ChatColor.GREEN + skill.getName() + " " + level + ChatColor.GRAY + ".");
         }

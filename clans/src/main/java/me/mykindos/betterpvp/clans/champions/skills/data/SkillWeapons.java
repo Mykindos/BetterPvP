@@ -10,4 +10,7 @@ public class SkillWeapons {
 
     public static final Material[] AXES = {Material.IRON_AXE, Material.GOLDEN_AXE, Material.DIAMOND_AXE, Material.NETHERITE_AXE};
 
+    public static final Material[] BOOSTERS = {Material.DIAMOND_AXE, Material.DIAMOND_SWORD, Material.NETHERITE_SWORD,
+            Material.NETHERITE_AXE, Material.CROSSBOW};
+
 }

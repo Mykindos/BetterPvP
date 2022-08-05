@@ -35,7 +35,7 @@ public class CombatTagListener implements Listener {
                 if (!UtilTime.elapsed(gamer.getLastDamaged(), 15000)) {
                     if (effectManager.hasEffect(player, EffectType.INVISIBILITY)) return;
 
-                    Particle.VILLAGER_HAPPY.builder().allPlayers().location(player.getLocation().add(0, 4, 0)).spawn();
+                    Particle.VILLAGER_HAPPY.builder().location(player.getLocation().add(0, 4, 0)).receivers(10).spawn();
                 }
             });
 

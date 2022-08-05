@@ -26,15 +26,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
 
 @Singleton
 @BPvPListener
-public class Sever extends Skill implements InteractSkill, CooldownSkill, PrepareSkill, Listener {
-
-    private final Set<UUID> active = new HashSet<>();
+public class Sever extends PrepareSkill implements CooldownSkill, Listener {
 
     @Inject
     public Sever(Clans clans, ChampionsManager championsManager, SkillConfigFactory configFactory) {

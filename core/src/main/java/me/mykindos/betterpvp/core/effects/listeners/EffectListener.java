@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.EntityEffect;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -62,6 +63,8 @@ public class EffectListener implements Listener {
             }
             if (effect.getEffectType() == EffectType.SILENCE) {
                 player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 1F, 1.5F);
+                UtilMessage.message(player, "Silence", "You have been silenced for %s seconds.",
+                        ChatColor.GREEN.toString() + (effect.getRawLength()/1000) + ChatColor.GRAY);
             }
 
             if (effect.getEffectType() == EffectType.VULNERABILITY) {
@@ -87,8 +90,8 @@ public class EffectListener implements Listener {
     }
 
     @EventHandler
-    public void onDeath(PlayerDeathEvent e) {
-        effectManager.removeAllEffects(e.getEntity());
+    public void onDeath(PlayerDeathEvent event) {
+        effectManager.removeAllEffects(event.getEntity());
     }
 
 
@@ -127,72 +130,72 @@ public class EffectListener implements Listener {
     }
 
     @EventHandler
-    public void onMove(PlayerMoveEvent e) {
-        if (e.getFrom().getX() != e.getTo().getX() || e.getFrom().getZ() != e.getTo().getZ()
-                || e.getFrom().getY() != e.getTo().getY()) {
-            if (effectManager.hasEffect(e.getPlayer(), EffectType.STUN)) {
-                e.setCancelled(true);
+    public void onMove(PlayerMoveEvent event) {
+        if (event.getFrom().getX() != event.getTo().getX() || event.getFrom().getZ() != event.getTo().getZ()
+                || event.getFrom().getY() != event.getTo().getY()) {
+            if (effectManager.hasEffect(event.getPlayer(), EffectType.STUN)) {
+                event.setCancelled(true);
             }
         }
     }
 
 
     @EventHandler
-    public void entityDamageEvent(EntityDamageEvent e) {
-        if (e.getEntity() instanceof Player player) {
+    public void entityDamageEvent(EntityDamageEvent event) {
+        if (event.getEntity() instanceof Player player) {
             if (effectManager.hasEffect(player, EffectType.PROTECTION)) {
-                e.setCancelled(true);
+                event.setCancelled(true);
             }
         }
     }
 
     @EventHandler
-    public void entDamage(EntityDamageByEntityEvent e) {
-        if (e.getEntity() instanceof Player damagee && e.getDamager() instanceof Player damager) {
+    public void entDamage(EntityDamageByEntityEvent event) {
+        if (event.getEntity() instanceof Player damagee && event.getDamager() instanceof Player damager) {
             if (effectManager.hasEffect(damagee, EffectType.PROTECTION)) {
                 UtilMessage.message(damager, "Protected", "This is a new player and has protection!");
-                e.setCancelled(true);
+                event.setCancelled(true);
             }
 
             if (effectManager.hasEffect(damager, EffectType.PROTECTION)) {
                 UtilMessage.message(damager, "Protected", "You cannot damage other players while you have protection!");
                 UtilMessage.message(damager, "Protected", "Type '/protection' to disable this permanently.");
-                e.setCancelled(true);
+                event.setCancelled(true);
             }
         }
     }
 
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onStrengthDamage(CustomDamageEvent e) {
-        if (e.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
-        if (e.getDamager() instanceof Player player) {
+    public void onStrengthDamage(CustomDamageEvent event) {
+        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
+        if (event.getDamager() instanceof Player player) {
             Optional<Effect> effectOptional = effectManager.getEffect(player, EffectType.STRENGTH);
-            effectOptional.ifPresent(effect -> e.setDamage(e.getDamage() + (1.5 * effect.getLevel())));
+            effectOptional.ifPresent(effect -> event.setDamage(event.getDamage() + (1.5 * effect.getLevel())));
         }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onDamage(CustomDamageEvent e) {
-        if (e.getDamagee() instanceof Player player) {
+    public void onDamage(CustomDamageEvent event) {
+        if (event.getDamagee() instanceof Player player) {
             Optional<Effect> effectOptional = effectManager.getEffect(player, EffectType.VULNERABILITY);
             effectOptional.ifPresent(effect -> {
-                if (e.getCause() == EntityDamageEvent.DamageCause.LIGHTNING) return;
-                e.setDamage((e.getDamage() * (1.0 + (effect.getLevel() * 0.25))));
+                if (event.getCause() == EntityDamageEvent.DamageCause.LIGHTNING) return;
+                event.setDamage((event.getDamage() * (1.0 + (effect.getLevel() * 0.25))));
             });
         }
     }
 
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onLoadingTextureDamage(CustomDamageEvent e) {
-        if (e.getDamagee() instanceof Player player) {
+    public void onLoadingTextureDamage(CustomDamageEvent event) {
+        if (event.getDamagee() instanceof Player player) {
             if (effectManager.hasEffect(player, EffectType.TEXTURELOADING)) {
-                e.cancel("Player is loading the server texture pack");
+                event.cancel("Player is loading the server texture pack");
             }
         }
 
-        if (e.getDamager() instanceof Player damager) {
+        if (event.getDamager() instanceof Player damager) {
             if (effectManager.hasEffect(damager, EffectType.TEXTURELOADING)) {
                 effectManager.removeEffect(damager, EffectType.TEXTURELOADING);
             }
@@ -200,21 +203,21 @@ public class EffectListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void resistanceReduction(CustomDamageEvent e) {
-        if (e.getDamagee() instanceof Player player) {
+    public void resistanceReduction(CustomDamageEvent event) {
+        if (event.getDamagee() instanceof Player player) {
             Optional<Effect> effectOptional = effectManager.getEffect(player, EffectType.RESISTANCE);
-            effectOptional.ifPresent(effect -> e.setDamage(e.getDamage() * (1.0 - (effect.getLevel() * 20) * 0.01)));
+            effectOptional.ifPresent(effect -> event.setDamage(event.getDamage() * (1.0 - (effect.getLevel() * 20) * 0.01)));
         }
     }
 
     @EventHandler
-    public void onImmuneToNegativity(EffectReceiveEvent e) {
-        if (effectManager.hasEffect(e.getPlayer(), EffectType.IMMUNETOEFFECTS)) {
-            EffectType type = e.getEffect().getEffectType();
+    public void onImmuneToNegativity(EffectReceiveEvent event) {
+        if (effectManager.hasEffect(event.getPlayer(), EffectType.IMMUNETOEFFECTS)) {
+            EffectType type = event.getEffect().getEffectType();
 
             if (type == EffectType.SILENCE || type == EffectType.SHOCK || type == EffectType.VULNERABILITY
                     || type == EffectType.STUN || type == EffectType.FRAILTY) {
-                e.setCancelled(true);
+                event.setCancelled(true);
             }
         }
     }
