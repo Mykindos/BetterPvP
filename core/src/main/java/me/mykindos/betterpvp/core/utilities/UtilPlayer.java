@@ -1,6 +1,8 @@
 package me.mykindos.betterpvp.core.utilities;
 
+import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -8,8 +10,24 @@ import org.bukkit.entity.Player;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class UtilPlayer {
+
+    public static List<Player> getNearbyPlayers(Player player, double radius){
+        return getNearbyPlayers(player, player.getLocation(), radius);
+    }
+
+    public static List<Player> getNearbyPlayers(Player player, Location location, double radius) {
+        List<Player> players = player.getWorld().getPlayers().stream()
+                .filter(worldPlayer -> worldPlayer.getLocation().distance(location) <= radius && !worldPlayer.equals(player))
+                .collect(Collectors.toList());
+        FetchNearbyEntityEvent<Player> fetchNearbyEntityEvent = new FetchNearbyEntityEvent<>(player, location, players);
+        UtilServer.callEvent(fetchNearbyEntityEvent);
+
+        return fetchNearbyEntityEvent.getEntities();
+    }
 
     public static int getPing(Player player) {
         try {
