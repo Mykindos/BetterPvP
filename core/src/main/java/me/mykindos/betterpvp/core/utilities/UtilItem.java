@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.utilities;
 
 import net.kyori.adventure.text.Component;
+import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -85,6 +86,74 @@ public class UtilItem {
 
 
         return item;
+    }
+
+    /**
+     * Check if a Material is a type of sword
+     *
+     * @param swordType Material to check
+     * @return Returns true if the Material is a type of sword
+     */
+    public static boolean isSword(Material swordType) {
+        return swordType.name().contains("_SWORD");
+    }
+
+    /**
+     * Check if a Material is a type of axe
+     *
+     * @param axeType Material to check
+     * @return Returns true if the Material is a type of axe
+     */
+    public static boolean isAxe(Material axeType) {
+        return axeType.name().contains("_AXE");
+    }
+
+    /**
+     * Check if a Material is a type of pickaxe
+     *
+     * @param pickType Material to check
+     * @return Returns true if the Material is a type of pickaxe
+     */
+    public static boolean isPickAxe(Material pickType) {
+        return pickType.name().contains("_PICKAXE");
+    }
+
+    public static boolean isShovel(Material shovelType) {
+        return shovelType.name().contains("_SHOVEL");
+    }
+
+    /**
+     * Check if a Material is a type of hoe
+     *
+     * @param hoeType Material to check
+     * @return Returns true if the Material is a type of hoe
+     */
+    public static boolean isHoe(Material hoeType) {
+        return hoeType.name().contains("_HOE");
+    }
+
+    /**
+     * Check if a Material is a type of ranged weapon
+     *
+     * @param wep Material to check
+     * @return Returns true if the Material is a type of ranged weapon
+     */
+    public static boolean isRanged(Material wep) {
+        return (wep == Material.BOW || wep == Material.CROSSBOW);
+    }
+
+    /**
+     * Check if a Material is a gold tool
+     *
+     * @param item Material to check
+     * @return Returns true if the Material is a gold tool
+     */
+    public static boolean isGold(Material item) {
+        return (item == Material.GOLDEN_SWORD
+                || item == Material.GOLDEN_AXE
+                || item == Material.GOLDEN_PICKAXE
+                || item == Material.GOLDEN_SHOVEL
+                || item == Material.GOLDEN_HOE);
     }
 
 

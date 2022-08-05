@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.clans.champions.skills.config.SkillConfig;
 import me.mykindos.betterpvp.clans.champions.skills.config.SkillConfigFactory;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.clans.gamer.Gamer;
+import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
@@ -95,7 +96,16 @@ public abstract class Skill implements ISkill {
 
     protected int getLevel(Player player){
         Optional<BuildSkill> skillOptional = getSkill(player);
-        return skillOptional.map(BuildSkill::getLevel).orElse(0);
+        int level = skillOptional.map(BuildSkill::getLevel).orElse(0);
+        if(UtilPlayer.isHoldingItem(player, getItemsBySkillType())) {
+            if(UtilPlayer.isHoldingItem(player, SkillWeapons.BOOSTERS)){
+                level++;
+            }
+        }
+
+        // TODO remove me
+        System.out.println("Using level: " + level);
+        return level;
     }
 
     protected Material[] getItemsBySkillType() {

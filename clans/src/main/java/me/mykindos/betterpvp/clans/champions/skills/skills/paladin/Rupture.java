@@ -45,13 +45,12 @@ import java.util.WeakHashMap;
 public class Rupture extends Skill implements Listener, InteractSkill, CooldownSkill {
 
     private final WeakHashMap<Player, ArrayList<LivingEntity>> cooldownJump = new WeakHashMap<>();
-    private final HashMap<ArmorStand, Long> stands = new HashMap<>();
+    private final WeakHashMap<ArmorStand, Long> stands = new WeakHashMap<>();
 
     @Inject
     public Rupture(Clans clans, ChampionsManager championsManager, SkillConfigFactory configFactory) {
         super(clans, championsManager, configFactory);
     }
-
 
     @Override
     public String getName() {
@@ -141,20 +140,20 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
                             loc.getZ() + UtilMath.randDouble(-1.5D, 1.5D));
 
                     CustomArmourStand as = new CustomArmourStand(((CraftWorld) loc.getWorld()).getHandle());
-                    ArmorStand test = (ArmorStand) as.spawn(tempLoc);
-                    test.getEquipment().setHelmet(new ItemStack(Material.PACKED_ICE));
-                    test.setGravity(false);
-                    test.setVisible(false);
-                    test.setSmall(true);
-                    test.setHeadPose(new EulerAngle(UtilMath.randomInt(360), UtilMath.randomInt(360), UtilMath.randomInt(360)));
+                    ArmorStand armourStand = (ArmorStand) as.spawn(tempLoc);
+                    armourStand.getEquipment().setHelmet(new ItemStack(Material.PACKED_ICE));
+                    armourStand.setGravity(false);
+                    armourStand.setVisible(false);
+                    armourStand.setSmall(true);
+                    armourStand.setHeadPose(new EulerAngle(UtilMath.randomInt(360), UtilMath.randomInt(360), UtilMath.randomInt(360)));
 
 
                     player.getWorld().playEffect(loc, Effect.STEP_SOUND, Material.PACKED_ICE);
 
 
-                    stands.put(test, System.currentTimeMillis() + 4000);
+                    stands.put(armourStand, System.currentTimeMillis() + 4000);
 
-                    for (Entity ent : test.getNearbyEntities(0.5D, 0.5D, 0.5D)) {
+                    for (Entity ent : armourStand.getNearbyEntities(0.5D, 0.5D, 0.5D)) {
                         if (ent.equals(player)) continue;
                         if (UtilPlayer.isCreativeOrSpectator(ent)) continue;
                         if (ent instanceof LivingEntity ed) {

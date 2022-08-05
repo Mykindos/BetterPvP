@@ -35,6 +35,19 @@ public class UtilMessage {
     }
 
     /**
+     * Sends a message to a CommandSender with appropriate formatting
+     * Can also send to players
+     *
+     * @param sender  The CommandSender
+     * @param prefix  The message
+     * @param message Message to send to the CommandSender
+     * @param args The args to interpolate in the string
+     */
+    public static void message(CommandSender sender, String prefix, String message, Object... args) {
+        sender.sendMessage(String.format(ChatColor.BLUE + prefix + "> " + ChatColor.GRAY + message, args));
+    }
+
+    /**
      * Sends a message to a player with appropriate formatting
      * Additionally plays a sound to the player when they receive this message
      *
