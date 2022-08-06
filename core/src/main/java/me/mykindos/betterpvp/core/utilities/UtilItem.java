@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.utilities;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -156,5 +157,16 @@ public class UtilItem {
                 || item == Material.GOLDEN_HOE);
     }
 
+    public static void insert(Player player, ItemStack stack) {
+        if (stack != null && stack.getType() != Material.AIR) {
+            if (player.getInventory().firstEmpty() != -1) {
+                player.getInventory().addItem(stack);
+            } else {
+                player.getWorld().dropItem(player.getLocation(), stack);
+            }
+
+            player.updateInventory();
+        }
+    }
 
 }

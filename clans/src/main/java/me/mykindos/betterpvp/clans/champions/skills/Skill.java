@@ -103,8 +103,6 @@ public abstract class Skill implements ISkill {
             }
         }
 
-        // TODO remove me
-        System.out.println("Using level: " + level);
         return level;
     }
 
