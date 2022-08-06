@@ -30,12 +30,13 @@ import org.bukkit.potion.PotionEffectType;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.HashMap;
+import java.util.UUID;
 
 @Singleton
 @BPvPListener
 public class BullsCharge extends Skill implements Listener, InteractSkill, CooldownSkill {
 
-    private final HashMap<String, Long> running = new HashMap<>();
+    private final HashMap<UUID, Long> running = new HashMap<>();
 
     @Inject
     public BullsCharge(Clans clans, ChampionsManager championsManager, SkillConfigFactory configFactory) {
@@ -66,7 +67,7 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
         player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 60, 2));
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_SCREAM, 1.5F, 0.0F);
         player.getWorld().playEffect(player.getLocation(), Effect.STEP_SOUND, 49);
-        running.put(player.getName(), System.currentTimeMillis() + 4000L);
+        running.put(player.getUniqueId(), System.currentTimeMillis() + 4000L);
     }
 
     @EventHandler(priority = EventPriority.HIGH)
@@ -74,7 +75,7 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
         if (event.isCancelled()) return;
 
         if (event.getDamagee() instanceof Player player) {
-            if (running.containsKey(player.getName())) {
+            if (running.containsKey(player.getUniqueId())) {
                 event.setKnockback(false);
             }
         }
@@ -85,11 +86,11 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
 
         if (event.getDamager() instanceof Player damager) {
 
-            final LivingEntity damagee = (LivingEntity) event.getDamagee();
+            final LivingEntity damagee = event.getDamagee();
 
-            if (running.containsKey(damager.getName())) {
-                if (System.currentTimeMillis() >= running.get(damager.getName())) {
-                    running.remove(damager.getName());
+            if (running.containsKey(damager.getUniqueId())) {
+                if (System.currentTimeMillis() >= running.get(damager.getUniqueId())) {
+                    running.remove(damager.getUniqueId());
                     return;
                 }
 
@@ -104,13 +105,13 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
                 if (event.getDamagee() instanceof Player damaged) {
                     UtilMessage.message(damaged, getClassType().getName(), ChatColor.YELLOW + damager.getName() + ChatColor.GRAY + " hit you with " + ChatColor.GREEN + getName() + ChatColor.GRAY + ".");
                     UtilMessage.message(damager, getClassType().getName(), "You hit " + ChatColor.YELLOW + damaged.getName() + ChatColor.GRAY + " with " + ChatColor.GREEN + getName() + ChatColor.GRAY + ".");
-                    running.remove(damager.getName());
+                    running.remove(damager.getUniqueId());
                     return;
                 }
 
                 UtilMessage.message(damager, getClassType().getName(), "You hit a " + ChatColor.YELLOW + UtilFormat.cleanString(damagee.getType().toString())
                         + ChatColor.GRAY + " with " + ChatColor.GREEN + getName() + ChatColor.GRAY + ".");
-                running.remove(damager.getName());
+                running.remove(damager.getUniqueId());
             }
         }
     }
