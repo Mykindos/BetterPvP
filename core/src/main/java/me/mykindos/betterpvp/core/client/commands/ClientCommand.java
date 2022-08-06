@@ -21,6 +21,7 @@ public class ClientCommand extends Command {
     public ClientCommand() {
         subCommands.add(new AdminSubCommand());
         subCommands.add(new SearchSubCommand());
+        subCommands.add(new PromoteSubCommand());
     }
 
     @Override
@@ -108,6 +109,49 @@ public class ClientCommand extends Command {
         @Override
         public Rank getRequiredRank() {
             return Rank.ADMIN;
+        }
+    }
+
+    private static class PromoteSubCommand extends SubCommand {
+
+        @Inject
+        private ClientManager clientManager;
+
+        @Override
+        public String getName() {
+            return "promote";
+        }
+
+        @Override
+        public String getDescription() {
+            return "Promote a client to a higher rank";
+        }
+
+        @Override
+        public void execute(Player player, Client client, String... args) {
+            if (args.length == 0) {
+                UtilMessage.message(player, "Client", "You must specify a client");
+                return;
+            }
+
+            Optional<Client> clientOptional = clientManager.getClientByName(args[0]);
+            if (clientOptional.isPresent()) {
+                Client targetClient = clientOptional.get();
+                Rank targetRank = Rank.getRank(targetClient.getRank().getId() + 1);
+                if(targetRank != null) {
+                    if (client.getRank().getId() < targetRank.getId() || player.isOp()) {
+                        targetClient.setRank(targetRank);
+                        UtilMessage.message(player, "Client", "%s has been promoted to %s",
+                                ChatColor.YELLOW + targetClient.getName() + ChatColor.GRAY, targetRank.getTag(true));
+                        clientManager.getRepository().save(targetClient);
+                    }else{
+                        UtilMessage.message(player, "Client", "You cannot promote someone to your current rank or higher.");
+                    }
+                }else{
+                    UtilMessage.message(player, "Client", "%s already has the highest rank.",
+                            ChatColor.YELLOW + targetClient.getName() + ChatColor.GRAY);
+                }
+            }
         }
     }
 }

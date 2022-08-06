@@ -82,10 +82,11 @@ public class ClientRepository implements IRepository<Client> {
 
     @Override
     public void save(Client object) {
-        String query = "INSERT INTO clients (UUID, Name) VALUES(?, ?);";
+        String query = "INSERT INTO clients (UUID, Name) VALUES(?, ?) ON DUPLICATE KEY UPDATE `Rank` = ?;";
         database.executeUpdateAsync(new Statement(query,
                 new StringStatementValue(object.getUuid()),
-                new StringStatementValue(object.getName())
+                new StringStatementValue(object.getName()),
+                new StringStatementValue(object.getRank().name())
         ));
     }
 

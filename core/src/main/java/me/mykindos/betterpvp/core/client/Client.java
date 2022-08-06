@@ -14,10 +14,10 @@ public class Client {
 
     String uuid;
     String name;
-    Rank rank;
-    boolean administrating;
+    @Builder.Default
+    Rank rank = Rank.PLAYER;
 
-    public int test = 1;
+    boolean administrating;
 
     private final HashMap<Enum<?>, Object> properties = new HashMap<>();
 
@@ -30,11 +30,11 @@ public class Client {
         return Optional.ofNullable(type.cast(properties.getOrDefault(key, null)));
     }
 
-    public void putProperty(Enum<?> key, Object object){
+    public void putProperty(Enum<?> key, Object object) {
         properties.put(key, object);
     }
 
-    public boolean hasRank(Rank rank){
+    public boolean hasRank(Rank rank) {
         return this.rank.getId() >= rank.getId();
     }
 

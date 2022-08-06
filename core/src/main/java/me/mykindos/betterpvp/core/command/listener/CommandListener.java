@@ -68,7 +68,7 @@ public class CommandListener implements Listener {
                         command.execute(event.getPlayer(), client, args);
                     } else {
                         SubCommand subCommand = subCommandOptional.get();
-                        if (client.hasRank(subCommand.getRequiredRank())) {
+                        if (client.hasRank(subCommand.getRequiredRank()) || event.getPlayer().isOp()) {
                             String[] newArgs = args.length > 1 ? Arrays.copyOfRange(args, 1, args.length) : new String[]{};
                             subCommand.execute(event.getPlayer(), client, newArgs);
                         } else {
