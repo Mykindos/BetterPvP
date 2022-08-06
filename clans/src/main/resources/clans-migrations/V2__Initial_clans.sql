@@ -101,6 +101,6 @@ INSERT IGNORE INTO property_map VALUES ("CLAN_CHAT", "java.lang.Boolean");
 # noinspection SqlResolve
 INSERT IGNORE INTO property_map VALUES ("STAFF_CHAT", "java.lang.Boolean");
 # noinspection SqlResolve
-INSERT IGNORE INTO property_map VALUES ("BLOCKS_PLACED", "java.lang.Boolean");
+INSERT IGNORE INTO property_map VALUES ("BLOCKS_PLACED", "java.lang.Integer");
 # noinspection SqlResolve
-INSERT IGNORE INTO property_map VALUES ("BLOCKS_BROKEN", "java.lang.Boolean");
+INSERT IGNORE INTO property_map VALUES ("BLOCKS_BROKEN", "java.lang.Integer");

@@ -134,4 +134,9 @@ public class BattleTaunt extends ChannelSkill implements InteractSkill, Cooldown
     public double getCooldown(int level) {
         return 0.5;
     }
+
+    @Override
+    public boolean showCooldownFinished(){
+        return false;
+    }
 }

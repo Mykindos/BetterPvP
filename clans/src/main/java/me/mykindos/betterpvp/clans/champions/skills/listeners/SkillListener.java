@@ -75,9 +75,7 @@ public class SkillListener implements Listener {
         int level = event.getLevel();
 
         if (!clanManager.canCast(player)) return;
-
         if (hasNegativeEffect(player)) return;
-
         if (!skill.canUse(player)) return;
 
         if (skill instanceof CooldownSkill cooldownSkill) {
@@ -311,7 +309,6 @@ public class SkillListener implements Listener {
 
     @EventHandler
     public void onFetchNearbyEntity(FetchNearbyEntityEvent<?> event) {
-        System.out.println("EVENT FIRED, POG");
         event.getEntities().removeIf(entity -> {
             if (entity instanceof Player player) {
                 return !clanManager.canHurt(event.getPlayer(), player)
