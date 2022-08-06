@@ -44,7 +44,7 @@ public abstract class Skill implements ISkill {
     }
 
     @Override
-    public int getMaxLevel(){
+    public int getMaxLevel() {
         return skillConfig.getMaxlevel();
     }
 
@@ -94,12 +94,14 @@ public abstract class Skill implements ISkill {
         return Optional.empty();
     }
 
-    protected int getLevel(Player player){
+    protected int getLevel(Player player) {
         Optional<BuildSkill> skillOptional = getSkill(player);
         int level = skillOptional.map(BuildSkill::getLevel).orElse(0);
-        if(UtilPlayer.isHoldingItem(player, getItemsBySkillType())) {
-            if(UtilPlayer.isHoldingItem(player, SkillWeapons.BOOSTERS)){
-                level++;
+        if (level > 0) {
+            if (UtilPlayer.isHoldingItem(player, getItemsBySkillType())) {
+                if (UtilPlayer.isHoldingItem(player, SkillWeapons.BOOSTERS)) {
+                    level++;
+                }
             }
         }
 

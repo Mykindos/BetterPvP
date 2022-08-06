@@ -57,4 +57,11 @@ public class UtilWorld {
 
     }
 
+    public static Location locMerge(Location a, Location b) {
+        a.setX(b.getX());
+        a.setY(b.getY());
+        a.setZ(b.getZ());
+        return a;
+    }
+
 }

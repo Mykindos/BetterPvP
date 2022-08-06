@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.clans.champions.skills.listeners;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.champions.builds.BuildSkill;
 import me.mykindos.betterpvp.clans.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.clans.champions.roles.Role;
@@ -43,6 +44,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 
+@Singleton
 @BPvPListener
 public class SkillListener implements Listener {
 
@@ -301,7 +303,8 @@ public class SkillListener implements Listener {
 
     private boolean hasNegativeEffect(Player player) {
         if (effectManager.hasEffect(player, EffectType.SILENCE)
-                || player.hasPotionEffect(PotionEffectType.LEVITATION)) {
+                || player.hasPotionEffect(PotionEffectType.LEVITATION)
+                || effectManager.hasEffect(player, EffectType.STUN)) {
             return true;
         }
         return false;
