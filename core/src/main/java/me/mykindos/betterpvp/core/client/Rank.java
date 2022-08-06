@@ -31,13 +31,26 @@ public enum Rank {
     public String getTag(boolean bold) {
         String tag = this.name;
         if (bold) {
-            return this.color.toString() + ChatColor.BOLD + fixColors(tag);
+            return getChatColor().toString() + ChatColor.BOLD + fixColors(tag);
         }
-        return this.color + fixColors(tag);
+        return getChatColor().toString() + fixColors(tag);
     }
 
     private String fixColors(String s) {
         return ChatColor.translateAlternateColorCodes('&', s);
+    }
+
+    private ChatColor getChatColor(){
+        return ChatColor.valueOf(color.toString().toUpperCase());
+    }
+
+    public static Rank getRank(int id) {
+        for (Rank rank : Rank.values()) {
+            if (rank.getId() == id) {
+                return rank;
+            }
+        }
+        return null;
     }
 
 }
