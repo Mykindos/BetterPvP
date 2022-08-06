@@ -5,16 +5,13 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.champions.ChampionsManager;
 import me.mykindos.betterpvp.clans.champions.builds.menus.events.SkillDequipEvent;
 import me.mykindos.betterpvp.clans.champions.roles.Role;
-import me.mykindos.betterpvp.clans.champions.skills.Skill;
 import me.mykindos.betterpvp.clans.champions.skills.config.SkillConfigFactory;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillType;
 import me.mykindos.betterpvp.clans.champions.skills.types.CooldownSkill;
-import me.mykindos.betterpvp.clans.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.clans.champions.skills.types.PrepareSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;

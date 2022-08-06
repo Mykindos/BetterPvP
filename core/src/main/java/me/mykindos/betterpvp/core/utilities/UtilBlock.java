@@ -499,4 +499,16 @@ public class UtilBlock {
         return false;
     }
 
+    public static boolean isWall(Block block) {
+        boolean relativeNorth = UtilBlock.airFoliage(block.getRelative(BlockFace.NORTH));
+        boolean relativeSouth = UtilBlock.airFoliage(block.getRelative(BlockFace.SOUTH));
+        boolean relativeEast = UtilBlock.airFoliage(block.getRelative(BlockFace.EAST));
+        boolean relativeWest = UtilBlock.airFoliage(block.getRelative(BlockFace.WEST));
+        return !UtilBlock.airFoliage(block) || !UtilBlock.airFoliage(block.getRelative(BlockFace.UP))
+                || (!relativeWest && !relativeNorth)
+                || (!relativeEast && !relativeNorth)
+                || (!relativeEast && !relativeSouth)
+                || (!relativeWest && !relativeSouth);
+    }
+
 }

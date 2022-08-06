@@ -3,6 +3,8 @@ package me.mykindos.betterpvp.clans.champions.skills.config;
 import com.google.inject.Inject;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.champions.skills.Skill;
+import me.mykindos.betterpvp.clans.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.clans.champions.skills.types.EnergySkill;
 
 
 public class SkillConfigFactory implements ISkillConfigFactory {
@@ -10,7 +12,7 @@ public class SkillConfigFactory implements ISkillConfigFactory {
     private final Clans clans;
 
     @Inject
-    public SkillConfigFactory(Clans clans){
+    public SkillConfigFactory(Clans clans) {
         this.clans = clans;
     }
 
@@ -21,10 +23,16 @@ public class SkillConfigFactory implements ISkillConfigFactory {
         String path = "skills." + skill.getClassType().toString().toLowerCase() + "." + skill.getName().replace(" ", "").toLowerCase();
 
         boolean enabled = config.getOrSaveBoolean(path + ".enabled", true);
-        int cooldown = config.getOrSaveInt(path + ".cooldown", 0);
-        int energy = config.getOrSaveInt(path + ".energy", 0);
         int maxLevel = config.getOrSaveInt(path + ".maxlevel", 5);
+        int cooldown = 0;
+        int energy = 0;
+        if (skill instanceof CooldownSkill) {
+            cooldown = config.getOrSaveInt(path + ".cooldown", 0);
 
+        }
+        if (skill instanceof EnergySkill) {
+            energy = config.getOrSaveInt(path + ".energy", 0);
+        }
         return SkillConfig.builder()
                 .enabled(enabled)
                 .cooldown(cooldown)

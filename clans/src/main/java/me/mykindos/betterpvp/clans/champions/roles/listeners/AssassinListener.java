@@ -12,7 +12,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 
 import javax.inject.Inject;
-import java.util.Optional;
 
 @BPvPListener
 public class AssassinListener implements Listener {
