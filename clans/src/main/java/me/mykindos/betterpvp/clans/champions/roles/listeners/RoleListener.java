@@ -41,16 +41,19 @@ public class RoleListener implements Listener {
         this.gamerManager = gamerManager;
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onRoleChange(RoleChangeEvent event) {
-        if (event.isCancelled()) return;
 
         Player player = event.getPlayer();
         Role role = event.getRole();
 
-        roleManager.addObject(player.getUniqueId().toString(), role);
-
-        UtilMessage.message(player, "Class", "You equipped " + ChatColor.GREEN + role.getName());
+        if (role == null) {
+            UtilMessage.message(player, "Class", "Armor Class: " + ChatColor.GREEN + "None");
+        } else {
+            roleManager.addObject(player.getUniqueId().toString(), role);
+            UtilMessage.message(player, "Class", "You equipped " + ChatColor.GREEN + role.getName());
+            UtilMessage.message(player, equipMessage(player, role));
+        }
 
         for (PotionEffect effect : player.getActivePotionEffects()) {
 
@@ -64,7 +67,6 @@ public class RoleListener implements Listener {
 
         }
 
-        UtilMessage.message(player, equipMessage(player, role));
 
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_HORSE_ARMOR, 2.0F, 1.09F);
 
@@ -75,23 +77,28 @@ public class RoleListener implements Listener {
         for (Player player : Bukkit.getOnlinePlayers()) {
 
             if (!checkNoRoleEquipped(player)) {
-
-                EntityEquipment equipment = player.getEquipment();
-                for (Role role : Role.values()) {
-                    if (equipment.getHelmet().getType() == role.getHelmet()
-                            && equipment.getChestplate().getType() == role.getChestplate()
-                            && equipment.getLeggings().getType() == role.getLeggings()
-                            && equipment.getBoots().getType() == role.getBoots()) {
-                        equipRole(player, role);
-                        break;
-                    }
-
-                }
+                checkEquippedRole(player);
             } else {
                 equipRole(player, null);
             }
 
         }
+    }
+
+    private void checkEquippedRole(Player player) {
+        EntityEquipment equipment = player.getEquipment();
+        for (Role role : Role.values()) {
+            if (equipment.getHelmet().getType() == role.getHelmet()
+                    && equipment.getChestplate().getType() == role.getChestplate()
+                    && equipment.getLeggings().getType() == role.getLeggings()
+                    && equipment.getBoots().getType() == role.getBoots()) {
+                equipRole(player, role);
+                return;
+            }
+
+        }
+
+        equipRole(player, null);
     }
 
     @EventHandler
@@ -147,7 +154,10 @@ public class RoleListener implements Listener {
 
     private void equipRole(Player player, Role role) {
         if (role == null) {
-            roleManager.removeObject(player.getUniqueId().toString());
+            if (roleManager.getObjects().containsKey(player.getUniqueId().toString())) {
+                roleManager.removeObject(player.getUniqueId().toString());
+                UtilServer.callEvent(new RoleChangeEvent(player, null));
+            }
             return;
         }
 

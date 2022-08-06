@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.combat.listeners;
 
+import me.mykindos.betterpvp.core.combat.armour.ArmourManager;
 import me.mykindos.betterpvp.core.combat.data.DamageData;
 import me.mykindos.betterpvp.core.combat.events.*;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
@@ -20,6 +21,7 @@ import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
 
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,8 +29,11 @@ import java.util.List;
 public class CombatListener implements Listener {
 
     private final List<DamageData> damageDataList;
+    private final ArmourManager armourManager;
 
-    public CombatListener() {
+    @Inject
+    public CombatListener(ArmourManager armourManager) {
+        this.armourManager = armourManager;
         damageDataList = new ArrayList<>();
     }
 
@@ -82,14 +87,6 @@ public class CombatListener implements Listener {
 
     private void damage(CustomDamageEvent event) {
 
-
-        // TODO this shouldn't be necessary, we check it before the custom damage event is called
-        // Maybe when we call CustomDamageEvent ourselves
-        if (hasDamageData(event.getDamagee().getUniqueId().toString(), event.getCause())) {
-            return;
-//
-        }
-
         // TODO handle this elsewhere
         //if (event.getDamagee() instanceof Sheep) {
         //    Sheep sheep = (Sheep) event.getDamagee();
@@ -133,6 +130,16 @@ public class CombatListener implements Listener {
 
                 if (!event.getDamagee().isDead()) {
 
+                    if (event.getDamagee() instanceof Player player) {
+                        if (player.getInventory().getItemInMainHand().getType() == Material.BOOK) {
+                            player.sendMessage("");
+                            player.sendMessage("Damage: " + event.getDamage());
+                            player.sendMessage("Damage Reduced: " + damage);
+                            player.sendMessage("Delay: " + event.getDamageDelay());
+                            player.sendMessage("Cause: " + event.getCause().name());
+//
+                        }
+                    }
 
                     if (event.getDamagee().getHealth() - damage < 1.0) {
                         //if (Clans.getOptions().isFNG()) {
@@ -153,18 +160,6 @@ public class CombatListener implements Listener {
             }
 
 
-            // TODO handle this elsewhere
-            //if (event.getDamagee() instanceof Player) {
-            //    Player p = (Player) event.getDamagee();
-            //    if (p.getInventory().getItemInMainHand().getType() == Material.BOOK) {
-            //        p.sendMessage("");
-            //        p.sendMessage("Damage: " + event.getDamage());
-            //        p.sendMessage("Damage Reduced: " + UtilGamer.getDamageReduced(event.getDamage(), event.getDamagee()));
-            //        p.sendMessage("Delay: " + event.getDamageDelay());
-            //        p.sendMessage("Cause: " + event.getCause().name());
-//
-            //    }
-            //}
         }
 
 
@@ -174,14 +169,18 @@ public class CombatListener implements Listener {
     public void onPreDamage(PreCustomDamageEvent event) {
         CustomDamageEvent cde = event.getCustomDamageEvent();
 
-        if(cde.getDamager() != null) {
+        if (cde.getDamager() != null) {
             if (cde.getDamager().equals(cde.getDamagee())) {
                 event.setCancelled(true);
                 return;
             }
         }
 
-        if(UtilPlayer.isCreativeOrSpectator(cde.getDamagee())){
+        if (UtilPlayer.isCreativeOrSpectator(cde.getDamagee())) {
+            event.setCancelled(true);
+        }
+
+        if (hasDamageData(cde.getDamagee().getUniqueId().toString(), cde.getCause())) {
             event.setCancelled(true);
         }
 
@@ -307,6 +306,11 @@ public class CombatListener implements Listener {
 
         UtilVelocity.velocity(event.getDamagee(),
                 trajectory, 0.3D + trajectory.length() * 0.8D, false, 0.0D, Math.abs(0.2D * knockback), 0.4D + 0.04D * knockback, true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onDamageReduction(CustomDamageReductionEvent event) {
+        event.setDamage(armourManager.getDamageReduced(event.getDamage(), event.getCustomDamageEvent().getDamagee()));
     }
 
     @UpdateEvent

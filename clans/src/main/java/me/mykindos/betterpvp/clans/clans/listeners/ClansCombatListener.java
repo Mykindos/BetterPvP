@@ -60,4 +60,9 @@ public class ClansCombatListener implements Listener {
         }
 
     }
+
+    @EventHandler (priority = EventPriority.LOWEST)
+    public void onWeaponDamage(CustomDamageEvent event) {
+
+    }
 }

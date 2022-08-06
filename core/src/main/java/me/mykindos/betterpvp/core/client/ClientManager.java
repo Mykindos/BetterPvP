@@ -21,7 +21,6 @@ public class ClientManager extends Manager<Client> {
     @Inject
     public ClientManager(ClientRepository repository){
         this.repository = repository;
-        loadFromList(repository.getAll());
     }
 
     public Optional<Client> getObject(UUID uuid) {

@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Particle;
@@ -24,6 +25,8 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -178,12 +181,9 @@ public class SmokeBomb extends Skill implements ToggleSkill, CooldownSkill, List
         // Display particle to those only within 30 blocks
         Particle.EXPLOSION_HUGE.builder().location(player.getLocation()).receivers(30).spawn();
 
-        // TODO perhaps an event here so that we dont have a clans dependency
-        //for (Player d : UtilPlayer.getInRadius(player.getLocation(), 2.5)) {
-        //    if (d == player) continue;
-        //    if (ClanUtilities.canHurt(player, d)) {
-        //        d.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 35, 1));
-        //    }
-        //}
+        for(Player target : UtilPlayer.getNearbyPlayers(player, 2.5)) {
+            target.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 35, 1));
+        }
+
     }
 }

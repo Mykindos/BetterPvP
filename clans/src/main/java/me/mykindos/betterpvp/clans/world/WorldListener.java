@@ -82,12 +82,12 @@ public class WorldListener implements Listener {
      * Prevent fall damage when landing on wool or sponge
      */
     @EventHandler
-    public void onSafeFall(EntityDamageEvent e) {
-        if (e.getEntity() instanceof Player player) {
-            if (e.getCause() == EntityDamageEvent.DamageCause.FALL) {
+    public void onSafeFall(EntityDamageEvent event) {
+        if (event.getEntity() instanceof Player player) {
+            if (event.getCause() == EntityDamageEvent.DamageCause.FALL) {
                 if (UtilBlock.getBlockUnder(player.getLocation()).getType().name().contains("SPONGE")
                         || UtilBlock.getBlockUnder(player.getLocation()).getType().name().contains("WOOL")) {
-                    e.setCancelled(true);
+                    event.setCancelled(true);
                 }
             }
         }
@@ -187,9 +187,9 @@ public class WorldListener implements Listener {
      * When we had the nether, people would pull the boss in.
      */
     @EventHandler
-    public void onPortal(EntityPortalEvent e) {
-        if (!(e.getEntity() instanceof Player)) {
-            e.setCancelled(true);
+    public void onPortal(EntityPortalEvent event) {
+        if (!(event.getEntity() instanceof Player)) {
+            event.setCancelled(true);
         }
     }
 
@@ -386,10 +386,10 @@ public class WorldListener implements Listener {
      * Other than enchanted armour
      */
     @EventHandler
-    public void onPickup(EntityPickupItemEvent e) {
-        if (e.getEntity() instanceof Player) {
+    public void onPickup(EntityPickupItemEvent event) {
+        if (event.getEntity() instanceof Player) {
             // TODO implement weapons
-            //Weapon w = WeaponManager.getWeapon(e.getItem().getItemStack());
+            //Weapon w = WeaponManager.getWeapon(event.getItem().getItemStack());
             //if (w != null) {
             //    if (w instanceof EnchantedWeapon) {
 //
@@ -398,7 +398,7 @@ public class WorldListener implements Listener {
 //
             //}
 
-            itemHandler.updateNames(e.getItem().getItemStack());
+            itemHandler.updateNames(event.getItem().getItemStack());
         }
     }
 
@@ -406,9 +406,9 @@ public class WorldListener implements Listener {
      * Stops magma cubes from splitting
      */
     @EventHandler
-    public void onMagmaSplit(SlimeSplitEvent e) {
-        if (e.getEntity() instanceof MagmaCube) {
-            e.setCancelled(true);
+    public void onMagmaSplit(SlimeSplitEvent event) {
+        if (event.getEntity() instanceof MagmaCube) {
+            event.setCancelled(true);
         }
     }
 
@@ -419,10 +419,10 @@ public class WorldListener implements Listener {
     public static HashMap<Item, Long> blood = new HashMap<>();
 
     @EventHandler
-    public void onDeath(PlayerDeathEvent e) {
+    public void onDeath(PlayerDeathEvent event) {
 
         for (int i = 0; i < 10; i++) {
-            final Item item = e.getEntity().getWorld().dropItem(e.getEntity().getEyeLocation(), new ItemStack(Material.RED_DYE, 1));
+            final Item item = event.getEntity().getWorld().dropItem(event.getEntity().getEyeLocation(), new ItemStack(Material.RED_DYE, 1));
             item.setVelocity(new Vector((Math.random() - 0.5D) * 0.5, Math.random() * 0.5, (Math.random() - 0.5D) * 0.5));
             item.setPickupDelay(Integer.MAX_VALUE);
             blood.put(item, System.currentTimeMillis());
@@ -451,20 +451,20 @@ public class WorldListener implements Listener {
     /**
      * No hand swapping!
      *
-     * @param e the event
+     * @param event the event
      */
     @EventHandler
-    public void onSwapHand(PlayerSwapHandItemsEvent e) {
-        e.setCancelled(true);
+    public void onSwapHand(PlayerSwapHandItemsEvent event) {
+        event.setCancelled(true);
     }
 
     /*
      * Stops ground items from being destroyed from things like lava, fire, lightning, etc.
      */
     @EventHandler
-    public void itemDamage(EntityDamageEvent e) {
-        if (e.getEntity() instanceof Item) {
-            e.setCancelled(true);
+    public void itemDamage(EntityDamageEvent event) {
+        if (event.getEntity() instanceof Item) {
+            event.setCancelled(true);
         }
     }
 
@@ -475,6 +475,15 @@ public class WorldListener implements Listener {
     public void onArrowHit(ProjectileHitEvent event) {
         if (event.getEntity() instanceof Arrow arrow) {
             arrow.remove();
+        }
+    }
+
+    @EventHandler
+    public void onPhantomSpawn(CreatureSpawnEvent event) {
+        if (event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.NATURAL) {
+            if (event.getEntityType() == EntityType.PHANTOM) {
+                event.setCancelled(true);
+            }
         }
     }
 

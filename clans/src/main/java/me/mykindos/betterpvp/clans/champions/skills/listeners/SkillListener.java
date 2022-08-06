@@ -133,6 +133,7 @@ public class SkillListener implements Listener {
 
                 RoleBuild build = gamer.getActiveBuilds().get(role.getName());
                 if (build == null) return;
+                if (build.getPassiveB() == null) return;
 
                 Skill skill = build.getPassiveB().getSkill();
                 if (!(skill instanceof ToggleSkill)) return;
@@ -312,7 +313,7 @@ public class SkillListener implements Listener {
     public void onFetchNearbyEntity(FetchNearbyEntityEvent<?> event) {
         System.out.println("EVENT FIRED, POG");
         event.getEntities().removeIf(entity -> {
-            if(entity instanceof Player player) {
+            if (entity instanceof Player player) {
                 return !clanManager.canHurt(event.getPlayer(), player)
                         || player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR;
             }

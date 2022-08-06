@@ -32,7 +32,6 @@ public class Core extends BPvPPlugin {
     @Inject
     private Database database;
 
-    @Inject
     private ClientManager clientManager;
 
     @Inject
@@ -56,6 +55,9 @@ public class Core extends BPvPPlugin {
 
         var coreCommandLoader = injector.getInstance(CoreCommandLoader.class);
         coreCommandLoader.loadCommands(PACKAGE);
+
+        clientManager = injector.getInstance(ClientManager.class);
+        clientManager.loadFromList(clientManager.getRepository().getAll());
 
         updateEventExecutor.initialize();
     }
