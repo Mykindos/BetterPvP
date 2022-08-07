@@ -195,9 +195,8 @@ public class SkillListener implements Listener {
                 RoleBuild build = gamer.getActiveBuilds().get(role.getName());
                 if (build == null) return;
 
-                Optional<Skill> skillOptional = build.getActiveSkills().stream().filter(skill -> {
-                    return skill instanceof InteractSkill && skill.getType() == skillType;
-                }).findFirst();
+                Optional<Skill> skillOptional = build.getActiveSkills().stream()
+                        .filter(skill -> skill instanceof InteractSkill && skill.getType() == skillType).findFirst();
 
                 if (skillOptional.isPresent()) {
                     Skill skill = skillOptional.get();
@@ -302,12 +301,9 @@ public class SkillListener implements Listener {
     }
 
     private boolean hasNegativeEffect(Player player) {
-        if (effectManager.hasEffect(player, EffectType.SILENCE)
+        return effectManager.hasEffect(player, EffectType.SILENCE)
                 || player.hasPotionEffect(PotionEffectType.LEVITATION)
-                || effectManager.hasEffect(player, EffectType.STUN)) {
-            return true;
-        }
-        return false;
+                || effectManager.hasEffect(player, EffectType.STUN);
     }
 
     @EventHandler

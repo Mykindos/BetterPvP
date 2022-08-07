@@ -2,6 +2,8 @@ package me.mykindos.betterpvp.core.utilities;
 
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
 import org.bukkit.Location;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -22,6 +24,13 @@ public class UtilEntity {
         UtilServer.callEvent(fetchNearbyEntityEvent);
 
         return fetchNearbyEntityEvent.getEntities();
+    }
+
+    public static void setHealth(LivingEntity entity, double health){
+        AttributeInstance maxHealthAttribute = entity.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+        if(maxHealthAttribute != null) {
+            entity.setHealth(Math.min(maxHealthAttribute.getValue(), health));
+        }
     }
 
 }

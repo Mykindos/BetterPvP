@@ -64,9 +64,9 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener 
     }
 
     @EventHandler
-    public void onDequip(SkillDequipEvent e) {
-        if (e.getSkill() == this) {
-            active.remove(e.getPlayer().getUniqueId());
+    public void onDequip(SkillDequipEvent event) {
+        if (event.getSkill() == this) {
+            active.remove(event.getPlayer().getUniqueId());
         }
     }
 

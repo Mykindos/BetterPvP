@@ -40,7 +40,7 @@ public class UpdateEventExecutor {
 
             for (var listener : listeners) {
 
-                var methods = listener.getClass().getDeclaredMethods();
+                var methods = listener.getClass().getMethods();
 
                 for (var method : methods) {
 
