@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.ClientManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -42,9 +43,11 @@ public class ClansChatListener extends ClanListener {
 
             ClanRelation relation = clanManager.getRelation(senderClan, targetClan);
 
-            Component clanPrefix = Component.text(senderClan.getName() + " ", relation.getSecondary())
-                    .hoverEvent(HoverEvent.showText(clanManager.getClanTooltip(event.getTarget(), senderClan)))
+            HoverEvent<Component> clanTooltip = HoverEvent.showText(clanManager.getClanTooltip(event.getTarget(), senderClan));
+            Component clanPrefix = Component.empty()
+                    .append(Component.text(senderClan.getName() + " ", relation.getSecondary()).hoverEvent(clanTooltip))
                     .append(Component.text(event.getPlayer().getName() + ": ", relation.getPrimary()));
+
 
             event.setPrefix(clanPrefix);
         } else {
@@ -70,8 +73,7 @@ public class ClansChatListener extends ClanListener {
             if (clanChat) {
                 event.cancel("Player has clan chat enabled");
 
-                String message = ChatColor.AQUA + event.getPlayer().getName() + " "
-                        + ChatColor.DARK_AQUA + PlainTextComponentSerializer.plainText().serialize(event.getMessage());
+                String message = ChatColor.AQUA + event.getPlayer().getName() + " " + ChatColor.DARK_AQUA + PlainTextComponentSerializer.plainText().serialize(event.getMessage());
                 clan.messageClan(message, null, false);
 
             }
@@ -82,11 +84,10 @@ public class ClansChatListener extends ClanListener {
             if (allyChat) {
                 event.cancel("Player has ally chat enabled");
 
-                String message = ChatColor.DARK_GREEN + event.getPlayer().getName() + " "
-                        + ChatColor.GREEN + PlainTextComponentSerializer.plainText().serialize(event.getMessage());
+                String message = ChatColor.DARK_GREEN + event.getPlayer().getName() + " " + ChatColor.GREEN + PlainTextComponentSerializer.plainText().serialize(event.getMessage());
 
                 clan.getAlliances().forEach(alliance -> {
-                  alliance.getClan().messageClan(message, null, false);
+                    alliance.getClan().messageClan(message, null, false);
                 });
 
                 clan.messageClan(message, null, false);

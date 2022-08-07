@@ -2,9 +2,11 @@ package me.mykindos.betterpvp.clans.clans.listeners;
 
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.champions.builds.RoleBuild;
+import me.mykindos.betterpvp.clans.champions.builds.menus.events.SkillEquipEvent;
 import me.mykindos.betterpvp.clans.champions.roles.Role;
 import me.mykindos.betterpvp.clans.champions.roles.RoleManager;
 import me.mykindos.betterpvp.clans.champions.roles.events.RoleChangeEvent;
+import me.mykindos.betterpvp.clans.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.clans.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.clans.gamer.Gamer;
 import me.mykindos.betterpvp.clans.gamer.GamerManager;
@@ -12,6 +14,7 @@ import me.mykindos.betterpvp.clans.utilities.UtilClans;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
+import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -90,12 +93,12 @@ public class ClansShieldListener implements Listener {
     }
 
     @EventHandler
-    public void onItemSwap(PlayerItemHeldEvent event){
+    public void onItemSwap(PlayerItemHeldEvent event) {
         Player player = event.getPlayer();
         ItemStack item = player.getInventory().getItem(event.getNewSlot());
-        if(item != null) {
+        if (item != null) {
             UtilServer.runTaskLater(clans, () -> giveShieldIfRequired(player), 1);
-        }else{
+        } else {
             player.getInventory().setItemInOffHand(null);
         }
     }
@@ -121,7 +124,7 @@ public class ClansShieldListener implements Listener {
     }
 
     @UpdateEvent(delay = 1000)
-    public void returnUnknownOffhands(){
+    public void returnUnknownOffhands() {
         Bukkit.getOnlinePlayers().forEach(player -> {
             ItemStack offhand = player.getInventory().getItemInOffHand();
             if (offhand.getType() != Material.SHIELD && offhand.getType() != Material.AIR) {
@@ -134,8 +137,8 @@ public class ClansShieldListener implements Listener {
     }
 
 
-    @EventHandler (priority = EventPriority.HIGHEST)
-    public void onRoleChange(RoleChangeEvent event){
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onRoleChange(RoleChangeEvent event) {
         Player player = event.getPlayer();
         giveShieldIfRequired(player);
     }
@@ -165,7 +168,7 @@ public class ClansShieldListener implements Listener {
                 //}
             }
 
-        } else{
+        } else {
             player.getInventory().setItemInOffHand(null);
         }
     }
@@ -174,6 +177,16 @@ public class ClansShieldListener implements Listener {
     public void onDropOffhand(PlayerDropItemEvent event) {
         if (event.getItemDrop().getItemStack().getType() == Material.SHIELD) {
             event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onSkillEquip(SkillEquipEvent event) {
+        if (event.getSkill() instanceof ChannelSkill) {
+            Player player = event.getPlayer();
+            if (UtilClans.isUsableWithShield(player.getInventory().getItemInMainHand())) {
+                player.getInventory().setItemInOffHand(new ItemStack(Material.SHIELD));
+            }
         }
     }
 
