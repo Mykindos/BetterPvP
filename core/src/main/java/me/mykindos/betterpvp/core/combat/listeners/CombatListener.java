@@ -447,43 +447,13 @@ public class CombatListener implements Listener {
             }
         }
 
-        // TODO handle elsewhere
-        //if (event.getDamager() instanceof Player) {
-        //    if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
-        //        Player p = (Player) event.getDamager();
-        //        ItemStack hand = p.getInventory().getItemInMainHand();
-        //        if (hand != null) {
-        //            if (UtilItem.isAxe(hand.getType()) || UtilItem.isSword(hand.getType())
-        //                    || UtilItem.isPickAxe(hand.getType()) || UtilItem.isHoe(hand.getType())
-        //                    || UtilItem.isShovel(hand.getType())) {
-//
-//
-        //                if (p.getInventory().getItemInMainHand().getType() == Material.GOLDEN_SWORD) {
-        //                    if (UtilMath.randomInt(10) > 6) {
-        //                        hand.setDurability((short) (hand.getDurability() + 1));
-//
-        //                    }
-        //                    p.updateInventory();
-        //                } else {
-//
-        //                    Weapon w = WeaponManager.getWeapon(hand);
-        //                    if (w != null && w instanceof ILegendary) {
-        //                        return;
-        //                    }
-//
-        //                    hand.setDurability((short) (hand.getDurability() + 1));
-        //                }
-        //                if (hand.getDurability() > hand.getType().getMaxDurability()) {
-        //                    p.getInventory().setItemInMainHand(new ItemStack(Material.AIR));
-        //                    p.playSound(p.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
-//
-        //                }
-        //            }
-        //        }
-//
-//
-        //    }
-        //}
+    }
+
+    @EventHandler
+    public void onFireDamage(CustomDamageEvent event) {
+        if(event.getCause() == EntityDamageEvent.DamageCause.FIRE_TICK) {
+            event.setIgnoreArmour(true);
+        }
     }
 
 }

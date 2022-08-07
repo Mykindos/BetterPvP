@@ -87,15 +87,15 @@ public class ChatListener implements Listener {
     public void onChatReceived(ChatReceivedEvent event) {
         if (event.isCancelled()) return;
 
-        Optional<Boolean> lunarClientOptional = event.getClient().getProperty(ClientProperty.LUNAR);
-        if(lunarClientOptional.isPresent()) {
-            event.setPrefix(Component.text(ChatColor.GREEN + "* ").append(event.getPrefix()));
-        }
-
         Rank rank = event.getClient().getRank();
         if(rank.isDisplayPrefix()) {
             Component rankPrefix = Component.text(ChatColor.BOLD + rank.getName() + " ", rank.getColor());
             event.setPrefix(rankPrefix.append(event.getPrefix()));
+        }
+
+        Optional<Boolean> lunarClientOptional = event.getClient().getProperty(ClientProperty.LUNAR);
+        if(lunarClientOptional.isPresent()) {
+            event.setPrefix(Component.text(ChatColor.GREEN + "* ").append(event.getPrefix()));
         }
 
         Component finalMessage = event.getPrefix().append(event.getMessage());

@@ -95,14 +95,6 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener 
 
     }
 
-    @EventHandler
-    public void onSprint(PlayerToggleSprintEvent e) {
-        if (!e.isSprinting()) {
-            if (e.getPlayer().hasPotionEffect(PotionEffectType.BLINDNESS)) {
-                e.setCancelled(true);
-            }
-        }
-    }
 
     @Override
     public boolean canUse(Player player) {
