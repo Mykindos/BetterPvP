@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.clans.champions.skills.skills.assassin.bow;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.champions.ChampionsManager;
 import me.mykindos.betterpvp.clans.champions.roles.Role;
@@ -18,28 +20,34 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 @Singleton
 @BPvPListener
-public class SilencingArrow extends PrepareArrowSkill {
+public class MarkedForDeath extends PrepareArrowSkill {
+
 
     @Inject
-    public SilencingArrow(Clans clans, ChampionsManager championsManager, SkillConfigFactory configFactory) {
+    public MarkedForDeath(Clans clans, ChampionsManager championsManager, SkillConfigFactory configFactory) {
         super(clans, championsManager, configFactory);
     }
 
+
     @Override
     public String getName() {
-        return "Silencing Arrow";
+        return "Marked for Death";
     }
 
     @Override
     public String[] getDescription(int level) {
 
-        return new String[]{"Your next arrow will silence your", "target for " + ChatColor.GREEN + (3 + level) + ChatColor.GRAY + " seconds.", "Making them unable to use any active skills", "", "Cooldown: " + ChatColor.GREEN + getCooldown(level)
-
+        return new String[]{
+                "Your next arrow will mark players",
+                "for death, giving them Vulnerability I",
+                "for " + ChatColor.GREEN + (4 + level) + ChatColor.GRAY + " seconds",
+                "Causing them to take 25% additional damage",
+                "from all targets.",
+                "",
+                "Cooldown: " + ChatColor.GREEN + getCooldown(level)
         };
     }
 
@@ -54,31 +62,35 @@ public class SilencingArrow extends PrepareArrowSkill {
     }
 
     @Override
-    public double getCooldown(int level) {
-        return getSkillConfig().getCooldown() - ((level - 1) * 0.5);
-    }
-
-
-
-    @Override
     public void onHit(Player damager, LivingEntity target, int level) {
         if (!(target instanceof Player damagee)) return;
-        championsManager.getEffects().addEffect(damagee, EffectType.SILENCE, (3 + level * 1000L));
-        if (championsManager.getEffects().hasEffect(damagee, EffectType.IMMUNETOEFFECTS)) {
-            UtilMessage.message(damager, getClassType().getName(), ChatColor.GREEN + damagee.getName() + ChatColor.GRAY + " is immune to your silence!");
-        }
+
+        championsManager.getEffects().addEffect(damagee, EffectType.VULNERABILITY, 1, (6 + level * 1000L));
+        UtilMessage.message(damagee, getClassType().getName(), "%s hit you with %s",
+                ChatColor.YELLOW + damager.getName() + ChatColor.GRAY, ChatColor.GREEN + getName());
     }
 
     @Override
     public void displayTrail(Location location) {
-        Particle.REDSTONE.builder().location(location).color(125, 0, 125).count(3).extra(0).receivers(60, true).spawn();
+        Particle.REDSTONE.builder().location(location).color(5, 5, 5).count(3).extra(0).receivers(60, true).spawn();
+    }
+
+
+    @Override
+    public double getCooldown(int level) {
+        return getSkillConfig().getCooldown() - ((level - 1) * 2);
+    }
+
+    @Override
+    public boolean isCancellable() {
+        return true;
     }
 
 
     @Override
     public void activate(Player player, int level) {
-        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
         active.add(player.getUniqueId());
+        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
     }
 
     @Override

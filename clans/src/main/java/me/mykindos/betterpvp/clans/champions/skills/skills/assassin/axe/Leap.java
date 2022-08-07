@@ -10,7 +10,6 @@ import me.mykindos.betterpvp.clans.champions.skills.config.SkillConfigFactory;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillType;
 import me.mykindos.betterpvp.clans.champions.skills.types.CooldownSkill;
-import me.mykindos.betterpvp.clans.champions.skills.types.EnergySkill;
 import me.mykindos.betterpvp.clans.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
@@ -29,7 +28,7 @@ import org.bukkit.util.Vector;
 
 @Singleton
 @BPvPListener
-public class Leap extends Skill implements InteractSkill, CooldownSkill, EnergySkill, Listener {
+public class Leap extends Skill implements InteractSkill, CooldownSkill, Listener {
 
 
     @Inject
@@ -159,15 +158,9 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, EnergyS
         return !wallKick(player, 1);
     }
 
-
     @Override
     public double getCooldown(int level) {
         return getSkillConfig().getCooldown() - ((level - 1) * 0.5);
-    }
-
-    @Override
-    public float getEnergy(int level) {
-        return getSkillConfig().getEnergyCost();
     }
 
     @Override
