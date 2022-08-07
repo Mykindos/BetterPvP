@@ -8,7 +8,7 @@ import net.minecraft.world.level.material.MaterialColor;
 @AllArgsConstructor
 public class MapPixel {
 
-    private MaterialColor color;
+    private int colorId;
     private short averageY;
 
 }

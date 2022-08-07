@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.clans.clans.map.renderer;
 
+import com.google.inject.Inject;
 import lombok.Getter;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.map.MapHandler;
@@ -8,8 +9,13 @@ import me.mykindos.betterpvp.clans.clans.map.data.ExtraCursor;
 import me.mykindos.betterpvp.clans.clans.map.data.MapPixel;
 import me.mykindos.betterpvp.clans.clans.map.data.MapSettings;
 import me.mykindos.betterpvp.clans.clans.map.events.MinimapExtraCursorEvent;
+import me.mykindos.betterpvp.clans.clans.map.events.MinimapPlayerCursorEvent;
 import me.mykindos.betterpvp.clans.clans.map.nms.UtilMapMaterial;
+import me.mykindos.betterpvp.core.config.Config;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
+import net.minecraft.world.level.material.MaterialColor;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -24,6 +30,7 @@ import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
 import org.jetbrains.annotations.NotNull;
 
+import java.awt.Color;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
@@ -36,21 +43,29 @@ public class MinimapRenderer extends MapRenderer implements Listener {
     protected Map<String, Map<Integer, Map<Integer, MapPixel>>> worldCacheMap = new TreeMap<>();
     protected Queue<Coords> queue = new LinkedList<>();
 
-    public MinimapRenderer(MapHandler mapHandler, Clans clans){
+    @Inject
+    @Config(path = "clans.map.maxProcess", defaultValue = "64")
+    private int maxProcess;
+
+
+    @Inject
+    public MinimapRenderer(MapHandler mapHandler, Clans clans) {
+        super(true);
         this.mapHandler = mapHandler;
         Bukkit.getPluginManager().registerEvents(this, clans);
+        UtilServer.runTaskTimer(clans, this::processQueue, 5, 5);
     }
 
     private void processQueue() {
-        if(queue.isEmpty()) {
+        if (queue.isEmpty()) {
             return;
         }
 
-        for (int i = 0; i < 64; i++) {
+        for (int i = 0; i < maxProcess; i++) {
             final Coords poll = queue.poll();
 
             if (poll == null) {
-                break;
+                return;
             }
 
             World world = Bukkit.getWorld(poll.getWorld());
@@ -79,36 +94,42 @@ public class MinimapRenderer extends MapRenderer implements Listener {
 
             final MapPixel mapPixel = getWorldCacheMap().get(b.getWorld().getName()).get(b.getX()).get(b.getZ());
             mapPixel.setAverageY(avgY);
-            mapPixel.setColor(mainColor);
+            mapPixel.setColorId(mainColor.id);
         }
     }
 
 
     @Override
     public void render(@NotNull MapView map, @NotNull MapCanvas canvas, @NotNull Player player) {
+        if (player.getInventory().getItemInMainHand().getType() != Material.FILLED_MAP) return;
+        //for(int x = 0; x < 128; x++){
+        //    for(int y = 0; y < 128; y++){
+        //        canvas.setPixelColor(x, y, Color.BLACK);
+        //    }
+        //}
         int centerX = player.getLocation().getBlockX();
         int centerZ = player.getLocation().getBlockZ();
-
+//
         final MapSettings mapSettings = mapHandler.mapSettingsMap.get(player.getUniqueId());
-
+//
         int scale = 1 << mapSettings.getScale().getValue();
-
+//
         if (mapSettings.getScale() == MapSettings.Scale.FAR) {
             centerX = 0;
             centerZ = 0;
         }
-
+//
         if (!worldCacheMap.containsKey(player.getWorld().getName()))
             worldCacheMap.put(player.getWorld().getName(), new TreeMap<>());
-
+//
         final Map<Integer, Map<Integer, MapPixel>> cacheMap = worldCacheMap.get(player.getWorld().getName());
-
+//
         final boolean hasMoved = mapHandler.hasMoved(player);
-
+//
         if (hasMoved || mapSettings.isUpdate()) {
             for (int i = 0; i < 128; i++) {
                 for (int j = 0; j < 128; j++) {
-                    canvas.setPixel(i, j, (byte) 0);
+                    canvas.setPixelColor(i, j, Color.WHITE);
                 }
             }
             int locX = centerX / scale - 64;
@@ -117,25 +138,32 @@ public class MinimapRenderer extends MapRenderer implements Listener {
                 for (int j = 0; j < 128; j++) {
                     int x = (locX + i) * scale;
                     int z = (locZ + j) * scale;
-
+//
                     if (locX + i < 0 && (locX + i) % scale != 0)
                         x--;
                     if (locZ + j < 0 && (locZ + j) % scale != 0)
                         z--;
-                    if (cacheMap.containsKey(x) && cacheMap.get(x).containsKey(z)) {
-                        final MapPixel mapPixel = cacheMap.get(x).get(z);
-                        short prevY = getPrevY(x, z, player.getWorld().getName(), scale);
 
+
+                    var pixelX = cacheMap.get(x);
+                    if (pixelX != null && pixelX.containsKey(z)) {
+                        final MapPixel mapPixel = pixelX.get(z);
+                        short prevY = getPrevY(x, z, player.getWorld().getName(), scale);
+//
                         double d2 = (mapPixel.getAverageY() - prevY) * 4.0D / (scale + 4) + ((i + j & 1) - 0.5D) * 0.4D;
-                        byte b0 = 1;
+
+                        MaterialColor.Brightness brightness = MaterialColor.Brightness.NORMAL;
 
                         if (d2 > 0.6D) {
-                            b0 = 2;
+                            brightness = MaterialColor.Brightness.HIGH;
+                        }else if (d2 < -0.6D) {
+                            brightness = MaterialColor.Brightness.LOW;
                         }
-                        if (d2 < -0.6D) {
-                            b0 = 0;
-                        }
-                        canvas.setPixel(i, j, (byte) (mapPixel.getColor().col + b0));
+
+                        MaterialColor materialColor = MaterialColor.byId(mapPixel.getColorId());
+
+                        // TODO convert to color
+                        canvas.setPixel(i, j, materialColor.getPackedId(brightness));
                     } else {
                         for (int k = -scale; k < scale; k++) {
                             for (int l = -scale; l < scale; l++) {
@@ -150,7 +178,7 @@ public class MinimapRenderer extends MapRenderer implements Listener {
     }
 
     private void addToQueue(Coords coords) {
-        if(!queue.contains(coords)) {
+        if (!queue.contains(coords)) {
             queue.add(coords);
         }
     }
@@ -161,7 +189,7 @@ public class MinimapRenderer extends MapRenderer implements Listener {
         }
         if (!cacheMap.get(x).containsKey(z)) {
             //IF WANT HEIGHT LIMIT JUST CHANGE THIS
-            int y = player.getWorld().getHighestBlockYAt(x, z) + 1;
+            int y = player.getWorld().getHighestBlockYAt(x, z);
 
             Block b = player.getWorld().getBlockAt(x, y, z);
 
@@ -174,7 +202,7 @@ public class MinimapRenderer extends MapRenderer implements Listener {
             short avgY = 0;
             avgY += b.getY();
 
-            var mainColor = UtilMapMaterial.getBlockColor(b);
+            var mainColor = UtilMapMaterial.getBlockColor(b).id;
 
             cacheMap.get(x).put(z, new MapPixel(mainColor, avgY));
         }
@@ -188,30 +216,30 @@ public class MinimapRenderer extends MapRenderer implements Listener {
 
         MinimapExtraCursorEvent e = new MinimapExtraCursorEvent(player, cursors, scale);
         Bukkit.getServer().getPluginManager().callEvent(e);
-        for (ExtraCursor c : e.getCursors()) {
-            if (!c.getWorld().equalsIgnoreCase(player.getWorld().getName())) {
+        for (ExtraCursor cursor : e.getCursors()) {
+            if (!cursor.getWorld().equalsIgnoreCase(player.getWorld().getName())) {
                 continue;
             }
 
-            int x = ((c.getX() - centerX) / scale) * 2;
-            int z = ((c.getZ() - centerZ) / scale) * 2;
+            int x = ((cursor.getX() - centerX) / scale) * 2;
+            int z = ((cursor.getZ() - centerZ) / scale) * 2;
 
             if (Math.abs(x) > 127) {
-                if (c.isShownOutside()) {
-                    x = c.getX() > player.getLocation().getBlockX() ? 127 : -128;
+                if (cursor.isShownOutside()) {
+                    x = cursor.getX() > player.getLocation().getBlockX() ? 127 : -128;
                 } else {
                     continue;
                 }
             }
 
             if (Math.abs(z) > 127) {
-                if (c.isShownOutside()) {
-                    z = c.getZ() > player.getLocation().getBlockZ() ? 127 : -128;
+                if (cursor.isShownOutside()) {
+                    z = cursor.getZ() > player.getLocation().getBlockZ() ? 127 : -128;
                 } else {
                     continue;
                 }
             }
-            cursors.addCursor(x, z, c.getDirection(), c.getType().getValue(), c.isVisible());
+            cursors.addCursor(x, z, cursor.getDirection(), cursor.getType().getValue(), cursor.isVisible());
         }
     }
 
@@ -236,6 +264,7 @@ public class MinimapRenderer extends MapRenderer implements Listener {
     private void handleBlockEvent(Block block) {
         addToQueue(new Coords(block.getX(), block.getZ(), block.getWorld().getName()));
     }
+
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockEvent(BlockPlaceEvent e) {
