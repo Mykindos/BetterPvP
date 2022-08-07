@@ -129,6 +129,7 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
                 }
 
                 Block lastSmoke = player.getLocation().getBlock();
+
                 double curRange = 0.0D;
                 Location target = this.loc.remove(player);
 

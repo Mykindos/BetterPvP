@@ -178,6 +178,7 @@ public class CombatListener implements Listener {
 
         if (UtilPlayer.isCreativeOrSpectator(cde.getDamagee())) {
             event.setCancelled(true);
+            System.out.println("Cancelled");
         }
 
         if (hasDamageData(cde.getDamagee().getUniqueId().toString(), cde.getCause())) {

@@ -1,6 +1,8 @@
 package me.mykindos.betterpvp.core.utilities;
 
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -56,5 +58,11 @@ public class UtilPlayer {
         return Arrays.stream(items).anyMatch(item -> item == player.getInventory().getItemInMainHand().getType());
     }
 
+    public static void sendActionBar(Player player, String msg) {
+
+        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(msg));
+
+
+    }
 
 }

@@ -11,9 +11,12 @@ public class UtilServer {
      *
      * @param event The event to call
      */
-    public static void callEvent(Event event) {
+    public static <T extends Event> T callEvent(T event) {
         Bukkit.getPluginManager().callEvent(event);
+        return event;
     }
+
+
 
     public static void runTask(BPvPPlugin plugin, boolean async, Runnable task) {
         if (plugin.isEnabled()) {

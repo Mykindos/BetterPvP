@@ -7,8 +7,7 @@ public class UtilDamage {
 
     public static void doCustomDamage(CustomDamageEvent event) {
 
-        PreCustomDamageEvent preCustomDamageEvent = new PreCustomDamageEvent(event);
-        UtilServer.callEvent(preCustomDamageEvent);
+        PreCustomDamageEvent preCustomDamageEvent = UtilServer.callEvent(new PreCustomDamageEvent(event));
         if (!preCustomDamageEvent.isCancelled()) {
             UtilServer.callEvent(event);
         }

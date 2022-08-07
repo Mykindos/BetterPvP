@@ -5,6 +5,7 @@ import me.mykindos.betterpvp.clans.champions.ChampionsManager;
 import me.mykindos.betterpvp.clans.champions.roles.Role;
 import me.mykindos.betterpvp.clans.champions.skills.Skill;
 import me.mykindos.betterpvp.clans.champions.skills.config.SkillConfigFactory;
+import me.mykindos.betterpvp.clans.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillType;
 import me.mykindos.betterpvp.clans.champions.skills.skills.paladin.data.CustomArmourStand;
 import me.mykindos.betterpvp.clans.champions.skills.types.CooldownSkill;
@@ -13,6 +14,7 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.*;
+import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
 import org.bukkit.ChatColor;
 import org.bukkit.Effect;
 import org.bukkit.Location;
@@ -96,7 +98,7 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
     @Override
     public double getCooldown(int level) {
 
-        return 12 - ((level - 1));
+        return getSkillConfig().getCooldown() - ((level - 1));
     }
 
     @Override
@@ -152,20 +154,19 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
 
                     stands.put(armourStand, System.currentTimeMillis() + 4000);
 
-                    for (Entity ent : armourStand.getNearbyEntities(0.5D, 0.5D, 0.5D)) {
+                    for (LivingEntity ent : UtilEntity.getNearbyEntities(player, armourStand.getLocation(), 1)) {
+                        if (ent instanceof ArmorStand) continue;
                         if (ent.equals(player)) continue;
-                        if (UtilPlayer.isCreativeOrSpectator(ent)) continue;
-                        if (ent instanceof LivingEntity ed) {
 
-                            if (!cooldownJump.get(player).contains(ed)) {
+                        if (!cooldownJump.get(player).contains(ent)) {
 
-                                UtilVelocity.velocity(ed, 0.5, 1, 2.0, false);
-                                ed.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 30, 2));
-                                UtilDamage.doCustomDamage(new CustomDamageEvent(ed, player, null, DamageCause.CUSTOM, 8.0, false, getName()));
+                            UtilVelocity.velocity(ent, 0.5, 1, 2.0, false);
+                            ent.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 30, 2));
+                            UtilDamage.doCustomDamage(new CustomDamageEvent(ent, player, null, DamageCause.CUSTOM, 8.0, false, getName()));
 
-                                cooldownJump.get(player).add(ed);
-                            }
+                            cooldownJump.get(player).add(ent);
                         }
+
                     }
 
 
@@ -189,6 +190,6 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
 
     @Override
     public Action[] getActions() {
-        return new Action[0];
+        return SkillActions.RIGHT_CLICK;
     }
 }

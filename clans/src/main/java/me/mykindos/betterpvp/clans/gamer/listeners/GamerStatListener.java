@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.clans.gamer.listeners;
 
 import com.google.inject.Inject;
+import me.mykindos.betterpvp.clans.clans.map.nms.UtilMapMaterial;
 import me.mykindos.betterpvp.clans.gamer.Gamer;
 import me.mykindos.betterpvp.clans.gamer.GamerManager;
 import me.mykindos.betterpvp.clans.gamer.properties.GamerProperty;
@@ -62,7 +63,7 @@ public class GamerStatListener implements Listener {
     @EventHandler (priority = EventPriority.MONITOR)
     public void onBlockBroken(BlockBreakEvent event) {
         if(event.isCancelled()) return;
-
+        System.out.println(UtilMapMaterial.getBlockColor(event.getBlock()).id);
         Player player = event.getPlayer();
 
         Optional<Gamer> gamerOptional = gamerManager.getObject(player.getUniqueId().toString());
