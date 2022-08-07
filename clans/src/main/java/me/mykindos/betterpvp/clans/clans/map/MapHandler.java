@@ -3,10 +3,12 @@ package me.mykindos.betterpvp.clans.clans.map;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.map.data.ChunkData;
 import me.mykindos.betterpvp.clans.clans.map.data.MapPixel;
 import me.mykindos.betterpvp.clans.clans.map.data.MapSettings;
+import me.mykindos.betterpvp.clans.clans.map.renderer.ClanMapRenderer;
 import me.mykindos.betterpvp.clans.clans.map.renderer.MinimapRenderer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
@@ -25,6 +27,12 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 
+
+/**
+ * Map system by <a href="https://github.com/areeoh/">Areeoh</a>
+ * Modified by Tom Hoogstra for 1.19
+ */
+@Slf4j
 @Singleton
 public class MapHandler {
 
@@ -51,71 +59,80 @@ public class MapHandler {
         return (distX >= scale) || (distZ >= scale);
     }
 
+    public void updateLastMoved(Player player) {
+        if (!mapSettingsMap.containsKey(player.getUniqueId())) {
+            return;
+        }
+        final MapSettings mapData = mapSettingsMap.get(player.getUniqueId());
+        mapData.setMapX(player.getLocation().getBlockX());
+        mapData.setMapZ(player.getLocation().getBlockZ());
+    }
+
+
     public synchronized void loadMap() {
 
         try {
+
+            File file = new File("./world/data/map_0.dat");
+            if (!file.exists()) {
+                if (!file.createNewFile()) {
+                    log.error("Failed to create blank map file");
+                }
+            }
+
             MapView map = Bukkit.getMap(0);
             if (map == null) {
                 map = Bukkit.createMap(Bukkit.getWorld("world"));
             }
             if (!(map.getRenderers().get(0) instanceof MinimapRenderer)) {
-                for (final MapRenderer r : map.getRenderers()) {
+                for (MapRenderer r : map.getRenderers()) {
                     map.removeRenderer(r);
                 }
-                final MinimapRenderer renderer = new MinimapRenderer(this, clans);
-                map.addRenderer(renderer);
-                // TODO
-                //map.addRenderer(new ClanMapRenderer(this));
+
+                MinimapRenderer minimapRenderer = clans.getInjector().getInstance(MinimapRenderer.class);
+                ClanMapRenderer clanMapRenderer = clans.getInjector().getInstance(ClanMapRenderer.class);
+                clans.getInjector().injectMembers(minimapRenderer);
+                clans.getInjector().injectMembers(clanMapRenderer);
+
+                map.addRenderer(minimapRenderer);
+                map.addRenderer(clanMapRenderer);
+
             }
             loadMapData((MinimapRenderer) map.getRenderers().get(0));
-        }catch(Exception ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
-    private void deleteFolder(File folder) {
-        if(!folder.exists()) {
-            return;
-        }
-        File[] files = folder.listFiles();
-        if (files != null) { //some JVMs return null for empty dirs
-            for (File f : files) {
-                if (f.isDirectory()) {
-                    deleteFolder(f);
-                } else {
-                    f.delete();
-                }
-            }
-        }
-        folder.delete();
-    }
-
-
+    @SuppressWarnings("unchecked")
     public synchronized void loadMapData(MinimapRenderer minimapRenderer) {
         final long l = System.currentTimeMillis();
 
-        final File file = new File(clans.getDataFolder().getPath(), "map.json");
+        final File file = new File("world/data/map.json");
+
+        if (!file.exists()) {
+            return;
+        }
 
         JSONParser parser = new JSONParser();
         try {
             JSONObject jsonObject = (JSONObject) parser.parse(new FileReader(file));
 
             jsonObject.forEach((key, value) -> {
-                Bukkit.broadcastMessage(key + "");
                 minimapRenderer.getWorldCacheMap().put(key.toString(), new TreeMap<>());
                 ((JSONObject) value).forEach((o, o2) -> {
                     minimapRenderer.getWorldCacheMap().get(key.toString()).put(Integer.parseInt((String) o), new TreeMap<>());
                     ((JSONObject) o2).forEach((o1, o21) -> {
                         JSONObject jsonObject1 = (JSONObject) o21;
-                        minimapRenderer.getWorldCacheMap().get(key.toString()).get(Integer.parseInt((String) o)).put(Integer.parseInt((String) o1),
-                                new MapPixel((MaterialColor) jsonObject1.get("color"), (short) (long) jsonObject1.get("averageY")));
+                        minimapRenderer.getWorldCacheMap().get(key.toString()).get(Integer.parseInt(String.valueOf(o))).put(Integer.parseInt((String) o1),
+                                new MapPixel((int) (long) jsonObject1.get("colorId"), (short) (long) jsonObject1.get("averageY")));
                     });
                 });
             });
         } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
-        System.out.println("Loaded map data in " + UtilTime.getTime(System.currentTimeMillis() - l, UtilTime.TimeUnit.SECONDS, 2));
+        log.info("Loaded map data in {}", UtilTime.getTime(System.currentTimeMillis() - l, UtilTime.TimeUnit.SECONDS, 2) );
     }
 
     public void saveMapData() {
@@ -124,7 +141,7 @@ public class MapHandler {
             public void run() {
                 final long l = System.currentTimeMillis();
 
-                System.out.println("Saving map data...");
+                log.info("Saving map data...");
 
                 MapView map = Bukkit.getMap(0);
                 if (map == null) {
@@ -133,7 +150,7 @@ public class MapHandler {
                 MinimapRenderer minimapRenderer = (MinimapRenderer) map.getRenderers().get(0);
 
                 try {
-                    final File file = new File(clans.getDataFolder().getPath(), "map.json");
+                    final File file = new File("world/data/map.json");
                     if (!file.exists()) {
                         file.createNewFile();
                     }
@@ -143,7 +160,7 @@ public class MapHandler {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                System.out.println("Saved map data in " + UtilTime.getTime(System.currentTimeMillis() - l, UtilTime.TimeUnit.SECONDS, 2));
+               log.info("Saved map data in {}",  UtilTime.getTime(System.currentTimeMillis() - l, UtilTime.TimeUnit.SECONDS, 2));
             }
         }.runTaskAsynchronously(clans);
     }

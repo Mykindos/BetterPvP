@@ -71,7 +71,7 @@ public class MapListener implements Listener {
         final Player player = event.getPlayer();
         mapHandler.clanMapData.remove(player.getUniqueId());
         mapHandler.mapSettingsMap.remove(player.getUniqueId());
-        for (ItemStack value : player.getInventory().all(Material.MAP).values()) {
+        for (ItemStack value : player.getInventory().all(Material.FILLED_MAP).values()) {
             player.getInventory().remove(value);
         }
     }
@@ -83,13 +83,13 @@ public class MapListener implements Listener {
         ItemStack is = new ItemStack(Material.FILLED_MAP);
         MapMeta meta = (MapMeta) is.getItemMeta();
         meta.setMapView(Bukkit.getMap(0));
-        is.setItemMeta( meta );
+        is.setItemMeta(meta);
         event.getPlayer().getInventory().addItem(is);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerDeath(PlayerDeathEvent event) {
-        event.getDrops().removeIf(itemStack -> itemStack.getType() == Material.MAP);
+        event.getDrops().removeIf(itemStack -> itemStack.getType() == Material.FILLED_MAP);
     }
 
     @EventHandler
@@ -97,7 +97,7 @@ public class MapListener implements Listener {
         if (event.getCurrentItem() == null)
             return;
 
-        if (event.getCurrentItem().getType() == Material.MAP) {
+        if (event.getCurrentItem().getType() == Material.FILLED_MAP) {
             final Inventory topInventory = event.getWhoClicked().getOpenInventory().getTopInventory();
             if (topInventory != null && topInventory.getType() != InventoryType.CRAFTING) {
                 event.setCancelled(true);
@@ -111,7 +111,7 @@ public class MapListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     private void onEvent(PrepareItemCraftEvent event) {
         for (ItemStack item : event.getInventory().getMatrix()) {
-            if (item != null && item.getType() == Material.MAP) {
+            if (item != null && item.getType() == Material.FILLED_MAP) {
                 event.getInventory().setResult(new ItemStack(Material.AIR));
             }
         }
@@ -120,7 +120,7 @@ public class MapListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     private void onEvent(PlayerDropItemEvent event) {
         ItemStack item = event.getItemDrop().getItemStack();
-        if (item != null && item.getType() == Material.MAP) {
+        if (item != null && item.getType() == Material.FILLED_MAP) {
             event.getItemDrop().remove();
         }
     }
@@ -384,7 +384,7 @@ public class MapListener implements Listener {
     public void onPlayerInteract(PlayerInteractEvent event) {
         if (event.getHand() == EquipmentSlot.OFF_HAND) return;
         final Player player = event.getPlayer();
-        if (player.getInventory().getItemInMainHand().getType() != Material.MAP) {
+        if (player.getInventory().getItemInMainHand().getType() != Material.FILLED_MAP) {
             return;
         }
         if (!(event.getAction().name().contains("RIGHT") || event.getAction().name().contains("LEFT"))) {

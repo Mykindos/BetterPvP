@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.settings.events.SettingsUpdatedEvent;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import net.minecraft.world.level.material.MaterialColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -63,7 +64,8 @@ public class GamerStatListener implements Listener {
     @EventHandler (priority = EventPriority.MONITOR)
     public void onBlockBroken(BlockBreakEvent event) {
         if(event.isCancelled()) return;
-        System.out.println(UtilMapMaterial.getBlockColor(event.getBlock()).id);
+        System.out.println(UtilMapMaterial.getBlockColor(event.getBlock()).id + " : "
+                + UtilMapMaterial.getBlockColor(event.getBlock()).calculateRGBColor(MaterialColor.Brightness.NORMAL));
         Player player = event.getPlayer();
 
         Optional<Gamer> gamerOptional = gamerManager.getObject(player.getUniqueId().toString());
