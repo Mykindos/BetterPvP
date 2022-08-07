@@ -52,14 +52,12 @@ public class MenuListener implements Listener {
                 if (button != null) {
 
                     if (cooldownManager.add(player, "Button Click", button.getClickCooldown(), false)) {
-                        ButtonPreClickEvent buttonClickEvent = new ButtonPreClickEvent(player, menu, button, event.getClick(), event.getSlot());
-                        UtilServer.callEvent(buttonClickEvent);
+                        ButtonPreClickEvent buttonClickEvent = UtilServer.callEvent(new ButtonPreClickEvent(player, menu, button, event.getClick(), event.getSlot()));
                         if (!buttonClickEvent.isCancelled()) {
                             buttonClickEvent.getButton().onClick(player, event.getClick());
                             UtilServer.callEvent(new ButtonPostClickEvent(player, menu, button));
 
                         }
-
                     }
 
                 }

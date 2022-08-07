@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.utilities.events;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import me.mykindos.betterpvp.core.framework.events.CustomEvent;
