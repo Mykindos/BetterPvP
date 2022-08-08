@@ -15,6 +15,8 @@ import me.mykindos.betterpvp.clans.clans.map.MapHandler;
 import me.mykindos.betterpvp.clans.clans.map.data.ChunkData;
 import me.mykindos.betterpvp.clans.clans.map.data.MapSettings;
 import me.mykindos.betterpvp.clans.clans.map.nms.UtilMapMaterial;
+import me.mykindos.betterpvp.clans.gamer.Gamer;
+import me.mykindos.betterpvp.clans.gamer.GamerManager;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
@@ -43,7 +45,6 @@ import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.MapMeta;
 
 import java.util.HashSet;
 import java.util.Optional;
@@ -57,13 +58,16 @@ public class MapListener implements Listener {
     private final MapHandler mapHandler;
     private final ClanManager clanManager;
     private final CooldownManager cooldownManager;
+    private final GamerManager gamerManager;
 
     @Inject
-    public MapListener(Clans clans, MapHandler mapHandler, ClanManager clanManager, CooldownManager cooldownManager) {
+    public MapListener(Clans clans, MapHandler mapHandler, ClanManager clanManager,
+                       CooldownManager cooldownManager, GamerManager gamerManager) {
         this.clans = clans;
         this.mapHandler = mapHandler;
         this.clanManager = clanManager;
         this.cooldownManager = cooldownManager;
+        this.gamerManager = gamerManager;
     }
 
     @EventHandler
@@ -225,7 +229,7 @@ public class MapListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onClaim(ChunkClaimEvent event) {
-        if(event.isCancelled()) return;
+        if (event.isCancelled()) return;
         updateClaims(event.getClan());
     }
 
@@ -270,7 +274,7 @@ public class MapListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onClanLeave(MemberLeaveClanEvent event) {
-        if(event.isCancelled()) return;
+        if (event.isCancelled()) return;
         UtilServer.runTaskLater(clans, () -> {
             final Player player = event.getPlayer();
             if (!mapHandler.clanMapData.containsKey(player.getUniqueId())) {
@@ -289,7 +293,7 @@ public class MapListener implements Listener {
     //
     @EventHandler(priority = EventPriority.MONITOR)
     public void onDisband(ClanDisbandEvent event) {
-        if(event.isCancelled()) return;
+        if (event.isCancelled()) return;
         UtilServer.runTaskLater(clans, () -> {
             for (Player online : Bukkit.getOnlinePlayers()) {
                 if (!mapHandler.clanMapData.containsKey(online.getUniqueId())) {
@@ -311,7 +315,7 @@ public class MapListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerJoinClan(MemberJoinClanEvent event) {
-        if(event.isCancelled()) return;
+        if (event.isCancelled()) return;
         UtilServer.runTaskLater(clans, () -> {
             final Player player = event.getPlayer();
             final Clan clan = event.getClan();
@@ -403,26 +407,37 @@ public class MapListener implements Listener {
             return;
         }
 
-        if (event.getAction().name().contains("RIGHT")) {
-            MapSettings.Scale curScale = mapSettings.getScale();
+        Optional<Gamer> gamerOptional = gamerManager.getObject(player.getUniqueId().toString());
+        if (gamerOptional.isPresent()) {
+            Gamer gamer = gamerOptional.get();
 
-            if (curScale == MapSettings.Scale.FAR) {
-                return;
-            }
-            UtilPlayer.sendActionBar(player, createZoomBar(mapSettings.setScale(MapSettings.Scale.values()[curScale.ordinal() + 1])));
-            mapSettings.setUpdate(true);
-        } else if (event.getAction().name().contains("LEFT")) {
-            MapSettings.Scale curScale = mapSettings.getScale();
+            if (event.getAction().name().contains("RIGHT")) {
+                MapSettings.Scale curScale = mapSettings.getScale();
 
-            if (curScale == MapSettings.Scale.CLOSEST) {
-                return;
+                if (curScale == MapSettings.Scale.NORMAL && !gamer.getClient().isAdministrating()) {
+                    return;
+                } else if (curScale == MapSettings.Scale.FAR) {
+                    return;
+                }
+
+                UtilPlayer.sendActionBar(player, createZoomBar(mapSettings.setScale(MapSettings.Scale.values()[curScale.ordinal() + 1])));
+                mapSettings.setUpdate(true);
+            } else if (event.getAction().name().contains("LEFT")) {
+                MapSettings.Scale curScale = mapSettings.getScale();
+
+                if (curScale == MapSettings.Scale.CLOSEST) {
+                    return;
+                }
+                UtilPlayer.sendActionBar(player, createZoomBar(mapSettings.setScale(MapSettings.Scale.values()[curScale.ordinal() - 1])));
+                mapSettings.setUpdate(true);
             }
-            UtilPlayer.sendActionBar(player, createZoomBar(mapSettings.setScale(MapSettings.Scale.values()[curScale.ordinal() - 1])));
-            mapSettings.setUpdate(true);
+
         }
+
+
     }
 
     private String createZoomBar(MapSettings.Scale scale) {
-        return ChatColor.WHITE + "Zoom Factor: " + ChatColor.GREEN + (1 << scale.getValue()) + "x";
+        return ChatColor.WHITE + "Zoom: " + ChatColor.GREEN + (1 << scale.getValue()) + "x";
     }
 }
