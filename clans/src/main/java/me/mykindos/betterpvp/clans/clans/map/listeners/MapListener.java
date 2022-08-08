@@ -69,7 +69,6 @@ public class MapListener implements Listener {
     @EventHandler
     public void onWorldLoad(WorldLoadEvent event) {
         if (event.getWorld().getName().equals("world")) {
-            System.out.println("Loading map");
             try {
                 mapHandler.loadMap();
             } catch (Exception ex) {
@@ -91,12 +90,6 @@ public class MapListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerJoin(PlayerJoinEvent event) {
         loadChunks(event.getPlayer());
-
-        ItemStack is = new ItemStack(Material.FILLED_MAP);
-        MapMeta meta = (MapMeta) is.getItemMeta();
-        meta.setMapView(Bukkit.getMap(0));
-        is.setItemMeta(meta);
-        event.getPlayer().getInventory().addItem(is);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -248,6 +241,7 @@ public class MapListener implements Listener {
                     mapHandler.clanMapData.put(online.getUniqueId(), new HashSet<>());
                 }
 
+                mapHandler.clanMapData.get(online.getUniqueId()).removeIf(chunkData -> chunkData.getClan().equals(clan));
                 for (ClanTerritory claim : clan.getTerritory()) {
 
                     Chunk chunk = UtilWorld.stringToChunk(claim.getChunk());
