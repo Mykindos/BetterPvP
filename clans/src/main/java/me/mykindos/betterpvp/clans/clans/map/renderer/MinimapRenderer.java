@@ -68,7 +68,7 @@ public class MinimapRenderer extends MapRenderer implements Listener {
 
             World world = Bukkit.getWorld(poll.getWorld());
 
-            if(world == null) continue;
+            if (world == null) continue;
             if (!getWorldCacheMap().containsKey(poll.getWorld())) continue;
             if (!getWorldCacheMap().get(poll.getWorld()).containsKey(poll.getX())) continue;
             if (!getWorldCacheMap().get(poll.getWorld()).get(poll.getX()).containsKey(poll.getZ())) continue;
@@ -113,21 +113,16 @@ public class MinimapRenderer extends MapRenderer implements Listener {
 
         final Map<Integer, Map<Integer, MapPixel>> cacheMap = worldCacheMap.get(player.getWorld().getName());
 
-        final boolean hasMoved = mapHandler.hasMoved(player);
-
+        boolean hasMoved = mapHandler.hasMoved(player);
         if (hasMoved || mapSettings.isUpdate()) {
-            for (int i = 0; i < 128; i++) {
-                for (int j = 0; j < 128; j++) {
-                    canvas.setPixelColor(i, j, Color.WHITE);
-                }
-            }
+
             int locX = centerX / scale - 64;
             int locZ = centerZ / scale - 64;
             for (int i = 0; i < 128; i++) {
                 for (int j = 0; j < 128; j++) {
                     int x = (locX + i) * scale;
                     int z = (locZ + j) * scale;
-//
+
                     if (locX + i < 0 && (locX + i) % scale != 0)
                         x--;
                     if (locZ + j < 0 && (locZ + j) % scale != 0)
@@ -135,17 +130,17 @@ public class MinimapRenderer extends MapRenderer implements Listener {
 
 
                     var pixelX = cacheMap.get(x);
-                    if (pixelX != null && pixelX.containsKey(z)) {
-                        final MapPixel mapPixel = pixelX.get(z);
+                    MapPixel mapPixel;
+                    if (pixelX != null && (mapPixel = pixelX.get(z)) != null) {
                         short prevY = getPrevY(x, z, player.getWorld().getName(), scale);
-//
+
                         double d2 = (mapPixel.getAverageY() - prevY) * 4.0D / (scale + 4) + ((i + j & 1) - 0.5D) * 0.4D;
 
                         MaterialColor.Brightness brightness = MaterialColor.Brightness.NORMAL;
 
                         if (d2 > 0.6D) {
                             brightness = MaterialColor.Brightness.HIGH;
-                        }else if (d2 < -0.6D) {
+                        } else if (d2 < -0.6D) {
                             brightness = MaterialColor.Brightness.LOW;
                         }
 
@@ -174,7 +169,8 @@ public class MinimapRenderer extends MapRenderer implements Listener {
         if (!cacheMap.containsKey(x)) {
             cacheMap.put(x, new TreeMap<>());
         }
-        if (!cacheMap.get(x).containsKey(z)) {
+        Map<Integer, MapPixel> xMap = cacheMap.get(x);
+        if (!xMap.containsKey(z)) {
 
             int y = player.getWorld().getHighestBlockYAt(x, z);
 
@@ -191,7 +187,7 @@ public class MinimapRenderer extends MapRenderer implements Listener {
 
             var mainColor = UtilMapMaterial.getBlockColor(block).id;
 
-            cacheMap.get(x).put(z, new MapPixel(mainColor, avgY));
+            xMap.put(z, new MapPixel(mainColor, avgY));
         }
     }
 
@@ -203,9 +199,6 @@ public class MinimapRenderer extends MapRenderer implements Listener {
 
         MinimapExtraCursorEvent cursorEvent = UtilServer.callEvent(new MinimapExtraCursorEvent(player, cursors, scale));
         for (ExtraCursor cursor : cursorEvent.getCursors()) {
-            if (!cursor.getWorld().equalsIgnoreCase(player.getWorld().getName())) {
-                continue;
-            }
 
             int x = ((cursor.getX() - centerX) / scale) * 2;
             int z = ((cursor.getZ() - centerZ) / scale) * 2;
@@ -233,18 +226,28 @@ public class MinimapRenderer extends MapRenderer implements Listener {
     private short getPrevY(int x, int z, String world, int scale) {
         final Map<Integer, Map<Integer, MapPixel>> cacheMap = worldCacheMap.get(world);
 
-        if (cacheMap.containsKey(x - scale) && cacheMap.get(x - scale).containsKey(z - scale)) {
-            return cacheMap.get(x - scale).get(z - scale).getAverageY();
+        Map<Integer, MapPixel> xMinusScale = cacheMap.get(x - scale);
+        if (xMinusScale != null) {
+            MapPixel zMinusScale = xMinusScale.get(z - scale);
+            if (zMinusScale != null) {
+                return zMinusScale.getAverageY();
+            }
+
+            MapPixel zPlusScale = xMinusScale.get(z + scale);
+            if (zPlusScale != null) {
+                return zPlusScale.getAverageY();
+            }
         }
-        if (cacheMap.containsKey(x + scale) && cacheMap.get(x + scale).containsKey(z + scale)) {
-            return cacheMap.get(x + scale).get(z + scale).getAverageY();
+
+        Map<Integer, MapPixel> xPlusScale = cacheMap.get(x + scale);
+        if (xPlusScale != null) {
+            MapPixel zPlusScale = xPlusScale.get(z + scale);
+            if (zPlusScale != null) {
+                return zPlusScale.getAverageY();
+            }
         }
-        if (cacheMap.containsKey(x - scale) && cacheMap.get(x - scale).containsKey(z + scale)) {
-            return cacheMap.get(x - scale).get(z + scale).getAverageY();
-        }
-        if (cacheMap.containsKey(x - scale) && cacheMap.get(x + -scale).containsKey(z + scale)) {
-            return cacheMap.get(x - scale).get(z + scale).getAverageY();
-        }
+
+
         return 0;
     }
 
@@ -268,7 +271,8 @@ public class MinimapRenderer extends MapRenderer implements Listener {
     public void onBlockEvent(BlockPhysicsEvent event) {
         switch (event.getChangedType()) {
             case LAVA, WATER -> handleBlockEvent(event.getBlock());
-            default -> {}
+            default -> {
+            }
         }
     }
 

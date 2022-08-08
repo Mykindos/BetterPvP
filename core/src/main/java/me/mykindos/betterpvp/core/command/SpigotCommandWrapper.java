@@ -38,7 +38,7 @@ public class SpigotCommandWrapper extends org.bukkit.command.Command {
         if (sender instanceof Player player) {
             Optional<Client> clientOptional = clientManager.getObject(player.getUniqueId().toString());
             if (clientOptional.isPresent()) {
-                if (!clientOptional.get().hasRank(this.command.getRequiredRank()) || sender.isOp()) {
+                if (!clientOptional.get().hasRank(this.command.getRequiredRank()) && !sender.isOp()) {
                     return aliases;
                 }
             }

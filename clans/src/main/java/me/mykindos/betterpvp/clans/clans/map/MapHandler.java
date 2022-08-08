@@ -49,9 +49,10 @@ public class MapHandler {
     }
 
     public boolean hasMoved(Player player) {
-        if (!mapSettingsMap.containsKey(player.getUniqueId())) return false;
-
         final MapSettings mapData = mapSettingsMap.get(player.getUniqueId());
+        if (mapData == null) return false;
+
+
         int distX = Math.abs(mapData.getMapX() - player.getLocation().getBlockX());
         int distZ = Math.abs(mapData.getMapZ() - player.getLocation().getBlockZ());
         final int scale = 1 << mapData.getScale().getValue();
@@ -59,8 +60,9 @@ public class MapHandler {
     }
 
     public void updateLastMoved(Player player) {
-        if (!mapSettingsMap.containsKey(player.getUniqueId())) return;
         final MapSettings mapData = mapSettingsMap.get(player.getUniqueId());
+        if (mapData == null) return;
+
         mapData.setMapX(player.getLocation().getBlockX());
         mapData.setMapZ(player.getLocation().getBlockZ());
     }
@@ -78,7 +80,7 @@ public class MapHandler {
             }
 
             World world = Bukkit.getWorld("world");
-            if(world == null){
+            if (world == null) {
                 log.error("Could not load map as main world does not exist");
                 return;
             }

@@ -20,13 +20,11 @@ import org.jetbrains.annotations.NotNull;
 public class ClanMapRenderer extends MapRenderer {
 
     private final MapHandler mapHandler;
-    private final ClanManager clanManager;
 
     @Inject
-    public ClanMapRenderer(MapHandler mapHandler, ClanManager clanManager) {
+    public ClanMapRenderer(MapHandler mapHandler) {
         super(true);
         this.mapHandler = mapHandler;
-        this.clanManager = clanManager;
     }
 
     @SuppressWarnings("deprecation")
@@ -85,7 +83,7 @@ public class ClanMapRenderer extends MapRenderer {
                     if (pX + cx >= 0 && pX + cx < 128 && pZ + cz >= 0 && pZ + cz < 128) { //Checking if its in the maps bounds;
                         if (s.ordinal() <= MapView.Scale.CLOSE.ordinal() || admin) {
 
-                            mapCanvas.setPixel(pX + cz, pZ + cz,chunkDataColor);
+                            mapCanvas.setPixel(pX + cz, pZ + cz, chunkDataColor);
                         }
                         if (s.ordinal() < MapView.Scale.NORMAL.ordinal() || admin) {
                             if (cx == 0) {
