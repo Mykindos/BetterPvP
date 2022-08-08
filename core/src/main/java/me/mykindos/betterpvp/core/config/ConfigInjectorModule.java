@@ -36,6 +36,8 @@ public class ConfigInjectorModule extends AbstractModule {
                 bind(String.class).annotatedWith(conf).toProvider(getProvider(config.path(), config.defaultValue(), String.class));
             } else if (field.getType().isAssignableFrom(int.class)) {
                 bind(int.class).annotatedWith(conf).toProvider(getProvider(config.path(), config.defaultValue(), Integer.class));
+            }else if(field.getType().isAssignableFrom(double.class)){
+                bind(double.class).annotatedWith(conf).toProvider(getProvider(config.path(), config.defaultValue(), Double.class));
             } else if (field.getType().isAssignableFrom(boolean.class)) {
                 bind(boolean.class).annotatedWith(conf).toProvider(getProvider(config.path(), config.defaultValue(), Boolean.class));
             }

@@ -27,7 +27,6 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 
 import javax.inject.Inject;
@@ -45,16 +44,6 @@ public class ClansShieldListener implements Listener {
         this.clans = clans;
         this.gamerManager = gamerManager;
         this.roleManager = roleManager;
-    }
-
-    /**
-     * No hand swapping!
-     *
-     * @param event the event
-     */
-    @EventHandler
-    public void onSwapHand(PlayerSwapHandItemsEvent event) {
-        event.setCancelled(true);
     }
 
     @EventHandler

@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.clans.clans.map.data.MapPixel;
 import me.mykindos.betterpvp.clans.clans.map.data.MapSettings;
 import me.mykindos.betterpvp.clans.clans.map.renderer.ClanMapRenderer;
 import me.mykindos.betterpvp.clans.clans.map.renderer.MinimapRenderer;
+import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
@@ -36,10 +37,13 @@ import java.util.*;
 @Singleton
 public class MapHandler {
 
-    private final Clans clans;
+    @Inject
+    @Config(path = "clans.map.enabled", defaultValue = "true")
+    public boolean enabled;
 
-    public HashMap<UUID, Set<ChunkData>> clanMapData = new HashMap<>();
-    public Map<UUID, MapSettings> mapSettingsMap = new HashMap<>();
+    private final Clans clans;
+    public final HashMap<UUID, Set<ChunkData>> clanMapData = new HashMap<>();
+    public final Map<UUID, MapSettings> mapSettingsMap = new HashMap<>();
 
     @Inject
     public MapHandler(Clans clans) {
@@ -98,7 +102,9 @@ public class MapHandler {
                 ClanMapRenderer clanMapRenderer = clans.getInjector().getInstance(ClanMapRenderer.class);
                 clans.getInjector().injectMembers(minimapRenderer);
                 clans.getInjector().injectMembers(clanMapRenderer);
+                clans.getListeners().add(minimapRenderer);
                 clans.saveConfig();
+
 
                 map.addRenderer(minimapRenderer);
                 map.addRenderer(clanMapRenderer);

@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.utilities;
 
 import me.mykindos.betterpvp.core.client.Rank;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
@@ -41,7 +42,7 @@ public class UtilMessage {
      * @param sender  The CommandSender
      * @param prefix  The message
      * @param message Message to send to the CommandSender
-     * @param args The args to interpolate in the string
+     * @param args    The args to interpolate in the string
      */
     public static void message(CommandSender sender, String prefix, String message, Object... args) {
         sender.sendMessage(String.format(ChatColor.BLUE + prefix + "> " + ChatColor.GRAY + message, args));
@@ -110,6 +111,31 @@ public class UtilMessage {
         for (String string : message) {
             player.sendMessage(ChatColor.BLUE + prefix + "> " + ChatColor.GRAY + string);
         }
+    }
+
+    /**
+     * Sends a message utilizing <a href="https://docs.adventure.kyori.net/minimessage">MiniMessage</a> from Adventure API
+     *
+     * @param sender  The CommandSender
+     * @param prefix  The message
+     * @param message Message to send to the CommandSender
+     */
+    public static void simpleMessage(CommandSender sender, String prefix, String message) {
+        sender.sendMessage(Component.text(ChatColor.BLUE + prefix + "> ")
+                .append(MiniMessage.miniMessage().deserialize("<gray>" + message)));
+    }
+
+    /**
+     * Sends a message utilizing <a href="https://docs.adventure.kyori.net/minimessage">MiniMessage</a> from Adventure API
+     *
+     * @param sender  The CommandSender
+     * @param prefix  The message
+     * @param message Message to send to the CommandSender
+     * @param args    The args to interpolate in the string
+     */
+    public static void simpleMessage(CommandSender sender, String prefix, String message, Object... args) {
+        sender.sendMessage(Component.text(ChatColor.BLUE + prefix + "> ")
+                .append(MiniMessage.miniMessage().deserialize("<gray>" + String.format(message, args))));
     }
 
     /**

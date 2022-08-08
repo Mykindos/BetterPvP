@@ -21,8 +21,10 @@ public class ConfigProvider<T> implements Provider<T> {
     public T get() {
 
         Object castedDefault = defaultValue;
-        if(type == Integer.class){
+        if(type == Integer.class) {
             castedDefault = Integer.parseInt(defaultValue);
+        }else if(type == Double.class){
+            castedDefault = Double.parseDouble(defaultValue);
         }else if(type == Boolean.class){
             castedDefault = Boolean.parseBoolean(defaultValue);
         }

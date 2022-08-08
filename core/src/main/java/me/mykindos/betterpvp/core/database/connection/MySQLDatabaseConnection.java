@@ -34,13 +34,17 @@ public class MySQLDatabaseConnection implements IDatabaseConnection {
     @Override
     public Connection getDatabaseConnection() {
 
-        if (connection == null) {
-            var url = "jdbc:mysql://" + sqlServer + "/" + sqlDatabaseName + "?autoReconnect=true&characterEncoding=latin1&useConfigs=maxPerformance";
-            try {
-                connection = DriverManager.getConnection(url, sqlUsername, sqlPassword);
-            } catch (SQLException ex) {
-                ex.printStackTrace();
+        try {
+            if (connection == null || connection.isClosed()) {
+                var url = "jdbc:mysql://" + sqlServer + "/" + sqlDatabaseName + "?autoReconnect=true&characterEncoding=latin1&useConfigs=maxPerformance";
+                try {
+                    connection = DriverManager.getConnection(url, sqlUsername, sqlPassword);
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
             }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
 
         return connection;

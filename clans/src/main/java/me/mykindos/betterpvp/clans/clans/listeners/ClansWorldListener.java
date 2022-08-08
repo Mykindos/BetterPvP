@@ -156,7 +156,7 @@ public class ClansWorldListener extends ClanListener {
             ClanRelation relation = clanManager.getRelation(clan, locationClan);
 
             if (block.getType() == Material.SAND || block.getType() == Material.GRAVEL
-                    || block.getType().name().contains("POWDER")) {
+                    || block.getType().name().contains("CONCRETE_POWDER")) {
                 UtilMessage.message(player, "Clans", "You cannot place " + ChatColor.GREEN + UtilFormat.cleanString(block.getType().toString())
                         + ChatColor.GRAY + " in " + ChatColor.YELLOW + relation.getPrimaryAsChatColor()
                         + "Clan " + locationClan.getName() + ChatColor.GRAY + ".");

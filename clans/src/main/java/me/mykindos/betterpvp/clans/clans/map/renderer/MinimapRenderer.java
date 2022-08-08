@@ -27,7 +27,6 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.map.*;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.Color;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
@@ -55,9 +54,7 @@ public class MinimapRenderer extends MapRenderer implements Listener {
     }
 
     private void processQueue() {
-        if (queue.isEmpty()) {
-            return;
-        }
+        if (queue.isEmpty()) return;
 
         for (int i = 0; i < maxProcess; i++) {
             final Coords poll = queue.poll();
@@ -94,6 +91,7 @@ public class MinimapRenderer extends MapRenderer implements Listener {
     @SuppressWarnings("deprecation")
     @Override
     public void render(@NotNull MapView map, @NotNull MapCanvas canvas, @NotNull Player player) {
+        if (!mapHandler.enabled) return;
         if (player.getInventory().getItemInMainHand().getType() != Material.FILLED_MAP) return;
 
         int centerX = player.getLocation().getBlockX();

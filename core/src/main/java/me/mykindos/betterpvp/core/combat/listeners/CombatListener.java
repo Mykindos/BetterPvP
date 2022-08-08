@@ -96,15 +96,6 @@ public class CombatListener implements Listener {
         //    }
         //}
 
-        // TODO we should just cancel this before the custom damage event is called
-        //if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
-        //    if (event.getDamager() != null) {
-        //        if (event.getDamager().getHealth() <= 0) {
-        //            return;
-        //        }
-        //    }
-        //}
-
         if (event.getDamagee().getHealth() > 0) {
             if (event.getDamage() >= 0) {
 
@@ -142,18 +133,10 @@ public class CombatListener implements Listener {
                     }
 
                     if (event.getDamagee().getHealth() - damage < 1.0) {
-                        //if (Clans.getOptions().isFNG()) {
-                        //    return;
-                        //}
-
                         event.getDamagee().setHealth(0);
-
-
                     } else {
-
                         event.getDamagee().setHealth(event.getDamagee().getHealth() - damage);
                     }
-
 
                 }
 
@@ -178,11 +161,20 @@ public class CombatListener implements Listener {
 
         if (UtilPlayer.isCreativeOrSpectator(cde.getDamagee())) {
             event.setCancelled(true);
-            System.out.println("Cancelled");
+            return;
         }
 
         if (hasDamageData(cde.getDamagee().getUniqueId().toString(), cde.getCause())) {
             event.setCancelled(true);
+            return;
+        }
+
+        if (cde.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
+            if (cde.getDamager() != null) {
+                if (cde.getDamager().getHealth() <= 0) {
+                    event.setCancelled(true);
+                }
+            }
         }
 
     }

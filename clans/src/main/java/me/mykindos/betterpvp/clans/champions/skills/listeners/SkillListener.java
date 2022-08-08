@@ -68,24 +68,33 @@ public class SkillListener implements Listener {
         this.effectManager = effectManager;
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onPlayerUseSkill(PlayerUseSkillEvent event) {
+    @EventHandler (priority = EventPriority.HIGH)
+    public void onUseSkill(PlayerUseSkillEvent event) {
         if (event.isCancelled()) return;
 
         Player player = event.getPlayer();
         Skill skill = event.getSkill();
         int level = event.getLevel();
 
-        if (!clanManager.canCast(player)) return;
-        if (hasNegativeEffect(player)) return;
-        if (!skill.canUse(player)) return;
+        if (!clanManager.canCast(player)) {
+            event.setCancelled(true);
+            return;
+        }
+
+        if (hasNegativeEffect(player)) {
+            event.setCancelled(true);
+            return;
+        }
+
+        if (!skill.canUse(player)) {
+            event.setCancelled(true);
+            return;
+        }
 
         if (skill instanceof CooldownSkill cooldownSkill) {
             if (!cooldownManager.add(player, skill.getName(), cooldownSkill.getCooldown(level),
                     cooldownSkill.showCooldownFinished(), true, cooldownSkill.isCancellable())) {
-                if (skill instanceof ToggleSkill) {
-                    event.setCancelled(true);
-                }
+                event.setCancelled(true);
                 return;
             }
         }
@@ -93,11 +102,20 @@ public class SkillListener implements Listener {
         if (skill instanceof EnergySkill energySkill) {
             if (energySkill.getEnergy(level) > 0) {
                 if (!energyHandler.use(player, skill.getName(), energySkill.getEnergy(level), true)) {
-                    return;
+                    event.setCancelled(true);
                 }
             }
 
         }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onFinishUseSkill(PlayerUseSkillEvent event) {
+        if (event.isCancelled()) return;
+
+        Player player = event.getPlayer();
+        Skill skill = event.getSkill();
+        int level = event.getLevel();
 
         if (skill instanceof InteractSkill interactSkill) {
             interactSkill.activate(player, level);
@@ -148,7 +166,6 @@ public class SkillListener implements Listener {
         }
 
     }
-
 
     @EventHandler
     public void onSkillActivate(PlayerInteractEvent event) {
