@@ -82,33 +82,30 @@ public class ClanMapRenderer extends MapRenderer {
                 for (int cz = 0; cz < 16 / scale; cz++) {
                     if (pX + cx >= 0 && pX + cx < 128 && pZ + cz >= 0 && pZ + cz < 128) { //Checking if its in the maps bounds;
                         if (s.ordinal() <= MapView.Scale.CLOSE.ordinal() || admin) {
-
                             mapCanvas.setPixel(pX + cz, pZ + cz, chunkDataColor);
                         }
-                        if (s.ordinal() < MapView.Scale.NORMAL.ordinal() || admin) {
-                            if (cx == 0) {
-                                if (!chunkData.getBlockFaceSet().contains(BlockFace.WEST)) {
-                                    mapCanvas.setPixel(pX + cx, pZ + cz, chunkDataColor);
-                                }
+
+                        if (cx == 0) {
+                            if (!chunkData.getBlockFaceSet().contains(BlockFace.WEST)) {
+                                mapCanvas.setPixel(pX + cx, pZ + cz, chunkDataColor);
                             }
-                            if (cx == (16 / scale) - 1) {
-                                if (!chunkData.getBlockFaceSet().contains(BlockFace.EAST)) {
-                                    mapCanvas.setPixel(pX + cx, pZ + cz, chunkDataColor);
-                                }
-                            }
-                            if (cz == 0) {
-                                if (!chunkData.getBlockFaceSet().contains(BlockFace.NORTH)) {
-                                    mapCanvas.setPixel(pX + cx, pZ + cz, chunkDataColor);
-                                }
-                            }
-                            if (cz == (16 / scale) - 1) {
-                                if (!chunkData.getBlockFaceSet().contains(BlockFace.SOUTH)) {
-                                    mapCanvas.setPixel(pX + cx, pZ + cz, chunkDataColor);
-                                }
-                            }
-                        } else {
-                            mapCanvas.setPixel(pX + cx, pZ + cz, chunkDataColor);
                         }
+                        if (cx == (16 / scale) - 1) {
+                            if (!chunkData.getBlockFaceSet().contains(BlockFace.EAST)) {
+                                mapCanvas.setPixel(pX + cx, pZ + cz, chunkDataColor);
+                            }
+                        }
+                        if (cz == 0) {
+                            if (!chunkData.getBlockFaceSet().contains(BlockFace.NORTH)) {
+                                mapCanvas.setPixel(pX + cx, pZ + cz, chunkDataColor);
+                            }
+                        }
+                        if (cz == (16 / scale) - 1) {
+                            if (!chunkData.getBlockFaceSet().contains(BlockFace.SOUTH)) {
+                                mapCanvas.setPixel(pX + cx, pZ + cz, chunkDataColor);
+                            }
+                        }
+
                     }
                 }
             }
