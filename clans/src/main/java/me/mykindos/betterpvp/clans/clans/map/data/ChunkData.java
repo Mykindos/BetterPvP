@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.clans.clans.map.data;
 
 import lombok.Data;
+import me.mykindos.betterpvp.clans.clans.Clan;
 import net.minecraft.world.level.material.MaterialColor;
 import org.bukkit.block.BlockFace;
 
@@ -13,10 +14,10 @@ public class ChunkData {
     private MaterialColor color;
     private final String world;
     private final int x,z;
-    private final String clan;
+    private final Clan clan;
     private final Set<BlockFace> blockFaceSet;
 
-    public ChunkData(String world, MaterialColor color, int x, int z, String clan) {
+    public ChunkData(String world, MaterialColor color, int x, int z, Clan clan) {
         this.world = world;
         this.color = color;
         this.x = x;

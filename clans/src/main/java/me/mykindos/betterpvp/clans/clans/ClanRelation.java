@@ -12,9 +12,9 @@ public enum ClanRelation {
     ALLY(NamedTextColor.GREEN, NamedTextColor.DARK_GREEN, MaterialColor.COLOR_LIGHT_GREEN),
     ALLY_TRUST(NamedTextColor.DARK_GREEN, NamedTextColor.GREEN, MaterialColor.COLOR_GREEN),
     ENEMY(NamedTextColor.RED, NamedTextColor.DARK_RED, MaterialColor.COLOR_RED),
-    SAFE(NamedTextColor.AQUA, NamedTextColor.DARK_AQUA, MaterialColor.COLOR_CYAN),
-    NEUTRAL(NamedTextColor.YELLOW, NamedTextColor.GOLD, MaterialColor.COLOR_ORANGE),
-    SELF(NamedTextColor.AQUA, NamedTextColor.DARK_AQUA, MaterialColor.COLOR_LIGHT_BLUE);
+    SAFE(NamedTextColor.AQUA, NamedTextColor.DARK_AQUA, MaterialColor.SNOW),
+    NEUTRAL(NamedTextColor.YELLOW, NamedTextColor.GOLD, MaterialColor.GOLD),
+    SELF(NamedTextColor.AQUA, NamedTextColor.DARK_AQUA, MaterialColor.DIAMOND);
 
     private final NamedTextColor primary;
     private final NamedTextColor secondary;

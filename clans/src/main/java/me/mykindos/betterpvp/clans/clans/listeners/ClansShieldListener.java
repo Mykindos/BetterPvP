@@ -6,7 +6,6 @@ import me.mykindos.betterpvp.clans.champions.builds.menus.events.SkillEquipEvent
 import me.mykindos.betterpvp.clans.champions.roles.Role;
 import me.mykindos.betterpvp.clans.champions.roles.RoleManager;
 import me.mykindos.betterpvp.clans.champions.roles.events.RoleChangeEvent;
-import me.mykindos.betterpvp.clans.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.clans.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.clans.gamer.Gamer;
 import me.mykindos.betterpvp.clans.gamer.GamerManager;
@@ -14,7 +13,6 @@ import me.mykindos.betterpvp.clans.utilities.UtilClans;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
