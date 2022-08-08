@@ -15,6 +15,7 @@ import org.bukkit.map.MapCanvas;
 import org.bukkit.map.MapCursorCollection;
 import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
+import org.jetbrains.annotations.NotNull;
 
 public class ClanMapRenderer extends MapRenderer {
 
@@ -28,8 +29,9 @@ public class ClanMapRenderer extends MapRenderer {
         this.clanManager = clanManager;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
-    public void render(MapView mapView, MapCanvas mapCanvas, Player player) {
+    public void render(@NotNull MapView mapView, @NotNull MapCanvas mapCanvas, Player player) {
         if (player.getInventory().getItemInMainHand().getType() != Material.FILLED_MAP) return;
 
         MapSettings mapSettings = mapHandler.mapSettingsMap.get(player.getUniqueId());
@@ -63,13 +65,11 @@ public class ClanMapRenderer extends MapRenderer {
 
 
         for (ChunkData chunkData : mapHandler.clanMapData.get(player.getUniqueId())) {
-            if (!chunkData.getWorld().equals(player.getWorld().getName())) {
-                continue;
-            }
-            final Clan clan = clanManager.getObject(chunkData.getClan()).orElse(null);
-            if (clan == null) {
-                continue;
-            }
+            if (!chunkData.getWorld().equals(player.getWorld().getName())) continue;
+
+            final Clan clan = chunkData.getClan();
+            if (clan == null) continue;
+
             int bx = chunkData.getX() << 4; //Chunk's actual world coord;
             int bz = chunkData.getZ() << 4; //Chunk's actual world coord;
 

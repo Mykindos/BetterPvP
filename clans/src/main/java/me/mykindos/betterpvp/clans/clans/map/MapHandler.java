@@ -12,8 +12,8 @@ import me.mykindos.betterpvp.clans.clans.map.renderer.ClanMapRenderer;
 import me.mykindos.betterpvp.clans.clans.map.renderer.MinimapRenderer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
-import net.minecraft.world.level.material.MaterialColor;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
@@ -49,9 +49,8 @@ public class MapHandler {
     }
 
     public boolean hasMoved(Player player) {
-        if (!mapSettingsMap.containsKey(player.getUniqueId())) {
-            return false;
-        }
+        if (!mapSettingsMap.containsKey(player.getUniqueId())) return false;
+
         final MapSettings mapData = mapSettingsMap.get(player.getUniqueId());
         int distX = Math.abs(mapData.getMapX() - player.getLocation().getBlockX());
         int distZ = Math.abs(mapData.getMapZ() - player.getLocation().getBlockZ());
@@ -60,9 +59,7 @@ public class MapHandler {
     }
 
     public void updateLastMoved(Player player) {
-        if (!mapSettingsMap.containsKey(player.getUniqueId())) {
-            return;
-        }
+        if (!mapSettingsMap.containsKey(player.getUniqueId())) return;
         final MapSettings mapData = mapSettingsMap.get(player.getUniqueId());
         mapData.setMapX(player.getLocation().getBlockX());
         mapData.setMapZ(player.getLocation().getBlockZ());
@@ -80,9 +77,15 @@ public class MapHandler {
                 }
             }
 
+            World world = Bukkit.getWorld("world");
+            if(world == null){
+                log.error("Could not load map as main world does not exist");
+                return;
+            }
+
             MapView map = Bukkit.getMap(0);
             if (map == null) {
-                map = Bukkit.createMap(Bukkit.getWorld("world"));
+                map = Bukkit.createMap(world);
             }
             if (!(map.getRenderers().get(0) instanceof MinimapRenderer)) {
                 for (MapRenderer r : map.getRenderers()) {
@@ -93,6 +96,7 @@ public class MapHandler {
                 ClanMapRenderer clanMapRenderer = clans.getInjector().getInstance(ClanMapRenderer.class);
                 clans.getInjector().injectMembers(minimapRenderer);
                 clans.getInjector().injectMembers(clanMapRenderer);
+                clans.saveConfig();
 
                 map.addRenderer(minimapRenderer);
                 map.addRenderer(clanMapRenderer);
@@ -105,34 +109,37 @@ public class MapHandler {
     }
 
     @SuppressWarnings("unchecked")
-    public synchronized void loadMapData(MinimapRenderer minimapRenderer) {
-        final long l = System.currentTimeMillis();
+    public void loadMapData(MinimapRenderer minimapRenderer) {
+        // Load async as well, just to let server boot up quicker.
+        UtilServer.runTaskAsync(clans, () -> {
+            final long l = System.currentTimeMillis();
 
-        final File file = new File("world/data/map.json");
+            final File file = new File("world/data/map.json");
 
-        if (!file.exists()) {
-            return;
-        }
+            if (!file.exists()) {
+                return;
+            }
 
-        JSONParser parser = new JSONParser();
-        try {
-            JSONObject jsonObject = (JSONObject) parser.parse(new FileReader(file));
+            JSONParser parser = new JSONParser();
+            try {
+                JSONObject jsonObject = (JSONObject) parser.parse(new FileReader(file));
 
-            jsonObject.forEach((key, value) -> {
-                minimapRenderer.getWorldCacheMap().put(key.toString(), new TreeMap<>());
-                ((JSONObject) value).forEach((o, o2) -> {
-                    minimapRenderer.getWorldCacheMap().get(key.toString()).put(Integer.parseInt((String) o), new TreeMap<>());
-                    ((JSONObject) o2).forEach((o1, o21) -> {
-                        JSONObject jsonObject1 = (JSONObject) o21;
-                        minimapRenderer.getWorldCacheMap().get(key.toString()).get(Integer.parseInt(String.valueOf(o))).put(Integer.parseInt((String) o1),
-                                new MapPixel((int) (long) jsonObject1.get("colorId"), (short) (long) jsonObject1.get("averageY")));
+                jsonObject.forEach((key, value) -> {
+                    minimapRenderer.getWorldCacheMap().put(key.toString(), new TreeMap<>());
+                    ((JSONObject) value).forEach((o, o2) -> {
+                        minimapRenderer.getWorldCacheMap().get(key.toString()).put(Integer.parseInt((String) o), new TreeMap<>());
+                        ((JSONObject) o2).forEach((o1, o21) -> {
+                            JSONObject jsonObject1 = (JSONObject) o21;
+                            minimapRenderer.getWorldCacheMap().get(key.toString()).get(Integer.parseInt(String.valueOf(o))).put(Integer.parseInt((String) o1),
+                                    new MapPixel((int) (long) jsonObject1.get("colorId"), (short) (long) jsonObject1.get("averageY")));
+                        });
                     });
                 });
-            });
-        } catch (IOException | ParseException e) {
-            e.printStackTrace();
-        }
-        log.info("Loaded map data in {}", UtilTime.getTime(System.currentTimeMillis() - l, UtilTime.TimeUnit.SECONDS, 2) );
+            } catch (IOException | ParseException e) {
+                e.printStackTrace();
+            }
+            log.info("Loaded map data in {}", UtilTime.getTime(System.currentTimeMillis() - l, UtilTime.TimeUnit.SECONDS, 2));
+        });
     }
 
     public void saveMapData() {
@@ -160,7 +167,7 @@ public class MapHandler {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-               log.info("Saved map data in {}",  UtilTime.getTime(System.currentTimeMillis() - l, UtilTime.TimeUnit.SECONDS, 2));
+                log.info("Saved map data in {}", UtilTime.getTime(System.currentTimeMillis() - l, UtilTime.TimeUnit.SECONDS, 2));
             }
         }.runTaskAsynchronously(clans);
     }

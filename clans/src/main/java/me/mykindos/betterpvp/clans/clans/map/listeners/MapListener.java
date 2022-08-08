@@ -1,19 +1,30 @@
 package me.mykindos.betterpvp.clans.clans.map.listeners;
 
 import com.google.inject.Inject;
+import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
+import me.mykindos.betterpvp.clans.clans.components.ClanAlliance;
 import me.mykindos.betterpvp.clans.clans.components.ClanTerritory;
+import me.mykindos.betterpvp.clans.clans.events.ChunkClaimEvent;
+import me.mykindos.betterpvp.clans.clans.events.ClanDisbandEvent;
+import me.mykindos.betterpvp.clans.clans.events.MemberJoinClanEvent;
+import me.mykindos.betterpvp.clans.clans.events.MemberLeaveClanEvent;
 import me.mykindos.betterpvp.clans.clans.map.MapHandler;
 import me.mykindos.betterpvp.clans.clans.map.data.ChunkData;
 import me.mykindos.betterpvp.clans.clans.map.data.MapSettings;
+import me.mykindos.betterpvp.clans.clans.map.nms.UtilMapMaterial;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import net.minecraft.world.level.material.MaterialColor;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Chunk;
+import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -32,23 +43,24 @@ import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.Damageable;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.MapMeta;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @BPvPListener
 public class MapListener implements Listener {
 
 
+    private final Clans clans;
     private final MapHandler mapHandler;
     private final ClanManager clanManager;
     private final CooldownManager cooldownManager;
 
     @Inject
-    public MapListener(MapHandler mapHandler, ClanManager clanManager, CooldownManager cooldownManager) {
+    public MapListener(Clans clans, MapHandler mapHandler, ClanManager clanManager, CooldownManager cooldownManager) {
+        this.clans = clans;
         this.mapHandler = mapHandler;
         this.clanManager = clanManager;
         this.cooldownManager = cooldownManager;
@@ -217,124 +229,122 @@ public class MapListener implements Listener {
     //public void onUnclaim(ClanUnclaimEvent event) {
     //    updateClaims(event.getClan());
     //}
-//
-    //@EventHandler(priority = EventPriority.MONITOR)
-    //public void onClaim(ClanClaimEvent event) {
-    //    updateClaims(event.getClan());
-    //}
-//
-    //private void updateClaims(Clan clan) {
-    //    for (Player online : Bukkit.getOnlinePlayers()) {
-    //        final ClanManager.ClanRelation clanRelation = getManager(ClanManager.class).getClanRelation(clan, getManager(ClanManager.class).getClan(online));
-    //        byte color;
-    //        color = clanRelation.getMapColor();
-    //        if (clan.getName().equals("Fields")) {
-    //            color = 62;
-    //        }
-    //        if (clan.getName().equals("Red Shops") || clan.getName().equals("Red Spawn")) {
-    //            color = 114;
-    //        }
-    //        if (clan.getName().equals("Blue Shops") || clan.getName().equals("Blue Spawn")) {
-    //            color = (byte) 129;
-    //        }
-    //        if (clan.getName().equals("Outskirts")) {
-    //            color = 74;
-    //        }
-    //        if (!mapHandler.clanMapData.containsKey(online.getUniqueId())) {
-    //            mapHandler.clanMapData.put(online.getUniqueId(), new HashSet<>());
-    //        }
-    //        mapHandler.clanMapData.get(online.getUniqueId()).removeIf(chunkData -> getManager(ClanManager.class).getClan(online.getWorld().getName(), chunkData.getX(), chunkData.getZ()) == null);
-    //        for (String claim : clan.getClaims()) {
-    //            final String[] split = claim.split(":");
-    //            final String world = split[0];
-    //            final int x = Integer.parseInt(split[1]);
-    //            final int z = Integer.parseInt(split[2]);
-    //            if (mapHandler.clanMapData.get(online.getUniqueId()).stream().noneMatch(chunkData -> chunkData.getX() == x && chunkData.getZ() == z && chunkData.getClan().equals(clan.getName()))) {
-    //                final ChunkData e = new ChunkData(world, color, x, z, clan.getName());
-    //                mapHandler.clanMapData.get(online.getUniqueId()).add(e);
-    //            }
-    //        }
-    //        for (ChunkData chunkData : mapHandler.clanMapData.get(online.getUniqueId())) {
-    //            chunkData.getBlockFaceSet().clear();
-    //            for (int i = 0; i < 4; i++) {
-    //                BlockFace blockFace = BlockFace.values()[i];
-    //                final Clan other = getManager(MapManager.class).getManager(ClanManager.class).getClan(online.getWorld().getName(), chunkData.getX() + blockFace.getModX(), chunkData.getZ() + blockFace.getModZ());
-    //                if (other != null && chunkData.getClan().equals(other.getName())) {
-    //                    chunkData.getBlockFaceSet().add(blockFace);
-    //                }
-    //            }
-    //        }
-    //        updateStatus(online);
-    //    }
-    //}
-//
-    //@EventHandler(priority = EventPriority.MONITOR)
-    //public void onClanLeave(ClanLeaveEvent event) {
-    //    final Player player = event.getPlayer();
-    //    if (!mapHandler.clanMapData.containsKey(player.getUniqueId())) {
-    //        mapHandler.clanMapData.put(player.getUniqueId(), new HashSet<>());
-    //    }
-    //    for (ChunkData chunkData : mapHandler.clanMapData.get(player.getUniqueId())) {
-    //        final Clan clan = getManager(ClanManager.class).getClan(chunkData.getClan());
-    //        if (clan != null && !clan.isAdmin()) {
-    //            chunkData.setColor(ClanManager.ClanRelation.NEUTRAL.getMapColor());
-    //        }
-    //    }
-    //    updateStatus(player);
-    //}
-//
-    //@EventHandler(priority = EventPriority.LOWEST)
-    //public void onDisband(ClanDisbandEvent event) {
-    //    for (Player online : Bukkit.getOnlinePlayers()) {
-    //        if (!mapHandler.clanMapData.containsKey(online.getUniqueId())) {
-    //            mapHandler.clanMapData.put(online.getUniqueId(), new HashSet<>());
-    //        }
-    //        mapHandler.clanMapData.get(online.getUniqueId()).removeIf(chunkData -> getManager(ClanManager.class).getClan(chunkData.getClan()) == null);
-    //        for (ChunkData chunkData : mapHandler.clanMapData.get(online.getUniqueId())) {
-    //            final Clan clan = getManager(ClanManager.class).getClan(chunkData.getClan());
-    //            if (clan != null && !clan.isAdmin()) {
-    //                chunkData.setColor(getManager(ClanManager.class).getClanRelation(clan, getManager(ClanManager.class).getClan(online.getUniqueId())).getMapColor());
-    //            }
-    //        }
-    //        updateStatus(online);
-    //    }
-    //}
-//
-    //@EventHandler(priority = EventPriority.MONITOR)
-    //public void onPlayerJoinClan(ClanJoinEvent event) {
-    //    final Player player = event.getPlayer();
-    //    final Clan clan = getManager(ClanManager.class).getClan(player);
-    //    if (clan == null) {
-    //        return;
-    //    }
-    //    if (!mapHandler.clanMapData.containsKey(player.getUniqueId())) {
-    //        mapHandler.clanMapData.put(player.getUniqueId(), new HashSet<>());
-    //    }
-    //    for (String claim : clan.getClaims()) {
-    //        final int x = Integer.parseInt(claim.split(":")[1]);
-    //        final int z = Integer.parseInt(claim.split(":")[2]);
-    //        mapHandler.clanMapData.get(player.getUniqueId()).stream().filter(chunkData -> chunkData.getX() == x && chunkData.getZ() == z && chunkData.getClan().equals(clan.getName())).forEach(chunkData -> chunkData.setColor(ClanManager.ClanRelation.SELF.getMapColor()));
-    //    }
-    //    for (String ally : clan.getAllianceMap().keySet()) {
-    //        Clan allyClan = getManager(ClanManager.class).getClan(ally);
-    //        ClanManager.ClanRelation clanRelation = getManager(ClanManager.class).getClanRelation(clan, allyClan);
-    //        for (String claim : allyClan.getClaims()) {
-    //            final int x = Integer.parseInt(claim.split(":")[1]);
-    //            final int z = Integer.parseInt(claim.split(":")[2]);
-    //            mapHandler.clanMapData.get(player.getUniqueId()).stream().filter(chunkData -> chunkData.getX() == x && chunkData.getZ() == z && chunkData.getClan().equals(ally)).forEach(chunkData -> chunkData.setColor(clanRelation.getMapColor()));
-    //        }
-    //    }
-    //    for (String enemy : clan.getAllianceMap().keySet()) {
-    //        Clan enemyClan = getManager(ClanManager.class).getClan(enemy);
-    //        ClanManager.ClanRelation clanRelation = getManager(ClanManager.class).getClanRelation(clan, enemyClan);
-    //        for (String claim : enemyClan.getClaims()) {
-    //            final int x = Integer.parseInt(claim.split(":")[1]);
-    //            final int z = Integer.parseInt(claim.split(":")[2]);
-    //            mapHandler.clanMapData.get(player.getUniqueId()).stream().filter(chunkData -> chunkData.getX() == x && chunkData.getZ() == z && chunkData.getClan().equals(enemy)).forEach(chunkData -> chunkData.setColor(clanRelation.getMapColor()));
-    //        }
-    //    }
-    //    updateStatus(player);
-    //}
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onClaim(ChunkClaimEvent event) {
+        if(event.isCancelled()) return;
+        updateClaims(event.getClan());
+    }
+
+    private void updateClaims(Clan clan) {
+        UtilServer.runTaskLater(clans, () -> {
+            for (Player online : Bukkit.getOnlinePlayers()) {
+
+                Clan otherClan = clanManager.getClanByPlayer(online).orElse(null);
+                ClanRelation clanRelation = clanManager.getRelation(clan, otherClan);
+                MaterialColor color = clanRelation.getMaterialColor();
+
+                if (!mapHandler.clanMapData.containsKey(online.getUniqueId())) {
+                    mapHandler.clanMapData.put(online.getUniqueId(), new HashSet<>());
+                }
+
+                for (ClanTerritory claim : clan.getTerritory()) {
+
+                    Chunk chunk = UtilWorld.stringToChunk(claim.getChunk());
+                    if (chunk != null) {
+                        ChunkData chunkData = new ChunkData("world", color, chunk.getX(), chunk.getZ(), clan);
+                        for (int i = 0; i < 4; i++) {
+                            BlockFace blockFace = BlockFace.values()[i];
+                            Chunk targetChunk = online.getWorld().getChunkAt(chunk.getX() + blockFace.getModX(), chunk.getZ() + blockFace.getModZ());
+                            Clan other = clanManager.getClanByChunk(targetChunk).orElse(null);
+                            if (chunkData.getClan().equals(other)) {
+                                chunkData.getBlockFaceSet().add(blockFace);
+                            }
+                        }
+
+                        Set<ChunkData> chunkDataset = mapHandler.clanMapData.get(online.getUniqueId());
+                        if (chunkDataset.stream().noneMatch(cd -> cd.equals(chunkData))) {
+                            chunkDataset.add(chunkData);
+                        }
+                    }
+
+                }
+                updateStatus(online);
+            }
+        }, 1);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onClanLeave(MemberLeaveClanEvent event) {
+        if(event.isCancelled()) return;
+        UtilServer.runTaskLater(clans, () -> {
+            final Player player = event.getPlayer();
+            if (!mapHandler.clanMapData.containsKey(player.getUniqueId())) {
+                mapHandler.clanMapData.put(player.getUniqueId(), new HashSet<>());
+            }
+            for (ChunkData chunkData : mapHandler.clanMapData.get(player.getUniqueId())) {
+                final Clan clan = chunkData.getClan();
+                if (clan != null && !clan.isAdmin()) {
+                    chunkData.setColor(UtilMapMaterial.getColorNeutral());
+                }
+            }
+            updateStatus(player);
+        }, 1);
+    }
+
+    //
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onDisband(ClanDisbandEvent event) {
+        if(event.isCancelled()) return;
+        UtilServer.runTaskLater(clans, () -> {
+            for (Player online : Bukkit.getOnlinePlayers()) {
+                if (!mapHandler.clanMapData.containsKey(online.getUniqueId())) {
+                    mapHandler.clanMapData.put(online.getUniqueId(), new HashSet<>());
+                }
+                mapHandler.clanMapData.get(online.getUniqueId()).removeIf(chunkData -> clanManager.getObject(chunkData.getClan().getName()).isEmpty());
+                for (ChunkData chunkData : mapHandler.clanMapData.get(online.getUniqueId())) {
+                    final Clan clan = chunkData.getClan();
+                    if (clan != null && !clan.isAdmin()) {
+                        ClanRelation relation = clanManager.getRelation(clan, clanManager.getClanByPlayer(online).orElse(null));
+                        chunkData.setColor(relation.getMaterialColor());
+                    }
+                }
+                updateStatus(online);
+            }
+        }, 1);
+
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerJoinClan(MemberJoinClanEvent event) {
+        if(event.isCancelled()) return;
+        UtilServer.runTaskLater(clans, () -> {
+            final Player player = event.getPlayer();
+            final Clan clan = event.getClan();
+
+            if (!mapHandler.clanMapData.containsKey(player.getUniqueId())) {
+                mapHandler.clanMapData.put(player.getUniqueId(), new HashSet<>());
+            }
+
+            Set<ChunkData> chunkData = mapHandler.clanMapData.get(player.getUniqueId());
+
+            chunkData.forEach(cd -> {
+                if (cd.getClan().equals(clan)) {
+                    cd.setColor(ClanRelation.SELF.getMaterialColor());
+                } else if (clan.isAllied(cd.getClan())) {
+                    Optional<ClanAlliance> clanAllianceOptional = clan.getAlliance(cd.getClan());
+                    clanAllianceOptional.ifPresent(clanAlliance -> {
+                        cd.setColor(clanAlliance.isTrusted() ? ClanRelation.ALLY_TRUST.getMaterialColor() : ClanRelation.ALLY.getMaterialColor());
+                    });
+                } else if (clan.isEnemy(cd.getClan())) {
+                    cd.setColor(ClanRelation.ENEMY.getMaterialColor());
+                }
+            });
+
+            updateStatus(player);
+        }, 1);
+
+    }
 
     private void loadChunks(Player player) {
         if (!mapHandler.clanMapData.containsKey(player.getUniqueId())) {
@@ -355,12 +365,12 @@ public class MapListener implements Listener {
 
                 Chunk chunk = UtilWorld.stringToChunk(claim.getChunk());
                 if (chunk != null) {
-                    ChunkData chunkData = new ChunkData("world", materialColor, chunk.getX(), chunk.getZ(), clan.getName());
+                    ChunkData chunkData = new ChunkData("world", materialColor, chunk.getX(), chunk.getZ(), clan);
                     for (int i = 0; i < 4; i++) {
                         BlockFace blockFace = BlockFace.values()[i];
                         Chunk targetChunk = player.getWorld().getChunkAt(chunk.getX() + blockFace.getModX(), chunk.getZ() + blockFace.getModZ());
                         Clan other = clanManager.getClanByChunk(targetChunk).orElse(null);
-                        if (other != null && chunkData.getClan().equals(other.getName())) {
+                        if (chunkData.getClan().equals(other)) {
                             chunkData.getBlockFaceSet().add(blockFace);
                         }
                     }
