@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.clans.champions.skills.skills.knight;
+package me.mykindos.betterpvp.clans.champions.skills.skills.knight.axe;
 
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.champions.ChampionsManager;
@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilSound;
 import org.bukkit.ChatColor;
 import org.bukkit.Effect;
 import org.bukkit.Sound;
@@ -65,7 +66,7 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
     @Override
     public void activate(Player player, int level) {
         player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 60, 2));
-        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_SCREAM, 1.5F, 0.0F);
+        UtilSound.playSound(player.getWorld(), player, Sound.ENTITY_ENDERMAN_SCREAM, 1.5F, 0);
         player.getWorld().playEffect(player.getLocation(), Effect.STEP_SOUND, 49);
         running.put(player.getUniqueId(), System.currentTimeMillis() + 4000L);
     }

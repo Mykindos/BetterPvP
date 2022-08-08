@@ -29,14 +29,14 @@ repositories {
 }
 
 dependencies {
-    paperweightDevelopmentBundle("io.papermc.paper:dev-bundle:1.19.1-R0.1-SNAPSHOT")
+    paperweightDevelopmentBundle("io.papermc.paper:dev-bundle:1.19.2-R0.1-SNAPSHOT")
 
     implementation("com.google.inject:guice:5.1.0")
     implementation("org.reflections:reflections:0.10.2")
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.0.1")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.12.6.1")
 
     compileOnly(project(":core"))
-    compileOnly("io.papermc.paper:paper-api:1.19-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.19.2-R0.1-SNAPSHOT")
     compileOnly("org.projectlombok:lombok:1.18.24")
     compileOnly("com.comphenix.protocol:ProtocolLib:4.8.0")
 

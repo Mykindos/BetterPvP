@@ -65,4 +65,25 @@ public class UtilPlayer {
 
     }
 
+    /**
+     * Adds a specified amount of health to a player
+     *
+     * @param player Player to add health to
+     * @param mod    Amount of health to add to the player
+     */
+    public static void health(Player player, double mod) {
+        if (player.isDead()) {
+            return;
+        }
+        double health = player.getHealth() + mod;
+        if (health < 0.0D) {
+            health = 0.0D;
+        }
+        if (health > 20.0D) {
+            health = 20.0D;
+        }
+        player.setHealth(health);
+    }
+
+
 }
