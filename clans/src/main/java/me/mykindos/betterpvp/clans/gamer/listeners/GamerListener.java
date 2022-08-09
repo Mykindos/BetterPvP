@@ -50,8 +50,10 @@ public class GamerListener implements Listener {
             gamerManager.getBuildRepository().loadDefaultBuilds(gamer);
         }else{
             gamer = gamerOptional.get();
-            gamerManager.getBuildRepository().loadBuilds(gamer);
-            gamerManager.getBuildRepository().loadDefaultBuilds(gamer);
+            UtilServer.runTaskAsync(clans, () -> {
+                gamerManager.getBuildRepository().loadBuilds(gamer);
+                gamerManager.getBuildRepository().loadDefaultBuilds(gamer);
+            });
 
         }
         checkUnsetProperties(gamer);

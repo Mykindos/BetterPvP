@@ -457,6 +457,7 @@ public class UtilBlock {
             blockUseSet.add(Material.DISPENSER);
             blockUseSet.add(Material.IRON_DOOR);
             blockUseSet.add(Material.IRON_TRAPDOOR);
+            blockUseSet.add(Material.NOTE_BLOCK);
 
           /*  blockUseSet.add((byte) 23);
             blockUseSet.add((byte) 330);

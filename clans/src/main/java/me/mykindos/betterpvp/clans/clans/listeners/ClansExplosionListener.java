@@ -13,6 +13,7 @@ import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 import java.util.Optional;
@@ -60,5 +61,10 @@ public class ClansExplosionListener extends ClanListener {
                 }
             });
         }
+    }
+
+    @EventHandler
+    public void onExplode(EntityExplodeEvent event){
+        event.setCancelled(true);
     }
 }

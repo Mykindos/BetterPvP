@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.clans.champions.skills.skills.paladin;
+package me.mykindos.betterpvp.clans.champions.skills.skills.paladin.axe;
 
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.champions.ChampionsManager;

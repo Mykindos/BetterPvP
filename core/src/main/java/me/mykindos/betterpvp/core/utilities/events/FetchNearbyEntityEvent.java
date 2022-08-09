@@ -13,7 +13,7 @@ import java.util.List;
 @Data
 public class FetchNearbyEntityEvent<T extends LivingEntity> extends CustomEvent {
 
-    private final Player player;
+    private final LivingEntity source;
     private final Location location;
     private final List<T> entities;
 

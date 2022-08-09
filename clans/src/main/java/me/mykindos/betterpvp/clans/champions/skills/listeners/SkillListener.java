@@ -325,10 +325,11 @@ public class SkillListener implements Listener {
 
     @EventHandler
     public void onFetchNearbyEntity(FetchNearbyEntityEvent<?> event) {
+        if(!(event.getSource() instanceof Player player)) return;
         event.getEntities().removeIf(entity -> {
-            if (entity instanceof Player player) {
-                return !clanManager.canHurt(event.getPlayer(), player)
-                        || player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR;
+            if (entity instanceof Player target) {
+                return !clanManager.canHurt(player, target)
+                        || target.getGameMode() == GameMode.CREATIVE || target.getGameMode() == GameMode.SPECTATOR;
             }
             return false;
         });
