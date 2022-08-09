@@ -79,30 +79,30 @@ public class DefensiveStance extends ChannelSkill implements InteractSkill, Ener
     public void onDamage(CustomDamageEvent event) {
         if (event.isCancelled()) return;
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
-        if (!(event.getDamagee() instanceof Player p)) return;
-        if (!active.contains(p.getUniqueId())) return;
-        if (!p.isHandRaised()) return;
+        if (!(event.getDamagee() instanceof Player player)) return;
+        if (!active.contains(player.getUniqueId())) return;
+        if (!player.isHandRaised()) return;
 
-        int level = getLevel(p);
+        int level = getLevel(player);
         if (level > 0) {
-            Vector look = p.getLocation().getDirection();
+            Vector look = player.getLocation().getDirection();
             look.setY(0);
             look.normalize();
 
-            Vector from = UtilVelocity.getTrajectory(p, event.getDamager());
+            Vector from = UtilVelocity.getTrajectory(player, event.getDamager());
             from.normalize();
-            if (p.getLocation().getDirection().subtract(from).length() > 0.6D) {
+            if (player.getLocation().getDirection().subtract(from).length() > 0.6D) {
                 return;
             }
 
             event.getDamager().setVelocity(event.getDamagee().getEyeLocation().getDirection().add(new Vector(0, 0.5, 0)).multiply(1));
 
-            CustomDamageEvent customDamageEvent = new CustomDamageEvent(event.getDamager(), event.getDamagee(), null, DamageCause.ENTITY_ATTACK, 2, false, getName());
+            CustomDamageEvent customDamageEvent = new CustomDamageEvent(event.getDamager(), event.getDamagee(), null, DamageCause.CUSTOM, 2, false, getName());
             UtilDamage.doCustomDamage(customDamageEvent);
 
             event.cancel(getName());
 
-            p.getWorld().playSound(p.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1.0F, 2.0F);
+            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1.0F, 2.0F);
         }
 
     }

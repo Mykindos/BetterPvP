@@ -16,11 +16,11 @@ public class UtilEntity {
         return getNearbyEntities(player, player.getLocation(), radius);
     }
 
-    public static List<LivingEntity> getNearbyEntities(Player player, Location location, double radius) {
-        List<LivingEntity> livingEntities = player.getWorld().getLivingEntities().stream()
-                .filter(livingEntity -> livingEntity.getLocation().distance(location) <= radius && !livingEntity.equals(player))
+    public static List<LivingEntity> getNearbyEntities(LivingEntity source, Location location, double radius) {
+        List<LivingEntity> livingEntities = source.getWorld().getLivingEntities().stream()
+                .filter(livingEntity -> livingEntity.getLocation().distance(location) <= radius && !livingEntity.equals(source))
                 .collect(Collectors.toList());
-        FetchNearbyEntityEvent<LivingEntity> fetchNearbyEntityEvent = new FetchNearbyEntityEvent<>(player, location, livingEntities);
+        FetchNearbyEntityEvent<LivingEntity> fetchNearbyEntityEvent = new FetchNearbyEntityEvent<>(source, location, livingEntities);
         UtilServer.callEvent(fetchNearbyEntityEvent);
 
         return fetchNearbyEntityEvent.getEntities();
