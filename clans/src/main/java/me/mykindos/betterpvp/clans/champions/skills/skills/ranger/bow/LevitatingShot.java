@@ -5,7 +5,6 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.champions.ChampionsManager;
 import me.mykindos.betterpvp.clans.champions.roles.Role;
-import me.mykindos.betterpvp.clans.champions.skills.config.SkillConfigFactory;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillType;
 import me.mykindos.betterpvp.clans.champions.skills.types.PrepareArrowSkill;
@@ -26,8 +25,8 @@ import org.bukkit.potion.PotionEffectType;
 public class LevitatingShot extends PrepareArrowSkill {
 
     @Inject
-    public LevitatingShot(Clans clans, ChampionsManager championsManager, SkillConfigFactory configFactory) {
-        super(clans, championsManager, configFactory);
+    public LevitatingShot(Clans clans, ChampionsManager championsManager) {
+        super(clans, championsManager);
     }
 
     @Override

@@ -59,7 +59,7 @@ public class GamerListener implements Listener {
         checkUnsetProperties(gamer);
 
         Bukkit.getOnlinePlayers().forEach(player ->
-                UtilServer.runTaskLater(clans, () ->UtilServer.callEvent(new ScoreboardUpdateEvent(player)), 1));
+                UtilServer.runTaskLater(clans, () -> UtilServer.callEvent(new ScoreboardUpdateEvent(player)), 1));
 
     }
 

@@ -6,7 +6,6 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.champions.ChampionsManager;
 import me.mykindos.betterpvp.clans.champions.roles.Role;
 import me.mykindos.betterpvp.clans.champions.skills.Skill;
-import me.mykindos.betterpvp.clans.champions.skills.config.SkillConfigFactory;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillType;
 import me.mykindos.betterpvp.clans.champions.skills.types.CooldownSkill;
@@ -17,7 +16,6 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -32,23 +30,15 @@ import org.bukkit.inventory.ItemStack;
 @BPvPListener
 public class GlacialPrison extends Skill implements InteractSkill, CooldownSkill, Listener {
 
-    @Inject
-    @Config(path="skills.paladin.glacialprison.sphereSize", defaultValue = "5")
     private int sphereSize;
-
-    @Inject
-    @Config(path="skills.paladin.glacialprison.duration", defaultValue = "4")
     private double duration;
-
-    @Inject
-    @Config(path="skills.paladin.glacialprison.speed", defaultValue = "1.5")
     private double speed;
 
     private final WorldBlockHandler blockHandler;
 
     @Inject
-    public GlacialPrison(Clans clans, ChampionsManager championsManager, SkillConfigFactory configFactory, WorldBlockHandler blockHandler) {
-        super(clans, championsManager, configFactory);
+    public GlacialPrison(Clans clans, ChampionsManager championsManager, WorldBlockHandler blockHandler) {
+        super(clans, championsManager);
         this.blockHandler = blockHandler;
     }
 
@@ -84,7 +74,7 @@ public class GlacialPrison extends Skill implements InteractSkill, CooldownSkill
     @Override
     public double getCooldown(int level) {
 
-        return getSkillConfig().getCooldown() - ((level - 1) * 2);
+        return cooldown - ((level - 1) * 2);
     }
 
     @EventHandler
@@ -106,6 +96,13 @@ public class GlacialPrison extends Skill implements InteractSkill, CooldownSkill
         Item item = player.getWorld().dropItem(player.getEyeLocation(), new ItemStack(Material.ICE));
         item.setVelocity(player.getLocation().getDirection().multiply(speed));
         championsManager.getThrowables().addThrowable(item, player, getName(), 5000, true, true);
+    }
+
+    @Override
+    public void loadSkillConfig(){
+        sphereSize = getConfig("sphereSize", 5, Integer.class);
+        duration = getConfig("duration", 4, Double.class);
+        speed = getConfig("speed", 1.5, Double.class);
     }
 
     @Override

@@ -7,7 +7,6 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.champions.ChampionsManager;
 import me.mykindos.betterpvp.clans.champions.roles.Role;
 import me.mykindos.betterpvp.clans.champions.skills.Skill;
-import me.mykindos.betterpvp.clans.champions.skills.config.SkillConfigFactory;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillType;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.clans.champions.skills.types.PassiveSkill;
@@ -33,19 +32,14 @@ import java.util.WeakHashMap;
 @BPvPListener
 public class Swordsmanship extends Skill implements PassiveSkill {
 
-    @Inject
-    @Config(path="skills.knight.swordsmanship.timeBetweenCharges", defaultValue = "2")
     private double timeBetweenCharges;
-
-    @Inject
-    @Config(path="skills.knight.swordsmanship.timeOutOfCombat", defaultValue = "2.5")
     private double timeOutOfCombat;
 
     private final WeakHashMap<Player, Integer> charges = new WeakHashMap<>();
 
     @Inject
-    public Swordsmanship(Clans clans, ChampionsManager championsManager, SkillConfigFactory configFactory) {
-        super(clans, championsManager, configFactory);
+    public Swordsmanship(Clans clans, ChampionsManager championsManager) {
+        super(clans, championsManager);
     }
 
     @Override
@@ -122,6 +116,12 @@ public class Swordsmanship extends Skill implements PassiveSkill {
             }
         }
 
+    }
+
+    @Override
+    public void loadSkillConfig(){
+        timeBetweenCharges = getConfig("timeBetweenCharges", 2.0, Double.class);
+        timeOutOfCombat = getConfig("timeOutOfCombat", 2.5, Double.class);
     }
 
 }

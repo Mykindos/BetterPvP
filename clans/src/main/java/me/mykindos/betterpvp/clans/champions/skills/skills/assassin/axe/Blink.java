@@ -6,7 +6,6 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.champions.ChampionsManager;
 import me.mykindos.betterpvp.clans.champions.roles.Role;
 import me.mykindos.betterpvp.clans.champions.skills.Skill;
-import me.mykindos.betterpvp.clans.champions.skills.config.SkillConfigFactory;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillType;
 import me.mykindos.betterpvp.clans.champions.skills.types.CooldownSkill;
@@ -38,8 +37,8 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
     private final WeakHashMap<Player, Long> blinkTime = new WeakHashMap<>();
 
     @Inject
-    public Blink(Clans clans, ChampionsManager championsManager, SkillConfigFactory configFactory, Clans clans1) {
-        super(clans, championsManager, configFactory);
+    public Blink(Clans clans, ChampionsManager championsManager, Clans clans1) {
+        super(clans, championsManager);
     }
 
 
@@ -191,7 +190,7 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
     @Override
     public double getCooldown(int level) {
 
-        return getSkillConfig().getCooldown() - ((level - 1));
+        return cooldown - ((level - 1));
     }
 
 

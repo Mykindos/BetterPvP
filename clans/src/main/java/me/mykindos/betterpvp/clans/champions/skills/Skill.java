@@ -2,15 +2,15 @@ package me.mykindos.betterpvp.clans.champions.skills;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.champions.ChampionsManager;
 import me.mykindos.betterpvp.clans.champions.builds.BuildSkill;
 import me.mykindos.betterpvp.clans.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.clans.champions.roles.Role;
-import me.mykindos.betterpvp.clans.champions.skills.config.SkillConfig;
-import me.mykindos.betterpvp.clans.champions.skills.config.SkillConfigFactory;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillWeapons;
+import me.mykindos.betterpvp.clans.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.clans.champions.skills.types.EnergySkill;
 import me.mykindos.betterpvp.clans.gamer.Gamer;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Material;
@@ -19,39 +19,65 @@ import org.bukkit.entity.Player;
 import java.util.Optional;
 
 @Singleton
+@Slf4j
 public abstract class Skill implements ISkill {
 
 
     protected final Clans clans;
     protected final ChampionsManager championsManager;
 
-    private final SkillConfigFactory configFactory;
-
-    @Getter
-    private SkillConfig skillConfig;
-
+    private boolean enabled;
+    private int maxLevel;
+    protected int cooldown;
+    protected int energy;
+    
     @Inject
-    public Skill(Clans clans, ChampionsManager championsManager, SkillConfigFactory configFactory) {
+    public Skill(Clans clans, ChampionsManager championsManager) {
         this.clans = clans;
         this.championsManager = championsManager;
-        this.configFactory = configFactory;
-        this.skillConfig = configFactory.create(this);
+        loadConfig();
     }
 
     @Override
     public boolean isEnabled() {
-        return skillConfig.isEnabled();
+        return enabled;
     }
 
     @Override
     public int getMaxLevel() {
-        return skillConfig.getMaxlevel();
+        return maxLevel;
     }
 
     public void reload() {
-        this.skillConfig = configFactory.create(this);
+        try {
+            loadConfig();
+        }catch(Exception ex){
+            log.error("Something went wrong loading the skill configuration for {}", getName(), ex);
+        }
     }
 
+    protected <T> T getConfig(String name, Object defaultValue, Class<T> type) {
+        String path = "skills." + getClassType().name().toLowerCase() + "." + getName().toLowerCase().replace(" ", "") + "." + name;
+        return clans.getConfig().getOrSaveObject(path, defaultValue, type);
+    }
+
+    @Override
+    public final void loadConfig() {
+        enabled = getConfig("enabled", true, Boolean.class);
+        maxLevel = getConfig("maxlevel", 5, Integer.class);
+
+        if (this instanceof CooldownSkill) {
+            cooldown = getConfig("cooldown", 0, Integer.class);
+        }
+
+        if (this instanceof EnergySkill) {
+            energy = getConfig("energy", 0, Integer.class);
+        }
+
+        loadSkillConfig();
+    }
+
+    public void loadSkillConfig(){}
 
     protected boolean hasSkill(Player player) {
         Optional<Gamer> gamerOptional = championsManager.getGamers().getObject(player.getUniqueId());

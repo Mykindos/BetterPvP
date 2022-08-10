@@ -4,7 +4,6 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.champions.ChampionsManager;
 import me.mykindos.betterpvp.clans.champions.roles.Role;
 import me.mykindos.betterpvp.clans.champions.skills.Skill;
-import me.mykindos.betterpvp.clans.champions.skills.config.SkillConfigFactory;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillType;
 import me.mykindos.betterpvp.clans.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -26,8 +25,8 @@ import javax.inject.Singleton;
 public class ShockingStrikes extends Skill implements PassiveSkill, Listener {
 
     @Inject
-    public ShockingStrikes(Clans clans, ChampionsManager championsManager, SkillConfigFactory configFactory) {
-        super(clans, championsManager, configFactory);
+    public ShockingStrikes(Clans clans, ChampionsManager championsManager) {
+        super(clans, championsManager);
     }
 
     @Override

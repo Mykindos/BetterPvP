@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.clans.champions.skills.types;
 
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.champions.ChampionsManager;
-import me.mykindos.betterpvp.clans.champions.skills.config.SkillConfigFactory;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.cooldowns.Cooldown;
@@ -29,8 +28,8 @@ public abstract class PrepareArrowSkill extends PrepareSkill implements Cooldown
 
     protected final List<Arrow> arrows = new ArrayList<>();
 
-    public PrepareArrowSkill(Clans clans, ChampionsManager championsManager, SkillConfigFactory configFactory) {
-        super(clans, championsManager, configFactory);
+    public PrepareArrowSkill(Clans clans, ChampionsManager championsManager) {
+        super(clans, championsManager);
     }
 
     @EventHandler

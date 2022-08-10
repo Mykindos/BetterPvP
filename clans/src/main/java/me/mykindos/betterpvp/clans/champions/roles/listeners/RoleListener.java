@@ -26,6 +26,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.Optional;
 
@@ -99,6 +100,19 @@ public class RoleListener implements Listener {
         }
 
         equipRole(player, null);
+    }
+
+    @UpdateEvent(delay = 500)
+    public void checkRoleBuffs() {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            Optional<Role> roleOptional = roleManager.getObject(player.getUniqueId().toString());
+            if (roleOptional.isPresent()) {
+                Role role = roleOptional.get();
+                if (role == Role.ASSASSIN) {
+                    player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 1));
+                }
+            }
+        }
     }
 
     @EventHandler

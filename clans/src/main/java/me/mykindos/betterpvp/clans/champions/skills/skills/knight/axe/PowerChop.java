@@ -5,13 +5,10 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.champions.ChampionsManager;
 import me.mykindos.betterpvp.clans.champions.roles.Role;
-import me.mykindos.betterpvp.clans.champions.skills.Skill;
-import me.mykindos.betterpvp.clans.champions.skills.config.SkillConfigFactory;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillType;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.clans.champions.skills.types.CooldownSkill;
-import me.mykindos.betterpvp.clans.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.clans.champions.skills.types.PrepareSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.config.Config;
@@ -25,7 +22,6 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
@@ -36,15 +32,13 @@ import java.util.WeakHashMap;
 @BPvPListener
 public class PowerChop extends PrepareSkill implements CooldownSkill {
 
-    @Inject
-    @Config(path = "skills.knight.powerchop.timeToHit", defaultValue = "1")
     private double timeToHit;
 
     private final WeakHashMap<Player, Long> charge = new WeakHashMap<>();
 
     @Inject
-    public PowerChop(Clans clans, ChampionsManager championsManager, SkillConfigFactory configFactory) {
-        super(clans, championsManager, configFactory);
+    public PowerChop(Clans clans, ChampionsManager championsManager) {
+        super(clans, championsManager);
     }
 
 
@@ -113,13 +107,18 @@ public class PowerChop extends PrepareSkill implements CooldownSkill {
 
     @Override
     public double getCooldown(int level) {
-        return getSkillConfig().getCooldown() - ((level - 1) * 1.5);
+        return cooldown - ((level - 1) * 1.5);
     }
 
     @Override
     public void activate(Player player, int level) {
         charge.put(player, System.currentTimeMillis());
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ARMOR_STAND_BREAK, 2.0f, 1.8f);
+    }
+
+    @Override
+    public void loadSkillConfig() {
+        timeToHit = getConfig("timeToHit", 1, Double.class);
     }
 
     @Override

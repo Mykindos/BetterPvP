@@ -4,7 +4,6 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.champions.ChampionsManager;
 import me.mykindos.betterpvp.clans.champions.roles.Role;
 import me.mykindos.betterpvp.clans.champions.skills.Skill;
-import me.mykindos.betterpvp.clans.champions.skills.config.SkillConfigFactory;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillType;
 import me.mykindos.betterpvp.clans.champions.skills.skills.paladin.data.CustomArmourStand;
@@ -47,8 +46,8 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
     private final WeakHashMap<ArmorStand, Long> stands = new WeakHashMap<>();
 
     @Inject
-    public Rupture(Clans clans, ChampionsManager championsManager, SkillConfigFactory configFactory) {
-        super(clans, championsManager, configFactory);
+    public Rupture(Clans clans, ChampionsManager championsManager) {
+        super(clans, championsManager);
     }
 
     @Override
@@ -96,7 +95,7 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
     @Override
     public double getCooldown(int level) {
 
-        return getSkillConfig().getCooldown() - ((level - 1));
+        return cooldown - ((level - 1));
     }
 
     @Override

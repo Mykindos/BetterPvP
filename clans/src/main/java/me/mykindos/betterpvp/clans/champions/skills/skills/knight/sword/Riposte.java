@@ -6,7 +6,6 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.champions.ChampionsManager;
 import me.mykindos.betterpvp.clans.champions.roles.Role;
-import me.mykindos.betterpvp.clans.champions.skills.config.SkillConfigFactory;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillType;
 import me.mykindos.betterpvp.clans.champions.skills.types.CooldownSkill;
@@ -41,8 +40,8 @@ public class Riposte extends PrepareSkill implements CooldownSkill, Listener {
     private final HashMap<String, Long> riposting = new HashMap<>();
 
     @Inject
-    public Riposte(Clans clans, ChampionsManager championsManager, SkillConfigFactory configFactory) {
-        super(clans, championsManager, configFactory);
+    public Riposte(Clans clans, ChampionsManager championsManager) {
+        super(clans, championsManager);
     }
 
     @Override
@@ -191,7 +190,7 @@ public class Riposte extends PrepareSkill implements CooldownSkill, Listener {
 
     @Override
     public double getCooldown(int level) {
-        return getSkillConfig().getCooldown() - ((level - 1) * 1.5);
+        return cooldown - ((level - 1) * 1.5);
     }
 
 

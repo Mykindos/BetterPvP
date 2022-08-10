@@ -5,7 +5,6 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.champions.ChampionsManager;
 import me.mykindos.betterpvp.clans.champions.roles.Role;
 import me.mykindos.betterpvp.clans.champions.skills.Skill;
-import me.mykindos.betterpvp.clans.champions.skills.config.SkillConfigFactory;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillType;
 import me.mykindos.betterpvp.clans.champions.skills.types.CooldownSkill;
@@ -33,8 +32,8 @@ public class ExcessiveForce extends Skill implements InteractSkill, CooldownSkil
     private final WeakHashMap<Player, Long> active = new WeakHashMap<>();
 
     @Inject
-    public ExcessiveForce(Clans clans, ChampionsManager championsManager, SkillConfigFactory configFactory) {
-        super(clans, championsManager, configFactory);
+    public ExcessiveForce(Clans clans, ChampionsManager championsManager) {
+        super(clans, championsManager);
     }
 
     @Override
@@ -107,7 +106,7 @@ public class ExcessiveForce extends Skill implements InteractSkill, CooldownSkil
 
     @Override
     public double getCooldown(int level) {
-        return getSkillConfig().getCooldown() - (level * 2);
+        return cooldown - (level * 2);
     }
 
 

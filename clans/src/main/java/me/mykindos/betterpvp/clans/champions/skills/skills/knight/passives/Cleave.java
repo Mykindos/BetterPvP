@@ -6,7 +6,6 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.champions.ChampionsManager;
 import me.mykindos.betterpvp.clans.champions.roles.Role;
 import me.mykindos.betterpvp.clans.champions.skills.Skill;
-import me.mykindos.betterpvp.clans.champions.skills.config.SkillConfigFactory;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillType;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.clans.champions.skills.types.PassiveSkill;
@@ -27,17 +26,12 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 @BPvPListener
 public class Cleave extends Skill implements PassiveSkill, Listener {
 
-    @Inject
-    @Config(path="skills.knight.cleave.baseDistance", defaultValue = "2")
-    private int baseDistance;
+    private double baseDistance;
+    private double baseDamage;
 
     @Inject
-    @Config(path="skills.knight.cleave.baseDamage", defaultValue = "4")
-    private int baseDamage;
-
-    @Inject
-    public Cleave(Clans clans, ChampionsManager championsManager, SkillConfigFactory configFactory) {
-        super(clans, championsManager, configFactory);
+    public Cleave(Clans clans, ChampionsManager championsManager) {
+        super(clans, championsManager);
     }
 
     @Override
@@ -71,18 +65,24 @@ public class Cleave extends Skill implements PassiveSkill, Listener {
     @EventHandler
     public void onCustomDamage(CustomDamageEvent event) {
         if (event.isCancelled()) return;
-        if(!(event.getDamager() instanceof Player damager)) return;
-        if(!UtilPlayer.isHoldingItem(damager, SkillWeapons.AXES)) return;
+        if (!(event.getDamager() instanceof Player damager)) return;
+        if (!UtilPlayer.isHoldingItem(damager, SkillWeapons.AXES)) return;
 
         int level = getLevel(damager);
-        if(level > 0) {
-            for(LivingEntity target : UtilEntity.getNearbyEntities(damager, damager.getLocation(), baseDistance + level)) {
-                if(target.equals(damager)) continue;
-                if(target.equals(event.getDamagee())) continue;
+        if (level > 0) {
+            for (LivingEntity target : UtilEntity.getNearbyEntities(damager, damager.getLocation(), baseDistance + level)) {
+                if (target.equals(damager)) continue;
+                if (target.equals(event.getDamagee())) continue;
 
                 UtilDamage.doCustomDamage(new CustomDamageEvent(target, damager, null, DamageCause.ENTITY_ATTACK, (baseDamage + level), true, "Cleave"));
             }
         }
+    }
+
+    @Override
+    public void loadSkillConfig() {
+        baseDistance = getConfig("baseDistance", 2.0, Double.class);
+        baseDamage = getConfig("baseDamage", 4.0, Double.class);
     }
 
 

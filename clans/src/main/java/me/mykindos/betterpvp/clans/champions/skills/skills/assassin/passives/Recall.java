@@ -10,7 +10,6 @@ import me.mykindos.betterpvp.clans.champions.builds.menus.events.SkillEquipEvent
 import me.mykindos.betterpvp.clans.champions.roles.Role;
 import me.mykindos.betterpvp.clans.champions.roles.events.RoleChangeEvent;
 import me.mykindos.betterpvp.clans.champions.skills.Skill;
-import me.mykindos.betterpvp.clans.champions.skills.config.SkillConfigFactory;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillType;
 import me.mykindos.betterpvp.clans.champions.skills.skills.assassin.data.RecallData;
 import me.mykindos.betterpvp.clans.champions.skills.types.CooldownSkill;
@@ -34,8 +33,8 @@ public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listene
     public WeakHashMap<Player, RecallData> data = new WeakHashMap<>();
 
     @Inject
-    public Recall(Clans clans, ChampionsManager championsManager, SkillConfigFactory configFactory) {
-        super(clans, championsManager, configFactory);
+    public Recall(Clans clans, ChampionsManager championsManager) {
+        super(clans, championsManager);
     }
 
 
@@ -118,7 +117,7 @@ public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listene
     @Override
     public double getCooldown(int level) {
 
-        return getSkillConfig().getCooldown() - ((level - 1) * 2);
+        return cooldown - ((level - 1) * 2);
     }
 
     @Override

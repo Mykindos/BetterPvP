@@ -5,7 +5,6 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.champions.ChampionsManager;
 import me.mykindos.betterpvp.clans.champions.roles.Role;
 import me.mykindos.betterpvp.clans.champions.skills.Skill;
-import me.mykindos.betterpvp.clans.champions.skills.config.SkillConfigFactory;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillType;
 import me.mykindos.betterpvp.clans.champions.skills.skills.assassin.data.SilencingStrikesData;
 import me.mykindos.betterpvp.clans.champions.skills.types.PassiveSkill;
@@ -33,8 +32,8 @@ public class SilencingStrikes extends Skill implements PassiveSkill, Listener {
     public List<SilencingStrikesData> data = new ArrayList<>();
 
     @Inject
-    public SilencingStrikes(Clans clans, ChampionsManager championsManager, SkillConfigFactory configFactory) {
-        super(clans, championsManager, configFactory);
+    public SilencingStrikes(Clans clans, ChampionsManager championsManager) {
+        super(clans, championsManager);
     }
 
 
