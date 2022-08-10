@@ -32,6 +32,7 @@ public class Flash extends Skill implements InteractSkill, Listener {
 
     private int maxCharges;
     private double timeBetweenCharges;
+    private int maxTravelDistance;
 
     private final WeakHashMap<Player, Location> loc = new WeakHashMap<>();
     private final WeakHashMap<Player, Integer> charges = new WeakHashMap<>();
@@ -200,7 +201,7 @@ public class Flash extends Skill implements InteractSkill, Listener {
             Vector direction = player.getLocation().getDirection();
             Location targetLocation = player.getLocation().add(0, 1, 0);
 
-            double maxDistance = 16;
+            double maxDistance = maxTravelDistance;
 
             for (double currentDistance = 0; currentDistance < maxDistance; currentDistance += 1) {
                 Location testLocation = targetLocation.clone().add(direction.clone());
@@ -234,6 +235,7 @@ public class Flash extends Skill implements InteractSkill, Listener {
     public void loadSkillConfig(){
         maxCharges = getConfig("maxCharges", 4, Integer.class);
         timeBetweenCharges = getConfig("timeBetweenCharges", 11, Double.class);
+        maxTravelDistance = getConfig("maxTravelDistance", 16, Integer.class);
     }
 
 

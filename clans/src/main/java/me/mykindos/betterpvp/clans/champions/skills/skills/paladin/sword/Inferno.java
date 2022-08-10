@@ -41,9 +41,9 @@ import java.util.WeakHashMap;
 @BPvPListener
 public class Inferno extends ChannelSkill implements InteractSkill, EnergySkill {
 
-    private int fireTicks;
-
     private final WeakHashMap<LivingEntity, Long> tempImmune = new WeakHashMap<>();
+
+    private int fireTicks;
 
     @Inject
     public Inferno(Clans clans, ChampionsManager championsManager) {
