@@ -36,6 +36,8 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
     private final WeakHashMap<Player, Location> loc = new WeakHashMap<>();
     private final WeakHashMap<Player, Long> blinkTime = new WeakHashMap<>();
 
+    private int maxTravelDistance;
+
     @Inject
     public Blink(Clans clans, ChampionsManager championsManager, Clans clans1) {
         super(clans, championsManager);
@@ -202,7 +204,7 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
             Vector direction = player.getLocation().getDirection();
             Location targetLocation = player.getLocation().add(0, 1, 0);
 
-            double maxDistance = 16;
+            double maxDistance = maxTravelDistance;
 
             for (double currentDistance = 0; currentDistance < maxDistance; currentDistance += 1) {
                 Location testLocation = targetLocation.clone().add(direction.clone());
@@ -232,6 +234,11 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
         }, 1);
 
 
+    }
+
+    @Override
+    public void loadSkillConfig(){
+        maxTravelDistance = getConfig("maxTravelDistance", 16, Integer.class);
     }
 
     @Override

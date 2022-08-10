@@ -30,11 +30,11 @@ import org.bukkit.inventory.ItemStack;
 @BPvPListener
 public class GlacialPrison extends Skill implements InteractSkill, CooldownSkill, Listener {
 
+    private final WorldBlockHandler blockHandler;
+
     private int sphereSize;
     private double duration;
     private double speed;
-
-    private final WorldBlockHandler blockHandler;
 
     @Inject
     public GlacialPrison(Clans clans, ChampionsManager championsManager, WorldBlockHandler blockHandler) {

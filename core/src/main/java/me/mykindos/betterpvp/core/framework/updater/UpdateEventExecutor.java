@@ -35,18 +35,18 @@ public class UpdateEventExecutor {
         var listeners = plugin.getListeners();
 
         for (var listener : listeners) {
-                var methods = listener.getClass().getMethods();
-                HashMap<Method, UpdateEvent> methodMap = new HashMap<>();
-                for (var method : methods) {
+            var methods = listener.getClass().getMethods();
+            HashMap<Method, UpdateEvent> methodMap = new HashMap<>();
+            for (var method : methods) {
 
-                    var updateEvent = method.getAnnotation(UpdateEvent.class);
-                    if (updateEvent == null) continue;
+                var updateEvent = method.getAnnotation(UpdateEvent.class);
+                if (updateEvent == null) continue;
 
-                    methodMap.put(method, updateEvent);
+                methodMap.put(method, updateEvent);
 
-                }
+            }
 
-                updateMethods.put(listener, methodMap);
+            updateMethods.put(listener, methodMap);
 
 
         }
@@ -56,17 +56,20 @@ public class UpdateEventExecutor {
 
         var updateTimers = new HashMap<Long, Long>();
 
-        updateMethods.forEach((key, value) -> value.forEach((method, event) -> {
-            if (lastRunTimers.containsKey(event.delay())) {
-                if (lastRunTimers.get(event.delay()) < System.currentTimeMillis()) {
+        for (var entry : updateMethods.entrySet()) {
+            for (var method : entry.getValue().entrySet()) {
+                var event = method.getValue();
+                if (lastRunTimers.containsKey(event.delay())) {
+                    if (lastRunTimers.get(event.delay()) < System.currentTimeMillis()) {
 
-                    callUpdater(event, method, key);
-                    updateTimers.put(event.delay(), System.currentTimeMillis() + event.delay());
+                        callUpdater(event, method.getKey(), entry.getKey());
+                        updateTimers.put(event.delay(), System.currentTimeMillis() + event.delay());
+                    }
+                } else {
+                    lastRunTimers.put(event.delay(), System.currentTimeMillis() + event.delay());
                 }
-            } else {
-                lastRunTimers.put(event.delay(), System.currentTimeMillis() + event.delay());
             }
-        }));
+        }
 
         lastRunTimers.putAll(updateTimers);
     }
