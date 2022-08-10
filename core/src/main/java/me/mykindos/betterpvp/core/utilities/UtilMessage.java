@@ -32,7 +32,7 @@ public class UtilMessage {
      * @param message Message to send to the CommandSender
      */
     public static void message(CommandSender sender, String prefix, String message) {
-        sender.sendMessage(ChatColor.BLUE + prefix + "> " + ChatColor.GRAY + message);
+        sender.sendMessage((!prefix.equals("") ? (ChatColor.BLUE + prefix + "> ") : "") + ChatColor.GRAY + message);
     }
 
     /**

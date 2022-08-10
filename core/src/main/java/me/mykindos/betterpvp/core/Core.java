@@ -59,6 +59,7 @@ public class Core extends BPvPPlugin {
         clientManager = injector.getInstance(ClientManager.class);
         clientManager.loadFromList(clientManager.getRepository().getAll());
 
+        updateEventExecutor.loadPlugin(this);
         updateEventExecutor.initialize();
     }
 

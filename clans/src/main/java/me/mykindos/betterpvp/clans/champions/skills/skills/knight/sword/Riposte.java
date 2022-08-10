@@ -118,12 +118,10 @@ public class Riposte extends PrepareSkill implements CooldownSkill, Listener {
                 if (riposting.containsKey(target.getName())) {
 
                     long time = riposting.get(target.getName()) - System.currentTimeMillis();
-                    System.out.println(time);
                     double remaining = UtilTime.convert(time,
                             UtilTime.TimeUnit.SECONDS, 1);
 
                     if (time <= 0) {
-                        System.out.println(time);
                         riposting.remove(target.getName());
                         return;
                     }

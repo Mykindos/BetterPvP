@@ -68,7 +68,7 @@ public class SkillListener implements Listener {
         this.effectManager = effectManager;
     }
 
-    @EventHandler (priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGH)
     public void onUseSkill(PlayerUseSkillEvent event) {
         if (event.isCancelled()) return;
 
@@ -238,12 +238,12 @@ public class SkillListener implements Listener {
 
     private void sendSkillUsed(Player player, Skill skill, int level) {
         if (skill instanceof PrepareSkill) {
-            UtilMessage.message(player, skill.getClassType().getName(), "You prepared %s.",
-                    ChatColor.GREEN + skill.getName() + " " + level + ChatColor.GRAY);
+            UtilMessage.simpleMessage(player, skill.getClassType().getName(), "You prepared <green>%s %d<gray>.", skill.getName(), level);
 
         } else {
-            UtilMessage.message(player, skill.getClassType().getName(), "You used %s.",
-                    ChatColor.GREEN + skill.getName() + " " + level + ChatColor.GRAY);
+            if (!(skill instanceof ChannelSkill)) {
+                UtilMessage.simpleMessage(player, skill.getClassType().getName(), "You used <green>%s %d<gray>.", skill.getName(), level);
+            }
         }
     }
 
@@ -325,7 +325,7 @@ public class SkillListener implements Listener {
 
     @EventHandler
     public void onFetchNearbyEntity(FetchNearbyEntityEvent<?> event) {
-        if(!(event.getSource() instanceof Player player)) return;
+        if (!(event.getSource() instanceof Player player)) return;
         event.getEntities().removeIf(entity -> {
             if (entity instanceof Player target) {
                 return !clanManager.canHurt(player, target)

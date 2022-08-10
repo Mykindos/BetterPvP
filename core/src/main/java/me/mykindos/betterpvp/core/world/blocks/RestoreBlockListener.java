@@ -25,7 +25,6 @@ public class RestoreBlockListener implements Listener {
         Block block = event.getBlock();
 
         if (blockHandler.isRestoreBlock(block)) {
-            System.out.println("Is restore block");
             event.setCancelled(true);
         }
 

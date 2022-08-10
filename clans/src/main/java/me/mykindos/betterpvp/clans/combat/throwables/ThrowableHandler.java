@@ -16,8 +16,21 @@ public class ThrowableHandler {
     private final List<ThrowableItem> throwables = new ArrayList<>();
 
     public void addThrowable(Item item, LivingEntity entity, String name, long expire){
-        throwables.add(new ThrowableItem(item, entity, name, expire));
+        addThrowable(item, entity, name, expire, false);
     }
+
+    public void addThrowable(Item item, LivingEntity entity, String name, long expire, boolean checkHead){
+        addThrowable(item, entity, name, expire, checkHead, false);
+    }
+
+    public void addThrowable(Item item, LivingEntity entity, String name, long expire, boolean checkHead, boolean removeOnCollision){
+        addThrowable(new ThrowableItem(item, entity, name, expire, checkHead, removeOnCollision));
+    }
+
+    public void addThrowable(ThrowableItem throwableItem){
+        throwables.add(throwableItem);
+    }
+
 
     public Optional<ThrowableItem> getThrowable(Item item) {
         return throwables.stream().filter(throwable -> throwable.getItem().equals(item)).findFirst();

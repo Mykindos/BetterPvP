@@ -1,35 +1,45 @@
 package me.mykindos.betterpvp.clans.combat.throwables;
 
+import lombok.Data;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Data
 public class ThrowableItem {
 
-    private Item item;
-    private LivingEntity ent;
-    private String skillName;
-    private long expire;
-    private List<LivingEntity> immune;
-    private boolean checkHead;
+    private final Item item;
+    private final LivingEntity thrower;
+    private final String name;
+    private final long expireTime;
+    private final List<LivingEntity> immune;
+    private final boolean checkHead;
 
-    public ThrowableItem(Item item, LivingEntity ent, String skillName, long expire) {
+    private boolean collideGround;
+    private boolean removeOnCollision;
+    private boolean singleCollision;
+
+    public ThrowableItem(Item item, LivingEntity thrower, String name, long expireTime) {
+        this(item, thrower, name, expireTime, false, false);
+    }
+
+    public ThrowableItem(Item item, LivingEntity thrower, String name, long expireTime, boolean checkHead){
+        this(item, thrower, name, expireTime, checkHead, false);
+    }
+
+    public ThrowableItem(Item item, LivingEntity thrower, String name, long expireTime, boolean checkHead, boolean removeOnCollision){
         this.item = item;
-        this.ent = ent;
-        this.skillName = skillName;
-        this.expire = System.currentTimeMillis() + expire;
+        this.thrower = thrower;
+        this.name = name;
+        this.expireTime = System.currentTimeMillis() + expireTime;
+        this.checkHead = checkHead;
+        this.removeOnCollision = removeOnCollision;
+        this.singleCollision = true;
+        this.collideGround = true;
         item.setPickupDelay(Integer.MAX_VALUE);
         immune = new ArrayList<>();
-    }
-
-    public Item getItem() {
-        return item;
-    }
-
-    public void setCheckHead(boolean bool) {
-        this.checkHead = bool;
     }
 
     public boolean isCheckingHead() {
@@ -40,16 +50,4 @@ public class ThrowableItem {
         return immune;
     }
 
-
-    public LivingEntity getThrower() {
-        return ent;
-    }
-
-    public String getSkillName() {
-        return skillName;
-    }
-
-    public long getExpireTime() {
-        return expire;
-    }
 }
