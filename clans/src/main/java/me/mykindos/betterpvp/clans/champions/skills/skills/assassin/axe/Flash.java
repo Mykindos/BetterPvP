@@ -7,7 +7,6 @@ import me.mykindos.betterpvp.clans.champions.ChampionsManager;
 import me.mykindos.betterpvp.clans.champions.builds.menus.events.SkillEquipEvent;
 import me.mykindos.betterpvp.clans.champions.roles.Role;
 import me.mykindos.betterpvp.clans.champions.skills.Skill;
-import me.mykindos.betterpvp.clans.champions.skills.config.SkillConfigFactory;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillType;
 import me.mykindos.betterpvp.clans.champions.skills.types.InteractSkill;
@@ -31,13 +30,8 @@ import java.util.WeakHashMap;
 @BPvPListener
 public class Flash extends Skill implements InteractSkill, Listener {
 
-    @Inject
-    @Config(path = "skills.assassin.flash.maxCharges", defaultValue = "4")
     private int maxCharges;
-
-    @Inject
-    @Config(path = "skills.assassin.flash.timeBetweenCharges", defaultValue = "11")
-    private int timeBetweenCharges;
+    private double timeBetweenCharges;
 
     private final WeakHashMap<Player, Location> loc = new WeakHashMap<>();
     private final WeakHashMap<Player, Integer> charges = new WeakHashMap<>();
@@ -45,8 +39,8 @@ public class Flash extends Skill implements InteractSkill, Listener {
     private final WeakHashMap<Player, Long> blinkTime = new WeakHashMap<>();
 
     @Inject
-    public Flash(Clans clans, ChampionsManager championsManager, SkillConfigFactory configFactory) {
-        super(clans, championsManager, configFactory);
+    public Flash(Clans clans, ChampionsManager championsManager) {
+        super(clans, championsManager);
     }
 
 
@@ -114,7 +108,7 @@ public class Flash extends Skill implements InteractSkill, Listener {
                 continue;
             }
 
-            if (UtilTime.elapsed(lastRecharge.get(player), ((timeBetweenCharges * 1000L) - (level * 1000L)))) {
+            if (UtilTime.elapsed(lastRecharge.get(player), (long) ((timeBetweenCharges * 1000L) - (level * 1000L)))) {
                 charges.put(player, Math.min(maxCharges, charges.get(player) + 1));
                 UtilMessage.message(player, getClassType().getName(), "Flash Charges: " + ChatColor.GREEN + charges.get(player));
                 lastRecharge.put(player, System.currentTimeMillis());
@@ -234,6 +228,12 @@ public class Flash extends Skill implements InteractSkill, Listener {
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SILVERFISH_DEATH, 1.0F, 1.6F);
         }, 1);
 
+    }
+
+    @Override
+    public void loadSkillConfig(){
+        maxCharges = getConfig("maxCharges", 4, Integer.class);
+        timeBetweenCharges = getConfig("timeBetweenCharges", 11, Double.class);
     }
 
 

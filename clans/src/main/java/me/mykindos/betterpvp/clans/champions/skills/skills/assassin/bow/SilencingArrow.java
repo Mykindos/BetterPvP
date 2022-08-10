@@ -3,7 +3,6 @@ package me.mykindos.betterpvp.clans.champions.skills.skills.assassin.bow;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.champions.ChampionsManager;
 import me.mykindos.betterpvp.clans.champions.roles.Role;
-import me.mykindos.betterpvp.clans.champions.skills.config.SkillConfigFactory;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillType;
 import me.mykindos.betterpvp.clans.champions.skills.types.PrepareArrowSkill;
@@ -26,8 +25,8 @@ import javax.inject.Singleton;
 public class SilencingArrow extends PrepareArrowSkill {
 
     @Inject
-    public SilencingArrow(Clans clans, ChampionsManager championsManager, SkillConfigFactory configFactory) {
-        super(clans, championsManager, configFactory);
+    public SilencingArrow(Clans clans, ChampionsManager championsManager) {
+        super(clans, championsManager);
     }
 
     @Override
@@ -55,7 +54,7 @@ public class SilencingArrow extends PrepareArrowSkill {
 
     @Override
     public double getCooldown(int level) {
-        return getSkillConfig().getCooldown() - ((level - 1) * 0.5);
+        return cooldown - ((level - 1) * 0.5);
     }
 
 

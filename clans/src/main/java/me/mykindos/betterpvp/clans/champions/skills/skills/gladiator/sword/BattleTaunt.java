@@ -3,7 +3,6 @@ package me.mykindos.betterpvp.clans.champions.skills.skills.gladiator.sword;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.champions.ChampionsManager;
 import me.mykindos.betterpvp.clans.champions.roles.Role;
-import me.mykindos.betterpvp.clans.champions.skills.config.SkillConfigFactory;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillType;
 import me.mykindos.betterpvp.clans.champions.skills.types.ChannelSkill;
@@ -32,8 +31,8 @@ import java.util.UUID;
 public class BattleTaunt extends ChannelSkill implements InteractSkill, CooldownSkill, EnergySkill, Listener {
 
     @Inject
-    public BattleTaunt(Clans clans, ChampionsManager championsManager, SkillConfigFactory configFactory) {
-        super(clans, championsManager, configFactory);
+    public BattleTaunt(Clans clans, ChampionsManager championsManager) {
+        super(clans, championsManager);
     }
 
     @Override
@@ -117,7 +116,7 @@ public class BattleTaunt extends ChannelSkill implements InteractSkill, Cooldown
     @Override
     public float getEnergy(int level) {
 
-        return getSkillConfig().getEnergyCost() - ((level - 1));
+        return energy - ((level - 1));
     }
 
     @Override

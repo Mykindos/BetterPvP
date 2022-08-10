@@ -5,7 +5,6 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.champions.ChampionsManager;
 import me.mykindos.betterpvp.clans.champions.roles.Role;
-import me.mykindos.betterpvp.clans.champions.skills.config.SkillConfigFactory;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillType;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillWeapons;
@@ -42,12 +41,9 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
     private final WeakHashMap<Player, Long> delay = new WeakHashMap<>();
 
     @Inject
-    public Evade(Clans clans, ChampionsManager championsManager, SkillConfigFactory configFactory) {
-        super(clans, championsManager, configFactory);
+    public Evade(Clans clans, ChampionsManager championsManager) {
+        super(clans, championsManager);
     }
-
-
-
 
     @Override
     public String getName() {
@@ -290,13 +286,13 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
 
     @Override
     public double getCooldown(int level) {
-        return getSkillConfig().getCooldown();
+        return cooldown;
     }
 
     @Override
     public float getEnergy(int level) {
 
-        return (float) (getSkillConfig().getEnergyCost() - ((level - 1)));
+        return (float) (energy - ((level - 1)));
     }
 
     @Override

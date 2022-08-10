@@ -4,7 +4,6 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.champions.ChampionsManager;
 import me.mykindos.betterpvp.clans.champions.roles.Role;
 import me.mykindos.betterpvp.clans.champions.roles.events.RoleChangeEvent;
-import me.mykindos.betterpvp.clans.champions.skills.config.SkillConfigFactory;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillType;
 import me.mykindos.betterpvp.clans.champions.skills.types.CooldownSkill;
@@ -30,8 +29,8 @@ import javax.inject.Singleton;
 public class Sever extends PrepareSkill implements CooldownSkill, Listener {
 
     @Inject
-    public Sever(Clans clans, ChampionsManager championsManager, SkillConfigFactory configFactory) {
-        super(clans, championsManager, configFactory);
+    public Sever(Clans clans, ChampionsManager championsManager) {
+        super(clans, championsManager);
     }
 
     @Override
@@ -112,7 +111,7 @@ public class Sever extends PrepareSkill implements CooldownSkill, Listener {
 
     @Override
     public double getCooldown(int level) {
-        return getSkillConfig().getCooldown();
+        return cooldown;
     }
 
     @Override

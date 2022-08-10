@@ -4,7 +4,6 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.champions.ChampionsManager;
 import me.mykindos.betterpvp.clans.champions.builds.menus.events.SkillDequipEvent;
 import me.mykindos.betterpvp.clans.champions.skills.Skill;
-import me.mykindos.betterpvp.clans.champions.skills.config.SkillConfigFactory;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -20,8 +19,8 @@ public abstract class PrepareSkill extends Skill implements InteractSkill, Liste
 
     protected final Set<UUID> active = new HashSet<>();
 
-    public PrepareSkill(Clans clans, ChampionsManager championsManager, SkillConfigFactory configFactory) {
-        super(clans, championsManager, configFactory);
+    public PrepareSkill(Clans clans, ChampionsManager championsManager) {
+        super(clans, championsManager);
     }
 
     @EventHandler

@@ -3,7 +3,6 @@ package me.mykindos.betterpvp.clans.champions.skills.types;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.champions.ChampionsManager;
 import me.mykindos.betterpvp.clans.champions.skills.Skill;
-import me.mykindos.betterpvp.clans.champions.skills.config.SkillConfigFactory;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -16,8 +15,8 @@ import java.util.UUID;
 public abstract class ChannelSkill extends Skill implements Listener {
 
     protected final Set<UUID> active = new HashSet<>();
-    public ChannelSkill(Clans clans, ChampionsManager championsManager, SkillConfigFactory configFactory) {
-        super(clans, championsManager, configFactory);
+    public ChannelSkill(Clans clans, ChampionsManager championsManager) {
+        super(clans, championsManager);
     }
 
     @EventHandler

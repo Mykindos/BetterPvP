@@ -7,7 +7,6 @@ import lombok.Data;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.champions.ChampionsManager;
 import me.mykindos.betterpvp.clans.champions.roles.Role;
-import me.mykindos.betterpvp.clans.champions.skills.config.SkillConfigFactory;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillType;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillWeapons;
@@ -48,9 +47,11 @@ public class Swarm extends ChannelSkill implements InteractSkill, EnergySkill, L
     private final WeakHashMap<Player, Long> batCD = new WeakHashMap<>();
     private final WeakHashMap<Player, ArrayList<BatData>> batData = new WeakHashMap<>();
 
+    private double batLifespan;
+
     @Inject
-    public Swarm(Clans clans, ChampionsManager championsManager, SkillConfigFactory configFactory) {
-        super(clans, championsManager, configFactory);
+    public Swarm(Clans clans, ChampionsManager championsManager) {
+        super(clans, championsManager);
     }
 
     @Override
@@ -85,7 +86,7 @@ public class Swarm extends ChannelSkill implements InteractSkill, EnergySkill, L
     @Override
     public float getEnergy(int level) {
 
-        return getSkillConfig().getEnergyCost() - ((level - 1));
+        return energy - ((level - 1));
     }
 
 
@@ -197,7 +198,7 @@ public class Swarm extends ChannelSkill implements InteractSkill, EnergySkill, L
                     continue;
                 }
 
-                if (UtilTime.elapsed(bat.getTimer(), 2000)) {
+                if (UtilTime.elapsed(bat.getTimer(), (long) batLifespan * 1000)) {
                     bat.getBat().remove();
                     batIt.remove();
 
@@ -218,12 +219,16 @@ public class Swarm extends ChannelSkill implements InteractSkill, EnergySkill, L
         }
     }
 
+    @Override
+    public void loadSkillConfig(){
+        batLifespan = getConfig("batLifespan", 2.0, Double.class);
+
+    }
 
     @Override
     public Action[] getActions() {
         return SkillActions.RIGHT_CLICK;
     }
-
 
     @Data
     private static class BatData {

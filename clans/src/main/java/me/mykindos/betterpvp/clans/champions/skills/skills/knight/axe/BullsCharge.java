@@ -4,7 +4,6 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.champions.ChampionsManager;
 import me.mykindos.betterpvp.clans.champions.roles.Role;
 import me.mykindos.betterpvp.clans.champions.skills.Skill;
-import me.mykindos.betterpvp.clans.champions.skills.config.SkillConfigFactory;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillType;
 import me.mykindos.betterpvp.clans.champions.skills.types.CooldownSkill;
@@ -40,8 +39,8 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
     private final HashMap<UUID, Long> running = new HashMap<>();
 
     @Inject
-    public BullsCharge(Clans clans, ChampionsManager championsManager, SkillConfigFactory configFactory) {
-        super(clans, championsManager, configFactory);
+    public BullsCharge(Clans clans, ChampionsManager championsManager) {
+        super(clans, championsManager);
     }
 
     @Override
@@ -129,7 +128,7 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
 
     @Override
     public double getCooldown(int level) {
-        return getSkillConfig().getCooldown() - (level - 1);
+        return cooldown - (level - 1);
     }
 
     @Override

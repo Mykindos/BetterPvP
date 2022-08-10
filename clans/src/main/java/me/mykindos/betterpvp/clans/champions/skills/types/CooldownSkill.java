@@ -1,6 +1,8 @@
 package me.mykindos.betterpvp.clans.champions.skills.types;
 
-public interface CooldownSkill {
+import me.mykindos.betterpvp.clans.champions.skills.ISkill;
+
+public interface CooldownSkill extends ISkill {
 
     double getCooldown(int level);
 

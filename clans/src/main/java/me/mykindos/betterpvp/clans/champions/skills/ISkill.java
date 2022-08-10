@@ -24,4 +24,6 @@ public interface ISkill {
         return true;
     }
 
+    void loadConfig();
+
 }

@@ -1,6 +1,8 @@
 package me.mykindos.betterpvp.clans.champions.skills.types;
 
-public interface EnergySkill {
+import me.mykindos.betterpvp.clans.champions.skills.ISkill;
+
+public interface EnergySkill extends ISkill {
 
     float getEnergy(int level);
 

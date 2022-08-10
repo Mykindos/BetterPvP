@@ -6,7 +6,6 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.champions.ChampionsManager;
 import me.mykindos.betterpvp.clans.champions.roles.Role;
-import me.mykindos.betterpvp.clans.champions.skills.config.SkillConfigFactory;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillType;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillWeapons;
@@ -42,15 +41,13 @@ import java.util.WeakHashMap;
 @BPvPListener
 public class Inferno extends ChannelSkill implements InteractSkill, EnergySkill {
 
-    @Inject
-    @Config(path="skills.paladin.inferno.fireTicks", defaultValue = "50")
     private int fireTicks;
 
     private final WeakHashMap<LivingEntity, Long> tempImmune = new WeakHashMap<>();
 
     @Inject
-    public Inferno(Clans clans, ChampionsManager championsManager, SkillConfigFactory configFactory) {
-        super(clans, championsManager, configFactory);
+    public Inferno(Clans clans, ChampionsManager championsManager) {
+        super(clans, championsManager);
     }
 
     @Override
@@ -144,13 +141,18 @@ public class Inferno extends ChannelSkill implements InteractSkill, EnergySkill 
     @Override
     public float getEnergy(int level) {
 
-        return getSkillConfig().getEnergyCost() - ((level - 1));
+        return energy - ((level - 1));
     }
 
 
     @Override
     public void activate(Player player, int level) {
         active.add(player.getUniqueId());
+    }
+
+    @Override
+    public void loadSkillConfig(){
+        fireTicks = getConfig("fireTicks", 50, Integer.class);
     }
 
     @Override

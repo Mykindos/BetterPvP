@@ -6,7 +6,6 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.champions.ChampionsManager;
 import me.mykindos.betterpvp.clans.champions.roles.Role;
 import me.mykindos.betterpvp.clans.champions.skills.Skill;
-import me.mykindos.betterpvp.clans.champions.skills.config.SkillConfigFactory;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillType;
 import me.mykindos.betterpvp.clans.champions.skills.types.CooldownSkill;
@@ -28,8 +27,8 @@ import org.bukkit.potion.PotionEffectType;
 public class HoldPosition extends Skill implements InteractSkill, CooldownSkill, Listener {
 
     @Inject
-    public HoldPosition(Clans clans, ChampionsManager championsManager, SkillConfigFactory configFactory) {
-        super(clans, championsManager, configFactory);
+    public HoldPosition(Clans clans, ChampionsManager championsManager) {
+        super(clans, championsManager);
     }
 
     @Override
@@ -74,7 +73,7 @@ public class HoldPosition extends Skill implements InteractSkill, CooldownSkill,
     @Override
     public double getCooldown(int level) {
 
-        return getSkillConfig().getCooldown() - ((level - 1) * 2);
+        return cooldown - ((level - 1) * 2);
     }
 
 

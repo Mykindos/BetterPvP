@@ -6,7 +6,6 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.champions.ChampionsManager;
 import me.mykindos.betterpvp.clans.champions.roles.Role;
 import me.mykindos.betterpvp.clans.champions.skills.Skill;
-import me.mykindos.betterpvp.clans.champions.skills.config.SkillConfigFactory;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillType;
 import me.mykindos.betterpvp.clans.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.clans.gamer.Gamer;
@@ -30,19 +29,15 @@ import java.util.WeakHashMap;
 @BPvPListener
 public class Deflection extends Skill implements PassiveSkill {
 
-    @Inject
-    @Config(path="skills.knight.deflection.timeBetweenCharges", defaultValue = "2")
-    private double timeBetweenCharges;
 
-    @Inject
-    @Config(path="skills.knight.deflection.timeOutOfCombat", defaultValue = "2")
+    private double timeBetweenCharges;
     private double timeOutOfCombat;
 
     private final WeakHashMap<Player, Integer> charges = new WeakHashMap<>();
 
     @Inject
-    public Deflection(Clans clans, ChampionsManager championsManager, SkillConfigFactory configFactory) {
-        super(clans, championsManager, configFactory);
+    public Deflection(Clans clans, ChampionsManager championsManager) {
+        super(clans, championsManager);
     }
 
     @Override
@@ -116,6 +111,12 @@ public class Deflection extends Skill implements PassiveSkill {
             }
         }
 
+    }
+
+    @Override
+    public void loadSkillConfig(){
+        timeBetweenCharges = getConfig("timeBetweenCharges", 2.0, Double.class);
+        timeOutOfCombat = getConfig("timeOutOfCombat", 2.0, Double.class);
     }
 
 }

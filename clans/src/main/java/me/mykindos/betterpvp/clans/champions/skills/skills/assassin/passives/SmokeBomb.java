@@ -4,7 +4,6 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.champions.ChampionsManager;
 import me.mykindos.betterpvp.clans.champions.roles.Role;
 import me.mykindos.betterpvp.clans.champions.skills.Skill;
-import me.mykindos.betterpvp.clans.champions.skills.config.SkillConfigFactory;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillType;
 import me.mykindos.betterpvp.clans.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.clans.champions.skills.types.ToggleSkill;
@@ -43,8 +42,8 @@ public class SmokeBomb extends Skill implements ToggleSkill, CooldownSkill, List
     private final WeakHashMap<Player, Integer> smoked = new WeakHashMap<>();
 
     @Inject
-    public SmokeBomb(Clans clans, ChampionsManager championsManager, SkillConfigFactory configFactory) {
-        super(clans, championsManager, configFactory);
+    public SmokeBomb(Clans clans, ChampionsManager championsManager) {
+        super(clans, championsManager);
     }
 
     @EventHandler
@@ -161,7 +160,7 @@ public class SmokeBomb extends Skill implements ToggleSkill, CooldownSkill, List
     @Override
     public double getCooldown(int level) {
 
-        return getSkillConfig().getCooldown() - ((level - 1) * 2.5);
+        return cooldown - ((level - 1) * 2.5);
     }
 
     @Override

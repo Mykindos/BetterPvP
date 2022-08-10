@@ -7,7 +7,6 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.champions.ChampionsManager;
 import me.mykindos.betterpvp.clans.champions.roles.Role;
 import me.mykindos.betterpvp.clans.champions.skills.Skill;
-import me.mykindos.betterpvp.clans.champions.skills.config.SkillConfigFactory;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillType;
 import me.mykindos.betterpvp.clans.champions.skills.types.CooldownSkill;
@@ -38,27 +37,14 @@ import org.bukkit.potion.PotionEffectType;
 @BPvPListener
 public class LightningOrb extends Skill implements InteractSkill, CooldownSkill, Listener {
 
-    //region Config
-    @Inject
-    @Config(path = "skills.paladin.lightningorb.maxTargets", defaultValue = "3")
     private int maxTargets;
-
-    @Inject
-    @Config(path = "skills.paladin.lightningorb.spreadDistance", defaultValue = "3.0")
     private double spreadDistance;
-
-    @Inject
-    @Config(path = "skills.paladin.lightningorb.slowDuration", defaultValue = "4.0")
     private double slowDuration;
-
-    @Inject
-    @Config(path = "skills.paladin.lightningorb.shockDuration", defaultValue = "2.0")
     private double shockDuration;
-    //endregion
 
     @Inject
-    public LightningOrb(Clans clans, ChampionsManager championsManager, SkillConfigFactory configFactory) {
-        super(clans, championsManager, configFactory);
+    public LightningOrb(Clans clans, ChampionsManager championsManager) {
+        super(clans, championsManager);
     }
 
     @Override
@@ -91,7 +77,7 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
     @Override
     public double getCooldown(int level) {
 
-        return getSkillConfig().getCooldown() - ((level * 2));
+        return cooldown - ((level * 2));
     }
 
 
@@ -130,6 +116,14 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
         ThrowableItem throwableItem = new ThrowableItem(orb, player, "Lightning Orb", 5000, true, true);
         throwableItem.setCollideGround(false);
         championsManager.getThrowables().addThrowable(throwableItem);
+    }
+
+    @Override
+    public void loadSkillConfig(){
+        maxTargets = getConfig("maxTarget", 3, Integer.class);
+        spreadDistance = getConfig("spreadDistance", 3.0, Double.class);
+        slowDuration = getConfig("slowDuration", 4.0, Double.class);
+        shockDuration = getConfig("shockDuration", 2.0, Double.class);
     }
 
     @Override
