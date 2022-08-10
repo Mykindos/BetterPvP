@@ -38,9 +38,9 @@ public class ClansChatListener extends ClanListener {
 
             ClanRelation relation = clanManager.getRelation(senderClan, targetClan);
 
-            HoverEvent<Component> clanTooltip = HoverEvent.showText(clanManager.getClanTooltip(event.getTarget(), senderClan));
+            //HoverEvent<Component> clanTooltip = HoverEvent.showText(clanManager.getClanTooltip(event.getTarget(), senderClan));
             Component clanPrefix = Component.empty()
-                    .append(Component.text(senderClan.getName() + " ", relation.getSecondary()).hoverEvent(clanTooltip))
+                    .append(Component.text(senderClan.getName() + " ", relation.getSecondary()))
                     .append(Component.text(event.getPlayer().getName() + ": ", relation.getPrimary()));
 
 

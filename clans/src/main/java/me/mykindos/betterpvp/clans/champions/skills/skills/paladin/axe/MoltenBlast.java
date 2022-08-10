@@ -24,6 +24,7 @@ import org.bukkit.entity.LargeFireball;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
@@ -35,10 +36,10 @@ import java.util.List;
 
 @Singleton
 @BPvPListener
-public class MoltenBlast extends Skill implements InteractSkill, CooldownSkill {
+public class MoltenBlast extends Skill implements InteractSkill, CooldownSkill, Listener {
 
     @Inject
-    @Config(path="skills.paladin.moltenblast.speed", defaultValue = "2")
+    @Config(path = "skills.paladin.moltenblast.speed", defaultValue = "2")
     private double speed;
 
     public final List<LargeFireball> fireballs = new ArrayList<>();
@@ -88,7 +89,7 @@ public class MoltenBlast extends Skill implements InteractSkill, CooldownSkill {
                 continue;
             }
             if (fireball.getLocation().getY() < 255 || !fireball.isDead()) {
-                Particle.LAVA.builder().location(fireball.getLocation()).receivers(30).extra(0).spawn();
+                Particle.LAVA.builder().location(fireball.getLocation()).receivers(30).count(10).spawn();
             } else {
                 it.remove();
             }
@@ -100,7 +101,15 @@ public class MoltenBlast extends Skill implements InteractSkill, CooldownSkill {
     public void onProjectileHit(ProjectileHitEvent event) {
         if (event.getEntity() instanceof LargeFireball largeFireball) {
             fireballs.remove(largeFireball);
-            event.getEntity().getWorld().playSound(event.getEntity().getLocation(), Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 2.0f, 1.0f);
+
+        }
+    }
+
+    @EventHandler
+    public void onExplode(EntityExplodeEvent event) {
+        if (event.getEntity() instanceof LargeFireball largeFireball) {
+            fireballs.remove(largeFireball);
+            largeFireball.getWorld().playSound(largeFireball.getLocation(), Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 2.0f, 1.0f);
         }
     }
 
@@ -142,7 +151,7 @@ public class MoltenBlast extends Skill implements InteractSkill, CooldownSkill {
     @Override
     public double getCooldown(int level) {
 
-        return 23 - ((level - 1) * 2);
+        return getSkillConfig().getCooldown() - ((level - 1) * 2);
     }
 
 

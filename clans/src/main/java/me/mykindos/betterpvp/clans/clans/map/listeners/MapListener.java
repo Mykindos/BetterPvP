@@ -403,7 +403,7 @@ public class MapListener implements Listener {
         }
         final MapSettings mapSettings = mapHandler.mapSettingsMap.get(player.getUniqueId());
 
-        if (!cooldownManager.add(player, "Map Zoom", 2.5, false, false)) {
+        if (!cooldownManager.add(player, "Map Zoom", 0.1, false, false)) {
             return;
         }
 

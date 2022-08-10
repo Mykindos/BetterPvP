@@ -17,16 +17,12 @@ public class ChatSentEvent extends CustomCancellableEvent {
     private Component message;
     private Component prefix;
 
-    private boolean cancelled;
-    private String cancelReason;
-
     public ChatSentEvent(Player player, Collection<? extends Player> targets, Component prefix, Component message) {
         super(true);
         this.player = player;
         this.targets = targets;
         this.prefix = prefix;
         this.message = message;
-        this.cancelReason = "";
     }
 
 }

@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
+import org.bukkit.event.Listener;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -19,6 +20,7 @@ public class UpdateEventExecutor {
     private final Core core;
 
     public HashMap<Long, Long> lastRunTimers = new HashMap<>();
+    public HashMap<Object, HashMap<Method, UpdateEvent>> updateMethods = new HashMap<>();
 
     @Inject
     public UpdateEventExecutor(Core core) {
@@ -29,40 +31,44 @@ public class UpdateEventExecutor {
         UtilServer.runTaskTimer(core, this::executeUpdateEvents, 0, 1);
     }
 
-    private void executeUpdateEvents() {
+    public void loadPlugin(BPvPPlugin plugin) {
+        var listeners = plugin.getListeners();
 
-        var updateTimers = new HashMap<Long, Long>();
-
-        for (var plugin : Bukkit.getPluginManager().getPlugins()) {
-
-            if (!(plugin instanceof BPvPPlugin bPvPPlugin)) continue;
-            var listeners = bPvPPlugin.getListeners();
-
-            for (var listener : listeners) {
-
+        for (var listener : listeners) {
                 var methods = listener.getClass().getMethods();
-
+                HashMap<Method, UpdateEvent> methodMap = new HashMap<>();
                 for (var method : methods) {
 
                     var updateEvent = method.getAnnotation(UpdateEvent.class);
                     if (updateEvent == null) continue;
 
-                    if (lastRunTimers.containsKey(updateEvent.delay())) {
-                        if (lastRunTimers.get(updateEvent.delay()) < System.currentTimeMillis()) {
+                    methodMap.put(method, updateEvent);
 
-                            callUpdater(updateEvent, method, listener);
-                            updateTimers.put(updateEvent.delay(), System.currentTimeMillis() + updateEvent.delay());
-                        }
-                    } else {
-                        lastRunTimers.put(updateEvent.delay(), System.currentTimeMillis() + updateEvent.delay());
-                    }
                 }
-            }
-        }
 
-        for (var update : updateTimers.entrySet()) {
-            lastRunTimers.put(update.getKey(), update.getValue());
+                updateMethods.put(listener, methodMap);
+
+
         }
+    }
+
+    private void executeUpdateEvents() {
+
+        var updateTimers = new HashMap<Long, Long>();
+
+        updateMethods.forEach((key, value) -> value.forEach((method, event) -> {
+            if (lastRunTimers.containsKey(event.delay())) {
+                if (lastRunTimers.get(event.delay()) < System.currentTimeMillis()) {
+
+                    callUpdater(event, method, key);
+                    updateTimers.put(event.delay(), System.currentTimeMillis() + event.delay());
+                }
+            } else {
+                lastRunTimers.put(event.delay(), System.currentTimeMillis() + event.delay());
+            }
+        }));
+
+        lastRunTimers.putAll(updateTimers);
     }
 
 

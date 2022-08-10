@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -88,8 +89,7 @@ public class GlacialPrison extends Skill implements InteractSkill, CooldownSkill
 
     @EventHandler
     public void onThrowableHit(ThrowableHitEvent event) {
-        if (!event.getThrowable().getSkillName().equals(getName())) return;
-        event.getThrowable().getItem().remove();
+        if (!event.getThrowable().getName().equals(getName())) return;
         for (Location loc : UtilMath.sphere(event.getThrowable().getItem().getLocation(), sphereSize, true)) {
             if (loc.getBlock().getType().name().contains("REDSTONE")) continue;
             if (loc.getBlock().getType() == Material.AIR || UtilBlock.airFoliage(loc.getBlock())) {
@@ -104,9 +104,8 @@ public class GlacialPrison extends Skill implements InteractSkill, CooldownSkill
     @Override
     public void activate(Player player, int level) {
         Item item = player.getWorld().dropItem(player.getEyeLocation(), new ItemStack(Material.ICE));
-        item.setPickupDelay(Integer.MAX_VALUE);
         item.setVelocity(player.getLocation().getDirection().multiply(speed));
-        championsManager.getThrowables().addThrowable(item, player, getName(), 5000);
+        championsManager.getThrowables().addThrowable(item, player, getName(), 5000, true, true);
     }
 
     @Override

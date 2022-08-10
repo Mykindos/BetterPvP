@@ -84,7 +84,7 @@ public class Inferno extends ChannelSkill implements InteractSkill, EnergySkill 
 
     @EventHandler
     public void onCollide(ThrowableHitEntityEvent e) {
-        if (e.getThrowable().getSkillName().equals(getName())) {
+        if (e.getThrowable().getName().equals(getName())) {
             if (e.getCollision() instanceof ArmorStand) {
                 return;
             }

@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.config.ConfigInjectorModule;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.ModuleLoadedEvent;
+import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
 import org.bukkit.Bukkit;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
@@ -35,6 +36,9 @@ public class Clans extends BPvPPlugin {
 
     @Inject
     private Database database;
+
+    @Inject
+    private UpdateEventExecutor updateEventExecutor;
 
     @Inject
     @Config(path = "clans.database.prefix", defaultValue = "clans_")
@@ -73,6 +77,8 @@ public class Clans extends BPvPPlugin {
 
             gamerManager = injector.getInstance(GamerManager.class);
             gamerManager.loadFromList(gamerManager.getGamerRepository().getAll());
+
+            updateEventExecutor.loadPlugin(this);
         }
     }
 

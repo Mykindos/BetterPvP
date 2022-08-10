@@ -28,6 +28,10 @@ public class EnergyListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onRegen(RegenerateEnergyEvent event) {
+        Player player = event.getPlayer();
+        if(player.getLevel() > 0){
+            player.setLevel(0);
+        }
         energyHandler.regenerateEnergy(event.getPlayer(), event.getEnergy());
 
     }
