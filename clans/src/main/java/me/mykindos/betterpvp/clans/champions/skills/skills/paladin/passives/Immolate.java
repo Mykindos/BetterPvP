@@ -125,21 +125,21 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill {
         Iterator<UUID> iterator = active.iterator();
         while (iterator.hasNext()) {
             UUID uuid = iterator.next();
-            Player cur = Bukkit.getPlayer(uuid);
-            if (cur != null) {
-                int level = getLevel(cur);
+            Player player = Bukkit.getPlayer(uuid);
+            if (player != null) {
+                int level = getLevel(player);
                 if (level <= 0) {
                     iterator.remove();
-                    UtilMessage.message(cur, getClassType().getName(), "Immolate: " + ChatColor.RED + "Off");
-                } else if (!championsManager.getEnergy().use(cur, getName(), getEnergy(level) / 5, true)) {
+                    sendState(player, false);
+                } else if (!championsManager.getEnergy().use(player, getName(), getEnergy(level) / 5, true)) {
                     iterator.remove();
-                    UtilMessage.message(cur, getClassType().getName(), "Immolate: " + ChatColor.RED + "Off");
-                } else if (championsManager.getEffects().hasEffect(cur, EffectType.SILENCE)) {
+                    sendState(player, false);
+                } else if (championsManager.getEffects().hasEffect(player, EffectType.SILENCE)) {
                     iterator.remove();
-                    UtilMessage.message(cur, getClassType().getName(), "Immolate: " + ChatColor.RED + "Off");
+                    sendState(player, false);
                 } else {
-                    cur.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 25, 1));
-                    cur.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 25, 0));
+                    player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 25, 1));
+                    player.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 25, 0));
                 }
             } else {
                 iterator.remove();
@@ -166,13 +166,17 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill {
     public void toggle(Player player, int level) {
         if (active.contains(player.getUniqueId())) {
             active.remove(player.getUniqueId());
-            UtilMessage.message(player, getClassType().getName(), "Immolate: " + ChatColor.RED + "Off");
+            sendState(player, false);
         } else {
             if (championsManager.getEnergy().use(player, getName(), 10, false)) {
                 active.add(player.getUniqueId());
-                UtilMessage.message(player, getClassType().getName(), "Immolate: " + ChatColor.GREEN + "On");
+                sendState(player, true);
             }
 
         }
+    }
+
+    private void sendState(Player player, boolean state) {
+        UtilMessage.simpleMessage(player, getClassType().getName(), "Immolate: %s", state ? "<green>On" : "<red>Off");
     }
 }

@@ -92,7 +92,7 @@ public class CommandListener implements Listener {
         if (event.getSender() instanceof Player) return;
 
         String commandName = event.getCommand();
-        String[] args = null;
+        String[] args = new String[]{};
 
         if (commandName.contains(" ")) {
             commandName = commandName.split(" ")[0];
@@ -106,7 +106,18 @@ public class CommandListener implements Listener {
                 .or(() -> commandManager.getCommandByAlias(finalCommandName));
         commandOptional.ifPresent(command -> {
             if (command instanceof IConsoleCommand consoleCommand) {
-                consoleCommand.execute(event.getSender(), finalArgs);
+                var subCommandOptional = getSubCommand(command, finalArgs)
+                        .or(() -> getSubCommandByAlias(command, finalArgs));
+                if (subCommandOptional.isEmpty()) {
+                    consoleCommand.execute(event.getSender(), finalArgs);
+                } else {
+                    SubCommand subCommand = subCommandOptional.get();
+                    if (subCommand instanceof IConsoleCommand subConsoleCommand) {
+                        String[] newArgs = finalArgs.length > 1 ? Arrays.copyOfRange(finalArgs, 1, finalArgs.length) : new String[]{};
+                        subConsoleCommand.execute(event.getSender(), newArgs);
+                    }
+                }
+
             }
         });
 

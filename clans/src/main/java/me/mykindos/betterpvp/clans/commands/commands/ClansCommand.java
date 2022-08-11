@@ -8,11 +8,14 @@ import me.mykindos.betterpvp.clans.listener.ClansListenerLoader;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.Command;
+import me.mykindos.betterpvp.core.command.IConsoleCommand;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.framework.annotations.WithReflection;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class ClansCommand extends Command {
+public class ClansCommand extends Command implements IConsoleCommand {
 
     @WithReflection
     public ClansCommand() {
@@ -35,11 +38,17 @@ public class ClansCommand extends Command {
     }
 
     @Override
+    public void execute(CommandSender sender, String[] args) {
+
+    }
+
+    @Override
     public Rank getRequiredRank() {
         return Rank.OWNER;
     }
 
-    private static class ReloadCommand extends SubCommand {
+
+    private static class ReloadCommand extends SubCommand implements IConsoleCommand {
 
         @Inject
         private Clans clans;
@@ -65,13 +74,18 @@ public class ClansCommand extends Command {
 
         @Override
         public void execute(Player player, Client client, String... args) {
+            execute(player, args);
+        }
 
+        @Override
+        public void execute(CommandSender sender, String[] args) {
             clans.reloadConfig();
 
             commandLoader.reload();
             listenerLoader.reload();
             skillManager.reloadSkills();
 
+            UtilMessage.message(sender, "Clans", "Successfully reloaded clans");
         }
     }
 }

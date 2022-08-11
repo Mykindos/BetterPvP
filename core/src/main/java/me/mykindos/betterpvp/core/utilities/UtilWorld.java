@@ -57,6 +57,17 @@ public class UtilWorld {
 
     }
 
+    /**
+     * Converts a locations coordinates to a readable string
+     * Rounds to the nearest whole number
+     *
+     * @param location The location
+     * @return Returns a string of a locations coordinates
+     */
+    public static String locationToString(Location location) {
+        return "(" + Math.round(location.getX()) + ", " + Math.round(location.getY()) + ", " + Math.round(location.getZ()) + ")";
+    }
+
     public static Location locMerge(Location a, Location b) {
         a.setX(b.getX());
         a.setY(b.getY());

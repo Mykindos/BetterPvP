@@ -5,13 +5,16 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.Command;
+import me.mykindos.betterpvp.core.command.IConsoleCommand;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.command.loader.CoreCommandLoader;
 import me.mykindos.betterpvp.core.framework.annotations.WithReflection;
 import me.mykindos.betterpvp.core.listener.loader.CoreListenerLoader;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class CoreCommand extends Command {
+public class CoreCommand extends Command implements IConsoleCommand {
 
     @WithReflection
     public CoreCommand() {
@@ -34,11 +37,16 @@ public class CoreCommand extends Command {
     }
 
     @Override
+    public void execute(CommandSender sender, String[] args) {
+
+    }
+
+    @Override
     public Rank getRequiredRank() {
         return Rank.OWNER;
     }
 
-    private static class ReloadCommand extends SubCommand {
+    private static class ReloadCommand extends SubCommand implements IConsoleCommand {
 
         @Inject
         private Core core;
@@ -61,15 +69,23 @@ public class CoreCommand extends Command {
 
         @Override
         public void execute(Player player, Client client, String... args) {
-            core.reloadConfig();
+            execute(player, args);
+        }
 
+        @Override
+        public void execute(CommandSender sender, String[] args) {
+            core.reloadConfig();
             commandLoader.reload();
             listenerLoader.reload();
+
+            UtilMessage.message(sender, "Core", "Successfully reloaded core");
         }
 
         @Override
         public Rank getRequiredRank() {
             return Rank.OWNER;
         }
+
+
     }
 }
