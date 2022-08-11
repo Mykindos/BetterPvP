@@ -6,8 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import org.bukkit.Bukkit;
-import org.bukkit.event.Listener;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

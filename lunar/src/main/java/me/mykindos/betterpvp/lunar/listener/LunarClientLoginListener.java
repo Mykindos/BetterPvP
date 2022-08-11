@@ -5,19 +5,13 @@ import me.mykindos.betterpvp.core.framework.events.lunar.LunarClientEvent;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.lunar.LunarClientAPI;
 import me.mykindos.betterpvp.lunar.event.LCPlayerRegisterEvent;
-import me.mykindos.betterpvp.lunar.nethandler.client.LCPacketModSettings;
 import me.mykindos.betterpvp.lunar.nethandler.client.LCPacketUpdateWorld;
-import me.mykindos.betterpvp.lunar.nethandler.client.obj.ModSettings;
-import me.mykindos.betterpvp.lunar.nethandler.client.obj.ServerRule;
-import me.mykindos.betterpvp.lunar.serverrule.LunarClientAPIServerRule;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.*;
-
-import java.util.HashMap;
 
 @RequiredArgsConstructor
 public class LunarClientLoginListener implements Listener {

@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.clans.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.clans.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
+import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import org.bukkit.ChatColor;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -72,7 +73,7 @@ public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill
         AttributeInstance playerMaxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
         if(playerMaxHealth != null) {
             player.setHealth(Math.min(player.getHealth() + 4, playerMaxHealth.getValue()));
-            for (Player target : UtilPlayer.getNearbyPlayers(player, player.getLocation(), (6 + level))) {
+            for (Player target : UtilPlayer.getNearbyPlayers(player, player.getLocation(), (6 + level), EntityProperty.FRIENDLY)) {
 
                 target.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, 200, 0));
                 AttributeInstance targetMaxHealth = target.getAttribute(Attribute.GENERIC_MAX_HEALTH);

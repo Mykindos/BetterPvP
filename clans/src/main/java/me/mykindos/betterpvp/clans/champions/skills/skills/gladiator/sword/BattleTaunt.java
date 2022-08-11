@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import org.bukkit.*;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -96,7 +97,7 @@ public class BattleTaunt extends ChannelSkill implements InteractSkill, Cooldown
     }
 
     private void pull(Player player, Location location) {
-        for (LivingEntity other : UtilEntity.getNearbyEntities(player, location, 2.0)) {
+        for (LivingEntity other : UtilEntity.getNearbyEntities(player, location, 2.0, EntityProperty.ENEMY)) {
             if (other instanceof Player target) {
 
                 if (UtilMath.offset(player.getLocation(), other.getLocation()) >= 2.0D) {

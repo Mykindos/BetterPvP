@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.utilities;
 
+import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -18,14 +19,14 @@ import java.util.stream.Collectors;
 public class UtilPlayer {
 
     public static List<Player> getNearbyPlayers(Player player, double radius){
-        return getNearbyPlayers(player, player.getLocation(), radius);
+        return getNearbyPlayers(player, player.getLocation(), radius, EntityProperty.ALL);
     }
 
-    public static List<Player> getNearbyPlayers(Player player, Location location, double radius) {
+    public static List<Player> getNearbyPlayers(Player player, Location location, double radius, EntityProperty entityProperty) {
         List<Player> players = player.getWorld().getPlayers().stream()
                 .filter(worldPlayer -> worldPlayer.getLocation().distance(location) <= radius && !worldPlayer.equals(player))
                 .collect(Collectors.toList());
-        FetchNearbyEntityEvent<Player> fetchNearbyEntityEvent = new FetchNearbyEntityEvent<>(player, location, players);
+        FetchNearbyEntityEvent<Player> fetchNearbyEntityEvent = new FetchNearbyEntityEvent<>(player, location, players, entityProperty);
         UtilServer.callEvent(fetchNearbyEntityEvent);
 
         return fetchNearbyEntityEvent.getEntities();

@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.*;
+import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import org.bukkit.ChatColor;
 import org.bukkit.Effect;
 import org.bukkit.Location;
@@ -151,10 +152,7 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
 
                     stands.put(armourStand, System.currentTimeMillis() + 4000);
 
-                    for (LivingEntity ent : UtilEntity.getNearbyEntities(player, armourStand.getLocation(), 1)) {
-                        if (ent instanceof ArmorStand) continue;
-                        if (ent.equals(player)) continue;
-
+                    for (LivingEntity ent : UtilEntity.getNearbyEntities(player, armourStand.getLocation(), 1, EntityProperty.ENEMY)) {
                         if (!cooldownJump.get(player).contains(ent)) {
 
                             UtilVelocity.velocity(ent, 0.5, 1, 2.0, false);
@@ -165,7 +163,6 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
                         }
 
                     }
-
 
                 }
 

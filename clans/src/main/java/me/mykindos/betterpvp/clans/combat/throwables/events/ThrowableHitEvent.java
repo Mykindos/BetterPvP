@@ -4,7 +4,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import me.mykindos.betterpvp.clans.combat.throwables.ThrowableItem;
 import me.mykindos.betterpvp.core.framework.events.CustomEvent;
-import org.bukkit.entity.LivingEntity;
 
 @EqualsAndHashCode(callSuper = true)
 @Data

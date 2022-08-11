@@ -21,11 +21,11 @@ import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Sound;
-import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Bat;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -142,9 +142,8 @@ public class Swarm extends ChannelSkill implements InteractSkill, EnergySkill, L
                 Vector rand = new Vector((Math.random() - 0.5D) / 3.0D, (Math.random() - 0.5D) / 3.0D, (Math.random() - 0.5D) / 3.0D);
                 bat.setVelocity(batData.getLoc().getDirection().clone().multiply(0.5D).add(rand));
 
-                for (LivingEntity other : UtilEntity.getNearbyEntities(player, bat.getLocation(), 3)) {
+                for (LivingEntity other : UtilEntity.getNearbyEntities(player, bat.getLocation(), 3, EntityProperty.ENEMY)) {
                     if (other instanceof Bat) continue;
-                    if (other instanceof ArmorStand) continue;
                     if (!hitPlayer(bat.getLocation(), other)) continue;
 
                     if (other instanceof Player) {
