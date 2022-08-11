@@ -59,15 +59,17 @@ public class UpdateEventExecutor {
         for (var entry : updateMethods.entrySet()) {
             for (var method : entry.getValue().entrySet()) {
                 var event = method.getValue();
-                if (lastRunTimers.containsKey(event.delay())) {
-                    if (lastRunTimers.get(event.delay()) < System.currentTimeMillis()) {
 
+                Long lastRun = lastRunTimers.get(event.delay());
+                if(lastRun != null){
+                    if(lastRun < System.currentTimeMillis()) {
                         callUpdater(event, method.getKey(), entry.getKey());
                         updateTimers.put(event.delay(), System.currentTimeMillis() + event.delay());
                     }
-                } else {
+                }else{
                     lastRunTimers.put(event.delay(), System.currentTimeMillis() + event.delay());
                 }
+
             }
         }
 
