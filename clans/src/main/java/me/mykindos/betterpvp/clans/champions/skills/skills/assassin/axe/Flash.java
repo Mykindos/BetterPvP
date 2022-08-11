@@ -11,10 +11,10 @@ import me.mykindos.betterpvp.clans.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillType;
 import me.mykindos.betterpvp.clans.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
-import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.*;
+import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -210,7 +210,7 @@ public class Flash extends Skill implements InteractSkill, Listener {
                     targetLocation = testLocation;
                     Particle.FIREWORKS_SPARK.builder().location(targetLocation).count(2).receivers(100).extra(0).spawn();
 
-                    if (!UtilPlayer.getNearbyPlayers(player, targetLocation, 0.5D).isEmpty()) {
+                    if (!UtilPlayer.getNearbyPlayers(player, targetLocation, 0.5D, EntityProperty.ENEMY).isEmpty()) {
                         break;
                     }
                 } else {

@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.*;
+import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import org.bukkit.ChatColor;
 import org.bukkit.Effect;
 import org.bukkit.Location;
@@ -213,7 +214,7 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
                     targetLocation = testLocation;
                     player.getWorld().playEffect(targetLocation, Effect.SMOKE, 4);
 
-                    if (!UtilPlayer.getNearbyPlayers(player, targetLocation, 0.5D).isEmpty()) {
+                    if (!UtilPlayer.getNearbyPlayers(player, targetLocation, 0.5D, EntityProperty.ENEMY).isEmpty()) {
                         break;
                     }
                 } else {

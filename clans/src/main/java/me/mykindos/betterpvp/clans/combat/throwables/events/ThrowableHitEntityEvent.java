@@ -1,9 +1,6 @@
 package me.mykindos.betterpvp.clans.combat.throwables.events;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-
 import lombok.Getter;
 import me.mykindos.betterpvp.clans.combat.throwables.ThrowableItem;
 import org.bukkit.entity.LivingEntity;

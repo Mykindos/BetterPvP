@@ -14,11 +14,11 @@ import me.mykindos.betterpvp.clans.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.clans.combat.throwables.ThrowableItem;
 import me.mykindos.betterpvp.clans.combat.throwables.events.ThrowableHitEntityEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
-import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -89,7 +89,7 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
         int level = getLevel(thrower);
         if (level > 0) {
             int count = 0;
-            for (LivingEntity ent : UtilEntity.getNearbyEntities(thrower, event.getThrowable().getItem().getLocation(), spreadDistance + (0.5 * level))) {
+            for (LivingEntity ent : UtilEntity.getNearbyEntities(thrower, event.getThrowable().getItem().getLocation(), spreadDistance + (0.5 * level), EntityProperty.ENEMY)) {
 
                 if (count >= maxTargets) continue;
                 event.getThrowable().getImmunes().add(ent);
@@ -119,7 +119,7 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
     }
 
     @Override
-    public void loadSkillConfig(){
+    public void loadSkillConfig() {
         maxTargets = getConfig("maxTarget", 3, Integer.class);
         spreadDistance = getConfig("spreadDistance", 3.0, Double.class);
         slowDuration = getConfig("slowDuration", 4.0, Double.class);

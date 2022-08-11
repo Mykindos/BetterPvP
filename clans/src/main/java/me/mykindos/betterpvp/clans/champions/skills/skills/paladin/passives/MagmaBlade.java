@@ -18,8 +18,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
-import java.util.Arrays;
-
 @BPvPListener
 public class MagmaBlade extends Skill implements PassiveSkill {
 

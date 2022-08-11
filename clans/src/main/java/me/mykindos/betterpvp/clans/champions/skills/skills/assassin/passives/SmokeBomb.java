@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
+import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Particle;
@@ -180,7 +181,7 @@ public class SmokeBomb extends Skill implements ToggleSkill, CooldownSkill, List
         // Display particle to those only within 30 blocks
         Particle.EXPLOSION_HUGE.builder().location(player.getLocation()).receivers(30).spawn();
 
-        for(Player target : UtilPlayer.getNearbyPlayers(player, 2.5)) {
+        for(Player target : UtilPlayer.getNearbyPlayers(player, player.getLocation(), 2.5, EntityProperty.ENEMY)) {
             target.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 35, 1));
         }
 

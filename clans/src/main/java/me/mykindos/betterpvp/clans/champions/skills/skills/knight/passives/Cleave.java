@@ -10,11 +10,11 @@ import me.mykindos.betterpvp.clans.champions.skills.data.SkillType;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.clans.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
-import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
+import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -70,7 +70,7 @@ public class Cleave extends Skill implements PassiveSkill, Listener {
 
         int level = getLevel(damager);
         if (level > 0) {
-            for (LivingEntity target : UtilEntity.getNearbyEntities(damager, damager.getLocation(), baseDistance + level)) {
+            for (LivingEntity target : UtilEntity.getNearbyEntities(damager, damager.getLocation(), baseDistance + level, EntityProperty.ENEMY)) {
                 if (target.equals(damager)) continue;
                 if (target.equals(event.getDamagee())) continue;
 

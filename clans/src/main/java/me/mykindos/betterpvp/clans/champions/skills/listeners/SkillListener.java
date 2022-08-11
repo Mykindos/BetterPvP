@@ -25,6 +25,7 @@ import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -328,8 +329,15 @@ public class SkillListener implements Listener {
         if (!(event.getSource() instanceof Player player)) return;
         event.getEntities().removeIf(entity -> {
             if (entity instanceof Player target) {
-                return !clanManager.canHurt(player, target)
-                        || target.getGameMode() == GameMode.CREATIVE || target.getGameMode() == GameMode.SPECTATOR;
+                if (target.getGameMode() == GameMode.CREATIVE || target.getGameMode() == GameMode.SPECTATOR) {
+                    return true;
+                }
+                boolean canHurt = clanManager.canHurt(player, target);
+                if (event.getEntityProperty() == EntityProperty.FRIENDLY) {
+                    return canHurt;
+                } else if (event.getEntityProperty() == EntityProperty.ENEMY) {
+                    return !canHurt;
+                }
             }
             return false;
         });
