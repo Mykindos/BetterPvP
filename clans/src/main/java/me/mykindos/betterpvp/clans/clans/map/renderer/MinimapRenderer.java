@@ -27,6 +27,7 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.map.*;
 import org.jetbrains.annotations.NotNull;
 
+import java.awt.Color;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
@@ -93,6 +94,14 @@ public class MinimapRenderer extends MapRenderer implements Listener {
     public void render(@NotNull MapView map, @NotNull MapCanvas canvas, @NotNull Player player) {
         if (!mapHandler.enabled) return;
         if (player.getInventory().getItemInMainHand().getType() != Material.FILLED_MAP) return;
+        if (!player.getWorld().getName().equals("world")) {
+            for (int x = 0; x < 128; x++) {
+                for (int z = 0; z < 128; z++) {
+                    canvas.setPixelColor(x, z, Color.WHITE);
+                }
+            }
+            return;
+        }
 
         int centerX = player.getLocation().getBlockX();
         int centerZ = player.getLocation().getBlockZ();

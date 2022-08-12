@@ -115,7 +115,6 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
         Item orb = player.getWorld().dropItem(player.getEyeLocation().add(player.getLocation().getDirection()), new ItemStack(Material.DIAMOND_BLOCK));
         orb.setVelocity(player.getLocation().getDirection());
         ThrowableItem throwableItem = new ThrowableItem(orb, player, "Lightning Orb", 5000, true, true);
-        throwableItem.setCollideGround(false);
         championsManager.getThrowables().addThrowable(throwableItem);
     }
 

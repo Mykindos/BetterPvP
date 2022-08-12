@@ -37,7 +37,7 @@ public class ThrowableItem {
         this.checkHead = checkHead;
         this.removeOnCollision = removeOnCollision;
         this.singleCollision = true;
-        this.collideGround = true;
+        this.collideGround = false;
         item.setPickupDelay(Integer.MAX_VALUE);
         immune = new ArrayList<>();
     }

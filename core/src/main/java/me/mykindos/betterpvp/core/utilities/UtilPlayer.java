@@ -1,5 +1,9 @@
 package me.mykindos.betterpvp.core.utilities;
 
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
@@ -8,10 +12,13 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -93,5 +100,33 @@ public class UtilPlayer {
         player.setHealth(health);
     }
 
+    public static double getHealthPercentage(LivingEntity e) {
+        return e.getHealth() / e.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 100;
+    }
+
+    public static double getMaxHealth(LivingEntity e) {
+        return e.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+    }
+
+    public static void setGlowing(Player player, Player target, boolean glowing) {
+        PacketContainer packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.ENTITY_METADATA);
+        packet.getIntegers().write(0, target.getEntityId()); //Set packet's entity id
+        WrappedDataWatcher watcher = new WrappedDataWatcher(); //Create data watcher, the Entity Metadata packet requires this
+        WrappedDataWatcher.Serializer serializer = WrappedDataWatcher.Registry.get(Byte.class); //Found this through google, needed for some stupid reason
+        watcher.setEntity(target); //Set the new data watcher's target
+        byte entityByte = 0x00;
+        if (glowing) {
+            entityByte = (byte) (entityByte | 0x40);
+        } else {
+            entityByte = (byte) (entityByte & ~0x40);
+        }
+        watcher.setObject(0, serializer, entityByte); //Set status to glowing, found on protocol page
+        packet.getWatchableCollectionModifier().write(0, watcher.getWatchableObjects()); //Make the packet's datawatcher the one we created
+        try {
+            ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet);
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+    }
 
 }

@@ -93,25 +93,27 @@ public class Flash extends Skill implements InteractSkill, Listener {
     @UpdateEvent(delay = 100)
     public void recharge() {
         for (Player player : Bukkit.getOnlinePlayers()) {
+
             int level = getLevel(player);
             if (level <= 0) continue;
-            if (!charges.containsKey(player)) {
-                charges.put(player, 0);
-            }
-
 
             if (!lastRecharge.containsKey(player)) {
                 lastRecharge.put(player, System.currentTimeMillis());
             }
 
-            if (charges.get(player) == maxCharges) {
+            int charge = charges.get(player);
+            if (charge <= 0) {
+                charges.put(player, 0);
+            }
+
+            if (charge == maxCharges) {
                 lastRecharge.put(player, System.currentTimeMillis());
                 continue;
             }
 
             if (UtilTime.elapsed(lastRecharge.get(player), (long) ((timeBetweenCharges * 1000L) - (level * 1000L)))) {
-                charges.put(player, Math.min(maxCharges, charges.get(player) + 1));
-                UtilMessage.message(player, getClassType().getName(), "Flash Charges: " + ChatColor.GREEN + charges.get(player));
+                charges.put(player, Math.min(maxCharges, charge + 1));
+                UtilMessage.message(player, getClassType().getName(), "Flash Charges: " + ChatColor.GREEN + charge);
                 lastRecharge.put(player, System.currentTimeMillis());
             }
         }
@@ -232,7 +234,7 @@ public class Flash extends Skill implements InteractSkill, Listener {
     }
 
     @Override
-    public void loadSkillConfig(){
+    public void loadSkillConfig() {
         maxCharges = getConfig("maxCharges", 4, Integer.class);
         timeBetweenCharges = getConfig("timeBetweenCharges", 11, Double.class);
         maxTravelDistance = getConfig("maxTravelDistance", 16, Integer.class);

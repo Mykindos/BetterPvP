@@ -26,7 +26,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.UUID;
 
 @Singleton
 @BPvPListener
