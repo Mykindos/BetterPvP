@@ -12,6 +12,7 @@ import org.bukkit.util.BlockIterator;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
 public class UtilBlock {
 
@@ -241,21 +242,21 @@ public class UtilBlock {
                     blockAirFoliageSet.add(m);
                 } else if (m.name().contains("DEAD")) {
                     blockAirFoliageSet.add(m);
-                }else if(m.name().contains("TULIP")){
+                } else if (m.name().contains("TULIP")) {
                     blockAirFoliageSet.add(m);
-                }else if(m.name().contains("MUSHROOM")){
+                } else if (m.name().contains("MUSHROOM")) {
                     blockAirFoliageSet.add(m);
-                }else if(m.name().contains("CORAL")){
+                } else if (m.name().contains("CORAL")) {
                     blockAirFoliageSet.add(m);
-                }else if(m.name().contains("_SIGN")){
+                } else if (m.name().contains("_SIGN")) {
                     blockAirFoliageSet.add(m);
-                }else if(m.name().contains("_BANNER")){
+                } else if (m.name().contains("_BANNER")) {
                     blockAirFoliageSet.add(m);
-                }else if(m.name().contains("CHORUS")){
+                } else if (m.name().contains("CHORUS")) {
                     blockAirFoliageSet.add(m);
-                }else if(m.name().contains("TORCH")){
+                } else if (m.name().contains("TORCH")) {
                     blockAirFoliageSet.add(m);
-                }else if(m.name().contains("GATE")){
+                } else if (m.name().contains("GATE")) {
                     blockAirFoliageSet.add(m);
                 }
             }
@@ -325,35 +326,35 @@ public class UtilBlock {
                     blockPassSet.add(m);
                 } else if (m.name().contains("DEAD")) {
                     blockPassSet.add(m);
-                }else if(m.name().contains("_BED")){
+                } else if (m.name().contains("_BED")) {
                     blockPassSet.add(m);
-                }else if(m.name().contains("RAIL")){
+                } else if (m.name().contains("RAIL")) {
                     blockPassSet.add(m);
-                }else if(m.name().contains("TULIP")){
+                } else if (m.name().contains("TULIP")) {
                     blockPassSet.add(m);
-                }else if(m.name().contains("MUSHROOM")){
+                } else if (m.name().contains("MUSHROOM")) {
                     blockPassSet.add(m);
-                }else if(m.name().contains("CARPET")){
+                } else if (m.name().contains("CARPET")) {
                     blockPassSet.add(m);
-                }else if(m.name().contains("CORAL")){
+                } else if (m.name().contains("CORAL")) {
                     blockPassSet.add(m);
-                }else if(m.name().contains("_SIGN")){
+                } else if (m.name().contains("_SIGN")) {
                     blockPassSet.add(m);
-                }else if(m.name().contains("_BANNER")){
+                } else if (m.name().contains("_BANNER")) {
                     blockPassSet.add(m);
-                }else if(m.name().contains("_HEAD")){
+                } else if (m.name().contains("_HEAD")) {
                     blockPassSet.add(m);
-                }else if(m.name().contains("_SLAB")){
+                } else if (m.name().contains("_SLAB")) {
                     blockPassSet.add(m);
-                }else if(m.name().contains("POTTED")){
+                } else if (m.name().contains("POTTED")) {
                     blockPassSet.add(m);
-                }else if(m.name().contains("CHORUS")){
+                } else if (m.name().contains("CHORUS")) {
                     blockPassSet.add(m);
-                }else if(m.name().contains("TORCH")){
+                } else if (m.name().contains("TORCH")) {
                     blockPassSet.add(m);
-                }else if(m.name().contains("GATE")){
+                } else if (m.name().contains("GATE")) {
                     blockPassSet.add(m);
-                }else if(m.name().contains("BUTTON")){
+                } else if (m.name().contains("BUTTON")) {
                     blockPassSet.add(m);
                 }
             }
@@ -426,18 +427,18 @@ public class UtilBlock {
      */
     public static boolean usable(Material mat) {
         if (blockUseSet.isEmpty()) {
-            for(Material m : Material.values()){
-                if(m.name().contains("CHEST")){
+            for (Material m : Material.values()) {
+                if (m.name().contains("CHEST")) {
                     blockUseSet.add(m);
-                }else if(m.name().contains("FURNACE")){
+                } else if (m.name().contains("FURNACE")) {
                     blockUseSet.add(m);
-                }else if(m.name().contains("SHULKER")){
+                } else if (m.name().contains("SHULKER")) {
                     blockUseSet.add(m);
-                }else if(m.name().contains("ANVIL")){
+                } else if (m.name().contains("ANVIL")) {
                     blockUseSet.add(m);
-                }else if(m.name().contains("DOOR")){
+                } else if (m.name().contains("DOOR")) {
                     blockUseSet.add(m);
-                }else if(m.name().contains("GATE")){
+                } else if (m.name().contains("GATE")) {
                     blockUseSet.add(m);
                 }
             }
@@ -512,4 +513,61 @@ public class UtilBlock {
                 || (!relativeWest && !relativeSouth);
     }
 
+    public static boolean isCultivation(Material material) {
+        return material == Material.PUMPKIN_SEEDS || material == Material.MELON_SEEDS
+                || material == Material.WHEAT_SEEDS
+                || material == Material.SUGAR_CANE
+                || material == Material.POTATO
+                || material == Material.POTATOES
+                || material == Material.CARROT
+                || material == Material.CARROTS
+                || material == Material.CACTUS
+                || material == Material.MELON_STEM
+                || material == Material.WHEAT
+                || material == Material.PUMPKIN_STEM
+                || material == Material.PUMPKIN
+                || material == Material.MELON
+                || material == Material.NETHER_WART_BLOCK
+                || material == Material.NETHER_WART
+                || material == Material.BEETROOT
+                || material == Material.BEETROOTS
+                || material == Material.SWEET_BERRY_BUSH
+                || material == Material.SWEET_BERRIES;
+    }
+
+
+    public static boolean isSeed(Material material) {
+        return material == Material.PUMPKIN_SEEDS || material == Material.MELON_SEEDS
+                || material == Material.WHEAT_SEEDS || material == Material.SUGAR_CANE
+                || material == Material.POTATO
+                || material == Material.WHEAT
+                || material == Material.CARROT
+                || material == Material.CACTUS
+                || material == Material.NETHER_WART_BLOCK
+                || material == Material.NETHER_WART
+                || material == Material.BEETROOT_SEEDS
+                || material == Material.SWEET_BERRIES
+                || material == Material.SWEET_BERRY_BUSH;
+    }
+
+    public static boolean shouldPlaceSnowOn(Block block) {
+
+        if (block.isLiquid()) return false;
+
+        if (airFoliage(block)) return false;
+
+        if (usable(block)) return false;
+
+        if (isCultivation(block.getType()) || isSeed(block.getType())) return false;
+
+        if (List.of(Material.DIRT_PATH, Material.FARMLAND, Material.RAIL).contains(block.getType())) return false;
+
+        String name = block.getType().name();
+        if (name.contains("STAIRS") || name.contains("CAMPFIRE") || name.contains("SLAB") || name.contains("ICE")
+                || name.contains("WIRE") || name.contains("FENCE")) {
+            return false;
+        }
+
+        return true;
+    }
 }

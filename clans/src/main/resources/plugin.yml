@@ -7,3 +7,4 @@ depend: [Core]
 api-version: 1.19
 softdepend:
   - ProtocolLib
+  - LibsDisguises
