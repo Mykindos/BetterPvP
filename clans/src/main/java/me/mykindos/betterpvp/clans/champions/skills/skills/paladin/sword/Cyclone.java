@@ -23,6 +23,8 @@ import org.bukkit.util.Vector;
 @Singleton
 public class Cyclone extends Skill implements InteractSkill, CooldownSkill {
 
+    private int minimumDistance;
+
     @Inject
     public Cyclone(Clans clans, ChampionsManager championsManager) {
         super(clans, championsManager);
@@ -40,7 +42,7 @@ public class Cyclone extends Skill implements InteractSkill, CooldownSkill {
                 "Right click with a sword to activate.",
                 "",
                 "Pulls all enemies within",
-                ChatColor.GREEN.toString() + (7 + level) + ChatColor.GRAY + " blocks towards you",
+                ChatColor.GREEN.toString() + (minimumDistance + level) + ChatColor.GRAY + " blocks towards you",
                 "",
                 "Cooldown: " + ChatColor.GREEN + getCooldown(level)
         };
@@ -60,7 +62,7 @@ public class Cyclone extends Skill implements InteractSkill, CooldownSkill {
     @Override
     public double getCooldown(int level) {
 
-        return 16 - ((level - 1));
+        return cooldown - ((level - 1));
     }
 
 
@@ -70,7 +72,8 @@ public class Cyclone extends Skill implements InteractSkill, CooldownSkill {
         vector.setY(vector.getY() + 2);
 
 
-        for (LivingEntity target : UtilEntity.getNearbyEntities(player, player.getLocation(), 7 + level, EntityProperty.ENEMY)) {
+        for (var data : UtilEntity.getNearbyEntities(player, player.getLocation(), minimumDistance + level, EntityProperty.ENEMY)) {
+            LivingEntity target = data.getKey();
             if (!target.getName().equalsIgnoreCase(player.getName())) {
                 if (player.hasLineOfSight(target)) {
 
@@ -88,5 +91,10 @@ public class Cyclone extends Skill implements InteractSkill, CooldownSkill {
     @Override
     public Action[] getActions() {
         return SkillActions.RIGHT_CLICK;
+    }
+
+    @Override
+    public void loadSkillConfig(){
+        minimumDistance = getConfig("minimumDistance", 7, Integer.class);
     }
 }

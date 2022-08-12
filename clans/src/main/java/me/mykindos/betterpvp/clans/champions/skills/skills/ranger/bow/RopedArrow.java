@@ -69,8 +69,8 @@ public class RopedArrow extends PrepareArrowSkill {
     @EventHandler
     public void ArrowHit(ProjectileHitEvent event) {
         if (!(event.getEntity() instanceof Arrow arrow)) return;
-        if (!arrows.contains(arrow)) return;
         if (!(arrow.getShooter() instanceof Player player)) return;
+        if (!arrows.contains(arrow)) return;
         if (!hasSkill(player)) return;
 
 

@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.utilities;
 
+import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
 import net.md_5.bungee.api.ChatMessageType;
@@ -12,20 +13,26 @@ import org.bukkit.entity.Player;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class UtilPlayer {
 
-    public static List<Player> getNearbyPlayers(Player player, double radius){
+    public static List<KeyValue<Player, EntityProperty>> getNearbyPlayers(Player player, double radius) {
         return getNearbyPlayers(player, player.getLocation(), radius, EntityProperty.ALL);
     }
 
-    public static List<Player> getNearbyPlayers(Player player, Location location, double radius, EntityProperty entityProperty) {
-        List<Player> players = player.getWorld().getPlayers().stream()
-                .filter(worldPlayer -> worldPlayer.getLocation().distance(location) <= radius && !worldPlayer.equals(player))
-                .collect(Collectors.toList());
+    public static List<KeyValue<Player, EntityProperty>> getNearbyPlayers(Player player, Location location, double radius, EntityProperty entityProperty) {
+
+        List<KeyValue<Player, EntityProperty>> players = new ArrayList<>();
+        player.getWorld().getPlayers().stream()
+                .filter(worldPlayer -> {
+                    if (worldPlayer.equals(player)) return false;
+                    return !(worldPlayer.getLocation().distance(location) > radius);
+                })
+                .forEach(ent -> players.add(new KeyValue<>(ent, entityProperty)));
+
         FetchNearbyEntityEvent<Player> fetchNearbyEntityEvent = new FetchNearbyEntityEvent<>(player, location, players, entityProperty);
         UtilServer.callEvent(fetchNearbyEntityEvent);
 

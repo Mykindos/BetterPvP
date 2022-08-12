@@ -21,8 +21,6 @@ import org.bukkit.event.entity.ItemMergeEvent;
 import org.bukkit.event.inventory.InventoryPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import java.util.List;
-
 @BPvPListener
 public class ThrowableListener implements Listener {
 
@@ -98,8 +96,9 @@ public class ThrowableListener implements Listener {
     }
 
     private boolean doCollision(ThrowableItem throwable, Location location, double distance) {
-        List<LivingEntity> targets = UtilEntity.getNearbyEntities(throwable.getThrower(), location, distance, EntityProperty.ENEMY);
-        for (LivingEntity entity : targets) {
+        var targets = UtilEntity.getNearbyEntities(throwable.getThrower(), location, distance, EntityProperty.ENEMY);
+        for (var data : targets) {
+            LivingEntity entity = data.get();
             if (throwable.getImmune().contains(entity)) continue;
             UtilServer.callEvent(new ThrowableHitEntityEvent(throwable, entity));
             if (throwable.isSingleCollision()) {

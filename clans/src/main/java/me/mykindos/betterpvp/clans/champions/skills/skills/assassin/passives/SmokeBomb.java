@@ -91,7 +91,7 @@ public class SmokeBomb extends Skill implements ToggleSkill, CooldownSkill, List
     private void reappear(Player player) {
         championsManager.getEffects().removeEffect(player, EffectType.INVISIBILITY);
         Bukkit.getOnlinePlayers().forEach(onlinePlayer -> {
-            if(!onlinePlayer.canSee(player)) {
+            if (!onlinePlayer.canSee(player)) {
                 onlinePlayer.showPlayer(clans, player);
             }
         });
@@ -181,8 +181,8 @@ public class SmokeBomb extends Skill implements ToggleSkill, CooldownSkill, List
         // Display particle to those only within 30 blocks
         Particle.EXPLOSION_HUGE.builder().location(player.getLocation()).receivers(30).spawn();
 
-        for(Player target : UtilPlayer.getNearbyPlayers(player, player.getLocation(), 2.5, EntityProperty.ENEMY)) {
-            target.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 35, 1));
+        for (var target : UtilPlayer.getNearbyPlayers(player, player.getLocation(), 2.5, EntityProperty.ENEMY)) {
+            target.get().addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 35, 1));
         }
 
     }

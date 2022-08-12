@@ -138,10 +138,6 @@ public class SkillListener implements Listener {
             return;
         }
 
-        //if(Polymorph.polymorphed.containsKey(player)){
-        //    return;
-        //}
-
         Optional<Role> roleOptional = roleManager.getObject(player.getUniqueId().toString());
         if (roleOptional.isPresent()) {
             Role role = roleOptional.get();
@@ -327,16 +323,21 @@ public class SkillListener implements Listener {
     @EventHandler
     public void onFetchNearbyEntity(FetchNearbyEntityEvent<?> event) {
         if (!(event.getSource() instanceof Player player)) return;
+        event.getEntities().forEach(entity -> {
+            if (!(entity.getKey() instanceof Player target)) return;
+            boolean canHurt = clanManager.canHurt(player, target);
+
+            entity.setValue(canHurt ? EntityProperty.ENEMY : EntityProperty.FRIENDLY);
+        });
+
         event.getEntities().removeIf(entity -> {
-            if (entity instanceof Player target) {
+            if (entity.getKey() instanceof Player target) {
                 if (target.getGameMode() == GameMode.CREATIVE || target.getGameMode() == GameMode.SPECTATOR) {
                     return true;
                 }
-                boolean canHurt = clanManager.canHurt(player, target);
-                if (event.getEntityProperty() == EntityProperty.FRIENDLY) {
-                    return canHurt;
-                } else if (event.getEntityProperty() == EntityProperty.ENEMY) {
-                    return !canHurt;
+
+                if(event.getEntityProperty() != EntityProperty.ALL) {
+                    return entity.getValue() != event.getEntityProperty();
                 }
             }
             return false;

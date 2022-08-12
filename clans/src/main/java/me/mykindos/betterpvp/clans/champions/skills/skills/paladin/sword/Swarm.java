@@ -142,7 +142,9 @@ public class Swarm extends ChannelSkill implements InteractSkill, EnergySkill, L
                 Vector rand = new Vector((Math.random() - 0.5D) / 3.0D, (Math.random() - 0.5D) / 3.0D, (Math.random() - 0.5D) / 3.0D);
                 bat.setVelocity(batData.getLoc().getDirection().clone().multiply(0.5D).add(rand));
 
-                for (LivingEntity other : UtilEntity.getNearbyEntities(player, bat.getLocation(), 3, EntityProperty.ENEMY)) {
+                for (var data : UtilEntity.getNearbyEntities(player, bat.getLocation(), 3, EntityProperty.ENEMY)) {
+                    LivingEntity other = data.get();
+
                     if (other instanceof Bat) continue;
                     if (!hitPlayer(bat.getLocation(), other)) continue;
 
@@ -219,7 +221,7 @@ public class Swarm extends ChannelSkill implements InteractSkill, EnergySkill, L
     }
 
     @Override
-    public void loadSkillConfig(){
+    public void loadSkillConfig() {
         batLifespan = getConfig("batLifespan", 2.0, Double.class);
 
     }

@@ -97,18 +97,16 @@ public class BattleTaunt extends ChannelSkill implements InteractSkill, Cooldown
     }
 
     private void pull(Player player, Location location) {
-        for (LivingEntity other : UtilEntity.getNearbyEntities(player, location, 2.0, EntityProperty.ENEMY)) {
-            if (other instanceof Player target) {
+        for (var other : UtilEntity.getNearbyEntities(player, location, 2.0, EntityProperty.ENEMY)) {
+            LivingEntity target = other.getKey();
+            if (other.getKey() instanceof Player) {
 
-                if (UtilMath.offset(player.getLocation(), other.getLocation()) >= 2.0D) {
-                    UtilVelocity.velocity(other, UtilVelocity.getTrajectory(target, player), 0.3D, false, 0.0D, 0.0D, 1.0D, true);
+                if (UtilMath.offset(player.getLocation(), target.getLocation()) >= 2.0D) {
+                    UtilVelocity.velocity(target, UtilVelocity.getTrajectory(target, player), 0.3D, false, 0.0D, 0.0D, 1.0D, true);
                 }
 
             } else {
-
-                // TODO handle this in fetchnearbyentityevent
-                //if(ShopManager.isShop(other)) continue;
-                UtilVelocity.velocity(other, UtilVelocity.getTrajectory(other, player), 0.3D, false, 0.0D, 0.0D, 1.0D, true);
+                UtilVelocity.velocity(target, UtilVelocity.getTrajectory(target, player), 0.3D, false, 0.0D, 0.0D, 1.0D, true);
             }
         }
     }

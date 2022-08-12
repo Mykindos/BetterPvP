@@ -52,8 +52,8 @@ public class HolyLight extends Skill implements PassiveSkill {
 
     private void activate(Player player, int level) {
         player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 140, 0));
-        for (Player cur : UtilPlayer.getNearbyPlayers(player, player.getLocation(), (8 + level), EntityProperty.FRIENDLY)) {
-            cur.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 40, 0));
+        for (var target : UtilPlayer.getNearbyPlayers(player, player.getLocation(), (8 + level), EntityProperty.FRIENDLY)) {
+            target.getKey().addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 40, 0));
         }
     }
 
