@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.clans.champions.skills.skills.paladin.data;
+package me.mykindos.betterpvp.core.framework.customtypes;
 
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageSource;
@@ -11,7 +11,7 @@ import org.bukkit.craftbukkit.v1_19_R1.entity.CraftEntity;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
 /**
- * Used for Rupture to ensure entity is invisible when spawned
+ * Used for Rupture / Grasp to ensure entity is invisible when spawned
  */
 public class CustomArmourStand extends ArmorStand {
     public CustomArmourStand(Level world) {

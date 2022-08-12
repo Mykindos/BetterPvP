@@ -31,6 +31,7 @@ public class ClanMapRenderer extends MapRenderer {
     public void render(@NotNull MapView mapView, @NotNull MapCanvas mapCanvas, @NotNull Player player) {
         if (!mapHandler.enabled) return;
         if (player.getInventory().getItemInMainHand().getType() != Material.FILLED_MAP) return;
+        if (!player.getWorld().getName().equals("world")) return;
 
         MapSettings mapSettings = mapHandler.mapSettingsMap.get(player.getUniqueId());
         MapSettings.Scale s = mapSettings.getScale();

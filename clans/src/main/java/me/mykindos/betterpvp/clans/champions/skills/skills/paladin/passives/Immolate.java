@@ -98,7 +98,6 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill {
             if (player != null) {
                 Item fire = player.getWorld().dropItem(player.getLocation().add(0.0D, 0.5D, 0.0D), new ItemStack(Material.BLAZE_POWDER));
                 ThrowableItem throwableItem = new ThrowableItem(fire, player, getName(), 2000L);
-                throwableItem.setCollideGround(false);
                 championsManager.getThrowables().addThrowable(throwableItem);
 
                 fire.setVelocity(new Vector((Math.random() - 0.5D) / 3.0D, Math.random() / 3.0D, (Math.random() - 0.5D) / 3.0D));

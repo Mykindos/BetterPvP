@@ -8,7 +8,6 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +16,10 @@ public class UtilEntity {
 
     public static List<KeyValue<LivingEntity, EntityProperty>> getNearbyEntities(LivingEntity source, double radius) {
         return getNearbyEntities(source, source.getLocation(), radius, EntityProperty.ALL);
+    }
+
+    public static List<KeyValue<LivingEntity, EntityProperty>> getNearbyEnemies(LivingEntity source, Location location, double radius){
+        return getNearbyEntities(source, location, radius, EntityProperty.ENEMY);
     }
 
     public static List<KeyValue<LivingEntity, EntityProperty>> getNearbyEntities(LivingEntity source, Location location, double radius, EntityProperty entityProperty) {

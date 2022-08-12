@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.clans.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillType;
 import me.mykindos.betterpvp.clans.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.clans.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.clans.combat.throwables.ThrowableItem;
 import me.mykindos.betterpvp.clans.combat.throwables.events.ThrowableHitEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
@@ -94,7 +95,9 @@ public class GlacialPrison extends Skill implements InteractSkill, CooldownSkill
     public void activate(Player player, int level) {
         Item item = player.getWorld().dropItem(player.getEyeLocation(), new ItemStack(Material.ICE));
         item.setVelocity(player.getLocation().getDirection().multiply(speed));
-        championsManager.getThrowables().addThrowable(item, player, getName(), 5000, true, true);
+        ThrowableItem throwableItem = new ThrowableItem(item, player, getName(), 5000, true, true);
+        throwableItem.setCollideGround(true);
+        championsManager.getThrowables().addThrowable(throwableItem);
     }
 
     @Override
