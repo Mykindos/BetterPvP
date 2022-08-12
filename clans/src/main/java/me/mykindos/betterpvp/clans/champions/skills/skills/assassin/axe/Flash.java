@@ -101,11 +101,11 @@ public class Flash extends Skill implements InteractSkill, Listener {
                 lastRecharge.put(player, System.currentTimeMillis());
             }
 
-            int charge = charges.get(player);
-            if (charge <= 0) {
+            if(!charges.containsKey(player)) {
                 charges.put(player, 0);
             }
 
+            int charge = charges.get(player);
             if (charge == maxCharges) {
                 lastRecharge.put(player, System.currentTimeMillis());
                 continue;
@@ -113,7 +113,7 @@ public class Flash extends Skill implements InteractSkill, Listener {
 
             if (UtilTime.elapsed(lastRecharge.get(player), (long) ((timeBetweenCharges * 1000L) - (level * 1000L)))) {
                 charges.put(player, Math.min(maxCharges, charge + 1));
-                UtilMessage.message(player, getClassType().getName(), "Flash Charges: " + ChatColor.GREEN + charge);
+                UtilMessage.message(player, getClassType().getName(), "Flash Charges: " + ChatColor.GREEN + (charge + 1));
                 lastRecharge.put(player, System.currentTimeMillis());
             }
         }

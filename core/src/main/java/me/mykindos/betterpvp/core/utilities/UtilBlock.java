@@ -244,8 +244,6 @@ public class UtilBlock {
                     blockAirFoliageSet.add(m);
                 } else if (m.name().contains("TULIP")) {
                     blockAirFoliageSet.add(m);
-                } else if (m.name().contains("MUSHROOM")) {
-                    blockAirFoliageSet.add(m);
                 } else if (m.name().contains("CORAL")) {
                     blockAirFoliageSet.add(m);
                 } else if (m.name().contains("_SIGN")) {
@@ -261,6 +259,8 @@ public class UtilBlock {
                 }
             }
 
+            blockAirFoliageSet.add(Material.BROWN_MUSHROOM);
+            blockAirFoliageSet.add(Material.RED_MUSHROOM);
             blockAirFoliageSet.add(Material.FERN);
             blockAirFoliageSet.add(Material.LARGE_FERN);
             blockAirFoliageSet.add(Material.GRASS);

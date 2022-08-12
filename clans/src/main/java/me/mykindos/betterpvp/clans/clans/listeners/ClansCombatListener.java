@@ -71,6 +71,7 @@ public class ClansCombatListener implements Listener {
     public void onWeaponDamage(CustomDamageEvent event) {
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
         if (!(event.getDamager() instanceof Player player)) return;
+        if (!event.getReason().equals("")) return;
 
         Material material = player.getInventory().getItemInMainHand().getType();
 
