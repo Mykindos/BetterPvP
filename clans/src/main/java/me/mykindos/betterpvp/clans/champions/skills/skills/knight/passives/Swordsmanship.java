@@ -55,8 +55,8 @@ public class Swordsmanship extends Skill implements PassiveSkill {
                 "You can store a maximum of " + ChatColor.GREEN + (level) + ChatColor.GRAY + " charges",
                 "",
                 "When you attack, your damage is",
-                "increased by the number of your charges",
-                "and your charges are reset to 0.",
+                "increased by 0.5 for each charge you have",
+                "and then your charges are reset to 0.",
                 "",
                 "This only applies to swords."
         };
@@ -109,16 +109,16 @@ public class Swordsmanship extends Skill implements PassiveSkill {
                         }
                     });
 
+                } else {
+                    charges.put(cur, 0);
                 }
-            } else {
-                charges.put(cur, 0);
             }
         }
 
     }
 
     @Override
-    public void loadSkillConfig(){
+    public void loadSkillConfig() {
         timeBetweenCharges = getConfig("timeBetweenCharges", 2.0, Double.class);
         timeOutOfCombat = getConfig("timeOutOfCombat", 2.5, Double.class);
     }

@@ -104,16 +104,16 @@ public class Deflection extends Skill implements PassiveSkill {
                         }
                     });
 
+                } else {
+                    charges.put(cur, 0);
                 }
-            } else {
-                charges.put(cur, 0);
             }
         }
 
     }
 
     @Override
-    public void loadSkillConfig(){
+    public void loadSkillConfig() {
         timeBetweenCharges = getConfig("timeBetweenCharges", 2.0, Double.class);
         timeOutOfCombat = getConfig("timeOutOfCombat", 2.0, Double.class);
     }

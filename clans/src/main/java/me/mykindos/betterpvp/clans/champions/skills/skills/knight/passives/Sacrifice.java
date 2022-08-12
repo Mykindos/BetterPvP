@@ -60,7 +60,9 @@ public class Sacrifice extends Skill implements PassiveSkill {
                 event.setDamage(Math.ceil(event.getDamage() * (1.0 + (level * 0.08))));
             }
 
-        } else if (event.getDamagee() instanceof Player damagee) {
+        }
+
+        if (event.getDamagee() instanceof Player damagee) {
             int level = getLevel(damagee);
             if (level > 0) {
                 event.setDamage(Math.ceil(event.getDamage() * (1.0 + (level * 0.08))));
