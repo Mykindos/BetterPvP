@@ -26,7 +26,6 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 public class Cleave extends Skill implements PassiveSkill, Listener {
 
     private double baseDistance;
-    private double baseDamage;
 
     @Inject
     public Cleave(Clans clans, ChampionsManager championsManager) {
@@ -44,7 +43,6 @@ public class Cleave extends Skill implements PassiveSkill, Listener {
         return new String[]{
                 "Your axe attacks cleave onto nearby targets and deal damage.",
                 "",
-                "Damage: " + ChatColor.GREEN + (baseDamage + level) + ChatColor.GRAY,
                 "Distance: " + ChatColor.GREEN + (baseDistance + level) + ChatColor.GRAY,
                 "",
                 "Only applies to axes."
@@ -64,15 +62,17 @@ public class Cleave extends Skill implements PassiveSkill, Listener {
     @EventHandler
     public void onCustomDamage(CustomDamageEvent event) {
         if (event.isCancelled()) return;
+        if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
         if (!(event.getDamager() instanceof Player damager)) return;
         if (!UtilPlayer.isHoldingItem(damager, SkillWeapons.AXES)) return;
+        if (event.getReason().equals(getName())) return; // Don't get stuck in an endless damage loop
 
         int level = getLevel(damager);
         if (level > 0) {
             for (var target : UtilEntity.getNearbyEntities(damager, damager.getLocation(), baseDistance + level, EntityProperty.ENEMY)) {
-                if (target.getKey().equals(event.getDamagee())) continue;
+                if (target.get().equals(event.getDamagee())) continue;
 
-                UtilDamage.doCustomDamage(new CustomDamageEvent(target.getKey(), damager, null, DamageCause.ENTITY_ATTACK, (baseDamage + level), true, "Cleave"));
+                UtilDamage.doCustomDamage(new CustomDamageEvent(target.getKey(), damager, null, DamageCause.ENTITY_ATTACK, event.getDamage(), true, getName()));
             }
         }
     }
@@ -80,7 +80,6 @@ public class Cleave extends Skill implements PassiveSkill, Listener {
     @Override
     public void loadSkillConfig() {
         baseDistance = getConfig("baseDistance", 2.0, Double.class);
-        baseDamage = getConfig("baseDamage", 4.0, Double.class);
     }
 
 
