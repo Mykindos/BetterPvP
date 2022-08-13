@@ -90,7 +90,7 @@ public class ThrowableListener implements Listener {
         Location location = throwable.getItem().getLocation().clone();
         if (!doCollision(throwable, location, 1.5)) {
             if (throwable.isCheckingHead()) {
-                doCollision(throwable, location.add(0, 1, 0), 1);
+                doCollision(throwable, location.add(0, 1, 0), 1.5);
             }
         }
     }

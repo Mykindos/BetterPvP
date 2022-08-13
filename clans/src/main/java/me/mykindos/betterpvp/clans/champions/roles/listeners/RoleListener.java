@@ -10,6 +10,8 @@ import me.mykindos.betterpvp.clans.champions.roles.events.RoleChangeEvent;
 import me.mykindos.betterpvp.clans.gamer.Gamer;
 import me.mykindos.betterpvp.clans.gamer.GamerManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageDurabilityEvent;
+import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
@@ -35,11 +37,13 @@ public class RoleListener implements Listener {
 
     private final RoleManager roleManager;
     private final GamerManager gamerManager;
+    private final CooldownManager cooldownManager;
 
     @Inject
-    public RoleListener(RoleManager roleManager, GamerManager gamerManager) {
+    public RoleListener(RoleManager roleManager, GamerManager gamerManager, CooldownManager cooldownManager) {
         this.roleManager = roleManager;
         this.gamerManager = gamerManager;
+        this.cooldownManager = cooldownManager;
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -218,6 +222,30 @@ public class RoleListener implements Listener {
 
         return new String[]{};
 
+    }
+
+    @EventHandler
+    public void damageSound(CustomDamageEvent event) {
+        if (!(event.getDamagee() instanceof Player damagee)) return;
+
+        Optional<Role> roleOptional = roleManager.getObject(damagee.getUniqueId().toString());
+        if (roleOptional.isPresent()) {
+            Role role = roleOptional.get();
+            if (cooldownManager.add(damagee, "DamageSound", 0.7, false)) {
+                switch (role) {
+                    case KNIGHT ->
+                            damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_BLAZE_HURT, 1.0F, 0.7F);
+                    case ASSASSIN ->
+                            damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1.0F, 2.0F);
+                    case GLADIATOR ->
+                            damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_BLAZE_HURT, 1.0F, 0.9F);
+                    case RANGER ->
+                            damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.4F);
+                    case PALADIN, WARLOCK ->
+                            damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.8F);
+                }
+            }
+        }
     }
 
 }

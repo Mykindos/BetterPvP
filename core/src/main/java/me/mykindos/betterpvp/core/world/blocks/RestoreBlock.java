@@ -11,7 +11,7 @@ public class RestoreBlock {
 
     private final Block block;
     private final Material newMaterial;
-    private final long expire;
+    private long expire;
 
     private BlockData blockData;
     private int blockLevel;

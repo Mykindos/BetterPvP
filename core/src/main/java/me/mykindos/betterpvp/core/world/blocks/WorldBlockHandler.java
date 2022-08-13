@@ -11,6 +11,7 @@ import org.bukkit.block.Container;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Singleton
 public class WorldBlockHandler {
@@ -23,13 +24,21 @@ public class WorldBlockHandler {
     }
 
     public void addRestoreBlock(Block block, Material newMaterial, long expiry) {
-        if(!isRestoreBlock(block)) {
+        Optional<RestoreBlock> restoreBlockOptional = getRestoreBlock(block);
+        if(restoreBlockOptional.isPresent()) {
+            RestoreBlock restoreBlock = restoreBlockOptional.get();
+            restoreBlock.setExpire(expiry);
+        }else{
             restoreBlocks.add(new RestoreBlock(block, newMaterial, expiry));
         }
     }
 
     public boolean isRestoreBlock(Block block) {
         return restoreBlocks.stream().anyMatch(restoreBlock -> restoreBlock.getBlock().getLocation().equals(block.getLocation()));
+    }
+
+    public Optional<RestoreBlock> getRestoreBlock(Block block) {
+        return restoreBlocks.stream().filter(restoreBlock -> restoreBlock.getBlock().getLocation().equals(block.getLocation())).findFirst();
     }
 
 

@@ -123,7 +123,7 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill {
                                 Block relDown = block.getRelative(BlockFace.DOWN);
                                 if (relDown.getType() != Material.SNOW && relDown.getType() != Material.AIR
                                         && UtilBlock.shouldPlaceSnowOn(relDown)) {
-                                    if (block.getType() == Material.AIR) {
+                                    if (block.getType() == Material.AIR || block.getType() == Material.SNOW) {
                                         blockHandler.addRestoreBlock(block, Material.SNOW, (long) duration * 1000);
                                     }
 

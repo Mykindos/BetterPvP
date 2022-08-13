@@ -103,7 +103,7 @@ public class ItemHandler {
                 meta.setDisplayName("Ranger Boots");
             } else if (m == Material.GOLDEN_AXE) {
                 meta.setDisplayName("Radiant axe");
-                lore.add(ChatColor.GRAY + "Damage: " + ChatColor.GREEN + "6");
+                lore.add(ChatColor.GRAY + "Damage: " + ChatColor.GREEN + "5");
 
             } else if (m == Material.MUSIC_DISC_WAIT) {
                 meta.setDisplayName("$100,000");
@@ -118,18 +118,18 @@ public class ItemHandler {
             } else if (m == Material.IRON_SWORD) {
 
                 meta.setDisplayName("Standard Sword");
-                lore.add(ChatColor.GRAY + "Damage: " + ChatColor.GREEN + "5");
+                lore.add(ChatColor.GRAY + "Damage: " + ChatColor.GREEN + "4.5");
 
             } else if (m == Material.GOLDEN_SWORD) {
                 meta.setDisplayName("Radiant Sword");
-                lore.add(ChatColor.GRAY + "Damage: " + ChatColor.GREEN + "7");
+                lore.add(ChatColor.GRAY + "Damage: " + ChatColor.GREEN + "6");
             } else if (m == Material.DIAMOND_SWORD) {
                 meta.setDisplayName("Power Sword");
-                lore.add(ChatColor.GRAY + "Damage: " + ChatColor.GREEN + "6");
+                lore.add(ChatColor.GRAY + "Damage: " + ChatColor.GREEN + "5");
                 lore.add(ChatColor.GRAY + "Bonus 1 Level to Sword Skills");
             } else if (m == Material.NETHERITE_SWORD) {
                 meta.setDisplayName("Ancient Sword");
-                lore.add(ChatColor.GRAY + "Damage: " + ChatColor.GREEN + "7");
+                lore.add(ChatColor.GRAY + "Damage: " + ChatColor.GREEN + "6");
                 lore.add(ChatColor.GRAY + "Bonus 1 Level to Sword Skills");
             } else if (m == Material.IRON_AXE) {
                 meta.setDisplayName("Standard Axe");
@@ -137,11 +137,11 @@ public class ItemHandler {
 
             } else if (m == Material.DIAMOND_AXE) {
                 meta.setDisplayName("Power Axe");
-                lore.add(ChatColor.GRAY + "Damage: " + ChatColor.GREEN + "5");
+                lore.add(ChatColor.GRAY + "Damage: " + ChatColor.GREEN + "4");
                 lore.add(ChatColor.GRAY + "Bonus 1 Level to Axe Skills");
             } else if (m == Material.NETHERITE_AXE) {
                 meta.setDisplayName("Ancient Axe");
-                lore.add(ChatColor.GRAY + "Damage: " + ChatColor.GREEN + "6");
+                lore.add(ChatColor.GRAY + "Damage: " + ChatColor.GREEN + "5");
                 lore.add(ChatColor.GRAY + "Bonus 1 Level to Axe Skills");
             } else if (m == Material.TURTLE_HELMET) {
                 meta.setDisplayName("Agility Helmet");

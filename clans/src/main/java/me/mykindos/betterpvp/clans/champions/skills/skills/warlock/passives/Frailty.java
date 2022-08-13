@@ -49,7 +49,7 @@ public class Frailty extends Skill implements PassiveSkill {
     public String[] getDescription(int level) {
         return new String[]{
                 "Nearby enemies that fall below " + ChatColor.GREEN + (40 + ((level - 1) * 10)) + "%" + ChatColor.GRAY + " health",
-                "take " + ChatColor.GREEN + (20 + ((level - 1) * 5)) + "%" + ChatColor.GRAY + " more damage from only you."
+                "take " + ChatColor.GREEN + (20 + ((level - 1) * 5)) + "%" + ChatColor.GRAY + " more damage from your melee attacks."
         };
     }
 
