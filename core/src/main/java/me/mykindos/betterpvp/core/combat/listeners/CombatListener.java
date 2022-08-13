@@ -16,6 +16,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -444,8 +445,19 @@ public class CombatListener implements Listener {
 
     @EventHandler
     public void onFireDamage(CustomDamageEvent event) {
-        if(event.getCause() == EntityDamageEvent.DamageCause.FIRE_TICK) {
+        if (event.getCause() == EntityDamageEvent.DamageCause.FIRE_TICK) {
             event.setIgnoreArmour(true);
+        }
+    }
+
+    /**
+     * Disable bow critical hits
+     * @param event The event
+     */
+    @EventHandler
+    public void onShootBow(EntityShootBowEvent event) {
+        if (event.getProjectile() instanceof Arrow arrow) {
+            arrow.setCritical(false);
         }
     }
 

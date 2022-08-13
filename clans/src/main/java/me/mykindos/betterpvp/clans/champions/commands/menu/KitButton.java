@@ -28,6 +28,7 @@ public class KitButton extends Button {
         player.getInventory().addItem(new ItemStack(Material.IRON_AXE));
         player.getInventory().addItem(new ItemStack(Material.BOW));
         player.getInventory().addItem(new ItemStack(Material.ARROW, 64));
+        player.getInventory().addItem(new ItemStack(Material.BOOK));
 
         player.closeInventory();
     }

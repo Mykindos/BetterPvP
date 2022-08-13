@@ -233,68 +233,9 @@ public class UtilBlock {
      * @return Returns true if the block does not stop player movement
      */
     public static boolean airFoliage(Material mat) {
-        if (blockAirFoliageSet.isEmpty()) {
-            blockAirFoliageSet.add(Material.AIR);
-            blockAirFoliageSet.add(Material.CAVE_AIR);
-            blockAirFoliageSet.add(Material.VOID_AIR);
-            for (Material m : Material.values()) {
-                if (m.name().contains("SAPLING")) {
-                    blockAirFoliageSet.add(m);
-                } else if (m.name().contains("DEAD")) {
-                    blockAirFoliageSet.add(m);
-                } else if (m.name().contains("TULIP")) {
-                    blockAirFoliageSet.add(m);
-                } else if (m.name().contains("CORAL")) {
-                    blockAirFoliageSet.add(m);
-                } else if (m.name().contains("_SIGN")) {
-                    blockAirFoliageSet.add(m);
-                } else if (m.name().contains("_BANNER")) {
-                    blockAirFoliageSet.add(m);
-                } else if (m.name().contains("CHORUS")) {
-                    blockAirFoliageSet.add(m);
-                } else if (m.name().contains("TORCH")) {
-                    blockAirFoliageSet.add(m);
-                } else if (m.name().contains("GATE")) {
-                    blockAirFoliageSet.add(m);
-                }
-            }
-
-            blockAirFoliageSet.add(Material.BROWN_MUSHROOM);
-            blockAirFoliageSet.add(Material.RED_MUSHROOM);
-            blockAirFoliageSet.add(Material.FERN);
-            blockAirFoliageSet.add(Material.LARGE_FERN);
-            blockAirFoliageSet.add(Material.GRASS);
-            blockAirFoliageSet.add(Material.TALL_GRASS);
-            blockAirFoliageSet.add(Material.SEAGRASS);
-            blockAirFoliageSet.add(Material.TALL_SEAGRASS);
-            blockAirFoliageSet.add(Material.CORNFLOWER);
-            blockAirFoliageSet.add(Material.SUNFLOWER);
-            blockAirFoliageSet.add(Material.LILY_OF_THE_VALLEY);
-            blockAirFoliageSet.add(Material.SEA_PICKLE);
-            blockAirFoliageSet.add(Material.POPPY);
-            blockAirFoliageSet.add(Material.OXEYE_DAISY);
-            blockAirFoliageSet.add(Material.WITHER_ROSE);
-            blockAirFoliageSet.add(Material.DANDELION);
-            blockAirFoliageSet.add(Material.AZURE_BLUET);
-            blockAirFoliageSet.add(Material.BLUE_ORCHID);
-            blockAirFoliageSet.add(Material.ALLIUM);
-            blockAirFoliageSet.add(Material.SNOW);
-
-        }
-
-        return blockAirFoliageSet.contains(mat);
+        return !mat.isSolid();
     }
 
-
-    /**
-     * Check if block is a block entities can walk through (e.g. Long grass)
-     *
-     * @param block block ID
-     * @return Returns true if the block does not stop player movement
-     */
-    public static boolean airFoliage(int block) {
-        return airFoliage((byte) block);
-    }
 
     /**
      * Check if block is a block entities can walk through (e.g. Long grass)
@@ -302,7 +243,6 @@ public class UtilBlock {
      * @param block Block to check
      * @return Returns true if the block does not stop player movement
      */
-    @SuppressWarnings("deprecation")
     public static boolean airFoliage(Block block) {
         if (block == null) {
             return false;
@@ -316,80 +256,7 @@ public class UtilBlock {
      * @return Returns true if the block is solid (e.g. Stone)
      */
     public static boolean solid(Material mat) {
-        if (blockPassSet.isEmpty()) {
-
-            blockPassSet.add(Material.AIR);
-            blockPassSet.add(Material.CAVE_AIR);
-            blockPassSet.add(Material.VOID_AIR);
-            for (Material m : Material.values()) {
-                if (m.name().contains("SAPLING")) {
-                    blockPassSet.add(m);
-                } else if (m.name().contains("DEAD")) {
-                    blockPassSet.add(m);
-                } else if (m.name().contains("_BED")) {
-                    blockPassSet.add(m);
-                } else if (m.name().contains("RAIL")) {
-                    blockPassSet.add(m);
-                } else if (m.name().contains("TULIP")) {
-                    blockPassSet.add(m);
-                } else if (m.name().contains("MUSHROOM")) {
-                    blockPassSet.add(m);
-                } else if (m.name().contains("CARPET")) {
-                    blockPassSet.add(m);
-                } else if (m.name().contains("CORAL")) {
-                    blockPassSet.add(m);
-                } else if (m.name().contains("_SIGN")) {
-                    blockPassSet.add(m);
-                } else if (m.name().contains("_BANNER")) {
-                    blockPassSet.add(m);
-                } else if (m.name().contains("_HEAD")) {
-                    blockPassSet.add(m);
-                } else if (m.name().contains("_SLAB")) {
-                    blockPassSet.add(m);
-                } else if (m.name().contains("POTTED")) {
-                    blockPassSet.add(m);
-                } else if (m.name().contains("CHORUS")) {
-                    blockPassSet.add(m);
-                } else if (m.name().contains("TORCH")) {
-                    blockPassSet.add(m);
-                } else if (m.name().contains("GATE")) {
-                    blockPassSet.add(m);
-                } else if (m.name().contains("BUTTON")) {
-                    blockPassSet.add(m);
-                }
-            }
-
-            blockPassSet.add(Material.GRASS);
-            blockPassSet.add(Material.TALL_GRASS);
-            blockPassSet.add(Material.REDSTONE_WIRE);
-            blockPassSet.add(Material.CAULDRON);
-            blockPassSet.add(Material.BREWING_STAND);
-            blockPassSet.add(Material.WATER);
-            blockPassSet.add(Material.LAVA);
-            blockPassSet.add(Material.COBWEB);
-            blockPassSet.add(Material.FERN);
-            blockPassSet.add(Material.LARGE_FERN);
-            blockPassSet.add(Material.GRASS);
-            blockPassSet.add(Material.SEAGRASS);
-            blockPassSet.add(Material.TALL_SEAGRASS);
-            blockPassSet.add(Material.CORNFLOWER);
-            blockPassSet.add(Material.SUNFLOWER);
-            blockPassSet.add(Material.LILY_OF_THE_VALLEY);
-            blockPassSet.add(Material.SEA_PICKLE);
-            blockPassSet.add(Material.POPPY);
-            blockPassSet.add(Material.OXEYE_DAISY);
-            blockPassSet.add(Material.WITHER_ROSE);
-            blockPassSet.add(Material.DANDELION);
-            blockPassSet.add(Material.AZURE_BLUET);
-            blockPassSet.add(Material.BLUE_ORCHID);
-            blockPassSet.add(Material.ALLIUM);
-            blockPassSet.add(Material.LANTERN);
-            blockPassSet.add(Material.CAMPFIRE);
-            blockPassSet.add(Material.BARRIER);
-
-        }
-
-        return !blockPassSet.contains(mat);
+        return mat.isSolid();
     }
 
     /**
@@ -426,67 +293,8 @@ public class UtilBlock {
      * @return True if the block can be interacted with. (E.g. a chest or door)
      */
     public static boolean usable(Material mat) {
-        if (blockUseSet.isEmpty()) {
-            for (Material m : Material.values()) {
-                if (m.name().contains("CHEST")) {
-                    blockUseSet.add(m);
-                } else if (m.name().contains("FURNACE")) {
-                    blockUseSet.add(m);
-                } else if (m.name().contains("SHULKER")) {
-                    blockUseSet.add(m);
-                } else if (m.name().contains("ANVIL")) {
-                    blockUseSet.add(m);
-                } else if (m.name().contains("DOOR")) {
-                    blockUseSet.add(m);
-                } else if (m.name().contains("GATE")) {
-                    blockUseSet.add(m);
-                }
-            }
-
-            blockUseSet.add(Material.CAULDRON);
-            blockUseSet.add(Material.CARTOGRAPHY_TABLE);
-            blockUseSet.add(Material.BEEHIVE);
-            blockUseSet.add(Material.JUKEBOX);
-            blockUseSet.add(Material.ENCHANTING_TABLE);
-            blockUseSet.add(Material.SMOKER);
-            blockUseSet.add(Material.BARREL);
-            blockUseSet.add(Material.BREWING_STAND);
-            blockUseSet.add(Material.BELL);
-            blockUseSet.add(Material.SMITHING_TABLE);
-            blockUseSet.add(Material.LOOM);
-            blockUseSet.add(Material.GRINDSTONE);
-            blockUseSet.add(Material.DISPENSER);
-            blockUseSet.add(Material.IRON_DOOR);
-            blockUseSet.add(Material.IRON_TRAPDOOR);
-            blockUseSet.add(Material.NOTE_BLOCK);
-
-          /*  blockUseSet.add((byte) 23);
-            blockUseSet.add((byte) 330);
-            blockUseSet.add((byte) 167);
-            blockUseSet.add((byte) 26);
-            blockUseSet.add((byte) 54);
-            blockUseSet.add((byte) 58);
-            blockUseSet.add((byte) 61);
-            blockUseSet.add((byte) 62);
-            blockUseSet.add((byte) 64);
-            blockUseSet.add((byte) 69);
-            blockUseSet.add((byte) 71);
-            blockUseSet.add((byte) 77);
-            blockUseSet.add((byte) 93);
-            blockUseSet.add((byte) 94);
-            blockUseSet.add((byte) 96);
-            blockUseSet.add((byte) 107);
-            blockUseSet.add((byte) 183);
-            blockUseSet.add((byte) 184);
-            blockUseSet.add((byte) 185);
-            blockUseSet.add((byte) 186);
-            blockUseSet.add((byte) 187);
-            blockUseSet.add((byte) 117);
-            blockUseSet.add((byte) 116);
-            blockUseSet.add((byte) 145);
-            blockUseSet.add((byte) 146);*/
-        }
-        return blockUseSet.contains(mat);
+        boolean interactable = mat.isInteractable();
+        return interactable || mat.name().contains("STAIR") || mat.name().contains("FENCE") || mat.name().contains("WIRE");
     }
 
     public static boolean isInLiquid(Entity ent) {

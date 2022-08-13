@@ -45,4 +45,13 @@ public class TeleportWorldCommand extends Command {
             UtilMessage.message(player, "Teleport", "You must specify a world name");
         }
     }
+
+    @Override
+    public String getArgumentType(int arg) {
+        if(arg == 1) {
+            return ArgumentType.WORLD.name();
+        }
+
+        return ArgumentType.NONE.name();
+    }
 }

@@ -25,6 +25,8 @@ import org.bukkit.event.block.Action;
 public class MarkedForDeath extends PrepareArrowSkill {
 
 
+    private double baseDuration;
+
     @Inject
     public MarkedForDeath(Clans clans, ChampionsManager championsManager) {
         super(clans, championsManager);
@@ -42,7 +44,7 @@ public class MarkedForDeath extends PrepareArrowSkill {
         return new String[]{
                 "Your next arrow will mark players",
                 "for death, giving them Vulnerability I",
-                "for " + ChatColor.GREEN + (4 + level) + ChatColor.GRAY + " seconds",
+                "for " + ChatColor.GREEN + (baseDuration + level) + ChatColor.GRAY + " seconds",
                 "Causing them to take 25% additional damage",
                 "from all targets.",
                 "",
@@ -64,7 +66,7 @@ public class MarkedForDeath extends PrepareArrowSkill {
     public void onHit(Player damager, LivingEntity target, int level) {
         if (!(target instanceof Player damagee)) return;
 
-        championsManager.getEffects().addEffect(damagee, EffectType.VULNERABILITY, 1, (6 + level * 1000L));
+        championsManager.getEffects().addEffect(damagee, EffectType.VULNERABILITY, 1, (long) ((baseDuration + level) * 1000L));
         UtilMessage.message(damagee, getClassType().getName(), "%s hit you with %s",
                 ChatColor.YELLOW + damager.getName() + ChatColor.GRAY, ChatColor.GREEN + getName());
     }
@@ -95,5 +97,10 @@ public class MarkedForDeath extends PrepareArrowSkill {
     @Override
     public Action[] getActions() {
         return SkillActions.LEFT_CLICK;
+    }
+
+    @Override
+    public void loadSkillConfig(){
+        baseDuration = getConfig("baseDuration", 6.0, Double.class);
     }
 }

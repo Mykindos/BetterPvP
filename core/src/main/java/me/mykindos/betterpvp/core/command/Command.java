@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.client.Rank;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -11,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Getter
 public abstract class Command implements ICommand {
@@ -74,6 +76,8 @@ public abstract class Command implements ICommand {
             case "POSITION_X" -> tabCompletions.add(sender instanceof Player player ? player.getLocation().getX() + "" : "0");
             case "POSITION_Y" -> tabCompletions.add(sender instanceof Player player ? player.getLocation().getY() + "" : "0");
             case "POSITION_Z" -> tabCompletions.add(sender instanceof Player player ? player.getLocation().getZ() + "" : "0");
+            case "WORLD" -> tabCompletions.addAll(Bukkit.getWorlds().stream().map(World::getName)
+                    .filter(name -> name.toLowerCase().startsWith(lowercaseArg)).toList());
         }
 
 

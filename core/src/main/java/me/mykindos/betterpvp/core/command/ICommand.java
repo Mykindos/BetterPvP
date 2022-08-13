@@ -55,7 +55,8 @@ public interface ICommand {
         PLAYER,
         POSITION_X,
         POSITION_Y,
-        POSITION_Z
+        POSITION_Z,
+        WORLD
     }
 
 }
