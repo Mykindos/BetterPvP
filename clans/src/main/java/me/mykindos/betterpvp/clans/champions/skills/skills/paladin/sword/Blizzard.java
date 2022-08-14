@@ -108,7 +108,7 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergySkill
                     int level = getLevel(player);
                     if (level <= 0) {
                         active.remove(player.getUniqueId());
-                    } else if (!championsManager.getEnergy().use(player, getName(), getEnergy(getLevel(player)) / 4, true)) {
+                    } else if (!championsManager.getEnergy().use(player, getName(), getEnergy(level) / 4, true)) {
                         active.remove(player.getUniqueId());
                     } else if (!UtilPlayer.isHoldingItem(player, SkillWeapons.SWORDS)) {
                         active.remove(player.getUniqueId());

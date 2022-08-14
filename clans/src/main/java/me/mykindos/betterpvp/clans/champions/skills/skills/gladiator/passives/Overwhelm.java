@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.clans.champions.skills.skills.warlock.passives;
+package me.mykindos.betterpvp.clans.champions.skills.skills.gladiator.passives;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -10,57 +10,62 @@ import me.mykindos.betterpvp.clans.champions.skills.data.SkillType;
 import me.mykindos.betterpvp.clans.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 @Singleton
 @BPvPListener
-public class Impotence extends Skill implements PassiveSkill {
+public class Overwhelm extends Skill implements PassiveSkill {
 
     @Inject
-    public Impotence(Clans clans, ChampionsManager championsManager) {
+    public Overwhelm(Clans clans, ChampionsManager championsManager) {
         super(clans, championsManager);
     }
 
     @Override
     public String getName() {
-        return "Impotence";
+        return "Overwhelm";
     }
 
     @Override
     public String[] getDescription(int level) {
+
         return new String[]{
-                "For each enemy within " + ChatColor.GREEN + (3 + level) + ChatColor.GRAY + " blocks",
-                "you take reduced damage from all sources, at a maximum of 3 players.",
-                "",
-                "Damage Reduction:",
-                "1 nearby enemy = 20%",
-                "3 nearby enemies = 30%"
+                "You deal 1 bonus damage for every",
+                "2 more health you have than your",
+                "target. You can deal a maximum of",
+                ChatColor.GREEN + String.format("%.1f", (0.0 + (level * 0.5))) + ChatColor.GRAY + " bonus damage."
         };
     }
 
     @Override
     public Role getClassType() {
-        return Role.WARLOCK;
+        return Role.GLADIATOR;
     }
 
     @Override
     public SkillType getType() {
-        return SkillType.PASSIVE_A;
+        return SkillType.PASSIVE_B;
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGH)
     public void onDamage(CustomDamageEvent event) {
-        if (!(event.getDamagee() instanceof Player player)) return;
-
+        if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
+        if (!(event.getDamager() instanceof Player player)) return;
         int level = getLevel(player);
         if (level > 0) {
-            int nearby = UtilPlayer.getNearbyEnemies(player, player.getLocation(), 3 + level).size();
-            event.setDamage(event.getDamage() * (1 - ((15 + (Math.min(nearby, 3) * 5)) * 0.01)));
+            LivingEntity ent = event.getDamagee();
+            double difference = (player.getHealth() - ent.getHealth()) / 2;
+            if (difference > 0) {
+                difference = Math.min(difference, (level * 0.5));
+                event.setDamage(event.getDamage() + difference);
+            }
         }
-
     }
+
+
 }

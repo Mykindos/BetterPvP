@@ -77,13 +77,13 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
         }
     }
 
-    private boolean isInTorment(LivingEntity e) {
+    private boolean isInTorment(LivingEntity entity) {
         for (Torment torment : tormentList) {
-            if (!torment.getLocation().getWorld().equals(e.getLocation().getWorld())) {
+            if (!torment.getLocation().getWorld().equals(entity.getLocation().getWorld())) {
                 return false;
             }
-            for (var data : UtilEntity.getNearbyEnemies(torment.getCaster(), torment.getLocation(), (radius + (torment.getLevel() / 2f)))) {
-                if (data.get().equals(e)) {
+            for (LivingEntity target : UtilEntity.getNearbyEnemies(torment.getCaster(), torment.getLocation(), (radius + (torment.getLevel() / 2f)))) {
+                if (target.equals(entity)) {
                     return true;
                 }
             }

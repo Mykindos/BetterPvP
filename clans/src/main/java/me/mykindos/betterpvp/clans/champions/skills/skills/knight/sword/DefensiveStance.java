@@ -112,13 +112,12 @@ public class DefensiveStance extends ChannelSkill implements InteractSkill, Ener
             if (!active.contains(player.getUniqueId())) continue;
 
             if (player.isHandRaised()) {
-
-                if (!championsManager.getEnergy().use(player, getName(), getEnergy(getLevel(player)) / 2, true)) {
+                int level = getLevel(player);
+                if (level <= 0) {
                     active.remove(player.getUniqueId());
-
+                } else if (!championsManager.getEnergy().use(player, getName(), getEnergy(level) / 2, true)) {
+                    active.remove(player.getUniqueId());
                 } else if (!UtilPlayer.isHoldingItem(player, SkillWeapons.SWORDS)) {
-                    active.remove(player.getUniqueId());
-                } else if (!hasSkill(player)) {
                     active.remove(player.getUniqueId());
                 } else {
                     player.getWorld().playEffect(player.getLocation(), Effect.STEP_SOUND, 20);

@@ -15,7 +15,6 @@ import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
-import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -98,9 +97,10 @@ public class Frailty extends Skill implements PassiveSkill {
         active.forEach(uuid -> {
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
-                for (var data : UtilPlayer.getNearbyPlayers(player, player.getLocation(), 5, EntityProperty.ENEMY)) {
-                    Player target = data.get();
-                    if (target.getHealth() / UtilPlayer.getMaxHealth(target) * 100 < (40 + ((getLevel(player) - 1) * 10))) {
+                int level = getLevel(player);
+                if (level <= 0) return;
+                for (Player target : UtilPlayer.getNearbyAllies(player, player.getLocation(), 5)) {
+                    if (target.getHealth() / UtilPlayer.getMaxHealth(target) * 100 < (40 + ((level - 1) * 10))) {
                         target.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 30, 0));
                     }
                 }

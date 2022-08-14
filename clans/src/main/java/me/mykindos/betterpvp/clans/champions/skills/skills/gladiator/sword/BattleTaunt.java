@@ -15,7 +15,6 @@ import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
-import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import org.bukkit.*;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -64,16 +63,17 @@ public class BattleTaunt extends ChannelSkill implements InteractSkill, Cooldown
 
 
     @UpdateEvent
-    public void Energy() {
+    public void energy() {
         Iterator<UUID> activeIterator = active.iterator();
         while (activeIterator.hasNext()) {
             UUID uuid = activeIterator.next();
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
                 if (player.isHandRaised()) {
-                    if (!championsManager.getEnergy().use(player, getName(), getEnergy(getLevel(player)) / 2, true)) {
+                    int level = getLevel(player);
+                    if(level <= 0){
                         activeIterator.remove();
-                    } else if (!hasSkill(player)) {
+                    }else if (!championsManager.getEnergy().use(player, getName(), getEnergy(level) / 2, true)) {
                         activeIterator.remove();
                     } else if (!player.getInventory().getItemInMainHand().getType().name().contains("SWORD")) {
                         activeIterator.remove();
@@ -83,7 +83,7 @@ public class BattleTaunt extends ChannelSkill implements InteractSkill, Cooldown
 
                         player.getWorld().playEffect(player.getLocation(), Effect.STEP_SOUND, Material.DIAMOND_BLOCK);
 
-                        for (int i = 0; i <= (2 + getLevel(player)); i++) {
+                        for (int i = 0; i <= (2 + level); i++) {
                             pull(player, player.getEyeLocation().add(player.getLocation().getDirection().multiply(i)));
                         }
                     }
@@ -97,9 +97,8 @@ public class BattleTaunt extends ChannelSkill implements InteractSkill, Cooldown
     }
 
     private void pull(Player player, Location location) {
-        for (var other : UtilEntity.getNearbyEntities(player, location, 2.0, EntityProperty.ENEMY)) {
-            LivingEntity target = other.getKey();
-            if (other.getKey() instanceof Player) {
+        for (LivingEntity target : UtilEntity.getNearbyEnemies(player, location, 2.0)) {
+            if (target instanceof Player) {
 
                 if (UtilMath.offset(player.getLocation(), target.getLocation()) >= 2.0D) {
                     UtilVelocity.velocity(target, UtilVelocity.getTrajectory(target, player), 0.3D, false, 0.0D, 0.0D, 1.0D, true);

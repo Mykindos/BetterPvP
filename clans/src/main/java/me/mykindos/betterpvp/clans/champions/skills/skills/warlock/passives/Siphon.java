@@ -13,7 +13,6 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
-import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -58,8 +57,7 @@ public class Siphon extends Skill implements PassiveSkill {
         for (Player player : Bukkit.getOnlinePlayers()) {
             int level = getLevel(player);
             if(level > 0) {
-                for(var data : UtilPlayer.getNearbyPlayers(player, player.getLocation(), 4+ level, EntityProperty.ENEMY)) {
-                    Player target = data.get();
+                for(Player target : UtilPlayer.getNearbyEnemies(player, player.getLocation(), 4+ level)) {;
                     championsManager.getEnergy().degenerateEnergy(target, 0.1f);
                     new BukkitRunnable() {
                         private final Location position = target.getLocation().add(0, 1, 0);

@@ -12,7 +12,6 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
-import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
@@ -56,8 +55,7 @@ public class Bloodthirst extends Skill implements PassiveSkill {
             int level = getLevel(player);
             if (level <= 0) continue;
 
-            for (var data : UtilPlayer.getNearbyPlayers(player, player.getLocation(), 50, EntityProperty.ENEMY)) {
-                Player target = data.get();
+            for (Player target : UtilPlayer.getNearbyEnemies(player, player.getLocation(), 50)) {
                 if (UtilPlayer.getHealthPercentage(target) < (25 + (level * 5))) {
                     UtilPlayer.setGlowing(player, target, true);
 

@@ -3,7 +3,6 @@ package me.mykindos.betterpvp.clans.champions.skills.skills.gladiator.sword;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Data;
-
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.champions.ChampionsManager;
 import me.mykindos.betterpvp.clans.champions.roles.Role;
@@ -15,7 +14,6 @@ import me.mykindos.betterpvp.clans.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.clans.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.clans.combat.throwables.ThrowableItem;
 import me.mykindos.betterpvp.clans.combat.throwables.events.ThrowableHitEntityEvent;
-import me.mykindos.betterpvp.clans.combat.throwables.events.ThrowableHitGroundEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;

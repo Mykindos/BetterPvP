@@ -15,7 +15,6 @@ import me.mykindos.betterpvp.core.framework.customtypes.CustomArmourStand;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.*;
-import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -88,9 +87,7 @@ public class Grasp extends Skill implements InteractSkill, CooldownSkill, Listen
 
         stands.put(test, System.currentTimeMillis() + 200);
 
-        for (var data : UtilEntity.getNearbyEntities(player, loc, 1, EntityProperty.ENEMY)) {
-            LivingEntity target = data.get();
-
+        for (LivingEntity target : UtilEntity.getNearbyEnemies(player, loc, 1)) {
             if (target.getLocation().distance(player.getLocation()) < 3) continue;
             Location targetLocation = player.getLocation();
             targetLocation.add(targetLocation.getDirection().normalize().multiply(2));
