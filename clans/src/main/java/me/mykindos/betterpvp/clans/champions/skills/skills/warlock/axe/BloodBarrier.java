@@ -17,7 +17,6 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
-import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Particle;
@@ -157,8 +156,8 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_EVOKER_PREPARE_ATTACK, 2.0f, 1.0f);
 
         shieldDataMap.put(player.getUniqueId(), new ShieldData((long) (duration * 1000)));
-        for (var data : UtilPlayer.getNearbyPlayers(player, player.getLocation(), range + level, EntityProperty.FRIENDLY)) {
-            shieldDataMap.put(data.get().getUniqueId(), new ShieldData((long) (duration * 1000)));
+        for (Player ally : UtilPlayer.getNearbyAllies(player, player.getLocation(), range + level)) {
+            shieldDataMap.put(ally.getUniqueId(), new ShieldData((long) (duration * 1000)));
         }
     }
 

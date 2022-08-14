@@ -12,7 +12,6 @@ import me.mykindos.betterpvp.clans.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.clans.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
-import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
@@ -72,8 +71,7 @@ public class Cyclone extends Skill implements InteractSkill, CooldownSkill {
         vector.setY(vector.getY() + 2);
 
 
-        for (var data : UtilEntity.getNearbyEntities(player, player.getLocation(), minimumDistance + level, EntityProperty.ENEMY)) {
-            LivingEntity target = data.getKey();
+        for (LivingEntity target : UtilEntity.getNearbyEnemies(player, player.getLocation(), minimumDistance + level)) {
             if (!target.getName().equalsIgnoreCase(player.getName())) {
                 if (player.hasLineOfSight(target)) {
 

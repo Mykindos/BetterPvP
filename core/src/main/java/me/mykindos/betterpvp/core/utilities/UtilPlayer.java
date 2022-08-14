@@ -26,6 +26,19 @@ import java.util.List;
 
 public class UtilPlayer {
 
+
+    public static List<Player> getNearbyEnemies(Player player, Location location, double radius) {
+        List<Player> enemies = new ArrayList<>();
+        getNearbyPlayers(player, location, radius, EntityProperty.ENEMY).forEach(entry -> enemies.add(entry.get()));
+        return enemies;
+    }
+
+    public static List<Player> getNearbyAllies(Player player, Location location, double radius) {
+        List<Player> friendlies = new ArrayList<>();
+        getNearbyPlayers(player, location, radius, EntityProperty.FRIENDLY).forEach(entry -> friendlies.add(entry.get()));
+        return friendlies;
+    }
+
     public static List<KeyValue<Player, EntityProperty>> getNearbyPlayers(Player player, double radius) {
         return getNearbyPlayers(player, player.getLocation(), radius, EntityProperty.ALL);
     }

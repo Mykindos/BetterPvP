@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.clans.champions.skills.skills.paladin.axe;
+package me.mykindos.betterpvp.clans.champions.skills.skills.gladiator.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -10,46 +10,51 @@ import me.mykindos.betterpvp.clans.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.clans.champions.skills.data.SkillType;
 import me.mykindos.betterpvp.clans.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.clans.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.ChatColor;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 @Singleton
 @BPvPListener
-public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill {
+public class StrengthInNumbers extends Skill implements InteractSkill, CooldownSkill {
+
+    private int radius;
+    private double duration;
 
     @Inject
-    public DefensiveAura(Clans clans, ChampionsManager championsManager) {
+    public StrengthInNumbers(Clans clans, ChampionsManager championsManager) {
         super(clans, championsManager);
     }
 
     @Override
     public String getName() {
-        return "Defensive Aura";
+        return "Strength in Numbers";
     }
 
     @Override
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Right click with a axe to Activate",
+                "Right click with a axe to activate.",
                 "",
-                "Gives you, and all allies within " + ChatColor.GREEN + (6 + level) + ChatColor.GRAY + " blocks",
-                "2 bonus hearts",
+                "Grant all allies within " + ChatColor.GREEN + radius + ChatColor.GRAY + " blocks",
+                "Strength I for " + ChatColor.GREEN + (duration + level),
+                "seconds.",
+                "",
+                "This does not give you the buff.",
                 "",
                 "Cooldown: " + ChatColor.GREEN + getCooldown(level)
+
         };
     }
 
     @Override
     public Role getClassType() {
-        return Role.PALADIN;
+        return Role.GLADIATOR;
     }
 
     @Override
@@ -58,34 +63,30 @@ public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill
         return SkillType.AXE;
     }
 
-
     @Override
     public double getCooldown(int level) {
 
-        return cooldown - ((level - 1) * 2);
+        return cooldown - ((level - 1));
     }
-
 
     @Override
     public void activate(Player player, int level) {
-        player.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, 200, 0));
-        AttributeInstance playerMaxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
-        if (playerMaxHealth != null) {
-            player.setHealth(Math.min(player.getHealth() + 4, playerMaxHealth.getValue()));
-            for (Player target : UtilPlayer.getNearbyAllies(player, player.getLocation(), (6 + level))) {
+        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 2.0F);
+        championsManager.getEffects().addEffect(player, EffectType.STRENGTH, 1, (long) ((duration + level) * 1000L));
 
-                target.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, 200, 0));
-                AttributeInstance targetMaxHealth = target.getAttribute(Attribute.GENERIC_MAX_HEALTH);
-                if (targetMaxHealth != null) {
-                    target.setHealth(Math.min(target.getHealth() + 4, targetMaxHealth.getValue()));
-                }
-
-            }
+        for (Player target : UtilPlayer.getNearbyAllies(player, player.getLocation(), radius)) {
+            championsManager.getEffects().addEffect(target, EffectType.STRENGTH, 1, (long) ((duration + level) * 1000L));
         }
     }
 
     @Override
     public Action[] getActions() {
         return SkillActions.RIGHT_CLICK;
+    }
+
+    @Override
+    public void loadSkillConfig() {
+        radius = getConfig("radius", 10, Integer.class);
+        duration = getConfig("duration", 2.0, Double.class);
     }
 }

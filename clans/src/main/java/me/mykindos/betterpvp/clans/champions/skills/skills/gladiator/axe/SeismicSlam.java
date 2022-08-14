@@ -144,8 +144,7 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
                     }
                 }
 
-                for (var data : UtilEntity.getNearbyEnemies(player, player.getLocation(), radius)) {
-                    LivingEntity ent = data.get();
+                for (LivingEntity ent : UtilEntity.getNearbyEnemies(player, player.getLocation(), radius)) {
                     if (immune.get(player).contains(ent)) continue;
                     if (ent instanceof Player target) {
                         if (hit.contains(target)) continue;

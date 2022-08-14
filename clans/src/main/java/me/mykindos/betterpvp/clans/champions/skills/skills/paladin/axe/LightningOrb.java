@@ -18,7 +18,6 @@ import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
-import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -89,8 +88,7 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
         int level = getLevel(thrower);
         if (level > 0) {
             int count = 0;
-            for (var tuple : UtilEntity.getNearbyEntities(thrower, event.getThrowable().getItem().getLocation(), spreadDistance + (0.5 * level), EntityProperty.ENEMY)) {
-                LivingEntity ent = tuple.getKey();
+            for (LivingEntity ent : UtilEntity.getNearbyEnemies(thrower, event.getThrowable().getItem().getLocation(), spreadDistance + (0.5 * level))) {
 
                 if (count >= maxTargets) continue;
                 event.getThrowable().getImmunes().add(ent);

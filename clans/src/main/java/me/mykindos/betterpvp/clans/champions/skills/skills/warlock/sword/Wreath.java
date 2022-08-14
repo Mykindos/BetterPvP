@@ -152,11 +152,10 @@ public class Wreath extends PrepareSkill implements CooldownSkill {
                     }
 
                     EvokerFangs fangs = (EvokerFangs) player.getWorld().spawnEntity(loc, EntityType.EVOKER_FANGS);
-                    for (var data : UtilEntity.getNearbyEnemies(player, fangs.getLocation(), 1.5)) {
-                        LivingEntity ent = data.get();
-                        CustomDamageEvent dmg = new CustomDamageEvent(ent, player, null, EntityDamageEvent.DamageCause.CUSTOM, 2 + (getLevel(player) / 1.5), false, getName());
+                    for (LivingEntity target : UtilEntity.getNearbyEnemies(player, fangs.getLocation(), 1.5)) {
+                        CustomDamageEvent dmg = new CustomDamageEvent(target, player, null, EntityDamageEvent.DamageCause.CUSTOM, 2 + (level / 1.5), false, getName());
                         UtilDamage.doCustomDamage(dmg);
-                        ent.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 1));
+                        target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 1));
                     }
 
                 }

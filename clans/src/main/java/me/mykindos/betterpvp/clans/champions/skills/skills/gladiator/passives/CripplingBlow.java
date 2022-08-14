@@ -57,7 +57,6 @@ public class CripplingBlow extends Skill implements PassiveSkill {
 
         int level = getLevel(player);
         if(level > 0) {
-
             LivingEntity target = event.getDamagee();
             target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) ((slowDuration + (level * 0.5)) * 20), 0));
             event.setReason(getName());

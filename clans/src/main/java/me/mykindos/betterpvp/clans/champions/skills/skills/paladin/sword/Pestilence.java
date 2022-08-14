@@ -17,7 +17,6 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
-import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Particle;
@@ -81,8 +80,7 @@ public class Pestilence extends PrepareSkill implements CooldownSkill {
             Player player = Bukkit.getPlayer(key);
             if (player == null) return;
             for (LivingEntity entity : value.getCurrentlyInfected().keySet()) {
-                for (var data : UtilEntity.getNearbyEntities(player, entity.getLocation(), 5.0, EntityProperty.ENEMY)) {
-                    LivingEntity target = data.get();
+                for (LivingEntity target : UtilEntity.getNearbyEnemies(player, entity.getLocation(), 5.0)) {
                     if (value.getCurrentlyInfected().containsKey(target)) continue;
                     if (value.getOldInfected().containsKey(target)) continue;
 

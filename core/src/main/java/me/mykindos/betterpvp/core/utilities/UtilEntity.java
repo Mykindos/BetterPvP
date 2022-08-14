@@ -18,8 +18,10 @@ public class UtilEntity {
         return getNearbyEntities(source, source.getLocation(), radius, EntityProperty.ALL);
     }
 
-    public static List<KeyValue<LivingEntity, EntityProperty>> getNearbyEnemies(LivingEntity source, Location location, double radius){
-        return getNearbyEntities(source, location, radius, EntityProperty.ENEMY);
+    public static List<LivingEntity> getNearbyEnemies(LivingEntity source, Location location, double radius){
+        List<LivingEntity> enemies = new ArrayList<>();
+        getNearbyEntities(source, location, radius, EntityProperty.ENEMY).forEach(entry -> enemies.add(entry.get()));
+        return enemies;
     }
 
     public static List<KeyValue<LivingEntity, EntityProperty>> getNearbyEntities(LivingEntity source, Location location, double radius, EntityProperty entityProperty) {

@@ -15,7 +15,6 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
-import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -94,10 +93,9 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_EVOKER_PREPARE_WOLOLO, 1.0f, 0.9f);
         championsManager.getEffects().addEffect(player, EffectType.IMMUNETOEFFECTS, (long) ((duration + (level / 2)) * 1000L));
 
-        for (var data : UtilPlayer.getNearbyPlayers(player, player.getLocation(), (distance + level), EntityProperty.FRIENDLY)) {
-            Player target = data.get();
-            championsManager.getEffects().addEffect(target, EffectType.IMMUNETOEFFECTS, (long) ((duration + (level / 2)) * 1000L));
-            UtilMessage.message(target, "Cleanse", "You were cleansed of negative by " + ChatColor.GREEN + player.getName());
+        for (Player ally : UtilPlayer.getNearbyAllies(player, player.getLocation(), (distance + level))) {
+            championsManager.getEffects().addEffect(ally, EffectType.IMMUNETOEFFECTS, (long) ((duration + (level / 2)) * 1000L));
+            UtilMessage.message(ally, "Cleanse", "You were cleansed of negative by " + ChatColor.GREEN + player.getName());
 
         }
     }
