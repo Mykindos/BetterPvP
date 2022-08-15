@@ -4,18 +4,19 @@ import com.google.inject.Inject;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
-import me.mykindos.betterpvp.clans.clans.components.ClanAlliance;
-import me.mykindos.betterpvp.clans.clans.components.ClanEnemy;
-import me.mykindos.betterpvp.clans.clans.components.ClanMember;
-import me.mykindos.betterpvp.clans.clans.components.ClanTerritory;
 import me.mykindos.betterpvp.clans.clans.events.*;
-import me.mykindos.betterpvp.clans.gamer.Gamer;
-import me.mykindos.betterpvp.clans.gamer.GamerManager;
-import me.mykindos.betterpvp.clans.gamer.exceptions.NoSuchGamerException;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
+import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
+import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
+import me.mykindos.betterpvp.core.components.clans.data.ClanTerritory;
+import me.mykindos.betterpvp.core.components.clans.events.ClanEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.events.scoreboard.ScoreboardUpdateEvent;
 import me.mykindos.betterpvp.core.framework.inviting.InviteHandler;
+import me.mykindos.betterpvp.core.gamer.Gamer;
+import me.mykindos.betterpvp.core.gamer.GamerManager;
+import me.mykindos.betterpvp.core.gamer.exceptions.NoSuchGamerException;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -52,7 +53,7 @@ public class ClanEventListener extends ClanListener {
     }
 
     @EventHandler
-    public void onClanEvent(ClanEvent event) {
+    public void onClanEvent(ClanEvent<Clan> event) {
         if (event.isGlobalScoreboardUpdate()) {
             Bukkit.getOnlinePlayers().forEach(player -> UtilServer.runTaskLater(clans,
                     () -> UtilServer.callEvent(new ScoreboardUpdateEvent(player)), 5));
@@ -66,7 +67,7 @@ public class ClanEventListener extends ClanListener {
         if (event.isCancelled()) return;
 
         Player player = event.getPlayer();
-        Clan clan = event.getClan();
+        Clan clan = (Clan) event.getClan();
 
         String chunkString = UtilWorld.chunkToFile(player.getLocation().getChunk());
         clan.getTerritory().add(new ClanTerritory(chunkString));

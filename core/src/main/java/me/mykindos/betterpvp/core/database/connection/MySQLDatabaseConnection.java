@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.database.connection;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.config.Config;
 import org.flywaydb.core.Flyway;
+import org.flywaydb.core.api.MigrationVersion;
 
 import javax.inject.Inject;
 import java.sql.Connection;
@@ -55,6 +56,7 @@ public class MySQLDatabaseConnection implements IDatabaseConnection {
         var url = "jdbc:mysql://" + sqlServer + "/" + sqlDatabaseName;
 
         var flyway = Flyway.configure(classLoader)
+                .table(prefix + "schema_history")
                 .dataSource(url, sqlUsername, sqlPassword)
                 .locations(location)
                 .placeholders(Map.of("tablePrefix", prefix))

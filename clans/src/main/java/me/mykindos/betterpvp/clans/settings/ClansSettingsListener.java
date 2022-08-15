@@ -1,8 +1,8 @@
 package me.mykindos.betterpvp.clans.settings;
 
 import com.google.inject.Inject;
-import me.mykindos.betterpvp.clans.gamer.GamerManager;
 import me.mykindos.betterpvp.clans.settings.buttons.ClansCategoryButton;
+import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.menu.events.MenuOpenEvent;
 import me.mykindos.betterpvp.core.settings.menus.SettingsMenu;

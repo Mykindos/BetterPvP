@@ -2,10 +2,11 @@ package me.mykindos.betterpvp.clans.clans;
 
 import lombok.Builder;
 import lombok.Data;
-import me.mykindos.betterpvp.clans.clans.components.ClanAlliance;
-import me.mykindos.betterpvp.clans.clans.components.ClanEnemy;
-import me.mykindos.betterpvp.clans.clans.components.ClanMember;
-import me.mykindos.betterpvp.clans.clans.components.ClanTerritory;
+import me.mykindos.betterpvp.core.components.clans.IClan;
+import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
+import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
+import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
+import me.mykindos.betterpvp.core.components.clans.data.ClanTerritory;
 import me.mykindos.betterpvp.core.framework.inviting.Invitable;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
@@ -23,7 +24,7 @@ import java.util.UUID;
 
 @Data
 @Builder
-public class Clan implements Invitable {
+public class Clan implements IClan, Invitable {
 
     private int id;
     private String name;
@@ -93,14 +94,6 @@ public class Clan implements Invitable {
     }
 
 
-    public boolean isAllied(Clan clan) {
-        return alliances.stream().anyMatch(ally -> ally.getClan().getName().equalsIgnoreCase(clan.getName()));
-    }
-
-    public Optional<ClanAlliance> getAlliance(Clan clan) {
-        return alliances.stream().filter(ally -> ally.getClan().getName().equalsIgnoreCase(clan.getName())).findFirst();
-    }
-
     /**
      * @return The total amount of members in an entire alliance
      */
@@ -114,21 +107,6 @@ public class Clan implements Invitable {
         }
 
         return count;
-    }
-
-    public boolean hasTrust(Clan clan) {
-        Optional<ClanAlliance> allianceOptional = getAlliance(clan);
-        return allianceOptional.map(ClanAlliance::isTrusted).orElse(false);
-    }
-
-    public boolean isEnemy(Clan clan) {
-        for (ClanEnemy enemy : getEnemies()) {
-            if (enemy.getClan().equals(clan)) {
-                return true;
-            }
-
-        }
-        return false;
     }
 
     public ClanEnemy getEnemy(Clan clan) {
@@ -177,6 +155,7 @@ public class Clan implements Invitable {
      * @param ignore  Ignore a specific clan member (perhaps the creator)
      * @param prefix  Whether to add a prefix or not. 'Clans>'
      */
+    @Override
     public void messageClan(String message, UUID ignore, boolean prefix) {
         members.forEach(member -> {
             if(ignore != null && ignore.toString().equalsIgnoreCase(member.getUuid())) return;

@@ -1,6 +1,6 @@
 package me.mykindos.betterpvp.clans.settings.buttons;
 
-import me.mykindos.betterpvp.clans.gamer.Gamer;
+import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.settings.menus.buttons.SettingsButton;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
 import org.bukkit.Sound;

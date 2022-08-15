@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.clans.commands.commands;
 
 import com.google.inject.Inject;
 import me.mykindos.betterpvp.clans.Clans;
-import me.mykindos.betterpvp.clans.champions.skills.SkillManager;
 import me.mykindos.betterpvp.clans.commands.ClansCommandLoader;
 import me.mykindos.betterpvp.clans.listener.ClansListenerLoader;
 import me.mykindos.betterpvp.core.client.Client;
@@ -59,8 +58,6 @@ public class ClansCommand extends Command implements IConsoleCommand {
         @Inject
         private ClansListenerLoader listenerLoader;
 
-        @Inject
-        private SkillManager skillManager;
 
         @Override
         public String getName() {
@@ -83,7 +80,6 @@ public class ClansCommand extends Command implements IConsoleCommand {
 
             commandLoader.reload();
             listenerLoader.reload();
-            skillManager.reloadSkills();
 
             UtilMessage.message(sender, "Clans", "Successfully reloaded clans");
         }

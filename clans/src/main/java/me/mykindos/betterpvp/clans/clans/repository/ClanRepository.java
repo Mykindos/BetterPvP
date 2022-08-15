@@ -5,10 +5,11 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
-import me.mykindos.betterpvp.clans.clans.components.ClanAlliance;
-import me.mykindos.betterpvp.clans.clans.components.ClanEnemy;
-import me.mykindos.betterpvp.clans.clans.components.ClanMember;
-import me.mykindos.betterpvp.clans.clans.components.ClanTerritory;
+import me.mykindos.betterpvp.core.components.clans.IClan;
+import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
+import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
+import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
+import me.mykindos.betterpvp.core.components.clans.data.ClanTerritory;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
@@ -29,7 +30,7 @@ import java.util.List;
 public class ClanRepository implements IRepository<Clan> {
 
     @Inject
-    @Config(path = "clans.database.prefix")
+    @Config(path = "clans.database.prefix", defaultValue = "clans_")
     private String databasePrefix;
 
     private final Clans clans;
@@ -182,7 +183,7 @@ public class ClanRepository implements IRepository<Clan> {
         });
     }
 
-    public void saveClanTerritory(Clan clan, String chunk) {
+    public void saveClanTerritory(IClan clan, String chunk) {
         String query = "INSERT INTO " + databasePrefix + "clan_territory (Clan, Chunk) VALUES (?, ?);";
         database.executeUpdateAsync(new Statement(query, new IntegerStatementValue(clan.getId()), new StringStatementValue(chunk)));
     }

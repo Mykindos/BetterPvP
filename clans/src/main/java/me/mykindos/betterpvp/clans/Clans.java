@@ -5,10 +5,7 @@ import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.Setter;
-import me.mykindos.betterpvp.clans.champions.skills.SkillManager;
-import me.mykindos.betterpvp.clans.champions.skills.injector.SkillInjectorModule;
 import me.mykindos.betterpvp.clans.commands.ClansCommandLoader;
-import me.mykindos.betterpvp.clans.gamer.GamerManager;
 import me.mykindos.betterpvp.clans.injector.ClansInjectorModule;
 import me.mykindos.betterpvp.clans.listener.ClansListenerLoader;
 import me.mykindos.betterpvp.core.Core;
@@ -18,6 +15,7 @@ import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.ModuleLoadedEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
+import me.mykindos.betterpvp.core.gamer.GamerManager;
 import org.bukkit.Bukkit;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
@@ -58,8 +56,7 @@ public class Clans extends BPvPPlugin {
             Set<Field> fields = reflections.getFieldsAnnotatedWith(Config.class);
 
             injector = core.getInjector().createChildInjector(new ClansInjectorModule(this),
-                    new ConfigInjectorModule(this, fields),
-                    new SkillInjectorModule(this));
+                    new ConfigInjectorModule(this, fields));
             injector.injectMembers(this);
 
             database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:clans-migrations", databasePrefix);
@@ -71,9 +68,6 @@ public class Clans extends BPvPPlugin {
 
             var clansCommandLoader = injector.getInstance(ClansCommandLoader.class);
             clansCommandLoader.loadCommands(PACKAGE);
-
-            var skillManager = injector.getInstance(SkillManager.class);
-            skillManager.loadSkills();
 
             gamerManager = injector.getInstance(GamerManager.class);
             gamerManager.loadFromList(gamerManager.getGamerRepository().getAll());

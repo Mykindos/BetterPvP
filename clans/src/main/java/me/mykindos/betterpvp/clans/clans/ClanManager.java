@@ -4,15 +4,16 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import me.mykindos.betterpvp.clans.clans.components.ClanAlliance;
-import me.mykindos.betterpvp.clans.clans.components.ClanEnemy;
-import me.mykindos.betterpvp.clans.clans.components.ClanMember;
 import me.mykindos.betterpvp.clans.clans.repository.ClanRepository;
-import me.mykindos.betterpvp.clans.gamer.Gamer;
-import me.mykindos.betterpvp.clans.gamer.GamerManager;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.components.clans.IClan;
+import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
+import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
+import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
+import me.mykindos.betterpvp.core.gamer.Gamer;
+import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
@@ -100,7 +101,7 @@ public class ClanManager extends Manager<Clan> {
     }
 
     // TODO implement pillaging
-    public ClanRelation getRelation(Clan clanA, Clan clanB) {
+    public ClanRelation getRelation(IClan clanA, IClan clanB) {
         if (clanA == null || clanB == null) {
             return ClanRelation.NEUTRAL;
         } else if (clanA.equals(clanB)) {
