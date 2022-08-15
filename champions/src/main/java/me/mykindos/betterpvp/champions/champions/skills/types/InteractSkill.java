@@ -14,4 +14,8 @@ public interface InteractSkill extends ISkill {
         return true;
     }
 
+    default boolean canUseLevitating() {
+        return true;
+    }
+
 }
