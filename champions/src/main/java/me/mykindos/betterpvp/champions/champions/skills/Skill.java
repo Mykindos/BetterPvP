@@ -31,7 +31,7 @@ public abstract class Skill implements ISkill {
     private int maxLevel;
     protected int cooldown;
     protected int energy;
-    
+
     @Inject
     public Skill(Champions champions, ChampionsManager championsManager) {
         this.champions = champions;
@@ -52,13 +52,18 @@ public abstract class Skill implements ISkill {
     public void reload() {
         try {
             loadConfig();
-        }catch(Exception ex){
+        } catch (Exception ex) {
             log.error("Something went wrong loading the skill configuration for {}", getName(), ex);
         }
     }
 
     protected <T> T getConfig(String name, Object defaultValue, Class<T> type) {
-        String path = "skills." + getClassType().name().toLowerCase() + "." + getName().toLowerCase().replace(" ", "") + "." + name;
+        String path;
+        if (getClassType() != null) {
+            path = "skills." + getClassType().name().toLowerCase() + "." + getName().toLowerCase().replace(" ", "") + "." + name;
+        } else {
+            path = "skills.global." + getName().toLowerCase().replace(" ", "") + "." + name;
+        }
         return champions.getConfig().getOrSaveObject(path, defaultValue, type);
     }
 
@@ -78,7 +83,8 @@ public abstract class Skill implements ISkill {
         loadSkillConfig();
     }
 
-    public void loadSkillConfig(){}
+    public void loadSkillConfig() {
+    }
 
     protected boolean hasSkill(Player player) {
         Optional<GamerBuilds> gamerBuildsOptional = championsManager.getBuilds().getObject(player.getUniqueId());
@@ -107,7 +113,7 @@ public abstract class Skill implements ISkill {
         Optional<Role> roleOptional = championsManager.getRoles().getObject(gamerBuilds.getUuid());
         if (roleOptional.isPresent()) {
             Role role = roleOptional.get();
-            if (role == getClassType()) {
+            if (role == getClassType() || getClassType() == null) {
                 RoleBuild roleBuild = gamerBuilds.getActiveBuilds().get(role.getName());
                 BuildSkill buildSkill = roleBuild.getBuildSkill(getType());
                 if (buildSkill != null && buildSkill.getSkill() != null) {

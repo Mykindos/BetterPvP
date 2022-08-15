@@ -16,6 +16,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.util.Vector;
 
@@ -50,19 +51,23 @@ public abstract class PrepareArrowSkill extends PrepareSkill implements Cooldown
 
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onShoot(EntityShootBowEvent event) {
         if (!(event.getEntity() instanceof Player player)) return;
         if (!active.contains(player.getUniqueId())) return;
         if (!(event.getProjectile() instanceof Arrow arrow)) return;
+
         int level = getLevel(player);
         if (level > 0) {
-            arrows.add(arrow);
+            processEntityShootBowEvent(event, player, level, arrow);
             active.remove(player.getUniqueId());
-
             championsManager.getCooldowns().removeCooldown(player, getName(), true);
             championsManager.getCooldowns().add(player, getName(), getCooldown(level), showCooldownFinished(), false);
         }
+    }
+
+    public void processEntityShootBowEvent(EntityShootBowEvent event, Player player, int level, Arrow arrow) {
+        arrows.add(arrow);
     }
 
     @UpdateEvent
@@ -104,7 +109,7 @@ public abstract class PrepareArrowSkill extends PrepareSkill implements Cooldown
                 if (cooldown != null) {
                     if (cooldown.isCancellable()) {
                         championsManager.getCooldowns().removeCooldown(player, getName(), true);
-                        UtilMessage.message(player, getClassType().getName(),  "%s was cancelled.",
+                        UtilMessage.message(player, getClassType().getName(), "%s was cancelled.",
                                 ChatColor.GREEN + getName() + " " + level + ChatColor.GRAY);
                         it.remove();
                     }

@@ -88,17 +88,16 @@ public class ThrowableListener implements Listener {
     private void checkEntityCollision(ThrowableItem throwable) {
         if (throwable.getItem() == null || throwable.getItem().isDead()) return;
         Location location = throwable.getItem().getLocation().clone();
-        if (!doCollision(throwable, location, 1.5)) {
+        if (!doCollision(throwable, location, throwable.getCollisionRadius())) {
             if (throwable.isCheckingHead()) {
-                doCollision(throwable, location.add(0, 1, 0), 1.5);
+                doCollision(throwable, location.add(0, 1.5, 0), throwable.getCollisionRadius());
             }
         }
     }
 
     private boolean doCollision(ThrowableItem throwable, Location location, double distance) {
-        var targets = UtilEntity.getNearbyEntities(throwable.getThrower(), location, distance, EntityProperty.ENEMY);
-        for (var data : targets) {
-            LivingEntity entity = data.get();
+        var targets = UtilEntity.getNearbyEnemies(throwable.getThrower(), location, distance);
+        for (LivingEntity entity : targets) {
             if (throwable.getImmune().contains(entity)) continue;
             UtilServer.callEvent(new ThrowableHitEntityEvent(throwable, entity));
             if (throwable.isSingleCollision()) {

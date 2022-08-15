@@ -10,7 +10,7 @@ public interface InteractSkill extends ISkill {
 
     Action[] getActions();
 
-    default boolean canUseSlowed(){
+    default boolean canUseSlowed() {
         return true;
     }
 

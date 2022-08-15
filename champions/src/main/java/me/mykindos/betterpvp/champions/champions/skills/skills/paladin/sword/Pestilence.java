@@ -32,12 +32,13 @@ import org.bukkit.potion.PotionEffectType;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
 @BPvPListener
 public class Pestilence extends PrepareSkill implements CooldownSkill {
 
-    private final HashMap<UUID, PestilenceData> pestilenceData = new HashMap<>();
+    private final ConcurrentHashMap<UUID, PestilenceData> pestilenceData = new ConcurrentHashMap<>();
 
     private double infectionDuration;
 

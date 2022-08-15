@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.components.champions.Role;
+import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 import org.reflections.Reflections;
 
@@ -51,7 +52,7 @@ public class SkillManager extends Manager<Skill> {
     }
 
     public List<Skill> getSkillsForRole(Role role) {
-        return objects.values().stream().filter(skill -> skill.getClassType() == role).toList();
+        return objects.values().stream().filter(skill -> skill.getClassType() == role || skill.getType() == SkillType.GLOBAL).toList();
     }
 
 }

@@ -78,4 +78,11 @@ public class ClansSkillListener implements Listener {
             }
         }
     }
+
+    @EventHandler
+    public void disableSafezone(PlayerCanUseSkillEvent event) {
+        if(!clanManager.canCast(event.getPlayer())) {
+            event.setCancelled(true);
+        }
+    }
 }

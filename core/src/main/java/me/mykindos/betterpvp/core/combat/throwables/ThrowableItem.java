@@ -20,6 +20,7 @@ public class ThrowableItem {
     private boolean collideGround;
     private boolean removeOnCollision;
     private boolean singleCollision;
+    private double collisionRadius = 1.5;
 
     public ThrowableItem(Item item, LivingEntity thrower, String name, long expireTime) {
         this(item, thrower, name, expireTime, false, false);

@@ -113,8 +113,9 @@ public class SkillListener implements Listener {
             toggleSkill.toggle(player, level);
         }
 
-        sendSkillUsed(player, skill, level);
-
+        if(skill.displayWhenUsed()) {
+            sendSkillUsed(player, skill, level);
+        }
     }
 
     @EventHandler
