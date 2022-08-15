@@ -1,8 +1,8 @@
 package me.mykindos.betterpvp.clans.settings.menus;
 
-import me.mykindos.betterpvp.clans.gamer.Gamer;
-import me.mykindos.betterpvp.clans.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.clans.settings.buttons.ClansSettingButton;
+import me.mykindos.betterpvp.core.gamer.Gamer;
+import me.mykindos.betterpvp.core.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.menu.interfaces.IRefreshingMenu;
 import me.mykindos.betterpvp.core.settings.menus.SettingSubMenu;
 import org.bukkit.ChatColor;

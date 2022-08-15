@@ -5,8 +5,6 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
-import me.mykindos.betterpvp.clans.clans.components.ClanAlliance;
-import me.mykindos.betterpvp.clans.clans.components.ClanTerritory;
 import me.mykindos.betterpvp.clans.clans.events.ChunkClaimEvent;
 import me.mykindos.betterpvp.clans.clans.events.ClanDisbandEvent;
 import me.mykindos.betterpvp.clans.clans.events.MemberJoinClanEvent;
@@ -15,9 +13,12 @@ import me.mykindos.betterpvp.clans.clans.map.MapHandler;
 import me.mykindos.betterpvp.clans.clans.map.data.ChunkData;
 import me.mykindos.betterpvp.clans.clans.map.data.MapSettings;
 import me.mykindos.betterpvp.clans.clans.map.nms.UtilMapMaterial;
-import me.mykindos.betterpvp.clans.gamer.Gamer;
-import me.mykindos.betterpvp.clans.gamer.GamerManager;
+import me.mykindos.betterpvp.core.components.clans.IClan;
+import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
+import me.mykindos.betterpvp.core.components.clans.data.ClanTerritory;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
+import me.mykindos.betterpvp.core.gamer.Gamer;
+import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -233,11 +234,11 @@ public class MapListener implements Listener {
         updateClaims(event.getClan());
     }
 
-    private void updateClaims(Clan clan) {
+    private void updateClaims(IClan clan) {
         UtilServer.runTaskLater(clans, () -> {
             for (Player online : Bukkit.getOnlinePlayers()) {
 
-                Clan otherClan = clanManager.getClanByPlayer(online).orElse(null);
+                IClan otherClan = clanManager.getClanByPlayer(online).orElse(null);
                 ClanRelation clanRelation = clanManager.getRelation(clan, otherClan);
                 MaterialColor color = clanRelation.getMaterialColor();
 
@@ -281,7 +282,7 @@ public class MapListener implements Listener {
                 mapHandler.clanMapData.put(player.getUniqueId(), new HashSet<>());
             }
             for (ChunkData chunkData : mapHandler.clanMapData.get(player.getUniqueId())) {
-                final Clan clan = chunkData.getClan();
+                final IClan clan = chunkData.getClan();
                 if (clan != null && !clan.isAdmin()) {
                     chunkData.setColor(UtilMapMaterial.getColorNeutral());
                 }
@@ -301,7 +302,7 @@ public class MapListener implements Listener {
                 }
                 mapHandler.clanMapData.get(online.getUniqueId()).removeIf(chunkData -> clanManager.getObject(chunkData.getClan().getName()).isEmpty());
                 for (ChunkData chunkData : mapHandler.clanMapData.get(online.getUniqueId())) {
-                    final Clan clan = chunkData.getClan();
+                    final IClan clan = chunkData.getClan();
                     if (clan != null && !clan.isAdmin()) {
                         ClanRelation relation = clanManager.getRelation(clan, clanManager.getClanByPlayer(online).orElse(null));
                         chunkData.setColor(relation.getMaterialColor());
@@ -318,7 +319,7 @@ public class MapListener implements Listener {
         if (event.isCancelled()) return;
         UtilServer.runTaskLater(clans, () -> {
             final Player player = event.getPlayer();
-            final Clan clan = event.getClan();
+            final IClan clan = event.getClan();
 
             if (!mapHandler.clanMapData.containsKey(player.getUniqueId())) {
                 mapHandler.clanMapData.put(player.getUniqueId(), new HashSet<>());

@@ -2,10 +2,10 @@ package me.mykindos.betterpvp.clans.clans.map.renderer;
 
 
 import com.google.inject.Inject;
-import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.map.MapHandler;
 import me.mykindos.betterpvp.clans.clans.map.data.ChunkData;
 import me.mykindos.betterpvp.clans.clans.map.data.MapSettings;
+import me.mykindos.betterpvp.core.components.clans.IClan;
 import net.minecraft.world.level.material.MaterialColor;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
@@ -66,7 +66,7 @@ public class ClanMapRenderer extends MapRenderer {
         for (ChunkData chunkData : mapHandler.clanMapData.get(player.getUniqueId())) {
             if (!chunkData.getWorld().equals(player.getWorld().getName())) continue;
 
-            final Clan clan = chunkData.getClan();
+            final IClan clan = chunkData.getClan();
             if (clan == null) continue;
 
             int bx = chunkData.getX() << 4; //Chunk's actual world coord;

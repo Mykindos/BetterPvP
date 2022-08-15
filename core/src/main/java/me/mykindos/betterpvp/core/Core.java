@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.injector.DatabaseInjectorModule;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
+import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.injector.CoreInjectorModule;
 import me.mykindos.betterpvp.core.listener.loader.CoreListenerLoader;
 import org.reflections.Reflections;
@@ -33,6 +34,7 @@ public class Core extends BPvPPlugin {
     private Database database;
 
     private ClientManager clientManager;
+    private GamerManager gamerManager;
 
     @Inject
     private UpdateEventExecutor updateEventExecutor;
@@ -59,6 +61,9 @@ public class Core extends BPvPPlugin {
         clientManager = injector.getInstance(ClientManager.class);
         clientManager.loadFromList(clientManager.getRepository().getAll());
 
+        gamerManager = injector.getInstance(GamerManager.class);
+        gamerManager.loadFromList(gamerManager.getGamerRepository().getAll());
+
         updateEventExecutor.loadPlugin(this);
         updateEventExecutor.initialize();
     }
@@ -66,6 +71,7 @@ public class Core extends BPvPPlugin {
     @Override
     public void onDisable() {
         clientManager.getRepository().processStatUpdates(false);
+        gamerManager.getGamerRepository().processStatUpdates(false);
     }
 
 }

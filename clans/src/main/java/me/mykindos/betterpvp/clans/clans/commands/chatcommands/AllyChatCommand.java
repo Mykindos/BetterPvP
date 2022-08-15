@@ -1,11 +1,11 @@
 package me.mykindos.betterpvp.clans.clans.commands.chatcommands;
 
 import com.google.inject.Inject;
-import me.mykindos.betterpvp.clans.gamer.Gamer;
-import me.mykindos.betterpvp.clans.gamer.GamerManager;
-import me.mykindos.betterpvp.clans.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
+import me.mykindos.betterpvp.core.gamer.Gamer;
+import me.mykindos.betterpvp.core.gamer.GamerManager;
+import me.mykindos.betterpvp.core.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
