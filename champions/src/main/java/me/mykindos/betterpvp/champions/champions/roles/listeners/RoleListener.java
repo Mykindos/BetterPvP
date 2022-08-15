@@ -224,9 +224,11 @@ public class RoleListener implements Listener {
 
     }
 
-    @EventHandler
+    @EventHandler (priority = EventPriority.HIGHEST)
     public void damageSound(CustomDamageEvent event) {
+        if (event.isCancelled()) return;
         if (!(event.getDamagee() instanceof Player damagee)) return;
+        if (!(event.getDamager() instanceof Player)) return;
 
         Optional<Role> roleOptional = roleManager.getObject(damagee.getUniqueId().toString());
         if (roleOptional.isPresent()) {
