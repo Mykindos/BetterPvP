@@ -1,13 +1,16 @@
 package me.mykindos.betterpvp.core.effects;
 
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.effects.events.EffectReceiveEvent;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.List;
 import java.util.Optional;
 
+@Singleton
 public class EffectManager extends Manager<List<Effect>> {
 
     public void addEffect(Player player, EffectType type, long length) {
@@ -15,7 +18,7 @@ public class EffectManager extends Manager<List<Effect>> {
     }
 
     public void addEffect(Player player, EffectType type, int level, long length) {
-        Bukkit.getPluginManager().callEvent(new EffectReceiveEvent(player, new Effect(player.getUniqueId().toString(), type, level, length)));
+       UtilServer.callEvent(new EffectReceiveEvent(player, new Effect(player.getUniqueId().toString(), type, level, length)));
 
     }
 

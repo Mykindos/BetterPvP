@@ -28,4 +28,8 @@ public interface ISkill {
         return true;
     }
 
+    default boolean ignoreNegativeEffects() {
+        return false;
+    }
+
 }

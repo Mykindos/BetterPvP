@@ -1,15 +1,18 @@
 package me.mykindos.betterpvp.champions.energy;
 
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.energy.events.DegenerateEnergyEvent;
 import me.mykindos.betterpvp.champions.energy.events.RegenerateEnergyEvent;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Effect;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 
+@Singleton
 public class EnergyHandler {
 
     public static double baseEnergy = 150.0D;
@@ -44,7 +47,7 @@ public class EnergyHandler {
             return false;
         }
 
-        Bukkit.getPluginManager().callEvent(new DegenerateEnergyEvent(player, amount));
+        UtilServer.callEvent(new DegenerateEnergyEvent(player, amount));
 
         return true;
     }
@@ -52,7 +55,7 @@ public class EnergyHandler {
     public void regenerateEnergy(Player player, double energy) {
         try {
             player.setExp(Math.min(0.999F, (float) getEnergy(player) + (float) energy));
-        } catch (Exception ex) {
+        } catch (Exception ignored) {
 
         }
     }
@@ -62,7 +65,7 @@ public class EnergyHandler {
         if (eg <= 0F) return;
         try {
             player.setExp(Math.min(0.999F, (float) eg - (float) energy));
-        } catch (Exception ex) {
+        } catch (Exception ignored) {
 
         }
     }

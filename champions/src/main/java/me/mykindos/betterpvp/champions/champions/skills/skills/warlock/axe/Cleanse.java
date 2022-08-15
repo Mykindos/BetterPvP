@@ -106,7 +106,12 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
     }
 
     @Override
-    public void loadSkillConfig(){
+    public boolean ignoreNegativeEffects() {
+        return true;
+    }
+
+    @Override
+    public void loadSkillConfig() {
         distance = getConfig("distance", 5, Integer.class);
         duration = getConfig("duration", 2.0, Double.class);
     }

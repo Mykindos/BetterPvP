@@ -63,18 +63,13 @@ public class SkillListener implements Listener {
         this.effectManager = effectManager;
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onUseSkill(PlayerUseSkillEvent event) {
         if (event.isCancelled()) return;
 
         Player player = event.getPlayer();
         ISkill skill = event.getSkill();
         int level = event.getLevel();
-
-        if (hasNegativeEffect(player)) {
-            event.setCancelled(true);
-            return;
-        }
 
         if (!skill.canUse(player)) {
             event.setCancelled(true);
@@ -113,7 +108,7 @@ public class SkillListener implements Listener {
             toggleSkill.toggle(player, level);
         }
 
-        if(skill.displayWhenUsed()) {
+        if (skill.displayWhenUsed()) {
             sendSkillUsed(player, skill, level);
         }
     }
@@ -257,8 +252,24 @@ public class SkillListener implements Listener {
         if (interactSkill.canUseSlowed()) return;
 
         if (player.hasPotionEffect(PotionEffectType.SLOW)) {
-            UtilMessage.message(player, event.getSkill().getClassType().getName(), "You cannot use %s while slowed.",
-                    ChatColor.GREEN + event.getSkill().getName() + ChatColor.GRAY);
+            UtilMessage.simpleMessage(player, event.getSkill().getClassType().getName(),
+                    "You cannot use <green>%s<gray> while slowed.", event.getSkill().getName());
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onUseSkillWhileLevitating(PlayerUseInteractSkillEvent event) {
+        if (event.isCancelled()) return;
+
+        Player player = event.getPlayer();
+        InteractSkill interactSkill = (InteractSkill) event.getSkill();
+
+        if (interactSkill.canUseLevitating()) return;
+
+        if (player.hasPotionEffect(PotionEffectType.LEVITATION)) {
+            UtilMessage.simpleMessage(player, event.getSkill().getClassType().getName(),
+                    "You cannot use <green>%s<gray> while levitating.", event.getSkill().getName());
             event.setCancelled(true);
         }
     }
@@ -271,9 +282,30 @@ public class SkillListener implements Listener {
         ISkill skill = event.getSkill();
 
         if (UtilBlock.isInLiquid(player)) {
-            UtilMessage.message(player, skill.getClassType().getName(), "You cannot use %s in water.",
-                    ChatColor.GREEN + skill.getName() + ChatColor.GRAY);
+            UtilMessage.simpleMessage(player, skill.getClassType().getName(), "You cannot use <green>%s<gray> in water.", skill.getName());
             event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onUseSkillWhileSilenced(PlayerUseSkillEvent event) {
+        if (event.isCancelled()) return;
+        Player player = event.getPlayer();
+        ISkill skill = event.getSkill();
+        if (skill.ignoreNegativeEffects()) return;
+        if (effectManager.hasEffect(player, EffectType.SILENCE)) {
+            UtilMessage.simpleMessage(player, skill.getClassType().getName(), "You cannot use <green>%s<gray> while silenced.", skill.getName());
+        }
+    }
+
+    @EventHandler
+    public void onUseSkillWhileStunned(PlayerUseSkillEvent event) {
+        if (event.isCancelled()) return;
+        Player player = event.getPlayer();
+        ISkill skill = event.getSkill();
+        if (skill.ignoreNegativeEffects()) return;
+        if (effectManager.hasEffect(player, EffectType.STUN)) {
+            UtilMessage.simpleMessage(player, skill.getClassType().getName(), "You cannot use <green>%s<gray> while stunned.", skill.getName());
         }
     }
 
@@ -303,13 +335,5 @@ public class SkillListener implements Listener {
 
         return null;
     }
-
-    private boolean hasNegativeEffect(Player player) {
-        return effectManager.hasEffect(player, EffectType.SILENCE)
-                || player.hasPotionEffect(PotionEffectType.LEVITATION)
-                || effectManager.hasEffect(player, EffectType.STUN);
-    }
-
-
 
 }

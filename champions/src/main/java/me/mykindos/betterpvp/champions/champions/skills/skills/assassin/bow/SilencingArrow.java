@@ -58,11 +58,10 @@ public class SilencingArrow extends PrepareArrowSkill {
     }
 
 
-
     @Override
     public void onHit(Player damager, LivingEntity target, int level) {
         if (!(target instanceof Player damagee)) return;
-        championsManager.getEffects().addEffect(damagee, EffectType.SILENCE, (3 + level * 1000L));
+        championsManager.getEffects().addEffect(damagee, EffectType.SILENCE, ((3 + level) * 1000L));
         if (championsManager.getEffects().hasEffect(damagee, EffectType.IMMUNETOEFFECTS)) {
             UtilMessage.message(damager, getClassType().getName(), ChatColor.GREEN + damagee.getName() + ChatColor.GRAY + " is immune to your silence!");
         }
