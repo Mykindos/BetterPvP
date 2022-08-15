@@ -231,10 +231,8 @@ public class ClanManager extends Manager<Clan> {
         return relation != ClanRelation.SELF && relation != ClanRelation.ALLY && relation != ClanRelation.ALLY_TRUST;
     }
 
-    public boolean canCast(Player p) {
-
-
-        return canCast(p, true);
+    public boolean canCast(Player player) {
+        return canCast(player, true);
     }
 
     public boolean canCast(Player player, boolean message) {

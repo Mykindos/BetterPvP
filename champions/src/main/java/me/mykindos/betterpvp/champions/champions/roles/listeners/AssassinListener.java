@@ -55,7 +55,7 @@ public class AssassinListener implements Listener {
 
         if(event.getDamagee() instanceof Player damagee){
             if(!assassinReceiveKnockback) {
-                if(!roleManager.hasRole(damagee, Role.ASSASSIN)) {
+                if(roleManager.hasRole(damagee, Role.ASSASSIN)) {
                     event.setKnockback(false);
                 }
             }

@@ -379,8 +379,7 @@ public class CombatListener implements Listener {
 
     private void updateDurability(CustomDamageEvent event) {
 
-        CustomDamageDurabilityEvent durabilityEvent = new CustomDamageDurabilityEvent(event);
-        UtilServer.callEvent(durabilityEvent);
+        CustomDamageDurabilityEvent durabilityEvent = UtilServer.callEvent(new CustomDamageDurabilityEvent(event));
 
         if (durabilityEvent.isDamageeTakeDurability()) {
             if (event.getDamagee() instanceof Player damagee) {
@@ -391,12 +390,6 @@ public class CombatListener implements Listener {
                     if (meta instanceof Damageable armourMeta) {
                         armourMeta.setDamage(armourMeta.getDamage() + 1);
                         armour.setItemMeta(armourMeta);
-
-                        // TODO move this somewhere else
-                        //    if (armour.getType() == Material.TURTLE_HELMET) {
-                        //        takeDura = false;
-                        //    }
-                        //}
 
                         if (armourMeta.getDamage() > armour.getType().getMaxDurability()) {
                             if (armour.getType().name().contains("HELMET")) {

@@ -24,4 +24,8 @@ public interface ISkill {
 
     void loadConfig();
 
+    default boolean displayWhenUsed() {
+        return true;
+    }
+
 }

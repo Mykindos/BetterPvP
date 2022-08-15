@@ -1,0 +1,118 @@
+package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.sword;
+
+import com.google.inject.Inject;
+import me.mykindos.betterpvp.champions.Champions;
+import me.mykindos.betterpvp.champions.champions.ChampionsManager;
+import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.PrepareSkill;
+import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.components.champions.Role;
+import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.Vector;
+
+import java.util.HashMap;
+import java.util.UUID;
+import java.util.WeakHashMap;
+
+public class Disengage extends PrepareSkill implements CooldownSkill {
+
+    private final WeakHashMap<Player, Long> disengages = new WeakHashMap<>();
+
+    @Inject
+    public Disengage(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
+    }
+
+
+    @Override
+    public String getName() {
+        return "Disengage";
+    }
+
+    @Override
+    public String[] getDescription(int level) {
+
+        return new String[]{
+                "Right click with a sword to prepare",
+                "",
+                "If you are attacked",
+                "within " + ChatColor.GREEN + ((level * 0.5)) + ChatColor.GRAY + " seconds you successfully disengage",
+                "",
+                "If successful, you leap backwards",
+                "and your attacker receives Slow 4",
+                "for " + ChatColor.GREEN + (2 + level) + ChatColor.GRAY + " seconds.",
+                "",
+                "Recharge: " + ChatColor.GREEN + getCooldown(level)};
+    }
+
+    @Override
+    public Role getClassType() {
+        return Role.RANGER;
+    }
+
+    @Override
+    public SkillType getType() {
+
+        return SkillType.SWORD;
+    }
+
+    @EventHandler
+    public void onDamage(CustomDamageEvent event) {
+        if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
+        if (!(event.getDamagee() instanceof Player damagee)) return;
+        if (!disengages.containsKey(damagee)) return;
+
+        int level = getLevel(damagee);
+        if (level > 0) {
+            LivingEntity ent = event.getDamager();
+            Vector vec = ent.getLocation().getDirection();
+            event.setKnockback(false);
+            event.setDamage(0);
+            UtilVelocity.velocity(damagee, vec, 3D, true, 0.0D, 0.4D, 1.5D, true);
+            championsManager.getEffects().addEffect(damagee, EffectType.NOFALL, 3000);
+            ent.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (2 + getLevel(damagee)) * 20, 3));
+            UtilMessage.message(damagee, getClassType().getName(), "You successfully disengaged");
+            disengages.remove(damagee);
+        }
+
+    }
+
+    @UpdateEvent(delay = 100)
+    public void checkTimers() {
+        disengages.entrySet().removeIf(entry -> entry.getValue() - System.currentTimeMillis() <= 0);
+    }
+
+    @Override
+    public double getCooldown(int level) {
+
+        return cooldown;
+    }
+
+    @Override
+    public void activate(Player player, int level) {
+        disengages.put(player, (long) (System.currentTimeMillis() + ((0 + (level * 0.5)) * 1000L)));
+
+    }
+
+    @Override
+    public Action[] getActions() {
+        return SkillActions.RIGHT_CLICK;
+    }
+}

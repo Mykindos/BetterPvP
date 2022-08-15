@@ -25,6 +25,7 @@ import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.util.Vector;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.WeakHashMap;
 
@@ -97,24 +98,16 @@ public class Longshot extends Skill implements PassiveSkill {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onArrowHit(ProjectileHitEvent event) {
-        if(event.getEntity() instanceof Arrow arrow) {
-            arrows.remove(arrow);
-        }
-    }
-
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onDamage(CustomDamageEvent e) {
-        if(!(e.getProjectile() instanceof Arrow arrow)) return;
-        if(!(e.getDamager() instanceof Player damager)) return;
+    public void onDamage(CustomDamageEvent event) {
+        if(!(event.getProjectile() instanceof Arrow arrow)) return;
+        if(!(event.getDamager() instanceof Player damager)) return;
         if(!arrows.containsKey(arrow)) return;
 
         Location loc = arrows.remove(arrow);
-        double length = UtilMath.offset(loc, e.getDamagee().getLocation());
+        double length = UtilMath.offset(loc, event.getDamagee().getLocation());
         double damage = Math.min(baseDamage + getLevel(damager), length / 3.0 - 4);
 
-        e.setDamage(e.getDamage() + (damage));
+        event.setDamage(event.getDamage() + (damage));
 
     }
 
