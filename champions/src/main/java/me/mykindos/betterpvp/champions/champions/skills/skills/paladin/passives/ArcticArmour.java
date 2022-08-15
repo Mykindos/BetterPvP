@@ -104,8 +104,6 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill {
                     int distance = (minRadius + level);
                     HashMap<Block, Double> blocks = UtilBlock.getInRadius(cur.getLocation(), distance);
 
-                    // TODO revisit this
-
                     for (var data : UtilPlayer.getNearbyPlayers(cur, distance)) {
                         Player target = data.getKey();
                         boolean friendly = data.getValue() == EntityProperty.FRIENDLY;

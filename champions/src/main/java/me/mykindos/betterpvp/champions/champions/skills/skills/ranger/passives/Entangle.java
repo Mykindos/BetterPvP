@@ -12,7 +12,6 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Arrow;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -22,6 +21,8 @@ import org.bukkit.potion.PotionEffectType;
 @Singleton
 @BPvPListener
 public class Entangle extends Skill implements PassiveSkill {
+
+    private double baseDuration;
 
     @Inject
     public Entangle(Champions champions, ChampionsManager championsManager) {
@@ -37,7 +38,7 @@ public class Entangle extends Skill implements PassiveSkill {
     public String[] getDescription(int level) {
 
         return new String[]{"Your arrows apply Slowness 2",
-                "to any damageable target for " + ChatColor.GREEN + (2 + (level * 0.5)) + ChatColor.GRAY + " seconds"};
+                "to any damageable target for " + ChatColor.GREEN + (baseDuration + (level * 0.5)) + ChatColor.GRAY + " seconds"};
     }
 
     @Override
@@ -59,8 +60,13 @@ public class Entangle extends Skill implements PassiveSkill {
         int level = getLevel(damager);
         if (level > 0) {
             event.setReason(getName());
-            event.getDamagee().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) ((2 + (level * 0.5)) * 20), 1));
+            event.getDamagee().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) ((baseDuration + (level * 0.5)) * 20), 1));
         }
+    }
+
+    @Override
+    public void loadSkillConfig(){
+        baseDuration = getConfig("baseDuration", 2.0, Double.class);
     }
 
 }

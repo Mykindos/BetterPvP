@@ -7,7 +7,6 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
-
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -31,6 +30,8 @@ public class WolvesFury extends Skill implements InteractSkill, CooldownSkill, L
 
     private final WeakHashMap<Player, Long> active = new WeakHashMap<>();
 
+    private double baseDuration;
+
     @Inject
     public WolvesFury(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -48,7 +49,7 @@ public class WolvesFury extends Skill implements InteractSkill, CooldownSkill, L
                 "Right click with a axe to activate.",
                 "",
                 "Summon the power of the wolf, gaining",
-                "Strength 1 for " + ChatColor.GREEN + (3 + level) + ChatColor.GRAY + " seconds, and giving",
+                "Strength 1 for " + ChatColor.GREEN + (baseDuration + level) + ChatColor.GRAY + " seconds, and giving",
                 "no knockback on your attacks.",
                 "",
                 "Cooldown: " + ChatColor.GREEN + getCooldown(level)
@@ -94,12 +95,17 @@ public class WolvesFury extends Skill implements InteractSkill, CooldownSkill, L
     @Override
     public void activate(Player player, int level) {
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WOLF_HOWL, 1.0f, 1.0f);
-        active.put(player, System.currentTimeMillis() + ((3 + level) * 1000L));
-        championsManager.getEffects().addEffect(player, EffectType.STRENGTH, 1, ((3 + level) * 1000L));
+        active.put(player, (long) (System.currentTimeMillis() + ((baseDuration + level) * 1000L)));
+        championsManager.getEffects().addEffect(player, EffectType.STRENGTH, 1, (long) ((baseDuration + level) * 1000L));
     }
 
     @Override
     public Action[] getActions() {
         return SkillActions.RIGHT_CLICK;
+    }
+
+    @Override
+    public void loadSkillConfig(){
+        baseDuration = getConfig("baseDuration", 3.0, Double.class);
     }
 }

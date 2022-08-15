@@ -3,7 +3,6 @@ package me.mykindos.betterpvp.core.database.connection;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.config.Config;
 import org.flywaydb.core.Flyway;
-import org.flywaydb.core.api.MigrationVersion;
 
 import javax.inject.Inject;
 import java.sql.Connection;

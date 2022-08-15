@@ -16,7 +16,7 @@ public class CooldownListener implements Listener {
         this.cooldownManager = cooldownManager;
     }
 
-    @UpdateEvent(delay = 100, isAsync = true)
+    @UpdateEvent(delay = 100)
     public void processCooldowns() {
         cooldownManager.processCooldowns();
     }

@@ -6,7 +6,6 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
-
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -27,6 +26,8 @@ import java.util.Optional;
 @BPvPListener
 public class VitalitySpores extends Skill implements PassiveSkill {
 
+    private double baseDuration;
+
     @Inject
     public VitalitySpores(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -41,7 +42,7 @@ public class VitalitySpores extends Skill implements PassiveSkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "After " + ChatColor.GREEN + (7 - level) + ChatColor.GRAY + " seconds of not taking damage,",
+                "After " + ChatColor.GREEN + (baseDuration - level) + ChatColor.GRAY + " seconds of not taking damage,",
                 "forest spores surround you, giving",
                 "you Regeneration 1 for 6 seconds.",
                 "",
@@ -60,7 +61,7 @@ public class VitalitySpores extends Skill implements PassiveSkill {
             if (level > 0) {
                 Optional<Gamer> gamerOptional = championsManager.getGamers().getObject(player.getUniqueId());
                 gamerOptional.ifPresent(gamer -> {
-                    if (UtilTime.elapsed(gamer.getLastDamaged(), (7 - level) * 1000L)) {
+                    if (UtilTime.elapsed(gamer.getLastDamaged(), (long) ((baseDuration - level) * 1000L))) {
                         player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 120, 0));
                     }
                 });
@@ -84,6 +85,11 @@ public class VitalitySpores extends Skill implements PassiveSkill {
     public SkillType getType() {
 
         return SkillType.PASSIVE_B;
+    }
+
+    @Override
+    public void loadSkillConfig(){
+        baseDuration = getConfig("baseDuration", 7.0, Double.class);
     }
 
 }

@@ -44,7 +44,7 @@ public class Bloodshed extends Skill implements InteractSkill, CooldownSkill, Li
                 "Right click with a axe to activate.",
                 "",
                 "Sacrifice " + ChatColor.GREEN + UtilMath.round(100 - ((0.50 + (level * 0.05)) * 100), 2) + "%" + ChatColor.GRAY + " of your health to grant",
-                "yourself Speed III for " + ChatColor.GREEN + UtilTime.getTime(duration, UtilTime.TimeUnit.SECONDS, 1) + ChatColor.GRAY + " seconds.",
+                "yourself Speed III for " + ChatColor.GREEN + UtilTime.convert(duration, UtilTime.TimeUnit.SECONDS, 1) + ChatColor.GRAY + " seconds.",
                 "",
                 "Recharge: " + ChatColor.GREEN + getCooldown(level)
         };

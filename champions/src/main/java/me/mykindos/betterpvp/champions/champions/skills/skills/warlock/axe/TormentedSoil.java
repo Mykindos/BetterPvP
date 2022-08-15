@@ -56,7 +56,8 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
         return new String[]{
                 "Right click with a axe to activate.",
                 "",
-                "Corrupt the earth around you, creating a ring that debuffs enemies within it for " + ChatColor.GREEN + duration + ChatColor.GRAY + " seconds.",
+                "Corrupt the earth around you, creating a ring that",
+                "debuffs enemies within it for " + ChatColor.GREEN + duration + ChatColor.GRAY + " seconds.",
                 "Player within the ring take 33% more damage.",
                 "",
                 "Range: " + ChatColor.GREEN + (radius + (level / 2)) + ChatColor.GRAY + " blocks.",
