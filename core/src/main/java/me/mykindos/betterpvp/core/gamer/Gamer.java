@@ -7,6 +7,10 @@ import me.mykindos.betterpvp.core.framework.inviting.Invitable;
 import java.util.HashMap;
 import java.util.Optional;
 
+/**
+ * A gamer represents a clients seasonal data.
+ * Such as their blocks broken, their kills, deaths, etc.
+ */
 @Data
 public class Gamer implements Invitable {
 
@@ -35,8 +39,5 @@ public class Gamer implements Invitable {
     public void putProperty(Enum<?> key, Object object){
         properties.put(key, object);
     }
-
-
-
 
 }

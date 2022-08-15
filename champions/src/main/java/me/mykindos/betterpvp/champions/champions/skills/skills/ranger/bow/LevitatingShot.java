@@ -88,7 +88,7 @@ public class LevitatingShot extends PrepareArrowSkill {
     @Override
     public double getCooldown(int level) {
 
-        return 14 - ((level - 1));
+        return cooldown - ((level - 1));
     }
 
 }

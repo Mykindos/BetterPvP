@@ -27,7 +27,7 @@ public class WorldBlockHandler {
         Optional<RestoreBlock> restoreBlockOptional = getRestoreBlock(block);
         if(restoreBlockOptional.isPresent()) {
             RestoreBlock restoreBlock = restoreBlockOptional.get();
-            restoreBlock.setExpire(expiry);
+            restoreBlock.setExpire(System.currentTimeMillis() + expiry);
         }else{
             restoreBlocks.add(new RestoreBlock(block, newMaterial, expiry));
         }

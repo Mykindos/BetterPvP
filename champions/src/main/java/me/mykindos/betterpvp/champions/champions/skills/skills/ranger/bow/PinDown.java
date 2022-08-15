@@ -85,7 +85,7 @@ public class PinDown extends PrepareArrowSkill {
     @Override
     public double getCooldown(int level) {
 
-        return 13 - ((level - 1) * 1.5);
+        return cooldown - ((level - 1) * 1.5);
     }
 
 }

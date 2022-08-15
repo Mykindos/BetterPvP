@@ -7,6 +7,7 @@ import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockFadeEvent;
 
 import java.util.ListIterator;
 
@@ -33,13 +34,21 @@ public class RestoreBlockListener implements Listener {
     @UpdateEvent
     public void processBlocks() {
         ListIterator<RestoreBlock> restoreBlockListIterator = blockHandler.getRestoreBlocks().listIterator();
-        while(restoreBlockListIterator.hasNext()){
+        while (restoreBlockListIterator.hasNext()) {
             RestoreBlock next = restoreBlockListIterator.next();
-            if(System.currentTimeMillis() >= next.getExpire()) {
+            if (System.currentTimeMillis() >= next.getExpire()) {
                 next.restore();
                 restoreBlockListIterator.remove();
             }
         }
 
+    }
+
+    @EventHandler
+    public void onStateChange(BlockFadeEvent event) {
+        Block block = event.getBlock();
+        if (blockHandler.isRestoreBlock(block)) {
+            event.setCancelled(true);
+        }
     }
 }

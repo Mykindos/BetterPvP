@@ -1,39 +1,39 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.sword;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
-import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
+import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
-import java.util.HashMap;
-import java.util.UUID;
 import java.util.WeakHashMap;
 
+@Singleton
+@BPvPListener
 public class Disengage extends PrepareSkill implements CooldownSkill {
 
     private final WeakHashMap<Player, Long> disengages = new WeakHashMap<>();
+
+    private double baseSlowDuration;
 
     @Inject
     public Disengage(Champions champions, ChampionsManager championsManager) {
@@ -57,7 +57,7 @@ public class Disengage extends PrepareSkill implements CooldownSkill {
                 "",
                 "If successful, you leap backwards",
                 "and your attacker receives Slow 4",
-                "for " + ChatColor.GREEN + (2 + level) + ChatColor.GRAY + " seconds.",
+                "for " + ChatColor.GREEN + (baseSlowDuration + level) + ChatColor.GRAY + " seconds.",
                 "",
                 "Recharge: " + ChatColor.GREEN + getCooldown(level)};
     }
@@ -87,7 +87,7 @@ public class Disengage extends PrepareSkill implements CooldownSkill {
             event.setDamage(0);
             UtilVelocity.velocity(damagee, vec, 3D, true, 0.0D, 0.4D, 1.5D, true);
             championsManager.getEffects().addEffect(damagee, EffectType.NOFALL, 3000);
-            ent.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (2 + getLevel(damagee)) * 20, 3));
+            ent.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) ((baseSlowDuration + level) * 20), 3));
             UtilMessage.message(damagee, getClassType().getName(), "You successfully disengaged");
             disengages.remove(damagee);
         }
@@ -114,5 +114,10 @@ public class Disengage extends PrepareSkill implements CooldownSkill {
     @Override
     public Action[] getActions() {
         return SkillActions.RIGHT_CLICK;
+    }
+
+    @Override
+    public void loadSkillConfig(){
+        baseSlowDuration = getConfig("baseSlowDuration", 2.0, Double.class);
     }
 }

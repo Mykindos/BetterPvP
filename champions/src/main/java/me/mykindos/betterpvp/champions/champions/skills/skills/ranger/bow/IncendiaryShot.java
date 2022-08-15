@@ -80,7 +80,7 @@ public class IncendiaryShot extends PrepareArrowSkill {
     @Override
     public double getCooldown(int level) {
 
-        return 12 - ((level - 1));
+        return cooldown - ((level - 1));
     }
 
 }

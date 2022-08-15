@@ -37,6 +37,8 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
 
     private final Set<UUID> active = new HashSet<>();
 
+    private double baseDuration;
+
     @Inject
     public Agility(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -54,7 +56,7 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
                 "Right click with a axe to activate.",
                 "",
                 "Sprint with great agility, gaining",
-                "Speed I for " + ChatColor.GREEN + (3 + level) + ChatColor.GRAY + " seconds.",
+                "Speed I for " + ChatColor.GREEN + (baseDuration + level) + ChatColor.GRAY + " seconds.",
                 "You also take 60% reduced damage while active.",
                 "Agility ends if you interact",
                 "",
@@ -119,7 +121,7 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
     @Override
     public void activate(Player player, int level) {
         if (!active.contains(player.getUniqueId())) {
-            player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (3 + level) * 20, 1));
+            player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) ((baseDuration + level) * 20), 1));
             player.getWorld().playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.5F, 0.5F);
             active.add(player.getUniqueId());
         }
@@ -128,5 +130,10 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
     @Override
     public Action[] getActions() {
         return SkillActions.RIGHT_CLICK;
+    }
+
+    @Override
+    public void loadSkillConfig(){
+        baseDuration = getConfig("baseDuration", 3.0, Double.class);
     }
 }

@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -23,6 +24,8 @@ import org.bukkit.event.player.PlayerToggleSneakEvent;
 @Singleton
 @BPvPListener
 public class Swim extends Skill implements PassiveSkill, EnergySkill {
+
+    private double internalCooldown;
 
     @Inject
     public Swim(Champions champions, ChampionsManager championsManager) {
@@ -70,7 +73,7 @@ public class Swim extends Skill implements PassiveSkill, EnergySkill {
 
         int level = getLevel(player);
         if (level > 0) {
-            if (championsManager.getCooldowns().add(player, getName(), 0.35, false)){
+            if (championsManager.getCooldowns().add(player, getName(), internalCooldown, false)){
                 if (championsManager.getEnergy().use(player, getName(), getEnergy(level), true)) {
                     UtilVelocity.velocity(player, 0.6D, 0.2D, 0.6D, false);
                     player.getWorld().playSound(player.getLocation(), Sound.ENTITY_GENERIC_SPLASH, 0.3F, 2.0F);
@@ -84,6 +87,11 @@ public class Swim extends Skill implements PassiveSkill, EnergySkill {
     public float getEnergy(int level) {
 
         return energy - ((level - 1) * 2);
+    }
+
+    @Override
+    public void loadSkillConfig(){
+        internalCooldown = getConfig("internalCooldown", 0.35, Double.class);
     }
 
 }

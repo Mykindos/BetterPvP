@@ -83,7 +83,7 @@ public class StunningShot extends PrepareArrowSkill {
     @Override
     public double getCooldown(int level) {
 
-        return 25 - ((level - 1));
+        return cooldown - ((level - 1));
     }
 
 }
