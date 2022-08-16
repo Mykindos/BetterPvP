@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.menu.Button;
 import me.mykindos.betterpvp.core.menu.MenuManager;
 import org.bukkit.ChatColor;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
@@ -28,5 +29,6 @@ public class ClassSelectionButton extends Button {
     @Override
     public void onClick(Player player, ClickType clickType) {
         MenuManager.openMenu(player, new BuildMenu(player, builds, role, skillManager));
+        player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1.0F, 2.0F);
     }
 }

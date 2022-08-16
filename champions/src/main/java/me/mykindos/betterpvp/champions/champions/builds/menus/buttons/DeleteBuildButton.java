@@ -36,5 +36,6 @@ public class DeleteBuildButton extends Button {
             UtilServer.callEvent(new DeleteBuildEvent(player, builds, build));
             player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1, 0.6f);
         });
+
     }
 }

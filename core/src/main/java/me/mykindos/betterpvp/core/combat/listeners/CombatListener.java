@@ -1,9 +1,12 @@
 package me.mykindos.betterpvp.core.combat.listeners;
 
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.combat.armour.ArmourManager;
 import me.mykindos.betterpvp.core.combat.data.DamageData;
 import me.mykindos.betterpvp.core.combat.events.*;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
+import me.mykindos.betterpvp.core.gamer.GamerManager;
+import me.mykindos.betterpvp.core.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.*;
 import org.bukkit.Bukkit;
@@ -29,11 +32,15 @@ import java.util.List;
 @BPvPListener
 public class CombatListener implements Listener {
 
+    private final Core core;
     private final List<DamageData> damageDataList;
+    private final GamerManager gamerManager;
     private final ArmourManager armourManager;
 
     @Inject
-    public CombatListener(ArmourManager armourManager) {
+    public CombatListener(Core core, GamerManager gamerManager, ArmourManager armourManager) {
+        this.core = core;
+        this.gamerManager = gamerManager;
         this.armourManager = armourManager;
         damageDataList = new ArrayList<>();
     }
@@ -49,39 +56,6 @@ public class CombatListener implements Listener {
         if (event.getDamagee() instanceof ArmorStand) {
             return;
         }
-
-
-        // TODO handle this elsewhere, or not at all
-        //if (!(event.getDamager() instanceof Player) && event.getDamagee() instanceof Player) {
-        //    Gamer gamer = GamerManager.getOnlineGamer((Player) event.getDamagee());
-        //    if (gamer != null) {
-        //        gamer.setLastDamaged(System.currentTimeMillis());
-        //    }
-        //}
-        //if (event.getDamagee() instanceof Player && event.getDamager() instanceof Player) {
-        //    if (ClanUtilities.canHurt((Player) event.getDamager(), (Player) event.getDamagee())) {
-        //        Gamer gamer = GamerManager.getOnlineGamer((Player) event.getDamager());
-        //        if (gamer != null) {
-        //            gamer.setLastDamaged(System.currentTimeMillis());
-        //            gamer.setLastDamagedByPlayer(System.currentTimeMillis());
-        //            gamer.setStatValue("Damage dealt", gamer.getStatValue("Damage dealt") + event.getDamage());
-        //        }
-//
-//
-        //        Gamer xGamer = GamerManager.getOnlineGamer((Player) event.getDamagee());
-        //        if (xGamer != null) {
-        //            xGamer.setLastDamaged(System.currentTimeMillis());
-        //            xGamer.setLastDamagedByPlayer(System.currentTimeMillis());
-        //        }
-//
-//
-        //    } else {
-        //        return;
-        //    }
-//
-//
-        //}
-
 
         damage(event);
     }
@@ -129,7 +103,7 @@ public class CombatListener implements Listener {
                             player.sendMessage("Damage Reduced: " + damage);
                             player.sendMessage("Delay: " + event.getDamageDelay());
                             player.sendMessage("Cause: " + event.getCause().name());
-//
+
                         }
                     }
 
@@ -139,14 +113,27 @@ public class CombatListener implements Listener {
                         event.getDamagee().setHealth(event.getDamagee().getHealth() - damage);
                     }
 
+                    processDamageData(event, damage);
+
                 }
-
             }
-
-
         }
 
+    }
 
+    private void processDamageData(CustomDamageEvent event, double damage) {
+        if (event.getDamagee() instanceof Player damagee) {
+            gamerManager.getObject(damagee.getUniqueId()).ifPresent(gamer -> {
+                gamer.setLastDamaged(System.currentTimeMillis());
+                gamer.saveProperty(GamerProperty.DAMAGE_TAKEN, damage);
+            });
+        }
+
+        if (event.getDamager() instanceof Player damager) {
+            gamerManager.getObject(damager.getUniqueId()).ifPresent(gamer -> {
+                gamer.saveProperty(GamerProperty.DAMAGE_DEALT, damage);
+            });
+        }
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -445,6 +432,7 @@ public class CombatListener implements Listener {
 
     /**
      * Disable bow critical hits
+     *
      * @param event The event
      */
     @EventHandler

@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.menu.Button;
 import me.mykindos.betterpvp.core.menu.MenuManager;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
@@ -30,5 +31,6 @@ public class EditBuildButton extends Button {
     @Override
     public void onClick(Player player, ClickType clickType) {
         MenuManager.openMenu(player, new SkillMenu(player, builds, role, buildNumber, skillManager));
+        player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1.0F, 2.0F);
     }
 }

@@ -3,12 +3,12 @@ package me.mykindos.betterpvp.core.gamer.listeners;
 import com.google.inject.Inject;
 import me.mykindos.betterpvp.core.framework.events.scoreboard.ScoreboardUpdateEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
-import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.gamer.properties.GamerProperty;
+import me.mykindos.betterpvp.core.gamer.properties.GamerPropertyUpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.settings.events.SettingsUpdatedEvent;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -16,7 +16,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 
-import java.util.Optional;
+import java.util.UUID;
 
 @BPvPListener
 public class GamerStatListener implements Listener {
@@ -29,15 +29,15 @@ public class GamerStatListener implements Listener {
     }
 
     @EventHandler
-    public void onSettingsUpdated(SettingsUpdatedEvent event) {
-        Optional<Gamer> gamerOptional = gamerManager.getObject(event.getClient().getUuid());
-        gamerOptional.ifPresent(gamer -> {
-            if(event.getSetting() instanceof GamerProperty key){
-                gamerManager.getGamerRepository().saveProperty(gamer, key, gamer.getProperties().get(key));
-            }
-        });
+    public void onSettingsUpdated(GamerPropertyUpdateEvent event) {
+        gamerManager.getGamerRepository().saveProperty(event.getGamer(), event.getProperty(), event.getValue());
 
-        UtilServer.callEvent(new ScoreboardUpdateEvent(event.getPlayer()));
+        if(event.isUpdateScoreboard()) {
+            Player player = Bukkit.getPlayer(UUID.fromString(event.getGamer().getUuid()));
+            if (player != null) {
+                UtilServer.callEvent(new ScoreboardUpdateEvent(player));
+            }
+        }
     }
 
     @UpdateEvent(delay = 120_000)
@@ -51,11 +51,9 @@ public class GamerStatListener implements Listener {
 
         Player player = event.getPlayer();
 
-        Optional<Gamer> gamerOptional = gamerManager.getObject(player.getUniqueId().toString());
-        gamerOptional.ifPresent(gamer -> {
+        gamerManager.getObject(player.getUniqueId()).ifPresent(gamer -> {
             int blocksPlaced = (int) (gamer.getProperty(GamerProperty.BLOCKS_PLACED).orElse(0)) + 1;
-            gamer.putProperty(GamerProperty.BLOCKS_PLACED, blocksPlaced);
-            UtilServer.callEvent(new SettingsUpdatedEvent(player, gamer.getClient(), GamerProperty.BLOCKS_PLACED));
+            gamer.saveProperty(GamerProperty.BLOCKS_PLACED, blocksPlaced);
         });
     }
 
@@ -64,12 +62,11 @@ public class GamerStatListener implements Listener {
         if(event.isCancelled()) return;
         Player player = event.getPlayer();
 
-        Optional<Gamer> gamerOptional = gamerManager.getObject(player.getUniqueId().toString());
-        gamerOptional.ifPresent(gamer -> {
+        gamerManager.getObject(player.getUniqueId()).ifPresent(gamer -> {
             int blocksBroken = (int) (gamer.getProperty(GamerProperty.BLOCKS_BROKEN).orElse(0)) + 1;
-            gamer.putProperty(GamerProperty.BLOCKS_BROKEN, blocksBroken);
-            UtilServer.callEvent(new SettingsUpdatedEvent(player, gamer.getClient(), GamerProperty.BLOCKS_BROKEN));
+            gamer.saveProperty(GamerProperty.BLOCKS_BROKEN, blocksBroken);
         });
+
     }
 
 

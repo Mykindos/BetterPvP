@@ -1,18 +1,20 @@
 package me.mykindos.betterpvp.core.gamer;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.framework.inviting.Invitable;
-
-import java.util.HashMap;
-import java.util.Optional;
+import me.mykindos.betterpvp.core.gamer.properties.GamerPropertyUpdateEvent;
+import me.mykindos.betterpvp.core.properties.PropertyContainer;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 
 /**
  * A gamer represents a clients seasonal data.
  * Such as their blocks broken, their kills, deaths, etc.
  */
-@Data
-public class Gamer implements Invitable {
+@Getter
+@Setter
+public class Gamer extends PropertyContainer implements Invitable {
 
     private final Client client;
     private final String uuid;
@@ -22,22 +24,13 @@ public class Gamer implements Invitable {
         this.uuid = uuid;
     }
 
-    private HashMap<Enum<?>, Object> properties = new HashMap<>();
 
-    private int lastDamaged;
+    private long lastDamaged;
 
-    @SuppressWarnings("unchecked")
-    public <T> Optional<T> getProperty(Enum<?> key) {
-        return Optional.ofNullable((T) properties.getOrDefault(key, null));
-    }
-
-    @SuppressWarnings("unchecked")
-    public <T> Optional<T> getProperty(Enum<?> key, Class<T> type) {
-        return Optional.ofNullable(type.cast(properties.getOrDefault(key, null)));
-    }
-
-    public void putProperty(Enum<?> key, Object object){
+    @Override
+    public void saveProperty(String key, Object object, boolean updateScoreboard) {
         properties.put(key, object);
+        UtilServer.callEvent(new GamerPropertyUpdateEvent( this, key, object, updateScoreboard));
     }
 
 }

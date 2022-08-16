@@ -60,15 +60,13 @@ create table if not exists property_map
         primary key (Property, Type)
 );
 
-INSERT IGNORE INTO property_map VALUES ("CHAT_ENABLED", "java.lang.Boolean");
-
 create table if not exists ${tablePrefix}gamers
 (
     id   int auto_increment,
     UUID varchar(255) not null,
     constraint gamers_pk
     primary key (id)
-    );
+);
 
 create unique index ${tablePrefix}gamers_UUID_uindex
     on ${tablePrefix}gamers (UUID);
@@ -79,4 +77,17 @@ create table if not exists ${tablePrefix}gamer_properties
     Property varchar(255) not null,
     Value    varchar(255) null,
     primary key (Gamer, Property)
-    );
+);
+
+INSERT IGNORE INTO property_map VALUES ("CHAT_ENABLED", "java.lang.Boolean");
+INSERT IGNORE INTO property_map VALUES ("COINS", "int");
+INSERT IGNORE INTO property_map VALUES ("FRAGMENTS", "int");
+INSERT IGNORE INTO property_map VALUES ("CLANS_SIDEBAR_ENABLED", "boolean");
+INSERT IGNORE INTO property_map VALUES ("ALLY_CHAT", "boolean");
+INSERT IGNORE INTO property_map VALUES ("CLAN_CHAT", "boolean");
+INSERT IGNORE INTO property_map VALUES ("STAFF_CHAT", "boolean");
+INSERT IGNORE INTO property_map VALUES ("BLOCKS_PLACED", "int");
+INSERT IGNORE INTO property_map VALUES ("BLOCKS_BROKEN", "int");
+INSERT IGNORE INTO property_map VALUES ("BLOCKS_BROKEN", "int");
+INSERT IGNORE INTO property_map VALUES ("DAMAGE_DEALT", "double");
+INSERT IGNORE INTO property_map VALUES ("DAMAGE_TAKEN", "double");
