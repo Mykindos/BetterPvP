@@ -82,7 +82,7 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill {
     }
 
     @UpdateEvent(delay = 125)
-    public void SnowAura() {
+    public void snowAura() {
 
         Iterator<UUID> iterator = active.iterator();
         while (iterator.hasNext()) {

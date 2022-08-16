@@ -68,20 +68,3 @@ create table if not exists ${tablePrefix}clan_enemies
 
 create unique index ${tablePrefix}clans_enemies_Clan_EnemyClan_uindex
     on ${tablePrefix}clan_enemies (Clan, EnemyClan);
-
-# noinspection SqlResolve
-INSERT IGNORE INTO property_map VALUES ("COINS", "java.lang.Integer");
-# noinspection SqlResolve
-INSERT IGNORE INTO property_map VALUES ("FRAGMENTS", "java.lang.Integer");
-# noinspection SqlResolve
-INSERT IGNORE INTO property_map VALUES ("CLANS_SIDEBAR_ENABLED", "java.lang.Boolean");
-# noinspection SqlResolve
-INSERT IGNORE INTO property_map VALUES ("ALLY_CHAT", "java.lang.Boolean");
-# noinspection SqlResolve
-INSERT IGNORE INTO property_map VALUES ("CLAN_CHAT", "java.lang.Boolean");
-# noinspection SqlResolve
-INSERT IGNORE INTO property_map VALUES ("STAFF_CHAT", "java.lang.Boolean");
-# noinspection SqlResolve
-INSERT IGNORE INTO property_map VALUES ("BLOCKS_PLACED", "java.lang.Integer");
-# noinspection SqlResolve
-INSERT IGNORE INTO property_map VALUES ("BLOCKS_BROKEN", "java.lang.Integer");

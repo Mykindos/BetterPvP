@@ -10,12 +10,12 @@ import me.mykindos.betterpvp.core.client.ClientManager;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.events.ClientLoginEvent;
 import me.mykindos.betterpvp.core.client.properties.ClientProperty;
+import me.mykindos.betterpvp.core.client.properties.ClientPropertyUpdateEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.events.lunar.LunarClientEvent;
 import me.mykindos.betterpvp.core.framework.events.scoreboard.ScoreboardUpdateEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.settings.events.SettingsUpdatedEvent;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
@@ -31,6 +31,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Optional;
+import java.util.UUID;
 
 @BPvPListener
 public class ClientListener implements Listener {
@@ -90,7 +91,7 @@ public class ClientListener implements Listener {
 
 
     @EventHandler
-    public void onLunarEvent(LunarClientEvent event){
+    public void onLunarEvent(LunarClientEvent event) {
         Optional<Client> clientOptional = clientManager.getObject(event.getPlayer().getUniqueId().toString());
         clientOptional.ifPresent(client -> {
             client.putProperty(ClientProperty.LUNAR, event.isRegistered());
@@ -99,7 +100,7 @@ public class ClientListener implements Listener {
 
 
     @UpdateEvent(delay = 5000)
-    public void updateTabAllPlayers(){
+    public void updateTabAllPlayers() {
         Bukkit.getOnlinePlayers().forEach(this::updateTab);
     }
 
@@ -123,30 +124,30 @@ public class ClientListener implements Listener {
     }
 
     @EventHandler
-    public void onSettingsUpdated(SettingsUpdatedEvent event) {
-        Optional<Client> clientOptional = clientManager.getObject(event.getClient().getUuid());
-        clientOptional.ifPresent(client -> {
-            if(event.getSetting() instanceof ClientProperty key) {
-                clientManager.getRepository().saveProperty(client, key, client.getProperties().get(key));
-            }
-        });
+    public void onSettingsUpdated(ClientPropertyUpdateEvent event) {
 
-        UtilServer.callEvent(new ScoreboardUpdateEvent(event.getPlayer()));
+        clientManager.getRepository().saveProperty(event.getClient(), event.getProperty(), event.getValue());
+
+        if(event.isUpdateScoreboard()) {
+            Player player = Bukkit.getPlayer(UUID.fromString(event.getClient().getUuid()));
+            if (player != null) {
+                UtilServer.callEvent(new ScoreboardUpdateEvent(player));
+            }
+        }
     }
 
     private void checkUnsetProperties(Client client) {
 
         ClientProperty chatEnabledProperty = ClientProperty.CHAT_ENABLED;
         Optional<Integer> chatEnabledOptional = client.getProperty(chatEnabledProperty);
-        if(chatEnabledOptional.isEmpty()){
-            client.putProperty(chatEnabledProperty, true);
-            clientManager.getRepository().saveProperty(client, chatEnabledProperty, true);
+        if (chatEnabledOptional.isEmpty()) {
+            client.saveProperty(chatEnabledProperty, true);
         }
 
     }
 
     @UpdateEvent(delay = 120_000)
-    public void processStatUpdates(){
+    public void processStatUpdates() {
         clientManager.getRepository().processStatUpdates(true);
     }
 

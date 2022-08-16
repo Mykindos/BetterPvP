@@ -12,7 +12,6 @@ import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.database.repository.IRepository;
 import me.mykindos.betterpvp.core.gamer.Gamer;
-import me.mykindos.betterpvp.core.gamer.properties.GamerProperty;
 
 import javax.sql.rowset.CachedRowSet;
 import java.sql.SQLException;
@@ -77,12 +76,13 @@ public class GamerRepository implements IRepository<Gamer> {
                 String value = result.getString(1);
                 String type = result.getString(3);
                 Object property = switch (type) {
-                    case "java.lang.Integer" -> result.getInt(2);
-                    case "java.lang.Boolean" -> Boolean.parseBoolean(result.getString(2));
+                    case "int" -> result.getInt(2);
+                    case "boolean" -> Boolean.parseBoolean(result.getString(2));
+                    case "double" -> Double.parseDouble(result.getString(2));
                     default -> Class.forName(type).cast(result.getObject(2));
                 };
 
-                gamer.putProperty(GamerProperty.valueOf(value), property);
+                gamer.putProperty(value, property);
             }
         } catch (SQLException | ClassNotFoundException ex) {
             ex.printStackTrace();
@@ -100,15 +100,15 @@ public class GamerRepository implements IRepository<Gamer> {
         gamer.getProperties().forEach((key, value) -> saveProperty(gamer, key, value));
     }
 
-    public void saveProperty(Gamer gamer, Enum<?> property, Object value) {
+    public void saveProperty(Gamer gamer, String property, Object value) {
         String savePropertyQuery = "INSERT INTO " + databasePrefix + "gamer_properties (Gamer, Property, Value) VALUES (?, ?, ?)"
                 + " ON DUPLICATE KEY UPDATE Value = ?";
         Statement statement = new Statement(savePropertyQuery,
                 new StringStatementValue(gamer.getUuid()),
-                new StringStatementValue(property.name()),
+                new StringStatementValue(property),
                 new StringStatementValue(value.toString()),
                 new StringStatementValue(value.toString()));
-        queuedStatUpdates.put(gamer.getUuid() + property.name(), statement);
+        queuedStatUpdates.put(gamer.getUuid() + property, statement);
     }
 
     public void processStatUpdates(boolean async){

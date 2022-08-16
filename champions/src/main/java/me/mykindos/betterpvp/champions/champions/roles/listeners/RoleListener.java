@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
+import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -28,7 +29,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import java.util.Optional;
 
@@ -36,12 +36,14 @@ import java.util.Optional;
 public class RoleListener implements Listener {
 
     private final RoleManager roleManager;
+    private final GamerManager gamerManager;
     private final BuildManager buildManager;
     private final CooldownManager cooldownManager;
 
     @Inject
-    public RoleListener(RoleManager roleManager, BuildManager buildManager, CooldownManager cooldownManager) {
+    public RoleListener(RoleManager roleManager, GamerManager gamerManager, BuildManager buildManager, CooldownManager cooldownManager) {
         this.roleManager = roleManager;
+        this.gamerManager = gamerManager;
         this.buildManager = buildManager;
         this.cooldownManager = cooldownManager;
     }
@@ -58,6 +60,12 @@ public class RoleListener implements Listener {
             roleManager.addObject(player.getUniqueId().toString(), role);
             UtilMessage.message(player, "Class", "You equipped " + ChatColor.GREEN + role.getName());
             UtilMessage.message(player, equipMessage(player, role));
+
+            gamerManager.getObject(player.getUniqueId()).ifPresent(gamer -> {
+                String roleProperty = role.name() + "_EQUIPPED";
+                int timesEquipped = (int) gamer.getProperty(roleProperty).orElse(0) + 1;
+                gamer.saveProperty(roleProperty, timesEquipped);
+            });
         }
 
         for (PotionEffect effect : player.getActivePotionEffects()) {
@@ -106,32 +114,18 @@ public class RoleListener implements Listener {
         equipRole(player, null);
     }
 
-    @UpdateEvent(delay = 500)
-    public void checkRoleBuffs() {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            Optional<Role> roleOptional = roleManager.getObject(player.getUniqueId().toString());
-            if (roleOptional.isPresent()) {
-                Role role = roleOptional.get();
-                if (role == Role.ASSASSIN) {
-                    player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 1));
-                }
-            }
-        }
-    }
-
     @EventHandler
     public void reduceDurability(CustomDamageDurabilityEvent event) {
         if (event.getCustomDamageEvent().getDamagee() instanceof Player player) {
-            Optional<Role> roleOptional = roleManager.getObject(player.getUniqueId());
-            if (roleOptional.isPresent()) {
-                Role role = roleOptional.get();
+            roleManager.getObject(player.getUniqueId()).ifPresent(role -> {
                 if (role != Role.WARLOCK) {
                     double chance = (float) Role.WARLOCK.getChestplate().getMaxDurability() / (float) role.getChestplate().getMaxDurability();
                     if (UtilMath.randDouble(0, chance) >= 1) {
                         event.setDamageeTakeDurability(false);
                     }
                 }
-            }
+            });
+
         }
     }
 
@@ -150,20 +144,17 @@ public class RoleListener implements Listener {
     @EventHandler
     public void onApplyBuild(ApplyBuildEvent event) {
         Player player = event.getPlayer();
-        Optional<Role> roleOptional = roleManager.getObject(event.getPlayer().getUniqueId());
-        roleOptional.ifPresent(role -> {
+        roleManager.getObject(event.getPlayer().getUniqueId()).ifPresent(role -> {
             if (event.getNewBuild().getRole() == role) {
                 UtilMessage.message(player, equipMessage(player, role));
             }
         });
-
     }
 
     @EventHandler
     public void onDeleteBuild(DeleteBuildEvent event) {
         Player player = event.getPlayer();
-        Optional<Role> roleOptional = roleManager.getObject(event.getPlayer().getUniqueId());
-        roleOptional.ifPresent(role -> {
+        roleManager.getObject(event.getPlayer().getUniqueId()).ifPresent(role -> {
             if (event.getRoleBuild().getRole() == role) {
                 UtilMessage.message(player, equipMessage(player, role));
             }
@@ -224,7 +215,7 @@ public class RoleListener implements Listener {
 
     }
 
-    @EventHandler (priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void damageSound(CustomDamageEvent event) {
         if (event.isCancelled()) return;
         if (!(event.getDamagee() instanceof Player damagee)) return;

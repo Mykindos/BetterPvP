@@ -4,12 +4,16 @@ import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.config.Config;
+import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import javax.inject.Inject;
 
@@ -42,7 +46,7 @@ public class AssassinListener implements Listener {
 
     }
 
-    @EventHandler (priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onAssassinKnockback(CustomDamageEvent event) {
 
         if (event.getDamager() instanceof Player damager) {
@@ -53,13 +57,24 @@ public class AssassinListener implements Listener {
             }
         }
 
-        if(event.getDamagee() instanceof Player damagee){
-            if(!assassinReceiveKnockback) {
-                if(roleManager.hasRole(damagee, Role.ASSASSIN)) {
+        if (event.getDamagee() instanceof Player damagee) {
+            if (!assassinReceiveKnockback) {
+                if (roleManager.hasRole(damagee, Role.ASSASSIN)) {
                     event.setKnockback(false);
                 }
             }
         }
 
+    }
+
+    @UpdateEvent(delay = 500)
+    public void checkRoleBuffs() {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            roleManager.getObject(player.getUniqueId()).ifPresent(role -> {
+                if (role == Role.ASSASSIN) {
+                    player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 1));
+                }
+            });
+        }
     }
 }

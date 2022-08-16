@@ -17,7 +17,6 @@ public class UtilServer {
     }
 
 
-
     public static void runTask(BPvPPlugin plugin, boolean async, Runnable task) {
         if (plugin.isEnabled()) {
             if (async) {

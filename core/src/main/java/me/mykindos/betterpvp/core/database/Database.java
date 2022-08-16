@@ -61,7 +61,11 @@ public class Database {
     }
 
     public void executeBatch(List<Statement> statements, boolean async) {
-        UtilServer.runTask(core, async, () -> executeBatch(statements));
+        if(async) {
+            UtilServer.runTaskAsync(core, () -> executeBatch(statements));
+        }else{
+            executeBatch(statements);
+        }
     }
 
     private void executeBatch(List<Statement> statements) {

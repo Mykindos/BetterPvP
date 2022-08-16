@@ -60,20 +60,17 @@ public class GamerListener implements Listener {
     private void checkUnsetProperties(Gamer gamer) {
         Optional<Integer> coinsOptional = gamer.getProperty(GamerProperty.COINS);
         if(coinsOptional.isEmpty()){
-            gamer.putProperty(GamerProperty.COINS, defaultCoins);
-            gamerManager.getGamerRepository().saveProperty(gamer, GamerProperty.COINS, defaultCoins);
+            gamer.saveProperty(GamerProperty.COINS, defaultCoins);
         }
 
         Optional<Integer> fragmentsOptional = gamer.getProperty(GamerProperty.FRAGMENTS);
         if(fragmentsOptional.isEmpty()){
-            gamer.putProperty(GamerProperty.FRAGMENTS, defaultFragments);
-            gamerManager.getGamerRepository().saveProperty(gamer, GamerProperty.FRAGMENTS, defaultFragments);
+            gamer.saveProperty(GamerProperty.FRAGMENTS, defaultFragments);
         }
 
         Optional<Boolean> sidebarOptional = gamer.getProperty(GamerProperty.SIDEBAR_ENABLED);
         if(sidebarOptional.isEmpty()){
-            gamer.putProperty(GamerProperty.SIDEBAR_ENABLED, true);
-            gamerManager.getGamerRepository().saveProperty(gamer, GamerProperty.SIDEBAR_ENABLED, true);
+            gamer.saveProperty(GamerProperty.SIDEBAR_ENABLED, true);
         }
     }
 

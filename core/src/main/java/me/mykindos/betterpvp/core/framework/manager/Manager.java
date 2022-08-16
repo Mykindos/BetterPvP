@@ -2,15 +2,16 @@ package me.mykindos.betterpvp.core.framework.manager;
 
 import lombok.Getter;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class Manager<T> {
 
     @Getter
-    protected final HashMap<String, T> objects = new HashMap<>();
+    protected final Map<String, T> objects = new ConcurrentHashMap<>();
 
     public void addObject(String identifier, T object){
         objects.put(identifier, object);

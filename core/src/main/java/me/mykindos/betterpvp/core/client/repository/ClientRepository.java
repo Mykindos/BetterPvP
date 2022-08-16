@@ -5,7 +5,6 @@ import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
-import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
@@ -68,12 +67,13 @@ public class ClientRepository implements IRepository<Client> {
                 String value = result.getString(1);
                 String type = result.getString(3);
                 Object property = switch (type) {
-                    case "java.lang.Integer" -> result.getInt(2);
-                    case "java.lang.Boolean" -> Boolean.parseBoolean(result.getString(2));
+                    case "int" -> result.getInt(2);
+                    case "boolean" -> Boolean.parseBoolean(result.getString(2));
+                    case "double" -> Double.parseDouble(result.getString(2));
                     default -> Class.forName(type).cast(result.getObject(2));
                 };
 
-                client.putProperty(ClientProperty.valueOf(value), property);
+                client.putProperty(value, property);
             }
         } catch (SQLException | ClassNotFoundException ex) {
             ex.printStackTrace();
@@ -90,15 +90,15 @@ public class ClientRepository implements IRepository<Client> {
         ));
     }
 
-    public void saveProperty(Client client, Enum<?> property, Object value) {
+    public void saveProperty(Client client, String property, Object value) {
         String savePropertyQuery = "INSERT INTO " + databasePrefix + "client_properties (Client, Property, Value) VALUES (?, ?, ?)"
                 + " ON DUPLICATE KEY UPDATE Value = ?";
         Statement statement = new Statement(savePropertyQuery,
                 new StringStatementValue(client.getUuid()),
-                new StringStatementValue(property.name()),
+                new StringStatementValue(property),
                 new StringStatementValue(value.toString()),
                 new StringStatementValue(value.toString()));
-        queuedStatUpdates.put(client.getUuid() + property.name(), statement);
+        queuedStatUpdates.put(client.getUuid() + property, statement);
     }
 
     public void processStatUpdates(boolean async){
