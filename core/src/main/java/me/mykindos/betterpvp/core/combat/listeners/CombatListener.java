@@ -4,6 +4,8 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.combat.armour.ArmourManager;
 import me.mykindos.betterpvp.core.combat.data.DamageData;
 import me.mykindos.betterpvp.core.combat.events.*;
+import me.mykindos.betterpvp.core.combat.log.DamageLog;
+import me.mykindos.betterpvp.core.combat.log.DamageLogManager;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.gamer.properties.GamerProperty;
@@ -36,12 +38,14 @@ public class CombatListener implements Listener {
     private final List<DamageData> damageDataList;
     private final GamerManager gamerManager;
     private final ArmourManager armourManager;
+    private final DamageLogManager damageLogManager;
 
     @Inject
-    public CombatListener(Core core, GamerManager gamerManager, ArmourManager armourManager) {
+    public CombatListener(Core core, GamerManager gamerManager, ArmourManager armourManager, DamageLogManager damageLogManager) {
         this.core = core;
         this.gamerManager = gamerManager;
         this.armourManager = armourManager;
+        this.damageLogManager = damageLogManager;
         damageDataList = new ArrayList<>();
     }
 
@@ -107,13 +111,13 @@ public class CombatListener implements Listener {
                         }
                     }
 
+                    processDamageData(event, damage);
+
                     if (event.getDamagee().getHealth() - damage < 1.0) {
                         event.getDamagee().setHealth(0);
                     } else {
                         event.getDamagee().setHealth(event.getDamagee().getHealth() - damage);
                     }
-
-                    processDamageData(event, damage);
 
                 }
             }
@@ -134,6 +138,9 @@ public class CombatListener implements Listener {
                 gamer.saveProperty(GamerProperty.DAMAGE_DEALT, damage);
             });
         }
+
+        DamageLog damageLog = new DamageLog(event.getDamager(), event.getCause(), damage, event.getReason());
+        damageLogManager.add(event.getDamagee(), damageLog);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)

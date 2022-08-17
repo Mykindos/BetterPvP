@@ -75,11 +75,10 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener {
         if (level > 0) {
 
             if (event.getRightClicked() instanceof LivingEntity ent) {
+
+                PlayerUseSkillEvent playerUseSkillEvent = UtilServer.callEvent(new PlayerUseSkillEvent(player, this, level));
+                if (playerUseSkillEvent.isCancelled()) return;
                 if (UtilMath.offset(player, ent) <= 3.0) {
-
-                    PlayerUseSkillEvent playerUseSkillEvent = UtilServer.callEvent(new PlayerUseSkillEvent(player, this, level));
-                    if(playerUseSkillEvent.isCancelled()) return;
-
                     if (ent instanceof Player damagee) {
                         UtilMessage.simpleMessage(damagee, getClassType().getName(), "<yellow>%s<gray> hit you with <green>%s<gray>.",
                                 player.getName(), getName() + " " + level);

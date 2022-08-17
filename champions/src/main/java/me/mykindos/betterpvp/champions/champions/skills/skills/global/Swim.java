@@ -11,10 +11,10 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -61,7 +61,7 @@ public class Swim extends Skill implements PassiveSkill, EnergySkill {
 
         Player player = event.getPlayer();
 
-        if (player.getLocation().getBlock().getType() != Material.WATER) {
+        if (!UtilBlock.isInLiquid(player)) {
             return;
         }
 

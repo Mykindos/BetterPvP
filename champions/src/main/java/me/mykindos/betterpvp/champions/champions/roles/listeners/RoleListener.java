@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.champions.champions.builds.menus.events.ApplyBuildE
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.DeleteBuildEvent;
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.champions.champions.roles.events.RoleChangeEvent;
+import me.mykindos.betterpvp.core.combat.death.events.CustomDeathEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageDurabilityEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -15,6 +16,7 @@ import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -26,6 +28,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -238,6 +241,41 @@ public class RoleListener implements Listener {
                             damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.8F);
                 }
             }
+        }
+    }
+
+    @EventHandler
+    public void onShootBow(EntityShootBowEvent event) {
+        if (!(event.getEntity() instanceof Player player)) return;
+
+        if (UtilBlock.isInLiquid(player)) {
+            UtilMessage.message(player, "Bow", "You can't shoot a bow in water.");
+            event.setCancelled(true);
+            return;
+        }
+
+        roleManager.getObject(player.getUniqueId()).ifPresent(role -> {
+            if (role != Role.ASSASSIN && role != Role.RANGER) {
+                UtilMessage.message(player, "Bow", "You can't shoot a bow with this class.");
+                event.setCancelled(true);
+            }
+        });
+    }
+
+    @EventHandler (priority = EventPriority.LOW)
+    public void onDeath(CustomDeathEvent event) {
+        if (event.getKilled() instanceof Player killed){
+            roleManager.getObject(killed.getUniqueId()).ifPresent(role -> {
+                event.setCustomDeathMessage(event.getCustomDeathMessage()
+                        .replace(killed.getName(), "<green>" + role.getPrefix() + ".<yellow>" + killed.getName()));
+            });
+        }
+
+        if (event.getKiller() instanceof Player killer){
+            roleManager.getObject(killer.getUniqueId()).ifPresent(role -> {
+                event.setCustomDeathMessage(event.getCustomDeathMessage()
+                        .replace(killer.getName(), "<green>" + role.getPrefix() + ".<yellow>" + killer.getName()));
+            });
         }
     }
 

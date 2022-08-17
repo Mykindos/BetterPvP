@@ -35,4 +35,8 @@ public enum ClanRelation {
         return ChatColor.valueOf(primary.toString().toUpperCase());
     }
 
+    public String getPrimaryMiniColor() {
+        return "<" + primary.toString().toLowerCase() + ">";
+    }
+
 }
