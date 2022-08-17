@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.utilities;
 
 import me.mykindos.betterpvp.core.client.Rank;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -115,7 +116,8 @@ public class UtilMessage {
 
     /**
      * Sends a message utilizing <a href="https://docs.adventure.kyori.net/minimessage">MiniMessage</a> from Adventure API
-     * @param sender The CommandSender to send the message to
+     *
+     * @param sender  The CommandSender to send the message to
      * @param message The message to send
      */
     public static void simpleMessage(CommandSender sender, String message) {
@@ -131,6 +133,19 @@ public class UtilMessage {
      */
     public static void simpleMessage(CommandSender sender, String prefix, String message) {
         sender.sendMessage(Component.text(ChatColor.BLUE + prefix + "> ")
+                .append(MiniMessage.miniMessage().deserialize("<gray>" + message)));
+    }
+
+    /**
+     * Sends a message utilizing <a href="https://docs.adventure.kyori.net/minimessage">MiniMessage</a> from Adventure API
+     * @param sender The CommandSender to send the message to
+     * @param prefix The message
+     * @param message Message to send to the CommandSender
+     * @param hover Hover event to add to the message
+     */
+    public static void simpleMessage(CommandSender sender, String prefix, String message, Component hover) {
+        sender.sendMessage(Component.text(ChatColor.BLUE + prefix + "> ")
+                .hoverEvent(HoverEvent.showText(hover))
                 .append(MiniMessage.miniMessage().deserialize("<gray>" + message)));
     }
 

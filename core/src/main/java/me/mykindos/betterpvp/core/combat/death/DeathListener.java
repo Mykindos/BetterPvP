@@ -5,10 +5,14 @@ import me.mykindos.betterpvp.core.combat.death.events.CustomDeathEvent;
 import me.mykindos.betterpvp.core.combat.log.DamageLog;
 import me.mykindos.betterpvp.core.combat.log.DamageLogManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -64,9 +68,9 @@ public class DeathListener implements Listener {
                 }
             }
 
-            if(event.getReason().equals("")){
-                if(!(event.getKiller() instanceof Player)) {
-                    if(event.getKiller().customName() == null) {
+            if (event.getReason().equals("")) {
+                if (!(event.getKiller() instanceof Player)) {
+                    if (event.getKiller().customName() == null) {
                         // Better english if the killer doesnt have a custom name
                         event.setCustomDeathMessage(String.format("<yellow>%s<gray> was killed by a <yellow>%s<gray>.",
                                 event.getKilled().getName(), event.getKiller().getName()));
@@ -74,11 +78,11 @@ public class DeathListener implements Listener {
                         event.setCustomDeathMessage(String.format("<yellow>%s<gray> was killed by <yellow>%s<gray>.",
                                 event.getKilled().getName(), event.getKiller().getName()));
                     }
-                }else{
+                } else {
                     event.setCustomDeathMessage(String.format("<yellow>%s<gray> was killed by <yellow>%s<gray>.",
                             event.getKilled().getName(), event.getKiller().getName()));
                 }
-            }else{
+            } else {
                 event.setCustomDeathMessage(String.format("<yellow>%s<gray> was killed by <yellow>%s<gray> with <green>%s<gray>.",
                         event.getKilled().getName(), event.getKiller().getName(), event.getReason()));
             }
@@ -91,6 +95,12 @@ public class DeathListener implements Listener {
     public void finishCustomDeath(CustomDeathEvent event) {
         if (event.isCancelled()) return;
 
-        UtilMessage.simpleMessage(event.getReceiver(), "Death", event.getCustomDeathMessage());
+        Component hoverComponent = Component.text(ChatColor.GOLD + "Damage Breakdown");
+        for (var breakdown : damageLogManager.getDamageBreakdown(event.getKilled())) {
+            hoverComponent = hoverComponent.append(Component.text("\n" + ChatColor.YELLOW + breakdown.getKey() + ": "
+                    + ChatColor.GREEN + UtilMath.round(breakdown.getValue(), 1)));
+        }
+
+        UtilMessage.simpleMessage(event.getReceiver(), "Death", event.getCustomDeathMessage(), hoverComponent);
     }
 }
