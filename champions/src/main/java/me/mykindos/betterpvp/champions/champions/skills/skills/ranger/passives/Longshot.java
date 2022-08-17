@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
+import me.mykindos.betterpvp.core.combat.death.events.CustomDeathEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -34,6 +35,7 @@ public class Longshot extends Skill implements PassiveSkill {
     private final WeakHashMap<Arrow, Location> arrows = new WeakHashMap<>();
 
     private double baseDamage;
+    private double deathMessageThreshold;
 
     @Inject
     public Longshot(Champions champions, ChampionsManager championsManager) {
@@ -106,6 +108,12 @@ public class Longshot extends Skill implements PassiveSkill {
         double damage = Math.min(baseDamage + getLevel(damager), length / 3.0 - 4);
 
         event.setDamage(event.getDamage() + (damage));
+        event.setReason(getName() + (length > deathMessageThreshold ? " <gray>from <green>" + (int) length + "<gray> blocks" : ""));
+
+    }
+
+    @EventHandler
+    public void onDeath(CustomDeathEvent event) {
 
     }
 
@@ -119,6 +127,7 @@ public class Longshot extends Skill implements PassiveSkill {
     @Override
     public void loadSkillConfig(){
         baseDamage = getConfig("baseDamage", 18.0, Double.class);
+        deathMessageThreshold = getConfig("deathMessageThreshold", 40.0, Double.class);
     }
 
 }

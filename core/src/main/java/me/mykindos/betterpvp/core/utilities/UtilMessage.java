@@ -115,6 +115,15 @@ public class UtilMessage {
 
     /**
      * Sends a message utilizing <a href="https://docs.adventure.kyori.net/minimessage">MiniMessage</a> from Adventure API
+     * @param sender The CommandSender to send the message to
+     * @param message The message to send
+     */
+    public static void simpleMessage(CommandSender sender, String message) {
+        sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray>" + message));
+    }
+
+    /**
+     * Sends a message utilizing <a href="https://docs.adventure.kyori.net/minimessage">MiniMessage</a> from Adventure API
      *
      * @param sender  The CommandSender
      * @param prefix  The message

@@ -11,10 +11,7 @@ import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.gamer.exceptions.NoSuchGamerException;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilBlock;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import me.mykindos.betterpvp.core.utilities.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -28,6 +25,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
@@ -60,7 +58,7 @@ public class ClansWorldListener extends ClanListener {
         clanOptional.ifPresent(clan -> {
             for (ClanMember member : clan.getMembers()) {
                 Player player = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
-                if(player != null){
+                if (player != null) {
                     return;
                 }
             }
@@ -546,5 +544,24 @@ public class ClansWorldListener extends ClanListener {
             });
 
         }
+    }
+
+    /**
+     * Stop players shooting bows in safezones if they have not taken damage recently
+     * @param event The event
+     */
+    @EventHandler
+    public void onShootBow(EntityShootBowEvent event) {
+        if (!(event.getEntity() instanceof Player player)) return;
+
+        clanManager.getClanByLocation(player.getLocation()).ifPresent(clan -> {
+            if (clan.isSafe()) {
+                gamerManager.getObject(player.getUniqueId()).ifPresent(gamer -> {
+                    if (UtilTime.elapsed(gamer.getLastDamaged(), 15000)) {
+                        event.setCancelled(true);
+                    }
+                });
+            }
+        });
     }
 }
