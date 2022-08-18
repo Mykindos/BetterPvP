@@ -24,7 +24,7 @@ public interface IClan {
     List<ClanTerritory> getTerritory();
 
     default boolean isAllied(IClan clan) {
-        return getAlliances().stream().anyMatch(ally -> ally.getClan().getName().equalsIgnoreCase(clan.getName()));
+        return getAlliances().stream().anyMatch(ally -> ally.getClan().equals(clan));
     }
 
     default Optional<ClanAlliance> getAlliance(IClan clan) {
@@ -39,4 +39,7 @@ public interface IClan {
     default boolean isEnemy(IClan clan) {
         return getEnemies().stream().anyMatch(enemy -> enemy.getClan().getName().equalsIgnoreCase(clan.getName()));
     }
+
+
+
 }

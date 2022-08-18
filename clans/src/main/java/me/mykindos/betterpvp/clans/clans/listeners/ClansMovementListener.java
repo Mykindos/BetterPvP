@@ -20,7 +20,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import java.util.Optional;
 
 @BPvPListener
-public class ClansMovementListener extends ClanListener{
+public class ClansMovementListener extends ClanListener {
 
     private final Clans clans;
 
@@ -47,7 +47,7 @@ public class ClansMovementListener extends ClanListener{
 
 
                 if (clanFromOption.isEmpty() || clanToOptional.isEmpty()
-                        ||  !clanFromOption.equals(clanToOptional)) {
+                        || !clanFromOption.equals(clanToOptional)) {
                     displayOwner(e.getPlayer(), clanToOptional.orElse(null));
 
                     UtilServer.runTask(clans, () -> UtilServer.callEvent(new ScoreboardUpdateEvent(e.getPlayer())));
@@ -65,7 +65,7 @@ public class ClansMovementListener extends ClanListener{
 
         Clan clan = null;
         Optional<Clan> clanOptional = clanManager.getClanByPlayer(player);
-        if(clanOptional.isPresent()){
+        if (clanOptional.isPresent()) {
             clan = clanOptional.get();
         }
 
@@ -97,8 +97,12 @@ public class ClansMovementListener extends ClanListener{
                         + ChatColor.GRAY.toString() + ChatColor.BOLD + "PvP Hotspot";
             }
 
-            UtilMessage.message(player, "Territory", Component.text(ownerString + append)
-                    .hoverEvent(HoverEvent.showText(clanManager.getClanTooltip(player, locationClan))));
+            if (clan != null && !locationClan.equals(clan)) {
+                UtilMessage.message(player, "Territory", Component.text(ownerString + append)
+                        .hoverEvent(HoverEvent.showText(clanManager.getClanTooltip(player, locationClan))));
+            } else {
+                UtilMessage.message(player, "Territory", Component.text(ownerString + append));
+            }
 
         } else {
             UtilMessage.message(player, "Territory", ownerString + " " + append);

@@ -47,6 +47,7 @@ public class ClanManager extends Manager<Clan> {
         this.gamerManager = gamerManager;
 
         var clans = repository.getAll();
+        loadFromList(clans);
 
         clans.forEach(clan -> {
             clan.setTerritory(repository.getTerritory(this, clan));
@@ -57,7 +58,6 @@ public class ClanManager extends Manager<Clan> {
 
         log.info("Loaded {} clans", clans.size());
 
-        loadFromList(clans);
     }
 
     public Optional<Clan> getClanById(int id) {

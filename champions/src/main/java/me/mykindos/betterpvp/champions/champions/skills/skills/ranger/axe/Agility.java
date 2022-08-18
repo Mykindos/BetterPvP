@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
@@ -96,8 +97,8 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
 
     @EventHandler
     public void onDamage(CustomDamageEvent event) {
-        if(!(event.getDamagee() instanceof Player damagee)) return;
-        if(!(event.getDamager() instanceof Player damager)) return;
+        if (!(event.getDamagee() instanceof Player damagee)) return;
+        if (!(event.getDamager() instanceof Player damager)) return;
 
         if (active.contains(damagee.getUniqueId())) {
             event.setDamage(event.getDamage() * 0.40);
@@ -112,7 +113,7 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
 
     }
 
-    @UpdateEvent(delay=500)
+    @UpdateEvent(delay = 500)
     public void onUpdate() {
         active.removeIf(uuid -> Bukkit.getPlayer(uuid) == null);
     }
@@ -120,11 +121,13 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
 
     @Override
     public void activate(Player player, int level) {
-        if (!active.contains(player.getUniqueId())) {
-            player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) ((baseDuration + level) * 20), 1));
-            player.getWorld().playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.5F, 0.5F);
-            active.add(player.getUniqueId());
-        }
+        UtilServer.runTaskLater(champions, () -> {
+            if (!active.contains(player.getUniqueId())) {
+                player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) ((baseDuration + level) * 20), 1));
+                player.getWorld().playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.5F, 0.5F);
+                active.add(player.getUniqueId());
+            }
+        }, 1);
     }
 
     @Override
@@ -133,7 +136,7 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
     }
 
     @Override
-    public void loadSkillConfig(){
+    public void loadSkillConfig() {
         baseDuration = getConfig("baseDuration", 3.0, Double.class);
     }
 }

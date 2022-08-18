@@ -232,4 +232,43 @@ public class ClanEventListener extends ClanListener {
         }
 
     }
+
+    @EventHandler
+    public void onClanRequestAlliance(ClanRequestAllianceEvent event) {
+        if (event.isCancelled()) return;
+
+        Clan clan = event.getClan();
+        Clan target = event.getTargetClan();
+
+        if (inviteHandler.isInvited(clan, target, "Alliance") || inviteHandler.isInvited(target, clan, "Alliance")) {
+
+            UtilServer.callEvent(new ClanAllianceEvent(event.getPlayer(), clan, target));
+            return;
+        }
+
+        inviteHandler.createInvite(clan, target, "Alliance", 10);
+        UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You have requested an alliance with <yellow>%s<gray>.", target.getName());
+        target.messageClan(ChatColor.YELLOW + "Clan " + clan.getName() + ChatColor.GRAY + " has requested an alliance.", null, true);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onClanAlly(ClanAllianceEvent event) {
+        if (event.isCancelled()) return;
+        Clan clan = event.getClan();
+        Clan target = event.getTargetClan();
+
+        inviteHandler.removeInvite(clan, target, "Alliance");
+        inviteHandler.removeInvite(target, clan, "Alliance");
+
+        ClanAlliance clanAlliance = new ClanAlliance(target, false);
+        ClanAlliance targetAlliance = new ClanAlliance(clan, false);
+        clan.getAlliances().add(clanAlliance);
+        target.getAlliances().add(targetAlliance);
+
+        clan.messageClan(ChatColor.YELLOW + "Clan " + target.getName() + ChatColor.GRAY + " is now allied to your Clan.", null, true);
+        target.messageClan(ChatColor.YELLOW + "Clan " + clan.getName() + ChatColor.GRAY + " is now allied to your Clan.", null, true);
+
+        clanManager.getRepository().saveClanAlliance(clan, clanAlliance);
+        clanManager.getRepository().saveClanAlliance(target, targetAlliance);
+    }
 }

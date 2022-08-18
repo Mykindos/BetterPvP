@@ -21,7 +21,7 @@ public class InviteSubCommand extends ClanSubCommand {
 
     @Inject
     @Config(path="clans.members.max", defaultValue = "6")
-    private int maxClanmMembers;
+    private int maxClanMembers;
 
     public InviteSubCommand(ClanManager clanManager, GamerManager gamerManager) {
         super(clanManager, gamerManager);
@@ -72,7 +72,7 @@ public class InviteSubCommand extends ClanSubCommand {
             return;
         }
 
-        if(clan.getSquadCount() >= maxClanmMembers){
+        if(clan.getSquadCount() >= maxClanMembers){
             UtilMessage.message(player, "Clans", "Your clan has too many members or allies to invite another member.");
             return;
         }

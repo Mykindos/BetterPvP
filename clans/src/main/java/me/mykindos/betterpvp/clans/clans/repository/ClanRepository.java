@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.components.clans.data.ClanTerritory;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
+import me.mykindos.betterpvp.core.database.query.values.BooleanStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.database.repository.IRepository;
@@ -127,6 +128,8 @@ public class ClanRepository implements IRepository<Clan> {
                 if (otherClan.isPresent()) {
                     boolean trusted = result.getBoolean(4);
                     alliances.add(new ClanAlliance(otherClan.get(), trusted));
+                }else{
+                    System.out.println("Could not find clan with id " + result.getInt(3));
                 }
             }
         } catch (SQLException ex) {
@@ -194,6 +197,14 @@ public class ClanRepository implements IRepository<Clan> {
                 new IntegerStatementValue(clan.getId()),
                 new StringStatementValue(member.getUuid()),
                 new StringStatementValue(member.getRank().name())));
+    }
+
+    public void saveClanAlliance(IClan clan, ClanAlliance alliance) {
+        String query = "INSERT INTO " + databasePrefix + "clan_alliances (Clan, AllyClan, Trusted) VALUES (?, ?, ?);";
+        database.executeUpdateAsync(new Statement(query,
+                new IntegerStatementValue(clan.getId()),
+                new IntegerStatementValue(alliance.getClan().getId()),
+                new BooleanStatementValue(alliance.isTrusted())));
     }
 
     public void deleteClanMember(Clan clan, ClanMember member) {
