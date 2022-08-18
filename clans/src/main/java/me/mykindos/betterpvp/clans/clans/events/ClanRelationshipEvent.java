@@ -1,17 +1,17 @@
 package me.mykindos.betterpvp.clans.clans.events;
 
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.core.components.clans.events.ClanEvent;
 import org.bukkit.entity.Player;
 
-@EqualsAndHashCode(callSuper = true)
+public class ClanRelationshipEvent extends ClanEvent<Clan> {
 
-public class ClanCreateEvent extends ClanEvent<Clan> {
+    @Getter
+    private final Clan targetClan;
 
-    public ClanCreateEvent(Player player, Clan clan) {
+    public ClanRelationshipEvent(Player player, Clan clan, Clan targetClan) {
         super(player, clan, true);
+        this.targetClan = targetClan;
     }
-
 }
-

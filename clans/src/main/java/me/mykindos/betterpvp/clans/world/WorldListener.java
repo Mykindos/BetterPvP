@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.clans.world;
 import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.clans.items.ItemHandler;
+import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.framework.ModuleLoadedEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.gamer.Gamer;
@@ -487,5 +488,11 @@ public class WorldListener implements Listener {
         }
     }
 
+    @EventHandler
+    public void onDamageWarden(CustomDamageEvent event) {
+        if(event.getDamagee() instanceof Warden) {
+            event.setKnockback(false);
+        }
+    }
 
 }

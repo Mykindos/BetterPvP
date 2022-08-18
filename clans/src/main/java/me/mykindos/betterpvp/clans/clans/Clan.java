@@ -177,4 +177,13 @@ public class Clan implements IClan, Invitable {
 
     }
 
+    @Override
+    public boolean equals(Object other) {
+        if(other instanceof Clan otherClan) {
+            return getName().equalsIgnoreCase(otherClan.getName());
+        }
+
+        return false;
+    }
+
 }

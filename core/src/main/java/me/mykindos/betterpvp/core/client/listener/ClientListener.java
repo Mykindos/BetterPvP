@@ -28,6 +28,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Optional;
@@ -151,4 +152,8 @@ public class ClientListener implements Listener {
         clientManager.getRepository().processStatUpdates(true);
     }
 
+    @EventHandler
+    public void onRespawn(PlayerRespawnEvent event) {
+        event.setRespawnLocation(event.getPlayer().getWorld().getSpawnLocation());
+    }
 }

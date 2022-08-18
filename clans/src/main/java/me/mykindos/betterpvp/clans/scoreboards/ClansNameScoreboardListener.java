@@ -109,7 +109,7 @@ public class ClansNameScoreboardListener implements Listener {
             ClanRelation relation = clanManager.getRelation(playerClan, targetClan);
             String prefix = targetClan.getName();
             if (relation == ClanRelation.ALLY) {
-                team.prefix(Component.text(ChatColor.GREEN + prefix + " "));
+                team.prefix(Component.text(ChatColor.DARK_GREEN + prefix + " "));
                 team.color(NamedTextColor.GREEN);
                 team.suffix(Component.text(""));
             } else if (relation == ClanRelation.ALLY_TRUST) {

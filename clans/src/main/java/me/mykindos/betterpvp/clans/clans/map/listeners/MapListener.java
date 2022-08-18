@@ -5,16 +5,14 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
-import me.mykindos.betterpvp.clans.clans.events.ChunkClaimEvent;
-import me.mykindos.betterpvp.clans.clans.events.ClanDisbandEvent;
-import me.mykindos.betterpvp.clans.clans.events.MemberJoinClanEvent;
-import me.mykindos.betterpvp.clans.clans.events.MemberLeaveClanEvent;
+import me.mykindos.betterpvp.clans.clans.events.*;
 import me.mykindos.betterpvp.clans.clans.map.MapHandler;
 import me.mykindos.betterpvp.clans.clans.map.data.ChunkData;
 import me.mykindos.betterpvp.clans.clans.map.data.MapSettings;
 import me.mykindos.betterpvp.clans.clans.map.nms.UtilMapMaterial;
 import me.mykindos.betterpvp.core.components.clans.IClan;
 import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
+import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.components.clans.data.ClanTerritory;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.gamer.Gamer;
@@ -50,6 +48,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 @BPvPListener
 public class MapListener implements Listener {
@@ -130,17 +129,19 @@ public class MapListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     private void onEvent(PlayerDropItemEvent event) {
         ItemStack item = event.getItemDrop().getItemStack();
-        if (item != null && item.getType() == Material.FILLED_MAP) {
+        if (item.getType() == Material.FILLED_MAP) {
             event.getItemDrop().remove();
         }
     }
 
-    // TODO
-    //@EventHandler(priority = EventPriority.MONITOR)
-    //public void onClanAlly(ClanAllyEvent event) {
-    //    updateClanRelation(event.getClan(), event.getOther());
-    //}
-//
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onClanAlly(ClanRelationshipEvent event) {
+        UtilServer.runTaskLater(clans, () -> {
+            event.getClan().getMembers().forEach(this::updateClanChunks);
+            event.getTargetClan().getMembers().forEach(this::updateClanChunks);
+        }, 3);
+    }
+
     //@EventHandler(priority = EventPriority.MONITOR)
     //public void onClanEnemy(ClanEnemyEvent event) {
     //    updateClanRelation(event.getClan(), event.getOther());
@@ -273,6 +274,15 @@ public class MapListener implements Listener {
         }, 1);
     }
 
+    public void updateClanChunks(ClanMember member) {
+        mapHandler.clanMapData.remove(UUID.fromString(member.getUuid()));
+        Player player = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
+        if (player != null) {
+            loadChunks(player);
+        }
+    }
+
+
     @EventHandler(priority = EventPriority.MONITOR)
     public void onClanLeave(MemberLeaveClanEvent event) {
         if (event.isCancelled()) return;
@@ -350,18 +360,15 @@ public class MapListener implements Listener {
             mapHandler.clanMapData.put(player.getUniqueId(), new HashSet<>());
         }
 
-        final Set<ChunkData> chunkClaimColor = mapHandler.clanMapData.get(player.getUniqueId());
-
+        Set<ChunkData> chunkClaimColor = mapHandler.clanMapData.get(player.getUniqueId());
 
         Clan pClan = clanManager.getClanByPlayer(player).orElse(null);
 
         for (Clan clan : clanManager.getObjects().values()) {
             ClanRelation clanRelation = clanManager.getRelation(pClan, clan);
-
             MaterialColor materialColor = clanRelation.getMaterialColor();
 
             for (ClanTerritory claim : clan.getTerritory()) {
-
                 Chunk chunk = UtilWorld.stringToChunk(claim.getChunk());
                 if (chunk != null) {
                     ChunkData chunkData = new ChunkData("world", materialColor, chunk.getX(), chunk.getZ(), clan);
@@ -379,6 +386,7 @@ public class MapListener implements Listener {
             }
 
         }
+
         updateStatus(player);
     }
 

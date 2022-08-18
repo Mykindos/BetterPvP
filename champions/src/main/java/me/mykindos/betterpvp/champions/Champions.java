@@ -43,6 +43,8 @@ public class Champions extends BPvPPlugin {
     @Config(path = "champions.database.prefix", defaultValue = "champions_")
     private String databasePrefix;
 
+    private ChampionsListenerLoader championsListenerLoader;
+
 
     @Override
     public void onEnable() {
