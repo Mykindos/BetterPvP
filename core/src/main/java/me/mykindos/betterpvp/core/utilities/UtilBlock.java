@@ -265,7 +265,6 @@ public class UtilBlock {
      * @param block Block to check
      * @return Returns true if the block is solid (e.g. Stone)
      */
-    @SuppressWarnings("deprecation")
     public static boolean solid(Block block) {
         if (block == null) {
             return false;
@@ -279,7 +278,6 @@ public class UtilBlock {
      * @param block Block ID to check
      * @return True if the block can be interacted with. (E.g. a chest or door)
      */
-    @SuppressWarnings("deprecation")
     public static boolean usable(Block block) {
         if (block == null) {
             return false;

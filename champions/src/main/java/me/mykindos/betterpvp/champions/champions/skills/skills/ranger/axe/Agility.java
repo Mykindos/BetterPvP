@@ -14,7 +14,6 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
@@ -121,13 +120,11 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
 
     @Override
     public void activate(Player player, int level) {
-        UtilServer.runTaskLater(champions, () -> {
-            if (!active.contains(player.getUniqueId())) {
-                player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) ((baseDuration + level) * 20), 1));
-                player.getWorld().playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.5F, 0.5F);
-                active.add(player.getUniqueId());
-            }
-        }, 1);
+        if (!active.contains(player.getUniqueId())) {
+            player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) ((baseDuration + level) * 20), 1));
+            player.getWorld().playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.5F, 0.5F);
+            active.add(player.getUniqueId());
+        }
     }
 
     @Override

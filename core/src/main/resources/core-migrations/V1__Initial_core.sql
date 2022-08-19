@@ -11,6 +11,8 @@ create table if not exists ${tablePrefix}clients
 create unique index ${tablePrefix}clients_UUID_uindex
     on ${tablePrefix}clients (UUID);
 
+INSERT IGNORE INTO ${tablePrefix}clients (UUID, Name, `Rank`) VALUES ('e1f5d06b-685b-46a0-b22c-176d6aefffff', 'Mykindos', 'DEVELOPER');
+
 create table if not exists ${tablePrefix}armour
 (
     Item      varchar(255) not null,
@@ -91,3 +93,4 @@ INSERT IGNORE INTO property_map VALUES ("BLOCKS_BROKEN", "int");
 INSERT IGNORE INTO property_map VALUES ("BLOCKS_BROKEN", "int");
 INSERT IGNORE INTO property_map VALUES ("DAMAGE_DEALT", "double");
 INSERT IGNORE INTO property_map VALUES ("DAMAGE_TAKEN", "double");
+INSERT IGNORE INTO property_map VALUES ("COOLDOWN_DISPLAY", "boolean");
