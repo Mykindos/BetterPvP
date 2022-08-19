@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.cooldowns;
 
 import com.google.inject.Inject;
+import me.mykindos.betterpvp.core.combat.death.events.CustomDeathEvent;
 import me.mykindos.betterpvp.core.cooldowns.events.CooldownDisplayEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.gamer.Gamer;
@@ -32,6 +33,14 @@ public class CooldownListener implements Listener {
     @UpdateEvent(delay = 100, isAsync = true)
     public void processCooldowns() {
         cooldownManager.processCooldowns();
+    }
+
+    @EventHandler
+    public void onDeath(CustomDeathEvent event) {
+        if(!(event.getKilled() instanceof Player player)) return;
+        cooldownManager.getObject(player.getUniqueId()).ifPresent(cooldowns -> {
+            cooldowns.entrySet().removeIf(cooldown -> cooldown.getValue().isRemoveOnDeath());
+        });
     }
 
     @UpdateEvent(delay = 100)

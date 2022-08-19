@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import me.mykindos.betterpvp.core.combat.death.events.CustomDeathEvent;
 import me.mykindos.betterpvp.core.combat.log.DamageLog;
 import me.mykindos.betterpvp.core.combat.log.DamageLogManager;
+import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -25,16 +26,22 @@ import org.bukkit.inventory.ItemStack;
 public class DeathListener implements Listener {
 
     private final DamageLogManager damageLogManager;
+    private final GamerManager gamerManager;
 
     @Inject
-    public DeathListener(DamageLogManager damageLogManager) {
+    public DeathListener(DamageLogManager damageLogManager, GamerManager gamerManager) {
         this.damageLogManager = damageLogManager;
+        this.gamerManager = gamerManager;
     }
 
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
         event.deathMessage(null);
         DamageLog lastDamage = damageLogManager.getLastDamager(event.getPlayer());
+
+        gamerManager.getObject(event.getEntity().getUniqueId()).ifPresent(gamer -> {
+            gamer.setLastDamaged(0);
+        });
 
         Bukkit.getOnlinePlayers().forEach(onlinePlayer -> {
             CustomDeathEvent customDeathEvent = new CustomDeathEvent(onlinePlayer, event.getPlayer());

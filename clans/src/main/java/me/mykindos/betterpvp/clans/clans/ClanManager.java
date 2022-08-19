@@ -223,9 +223,20 @@ public class ClanManager extends Manager<Clan> {
     }
 
     public boolean canHurt(Player player, Player target) {
+
+        Clan targetLocationClan = getClanByLocation(target.getLocation()).orElse(null);
+        if (targetLocationClan != null && targetLocationClan.isSafe()) {
+            Optional<Gamer> gamerOptional = gamerManager.getObject(target.getUniqueId());
+            if (gamerOptional.isPresent()) {
+                Gamer gamer = gamerOptional.get();
+                if (UtilTime.elapsed(gamer.getLastDamaged(), 15000)) {
+                    return false;
+                }
+            }
+        }
+
         Clan playerClan = getClanByPlayer(player).orElse(null);
         Clan targetClan = getClanByPlayer(target).orElse(null);
-
         ClanRelation relation = getRelation(playerClan, targetClan);
 
         return relation != ClanRelation.SELF && relation != ClanRelation.ALLY && relation != ClanRelation.ALLY_TRUST;
