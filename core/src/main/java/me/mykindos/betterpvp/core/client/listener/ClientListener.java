@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.ClientManager;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.events.ClientLoginEvent;
+import me.mykindos.betterpvp.core.client.events.ClientQuitEvent;
 import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.client.properties.ClientPropertyUpdateEvent;
 import me.mykindos.betterpvp.core.config.Config;
@@ -28,6 +29,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 
 import java.lang.reflect.InvocationTargetException;
@@ -90,6 +92,20 @@ public class ClientListener implements Listener {
 
     }
 
+    @EventHandler (priority = EventPriority.MONITOR)
+    public void onQuit(PlayerQuitEvent event) {
+        clientManager.getClientByName(event.getPlayer().getName()).ifPresent(client -> {
+            ClientQuitEvent quitEvent = UtilServer.callEvent(new ClientQuitEvent(client, event.getPlayer()));
+            if(!quitEvent.isCancelled()) {
+                event.quitMessage(Component.text(quitEvent.getQuitMessage()));
+            }
+        });
+    }
+
+    @EventHandler (priority = EventPriority.LOWEST)
+    public void onClientQuit(ClientQuitEvent event) {
+        event.setQuitMessage(ChatColor.RED + "Leave> " + ChatColor.GRAY + event.getPlayer().getName());
+    }
 
     @EventHandler
     public void onLunarEvent(LunarClientEvent event) {

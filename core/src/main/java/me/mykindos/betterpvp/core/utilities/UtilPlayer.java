@@ -7,8 +7,7 @@ import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.kyori.adventure.text.Component;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -87,10 +86,7 @@ public class UtilPlayer {
     }
 
     public static void sendActionBar(Player player, String msg) {
-
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(msg));
-
-
+        player.sendActionBar(Component.text(msg));
     }
 
     /**
