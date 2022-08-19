@@ -73,14 +73,17 @@ public class SkillCooldownDisplayListener implements Listener {
             skillType = SkillType.BOW;
         }
 
+        if (skillType == null) return null;
         BuildSkill buildSkill = roleBuild.getBuildSkill(skillType);
-        if (cooldownManager.isCooling(player, buildSkill.getSkill().getName())) {
-            return buildSkill;
-        } else {
-            BuildSkill passiveB = roleBuild.getBuildSkill(SkillType.PASSIVE_B);
-            if (passiveB != null) {
-                if (passiveB.getLevel() > 0 && cooldownManager.isCooling(player, passiveB.getSkill().getName())) {
-                    return passiveB;
+        if (buildSkill != null) {
+            if (cooldownManager.isCooling(player, buildSkill.getSkill().getName())) {
+                return buildSkill;
+            } else {
+                BuildSkill passiveB = roleBuild.getBuildSkill(SkillType.PASSIVE_B);
+                if (passiveB != null) {
+                    if (passiveB.getLevel() > 0 && cooldownManager.isCooling(player, passiveB.getSkill().getName())) {
+                        return passiveB;
+                    }
                 }
             }
         }

@@ -49,7 +49,7 @@ public class SoulHarvest extends Skill implements PassiveSkill {
                 "Collected souls give bursts of speed and regeneration.",
                 "Souls are visible by Warlocks only",
                 "",
-                "Buff duration: " + ChatColor.GREEN + ((40 + (level * 20)) /20) + ChatColor.GRAY + " seconds."
+                "Buff duration: " + ChatColor.GREEN + ((40 + (level * 20)) / 20) + ChatColor.GRAY + " seconds."
         };
     }
 
@@ -65,22 +65,22 @@ public class SoulHarvest extends Skill implements PassiveSkill {
 
 
     @EventHandler
-    public void onDeath(PlayerDeathEvent event){
+    public void onDeath(PlayerDeathEvent event) {
         souls.add(new SoulData(event.getEntity().getUniqueId(), event.getEntity().getLocation(), System.currentTimeMillis() + 120_000));
     }
 
-    @UpdateEvent(delay=250)
-    public void displaySouls(){
+    @UpdateEvent(delay = 250)
+    public void displaySouls() {
         List<Player> active = new ArrayList<>();
-        for(Player player : Bukkit.getOnlinePlayers()) {
+        for (Player player : Bukkit.getOnlinePlayers()) {
             int level = getLevel(player);
-            if(level > 0) {
+            if (level > 0) {
                 active.add(player);
 
-                if(!player.isDead() && player.getHealth() > 0) {
+                if (!player.isDead() && player.getHealth() > 0) {
                     List<SoulData> remove = new ArrayList<>();
                     souls.forEach(soul -> {
-                        if(soul.getLocation().getWorld().getName().equals(player.getWorld().getName())) {
+                        if (soul.getLocation().getWorld().getName().equals(player.getWorld().getName()) && !soul.getUuid().equals(player.getUniqueId())) {
                             if (soul.getLocation().distance(player.getLocation()) <= 1.5 && !soul.getUuid().toString().equals(player.getUniqueId().toString())) {
                                 giveEffect(player, level);
                                 remove.add(soul);
@@ -96,13 +96,13 @@ public class SoulHarvest extends Skill implements PassiveSkill {
         souls.removeIf(soul -> soul.getExpiry() - System.currentTimeMillis() <= 0);
         souls.forEach(soul -> {
             List<Player> newActives = new ArrayList<>(active);
-            newActives.removeIf(p -> p.getUniqueId().toString().equals(soul.getUuid().toString()));
-            Particle.HEART.builder().location(soul.getLocation().clone().add(0, 1, 0)).receivers(active).extra(0).spawn();
+            newActives.removeIf(p -> p.getUniqueId().equals(soul.getUuid()));
+            Particle.HEART.builder().location(soul.getLocation().clone().add(0, 1, 0)).receivers(newActives).extra(0).spawn();
         });
 
     }
 
-    private void giveEffect(Player player, int level){
+    private void giveEffect(Player player, int level) {
         player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 40 + (level * 20), 1));
         player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 40 + (level * 20), 1));
     }

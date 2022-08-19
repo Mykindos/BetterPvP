@@ -72,9 +72,13 @@ public class Stampede extends Skill implements PassiveSkill {
     public void updateSpeed() {
 
         for (Player player : Bukkit.getOnlinePlayers()) {
-            if (!sprintTime.containsKey(player)) continue;
             int level = getLevel(player);
             if (level > 0) {
+                if (!sprintTime.containsKey(player)) {
+                    sprintTime.put(player, System.currentTimeMillis());
+                    sprintStr.put(player, 0);
+                }
+
                 if (!player.isSprinting()) {
                     sprintTime.remove(player);
                     sprintStr.remove(player);
@@ -97,11 +101,6 @@ public class Stampede extends Skill implements PassiveSkill {
                             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_AMBIENT, 2.0F, 0.2F * str + 1.0F);
                         }
                     }
-                }
-            } else if (player.isSprinting()) {
-                if (!sprintTime.containsKey(player)) {
-                    this.sprintTime.put(player, System.currentTimeMillis());
-                    this.sprintStr.put(player, 0);
                 }
             }
         }

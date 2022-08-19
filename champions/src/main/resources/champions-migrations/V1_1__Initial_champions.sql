@@ -17,14 +17,14 @@ alter table  ${tablePrefix}builds
         primary key (Gamer, Role, ID);
 
 # noinspection SqlResolve
-INSERT IGNORE INTO property_map VALUES ("ASSASSIN_EQUIPPED", "java.lang.Integer");
+INSERT IGNORE INTO property_map VALUES ("ASSASSIN_EQUIPPED", "int");
 # noinspection SqlResolve
-INSERT IGNORE INTO property_map VALUES ("KNIGHT_EQUIPPED", "java.lang.Integer");
+INSERT IGNORE INTO property_map VALUES ("KNIGHT_EQUIPPED", "int");
 # noinspection SqlResolve
-INSERT IGNORE INTO property_map VALUES ("RANGER_EQUIPPED", "java.lang.Integer");
+INSERT IGNORE INTO property_map VALUES ("RANGER_EQUIPPED", "int");
 # noinspection SqlResolve
-INSERT IGNORE INTO property_map VALUES ("WARLOCK_EQUIPPED", "java.lang.Integer");
+INSERT IGNORE INTO property_map VALUES ("WARLOCK_EQUIPPED", "int");
 # noinspection SqlResolve
-INSERT IGNORE INTO property_map VALUES ("PALADIN_EQUIPPED", "java.lang.Integer");
+INSERT IGNORE INTO property_map VALUES ("PALADIN_EQUIPPED", "int");
 # noinspection SqlResolve
-INSERT IGNORE INTO property_map VALUES ("GLADIATOR_EQUIPPED", "java.lang.Integer");
+INSERT IGNORE INTO property_map VALUES ("GLADIATOR_EQUIPPED", "int");

@@ -78,10 +78,10 @@ public class ClansMovementListener extends ClanListener {
             if (locationClan.isAdmin()) {
                 if (locationClan.isSafe()) {
                     ownerString = ChatColor.WHITE + locationClan.getName();
-                    append = ChatColor.WHITE + "(" + ChatColor.AQUA + "Safe" + ChatColor.WHITE + ")";
+                    append = ChatColor.WHITE + " (" + ChatColor.AQUA + "Safe" + ChatColor.WHITE + ")";
                 }
             } else if (relation == ClanRelation.ALLY_TRUST) {
-                append = ChatColor.GRAY + "(" + ChatColor.YELLOW + "Trusted" + ChatColor.GRAY + ")";
+                append = ChatColor.GRAY + " (" + ChatColor.YELLOW + "Trusted" + ChatColor.GRAY + ")";
 
             } else if (relation == ClanRelation.ENEMY) {
                 if (clan != null) {

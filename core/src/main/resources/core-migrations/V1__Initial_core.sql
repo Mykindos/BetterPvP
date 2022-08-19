@@ -81,7 +81,7 @@ create table if not exists ${tablePrefix}gamer_properties
     primary key (Gamer, Property)
 );
 
-INSERT IGNORE INTO property_map VALUES ("CHAT_ENABLED", "java.lang.Boolean");
+INSERT IGNORE INTO property_map VALUES ("CHAT_ENABLED", "boolean");
 INSERT IGNORE INTO property_map VALUES ("COINS", "int");
 INSERT IGNORE INTO property_map VALUES ("FRAGMENTS", "int");
 INSERT IGNORE INTO property_map VALUES ("SIDEBAR_ENABLED", "boolean");
