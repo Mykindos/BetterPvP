@@ -29,6 +29,8 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.UUID;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -37,7 +39,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @BPvPListener
 public class Pestilence extends PrepareSkill implements CooldownSkill {
 
-    private final ConcurrentHashMap<UUID, PestilenceData> pestilenceData = new ConcurrentHashMap<>();
+    private final HashMap<UUID, PestilenceData> pestilenceData = new HashMap<>();
 
     private double infectionDuration;
 
@@ -78,7 +80,12 @@ public class Pestilence extends PrepareSkill implements CooldownSkill {
 
         pestilenceData.forEach((key, value) -> {
             Player player = Bukkit.getPlayer(key);
-            if (player == null) return;
+            if (player == null) {
+                value.getOldInfected().clear();
+                value.getCurrentlyInfected().clear();
+                return;
+            }
+
             for (LivingEntity entity : value.getCurrentlyInfected().keySet()) {
                 for (LivingEntity target : UtilEntity.getNearbyEnemies(player, entity.getLocation(), 5.0)) {
                     if (value.getCurrentlyInfected().containsKey(target)) continue;
@@ -87,6 +94,7 @@ public class Pestilence extends PrepareSkill implements CooldownSkill {
                     value.addInfection(target, (long) infectionDuration * 1000);
                 }
             }
+
         });
 
     }
@@ -182,8 +190,8 @@ public class Pestilence extends PrepareSkill implements CooldownSkill {
     @Data
     private static class PestilenceData {
 
-        private final WeakHashMap<LivingEntity, DamageData> oldInfected = new WeakHashMap<>();
-        private final WeakHashMap<LivingEntity, DamageData> currentlyInfected = new WeakHashMap<>();
+        private final HashMap<LivingEntity, DamageData> oldInfected = new HashMap<>();
+        private final HashMap<LivingEntity, DamageData> currentlyInfected = new HashMap<>();
 
         public void addInfection(LivingEntity entity, long length) {
             entity.addPotionEffect(new PotionEffect(PotionEffectType.POISON, (int) ((length / 1000) * 20), 0));

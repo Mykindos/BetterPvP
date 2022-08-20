@@ -75,8 +75,8 @@ public class CoreCommand extends Command implements IConsoleCommand {
         @Override
         public void execute(CommandSender sender, String[] args) {
             core.reloadConfig();
-            commandLoader.reload();
-            listenerLoader.reload();
+            commandLoader.reload(core.getClass().getPackageName());
+            listenerLoader.reload(core.getClass().getPackageName());
 
             UtilMessage.message(sender, "Core", "Successfully reloaded core");
         }

@@ -1,0 +1,76 @@
+package me.mykindos.betterpvp.clans.clans.commands.subcommands;
+
+import me.mykindos.betterpvp.clans.clans.Clan;
+import me.mykindos.betterpvp.clans.clans.ClanManager;
+import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
+import me.mykindos.betterpvp.clans.clans.events.ClanRequestNeutralEvent;
+import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
+import me.mykindos.betterpvp.core.gamer.GamerManager;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
+import org.bukkit.entity.Player;
+
+import java.util.Optional;
+
+public class NeutralSubCommand extends ClanSubCommand {
+
+    public NeutralSubCommand(ClanManager clanManager, GamerManager gamerManager) {
+        super(clanManager, gamerManager);
+    }
+
+    @Override
+    public String getName() {
+        return "neutral";
+    }
+
+    @Override
+    public String getDescription() {
+        return "Request a neutral status with another clan";
+    }
+
+    @Override
+    public void execute(Player player, Client client, String... args) {
+        if(args.length == 0) {
+            UtilMessage.message(player, "Clans", "You must specify a clan to request neutral status with.");
+            return;
+        }
+
+        Optional<Clan> playerClanOptional = clanManager.getClanByPlayer(player);
+        if(playerClanOptional.isEmpty()) {
+            UtilMessage.message(player, "Clans", "You are not in a clan.");
+            return;
+        }
+
+        Optional<Clan> targetClanOptional = clanManager.getObject(args[0]);
+        if(targetClanOptional.isEmpty()) {
+            UtilMessage.message(player, "Clans", "The target clan does not exist.");
+            return;
+        }
+
+        Clan playerClan = playerClanOptional.get();
+        Clan targetClan = targetClanOptional.get();
+
+        if(playerClan.equals(targetClan)) {
+            UtilMessage.message(player, "Clans", "You cannot neutral your own clan");
+            return;
+        }
+
+        if (!playerClan.getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.ADMIN)) {
+            UtilMessage.message(player, "Clans", "Only the clan admins can form alliances.");
+            return;
+        }
+
+        if(!playerClan.isEnemy(targetClan) && !playerClan.isAllied(targetClan)) {
+            UtilMessage.message(player, "Clans", "You are already neutral with this clan.");
+            return;
+        }
+
+        UtilServer.callEvent(new ClanRequestNeutralEvent(player, playerClan, targetClan));
+    }
+
+    @Override
+    public String getArgumentType(int arg) {
+        return ClanArgumentType.CLAN.name();
+    }
+}

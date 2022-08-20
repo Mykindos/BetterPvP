@@ -34,6 +34,8 @@ public class ClanCommand extends Command {
         subCommands.add(new LeaveSubCommand(clanManager, gamerManager));
         subCommands.add(new KickSubCommand(clanManager, gamerManager));
         subCommands.add(new AllySubCommand(clanManager, gamerManager));
+        subCommands.add(new EnemySubCommand(clanManager, gamerManager));
+        subCommands.add(new NeutralSubCommand(clanManager, gamerManager));
     }
 
     @Override

@@ -84,7 +84,7 @@ public class SkillListener implements Listener {
             }
         }
 
-        if (skill instanceof EnergySkill energySkill) {
+        if (skill instanceof EnergySkill energySkill && !(skill instanceof ActiveToggleSkill)) {
             if (energySkill.getEnergy(level) > 0) {
                 if (!energyHandler.use(player, skill.getName(), energySkill.getEnergy(level), true)) {
                     event.setCancelled(true);
@@ -149,7 +149,7 @@ public class SkillListener implements Listener {
 
     }
 
-    @EventHandler (priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onSkillActivate(PlayerInteractEvent event) {
         if (event.getAction() == Action.PHYSICAL) return;
         if (event.getHand() == EquipmentSlot.OFF_HAND) return;
@@ -295,6 +295,7 @@ public class SkillListener implements Listener {
         if (skill.ignoreNegativeEffects()) return;
         if (effectManager.hasEffect(player, EffectType.SILENCE)) {
             UtilMessage.simpleMessage(player, skill.getClassType().getName(), "You cannot use <green>%s<gray> while silenced.", skill.getName());
+            event.setCancelled(true);
         }
     }
 
