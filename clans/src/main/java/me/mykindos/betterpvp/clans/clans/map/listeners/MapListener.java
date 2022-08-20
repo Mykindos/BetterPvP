@@ -139,7 +139,7 @@ public class MapListener implements Listener {
         UtilServer.runTaskLater(clans, () -> {
             event.getClan().getMembers().forEach(this::updateClanChunks);
             event.getTargetClan().getMembers().forEach(this::updateClanChunks);
-        }, 3);
+        }, 1);
     }
 
     //@EventHandler(priority = EventPriority.MONITOR)
@@ -367,6 +367,16 @@ public class MapListener implements Listener {
         for (Clan clan : clanManager.getObjects().values()) {
             ClanRelation clanRelation = clanManager.getRelation(pClan, clan);
             MaterialColor materialColor = clanRelation.getMaterialColor();
+
+            if (clan.isSafe()) {
+                materialColor = MaterialColor.SNOW;
+            } else if (clan.isAdmin() && !clan.isSafe()) {
+                if (clan.getName().equals("Outskirts")) {
+                    materialColor = MaterialColor.COLOR_PINK;
+                } else {
+                    materialColor = MaterialColor.COLOR_RED;
+                }
+            }
 
             for (ClanTerritory claim : clan.getTerritory()) {
                 Chunk chunk = UtilWorld.stringToChunk(claim.getChunk());

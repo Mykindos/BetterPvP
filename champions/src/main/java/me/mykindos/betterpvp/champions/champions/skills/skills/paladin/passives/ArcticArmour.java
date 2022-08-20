@@ -87,24 +87,27 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill {
         Iterator<UUID> iterator = active.iterator();
         while (iterator.hasNext()) {
             UUID uuid = iterator.next();
-            Player cur = Bukkit.getPlayer(uuid);
-            if (cur != null) {
+            Player player = Bukkit.getPlayer(uuid);
+            if (player != null) {
 
-                int level = getLevel(cur);
+                int level = getLevel(player);
 
                 if (level <= 0) {
                     iterator.remove();
-                } else if (!championsManager.getEnergy().use(cur, getName(), getEnergy(level) / 2, true)) {
+                } else if (!championsManager.getEnergy().use(player, getName(), getEnergy(level) / 2, true)) {
                     iterator.remove();
 
-                } else if (championsManager.getEffects().hasEffect(cur, EffectType.SILENCE)) {
+                } else if (championsManager.getEffects().hasEffect(player, EffectType.SILENCE)) {
                     iterator.remove();
                 } else {
 
                     int distance = (minRadius + level);
-                    HashMap<Block, Double> blocks = UtilBlock.getInRadius(cur.getLocation(), distance);
+                    HashMap<Block, Double> blocks = UtilBlock.getInRadius(player.getLocation(), distance);
 
-                    for (var data : UtilPlayer.getNearbyPlayers(cur, distance)) {
+                    player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20, 0));
+                    championsManager.getEffects().addEffect(player, EffectType.RESISTANCE, 1, 1000);
+
+                    for (var data : UtilPlayer.getNearbyPlayers(player, distance)) {
                         Player target = data.getKey();
                         boolean friendly = data.getValue() == EntityProperty.FRIENDLY;
                         if (friendly) {
@@ -115,9 +118,9 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill {
                         }
                     }
 
-                    if (UtilBlock.isGrounded(cur)) {
+                    if (UtilBlock.isGrounded(player)) {
                         for (Block block : blocks.keySet()) {
-                            if (block.getLocation().getY() <= cur.getLocation().getY()) {
+                            if (block.getLocation().getY() <= player.getLocation().getY()) {
                                 Block relDown = block.getRelative(BlockFace.DOWN);
                                 if (relDown.getType() != Material.SNOW && relDown.getType() != Material.AIR
                                         && UtilBlock.shouldPlaceSnowOn(relDown)) {

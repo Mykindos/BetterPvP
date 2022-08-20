@@ -265,10 +265,86 @@ public class ClanEventListener extends ClanListener {
         clan.getAlliances().add(clanAlliance);
         target.getAlliances().add(targetAlliance);
 
-        clan.messageClan(ChatColor.YELLOW + "Clan " + target.getName() + ChatColor.GRAY + " is now allied to your Clan.", null, true);
-        target.messageClan(ChatColor.YELLOW + "Clan " + clan.getName() + ChatColor.GRAY + " is now allied to your Clan.", null, true);
+        clan.messageClan(ChatColor.YELLOW + "Clan " + target.getName() + ChatColor.GRAY + " is now your ally.", null, true);
+        target.messageClan(ChatColor.YELLOW + "Clan " + clan.getName() + ChatColor.GRAY + " is now your ally.", null, true);
 
         clanManager.getRepository().saveClanAlliance(clan, clanAlliance);
         clanManager.getRepository().saveClanAlliance(target, targetAlliance);
+    }
+
+    @EventHandler
+    public void onClanRequestNeutral(ClanRequestNeutralEvent event) {
+        if (event.isCancelled()) return;
+
+        Clan clan = event.getClan();
+        Clan target = event.getTargetClan();
+
+        if (clan.isEnemy(target)) {
+            if (inviteHandler.isInvited(clan, target, "Neutral") || inviteHandler.isInvited(target, clan, "Neutral")) {
+
+                UtilServer.callEvent(new ClanNeutralEvent(event.getPlayer(), clan, target));
+                return;
+            }
+
+            inviteHandler.createInvite(clan, target, "Neutral", 10);
+            UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You have requested to neutral with <yellow>%s<gray>.", target.getName());
+            target.messageClan(ChatColor.YELLOW + "Clan " + clan.getName() + ChatColor.GRAY + " has requested to neutral with your clan.", null, true);
+        } else {
+            UtilServer.callEvent(new ClanNeutralEvent(event.getPlayer(), clan, target));
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onClanNeutral(ClanNeutralEvent event) {
+        if (event.isCancelled()) return;
+        Clan clan = event.getClan();
+        Clan target = event.getTargetClan();
+
+        inviteHandler.removeInvite(clan, target, "Neutral");
+        inviteHandler.removeInvite(target, clan, "Neutral");
+
+        if (clan.isAllied(target)) {
+            ClanAlliance clanAlliance = clan.getAlliance(target).orElseThrow();
+            ClanAlliance targetAlliance = target.getAlliance(clan).orElseThrow();
+            clanManager.getRepository().deleteClanAlliance(clan, clanAlliance);
+            clanManager.getRepository().deleteClanAlliance(target, targetAlliance);
+            clan.getAlliances().remove(clanAlliance);
+            target.getAlliances().remove(targetAlliance);
+        } else if (clan.isEnemy(target)) {
+            ClanEnemy clanEnemy = clan.getEnemy(target);
+            ClanEnemy targetEnemy = target.getEnemy(clan);
+            clanManager.getRepository().deleteClanEnemy(clan, clanEnemy);
+            clanManager.getRepository().deleteClanEnemy(target, targetEnemy);
+            clan.getEnemies().remove(clanEnemy);
+            target.getEnemies().remove(targetEnemy);
+        }
+
+        clan.messageClan(ChatColor.YELLOW + "Clan " + target.getName() + ChatColor.GRAY + " is now neutral to your Clan.", null, true);
+        target.messageClan(ChatColor.YELLOW + "Clan " + clan.getName() + ChatColor.GRAY + " is now neutral to your Clan.", null, true);
+
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onClanEnemy(ClanEnemyEvent event) {
+        if (event.isCancelled()) return;
+        Clan clan = event.getClan();
+        Clan target = event.getTargetClan();
+
+        if (clan.isEnemy(target)) {
+            return;
+        }
+
+        ClanEnemy clanEnemy = new ClanEnemy(target, 0);
+        ClanEnemy targetEnemy = new ClanEnemy(clan, 0);
+
+        clan.getEnemies().add(clanEnemy);
+        target.getEnemies().add(targetEnemy);
+
+        clanManager.getRepository().saveClanEnemy(clan, clanEnemy);
+        clanManager.getRepository().saveClanEnemy(target, targetEnemy);
+
+        clan.messageClan(ChatColor.YELLOW + "Clan " + target.getName() + ChatColor.GRAY + " is now your enemy.", null, true);
+        target.messageClan(ChatColor.YELLOW + "Clan " + clan.getName() + ChatColor.GRAY + " is now your enemy.", null, true);
+
     }
 }

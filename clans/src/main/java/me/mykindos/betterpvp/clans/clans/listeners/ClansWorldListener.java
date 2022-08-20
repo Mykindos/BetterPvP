@@ -240,7 +240,7 @@ public class ClansWorldListener extends ClanListener {
 
 
                     UtilMessage.message(player, "Clans", "You cannot use " + ChatColor.GREEN + UtilFormat.cleanString(block.getType().toString())
-                            + ChatColor.GRAY + " in " + ChatColor.YELLOW + relation.getPrimary()
+                            + ChatColor.GRAY + " in " + ChatColor.YELLOW + relation.getPrimaryAsChatColor()
                             + "Clan " + locationClan.getName() + ChatColor.GRAY + ".");
                     event.setCancelled(true);
                 }
@@ -548,6 +548,7 @@ public class ClansWorldListener extends ClanListener {
 
     /**
      * Stop players shooting bows in safezones if they have not taken damage recently
+     *
      * @param event The event
      */
     @EventHandler

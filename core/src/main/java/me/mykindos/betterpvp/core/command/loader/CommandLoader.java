@@ -61,8 +61,9 @@ public class CommandLoader extends Loader {
     }
 
     @Override
-    public void reload() {
+    public void reload(String packageName) {
         commandManager.getObjects().values().forEach(command -> {
+            if(!command.getClass().getPackageName().contains(packageName)) return;
             String enabledPath = "command." + command.getName().toLowerCase() + ".enabled";
             String rankPath = "command." + command.getName().toLowerCase() + ".requiredRank";
             command.setEnabled(plugin.getConfig().getOrSaveBoolean(enabledPath, true));
