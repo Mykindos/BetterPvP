@@ -68,3 +68,19 @@ create table if not exists ${tablePrefix}clan_enemies
 
 create unique index ${tablePrefix}clans_enemies_Clan_EnemyClan_uindex
     on ${tablePrefix}clan_enemies (Clan, EnemyClan);
+
+
+create table if not exists ${tablePrefix}dominance_scale
+(
+    ClanSize  int not null,
+    Dominance int not null,
+    constraint ${tablePrefix}dominance_scale_pk
+        primary key (ClanSize)
+);
+
+INSERT IGNORE INTO ${tablePrefix}dominance_scale VALUES (1, 4);
+INSERT IGNORE INTO ${tablePrefix}dominance_scale VALUES (2, 4);
+INSERT IGNORE INTO ${tablePrefix}dominance_scale VALUES (3, 5);
+INSERT IGNORE INTO ${tablePrefix}dominance_scale VALUES (4, 5);
+INSERT IGNORE INTO ${tablePrefix}dominance_scale VALUES (5, 6);
+INSERT IGNORE INTO ${tablePrefix}dominance_scale VALUES (6, 6);

@@ -67,20 +67,20 @@ public class CooldownListener implements Listener {
             int red = (int) Math.ceil(((cooldown.getRemaining() / (cooldown.getSeconds() / 1000)) * 100 / 10));
             int green = 10 - red;
 
-            if (cooldown.getRemaining() < 0.15) {
+            if (cooldown.getRemaining() < 0.1) {
                 green = 10;
             }
 
-            String msg = "";
+            StringBuilder msg = new StringBuilder();
 
             for (int i = 0; i < green; i++) {
-                msg += ChatColor.GREEN.toString() + ChatColor.BOLD + "\u2588";
+                msg.append(ChatColor.GREEN).append(ChatColor.BOLD).append("\u2588");
             }
 
             if (green != 10) {
 
                 for (int i = 0; i < red; i++) {
-                    msg += ChatColor.RED.toString() + ChatColor.BOLD + "\u2588";
+                    msg.append(ChatColor.RED).append(ChatColor.BOLD).append("\u2588");
                 }
             }
 

@@ -421,6 +421,11 @@ public class CombatListener implements Listener {
                     weaponMeta.setDamage(weaponMeta.getDamage() + 1);
                     weapon.setItemMeta(weaponMeta);
 
+                    if(weaponMeta.getDamage() > weapon.getType().getMaxDurability()) {
+                        damager.getInventory().setItemInMainHand(null);
+                        damager.playSound(damager.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
+                    }
+
                     damager.updateInventory();
                 }
 

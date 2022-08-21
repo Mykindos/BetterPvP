@@ -11,23 +11,19 @@ import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.config.Config;
+import me.mykindos.betterpvp.core.framework.events.scoreboard.ScoreboardUpdateEvent;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilTime;
-import me.mykindos.betterpvp.core.utilities.UtilWorld;
+import me.mykindos.betterpvp.core.utilities.*;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Singleton
@@ -37,6 +33,8 @@ public class ClanManager extends Manager<Clan> {
     private final ClanRepository repository;
     private final GamerManager gamerManager;
 
+    private HashMap<Integer, Integer> dominanceScale;
+
     @Inject
     @Config(path = "clans.claims.additional", defaultValue = "3")
     private int additionalClaims;
@@ -45,6 +43,7 @@ public class ClanManager extends Manager<Clan> {
     public ClanManager(ClanRepository repository, GamerManager gamerManager) {
         this.repository = repository;
         this.gamerManager = gamerManager;
+        this.dominanceScale = new HashMap<>();
 
         var clans = repository.getAll();
         loadFromList(clans);
@@ -55,6 +54,8 @@ public class ClanManager extends Manager<Clan> {
             clan.setEnemies(repository.getEnemies(this, clan));
             clan.setMembers(repository.getMembers(this, clan));
         });
+
+        dominanceScale = repository.getDominanceScale();
 
         log.info("Loaded {} clans", clans.size());
 
@@ -276,6 +277,36 @@ public class ClanManager extends Manager<Clan> {
         return true;
     }
 
+    public void applyDominance(Clan killed, Clan killer) {
+        if (killed == null || killer == null) return;
+        if (killed.equals(killer)) return;
+        if (!killed.isEnemy(killer)) return;
+
+        ClanEnemy killedEnemy = killed.getEnemy(killer);
+        ClanEnemy killerEnemy = killer.getEnemy(killed);
+
+        int dominance = dominanceScale.getOrDefault(killed.getMembers().size(), 6);
+        if (killedEnemy.getDominance() == 0) {
+            killerEnemy.addDominance(dominance);
+        }
+        killedEnemy.takeDominance(dominance);
+
+        killed.messageClan("You lost " + ChatColor.RED + "%" + dominance + ChatColor.GRAY + " dominance to " + ChatColor.RED + killer.getName(), null, true);
+        killer.messageClan("You gained " + ChatColor.GREEN + "%" + dominance + ChatColor.GRAY + " dominance on " + ChatColor.RED + killed.getName(), null, true);
+
+        getRepository().updateDominance(killed, killedEnemy);
+        getRepository().updateDominance(killer, killerEnemy);
+
+        killed.getMembers().forEach(member -> {
+            Player player = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
+            UtilServer.callEvent(new ScoreboardUpdateEvent(player));
+        });
+
+        killer.getMembers().forEach(member -> {
+            Player player = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
+            UtilServer.callEvent(new ScoreboardUpdateEvent(player));
+        });
+    }
 
     @Override
     public void loadFromList(List<Clan> objects) {

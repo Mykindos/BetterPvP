@@ -110,9 +110,9 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
                         player.teleport(target);
                     }
 
-                    UtilMessage.message(player, getClassType().getName(), "You used " + getName());
+                    UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s<gray>.", getName());
                     if (ent instanceof Player temp) {
-                        UtilMessage.message(temp, getClassType().getName(), player.getName() + " used evade!");
+                        UtilMessage.simpleMessage(temp, getClassType().getName(), "<yellow>%s<gray> used evade!", player.getName());
                     }
 
                     delay.put(player, System.currentTimeMillis());

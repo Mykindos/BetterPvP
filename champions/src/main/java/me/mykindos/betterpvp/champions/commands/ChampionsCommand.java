@@ -84,7 +84,7 @@ public class ChampionsCommand extends Command implements IConsoleCommand {
             listenerLoader.reload(champions.getClass().getPackageName());
             skillManager.reloadSkills();
 
-            UtilMessage.message(sender, "champions", "Successfully reloaded champions");
+            UtilMessage.message(sender, "Champions", "Successfully reloaded champions");
         }
     }
 }

@@ -166,6 +166,7 @@ public class SmokeBomb extends Skill implements ToggleSkill, CooldownSkill, List
     @Override
     public void toggle(Player player, int level) {
         player.playSound(player.getLocation(), Sound.BLOCK_CONDUIT_AMBIENT, 2.0f, 1.f);
+
         championsManager.getEffects().addEffect(player, EffectType.INVISIBILITY, (5 + level * 1000L));
         smoked.put(player, (5 + level));
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
