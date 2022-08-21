@@ -254,5 +254,6 @@ public class EffectListener implements Listener {
         effectManager.removeEffect(player, EffectType.VULNERABILITY);
         effectManager.removeEffect(player, EffectType.FRAILTY);
         effectManager.removeEffect(player, EffectType.LEVITATION);
+        player.setFireTicks(0);
     }
 }

@@ -29,6 +29,8 @@ import javax.inject.Singleton;
 @BPvPListener
 public class Concussion extends PrepareSkill implements CooldownSkill, Listener {
 
+    private double durationPerLevel;
+
     @Inject
     public Concussion(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -45,7 +47,7 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener 
         return new String[]{
                 "Right click with a sword to activate.",
                 "",
-                "Your next hit blinds the target for " + ChatColor.GREEN + (level) + ChatColor.GRAY + " seconds.",
+                "Your next hit blinds the target for " + ChatColor.GREEN + (durationPerLevel * level) + ChatColor.GRAY + " seconds.",
                 "",
                 "Cooldown: " + ChatColor.GREEN + getCooldown(level)
         };
@@ -85,7 +87,7 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener 
 
         if (active.contains(damager.getUniqueId())) {
             e.setReason("Concussion");
-            damagee.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, (level * 20) + 20, 0));
+            damagee.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, (int) (level * durationPerLevel) * 20, 0));
             UtilMessage.message(damager, getName(), "You gave " + ChatColor.GREEN + damagee.getName() + ChatColor.GRAY + " a concussion.");
             UtilMessage.message(damagee, getName(), ChatColor.GREEN + damager.getName() + ChatColor.GRAY + " gave you a concussion.");
             active.remove(damager.getUniqueId());
@@ -113,5 +115,10 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener 
     @Override
     public Action[] getActions() {
         return SkillActions.RIGHT_CLICK;
+    }
+
+    @Override
+    public void loadSkillConfig() {
+        durationPerLevel = getConfig("durationPerLevel", 1.5, Double.class);
     }
 }
