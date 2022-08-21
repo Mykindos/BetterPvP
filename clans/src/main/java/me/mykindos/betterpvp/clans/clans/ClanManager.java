@@ -299,12 +299,16 @@ public class ClanManager extends Manager<Clan> {
 
         killed.getMembers().forEach(member -> {
             Player player = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
-            UtilServer.callEvent(new ScoreboardUpdateEvent(player));
+            if (player != null) {
+                UtilServer.callEvent(new ScoreboardUpdateEvent(player));
+            }
         });
 
         killer.getMembers().forEach(member -> {
             Player player = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
-            UtilServer.callEvent(new ScoreboardUpdateEvent(player));
+            if (player != null) {
+                UtilServer.callEvent(new ScoreboardUpdateEvent(player));
+            }
         });
     }
 

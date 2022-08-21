@@ -1,6 +1,8 @@
 package me.mykindos.betterpvp.champions.champions.roles;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 import org.bukkit.entity.Player;
@@ -9,8 +11,12 @@ import org.bukkit.entity.Player;
 @Singleton
 public class RoleManager extends Manager<Role> {
 
-    public RoleManager() {
+    @Getter
+    private final RoleRepository repository;
 
+    @Inject
+    public RoleManager(RoleRepository repository) {
+        this.repository = repository;
     }
 
     /**
