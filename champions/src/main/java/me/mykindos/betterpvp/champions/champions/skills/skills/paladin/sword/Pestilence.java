@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.PrepareSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.effects.events.EffectClearEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
@@ -158,6 +159,11 @@ public class Pestilence extends PrepareSkill implements CooldownSkill {
 
     public boolean isInfected(LivingEntity entity) {
         return pestilenceData.values().stream().anyMatch(value -> value.currentlyInfected.containsKey(entity));
+    }
+
+    @EventHandler
+    public void onEffectClear(EffectClearEvent event) {
+        pestilenceData.values().forEach(value -> value.getCurrentlyInfected().entrySet().removeIf(entry -> entry.getKey().equals(event.getPlayer())));
     }
 
     @Override

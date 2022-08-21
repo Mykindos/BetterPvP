@@ -9,10 +9,12 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.effects.events.EffectClearEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Particle;
@@ -184,6 +186,8 @@ public class SmokeBomb extends Skill implements ToggleSkill, CooldownSkill, List
         for (Player target : UtilPlayer.getNearbyEnemies(player, player.getLocation(), 2.5)) {
             target.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 35, 1));
         }
+
+        UtilServer.callEvent(new EffectClearEvent(player));
 
     }
 }
