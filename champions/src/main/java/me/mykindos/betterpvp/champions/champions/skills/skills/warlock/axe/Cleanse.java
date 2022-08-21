@@ -11,10 +11,12 @@ import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.effects.events.EffectClearEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -98,6 +100,8 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
             UtilMessage.message(ally, "Cleanse", "You were cleansed of negative by " + ChatColor.GREEN + player.getName());
 
         }
+
+        UtilServer.callEvent(new EffectClearEvent(player));
     }
 
     @Override

@@ -5,6 +5,7 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.effects.Effect;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.effects.events.EffectClearEvent;
 import me.mykindos.betterpvp.core.effects.events.EffectReceiveEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -64,7 +65,7 @@ public class EffectListener implements Listener {
             if (effect.getEffectType() == EffectType.SILENCE) {
                 player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 1F, 1.5F);
                 UtilMessage.message(player, "Silence", "You have been silenced for %s seconds.",
-                        ChatColor.GREEN.toString() + (effect.getRawLength()/1000) + ChatColor.GRAY);
+                        ChatColor.GREEN.toString() + (effect.getRawLength() / 1000) + ChatColor.GRAY);
             }
 
             if (effect.getEffectType() == EffectType.VULNERABILITY) {
@@ -225,25 +226,33 @@ public class EffectListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onReceiveImmuneToEffect(EffectReceiveEvent event) {
         if (event.getEffect().getEffectType() == EffectType.IMMUNETOEFFECTS) {
-            for (PotionEffect pot : event.getPlayer().getActivePotionEffects()) {
-
-                if (pot.getType().getName().contains("SLOW")
-                        || pot.getType().getName().contains("CONFUSION")
-                        || pot.getType().getName().contains("POISON")
-                        || pot.getType().getName().contains("BLINDNESS")
-                        || pot.getType().getName().contains("WITHER")
-                        || pot.getType().getName().contains("LEVITATION")) {
-                    event.getPlayer().removePotionEffect(pot.getType());
-                }
-            }
-
-            effectManager.removeEffect(event.getPlayer(), EffectType.SHOCK);
-            effectManager.removeEffect(event.getPlayer(), EffectType.SILENCE);
-            effectManager.removeEffect(event.getPlayer(), EffectType.STUN);
-            effectManager.removeEffect(event.getPlayer(), EffectType.VULNERABILITY);
-            effectManager.removeEffect(event.getPlayer(), EffectType.FRAILTY);
-            effectManager.removeEffect(event.getPlayer(), EffectType.LEVITATION);
+            removeNegativeEffects(event.getPlayer());
         }
     }
 
+    @EventHandler
+    public void onEventClear(EffectClearEvent event) {
+        removeNegativeEffects(event.getPlayer());
+    }
+
+    private void removeNegativeEffects(Player player) {
+        for (PotionEffect pot : player.getActivePotionEffects()) {
+
+            if (pot.getType().getName().contains("SLOW")
+                    || pot.getType().getName().contains("CONFUSION")
+                    || pot.getType().getName().contains("POISON")
+                    || pot.getType().getName().contains("BLINDNESS")
+                    || pot.getType().getName().contains("WITHER")
+                    || pot.getType().getName().contains("LEVITATION")) {
+                player.removePotionEffect(pot.getType());
+            }
+        }
+
+        effectManager.removeEffect(player, EffectType.SHOCK);
+        effectManager.removeEffect(player, EffectType.SILENCE);
+        effectManager.removeEffect(player, EffectType.STUN);
+        effectManager.removeEffect(player, EffectType.VULNERABILITY);
+        effectManager.removeEffect(player, EffectType.FRAILTY);
+        effectManager.removeEffect(player, EffectType.LEVITATION);
+    }
 }

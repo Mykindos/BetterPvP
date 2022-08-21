@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.PrepareSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.effects.events.EffectClearEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
@@ -253,6 +254,11 @@ public class Leech extends PrepareSkill implements CooldownSkill {
     @EventHandler
     public void removeOnDeath(EntityDeathEvent e) {
         removeLinks(e.getEntity());
+    }
+
+    @EventHandler
+    public void onEffectClear(EffectClearEvent event) {
+        removeLinks(event.getPlayer());
     }
 
 
