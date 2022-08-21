@@ -119,12 +119,20 @@ public class Clan implements IClan, Invitable {
         return null;
     }
 
+
     public String getDominanceString(Clan clan) {
         ClanEnemy enemy = getEnemy(clan);
         ClanEnemy theirEnemy = clan.getEnemy(this);
         if (enemy != null && theirEnemy != null) {
-            return ChatColor.GRAY + "(" + ChatColor.GREEN + theirEnemy.getDominance() + ChatColor.GRAY + ":"
-                    + ChatColor.RED + enemy.getDominance() + ChatColor.GRAY + ")" + ChatColor.GRAY;
+            String text = "";
+            if(enemy.getDominance() > 0){
+                text = ChatColor.GREEN + "%" + enemy.getDominance();
+            }else if(theirEnemy.getDominance() > 0) {
+                text = ChatColor.RED + "%" + theirEnemy.getDominance();
+            }else {
+                return "";
+            }
+            return ChatColor.GRAY + " (" + text + ChatColor.GRAY + ")" + ChatColor.GRAY;
         }
         return "";
     }
@@ -138,10 +146,9 @@ public class Clan implements IClan, Invitable {
                 return ChatColor.WHITE + " 0";
             }
             if (theirEnemy.getDominance() > 0) {
-                return ChatColor.DARK_RED + " -" + (theirEnemy.getDominance());
+                return ChatColor.GREEN + " %" + (theirEnemy.getDominance());
             } else {
-
-                return ChatColor.GREEN + " +" + (enemy.getDominance());
+                return ChatColor.DARK_RED + " %" + (enemy.getDominance());
             }
 
         }

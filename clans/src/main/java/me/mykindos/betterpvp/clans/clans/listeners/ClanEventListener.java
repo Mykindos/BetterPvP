@@ -334,6 +334,15 @@ public class ClanEventListener extends ClanListener {
             return;
         }
 
+        if (clan.isAllied(target)) {
+            ClanAlliance clanAlliance = clan.getAlliance(target).orElseThrow();
+            ClanAlliance targetAlliance = target.getAlliance(clan).orElseThrow();
+            clanManager.getRepository().deleteClanAlliance(clan, clanAlliance);
+            clanManager.getRepository().deleteClanAlliance(target, targetAlliance);
+            clan.getAlliances().remove(clanAlliance);
+            target.getAlliances().remove(targetAlliance);
+        }
+
         ClanEnemy clanEnemy = new ClanEnemy(target, 0);
         ClanEnemy targetEnemy = new ClanEnemy(clan, 0);
 

@@ -14,4 +14,13 @@ public class ClanEnemy {
         this.dominance = dominance;
     }
 
+    public void addDominance(int dominance) {
+        this.dominance = Math.min(100, this.dominance + dominance);
+    }
+
+    public void takeDominance(int dominance) {
+        this.dominance = Math.max(0, this.dominance - dominance);
+    }
+
+
 }

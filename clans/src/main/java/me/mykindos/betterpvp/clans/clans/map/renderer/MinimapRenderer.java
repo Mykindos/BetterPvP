@@ -12,9 +12,11 @@ import me.mykindos.betterpvp.clans.clans.map.data.MapSettings;
 import me.mykindos.betterpvp.clans.clans.map.events.MinimapExtraCursorEvent;
 import me.mykindos.betterpvp.clans.clans.map.nms.UtilMapMaterial;
 import me.mykindos.betterpvp.core.config.Config;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.minecraft.world.level.material.MaterialColor;
 import org.bukkit.Bukkit;
+import org.bukkit.HeightMap;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -28,16 +30,14 @@ import org.bukkit.map.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.Color;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Queue;
-import java.util.TreeMap;
+import java.util.*;
 
 @Getter
 @Singleton
 public class MinimapRenderer extends MapRenderer implements Listener {
 
     private final MapHandler mapHandler;
+    private final Clans clans;
     protected Map<String, Map<Integer, Map<Integer, MapPixel>>> worldCacheMap = new TreeMap<>();
     protected Queue<Coords> queue = new LinkedList<>();
 
@@ -45,11 +45,15 @@ public class MinimapRenderer extends MapRenderer implements Listener {
     @Config(path = "clans.map.maxProcess", defaultValue = "64")
     private int maxProcess;
 
+    @Inject
+    @Config(path = "clans.map.maxMapDistance", defaultValue = "512")
+    private int maxDistance;
 
     @Inject
     public MinimapRenderer(MapHandler mapHandler, Clans clans) {
         super(true);
         this.mapHandler = mapHandler;
+        this.clans = clans;
         Bukkit.getPluginManager().registerEvents(this, clans);
         UtilServer.runTaskTimer(clans, this::processQueue, 5, 5);
     }
@@ -130,6 +134,11 @@ public class MinimapRenderer extends MapRenderer implements Listener {
                     int x = (locX + i) * scale;
                     int z = (locZ + j) * scale;
 
+                    if (x > maxDistance || x < -maxDistance || z > maxDistance || z < -maxDistance) {
+                        canvas.setPixelColor(i, j, Color.WHITE);
+                        continue;
+                    }
+
                     if (locX + i < 0 && (locX + i) % scale != 0)
                         x--;
                     if (locZ + j < 0 && (locZ + j) % scale != 0)
@@ -173,15 +182,14 @@ public class MinimapRenderer extends MapRenderer implements Listener {
     }
 
     private void handlePixel(Map<Integer, Map<Integer, MapPixel>> cacheMap, int x, int z, Player player) {
+        if (x > maxDistance || x < -maxDistance || z > maxDistance || z < -maxDistance) return;
         if (!cacheMap.containsKey(x)) {
             cacheMap.put(x, new TreeMap<>());
         }
         Map<Integer, MapPixel> xMap = cacheMap.get(x);
         if (!xMap.containsKey(z)) {
 
-            int y = player.getWorld().getHighestBlockYAt(x, z);
-
-            Block block = player.getWorld().getBlockAt(x, y, z);
+            Block block = player.getWorld().getHighestBlockAt(x, z, HeightMap.WORLD_SURFACE);
 
             if (!block.getChunk().isLoaded()) {
                 return;

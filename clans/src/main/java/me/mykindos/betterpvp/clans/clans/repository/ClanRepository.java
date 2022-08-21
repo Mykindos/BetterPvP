@@ -25,6 +25,7 @@ import javax.sql.rowset.CachedRowSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @Singleton
@@ -243,6 +244,14 @@ public class ClanRepository implements IRepository<Clan> {
                 new IntegerStatementValue(enemy.getClan().getId())));
     }
 
+    public void updateDominance(IClan clan, ClanEnemy enemy) {
+        String query = "UPDATE " + databasePrefix + "clan_enemies SET Dominance = ? WHERE Clan = ? AND EnemyClan = ?;";
+        database.executeUpdateAsync(new Statement(query,
+                new IntegerStatementValue(enemy.getDominance()),
+                new IntegerStatementValue(clan.getId()),
+                new IntegerStatementValue(enemy.getClan().getId())));
+    }
+
     public List<ClanEnemy> getEnemies(ClanManager clanManager, Clan clan) {
         List<ClanEnemy> enemies = new ArrayList<>();
         String query = "SELECT * FROM " + databasePrefix + "clan_enemies WHERE Clan = ?;";
@@ -263,5 +272,19 @@ public class ClanRepository implements IRepository<Clan> {
     }
     //endregion
 
+    public HashMap<Integer, Integer> getDominanceScale() {
+        HashMap<Integer, Integer> dominanceScale = new HashMap<>();
+        String query = "SELECT * FROM " + databasePrefix + "dominance_scale;";
+        CachedRowSet result = database.executeQuery(new Statement(query));
+        try {
+            if (result.next()) {
+                dominanceScale.put(result.getInt(1), result.getInt(2));
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return dominanceScale;
+    }
 
 }

@@ -64,7 +64,7 @@ public class EnergyHandler {
         double eg = getEnergy(player);
         if (eg <= 0F) return;
         try {
-            player.setExp(Math.min(0.999F, (float) eg - (float) energy));
+            player.setExp(Math.max(0.001f, (float) eg - (float) energy));
         } catch (Exception ignored) {
 
         }
