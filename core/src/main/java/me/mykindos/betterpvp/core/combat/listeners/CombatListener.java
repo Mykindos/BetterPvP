@@ -416,12 +416,14 @@ public class CombatListener implements Listener {
 
                 ItemStack weapon = damager.getInventory().getItemInMainHand();
                 if (weapon.getType() == Material.AIR) return;
+                if (weapon.getType().getMaxDurability() == 0) return;
+
                 ItemMeta meta = weapon.getItemMeta();
                 if (meta instanceof Damageable weaponMeta) {
                     weaponMeta.setDamage(weaponMeta.getDamage() + 1);
                     weapon.setItemMeta(weaponMeta);
 
-                    if(weaponMeta.getDamage() > weapon.getType().getMaxDurability()) {
+                    if (weaponMeta.getDamage() > weapon.getType().getMaxDurability()) {
                         damager.getInventory().setItemInMainHand(null);
                         damager.playSound(damager.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
                     }

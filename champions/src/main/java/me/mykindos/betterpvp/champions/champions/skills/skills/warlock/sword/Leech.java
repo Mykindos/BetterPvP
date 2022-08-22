@@ -28,6 +28,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
@@ -258,6 +259,11 @@ public class Leech extends PrepareSkill implements CooldownSkill {
 
     @EventHandler
     public void onEffectClear(EffectClearEvent event) {
+        removeLinks(event.getPlayer());
+    }
+
+    @EventHandler
+    public void onQuit(PlayerQuitEvent event) {
         removeLinks(event.getPlayer());
     }
 
