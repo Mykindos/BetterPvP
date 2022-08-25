@@ -356,4 +356,17 @@ public class ClanEventListener extends ClanListener {
         target.messageClan(ChatColor.YELLOW + "Clan " + clan.getName() + ChatColor.GRAY + " is now your enemy.", null, true);
 
     }
+
+    @EventHandler (priority = EventPriority.MONITOR)
+    public void onClanSetHome(ClanSetHomeEvent event) {
+        if (event.isCancelled()) return;
+        Clan clan = event.getClan();
+        Player player = event.getPlayer();
+
+        clan.setHome(player.getLocation());
+        UtilMessage.simpleMessage(player, "Clans", "You set the clan home to <yellow>%s<gray>.",
+                UtilWorld.locationToString(player.getLocation()));
+
+        clanManager.getRepository().updateClanHome(clan);
+    }
 }
