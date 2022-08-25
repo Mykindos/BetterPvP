@@ -26,6 +26,8 @@ public class ClanCommand extends Command {
         aliases.addAll(List.of("c", "f", "faction"));
 
         subCommands.add(new InfoSubCommand(clanManager, gamerManager));
+        subCommands.add(new HomeSubCommand(clanManager, gamerManager));
+        subCommands.add(new SetHomeSubCommand(clanManager, gamerManager));
         subCommands.add(new CreateClanSubCommand(clanManager, gamerManager));
         subCommands.add(new DisbandClanSubCommand(clanManager, gamerManager));
         subCommands.add(new ClaimSubCommand(clanManager, gamerManager));
@@ -36,6 +38,7 @@ public class ClanCommand extends Command {
         subCommands.add(new AllySubCommand(clanManager, gamerManager));
         subCommands.add(new EnemySubCommand(clanManager, gamerManager));
         subCommands.add(new NeutralSubCommand(clanManager, gamerManager));
+
     }
 
     @Override

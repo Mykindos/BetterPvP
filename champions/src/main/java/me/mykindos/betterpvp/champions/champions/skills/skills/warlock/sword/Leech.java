@@ -79,7 +79,7 @@ public class Leech extends PrepareSkill implements CooldownSkill {
         if (!active.contains(damager.getUniqueId())) return;
 
         int level = getLevel(damager);
-        if(level > 0) {
+        if (level > 0) {
             leechData.add(new LeechData(damager, damager, event.getDamagee()));
             chainEnemies(damager, event.getDamagee());
             active.remove(damager.getUniqueId());
@@ -259,7 +259,11 @@ public class Leech extends PrepareSkill implements CooldownSkill {
 
     @EventHandler
     public void onEffectClear(EffectClearEvent event) {
-        removeLinks(event.getPlayer());
+        leechData.forEach(leechData -> {
+            if (leechData.getTarget().equals(event.getPlayer())) {
+                removeList.add(leechData);
+            }
+        });
     }
 
     @EventHandler

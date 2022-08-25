@@ -133,6 +133,13 @@ public class ClanRepository implements IRepository<Clan> {
         database.executeUpdateAsync(new Statement(deleteClanQuery, new IntegerStatementValue(clan.getId())));
     }
 
+    public void updateClanHome(Clan clan) {
+        String query = "UPDATE " + databasePrefix + "clans SET Home = ? WHERE id = ?;";
+        database.executeUpdateAsync(new Statement(query,
+                new StringStatementValue(UtilWorld.locationToString(clan.getHome())),
+                new IntegerStatementValue(clan.getId())));
+    }
+
     //region Clan territory
     public void saveClanTerritory(IClan clan, String chunk) {
         String query = "INSERT INTO " + databasePrefix + "clan_territory (Clan, Chunk) VALUES (?, ?);";

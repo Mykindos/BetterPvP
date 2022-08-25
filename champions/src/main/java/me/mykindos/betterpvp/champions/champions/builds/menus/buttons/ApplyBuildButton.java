@@ -35,6 +35,7 @@ public class ApplyBuildButton extends Button {
             activeBuild.setActive(false);
 
             build.setActive(true);
+            builds.getActiveBuilds().put(role.getName(), build);
 
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1.0F, 2.0F);
             UtilServer.callEvent(new ApplyBuildEvent(player, builds, activeBuild, build));
