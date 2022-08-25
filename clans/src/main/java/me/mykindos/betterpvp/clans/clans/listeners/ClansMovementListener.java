@@ -5,6 +5,7 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
+import me.mykindos.betterpvp.core.framework.delayedactions.events.PlayerDelayedTeleportEvent;
 import me.mykindos.betterpvp.core.framework.events.scoreboard.ScoreboardUpdateEvent;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -108,6 +109,26 @@ public class ClansMovementListener extends ClanListener {
             UtilMessage.message(player, "Territory", ownerString + " " + append);
         }
 
+
+    }
+
+    @EventHandler
+    public void onDelayedTeleport(PlayerDelayedTeleportEvent event) {
+        if(event.isCancelled()) return;
+
+        clanManager.getClanByLocation(event.getPlayer().getLocation()).ifPresentOrElse(clan -> {
+            if (clan.isAdmin()) {
+                if (clan.isSafe() && clan.getName().contains("Spawn") && event.getPlayer().getLocation().getY() > 110) {
+                    return;
+                }
+            }
+
+            UtilMessage.message(event.getPlayer(), "Clans", "You can only teleport to your clan home from spawn or the wilderness.");
+            event.setCancelled(true);
+
+        }, () -> {
+            event.setDelayInSeconds(30);
+        });
 
     }
 }

@@ -41,8 +41,6 @@ public class HomeSubCommand extends ClanSubCommand {
             return;
         }
 
-        PlayerDelayedTeleportEvent event = new PlayerDelayedTeleportEvent(player, () -> player.teleport(playerClan.getHome()));
-        event.setDelayInSeconds(30);
-        UtilServer.callEvent(event);
+        UtilServer.callEvent(new PlayerDelayedTeleportEvent(player, () -> player.teleport(playerClan.getHome())));
     }
 }

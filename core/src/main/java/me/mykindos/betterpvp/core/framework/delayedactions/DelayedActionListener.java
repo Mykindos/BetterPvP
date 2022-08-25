@@ -4,8 +4,10 @@ import com.google.inject.Inject;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
+import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.framework.delayedactions.events.PlayerDelayedActionEvent;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import net.kyori.adventure.text.Component;
@@ -24,10 +26,12 @@ import java.util.WeakHashMap;
 public class DelayedActionListener implements Listener {
 
     private final Core core;
+    private final GamerManager gamerManager;
 
     @Inject
-    public DelayedActionListener(Core core) {
+    public DelayedActionListener(Core core, GamerManager gamerManager) {
         this.core = core;
+        this.gamerManager = gamerManager;
     }
 
     private final WeakHashMap<Player, DelayedAction> delayedActionMap = new WeakHashMap<>();
@@ -102,5 +106,18 @@ public class DelayedActionListener implements Listener {
                         times));
             }
         }
+    }
+
+    @EventHandler (priority = EventPriority.LOWEST)
+    public void onCombatCancel(PlayerDelayedActionEvent event) {
+        if (event.isCancelled()) return;
+
+        gamerManager.getObject(event.getPlayer().getUniqueId()).ifPresent(gamer -> {
+            if(!UtilTime.elapsed(gamer.getLastDamaged(), 15000)) {
+                event.setCancelled(true);
+                UtilMessage.message(event.getPlayer(), "Combat", "You cannot do this while in combat!");
+            }
+        });
+
     }
 }
