@@ -67,7 +67,7 @@ public class ClanEventListener extends ClanListener {
         if (event.isCancelled()) return;
 
         Player player = event.getPlayer();
-        Clan clan = (Clan) event.getClan();
+        Clan clan = event.getClan();
 
         String chunkString = UtilWorld.chunkToFile(player.getLocation().getChunk());
         clan.getTerritory().add(new ClanTerritory(chunkString));
@@ -76,10 +76,29 @@ public class ClanEventListener extends ClanListener {
         UtilMessage.message(player, "Clans", "You claimed Territory " + ChatColor.YELLOW
                 + UtilWorld.chunkToPrettyString(player.getLocation().getChunk()) + ChatColor.GRAY + ".");
 
-        clan.messageClan(ChatColor.YELLOW + player.getName() + ChatColor.GRAY + " claimed Territory " + ChatColor.YELLOW
-                + UtilWorld.chunkToPrettyString(player.getLocation().getChunk()) + ChatColor.GRAY + ".", player.getUniqueId(), true);
+        clan.messageClan(String.format("<yellow>%s<gray> claimed territory <yellow>%s<gray>.", player.getName(),
+                UtilWorld.chunkToPrettyString(player.getLocation().getChunk())), player.getUniqueId(), true);
 
         blockHandler.outlineChunk(player.getLocation().getChunk());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onChunkUnclaim(ChunkUnclaimEvent event) {
+        if (event.isCancelled()) return;
+
+        Player player = event.getPlayer();
+        Clan targetClan = event.getClan();
+
+        String chunk = UtilWorld.chunkToFile(player.getLocation().getChunk());
+
+
+        UtilMessage.message(player, "Clans", "You unclaimed territory " + ChatColor.YELLOW
+                + UtilWorld.chunkToPrettyString(player.getLocation().getChunk()) + ChatColor.GRAY + ".");
+
+        targetClan.messageClan(String.format("<yellow>%s<gray> unclaimed territory <yellow>%s<gray>.", player.getName(),
+                        UtilWorld.chunkToPrettyString(player.getLocation().getChunk())), player.getUniqueId(), true);
+        clanManager.getRepository().deleteClanTerritory(targetClan, chunk);
+        targetClan.getTerritory().removeIf(territory -> territory.getChunk().equals(UtilWorld.chunkToFile(player.getLocation().getChunk())));
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -134,9 +153,8 @@ public class ClanEventListener extends ClanListener {
 
 
         UtilMessage.message(player, "Clans", "You invited " + ChatColor.YELLOW + target.getName() + ChatColor.GRAY + " to join your Clan.");
-        clan.messageClan(ChatColor.YELLOW + player.getName() + ChatColor.GRAY + " invited " + ChatColor.YELLOW
-                + target.getName() + ChatColor.GRAY + " to join your Clan.", player.getUniqueId(), true);
-
+        clan.messageClan(String.format("<yellow>%s<gray> invited <yellow>%s<gray> to join your Clan.", player.getName(), target.getName()),
+                player.getUniqueId(), true);
 
         UtilMessage.message(target, "Clans", ChatColor.YELLOW + player.getName() + ChatColor.GRAY + " invited you to join " + ChatColor.YELLOW
                 + "Clan " + clan.getName() + ChatColor.GRAY + ".");
@@ -181,8 +199,7 @@ public class ClanEventListener extends ClanListener {
         inviteHandler.removeInvite(clan, targetGamer, "Invite");
         inviteHandler.removeInvite(targetGamer, clan, "Invite");
 
-        clan.messageClan(ChatColor.YELLOW + player.getName() + ChatColor.GRAY
-                + " has joined your Clan.", player.getUniqueId(), true);
+        clan.messageClan(String.format("<yellow>%s<gray> has joined your Clan.", player.getName()), player.getUniqueId(), true);
         UtilMessage.message(player, "Clans", "You joined " + ChatColor.YELLOW + "Clan " + clan.getName() + ChatColor.GRAY + ".");
 
     }
@@ -202,7 +219,7 @@ public class ClanEventListener extends ClanListener {
             clan.getMembers().remove(clanMember);
 
             UtilMessage.message(player, "Clans", "You left " + ChatColor.YELLOW + "Clan " + clan.getName() + ChatColor.GRAY + ".");
-            clan.messageClan(ChatColor.YELLOW + player.getName() + ChatColor.GRAY + " left your Clan.", player.getUniqueId(), true);
+            clan.messageClan(String.format("<yellow>%s<gray> left your Clan.", player.getName()), player.getUniqueId(), true);
         }
 
     }
@@ -223,7 +240,7 @@ public class ClanEventListener extends ClanListener {
             clan.getMembers().remove(clanMember);
 
             UtilMessage.message(player, "Clans", "You kicked " + ChatColor.YELLOW + target.getName() + ChatColor.GRAY + ".");
-            clan.messageClan(ChatColor.YELLOW + player.getName() + ChatColor.GRAY + " was kicked from your Clan.", player.getUniqueId(), true);
+            clan.messageClan(String.format("<yellow>%s<gray> was kicked from your Clan.", player.getName()), player.getUniqueId(), true);
 
             Player targetPlayer = Bukkit.getPlayer(target.getName());
             if (targetPlayer != null) {
@@ -248,7 +265,7 @@ public class ClanEventListener extends ClanListener {
 
         inviteHandler.createInvite(clan, target, "Alliance", 10);
         UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You have requested an alliance with <yellow>%s<gray>.", target.getName());
-        target.messageClan(ChatColor.YELLOW + "Clan " + clan.getName() + ChatColor.GRAY + " has requested an alliance.", null, true);
+        target.messageClan("<yellow>Clan " + clan.getName() + "<gray> has requested an alliance.", null, true);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -265,8 +282,8 @@ public class ClanEventListener extends ClanListener {
         clan.getAlliances().add(clanAlliance);
         target.getAlliances().add(targetAlliance);
 
-        clan.messageClan(ChatColor.YELLOW + "Clan " + target.getName() + ChatColor.GRAY + " is now your ally.", null, true);
-        target.messageClan(ChatColor.YELLOW + "Clan " + clan.getName() + ChatColor.GRAY + " is now your ally.", null, true);
+        clan.messageClan("<yellow>Clan " + target.getName() + "<gray> is now your ally.", null, true);
+        target.messageClan("<yellow>Clan " + clan.getName() + "<gray> is now your ally.", null, true);
 
         clanManager.getRepository().saveClanAlliance(clan, clanAlliance);
         clanManager.getRepository().saveClanAlliance(target, targetAlliance);
@@ -288,7 +305,7 @@ public class ClanEventListener extends ClanListener {
 
             inviteHandler.createInvite(clan, target, "Neutral", 10);
             UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You have requested to neutral with <yellow>%s<gray>.", target.getName());
-            target.messageClan(ChatColor.YELLOW + "Clan " + clan.getName() + ChatColor.GRAY + " has requested to neutral with your clan.", null, true);
+            target.messageClan("<yellow>Clan " + clan.getName() + "<gray> has requested to neutral with your clan.", null, true);
         } else {
             UtilServer.callEvent(new ClanNeutralEvent(event.getPlayer(), clan, target));
         }
@@ -319,8 +336,8 @@ public class ClanEventListener extends ClanListener {
             target.getEnemies().remove(targetEnemy);
         }
 
-        clan.messageClan(ChatColor.YELLOW + "Clan " + target.getName() + ChatColor.GRAY + " is now neutral to your Clan.", null, true);
-        target.messageClan(ChatColor.YELLOW + "Clan " + clan.getName() + ChatColor.GRAY + " is now neutral to your Clan.", null, true);
+        clan.messageClan("<yellow>Clan " + target.getName() + "<gray> is now neutral to your Clan.", null, true);
+        target.messageClan("<yellow>Clan " + clan.getName() + "<gray> is now neutral to your Clan.", null, true);
 
     }
 
@@ -352,12 +369,12 @@ public class ClanEventListener extends ClanListener {
         clanManager.getRepository().saveClanEnemy(clan, clanEnemy);
         clanManager.getRepository().saveClanEnemy(target, targetEnemy);
 
-        clan.messageClan(ChatColor.YELLOW + "Clan " + target.getName() + ChatColor.GRAY + " is now your enemy.", null, true);
-        target.messageClan(ChatColor.YELLOW + "Clan " + clan.getName() + ChatColor.GRAY + " is now your enemy.", null, true);
+        clan.messageClan("<yellow>Clan " + target.getName() + "<gray> is now your enemy.", null, true);
+        target.messageClan("<yellow>Clan " + clan.getName() + "<gray> is now your enemy.", null, true);
 
     }
 
-    @EventHandler (priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onClanSetHome(ClanSetHomeEvent event) {
         if (event.isCancelled()) return;
         Clan clan = event.getClan();

@@ -169,7 +169,7 @@ public class Clan implements IClan, Invitable {
 
             Player player = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
             if(player != null) {
-                UtilMessage.message(player, prefix ? "Clans" : "", message);
+                UtilMessage.simpleMessage(player, prefix ? "Clans" : "", message);
             }
 
         });

@@ -291,8 +291,8 @@ public class ClanManager extends Manager<Clan> {
         }
         killedEnemy.takeDominance(dominance);
 
-        killed.messageClan("You lost " + ChatColor.RED + "%" + dominance + ChatColor.GRAY + " dominance to " + ChatColor.RED + killer.getName(), null, true);
-        killer.messageClan("You gained " + ChatColor.GREEN + "%" + dominance + ChatColor.GRAY + " dominance on " + ChatColor.RED + killed.getName(), null, true);
+        killed.messageClan("You lost <red>%" + dominance + "<gray> dominance to <red>" + killer.getName(), null, true);
+        killer.messageClan("You gained <green>%" + dominance + "<gray> dominance on <red>" + killed.getName(), null, true);
 
         getRepository().updateDominance(killed, killedEnemy);
         getRepository().updateDominance(killer, killerEnemy);
