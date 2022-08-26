@@ -146,6 +146,11 @@ public class ClanRepository implements IRepository<Clan> {
         database.executeUpdateAsync(new Statement(query, new IntegerStatementValue(clan.getId()), new StringStatementValue(chunk)));
     }
 
+    public void deleteClanTerritory(IClan clan, String chunk) {
+        String query = "DELETE FROM " + databasePrefix + "clan_territory WHERE Clan = ? AND Chunk = ?;";
+        database.executeUpdateAsync(new Statement(query, new IntegerStatementValue(clan.getId()), new StringStatementValue(chunk)));
+    }
+
     public List<ClanTerritory> getTerritory(ClanManager clanManager, Clan clan) {
         List<ClanTerritory> territory = new ArrayList<>();
         String query = "SELECT * FROM " + databasePrefix + "clan_territory WHERE Clan = ?;";
