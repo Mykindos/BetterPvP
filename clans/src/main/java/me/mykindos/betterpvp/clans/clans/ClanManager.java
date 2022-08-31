@@ -75,6 +75,10 @@ public class ClanManager extends Manager<Clan> {
                 .filter(clan -> clan.getMemberByUUID(player.getUniqueId().toString()).isPresent()).findFirst();
     }
 
+    public Optional<Clan> getClanByName(String name) {
+        return Optional.ofNullable(objects.get(name.toLowerCase()));
+    }
+
     /**
      * Finds a clan if the location is within a claimed chunk
      *

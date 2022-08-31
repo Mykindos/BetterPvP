@@ -31,6 +31,7 @@ public class ClanCommand extends Command {
         subCommands.add(new CreateClanSubCommand(clanManager, gamerManager));
         subCommands.add(new DisbandClanSubCommand(clanManager, gamerManager));
         subCommands.add(new ClaimSubCommand(clanManager, gamerManager));
+        subCommands.add(new UnclaimSubCommand(clanManager, gamerManager));
         subCommands.add(new InviteSubCommand(clanManager, gamerManager));
         subCommands.add(new JoinSubCommand(clanManager, gamerManager));
         subCommands.add(new LeaveSubCommand(clanManager, gamerManager));
@@ -38,6 +39,7 @@ public class ClanCommand extends Command {
         subCommands.add(new AllySubCommand(clanManager, gamerManager));
         subCommands.add(new EnemySubCommand(clanManager, gamerManager));
         subCommands.add(new NeutralSubCommand(clanManager, gamerManager));
+        subCommands.add(new AddOutskirtsSubCommand(clanManager, gamerManager));
 
     }
 

@@ -76,6 +76,7 @@ public class CreateClanSubCommand extends ClanSubCommand {
             Clan clan = Clan.builder().name(clanName).level(1)
                     .timeCreated(timestamp).lastLogin(timestamp)
                     .online(true)
+                    .admin(client.isAdministrating())
                     .build();
             Bukkit.getPluginManager().callEvent(new ClanCreateEvent(player, clan));
         } else {
