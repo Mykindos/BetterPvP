@@ -73,4 +73,9 @@ public class UnclaimSubCommand extends ClanSubCommand {
 
         UtilServer.callEvent(new ChunkUnclaimEvent(player, locationClan));
     }
+
+    @Override
+    public ClanMember.MemberRank getRequiredMemberRank() {
+        return ClanMember.MemberRank.ADMIN;
+    }
 }

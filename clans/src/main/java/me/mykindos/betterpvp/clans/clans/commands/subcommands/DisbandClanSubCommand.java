@@ -73,4 +73,9 @@ public class DisbandClanSubCommand extends ClanSubCommand {
 
 
     }
+
+    @Override
+    public ClanMember.MemberRank getRequiredMemberRank() {
+        return ClanMember.MemberRank.LEADER;
+    }
 }

@@ -87,5 +87,9 @@ public class AllySubCommand extends ClanSubCommand {
         return ClanArgumentType.CLAN.name();
     }
 
+    @Override
+    public ClanMember.MemberRank getRequiredMemberRank() {
+        return ClanMember.MemberRank.ADMIN;
+    }
 
 }

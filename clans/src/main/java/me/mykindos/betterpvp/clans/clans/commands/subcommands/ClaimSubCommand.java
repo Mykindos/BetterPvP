@@ -130,4 +130,9 @@ public class ClaimSubCommand extends ClanSubCommand {
             UtilMessage.message(player, "Clans", "You are not in a Clan.");
         }
     }
+
+    @Override
+    public ClanMember.MemberRank getRequiredMemberRank() {
+        return ClanMember.MemberRank.ADMIN;
+    }
 }

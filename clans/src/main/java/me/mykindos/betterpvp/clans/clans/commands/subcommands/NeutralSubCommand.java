@@ -73,4 +73,9 @@ public class NeutralSubCommand extends ClanSubCommand {
     public String getArgumentType(int arg) {
         return ClanArgumentType.CLAN.name();
     }
+
+    @Override
+    public ClanMember.MemberRank getRequiredMemberRank() {
+        return ClanMember.MemberRank.ADMIN;
+    }
 }

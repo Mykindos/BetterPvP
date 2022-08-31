@@ -35,6 +35,8 @@ public class ClanCommand extends Command {
         subCommands.add(new InviteSubCommand(clanManager, gamerManager));
         subCommands.add(new JoinSubCommand(clanManager, gamerManager));
         subCommands.add(new LeaveSubCommand(clanManager, gamerManager));
+        subCommands.add(new PromoteSubCommand(clanManager, gamerManager));
+        subCommands.add(new DemoteSubCommand(clanManager, gamerManager));
         subCommands.add(new KickSubCommand(clanManager, gamerManager));
         subCommands.add(new AllySubCommand(clanManager, gamerManager));
         subCommands.add(new EnemySubCommand(clanManager, gamerManager));
