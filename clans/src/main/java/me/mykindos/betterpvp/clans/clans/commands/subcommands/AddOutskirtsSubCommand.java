@@ -5,6 +5,7 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
 import me.mykindos.betterpvp.clans.clans.events.ChunkClaimEvent;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.components.clans.data.ClanTerritory;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -33,8 +34,13 @@ public class AddOutskirtsSubCommand extends ClanSubCommand {
 
     @Override
     public void execute(Player player, Client client, String... args) {
+        if(!client.hasRank(Rank.ADMIN)) {
+            UtilMessage.message(player, "Clans", "Uh oh!");
+            return;
+        }
+
         int borderSize = 1;
-        if(args.length > 0) {
+        if (args.length > 0) {
             borderSize = Integer.parseInt(args[0]);
         }
         Optional<Clan> clanOptional = clanManager.getClanByPlayer(player);
@@ -61,7 +67,7 @@ public class AddOutskirtsSubCommand extends ClanSubCommand {
                     if (x == 0 && z == 0) continue;
                     Chunk wildernessChunk = chunk.getWorld().getChunkAt(chunk.getX() + x, chunk.getZ() + z);
                     Optional<Clan> locationClanOptional = clanManager.getClanByChunk(wildernessChunk);
-                    if(locationClanOptional.isEmpty()) {
+                    if (locationClanOptional.isEmpty()) {
 
                         UtilServer.callEvent(new ChunkClaimEvent(player, outskirts, wildernessChunk));
                         claims++;
@@ -72,4 +78,10 @@ public class AddOutskirtsSubCommand extends ClanSubCommand {
 
         UtilMessage.simpleMessage(player, "Clans", "Added <yellow>%s<gray> claims to the outskirts", claims);
     }
+
+    @Override
+    public boolean requiresServerAdmin() {
+        return true;
+    }
+
 }

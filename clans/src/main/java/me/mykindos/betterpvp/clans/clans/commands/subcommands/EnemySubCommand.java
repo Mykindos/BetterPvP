@@ -37,8 +37,6 @@ public class EnemySubCommand extends ClanSubCommand {
             UtilMessage.message(player, "Clans", "You must specify a clan to enemy.");
             return;
         }
-        
-        
 
         Optional<Clan> playerClanOptional = clanManager.getClanByPlayer(player);
         if(playerClanOptional.isEmpty()) {
@@ -76,5 +74,10 @@ public class EnemySubCommand extends ClanSubCommand {
     @Override
     public String getArgumentType(int arg) {
         return ClanArgumentType.CLAN.name();
+    }
+
+    @Override
+    public ClanMember.MemberRank getRequiredMemberRank() {
+        return ClanMember.MemberRank.ADMIN;
     }
 }

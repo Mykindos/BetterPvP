@@ -34,4 +34,9 @@ public class InfoSubCommand extends ClanSubCommand {
 
         return ArgumentType.NONE.name();
     }
+
+    @Override
+    public boolean canExecuteWithoutClan(){
+        return true;
+    }
 }

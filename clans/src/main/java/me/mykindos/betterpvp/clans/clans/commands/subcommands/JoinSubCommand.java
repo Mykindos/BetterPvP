@@ -35,7 +35,7 @@ public class JoinSubCommand extends ClanSubCommand {
         }
 
         Optional<Clan> clanOptional = clanManager.getClanByPlayer(player);
-        if(clanOptional.isPresent()){
+        if (clanOptional.isPresent()) {
             UtilMessage.message(player, "Clans", "You are already in a clan");
             return;
         }
@@ -49,5 +49,10 @@ public class JoinSubCommand extends ClanSubCommand {
     @Override
     public String getArgumentType(int arg) {
         return ClanArgumentType.CLAN.name();
+    }
+
+    @Override
+    public boolean canExecuteWithoutClan() {
+        return true;
     }
 }

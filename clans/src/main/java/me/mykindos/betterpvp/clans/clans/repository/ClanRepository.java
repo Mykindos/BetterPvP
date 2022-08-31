@@ -201,6 +201,14 @@ public class ClanRepository implements IRepository<Clan> {
         return members;
     }
 
+    public void updateClanMemberRank(Clan clan, ClanMember member) {
+        String query = "UPDATE " + databasePrefix + "clan_members SET `Rank` = ? WHERE Clan = ? AND Member = ?;";
+        database.executeUpdateAsync(new Statement(query,
+                new StringStatementValue(member.getRank().name()),
+                new IntegerStatementValue(clan.getId()),
+                new StringStatementValue(member.getUuid())));
+    }
+
     //endregion
 
     //region Clan alliances

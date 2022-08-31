@@ -101,4 +101,9 @@ public class KickSubCommand extends ClanSubCommand {
     public String getArgumentType(int arg){
         return ClanArgumentType.CLAN_MEMBER.name();
     }
+
+    @Override
+    public ClanMember.MemberRank getRequiredMemberRank() {
+        return ClanMember.MemberRank.ADMIN;
+    }
 }

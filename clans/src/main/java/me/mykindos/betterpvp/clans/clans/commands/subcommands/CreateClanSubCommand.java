@@ -85,4 +85,9 @@ public class CreateClanSubCommand extends ClanSubCommand {
 
     }
 
+    @Override
+    public boolean canExecuteWithoutClan(){
+        return true;
+    }
+
 }

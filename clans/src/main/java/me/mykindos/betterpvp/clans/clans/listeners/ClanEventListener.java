@@ -32,6 +32,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @BPvPListener
 public class ClanEventListener extends ClanListener {
@@ -387,5 +388,51 @@ public class ClanEventListener extends ClanListener {
                 UtilWorld.locationToString(player.getLocation()));
 
         clanManager.getRepository().updateClanHome(clan);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onMemberPromote(MemberPromoteEvent event) {
+        if(event.isCancelled()) return;
+
+        Player player = event.getPlayer();
+        Clan clan = event.getClan();
+        ClanMember member = event.getClanMember();
+
+        member.setRank(ClanMember.MemberRank.getRankByPrivilege(Math.min(ClanMember.MemberRank.LEADER.getPrivilege(), member.getRank().getPrivilege() + 1)));
+        clanManager.getRepository().updateClanMemberRank(clan, member);
+
+        Gamer memberGamer = gamerManager.getObject(member.getUuid()).orElseThrow(() -> new NoSuchGamerException(member.getUuid()));
+
+        UtilMessage.simpleMessage(player, "Clans", "You promoted <aqua>%s<gray> to <yellow>%s<gray>.",
+                memberGamer.getClient().getName(), member.getName());
+
+        Player memberPlayer = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
+        if(memberPlayer != null){
+            UtilMessage.simpleMessage(memberPlayer, "Clans", "You were promoted to <yellow>%s<gray>.", member.getName());
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onMemberDemote(MemberDemoteEvent event) {
+        if(event.isCancelled()) return;
+
+        Player player = event.getPlayer();
+        Clan clan = event.getClan();
+        ClanMember member = event.getClanMember();
+
+        member.setRank(ClanMember.MemberRank.getRankByPrivilege(Math.max(1, member.getRank().getPrivilege() - 1)));
+        clanManager.getRepository().updateClanMemberRank(clan, member);
+
+        Gamer memberGamer = gamerManager.getObject(member.getUuid()).orElseThrow(() -> new NoSuchGamerException(member.getUuid()));
+
+        if(!player.getUniqueId().toString().equalsIgnoreCase(member.getUuid())) {
+            UtilMessage.simpleMessage(player, "Clans", "You demoted <aqua>%s<gray> to <yellow>%s<gray>.",
+                    memberGamer.getClient().getName(), member.getName());
+        }
+
+        Player memberPlayer = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
+        if(memberPlayer != null){
+            UtilMessage.simpleMessage(memberPlayer, "Clans", "You were demoted to <yellow>%s<gray>.", member.getName());
+        }
     }
 }

@@ -47,4 +47,9 @@ public class SetHomeSubCommand extends ClanSubCommand {
 
         UtilServer.callEvent(new ClanSetHomeEvent(player, playerClan));
     }
+
+    @Override
+    public ClanMember.MemberRank getRequiredMemberRank() {
+        return ClanMember.MemberRank.ADMIN;
+    }
 }

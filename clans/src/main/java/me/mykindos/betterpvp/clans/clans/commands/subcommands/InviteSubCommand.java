@@ -89,4 +89,9 @@ public class InviteSubCommand extends ClanSubCommand {
 
         return ArgumentType.NONE.name();
     }
+
+    @Override
+    public ClanMember.MemberRank getRequiredMemberRank() {
+        return ClanMember.MemberRank.ADMIN;
+    }
 }

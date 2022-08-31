@@ -54,9 +54,14 @@ public abstract class Command implements ICommand {
         if(args.length == 0) return tabCompletions;
 
         if(getArgumentType(1).equals(ArgumentType.SUBCOMMAND.name())){
-            Optional<SubCommand> subCommand = getSubCommand(args[0]);
-            if(subCommand.isPresent()){
-                return subCommand.get().processTabComplete(sender, Arrays.copyOfRange(args, 1, args.length));
+            Optional<SubCommand> subCommandOptional = getSubCommand(args[0]);
+            if(subCommandOptional.isPresent()){
+                SubCommand subCommand = subCommandOptional.get();
+                if(subCommand.showTabCompletion(sender)) {
+                    return subCommand.processTabComplete(sender, Arrays.copyOfRange(args, 1, args.length));
+                }else{
+                    return tabCompletions;
+                }
             }
         }
 
@@ -65,9 +70,11 @@ public abstract class Command implements ICommand {
 
         switch (getArgumentType(args.length)) {
             case "SUBCOMMAND" -> getSubCommands().forEach(subCommand -> {
-                if(subCommand.getName().toLowerCase().startsWith(lowercaseArg)) {
-                    tabCompletions.add(subCommand.getName());
-                    tabCompletions.addAll(subCommand.getAliases());
+                if(subCommand.showTabCompletion(sender)) {
+                    if (subCommand.getName().toLowerCase().startsWith(lowercaseArg)) {
+                        tabCompletions.add(subCommand.getName());
+                        tabCompletions.addAll(subCommand.getAliases());
+                    }
                 }
             });
             case "PLAYER" -> tabCompletions.addAll(Bukkit.getOnlinePlayers().stream().map(Player::getName).filter(name -> name.toLowerCase().
