@@ -224,24 +224,20 @@ public class MapListener implements Listener {
     //    }
     //}
 //
-    //@EventHandler(priority = EventPriority.MONITOR)
-    //public void onUnclaim(ClanUnclaimEvent event) {
-    //    updateClaims(event.getClan());
-    //}
+
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onClaim(ChunkClaimEvent event) {
+    public void onClaim(ClanTerritoryEvent event) {
         if (event.isCancelled()) return;
         updateClaims(event.getClan());
     }
 
-    private void updateClaims(IClan clan) {
+    private void updateClaims(Clan clan) {
         UtilServer.runTaskLater(clans, () -> {
             for (Player online : Bukkit.getOnlinePlayers()) {
 
-                IClan otherClan = clanManager.getClanByPlayer(online).orElse(null);
-                ClanRelation clanRelation = clanManager.getRelation(clan, otherClan);
-                MaterialColor color = clanRelation.getMaterialColor();
+                Clan otherClan = clanManager.getClanByPlayer(online).orElse(null);
+                MaterialColor materialColor = getColourForClan(clan, otherClan);
 
                 if (!mapHandler.clanMapData.containsKey(online.getUniqueId())) {
                     mapHandler.clanMapData.put(online.getUniqueId(), new HashSet<>());
@@ -252,7 +248,7 @@ public class MapListener implements Listener {
 
                     Chunk chunk = UtilWorld.stringToChunk(claim.getChunk());
                     if (chunk != null) {
-                        ChunkData chunkData = new ChunkData("world", color, chunk.getX(), chunk.getZ(), clan);
+                        ChunkData chunkData = new ChunkData("world", materialColor, chunk.getX(), chunk.getZ(), clan);
                         for (int i = 0; i < 4; i++) {
                             BlockFace blockFace = BlockFace.values()[i];
                             Chunk targetChunk = online.getWorld().getChunkAt(chunk.getX() + blockFace.getModX(), chunk.getZ() + blockFace.getModZ());
@@ -365,18 +361,8 @@ public class MapListener implements Listener {
         Clan pClan = clanManager.getClanByPlayer(player).orElse(null);
 
         for (Clan clan : clanManager.getObjects().values()) {
-            ClanRelation clanRelation = clanManager.getRelation(pClan, clan);
-            MaterialColor materialColor = clanRelation.getMaterialColor();
 
-            if (clan.isSafe()) {
-                materialColor = MaterialColor.SNOW;
-            } else if (clan.isAdmin() && !clan.isSafe()) {
-                if (clan.getName().equals("Outskirts")) {
-                    materialColor = MaterialColor.COLOR_PINK;
-                } else {
-                    materialColor = MaterialColor.COLOR_RED;
-                }
-            }
+            MaterialColor materialColor = getColourForClan(pClan, clan);
 
             for (ClanTerritory claim : clan.getTerritory()) {
                 Chunk chunk = UtilWorld.stringToChunk(claim.getChunk());
@@ -458,5 +444,22 @@ public class MapListener implements Listener {
 
     private String createZoomBar(MapSettings.Scale scale) {
         return ChatColor.WHITE + "Zoom: " + ChatColor.GREEN + (1 << scale.getValue()) + "x";
+    }
+
+    private MaterialColor getColourForClan(Clan playerClan, Clan otherClan) {
+        ClanRelation clanRelation = clanManager.getRelation(playerClan, otherClan);
+        MaterialColor materialColor = clanRelation.getMaterialColor();
+
+        if (otherClan.isSafe()) {
+            materialColor = MaterialColor.SNOW;
+        } else if (otherClan.isAdmin() && !otherClan.isSafe()) {
+            if (otherClan.getName().equals("Outskirts") || playerClan.getName().equalsIgnoreCase("Outskirts")) {
+                materialColor = MaterialColor.COLOR_ORANGE;
+            } else {
+                materialColor = MaterialColor.COLOR_RED;
+            }
+        }
+
+        return materialColor;
     }
 }

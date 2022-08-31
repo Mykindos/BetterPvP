@@ -40,7 +40,7 @@ public class JoinSubCommand extends ClanSubCommand {
             return;
         }
 
-        Optional<Clan> targetClanOptional = clanManager.getObject(args[0].toLowerCase());
+        Optional<Clan> targetClanOptional = clanManager.getClanByName(args[0].replace("_", " "));
         targetClanOptional.ifPresent(targetClan -> {
             UtilServer.callEvent(new MemberJoinClanEvent(player, targetClan));
         });

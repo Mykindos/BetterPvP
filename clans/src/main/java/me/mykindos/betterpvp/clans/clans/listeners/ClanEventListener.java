@@ -26,6 +26,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Chunk;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -68,18 +69,19 @@ public class ClanEventListener extends ClanListener {
 
         Player player = event.getPlayer();
         Clan clan = event.getClan();
+        Chunk chunk = event.getChunk();
 
-        String chunkString = UtilWorld.chunkToFile(player.getLocation().getChunk());
+        String chunkString = UtilWorld.chunkToFile(chunk);
         clan.getTerritory().add(new ClanTerritory(chunkString));
         clanManager.getRepository().saveClanTerritory(clan, chunkString);
 
         UtilMessage.message(player, "Clans", "You claimed Territory " + ChatColor.YELLOW
-                + UtilWorld.chunkToPrettyString(player.getLocation().getChunk()) + ChatColor.GRAY + ".");
+                + UtilWorld.chunkToPrettyString(chunk) + ChatColor.GRAY + ".");
 
         clan.messageClan(String.format("<yellow>%s<gray> claimed territory <yellow>%s<gray>.", player.getName(),
-                UtilWorld.chunkToPrettyString(player.getLocation().getChunk())), player.getUniqueId(), true);
+                UtilWorld.chunkToPrettyString(chunk)), player.getUniqueId(), true);
 
-        blockHandler.outlineChunk(player.getLocation().getChunk());
+        blockHandler.outlineChunk(chunk);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -88,17 +90,17 @@ public class ClanEventListener extends ClanListener {
 
         Player player = event.getPlayer();
         Clan targetClan = event.getClan();
+        Chunk chunk = event.getChunk();
 
-        String chunk = UtilWorld.chunkToFile(player.getLocation().getChunk());
-
+        String chunkString = UtilWorld.chunkToFile(chunk);
 
         UtilMessage.message(player, "Clans", "You unclaimed territory " + ChatColor.YELLOW
-                + UtilWorld.chunkToPrettyString(player.getLocation().getChunk()) + ChatColor.GRAY + ".");
+                + UtilWorld.chunkToPrettyString(chunk) + ChatColor.GRAY + ".");
 
         targetClan.messageClan(String.format("<yellow>%s<gray> unclaimed territory <yellow>%s<gray>.", player.getName(),
-                        UtilWorld.chunkToPrettyString(player.getLocation().getChunk())), player.getUniqueId(), true);
-        clanManager.getRepository().deleteClanTerritory(targetClan, chunk);
-        targetClan.getTerritory().removeIf(territory -> territory.getChunk().equals(UtilWorld.chunkToFile(player.getLocation().getChunk())));
+                        UtilWorld.chunkToPrettyString(chunk)), player.getUniqueId(), true);
+        clanManager.getRepository().deleteClanTerritory(targetClan, chunkString);
+        targetClan.getTerritory().removeIf(territory -> territory.getChunk().equals(UtilWorld.chunkToFile(chunk)));
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
