@@ -133,9 +133,9 @@ public class MapHandler {
                 JSONObject jsonObject = (JSONObject) parser.parse(new FileReader(file));
 
                 jsonObject.forEach((key, value) -> {
-                    minimapRenderer.getWorldCacheMap().put(key.toString(), new TreeMap<>());
+                    minimapRenderer.getWorldCacheMap().put(key.toString(), new HashMap<>());
                     ((JSONObject) value).forEach((o, o2) -> {
-                        minimapRenderer.getWorldCacheMap().get(key.toString()).put(Integer.parseInt((String) o), new TreeMap<>());
+                        minimapRenderer.getWorldCacheMap().get(key.toString()).put(Integer.parseInt((String) o), new HashMap<>());
                         ((JSONObject) o2).forEach((o1, o21) -> {
                             JSONObject jsonObject1 = (JSONObject) o21;
                             minimapRenderer.getWorldCacheMap().get(key.toString()).get(Integer.parseInt(String.valueOf(o))).put(Integer.parseInt((String) o1),

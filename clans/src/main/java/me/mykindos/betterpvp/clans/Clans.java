@@ -77,7 +77,7 @@ public class Clans extends BPvPPlugin {
     }
 
     @Override
-    public void onDisable(){
+    public void onDisable() {
         gamerManager.getGamerRepository().processStatUpdates(false);
     }
 }
