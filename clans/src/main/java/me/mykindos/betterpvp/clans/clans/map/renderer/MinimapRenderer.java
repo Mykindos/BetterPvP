@@ -38,7 +38,7 @@ public class MinimapRenderer extends MapRenderer implements Listener {
 
     private final MapHandler mapHandler;
     private final Clans clans;
-    protected Map<String, Map<Integer, Map<Integer, MapPixel>>> worldCacheMap = new TreeMap<>();
+    protected Map<String, Map<Integer, Map<Integer, MapPixel>>> worldCacheMap = new HashMap<>();
     protected Queue<Coords> queue = new LinkedList<>();
 
     @Inject
@@ -120,7 +120,7 @@ public class MinimapRenderer extends MapRenderer implements Listener {
         }
 
         if (!worldCacheMap.containsKey(player.getWorld().getName()))
-            worldCacheMap.put(player.getWorld().getName(), new TreeMap<>());
+            worldCacheMap.put(player.getWorld().getName(), new HashMap<>());
 
         final Map<Integer, Map<Integer, MapPixel>> cacheMap = worldCacheMap.get(player.getWorld().getName());
 
@@ -184,7 +184,7 @@ public class MinimapRenderer extends MapRenderer implements Listener {
     private void handlePixel(Map<Integer, Map<Integer, MapPixel>> cacheMap, int x, int z, Player player) {
         if (x > maxDistance || x < -maxDistance || z > maxDistance || z < -maxDistance) return;
         if (!cacheMap.containsKey(x)) {
-            cacheMap.put(x, new TreeMap<>());
+            cacheMap.put(x, new HashMap<>());
         }
         Map<Integer, MapPixel> xMap = cacheMap.get(x);
         if (!xMap.containsKey(z)) {

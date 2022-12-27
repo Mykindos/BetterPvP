@@ -29,6 +29,9 @@ public class ConfigProvider<T> implements Provider<T> {
             castedDefault = Boolean.parseBoolean(defaultValue);
         }
 
-        return plugin.getConfig().getOrSaveObject(configPath, castedDefault, type);
+        T value = plugin.getConfig().getOrSaveObject(configPath, castedDefault, type);
+        plugin.saveConfig();
+
+        return value;
     }
 }
