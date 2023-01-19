@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.clans.world;
 
 import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
-import me.mykindos.betterpvp.clans.items.ItemHandler;
+import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.framework.ModuleLoadedEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;

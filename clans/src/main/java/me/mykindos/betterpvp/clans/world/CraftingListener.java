@@ -1,7 +1,7 @@
 package me.mykindos.betterpvp.clans.world;
 
 import com.google.inject.Inject;
-import me.mykindos.betterpvp.clans.items.ItemHandler;
+import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
