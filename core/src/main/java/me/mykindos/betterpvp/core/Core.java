@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.injector.CoreInjectorModule;
+import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.loader.CoreListenerLoader;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
@@ -63,6 +64,9 @@ public class Core extends BPvPPlugin {
 
         gamerManager = injector.getInstance(GamerManager.class);
         gamerManager.loadFromList(gamerManager.getGamerRepository().getAll());
+
+        var itemHandler = injector.getInstance(ItemHandler.class);
+        itemHandler.loadItemData("Core");
 
         updateEventExecutor.loadPlugin(this);
         updateEventExecutor.initialize();
