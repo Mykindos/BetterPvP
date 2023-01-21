@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.utilities;
 
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
@@ -79,12 +80,15 @@ public class UtilItem {
      * @param item Item to update
      * @return Returns an ItemStack that is now glowing
      */
+    @SuppressWarnings("deprecation")
     public static ItemStack addGlow(ItemStack item) {
-        ItemMeta meta = item.getItemMeta();
-        meta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS);
-        item.setItemMeta(meta);
+        ItemMeta itemMeta = item.getItemMeta();
+        Enchantment enchantment = Enchantment.getByName("Glow");
+        if(enchantment != null) {
+            itemMeta.addEnchant(enchantment, 1, true);
+        }
 
-        item.addUnsafeEnchantment(Enchantment.LURE, 1);
+        item.setItemMeta(itemMeta);
 
         return item;
     }

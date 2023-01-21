@@ -6,12 +6,8 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.items.enchants.GlowEnchant;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
-import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.weapons.WeaponManager;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.util.RGBLike;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -21,7 +17,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,17 +28,24 @@ public class ItemHandler {
     private final ItemRepository itemRepository;
     private HashMap<Material, BPVPItem> itemMap = new HashMap<>();
 
+    private final Enchantment glowEnchantment;
+
     @Inject
     @Config(path = "items.hideAttributes", defaultValue = "true")
     private boolean hideAttributes;
+
+    @Inject
+    @Config(path = "items.hideEnchants", defaultValue = "true")
+    private boolean hideEnchants;
 
     @Inject
     public ItemHandler(Core core, WeaponManager weaponManager, ItemRepository itemRepository) {
         this.weaponManager = weaponManager;
         this.itemRepository = itemRepository;
 
-        NamespacedKey key = new NamespacedKey(core, core.getDescription().getName());
-        registerEnchantment(new GlowEnchant(key));
+        NamespacedKey key = new NamespacedKey(core, "Glow");
+        glowEnchantment = new GlowEnchant(key);
+        registerEnchantment(glowEnchantment);
     }
 
     public void loadItemData(String module) {
@@ -68,13 +70,17 @@ public class ItemHandler {
             itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
         }
 
+        if(hideEnchants) {
+            itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        }
+
         BPVPItem item = itemMap.get(material);
         if (item != null) {
             itemMeta.displayName(item.getName());
             itemMeta.lore(item.getLore());
 
             if (item.isGlowing()) {
-                UtilItem.addGlow(itemStack);
+                itemMeta.addEnchant(glowEnchantment, 1, true);
             }else{
                 for(Map.Entry<Enchantment, Integer> entry : itemStack.getEnchantments().entrySet()){
                     itemStack.removeEnchantment(entry.getKey());
