@@ -4,6 +4,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import me.mykindos.betterpvp.clans.clans.insurance.Insurance;
+import me.mykindos.betterpvp.clans.clans.insurance.InsuranceType;
 import me.mykindos.betterpvp.clans.clans.repository.ClanRepository;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.components.clans.IClan;
@@ -21,9 +23,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 @Slf4j
 @Singleton
@@ -35,6 +39,9 @@ public class ClanManager extends Manager<Clan> {
 
     private HashMap<Integer, Integer> dominanceScale;
 
+    @Getter
+    private final ConcurrentLinkedQueue<Insurance> insuranceQueue;
+
     @Inject
     @Config(path = "clans.claims.additional", defaultValue = "3")
     private int additionalClaims;
@@ -44,6 +51,7 @@ public class ClanManager extends Manager<Clan> {
         this.repository = repository;
         this.gamerManager = gamerManager;
         this.dominanceScale = new HashMap<>();
+        this.insuranceQueue = new ConcurrentLinkedQueue<>();
 
         var clans = repository.getAll();
         loadFromList(clans);
@@ -53,6 +61,7 @@ public class ClanManager extends Manager<Clan> {
             clan.setAlliances(repository.getAlliances(this, clan));
             clan.setEnemies(repository.getEnemies(this, clan));
             clan.setMembers(repository.getMembers(this, clan));
+            clan.setInsurance(repository.getInsurance(clan));
         });
 
         dominanceScale = repository.getDominanceScale();
@@ -314,6 +323,20 @@ public class ClanManager extends Manager<Clan> {
                 UtilServer.callEvent(new ScoreboardUpdateEvent(player));
             }
         });
+    }
+
+    /**
+     * Save insurance data for a particular block
+     * @param clan The clan to save the insurance for
+     * @param block The block to be insured
+     * @param insuranceType The insurance type (BREAK / PLACE)
+     */
+    public void addInsurance(Clan clan, Block block, InsuranceType insuranceType) {
+        Insurance insurance = new Insurance(System.currentTimeMillis(), block.getType(), block.getBlockData().getAsString(),
+                insuranceType, block.getLocation());
+
+        repository.saveInsurance(clan, insurance);
+        clan.getInsurance().add(insurance);
     }
 
     @Override
