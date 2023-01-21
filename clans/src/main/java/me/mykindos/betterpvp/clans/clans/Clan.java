@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.clans.clans;
 
 import lombok.Builder;
 import lombok.Data;
+import me.mykindos.betterpvp.clans.clans.insurance.Insurance;
 import me.mykindos.betterpvp.core.components.clans.IClan;
 import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
@@ -17,10 +18,8 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Data
 @Builder
@@ -54,6 +53,9 @@ public class Clan implements IClan, Invitable {
 
     @Builder.Default
     private List<ClanTerritory> territory = new ArrayList<>();
+
+    @Builder.Default
+    private List<Insurance> insurance = Collections.synchronizedList(new ArrayList<>());
 
     public Optional<ClanMember> getLeader() {
         return members.stream().filter(clanMember -> clanMember.getRank() == ClanMember.MemberRank.LEADER).findFirst();

@@ -27,6 +27,8 @@ public class ConfigProvider<T> implements Provider<T> {
             castedDefault = Double.parseDouble(defaultValue);
         }else if(type == Boolean.class){
             castedDefault = Boolean.parseBoolean(defaultValue);
+        }else if(type == Long.class) {
+            castedDefault = Long.parseLong(defaultValue);
         }
 
         T value = plugin.getConfig().getOrSaveObject(configPath, castedDefault, type);

@@ -5,6 +5,8 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
+import me.mykindos.betterpvp.clans.clans.insurance.Insurance;
+import me.mykindos.betterpvp.clans.clans.insurance.InsuranceType;
 import me.mykindos.betterpvp.core.components.clans.IClan;
 import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
@@ -15,16 +17,21 @@ import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.BooleanStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
+import me.mykindos.betterpvp.core.database.query.values.LongStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.database.repository.IRepository;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
 
 import javax.sql.rowset.CachedRowSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -307,5 +314,49 @@ public class ClanRepository implements IRepository<Clan> {
 
         return dominanceScale;
     }
+
+    //region Insurance
+    public void deleteExpiredInsurance(long duration) {
+        String query = "DELETE FROM " + databasePrefix + "insurance WHERE ((Time+?) - ?) <= 0";
+        database.executeQuery(new Statement(query, new LongStatementValue(duration), new LongStatementValue(System.currentTimeMillis())));
+    }
+
+    public void saveInsurance(Clan clan, Insurance insurance) {
+        String query = "INSERT INTO " + databasePrefix + "insurance VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
+        Location location = insurance.getBlockLocation();
+        database.executeQuery(new Statement(query,
+                new IntegerStatementValue(clan.getId()), new StringStatementValue(insurance.getInsuranceType().name()),
+                new StringStatementValue(insurance.getBlockMaterial().name()), new StringStatementValue(insurance.getBlockData()),
+                new LongStatementValue(insurance.getTime()), new IntegerStatementValue(location.getBlockX()),
+                new IntegerStatementValue(location.getBlockY()), new IntegerStatementValue(location.getBlockZ())
+        ));
+    }
+
+    public List<Insurance> getInsurance(Clan clan) {
+        World world = Bukkit.getWorld("world");
+        List<Insurance> insurance = Collections.synchronizedList(new ArrayList<>());
+        String query = "SELECT * FROM " + databasePrefix + "insurance WHERE Clan = ?";
+        CachedRowSet result = database.executeQuery(new Statement(query));
+        try {
+            if (result.next()) {
+                InsuranceType insuranceType = InsuranceType.valueOf(result.getString(2));
+                Material material = Material.valueOf(result.getString(3));
+                String blockData = result.getString(4);
+                long time = result.getLong(5);
+                int blockX = result.getInt(6);
+                int blockY = result.getInt(7);
+                int blockZ = result.getInt(8);
+
+                Location blockLocation = new Location(world, blockX, blockY, blockZ);
+                insurance.add(new Insurance(time, material, blockData, insuranceType, blockLocation));
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return insurance;
+    }
+    //endregion
 
 }

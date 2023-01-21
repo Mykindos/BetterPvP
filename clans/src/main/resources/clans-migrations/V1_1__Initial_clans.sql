@@ -84,3 +84,15 @@ INSERT IGNORE INTO ${tablePrefix}dominance_scale VALUES (3, 5);
 INSERT IGNORE INTO ${tablePrefix}dominance_scale VALUES (4, 5);
 INSERT IGNORE INTO ${tablePrefix}dominance_scale VALUES (5, 6);
 INSERT IGNORE INTO ${tablePrefix}dominance_scale VALUES (6, 6);
+
+create table if not exists ${tablePrefix}insurance
+(
+    Clan          int           not null,
+    InsuranceType varchar(255)  not null,
+    Material      varchar(255)  not null,
+    Data          varchar(1000) null,
+    Time          bigint        not null,
+    X             int           not null,
+    Y             int           not null,
+    Z             int           not null
+);
