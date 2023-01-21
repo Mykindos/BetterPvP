@@ -20,22 +20,22 @@ public class GlowEnchant extends Enchantment {
 
     @Override
     public @NotNull String getName() {
-        return null;
+        return "Glow";
     }
 
     @Override
     public int getMaxLevel() {
-        return 0;
+        return 1;
     }
 
     @Override
     public int getStartLevel() {
-        return 0;
+        return 1;
     }
 
     @Override
     public @NotNull EnchantmentTarget getItemTarget() {
-        return null;
+        return EnchantmentTarget.ARMOR;
     }
 
     @Override
@@ -55,7 +55,7 @@ public class GlowEnchant extends Enchantment {
 
     @Override
     public boolean canEnchantItem(@NotNull ItemStack item) {
-        return false;
+        return true;
     }
 
     @Override
