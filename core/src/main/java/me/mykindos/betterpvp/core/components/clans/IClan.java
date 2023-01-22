@@ -40,6 +40,9 @@ public interface IClan {
         return getEnemies().stream().anyMatch(enemy -> enemy.getClan().getName().equalsIgnoreCase(clan.getName()));
     }
 
+    default Optional<ClanEnemy> getEnemy(IClan clan) {
+        return getEnemies().stream().filter(enemy -> enemy.getClan().getName().equalsIgnoreCase(clan.getName())).findFirst();
+    }
 
 
 }
