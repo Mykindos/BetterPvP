@@ -321,6 +321,11 @@ public class ClanRepository implements IRepository<Clan> {
         database.executeUpdate(new Statement(query, new LongStatementValue(duration), new LongStatementValue(System.currentTimeMillis())));
     }
 
+    public void deleteInsuranceForClan(Clan clan) {
+        String query = "DELETE FROM " + databasePrefix + "insurance WHERE Clan = ?";
+        database.executeUpdate(new Statement(query, new IntegerStatementValue(clan.getId())));
+    }
+
     public void saveInsurance(Clan clan, Insurance insurance) {
         String query = "INSERT INTO " + databasePrefix + "insurance VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
@@ -336,8 +341,8 @@ public class ClanRepository implements IRepository<Clan> {
     public List<Insurance> getInsurance(Clan clan) {
         World world = Bukkit.getWorld("world");
         List<Insurance> insurance = Collections.synchronizedList(new ArrayList<>());
-        String query = "SELECT * FROM " + databasePrefix + "insurance WHERE Clan = ?";
-        CachedRowSet result = database.executeQuery(new Statement(query));
+        String query = "SELECT * FROM " + databasePrefix + "insurance WHERE Clan = ? ORDER BY Time ASC";
+        CachedRowSet result = database.executeQuery(new Statement(query, new IntegerStatementValue(clan.getId())));
         try {
             if (result.next()) {
                 InsuranceType insuranceType = InsuranceType.valueOf(result.getString(2));

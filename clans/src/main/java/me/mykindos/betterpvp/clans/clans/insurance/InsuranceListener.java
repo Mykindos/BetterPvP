@@ -52,17 +52,16 @@ public class InsuranceListener extends ClanListener {
             if (UtilTime.elapsed(insurance.getTime(),  (long) expiryTime * 60 * 60 * 1000)) continue;
 
             Location blockLocation = insurance.getBlockLocation();
-            if (blockLocation.getBlock().getType() == insurance.getBlockMaterial()) continue;
 
             if (insurance.getInsuranceType() == InsuranceType.PLACE) {
-                insurance.getBlockLocation().getBlock().setType(Material.AIR);
+                blockLocation.getBlock().setType(Material.AIR);
             } else {
+                if (blockLocation.getBlock().getType() == insurance.getBlockMaterial()) continue;
                 if (!shouldRestoreBlock(insurance.getBlockMaterial())) continue;
 
                 blockLocation.getBlock().setType(insurance.getBlockMaterial());
-                if (!(blockLocation.getBlock().getState() instanceof Container)) {
-                    blockLocation.getBlock().setBlockData(Bukkit.createBlockData(insurance.getBlockData()));
-                }
+                blockLocation.getBlock().setBlockData(Bukkit.createBlockData(insurance.getBlockData()));
+
             }
         }
     }

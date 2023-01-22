@@ -41,6 +41,10 @@ public class ClanMember {
         public static MemberRank getRankByPrivilege(int privilege) {
             return Arrays.stream(values()).filter(memberRank -> memberRank.getPrivilege() == privilege).findFirst().orElse(null);
         }
+
+        public boolean hasRank(MemberRank memberRank) {
+            return this.privilege >= memberRank.privilege;
+        }
     }
 
 }

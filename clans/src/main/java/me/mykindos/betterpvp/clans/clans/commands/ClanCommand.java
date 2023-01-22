@@ -42,6 +42,7 @@ public class ClanCommand extends Command {
         subCommands.add(new EnemySubCommand(clanManager, gamerManager));
         subCommands.add(new NeutralSubCommand(clanManager, gamerManager));
         subCommands.add(new AddOutskirtsSubCommand(clanManager, gamerManager));
+        subCommands.add(new ClanRecoveryCommand(clanManager, gamerManager));
 
     }
 

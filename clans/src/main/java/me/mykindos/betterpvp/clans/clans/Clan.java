@@ -128,9 +128,9 @@ public class Clan implements IClan, Invitable {
         if (enemy != null && theirEnemy != null) {
             String text = "";
             if(enemy.getDominance() > 0){
-                text = ChatColor.GREEN + "%" + enemy.getDominance();
+                text = ChatColor.GREEN.toString() + enemy.getDominance() + "%";
             }else if(theirEnemy.getDominance() > 0) {
-                text = ChatColor.RED + "%" + theirEnemy.getDominance();
+                text = ChatColor.RED.toString() + theirEnemy.getDominance() + "%";
             }else {
                 return "";
             }
