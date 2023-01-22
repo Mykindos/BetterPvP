@@ -33,19 +33,19 @@ public class EnemySubCommand extends ClanSubCommand {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        if(args.length == 0) {
+        if (args.length == 0) {
             UtilMessage.message(player, "Clans", "You must specify a clan to enemy.");
             return;
         }
 
         Optional<Clan> playerClanOptional = clanManager.getClanByPlayer(player);
-        if(playerClanOptional.isEmpty()) {
+        if (playerClanOptional.isEmpty()) {
             UtilMessage.message(player, "Clans", "You are not in a clan.");
             return;
         }
 
         Optional<Clan> targetClanOptional = clanManager.getObject(args[0]);
-        if(targetClanOptional.isEmpty()) {
+        if (targetClanOptional.isEmpty()) {
             UtilMessage.message(player, "Clans", "The target clan does not exist.");
             return;
         }
@@ -53,18 +53,24 @@ public class EnemySubCommand extends ClanSubCommand {
         Clan playerClan = playerClanOptional.get();
         Clan targetClan = targetClanOptional.get();
 
-        if(playerClan.equals(targetClan)) {
+        if (playerClan.equals(targetClan)) {
             UtilMessage.message(player, "Clans", "You cannot enemy your own clan");
             return;
         }
 
         if (!playerClan.getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.ADMIN)) {
-            UtilMessage.message(player, "Clans", "Only the clan admins can form alliances.");
+            UtilMessage.message(player, "Clans", "Only the clan admins can enemy other clans.");
             return;
         }
 
-        if(playerClan.isEnemy(targetClan)) {
+        if (playerClan.isEnemy(targetClan)) {
             UtilMessage.message(player, "Clans", "You are already enemy with this clan.");
+            return;
+        }
+
+        if (clanManager.getPillageHandler().isPillaging(playerClan, targetClan)
+                || clanManager.getPillageHandler().isPillaging(targetClan, playerClan)) {
+            UtilMessage.message(player, "Clans", "You cannot enemy this clan while a pillage is active.");
             return;
         }
 

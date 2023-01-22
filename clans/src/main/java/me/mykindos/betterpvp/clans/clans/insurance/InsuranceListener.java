@@ -19,8 +19,8 @@ import java.util.Set;
 public class InsuranceListener extends ClanListener {
 
     @Inject
-    @Config(path = "clans.insurance.duration", defaultValue = "86400000")
-    private long expiryTime;
+    @Config(path = "clans.insurance.durationInHours", defaultValue = "24")
+    private int expiryTime;
 
     private final Set<Material> nonRestorables = Set.of(Material.IRON_BLOCK, Material.DIAMOND_BLOCK, Material.NETHERITE_BLOCK,
             Material.GOLD_BLOCK, Material.EMERALD_BLOCK, Material.ENCHANTING_TABLE, Material.BEEHIVE,
@@ -34,11 +34,12 @@ public class InsuranceListener extends ClanListener {
 
     @UpdateEvent(delay = 38400, isAsync = true)
     public void cleanClanInsurance() {
+        long expiryTimeMs = (long) expiryTime * 60 * 60 * 1000;
         clanManager.getObjects().values().forEach(clan -> {
-            clan.getInsurance().removeIf(insurance -> UtilTime.elapsed(insurance.getTime(), expiryTime));
+            clan.getInsurance().removeIf(insurance -> UtilTime.elapsed(insurance.getTime(), expiryTimeMs));
         });
 
-        clanManager.getRepository().deleteExpiredInsurance(expiryTime);
+        clanManager.getRepository().deleteExpiredInsurance(expiryTimeMs);
     }
 
     @UpdateEvent(delay = 1)
@@ -48,7 +49,7 @@ public class InsuranceListener extends ClanListener {
         for (int i = 0; i < 3; i++) {
             Insurance insurance = clanManager.getInsuranceQueue().poll();
             if (insurance == null) continue;
-            if (UtilTime.elapsed(insurance.getTime(), expiryTime)) continue;
+            if (UtilTime.elapsed(insurance.getTime(),  (long) expiryTime * 60 * 60 * 1000)) continue;
 
             Location blockLocation = insurance.getBlockLocation();
             if (blockLocation.getBlock().getType() == insurance.getBlockMaterial()) continue;

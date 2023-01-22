@@ -318,14 +318,14 @@ public class ClanRepository implements IRepository<Clan> {
     //region Insurance
     public void deleteExpiredInsurance(long duration) {
         String query = "DELETE FROM " + databasePrefix + "insurance WHERE ((Time+?) - ?) <= 0";
-        database.executeQuery(new Statement(query, new LongStatementValue(duration), new LongStatementValue(System.currentTimeMillis())));
+        database.executeUpdate(new Statement(query, new LongStatementValue(duration), new LongStatementValue(System.currentTimeMillis())));
     }
 
     public void saveInsurance(Clan clan, Insurance insurance) {
         String query = "INSERT INTO " + databasePrefix + "insurance VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         Location location = insurance.getBlockLocation();
-        database.executeQuery(new Statement(query,
+        database.executeUpdate(new Statement(query,
                 new IntegerStatementValue(clan.getId()), new StringStatementValue(insurance.getInsuranceType().name()),
                 new StringStatementValue(insurance.getBlockMaterial().name()), new StringStatementValue(insurance.getBlockData()),
                 new LongStatementValue(insurance.getTime()), new IntegerStatementValue(location.getBlockX()),

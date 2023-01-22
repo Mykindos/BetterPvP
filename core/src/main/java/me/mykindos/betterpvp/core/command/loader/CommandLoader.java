@@ -76,7 +76,7 @@ public class CommandLoader extends Loader {
                 subCommand.setEnabled(plugin.getConfig().getOrSaveBoolean(subEnabledPath, true));
                 subCommand.setRequiredRank(Rank.valueOf(plugin.getConfig().getOrSaveString(subRankPath, "ADMIN").toUpperCase()));
 
-                plugin.getInjector().injectMembers(plugin);
+                plugin.getInjector().injectMembers(subCommand);
             });
         });
     }

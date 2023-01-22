@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.clans.clans.pillage;
 
 import com.google.inject.Inject;
+import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.pillage.events.PillageEndEvent;
 import me.mykindos.betterpvp.clans.clans.pillage.events.PillageStartEvent;
@@ -24,11 +25,13 @@ public class PillageListener implements Listener {
     @Config(path = "clans.pillage.duration", defaultValue = "10")
     private int pillageDurationInMinutes;
 
+    private final Clans clans;
     private final PillageHandler pillageHandler;
     private final ClanManager clanManager;
 
     @Inject
-    public PillageListener(ClanManager clanManager, PillageHandler pillageHandler) {
+    public PillageListener(Clans clans, ClanManager clanManager, PillageHandler pillageHandler) {
+        this.clans = clans;
         this.clanManager = clanManager;
         this.pillageHandler = pillageHandler;
     }
@@ -39,7 +42,7 @@ public class PillageListener implements Listener {
 
         pillageHandler.getActivePillages().forEach(pillage -> {
             if (pillage.getPillageFinishTime() - System.currentTimeMillis() <= 0) {
-                UtilServer.callEvent(new PillageEndEvent(pillage));
+                UtilServer.runTaskLater(clans, () ->UtilServer.callEvent(new PillageEndEvent(pillage)), 1);
             }
         });
     }
@@ -66,7 +69,7 @@ public class PillageListener implements Listener {
         pillageHandler.endPillage(event.getPillage());
     }
 
-    @UpdateEvent(delay = 60000)
+    @UpdateEvent(delay = 30000)
     public void notifyPillageDuration() {
         if (pillageHandler.getActivePillages().isEmpty()) return;
 
