@@ -4,10 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.jetbrains.annotations.NotNull;
 
 @Data
 @AllArgsConstructor
-public class Insurance {
+public class Insurance implements Comparable<Insurance>{
 
     private final long time;
     private final Material blockMaterial;
@@ -16,4 +17,8 @@ public class Insurance {
     private final Location blockLocation;
 
 
+    @Override
+    public int compareTo(@NotNull Insurance o) {
+        return (int) (this.time - o.time);
+    }
 }

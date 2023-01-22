@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
+import me.mykindos.betterpvp.clans.clans.insurance.InsuranceType;
 import me.mykindos.betterpvp.clans.clans.pillage.PillageHandler;
 import me.mykindos.betterpvp.core.client.events.ClientLoginEvent;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
@@ -18,6 +19,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
+import org.bukkit.block.Container;
 import org.bukkit.block.data.type.Gate;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.ItemFrame;
@@ -41,12 +43,9 @@ import java.util.UUID;
 @BPvPListener
 public class ClansWorldListener extends ClanListener {
 
-    private final PillageHandler pillageHandler;
-
     @Inject
-    public ClansWorldListener(ClanManager clanManager, GamerManager gamerManager, PillageHandler pillageHandler) {
+    public ClansWorldListener(ClanManager clanManager, GamerManager gamerManager) {
         super(clanManager, gamerManager);
-        this.pillageHandler = pillageHandler;
     }
 
     @EventHandler
@@ -107,18 +106,20 @@ public class ClansWorldListener extends ClanListener {
                 //    }
                 //}
 
-                if(pillageHandler.isPillaging(clan, locationClan)){
+                if (clanManager.getPillageHandler().isPillaging(clan, locationClan)) {
+                    clanManager.addInsurance(locationClan, block, InsuranceType.BREAK);
                     return;
                 }
 
-                UtilMessage.message(player, "Clans", "You cannot break " + ChatColor.GREEN + UtilFormat.cleanString(block.getType().toString())
-                        + ChatColor.GRAY + " in " + ChatColor.YELLOW + relation.getPrimaryAsChatColor()
-                        + "Clan " + locationClan.getName() + ChatColor.GRAY + ".");
+                UtilMessage.simpleMessage(player, "Clans", "You cannot break <green>%s <gray>in %s<gray>.",
+                        UtilFormat.cleanString(block.getType().name()),
+                        relation.getPrimaryMiniColor() + "Clan " + locationClan.getName()
+                );
                 event.setCancelled(true);
 
 
             } else {
-                if (clan.getMember(player.getUniqueId()).getRank() == ClanMember.MemberRank.RECRUIT) {
+                if (clan.getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.RECRUIT)) {
                     UtilMessage.message(player, "Clans", "Clan Recruits cannot break blocks" + ChatColor.GRAY + ".");
                     event.setCancelled(true);
 
@@ -135,11 +136,8 @@ public class ClansWorldListener extends ClanListener {
         Gamer gamer = gamerManager.getObject(player.getUniqueId().toString()).orElseThrow(() -> new NoSuchGamerException(player.getName()));
         Block block = event.getBlock();
 
-
         Clan clan = clanManager.getClanByPlayer(player).orElse(null);
         Optional<Clan> locationClanOptional = clanManager.getClanByLocation(block.getLocation());
-        //Clan clan = ClanUtilities.getClan(player);
-        //Clan locationClan = ClanUtilities.getClan(block.getLocation());
 
         if (gamer.getClient().isAdministrating()) {
             return;
@@ -154,26 +152,28 @@ public class ClansWorldListener extends ClanListener {
 
             ClanRelation relation = clanManager.getRelation(clan, locationClan);
 
-            if (block.getType() == Material.SAND || block.getType() == Material.GRAVEL
-                    || block.getType().name().contains("CONCRETE_POWDER")) {
+            if (block.getType().hasGravity()) {
                 UtilMessage.message(player, "Clans", "You cannot place " + ChatColor.GREEN + UtilFormat.cleanString(block.getType().toString())
                         + ChatColor.GRAY + " in " + ChatColor.YELLOW + relation.getPrimaryAsChatColor()
                         + "Clan " + locationClan.getName() + ChatColor.GRAY + ".");
                 event.setCancelled(true);
+                return;
             }
 
             if (!locationClan.equals(clan)) {
 
-                if (pillageHandler.isPillaging(clan, locationClan)) {
+                if (clanManager.getPillageHandler().isPillaging(clan, locationClan)) {
+                    clanManager.addInsurance(locationClan, block, InsuranceType.PLACE);
                     return;
                 }
 
-                UtilMessage.message(player, "Clans", "You cannot place " + ChatColor.GREEN + UtilFormat.cleanString(block.getType().toString())
-                        + ChatColor.GRAY + " in " + ChatColor.YELLOW + relation.getPrimaryAsChatColor()
-                        + "Clan " + locationClan.getName() + ChatColor.GRAY + ".");
+                UtilMessage.simpleMessage(player, "Clans", "You cannot place <green>%s <gray>in %s<gray>.",
+                        UtilFormat.cleanString(block.getType().name()),
+                        relation.getPrimaryMiniColor() + "Clan " + locationClan.getName()
+                );
                 event.setCancelled(true);
             } else {
-                if (clan.getMember(player.getUniqueId()).getRank() == ClanMember.MemberRank.RECRUIT) {
+                if (clan.getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.RECRUIT)) {
                     UtilMessage.message(player, "Clans", "Clan Recruits cannot place blocks" + ChatColor.GRAY + ".");
                     event.setCancelled(true);
                 }
@@ -193,6 +193,8 @@ public class ClansWorldListener extends ClanListener {
         if (block == null) return;
         if (UtilBlock.isTutorial(block.getLocation())) return;
 
+        Material material = block.getType();
+
         Gamer gamer = gamerManager.getObject(player.getUniqueId().toString()).orElseThrow(() -> new NoSuchGamerException(player.getName()));
 
         if (gamer.getClient().isAdministrating()) return;
@@ -204,48 +206,32 @@ public class ClansWorldListener extends ClanListener {
 
                 ClanRelation relation = clanManager.getRelation(clan, locationClan);
 
-                if (locationClan.isAdmin() && block.getType() == Material.ENCHANTING_TABLE) return;
-                if (block.getType() == Material.REDSTONE_ORE) return;
-                if (relation == ClanRelation.ALLY_TRUST && (block.getType() == Material.IRON_DOOR
-                        || block.getType() == Material.IRON_TRAPDOOR
-                        || block.getType().name().contains("GATE")
-                        || block.getType().name().contains("DOOR")
-                        || block.getType().name().contains("_BUTTON")
-                        || block.getType() == Material.LEVER)) {
+                if (locationClan.isAdmin() && material == Material.ENCHANTING_TABLE) return;
+                if (material == Material.REDSTONE_ORE) return;
+                if (relation == ClanRelation.ALLY_TRUST && material.isInteractable()) {
                     return;
                 }
 
-                if (pillageHandler.isPillaging(clan, locationClan)) {
+                if (clanManager.getPillageHandler().isPillaging(clan, locationClan)) {
                     return;
                 }
 
-                if (block.getType() == Material.CHEST || block.getType() == Material.TRAPPED_CHEST || block.getType() == Material.LEVER
-                        || block.getType().name().contains("_BUTTON") || block.getType() == Material.FURNACE
-                        || block.getType() == Material.OAK_FENCE_GATE || block.getType() == Material.CRAFTING_TABLE || UtilBlock.usable(block)) {
+                if (UtilBlock.usable(block)) {
 
                     if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
-                        if (block.getType() == Material.ENDER_CHEST) return;
+                        if (material == Material.ENDER_CHEST) return;
 
                     }
-
-                    // TODO koth
-                    //if (KOTHManager.koth != null) {
-                    //    if (KOTHManager.koth.getLocation().getBlockX() == block.getLocation().getBlockX()
-                    //            && KOTHManager.koth.getLocation().getBlockZ() == block.getLocation().getBlockZ()) {
-                    //        return;
-                    //    }
-                    //}
-
-
-                    UtilMessage.message(player, "Clans", "You cannot use " + ChatColor.GREEN + UtilFormat.cleanString(block.getType().toString())
-                            + ChatColor.GRAY + " in " + ChatColor.YELLOW + relation.getPrimaryAsChatColor()
-                            + "Clan " + locationClan.getName() + ChatColor.GRAY + ".");
+                    UtilMessage.simpleMessage(player, "Clans", "You cannot use <green>%s <gray>in %s<gray>.",
+                            UtilFormat.cleanString(material.toString()),
+                            relation.getPrimaryMiniColor() + "Clan " + locationClan.getName()
+                    );
                     event.setCancelled(true);
                 }
             } else {
-                if (clan.getMember(player.getUniqueId()).getRank() == ClanMember.MemberRank.RECRUIT) {
-                    if (block.getType() == Material.CHEST || block.getType() == Material.TRAPPED_CHEST) {
-                        UtilMessage.message(player, "Clans", "Clan Recruits cannot access " + ChatColor.GREEN + UtilFormat.cleanString(block.getType().toString())
+                if (clan.getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.RECRUIT)) {
+                    if (block.getState() instanceof Container) {
+                        UtilMessage.message(player, "Clans", "Clan Recruits cannot access " + ChatColor.GREEN + UtilFormat.cleanString(material.toString())
                                 + ChatColor.GRAY + ".");
                         event.setCancelled(true);
                     }
@@ -326,17 +312,17 @@ public class ClansWorldListener extends ClanListener {
      * Stops Armour stands from being broken in admin territory
      */
     @EventHandler
-    public void onArmorStandDeath(EntityDamageByEntityEvent e) {
-        if (e.getEntity() instanceof ArmorStand || e.getEntity() instanceof ItemFrame) {
+    public void onArmorStandDeath(EntityDamageByEntityEvent event) {
+        if (event.getEntity() instanceof ArmorStand || event.getEntity() instanceof ItemFrame) {
 
-            Optional<Clan> clanOptional = clanManager.getClanByLocation(e.getEntity().getLocation());
+            Optional<Clan> clanOptional = clanManager.getClanByLocation(event.getEntity().getLocation());
             clanOptional.ifPresent(clan -> {
                 if (!clan.isAdmin()) return;
-                if (e.getDamager() instanceof Player player) {
+                if (event.getDamager() instanceof Player player) {
                     Optional<Gamer> gamerOptional = gamerManager.getObject(player.getUniqueId().toString());
                     gamerOptional.ifPresent(gamer -> {
                         if (!gamer.getClient().isAdministrating()) {
-                            e.setCancelled(true);
+                            event.setCancelled(true);
                         }
                     });
                 }
@@ -532,7 +518,8 @@ public class ClansWorldListener extends ClanListener {
      */
     @EventHandler
     public void onAttachablePlace(BlockPlaceEvent event) {
-        if (event.getBlock().getType() == Material.LEVER || event.getBlock().getType().name().contains("_BUTTON")) {
+        Material material = event.getBlock().getType();
+        if (material == Material.LEVER || material.name().contains("_BUTTON") || material.name().contains("PRESSURE_PLATE")) {
             Optional<Clan> clanOptional = clanManager.getClanByLocation(event.getBlockAgainst().getLocation());
             clanOptional.ifPresent(clan -> {
                 Optional<Clan> playerClanOption = clanManager.getClanByPlayer(event.getPlayer());
