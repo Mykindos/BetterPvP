@@ -162,6 +162,11 @@ public class UtilMessage {
                 .append(MiniMessage.miniMessage().deserialize("<gray>" + String.format(message, args))));
     }
 
+    public static void simpleBroadcast(String prefix, String message, Object... args) {
+        Bukkit.getServer().broadcast(Component.text(ChatColor.BLUE + prefix + "> ")
+                .append(MiniMessage.miniMessage().deserialize("<gray>" + String.format(message, args))));
+    }
+
     /**
      * Broadcasts a message to all players on the server with formatting
      *

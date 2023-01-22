@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
+import me.mykindos.betterpvp.clans.clans.pillage.PillageHandler;
 import me.mykindos.betterpvp.core.client.events.ClientLoginEvent;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.gamer.Gamer;
@@ -40,10 +41,12 @@ import java.util.UUID;
 @BPvPListener
 public class ClansWorldListener extends ClanListener {
 
+    private final PillageHandler pillageHandler;
 
     @Inject
-    public ClansWorldListener(ClanManager clanManager, GamerManager gamerManager) {
+    public ClansWorldListener(ClanManager clanManager, GamerManager gamerManager, PillageHandler pillageHandler) {
         super(clanManager, gamerManager);
+        this.pillageHandler = pillageHandler;
     }
 
     @EventHandler
@@ -104,11 +107,9 @@ public class ClansWorldListener extends ClanListener {
                 //    }
                 //}
 
-
-                //if (Pillage.isPillaging(clan, locationClan)) {
-                //    return;
-                //}
-
+                if(pillageHandler.isPillaging(clan, locationClan)){
+                    return;
+                }
 
                 UtilMessage.message(player, "Clans", "You cannot break " + ChatColor.GREEN + UtilFormat.cleanString(block.getType().toString())
                         + ChatColor.GRAY + " in " + ChatColor.YELLOW + relation.getPrimaryAsChatColor()
@@ -163,10 +164,9 @@ public class ClansWorldListener extends ClanListener {
 
             if (!locationClan.equals(clan)) {
 
-                // TODO add pillage
-                //if (Pillage.isPillaging(clan, locationClan)) {
-                //    return;
-                //}
+                if (pillageHandler.isPillaging(clan, locationClan)) {
+                    return;
+                }
 
                 UtilMessage.message(player, "Clans", "You cannot place " + ChatColor.GREEN + UtilFormat.cleanString(block.getType().toString())
                         + ChatColor.GRAY + " in " + ChatColor.YELLOW + relation.getPrimaryAsChatColor()
@@ -215,11 +215,9 @@ public class ClansWorldListener extends ClanListener {
                     return;
                 }
 
-                // TODO this
-                //if (Pillage.isPillaging(clan, locationClan)) {
-                //    return;
-                //}
-
+                if (pillageHandler.isPillaging(clan, locationClan)) {
+                    return;
+                }
 
                 if (block.getType() == Material.CHEST || block.getType() == Material.TRAPPED_CHEST || block.getType() == Material.LEVER
                         || block.getType().name().contains("_BUTTON") || block.getType() == Material.FURNACE

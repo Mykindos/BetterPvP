@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.clans.clans.insurance.Insurance;
 import me.mykindos.betterpvp.clans.clans.insurance.InsuranceType;
+import me.mykindos.betterpvp.clans.clans.pillage.Pillage;
+import me.mykindos.betterpvp.clans.clans.pillage.PillageHandler;
+import me.mykindos.betterpvp.clans.clans.pillage.events.PillageStartEvent;
 import me.mykindos.betterpvp.clans.clans.repository.ClanRepository;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.components.clans.IClan;
@@ -36,6 +39,8 @@ public class ClanManager extends Manager<Clan> {
     @Getter
     private final ClanRepository repository;
     private final GamerManager gamerManager;
+    @Getter
+    private final PillageHandler pillageHandler;
 
     private HashMap<Integer, Integer> dominanceScale;
 
@@ -47,9 +52,10 @@ public class ClanManager extends Manager<Clan> {
     private int additionalClaims;
 
     @Inject
-    public ClanManager(ClanRepository repository, GamerManager gamerManager) {
+    public ClanManager(ClanRepository repository, GamerManager gamerManager, PillageHandler pillageHandler) {
         this.repository = repository;
         this.gamerManager = gamerManager;
+        this.pillageHandler = pillageHandler;
         this.dominanceScale = new HashMap<>();
         this.insuranceQueue = new ConcurrentLinkedQueue<>();
 
@@ -114,7 +120,6 @@ public class ClanManager extends Manager<Clan> {
 
     }
 
-    // TODO implement pillaging
     public ClanRelation getRelation(IClan clanA, IClan clanB) {
         if (clanA == null || clanB == null) {
             return ClanRelation.NEUTRAL;
@@ -126,11 +131,10 @@ public class ClanManager extends Manager<Clan> {
             return ClanRelation.ALLY;
         } else if (clanA.isEnemy(clanB)) {
             return ClanRelation.ENEMY;
-
-            // } else if (Pillage.isPillaging(clanA, clanB)) {
-            //    return ClanRelation.PILLAGE;
-            //} else if (Pillage.isPillaging(clanB, clanA)) {
-            //    return ClanRelation.PILLAGE;
+        } else if (pillageHandler.isPillaging(clanA, clanB)) {
+            return ClanRelation.PILLAGE;
+        } else if (pillageHandler.isPillaging(clanB, clanA)) {
+            return ClanRelation.PILLAGE;
         }
 
         return ClanRelation.NEUTRAL;
@@ -146,12 +150,9 @@ public class ClanManager extends Manager<Clan> {
         Clan playerClan = playerClanOptional.get();
         Clan locationClan = locationClanOptional.get();
 
-
-        // TODO implement pillaging
-        //if (Pillage.isPillaging(pClan, locClan)) {
-        //    return true;
-        //}
-
+        if (pillageHandler.isPillaging(playerClan, locationClan)) {
+            return true;
+        }
 
         ClanRelation relation = getRelation(playerClan, locationClan);
 
@@ -299,6 +300,8 @@ public class ClanManager extends Manager<Clan> {
         ClanEnemy killerEnemy = killer.getEnemy(killed);
 
         int dominance = dominanceScale.getOrDefault(killed.getMembers().size(), 6);
+
+        // If the killed players clan has no dominance on the killer players clan, then give dominance to the killer
         if (killedEnemy.getDominance() == 0) {
             killerEnemy.addDominance(dominance);
         }
@@ -309,6 +312,10 @@ public class ClanManager extends Manager<Clan> {
 
         getRepository().updateDominance(killed, killedEnemy);
         getRepository().updateDominance(killer, killerEnemy);
+
+        if(killerEnemy.getDominance() == 100) {
+            UtilServer.callEvent(new PillageStartEvent(new Pillage(killer, killed)));
+        }
 
         killed.getMembers().forEach(member -> {
             Player player = Bukkit.getPlayer(UUID.fromString(member.getUuid()));

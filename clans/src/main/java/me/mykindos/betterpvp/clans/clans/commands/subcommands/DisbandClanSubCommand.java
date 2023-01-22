@@ -54,7 +54,10 @@ public class DisbandClanSubCommand extends ClanSubCommand {
                 return;
             }
 
-            // TODO implement pillaging
+            if(clanManager.getPillageHandler().isBeingPillaged(clan)){
+                UtilMessage.message(player, "Clans", "You cannot disband your clan while being pillaged.");
+                return;
+            }
 
             if (System.currentTimeMillis() < clan.getLastTnted()) {
                 UtilMessage.message(player, "Clans", "You cannot disband your clan for "
