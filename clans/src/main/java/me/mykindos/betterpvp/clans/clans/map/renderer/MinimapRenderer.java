@@ -12,7 +12,6 @@ import me.mykindos.betterpvp.clans.clans.map.data.MapSettings;
 import me.mykindos.betterpvp.clans.clans.map.events.MinimapExtraCursorEvent;
 import me.mykindos.betterpvp.clans.clans.map.nms.UtilMapMaterial;
 import me.mykindos.betterpvp.core.config.Config;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.minecraft.world.level.material.MaterialColor;
 import org.bukkit.Bukkit;
@@ -35,6 +34,11 @@ import java.util.*;
 @Getter
 @Singleton
 public class MinimapRenderer extends MapRenderer implements Listener {
+
+
+
+
+
 
     private final MapHandler mapHandler;
     private final Clans clans;

@@ -68,18 +68,20 @@ public class MapListener implements Listener {
         this.clanManager = clanManager;
         this.cooldownManager = cooldownManager;
         this.gamerManager = gamerManager;
+
+        mapHandler.loadMap();
     }
 
-    @EventHandler
-    public void onWorldLoad(WorldLoadEvent event) {
-        if (event.getWorld().getName().equals("world")) {
-            try {
-                mapHandler.loadMap();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }
-    }
+    //@EventHandler
+    //public void onWorldLoad(WorldLoadEvent event) {
+    //    if (event.getWorld().getName().equals("world")) {
+    //        try {
+    //            mapHandler.loadMap();
+    //        } catch (Exception ex) {
+    //            ex.printStackTrace();
+    //        }
+    //    }
+    //}
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerQuit(PlayerQuitEvent event) {
