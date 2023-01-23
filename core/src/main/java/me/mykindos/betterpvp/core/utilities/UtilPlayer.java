@@ -131,11 +131,7 @@ public class UtilPlayer {
         }
         watcher.setObject(0, serializer, entityByte); //Set status to glowing, found on protocol page
         packet.getWatchableCollectionModifier().write(0, watcher.getWatchableObjects()); //Make the packet's datawatcher the one we created
-        try {
-            ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet);
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
+        ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet);
     }
 
 }

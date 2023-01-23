@@ -4,7 +4,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MaterialColor;
-import org.bukkit.craftbukkit.v1_19_R1.util.CraftMagicNumbers;
+import org.bukkit.craftbukkit.v1_19_R2.util.CraftMagicNumbers;
 
 import java.lang.reflect.Field;
 import java.util.function.Function;
@@ -17,7 +17,7 @@ public class UtilMapMaterial {
     static {
         try {
 
-            BLOCKBEHAVIOUR_INFO = BlockBehaviour.class.getDeclaredField("aO");
+            BLOCKBEHAVIOUR_INFO = BlockBehaviour.class.getDeclaredField("aP");
             BLOCKBEHAVIOUR_INFO.setAccessible(true);
 
             PROPERTIES_FUNCTION = BlockBehaviour.Properties.class.getDeclaredField("b");

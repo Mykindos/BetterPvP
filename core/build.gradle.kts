@@ -33,7 +33,7 @@ repositories {
 }
 
 dependencies {
-    paperweightDevelopmentBundle("io.papermc.paper:dev-bundle:1.19.2-R0.1-SNAPSHOT")
+    paperweightDevelopmentBundle("io.papermc.paper:dev-bundle:1.19.3-R0.1-SNAPSHOT")
 
     implementation("org.flywaydb:flyway-core:9.0.4")
     implementation("org.flywaydb:flyway-mysql:9.0.4")
@@ -41,9 +41,9 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.10.0")
 
 
-    compileOnly("io.papermc.paper:paper-api:1.19.2-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.19.3-R0.1-SNAPSHOT")
     compileOnly("org.projectlombok:lombok:1.18.24")
-    compileOnly("com.comphenix.protocol:ProtocolLib:4.8.0")
+    compileOnly("com.comphenix.protocol:ProtocolLib:5.0.0-20230110.214117-7")
 
     implementation("com.google.inject:guice:5.1.0")
     implementation("org.reflections:reflections:0.10.2")
