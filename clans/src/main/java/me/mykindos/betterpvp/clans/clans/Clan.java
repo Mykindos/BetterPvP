@@ -148,9 +148,9 @@ public class Clan implements IClan, Invitable {
                 return ChatColor.WHITE + " 0";
             }
             if (theirEnemy.getDominance() > 0) {
-                return ChatColor.GREEN + " %" + (theirEnemy.getDominance());
+                return ChatColor.GREEN + " " + theirEnemy.getDominance() + "%";
             } else {
-                return ChatColor.DARK_RED + " %" + (enemy.getDominance());
+                return ChatColor.DARK_RED + " " + enemy.getDominance() + "%";
             }
 
         }
