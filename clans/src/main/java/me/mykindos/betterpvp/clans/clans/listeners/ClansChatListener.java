@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -32,6 +33,8 @@ public class ClansChatListener extends ClanListener {
         Clan targetClan = clanManager.getClanByPlayer(event.getTarget()).orElse(null);
         Optional<Clan> senderClanOptional = clanManager.getClanByPlayer(event.getPlayer());
 
+        String playerName = UtilFormat.spoofNameForLunar(event.getPlayer().getName());
+
         if (senderClanOptional.isPresent()) {
             Clan senderClan = senderClanOptional.get();
 
@@ -39,12 +42,12 @@ public class ClansChatListener extends ClanListener {
 
             Component clanPrefix = Component.empty()
                     .append(Component.text(senderClan.getName() + " ", relation.getSecondary()))
-                    .append(Component.text(event.getPlayer().getName() + ": ", relation.getPrimary()));
+                    .append(Component.text(playerName + ": ", relation.getPrimary()));
 
 
             event.setPrefix(clanPrefix);
         } else {
-            event.setPrefix(Component.text(event.getPlayer().getName() + ": ", NamedTextColor.YELLOW));
+            event.setPrefix(Component.text(playerName  + ": ", NamedTextColor.YELLOW));
         }
     }
 
@@ -61,13 +64,15 @@ public class ClansChatListener extends ClanListener {
         Gamer gamer = gamerOptional.get();
         Clan clan = clanOptional.get();
 
+        String playerName = UtilFormat.spoofNameForLunar(event.getPlayer().getName());
+
         Optional<Boolean> clanChatEnabledOptional = gamer.getProperty(GamerProperty.CLAN_CHAT);
         clanChatEnabledOptional.ifPresent(clanChat -> {
             if (clanChat) {
 
                 event.cancel("Player has clan chat enabled");
 
-                String message = ChatColor.AQUA + event.getPlayer().getName() + " " + ChatColor.DARK_AQUA + PlainTextComponentSerializer.plainText().serialize(event.getMessage());
+                String message = ChatColor.AQUA + playerName  + " " + ChatColor.DARK_AQUA + PlainTextComponentSerializer.plainText().serialize(event.getMessage());
                 clan.messageClan(message, null, false);
 
             }
@@ -78,7 +83,7 @@ public class ClansChatListener extends ClanListener {
             if (allyChat) {
                 event.cancel("Player has ally chat enabled");
 
-                String message = ChatColor.DARK_GREEN + event.getPlayer().getName() + " " + ChatColor.GREEN + PlainTextComponentSerializer.plainText().serialize(event.getMessage());
+                String message = ChatColor.DARK_GREEN + playerName + " " + ChatColor.GREEN + PlainTextComponentSerializer.plainText().serialize(event.getMessage());
 
                 clan.getAlliances().forEach(alliance -> {
                     alliance.getClan().messageClan(message, null, false);

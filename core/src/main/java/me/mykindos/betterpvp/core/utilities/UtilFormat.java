@@ -27,5 +27,14 @@ public class UtilFormat {
         return Bukkit.getPlayer(uuid) == null ? ChatColor.RED.toString() : ChatColor.GREEN.toString();
     }
 
+    /**
+     * Since some plugins and Lunar client have an inbuilt 'ping when mentioned' feature, this was causing pings every time a player typed
+     * This change prevents the ping from triggering off the players own messages, but still works when somebody else says their name
+     * @param name The players name
+     * @return The name with a ZWNJ character inserted
+     */
+    public static String spoofNameForLunar(String name) {
+        return name.charAt(0) + "\u200C" + name.substring(1);
+    }
 
 }

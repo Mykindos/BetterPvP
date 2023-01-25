@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.discord.DiscordMessage;
 import me.mykindos.betterpvp.core.discord.DiscordWebhook;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -49,7 +50,8 @@ public class ChatListener implements Listener {
 
         Component message = event.message().color(NamedTextColor.WHITE);
 
-        ChatSentEvent chatSent = new ChatSentEvent(player, Bukkit.getOnlinePlayers(), Component.text(player.getName() + ": " + ChatColor.RESET), message);
+
+        ChatSentEvent chatSent = new ChatSentEvent(player, Bukkit.getOnlinePlayers(), Component.text(UtilFormat.spoofNameForLunar(player.getName()) + ": " + ChatColor.RESET), message);
         Bukkit.getPluginManager().callEvent(chatSent);
         if (chatSent.isCancelled()) {
             log.info("ChatSentEvent cancelled for {} - {}", chatSent.getPlayer().getName(), chatSent.getCancelReason());
@@ -112,4 +114,6 @@ public class ChatListener implements Listener {
                     .build());
         }
     }
+
+
 }
