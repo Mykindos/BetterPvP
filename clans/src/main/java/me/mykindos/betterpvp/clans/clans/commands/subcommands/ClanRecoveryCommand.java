@@ -37,18 +37,14 @@ public class ClanRecoveryCommand extends ClanSubCommand {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        if(!client.hasRank(Rank.ADMIN)) {
-            UtilMessage.message(player, "Clans", "Uh oh!");
-            return;
-        }
+        Clan clan = clanManager.getClanByPlayer(player).orElseThrow();
 
-        clanManager.getClanByPlayer(player).ifPresent(clan -> {
-            List<Insurance> insuranceList = clan.getInsurance();
-            insuranceList.sort(Collections.reverseOrder());
-            clanManager.getInsuranceQueue().addAll(insuranceList);
-            clanManager.getRepository().deleteInsuranceForClan(clan);
-            clan.getInsurance().clear();
-        });
+        List<Insurance> insuranceList = clan.getInsurance();
+        insuranceList.sort(Collections.reverseOrder());
+        clanManager.getInsuranceQueue().addAll(insuranceList);
+        clanManager.getRepository().deleteInsuranceForClan(clan);
+        clan.getInsurance().clear();
+
     }
 
     @Override

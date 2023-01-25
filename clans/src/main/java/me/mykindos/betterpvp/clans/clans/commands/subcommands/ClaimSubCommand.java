@@ -43,92 +43,85 @@ public class ClaimSubCommand extends ClanSubCommand {
     public void execute(Player player, Client client, String... args) {
         if (player.getWorld().getName().equalsIgnoreCase("bossworld")) return;
 
-        Optional<Clan> clanOptional = clanManager.getClanByPlayer(player);
-        if(clanOptional.isPresent()) {
-            Clan clan = clanOptional.get();
+        Clan clan = clanManager.getClanByPlayer(player).orElseThrow();
 
+        if (!clan.getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.ADMIN)) {
+            UtilMessage.message(player, "Clans", "You need to be a clan admin to claim land");
+            return;
+        }
 
-            if (!clan.getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.ADMIN)) {
-                UtilMessage.message(player, "Clans", "You need to be a clan admin to claim land");
+        if (player.getWorld().getEnvironment().equals(World.Environment.NETHER) && !client.isAdministrating()) {
+            UtilMessage.message(player, "Clans", "You cannot claim land in the nether.");
+            return;
+        }
+
+        if (!clan.isAdmin()) {
+            if (clan.getTerritory().size() >= clan.getMembers().size() + additionalClaims) { // Previously
+                UtilMessage.message(player, "Clans", "Your Clan cannot claim more Territory.");
                 return;
             }
+        }
 
-            if (player.getWorld().getEnvironment().equals(World.Environment.NETHER) && !client.isAdministrating()) {
-                UtilMessage.message(player, "Clans", "You cannot claim land in the nether.");
-                return;
+        Optional<Clan> locationClanOptional = clanManager.getClanByLocation(player.getLocation());
+        if (locationClanOptional.isPresent()) {
+            Clan locationClan = locationClanOptional.get();
+            if (locationClan.equals(clan)) {
+                UtilMessage.message(player, "Clans", "Your clan already owns this territory");
+            } else {
+                UtilMessage.message(player, "Clans", "This territory is owned by " + ChatColor.YELLOW + "Clan "
+                        + locationClan.getName() + ChatColor.GRAY + ".");
             }
+            return;
+        }
 
-            if (!clan.isAdmin()) {
-                if (clan.getTerritory().size() >= clan.getMembers().size() + additionalClaims) { // Previously
-                    UtilMessage.message(player, "Clans", "Your Clan cannot claim more Territory.");
-                    return;
+        Chunk chunk = player.getLocation().getChunk();
+        World world = player.getWorld();
+        if (chunk.getEntities() != null) {
+            for (Entity entitys : chunk.getEntities()) {
+                if (entitys instanceof Player target) {
+                    if (entitys.equals(player)) {
+                        continue;
+                    }
+
+                    if (clanManager.canHurt(player, target)) {
+                        Optional<Clan> targetClanOptional = clanManager.getClanByPlayer(target);
+                        if (targetClanOptional.isEmpty()) continue;
+                        UtilMessage.message(player, "Clans", "You cannot claim Territory containing enemies.");
+                        return;
+                    }
+
                 }
             }
+        }
 
-            Optional<Clan> locationClanOptional = clanManager.getClanByLocation(player.getLocation());
-            if(locationClanOptional.isPresent()){
-                Clan locationClan = locationClanOptional.get();
-                if(locationClan.equals(clan)){
-                    UtilMessage.message(player, "Clans", "Your clan already owns this territory");
-                }else{
-                    UtilMessage.message(player, "Clans", "This territory is owned by " + ChatColor.YELLOW + "Clan "
-                            + locationClan.getName() + ChatColor.GRAY + ".");
-                }
-                return;
-            }
-
-            Chunk chunk = player.getLocation().getChunk();
-            World world = player.getWorld();
-            if (chunk.getEntities() != null) {
-                for (Entity entitys : chunk.getEntities()) {
-                    if (entitys instanceof Player target) {
-                        if (entitys.equals(player)) {
+        boolean isNextToExistingClaim = false;
+        if (!clan.isAdmin()) {
+            for (int x = -1; x <= 1; x++) {
+                for (int z = -1; z <= 1; z++) {
+                    Chunk testedChunk = world.getChunkAt(chunk.getX() + x, chunk.getZ() + z);
+                    Optional<Clan> nearbyClanOptional = clanManager.getClanByChunk(testedChunk);
+                    if (nearbyClanOptional.isPresent()) {
+                        Clan nearbyClan = nearbyClanOptional.get();
+                        if (clan.equals(nearbyClan)) {
+                            isNextToExistingClaim = true;
                             continue;
                         }
-
-                        if(clanManager.canHurt(player, target)) {
-                            Optional<Clan> targetClanOptional = clanManager.getClanByPlayer(target);
-                            if(targetClanOptional.isEmpty()) continue;
-                            UtilMessage.message(player, "Clans", "You cannot claim Territory containing enemies.");
-                            return;
-                        }
-
+                        UtilMessage.message(player, "Clans", "You cannot claim next to enemy territory.");
+                        return;
                     }
+
                 }
             }
-
-            boolean isNextToExistingClaim = false;
-            if (!clan.isAdmin()) {
-                for (int x = -1; x <= 1; x++) {
-                    for (int z = -1; z <= 1; z++) {
-                        Chunk testedChunk = world.getChunkAt(chunk.getX() + x, chunk.getZ() + z);
-                        Optional<Clan> nearbyClanOptional = clanManager.getClanByChunk(testedChunk);
-                        if(nearbyClanOptional.isPresent()) {
-                            Clan nearbyClan = nearbyClanOptional.get();
-                            if(clan.equals(nearbyClan)) {
-                                isNextToExistingClaim = true;
-                                continue;
-                            }
-                            UtilMessage.message(player, "Clans", "You cannot claim next to enemy territory.");
-                            return;
-                        }
-
-                    }
-                }
-            }
-
-            if(clan.getTerritory().size() > 0 && !isNextToExistingClaim && !clan.isAdmin()){
-                UtilMessage.message(player, "Clans", "You must claim next to your own territory");
-                return;
-            }
-
-
-            UtilServer.callEvent(new ChunkClaimEvent(player, clan));
-
-
-        } else {
-            UtilMessage.message(player, "Clans", "You are not in a Clan.");
         }
+
+        if (clan.getTerritory().size() > 0 && !isNextToExistingClaim && !clan.isAdmin()) {
+            UtilMessage.message(player, "Clans", "You must claim next to your own territory");
+            return;
+        }
+
+
+        UtilServer.callEvent(new ChunkClaimEvent(player, clan));
+
     }
 
     @Override

@@ -34,19 +34,10 @@ public class AddOutskirtsSubCommand extends ClanSubCommand {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        if(!client.hasRank(Rank.ADMIN)) {
-            UtilMessage.message(player, "Clans", "Uh oh!");
-            return;
-        }
 
         int borderSize = 1;
         if (args.length > 0) {
             borderSize = Integer.parseInt(args[0]);
-        }
-        Optional<Clan> clanOptional = clanManager.getClanByPlayer(player);
-        if (clanOptional.isEmpty()) {
-            UtilMessage.message(player, "Clans", "You are not in a clan");
-            return;
         }
 
         Optional<Clan> outskirtsOptional = clanManager.getClanByName("Outskirts");
@@ -55,7 +46,7 @@ public class AddOutskirtsSubCommand extends ClanSubCommand {
             return;
         }
 
-        Clan clan = clanOptional.get();
+        Clan clan = clanManager.getClanByPlayer(player).orElseThrow();;
         Clan outskirts = outskirtsOptional.get();
 
         int claims = 0;

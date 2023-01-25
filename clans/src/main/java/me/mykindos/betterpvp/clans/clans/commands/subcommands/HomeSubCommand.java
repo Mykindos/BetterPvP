@@ -30,12 +30,7 @@ public class HomeSubCommand extends ClanSubCommand {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        Optional<Clan> playerClanOptional = clanManager.getClanByPlayer(player);
-        if (playerClanOptional.isEmpty()) {
-            UtilMessage.message(player, "Clans", "You are not in a clan");
-            return;
-        }
-        Clan playerClan = playerClanOptional.get();
+        Clan playerClan = clanManager.getClanByPlayer(player).orElseThrow();;
         if (playerClan.getHome() == null) {
             UtilMessage.message(player, "Clans", "Your clan has not set a home");
             return;

@@ -43,62 +43,56 @@ public class KickSubCommand extends ClanSubCommand {
             return;
         }
 
-        Optional<Clan> clanOptional = clanManager.getClanByPlayer(player);
-        if (clanOptional.isPresent()) {
-            Clan clan = clanOptional.get();
+        Clan clan = clanManager.getClanByPlayer(player).orElseThrow();
 
-            Optional<Client> clientOptional = clientManager.getClientByName(args[0]);
-            if (clientOptional.isPresent()) {
-                Client target = clientOptional.get();
+        Optional<Client> clientOptional = clientManager.getClientByName(args[0]);
+        if (clientOptional.isPresent()) {
+            Client target = clientOptional.get();
 
-                ClanMember ourMember = clan.getMember(player.getUniqueId());
-                if (!ourMember.hasRank(ClanMember.MemberRank.ADMIN)) {
-                    UtilMessage.message(player, "Clans", "Only the Clan Leader and Admins can kick members.");
+            ClanMember ourMember = clan.getMember(player.getUniqueId());
+            if (!ourMember.hasRank(ClanMember.MemberRank.ADMIN)) {
+                UtilMessage.message(player, "Clans", "Only the Clan Leader and Admins can kick members.");
+                return;
+            }
+
+            if (target.getUuid().equals(player.getUniqueId().toString())) {
+                UtilMessage.message(player, "Clans", "You cannot kick yourself.");
+                return;
+            }
+
+            Optional<ClanMember> memberOptional = clan.getMemberByUUID(target.getUuid());
+            if (memberOptional.isPresent()) {
+                ClanMember member = memberOptional.get();
+
+                if (member.getRank().getPrivilege() >= ourMember.getRank().getPrivilege()) {
+                    UtilMessage.message(player, "Clans", "You are not a high enough rank to kick this member");
                     return;
                 }
 
-                if (target.getUuid().equals(player.getUniqueId().toString())) {
-                    UtilMessage.message(player, "Clans", "You cannot kick yourself.");
-                    return;
-                }
 
-                Optional<ClanMember> memberOptional = clan.getMemberByUUID(target.getUuid());
-                if (memberOptional.isPresent()) {
-                    ClanMember member = memberOptional.get();
-
-                    if (member.getRank().getPrivilege() >= ourMember.getRank().getPrivilege()) {
-                        UtilMessage.message(player, "Clans", "You are not a high enough rank to kick this member");
-                        return;
-                    }
-
-
-                    Player targetPlayer = Bukkit.getPlayer(args[0]);
-                    if (targetPlayer != null) {
-                        Optional<Clan> locationClanOptional = clanManager.getClanByLocation(targetPlayer.getLocation());
-                        if (locationClanOptional.isPresent()) {
-                            Clan locationClan = locationClanOptional.get();
-                            if (clan.isEnemy(locationClan)) {
-                                UtilMessage.message(player, "Clans", "You cannot leave your clan while in enemy territory");
-                                return;
-                            }
+                Player targetPlayer = Bukkit.getPlayer(args[0]);
+                if (targetPlayer != null) {
+                    Optional<Clan> locationClanOptional = clanManager.getClanByLocation(targetPlayer.getLocation());
+                    if (locationClanOptional.isPresent()) {
+                        Clan locationClan = locationClanOptional.get();
+                        if (clan.isEnemy(locationClan)) {
+                            UtilMessage.message(player, "Clans", "You cannot leave your clan while in enemy territory");
+                            return;
                         }
                     }
-
-                    UtilServer.callEvent(new ClanKickMemberEvent(player, clan, target));
-
-                } else {
-                    UtilMessage.message(player, "Clans", ChatColor.YELLOW + target.getName() + ChatColor.GRAY + " is not in your clan");
                 }
 
-            }
-        } else {
-            UtilMessage.message(player, "Clans", "You are not in a clan");
-        }
+                UtilServer.callEvent(new ClanKickMemberEvent(player, clan, target));
 
+            } else {
+                UtilMessage.message(player, "Clans", ChatColor.YELLOW + target.getName() + ChatColor.GRAY + " is not in your clan");
+            }
+
+        }
     }
 
     @Override
-    public String getArgumentType(int arg){
+    public String getArgumentType(int arg) {
         return ClanArgumentType.CLAN_MEMBER.name();
     }
 

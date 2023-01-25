@@ -19,6 +19,10 @@ public interface ICommand {
 
     void execute(Player player, Client client, String... args);
 
+    default void process(Player player, Client client, String... args) {
+        execute(player, client, args);
+    }
+
     Rank getRequiredRank();
 
     default boolean informInsufficientRank() {

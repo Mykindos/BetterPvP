@@ -38,13 +38,7 @@ public class DisbandClanSubCommand extends ClanSubCommand {
     @Override
     public void execute(Player player, Client client, String... args) {
 
-        Optional<Clan> clanOptional = clanManager.getClanByClient(client);
-        if (clanOptional.isEmpty()) {
-            UtilMessage.message(player, "Command", "You are not in a clan.");
-            return;
-        }
-
-        Clan clan = clanOptional.get();
+        Clan clan = clanManager.getClanByPlayer(player).orElseThrow();;
         Optional<ClanMember> leaderOptional = clan.getLeader();
         if (leaderOptional.isPresent()) {
             ClanMember leader = leaderOptional.get();

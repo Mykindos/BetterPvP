@@ -30,20 +30,10 @@ public class SetDominanceSubCommand extends ClanSubCommand {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        if(!client.hasRank(Rank.ADMIN)) {
-            UtilMessage.message(player, "Clans", "Uh oh!");
-            return;
-        }
 
         int dominance = Integer.parseInt(args[1]);
         if(dominance > 99) {
             UtilMessage.message(player, "Clans", "Dominance must be between 0-99");
-            return;
-        }
-
-        Optional<Clan> playerClanOptional = clanManager.getClanByPlayer(player);
-        if(playerClanOptional.isEmpty()) {
-            UtilMessage.message(player, "Clans", "You must be in a clan to use this command");
             return;
         }
 
@@ -53,7 +43,7 @@ public class SetDominanceSubCommand extends ClanSubCommand {
             return;
         }
 
-        Clan playerClan = playerClanOptional.get();
+        Clan playerClan = clanManager.getClanByPlayer(player).orElseThrow();
         Clan targetClan = targetClanOptional.get();
 
         ClanEnemy playerClanEnemy = playerClan.getEnemy(targetClan);
