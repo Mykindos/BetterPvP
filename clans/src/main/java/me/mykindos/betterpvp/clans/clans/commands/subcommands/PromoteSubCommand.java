@@ -33,18 +33,12 @@ public class PromoteSubCommand extends ClanSubCommand {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        Optional<Clan> clanOptional = clanManager.getClanByPlayer(player);
-        if (clanOptional.isEmpty()) {
-            UtilMessage.message(player, "Clans", "You are not in a clan");
-            return;
-        }
-
         if (args.length == 0) {
             UtilMessage.message(player, "Clans", "You must specify a player to promote.");
             return;
         }
 
-        Clan clan = clanOptional.get();
+        Clan clan = clanManager.getClanByPlayer(player).orElseThrow();
 
         ClanMember member = clan.getMember(player.getUniqueId());
         if (member.getRank().getPrivilege() < ClanMember.MemberRank.ADMIN.getPrivilege()) {

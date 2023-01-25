@@ -2,11 +2,13 @@ package me.mykindos.betterpvp.clans.clans.commands;
 
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
+import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -23,6 +25,29 @@ public abstract class ClanSubCommand extends SubCommand {
     public ClanSubCommand(ClanManager clanManager, GamerManager gamerManager) {
         this.clanManager = clanManager;
         this.gamerManager = gamerManager;
+    }
+
+    @Override
+    public void process(Player player, Client client, String... args) {
+        if (!canExecuteWithoutClan()) {
+            Optional<Clan> playerClanOptional = clanManager.getClanByPlayer(player);
+            if (playerClanOptional.isEmpty()) {
+                UtilMessage.message(player, "Clans", "You are not in a clan");
+                return;
+            }
+        }
+
+        if (requiresServerAdmin()) {
+            Optional<Gamer> gamerOptional = gamerManager.getObject(player.getUniqueId());
+            if (gamerOptional.isPresent()) {
+                Gamer gamer = gamerOptional.get();
+                if (!gamer.getClient().hasRank(Rank.ADMIN)) {
+                    return;
+                }
+            }
+        }
+
+        execute(player, client, args);
     }
 
     @Override

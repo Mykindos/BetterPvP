@@ -42,7 +42,7 @@ public class ClanManager extends Manager<Clan> {
     @Getter
     private final PillageHandler pillageHandler;
 
-    private HashMap<Integer, Integer> dominanceScale;
+    private Map<Integer, Integer> dominanceScale;
 
     @Getter
     private final ConcurrentLinkedQueue<Insurance> insuranceQueue;
@@ -63,10 +63,10 @@ public class ClanManager extends Manager<Clan> {
         loadFromList(clans);
 
         clans.forEach(clan -> {
-            clan.setTerritory(repository.getTerritory(this, clan));
+            clan.setTerritory(repository.getTerritory(clan));
             clan.setAlliances(repository.getAlliances(this, clan));
             clan.setEnemies(repository.getEnemies(this, clan));
-            clan.setMembers(repository.getMembers(this, clan));
+            clan.setMembers(repository.getMembers(clan));
             clan.setInsurance(repository.getInsurance(clan));
         });
 
@@ -170,7 +170,7 @@ public class ClanManager extends Manager<Clan> {
             }
         }
 
-        if (locations.size() > 0) {
+        if (!locations.isEmpty()) {
 
             locations.sort(Comparator.comparingInt(a -> (int) player.getLocation().distance(a)));
             return locations.get(0);
@@ -265,26 +265,22 @@ public class ClanManager extends Manager<Clan> {
         Optional<Clan> locationClanOptional = getClanByLocation(player.getLocation());
         if (locationClanOptional.isPresent()) {
             Clan locationClan = locationClanOptional.get();
-            if (locationClan.isAdmin()) {
+            if (locationClan.isAdmin() && locationClan.isSafe()) {
 
-                if (locationClan.isSafe()) {
+                Optional<Gamer> gamerOptional = gamerManager.getObject(player.getUniqueId().toString());
+                if (gamerOptional.isPresent()) {
+                    Gamer gamer = gamerOptional.get();
+                    // Allow skills if player is combat tagged
+                    if (!UtilTime.elapsed(gamer.getLastDamaged(), 15000)) {
+                        return true;
 
-                    Optional<Gamer> gamerOptional = gamerManager.getObject(player.getUniqueId().toString());
-                    if (gamerOptional.isPresent()) {
-                        Gamer gamer = gamerOptional.get();
-                        // Allow skills if player is combat tagged
-                        if (!UtilTime.elapsed(gamer.getLastDamaged(), 15000)) {
-                            return true;
-
-                        }
                     }
-
-
-                    if (message) {
-                        UtilMessage.message(player, "Restriction", "You are not allowed to cast abilities here!");
-                    }
-                    return false;
                 }
+
+                if (message) {
+                    UtilMessage.message(player, "Restriction", "You are not allowed to cast abilities here!");
+                }
+                return false;
             }
         }
 
@@ -313,7 +309,7 @@ public class ClanManager extends Manager<Clan> {
         getRepository().updateDominance(killed, killedEnemy);
         getRepository().updateDominance(killer, killerEnemy);
 
-        if(killerEnemy.getDominance() == 100) {
+        if (killerEnemy.getDominance() == 100) {
             UtilServer.callEvent(new PillageStartEvent(new Pillage(killer, killed)));
         }
 
@@ -334,8 +330,9 @@ public class ClanManager extends Manager<Clan> {
 
     /**
      * Save insurance data for a particular block
-     * @param clan The clan to save the insurance for
-     * @param block The block to be insured
+     *
+     * @param clan          The clan to save the insurance for
+     * @param block         The block to be insured
      * @param insuranceType The insurance type (BREAK / PLACE)
      */
     public void addInsurance(Clan clan, Block block, InsuranceType insuranceType) {

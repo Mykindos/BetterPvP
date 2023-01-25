@@ -37,11 +37,6 @@ public class UnclaimSubCommand extends ClanSubCommand {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        Optional<Clan> playerClanOptional = clanManager.getClanByPlayer(player);
-        if(playerClanOptional.isEmpty()) {
-            UtilMessage.message(player, "Clans", "You are not in a clan");
-            return;
-        }
 
         Optional<Clan> locationClanOptional = clanManager.getClanByLocation(player.getLocation());
         if(locationClanOptional.isEmpty()) {
@@ -49,7 +44,7 @@ public class UnclaimSubCommand extends ClanSubCommand {
             return;
         }
 
-        Clan playerClan = playerClanOptional.get();
+        Clan playerClan = clanManager.getClanByPlayer(player).orElseThrow();
         Clan locationClan = locationClanOptional.get();
 
         if(playerClan.equals(locationClan)) {

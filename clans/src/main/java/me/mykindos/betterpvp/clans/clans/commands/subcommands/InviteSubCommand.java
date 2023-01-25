@@ -44,10 +44,7 @@ public class InviteSubCommand extends ClanSubCommand {
             return;
         }
 
-        Optional<Clan> clanOptional = clanManager.getClanByPlayer(player);
-        if(clanOptional.isEmpty()) return;
-
-        Clan clan = clanOptional.get();
+        Clan clan = clanManager.getClanByPlayer(player).orElseThrow();;
 
         if(!clan.getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.ADMIN)){
             UtilMessage.message(player, "Clans", "Only the Clan Leader and Admins can send invites.");

@@ -33,13 +33,7 @@ public class SetHomeSubCommand extends ClanSubCommand {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        Optional<Clan> playerClanOptional = clanManager.getClanByPlayer(player);
-        if (playerClanOptional.isEmpty()) {
-            UtilMessage.message(player, "Clans", "You are not in a clan");
-            return;
-        }
-
-        Clan playerClan = playerClanOptional.get();
+        Clan playerClan = clanManager.getClanByPlayer(player).orElseThrow();
         if (!playerClan.getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.ADMIN)) {
             UtilMessage.message(player, "Clans", "You must be a clan admin or above to use this command");
             return;

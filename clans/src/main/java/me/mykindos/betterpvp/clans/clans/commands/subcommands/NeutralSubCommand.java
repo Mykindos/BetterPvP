@@ -36,19 +36,13 @@ public class NeutralSubCommand extends ClanSubCommand {
             return;
         }
 
-        Optional<Clan> playerClanOptional = clanManager.getClanByPlayer(player);
-        if(playerClanOptional.isEmpty()) {
-            UtilMessage.message(player, "Clans", "You are not in a clan.");
-            return;
-        }
-
         Optional<Clan> targetClanOptional = clanManager.getObject(args[0]);
         if(targetClanOptional.isEmpty()) {
             UtilMessage.message(player, "Clans", "The target clan does not exist.");
             return;
         }
 
-        Clan playerClan = playerClanOptional.get();
+        Clan playerClan = clanManager.getClanByPlayer(player).orElseThrow();
         Clan targetClan = targetClanOptional.get();
 
         if(playerClan.equals(targetClan)) {

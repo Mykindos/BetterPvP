@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.clans.clans.repository;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
@@ -30,11 +31,9 @@ import org.bukkit.World;
 import javax.sql.rowset.CachedRowSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
+@Slf4j
 @Singleton
 public class ClanRepository implements IRepository<Clan> {
 
@@ -53,7 +52,7 @@ public class ClanRepository implements IRepository<Clan> {
 
     @Override
     public List<Clan> getAll() {
-        List<Clan> clans = new ArrayList<>();
+        List<Clan> clanList = new ArrayList<>();
         String query = "SELECT * FROM " + databasePrefix + "clans;";
         CachedRowSet result = database.executeQuery(new Statement(query));
         try {
@@ -82,7 +81,7 @@ public class ClanRepository implements IRepository<Clan> {
                         .level(level)
                         .lastLogin(lastLogin)
                         .build();
-                clans.add(clan);
+                clanList.add(clan);
 
             }
         } catch (SQLException ex) {
@@ -90,7 +89,7 @@ public class ClanRepository implements IRepository<Clan> {
         }
 
 
-        return clans;
+        return clanList;
     }
 
     @Override
@@ -159,7 +158,7 @@ public class ClanRepository implements IRepository<Clan> {
         database.executeUpdateAsync(new Statement(query, new IntegerStatementValue(clan.getId()), new StringStatementValue(chunk)));
     }
 
-    public List<ClanTerritory> getTerritory(ClanManager clanManager, Clan clan) {
+    public List<ClanTerritory> getTerritory(Clan clan) {
         List<ClanTerritory> territory = new ArrayList<>();
         String query = "SELECT * FROM " + databasePrefix + "clan_territory WHERE Clan = ?;";
         CachedRowSet result = database.executeQuery(new Statement(query, new IntegerStatementValue(clan.getId())));
@@ -191,7 +190,7 @@ public class ClanRepository implements IRepository<Clan> {
                 new StringStatementValue(member.getUuid())));
     }
 
-    public List<ClanMember> getMembers(ClanManager clanManager, Clan clan) {
+    public List<ClanMember> getMembers(Clan clan) {
         List<ClanMember> members = new ArrayList<>();
         String query = "SELECT * FROM " + databasePrefix + "clan_members WHERE Clan = ?;";
         CachedRowSet result = database.executeQuery(new Statement(query, new IntegerStatementValue(clan.getId())));
@@ -245,7 +244,7 @@ public class ClanRepository implements IRepository<Clan> {
                     boolean trusted = result.getBoolean(4);
                     alliances.add(new ClanAlliance(otherClan.get(), trusted));
                 } else {
-                    System.out.println("Could not find clan with id " + result.getInt(3));
+                    log.warn("Could not find clan with id {}", result.getInt(3));
                 }
             }
         } catch (SQLException ex) {
@@ -300,7 +299,7 @@ public class ClanRepository implements IRepository<Clan> {
     }
     //endregion
 
-    public HashMap<Integer, Integer> getDominanceScale() {
+    public Map<Integer, Integer> getDominanceScale() {
         HashMap<Integer, Integer> dominanceScale = new HashMap<>();
         String query = "SELECT * FROM " + databasePrefix + "dominance_scale;";
         CachedRowSet result = database.executeQuery(new Statement(query));

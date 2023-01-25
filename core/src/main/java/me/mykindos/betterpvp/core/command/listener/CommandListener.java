@@ -65,12 +65,12 @@ public class CommandListener implements Listener {
                     var subCommandOptional = getSubCommand(command, args)
                             .or(() -> getSubCommandByAlias(command, finalArgs));
                     if (subCommandOptional.isEmpty()) {
-                        command.execute(event.getPlayer(), client, args);
+                        command.process(event.getPlayer(), client, args);
                     } else {
                         SubCommand subCommand = subCommandOptional.get();
                         if (client.hasRank(subCommand.getRequiredRank()) || event.getPlayer().isOp()) {
                             String[] newArgs = args.length > 1 ? Arrays.copyOfRange(args, 1, args.length) : new String[]{};
-                            subCommand.execute(event.getPlayer(), client, newArgs);
+                            subCommand.process(event.getPlayer(), client, newArgs);
                         } else {
                             promptInsufficientPrivileges(subCommand, event.getPlayer());
                         }

@@ -42,44 +42,42 @@ public class AllySubCommand extends ClanSubCommand {
             return;
         }
 
-        clanManager.getClanByPlayer(player).ifPresentOrElse(clan -> {
-            if (!clan.getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.ADMIN)) {
-                UtilMessage.message(player, "Clans", "Only the clan admins can form alliances.");
-                return;
-            }
+        Clan clan = clanManager.getClanByPlayer(player).orElseThrow();
+        if (!clan.getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.ADMIN)) {
+            UtilMessage.message(player, "Clans", "Only the clan admins can form alliances.");
+            return;
+        }
 
-            Optional<Clan> targetClanOptional = clanManager.getObject(args[0]);
-            if (targetClanOptional.isEmpty()) {
-                UtilMessage.message(player, "Clans", "The clan you want to ally with does not exist.");
-                return;
-            }
+        Optional<Clan> targetClanOptional = clanManager.getObject(args[0]);
+        if (targetClanOptional.isEmpty()) {
+            UtilMessage.message(player, "Clans", "The clan you want to ally with does not exist.");
+            return;
+        }
 
-            Clan targetClan = targetClanOptional.get();
-            if (clan.equals(targetClan)) {
-                UtilMessage.message(player, "Clans", "You cannot ally with your own clan.");
-                return;
-            }
+        Clan targetClan = targetClanOptional.get();
+        if (clan.equals(targetClan)) {
+            UtilMessage.message(player, "Clans", "You cannot ally with your own clan.");
+            return;
+        }
 
-            if (clan.isAllied(targetClan)) {
-                UtilMessage.message(player, "Clans", "You are already allied with this clan.");
-                return;
-            }
+        if (clan.isAllied(targetClan)) {
+            UtilMessage.message(player, "Clans", "You are already allied with this clan.");
+            return;
+        }
 
-            int ownSquadSize = clan.getSquadCount();
-            if (ownSquadSize + targetClan.getMembers().size() >= maxClanMembers) {
-                UtilMessage.message(player, "Clans", "Your clan has too many members / allies to ally another clan.");
-                return;
-            }
+        int ownSquadSize = clan.getSquadCount();
+        if (ownSquadSize + targetClan.getMembers().size() >= maxClanMembers) {
+            UtilMessage.message(player, "Clans", "Your clan has too many members / allies to ally another clan.");
+            return;
+        }
 
-            if (targetClan.getSquadCount() >= maxClanMembers) {
-                UtilMessage.simpleMessage(player, "Clans", "<yellow>%s<gray> has too many members / allies to ally another clan.", targetClan.getName());
-                return;
-            }
+        if (targetClan.getSquadCount() >= maxClanMembers) {
+            UtilMessage.simpleMessage(player, "Clans", "<yellow>%s<gray> has too many members / allies to ally another clan.", targetClan.getName());
+            return;
+        }
 
-            UtilServer.callEvent(new ClanRequestAllianceEvent(player, clan, targetClan));
-        }, () -> {
-            UtilMessage.message(player, "Clans", "You are not in a clan.");
-        });
+        UtilServer.callEvent(new ClanRequestAllianceEvent(player, clan, targetClan));
+
     }
 
     @Override
