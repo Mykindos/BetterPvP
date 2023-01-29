@@ -29,7 +29,6 @@ public class CommandManager extends Manager<ICommand> {
                 }
             }
 
-            String[] newArgs = args.length > 1 ? Arrays.copyOfRange(args, 1, args.length) : new String[]{};
             return Optional.of(command);
 
         }
