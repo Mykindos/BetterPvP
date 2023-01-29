@@ -2,10 +2,10 @@ package me.mykindos.betterpvp.clans.clans.map.commands;
 
 import com.google.inject.Inject;
 import me.mykindos.betterpvp.clans.clans.map.MapHandler;
-import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.SubCommand;
+import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Bukkit;
@@ -48,7 +48,8 @@ public class MapCommand extends Command {
 
     }
 
-    private static class SaveMapSubCommand extends SubCommand {
+    @SubCommand
+    private static class SaveMapSubCommand extends Command {
 
         @Inject
         private MapHandler mapHandler;

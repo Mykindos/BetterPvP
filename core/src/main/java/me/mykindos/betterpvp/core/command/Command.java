@@ -23,7 +23,7 @@ public abstract class Command implements ICommand {
     private Rank requiredRank;
 
     protected List<String> aliases;
-    protected List<SubCommand> subCommands;
+    protected List<ICommand> subCommands;
 
     public Command() {
         aliases = new ArrayList<>();
@@ -40,26 +40,27 @@ public abstract class Command implements ICommand {
         return aliases;
     }
 
-    public List<SubCommand> getSubCommands() {
+    public List<ICommand> getSubCommands() {
         return subCommands;
     }
 
-    public Optional<SubCommand> getSubCommand(String name) {
-        return getSubCommands().stream().filter(subCommand -> subCommand.getName().equalsIgnoreCase(name)).findFirst();
+    public Optional<ICommand> getSubCommand(String name) {
+        return getSubCommands().stream().filter(subCommand -> subCommand.getName().equalsIgnoreCase(name)
+                || subCommand.getAliases().contains(name)).findFirst();
     }
 
     @Override
     public List<String> processTabComplete(CommandSender sender, String[] args) {
         List<String> tabCompletions = new ArrayList<>();
-        if(args.length == 0) return tabCompletions;
+        if (args.length == 0) return tabCompletions;
 
-        if(getArgumentType(1).equals(ArgumentType.SUBCOMMAND.name())){
-            Optional<SubCommand> subCommandOptional = getSubCommand(args[0]);
-            if(subCommandOptional.isPresent()){
-                SubCommand subCommand = subCommandOptional.get();
-                if(subCommand.showTabCompletion(sender)) {
+        if (getArgumentType(1).equals(ArgumentType.SUBCOMMAND.name())) {
+            Optional<ICommand> subCommandOptional = getSubCommand(args[0]);
+            if (subCommandOptional.isPresent()) {
+                ICommand subCommand = subCommandOptional.get();
+                if (subCommand.showTabCompletion(sender)) {
                     return subCommand.processTabComplete(sender, Arrays.copyOfRange(args, 1, args.length));
-                }else{
+                } else {
                     return tabCompletions;
                 }
             }
@@ -70,29 +71,28 @@ public abstract class Command implements ICommand {
 
         switch (getArgumentType(args.length)) {
             case "SUBCOMMAND" -> getSubCommands().forEach(subCommand -> {
-                if(subCommand.showTabCompletion(sender)) {
+                if (subCommand.showTabCompletion(sender)) {
                     if (subCommand.getName().toLowerCase().startsWith(lowercaseArg)) {
                         tabCompletions.add(subCommand.getName());
                         tabCompletions.addAll(subCommand.getAliases());
                     }
                 }
             });
-            case "PLAYER" -> tabCompletions.addAll(Bukkit.getOnlinePlayers().stream().map(Player::getName).filter(name -> name.toLowerCase().
-                    startsWith(lowercaseArg)).toList());
-            case "POSITION_X" -> tabCompletions.add(sender instanceof Player player ? player.getLocation().getX() + "" : "0");
-            case "POSITION_Y" -> tabCompletions.add(sender instanceof Player player ? player.getLocation().getY() + "" : "0");
-            case "POSITION_Z" -> tabCompletions.add(sender instanceof Player player ? player.getLocation().getZ() + "" : "0");
+            case "PLAYER" ->
+                    tabCompletions.addAll(Bukkit.getOnlinePlayers().stream().map(Player::getName).filter(name -> name.toLowerCase().
+                            startsWith(lowercaseArg)).toList());
+            case "POSITION_X" ->
+                    tabCompletions.add(sender instanceof Player player ? player.getLocation().getX() + "" : "0");
+            case "POSITION_Y" ->
+                    tabCompletions.add(sender instanceof Player player ? player.getLocation().getY() + "" : "0");
+            case "POSITION_Z" ->
+                    tabCompletions.add(sender instanceof Player player ? player.getLocation().getZ() + "" : "0");
             case "WORLD" -> tabCompletions.addAll(Bukkit.getWorlds().stream().map(World::getName)
                     .filter(name -> name.toLowerCase().startsWith(lowercaseArg)).toList());
         }
 
 
         return tabCompletions;
-    }
-
-    @Override
-    public Rank getRequiredRank() {
-        return requiredRank;
     }
 
 

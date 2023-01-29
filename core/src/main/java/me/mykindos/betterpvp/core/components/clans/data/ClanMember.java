@@ -3,7 +3,6 @@ package me.mykindos.betterpvp.core.components.clans.data;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
-import lombok.Value;
 import org.bukkit.ChatColor;
 
 import java.util.Arrays;

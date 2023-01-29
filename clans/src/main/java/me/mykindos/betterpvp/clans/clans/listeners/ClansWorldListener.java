@@ -6,7 +6,6 @@ import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
 import me.mykindos.betterpvp.clans.clans.insurance.InsuranceType;
-import me.mykindos.betterpvp.clans.clans.pillage.PillageHandler;
 import me.mykindos.betterpvp.core.client.events.ClientLoginEvent;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.gamer.Gamer;
@@ -119,7 +118,7 @@ public class ClansWorldListener extends ClanListener {
 
 
             } else {
-                if (clan.getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.RECRUIT)) {
+                if (!clan.getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.MEMBER)) {
                     UtilMessage.message(player, "Clans", "Clan Recruits cannot break blocks" + ChatColor.GRAY + ".");
                     event.setCancelled(true);
 
@@ -173,7 +172,7 @@ public class ClansWorldListener extends ClanListener {
                 );
                 event.setCancelled(true);
             } else {
-                if (clan.getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.RECRUIT)) {
+                if (!clan.getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.MEMBER)) {
                     UtilMessage.message(player, "Clans", "Clan Recruits cannot place blocks" + ChatColor.GRAY + ".");
                     event.setCancelled(true);
                 }
@@ -229,7 +228,7 @@ public class ClansWorldListener extends ClanListener {
                     event.setCancelled(true);
                 }
             } else {
-                if (clan.getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.RECRUIT)) {
+                if (!clan.getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.MEMBER)) {
                     if (block.getState() instanceof Container) {
                         UtilMessage.message(player, "Clans", "Clan Recruits cannot access " + ChatColor.GREEN + UtilFormat.cleanString(material.toString())
                                 + ChatColor.GRAY + ".");

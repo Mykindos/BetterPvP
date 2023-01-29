@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public interface ICommand {
 
@@ -24,13 +25,21 @@ public interface ICommand {
     }
 
     Rank getRequiredRank();
+    void setRequiredRank(Rank rank);
 
     default boolean informInsufficientRank() {
         return true;
     }
 
     boolean isEnabled();
+    void setEnabled(boolean enabled);
 
+    Optional<ICommand> getSubCommand(String name);
+    List<ICommand> getSubCommands();
+
+    default boolean showTabCompletion(CommandSender sender) {
+        return true;
+    }
 
     default List<String> processTabComplete(CommandSender sender, String[] args) {
         List<String> tabCompletions = new ArrayList<>();
