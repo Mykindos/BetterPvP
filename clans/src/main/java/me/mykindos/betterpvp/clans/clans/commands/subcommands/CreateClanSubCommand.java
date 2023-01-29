@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
 import me.mykindos.betterpvp.clans.clans.events.ClanCreateEvent;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -15,7 +16,7 @@ import org.bukkit.entity.Player;
 import java.sql.Timestamp;
 import java.util.Optional;
 
-
+@SubCommand
 public class CreateClanSubCommand extends ClanSubCommand {
 
 

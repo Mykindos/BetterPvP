@@ -5,7 +5,6 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.ClientManager;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.Command;
-import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.framework.annotations.WithReflection;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.ChatColor;
@@ -39,7 +38,7 @@ public class ClientCommand extends Command {
         UtilMessage.message(player, "Command", "You must specify a sub command");
     }
 
-    private static class AdminSubCommand extends SubCommand {
+    private static class AdminSubCommand extends Command {
 
         @Override
         public String getName() {
@@ -64,7 +63,7 @@ public class ClientCommand extends Command {
         }
     }
 
-    private static class SearchSubCommand extends SubCommand {
+    private static class SearchSubCommand extends Command {
 
         @Inject
         private ClientManager clientManager;
@@ -112,7 +111,7 @@ public class ClientCommand extends Command {
         }
     }
 
-    private static class PromoteSubCommand extends SubCommand {
+    private static class PromoteSubCommand extends Command {
 
         @Inject
         private ClientManager clientManager;

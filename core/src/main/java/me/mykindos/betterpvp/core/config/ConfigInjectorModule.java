@@ -6,7 +6,6 @@ import me.mykindos.betterpvp.core.config.implementations.ConfigProvider;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 
 import java.lang.reflect.Field;
-import java.sql.SQLOutput;
 import java.util.HashMap;
 import java.util.Set;
 

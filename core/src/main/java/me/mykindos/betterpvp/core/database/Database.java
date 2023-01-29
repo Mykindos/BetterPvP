@@ -100,12 +100,12 @@ public class Database {
      */
     public CachedRowSet executeQuery(Statement statement) {
         Connection connection = getConnection().getDatabaseConnection();
-
         CachedRowSet rowset = null;
 
         try {
             RowSetFactory factory = RowSetProvider.newFactory();
             rowset = factory.createCachedRowSet();
+            rowset.setFetchSize(100);
             @Cleanup
             PreparedStatement preparedStatement = connection.prepareStatement(statement.getQuery());
             for (int i = 1; i <= statement.getValues().length; i++) {

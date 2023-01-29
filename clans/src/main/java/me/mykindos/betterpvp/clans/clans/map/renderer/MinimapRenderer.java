@@ -28,8 +28,11 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.map.*;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.Color;
-import java.util.*;
+import java.awt.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Queue;
 
 @Getter
 @Singleton

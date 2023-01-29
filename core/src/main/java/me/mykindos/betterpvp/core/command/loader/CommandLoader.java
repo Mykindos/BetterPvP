@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.command.loader;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.CommandManager;
+import me.mykindos.betterpvp.core.command.ICommand;
 import me.mykindos.betterpvp.core.command.SpigotCommandWrapper;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.Loader;
@@ -29,20 +30,6 @@ public class CommandLoader extends Loader {
             plugin.getInjector().injectMembers(commandWrapper);
             Bukkit.getCommandMap().register(command.getName(), commandWrapper);
 
-            command.getSubCommands().forEach(sub -> {
-                plugin.getInjector().injectMembers(sub);
-
-                String enabledPath = "command." + command.getName().toLowerCase() + "." + sub.getName().toLowerCase() + ".enabled";
-                String rankPath = "command." + command.getName().toLowerCase() + "." + sub.getName().toLowerCase() + ".requiredRank";
-
-                boolean enabled = plugin.getConfig().getOrSaveBoolean(enabledPath, true);
-                Rank rank = Rank.valueOf(plugin.getConfig().getOrSaveString(rankPath, "ADMIN").toUpperCase());
-
-                sub.setEnabled(enabled);
-                sub.setRequiredRank(rank);
-
-            });
-
             String enabledPath = "command." + command.getName().toLowerCase() + ".enabled";
             String rankPath = "command." + command.getName().toLowerCase() + ".requiredRank";
 
@@ -51,6 +38,8 @@ public class CommandLoader extends Loader {
 
             command.setEnabled(enabled);
             command.setRequiredRank(rank);
+
+            loadSubCommands(command, "command." + command.getName().toLowerCase() + ".");
 
             commandManager.addObject(command.getName().toLowerCase(), command);
 
@@ -68,16 +57,25 @@ public class CommandLoader extends Loader {
             String rankPath = "command." + command.getName().toLowerCase() + ".requiredRank";
             command.setEnabled(plugin.getConfig().getOrSaveBoolean(enabledPath, true));
             command.setRequiredRank(Rank.valueOf(plugin.getConfig().getOrSaveString(rankPath, "ADMIN").toUpperCase()));
-
             plugin.getInjector().injectMembers(command);
-            command.getSubCommands().forEach(subCommand -> {
-                String subEnabledPath = "command." + command.getName().toLowerCase() + "." + subCommand.getName().toLowerCase() + ".enabled";
-                String subRankPath = "command." + command.getName().toLowerCase() + "." + subCommand.getName().toLowerCase() + ".requiredRank";
-                subCommand.setEnabled(plugin.getConfig().getOrSaveBoolean(subEnabledPath, true));
-                subCommand.setRequiredRank(Rank.valueOf(plugin.getConfig().getOrSaveString(subRankPath, "ADMIN").toUpperCase()));
 
-                plugin.getInjector().injectMembers(subCommand);
-            });
+            loadSubCommands(command, "command." + command.getName().toLowerCase() + ".");
+
+        });
+    }
+
+    private void loadSubCommands(ICommand command, String basePath) {
+        command.getSubCommands().forEach(subCommand -> {
+            String subBasePath = basePath + subCommand.getName() + ".";
+            String enabledPath = subBasePath + ".enabled";
+            String rankPath = subBasePath + ".requiredRank";
+
+            subCommand.setEnabled(plugin.getConfig().getOrSaveBoolean(enabledPath, true));
+            subCommand.setRequiredRank(Rank.valueOf(plugin.getConfig().getOrSaveString(rankPath, "ADMIN").toUpperCase()));
+
+            plugin.getInjector().injectMembers(subCommand);
+
+            loadSubCommands(subCommand, subBasePath);
         });
     }
 }

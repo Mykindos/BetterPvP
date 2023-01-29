@@ -2,12 +2,12 @@ package me.mykindos.betterpvp.clans.world;
 
 import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
-import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.framework.ModuleLoadedEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
+import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.*;
 import org.apache.commons.lang.WordUtils;

@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.CommandManager;
+import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.command.loader.CommandLoader;
 import org.reflections.Reflections;
 
@@ -23,7 +24,7 @@ public class ChampionsCommandLoader extends CommandLoader {
         Reflections reflections = new Reflections(packageName);
         Set<Class<? extends Command>> classes = reflections.getSubTypesOf(Command.class);
         for (var clazz : classes) {
-            if (Command.class.isAssignableFrom(clazz)) {
+            if (Command.class.isAssignableFrom(clazz) && !clazz.isAnnotationPresent(SubCommand.class)) {
                 load(clazz);
             }
         }

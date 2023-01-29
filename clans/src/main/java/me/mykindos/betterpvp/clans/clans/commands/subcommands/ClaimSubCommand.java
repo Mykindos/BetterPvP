@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
 import me.mykindos.betterpvp.clans.clans.events.ChunkClaimEvent;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
@@ -19,6 +20,7 @@ import org.bukkit.entity.Player;
 
 import java.util.Optional;
 
+@SubCommand
 public class ClaimSubCommand extends ClanSubCommand {
 
     @Inject

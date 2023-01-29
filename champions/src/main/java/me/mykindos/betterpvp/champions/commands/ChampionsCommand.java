@@ -46,8 +46,8 @@ public class ChampionsCommand extends Command implements IConsoleCommand {
         return Rank.OWNER;
     }
 
-
-    private static class ReloadCommand extends SubCommand implements IConsoleCommand {
+    @SubCommand
+    private static class ReloadCommand extends Command implements IConsoleCommand {
 
         @Inject
         private Champions champions;

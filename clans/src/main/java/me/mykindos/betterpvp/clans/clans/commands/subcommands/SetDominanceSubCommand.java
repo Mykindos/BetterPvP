@@ -4,7 +4,7 @@ import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
 import me.mykindos.betterpvp.core.client.Client;
-import me.mykindos.betterpvp.core.client.Rank;
+import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 
 import java.util.Optional;
 
+@SubCommand
 public class SetDominanceSubCommand extends ClanSubCommand {
 
     public SetDominanceSubCommand(ClanManager clanManager, GamerManager gamerManager) {

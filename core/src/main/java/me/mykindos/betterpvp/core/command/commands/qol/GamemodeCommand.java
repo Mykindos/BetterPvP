@@ -35,7 +35,8 @@ public class GamemodeCommand extends Command {
         UtilMessage.message(player, "Command", "Please specify a valid gamemode");
     }
 
-    private static class SurvivalSubCommand extends SubCommand {
+    @SubCommand
+    private static class SurvivalSubCommand extends Command {
 
         public SurvivalSubCommand() {
             aliases.add("s");
@@ -58,7 +59,8 @@ public class GamemodeCommand extends Command {
         }
     }
 
-    private static class CreativeSubCommand extends SubCommand {
+    @SubCommand
+    private static class CreativeSubCommand extends Command {
 
         public CreativeSubCommand() {
             aliases.add("c");
@@ -81,7 +83,8 @@ public class GamemodeCommand extends Command {
         }
     }
 
-    private static class AdventureSubCommand extends SubCommand {
+    @SubCommand
+    private static class AdventureSubCommand extends Command {
 
         public AdventureSubCommand() {
             aliases.add("a");
@@ -104,7 +107,8 @@ public class GamemodeCommand extends Command {
         }
     }
 
-    private static class SpectatorSubCommand extends SubCommand {
+    @SubCommand
+    private static class SpectatorSubCommand extends Command {
 
         public SpectatorSubCommand() {
             aliases.add("sp");
@@ -125,5 +129,6 @@ public class GamemodeCommand extends Command {
         public void execute(Player player, Client client, String[] args) {
             player.setGameMode(GameMode.SPECTATOR);
         }
+
     }
 }

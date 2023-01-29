@@ -5,7 +5,6 @@ import lombok.Data;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**

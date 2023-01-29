@@ -11,7 +11,6 @@ import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Container;
 
 import java.util.Set;
 
@@ -64,6 +63,8 @@ public class InsuranceListener extends ClanListener {
 
             }
         }
+
+
     }
 
     private boolean shouldRestoreBlock(Material material) {

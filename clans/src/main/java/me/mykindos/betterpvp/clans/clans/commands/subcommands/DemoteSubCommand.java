@@ -4,8 +4,8 @@ import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
 import me.mykindos.betterpvp.clans.clans.events.MemberDemoteEvent;
-import me.mykindos.betterpvp.clans.clans.events.MemberPromoteEvent;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
@@ -15,6 +15,7 @@ import org.bukkit.entity.Player;
 
 import java.util.Optional;
 
+@SubCommand
 public class DemoteSubCommand extends ClanSubCommand {
 
     public DemoteSubCommand(ClanManager clanManager, GamerManager gamerManager) {

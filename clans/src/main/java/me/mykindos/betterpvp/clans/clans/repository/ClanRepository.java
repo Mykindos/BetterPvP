@@ -329,7 +329,7 @@ public class ClanRepository implements IRepository<Clan> {
         String query = "INSERT INTO " + databasePrefix + "insurance VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         Location location = insurance.getBlockLocation();
-        database.executeUpdate(new Statement(query,
+        database.executeUpdateAsync(new Statement(query,
                 new IntegerStatementValue(clan.getId()), new StringStatementValue(insurance.getInsuranceType().name()),
                 new StringStatementValue(insurance.getBlockMaterial().name()), new StringStatementValue(insurance.getBlockData()),
                 new LongStatementValue(insurance.getTime()), new IntegerStatementValue(location.getBlockX()),
@@ -343,7 +343,7 @@ public class ClanRepository implements IRepository<Clan> {
         String query = "SELECT * FROM " + databasePrefix + "insurance WHERE Clan = ? ORDER BY Time ASC";
         CachedRowSet result = database.executeQuery(new Statement(query, new IntegerStatementValue(clan.getId())));
         try {
-            if (result.next()) {
+            while (result.next()) {
                 InsuranceType insuranceType = InsuranceType.valueOf(result.getString(2));
                 Material material = Material.valueOf(result.getString(3));
                 String blockData = result.getString(4);
