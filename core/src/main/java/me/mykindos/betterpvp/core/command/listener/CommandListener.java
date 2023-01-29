@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.client.ClientManager;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.CommandManager;
 import me.mykindos.betterpvp.core.command.ICommand;
+import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.entity.Player;
@@ -57,7 +58,9 @@ public class CommandListener implements Listener {
             return;
         }
 
-        commandOptional.ifPresent(command -> {
+        if (commandOptional.isPresent()) {
+            ICommand command = commandOptional.get();
+
             if (!command.isEnabled()) {
                 log.info(event.getPlayer().getName() + " attempted to use " + command.getName() + " but it is disabled");
                 return;
@@ -68,14 +71,15 @@ public class CommandListener implements Listener {
                 return;
             }
 
-            int subCommandIndex = commandManager.getSubCommandIndex(finalCommandName, finalArgs);
-            String[] newArgs = finalArgs.length > 1 ? Arrays.copyOfRange(finalArgs, subCommandIndex + 1, finalArgs.length) : new String[]{};
+            if (command.getClass().isAnnotationPresent(SubCommand.class)) {
+                int subCommandIndex = commandManager.getSubCommandIndex(finalCommandName, finalArgs);
+                finalArgs = finalArgs.length > 1 ? Arrays.copyOfRange(finalArgs, subCommandIndex + 1, finalArgs.length) : new String[]{};
+            }
 
-            command.process(event.getPlayer(), client, newArgs);
+            command.process(event.getPlayer(), client, finalArgs);
 
             event.setCancelled(true);
-        });
-
+        }
     }
 
     private void promptInsufficientPrivileges(ICommand command, Player player) {
