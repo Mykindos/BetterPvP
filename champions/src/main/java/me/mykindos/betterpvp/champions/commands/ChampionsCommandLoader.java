@@ -23,13 +23,12 @@ public class ChampionsCommandLoader extends CommandLoader {
     public void loadCommands(String packageName) {
         Reflections reflections = new Reflections(packageName);
         Set<Class<? extends Command>> classes = reflections.getSubTypesOf(Command.class);
-        for (var clazz : classes) {
-            if (Command.class.isAssignableFrom(clazz) && !clazz.isAnnotationPresent(SubCommand.class)) {
-                load(clazz);
-            }
-        }
+        loadAll(classes);
+
+        Set<Class<?>> subCommandClasses = reflections.getTypesAnnotatedWith(SubCommand.class);
+        loadSubCommands(subCommandClasses);
 
         plugin.saveConfig();
-        log.info("Loaded " + count + " commands for Champions");
+        log.info("Loaded {} commands for Champions", count);
     }
 }

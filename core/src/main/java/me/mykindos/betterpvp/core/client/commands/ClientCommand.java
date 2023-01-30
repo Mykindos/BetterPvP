@@ -1,10 +1,12 @@
 package me.mykindos.betterpvp.core.client.commands;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.ClientManager;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.Command;
+import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.framework.annotations.WithReflection;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.ChatColor;
@@ -14,14 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Singleton
 public class ClientCommand extends Command {
-
-    @WithReflection
-    public ClientCommand() {
-        subCommands.add(new AdminSubCommand());
-        subCommands.add(new SearchSubCommand());
-        subCommands.add(new PromoteSubCommand());
-    }
 
     @Override
     public String getName() {
@@ -38,6 +34,8 @@ public class ClientCommand extends Command {
         UtilMessage.message(player, "Command", "You must specify a sub command");
     }
 
+    @Singleton
+    @SubCommand(ClientCommand.class)
     private static class AdminSubCommand extends Command {
 
         @Override
@@ -63,6 +61,8 @@ public class ClientCommand extends Command {
         }
     }
 
+    @Singleton
+    @SubCommand(ClientCommand.class)
     private static class SearchSubCommand extends Command {
 
         @Inject
@@ -111,6 +111,8 @@ public class ClientCommand extends Command {
         }
     }
 
+    @Singleton
+    @SubCommand(ClientCommand.class)
     private static class PromoteSubCommand extends Command {
 
         @Inject

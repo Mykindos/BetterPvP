@@ -1,21 +1,52 @@
 package me.mykindos.betterpvp.core.command.loader;
 
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.client.Rank;
-import me.mykindos.betterpvp.core.command.Command;
-import me.mykindos.betterpvp.core.command.CommandManager;
-import me.mykindos.betterpvp.core.command.ICommand;
-import me.mykindos.betterpvp.core.command.SpigotCommandWrapper;
+import me.mykindos.betterpvp.core.command.*;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.Loader;
 import org.bukkit.Bukkit;
 
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+@Slf4j
 public class CommandLoader extends Loader {
 
     protected final CommandManager commandManager;
+    protected final List<ICommand> tempCommands;
 
     public CommandLoader(BPvPPlugin plugin, CommandManager commandManager) {
         super(plugin);
         this.commandManager = commandManager;
+        this.tempCommands = new ArrayList<>();
+    }
+
+    public void loadAll(Set<Class<? extends Command>> classes) {
+        for (var clazz : classes) {
+            if (Command.class.isAssignableFrom(clazz) && !clazz.isAnnotationPresent(SubCommand.class)) {
+                if (!Modifier.isAbstract(clazz.getModifiers())) {
+                    load(clazz);
+                }
+            }
+        }
+    }
+
+    public void loadSubCommands(Set<Class<?>> classes) {
+        for (var clazz : classes) {
+            SubCommand subCommandAnnotation = clazz.getAnnotation(SubCommand.class);
+            ICommand command = plugin.getInjector().getInstance(subCommandAnnotation.value());
+            ICommand subCommand = (ICommand) plugin.getInjector().getInstance(clazz);
+            plugin.getInjector().injectMembers(subCommand);
+            log.info("Added {} to {} sub commands", subCommand.getName(), command.getName());
+            command.getSubCommands().add(subCommand);
+
+        }
+
+        tempCommands.forEach(command -> loadSubCommandsConfig(command, "command." + command.getName().toLowerCase() + "."));
+        tempCommands.clear();
     }
 
     @Override
@@ -39,8 +70,7 @@ public class CommandLoader extends Loader {
             command.setEnabled(enabled);
             command.setRequiredRank(rank);
 
-            loadSubCommands(command, "command." + command.getName().toLowerCase() + ".");
-
+            tempCommands.add(command);
             commandManager.addObject(command.getName().toLowerCase(), command);
 
             count++;
@@ -52,19 +82,19 @@ public class CommandLoader extends Loader {
     @Override
     public void reload(String packageName) {
         commandManager.getObjects().values().forEach(command -> {
-            if(!command.getClass().getPackageName().contains(packageName)) return;
+            if (!command.getClass().getPackageName().contains(packageName)) return;
             String enabledPath = "command." + command.getName().toLowerCase() + ".enabled";
             String rankPath = "command." + command.getName().toLowerCase() + ".requiredRank";
             command.setEnabled(plugin.getConfig().getOrSaveBoolean(enabledPath, true));
             command.setRequiredRank(Rank.valueOf(plugin.getConfig().getOrSaveString(rankPath, "ADMIN").toUpperCase()));
             plugin.getInjector().injectMembers(command);
 
-            loadSubCommands(command, "command." + command.getName().toLowerCase() + ".");
+            loadSubCommandsConfig(command, "command." + command.getName().toLowerCase() + ".");
 
         });
     }
 
-    private void loadSubCommands(ICommand command, String basePath) {
+    protected void loadSubCommandsConfig(ICommand command, String basePath) {
         command.getSubCommands().forEach(subCommand -> {
             String subBasePath = basePath + subCommand.getName() + ".";
             String enabledPath = subBasePath + ".enabled";
@@ -75,7 +105,7 @@ public class CommandLoader extends Loader {
 
             plugin.getInjector().injectMembers(subCommand);
 
-            loadSubCommands(subCommand, subBasePath);
+            loadSubCommandsConfig(subCommand, subBasePath);
         });
     }
 }

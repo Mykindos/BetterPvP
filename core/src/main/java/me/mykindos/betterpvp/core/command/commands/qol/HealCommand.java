@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.command.commands.qol;
 
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -7,7 +8,9 @@ import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+@Singleton
 public class HealCommand extends Command {
+
     @Override
     public String getName() {
         return "heal";

@@ -1,8 +1,10 @@
 package me.mykindos.betterpvp.clans.clans.commands.subcommands;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
+import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
 import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
 import me.mykindos.betterpvp.clans.clans.events.ChunkUnclaimEvent;
 import me.mykindos.betterpvp.core.client.Client;
@@ -16,13 +18,15 @@ import org.bukkit.entity.Player;
 
 import java.util.Optional;
 
-@SubCommand
+@Singleton
+@SubCommand(ClanCommand.class)
 public class UnclaimSubCommand extends ClanSubCommand {
 
     @Inject
     @Config(path = "clans.claims.additional", defaultValue = "3")
     private int additionalClaims;
 
+    @Inject
     public UnclaimSubCommand(ClanManager clanManager, GamerManager gamerManager) {
         super(clanManager, gamerManager);
     }

@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.clans.clans.commands.chatcommands;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.gamer.Gamer;
@@ -12,6 +13,7 @@ import org.bukkit.entity.Player;
 
 import java.util.Optional;
 
+@Singleton
 public class ClanChatCommand extends Command {
 
     private final GamerManager gamerManager;

@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.command.commands.qol;
 
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.SubCommand;
@@ -8,16 +9,13 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 
+@Singleton
 public class GamemodeCommand extends Command {
 
     @WithReflection
     public GamemodeCommand() {
         aliases.add("gm");
 
-        subCommands.add(new CreativeSubCommand());
-        subCommands.add(new SurvivalSubCommand());
-        subCommands.add(new AdventureSubCommand());
-        subCommands.add(new SpectatorSubCommand());
     }
 
     @Override
@@ -35,7 +33,8 @@ public class GamemodeCommand extends Command {
         UtilMessage.message(player, "Command", "Please specify a valid gamemode");
     }
 
-    @SubCommand
+    @Singleton
+    @SubCommand(GamemodeCommand.class)
     private static class SurvivalSubCommand extends Command {
 
         public SurvivalSubCommand() {
@@ -59,7 +58,8 @@ public class GamemodeCommand extends Command {
         }
     }
 
-    @SubCommand
+    @Singleton
+    @SubCommand(GamemodeCommand.class)
     private static class CreativeSubCommand extends Command {
 
         public CreativeSubCommand() {
@@ -83,7 +83,8 @@ public class GamemodeCommand extends Command {
         }
     }
 
-    @SubCommand
+    @Singleton
+    @SubCommand(GamemodeCommand.class)
     private static class AdventureSubCommand extends Command {
 
         public AdventureSubCommand() {
@@ -107,7 +108,8 @@ public class GamemodeCommand extends Command {
         }
     }
 
-    @SubCommand
+    @Singleton
+    @SubCommand(GamemodeCommand.class)
     private static class SpectatorSubCommand extends Command {
 
         public SpectatorSubCommand() {
@@ -131,4 +133,5 @@ public class GamemodeCommand extends Command {
         }
 
     }
+
 }
