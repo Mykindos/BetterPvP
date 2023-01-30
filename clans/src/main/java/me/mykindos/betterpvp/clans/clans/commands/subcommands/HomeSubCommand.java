@@ -1,7 +1,10 @@
 package me.mykindos.betterpvp.clans.clans.commands.subcommands;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
+import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
 import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.SubCommand;
@@ -11,9 +14,11 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.entity.Player;
 
-@SubCommand
+@Singleton
+@SubCommand(ClanCommand.class)
 public class HomeSubCommand extends ClanSubCommand {
 
+    @Inject
     public HomeSubCommand(ClanManager clanManager, GamerManager gamerManager) {
         super(clanManager, gamerManager);
     }

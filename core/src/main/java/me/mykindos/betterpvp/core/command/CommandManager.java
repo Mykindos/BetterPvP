@@ -3,7 +3,6 @@ package me.mykindos.betterpvp.core.command;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 

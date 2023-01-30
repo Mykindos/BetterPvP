@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.command.commands.admin;
 
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.Command;
@@ -12,7 +13,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-@WithReflection
+@Singleton
 public class KickCommand extends Command implements IConsoleCommand {
 
 

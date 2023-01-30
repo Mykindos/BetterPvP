@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.command.commands.general;
 
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.framework.annotations.WithReflection;
@@ -11,7 +12,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 
-@WithReflection
+@Singleton
 public class ListCommand extends Command {
 
     @Override

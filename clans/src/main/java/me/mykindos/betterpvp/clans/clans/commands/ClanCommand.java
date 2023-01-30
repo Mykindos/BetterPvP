@@ -1,8 +1,8 @@
 package me.mykindos.betterpvp.clans.clans.commands;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
-import me.mykindos.betterpvp.clans.clans.commands.subcommands.*;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.framework.annotations.WithReflection;
@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
+@Singleton
 public class ClanCommand extends Command {
 
     private final ClanManager clanManager;
@@ -24,26 +25,6 @@ public class ClanCommand extends Command {
         this.gamerManager = gamerManager;
 
         aliases.addAll(List.of("c", "f", "faction"));
-
-        subCommands.add(new InfoSubCommand(clanManager, gamerManager));
-        subCommands.add(new HomeSubCommand(clanManager, gamerManager));
-        subCommands.add(new SetHomeSubCommand(clanManager, gamerManager));
-        subCommands.add(new CreateClanSubCommand(clanManager, gamerManager));
-        subCommands.add(new DisbandClanSubCommand(clanManager, gamerManager));
-        subCommands.add(new ClaimSubCommand(clanManager, gamerManager));
-        subCommands.add(new UnclaimSubCommand(clanManager, gamerManager));
-        subCommands.add(new InviteSubCommand(clanManager, gamerManager));
-        subCommands.add(new JoinSubCommand(clanManager, gamerManager));
-        subCommands.add(new LeaveSubCommand(clanManager, gamerManager));
-        subCommands.add(new PromoteSubCommand(clanManager, gamerManager));
-        subCommands.add(new DemoteSubCommand(clanManager, gamerManager));
-        subCommands.add(new KickSubCommand(clanManager, gamerManager));
-        subCommands.add(new AllySubCommand(clanManager, gamerManager));
-        subCommands.add(new EnemySubCommand(clanManager, gamerManager));
-        subCommands.add(new NeutralSubCommand(clanManager, gamerManager));
-        subCommands.add(new AddOutskirtsSubCommand(clanManager, gamerManager));
-        subCommands.add(new ClanRecoveryCommand(clanManager, gamerManager));
-        subCommands.add(new SetDominanceSubCommand(clanManager, gamerManager));
 
     }
 

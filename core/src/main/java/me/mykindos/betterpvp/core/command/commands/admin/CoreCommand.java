@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.command.commands.admin;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
@@ -14,12 +15,8 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+@Singleton
 public class CoreCommand extends Command implements IConsoleCommand {
-
-    @WithReflection
-    public CoreCommand() {
-        subCommands.add(new ReloadCommand());
-    }
 
     @Override
     public String getName() {
@@ -46,7 +43,8 @@ public class CoreCommand extends Command implements IConsoleCommand {
         return Rank.OWNER;
     }
 
-    @SubCommand
+    @Singleton
+    @SubCommand(CoreCommand.class)
     private static class ReloadCommand extends Command implements IConsoleCommand {
 
         @Inject

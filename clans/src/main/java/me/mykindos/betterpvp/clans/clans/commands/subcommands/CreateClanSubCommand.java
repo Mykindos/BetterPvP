@@ -1,8 +1,10 @@
 package me.mykindos.betterpvp.clans.clans.commands.subcommands;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
+import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
 import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
 import me.mykindos.betterpvp.clans.clans.events.ClanCreateEvent;
 import me.mykindos.betterpvp.core.client.Client;
@@ -16,10 +18,9 @@ import org.bukkit.entity.Player;
 import java.sql.Timestamp;
 import java.util.Optional;
 
-@SubCommand
+@Singleton
+@SubCommand(ClanCommand.class)
 public class CreateClanSubCommand extends ClanSubCommand {
-
-
 
     @Inject
     @Config(path = "command.clan.create.maxCharactersInClanName", defaultValue = "13")
@@ -29,6 +30,7 @@ public class CreateClanSubCommand extends ClanSubCommand {
     @Config(path = "command.clan.create.minCharactersInClanName", defaultValue = "3")
     private int minCharactersInClanName;
 
+    @Inject
     public CreateClanSubCommand(ClanManager clanManager, GamerManager gamerManager) {
         super(clanManager, gamerManager);
     }

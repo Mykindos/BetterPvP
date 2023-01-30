@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.command.commands.qol;
 
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.framework.annotations.WithReflection;
@@ -9,6 +10,7 @@ import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.entity.Player;
 
+@Singleton
 public class TeleportWorldCommand extends Command {
 
     @WithReflection

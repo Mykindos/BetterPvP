@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.champions.commands;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.skills.SkillManager;
 import me.mykindos.betterpvp.champions.listeners.ChampionsListenerLoader;
@@ -14,12 +15,9 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+@Singleton
 public class ChampionsCommand extends Command implements IConsoleCommand {
 
-    @WithReflection
-    public ChampionsCommand() {
-        subCommands.add(new ReloadCommand());
-    }
 
     @Override
     public String getName() {
@@ -46,7 +44,8 @@ public class ChampionsCommand extends Command implements IConsoleCommand {
         return Rank.OWNER;
     }
 
-    @SubCommand
+    @Singleton
+    @SubCommand(ChampionsCommand.class)
     private static class ReloadCommand extends Command implements IConsoleCommand {
 
         @Inject

@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.clans.clans.map.commands;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.clans.map.MapHandler;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
@@ -14,6 +15,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
 
+@Singleton
 public class MapCommand extends Command {
 
     private final ItemHandler itemHandler;
@@ -21,7 +23,6 @@ public class MapCommand extends Command {
     @Inject
     public MapCommand(ItemHandler itemHandler){
         this.itemHandler = itemHandler;
-        subCommands.add(new SaveMapSubCommand());
     }
 
     @Override
@@ -48,7 +49,8 @@ public class MapCommand extends Command {
 
     }
 
-    @SubCommand
+    @Singleton
+    @SubCommand(MapCommand.class)
     private static class SaveMapSubCommand extends Command {
 
         @Inject

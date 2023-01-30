@@ -8,12 +8,10 @@ import me.mykindos.betterpvp.core.command.CommandManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import org.reflections.Reflections;
 
-import java.lang.reflect.Modifier;
 import java.util.Set;
 
 @Slf4j
 public class CoreCommandLoader extends CommandLoader{
-
 
     @Inject
     public CoreCommandLoader(Core plugin, CommandManager commandManager) {
@@ -23,16 +21,12 @@ public class CoreCommandLoader extends CommandLoader{
     public void loadCommands(String packageName) {
         Reflections reflections = new Reflections(packageName);
         Set<Class<? extends Command>> classes = reflections.getSubTypesOf(Command.class);
-        for (var clazz : classes) {
-            if (Command.class.isAssignableFrom(clazz) && !clazz.isAnnotationPresent(SubCommand.class)) {
-                if(!Modifier.isAbstract(clazz.getModifiers())) {
-                    load(clazz);
-                }
-            }
-        }
+        loadAll(classes);
+
+        Set<Class<?>> subCommandClasses = reflections.getTypesAnnotatedWith(SubCommand.class);
+        loadSubCommands(subCommandClasses);
 
         plugin.saveConfig();
-
         log.info("Loaded {} commands for Core", count);
     }
 

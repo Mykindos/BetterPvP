@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.clans.commands.commands;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.commands.ClansCommandLoader;
 import me.mykindos.betterpvp.clans.listener.ClansListenerLoader;
@@ -14,12 +15,8 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+@Singleton
 public class ClansCommand extends Command implements IConsoleCommand {
-
-    @WithReflection
-    public ClansCommand() {
-        subCommands.add(new ReloadCommand());
-    }
 
     @Override
     public String getName() {
@@ -46,7 +43,8 @@ public class ClansCommand extends Command implements IConsoleCommand {
         return Rank.OWNER;
     }
 
-    @SubCommand
+    @Singleton
+    @SubCommand(ClansCommand.class)
     private static class ReloadCommand extends Command implements IConsoleCommand {
 
         @Inject
