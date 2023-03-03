@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.components.clans.data.ClanTerritory;
 import me.mykindos.betterpvp.core.framework.inviting.Invitable;
+import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
@@ -22,7 +23,7 @@ import java.util.*;
 
 @Data
 @Builder
-public class Clan implements IClan, Invitable {
+public class Clan extends PropertyContainer implements IClan, Invitable {
 
     private int id;
     private String name;
@@ -194,4 +195,8 @@ public class Clan implements IClan, Invitable {
         return false;
     }
 
+    @Override
+    public void saveProperty(String key, Object object, boolean updateScoreboard) {
+        properties.put(key, object);
+    }
 }

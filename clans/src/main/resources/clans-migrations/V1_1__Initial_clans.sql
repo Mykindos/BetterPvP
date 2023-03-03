@@ -96,3 +96,11 @@ create table if not exists ${tablePrefix}insurance
     Y             int           not null,
     Z             int           not null
 );
+
+create table if not exists ${tablePrefix}clan_properties
+(
+    Clan     int not null,
+    Property varchar(255) not null,
+    Value    varchar(255) null,
+    primary key (Clan, Property)
+);

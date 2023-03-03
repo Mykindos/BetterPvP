@@ -32,6 +32,7 @@ import javax.sql.rowset.CachedRowSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Singleton
@@ -44,10 +45,13 @@ public class ClanRepository implements IRepository<Clan> {
     private final Clans clans;
     private final Database database;
 
+    private final ConcurrentHashMap<String, Statement> queuedPropertyUpdates;
+
     @Inject
     public ClanRepository(Clans clans, Database database) {
         this.clans = clans;
         this.database = database;
+        this.queuedPropertyUpdates = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -81,6 +85,7 @@ public class ClanRepository implements IRepository<Clan> {
                         .level(level)
                         .lastLogin(lastLogin)
                         .build();
+                loadProperties(clan);
                 clanList.add(clan);
 
             }
@@ -90,6 +95,49 @@ public class ClanRepository implements IRepository<Clan> {
 
 
         return clanList;
+    }
+
+    private void loadProperties(Clan clan) {
+        String query = "SELECT properties.Property, Value, Type FROM " + databasePrefix + "clan_properties properties INNER JOIN "
+                + "property_map map on properties.Property = map.Property WHERE Clan = ?";
+        CachedRowSet result = database.executeQuery(new Statement(query, new IntegerStatementValue(clan.getId())));
+        try {
+            while (result.next()) {
+                String value = result.getString(1);
+                String type = result.getString(3);
+                Object property = switch (type) {
+                    case "int" -> result.getInt(2);
+                    case "boolean" -> Boolean.parseBoolean(result.getString(2));
+                    case "double" -> Double.parseDouble(result.getString(2));
+                    default -> Class.forName(type).cast(result.getObject(2));
+                };
+
+                clan.putProperty(value, property);
+            }
+        } catch (SQLException | ClassNotFoundException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public void saveProperty(Clan clan, String property, Object value) {
+        String savePropertyQuery = "INSERT INTO " + databasePrefix + "clan_properties (Clan, Property, Value) VALUES (?, ?, ?)"
+                + " ON DUPLICATE KEY UPDATE Value = ?";
+        Statement statement = new Statement(savePropertyQuery,
+                new IntegerStatementValue(clan.getId()),
+                new StringStatementValue(property),
+                new StringStatementValue(value.toString()),
+                new StringStatementValue(value.toString()));
+        queuedPropertyUpdates.put(clan.getId() + property, statement);
+    }
+
+    public void processPropertyUpdates(boolean async){
+        ConcurrentHashMap<String, Statement> statements = new ConcurrentHashMap<>(queuedPropertyUpdates);
+        queuedPropertyUpdates.clear();
+
+        List<Statement> statementList = statements.values().stream().toList();
+        database.executeBatch(statementList, async);
+
+        log.info("Updated clan properties with {} queries", statements.size());
     }
 
     @Override

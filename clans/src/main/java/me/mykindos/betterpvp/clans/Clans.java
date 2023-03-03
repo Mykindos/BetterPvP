@@ -5,6 +5,7 @@ import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.Setter;
+import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.commands.ClansCommandLoader;
 import me.mykindos.betterpvp.clans.injector.ClansInjectorModule;
 import me.mykindos.betterpvp.clans.listener.ClansListenerLoader;
@@ -42,7 +43,7 @@ public class Clans extends BPvPPlugin {
     @Config(path = "clans.database.prefix", defaultValue = "clans_")
     private String databasePrefix;
 
-    private GamerManager gamerManager;
+    private ClanManager clanManager;
 
     @Override
     public void onEnable() {
@@ -69,8 +70,8 @@ public class Clans extends BPvPPlugin {
             var clansCommandLoader = injector.getInstance(ClansCommandLoader.class);
             clansCommandLoader.loadCommands(PACKAGE);
 
-            gamerManager = injector.getInstance(GamerManager.class);
-            gamerManager.loadFromList(gamerManager.getGamerRepository().getAll());
+            clanManager = injector.getInstance(ClanManager.class);
+            clanManager.loadFromList(clanManager.getRepository().getAll());
 
             updateEventExecutor.loadPlugin(this);
         }
@@ -78,6 +79,6 @@ public class Clans extends BPvPPlugin {
 
     @Override
     public void onDisable() {
-        gamerManager.getGamerRepository().processStatUpdates(false);
+        clanManager.getRepository().processPropertyUpdates(false);
     }
 }

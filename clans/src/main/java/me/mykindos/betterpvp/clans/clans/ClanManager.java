@@ -59,20 +59,7 @@ public class ClanManager extends Manager<Clan> {
         this.dominanceScale = new HashMap<>();
         this.insuranceQueue = new ConcurrentLinkedQueue<>();
 
-        var clans = repository.getAll();
-        loadFromList(clans);
-
-        clans.forEach(clan -> {
-            clan.setTerritory(repository.getTerritory(clan));
-            clan.setAlliances(repository.getAlliances(this, clan));
-            clan.setEnemies(repository.getEnemies(this, clan));
-            clan.setMembers(repository.getMembers(clan));
-            clan.setInsurance(repository.getInsurance(clan));
-        });
-
         dominanceScale = repository.getDominanceScale();
-
-        log.info("Loaded {} clans", clans.size());
 
     }
 
@@ -345,6 +332,16 @@ public class ClanManager extends Manager<Clan> {
 
     @Override
     public void loadFromList(List<Clan> objects) {
-        objects.forEach(clan -> addObject(clan.getName().toLowerCase(), clan));
+        objects.forEach(clan -> {
+            clan.setTerritory(repository.getTerritory(clan));
+            clan.setAlliances(repository.getAlliances(this, clan));
+            clan.setEnemies(repository.getEnemies(this, clan));
+            clan.setMembers(repository.getMembers(clan));
+            clan.setInsurance(repository.getInsurance(clan));
+
+            addObject(clan.getName().toLowerCase(), clan);
+        });
+
+        log.info("Loaded {} clans", objects.size());
     }
 }
