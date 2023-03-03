@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.properties;
 
 import lombok.Getter;
+import me.mykindos.betterpvp.core.framework.customtypes.MyConcurrentHashMap;
 
 import java.util.Map;
 import java.util.Optional;
@@ -13,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public abstract class PropertyContainer {
 
     @Getter
-    protected final Map<String, Object> properties = new ConcurrentHashMap<>();
+    protected final MyConcurrentHashMap<String, Object> properties = new MyConcurrentHashMap<>();
 
     /**
      * Get a property by enum key.

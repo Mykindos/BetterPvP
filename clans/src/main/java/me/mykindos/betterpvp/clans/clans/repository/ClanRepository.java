@@ -158,6 +158,7 @@ public class ClanRepository implements IRepository<Clan> {
             try {
                 if (result.next()) {
                     clan.setId(result.getInt(1));
+                    clan.saveDefaultProperties();
                 }
             } catch (SQLException ex) {
                 ex.printStackTrace();

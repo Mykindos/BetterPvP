@@ -26,12 +26,6 @@ public class ClanPropertyListener extends ClanListener{
     @EventHandler
     public void onSettingsUpdated(ClanPropertyUpdateEvent event) {
         clanManager.getRepository().saveProperty(event.getClan(), event.getProperty(), event.getValue());
-
-        if(event.isUpdateScoreboard()) {
-            event.getClan().getMembersAsPlayers().forEach(player -> {
-                UtilServer.callEvent(new ScoreboardUpdateEvent(player));
-            });
-        }
     }
 
     @UpdateEvent(delay = 120_000)
