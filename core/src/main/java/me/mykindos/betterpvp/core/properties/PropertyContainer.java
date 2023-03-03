@@ -3,9 +3,7 @@ package me.mykindos.betterpvp.core.properties;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.framework.customtypes.MyConcurrentHashMap;
 
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Simple container for properties.

@@ -14,7 +14,6 @@ import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.client.properties.ClientPropertyUpdateEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.events.lunar.LunarClientEvent;
-import me.mykindos.betterpvp.core.framework.events.scoreboard.ScoreboardUpdateEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
@@ -33,7 +32,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @BPvPListener
 public class ClientListener implements Listener {
@@ -55,7 +53,7 @@ public class ClientListener implements Listener {
         Optional<Client> clientOptional = clientManager.getObject(uuid);
         Client client;
         if (clientOptional.isEmpty()) {
-            client = Client.builder().uuid(uuid).name(event.getPlayer().getName()).rank(Rank.PLAYER).build();
+            client = new Client(uuid, event.getPlayer().getName(), Rank.PLAYER);
             clientManager.addObject(uuid, client);
             clientManager.getRepository().save(client);
 
@@ -136,15 +134,7 @@ public class ClientListener implements Listener {
 
     @EventHandler
     public void onSettingsUpdated(ClientPropertyUpdateEvent event) {
-
         clientManager.getRepository().saveProperty(event.getClient(), event.getProperty(), event.getValue());
-
-        if (event.isUpdateScoreboard()) {
-            Player player = Bukkit.getPlayer(UUID.fromString(event.getClient().getUuid()));
-            if (player != null) {
-                UtilServer.callEvent(new ScoreboardUpdateEvent(player));
-            }
-        }
     }
 
     private void checkUnsetProperties(Client client) {

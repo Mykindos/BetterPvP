@@ -10,11 +10,7 @@ public class ClanPropertyUpdateEvent extends PropertyUpdateEvent {
     private final Clan clan;
 
     public ClanPropertyUpdateEvent(Clan clan, String property, Object value) {
-        this(clan, property, value, false);
-    }
-
-    public ClanPropertyUpdateEvent(Clan clan, String property, Object value, boolean updateScoreboard) {
-        super(property, value, updateScoreboard);
+        super(property, value);
         this.clan = clan;
     }
 

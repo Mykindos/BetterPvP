@@ -9,8 +9,8 @@ public class ClientPropertyUpdateEvent extends PropertyUpdateEvent {
 
     private final Client client;
 
-    public ClientPropertyUpdateEvent(Client client, String property, Object object, boolean updateScoreboard) {
-        super(property, object, updateScoreboard);
+    public ClientPropertyUpdateEvent(Client client, String property, Object object) {
+        super(property, object);
         this.client = client;
     }
 }

@@ -16,7 +16,6 @@ import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.ModuleLoadedEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
 import org.bukkit.Bukkit;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;

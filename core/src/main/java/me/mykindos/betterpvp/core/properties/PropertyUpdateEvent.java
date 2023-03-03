@@ -12,6 +12,5 @@ public class PropertyUpdateEvent extends CustomCancellableEvent {
 
     private final String property;
     private final Object value;
-    private boolean updateScoreboard;
 
 }

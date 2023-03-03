@@ -9,7 +9,6 @@ import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.IConsoleCommand;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.command.loader.CoreCommandLoader;
-import me.mykindos.betterpvp.core.framework.annotations.WithReflection;
 import me.mykindos.betterpvp.core.listener.loader.CoreListenerLoader;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.command.CommandSender;
