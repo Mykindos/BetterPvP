@@ -2,15 +2,19 @@ package me.mykindos.betterpvp.clans.clans;
 
 import lombok.Builder;
 import lombok.Data;
+import me.mykindos.betterpvp.clans.clans.events.ClanPropertyUpdateEvent;
 import me.mykindos.betterpvp.clans.clans.insurance.Insurance;
 import me.mykindos.betterpvp.core.components.clans.IClan;
 import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.components.clans.data.ClanTerritory;
+import me.mykindos.betterpvp.core.framework.customtypes.IMapListener;
+import me.mykindos.betterpvp.core.framework.events.scoreboard.ScoreboardUpdateEvent;
 import me.mykindos.betterpvp.core.framework.inviting.Invitable;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -23,7 +27,7 @@ import java.util.*;
 
 @Data
 @Builder
-public class Clan extends PropertyContainer implements IClan, Invitable {
+public class Clan extends PropertyContainer implements IClan, Invitable, IMapListener {
 
     private int id;
     private String name;
@@ -41,6 +45,17 @@ public class Clan extends PropertyContainer implements IClan, Invitable {
     private long lastTnted;
 
     private boolean online;
+
+    public void saveDefaultProperties() {
+        properties.registerListener(this);
+        saveProperty(ClanProperty.TIME_CREATED, System.currentTimeMillis());
+        saveProperty(ClanProperty.LAST_LOGIN, System.currentTimeMillis());
+        saveProperty(ClanProperty.LEVEL, 1);
+        saveProperty(ClanProperty.POINTS, 0);
+        saveProperty(ClanProperty.ENERGY, 2400);
+        saveProperty(ClanProperty.RAID_COOLDOWN, 0);
+        saveProperty(ClanProperty.LAST_TNTED, 0);
+    }
 
     @Builder.Default
     private List<ClanMember> members = new ArrayList<>();
@@ -198,5 +213,13 @@ public class Clan extends PropertyContainer implements IClan, Invitable {
     @Override
     public void saveProperty(String key, Object object, boolean updateScoreboard) {
         properties.put(key, object);
+        if(updateScoreboard) {
+            getMembersAsPlayers().forEach(player -> UtilServer.callEvent(new ScoreboardUpdateEvent(player)));
+        }
+    }
+
+    @Override
+    public void onMapValueChanged(String key, Object value) {
+        UtilServer.callEvent(new ClanPropertyUpdateEvent(this, key, value));
     }
 }
