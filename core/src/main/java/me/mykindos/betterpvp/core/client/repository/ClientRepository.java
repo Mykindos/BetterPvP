@@ -46,7 +46,7 @@ public class ClientRepository implements IRepository<Client> {
                 String name = result.getString(3);
                 Rank rank = Rank.valueOf(result.getString(4));
 
-                Client client = Client.builder().uuid(uuid).name(name).rank(rank).build();
+                Client client = new Client(uuid, name, rank);
                 loadProperties(client);
                 clients.add(client);
             }
