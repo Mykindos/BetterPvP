@@ -1,9 +1,9 @@
 {
 	"__comment": "Designed by Waify with Cubik Studio - https://cubik.studio",
 	"textures": {
-		"particle": "items/particle",
-		"texture": "items/texture",
-		"voxels_atlas": "items/dwarvenpickaxe"
+		"particle": "item/particle",
+		"texture": "item/texture",
+		"voxels_atlas": "item/dwarvenpickaxe"
 	},
 	"elements": [ 	 
 		{
