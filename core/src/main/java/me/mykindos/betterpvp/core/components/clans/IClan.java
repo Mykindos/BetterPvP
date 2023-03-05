@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public interface IClan {
 
-    int getId();
+    UUID getId();
     String getName();
 
     boolean isAdmin();

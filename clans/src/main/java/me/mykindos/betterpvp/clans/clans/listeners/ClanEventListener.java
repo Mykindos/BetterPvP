@@ -4,6 +4,8 @@ import com.google.inject.Inject;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
+import me.mykindos.betterpvp.clans.clans.ClanProperty;
+import me.mykindos.betterpvp.clans.clans.data.ClanDefaultValues;
 import me.mykindos.betterpvp.clans.clans.events.*;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
@@ -113,6 +115,15 @@ public class ClanEventListener extends ClanListener {
 
         clanManager.addObject(clan.getName().toLowerCase(), clan);
         clanManager.getRepository().save(clan);
+
+        var defaultValues = clans.getInjector().getInstance(ClanDefaultValues.class);
+        clan.saveProperty(ClanProperty.TIME_CREATED, System.currentTimeMillis());
+        clan.saveProperty(ClanProperty.LAST_LOGIN, System.currentTimeMillis());
+        clan.saveProperty(ClanProperty.LEVEL, defaultValues.getDefaultLevel());
+        clan.saveProperty(ClanProperty.POINTS, defaultValues.getDefaultPoints());
+        clan.saveProperty(ClanProperty.ENERGY, defaultValues.getDefaultEnergy());
+        clan.saveProperty(ClanProperty.RAID_COOLDOWN, 0);
+        clan.saveProperty(ClanProperty.LAST_TNTED, 0);
 
         UtilMessage.message(event.getPlayer(), "Clans", "Successfully created clan " + ChatColor.AQUA + clan.getName());
     }

@@ -97,7 +97,7 @@ public class GamerRepository implements IRepository<Gamer> {
                 new StringStatementValue(gamer.getUuid())
         ));
 
-        gamer.getProperties().forEach((key, value) -> saveProperty(gamer, key, value));
+        gamer.getProperties().getMap().forEach((key, value) -> saveProperty(gamer, key, value));
     }
 
     public void saveProperty(Gamer gamer, String property, Object value) {
