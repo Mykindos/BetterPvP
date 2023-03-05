@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.clans.clans;
 
-import lombok.Builder;
 import lombok.Data;
 import me.mykindos.betterpvp.clans.clans.events.ClanPropertyUpdateEvent;
 import me.mykindos.betterpvp.clans.clans.insurance.Insurance;
@@ -22,62 +21,58 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.sql.Timestamp;
 import java.util.*;
 
 @Data
-@Builder
 public class Clan extends PropertyContainer implements IClan, Invitable, IMapListener {
 
-    private int id;
+    private final UUID id;
     private String name;
-    private Timestamp timeCreated;
-    private Timestamp lastLogin;
     private Location home;
-    private int energy;
-    private int points;
-    private int level;
-    private long cooldown;
-
     private boolean admin;
     private boolean safe;
-
-    private long lastTnted;
-
     private boolean online;
 
-    public void saveDefaultProperties() {
-        properties.registerListener(this);
-        saveProperty(ClanProperty.TIME_CREATED, System.currentTimeMillis());
-        saveProperty(ClanProperty.LAST_LOGIN, System.currentTimeMillis());
-        saveProperty(ClanProperty.LEVEL, 1);
-        saveProperty(ClanProperty.POINTS, 0);
-        saveProperty(ClanProperty.ENERGY, 2400);
-        saveProperty(ClanProperty.RAID_COOLDOWN, 0);
-        saveProperty(ClanProperty.LAST_TNTED, 0);
+    private List<ClanMember> members = new ArrayList<>();
+    private List<ClanAlliance> alliances = new ArrayList<>();
+    private List<ClanEnemy> enemies = new ArrayList<>();
+    private List<ClanTerritory> territory = new ArrayList<>();
+    private List<Insurance> insurance = Collections.synchronizedList(new ArrayList<>());
+
+    public long getTimeCreated() {
+        return (long) getProperty(ClanProperty.TIME_CREATED).orElse(0);
     }
 
-    @Builder.Default
-    private List<ClanMember> members = new ArrayList<>();
+    public long getLastLogin() {
+        return (long) getProperty(ClanProperty.LAST_LOGIN).orElse(0);
+    }
 
-    @Builder.Default
-    private List<ClanAlliance> alliances = new ArrayList<>();
+    public int getEnergy() {
+        return (int) getProperty(ClanProperty.ENERGY).orElse(9999);
+    }
 
-    @Builder.Default
-    private List<ClanEnemy> enemies = new ArrayList<>();
+    public int getPoints() {
+        return (int) getProperty(ClanProperty.POINTS).orElse(0);
+    }
 
-    @Builder.Default
-    private List<ClanTerritory> territory = new ArrayList<>();
+    public int getLevel() {
+        return (int) getProperty(ClanProperty.LEVEL).orElse(1);
+    }
 
-    @Builder.Default
-    private List<Insurance> insurance = Collections.synchronizedList(new ArrayList<>());
+    public long getRaidCooldown() {
+        return (long) getProperty(ClanProperty.RAID_COOLDOWN).orElse(0);
+    }
+
+    public long getLastTntedTime() {
+        return (long) getProperty(ClanProperty.LAST_TNTED).orElse(0);
+    }
 
     public Optional<ClanMember> getLeader() {
         return members.stream().filter(clanMember -> clanMember.getRank() == ClanMember.MemberRank.LEADER).findFirst();
     }
 
     public String getAge() {
-        return UtilTime.getTime(System.currentTimeMillis() - timeCreated.getTime(), UtilTime.TimeUnit.BEST, 1);
+        return UtilTime.getTime(System.currentTimeMillis() - getTimeCreated(), UtilTime.TimeUnit.BEST, 1);
     }
 
     /**

@@ -11,7 +11,7 @@ public class ChampionsPropertyUpdateEvent extends PropertyUpdateEvent {
     private final Gamer gamer;
 
     public ChampionsPropertyUpdateEvent(Gamer gamer, String property, Object value) {
-        super(property, value, false);
+        super(property, value);
         this.gamer = gamer;
     }
 }

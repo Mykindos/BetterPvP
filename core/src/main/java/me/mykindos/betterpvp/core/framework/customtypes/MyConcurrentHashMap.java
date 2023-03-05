@@ -9,6 +9,10 @@ public class MyConcurrentHashMap<K, V> {
     private final ConcurrentHashMap<K, V> myMap = new ConcurrentHashMap<>();
     private final List<IMapListener> listeners = new ArrayList<>();
 
+    public ConcurrentHashMap<K, V> getMap() {
+        return myMap;
+    }
+
     public void put(K key, V value) {
         myMap.put(key, value);
         listeners.forEach(l -> l.onMapValueChanged(key.toString(), value));

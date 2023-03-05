@@ -12,11 +12,13 @@ import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.sql.Timestamp;
 import java.util.Optional;
+import java.util.UUID;
 
 @Singleton
 @SubCommand(ClanCommand.class)
@@ -75,13 +77,13 @@ public class CreateClanSubCommand extends ClanSubCommand {
 
         Optional<Clan> clanOptional = clanManager.getObject(clanName.toLowerCase());
         if (clanOptional.isEmpty()) {
-            var timestamp = new Timestamp(System.currentTimeMillis());
-            Clan clan = Clan.builder().name(clanName).level(1)
-                    .timeCreated(timestamp).lastLogin(timestamp)
-                    .online(true)
-                    .admin(client.isAdministrating())
-                    .build();
-            Bukkit.getPluginManager().callEvent(new ClanCreateEvent(player, clan));
+            Clan clan = new Clan(UUID.randomUUID());
+            clan.setName(clanName);
+            clan.setOnline(true);
+            clan.setAdmin(client.isAdministrating());
+            clan.getProperties().registerListener(clan);
+
+            UtilServer.callEvent(new ClanCreateEvent(player, clan));
         } else {
             UtilMessage.message(player, "Command", "A clan with that name already exists.");
         }

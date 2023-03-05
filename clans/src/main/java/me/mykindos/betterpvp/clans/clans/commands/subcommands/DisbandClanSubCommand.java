@@ -59,9 +59,9 @@ public class DisbandClanSubCommand extends ClanSubCommand {
                 return;
             }
 
-            if (System.currentTimeMillis() < clan.getLastTnted()) {
+            if (System.currentTimeMillis() < clan.getLastTntedTime()) {
                 UtilMessage.message(player, "Clans", "You cannot disband your clan for "
-                        + ChatColor.GREEN + UtilTime.getTime(clan.getLastTnted() - System.currentTimeMillis(), UtilTime.TimeUnit.BEST, 1));
+                        + ChatColor.GREEN + UtilTime.getTime(clan.getLastTntedTime() - System.currentTimeMillis(), UtilTime.TimeUnit.BEST, 1));
                 return;
             }
 

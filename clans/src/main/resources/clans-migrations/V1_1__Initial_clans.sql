@@ -1,16 +1,10 @@
 create table if not exists ${tablePrefix}clans
 (
-    id        int         auto_increment,
+    id        varchar(36) not null,
     Name      varchar(32) not null,
-    Created   TIMESTAMP   null default CURRENT_TIMESTAMP,
     Home      varchar(64) null,
     Admin     tinyint     null default 0,
     Safe      tinyint     null default 0,
-    Energy    int         null default 0,
-    Points    int         null default 0,
-    Cooldown  bigint      null default 0,
-    Level     int         null default 1,
-    LastLogin TIMESTAMP   null default CURRENT_TIMESTAMP,
     constraint clans_pk
         primary key (id)
 );
@@ -21,7 +15,7 @@ create unique index ${tablePrefix}clans_Name_uindex
 create table if not exists ${tablePrefix}clan_territory
 (
     id        int         auto_increment not null,
-    Clan      int         not null,
+    Clan      varchar(36) not null,
     Chunk     varchar(64) not null,
     constraint clan_territory_pk
         primary key (id)
@@ -33,7 +27,7 @@ create unique index ${tablePrefix}clans_territory_Clan_Chunk_uindex
 create table if not exists ${tablePrefix}clan_members
 (
     id        int         auto_increment not null,
-    Clan      int         not null,
+    Clan      varchar(36) not null,
     Member    varchar(64) not null,
     `Rank`    varchar(64) not null default 'RECRUIT',
     constraint clan_members_pk
@@ -46,7 +40,7 @@ create unique index ${tablePrefix}clans_members_Clan_Member_uindex
 create table if not exists ${tablePrefix}clan_alliances
 (
     id        int         auto_increment not null,
-    Clan      int         not null,
+    Clan      varchar(36) not null,
     AllyClan  int         not null,
     Trusted   tinyint     default 0,
     constraint clan_alliances_pk
@@ -58,9 +52,9 @@ create unique index ${tablePrefix}clans_alliances_Clan_AllyClan_uindex
 
 create table if not exists ${tablePrefix}clan_enemies
 (
-    id        int         auto_increment not null,
-    Clan      int         not null,
-    EnemyClan  int        not null,
+    id         int         auto_increment not null,
+    Clan       varchar(36) not null,
+    EnemyClan  varchar(36) not null,
     Dominance  tinyint    default 0,
     constraint clan_enemies_pk
         primary key (id)
@@ -87,7 +81,7 @@ INSERT IGNORE INTO ${tablePrefix}dominance_scale VALUES (6, 6);
 
 create table if not exists ${tablePrefix}insurance
 (
-    Clan          int           not null,
+    Clan          varchar(36) not null,
     InsuranceType varchar(255)  not null,
     Material      varchar(255)  not null,
     Data          varchar(1000) null,
@@ -99,7 +93,7 @@ create table if not exists ${tablePrefix}insurance
 
 create table if not exists ${tablePrefix}clan_properties
 (
-    Clan     int not null,
+    Clan     varchar(36)  not null,
     Property varchar(255) not null,
     Value    varchar(255) null,
     primary key (Clan, Property)

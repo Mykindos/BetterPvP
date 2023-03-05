@@ -63,8 +63,8 @@ public class ClanManager extends Manager<Clan> {
 
     }
 
-    public Optional<Clan> getClanById(int id) {
-        return objects.values().stream().filter(clan -> clan.getId() == id).findFirst();
+    public Optional<Clan> getClanById(UUID id) {
+        return objects.values().stream().filter(clan -> clan.getId().equals(id)).findFirst();
     }
 
     public Optional<Clan> getClanByClient(Client client) {
