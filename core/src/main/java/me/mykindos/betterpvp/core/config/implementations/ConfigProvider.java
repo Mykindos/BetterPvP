@@ -1,14 +1,15 @@
 package me.mykindos.betterpvp.core.config.implementations;
 
-import com.google.inject.Provider;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
+
+import javax.inject.Provider;
 
 public class ConfigProvider<T> implements Provider<T> {
 
     private final BPvPPlugin plugin;
     private final String configPath;
     private final String defaultValue;
-    private final Class<T> type;
+    private Class<T> type;
 
     public ConfigProvider(BPvPPlugin plugin, String configPath, String defaultValue, Class<T> type) {
         this.plugin = plugin;
@@ -17,18 +18,23 @@ public class ConfigProvider<T> implements Provider<T> {
         this.defaultValue = defaultValue;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public T get() {
 
         Object castedDefault = defaultValue;
-        if(type == Integer.class) {
+        if(type == int.class) {
             castedDefault = Integer.parseInt(defaultValue);
-        }else if(type == Double.class){
+            type = (Class<T>) Integer.class;
+        }else if(type == double.class){
             castedDefault = Double.parseDouble(defaultValue);
-        }else if(type == Boolean.class){
+            type = (Class<T>) Double.class;
+        }else if(type == boolean.class){
             castedDefault = Boolean.parseBoolean(defaultValue);
-        }else if(type == Long.class) {
+            type = (Class<T>) Boolean.class;
+        }else if(type == long.class) {
             castedDefault = Long.parseLong(defaultValue);
+            type = (Class<T>) Long.class;
         }
 
         T value = plugin.getConfig().getOrSaveObject(configPath, castedDefault, type);
