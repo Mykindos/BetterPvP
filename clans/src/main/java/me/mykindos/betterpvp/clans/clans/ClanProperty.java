@@ -13,5 +13,6 @@ public enum ClanProperty {
     POINTS,
     ENERGY,
     RAID_COOLDOWN,
-    LAST_TNTED
+    LAST_TNTED,
+    BALANCE
 }

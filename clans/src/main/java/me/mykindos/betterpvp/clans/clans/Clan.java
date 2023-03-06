@@ -67,6 +67,10 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
         return (long) getProperty(ClanProperty.LAST_TNTED).orElse(0);
     }
 
+    public int getBalance() {
+        return (int) getProperty(ClanProperty.BALANCE).orElse(0);
+    }
+
     public Optional<ClanMember> getLeader() {
         return members.stream().filter(clanMember -> clanMember.getRank() == ClanMember.MemberRank.LEADER).findFirst();
     }

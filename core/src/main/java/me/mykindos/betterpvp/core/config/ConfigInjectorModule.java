@@ -10,17 +10,16 @@ import java.util.HashMap;
 import java.util.Set;
 
 
-
 public class ConfigInjectorModule extends AbstractModule {
 
     private final BPvPPlugin plugin;
     private final Set<Field> fields;
     private final HashMap<String, ConfigProvider<?>> providers;
 
-    public ConfigInjectorModule(BPvPPlugin plugin, Set<Field> fields){
+    public ConfigInjectorModule(BPvPPlugin plugin, Set<Field> fields) {
         this.plugin = plugin;
-        providers = new HashMap<>();
         this.fields = fields;
+        this.providers = new HashMap<>();
     }
 
     @Override
@@ -28,32 +27,23 @@ public class ConfigInjectorModule extends AbstractModule {
 
         for (var field : fields) {
             Config config = field.getAnnotation(Config.class);
-            if(config == null) continue;
+            if (config == null) continue;
 
             Config conf = new ConfigImpl(config.path(), config.defaultValue());
 
-            if (field.getType().isAssignableFrom(String.class)) {
-                bind(String.class).annotatedWith(conf).toProvider(getProvider(config.path(), config.defaultValue(), String.class));
-            } else if (field.getType().isAssignableFrom(int.class)) {
-                bind(int.class).annotatedWith(conf).toProvider(getProvider(config.path(), config.defaultValue(), Integer.class));
-            }else if(field.getType().isAssignableFrom(double.class)){
-                bind(double.class).annotatedWith(conf).toProvider(getProvider(config.path(), config.defaultValue(), Double.class));
-            } else if (field.getType().isAssignableFrom(boolean.class)) {
-                bind(boolean.class).annotatedWith(conf).toProvider(getProvider(config.path(), config.defaultValue(), Boolean.class));
-            }else if(field.getType().isAssignableFrom(long.class)) {
-                bind(long.class).annotatedWith(conf).toProvider(getProvider(config.path(), config.defaultValue(), Long.class));
-            }
+            Class<?> type = field.getType();
+            bind(type).annotatedWith(conf).toProvider(getProvider(config.path(), config.defaultValue(), type));
 
         }
 
     }
 
     @SuppressWarnings("unchecked")
-    private <T> ConfigProvider<T> getProvider(String path, String defaultValue, Class<?> type){
+    private <T> ConfigProvider<T> getProvider(String path, String defaultValue, Class<?> type) {
         ConfigProvider<?> provider;
-        if(providers.containsKey(path)){
-            provider =  providers.get(path);
-        }else{
+        if (providers.containsKey(path)) {
+            provider = providers.get(path);
+        } else {
             provider = new ConfigProvider<>(plugin, path, defaultValue, type);
             providers.put(path, provider);
         }
