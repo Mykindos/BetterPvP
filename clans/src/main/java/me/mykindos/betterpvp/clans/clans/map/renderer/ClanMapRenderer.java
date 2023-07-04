@@ -6,7 +6,7 @@ import me.mykindos.betterpvp.clans.clans.map.MapHandler;
 import me.mykindos.betterpvp.clans.clans.map.data.ChunkData;
 import me.mykindos.betterpvp.clans.clans.map.data.MapSettings;
 import me.mykindos.betterpvp.core.components.clans.IClan;
-import net.minecraft.world.level.material.MaterialColor;
+import net.minecraft.world.level.material.MapColor;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -77,7 +77,7 @@ public class ClanMapRenderer extends MapRenderer {
 
             final boolean admin = clan.isAdmin();
 
-            byte chunkDataColor = chunkData.getColor().getPackedId(MaterialColor.Brightness.NORMAL);
+            byte chunkDataColor = chunkData.getColor().getPackedId(MapColor.Brightness.NORMAL);
 
             for (int cx = 0; cx < 16 / scale; cx++) {
                 for (int cz = 0; cz < 16 / scale; cz++) {

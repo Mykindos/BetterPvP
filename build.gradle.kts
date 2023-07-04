@@ -1,5 +1,5 @@
 plugins {
-    id("io.papermc.paperweight.userdev") version "1.3.8" apply false
+    id("io.papermc.paperweight.userdev") version "1.5.5" apply false
 }
 
 subprojects {

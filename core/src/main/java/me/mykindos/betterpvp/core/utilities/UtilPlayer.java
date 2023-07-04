@@ -4,6 +4,7 @@ import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
+import lombok.SneakyThrows;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
@@ -116,6 +117,7 @@ public class UtilPlayer {
         return e.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
     }
 
+    @SneakyThrows
     public static void setGlowing(Player player, Player target, boolean glowing) {
         PacketContainer packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.ENTITY_METADATA);
         packet.getIntegers().write(0, target.getEntityId()); //Set packet's entity id

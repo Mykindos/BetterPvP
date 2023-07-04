@@ -5,7 +5,6 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import lombok.Getter;
 import lombok.Setter;
-import me.mykindos.betterpvp.core.chat.encryption.ChatEncoder;
 import me.mykindos.betterpvp.core.client.ClientManager;
 import me.mykindos.betterpvp.core.command.loader.CoreCommandLoader;
 import me.mykindos.betterpvp.core.config.Config;
@@ -76,8 +75,6 @@ public class Core extends BPvPPlugin {
         updateEventExecutor.loadPlugin(this);
         updateEventExecutor.initialize();
 
-        // Remove chat signatures in 1.19
-        addListener(listenerKey, channel -> channel.pipeline().addAfter("packet_handler", "unsafechat_handler", new ChatEncoder()));
     }
 
     @Override

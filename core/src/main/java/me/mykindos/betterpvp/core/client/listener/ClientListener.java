@@ -5,6 +5,7 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import com.google.inject.Inject;
+import lombok.SneakyThrows;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.ClientManager;
 import me.mykindos.betterpvp.core.client.Rank;
@@ -117,6 +118,7 @@ public class ClientListener implements Listener {
         Bukkit.getOnlinePlayers().forEach(this::updateTab);
     }
 
+    @SneakyThrows
     public void updateTab(Player player) {
 
         PacketContainer pc = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.PLAYER_LIST_HEADER_FOOTER);

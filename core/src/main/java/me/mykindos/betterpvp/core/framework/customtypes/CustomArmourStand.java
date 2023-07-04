@@ -7,7 +7,7 @@ import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_19_R2.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_20_R1.entity.CraftEntity;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
 /**
@@ -21,7 +21,7 @@ public class CustomArmourStand extends ArmorStand {
 
     public CraftEntity spawn(Location loc) {
         this.absMoveTo(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        this.level.addFreshEntity(this, CreatureSpawnEvent.SpawnReason.CUSTOM);
+        this.level().addFreshEntity(this, CreatureSpawnEvent.SpawnReason.CUSTOM);
         return getBukkitEntity();
     }
 

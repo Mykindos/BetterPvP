@@ -21,7 +21,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
-import net.minecraft.world.level.material.MaterialColor;
+import net.minecraft.world.level.material.MapColor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -238,7 +238,7 @@ public class MapListener implements Listener {
             for (Player online : Bukkit.getOnlinePlayers()) {
 
                 Clan otherClan = clanManager.getClanByPlayer(online).orElse(null);
-                MaterialColor materialColor = getColourForClan(clan, otherClan);
+                MapColor materialColor = getColourForClan(clan, otherClan);
 
                 if (!mapHandler.clanMapData.containsKey(online.getUniqueId())) {
                     mapHandler.clanMapData.put(online.getUniqueId(), new HashSet<>());
@@ -363,7 +363,7 @@ public class MapListener implements Listener {
 
         for (Clan clan : clanManager.getObjects().values()) {
 
-            MaterialColor materialColor = getColourForClan(pClan, clan);
+            MapColor materialColor = getColourForClan(pClan, clan);
 
             for (ClanTerritory claim : clan.getTerritory()) {
                 Chunk chunk = UtilWorld.stringToChunk(claim.getChunk());
@@ -447,17 +447,17 @@ public class MapListener implements Listener {
         return ChatColor.WHITE + "Zoom: " + ChatColor.GREEN + (1 << scale.getValue()) + "x";
     }
 
-    private MaterialColor getColourForClan(Clan playerClan, Clan otherClan) {
+    private MapColor getColourForClan(Clan playerClan, Clan otherClan) {
         ClanRelation clanRelation = clanManager.getRelation(playerClan, otherClan);
-        MaterialColor materialColor = clanRelation.getMaterialColor();
+        MapColor materialColor = clanRelation.getMaterialColor();
 
         if (otherClan.isSafe()) {
-            materialColor = MaterialColor.SNOW;
+            materialColor = MapColor.SNOW;
         } else if (otherClan.isAdmin() && !otherClan.isSafe()) {
             if (otherClan.getName().equals("Outskirts") || playerClan.getName().equalsIgnoreCase("Outskirts")) {
-                materialColor = MaterialColor.COLOR_ORANGE;
+                materialColor = MapColor.COLOR_ORANGE;
             } else {
-                materialColor = MaterialColor.COLOR_RED;
+                materialColor = MapColor.COLOR_RED;
             }
         }
 

@@ -13,7 +13,7 @@ import me.mykindos.betterpvp.clans.clans.map.events.MinimapExtraCursorEvent;
 import me.mykindos.betterpvp.clans.clans.map.nms.UtilMapMaterial;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import net.minecraft.world.level.material.MaterialColor;
+import net.minecraft.world.level.material.MapColor;
 import org.bukkit.Bukkit;
 import org.bukkit.HeightMap;
 import org.bukkit.Material;
@@ -159,15 +159,15 @@ public class MinimapRenderer extends MapRenderer implements Listener {
 
                         double d2 = (mapPixel.getAverageY() - prevY) * 4.0D / (scale + 4) + ((i + j & 1) - 0.5D) * 0.4D;
 
-                        MaterialColor.Brightness brightness = MaterialColor.Brightness.NORMAL;
+                        MapColor.Brightness brightness = MapColor.Brightness.NORMAL;
 
                         if (d2 > 0.6D) {
-                            brightness = MaterialColor.Brightness.HIGH;
+                            brightness = MapColor.Brightness.HIGH;
                         } else if (d2 < -0.6D) {
-                            brightness = MaterialColor.Brightness.LOW;
+                            brightness = MapColor.Brightness.LOW;
                         }
 
-                        MaterialColor materialColor = MaterialColor.byId(mapPixel.getColorId());
+                        MapColor materialColor = MapColor.byId(mapPixel.getColorId());
                         canvas.setPixel(i, j, materialColor.getPackedId(brightness));
                     } else {
                         for (int k = -scale; k < scale; k++) {
