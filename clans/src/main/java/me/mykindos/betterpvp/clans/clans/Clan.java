@@ -15,8 +15,8 @@ import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -69,6 +69,10 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
 
     public int getBalance() {
         return (int) getProperty(ClanProperty.BALANCE).orElse(0);
+    }
+
+    public void setBalance(int balance) {
+        putProperty(ClanProperty.BALANCE, balance);
     }
 
     public Optional<ClanMember> getLeader() {
@@ -135,6 +139,13 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
         return null;
     }
 
+    /**
+     * @return Returns true if any clan has 90% or more dominance on this clan
+     */
+    public boolean isAlmostDominated() {
+        return getEnemies().stream().anyMatch(enemy -> enemy.getClan().getEnemy(this).orElseThrow().getDominance() >= 90);
+    }
+
 
     public String getDominanceString(Clan clan) {
         ClanEnemy enemy = getEnemy(clan);
@@ -142,13 +153,13 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
         if (enemy != null && theirEnemy != null) {
             String text = "";
             if(enemy.getDominance() > 0){
-                text = ChatColor.GREEN.toString() + enemy.getDominance() + "%";
+                text = NamedTextColor.GREEN.toString() + enemy.getDominance() + "%";
             }else if(theirEnemy.getDominance() > 0) {
-                text = ChatColor.RED.toString() + theirEnemy.getDominance() + "%";
+                text = NamedTextColor.RED.toString() + theirEnemy.getDominance() + "%";
             }else {
                 return "";
             }
-            return ChatColor.GRAY + " (" + text + ChatColor.GRAY + ")" + ChatColor.GRAY;
+            return NamedTextColor.GRAY + " (" + text + NamedTextColor.GRAY + ")" + NamedTextColor.GRAY;
         }
         return "";
     }
@@ -159,12 +170,12 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
 
         if (enemy != null && theirEnemy != null) {
             if (theirEnemy.getDominance() == 0 && enemy.getDominance() == 0) {
-                return ChatColor.WHITE + " 0";
+                return NamedTextColor.WHITE + " 0";
             }
             if (theirEnemy.getDominance() > 0) {
-                return ChatColor.GREEN + " " + theirEnemy.getDominance() + "%";
+                return NamedTextColor.GREEN + " " + theirEnemy.getDominance() + "%";
             } else {
-                return ChatColor.DARK_RED + " " + enemy.getDominance() + "%";
+                return NamedTextColor.DARK_RED + " " + enemy.getDominance() + "%";
             }
 
         }

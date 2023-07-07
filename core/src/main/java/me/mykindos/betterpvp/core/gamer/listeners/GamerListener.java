@@ -58,9 +58,9 @@ public class GamerListener implements Listener {
     }
 
     private void checkUnsetProperties(Gamer gamer) {
-        Optional<Integer> coinsOptional = gamer.getProperty(GamerProperty.COINS);
+        Optional<Integer> coinsOptional = gamer.getProperty(GamerProperty.BALANCE);
         if(coinsOptional.isEmpty()){
-            gamer.saveProperty(GamerProperty.COINS, defaultCoins);
+            gamer.saveProperty(GamerProperty.BALANCE, defaultCoins);
         }
 
         Optional<Integer> fragmentsOptional = gamer.getProperty(GamerProperty.FRAGMENTS);

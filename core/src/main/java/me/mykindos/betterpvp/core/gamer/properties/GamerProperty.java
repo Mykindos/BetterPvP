@@ -17,7 +17,7 @@ public enum GamerProperty {
     STAFF_CHAT,
 
     // Currency
-    COINS,
+    BALANCE,
     FRAGMENTS,
 
     // Blocks

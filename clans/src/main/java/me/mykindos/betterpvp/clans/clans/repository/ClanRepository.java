@@ -94,6 +94,7 @@ public class ClanRepository implements IRepository<Clan> {
                     case "int" -> result.getInt(2);
                     case "boolean" -> Boolean.parseBoolean(result.getString(2));
                     case "double" -> Double.parseDouble(result.getString(2));
+                    case "long" -> Long.parseLong(result.getString(2));
                     default -> Class.forName(type).cast(result.getObject(2));
                 };
 

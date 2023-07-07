@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,11 +36,25 @@ public class SpigotCommandWrapper extends org.bukkit.command.Command {
     public @NotNull List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args, @Nullable Location location) {
         List<String> aliases = new ArrayList<>();
 
+        if (args.length == 0) return new ArrayList<>();
+
         if (sender instanceof Player player) {
             Optional<Client> clientOptional = clientManager.getObject(player.getUniqueId().toString());
             if (clientOptional.isPresent()) {
                 if (!clientOptional.get().hasRank(this.command.getRequiredRank()) && !sender.isOp()) {
                     return aliases;
+                }
+            }
+        }
+
+        if (command.getArgumentType(1).equals(ICommand.ArgumentType.SUBCOMMAND.name())) {
+            Optional<ICommand> subCommandOptional = command.getSubCommand(args[0]);
+            if (subCommandOptional.isPresent()) {
+                ICommand subCommand = subCommandOptional.get();
+                if (subCommand.showTabCompletion(sender)) {
+                    return subCommand.processTabComplete(sender, Arrays.copyOfRange(args, 1, args.length));
+                } else {
+                    return new ArrayList<>();
                 }
             }
         }
