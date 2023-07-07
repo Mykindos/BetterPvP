@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.framework.customtypes.IMapListener;
 import me.mykindos.betterpvp.core.framework.events.scoreboard.ScoreboardUpdateEvent;
 import me.mykindos.betterpvp.core.framework.inviting.Invitable;
+import me.mykindos.betterpvp.core.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.gamer.properties.GamerPropertyUpdateEvent;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -25,14 +26,17 @@ public class Gamer extends PropertyContainer implements Invitable, IMapListener 
     private final Client client;
     private final String uuid;
 
+    private long lastDamaged;
+
     public Gamer(Client client, String uuid){
         this.client = client;
         this.uuid = uuid;
         properties.registerListener(this);
     }
 
-
-    private long lastDamaged;
+    public int getBalance() {
+        return (int) getProperty(GamerProperty.BALANCE).orElse(0);
+    }
 
     @Override
     public void saveProperty(String key, Object object, boolean updateScoreboard) {
@@ -50,4 +54,5 @@ public class Gamer extends PropertyContainer implements Invitable, IMapListener 
     public void onMapValueChanged(String key, Object value) {
         UtilServer.callEvent(new GamerPropertyUpdateEvent( this, key, value));
     }
+
 }

@@ -8,10 +8,7 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Getter
 public abstract class Command implements ICommand {
@@ -54,20 +51,7 @@ public abstract class Command implements ICommand {
         List<String> tabCompletions = new ArrayList<>();
         if (args.length == 0) return tabCompletions;
 
-        if (getArgumentType(1).equals(ArgumentType.SUBCOMMAND.name())) {
-            Optional<ICommand> subCommandOptional = getSubCommand(args[0]);
-            if (subCommandOptional.isPresent()) {
-                ICommand subCommand = subCommandOptional.get();
-                if (subCommand.showTabCompletion(sender)) {
-                    return subCommand.processTabComplete(sender, Arrays.copyOfRange(args, 1, args.length));
-                } else {
-                    return tabCompletions;
-                }
-            }
-        }
-
         String lowercaseArg = args[args.length - 1].toLowerCase();
-
 
         switch (getArgumentType(args.length)) {
             case "SUBCOMMAND" -> getSubCommands().forEach(subCommand -> {

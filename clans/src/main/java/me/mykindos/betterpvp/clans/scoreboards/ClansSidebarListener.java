@@ -98,7 +98,7 @@ public class ClansSidebarListener implements Listener {
             }
 
 
-            Optional<Integer> coinsOptional = gamer.getProperty(GamerProperty.COINS);
+            Optional<Integer> coinsOptional = gamer.getProperty(GamerProperty.BALANCE);
             if (coinsOptional.isPresent()) {
                 sidebarObjective.getScore(ChatColor.YELLOW.toString() + ChatColor.BOLD + "Coins").setScore(9);
                 sidebarObjective.getScore(ChatColor.GOLD.toString() + ChatColor.BOLD + UtilFormat.formatNumber(coinsOptional.get())).setScore(8);

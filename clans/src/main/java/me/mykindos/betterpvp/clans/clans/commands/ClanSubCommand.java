@@ -5,6 +5,7 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.Command;
+import me.mykindos.betterpvp.core.command.ICommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
@@ -14,6 +15,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -55,7 +57,6 @@ public abstract class ClanSubCommand extends Command {
         List<String> tabCompletions = new ArrayList<>();
         if (args.length == 0) return tabCompletions;
 
-
         String lowercaseArg = args[args.length - 1].toLowerCase();
         switch (getArgumentType(args.length)) {
             case "PLAYER" ->
@@ -75,18 +76,24 @@ public abstract class ClanSubCommand extends Command {
             case "CLAN_MEMBER" -> {
                 if (sender instanceof Player player) {
                     Optional<Clan> clanOptional = clanManager.getClanByPlayer(player);
-                    clanOptional.ifPresent(clan -> {
-                        clan.getMembers().forEach(clanMember -> {
-                            Optional<Gamer> gamerOptional = gamerManager.getObject(clanMember.getUuid());
-                            gamerOptional.ifPresent(gamer -> {
-                                if (gamer.getClient().getName().toLowerCase().startsWith(lowercaseArg)) {
-                                    tabCompletions.add(gamer.getClient().getName());
-                                }
-                            });
+                    clanOptional.ifPresent(clan -> clan.getMembers().forEach(clanMember -> {
+                        Optional<Gamer> gamerOptional = gamerManager.getObject(clanMember.getUuid());
+                        gamerOptional.ifPresent(gamer -> {
+                            if (gamer.getClient().getName().toLowerCase().startsWith(lowercaseArg)) {
+                                tabCompletions.add(gamer.getClient().getName());
+                            }
                         });
-                    });
+                    }));
                 }
             }
+            case "SUBCOMMAND" -> getSubCommands().forEach(subCommand -> {
+                if (subCommand.showTabCompletion(sender)) {
+                    if (subCommand.getName().toLowerCase().startsWith(lowercaseArg)) {
+                        tabCompletions.add(subCommand.getName());
+                        tabCompletions.addAll(subCommand.getAliases());
+                    }
+                }
+            });
         }
 
 
