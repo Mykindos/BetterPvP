@@ -18,7 +18,6 @@ import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.*;
 import me.mykindos.betterpvp.core.database.repository.IRepository;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -27,7 +26,6 @@ import org.bukkit.World;
 
 import javax.sql.rowset.CachedRowSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 

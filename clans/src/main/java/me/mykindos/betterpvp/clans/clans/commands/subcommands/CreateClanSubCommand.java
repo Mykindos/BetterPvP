@@ -13,10 +13,8 @@ import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.sql.Timestamp;
 import java.util.Optional;
 import java.util.UUID;
 

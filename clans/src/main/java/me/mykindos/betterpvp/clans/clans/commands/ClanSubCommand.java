@@ -5,7 +5,6 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.Command;
-import me.mykindos.betterpvp.core.command.ICommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
@@ -15,7 +14,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 

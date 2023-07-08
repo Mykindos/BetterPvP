@@ -3,7 +3,6 @@ package me.mykindos.betterpvp.clans.clans.listeners;
 import com.google.inject.Inject;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.core.config.Config;
-import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 
