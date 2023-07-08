@@ -32,6 +32,7 @@ import org.bukkit.entity.Player;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Singleton
@@ -198,27 +199,28 @@ public class ClanManager extends Manager<Clan> {
 
     public String getEnemyList(Player player, Clan clan) {
         Clan playerClan = getClanByPlayer(player).orElse(null);
-        StringBuilder enemyString = new StringBuilder();
-        if (!clan.getAlliances().isEmpty()) {
+        List<String> enemies = new ArrayList<>();
+
+        if (!clan.getEnemies().isEmpty()) {
             for (ClanEnemy enemy : clan.getEnemies()) {
-                enemyString.append(enemyString.length() != 0 ? NamedTextColor.GRAY + ", " : "")
-                        .append(getRelation(playerClan, enemy.getClan()).getPrimary()).append(enemy.getClan().getName());
+                ClanRelation relation = getRelation(playerClan, enemy.getClan());
+                enemies.add(relation.getPrimary() + enemy.getClan().getName());
             }
         }
-        return enemyString.toString();
+        return enemies.stream().collect(Collectors.joining(NamedTextColor.GRAY + ", "));
     }
 
     public String getEnemyListDom(Player player, Clan clan) {
         Clan playerClan = getClanByPlayer(player).orElse(null);
-        StringBuilder enemyString = new StringBuilder();
-        if (!clan.getAlliances().isEmpty()) {
+        List<String> enemies = new ArrayList<>();
+
+        if (!clan.getEnemies().isEmpty()) {
             for (ClanEnemy enemy : clan.getEnemies()) {
-                enemyString.append(enemyString.length() != 0 ? NamedTextColor.GRAY + ", " : "")
-                        .append(getRelation(playerClan, enemy.getClan()).getPrimary())
-                        .append(enemy.getClan().getName()).append(" ").append(clan.getDominanceString(enemy.getClan()));
+                ClanRelation relation = getRelation(playerClan, enemy.getClan());
+                enemies.add(relation.getPrimary() + enemy.getClan().getName() + " " + clan.getDominanceString(enemy.getClan()));
             }
         }
-        return enemyString.toString();
+        return enemies.stream().collect(Collectors.joining(NamedTextColor.GRAY + ", "));
     }
 
     public String getMembersList(Clan clan) {

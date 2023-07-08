@@ -138,17 +138,17 @@ public class ClanEventListener extends ClanListener {
 
         Clan clan = event.getClan();
 
-        clan.getMembers().clear();
-        clan.getTerritory().clear();
-
         for (ClanAlliance alliance : clan.getAlliances()) {
             alliance.getClan().getAlliances().removeIf(ally -> ally.getClan().getName().equalsIgnoreCase(clan.getName()));
         }
-        clan.getAlliances().clear();
 
         for (ClanEnemy enemy : clan.getEnemies()) {
             enemy.getClan().getEnemies().removeIf(en -> en.getClan().getName().equalsIgnoreCase(clan.getName()));
         }
+
+        clan.getMembers().clear();
+        clan.getTerritory().clear();
+        clan.getEnemies().clear();
         clan.getAlliances().clear();
 
         clanManager.getRepository().delete(clan);
