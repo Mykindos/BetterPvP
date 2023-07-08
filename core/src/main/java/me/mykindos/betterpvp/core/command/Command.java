@@ -8,7 +8,9 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Getter
 public abstract class Command implements ICommand {
@@ -74,7 +76,6 @@ public abstract class Command implements ICommand {
             case "WORLD" -> tabCompletions.addAll(Bukkit.getWorlds().stream().map(World::getName)
                     .filter(name -> name.toLowerCase().startsWith(lowercaseArg)).toList());
         }
-
 
         return tabCompletions;
     }

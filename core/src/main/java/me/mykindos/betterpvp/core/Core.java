@@ -24,7 +24,8 @@ import org.reflections.scanners.Scanners;
 import java.lang.reflect.Field;
 import java.util.Set;
 
-import static io.papermc.paper.network.ChannelInitializeListenerHolder.*;
+import static io.papermc.paper.network.ChannelInitializeListenerHolder.hasListener;
+import static io.papermc.paper.network.ChannelInitializeListenerHolder.removeListener;
 
 public class Core extends BPvPPlugin {
 
