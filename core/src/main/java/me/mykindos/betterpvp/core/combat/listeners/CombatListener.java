@@ -345,7 +345,7 @@ public class CombatListener implements Listener {
     }
 
     private void playDamageEffect(CustomDamageEvent event) {
-        event.getDamagee().playEffect(EntityEffect.HURT);
+        event.getDamagee().playHurtAnimation(0);
         if (event.getProjectile() instanceof Arrow) {
             if (event.getDamager() instanceof Player player) {
 

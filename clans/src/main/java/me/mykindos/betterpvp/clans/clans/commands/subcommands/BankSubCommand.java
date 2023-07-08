@@ -96,8 +96,8 @@ public class BankSubCommand extends ClanSubCommand {
                 return;
             }
 
-            if(clan.isAlmostDominated()) {
-                UtilMessage.message(player, "Clans", "You cannot withdraw money from your clans bank if your clan is close to being dominated.");
+            if(clan.isAlmostPillaged()) {
+                UtilMessage.message(player, "Clans", "You cannot withdraw money from your clans bank if your clan is close to being pillaged.");
                 return;
             }
 

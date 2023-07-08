@@ -22,6 +22,7 @@ import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.utilities.*;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -188,7 +189,7 @@ public class ClanManager extends Manager<Clan> {
         StringBuilder allyString = new StringBuilder();
         if (!clan.getAlliances().isEmpty()) {
             for (ClanAlliance ally : clan.getAlliances()) {
-                allyString.append(allyString.length() != 0 ? ChatColor.GRAY + ", " : "")
+                allyString.append(allyString.length() != 0 ? NamedTextColor.GRAY + ", " : "")
                         .append(getRelation(playerClan, ally.getClan()).getPrimary()).append(ally.getClan().getName());
             }
         }
@@ -200,8 +201,21 @@ public class ClanManager extends Manager<Clan> {
         StringBuilder enemyString = new StringBuilder();
         if (!clan.getAlliances().isEmpty()) {
             for (ClanEnemy enemy : clan.getEnemies()) {
-                enemyString.append(enemyString.length() != 0 ? ChatColor.GRAY + ", " : "")
+                enemyString.append(enemyString.length() != 0 ? NamedTextColor.GRAY + ", " : "")
                         .append(getRelation(playerClan, enemy.getClan()).getPrimary()).append(enemy.getClan().getName());
+            }
+        }
+        return enemyString.toString();
+    }
+
+    public String getEnemyListDom(Player player, Clan clan) {
+        Clan playerClan = getClanByPlayer(player).orElse(null);
+        StringBuilder enemyString = new StringBuilder();
+        if (!clan.getAlliances().isEmpty()) {
+            for (ClanEnemy enemy : clan.getEnemies()) {
+                enemyString.append(enemyString.length() != 0 ? NamedTextColor.GRAY + ", " : "")
+                        .append(getRelation(playerClan, enemy.getClan()).getPrimary())
+                        .append(enemy.getClan().getName()).append(" ").append(clan.getDominanceString(enemy.getClan()));
             }
         }
         return enemyString.toString();
@@ -213,7 +227,7 @@ public class ClanManager extends Manager<Clan> {
             for (ClanMember member : clan.getMembers()) {
                 Optional<Gamer> gamerOptional = gamerManager.getObject(member.getUuid());
                 gamerOptional.ifPresent(gamer -> {
-                    membersString.append(membersString.length() != 0 ? ChatColor.GRAY + ", " : "").append(ChatColor.YELLOW)
+                    membersString.append(membersString.length() != 0 ? "<gray>, " : "").append("<yellow>")
                             .append(member.getRoleIcon())
                             .append(UtilFormat.getOnlineStatus(member.getUuid()))
                             .append(gamer.getClient().getName());
@@ -274,13 +288,13 @@ public class ClanManager extends Manager<Clan> {
         return true;
     }
 
-    public void applyDominance(Clan killed, Clan killer) {
+    public void applyDominance(IClan killed, IClan killer) {
         if (killed == null || killer == null) return;
         if (killed.equals(killer)) return;
         if (!killed.isEnemy(killer)) return;
 
-        ClanEnemy killedEnemy = killed.getEnemy(killer);
-        ClanEnemy killerEnemy = killer.getEnemy(killed);
+        ClanEnemy killedEnemy = killed.getEnemy(killer).orElseThrow();
+        ClanEnemy killerEnemy = killer.getEnemy(killed).orElseThrow();
 
         int dominance = dominanceScale.getOrDefault(killed.getMembers().size(), 6);
 

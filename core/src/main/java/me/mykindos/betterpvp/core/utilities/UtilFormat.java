@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.utilities;
 
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -24,7 +25,7 @@ public class UtilFormat {
         return getOnlineStatus(UUID.fromString(uuid));
     }
     public static String getOnlineStatus(UUID uuid) {
-        return Bukkit.getPlayer(uuid) == null ? ChatColor.RED.toString() : ChatColor.GREEN.toString();
+        return Bukkit.getPlayer(uuid) == null ? "<red>" : "<green>";
     }
 
     /**

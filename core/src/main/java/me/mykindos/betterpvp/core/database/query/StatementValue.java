@@ -13,7 +13,7 @@ public abstract class StatementValue<T> {
     }
 
     /**
-     * https://docs.oracle.com/javase/8/docs/api/java/sql/Types.html
+     * <a href="https://docs.oracle.com/javase/8/docs/api/java/sql/Types.html">Types</a>
      * @return SQL Type of the object
      */
     public abstract int getType();

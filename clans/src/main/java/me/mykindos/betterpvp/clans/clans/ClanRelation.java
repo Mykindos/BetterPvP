@@ -39,4 +39,8 @@ public enum ClanRelation {
         return "<" + primary.toString().toLowerCase() + ">";
     }
 
+    public String getSecondaryMiniColor() {
+        return "<" + secondary.toString().toLowerCase() + ">";
+    }
+
 }

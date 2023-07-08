@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.utilities;
 import me.mykindos.betterpvp.core.client.Rank;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -20,7 +21,7 @@ public class UtilMessage {
      * @param message Message to send to a player
      */
     public static void message(Player player, String prefix, Component message) {
-        Component prefixComponent = Component.text(ChatColor.BLUE + prefix + "> ");
+        Component prefixComponent = MiniMessage.miniMessage().deserialize("<blue>" + prefix + "> ");
         player.sendMessage(prefixComponent.append(message));
     }
 
@@ -128,25 +129,40 @@ public class UtilMessage {
      * Sends a message utilizing <a href="https://docs.adventure.kyori.net/minimessage">MiniMessage</a> from Adventure API
      *
      * @param sender  The CommandSender
-     * @param prefix  The message
+     * @param prefix  The prefix
      * @param message Message to send to the CommandSender
      */
     public static void simpleMessage(CommandSender sender, String prefix, String message) {
-        sender.sendMessage(Component.text(ChatColor.BLUE + prefix + "> ")
+        sender.sendMessage(MiniMessage.miniMessage().deserialize("<blue>" + prefix + "> ")
                 .append(MiniMessage.miniMessage().deserialize("<gray>" + message)));
     }
 
     /**
      * Sends a message utilizing <a href="https://docs.adventure.kyori.net/minimessage">MiniMessage</a> from Adventure API
-     * @param sender The CommandSender to send the message to
-     * @param prefix The message
+     *
+     * @param sender  The CommandSender to send the message to
+     * @param prefix  The message
      * @param message Message to send to the CommandSender
-     * @param hover Hover event to add to the message
+     * @param hover   Hover event to add to the message
      */
     public static void simpleMessage(CommandSender sender, String prefix, String message, Component hover) {
-        sender.sendMessage(Component.text(ChatColor.BLUE + prefix + "> ")
+        sender.sendMessage(MiniMessage.miniMessage().deserialize("<blue>" + prefix + "> ")
                 .hoverEvent(HoverEvent.showText(hover))
                 .append(MiniMessage.miniMessage().deserialize("<gray>" + message)));
+    }
+
+    /**
+     * Sends a message utilizing <a href="https://docs.adventure.kyori.net/minimessage">MiniMessage</a> from Adventure API
+     *
+     * @param sender  The CommandSender to send the message to
+     * @param prefix  The message
+     * @param message Message to send to the CommandSender
+     * @param hover   Hover event to add to the message
+     */
+    public static void simpleMessage(CommandSender sender, String prefix, Component message, Component hover) {
+        sender.sendMessage(MiniMessage.miniMessage().deserialize("<blue>" + prefix + "> ")
+                .hoverEvent(HoverEvent.showText(hover))
+                .append(message));
     }
 
     /**
@@ -158,12 +174,36 @@ public class UtilMessage {
      * @param args    The args to interpolate in the string
      */
     public static void simpleMessage(CommandSender sender, String prefix, String message, Object... args) {
-        sender.sendMessage(Component.text(ChatColor.BLUE + prefix + "> ")
+        sender.sendMessage(MiniMessage.miniMessage().deserialize("<blue>" + prefix + "> ")
                 .append(MiniMessage.miniMessage().deserialize("<gray>" + String.format(message, args))));
     }
 
+    /**
+     * Sends a message utilizing <a href="https://docs.adventure.kyori.net/minimessage">MiniMessage</a> from Adventure API
+     *
+     * @param sender  The CommandSender
+     * @param prefix  The message
+     * @param component Message to send to the CommandSender
+     */
+    public static void simpleMessage(CommandSender sender, String prefix, Component component) {
+        sender.sendMessage(MiniMessage.miniMessage().deserialize("<blue>" + prefix + "> ").append(component));
+    }
+
+
+    /**
+     * Sends a message utilizing <a href="https://docs.adventure.kyori.net/minimessage">MiniMessage</a> from Adventure API
+     *
+     * @param sender  The CommandSender
+     * @param message Message to send to the CommandSender
+     * @param args    The args to interpolate in the string
+     */
+    public static void simpleMessage(CommandSender sender, String message, Object... args) {
+        sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray>" + String.format(message, args)));
+    }
+
+
     public static void simpleBroadcast(String prefix, String message, Object... args) {
-        Bukkit.getServer().broadcast(Component.text(ChatColor.BLUE + prefix + "> ")
+        Bukkit.getServer().broadcast(Component.text(NamedTextColor.BLUE + prefix + "> ")
                 .append(MiniMessage.miniMessage().deserialize("<gray>" + String.format(message, args))));
     }
 
