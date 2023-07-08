@@ -336,24 +336,32 @@ public class ClanEventListener extends ClanListener {
         inviteHandler.removeInvite(target, clan, "Neutral");
 
         if (clan.isAllied(target)) {
-            ClanAlliance clanAlliance = clan.getAlliance(target).orElseThrow();
-            ClanAlliance targetAlliance = target.getAlliance(clan).orElseThrow();
-            clanManager.getRepository().deleteClanAlliance(clan, clanAlliance);
-            clanManager.getRepository().deleteClanAlliance(target, targetAlliance);
-            clan.getAlliances().remove(clanAlliance);
-            target.getAlliances().remove(targetAlliance);
+            removeAlliance(clan, target);
         } else if (clan.isEnemy(target)) {
-            ClanEnemy clanEnemy = clan.getEnemy(target);
-            ClanEnemy targetEnemy = target.getEnemy(clan);
-            clanManager.getRepository().deleteClanEnemy(clan, clanEnemy);
-            clanManager.getRepository().deleteClanEnemy(target, targetEnemy);
-            clan.getEnemies().remove(clanEnemy);
-            target.getEnemies().remove(targetEnemy);
+            removeEnemy(clan, target);
         }
 
         clan.messageClan("<yellow>Clan " + target.getName() + "<gray> is now neutral to your Clan.", null, true);
         target.messageClan("<yellow>Clan " + clan.getName() + "<gray> is now neutral to your Clan.", null, true);
 
+    }
+
+    private void removeAlliance(Clan clan, Clan target) {
+        ClanAlliance clanAlliance = clan.getAlliance(target).orElseThrow();
+        ClanAlliance targetAlliance = target.getAlliance(clan).orElseThrow();
+        clanManager.getRepository().deleteClanAlliance(clan, clanAlliance);
+        clanManager.getRepository().deleteClanAlliance(target, targetAlliance);
+        clan.getAlliances().remove(clanAlliance);
+        target.getAlliances().remove(targetAlliance);
+    }
+
+    private void removeEnemy(Clan clan, Clan target) {
+        ClanEnemy clanEnemy = clan.getEnemy(target).orElseThrow();
+        ClanEnemy targetEnemy = target.getEnemy(clan).orElseThrow();
+        clanManager.getRepository().deleteClanEnemy(clan, clanEnemy);
+        clanManager.getRepository().deleteClanEnemy(target, targetEnemy);
+        clan.getEnemies().remove(clanEnemy);
+        target.getEnemies().remove(targetEnemy);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -367,12 +375,7 @@ public class ClanEventListener extends ClanListener {
         }
 
         if (clan.isAllied(target)) {
-            ClanAlliance clanAlliance = clan.getAlliance(target).orElseThrow();
-            ClanAlliance targetAlliance = target.getAlliance(clan).orElseThrow();
-            clanManager.getRepository().deleteClanAlliance(clan, clanAlliance);
-            clanManager.getRepository().deleteClanAlliance(target, targetAlliance);
-            clan.getAlliances().remove(clanAlliance);
-            target.getAlliances().remove(targetAlliance);
+            removeAlliance(clan, target);
         }
 
         ClanEnemy clanEnemy = new ClanEnemy(target, 0);

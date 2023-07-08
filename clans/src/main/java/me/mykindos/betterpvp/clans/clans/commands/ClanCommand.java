@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.framework.annotations.WithReflection;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -40,6 +41,28 @@ public class ClanCommand extends Command {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        UtilMessage.simpleMessage(player, "Test", "<rainbow>%s <yellow>%s <green>%s", "Testing", "123", "456");
+        if (args.length != 0) return;
+
+        clanManager.getClanByPlayer(player).ifPresentOrElse(clan -> {
+
+                    UtilMessage.message(player, "Clans", clan.getName() + " Information: ");
+
+                    UtilMessage.simpleMessage(player, "Age: <yellow>" + clan.getAge());
+                    UtilMessage.simpleMessage(player, "Territory: <yellow>" + clan.getTerritory().size() + "/" + (3 + clan.getMembers().size()));
+                    UtilMessage.simpleMessage(player, "Home: " + (clan.getHome() == null ? "<red>Not set" : "<yellow>" + UtilWorld.locationToString(clan.getHome())));
+                    UtilMessage.simpleMessage(player, "Allies: " + clanManager.getAllianceList(player, clan));
+                    UtilMessage.simpleMessage(player, "Enemies: " + clanManager.getEnemyListDom(player, clan));
+                    UtilMessage.simpleMessage(player, "Members: " + clanManager.getMembersList(clan));
+                    // UtilMessage.message(player, "TNT Protection: " + clan.getVulnerableString());
+                    // UtilMessage.message(player, "Cooldown: " + (!clan.isOnCooldown() ? ChatColor.GREEN + "No"
+                    //         : ChatColor.RED + UtilTime.getTime(clan.getCooldown(), TimeUnit.BEST, 1)));
+                    UtilMessage.simpleMessage(player, "Energy: <yellow>" + clan.getEnergy() + " - (<gold>" + clan.getEnergyTimeRemaining() + "<yellow>)");
+
+                    UtilMessage.simpleMessage(player, "Points: <yellow>%d", clan.getPoints());
+                    UtilMessage.simpleMessage(player, "Level: <yellow>%d", clan.getLevel());
+
+                },
+                () -> UtilMessage.message(player, "Clans", "You are not in a clan"));
+
     }
 }

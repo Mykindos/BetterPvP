@@ -156,6 +156,9 @@ public class ClanRepository implements IRepository<Clan> {
         String deleteTerritoryQuery = "DELETE FROM " + databasePrefix + "clan_territory WHERE Clan = ?;";
         database.executeUpdateAsync(new Statement(deleteTerritoryQuery, new UuidStatementValue(clan.getId())));
 
+        String deletePropertiesQuery = "DELETE FROM " + databasePrefix + "clan_properties WHERE Clan = ?;";
+        database.executeUpdateAsync(new Statement(deletePropertiesQuery, new UuidStatementValue(clan.getId())));
+
         String deleteClanQuery = "DELETE FROM " + databasePrefix + "clans WHERE id = ?;";
         database.executeUpdateAsync(new Statement(deleteClanQuery, new UuidStatementValue(clan.getId())));
     }

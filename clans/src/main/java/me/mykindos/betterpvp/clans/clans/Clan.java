@@ -129,29 +129,23 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
         return count;
     }
 
-    public ClanEnemy getEnemy(Clan clan) {
-        for (ClanEnemy enemy : getEnemies()) {
-            if (enemy.getClan().equals(clan)) {
-                return enemy;
-            }
-
-        }
-        return null;
-    }
-
     /**
      * @return Returns true if any clan has 90% or more dominance on this clan
      */
-    public boolean isAlmostDominated() {
+    public boolean isAlmostPillaged() {
         return getEnemies().stream().anyMatch(enemy -> enemy.getClan().getEnemy(this).orElseThrow().getDominance() >= 90);
     }
 
 
-    public String getDominanceString(Clan clan) {
-        ClanEnemy enemy = getEnemy(clan);
-        ClanEnemy theirEnemy = clan.getEnemy(this);
-        if (enemy != null && theirEnemy != null) {
-            String text = "";
+    public String getDominanceString(IClan clan) {
+        Optional<ClanEnemy> enemyOptional = getEnemy(clan);
+        Optional<ClanEnemy> theirEnemyOptional = clan.getEnemy(this);
+        if (enemyOptional.isPresent() && theirEnemyOptional.isPresent()) {
+
+            ClanEnemy enemy = enemyOptional.get();
+            ClanEnemy theirEnemy = theirEnemyOptional.get();
+
+            String text;
             if(enemy.getDominance() > 0){
                 text = NamedTextColor.GREEN.toString() + enemy.getDominance() + "%";
             }else if(theirEnemy.getDominance() > 0) {
@@ -164,11 +158,14 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
         return "";
     }
 
-    public String getSimpleDominanceString(Clan clan) {
-        ClanEnemy enemy = getEnemy(clan);
-        ClanEnemy theirEnemy = clan.getEnemy(this);
+    public String getSimpleDominanceString(IClan clan) {
+        Optional<ClanEnemy> enemyOptional = getEnemy(clan);
+        Optional<ClanEnemy> theirEnemyOptional = clan.getEnemy(this);
+        if (enemyOptional.isPresent() && theirEnemyOptional.isPresent()) {
 
-        if (enemy != null && theirEnemy != null) {
+            ClanEnemy enemy = enemyOptional.get();
+            ClanEnemy theirEnemy = theirEnemyOptional.get();
+
             if (theirEnemy.getDominance() == 0 && enemy.getDominance() == 0) {
                 return NamedTextColor.WHITE + " 0";
             }

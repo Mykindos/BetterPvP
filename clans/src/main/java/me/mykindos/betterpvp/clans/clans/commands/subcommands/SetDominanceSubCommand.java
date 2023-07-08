@@ -52,13 +52,13 @@ public class SetDominanceSubCommand extends ClanSubCommand {
         Clan playerClan = clanManager.getClanByPlayer(player).orElseThrow();
         Clan targetClan = targetClanOptional.get();
 
-        ClanEnemy playerClanEnemy = playerClan.getEnemy(targetClan);
+        ClanEnemy playerClanEnemy = playerClan.getEnemy(targetClan).orElse(null);
         if(playerClanEnemy == null) {
             UtilMessage.message(player, "Clans", "You must be enemies with the target clan to use this command.");
             return;
         }
 
-        ClanEnemy targetClanEnemy = targetClan.getEnemy(playerClan);
+        ClanEnemy targetClanEnemy = targetClan.getEnemy(playerClan).orElse(null);
         if(targetClanEnemy == null) {
             UtilMessage.message(player, "Clans", "Something went severely wrong. Contact a developer");
             return;

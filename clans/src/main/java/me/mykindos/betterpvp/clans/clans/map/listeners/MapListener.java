@@ -453,8 +453,8 @@ public class MapListener implements Listener {
 
         if (otherClan.isSafe()) {
             materialColor = MapColor.SNOW;
-        } else if (otherClan.isAdmin() && !otherClan.isSafe()) {
-            if (otherClan.getName().equals("Outskirts") || playerClan.getName().equalsIgnoreCase("Outskirts")) {
+        } else if (otherClan.isAdmin()) {
+            if (otherClan.getName().equals("Outskirts") || otherClan.getName().equalsIgnoreCase("Outskirts")) {
                 materialColor = MapColor.COLOR_ORANGE;
             } else {
                 materialColor = MapColor.COLOR_RED;

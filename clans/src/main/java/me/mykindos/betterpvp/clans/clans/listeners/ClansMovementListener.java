@@ -13,6 +13,8 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -62,7 +64,7 @@ public class ClansMovementListener extends ClanListener {
 
     public void displayOwner(Player player, Clan locationClan) {
 
-        String ownerString = ChatColor.YELLOW + "Wilderness";
+        Component component = Component.empty().color(NamedTextColor.YELLOW).append(Component.text("Wilderness"));
 
         Clan clan = null;
         Optional<Clan> clanOptional = clanManager.getClanByPlayer(player);
@@ -74,15 +76,15 @@ public class ClansMovementListener extends ClanListener {
 
         if (locationClan != null) {
             ClanRelation relation = clanManager.getRelation(clan, locationClan);
-            ownerString = relation.getPrimaryAsChatColor() + locationClan.getName();
+            component = Component.text(relation.getPrimaryAsChatColor() + locationClan.getName());
 
             if (locationClan.isAdmin()) {
                 if (locationClan.isSafe()) {
-                    ownerString = ChatColor.WHITE + locationClan.getName();
-                    append = ChatColor.WHITE + " (" + ChatColor.AQUA + "Safe" + ChatColor.WHITE + ")";
+                    component = Component.text(NamedTextColor.WHITE + locationClan.getName());
+                    append = NamedTextColor.WHITE + " (" + NamedTextColor.AQUA + "Safe" + NamedTextColor.WHITE + ")";
                 }
             } else if (relation == ClanRelation.ALLY_TRUST) {
-                append = ChatColor.GRAY + " (" + ChatColor.YELLOW + "Trusted" + ChatColor.GRAY + ")";
+                append = NamedTextColor.GRAY + " (" + NamedTextColor.YELLOW + "Trusted" + NamedTextColor.GRAY + ")";
 
             } else if (relation == ClanRelation.ENEMY) {
                 if (clan != null) {
@@ -94,27 +96,24 @@ public class ClansMovementListener extends ClanListener {
 
         if (locationClan != null) {
             if (locationClan.getName().equals("Fields") || locationClan.getName().equals("Lake")) {
-                append = ChatColor.RED.toString() + ChatColor.BOLD + "                    Warning! "
-                        + ChatColor.GRAY.toString() + ChatColor.BOLD + "PvP Hotspot";
+                append = NamedTextColor.RED.toString() + TextDecoration.BOLD + "                    Warning! "
+                        + NamedTextColor.GRAY + TextDecoration.BOLD + "PvP Hotspot";
             }
 
-            if (clan != null && !locationClan.equals(clan)) {
-                UtilMessage.message(player, "Territory", Component.text(ownerString + append)
-                        .hoverEvent(HoverEvent.showText(clanManager.getClanTooltip(player, locationClan))));
-            } else {
-                UtilMessage.message(player, "Territory", Component.text(ownerString + append));
-            }
+            UtilMessage.simpleMessage(player, "Territory",
+                    component.append(Component.text(append)),
+                    clanManager.getClanTooltip(player, locationClan)
+            );
 
         } else {
-            UtilMessage.message(player, "Territory", ownerString + " " + append);
+            UtilMessage.message(player, "Territory", component.append(Component.text(append)));
         }
-
 
     }
 
     @EventHandler
     public void onDelayedTeleport(PlayerDelayedTeleportEvent event) {
-        if(event.isCancelled()) return;
+        if (event.isCancelled()) return;
 
         clanManager.getClanByLocation(event.getPlayer().getLocation()).ifPresentOrElse(clan -> {
             if (clan.isAdmin()) {
