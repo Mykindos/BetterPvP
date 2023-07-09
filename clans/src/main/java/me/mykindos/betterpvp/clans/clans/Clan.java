@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.clans.clans;
 
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.clans.clans.events.ClanPropertyUpdateEvent;
 import me.mykindos.betterpvp.clans.clans.insurance.Insurance;
 import me.mykindos.betterpvp.core.components.clans.IClan;
@@ -23,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
+@Slf4j
 @Data
 public class Clan extends PropertyContainer implements IClan, Invitable, IMapListener {
 
@@ -61,6 +63,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
 
     /**
      * While a clan is on cooldown, they cannot gain or lose any dominance to other clans
+     *
      * @return The time the cooldown expires (epoch)
      */
     public long getNoDominanceCooldown() {
@@ -93,34 +96,34 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
 
     /**
      * Only use this method if you already acquired the Clan using the player
+     *
      * @param uuid UUID of the member
      * @return ClanMember
      */
     @NotNull
-    public ClanMember getMember(UUID uuid){
+    public ClanMember getMember(UUID uuid) {
         return getMemberByUUID(uuid).orElseThrow();
     }
 
-    public Optional<ClanMember> getMemberByUUID(UUID uuid){
+    public Optional<ClanMember> getMemberByUUID(UUID uuid) {
         return getMemberByUUID(uuid.toString());
     }
 
-    public Optional<ClanMember> getMemberByUUID(String uuid){
+    public Optional<ClanMember> getMemberByUUID(String uuid) {
         return members.stream().filter(clanMember -> clanMember.getUuid().equalsIgnoreCase(uuid)).findFirst();
     }
 
-    public List<Player> getMembersAsPlayers(){
+    public List<Player> getMembersAsPlayers() {
         List<Player> players = new ArrayList<>();
-        for(ClanMember member : getMembers()){
+        for (ClanMember member : getMembers()) {
             Player player = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
-            if(player != null){
+            if (player != null) {
                 players.add(player);
             }
         }
 
         return players;
     }
-
 
     /**
      * @return The total amount of members in an entire alliance
@@ -154,11 +157,11 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
             ClanEnemy theirEnemy = theirEnemyOptional.get();
 
             String text;
-            if(enemy.getDominance() > 0){
+            if (enemy.getDominance() > 0) {
                 text = NamedTextColor.GREEN.toString() + enemy.getDominance() + "%";
-            }else if(theirEnemy.getDominance() > 0) {
+            } else if (theirEnemy.getDominance() > 0) {
                 text = NamedTextColor.RED.toString() + theirEnemy.getDominance() + "%";
-            }else {
+            } else {
                 return "";
             }
             return NamedTextColor.GRAY + " (" + text + NamedTextColor.GRAY + ")" + NamedTextColor.GRAY;
@@ -197,10 +200,10 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
     @Override
     public void messageClan(String message, UUID ignore, boolean prefix) {
         members.forEach(member -> {
-            if(ignore != null && ignore.toString().equalsIgnoreCase(member.getUuid())) return;
+            if (ignore != null && ignore.toString().equalsIgnoreCase(member.getUuid())) return;
 
             Player player = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
-            if(player != null) {
+            if (player != null) {
                 UtilMessage.simpleMessage(player, prefix ? "Clans" : "", message);
             }
 
@@ -218,7 +221,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
 
     @Override
     public boolean equals(Object other) {
-        if(other instanceof Clan otherClan) {
+        if (other instanceof Clan otherClan) {
             return getName().equalsIgnoreCase(otherClan.getName());
         }
 
@@ -228,13 +231,20 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
     @Override
     public void saveProperty(String key, Object object, boolean updateScoreboard) {
         properties.put(key, object);
-        if(updateScoreboard) {
+        if (updateScoreboard) {
             getMembersAsPlayers().forEach(player -> UtilServer.callEvent(new ScoreboardUpdateEvent(player)));
         }
     }
 
     @Override
     public void onMapValueChanged(String key, Object value) {
-        UtilServer.callEvent(new ClanPropertyUpdateEvent(this, key, value));
+        try {
+            ClanProperty property = ClanProperty.valueOf(key);
+            if (property.isSaveProperty()) {
+                UtilServer.callEvent(new ClanPropertyUpdateEvent(this, key, value));
+            }
+        } catch (IllegalArgumentException ex) {
+            log.error("Could not find a ClanProperty named {}", key, ex);
+        }
     }
 }
