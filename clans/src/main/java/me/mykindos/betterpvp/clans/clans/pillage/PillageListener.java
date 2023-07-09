@@ -2,7 +2,9 @@ package me.mykindos.betterpvp.clans.clans.pillage;
 
 import com.google.inject.Inject;
 import me.mykindos.betterpvp.clans.Clans;
+import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
+import me.mykindos.betterpvp.clans.clans.ClanProperty;
 import me.mykindos.betterpvp.clans.clans.pillage.events.PillageEndEvent;
 import me.mykindos.betterpvp.clans.clans.pillage.events.PillageStartEvent;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
@@ -24,6 +26,10 @@ public class PillageListener implements Listener {
     @Inject
     @Config(path = "clans.pillage.duration", defaultValue = "10")
     private int pillageDurationInMinutes;
+
+    @Inject
+    @Config(path = "clans.pillage.noDominanceCooldown", defaultValue = "4")
+    private int noDominanceCooldownHours;
 
     private final Clans clans;
     private final PillageHandler pillageHandler;
@@ -62,6 +68,10 @@ public class PillageListener implements Listener {
         pillage.getPillaged().getEnemies().remove(pillagedEnemy);
         clanManager.getRepository().deleteClanEnemy(pillage.getPillager(), pillagerEnemy);
         clanManager.getRepository().deleteClanEnemy(pillage.getPillaged(), pillagedEnemy);
+
+        if(pillage.getPillaged() instanceof Clan pillagedClan) {
+            pillagedClan.putProperty(ClanProperty.NO_DOMINANCE_COOLDOWN, System.currentTimeMillis() + (3_600_000L * noDominanceCooldownHours));
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

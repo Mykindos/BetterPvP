@@ -122,11 +122,11 @@ public class ClanEventListener extends ClanListener {
         clan.saveProperty(ClanProperty.LEVEL, defaultValues.getDefaultLevel());
         clan.saveProperty(ClanProperty.POINTS, defaultValues.getDefaultPoints());
         clan.saveProperty(ClanProperty.ENERGY, defaultValues.getDefaultEnergy());
-        clan.saveProperty(ClanProperty.RAID_COOLDOWN, 0);
+        clan.saveProperty(ClanProperty.NO_DOMINANCE_COOLDOWN, System.currentTimeMillis() + (3_600_000L * 24));
         clan.saveProperty(ClanProperty.LAST_TNTED, 0);
         clan.saveProperty(ClanProperty.BALANCE, 0);
 
-        UtilMessage.message(event.getPlayer(), "Clans", "Successfully created clan " + ChatColor.AQUA + clan.getName());
+        UtilMessage.simpleMessage(event.getPlayer(), "Clans", "Successfully created clan <aqua>%s", clan.getName());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

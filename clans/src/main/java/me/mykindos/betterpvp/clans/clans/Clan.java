@@ -59,8 +59,16 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
         return (int) getProperty(ClanProperty.LEVEL).orElse(1);
     }
 
-    public long getRaidCooldown() {
-        return (long) getProperty(ClanProperty.RAID_COOLDOWN).orElse(0);
+    /**
+     * While a clan is on cooldown, they cannot gain or lose any dominance to other clans
+     * @return The time the cooldown expires (epoch)
+     */
+    public long getNoDominanceCooldown() {
+        return (long) getProperty(ClanProperty.NO_DOMINANCE_COOLDOWN).orElse(0);
+    }
+
+    public boolean isNoDominanceCooldownActive() {
+        return getNoDominanceCooldown() - System.currentTimeMillis() <= 0;
     }
 
     public long getLastTntedTime() {

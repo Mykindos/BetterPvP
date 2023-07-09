@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.combat.death.events.CustomDeathEvent;
 import me.mykindos.betterpvp.core.combat.log.DamageLog;
 import me.mykindos.betterpvp.core.combat.log.DamageLogManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -54,6 +55,21 @@ public class ClansDeathListener implements Listener {
             Clan killedClan = clanManager.getClanByPlayer(killed).orElse(null);
             Clan killerClan = clanManager.getClanByPlayer(killer).orElse(null);
 
+            if(killedClan != null & killerClan != null) {
+                if (killerClan.isNoDominanceCooldownActive()) {
+                    killerClan.messageClan("You did not gain any dominance as your clan is a new clan or was recently pillaged.", null, true);
+                    killedClan.messageClan("You did not lose any dominance as <yellow>" + killedClan.getName() + "<gray> is a new clan or was recently pillaged.", null, true);
+                    return;
+                }
+
+                if (killedClan.isNoDominanceCooldownActive()) {
+                    killedClan.messageClan("You did not lose any dominance as your clan is a new clan or was recently pillaged.", null, true);
+                    killerClan.messageClan("You did not gain any dominance as <yellow>" + killedClan.getName() + "<gray> is a new clan or was recently pillaged.", null, true);
+                    return;
+                }
+            }
+
+
             clanManager.applyDominance(killedClan, killerClan);
 
 
@@ -69,6 +85,21 @@ public class ClansDeathListener implements Listener {
             Clan killerClan = clanManager.getClanByLocation(killed.getLocation()).orElse(null);
 
             if (killerClan != null && killerClan.isOnline()) {
+
+                if(killedClan != null) {
+                    if (killerClan.isNoDominanceCooldownActive()) {
+                        killerClan.messageClan("You did not gain any dominance as your clan is a new clan or was recently pillaged.", null, true);
+                        killedClan.messageClan("You did not lose any dominance as <yellow>" + killedClan.getName() + "<gray> is a new clan or was recently pillaged.", null, true);
+                        return;
+                    }
+
+                    if (killedClan.isNoDominanceCooldownActive()) {
+                        killerClan.messageClan("You did not gain any dominance as <yellow>" + killedClan.getName() + "<gray> is a new clan or was recently pillaged.", null, true);
+                        killedClan.messageClan("You did not lose any dominance as your clan is a new clan or was recently pillaged.", null, true);
+                        return;
+                    }
+                }
+
                 clanManager.applyDominance(killedClan, killerClan);
             }
         }
