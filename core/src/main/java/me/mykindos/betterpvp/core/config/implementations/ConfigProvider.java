@@ -3,6 +3,8 @@ package me.mykindos.betterpvp.core.config.implementations;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 
 import javax.inject.Provider;
+import java.util.Arrays;
+import java.util.List;
 
 public class ConfigProvider<T> implements Provider<T> {
 
@@ -35,6 +37,8 @@ public class ConfigProvider<T> implements Provider<T> {
         }else if(type == long.class) {
             castedDefault = Long.parseLong(defaultValue);
             type = (Class<T>) Long.class;
+        }else if(type == List.class) {
+            castedDefault = Arrays.asList(defaultValue.split(","));
         }
 
         T value = plugin.getConfig().getOrSaveObject(configPath, castedDefault, type);

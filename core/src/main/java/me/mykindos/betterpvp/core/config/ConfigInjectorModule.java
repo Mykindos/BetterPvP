@@ -1,12 +1,14 @@
 package me.mykindos.betterpvp.core.config;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.TypeLiteral;
 import me.mykindos.betterpvp.core.config.implementations.ConfigImpl;
 import me.mykindos.betterpvp.core.config.implementations.ConfigProvider;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
 
@@ -31,9 +33,13 @@ public class ConfigInjectorModule extends AbstractModule {
 
             Config conf = new ConfigImpl(config.path(), config.defaultValue());
 
-            Class<?> type = field.getType();
-            bind(type).annotatedWith(conf).toProvider(getProvider(config.path(), config.defaultValue(), type));
 
+            Class<?> type = field.getType();
+            if (type == List.class) {
+                bind(new TypeLiteral<List<String>>() {}).annotatedWith(conf).toProvider(getProvider(config.path(), config.defaultValue(), type));
+            } else {
+                bind(type).annotatedWith(conf).toProvider(getProvider(config.path(), config.defaultValue(), type));
+            }
         }
 
     }

@@ -1,18 +1,24 @@
 package me.mykindos.betterpvp.clans.clans;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
-@AllArgsConstructor
 public enum ClanProperty {
 
-    TIME_CREATED,
-    LAST_LOGIN,
-    LEVEL,
-    POINTS,
-    ENERGY,
-    NO_DOMINANCE_COOLDOWN,
-    LAST_TNTED,
-    BALANCE
+    TIME_CREATED(true),
+    LAST_LOGIN(true),
+    LEVEL(true),
+    POINTS(true),
+    ENERGY(true),
+    NO_DOMINANCE_COOLDOWN(true),
+    LAST_TNTED(true),
+    BALANCE(true),
+    TNT_PROTECTION(false);
+
+    private final boolean saveProperty;
+
+    ClanProperty(boolean saveProperty) {
+        this.saveProperty = saveProperty;
+    }
+
 }
