@@ -12,7 +12,7 @@ public enum ClanProperty {
     LEVEL,
     POINTS,
     ENERGY,
-    RAID_COOLDOWN,
+    NO_DOMINANCE_COOLDOWN,
     LAST_TNTED,
     BALANCE
 }

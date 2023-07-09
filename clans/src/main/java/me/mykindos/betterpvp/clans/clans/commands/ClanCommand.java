@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.framework.annotations.WithReflection;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import org.bukkit.entity.Player;
 
@@ -54,8 +55,8 @@ public class ClanCommand extends Command {
                     UtilMessage.simpleMessage(player, "Enemies: " + clanManager.getEnemyListDom(player, clan));
                     UtilMessage.simpleMessage(player, "Members: " + clanManager.getMembersList(clan));
                     // UtilMessage.message(player, "TNT Protection: " + clan.getVulnerableString());
-                    // UtilMessage.message(player, "Cooldown: " + (!clan.isOnCooldown() ? ChatColor.GREEN + "No"
-                    //         : ChatColor.RED + UtilTime.getTime(clan.getCooldown(), TimeUnit.BEST, 1)));
+                    UtilMessage.simpleMessage(player, "Cooldown: " + (!clan.isNoDominanceCooldownActive() ? "<green>No"
+                            : "<red>" + UtilTime.getTime(clan.getNoDominanceCooldown() - System.currentTimeMillis(), UtilTime.TimeUnit.BEST, 1)));
                     UtilMessage.simpleMessage(player, "Energy: <yellow>" + clan.getEnergy() + " - (<gold>" + clan.getEnergyTimeRemaining() + "<yellow>)");
 
                     UtilMessage.simpleMessage(player, "Points: <yellow>%d", clan.getPoints());

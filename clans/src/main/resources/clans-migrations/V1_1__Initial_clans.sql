@@ -104,6 +104,6 @@ INSERT IGNORE INTO property_map VALUES ("LEVEL", "int");
 INSERT IGNORE INTO property_map VALUES ("POINTS", "int");
 INSERT IGNORE INTO property_map VALUES ("BALANCE", "int");
 INSERT IGNORE INTO property_map VALUES ("LAST_LOGIN", "long");
-INSERT IGNORE INTO property_map VALUES ("RAID_COOLDOWN", "long");
+INSERT IGNORE INTO property_map VALUES ("NO_DOMINANCE_COOLDOWN", "long");
 INSERT IGNORE INTO property_map VALUES ("LAST_TNTED", "long");
 INSERT IGNORE INTO property_map VALUES ("TIME_CREATED", "long");
