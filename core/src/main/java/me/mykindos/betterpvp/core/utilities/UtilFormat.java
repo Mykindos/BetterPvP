@@ -1,9 +1,7 @@
 package me.mykindos.betterpvp.core.utilities;
 
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 
 import java.text.DecimalFormat;
 import java.util.UUID;

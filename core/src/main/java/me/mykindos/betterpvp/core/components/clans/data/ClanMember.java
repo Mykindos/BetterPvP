@@ -3,8 +3,6 @@ package me.mykindos.betterpvp.core.components.clans.data;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
-import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.ChatColor;
 
 import java.util.Arrays;
 
