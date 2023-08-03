@@ -45,7 +45,6 @@ public class ClanCommand extends Command {
         if (args.length != 0) return;
 
         clanManager.getClanByPlayer(player).ifPresentOrElse(clan -> {
-
                     UtilMessage.message(player, "Clans", clan.getName() + " Information: ");
 
                     UtilMessage.simpleMessage(player, "Age: <yellow>" + clan.getAge());
@@ -63,7 +62,8 @@ public class ClanCommand extends Command {
                     UtilMessage.simpleMessage(player, "Level: <yellow>%d", clan.getLevel());
 
                 },
-                () -> UtilMessage.message(player, "Clans", "You are not in a clan"));
+                () -> UtilMessage.message(player, "Clans", "You are not in a clan")
+        );
 
     }
 }

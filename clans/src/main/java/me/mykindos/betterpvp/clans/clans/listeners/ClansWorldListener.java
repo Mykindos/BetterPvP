@@ -14,7 +14,6 @@ import me.mykindos.betterpvp.core.gamer.exceptions.NoSuchGamerException;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.*;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
@@ -119,7 +118,7 @@ public class ClansWorldListener extends ClanListener {
 
             } else {
                 if (!clan.getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.MEMBER)) {
-                    UtilMessage.message(player, "Clans", "Clan Recruits cannot break blocks" + ChatColor.GRAY + ".");
+                    UtilMessage.message(player, "Clans", "Clan Recruits cannot break blocks.");
                     event.setCancelled(true);
 
                 }
@@ -152,9 +151,8 @@ public class ClansWorldListener extends ClanListener {
             ClanRelation relation = clanManager.getRelation(clan, locationClan);
 
             if (block.getType().hasGravity()) {
-                UtilMessage.message(player, "Clans", "You cannot place " + ChatColor.GREEN + UtilFormat.cleanString(block.getType().toString())
-                        + ChatColor.GRAY + " in " + ChatColor.YELLOW + relation.getPrimaryAsChatColor()
-                        + "Clan " + locationClan.getName() + ChatColor.GRAY + ".");
+                UtilMessage.simpleMessage(player, "Clans", "You cannot place <green>%s <gray> in %s<gray>.",
+                        UtilFormat.cleanString(block.getType().toString()), relation.getPrimaryMiniColor() + locationClan.getName());
                 event.setCancelled(true);
                 return;
             }
@@ -173,7 +171,7 @@ public class ClansWorldListener extends ClanListener {
                 event.setCancelled(true);
             } else {
                 if (!clan.getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.MEMBER)) {
-                    UtilMessage.message(player, "Clans", "Clan Recruits cannot place blocks" + ChatColor.GRAY + ".");
+                    UtilMessage.simpleMessage(player, "Clans", "Clan Recruits cannot place blocks.");
                     event.setCancelled(true);
                 }
             }
@@ -230,8 +228,8 @@ public class ClansWorldListener extends ClanListener {
             } else {
                 if (!clan.getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.MEMBER)) {
                     if (block.getState() instanceof Container) {
-                        UtilMessage.message(player, "Clans", "Clan Recruits cannot access " + ChatColor.GREEN + UtilFormat.cleanString(material.toString())
-                                + ChatColor.GRAY + ".");
+                        UtilMessage.simpleMessage(player, "Clans", "Clan Recruits cannot access <green%s<gray>.",
+                                UtilFormat.cleanString(material.toString()));
                         event.setCancelled(true);
                     }
                 }
@@ -407,8 +405,6 @@ public class ClansWorldListener extends ClanListener {
 
     /**
      * Helps against people glitching through gates, maybe this isn't an issue in 1.19 anymore
-     *
-     * @param event
      */
     @EventHandler
     public void onBreakGate(BlockBreakEvent event) {
@@ -483,13 +479,13 @@ public class ClansWorldListener extends ClanListener {
             Optional<Clan> clanOptional = clanManager.getClanByLocation(event.getBlock().getLocation());
             if (clanOptional.isPresent()) {
                 if (clanOptional.get().isAdmin()) {
-                    UtilMessage.message(player, "Server", "You cannot break " + ChatColor.YELLOW + "Obsidian" + ChatColor.GRAY + ".");
+                    UtilMessage.simpleMessage(player, "Server", "You cannot break <yellow>Obsidian<gray>.");
                     return;
                 }
             }
 
             event.getBlock().setType(Material.AIR);
-            UtilMessage.message(player, "Server", "You cannot break " + ChatColor.YELLOW + "Obsidian" + ChatColor.GRAY + ".");
+            UtilMessage.simpleMessage(player, "Server", "You cannot break <yellow>Obsidian<gray>.");
         }
     }
 

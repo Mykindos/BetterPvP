@@ -1,0 +1,7 @@
+author: Mykindos
+main: me.mykindos.betterpvp.shops.Shops
+name: Shops
+load: POSTWORLD
+version: '1.0'
+depend: [Core]
+api-version: 1.20

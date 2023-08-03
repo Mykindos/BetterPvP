@@ -58,10 +58,10 @@ public class RoleListener implements Listener {
         Role role = event.getRole();
 
         if (role == null) {
-            UtilMessage.message(player, "Class", "Armor Class: " + ChatColor.GREEN + "None");
+            UtilMessage.simpleMessage(player, "Class", "Armor Class: <green>None");
         } else {
             roleManager.addObject(player.getUniqueId().toString(), role);
-            UtilMessage.message(player, "Class", "You equipped " + ChatColor.GREEN + role.getName());
+            UtilMessage.simpleMessage(player, "Class", "You equipped <green>%s", role.getName());
             UtilMessage.message(player, equipMessage(player, role));
 
             gamerManager.getObject(player.getUniqueId()).ifPresent(gamer -> {
@@ -262,16 +262,16 @@ public class RoleListener implements Listener {
         });
     }
 
-    @EventHandler (priority = EventPriority.LOW)
+    @EventHandler(priority = EventPriority.LOW)
     public void onDeath(CustomDeathEvent event) {
-        if (event.getKilled() instanceof Player killed){
+        if (event.getKilled() instanceof Player killed) {
             roleManager.getObject(killed.getUniqueId()).ifPresent(role -> {
                 event.setCustomDeathMessage(event.getCustomDeathMessage()
                         .replace(killed.getName(), "<green>" + role.getPrefix() + ".<yellow>" + killed.getName()));
             });
         }
 
-        if (event.getKiller() instanceof Player killer){
+        if (event.getKiller() instanceof Player killer) {
             roleManager.getObject(killer.getUniqueId()).ifPresent(role -> {
                 event.setCustomDeathMessage(event.getCustomDeathMessage()
                         .replace(killer.getName(), "<green>" + role.getPrefix() + ".<yellow>" + killer.getName()));

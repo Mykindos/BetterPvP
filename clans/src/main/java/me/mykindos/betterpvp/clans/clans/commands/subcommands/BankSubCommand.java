@@ -115,6 +115,7 @@ public class BankSubCommand extends ClanSubCommand {
                     return;
                 }
 
+
                 clan.saveProperty(ClanProperty.BALANCE, clan.getBalance() - amountToWithdraw);
                 gamer.saveProperty(GamerProperty.BALANCE, gamer.getBalance() + amountToWithdraw);
 
