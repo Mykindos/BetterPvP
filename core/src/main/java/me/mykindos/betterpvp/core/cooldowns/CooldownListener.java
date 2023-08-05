@@ -37,13 +37,13 @@ public class CooldownListener implements Listener {
 
     @EventHandler
     public void onDeath(CustomDeathEvent event) {
-        if(!(event.getKilled() instanceof Player player)) return;
+        if (!(event.getKilled() instanceof Player player)) return;
         cooldownManager.getObject(player.getUniqueId()).ifPresent(cooldowns -> {
             cooldowns.entrySet().removeIf(cooldown -> cooldown.getValue().isRemoveOnDeath());
         });
     }
 
-    @UpdateEvent(delay = 100)
+    @UpdateEvent(delay = 50)
     public void displayActionBar() {
         for (Player player : Bukkit.getOnlinePlayers()) {
 
@@ -59,8 +59,10 @@ public class CooldownListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void processCooldownDisplay(CooldownDisplayEvent event) {
-        if (event.isCancelled()) return;
-        if (event.getCooldownName().equals("")) return;
+        if (event.isCancelled() || event.getCooldownName().equals("")) {
+            UtilPlayer.sendActionBar(event.getPlayer(), "");
+            return;
+        }
 
         Cooldown cooldown = cooldownManager.getAbilityRecharge(event.getPlayer(), event.getCooldownName());
         if (cooldown != null) {

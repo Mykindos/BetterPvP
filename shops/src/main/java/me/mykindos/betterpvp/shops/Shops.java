@@ -16,6 +16,9 @@ import me.mykindos.betterpvp.shops.commands.loader.ShopsCommandLoader;
 import me.mykindos.betterpvp.shops.injector.ShopsInjectorModule;
 import me.mykindos.betterpvp.shops.listener.ShopsListenerLoader;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 
@@ -74,6 +77,14 @@ public class Shops extends BPvPPlugin {
 
     @Override
     public void onDisable() {
+        for(World world : Bukkit.getWorlds()) {
+            for(LivingEntity entity : world.getLivingEntities()) {
+                if(entity instanceof Player) continue;
 
+                if(entity.customName() != null) {
+                    entity.remove();
+                }
+            }
+        }
     }
 }

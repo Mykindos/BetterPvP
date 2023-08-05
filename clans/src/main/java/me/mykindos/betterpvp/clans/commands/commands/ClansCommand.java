@@ -63,7 +63,7 @@ public class ClansCommand extends Command implements IConsoleCommand {
 
         @Override
         public String getDescription() {
-            return "Reload the core plugin";
+            return "Reload the clans plugin";
         }
 
         @Override

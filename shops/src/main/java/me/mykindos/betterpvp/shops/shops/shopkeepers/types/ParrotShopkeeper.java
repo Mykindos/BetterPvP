@@ -1,5 +1,6 @@
-package me.mykindos.betterpvp.shops.shopkeepers;
+package me.mykindos.betterpvp.shops.shops.shopkeepers.types;
 
+import lombok.Getter;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.RandomSource;
@@ -7,25 +8,45 @@ import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LightningBolt;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
+import net.minecraft.world.entity.animal.Parrot;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.Location;
+import org.bukkit.craftbukkit.v1_20_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftEntity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-public abstract class Shopkeeper extends Mob {
+public class ParrotShopkeeper extends Parrot implements IShopkeeper {
 
-    public Shopkeeper(EntityType<? extends Mob> type, Level world) {
-        super(type, world);
+    @Getter
+    private final CraftEntity entity;
+
+    public ParrotShopkeeper(Location location, String name) {
+        this(EntityType.PARROT, location, name);
+    }
+
+    public ParrotShopkeeper(EntityType<? extends Parrot> type, Location location, String name) {
+        super(type, ((CraftWorld) location.getWorld()).getHandle());
 
         goalSelector.removeAllGoals(Objects::nonNull);
-        goalSelector.addGoal(1, new LookAtPlayerGoal(this, Player.class, 16.0F));
+        goalSelector.addGoal(10, new LookAtPlayerGoal(this, net.minecraft.world.entity.player.Player.class, 16.0F));
+
+        entity = spawn(location);
+
+        entity.setCustomName(name);
+        entity.setCustomNameVisible(true);
+
+        if(entity instanceof LivingEntity livingEntity) {
+            livingEntity.setRemoveWhenFarAway(false);
+            livingEntity.setCanPickupItems(false);
+        }
+
+
+
     }
 
     // Prevent NPC movement
@@ -52,6 +73,10 @@ public abstract class Shopkeeper extends Mob {
         return false;
     }
 
+    // Don't animate damage
+    @Override
+    public void animateHurt(float yaw) {}
+
     // Make unattackable
     @Override
     public boolean attackable() {
@@ -66,7 +91,7 @@ public abstract class Shopkeeper extends Mob {
 
     // Remove ambient sound
     @Override
-    protected SoundEvent getAmbientSound() {
+    public SoundEvent getAmbientSound() {
         return null;
     }
 
@@ -75,6 +100,9 @@ public abstract class Shopkeeper extends Mob {
     protected SoundEvent getHurtSound(@NotNull DamageSource damageSource) {
         return null;
     }
+
+    @Override
+    public void playHurtSound(@NotNull DamageSource damageSource) {}
 
     // Remove death sound
     @Override
@@ -88,7 +116,30 @@ public abstract class Shopkeeper extends Mob {
 
     // Dont allow shopkeepers to be set on fire
     @Override
-    public void setSecondsOnFire(int i, boolean callEvent) {}
+    public void setSecondsOnFire(int i, boolean callEvent) {
+        clearFire();
+    }
+
+    // Prevent flying
+    @Override
+    public boolean isFlying() {
+        return false;
+    }
+
+    @Override
+    public boolean isPartyParrot() {
+        return true;
+    }
+
+    @Override
+    public boolean onGround() {
+        return true;
+    }
+
+    @Override
+    public boolean isSilent(){
+        return true;
+    }
 
     public CraftEntity spawn(Location loc) {
         this.absMoveTo(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
