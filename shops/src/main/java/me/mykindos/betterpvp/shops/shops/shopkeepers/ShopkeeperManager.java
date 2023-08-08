@@ -11,6 +11,7 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 
 import java.util.Objects;
+import java.util.UUID;
 
 @Singleton
 public class ShopkeeperManager extends Manager<IShopkeeper> {
@@ -62,13 +63,13 @@ public class ShopkeeperManager extends Manager<IShopkeeper> {
     }
 
     public void saveShopkeeper(String type, String name, Location location) {
-        int count = objects.size() + 1;
-        shops.getConfig().set("shopkeepers." + count + ".type", type);
-        shops.getConfig().set("shopkeepers." + count + ".name", name);
-        shops.getConfig().set("shopkeepers." + count + ".world", location.getWorld().getName());
-        shops.getConfig().set("shopkeepers." + count + ".x", location.getX());
-        shops.getConfig().set("shopkeepers." + count + ".y", location.getY());
-        shops.getConfig().set("shopkeepers." + count + ".z", location.getZ());
+        String tag = UUID.randomUUID().toString();
+        shops.getConfig().set("shopkeepers." + tag + ".type", type);
+        shops.getConfig().set("shopkeepers." + tag + ".name", name);
+        shops.getConfig().set("shopkeepers." + tag + ".world", location.getWorld().getName());
+        shops.getConfig().set("shopkeepers." + tag + ".x", location.getX());
+        shops.getConfig().set("shopkeepers." + tag + ".y", location.getY());
+        shops.getConfig().set("shopkeepers." + tag + ".z", location.getZ());
 
         shops.saveConfig();
     }
