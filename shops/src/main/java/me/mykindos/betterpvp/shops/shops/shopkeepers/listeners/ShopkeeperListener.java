@@ -50,7 +50,7 @@ public class ShopkeeperListener implements Listener {
     @UpdateEvent(delay = 1000)
     public void playParrotMusic() {
 
-        Material song = MUSIC_DISC_MATERIALS[UtilMath.randomInt(MUSIC_DISC_MATERIALS.length -1)];
+        Material song = MUSIC_DISC_MATERIALS[UtilMath.randomInt(MUSIC_DISC_MATERIALS.length)];
         for (var shopkeeper : shopkeeperManager.getObjects().values()) {
             if (shopkeeper instanceof ParrotShopkeeper) {
                 Block block = shopkeeper.getEntity().getLocation().subtract(0, 2, 0).getBlock();
@@ -60,7 +60,6 @@ public class ShopkeeperListener implements Listener {
                             jukeboxState.setRecord(new ItemStack(song));
                             jukeboxState.update();
                         }
-
                     }
                 }
             }
