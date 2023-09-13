@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.repository.IRepository;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.apache.commons.lang.NotImplementedException;
 import org.bukkit.Material;
@@ -41,7 +42,7 @@ public class ItemRepository implements IRepository<BPVPItem> {
             while (result.next()) {
                 int id = result.getInt(1);
                 Material material = Material.getMaterial(result.getString(2));
-                Component name = MiniMessage.miniMessage().deserialize(result.getString(4));
+                Component name = MiniMessage.miniMessage().deserialize(result.getString(4)).decoration(TextDecoration.ITALIC, false);
                 boolean glowing = result.getBoolean(5);
                 List<Component> lore = getLoreForItem(id);
 
@@ -60,7 +61,7 @@ public class ItemRepository implements IRepository<BPVPItem> {
 
         try{
             while (result.next()) {
-                lore.add(MiniMessage.miniMessage().deserialize(result.getString(3)));
+                lore.add(MiniMessage.miniMessage().deserialize(result.getString(3)).decoration(TextDecoration.ITALIC, false));
             }
         }catch (Exception ex) {
             ex.printStackTrace();

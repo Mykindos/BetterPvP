@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.IConsoleCommand;
 import me.mykindos.betterpvp.core.command.SubCommand;
+import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -59,6 +60,9 @@ public class ChampionsCommand extends Command implements IConsoleCommand {
         @Inject
         private SkillManager skillManager;
 
+        @Inject
+        private ItemHandler itemHandler;
+
         @Override
         public String getName() {
             return "reload";
@@ -81,6 +85,8 @@ public class ChampionsCommand extends Command implements IConsoleCommand {
             commandLoader.reload(champions.getClass().getPackageName());
             listenerLoader.reload(champions.getClass().getPackageName());
             skillManager.reloadSkills();
+
+            itemHandler.loadItemData("Champions");
 
             UtilMessage.message(sender, "Champions", "Successfully reloaded champions");
         }

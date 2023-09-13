@@ -4,8 +4,11 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.Config;
+import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateLoreEvent;
+import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateNameEvent;
 import me.mykindos.betterpvp.core.items.enchants.GlowEnchant;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.weapons.WeaponManager;
 import net.kyori.adventure.text.Component;
 import org.bukkit.ChatColor;
@@ -15,20 +18,21 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Singleton
 public class ItemHandler {
 
     private final WeaponManager weaponManager;
     private final ItemRepository itemRepository;
-    private HashMap<Material, BPVPItem> itemMap = new HashMap<>();
-
+    private final HashMap<Material, BPVPItem> itemMap = new HashMap<>();
     private final Enchantment glowEnchantment;
+
+    private static final NamespacedKey UUID_KEY = new NamespacedKey("core", "uuid");
 
     @Inject
     @Config(path = "items.hideAttributes", defaultValue = "true")
@@ -68,6 +72,7 @@ public class ItemHandler {
 
         if (hideAttributes) {
             itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+            itemMeta.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS);
         }
 
         if(hideEnchants) {
@@ -76,8 +81,16 @@ public class ItemHandler {
 
         BPVPItem item = itemMap.get(material);
         if (item != null) {
-            itemMeta.displayName(item.getName());
-            itemMeta.lore(item.getLore());
+            var nameUpdateEvent = UtilServer.callEvent(new ItemUpdateNameEvent(itemMeta, item.getName()));
+            itemMeta.displayName(nameUpdateEvent.getItemName());
+
+            var loreUpdateEvent = UtilServer.callEvent(new ItemUpdateLoreEvent(itemMeta, new ArrayList<>(item.getLore())));
+            itemMeta.lore(loreUpdateEvent.getItemLore());
+
+            PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
+            if(!dataContainer.has(UUID_KEY)){
+                dataContainer.set(UUID_KEY, PersistentDataType.STRING, UUID.randomUUID().toString());
+            }
 
             if (item.isGlowing()) {
                 itemMeta.addEnchant(glowEnchantment, 1, true);
