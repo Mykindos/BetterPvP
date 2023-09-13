@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.utilities;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -118,7 +119,7 @@ public class UtilItem {
      * @param pickType Material to check
      * @return Returns true if the Material is a type of pickaxe
      */
-    public static boolean isPickAxe(Material pickType) {
+    public static boolean isPickaxe(Material pickType) {
         return pickType.name().contains("_PICKAXE");
     }
 
@@ -134,6 +135,19 @@ public class UtilItem {
      */
     public static boolean isHoe(Material hoeType) {
         return hoeType.name().contains("_HOE");
+    }
+
+    public static boolean isTool(Material material) {
+        return isPickaxe(material) || isHoe(material) || isShovel(material) || isAxe(material);
+    }
+
+    public static boolean isWeapon(Material material) {
+        return isSword(material) || isAxe(material) || isRanged(material);
+    }
+
+    public static boolean isArmour(Material material) {
+        return material.name().contains("_CAP") || material.name().contains("_CHESTPLATE")
+                || material.name().contains("_LEGGINGS") || material.name().contains("_BOOTS");
     }
 
     /**
@@ -170,6 +184,17 @@ public class UtilItem {
 
             player.updateInventory();
         }
+    }
+
+    public static int indexOf(String matchingText, List<Component> components) {
+        for (int i = 0; i < components.size(); i++) {
+            String componentText = PlainTextComponentSerializer.plainText().serialize(components.get(i));
+            if (componentText.equalsIgnoreCase(matchingText)) {
+                return i;
+            }
+        }
+
+        return -1;
     }
 
 }

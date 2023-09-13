@@ -142,14 +142,6 @@ public class WorldListener implements Listener {
     public void onInventoryOpen(InventoryOpenEvent event) {
         if (event.getPlayer() instanceof Player player) {
 
-            if (event.getInventory().getType() == InventoryType.ANVIL) {
-                event.setCancelled(true);
-            }
-
-            if (event.getInventory().getType() == InventoryType.BEACON) {
-                event.setCancelled(true);
-            }
-
             if (event.getInventory().getType() == InventoryType.BREWING
                     || event.getInventory().getType() == InventoryType.DISPENSER
                     || event.getInventory().getType() == InventoryType.CARTOGRAPHY
@@ -158,7 +150,8 @@ public class WorldListener implements Listener {
                     || event.getInventory().getType() == InventoryType.SHULKER_BOX
                     || event.getInventory().getType() == InventoryType.LOOM
                     || event.getInventory().getType() == InventoryType.STONECUTTER
-                    || event.getInventory().getType() == InventoryType.SMITHING) {
+                    || event.getInventory().getType() == InventoryType.SMITHING
+                    || event.getInventory().getType() == InventoryType.BEACON) {
                 UtilMessage.message(player, "Game",
                         ChatColor.YELLOW + UtilFormat.cleanString(event.getInventory().getType().toString())
                                 + ChatColor.GRAY + " is disabled.");
