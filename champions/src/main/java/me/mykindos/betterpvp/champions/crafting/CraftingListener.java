@@ -3,11 +3,13 @@ package me.mykindos.betterpvp.champions.crafting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
+import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateLoreEvent;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateNameEvent;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -69,8 +71,7 @@ public class CraftingListener implements Listener {
             return;
         }
 
-
-        ItemStack result = itemHandler.updateNames(firstItem.clone());
+        ItemStack result = firstItem.clone();
         ItemMeta meta = result.getItemMeta();
 
         var oldLore = meta.lore();
@@ -88,8 +89,10 @@ public class CraftingListener implements Listener {
 
             meta.lore(newLore);
         }
-        meta.getPersistentDataContainer().set(imbuementKey, PersistentDataType.BOOLEAN, true);
+        meta.getPersistentDataContainer().set(imbuementKey, PersistentDataType.STRING, "true");
+        meta.getPersistentDataContainer().set(CoreNamespaceKeys.GLOW_KEY, PersistentDataType.STRING, "true");
         result.setItemMeta(meta);
+
         event.setResult(itemHandler.updateNames(result));
 
         // Don't ask why, it's just required for some stupid reason
@@ -109,11 +112,11 @@ public class CraftingListener implements Listener {
                 var affixIndex = UtilItem.indexOf("affixes", event.getItemLore());
                 if (affixIndex == -1) {
                     event.getItemLore().add(Component.empty());
-                    event.getItemLore().add(Component.text("Affixes").color(NamedTextColor.BLUE));
+                    event.getItemLore().add(UtilMessage.getMiniMessage("<blue>Affixes"));
                     affixIndex = event.getItemLore().size() - 1;
                 }
 
-                event.getItemLore().add(affixIndex + 1, MiniMessage.miniMessage().deserialize(imbuement.getAffixText()));
+                event.getItemLore().add(affixIndex + 1, UtilMessage.getMiniMessage(imbuement.getAffixText()));
             }
         });
     }

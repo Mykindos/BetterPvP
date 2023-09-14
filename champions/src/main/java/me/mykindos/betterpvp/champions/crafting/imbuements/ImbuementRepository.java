@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.champions.crafting;
+package me.mykindos.betterpvp.champions.crafting.imbuements;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -11,7 +11,6 @@ import org.bukkit.Material;
 import javax.sql.rowset.CachedRowSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 @Singleton
@@ -39,11 +38,12 @@ public class ImbuementRepository implements IRepository<Imbuement> {
                 String key = result.getString(2);
                 String affixText = result.getString(3);
                 Material material = Material.valueOf(result.getString(4));
-                boolean canImbueArmour = result.getBoolean(5);
-                boolean canImbueWeapons = result.getBoolean(6);
-                boolean canImbueTools = result.getBoolean(7);
+                double value = result.getDouble(5);
+                boolean canImbueArmour = result.getBoolean(6);
+                boolean canImbueWeapons = result.getBoolean(7);
+                boolean canImbueTools = result.getBoolean(8);
 
-                var imbuement = new Imbuement(name, key, affixText, material, canImbueArmour, canImbueWeapons, canImbueTools);
+                var imbuement = new Imbuement(name, key, affixText, material, value, canImbueArmour, canImbueWeapons, canImbueTools);
 
                 imbuementValues.add(imbuement);
             }

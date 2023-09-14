@@ -34,7 +34,10 @@ public class ItemInfoCommand extends Command {
         var uuidKey = new NamespacedKey("core", "uuid");
         var persistentData = player.getInventory().getItemInMainHand().getItemMeta().getPersistentDataContainer();
 
-        UtilMessage.simpleMessage(player, "Info","UUID: %s", persistentData.getOrDefault(uuidKey, PersistentDataType.STRING, "NONE"));
+        persistentData.getKeys().forEach(key -> {
+            UtilMessage.simpleMessage(player, "Info", "<yellow>%s: <gray>%s", key.value(), persistentData.getOrDefault(key, PersistentDataType.STRING, ""));
+        });
+
     }
 
 

@@ -74,7 +74,7 @@ public class ClansMovementListener extends ClanListener {
 
         if (locationClan != null) {
             ClanRelation relation = clanManager.getRelation(clan, locationClan);
-            component = Component.text(relation.getPrimaryAsChatColor() + locationClan.getName());
+            component = Component.text(locationClan.getName()).color(relation.getPrimary());
 
             if (locationClan.isAdmin()) {
                 if (locationClan.isSafe()) {

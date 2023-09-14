@@ -23,6 +23,7 @@ import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.utilities.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -169,20 +170,15 @@ public class ClanManager extends Manager<Clan> {
     }
 
     public Component getClanTooltip(Player player, Clan target) {
-        List<String> list = new ArrayList<>();
         Clan clan = getClanByPlayer(player).orElse(null);
-        list.add(ChatColor.RED + "[Clans] " + getRelation(clan, target).getPrimaryAsChatColor() + target.getName() + " Information:");
-        list.add(" Age: " + ChatColor.YELLOW + target.getAge());
-        list.add(" Territory: " + ChatColor.YELLOW + target.getTerritory().size() + "/" + (target.getMembers().size() + additionalClaims));
-        list.add(" Allies: " + ChatColor.YELLOW + getAllianceList(player, target));
-        list.add(" Enemies: " + ChatColor.YELLOW + getEnemyList(player, target));
-        list.add(" Members: " + ChatColor.YELLOW + getMembersList(target));
+        var territoryString = target.getTerritory().size() + "/" + (target.getMembers().size() + additionalClaims);
 
-        Component textComponent = Component.text().build();
-        for (String text : list) {
-            textComponent = textComponent.append(Component.text(text + "\n"));
-        }
-        return textComponent;
+        return Component.text(target.getName() + " Information").color(getRelation(clan, target).getPrimary()).append(Component.newline())
+                .append(Component.text(" Age: ").color(NamedTextColor.WHITE).append(UtilMessage.getMiniMessage("<yellow>%s\n", target.getAge())))
+                .append(Component.text(" Territory: ").color(NamedTextColor.WHITE).append(UtilMessage.getMiniMessage("<yellow>%s\n", territoryString)))
+                .append(Component.text(" Allies: ").color(NamedTextColor.WHITE).append(Component.text(getAllianceList(player, target)))).append(Component.newline())
+                .append(Component.text(" Enemies: ").color(NamedTextColor.WHITE).append(Component.text(getEnemyList(player, target)))).append(Component.newline())
+                .append(Component.text(" Members: ").color(NamedTextColor.WHITE).append(UtilMessage.getMiniMessage("%s", getMembersList(target))));
     }
 
     public String getAllianceList(Player player, Clan clan) {
@@ -232,7 +228,7 @@ public class ClanManager extends Manager<Clan> {
                     membersString.append(membersString.length() != 0 ? "<gray>, " : "").append("<yellow>")
                             .append(member.getRoleIcon())
                             .append(UtilFormat.getOnlineStatus(member.getUuid()))
-                            .append(gamer.getClient().getName());
+                            .append(UtilFormat.spoofNameForLunar(gamer.getClient().getName()));
                 });
 
             }
