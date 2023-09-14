@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.Config;
+import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateLoreEvent;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateNameEvent;
 import me.mykindos.betterpvp.core.items.enchants.GlowEnchant;
@@ -11,6 +12,7 @@ import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.weapons.WeaponManager;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -32,7 +34,7 @@ public class ItemHandler {
     private final HashMap<Material, BPVPItem> itemMap = new HashMap<>();
     private final Enchantment glowEnchantment;
 
-    private static final NamespacedKey UUID_KEY = new NamespacedKey("core", "uuid");
+
 
     @Inject
     @Config(path = "items.hideAttributes", defaultValue = "true")
@@ -47,8 +49,8 @@ public class ItemHandler {
         this.weaponManager = weaponManager;
         this.itemRepository = itemRepository;
 
-        NamespacedKey key = new NamespacedKey(core, "Glow");
-        glowEnchantment = new GlowEnchant(key);
+
+        glowEnchantment = new GlowEnchant(CoreNamespaceKeys.GLOW_ENCHANTMENT_KEY);
         registerEnchantment(glowEnchantment);
     }
 
@@ -88,11 +90,11 @@ public class ItemHandler {
             itemMeta.lore(loreUpdateEvent.getItemLore());
 
             PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
-            if(!dataContainer.has(UUID_KEY)){
-                dataContainer.set(UUID_KEY, PersistentDataType.STRING, UUID.randomUUID().toString());
+            if(!dataContainer.has(CoreNamespaceKeys.UUID_KEY)){
+                dataContainer.set(CoreNamespaceKeys.UUID_KEY, PersistentDataType.STRING, UUID.randomUUID().toString());
             }
 
-            if (item.isGlowing()) {
+            if (item.isGlowing() || dataContainer.has(CoreNamespaceKeys.GLOW_KEY)) {
                 itemMeta.addEnchant(glowEnchantment, 1, true);
             }else{
                 for(Map.Entry<Enchantment, Integer> entry : itemStack.getEnchantments().entrySet()){
@@ -100,7 +102,7 @@ public class ItemHandler {
                 }
             }
         }else{
-            itemMeta.displayName(Component.text(ChatColor.YELLOW + UtilFormat.cleanString(material.name())));
+            itemMeta.displayName(Component.text(UtilFormat.cleanString(material.name())).color(NamedTextColor.YELLOW));
         }
 
         itemStack.setItemMeta(itemMeta);

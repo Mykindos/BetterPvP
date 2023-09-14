@@ -146,7 +146,7 @@ public class UtilItem {
     }
 
     public static boolean isArmour(Material material) {
-        return material.name().contains("_CAP") || material.name().contains("_CHESTPLATE")
+        return material.name().contains("_CAP") || material.name().contains("_HELMET") || material.name().contains("_CHESTPLATE")
                 || material.name().contains("_LEGGINGS") || material.name().contains("_BOOTS");
     }
 

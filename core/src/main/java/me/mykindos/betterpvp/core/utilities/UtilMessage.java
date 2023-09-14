@@ -2,8 +2,10 @@ package me.mykindos.betterpvp.core.utilities;
 
 import me.mykindos.betterpvp.core.client.Rank;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -205,6 +207,14 @@ public class UtilMessage {
     public static void simpleBroadcast(String prefix, String message, Object... args) {
         Bukkit.getServer().broadcast(Component.text(NamedTextColor.BLUE + prefix + "> ")
                 .append(MiniMessage.miniMessage().deserialize("<gray>" + String.format(message, args))));
+    }
+
+    public static Component getMiniMessage(String message, Object... args) {
+        return MiniMessage.miniMessage().deserialize(String.format(message, args)).decoration(TextDecoration.ITALIC, false);
+    }
+
+    public static Component getMiniMessage(String message) {
+        return MiniMessage.miniMessage().deserialize(message).decoration(TextDecoration.ITALIC, false);
     }
 
     /**
