@@ -131,3 +131,24 @@ INSERT IGNORE INTO itemlore
 
 INSERT IGNORE INTO itemlore
     VALUES ((SELECT id FROM items WHERE Material = "NETHERITE_AXE" AND Module = "Champions"), 1, "<gray>+1 Level to Axe Skills");
+
+
+-- Tools
+
+INSERT IGNORE INTO items (Material, Module, Name, Glow) VALUES
+    ("WOODEN_PICKAXE", "Champions", "<yellow>Wooden Pickaxe", 0), ("STONE_PICKAXE", "Champions", "<yellow>Stone Pickaxe", 0),
+    ("IRON_PICKAXE", "Champions", "<yellow>Iron Pickaxe", 0), ("GOLD_PICKAXE", "Champions", "<yellow>Gold Pickaxe", 0),
+    ("DIAMOND_PICKAXE", "Champions", "<yellow>Diamond Pickaxe", 0), ("NETHERITE_PICKAXE", "Champions", "<yellow>Netherite Pickaxe", 0);
+
+INSERT IGNORE INTO items (Material, Module, Name, Glow) VALUES
+    ("WOODEN_AXE", "Champions", "<yellow>Wooden Axe", 0), ("STONE_AXE", "Champions", "<yellow>Stone Axe", 0);
+    
+INSERT IGNORE INTO items (Material, Module, Name, Glow) VALUES
+    ("WOODEN_HOE", "Champions", "<yellow>Wooden Hoe", 0), ("STONE_HOE", "Champions", "<yellow>Stone Hoe", 0),
+    ("IRON_HOE", "Champions", "<yellow>Iron Hoe", 0), ("GOLD_HOE", "Champions", "<yellow>Gold Hoe", 0),
+    ("DIAMOND_HOE", "Champions", "<yellow>Diamond Hoe", 0), ("NETHERITE_HOE", "Champions", "<yellow>Netherite Hoe", 0);
+
+INSERT IGNORE INTO items (Material, Module, Name, Glow) VALUES
+    ("WOODEN_SHOVEL", "Champions", "<yellow>Wooden Shovel", 0), ("STONE_SHOVEL", "Champions", "<yellow>Stone Shovel", 0),
+    ("IRON_SHOVEL", "Champions", "<yellow>Iron Shovel", 0), ("GOLD_SHOVEL", "Champions", "<yellow>Gold Shovel", 0),
+    ("DIAMOND_SHOVEL", "Champions", "<yellow>Diamond Shovel", 0), ("NETHERITE_SHOVEL", "Champions", "<yellow>Netherite Shovel", 0);

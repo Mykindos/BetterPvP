@@ -41,7 +41,7 @@ create table if not exists ${tablePrefix}clan_alliances
 (
     id        int         auto_increment not null,
     Clan      varchar(36) not null,
-    AllyClan  varchar(36  not null,
+    AllyClan  varchar(36) not null,
     Trusted   tinyint     default 0,
     constraint clan_alliances_pk
         primary key (id)
