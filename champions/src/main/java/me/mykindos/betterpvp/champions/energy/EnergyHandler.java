@@ -37,7 +37,6 @@ public class EnergyHandler {
 
         amount = 0.999 * (amount / 100);
 
-
         if (amount > getEnergy(player)) {
             if (inform) {
                 UtilMessage.message(player, "Energy", "You are too exhausted to use " + ChatColor.GREEN + ability + ChatColor.GRAY + ".");
