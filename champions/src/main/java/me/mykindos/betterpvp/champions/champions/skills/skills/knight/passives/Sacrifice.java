@@ -36,7 +36,7 @@ public class Sacrifice extends Skill implements PassiveSkill {
         double percentage = ((level * 0.08) * 100);
         return new String[]{"Deal an extra " + ChatColor.GREEN + percentage + "%" + ChatColor.GRAY + " damage",
                 "But you now also take",
-                ChatColor.GREEN.toString() + percentage + ChatColor.GRAY + " extra damage from melee attacks"
+                ChatColor.GREEN.toString() + percentage + "%" + ChatColor.GRAY + " extra damage from melee attacks"
         };
     }
 

@@ -25,7 +25,7 @@ INSERT IGNORE INTO ${tablePrefix}imbuement_data (ImbuementName, NamespaceKey, Af
 INSERT IGNORE INTO ${tablePrefix}imbuement_data (ImbuementName, NamespaceKey, AffixText, Material, Value, OnArmour, OnWeapons, OnTools) VALUES
     ("Fortune", "champions:imbuement-fortune", "<green>10% <gray>chance to get double resources", "DUNE_ARMOR_TRIM_SMITHING_TEMPLATE", 10, 0, 0, 1);
 
--- Add runes to items & itemlore
+-- Add runes to items & item lore
 INSERT IGNORE INTO items (Material, Module, Name, Glow) VALUES ('SHAPER_ARMOR_TRIM_SMITHING_TEMPLATE', 'Champions', '<yellow>Rune of Skill Haste', 0);
 SELECT id INTO @itemId FROM items WHERE Material = 'SHAPER_ARMOR_TRIM_SMITHING_TEMPLATE';
 INSERT IGNORE INTO itemlore VALUES (@itemId, 0, '<gray>Can be applied to any equippable item'), (@itemId, 1, ''), (@itemId, 2, '<blue>Affix'), (@itemId, 3, '<green>15% <gray>cooldown reduction');
