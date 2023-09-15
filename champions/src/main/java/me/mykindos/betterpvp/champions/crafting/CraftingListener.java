@@ -59,16 +59,22 @@ public class CraftingListener implements Listener {
 
         if (firstItem.getItemMeta().getPersistentDataContainer().has(imbuementKey)) return;
 
-        if (UtilItem.isTool(firstItem.getType()) && !imbuement.isCanImbueTools()) {
-            return;
-        }
-
-        if ((UtilItem.isWeapon(firstItem.getType()) && !imbuement.isCanImbueWeapons())) {
-            return;
-        }
-
         if (UtilItem.isArmour(firstItem.getType()) && !imbuement.isCanImbueArmour()) {
             return;
+        }
+
+        if (UtilItem.isWeapon(firstItem.getType()) && !imbuement.isCanImbueWeapons()) {
+            if(!UtilItem.isAxe(firstItem.getType()) && !imbuement.isCanImbueTools()) {
+                System.out.println("A");
+                return;
+            }
+        }
+
+        if (UtilItem.isTool(firstItem.getType()) && !imbuement.isCanImbueTools()) {
+            if(!UtilItem.isAxe(firstItem.getType()) && !imbuement.isCanImbueWeapons()) {
+                System.out.println("B");
+                return;
+            }
         }
 
         ItemStack result = firstItem.clone();
@@ -93,6 +99,8 @@ public class CraftingListener implements Listener {
         meta.getPersistentDataContainer().set(CoreNamespaceKeys.GLOW_KEY, PersistentDataType.STRING, "true");
         result.setItemMeta(meta);
 
+        System.out.println("Set persistent data");
+
         event.setResult(itemHandler.updateNames(result));
 
         // Don't ask why, it's just required for some stupid reason
@@ -108,6 +116,8 @@ public class CraftingListener implements Listener {
             if (namespacedKey == null) return;
 
             if (event.getItemMeta().getPersistentDataContainer().has(namespacedKey)) {
+
+                System.out.println("Adding imbuement lore");
 
                 var affixIndex = UtilItem.indexOf("affixes", event.getItemLore());
                 if (affixIndex == -1) {
@@ -133,6 +143,7 @@ public class CraftingListener implements Listener {
         });
 
         if (hasImbuement) {
+            System.out.println("Update name: has imbuement = true");
             event.setItemName(
                     Component.text("Imbued ").color(NamedTextColor.AQUA)
                             .append(event.getItemName().color(NamedTextColor.AQUA))

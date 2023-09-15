@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.weapons.WeaponManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -85,6 +86,7 @@ public class ItemHandler {
         if (item != null) {
             var nameUpdateEvent = UtilServer.callEvent(new ItemUpdateNameEvent(itemMeta, item.getName()));
             itemMeta.displayName(nameUpdateEvent.getItemName());
+            Bukkit.broadcast(nameUpdateEvent.getItemName());
 
             var loreUpdateEvent = UtilServer.callEvent(new ItemUpdateLoreEvent(itemMeta, new ArrayList<>(item.getLore())));
             itemMeta.lore(loreUpdateEvent.getItemLore());
