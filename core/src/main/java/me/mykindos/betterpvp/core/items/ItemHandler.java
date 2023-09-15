@@ -86,7 +86,6 @@ public class ItemHandler {
         if (item != null) {
             var nameUpdateEvent = UtilServer.callEvent(new ItemUpdateNameEvent(itemMeta, item.getName()));
             itemMeta.displayName(nameUpdateEvent.getItemName());
-            Bukkit.broadcast(nameUpdateEvent.getItemName());
 
             var loreUpdateEvent = UtilServer.callEvent(new ItemUpdateLoreEvent(itemMeta, new ArrayList<>(item.getLore())));
             itemMeta.lore(loreUpdateEvent.getItemLore());

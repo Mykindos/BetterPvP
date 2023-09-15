@@ -43,5 +43,5 @@ SELECT id INTO @itemId FROM items WHERE Material = 'WAYFINDER_ARMOR_TRIM_SMITHIN
 INSERT IGNORE INTO itemlore VALUES (@itemId, 0, '<gray>Can be applied to any equippable item'), (@itemId, 1, ''), (@itemId, 2, '<blue>Affix'), (@itemId, 3, '<green>10% <gray>energy cost reduction');
 
 INSERT IGNORE INTO items (Material, Module, Name, Glow) VALUES ('DUNE_ARMOR_TRIM_SMITHING_TEMPLATE', 'Champions', '<yellow>Rune of Fortune', 0);
-SELECT id INTO @itemId FROM items WHERE Material = 'WAYFINDER_ARMOR_TRIM_SMITHING_TEMPLATE';
+SELECT id INTO @itemId FROM items WHERE Material = 'DUNE_ARMOR_TRIM_SMITHING_TEMPLATE';
 INSERT IGNORE INTO itemlore VALUES (@itemId, 0, '<gray>Can only be applied to tools'),(@itemId, 1, ''), (@itemId, 2, '<blue>Affix'), (@itemId, 3, '<green>10% <gray>chance to get double resources');
