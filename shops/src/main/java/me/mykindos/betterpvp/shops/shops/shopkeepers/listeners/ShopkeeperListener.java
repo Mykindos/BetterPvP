@@ -65,10 +65,6 @@ public class ShopkeeperListener implements Listener {
             }
         }
 
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            UtilServer.callEvent(new CooldownDisplayEvent(player));
-        }
-
     }
 
 
