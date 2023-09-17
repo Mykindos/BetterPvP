@@ -298,7 +298,7 @@ public class ClanManager extends Manager<Clan> {
         int killerSize = killer.getSquadCount();
         int killedSize = killer.getSquadCount();
 
-        int sizeOffset = 6 - Math.min(killerSize - killedSize, 6);
+        int sizeOffset = Math.min(6, 6 - Math.min(killerSize - killedSize, 6));
 
         int dominance = dominanceScale.getOrDefault(sizeOffset, 6);
 
