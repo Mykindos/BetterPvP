@@ -77,7 +77,7 @@ public class InfoSubCommand extends ClanSubCommand {
 
         if (client.hasRank(Rank.ADMIN)) {
             UtilMessage.simpleMessage(player, "Points: <yellow>%d", target.getPoints());
-            component = component.append(Component.text("Points", NamedTextColor.WHITE)).append(Component.text(target.getPoints(), NamedTextColor.YELLOW));
+            component = component.append(Component.text("Points: ", NamedTextColor.WHITE)).append(Component.text(target.getPoints(), NamedTextColor.YELLOW));
         }
 
         UtilMessage.message(player, "Clans", component);
