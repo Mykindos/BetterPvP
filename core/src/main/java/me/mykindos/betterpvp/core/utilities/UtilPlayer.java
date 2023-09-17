@@ -3,7 +3,9 @@ package me.mykindos.betterpvp.core.utilities;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.wrappers.WrappedDataValue;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
+import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 import lombok.SneakyThrows;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
@@ -127,11 +129,26 @@ public class UtilPlayer {
         byte entityByte = 0x00;
         if (glowing) {
             entityByte = (byte) (entityByte | 0x40);
-        } else {
-            entityByte = (byte) (entityByte & ~0x40);
         }
+
         watcher.setObject(0, serializer, entityByte); //Set status to glowing, found on protocol page
-        packet.getWatchableCollectionModifier().write(0, watcher.getWatchableObjects()); //Make the packet's datawatcher the one we created
+
+        final List<WrappedDataValue> wrappedDataValueList = new ArrayList<>();
+
+        for(final WrappedWatchableObject entry : watcher.getWatchableObjects()) {
+            if(entry == null) continue;
+
+            final WrappedDataWatcher.WrappedDataWatcherObject watcherObject = entry.getWatcherObject();
+            wrappedDataValueList.add(
+                    new WrappedDataValue(
+                            watcherObject.getIndex(),
+                            watcherObject.getSerializer(),
+                            entry.getRawValue()
+                    )
+            );
+        }
+
+        packet.getDataValueCollectionModifier().write(0, wrappedDataValueList);
         ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet);
     }
 

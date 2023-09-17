@@ -214,7 +214,7 @@ public class ClanManager extends Manager<Clan> {
         if (!clan.getEnemies().isEmpty()) {
             for (ClanEnemy enemy : clan.getEnemies()) {
                 ClanRelation relation = getRelation(playerClan, enemy.getClan());
-                enemies.add(relation.getPrimaryMiniColor() + enemy.getClan().getName() + " " + clan.getDominanceString(enemy.getClan()));
+                enemies.add((relation.getPrimaryMiniColor() + enemy.getClan().getName() + " " + clan.getDominanceString(enemy.getClan())).trim());
             }
         }
         return String.join("<gray>, ", enemies);
@@ -350,14 +350,15 @@ public class ClanManager extends Manager<Clan> {
 
     @Override
     public void loadFromList(List<Clan> objects) {
+        // Load the base clan objects first so they can be referenced in the loop below
+        objects.forEach(clan -> addObject(clan.getName().toLowerCase(), clan));
+
         objects.forEach(clan -> {
             clan.setTerritory(repository.getTerritory(clan));
             clan.setAlliances(repository.getAlliances(this, clan));
             clan.setEnemies(repository.getEnemies(this, clan));
             clan.setMembers(repository.getMembers(clan));
             clan.setInsurance(repository.getInsurance(clan));
-
-            addObject(clan.getName().toLowerCase(), clan);
         });
 
         log.info("Loaded {} clans", objects.size());

@@ -43,7 +43,7 @@ dependencies {
 
     compileOnly("io.papermc.paper:paper-api:1.20.1-R0.1-SNAPSHOT")
     compileOnly("org.projectlombok:lombok:1.18.24")
-    compileOnly("com.comphenix.protocol:ProtocolLib:4.6.1-SNAPSHOT")
+    compileOnly("com.comphenix.protocol:ProtocolLib:5.1.0")
 
     implementation("com.google.inject:guice:5.1.0")
     implementation("org.reflections:reflections:0.10.2")
