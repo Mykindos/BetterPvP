@@ -10,6 +10,8 @@ import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -45,21 +47,23 @@ public class ClanCommand extends Command {
         if (args.length != 0) return;
 
         clanManager.getClanByPlayer(player).ifPresentOrElse(clan -> {
-                    UtilMessage.message(player, "Clans", clan.getName() + " Information: ");
 
-                    UtilMessage.simpleMessage(player, "Age: <yellow>" + clan.getAge());
-                    UtilMessage.simpleMessage(player, "Territory: <yellow>" + clan.getTerritory().size() + "/" + (3 + clan.getMembers().size()));
-                    UtilMessage.simpleMessage(player, "Home: " + (clan.getHome() == null ? "<red>Not set" : "<yellow>" + UtilWorld.locationToString(clan.getHome())));
-                    UtilMessage.simpleMessage(player, "Allies: " + clanManager.getAllianceList(player, clan));
-                    UtilMessage.simpleMessage(player, "Enemies: " + clanManager.getEnemyListDom(player, clan));
-                    UtilMessage.simpleMessage(player, "Members: " + clanManager.getMembersList(clan));
-                    // UtilMessage.message(player, "TNT Protection: " + clan.getVulnerableString());
-                    UtilMessage.simpleMessage(player, "Cooldown: " + (!clan.isNoDominanceCooldownActive() ? "<green>No"
-                            : "<red>" + UtilTime.getTime(clan.getNoDominanceCooldown() - System.currentTimeMillis(), UtilTime.TimeUnit.BEST, 1)));
-                    UtilMessage.simpleMessage(player, "Energy: <yellow>" + clan.getEnergy() + " - (<gold>" + clan.getEnergyTimeRemaining() + "<yellow>)");
+                    Component component = Component.text(clan.getName() + " Information: ", NamedTextColor.AQUA).appendNewline()
+                            .append(Component.text("Age: ", NamedTextColor.WHITE)).append(Component.text(clan.getAge(), NamedTextColor.YELLOW)).appendNewline()
+                            .append(Component.text("Territory: ", NamedTextColor.WHITE)).append(Component.text(clan.getTerritory().size() + "/" + (3 + clan.getMembers().size()), NamedTextColor.YELLOW)).appendNewline()
+                            .append(Component.text("Home: ", NamedTextColor.WHITE)).append(UtilMessage.getMiniMessage((clan.getHome() == null ? "<red>Not set" : "<yellow>" + UtilWorld.locationToString(clan.getHome())))).appendNewline()
+                            .append(Component.text("Allies: ", NamedTextColor.WHITE)).append(UtilMessage.getMiniMessage(clanManager.getAllianceList(player, clan))).appendNewline()
+                            .append(Component.text("Enemies: ", NamedTextColor.WHITE)).append(UtilMessage.getMiniMessage(clanManager.getEnemyListDom(player, clan))).appendNewline()
+                            .append(Component.text("Members: ", NamedTextColor.WHITE)).append(UtilMessage.getMiniMessage(clanManager.getMembersList(clan))).appendNewline()
+                            .append(Component.text("Cooldown: ", NamedTextColor.WHITE)).append(UtilMessage.getMiniMessage((!clan.isNoDominanceCooldownActive() ? "<green>No"
+                                    : "<red>" + UtilTime.getTime(clan.getNoDominanceCooldown() - System.currentTimeMillis(), UtilTime.TimeUnit.BEST, 1)))).appendNewline()
+                            .append(Component.text("Energy: ", NamedTextColor.WHITE)).append(Component.text(clan.getEnergy() + " - (", NamedTextColor.YELLOW)
+                                    .append(Component.text(clan.getEnergyTimeRemaining(), NamedTextColor.GOLD).append(Component.text(")", NamedTextColor.YELLOW)))).appendNewline()
+                            .append(Component.text("Level: ", NamedTextColor.WHITE)).append(Component.text(clan.getLevel(), NamedTextColor.GOLD)).appendNewline()
+                            .append(Component.text("Points: ", NamedTextColor.WHITE)).append(Component.text(clan.getPoints(), NamedTextColor.YELLOW));
 
-                    UtilMessage.simpleMessage(player, "Points: <yellow>%d", clan.getPoints());
-                    UtilMessage.simpleMessage(player, "Level: <yellow>%d", clan.getLevel());
+                    UtilMessage.message(player, "Clans", component);
+
 
                 },
                 () -> UtilMessage.message(player, "Clans", "You are not in a clan")

@@ -12,8 +12,12 @@ import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
+import java.awt.*;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -56,26 +60,28 @@ public class InfoSubCommand extends ClanSubCommand {
         Clan playerClan = clanManager.getClanByPlayer(player).orElse(null);
         ClanRelation clanRelation = clanManager.getRelation(playerClan, target);
 
-        UtilMessage.simpleMessage(player, "Clans", clanRelation.getSecondaryMiniColor() + target.getName() + " Information: ");
-        UtilMessage.simpleMessage(player, "Age: <yellow>" + target.getAge());
-        UtilMessage.simpleMessage(player, "Territory: <yellow>" + target.getTerritory().size() + "/" + (3 + target.getMembers().size()));
-        UtilMessage.simpleMessage(player, "Allies: " + clanManager.getAllianceList(player, target));
-        UtilMessage.simpleMessage(player, "Enemies: " + clanManager.getEnemyList(player, target));
-        UtilMessage.simpleMessage(player, "Members: " + clanManager.getMembersList(target));
-        // UtilMessage.message(player, "TNT Protection: " + clan.getVulnerableString());
-        // UtilMessage.message(player, "Cooldown: " + (!clan.isOnCooldown() ? ChatColor.GREEN + "No"
-        //         : ChatColor.RED + UtilTime.getTime(clan.getCooldown(), TimeUnit.BEST, 2)));
-        UtilMessage.simpleMessage(player, "Energy: <yellow>" + target.getEnergy() + " - (<gold>"
-                + target.getEnergyTimeRemaining() + "<yellow>)");
-        UtilMessage.simpleMessage(player, "Level: <yellow>%d", target.getLevel());
+        Component component = Component.text(target.getName() + " Information: ", clanRelation.getPrimary()).appendNewline()
+                .append(Component.text("Age: ", NamedTextColor.WHITE)).append(Component.text(target.getAge(), NamedTextColor.YELLOW)).appendNewline()
+                .append(Component.text("Territory: ", NamedTextColor.WHITE)).append(Component.text(target.getTerritory().size() + "/" + (3 + target.getMembers().size()), NamedTextColor.YELLOW)).appendNewline()
+                .append(Component.text("Allies: ", NamedTextColor.WHITE)).append(UtilMessage.getMiniMessage(clanManager.getAllianceList(player, target))).appendNewline()
+                .append(Component.text("Enemies: ", NamedTextColor.WHITE)).append(UtilMessage.getMiniMessage(clanManager.getEnemyListDom(player, target))).appendNewline()
+                .append(Component.text("Members: ", NamedTextColor.WHITE)).append(UtilMessage.getMiniMessage(clanManager.getMembersList(target))).appendNewline()
+                .append(Component.text("Energy: ", NamedTextColor.WHITE)).append(Component.text(target.getEnergy() + " - (", NamedTextColor.YELLOW)
+                        .append(Component.text(target.getEnergyTimeRemaining(), NamedTextColor.GOLD).append(Component.text(")", NamedTextColor.YELLOW)))).appendNewline()
+                .append(Component.text("Level: ", NamedTextColor.WHITE)).append(Component.text(target.getLevel(), NamedTextColor.GOLD)).appendNewline();
+
 
         if (clanRelation == ClanRelation.ENEMY) {
-            UtilMessage.message(player, "Dominance: " + Objects.requireNonNull(playerClan).getDominanceString(target));
+            component = component.append(Component.text("Dominance: ", NamedTextColor.WHITE)).append(Component.text(Objects.requireNonNull(playerClan).getDominanceString(target))).appendNewline();
         }
 
         if (client.hasRank(Rank.ADMIN)) {
             UtilMessage.simpleMessage(player, "Points: <yellow>%d", target.getPoints());
+            component = component.append(Component.text("Points", NamedTextColor.WHITE)).append(Component.text(target.getPoints(), NamedTextColor.YELLOW));
         }
+
+        UtilMessage.message(player, "Clans", component);
+
     }
 
     @Override

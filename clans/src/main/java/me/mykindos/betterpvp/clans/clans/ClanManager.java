@@ -183,14 +183,15 @@ public class ClanManager extends Manager<Clan> {
 
     public String getAllianceList(Player player, Clan clan) {
         Clan playerClan = getClanByPlayer(player).orElse(null);
-        StringBuilder allyString = new StringBuilder();
+        List<String> allies = new ArrayList<>();
+
         if (!clan.getAlliances().isEmpty()) {
-            for (ClanAlliance ally : clan.getAlliances()) {
-                allyString.append(allyString.length() != 0 ? NamedTextColor.GRAY + ", " : "")
-                        .append(getRelation(playerClan, ally.getClan()).getPrimary()).append(ally.getClan().getName());
+            for (ClanAlliance enemy : clan.getAlliances()) {
+                ClanRelation relation = getRelation(playerClan, enemy.getClan());
+                allies.add(relation.getPrimaryMiniColor() + enemy.getClan().getName());
             }
         }
-        return allyString.toString();
+        return String.join("<gray>, ", allies);
     }
 
     public String getEnemyList(Player player, Clan clan) {
@@ -200,10 +201,10 @@ public class ClanManager extends Manager<Clan> {
         if (!clan.getEnemies().isEmpty()) {
             for (ClanEnemy enemy : clan.getEnemies()) {
                 ClanRelation relation = getRelation(playerClan, enemy.getClan());
-                enemies.add(relation.getPrimary() + enemy.getClan().getName());
+                enemies.add(relation.getPrimaryMiniColor() + enemy.getClan().getName());
             }
         }
-        return enemies.stream().collect(Collectors.joining(NamedTextColor.GRAY + ", "));
+        return String.join("<gray>, ", enemies);
     }
 
     public String getEnemyListDom(Player player, Clan clan) {
@@ -213,10 +214,10 @@ public class ClanManager extends Manager<Clan> {
         if (!clan.getEnemies().isEmpty()) {
             for (ClanEnemy enemy : clan.getEnemies()) {
                 ClanRelation relation = getRelation(playerClan, enemy.getClan());
-                enemies.add(relation.getPrimary() + enemy.getClan().getName() + " " + clan.getDominanceString(enemy.getClan()));
+                enemies.add(relation.getPrimaryMiniColor() + enemy.getClan().getName() + " " + clan.getDominanceString(enemy.getClan()));
             }
         }
-        return enemies.stream().collect(Collectors.joining(NamedTextColor.GRAY + ", "));
+        return String.join("<gray>, ", enemies);
     }
 
     public String getMembersList(Clan clan) {
@@ -302,8 +303,8 @@ public class ClanManager extends Manager<Clan> {
         }
         killedEnemy.takeDominance(dominance);
 
-        killed.messageClan("You lost <red>%" + dominance + "<gray> dominance to <red>" + killer.getName(), null, true);
-        killer.messageClan("You gained <green>%" + dominance + "<gray> dominance on <red>" + killed.getName(), null, true);
+        killed.messageClan("You lost <red>" + dominance + "%<gray> dominance to <red>" + killer.getName(), null, true);
+        killer.messageClan("You gained <green>" + dominance + "%<gray> dominance on <red>" + killed.getName(), null, true);
 
         getRepository().updateDominance(killed, killedEnemy);
         getRepository().updateDominance(killer, killerEnemy);
