@@ -23,6 +23,8 @@ public interface IClan {
     List<ClanEnemy> getEnemies();
     List<ClanTerritory> getTerritory();
 
+    int getSquadCount();
+
     default boolean isAllied(IClan clan) {
         return getAlliances().stream().anyMatch(ally -> ally.getClan().equals(clan));
     }

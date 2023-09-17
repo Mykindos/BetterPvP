@@ -295,7 +295,12 @@ public class ClanManager extends Manager<Clan> {
         ClanEnemy killedEnemy = killed.getEnemy(killer).orElseThrow();
         ClanEnemy killerEnemy = killer.getEnemy(killed).orElseThrow();
 
-        int dominance = dominanceScale.getOrDefault(killed.getMembers().size(), 6);
+        int killerSize = killer.getSquadCount();
+        int killedSize = killer.getSquadCount();
+
+        int sizeOffset = 6 - Math.min(killerSize - killedSize, 6);
+
+        int dominance = dominanceScale.getOrDefault(sizeOffset, 6);
 
         // If the killed players clan has no dominance on the killer players clan, then give dominance to the killer
         if (killedEnemy.getDominance() == 0) {
