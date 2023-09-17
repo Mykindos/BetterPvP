@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -158,13 +159,13 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
 
             String text;
             if (enemy.getDominance() > 0) {
-                text = NamedTextColor.GREEN.toString() + enemy.getDominance() + "%";
+                text = "<green>" + enemy.getDominance() + "%";
             } else if (theirEnemy.getDominance() > 0) {
-                text = NamedTextColor.RED.toString() + theirEnemy.getDominance() + "%";
+                text = "<red>" + theirEnemy.getDominance() + "%";
             } else {
                 return "";
             }
-            return NamedTextColor.GRAY + " (" + text + NamedTextColor.GRAY + ")" + NamedTextColor.GRAY;
+            return "<gray> (" + text + "<gray>)";
         }
         return "";
     }
@@ -178,12 +179,12 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
             ClanEnemy theirEnemy = theirEnemyOptional.get();
 
             if (theirEnemy.getDominance() == 0 && enemy.getDominance() == 0) {
-                return NamedTextColor.WHITE + " 0";
+                return ChatColor.WHITE + " 0";
             }
             if (theirEnemy.getDominance() > 0) {
-                return NamedTextColor.GREEN + " " + theirEnemy.getDominance() + "%";
+                return ChatColor.GREEN + " " + theirEnemy.getDominance() + "%";
             } else {
-                return NamedTextColor.DARK_RED + " " + enemy.getDominance() + "%";
+                return ChatColor.DARK_RED + " " + enemy.getDominance() + "%";
             }
 
         }
@@ -213,7 +214,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
     public String getEnergyTimeRemaining() {
 
         if (getTerritory().isEmpty()) {
-            return "∞";
+            return "\u221E";
         }
         return UtilTime.getTime((getEnergy() / (float) (getTerritory().size() * 25)) * 3600000, UtilTime.TimeUnit.BEST, 2);
 
