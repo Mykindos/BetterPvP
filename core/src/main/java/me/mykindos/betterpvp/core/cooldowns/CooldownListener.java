@@ -60,7 +60,6 @@ public class CooldownListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void processCooldownDisplay(CooldownDisplayEvent event) {
         if (event.isCancelled() || event.getCooldownName().equals("")) {
-            UtilPlayer.sendActionBar(event.getPlayer(), "");
             return;
         }
 
