@@ -145,7 +145,7 @@ public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listene
         RecallData recallData = data.get(player);
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 2.0F, 2.0F);
         player.teleport(recallData.getLocation());
-        UtilEntity.setHealth(player, player.getHealth() + (recallData.getHealth() / (5 - (level)));
+        UtilEntity.setHealth(player, player.getHealth() + (recallData.getHealth() / (5 - (level))));
 
         player.getWorld().playEffect(data.get(player).getLocation(), Effect.STEP_SOUND, Material.EMERALD_BLOCK);
 
