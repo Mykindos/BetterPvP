@@ -46,8 +46,7 @@ public class Shops extends BPvPPlugin {
 
     @Override
     public void onEnable() {
-
-        saveConfig();
+        saveDefaultConfig();
 
         var core = (Core) Bukkit.getPluginManager().getPlugin("Core");
         if (core != null) {
