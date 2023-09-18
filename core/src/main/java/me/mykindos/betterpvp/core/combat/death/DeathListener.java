@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -101,12 +102,12 @@ public class DeathListener implements Listener {
     public void finishCustomDeath(CustomDeathEvent event) {
         if (event.isCancelled()) return;
 
-        Component hoverComponent = Component.text(ChatColor.GOLD + "Damage Breakdown");
+        Component hoverComponent = Component.text("Damage Breakdown", NamedTextColor.GOLD);
         for (var breakdown : damageLogManager.getDamageBreakdown(event.getKilled())) {
-            hoverComponent = hoverComponent.append(Component.text("\n" + ChatColor.YELLOW + breakdown.getKey() + ": "
-                    + ChatColor.GREEN + UtilMath.round(breakdown.getValue(), 1)));
+            hoverComponent = hoverComponent.append(Component.text("\n" + breakdown.getKey() + ": ", NamedTextColor.YELLOW)
+                    .append(Component.text(UtilMath.round(breakdown.getValue(), 1), NamedTextColor.GREEN)));
         }
 
-        UtilMessage.simpleMessage(event.getReceiver(), "Death", event.getCustomDeathMessage(), hoverComponent);
+        UtilMessage.simpleMessage(event.getReceiver(), "Death", ChatColor.stripColor(event.getCustomDeathMessage()), hoverComponent);
     }
 }

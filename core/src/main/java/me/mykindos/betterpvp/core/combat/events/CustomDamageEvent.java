@@ -25,6 +25,8 @@ public class CustomDamageEvent extends CustomCancellableEvent {
     private boolean ignoreArmour;
     private String reason = "";
 
+    private boolean doVanillaEvent;
+
 
     /**
      * @param damagee   The entity taking damage
