@@ -18,7 +18,7 @@ permissions:
 
 jobs:
   build:
-
+    name: Build Project
     runs-on: ubuntu-latest
 
     steps:
