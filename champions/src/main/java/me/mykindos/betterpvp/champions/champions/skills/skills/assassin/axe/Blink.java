@@ -56,7 +56,7 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
         return new String[]{
                 "Right click with a axe to activate.",
                 "",
-                "Instantly teleport forwards 15 Blocks.",
+                "Instantly teleport forwards " + 15 + (3 * (level-1)) + " Blocks.",
                 "Cannot be used while Slowed.",
                 "",
                 "Using again within 5 seconds De-Blinks,",
@@ -205,9 +205,9 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
             Vector direction = player.getLocation().getDirection();
             Location targetLocation = player.getLocation().add(0, 1, 0);
 
-            double maxDistance = maxTravelDistance;
+            double scaledMaxDistance = maxTravelDistance + (3 * (level - 1));
 
-            for (double currentDistance = 0; currentDistance < maxDistance; currentDistance += 1) {
+            for (double currentDistance = 0; currentDistance < scaledMaxDistance; currentDistance += 1) {
                 Location testLocation = targetLocation.clone().add(direction.clone());
                 Block testBlock = testLocation.getBlock();
                 if (!UtilBlock.isWall(testBlock)) {

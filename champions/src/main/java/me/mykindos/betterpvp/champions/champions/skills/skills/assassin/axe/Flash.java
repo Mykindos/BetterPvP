@@ -62,7 +62,7 @@ public class Flash extends Skill implements InteractSkill, Listener {
                 "Stores up to 4 charges.",
                 "",
                 "Cannot be used while Slowed.",
-                "Recharge: 1 charge per " + ChatColor.GREEN + (timeBetweenCharges - level) + ChatColor.GRAY + " seconds."
+                "Recharge: 1 charge per " + ChatColor.GREEN + (9 - (level - 1) * 1) + ChatColor.GRAY + " seconds."
         };
     }
 
@@ -110,8 +110,9 @@ public class Flash extends Skill implements InteractSkill, Listener {
                 lastRecharge.put(player, System.currentTimeMillis());
                 continue;
             }
-
-            if (UtilTime.elapsed(lastRecharge.get(player), (long) ((timeBetweenCharges * 1000L) - (level * 1000L)))) {
+            
+            double adjustedTimeBetweenCharges = 9 - (level - 1) * 1;
+            if (UtilTime.elapsed(lastRecharge.get(player), (long) (adjustedTimeBetweenCharges * 1000L))) {
                 charges.put(player, Math.min(maxCharges, charge + 1));
                 UtilMessage.message(player, getClassType().getName(), "Flash Charges: " + ChatColor.GREEN + (charge + 1));
                 lastRecharge.put(player, System.currentTimeMillis());
