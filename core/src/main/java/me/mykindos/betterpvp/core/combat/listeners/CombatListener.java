@@ -1,5 +1,20 @@
 package me.mykindos.betterpvp.core.combat.listeners;
 
+import io.lumine.mythic.api.adapters.AbstractEntity;
+import io.lumine.mythic.api.mobs.GenericCaster;
+import io.lumine.mythic.api.skills.SkillMetadata;
+import io.lumine.mythic.api.skills.SkillTrigger;
+import io.lumine.mythic.api.skills.damage.DamageMetadata;
+import io.lumine.mythic.bukkit.BukkitAdapter;
+import io.lumine.mythic.bukkit.MythicBukkit;
+import io.lumine.mythic.bukkit.adapters.BukkitEntity;
+import io.lumine.mythic.bukkit.adapters.BukkitSkillAdapter;
+import io.lumine.mythic.bukkit.adapters.BukkitTriggerMetadata;
+import io.lumine.mythic.bukkit.events.MythicDamageEvent;
+import io.lumine.mythic.core.mobs.ActiveMob;
+import io.lumine.mythic.core.skills.SkillMetadataImpl;
+import io.lumine.mythic.core.skills.SkillTriggers;
+import io.lumine.mythic.core.skills.TriggeredSkill;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.combat.armour.ArmourManager;
 import me.mykindos.betterpvp.core.combat.data.DamageData;
@@ -12,6 +27,7 @@ import me.mykindos.betterpvp.core.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.*;
 import org.bukkit.Bukkit;
+import org.bukkit.EntityEffect;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.*;
@@ -21,6 +37,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
+import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -28,7 +45,9 @@ import org.bukkit.util.Vector;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 
 @BPvPListener
 public class CombatListener implements Listener {
@@ -39,6 +58,9 @@ public class CombatListener implements Listener {
     private final ArmourManager armourManager;
     private final DamageLogManager damageLogManager;
 
+    private final boolean isMythicMobsEnabled;
+
+
     @Inject
     public CombatListener(Core core, GamerManager gamerManager, ArmourManager armourManager, DamageLogManager damageLogManager) {
         this.core = core;
@@ -46,12 +68,17 @@ public class CombatListener implements Listener {
         this.armourManager = armourManager;
         this.damageLogManager = damageLogManager;
         damageDataList = new ArrayList<>();
+        this.isMythicMobsEnabled = Bukkit.getPluginManager().getPlugin("MythicMobs") != null;
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void damageEvent(CustomDamageEvent event) {
+
         if (event.isCancelled()) {
-            //System.out.println(event.getCancelReason());
+            return;
+        }
+
+        if (event.isDoVanillaEvent()) {
             return;
         }
 
@@ -73,6 +100,7 @@ public class CombatListener implements Listener {
         //        return;
         //    }
         //}
+
 
         if (event.getDamagee().getHealth() > 0) {
             if (event.getDamage() >= 0) {
@@ -97,6 +125,21 @@ public class CombatListener implements Listener {
                 playDamageEffect(event);
                 updateDurability(event);
 
+                if (isMythicMobsEnabled) {
+                    ActiveMob mythicMob = MythicBukkit.inst().getMobManager().getActiveMob(event.getDamagee().getUniqueId()).orElse(null);
+                    if (mythicMob != null && event.getDamager() != null) {
+
+                        var skillMetaData = new SkillMetadataImpl(SkillTriggers.DAMAGED, mythicMob, new BukkitEntity(event.getDamager()));
+                        skillMetaData.getVariables().putString("damage-cause", event.getCause().toString());
+                        skillMetaData.getVariables().putString("damage-amount", String.valueOf(damage));
+                        skillMetaData.getVariables().putObject("damage-metadata", skillMetaData);
+                        skillMetaData.getVariables().putString("real-damage-cause", event.getCause().toString());
+                        mythicMob.getType().executeSkills(skillMetaData.getCause(), skillMetaData);
+                        mythicMob.getEntity().getBukkitEntity().playEffect(EntityEffect.HURT);
+
+                    }
+                }
+
                 if (!event.getDamagee().isDead()) {
 
                     if (event.getDamagee() instanceof Player player) {
@@ -117,6 +160,7 @@ public class CombatListener implements Listener {
                     } else {
                         event.getDamagee().setHealth(event.getDamagee().getHealth() - damage);
                     }
+
 
                 }
             }
@@ -179,9 +223,12 @@ public class CombatListener implements Listener {
             return;
         }
 
+
         if (!(event.getEntity() instanceof LivingEntity damagee)) {
             return;
         }
+
+
         if ((event instanceof EntityDamageByEntityEvent ev)) {
 
             if (ev.getDamager() instanceof EvokerFangs) {
@@ -217,10 +264,6 @@ public class CombatListener implements Listener {
         //    if (sheep.customName() != null) {
         //        event.setCancelled(true);
         //    }
-        //}
-//
-        //if (ShopManager.isShop((LivingEntity) event.getEntity())) {
-        //    event.setCancelled(true);
         //}
 
         if (event.isCancelled()) {

@@ -1,0 +1,130 @@
+clans:
+  database:
+    prefix: clans_
+  claims:
+    additional: 3
+  tnt:
+    enabled: true
+  map:
+    enabled: true
+    maxMapDistance: 512
+    maxProcess: 64
+  members:
+    max: 6
+  insurance:
+    durationInHours: 24
+  pillage:
+    duration: 10
+    noDominanceCooldown: 4
+  bank:
+    interestIntervalDeviation: 6
+    interestIntervalInHours: 24
+    interestRate: 2.5
+  clan:
+    default:
+      energy: 2400
+      level: 1
+      points: 0
+server:
+  isHub: false
+  sidebar:
+    title: BetterPvP
+  world:
+    fastNightCycle: true
+    mainWorld: world
+command:
+  allychat:
+    enabled: true
+    requiredRank: ADMIN
+  clanchat:
+    enabled: true
+    requiredRank: ADMIN
+  map:
+    enabled: true
+    requiredRank: ADMIN
+    save:
+      enabled: true
+      requiredRank: ADMIN
+  clan:
+    enabled: true
+    requiredRank: ADMIN
+    info:
+      enabled: true
+      requiredRank: ADMIN
+    home:
+      enabled: true
+      requiredRank: ADMIN
+    sethome:
+      enabled: true
+      requiredRank: ADMIN
+    create:
+      enabled: true
+      requiredRank: ADMIN
+      maxCharactersInClanName: 13
+      minCharactersInClanName: 3
+    disband:
+      enabled: true
+      requiredRank: ADMIN
+    claim:
+      enabled: true
+      requiredRank: ADMIN
+    unclaim:
+      enabled: true
+      requiredRank: ADMIN
+    invite:
+      enabled: true
+      requiredRank: ADMIN
+    join:
+      enabled: true
+      requiredRank: ADMIN
+    leave:
+      enabled: true
+      requiredRank: ADMIN
+    promote:
+      enabled: true
+      requiredRank: ADMIN
+    demote:
+      enabled: true
+      requiredRank: ADMIN
+    kick:
+      enabled: true
+      requiredRank: ADMIN
+    ally:
+      enabled: true
+      requiredRank: ADMIN
+    enemy:
+      enabled: true
+      requiredRank: ADMIN
+    neutral:
+      enabled: true
+      requiredRank: ADMIN
+    addoutskirts:
+      enabled: true
+      requiredRank: ADMIN
+    clanrecovery:
+      enabled: true
+      requiredRank: ADMIN
+    setdominance:
+      enabled: true
+      requiredRank: ADMIN
+    bank:
+      enabled: true
+      requiredRank: ADMIN
+      withdraw:
+        enabled: true
+        requiredRank: ADMIN
+      deposit:
+        enabled: true
+        requiredRank: ADMIN
+    withdraw:
+      enabled: true
+      requiredRank: ADMIN
+    deposit:
+      enabled: true
+      requiredRank: ADMIN
+  clans:
+    enabled: true
+    requiredRank: ADMIN
+    reload:
+      enabled: true
+      requiredRank: ADMIN

@@ -1,0 +1,433 @@
+champions:
+  database:
+    prefix: champions_
+skills:
+  assassin:
+    leap:
+      enabled: true
+      cooldown: 8
+      maxlevel: 5
+    sever:
+      enabled: true
+      cooldown: 20
+      maxlevel: 3
+    shockingstrikes:
+      enabled: true
+      maxlevel: 3
+    backstab:
+      enabled: true
+      maxlevel: 5
+    smokebomb:
+      enabled: true
+      cooldown: 50
+      maxlevel: 5
+    silencingarrow:
+      enabled: true
+      maxlevel: 5
+      cooldown: 15
+    silencingstrikes:
+      enabled: true
+      maxlevel: 3
+    repeatedstrikes:
+      enabled: true
+      maxlevel: 3
+    concussion:
+      enabled: true
+      cooldown: 16
+      maxlevel: 3
+      durationPerLevel: 1.5
+    excessiveforce:
+      enabled: true
+      cooldown: 16
+      maxlevel: 3
+    blink:
+      enabled: true
+      cooldown: 13
+      maxlevel: 5
+      maxTravelDistance: 16
+    flash:
+      enabled: true
+      maxlevel: 5
+      maxCharges: 4
+      timeBetweenCharges: 11.0
+      maxTravelDistance: 8
+    markedfordeath:
+      enabled: true
+      maxlevel: 5
+      cooldown: 25
+      baseDuration: 6.0
+    toxicarrow:
+      enabled: true
+      maxlevel: 5
+      cooldown: 14
+    recall:
+      enabled: true
+      maxlevel: 5
+      cooldown: 30
+    evade:
+      enabled: true
+      maxlevel: 5
+      cooldown: 2
+      energy: 6
+  knight:
+    bullscharge:
+      enabled: true
+      cooldown: 14
+      maxlevel: 5
+    fortitude:
+      enabled: true
+      maxlevel: 3
+    cleave:
+      enabled: true
+      maxlevel: 3
+      baseDamage: 4.0
+      baseDistance: 2.0
+    riposte:
+      enabled: true
+      maxlevel: 3
+      cooldown: 20
+    holdposition:
+      enabled: true
+      maxlevel: 5
+      cooldown: 25
+    swordsmanship:
+      enabled: true
+      maxlevel: 3
+      timeBetweenCharges: 2.0
+      timeOutOfCombat: 2.5
+    fury:
+      enabled: true
+      maxlevel: 3
+    thorns:
+      enabled: true
+      maxlevel: 3
+    sacrifice:
+      enabled: true
+      maxlevel: 3
+    defensivestance:
+      enabled: true
+      maxlevel: 5
+      energy: 7
+    powerchop:
+      enabled: true
+      maxlevel: 5
+      cooldown: 14
+      timeToHit: 1.0
+    deflection:
+      enabled: true
+      maxlevel: 3
+      timeBetweenCharges: 2.0
+      timeOutOfCombat: 2.0
+    hiltsmash:
+      enabled: true
+      maxlevel: 5
+      cooldown: 10
+  paladin:
+    rupture:
+      enabled: true
+      cooldown: 12
+      maxlevel: 5
+    inferno:
+      enabled: true
+      maxlevel: 5
+      energy: 9
+      fireTicks: 50
+    moltenblast:
+      enabled: true
+      maxlevel: 5
+      cooldown: 23
+      speed: 2.0
+    glacialprison:
+      enabled: true
+      maxlevel: 5
+      cooldown: 25
+      duration: 4.0
+      sphereSize: 5
+      speed: 1.5
+    lightningorb:
+      enabled: true
+      maxlevel: 5
+      cooldown: 23
+      maxTargets: 3
+      slowDuration: 4.0
+      spreadDistance: 3.0
+      shockDuration: 2.0
+      maxTarget: 3
+    swarm:
+      enabled: true
+      maxlevel: 5
+      energy: 12
+      batLifespan: 2.0
+    immolate:
+      enabled: true
+      maxlevel: 5
+      energy: 11
+    magmablade:
+      enabled: true
+      maxlevel: 3
+    moltenshield:
+      enabled: true
+      maxlevel: 1
+    defensiveaura:
+      enabled: true
+      maxlevel: 5
+      cooldown: 30
+    blizzard:
+      enabled: true
+      maxlevel: 5
+      energy: 9
+    void:
+      enabled: true
+      maxlevel: 5
+      energy: 15
+    nullblade:
+      enabled: true
+      maxlevel: 5
+      energy: 7
+    holylight:
+      enabled: true
+      maxlevel: 5
+    cyclone:
+      enabled: true
+      maxlevel: 5
+      cooldown: 16
+      minimumDistance: 7
+    polymorph:
+      enabled: true
+      maxlevel: 3
+      cooldown: 45
+      duration: 8.0
+    arcticarmour:
+      enabled: true
+      maxlevel: 5
+      energy: 6
+      minRadius: 2
+      duration: 2.0
+    pestilence:
+      enabled: true
+      maxlevel: 3
+      cooldown: 20
+      duration: 5.0
+    rootingaxe:
+      enabled: true
+      maxlevel: 3
+      cooldown: 8
+  gladiator:
+    battletaunt:
+      enabled: true
+      energy: 15
+      maxlevel: 5
+      cooldown: 0
+    seismicslam:
+      enabled: true
+      maxlevel: 5
+      cooldown: 25
+      radius: 5
+    cripplingblow:
+      enabled: true
+      maxlevel: 3
+      slowDuration: 2.0
+    fleshhook:
+      enabled: true
+      maxlevel: 5
+      cooldown: 18
+    colossus:
+      enabled: true
+      maxlevel: 3
+      reductionPerLevel: 25
+    takedown:
+      enabled: true
+      maxlevel: 5
+      cooldown: 25
+    stampede:
+      enabled: true
+      maxlevel: 5
+      durationPerStack: 8.0
+    threateningshout:
+      enabled: true
+      maxlevel: 5
+      cooldown: 20
+      radius: 4
+      duration: 3.0
+    bloodlust:
+      enabled: true
+      maxlevel: 5
+      duration: 5.0
+    resistance:
+      enabled: true
+      maxlevel: 3
+    overwhelm:
+      enabled: true
+      maxlevel: 3
+    spiritofthewolf:
+      enabled: true
+      maxlevel: 5
+      cooldown: 15
+      radius: 5
+      duration: 9.0
+    spiritofthebear:
+      enabled: true
+      maxlevel: 5
+      cooldown: 20
+      radius: 5
+      duration: 5.0
+    strengthinnumbers:
+      enabled: true
+      maxlevel: 5
+      cooldown: 20
+      radius: 10
+      duration: 2.0
+  ranger:
+    stunningshot:
+      enabled: true
+      maxlevel: 5
+      cooldown: 25
+    incendiaryshot:
+      enabled: true
+      maxlevel: 5
+      cooldown: 14
+    ropedarrow:
+      enabled: true
+      maxlevel: 5
+      cooldown: 17
+    levitatingshot:
+      enabled: true
+      maxlevel: 5
+      cooldown: 14
+    pindown:
+      enabled: true
+      maxlevel: 5
+      cooldown: 13
+    longshot:
+      enabled: true
+      maxlevel: 5
+      baseDamage: 18.0
+      deathMessageThreshold: 40.0
+    overcharge:
+      enabled: true
+      maxlevel: 5
+    huntersthrill:
+      enabled: true
+      maxlevel: 5
+      maxTimeBetweenShots: 8.0
+      maxConsecutiveHits: 4
+    precision:
+      enabled: true
+      maxlevel: 5
+    entangle:
+      enabled: true
+      maxlevel: 3
+      baseDuration: 2.0
+    volley:
+      enabled: true
+      maxlevel: 5
+      cooldown: 15
+    vitalityspores:
+      enabled: true
+      maxlevel: 5
+      baseDuration: 7.0
+    sharpshooter:
+      enabled: true
+      maxlevel: 3
+      maxTimeBetweenShots: 5.0
+      maxConsecutiveHits: 4
+    agility:
+      enabled: true
+      maxlevel: 5
+      cooldown: 30
+      baseDuration: 3.0
+    wolvesfury:
+      enabled: true
+      maxlevel: 5
+      cooldown: 25
+      baseDuration: 3.0
+    disengage:
+      enabled: true
+      maxlevel: 5
+      cooldown: 12
+      baseSlowDuration: 2.0
+  warlock:
+    bloodbarrier:
+      enabled: true
+      maxlevel: 5
+      cooldown: 30
+      range: 8
+      duration: 60.0
+    bloodshed:
+      enabled: true
+      maxlevel: 5
+      cooldown: 12
+      duration: 4.0
+    bloodthirst:
+      enabled: true
+      maxlevel: 5
+    soulharvest:
+      enabled: true
+      maxlevel: 3
+    impotence:
+      enabled: true
+      maxlevel: 3
+    tormentedsoul:
+      enabled: true
+      maxlevel: 5
+      cooldown: 30
+      duration: 7.0
+      radius: 5
+    cleanse:
+      enabled: true
+      maxlevel: 5
+      cooldown: 15
+      distance: 5
+      duration: 2.0
+    grasp:
+      enabled: true
+      maxlevel: 5
+      cooldown: 30
+    leech:
+      enabled: true
+      maxlevel: 5
+      cooldown: 25
+    wreath:
+      enabled: true
+      maxlevel: 5
+      cooldown: 30
+    frailty:
+      enabled: true
+      maxlevel: 3
+    siphon:
+      enabled: true
+      maxlevel: 5
+  global:
+    breakfall:
+      enabled: true
+      maxlevel: 3
+    fastrecovery:
+      enabled: true
+      maxlevel: 5
+      percentagePerLevel: 20
+    swim:
+      enabled: true
+      maxlevel: 5
+      energy: 10
+      cooldown: 0.35
+      internalCooldown: 0.35
+class:
+  assassin:
+    dealKnockback: false
+    receiveKnockback: true
+chat:
+  skill:
+    preview: true
+command:
+  kit:
+    enabled: true
+    requiredRank: ADMIN
+  champions:
+    reload:
+      enabled: true
+      requiredRank: ADMIN
+    enabled: true
+    requiredRank: ADMIN
+  reload:
+    enabled: true
+    requiredRank: ADMIN

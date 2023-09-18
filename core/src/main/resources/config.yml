@@ -1,0 +1,114 @@
+core:
+  database:
+    databaseName:
+    password:
+    ip:
+    username:
+    prefix: ''
+pvp:
+  enableOldPvP: true
+gamer:
+  default:
+    coins: 5000
+    fragments: 0
+hunger:
+  enabled: false
+discord:
+  chatWebhook: ''
+resourcepack:
+  force: false
+  sha: dc1e31891324d735202029a646d2e29592d13061
+  url: https://betterpvp.net/betterpvptextures.zip
+weather:
+  enabled: false
+items:
+  hideAttributes: true
+  hideEnchants: true
+command:
+  promote:
+    enabled: true
+    requiredRank: ADMIN
+  list:
+    enabled: true
+    requiredRank: ADMIN
+  teleport:
+    enabled: true
+    requiredRank: ADMIN
+  teleportposition:
+    enabled: true
+    requiredRank: ADMIN
+  client:
+    enabled: true
+    requiredRank: ADMIN
+    admin:
+      enabled: true
+      requiredRank: ADMIN
+    search:
+      enabled: true
+      requiredRank: ADMIN
+    promote:
+      enabled: true
+      requiredRank: ADMIN
+  admin:
+    enabled: true
+    requiredRank: ADMIN
+  teleportworld:
+    enabled: true
+    requiredRank: ADMIN
+  kick:
+    enabled: true
+    requiredRank: ADMIN
+  search:
+    enabled: true
+    requiredRank: ADMIN
+  teleporthere:
+    enabled: true
+    requiredRank: ADMIN
+  test:
+    enabled: true
+    requiredRank: ADMIN
+  gamemode:
+    enabled: true
+    requiredRank: ADMIN
+    creative:
+      enabled: true
+      requiredRank: ADMIN
+    survival:
+      enabled: true
+      requiredRank: ADMIN
+    adventure:
+      enabled: true
+      requiredRank: ADMIN
+    spectator:
+      enabled: true
+      requiredRank: ADMIN
+      test:
+        enabled: true
+        requiredRank: ADMIN
+  setspawn:
+    enabled: true
+    requiredRank: ADMIN
+  core:
+    enabled: true
+    requiredRank: ADMIN
+    reload:
+      enabled: true
+      requiredRank: ADMIN
+  settings:
+    enabled: true
+    requiredRank: ADMIN
+  heal:
+    enabled: true
+    requiredRank: ADMIN
+  balance:
+    enabled: true
+    requiredRank: ADMIN
+    pay:
+      enabled: true
+      requiredRank: ADMIN
+    give:
+      enabled: true
+      requiredRank: ADMIN
+  iteminfo:
+    enabled: true
+    requiredRank: ADMIN

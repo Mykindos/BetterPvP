@@ -1,0 +1,19 @@
+shops:
+  database:
+    prefix: shops_
+command:
+  shop:
+    enabled: true
+    requiredRank: ADMIN
+    spawn:
+      enabled: true
+      requiredRank: ADMIN
+  shops:
+    enabled: true
+    requiredRank: ADMIN
+    reload:
+      enabled: true
+      requiredRank: ADMIN
+    spawn:
+      enabled: true
+      requiredRank: ADMIN
