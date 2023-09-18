@@ -48,7 +48,7 @@ public class Core extends BPvPPlugin {
     private UpdateEventExecutor updateEventExecutor;
 
     public void onEnable() {
-        saveConfig();
+        saveDefaultConfig();
 
         Reflections reflections = new Reflections(PACKAGE, Scanners.FieldsAnnotated);
         Set<Field> fields = reflections.getFieldsAnnotatedWith(Config.class);
