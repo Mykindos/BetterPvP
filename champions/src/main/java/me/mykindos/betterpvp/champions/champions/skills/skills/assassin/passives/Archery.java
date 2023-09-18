@@ -45,7 +45,7 @@ public class Archery extends Skill implements PassiveSkill, Listener {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Your arrows deal " + 2 + (level),
+                "Your arrows deal " + (2 + (level)),
                 " extra damage"};
     }
 
