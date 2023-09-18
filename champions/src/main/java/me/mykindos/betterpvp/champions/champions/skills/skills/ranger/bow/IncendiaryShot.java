@@ -64,7 +64,7 @@ public class IncendiaryShot extends PrepareArrowSkill {
 
     @Override
     public void onHit(Player damager, LivingEntity target, int level) {
-        UtilServer.runTaskLater(champions, () -> target.setFireTicks(level * 30), 2);
+        UtilServer.runTaskLater(champions, () -> target.setFireTicks(80 + (level * 30)), 2);
     }
 
     @Override
