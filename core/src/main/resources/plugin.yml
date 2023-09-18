@@ -4,5 +4,7 @@ name: Core
 load: STARTUP
 version: '1.0'
 api-version: 1.19
-softdepend:
+depend:
   - ProtocolLib
+softdepend:
+  - MythicMobs

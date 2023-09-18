@@ -1,9 +1,12 @@
 package me.mykindos.betterpvp.core.client.listener;
 
 import com.google.inject.Inject;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.events.ClientLoginEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
+import net.kyori.adventure.text.Component;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerResourcePackStatusEvent;
@@ -23,10 +26,20 @@ public class ResourcePackListener implements Listener {
     @Config(path = "resourcepack.force", defaultValue = "false")
     private boolean forceResourcePack;
 
+    private final Core core;
+
+    @Inject
+    public ResourcePackListener(Core core) {
+        this.core = core;
+    }
+
     @EventHandler
     public void onClientLogin(ClientLoginEvent event) {
 
-        event.getPlayer().setResourcePack(resourcePackUrl, resourcePackSha);
+        UtilServer.runTaskLater(core, () -> {
+            event.getPlayer().setResourcePack(resourcePackUrl, resourcePackSha);
+        }, 2L);
+
 
     }
 
@@ -34,9 +47,9 @@ public class ResourcePackListener implements Listener {
     public void onTexturepackStatus(PlayerResourcePackStatusEvent e) {
         if (forceResourcePack) {
             if (e.getStatus() == PlayerResourcePackStatusEvent.Status.DECLINED) {
-
+                e.getPlayer().kick(Component.text("You must allow the resource pack"));
             } else if (e.getStatus() == PlayerResourcePackStatusEvent.Status.FAILED_DOWNLOAD) {
-
+                e.getPlayer().kick(Component.text("Resource pack failed to load?"));
             }
         }
 
