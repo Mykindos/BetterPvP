@@ -28,6 +28,9 @@ skills:
     silencingstrikes:
       enabled: true
       maxlevel: 3
+    archery:
+      enabled: true
+      maxlevel: 3
     repeatedstrikes:
       enabled: true
       maxlevel: 3
