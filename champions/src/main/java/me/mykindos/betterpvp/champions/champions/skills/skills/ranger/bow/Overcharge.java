@@ -139,7 +139,7 @@ public class Overcharge extends Skill implements InteractSkill, Listener {
                     continue;
                 }
 
-                if (UtilTime.elapsed(data.getLastCharge(), 900 - (1000 * (level * 0.1))) {
+                if (UtilTime.elapsed(data.getLastCharge(), 900 - (1000 * (level * 0.1)))) {
                     if (data.getCharge() < data.getMaxCharge()) {
                         data.addCharge();
                         UtilMessage.simpleMessage(player, getClassType().getName(), "%s: <yellow>+%d<gray> Bonus Damage", getName(), data.getCharge());
