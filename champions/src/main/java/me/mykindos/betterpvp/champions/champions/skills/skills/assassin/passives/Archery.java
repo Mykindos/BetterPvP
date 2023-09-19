@@ -58,7 +58,7 @@ public class Archery extends Skill implements PassiveSkill, Listener {
                 ChatColor.GREEN + (2 + level) + " damage per shot"};
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGH)
     public void onSlow(CustomDamageEvent event) {
         if(!(event.getProjectile() instanceof Arrow)) return;
         if(!(event.getDamager() instanceof Player damager)) return;
@@ -67,6 +67,6 @@ public class Archery extends Skill implements PassiveSkill, Listener {
         if(level > 0) {
             event.setDamage(event.getDamage() + (2 + level));
         }
-
     }
+}
 
