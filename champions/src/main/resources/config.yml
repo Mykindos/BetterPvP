@@ -77,6 +77,9 @@ skills:
     fortitude:
       enabled: true
       maxlevel: 3
+    levelfield:
+      enabled: true
+      maxlevel: 3
     cleave:
       enabled: true
       maxlevel: 3
