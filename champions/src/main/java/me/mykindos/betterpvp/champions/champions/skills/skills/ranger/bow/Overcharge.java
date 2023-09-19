@@ -58,7 +58,7 @@ public class Overcharge extends Skill implements InteractSkill, Listener {
 
         return new String[]{
                 "Draw back harder on your bow, giving",
-                "2 bonus damage per " + ChatColor.GREEN + 1.5 - (level * 0.2) + ChatColor.GRAY + " seconds",
+                "2 bonus damage per " + ChatColor.GREEN + 0.9 - (level * 0.1) + ChatColor.GRAY + " seconds",
                 "",
                 "Maximum Damage: " + ChatColor.GREEN + (2 + level)
         };
@@ -139,7 +139,7 @@ public class Overcharge extends Skill implements InteractSkill, Listener {
                     continue;
                 }
 
-                if (UtilTime.elapsed(data.getLastCharge(), 1500 - (1000 * (level * 0.2))) {
+                if (UtilTime.elapsed(data.getLastCharge(), 900 - (1000 * (level * 0.1))) {
                     if (data.getCharge() < data.getMaxCharge()) {
                         data.addCharge();
                         UtilMessage.simpleMessage(player, getClassType().getName(), "%s: <yellow>+%d<gray> Bonus Damage", getName(), data.getCharge());
