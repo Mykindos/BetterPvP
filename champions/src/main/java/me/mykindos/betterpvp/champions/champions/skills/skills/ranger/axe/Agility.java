@@ -121,7 +121,7 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
     @Override
     public void activate(Player player, int level) {
         if (!active.contains(player.getUniqueId())) {
-            player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) ((baseDuration + level) * 20), 3));
+            player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) ((baseDuration + level) * 20), 2));
             player.getWorld().playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.5F, 0.5F);
             active.add(player.getUniqueId());
         }
