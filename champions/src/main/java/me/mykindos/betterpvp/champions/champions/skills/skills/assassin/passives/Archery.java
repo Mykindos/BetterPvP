@@ -55,7 +55,7 @@ public class Archery extends Skill implements PassiveSkill, Listener {
 
         return new String[]{
                 "Your arrows will deal an extra",
-                ChatColor.GREEN + (2 + level) + " damage per shot"};
+                ChatColor.GREEN + (2 + level) + ChatColor.GRAY + " damage per shot"};
     }
 
     @EventHandler(priority = EventPriority.HIGH)
