@@ -53,7 +53,7 @@ public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listene
                 "",
                 "Teleports you back to where you ",
                 "were located " + ChatColor.GREEN + (1.5 + (level)) + ChatColor.GRAY + " seconds ago",
-                "Increases health by " + ChatColor.GREEN + "1/" + (7 - (level)) + ChatColor.GRAY + " of the health you had",
+                "Increases health by " + ChatColor.GREEN + (35 + (level * 5)) + ChatColor.GRAY + "% of the health you had",
                 ChatColor.GREEN.toString() + (1.5 + (level)) + ChatColor.GRAY + " seconds ago",
                 "",
                 "Cooldown: " + ChatColor.GREEN + getCooldown(level)
@@ -145,7 +145,7 @@ public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listene
         RecallData recallData = data.get(player);
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 2.0F, 2.0F);
         player.teleport(recallData.getLocation());
-        UtilEntity.setHealth(player, player.getHealth() + (recallData.getHealth() / (7 - (level))));
+        UtilEntity.setHealth(player, player.getHealth() + (recallData.getHealth() * (0.35 + ((level * 5) * 0.01))));
 
         player.getWorld().playEffect(data.get(player).getLocation(), Effect.STEP_SOUND, Material.EMERALD_BLOCK);
 
