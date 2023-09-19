@@ -39,7 +39,7 @@ public class IncendiaryShot extends PrepareArrowSkill {
                 "Left click to activate.",
                 "",
                 "Shoot an ignited arrow",
-                "burning anyone hit for " + ChatColor.GREEN + (level * 1.5) + ChatColor.GRAY + " seconds",
+                "burning anyone hit for " + ChatColor.GREEN + 3 + (level * 1.5) + ChatColor.GRAY + " seconds",
                 "",
                 "Cooldown: " + ChatColor.GREEN + getCooldown(level)
         };
@@ -64,7 +64,7 @@ public class IncendiaryShot extends PrepareArrowSkill {
 
     @Override
     public void onHit(Player damager, LivingEntity target, int level) {
-        UtilServer.runTaskLater(champions, () -> target.setFireTicks(level * 30), 2);
+        UtilServer.runTaskLater(champions, () -> target.setFireTicks(80 + (level * 30)), 2);
     }
 
     @Override
