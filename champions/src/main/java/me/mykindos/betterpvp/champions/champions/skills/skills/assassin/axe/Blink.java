@@ -56,7 +56,7 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
         return new String[]{
                 "Right click with a axe to activate.",
                 "",
-                "Instantly teleport forwards " + ChatColor.GREEN + 15 + (3 * (level-1)) + ChatColor.GRAY + " Blocks.",
+                "Instantly teleport forwards " + ChatColor.GREEN + (15 + (3 * (level-1))) + ChatColor.GRAY + " Blocks.",
                 "Cannot be used while Slowed.",
                 "",
                 "Using again within 5 seconds De-Blinks,",
