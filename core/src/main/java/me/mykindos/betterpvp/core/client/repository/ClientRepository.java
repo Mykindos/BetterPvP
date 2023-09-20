@@ -38,7 +38,7 @@ public class ClientRepository implements IRepository<Client> {
     @Override
     public List<Client> getAll() {
         List<Client> clients = new ArrayList<>();
-        String query = "SELECT * FROM " + databasePrefix + "clients;";
+        String query = "SELECT * FROM clients;";
         CachedRowSet result = database.executeQuery(new Statement(query));
         try {
             while (result.next()) {
@@ -82,7 +82,7 @@ public class ClientRepository implements IRepository<Client> {
 
     @Override
     public void save(Client object) {
-        String query = "INSERT INTO " + databasePrefix + "clients (UUID, Name) VALUES(?, ?) ON DUPLICATE KEY UPDATE `Rank` = ?;";
+        String query = "INSERT INTO clients (UUID, Name) VALUES(?, ?) ON DUPLICATE KEY UPDATE `Rank` = ?;";
         database.executeUpdateAsync(new Statement(query,
                 new StringStatementValue(object.getUuid()),
                 new StringStatementValue(object.getName()),
