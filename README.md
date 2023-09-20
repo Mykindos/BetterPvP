@@ -24,11 +24,11 @@ Repository containing all of BetterPvP's plugins for 1.20.1.
 5. Start your server and wait for all plugins to load. You should get an error saying that the server couldn't establish a connection to the database.
 6. In the generated plugin folders, open the `config.yml` file in each one of them and fill in the required information.
    * For `Core` specifically, fill in all database details:
-     * `prefix`: The prefix to use for all tables in this module.
+     * `prefix`: (Optional) Overrides the default prefix for all tables in this module.
      * `ip`: The host of your MySQL server
      * `databaseName`: The name of the database to use
      * `username`: The username of an account with access to the database
      * `password`: The password of the account with access to the database
    * For all other modules:
-     * `prefix`: The prefix to use for all tables in this module. 
+       * `prefix`: (Optional) Overrides the default prefix for all tables in this module.
 7. Restart your server.
