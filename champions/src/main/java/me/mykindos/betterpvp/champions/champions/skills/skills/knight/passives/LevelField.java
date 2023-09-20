@@ -35,12 +35,13 @@ public class LevelField extends Skill implements PassiveSkill, Listener {
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "For every enemy within 10 blocks of you",
-                "You deal " + ChatColor.GREEN + (10 + ((level - 1) * 5)) + "%" + ChatColor.GRAY + " extra damage",
+                "For every enemy within 10 blocks,",
+                "You deal " + ChatColor.GREEN + (10 + ((level - 1) * 5)) + ".0%" + ChatColor.GRAY + " extra damage",
                 "Up to a maximum of 60% extra damage",
-                "For every ally within 10 blocks of you",
-                "You deal " + ChatColor.GREEN + (10 + ((level - 1) * 5)) + "%" + ChatColor.GRAY + " less damage",
-                "Down to a minimum of 30% less damage"
+                "",
+                "For every ally within 10 blocks,",
+                "You deal " + ChatColor.GREEN + (10 + ((level - 1) * 5)) + ".0%" + ChatColor.GRAY + " less damage",
+                "Down to a minimum of " + ChatColor.GREEN + (60 - ((level - 1) * 15)) + ChatColor.GRAY + "% less damage"
         };
     }
 
@@ -66,7 +67,7 @@ public class LevelField extends Skill implements PassiveSkill, Listener {
             int nearbyAllies = UtilPlayer.getNearbyAllies(player, player.getLocation(), 10).size();
             int nearbyDifference = ((nearbyEnemies - 1) - nearbyAllies);
 
-            event.setDamage(event.getDamage() * (1 + (nearbyDifference * (nearbyDifference > 0 ? 0.20 : 0.10))));
+            event.setDamage(event.getDamage() * (1 + (nearbyDifference * (nearbyDifference > 0 ? 0.20 : (0.20 - ((level - 1) * 0.05))))));
         }
     }
 
