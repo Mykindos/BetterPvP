@@ -37,10 +37,10 @@ public class LevelField extends Skill implements PassiveSkill, Listener {
         return new String[]{
                 "For every enemy within 10 blocks of you",
                 "You deal " + ChatColor.GREEN + (10 + ((level - 1) * 5)) + "%" + ChatColor.GRAY + " extra damage",
-                "Up to a maximum of " + ChatColor.GREEN + (30 + ((level-1) * 15)) + "%" + ChatColor.GRAY + " extra damage",
+                "Up to a maximum of 60% extra damage",
                 "For every ally within 10 blocks of you",
                 "You deal " + ChatColor.GREEN + (10 + ((level - 1) * 5)) + "%" + ChatColor.GRAY + " less damage",
-                "Down to a minimum of " + ChatColor.GREEN + (70 - (level * 10)) + "%" + ChatColor.GRAY + " less damage"
+                "Down to a minimum of 30% less damage"
         };
     }
 
@@ -66,19 +66,7 @@ public class LevelField extends Skill implements PassiveSkill, Listener {
             int nearbyAllies = UtilPlayer.getNearbyAllies(player, player.getLocation(), 10).size();
             int nearbyDifference = ((nearbyEnemies - 1) - nearbyAllies);
 
-            double minDamageDealt = (((100 - (70 - (level * 10))) * 0.01) * event.getDamage());
-            double scaledDamageDealt = ((((20 + ((level - 1) * 5)) * nearbyDifference) * 0.01) * event.getDamage());
-            double maxDamageDealt = (((30 + ((level-1) * 15)) * 0.01) * event.getDamage());
-
-            if(scaledDamageDealt == 0){
-                event.setDamage(event.getDamage());
-            } else if (scaledDamageDealt < minDamageDealt) {
-                event.setDamage(minDamageDealt);
-            } else if (scaledDamageDealt > maxDamageDealt) {
-                event.setDamage(maxDamageDealt+event.getDamage());}
-            else{
-                event.setDamage(event.getDamage() + scaledDamageDealt);
-            }
+            event.setDamage(event.getDamage() * (1 + (nearbyDifference * (nearbyDifference > 0 ? 0.20 : 0.10))));
         }
     }
 
