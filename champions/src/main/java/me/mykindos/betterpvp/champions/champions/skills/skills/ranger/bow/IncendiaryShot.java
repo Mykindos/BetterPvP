@@ -39,7 +39,7 @@ public class IncendiaryShot extends PrepareArrowSkill {
                 "Left click to activate.",
                 "",
                 "Shoot an ignited arrow",
-                "burning anyone hit for " + ChatColor.GREEN + 3 + (level * 1.5) + ChatColor.GRAY + " seconds",
+                "burning anyone hit for " + ChatColor.GREEN + (3 + (level * 1.5)) + ChatColor.GRAY + " seconds",
                 "",
                 "Cooldown: " + ChatColor.GREEN + getCooldown(level)
         };
