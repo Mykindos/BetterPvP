@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -35,11 +36,11 @@ public class LevelField extends Skill implements PassiveSkill, Listener {
     public String[] getDescription(int level) {
         return new String[]{
                 "For every enemy within 10 blocks of you",
-                "you deal " + (level * 0.5) + " extra damage and take " + (level * 0.5) + " less damage",
-                "Up to a maximum of " + (2 + (level * 2)) + " extra damage",
+                "you deal " + (15 + ((level - 1) * 5)) + "% extra damage",
+                "Up to a maximum of " + (40 + (level * 20)) + "% extra damage",
                 "For every ally within 10 blocks of you",
-                "you deal " + (level * 0.5) + " less damage and take " + (level * 0.5) + " more damage",
-                "Down to a minimum of " + (6 - ((level) * 1.5)) + " less damage"
+                "you deal " + (15 + ((level - 1) * 5)) + "% less damage",
+                "Down to a minimum of " + (70 - (level * 10)) + "% less damage"
         };
     }
 
@@ -52,17 +53,6 @@ public class LevelField extends Skill implements PassiveSkill, Listener {
     public SkillType getType() {
         return SkillType.PASSIVE_A;
     }
-
-    @EventHandler(priority = EventPriority.HIGH)
-    public void onDamage(CustomDamageEvent event) {
-        if (!(event.getDamagee() instanceof Player player)) return;
-
-        int level = getLevel(player);
-        if (level > 0) {
-            int nearbyEnemies = UtilPlayer.getNearbyEnemies(player, player.getLocation(), 10;
-            int nearbyAllies = UtilPlayer.getNearbyAllies(player, player.getLocation(), 10);
-            event.setDamage(event.getDamage() - (Math.min((2 + (level * 2)), Math.max((-6 + ((level) * 1.5)),(nearbyDifference) * (level * 0.5)))));        }
-    }
   
     @EventHandler(priority = EventPriority.HIGH)
     public void onHit(CustomDamageEvent event) {
@@ -72,10 +62,23 @@ public class LevelField extends Skill implements PassiveSkill, Listener {
 
         int level = getLevel(player);
         if (level > 0) {
-            int nearbyEnemies = UtilPlayer.getNearbyEnemies(player, player.getLocation(), 10;
-            int nearbyAllies = UtilPlayer.getNearbyAllies(player, player.getLocation(), 10);
-            int nearbyDifference = (nearbyEnemies - nearbyAllies);
-            event.setDamage(event.getDamage() + (Math.min((2 + (level * 2)), Math.max((-6 + ((level) * 1.5)),(nearbyDifference) * (level * 0.5)))));
+            int nearbyEnemies = UtilPlayer.getNearbyEnemies(player, player.getLocation(), 10).size();
+            int nearbyAllies = UtilPlayer.getNearbyAllies(player, player.getLocation(), 10).size();
+            int nearbyDifference = ((nearbyEnemies - 1) - nearbyAllies);
+
+            double minDamageDealt = (((100 - (70 - (level * 10))) * 0.01) * event.getDamage());
+            double scaledDamageDealt = ((((20 + ((level - 1) * 5)) * nearbyDifference) * 0.01) * event.getDamage());
+            double maxDamageDealt = (((40 + (level * 20)) * 0.01) * event.getDamage());
+
+            if(scaledDamageDealt == 0){
+                event.setDamage(event.getDamage());
+            } else if (scaledDamageDealt < minDamageDealt) {
+                event.setDamage(minDamageDealt);
+            } else if (scaledDamageDealt > maxDamageDealt) {
+                event.setDamage(maxDamageDealt+event.getDamage());}
+            else{
+                event.setDamage(event.getDamage() + scaledDamageDealt);
+            }
         }
     }
 
