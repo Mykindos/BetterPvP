@@ -52,9 +52,8 @@ public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listene
                 "Drop Sword / Axe to Activate",
                 "",
                 "Teleports you back to where you ",
-                "were located " + ChatColor.GREEN + (1.5 + (level)) + ChatColor.GRAY + " seconds ago",
-                "Increases health by " + ChatColor.GREEN + (35 + (level * 5)) + ChatColor.GRAY + "% of the health you had",
-                ChatColor.GREEN.toString() + (1.5 + (level)) + ChatColor.GRAY + " seconds ago",
+                "were located " + ChatColor.GREEN + (2 + (level)) + ChatColor.GRAY + " seconds ago",
+                "Increases health by " + ChatColor.GREEN + (35 + (level * 5)) + "%" + ChatColor.GRAY + " of your previous health",
                 "",
                 "Cooldown: " + ChatColor.GREEN + getCooldown(level)
         };
@@ -75,12 +74,12 @@ public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listene
                 if (data.containsKey(onlinePlayer)) {
                     RecallData recallData = data.get(onlinePlayer);
                     if (UtilTime.elapsed(recallData.getTime(), 1000)) {
-                        recallData.addLocation(onlinePlayer.getLocation(), onlinePlayer.getHealth(), (1.5 + (level)));
+                        recallData.addLocation(onlinePlayer.getLocation(), onlinePlayer.getHealth(), (2 + (level)));
                         recallData.setTime(System.currentTimeMillis());
                     }
                 } else {
                     data.put(onlinePlayer, new RecallData());
-                    data.get(onlinePlayer).addLocation(onlinePlayer.getLocation(), onlinePlayer.getHealth(), (1.5 + (level)));
+                    data.get(onlinePlayer).addLocation(onlinePlayer.getLocation(), onlinePlayer.getHealth(), (2 + (level)));
                 }
             }
 
