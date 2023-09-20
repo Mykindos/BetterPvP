@@ -49,7 +49,7 @@ public class ResourcePackListener implements Listener {
             if (e.getStatus() == PlayerResourcePackStatusEvent.Status.DECLINED) {
                 e.getPlayer().kick(Component.text("You must allow the resource pack"));
             } else if (e.getStatus() == PlayerResourcePackStatusEvent.Status.FAILED_DOWNLOAD) {
-                e.getPlayer().kick(Component.text("Resource pack failed to load?"));
+                e.getPlayer().kick(Component.text("Resource pack failed to load"));
             }
         }
 
