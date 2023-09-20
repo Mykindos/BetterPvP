@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.menu;
 
 import lombok.Data;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -17,17 +18,17 @@ public abstract class Menu {
 
     private final Player player;
     private final int size;
-    private final String title;
+    private final Component title;
     private final List<Button> buttons;
     private final Inventory inventory;
     private final long openTime;
 
-    public Menu(Player player, int size, String title, Button[] buttons) {
+    public Menu(Player player, int size, Component title, Button[] buttons) {
         this.player = player;
         this.size = size;
         this.title = title;
         this.buttons = Arrays.asList(buttons);
-        this.inventory = Bukkit.createInventory(player, size, Component.text(title));
+        this.inventory = Bukkit.createInventory(player, size, title);
         this.openTime = System.currentTimeMillis();
 
         fillInventoryWithAir();
@@ -35,12 +36,12 @@ public abstract class Menu {
 
     }
 
-    public Menu(Player player, int size, String title) {
+    public Menu(Player player, int size, Component title) {
         this.player = player;
         this.size = size;
         this.title = title;
         this.buttons = new ArrayList<>();
-        this.inventory = Bukkit.createInventory(player, size, Component.text(title));
+        this.inventory = Bukkit.createInventory(player, size, title);
         this.openTime = System.currentTimeMillis();
 
         fillInventoryWithAir();

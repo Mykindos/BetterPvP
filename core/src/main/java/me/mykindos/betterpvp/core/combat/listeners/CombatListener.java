@@ -1,21 +1,8 @@
 package me.mykindos.betterpvp.core.combat.listeners;
 
-import io.lumine.mythic.api.adapters.AbstractEntity;
-import io.lumine.mythic.api.mobs.GenericCaster;
-import io.lumine.mythic.api.skills.SkillMetadata;
-import io.lumine.mythic.api.skills.SkillTrigger;
-import io.lumine.mythic.api.skills.damage.DamageMetadata;
-import io.lumine.mythic.bukkit.BukkitAdapter;
-import io.lumine.mythic.bukkit.MythicBukkit;
-import io.lumine.mythic.bukkit.adapters.BukkitEntity;
-import io.lumine.mythic.bukkit.adapters.BukkitSkillAdapter;
-import io.lumine.mythic.bukkit.adapters.BukkitTriggerMetadata;
-import io.lumine.mythic.bukkit.events.MythicDamageEvent;
-import io.lumine.mythic.core.mobs.ActiveMob;
-import io.lumine.mythic.core.skills.SkillMetadataImpl;
-import io.lumine.mythic.core.skills.SkillTriggers;
-import io.lumine.mythic.core.skills.TriggeredSkill;
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.combat.adapters.CustomDamageAdapter;
 import me.mykindos.betterpvp.core.combat.armour.ArmourManager;
 import me.mykindos.betterpvp.core.combat.data.DamageData;
 import me.mykindos.betterpvp.core.combat.events.*;
@@ -27,7 +14,6 @@ import me.mykindos.betterpvp.core.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.*;
 import org.bukkit.Bukkit;
-import org.bukkit.EntityEffect;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.*;
@@ -37,7 +23,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
-import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -45,10 +30,9 @@ import org.bukkit.util.Vector;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 
+@Slf4j
 @BPvPListener
 public class CombatListener implements Listener {
 
@@ -59,6 +43,7 @@ public class CombatListener implements Listener {
     private final DamageLogManager damageLogManager;
 
     private final boolean isMythicMobsEnabled;
+    private CustomDamageAdapter customDamageAdapter;
 
 
     @Inject
@@ -69,6 +54,14 @@ public class CombatListener implements Listener {
         this.damageLogManager = damageLogManager;
         damageDataList = new ArrayList<>();
         this.isMythicMobsEnabled = Bukkit.getPluginManager().getPlugin("MythicMobs") != null;
+
+        try {
+            if (isMythicMobsEnabled) {
+                customDamageAdapter = (CustomDamageAdapter) Class.forName("me.mykindos.betterpvp.core.combat.listeners.mythicmobs.MythicMobsAdapter").getDeclaredConstructor().newInstance();
+            }
+        } catch (Exception ex) {
+            log.warn("Could not find MythicMobs plugin, adapter not loaded");
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -119,53 +112,46 @@ public class CombatListener implements Listener {
 
                 double damage = event.isIgnoreArmour() ? event.getDamage() : customDamageReductionEvent.getDamage();
 
-                //if (event.getDamager() != null) {
-                //    LogManager.addLog(event.getDamagee(), event.getDamager(), event.getReason(), damage);
-                //}
-                playDamageEffect(event);
-                updateDurability(event);
-
                 if (isMythicMobsEnabled) {
-                    ActiveMob mythicMob = MythicBukkit.inst().getMobManager().getActiveMob(event.getDamagee().getUniqueId()).orElse(null);
-                    if (mythicMob != null && event.getDamager() != null) {
-
-                        var skillMetaData = new SkillMetadataImpl(SkillTriggers.DAMAGED, mythicMob, new BukkitEntity(event.getDamager()));
-                        skillMetaData.getVariables().putString("damage-cause", event.getCause().toString());
-                        skillMetaData.getVariables().putString("damage-amount", String.valueOf(damage));
-                        skillMetaData.getVariables().putObject("damage-metadata", skillMetaData);
-                        skillMetaData.getVariables().putString("real-damage-cause", event.getCause().toString());
-                        mythicMob.getType().executeSkills(skillMetaData.getCause(), skillMetaData);
-                        mythicMob.getEntity().getBukkitEntity().playEffect(EntityEffect.HURT);
-
+                    if (customDamageAdapter.processCustomDamageAdapter(event, damage)) {
+                        finalizeDamage(event, damage);
+                        return;
                     }
                 }
 
-                if (!event.getDamagee().isDead()) {
-
-                    if (event.getDamagee() instanceof Player player) {
-                        if (player.getInventory().getItemInMainHand().getType() == Material.BOOK) {
-                            player.sendMessage("");
-                            player.sendMessage("Damage: " + event.getDamage());
-                            player.sendMessage("Damage Reduced: " + damage);
-                            player.sendMessage("Delay: " + event.getDamageDelay());
-                            player.sendMessage("Cause: " + event.getCause().name());
-
-                        }
-                    }
-
-                    processDamageData(event, damage);
-
-                    if (event.getDamagee().getHealth() - damage < 1.0) {
-                        event.getDamagee().setHealth(0);
-                    } else {
-                        event.getDamagee().setHealth(event.getDamagee().getHealth() - damage);
-                    }
-
-
-                }
+                playDamageEffect(event);
+                finalizeDamage(event, damage);
             }
         }
 
+    }
+
+    private void finalizeDamage(CustomDamageEvent event, double damage) {
+        updateDurability(event);
+
+        if (!event.getDamagee().isDead()) {
+
+            if (event.getDamagee() instanceof Player player) {
+                if (player.getInventory().getItemInMainHand().getType() == Material.BOOK) {
+                    player.sendMessage("");
+                    player.sendMessage("Damage: " + event.getDamage());
+                    player.sendMessage("Damage Reduced: " + damage);
+                    player.sendMessage("Delay: " + event.getDamageDelay());
+                    player.sendMessage("Cause: " + event.getCause().name());
+
+                }
+            }
+
+            processDamageData(event, damage);
+
+            if (event.getDamagee().getHealth() - damage < 1.0) {
+                event.getDamagee().setHealth(0);
+            } else {
+                event.getDamagee().setHealth(event.getDamagee().getHealth() - damage);
+            }
+
+
+        }
     }
 
     private void processDamageData(CustomDamageEvent event, double damage) {

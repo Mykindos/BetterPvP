@@ -5,6 +5,9 @@ import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.menu.interfaces.IRefreshingMenu;
 import me.mykindos.betterpvp.core.settings.menus.SettingSubMenu;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -17,7 +20,7 @@ public class ClansSettingsMenu extends SettingSubMenu implements IRefreshingMenu
     private final Gamer gamer;
 
     public ClansSettingsMenu(Player player, Gamer gamer) {
-        super(player, 9, ChatColor.GREEN.toString() + ChatColor.BOLD + "Clans Settings");
+        super(player, 9, Component.text("Clans Settings", NamedTextColor.GREEN).decorate(TextDecoration.BOLD));
         this.gamer = gamer;
 
         refresh();

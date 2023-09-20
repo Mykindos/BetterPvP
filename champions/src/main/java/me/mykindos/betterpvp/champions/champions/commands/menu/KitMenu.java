@@ -2,6 +2,8 @@ package me.mykindos.betterpvp.champions.champions.commands.menu;
 
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.menu.Menu;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -9,7 +11,7 @@ import org.bukkit.inventory.ItemStack;
 public class KitMenu extends Menu {
 
     public KitMenu(Player player) {
-        super(player, 36, ChatColor.RED + "Select a kit");
+        super(player, 36, Component.text("Select a kit", NamedTextColor.RED));
 
         int[] start = new int[]{0, 1, 3, 5, 7, 8};
         int count = 0;
