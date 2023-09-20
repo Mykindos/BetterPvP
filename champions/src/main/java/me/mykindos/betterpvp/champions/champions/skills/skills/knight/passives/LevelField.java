@@ -36,11 +36,11 @@ public class LevelField extends Skill implements PassiveSkill, Listener {
     public String[] getDescription(int level) {
         return new String[]{
                 "For every enemy within 10 blocks of you",
-                "you deal " + (15 + ((level - 1) * 5)) + "% extra damage",
-                "Up to a maximum of " + (40 + (level * 20)) + "% extra damage",
+                "you deal " + ChatColor.GREEN + (15 + ((level - 1) * 5)) + ChatColor.GRAY + "% extra damage",
+                "Up to a maximum of " + ChatColor.GREEN + (40 + (level * 20)) + ChatColor.GRAY + "% extra damage",
                 "For every ally within 10 blocks of you",
-                "you deal " + (15 + ((level - 1) * 5)) + "% less damage",
-                "Down to a minimum of " + (70 - (level * 10)) + "% less damage"
+                "you deal " + ChatColor.GREEN + (15 + ((level - 1) * 5)) + ChatColor.GRAY + "% less damage",
+                "Down to a minimum of " + ChatColor.GREEN + (70 - (level * 10)) + ChatColor.GRAY + "% less damage"
         };
     }
 
