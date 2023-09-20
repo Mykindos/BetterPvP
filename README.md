@@ -14,8 +14,7 @@ Repository containing all of BetterPvP's plugins for 1.20.1.
     ```bash
     git clone https://github.com/Mykindos/BetterPvP.git
     ```
-2. Compile the project using the Gradle task `reobfJar` to properly shade all project dependencies:
-   **NOTE: You must run `reobfJar` to properly obfuscate the Mojang mappings.**
+2. Compile the project using the Gradle task `assemble` to properly shade all project dependencies:
     ```bash
     ./gradlew assemble
     ```
