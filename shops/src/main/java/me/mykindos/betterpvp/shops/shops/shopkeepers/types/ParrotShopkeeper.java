@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.shops.shops.shopkeepers.types;
 
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.RandomSource;
@@ -25,11 +26,11 @@ public class ParrotShopkeeper extends Parrot implements IShopkeeper {
     @Getter
     private final CraftEntity entity;
 
-    public ParrotShopkeeper(Location location, String name) {
+    public ParrotShopkeeper(Location location, Component name) {
         this(EntityType.PARROT, location, name);
     }
 
-    public ParrotShopkeeper(EntityType<? extends Parrot> type, Location location, String name) {
+    public ParrotShopkeeper(EntityType<? extends Parrot> type, Location location, Component name) {
         super(type, ((CraftWorld) location.getWorld()).getHandle());
 
         goalSelector.removeAllGoals(Objects::nonNull);
@@ -37,7 +38,7 @@ public class ParrotShopkeeper extends Parrot implements IShopkeeper {
 
         entity = spawn(location);
 
-        entity.setCustomName(name);
+        entity.customName(name);
         entity.setCustomNameVisible(true);
 
         if(entity instanceof LivingEntity livingEntity) {

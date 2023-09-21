@@ -1,6 +1,8 @@
 package me.mykindos.betterpvp.shops.shops.shopkeepers.types;
 
+import java.util.Objects;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.RandomSource;
@@ -19,14 +21,12 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Objects;
-
 public class StandardShopkeeper extends Mob implements IShopkeeper{
 
     @Getter
     private final CraftEntity entity;
 
-    public StandardShopkeeper(EntityType<? extends Mob> type, Location location, String name) {
+    public StandardShopkeeper(EntityType<? extends Mob> type, Location location, Component name) {
         super(type, ((CraftWorld) location.getWorld()).getHandle());
 
         goalSelector.removeAllGoals(Objects::nonNull);
@@ -34,7 +34,7 @@ public class StandardShopkeeper extends Mob implements IShopkeeper{
 
         entity = spawn(location);
 
-        entity.setCustomName(name);
+        entity.customName(name);
         entity.setCustomNameVisible(true);
 
         if(entity instanceof LivingEntity livingEntity) {
