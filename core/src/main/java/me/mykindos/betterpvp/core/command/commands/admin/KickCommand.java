@@ -6,9 +6,7 @@ import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.IConsoleCommand;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -37,9 +35,8 @@ public class KickCommand extends Command implements IConsoleCommand {
             Player target = Bukkit.getPlayer(args[0]);
             if (target != null) {
                 String reason = args[1];
-                target.kick(Component.text(ChatColor.RED + "[Kick] " + ChatColor.GRAY + reason));
-                UtilMessage.broadcast("Kick", ChatColor.YELLOW + sender.getName() + ChatColor.GRAY + " kicked " + ChatColor.YELLOW + target.getName() + ChatColor.GRAY + " for "
-                        + ChatColor.GREEN + reason);
+                target.kick(UtilMessage.deserialize("<red>[Kick] <gray>" + reason));
+                UtilMessage.simpleBroadcast("Kick", "<alt2>%s</alt2> kicked <alt2>%s</alt2> for <alt>%s</alt>", sender.getName(), target.getName(), reason);
             }
         } else {
             UtilMessage.message(sender, "Command", "You must specify a player and a reason");

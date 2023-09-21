@@ -10,7 +10,6 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -33,8 +32,8 @@ public class Resistance extends Skill implements PassiveSkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "You take " + ChatColor.GREEN + (level * 15) + ChatColor.GRAY + "% less damage",
-                "but you deal " + ChatColor.GREEN + (level * 15) + ChatColor.GRAY + "% less as well"
+                "You take <val>" + (level * 15) + "</val>% less damage",
+                "but you deal <val>" + (level * 15) + "</val>% less as well"
         };
     }
 

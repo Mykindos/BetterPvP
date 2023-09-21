@@ -59,6 +59,27 @@ public class UtilItem {
     }
 
     /**
+     * Updates an ItemStack, giving it a custom name and lore
+     *
+     * @param item ItemStack to modify
+     * @param name Name to give the ItemStack
+     * @param lore Lore to give the ItemStack
+     * @return Returns the ItemStack with the newly adjusted name and lore
+     */
+    public static ItemStack setItemNameAndLore(ItemStack item, Component name, List<Component> lore) {
+        ItemMeta im = item.getItemMeta();
+        im.displayName(name);
+        if (lore != null) {
+            im.lore(lore);
+        }
+
+        im.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_POTION_EFFECTS);
+
+        item.setItemMeta(im);
+        return item;
+    }
+
+    /**
      * Removes attributes from an ItemStack (e.g. the +7 damage that is visible
      * on a diamond sword under the lore)
      *

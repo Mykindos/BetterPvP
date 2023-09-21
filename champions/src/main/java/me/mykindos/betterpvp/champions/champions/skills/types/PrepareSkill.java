@@ -1,19 +1,16 @@
 package me.mykindos.betterpvp.champions.champions.skills.types;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillDequipEvent;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
-
 
 public abstract class PrepareSkill extends Skill implements InteractSkill, Listener {
 
@@ -33,8 +30,7 @@ public abstract class PrepareSkill extends Skill implements InteractSkill, Liste
     @Override
     public boolean canUse(Player player) {
         if (active.contains(player.getUniqueId())) {
-            UtilMessage.message(player, getClassType().getName(), "You have already prepared %s.",
-                    ChatColor.GREEN + getName() + ChatColor.GRAY);
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You have already prepared <alt>%s</alt>.", getName());
             return false;
         }
 

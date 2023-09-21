@@ -1,5 +1,9 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.paladin.axe;
 
+import java.util.ArrayList;
+import java.util.WeakHashMap;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -13,7 +17,6 @@ import me.mykindos.betterpvp.core.framework.customtypes.CustomArmourStand;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.*;
-import org.bukkit.ChatColor;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -32,11 +35,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.util.ArrayList;
-import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -65,7 +63,7 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
                 "you are facing, damaging, knocking up",
                 "and slowing any enemies hit.",
                 "",
-                "Cooldown: " + ChatColor.GREEN + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level)
         };
     }
 

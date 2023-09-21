@@ -13,7 +13,6 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -42,9 +41,9 @@ public class HoldPosition extends Skill implements InteractSkill, CooldownSkill,
         return new String[]{
                 "Hold your position, gaining",
                 "Protection II, Slow III and no",
-                "knockback for " + ChatColor.GREEN + (5 + ((level - 1) * 0.5)) + ChatColor.GRAY + " seconds.",
+                "knockback for <val>" + (5 + ((level - 1) * 0.5)) + "</val> seconds.",
                 "",
-                "Recharge: " + ChatColor.GREEN + getCooldown(level)
+                "Recharge: <val>" + getCooldown(level)
         };
     }
 

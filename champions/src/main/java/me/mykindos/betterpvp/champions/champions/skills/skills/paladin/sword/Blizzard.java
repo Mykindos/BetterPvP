@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.paladin.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.WeakHashMap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
@@ -17,7 +18,6 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -27,8 +27,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
-
-import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -56,7 +54,7 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergySkill
                 "While channeling, release a blizzard",
                 "that slows anyone hit for 2 seconds.",
                 "",
-                "Energy: " + ChatColor.GREEN + getEnergy(level)
+                "Energy: <val>" + getEnergy(level)
         };
     }
 

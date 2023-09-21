@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 import me.mykindos.betterpvp.shops.Shops;
 import me.mykindos.betterpvp.shops.shops.shopkeepers.types.*;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -62,7 +63,7 @@ public class ShopkeeperManager extends Manager<IShopkeeper> {
         });
     }
 
-    public void saveShopkeeper(String type, String name, Location location) {
+    public void saveShopkeeper(String type, Component name, Location location) {
         String tag = UUID.randomUUID().toString();
         shops.getConfig().set("shopkeepers." + tag + ".type", type);
         shops.getConfig().set("shopkeepers." + tag + ".name", name);

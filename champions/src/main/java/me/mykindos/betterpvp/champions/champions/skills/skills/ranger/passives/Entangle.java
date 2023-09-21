@@ -10,7 +10,6 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -36,9 +35,10 @@ public class Entangle extends Skill implements PassiveSkill {
 
     @Override
     public String[] getDescription(int level) {
-
-        return new String[]{"Your arrows apply Slowness 2",
-                "to any damageable target for " + ChatColor.GREEN + (baseDuration + (level * 0.5)) + ChatColor.GRAY + " seconds"};
+        return new String[] {
+                "Your arrows apply Slowness 2",
+                "to any damageable target for <val>" + (baseDuration + (level * 0.5)) + "</val> seconds"
+        };
     }
 
     @Override

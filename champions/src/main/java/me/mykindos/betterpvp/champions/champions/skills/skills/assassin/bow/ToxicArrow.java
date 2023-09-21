@@ -9,7 +9,6 @@ import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -39,9 +38,9 @@ public class ToxicArrow extends PrepareArrowSkill {
 
         return new String[]{
                 "Your next arrow will poison your target, and give them",
-                "nausea for " + ChatColor.GREEN + (6 + level) + ChatColor.GRAY + " seconds.",
+                "nausea for <val>" + (6 + level) + "</val> seconds.",
                 "",
-                "Cooldown: " + ChatColor.GREEN + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level)
 
         };
     }

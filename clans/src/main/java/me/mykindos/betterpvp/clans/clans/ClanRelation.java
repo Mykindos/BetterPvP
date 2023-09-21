@@ -2,6 +2,8 @@ package me.mykindos.betterpvp.clans.clans;
 
 import lombok.Getter;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.minecraft.world.level.material.MapColor;
 import org.bukkit.ChatColor;
 
@@ -27,8 +29,12 @@ public enum ClanRelation {
     }
 
 
-    public String getPrimary(boolean bold) {
-        return primary.toString() + ChatColor.BOLD;
+    public Style getPrimary(boolean bold) {
+        final Style style = Style.style(primary);
+        if (bold) {
+            style.decorate(TextDecoration.BOLD);
+        }
+        return style;
     }
 
     public ChatColor getPrimaryAsChatColor(){

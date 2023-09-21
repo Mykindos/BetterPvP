@@ -52,11 +52,11 @@ public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listene
                 "Drop Sword / Axe to Activate",
                 "",
                 "Teleports you back to where you ",
-                "were located " + ChatColor.GREEN + (1.5 + (level)) + ChatColor.GRAY + " seconds ago",
+                "were located <val>" + (1.5 + (level)) + "</val> seconds ago",
                 "Increases health by 1/4 of the health you had",
-                ChatColor.GREEN.toString() + (1.5 + (level)) + ChatColor.GRAY + " seconds ago",
+                "<val>" + (1.5 + (level)) + "</val> seconds ago",
                 "",
-                "Cooldown: " + ChatColor.GREEN + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level)
         };
     }
 

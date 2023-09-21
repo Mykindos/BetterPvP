@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.passives;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.Optional;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -14,13 +15,10 @@ import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
-import java.util.Optional;
 
 @Singleton
 @BPvPListener
@@ -42,7 +40,7 @@ public class VitalitySpores extends Skill implements PassiveSkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "After " + ChatColor.GREEN + (baseDuration - level) + ChatColor.GRAY + " seconds of not taking damage,",
+                "After <val>" + (baseDuration - level) + "</val> seconds of not taking damage,",
                 "forest spores surround you, giving",
                 "you Regeneration 1 for 6 seconds.",
                 "",

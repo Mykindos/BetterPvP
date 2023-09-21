@@ -2,18 +2,18 @@ package me.mykindos.betterpvp.core.client.commands;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.ClientManager;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 @Singleton
 public class ClientCommand extends Command {
@@ -50,8 +50,9 @@ public class ClientCommand extends Command {
         @Override
         public void execute(Player player, Client client, String[] args) {
             client.setAdministrating(!client.isAdministrating());
-            UtilMessage.message(player, "Command", "Client admin: "
-                    + (client.isAdministrating() ? ChatColor.GREEN + "enabled" : ChatColor.RED + "disabled"));
+            
+            Component status = client.isAdministrating() ? Component.text("enabled", NamedTextColor.GREEN) : Component.text("disabled", NamedTextColor.RED);
+            UtilMessage.simpleMessage(player, "Command", Component.text("Client admin: ").append(status));
         }
 
         @Override
@@ -88,8 +89,8 @@ public class ClientCommand extends Command {
 
             Optional<Client> clientOptional = clientManager.getClientByName(name);
             clientOptional.ifPresentOrElse(target -> {
-                List<String> result = new ArrayList<>();
-                result.add(ChatColor.YELLOW + target.getName() + ChatColor.GRAY + " Client Details:");
+                List<Component> result = new ArrayList<>();
+                result.add(UtilMessage.deserialize("<alt2>%s</alt2> Client Details", target.getName()));
                 //event.getResult().add(ChatColor.YELLOW + "IP Address: "
                 //        + (client.hasRank(Rank.ADMIN, false) ? ChatColor.GRAY + target.getIP() : ChatColor.RED + "N/A"));
                 //event.getResult().add(ChatColor.YELLOW + "Previous Name: " + ChatColor.GRAY + target.getOldName());
@@ -141,15 +142,15 @@ public class ClientCommand extends Command {
                 if(targetRank != null) {
                     if (client.getRank().getId() < targetRank.getId() || player.isOp()) {
                         targetClient.setRank(targetRank);
-                        UtilMessage.message(player, "Client", "%s has been promoted to %s",
-                                ChatColor.YELLOW + targetClient.getName() + ChatColor.GRAY, targetRank.getTag(true));
+
+                        final Component msg = UtilMessage.deserialize("<alt2>%s</alt2> has been promoted to ", targetClient.getName()).append(targetRank.getTag(true));
+                        UtilMessage.simpleMessage(player, "Client", msg);
                         clientManager.getRepository().save(targetClient);
                     }else{
                         UtilMessage.message(player, "Client", "You cannot promote someone to your current rank or higher.");
                     }
                 }else{
-                    UtilMessage.message(player, "Client", "%s already has the highest rank.",
-                            ChatColor.YELLOW + targetClient.getName() + ChatColor.GRAY);
+                    UtilMessage.simpleMessage(player, "Client", "<alt2>%s</alt2> already has the highest rank.", targetClient.getName());
                 }
             }
         }

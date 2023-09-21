@@ -1,6 +1,10 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.passives;
 
 
+import java.util.HashSet;
+import java.util.WeakHashMap;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -11,17 +15,11 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.util.HashSet;
-import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -47,7 +45,7 @@ public class RepeatedStrikes extends Skill implements PassiveSkill, Listener {
         return new String[]{
                 "Each time you attack, your damage",
                 "increases by 1",
-                "You can get up to " + ChatColor.GREEN + level + ChatColor.GRAY + " bonus damage.",
+                "You can get up to <val>" + level + "</val> bonus damage.",
                 "",
                 "Not attacking for 2 seconds clears",
                 "your bonus damage."};

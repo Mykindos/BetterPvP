@@ -2,6 +2,9 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.gladiator.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.Iterator;
+import java.util.Map.Entry;
+import java.util.WeakHashMap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -14,7 +17,6 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.*;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -22,10 +24,6 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
-
-import java.util.Iterator;
-import java.util.Map.Entry;
-import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -50,13 +48,13 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
                 "Right click with a sword to activate.",
                 "",
                 "Hurl yourself towards an opponent.",
-                "If you collide with them, you " + ChatColor.WHITE + "both",
+                "If you collide with them, you <white>both",
                 "take damage and receive Slow 4",
-                "for " + ChatColor.GREEN + (1 + level) + ChatColor.GRAY + " seconds.",
+                "for <val>" + (1 + level) + "</val> seconds.",
                 "",
                 "Cannot be used while grounded.",
                 "",
-                "Cooldown: " + ChatColor.GREEN + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level)
         };
     }
 
@@ -126,12 +124,12 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
 
 
     public void doTakedown(Player player, Player target) {
-        UtilMessage.message(player, getClassType().getName(), "You hit " + ChatColor.GREEN + target.getName() + ChatColor.GRAY + " with " + ChatColor.GREEN + getName());
+        UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <alt>" + target.getName() + "</alt> with <alt>" + getName());
 
         UtilDamage.doCustomDamage(new CustomDamageEvent(target, player, null, DamageCause.CUSTOM, 10, false, "Takedown"));
 
 
-        UtilMessage.message(target, getClassType().getName(), ChatColor.GREEN + player.getName() + ChatColor.GRAY + " hit you with " + ChatColor.GREEN + getName());
+        UtilMessage.simpleMessage(target, getClassType().getName(), "<alt>" + player.getName() + "</alt> hit you with <alt>" + getName());
         UtilDamage.doCustomDamage(new CustomDamageEvent(player, target, null, DamageCause.CUSTOM, 10, false, "Takedown Recoil"));
 
         PotionEffect pot = new PotionEffect(PotionEffectType.SLOW, (int) (1 + (getLevel(player) * 0.5)) * 20, 2);
@@ -143,7 +141,7 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
     public boolean canUse(Player p) {
 
         if (UtilBlock.isGrounded(p)) {
-            UtilMessage.message(p, getClassType().getName(), "You cannot use " + ChatColor.GREEN + getName() + ChatColor.GRAY + " while grounded.");
+            UtilMessage.simpleMessage(p, getClassType().getName(), "You cannot use <alt>" + getName() + "</alt> while grounded.");
             return false;
         }
 

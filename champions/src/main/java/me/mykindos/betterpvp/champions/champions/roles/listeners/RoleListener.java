@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.champions.champions.roles.listeners;
 
 import com.google.inject.Inject;
+import java.util.Optional;
 import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
@@ -20,8 +21,9 @@ import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -32,8 +34,6 @@ import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
-
-import java.util.Optional;
 
 @BPvPListener
 public class RoleListener implements Listener {
@@ -189,7 +189,7 @@ public class RoleListener implements Listener {
         return false;
     }
 
-    public String[] equipMessage(Player player, Role role) {
+    public Component[] equipMessage(Player player, Role role) {
         Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(player.getUniqueId().toString());
         if (gamerBuildsOptional.isPresent()) {
             GamerBuilds builds = gamerBuildsOptional.get();
@@ -203,19 +203,18 @@ public class RoleListener implements Listener {
                 String passivea = build.getPassiveA() == null ? "" : build.getPassiveA().getString();
                 String passiveb = build.getPassiveB() == null ? "" : build.getPassiveB().getString();
                 String global = build.getGlobal() == null ? "" : build.getGlobal().getString();
-                return new String[]{
-                        ChatColor.GREEN + "Sword: " + ChatColor.WHITE + sword,
-                        ChatColor.GREEN + "Axe: " + ChatColor.WHITE + axe,
-                        ChatColor.GREEN + "Bow: " + ChatColor.WHITE + bow,
-                        ChatColor.GREEN + "Passive A: " + ChatColor.WHITE + passivea,
-                        ChatColor.GREEN + "Passive B: " + ChatColor.WHITE + passiveb,
-                        ChatColor.GREEN + "Global: " + ChatColor.WHITE + global
+                return new Component[]{
+                        Component.text("Sword: ", NamedTextColor.GREEN).append(Component.text(sword, NamedTextColor.WHITE)),
+                        Component.text("Axe: ", NamedTextColor.GREEN).append(Component.text(axe, NamedTextColor.WHITE)),
+                        Component.text("Bow: ", NamedTextColor.GREEN).append(Component.text(bow, NamedTextColor.WHITE)),
+                        Component.text("Passive A: ", NamedTextColor.GREEN).append(Component.text(passivea, NamedTextColor.WHITE)),
+                        Component.text("Passive B: ", NamedTextColor.GREEN).append(Component.text(passiveb, NamedTextColor.WHITE)),
+                        Component.text("Global: ", NamedTextColor.GREEN).append(Component.text(global, NamedTextColor.WHITE))
                 };
             }
         }
 
-        return new String[]{};
-
+        return new Component[]{};
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

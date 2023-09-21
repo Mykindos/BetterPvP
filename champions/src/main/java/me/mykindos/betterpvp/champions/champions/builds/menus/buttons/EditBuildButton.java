@@ -6,7 +6,9 @@ import me.mykindos.betterpvp.champions.champions.skills.SkillManager;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.menu.Button;
 import me.mykindos.betterpvp.core.menu.MenuManager;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -21,7 +23,7 @@ public class EditBuildButton extends Button {
     private final SkillManager skillManager;
 
     public EditBuildButton(GamerBuilds builds, Role role, int buildNumber, SkillManager skillManager, int slot) {
-        super(slot, new ItemStack(Material.ANVIL), ChatColor.GREEN.toString() + ChatColor.BOLD + "Edit & Save Build - " + buildNumber);
+        super(slot, new ItemStack(Material.ANVIL), Component.text("Edit & Save Build - " + buildNumber, NamedTextColor.GREEN, TextDecoration.BOLD));
         this.builds = builds;
         this.role = role;
         this.buildNumber = buildNumber;

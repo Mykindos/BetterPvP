@@ -2,6 +2,9 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.warlock.passives
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillDequipEvent;
@@ -16,17 +19,12 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
 
 @Singleton
 @BPvPListener
@@ -47,8 +45,8 @@ public class Frailty extends Skill implements PassiveSkill {
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Nearby enemies that fall below " + ChatColor.GREEN + (40 + ((level - 1) * 10)) + "%" + ChatColor.GRAY + " health",
-                "take " + ChatColor.GREEN + (20 + ((level - 1) * 5)) + "%" + ChatColor.GRAY + " more damage from your melee attacks."
+                "Nearby enemies that fall below <val>" + (40 + ((level - 1) * 10)) + "%" + "</val> health",
+                "take <val>" + (20 + ((level - 1) * 5)) + "%" + "</val> more damage from your melee attacks."
         };
     }
 

@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.knight.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.HashMap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
@@ -16,7 +17,6 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
@@ -28,8 +28,6 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.HashMap;
 
 @Singleton
 @BPvPListener
@@ -55,10 +53,10 @@ public class Riposte extends PrepareSkill implements CooldownSkill, Listener {
         return new String[]{
                 "Right click with a sword to activate.",
                 "",
-                "Reduce all melee damage by 75% for " + ChatColor.GREEN + (1 + (level * 0.5)) + ChatColor.GRAY + " seconds.",
+                "Reduce all melee damage by 75% for <val>" + (1 + (level * 0.5)) + "</val> seconds.",
                 "Impervious to knockback while active.",
                 "",
-                "Cooldown: " + ChatColor.GREEN + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level)
         };
     }
 

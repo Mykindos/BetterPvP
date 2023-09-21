@@ -1,5 +1,9 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.knight.axe;
 
+import java.util.HashMap;
+import java.util.UUID;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -13,7 +17,6 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
-import org.bukkit.ChatColor;
 import org.bukkit.Effect;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
@@ -25,11 +28,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.util.HashMap;
-import java.util.UUID;
 
 @Singleton
 @BPvPListener
@@ -57,7 +55,7 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
                 "",
                 "While charging, you take no knockback.",
                 "",
-                "Cooldown: " + ChatColor.GREEN + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level)
         };
     }
 
@@ -102,8 +100,9 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
                 damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1.5F, 0.5F);
 
                 if (event.getDamagee() instanceof Player damaged) {
-                    UtilMessage.message(damaged, getClassType().getName(), ChatColor.YELLOW + damager.getName() + ChatColor.GRAY + " hit you with " + ChatColor.GREEN + getName() + ChatColor.GRAY + ".");
-                    UtilMessage.message(damager, getClassType().getName(), "You hit " + ChatColor.YELLOW + damaged.getName() + ChatColor.GRAY + " with " + ChatColor.GREEN + getName() + ChatColor.GRAY + ".");
+                    UtilMessage.simpleMessage(damaged, getClassType().getName(), "<yellow>" + damager.getName() + "</yellow> hit you with <green>" + getName() + "</green>.");
+                    UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit <yellow>" + damaged.getName() + "</yellow> with <green>" + getName() + "</green>.");
+          
                     running.remove(damager.getUniqueId());
                     return;
                 }

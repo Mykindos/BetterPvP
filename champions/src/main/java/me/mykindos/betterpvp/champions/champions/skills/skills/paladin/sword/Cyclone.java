@@ -12,7 +12,6 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
-import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -41,9 +40,9 @@ public class Cyclone extends Skill implements InteractSkill, CooldownSkill {
                 "Right click with a sword to activate.",
                 "",
                 "Pulls all enemies within",
-                ChatColor.GREEN.toString() + (minimumDistance + level) + ChatColor.GRAY + " blocks towards you",
+                "<val>" + (minimumDistance + level) + "</val> blocks towards you",
                 "",
-                "Cooldown: " + ChatColor.GREEN + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level)
         };
     }
 

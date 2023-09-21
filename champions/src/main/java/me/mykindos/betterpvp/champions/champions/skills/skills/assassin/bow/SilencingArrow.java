@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.bow;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
@@ -9,16 +11,12 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 @Singleton
 @BPvPListener
@@ -37,8 +35,11 @@ public class SilencingArrow extends PrepareArrowSkill {
     @Override
     public String[] getDescription(int level) {
 
-        return new String[]{"Your next arrow will silence your", "target for " + ChatColor.GREEN + (3 + level) + ChatColor.GRAY + " seconds.", "Making them unable to use any active skills", "", "Cooldown: " + ChatColor.GREEN + getCooldown(level)
-
+        return new String[]{
+                "Your next arrow will silence your", "target for <val>" + (3 + level) + "</val> seconds.",
+                "Making them unable to use any active skills",
+                "",
+                "Cooldown: <val>" + getCooldown(level)
         };
     }
 
@@ -63,7 +64,7 @@ public class SilencingArrow extends PrepareArrowSkill {
         if (!(target instanceof Player damagee)) return;
         championsManager.getEffects().addEffect(damagee, EffectType.SILENCE, ((3 + level) * 1000L));
         if (championsManager.getEffects().hasEffect(damagee, EffectType.IMMUNETOEFFECTS)) {
-            UtilMessage.message(damager, getClassType().getName(), ChatColor.GREEN + damagee.getName() + ChatColor.GRAY + " is immune to your silence!");
+            UtilMessage.simpleMessage(damager, getClassType().getName(), "<alt>" + damagee.getName() + "</alt> is immune to your silence!");
         }
     }
 
