@@ -59,6 +59,7 @@ public class Pestilence extends PrepareSkill implements CooldownSkill {
                 "Pestilence poisons the target, and spreads to",
                 "nearby enemies. While enemies are infected,",
                 "they deal 20% reduced damage",
+                "Pestilence lasts <val>" + infectionDuration + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
