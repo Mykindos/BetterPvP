@@ -33,11 +33,11 @@ public class Impotence extends Skill implements PassiveSkill {
     public String[] getDescription(int level) {
         return new String[]{
                 "For each enemy within <val>" + (3 + level) + "</val> blocks",
-                "you take reduced damage from all sources, at a maximum of 3 players.",
+                "you take reduced damage from all sources, at a maximum of <val>3</val> players.", //Student 9/21/2023: Should this be in config?
                 "",
                 "Damage Reduction:",
-                "1 nearby enemy = 20%",
-                "3 nearby enemies = 30%"
+                "1 nearby enemy = <val>20%</val>", //Student 9/21/2023: Should this be in config?
+                "3 nearby enemies = <val>30%</val>"
         };
     }
 

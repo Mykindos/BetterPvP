@@ -44,7 +44,7 @@ public class SoulHarvest extends Skill implements PassiveSkill {
         return new String[]{
                 "Harvest the soul of nearby dead players.",
                 "",
-                "Collected souls give bursts of speed and regeneration.",
+                "Collected souls give bursts of Speed II and Regeneration II.",
                 "Souls are visible by Warlocks only",
                 "",
                 "Buff duration: <val>" + ((40 + (level * 20)) / 20) + "</val> seconds."
