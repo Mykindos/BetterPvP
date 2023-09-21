@@ -30,9 +30,9 @@ public enum ClanRelation {
 
 
     public Style getPrimary(boolean bold) {
-        final Style style = Style.style(primary);
+        Style style = Style.style(primary);
         if (bold) {
-            style.decorate(TextDecoration.BOLD);
+            style = style.decorate(TextDecoration.BOLD);
         }
         return style;
     }
