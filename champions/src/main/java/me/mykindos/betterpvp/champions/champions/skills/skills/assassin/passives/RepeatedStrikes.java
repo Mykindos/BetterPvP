@@ -44,7 +44,7 @@ public class RepeatedStrikes extends Skill implements PassiveSkill, Listener {
 
         return new String[]{
                 "Each time you attack, your damage",
-                "increases by 1",
+                "increases by <val>1</val>", //Student 9/21/2023: Should this be in config?
                 "You can get up to <val>" + level + "</val> bonus damage.",
                 "",
                 "Not attacking for 2 seconds clears",

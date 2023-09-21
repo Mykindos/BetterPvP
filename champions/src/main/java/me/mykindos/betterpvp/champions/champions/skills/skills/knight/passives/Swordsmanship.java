@@ -51,7 +51,7 @@ public class Swordsmanship extends Skill implements PassiveSkill {
                 "You can store a maximum of <val>" + (level) + "</val> charges",
                 "",
                 "When you attack, your damage is",
-                "increased by 0.5 for each charge you have",
+                "increased by <val>0.5</val> for each charge you have", //Student 9/21/2023: Should this be in config?
                 "and then your charges are reset to 0.",
                 "",
                 "This only applies to swords."

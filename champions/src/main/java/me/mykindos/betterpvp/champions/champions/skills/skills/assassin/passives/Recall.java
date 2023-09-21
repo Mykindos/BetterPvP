@@ -53,7 +53,7 @@ public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listene
                 "",
                 "Teleports you back to where you ",
                 "were located <val>" + (1.5 + (level)) + "</val> seconds ago",
-                "Increases health by 1/4 of the health you had",
+                "Increases health by <val>1/4</val> of the health you had", //Student 9/21/2023: Should this be in config?
                 "<val>" + (1.5 + (level)) + "</val> seconds ago",
                 "",
                 "Cooldown: <val>" + getCooldown(level)

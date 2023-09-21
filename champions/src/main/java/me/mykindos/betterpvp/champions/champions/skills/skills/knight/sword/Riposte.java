@@ -53,7 +53,7 @@ public class Riposte extends PrepareSkill implements CooldownSkill, Listener {
         return new String[]{
                 "Right click with a sword to activate.",
                 "",
-                "Reduce all melee damage by 75% for <val>" + (1 + (level * 0.5)) + "</val> seconds.",
+                "Reduce all melee damage by <val>75%</val> for <val>" + (1 + (level * 0.5)) + "</val> seconds.", //Student 9/21/2023 Should this be in config?
                 "Impervious to knockback while active.",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
