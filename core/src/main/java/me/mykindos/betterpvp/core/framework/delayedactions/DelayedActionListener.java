@@ -1,6 +1,8 @@
 package me.mykindos.betterpvp.core.framework.delayedactions;
 
 import com.google.inject.Inject;
+import java.time.Duration;
+import java.util.WeakHashMap;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.framework.delayedactions.events.PlayerDelayedActionEvent;
@@ -11,16 +13,13 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
-
-import java.time.Duration;
-import java.util.WeakHashMap;
 
 @BPvPListener
 public class DelayedActionListener implements Listener {
@@ -67,11 +66,14 @@ public class DelayedActionListener implements Listener {
         delayedActionMap.forEach((player, delayedAction) -> {
             if (delayedAction.isCountdown() && delayedAction.getCountdownText() != null) {
 
-                String remainingTime = String.format(ChatColor.YELLOW + delayedAction.getCountdownText() + ChatColor.GREEN + " %.1f %s",
+                Component remainingTime = UtilMessage.deserialize("<alt2>%s</alt2> <alt>%.1f</alt> <alt2>%s</alt2>",
+                        delayedAction.getCountdownText(),
                         UtilTime.convert((delayedAction.getTime() - System.currentTimeMillis()), UtilTime.TimeUnit.BEST, 1),
-                        ChatColor.YELLOW + UtilTime.getTimeUnit2(delayedAction.getTime() - System.currentTimeMillis()).toLowerCase());
+                        UtilTime.getTimeUnit2(delayedAction.getTime() - System.currentTimeMillis()).toLowerCase()
+                );
+                
                 var times = Title.Times.times(Duration.ofMillis(0), Duration.ofMillis(1000), Duration.ofMillis(1000));
-                player.showTitle(Title.title(Component.text(remainingTime), Component.empty(), times));
+                player.showTitle(Title.title(remainingTime, Component.empty(), times));
             }
 
         });
@@ -85,8 +87,8 @@ public class DelayedActionListener implements Listener {
 
                 var times = Title.Times.times(Duration.ofMillis(0), Duration.ofMillis(1000), Duration.ofMillis(1000));
                 player.showTitle(Title.title(
-                        Component.text(ChatColor.RED + delayedAction.getTitleText() + " cancelled"),
-                        Component.text(ChatColor.GRAY + "You took damage while " + delayedAction.getSubtitleText()),
+                        Component.text(delayedAction.getTitleText() + " cancelled", NamedTextColor.RED),
+                        Component.text("You took damage while " + delayedAction.getSubtitleText(), NamedTextColor.GRAY),
                         times));
             }
         }
@@ -101,8 +103,8 @@ public class DelayedActionListener implements Listener {
 
                 var times = Title.Times.times(Duration.ofMillis(0), Duration.ofMillis(1000), Duration.ofMillis(1000));
                 event.getPlayer().showTitle(Title.title(
-                        Component.text(ChatColor.RED + delayedAction.getTitleText() + " cancelled"),
-                        Component.text(ChatColor.GRAY + "You moved while " + delayedAction.getSubtitleText()),
+                        Component.text(delayedAction.getTitleText() + " cancelled", NamedTextColor.RED),
+                        Component.text("You moved while " + delayedAction.getSubtitleText(), NamedTextColor.GRAY),
                         times));
             }
         }

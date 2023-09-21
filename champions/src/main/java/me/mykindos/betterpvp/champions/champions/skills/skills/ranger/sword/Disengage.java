@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.WeakHashMap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
@@ -15,7 +16,6 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -24,8 +24,6 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
-
-import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -53,13 +51,13 @@ public class Disengage extends PrepareSkill implements CooldownSkill {
                 "Right click with a sword to prepare",
                 "",
                 "If you are attacked",
-                "within " + ChatColor.GREEN + ((level * 0.5)) + ChatColor.GRAY + " seconds you successfully disengage",
+                "within <val>" + (level * 0.5) + "</val> seconds you successfully disengage",
                 "",
                 "If successful, you leap backwards",
                 "and your attacker receives Slow 4",
-                "for " + ChatColor.GREEN + (baseSlowDuration + level) + ChatColor.GRAY + " seconds.",
+                "for <val>" + (baseSlowDuration + level) + "</val> seconds.",
                 "",
-                "Recharge: " + ChatColor.GREEN + getCooldown(level)};
+                "Recharge: <val>" + getCooldown(level)};
     }
 
     @Override

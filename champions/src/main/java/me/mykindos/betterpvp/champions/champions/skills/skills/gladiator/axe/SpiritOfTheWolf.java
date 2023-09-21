@@ -12,7 +12,6 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
-import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
@@ -42,10 +41,10 @@ public class SpiritOfTheWolf extends Skill implements InteractSkill, CooldownSki
                 "Right click with a axe to activate.",
                 "",
                 "Call upon the spirit of the wolf",
-                "granting all allies within " + ChatColor.GREEN + (radius + (level)) + ChatColor.GRAY + " blocks",
-                "Speed II for " + ChatColor.GREEN + duration + ChatColor.GRAY + " seconds.",
+                "granting all allies within <val>" + (radius + (level)) + "</val> blocks",
+                "Speed II for <val>" + duration + "</val> seconds.",
                 "",
-                "Cooldown: " + ChatColor.GREEN + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level)
         };
     }
 

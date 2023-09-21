@@ -14,7 +14,6 @@ import me.mykindos.betterpvp.core.utilities.UtilItem;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -36,14 +35,13 @@ public class BuildMenu extends Menu implements IRefreshingMenu {
 
     @Override
     public void refresh() {
-        addButton(new Button(0, new ItemStack(Material.EMERALD_BLOCK), ChatColor.GREEN.toString() + ChatColor.BOLD + "Back"));
-        addButton(new Button(18, new ItemStack(role.getHelmet()), ChatColor.GREEN.toString() + ChatColor.BOLD + role.getName() + " Helmet"));
-        addButton(new Button(27, new ItemStack(role.getChestplate()), ChatColor.GREEN.toString() + ChatColor.BOLD + role.getName() + " Chestplate"));
-        addButton(new Button(36, new ItemStack(role.getLeggings()), ChatColor.GREEN.toString() + ChatColor.BOLD + role.getName() + " Leggings"));
-        addButton(new Button(45, new ItemStack(role.getBoots()), ChatColor.GREEN.toString() + ChatColor.BOLD + role.getName() + " Boots"));
+        addButton(new Button(0, new ItemStack(Material.EMERALD_BLOCK), Component.text("Back", NamedTextColor.GREEN, TextDecoration.BOLD)));
+        addButton(new Button(18, new ItemStack(role.getHelmet()), Component.text(role.getName() + " Helmet", NamedTextColor.GREEN, TextDecoration.BOLD)));
+        addButton(new Button(27, new ItemStack(role.getChestplate()), Component.text(role.getName() + " Chestplate", NamedTextColor.GREEN, TextDecoration.BOLD)));
+        addButton(new Button(36, new ItemStack(role.getLeggings()), Component.text(role.getName() + " Leggings", NamedTextColor.GREEN, TextDecoration.BOLD)));
+        addButton(new Button(45, new ItemStack(role.getBoots()), Component.text(role.getName() + " Boots", NamedTextColor.GREEN, TextDecoration.BOLD)));
 
         int slot = 9;
-
 
         for (int i = 1; i < 5; i++) {
 

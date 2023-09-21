@@ -2,8 +2,9 @@ package me.mykindos.betterpvp.core.client;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.format.TextDecoration;
 
 @AllArgsConstructor
 public enum Rank {
@@ -28,20 +29,12 @@ public enum Rank {
     private final int id;
 
 
-    public String getTag(boolean bold) {
-        String tag = this.name;
+    public Component getTag(boolean bold) {
+        Component tag = Component.text(this.name, color);
         if (bold) {
-            return getChatColor().toString() + ChatColor.BOLD + fixColors(tag);
+            tag = tag.decorate(TextDecoration.BOLD);
         }
-        return getChatColor().toString() + fixColors(tag);
-    }
-
-    private String fixColors(String s) {
-        return ChatColor.translateAlternateColorCodes('&', s);
-    }
-
-    private ChatColor getChatColor(){
-        return ChatColor.valueOf(color.toString().toUpperCase());
+        return tag;
     }
 
     public static Rank getRank(int id) {

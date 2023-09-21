@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.clans.clans;
 
+import java.util.*;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.clans.clans.events.ClanPropertyUpdateEvent;
@@ -16,13 +17,12 @@ import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.*;
 
 @Slf4j
 @Data
@@ -169,7 +169,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
         return "";
     }
 
-    public String getSimpleDominanceString(IClan clan) {
+    public Component getSimpleDominanceString(IClan clan) {
         Optional<ClanEnemy> enemyOptional = getEnemy(clan);
         Optional<ClanEnemy> theirEnemyOptional = clan.getEnemy(this);
         if (enemyOptional.isPresent() && theirEnemyOptional.isPresent()) {
@@ -178,16 +178,16 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
             ClanEnemy theirEnemy = theirEnemyOptional.get();
 
             if (theirEnemy.getDominance() == 0 && enemy.getDominance() == 0) {
-                return ChatColor.WHITE + " 0";
+                return Component.text(" 0", NamedTextColor.WHITE);
             }
             if (theirEnemy.getDominance() > 0) {
-                return ChatColor.GREEN + " " + theirEnemy.getDominance() + "%";
+                return Component.text(" " + theirEnemy.getDominance() + "%", NamedTextColor.GREEN);
             } else {
-                return ChatColor.DARK_RED + " " + enemy.getDominance() + "%";
+                return Component.text(" " + enemy.getDominance() + "%", NamedTextColor.RED);
             }
 
         }
-        return "";
+        return Component.empty();
     }
 
     /**

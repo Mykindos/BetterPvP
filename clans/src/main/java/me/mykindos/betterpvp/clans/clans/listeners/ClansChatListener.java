@@ -82,7 +82,7 @@ public class ClansChatListener extends ClanListener {
             if (allyChat) {
                 event.cancel("Player has ally chat enabled");
 
-                String message = "dark_green" + playerName + " <green>" + PlainTextComponentSerializer.plainText().serialize(event.getMessage());
+                String message = "<dark_green>" + playerName + " <green>" + PlainTextComponentSerializer.plainText().serialize(event.getMessage());
 
                 clan.getAlliances().forEach(alliance -> {
                     alliance.getClan().messageClan(message, null, false);

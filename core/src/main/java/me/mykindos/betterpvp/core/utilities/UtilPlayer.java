@@ -87,8 +87,8 @@ public class UtilPlayer {
         return Arrays.stream(items).anyMatch(item -> item == player.getInventory().getItemInMainHand().getType());
     }
 
-    public static void sendActionBar(Player player, String msg) {
-        player.sendActionBar(Component.text(msg));
+    public static void sendActionBar(Player player, Component msg) {
+        player.sendActionBar(msg);
     }
 
     /**

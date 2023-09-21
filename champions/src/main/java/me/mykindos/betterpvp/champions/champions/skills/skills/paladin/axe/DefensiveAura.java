@@ -12,7 +12,6 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
-import org.bukkit.ChatColor;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
@@ -40,10 +39,10 @@ public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill
         return new String[]{
                 "Right click with a axe to Activate",
                 "",
-                "Gives you, and all allies within " + ChatColor.GREEN + (6 + level) + ChatColor.GRAY + " blocks",
+                "Gives you, and all allies within <val>" + (6 + level) + "</val> blocks",
                 "2 bonus hearts",
                 "",
-                "Cooldown: " + ChatColor.GREEN + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level)
         };
     }
 

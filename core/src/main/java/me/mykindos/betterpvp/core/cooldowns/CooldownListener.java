@@ -10,8 +10,10 @@ import me.mykindos.betterpvp.core.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -72,21 +74,14 @@ public class CooldownListener implements Listener {
                 green = 10;
             }
 
-            StringBuilder msg = new StringBuilder();
-
-            for (int i = 0; i < green; i++) {
-                msg.append(ChatColor.GREEN).append(ChatColor.BOLD).append("\u2588");
-            }
-
+            String msg = "<green><bold>" + "\u2588".repeat(Math.max(0, green));
             if (green != 10) {
-
-                for (int i = 0; i < red; i++) {
-                    msg.append(ChatColor.RED).append(ChatColor.BOLD).append("\u2588");
-                }
+                msg += "<red><bold>" + "\u2588".repeat(Math.max(0, red));
             }
 
-            UtilPlayer.sendActionBar(event.getPlayer(), ChatColor.GOLD.toString() + ChatColor.BOLD + event.getCooldownName() + " "
-                    + ChatColor.YELLOW + ChatColor.BOLD + "[" + msg + ChatColor.YELLOW + ChatColor.BOLD + "]");
+            final Component bar = MiniMessage.miniMessage().deserialize(msg);
+            final Component actionBar = MiniMessage.miniMessage().deserialize("<gold><bold>" + event.getCooldownName() + " <yellow><bold>[<bar>]", Placeholder.component("bar", bar));
+            UtilPlayer.sendActionBar(event.getPlayer(), actionBar);
         }
     }
 }

@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.shops.shops.shopkeepers.types;
 
+import javax.annotation.Nullable;
+import net.kyori.adventure.text.Component;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.EntityType;
@@ -10,14 +12,12 @@ import net.minecraft.world.level.ServerLevelAccessor;
 import org.bukkit.Location;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
-
 public class VillagerShopkeeper extends StandardShopkeeper {
-    public VillagerShopkeeper(Location location, String name) {
+    public VillagerShopkeeper(Location location, Component name) {
         super(EntityType.VILLAGER, location, name);
     }
 
-    public VillagerShopkeeper(EntityType<? extends AbstractVillager> type, Location location, String name) {
+    public VillagerShopkeeper(EntityType<? extends AbstractVillager> type, Location location, Component name) {
         super(type, location, name);
     }
 

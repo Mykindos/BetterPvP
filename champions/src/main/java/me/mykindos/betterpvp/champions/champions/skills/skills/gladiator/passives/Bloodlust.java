@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.gladiator.passiv
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.WeakHashMap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -14,15 +15,12 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
-import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -49,7 +47,7 @@ public class Bloodlust extends Skill implements PassiveSkill {
         return new String[]{
                 "When an enemy dies within 15 blocks,",
                 "you go into a Bloodlust, receiving",
-                "Speed 1 and Strength 1 for " + ChatColor.GREEN + (duration + level) + ChatColor.GRAY + " seconds.",
+                "Speed 1 and Strength 1 for <val>" + (duration + level) + "</val> seconds.",
                 "",
                 "Bloodlust can stack up to 3 times,",
                 "boosting the level of Speed and Strength."};
@@ -78,7 +76,7 @@ public class Bloodlust extends Skill implements PassiveSkill {
                 }
                 championsManager.getEffects().addEffect(target, EffectType.STRENGTH, tempStr, (long) ((duration + level) * 1000L));
                 target.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) ((duration + level) * 20), tempStr));
-                UtilMessage.message(target, getClassType().getName(), "You entered bloodlust at level: " + ChatColor.YELLOW + tempStr + ChatColor.GRAY + ".");
+                UtilMessage.simpleMessage(target, getClassType().getName(), "You entered bloodlust at level: <alt2>" + tempStr + "</alt2>.");
                 target.getWorld().playSound(target.getLocation(), Sound.ENTITY_ZOMBIFIED_PIGLIN_ANGRY, 2.0F, 0.6F);
             }
 
@@ -98,7 +96,7 @@ public class Bloodlust extends Skill implements PassiveSkill {
         if (System.currentTimeMillis() > time.get(player)) {
             int tempStr = str.get(player);
             str.remove(player);
-            UtilMessage.message(player, getClassType().getName(), "Your bloodlust has ended at level: " + ChatColor.YELLOW + tempStr + ChatColor.GRAY + ".");
+            UtilMessage.simpleMessage(player, getClassType().getName(), "Your bloodlust has ended at level: <alt2>" + tempStr + "</alt2>.");
             time.remove(player);
         }
 
