@@ -47,7 +47,7 @@ public class Swordsmanship extends Skill implements PassiveSkill {
 
         return new String[]{
                 "Prepare a powerful sword attack,",
-                "You gain 1 charge every 3 seconds.",
+                "You gain 1 charge every <val>" + timeBetweenCharges + "</val> seconds.",
                 "You can store a maximum of <val>" + (level) + "</val> charges",
                 "",
                 "When you attack, your damage is",
