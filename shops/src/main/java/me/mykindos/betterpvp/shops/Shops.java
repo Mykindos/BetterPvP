@@ -60,7 +60,7 @@ public class Shops extends BPvPPlugin {
 
             database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:shops-migrations", databasePrefix);
 
-            Bukkit.getPluginManager().callEvent(new ModuleLoadedEvent("Clans"));
+            Bukkit.getPluginManager().callEvent(new ModuleLoadedEvent("Shops"));
 
             var shopsListenerLoader = injector.getInstance(ShopsListenerLoader.class);
             shopsListenerLoader.registerListeners(PACKAGE);
