@@ -2,16 +2,16 @@ package me.mykindos.betterpvp.clans.clans.commands.chatcommands;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.Optional;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
-
-import java.util.Optional;
 
 @Singleton
 public class AllyChatCommand extends Command {
@@ -48,8 +48,9 @@ public class AllyChatCommand extends Command {
 
             gamer.saveProperty(GamerProperty.ALLY_CHAT, allyChatEnabled);
             gamer.saveProperty(GamerProperty.CLAN_CHAT, false);
-            UtilMessage.message(player, "Command", "Ally Chat: "
-                    + (allyChatEnabled ? ChatColor.GREEN + "enabled" : ChatColor.RED + "disabled"));
+
+            Component result = Component.text((allyChatEnabled ? "enabled" : "disabled"), (allyChatEnabled ? NamedTextColor.GREEN : NamedTextColor.RED));
+            UtilMessage.simpleMessage(player, "Command", Component.text("Ally Chat: ").append(result));
         }
     }
 }

@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.core.settings.commands;
 
-import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
@@ -9,7 +8,6 @@ import me.mykindos.betterpvp.core.settings.menus.SettingsMenu;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 @Singleton

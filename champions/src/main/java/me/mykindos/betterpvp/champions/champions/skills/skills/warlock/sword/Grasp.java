@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.warlock.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.*;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -15,7 +16,6 @@ import me.mykindos.betterpvp.core.framework.customtypes.CustomArmourStand;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.*;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -32,8 +32,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
-
-import java.util.*;
 
 @Singleton
 @BPvPListener
@@ -61,9 +59,9 @@ public class Grasp extends Skill implements InteractSkill, CooldownSkill, Listen
                 "Create a wall of skulls that closes in on you from a distance",
                 "and drags all enemies with it.",
                 "",
-                "Cooldown: " + ChatColor.GREEN + getCooldown(level),
-                "Max range: " + ChatColor.GREEN + (10 + ((level * 10) / 2)),
-                "Damage: " + ChatColor.GREEN + (1 + (level - 1))
+                "Cooldown: <val>" + getCooldown(level),
+                "Max range: <val>" + (10 + ((level * 10) / 2)),
+                "Damage: <val>" + (1 + (level - 1))
 
         };
     }
@@ -217,7 +215,7 @@ public class Grasp extends Skill implements InteractSkill, CooldownSkill, Listen
         int level = getLevel(player);
         Block block = player.getTargetBlock(null, (20 + (level * 10) / 2));
         if (block.getLocation().distance(player.getLocation()) < 3) {
-            UtilMessage.message(player, getClassType().getName(), "You cannot use " + ChatColor.GREEN + getName() + ChatColor.GRAY + " this close.");
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You cannot use <alt>" + getName() + "</alt> this close.");
             return false;
         }
 

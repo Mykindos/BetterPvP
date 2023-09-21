@@ -10,7 +10,6 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -34,7 +33,7 @@ public class Fury extends Skill implements PassiveSkill, Listener {
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Your attacks deal a bonus " + ChatColor.GREEN + (level * 0.5) + ChatColor.GRAY + " damage"
+                "Your attacks deal a bonus <val>" + (level * 0.5) + "</val> damage"
         };
     }
 

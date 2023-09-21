@@ -17,7 +17,6 @@ import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -45,13 +44,13 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
         return new String[]{
                 "Right click with a axe to activate.",
                 "",
-                "Sacrifice " + ChatColor.GREEN + UtilMath.round(100 - ((0.50 + (level * 0.05)) * 100), 2) + "%" + ChatColor.GRAY + " of your health to purge",
-                "all negative effects from yourself and allies within " + ChatColor.GREEN + (distance + level) + ChatColor.GRAY + " blocks.",
+                "Sacrifice <val>" + UtilMath.round(100 - ((0.50 + (level * 0.05)) * 100), 2) + "%" + "</val> of your health to purge",
+                "all negative effects from yourself and allies within <val>" + (distance + level) + "</val> blocks.",
                 "",
                 "You and your allies also receive an immunity against",
-                "negative effects for " + ChatColor.GREEN + (duration + (level / 2)) + ChatColor.GRAY + " seconds.",
+                "negative effects for <val>" + (duration + (level / 2)) + "</val> seconds.",
                 "",
-                "Recharge: " + ChatColor.GREEN + getCooldown(level)
+                "Recharge: <val>" + getCooldown(level)
         };
     }
 
@@ -97,7 +96,7 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
 
         for (Player ally : UtilPlayer.getNearbyAllies(player, player.getLocation(), (distance + level))) {
             championsManager.getEffects().addEffect(ally, EffectType.IMMUNETOEFFECTS, (long) ((duration + (level / 2)) * 1000L));
-            UtilMessage.message(ally, "Cleanse", "You were cleansed of negative by " + ChatColor.GREEN + player.getName());
+            UtilMessage.simpleMessage(ally, "Cleanse", "You were cleansed of negative by <alt>" + player.getName());
 
         }
 

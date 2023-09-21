@@ -2,6 +2,8 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.passives;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.Iterator;
+import java.util.WeakHashMap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -15,7 +17,6 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Arrow;
@@ -24,9 +25,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.util.Vector;
-
-import java.util.Iterator;
-import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -54,7 +52,7 @@ public class Longshot extends Skill implements PassiveSkill {
         return new String[]{
                 "Shoot an arrow that gains additional",
                 "damage the further the target hit is",
-                "Caps out at " + ChatColor.GREEN + (baseDamage + level) + ChatColor.GRAY + " damage",
+                "Caps out at <val>" + (baseDamage + level) + "</val> damage",
                 "Cannot be used in own territory"};
     }
 

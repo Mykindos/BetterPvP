@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.sword;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.roles.events.RoleChangeEvent;
@@ -13,16 +15,12 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 @Singleton
 @BPvPListener
@@ -44,10 +42,10 @@ public class Sever extends PrepareSkill implements CooldownSkill, Listener {
         return new String[]{
                 "Right click with a sword to activate",
                 "",
-                "Your next hit applies a " + ChatColor.GREEN + (level) + ChatColor.GRAY + " second bleed",
+                "Your next hit applies a <val>" + (level) + "</val> second bleed",
                 "dealing 1 heart per second",
                 "",
-                "Cooldown: " + ChatColor.GREEN + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level)
         };
     }
 
@@ -81,8 +79,8 @@ public class Sever extends PrepareSkill implements CooldownSkill, Listener {
 
         int level = getLevel(player);
         runSever(player, damagee, level);
-        UtilMessage.message(player, getClassType().getName(), "You severed " + ChatColor.GREEN + damagee.getName() + ChatColor.GRAY + ".");
-        UtilMessage.message(damagee, getClassType().getName(), "You have been severed by " + ChatColor.GREEN + player.getName() + ChatColor.GRAY + ".");
+        UtilMessage.simpleMessage(player, getClassType().getName(), "You severed <alt>" + damagee.getName() + "</alt>.");
+        UtilMessage.simpleMessage(damagee, getClassType().getName(), "You have been severed by <alt>" + player.getName() + "</alt>.");
         active.remove(player.getUniqueId());
 
         championsManager.getCooldowns().removeCooldown(player, getName(), true);

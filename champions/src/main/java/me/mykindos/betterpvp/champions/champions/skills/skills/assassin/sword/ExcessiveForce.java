@@ -1,6 +1,11 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.sword;
 
 
+import java.util.Iterator;
+import java.util.Map;
+import java.util.WeakHashMap;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -12,18 +17,11 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -47,12 +45,12 @@ public class ExcessiveForce extends Skill implements InteractSkill, CooldownSkil
         return new String[]{
                 "Right click with a Sword to activate.",
                 "",
-                "For the next " + ChatColor.GREEN + (3 + ((level - 1) * 0.5)) + ChatColor.GRAY + " seconds",
+                "For the next <val>" + (3 + ((level - 1) * 0.5)) + "</val> seconds",
                 "your attacks deal knockback to enemies",
                 "",
                 "Does not ignore anti-knockback abilities.",
                 "",
-                "Cooldown: " + ChatColor.GREEN + getCooldown(level)};
+                "Cooldown: <val>" + getCooldown(level)};
     }
 
 

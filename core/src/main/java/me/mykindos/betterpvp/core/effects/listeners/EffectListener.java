@@ -1,6 +1,10 @@
 package me.mykindos.betterpvp.core.effects.listeners;
 
 import com.google.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.effects.Effect;
 import me.mykindos.betterpvp.core.effects.EffectManager;
@@ -11,7 +15,6 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.EntityEffect;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -24,11 +27,6 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 @BPvPListener
 public class EffectListener implements Listener {
@@ -64,8 +62,7 @@ public class EffectListener implements Listener {
             }
             if (effect.getEffectType() == EffectType.SILENCE) {
                 player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 1F, 1.5F);
-                UtilMessage.message(player, "Silence", "You have been silenced for %s seconds.",
-                        ChatColor.GREEN.toString() + (effect.getRawLength() / 1000) + ChatColor.GRAY);
+                UtilMessage.simpleMessage(player, "Silence", "You have been silenced for <alt>%s</alt> seconds.", effect.getRawLength() / 1000);
             }
 
             if (effect.getEffectType() == EffectType.VULNERABILITY) {

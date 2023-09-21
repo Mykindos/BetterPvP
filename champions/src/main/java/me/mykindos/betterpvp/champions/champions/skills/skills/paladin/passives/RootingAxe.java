@@ -14,7 +14,6 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
-import org.bukkit.ChatColor;
 import org.bukkit.Effect;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -50,7 +49,7 @@ public class RootingAxe extends Skill implements PassiveSkill, CooldownSkill {
                 "the earth disrupting their movement,",
                 "and stops them from jumping for 2 seconds",
                 "",
-                "Internal Cooldown: " + ChatColor.GREEN + getCooldown(level)
+                "Internal Cooldown: <val>" + getCooldown(level)
         };
     }
 

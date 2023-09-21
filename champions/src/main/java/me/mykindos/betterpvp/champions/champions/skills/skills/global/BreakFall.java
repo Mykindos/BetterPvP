@@ -10,7 +10,6 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -35,7 +34,7 @@ public class BreakFall extends Skill implements PassiveSkill {
         return new String[]{
                 "You roll when you hit the ground.",
                 "",
-                "Fall damage is reduced by " + ChatColor.GREEN + (5 + level)};
+                "Fall damage is reduced by <val>" + (5 + level)};
     }
 
     @Override

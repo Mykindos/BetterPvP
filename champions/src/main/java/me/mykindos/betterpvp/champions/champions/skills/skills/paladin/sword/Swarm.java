@@ -3,6 +3,11 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.paladin.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.ListIterator;
+import java.util.Map.Entry;
+import java.util.WeakHashMap;
 import lombok.Data;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
@@ -23,7 +28,6 @@ import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Bat;
@@ -33,12 +37,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.util.Vector;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.ListIterator;
-import java.util.Map.Entry;
-import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -69,7 +67,7 @@ public class Swarm extends ChannelSkill implements InteractSkill, EnergySkill, L
                 "which damage, and knockback",
                 "any enemies they come in contact with",
                 "",
-                "Energy: " + ChatColor.GREEN + getEnergy(level)
+                "Energy: <val>" + getEnergy(level)
         };
     }
 

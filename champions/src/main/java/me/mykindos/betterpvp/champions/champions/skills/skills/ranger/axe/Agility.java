@@ -2,6 +2,9 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -15,7 +18,6 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -26,10 +28,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
 
 @Singleton
 @BPvPListener
@@ -56,11 +54,11 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
                 "Right click with a axe to activate.",
                 "",
                 "Sprint with great agility, gaining",
-                "Speed I for " + ChatColor.GREEN + (baseDuration + level) + ChatColor.GRAY + " seconds.",
+                "Speed I for <val>" + (baseDuration + level) + "</val> seconds.",
                 "You also take 60% reduced damage while active.",
                 "Agility ends if you interact",
                 "",
-                "Cooldown: " + ChatColor.GREEN + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level)
         };
     }
 

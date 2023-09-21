@@ -2,6 +2,8 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.paladin.passives
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.Iterator;
+import java.util.UUID;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.types.ActiveToggleSkill;
@@ -13,16 +15,12 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
-import java.util.Iterator;
-import java.util.UUID;
 
 @Singleton
 @BPvPListener
@@ -50,7 +48,7 @@ public class Void extends ActiveToggleSkill implements EnergySkill {
                 "Reduces incoming damage by 5, but",
                 "burns 20 of your energy",
                 "",
-                "Energy / Second: " + ChatColor.GREEN + getEnergy(level)
+                "Energy / Second: <val>" + getEnergy(level)
         };
     }
 
@@ -127,11 +125,11 @@ public class Void extends ActiveToggleSkill implements EnergySkill {
     public void toggle(Player player, int level) {
         if (active.contains(player.getUniqueId())) {
             active.remove(player.getUniqueId());
-            UtilMessage.message(player, getClassType().getName(), "Void: " + ChatColor.RED + "Off");
+            UtilMessage.simpleMessage(player, getClassType().getName(), "Void: <red>Off");
         } else {
             active.add(player.getUniqueId());
             if (championsManager.getEnergy().use(player, "Void", 5, false)) {
-                UtilMessage.message(player, getClassType().getName(), "Void: " + ChatColor.GREEN + "On");
+                UtilMessage.simpleMessage(player, getClassType().getName(), "Void: <green>On");
             }
         }
     }

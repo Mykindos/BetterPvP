@@ -10,7 +10,6 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -38,7 +37,7 @@ public class Overwhelm extends Skill implements PassiveSkill {
                 "You deal 1 bonus damage for every",
                 "2 more health you have than your",
                 "target. You can deal a maximum of",
-                ChatColor.GREEN + String.format("%.1f", (0.0 + (level * 0.5))) + ChatColor.GRAY + " bonus damage."
+                "<val>" + String.format("%.1f", (0.0 + (level * 0.5))) + "</val> bonus damage."
         };
     }
 

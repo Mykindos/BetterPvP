@@ -7,7 +7,6 @@ import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Effect;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
@@ -39,7 +38,7 @@ public class EnergyHandler {
 
         if (amount > getEnergy(player)) {
             if (inform) {
-                UtilMessage.message(player, "Energy", "You are too exhausted to use " + ChatColor.GREEN + ability + ChatColor.GRAY + ".");
+                UtilMessage.simpleMessage(player, "Energy", "You are too exhausted to use <green>" + ability + "</green>.");
                 player.getWorld().playEffect(player.getLocation(), Effect.SMOKE, 1);
             }
 

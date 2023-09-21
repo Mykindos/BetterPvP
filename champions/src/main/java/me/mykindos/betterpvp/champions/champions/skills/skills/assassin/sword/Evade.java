@@ -2,6 +2,9 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.Iterator;
+import java.util.UUID;
+import java.util.WeakHashMap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
@@ -17,7 +20,6 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.*;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -28,10 +30,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.util.Vector;
-
-import java.util.Iterator;
-import java.util.UUID;
-import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -62,7 +60,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
                 "",
                 "2 second internal cooldown.",
                 "",
-                "Energy / second: " + ChatColor.GREEN + (10 * getEnergy(level))};
+                "Energy / second: <val>" + (10 * getEnergy(level))};
     }
 
     @Override

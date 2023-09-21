@@ -1,6 +1,10 @@
 package me.mykindos.betterpvp.clans.clans.map.listeners;
 
 import com.google.inject.Inject;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
@@ -21,9 +25,10 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.world.level.material.MapColor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
@@ -43,11 +48,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
 
 @BPvPListener
 public class MapListener implements Listener {
@@ -443,8 +443,9 @@ public class MapListener implements Listener {
 
     }
 
-    private String createZoomBar(MapSettings.Scale scale) {
-        return ChatColor.WHITE + "Zoom: " + ChatColor.GREEN + (1 << scale.getValue()) + "x";
+    private Component createZoomBar(MapSettings.Scale scale) {
+        return Component.text("Zoom: ", NamedTextColor.WHITE)
+                .append(Component.text((1 << scale.getValue()) + "x", NamedTextColor.GREEN));
     }
 
     private MapColor getColourForClan(Clan playerClan, Clan otherClan) {

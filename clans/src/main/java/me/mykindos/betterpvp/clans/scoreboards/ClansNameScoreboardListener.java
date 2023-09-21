@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.clans.scoreboards;
 
 import com.google.inject.Inject;
+import java.util.Optional;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
@@ -9,14 +10,11 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
-
-import java.util.Optional;
 
 @BPvPListener
 public class ClansNameScoreboardListener implements Listener {
@@ -62,7 +60,7 @@ public class ClansNameScoreboardListener implements Listener {
         if (noTeam == null) {
             noTeam = scoreboard.registerNewTeam("None");
             noTeam.color(NamedTextColor.YELLOW);
-            noTeam.prefix(Component.text(ChatColor.YELLOW.toString()));
+            noTeam.prefix(Component.text("", NamedTextColor.YELLOW));
         }
         if (!noTeam.hasEntry(name)) {
             noTeam.addEntry(name);
@@ -109,36 +107,36 @@ public class ClansNameScoreboardListener implements Listener {
             ClanRelation relation = clanManager.getRelation(playerClan, targetClan);
             String prefix = targetClan.getName();
             if (relation == ClanRelation.ALLY) {
-                team.prefix(Component.text(ChatColor.DARK_GREEN + prefix + " "));
+                team.prefix(Component.text(prefix + " ", NamedTextColor.DARK_GREEN));
                 team.color(NamedTextColor.GREEN);
                 team.suffix(Component.text(""));
             } else if (relation == ClanRelation.ALLY_TRUST) {
-                team.prefix(Component.text(ChatColor.DARK_GREEN + prefix + " "));
+                team.prefix(Component.text(prefix + " ", NamedTextColor.DARK_GREEN));
                 team.color(NamedTextColor.DARK_GREEN);
                 team.suffix(Component.text(""));
             } else if (relation == ClanRelation.ENEMY) {
-                team.prefix(Component.text(ChatColor.DARK_RED + prefix + " "));
+                team.prefix(Component.text(prefix + " ", NamedTextColor.DARK_RED));
                 team.color(NamedTextColor.RED);
-                team.suffix(Component.text(targetClan.getSimpleDominanceString(playerClan)));
+                team.suffix(targetClan.getSimpleDominanceString(playerClan));
             } else if (relation == ClanRelation.PILLAGE) {
-                team.prefix(Component.text(ChatColor.DARK_PURPLE + prefix + " "));
+                team.prefix(Component.text(prefix + " ", NamedTextColor.DARK_PURPLE));
                 team.color(NamedTextColor.LIGHT_PURPLE);
                 team.suffix(Component.text(""));
             } else if (relation == ClanRelation.SELF) {
-                team.prefix(Component.text(ChatColor.DARK_AQUA + prefix + " "));
+                team.prefix(Component.text(prefix + " ", NamedTextColor.DARK_AQUA));
                 team.color(NamedTextColor.AQUA);
                 team.suffix(Component.text(""));
             } else {
-                team.prefix(Component.text(ChatColor.GOLD + prefix + " "));
+                team.prefix(Component.text(prefix + " ", NamedTextColor.GOLD));
                 team.color(NamedTextColor.YELLOW);
                 team.suffix(Component.text(""));
             }
         } else {
             if (playerClan == null && targetClan != null) {
                 String prefix = targetClan.getName();
-                team.prefix(Component.text(ChatColor.GOLD + prefix + " "));
+                team.prefix(Component.text(prefix + " ", NamedTextColor.GOLD));
             } else {
-                team.prefix(Component.text(ChatColor.YELLOW + ""));
+                team.prefix(Component.text("", NamedTextColor.YELLOW));
             }
             team.color(NamedTextColor.YELLOW);
             team.suffix(Component.text(""));
