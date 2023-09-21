@@ -56,7 +56,7 @@ public class Overcharge extends Skill implements InteractSkill, Listener {
 
         return new String[]{
                 "Draw back harder on your bow, giving",
-                "2 bonus damage per " + ChatColor.GREEN + (0.9 - (level * 0.1)) + ChatColor.GRAY + " seconds",
+                "2 bonus damage per <val>" + (0.9 - (level * 0.1)) + "</val> seconds",
                 "",
                 "Maximum Damage: <val>" + (2 + ((level-1) * 2))
         };
