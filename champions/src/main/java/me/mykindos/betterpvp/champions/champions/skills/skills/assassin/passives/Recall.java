@@ -52,7 +52,7 @@ public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listene
                 "Drop Sword / Axe to Activate",
                 "",
                 "Teleports you back to where you ",
-                "were located <val>" + (2 + (level)) "</val> seconds ago",
+                "were located <val>" + (2 + (level)) + "</val> seconds ago",
                 "Increases health by <val>" + (35 + (level * 5)) + "%" + "</val> of your previous health",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
