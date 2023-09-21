@@ -2,6 +2,8 @@ package me.mykindos.betterpvp.champions.champions.skills.listeners;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.Arrays;
+import java.util.Optional;
 import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
 import me.mykindos.betterpvp.champions.champions.builds.BuildSkill;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
@@ -25,7 +27,6 @@ import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -37,10 +38,6 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.potion.PotionEffectType;
-
-import java.util.Arrays;
-import java.util.Optional;
-
 
 @Singleton
 @BPvPListener
@@ -235,8 +232,7 @@ public class SkillListener implements Listener {
         ISkill skill = event.getSkill();
 
         if (!skill.isEnabled()) {
-            UtilMessage.message(player, skill.getClassType().getName(), "%s has been disabled by the server.",
-                    ChatColor.GREEN + skill.getName() + ChatColor.GRAY);
+            UtilMessage.simpleMessage(player, skill.getClassType().getName(), "<alt>%s</alt> has been disabled by the server.", skill.getName());
             event.setCancelled(true);
 
         }

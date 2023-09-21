@@ -2,6 +2,9 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.paladin.passives
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.UUID;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.types.ActiveToggleSkill;
@@ -17,7 +20,6 @@ import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
@@ -25,10 +27,6 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.UUID;
 
 @Singleton
 @BPvPListener
@@ -57,12 +55,12 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill {
                 "Drop Axe/Sword to Toggle.",
                 "",
                 "Create a freezing area around you",
-                "in a " + ChatColor.GREEN + (minRadius + level) + ChatColor.GRAY + " Block radius. Allies inside",
+                "in a <val>" + (minRadius + level) + "</val> Block radius. Allies inside",
                 "this area receive Protection I.",
                 "Enemies inside this area receive",
                 "Slowness I",
                 "",
-                "Energy / Second: " + ChatColor.GREEN + getEnergy(level)
+                "Energy / Second: <val>" + getEnergy(level)
         };
     }
 
@@ -158,10 +156,10 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill {
     public void toggle(Player player, int level) {
         if (active.contains(player.getUniqueId())) {
             active.remove(player.getUniqueId());
-            UtilMessage.message(player, getClassType().getName(), "Arctic Armour: " + ChatColor.RED + "Off");
+            UtilMessage.message(player, getClassType().getName(), "Arctic Armour: <red>Off");
         } else {
             active.add(player.getUniqueId());
-            UtilMessage.message(player, getClassType().getName(), "Arctic Armour: " + ChatColor.GREEN + "On");
+            UtilMessage.message(player, getClassType().getName(), "Arctic Armour: <green>On");
         }
     }
 

@@ -65,7 +65,7 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
                 "Jump and slam the ground, knocking up all opponents",
                 "within a small radius",
                 "",
-                "Cooldown: " + ChatColor.GREEN + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level)
         };
     }
 

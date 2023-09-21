@@ -2,6 +2,9 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.warlock.passives
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import lombok.Data;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
@@ -12,7 +15,6 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
@@ -20,10 +22,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 @Singleton
 @BPvPListener
@@ -49,7 +47,7 @@ public class SoulHarvest extends Skill implements PassiveSkill {
                 "Collected souls give bursts of speed and regeneration.",
                 "Souls are visible by Warlocks only",
                 "",
-                "Buff duration: " + ChatColor.GREEN + ((40 + (level * 20)) / 20) + ChatColor.GRAY + " seconds."
+                "Buff duration: <val>" + ((40 + (level * 20)) / 20) + "</val> seconds."
         };
     }
 

@@ -2,6 +2,8 @@ package me.mykindos.betterpvp.champions.champions.commands.menu;
 
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.menu.Button;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -11,7 +13,7 @@ public class KitButton extends Button {
 
     private final Role role;
     public KitButton(int slot, ItemStack item, String name, Role role) {
-        super(slot, item, name);
+        super(slot, item, Component.text(name, NamedTextColor.GREEN));
 
         this.role = role;
     }

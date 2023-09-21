@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillUpdate
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.core.menu.Button;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -20,7 +21,7 @@ public class SkillButton extends Button {
     private final Skill skill;
     private final RoleBuild roleBuild;
 
-    public SkillButton(Skill skill, RoleBuild roleBuild, int slot, ItemStack item, String name, List<String> lore) {
+    public SkillButton(Skill skill, RoleBuild roleBuild, int slot, ItemStack item, Component name, List<Component> lore) {
         super(slot, item, name, lore);
         this.skill = skill;
         this.roleBuild = roleBuild;

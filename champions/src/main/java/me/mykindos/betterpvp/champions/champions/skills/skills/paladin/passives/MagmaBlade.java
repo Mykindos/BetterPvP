@@ -11,7 +11,6 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -36,7 +35,7 @@ public class MagmaBlade extends Skill implements PassiveSkill {
 
         return new String[]{
                 "Your sword scorches opponents,",
-                "dealing an additional " + ChatColor.GREEN + (level) + ChatColor.GRAY + " damage",
+                "dealing an additional <val>" + (level) + "</val> damage",
                 "to players who are on fire."};
     }
 

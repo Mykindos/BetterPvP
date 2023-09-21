@@ -10,7 +10,6 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -41,11 +40,11 @@ public class LevitatingShot extends PrepareArrowSkill {
                 "Left click to activate.",
                 "",
                 "Your next arrow is tipped with mysterious magic,",
-                "causing the next target you hit to receive Levitation for " + ChatColor.GREEN + (3.5 + (level * .5)) + ChatColor.GRAY + " seconds.",
+                "causing the next target you hit to receive Levitation for <val>" + (3.5 + (level * .5)) + "</val> seconds.",
                 "",
                 "Players with levitation are unable to use abilities.",
                 "",
-                "Cooldown: " + ChatColor.GREEN + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level)
         };
     }
 

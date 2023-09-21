@@ -1,5 +1,11 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.passives;
 
+import java.util.Iterator;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.WeakHashMap;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -16,7 +22,6 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -28,14 +33,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.util.Iterator;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.WeakHashMap;
-
 
 @Singleton
 @BPvPListener
@@ -141,11 +138,11 @@ public class SmokeBomb extends Skill implements ToggleSkill, CooldownSkill, List
 
         return new String[]{
                 "Instantly vanish before your foes for a",
-                "maximum of " + ChatColor.GREEN + (3 + level) + ChatColor.GRAY + " seconds",
+                "maximum of <val>" + (3 + level) + "</val> seconds",
                 "hitting an enemy or using abilities",
                 " will make you reappear",
                 "",
-                "Cooldown: " + ChatColor.GREEN + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level)
         };
     }
 

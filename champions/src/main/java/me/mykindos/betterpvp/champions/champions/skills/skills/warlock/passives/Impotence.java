@@ -11,7 +11,6 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -33,7 +32,7 @@ public class Impotence extends Skill implements PassiveSkill {
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "For each enemy within " + ChatColor.GREEN + (3 + level) + ChatColor.GRAY + " blocks",
+                "For each enemy within <val>" + (3 + level) + "</val> blocks",
                 "you take reduced damage from all sources, at a maximum of 3 players.",
                 "",
                 "Damage Reduction:",

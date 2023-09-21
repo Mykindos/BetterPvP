@@ -11,14 +11,12 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-
 
 @Singleton
 @BPvPListener
@@ -44,11 +42,11 @@ public class MarkedForDeath extends PrepareArrowSkill {
         return new String[]{
                 "Your next arrow will mark players",
                 "for death, giving them Vulnerability I",
-                "for " + ChatColor.GREEN + (baseDuration + level) + ChatColor.GRAY + " seconds",
+                "for <val>" + (baseDuration + level) + "</val> seconds",
                 "Causing them to take 25% additional damage",
                 "from all targets.",
                 "",
-                "Cooldown: " + ChatColor.GREEN + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level)
         };
     }
 
@@ -67,8 +65,7 @@ public class MarkedForDeath extends PrepareArrowSkill {
         if (!(target instanceof Player damagee)) return;
 
         championsManager.getEffects().addEffect(damagee, EffectType.VULNERABILITY, 1, (long) ((baseDuration + level) * 1000L));
-        UtilMessage.message(damagee, getClassType().getName(), "%s hit you with %s",
-                ChatColor.YELLOW + damager.getName() + ChatColor.GRAY, ChatColor.GREEN + getName());
+        UtilMessage.simpleMessage(damagee, getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s</alt>.", damager.getName(), getName());
     }
 
     @Override

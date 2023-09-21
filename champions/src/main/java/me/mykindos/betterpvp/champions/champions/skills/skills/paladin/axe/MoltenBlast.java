@@ -3,6 +3,9 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.paladin.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -15,7 +18,6 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import org.bukkit.ChatColor;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LargeFireball;
@@ -27,10 +29,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 @Singleton
 @BPvPListener
@@ -59,9 +57,9 @@ public class MoltenBlast extends Skill implements InteractSkill, CooldownSkill, 
                 "",
                 "Shoot a large fireball that deals",
                 "area of effect damage, and igniting any players hit",
-                "for " + ChatColor.GREEN + ((level * 0.5)) + ChatColor.GRAY + " seconds",
+                "for <val>" + (level * 0.5) + "</val> seconds",
                 "",
-                "Cooldown: " + ChatColor.GREEN + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level)
         };
     }
 

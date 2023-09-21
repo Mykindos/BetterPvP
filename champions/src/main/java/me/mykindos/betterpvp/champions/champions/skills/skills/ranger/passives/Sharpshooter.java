@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.passives;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.WeakHashMap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -12,12 +13,9 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-
-import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -41,9 +39,9 @@ public class Sharpshooter extends Skill implements PassiveSkill {
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "You deal " +  ChatColor.GREEN.toString() + (level * 0.75) + ChatColor.GRAY + " extra damage for each consecutive hit",
+                "You deal <val>" + (level * 0.75) + "</val> extra damage for each consecutive hit",
                 "",
-                "Maximum consecutive hits: " + ChatColor.GREEN + maxConsecutiveHits
+                "Maximum consecutive hits: <val>" + maxConsecutiveHits
         };
     }
 

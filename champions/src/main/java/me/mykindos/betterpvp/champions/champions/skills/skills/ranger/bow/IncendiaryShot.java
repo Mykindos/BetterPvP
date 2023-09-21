@@ -10,7 +10,6 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -39,9 +38,9 @@ public class IncendiaryShot extends PrepareArrowSkill {
                 "Left click to activate.",
                 "",
                 "Shoot an ignited arrow",
-                "burning anyone hit for " + ChatColor.GREEN + (level * 1.5) + ChatColor.GRAY + " seconds",
+                "burning anyone hit for <val>" + (level * 1.5) + "</val> seconds",
                 "",
-                "Cooldown: " + ChatColor.GREEN + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level)
         };
     }
 

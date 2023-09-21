@@ -13,7 +13,6 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -42,10 +41,10 @@ public class Bloodshed extends Skill implements InteractSkill, CooldownSkill, Li
         return new String[]{
                 "Right click with a axe to activate.",
                 "",
-                "Sacrifice " + ChatColor.GREEN + UtilMath.round(100 - ((0.50 + (level * 0.05)) * 100), 2) + "%" + ChatColor.GRAY + " of your health to grant",
-                "yourself Speed III for " + ChatColor.GREEN + duration + ChatColor.GRAY + " seconds.",
+                "Sacrifice <val>" + UtilMath.round(100 - ((0.50 + (level * 0.05)) * 100), 2) + "%" + "</val> of your health to grant",
+                "yourself Speed III for <val>" + duration + "</val> seconds.",
                 "",
-                "Recharge: " + ChatColor.GREEN + getCooldown(level)
+                "Recharge: <val>" + getCooldown(level)
         };
     }
 

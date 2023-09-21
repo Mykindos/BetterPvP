@@ -2,6 +2,9 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.warlock.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
 import lombok.Data;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
@@ -17,7 +20,6 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -26,10 +28,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ListIterator;
 
 @Singleton
 @BPvPListener
@@ -57,11 +55,11 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
                 "Right click with a axe to activate.",
                 "",
                 "Corrupt the earth around you, creating a ring that",
-                "debuffs enemies within it for " + ChatColor.GREEN + duration + ChatColor.GRAY + " seconds.",
+                "debuffs enemies within it for <val>" + duration + "</val> seconds.",
                 "Player within the ring take 33% more damage.",
                 "",
-                "Range: " + ChatColor.GREEN + (radius + (level / 2)) + ChatColor.GRAY + " blocks.",
-                "Recharge: " + ChatColor.GREEN + getCooldown(level)
+                "Range: <val>" + (radius + (level / 2)) + "</val> blocks.",
+                "Recharge: <val>" + getCooldown(level)
         };
     }
 

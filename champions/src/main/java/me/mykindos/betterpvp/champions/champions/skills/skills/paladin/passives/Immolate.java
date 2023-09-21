@@ -2,6 +2,8 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.paladin.passives
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.Iterator;
+import java.util.UUID;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.types.ActiveToggleSkill;
@@ -15,7 +17,6 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Item;
@@ -26,9 +27,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
-
-import java.util.Iterator;
-import java.util.UUID;
 
 @Singleton
 @BPvPListener
@@ -58,7 +56,7 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill {
                 "You leave a trail of fire, which",
                 "burns players that go near it.",
                 "",
-                "Energy / Second: " + ChatColor.GREEN + getEnergy(level)
+                "Energy / Second: <val>" + getEnergy(level)
 
         };
     }

@@ -3,7 +3,8 @@ package me.mykindos.betterpvp.core.menu.demo;
 import me.mykindos.betterpvp.core.menu.Button;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -12,7 +13,7 @@ import org.bukkit.inventory.ItemStack;
 
 public class DemoMenu extends Menu {
     public DemoMenu(Player player) {
-        super(player, 9, ChatColor.RED + "DEMO MENU");
+        super(player, 9, Component.text("DEMO MENU", NamedTextColor.RED));
         addButton(new SomeButton());
         addButton(new SomeOtherButton());
     }

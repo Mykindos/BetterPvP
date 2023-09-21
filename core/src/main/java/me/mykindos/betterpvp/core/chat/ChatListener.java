@@ -2,6 +2,8 @@ package me.mykindos.betterpvp.core.chat;
 
 import com.google.inject.Inject;
 import io.papermc.paper.event.player.AsyncChatEvent;
+import java.util.Optional;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.chat.events.ChatReceivedEvent;
 import me.mykindos.betterpvp.core.chat.events.ChatSentEvent;
@@ -16,15 +18,13 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-
-import java.util.Optional;
 
 @Slf4j
 @BPvPListener
@@ -49,9 +49,9 @@ public class ChatListener implements Listener {
         Player player = event.getPlayer();
 
         Component message = event.message().color(NamedTextColor.WHITE);
+        message = message.decorations(Set.of(TextDecoration.values()), false);
 
-
-        ChatSentEvent chatSent = new ChatSentEvent(player, Bukkit.getOnlinePlayers(), Component.text(UtilFormat.spoofNameForLunar(player.getName()) + ": " + ChatColor.RESET), message);
+        ChatSentEvent chatSent = new ChatSentEvent(player, Bukkit.getOnlinePlayers(), Component.text(UtilFormat.spoofNameForLunar(player.getName()) + ": "), message);
         Bukkit.getPluginManager().callEvent(chatSent);
         if (chatSent.isCancelled()) {
             log.info("ChatSentEvent cancelled for {} - {}", chatSent.getPlayer().getName(), chatSent.getCancelReason());
@@ -91,13 +91,13 @@ public class ChatListener implements Listener {
 
         Rank rank = event.getClient().getRank();
         if(rank.isDisplayPrefix()) {
-            Component rankPrefix = Component.text(ChatColor.BOLD + rank.getName() + " ", rank.getColor());
+            Component rankPrefix = Component.text(rank.getName() + " ", rank.getColor(), TextDecoration.BOLD);
             event.setPrefix(rankPrefix.append(event.getPrefix()));
         }
 
         Optional<Boolean> lunarClientOptional = event.getClient().getProperty(ClientProperty.LUNAR);
         if(lunarClientOptional.isPresent()) {
-            event.setPrefix(Component.text(ChatColor.GREEN + "* ").append(event.getPrefix()));
+            event.setPrefix(Component.text("* ", NamedTextColor.GREEN).append(event.getPrefix()));
         }
 
         Component finalMessage = event.getPrefix().append(event.getMessage());

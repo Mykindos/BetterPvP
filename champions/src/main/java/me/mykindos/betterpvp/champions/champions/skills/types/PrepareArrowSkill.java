@@ -1,5 +1,9 @@
 package me.mykindos.betterpvp.champions.champions.skills.types;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.UUID;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
@@ -9,7 +13,6 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
@@ -19,11 +22,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.util.Vector;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
 
 public abstract class PrepareArrowSkill extends PrepareSkill implements CooldownSkill {
 
@@ -108,8 +106,7 @@ public abstract class PrepareArrowSkill extends PrepareSkill implements Cooldown
                 if (cooldown != null) {
                     if (cooldown.isCancellable()) {
                         championsManager.getCooldowns().removeCooldown(player, getName(), true);
-                        UtilMessage.message(player, getClassType().getName(), "%s was cancelled.",
-                                ChatColor.GREEN + getName() + " " + level + ChatColor.GRAY);
+                        UtilMessage.simpleMessage(player, getClassType().getName(), "<alt>%s</alt> was cancelled.", getName() + " " + level);
                         it.remove();
                     }
                 }

@@ -11,7 +11,6 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -34,7 +33,7 @@ public class NullBlade extends Skill implements PassiveSkill, EnergySkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Your sword sucks " + ChatColor.GREEN + getEnergy(level) + ChatColor.GRAY + " energy from",
+                "Your sword sucks <val>" + getEnergy(level) + "</val> energy from",
                 "opponents with every attack"
         };
     }

@@ -1,6 +1,9 @@
 package me.mykindos.betterpvp.champions.champions.skills.listeners;
 
 import com.google.inject.Inject;
+import java.util.Map;
+import java.util.Optional;
+import me.mykindos.betterpvp.champions.champions.builds.menus.SkillMenu;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.SkillManager;
 import me.mykindos.betterpvp.champions.properties.ChampionsProperty;
@@ -13,14 +16,11 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
-import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-
-import java.util.Map;
-import java.util.Optional;
 
 @BPvPListener
 public class SkillChatListener implements Listener {
@@ -82,10 +82,14 @@ public class SkillChatListener implements Listener {
     }
 
     private Component getDescriptionComponent(Skill skill) {
-        StringBuilder description = new StringBuilder();
-        for (String text : skill.getDescription(1)) {
-            description.append(ChatColor.GRAY).append(text).append("\n");
+        String[] lore = skill.getDescription(1);
+        
+        Component component = Component.empty();
+        for (String str : lore) {
+            component = component.append(MiniMessage.miniMessage().deserialize("<gray>" + str, SkillMenu.TAG_RESOLVER));
+            component = component.append(Component.newline());
         }
-        return Component.text(description.toString());
+        
+        return component;
     }
 }
