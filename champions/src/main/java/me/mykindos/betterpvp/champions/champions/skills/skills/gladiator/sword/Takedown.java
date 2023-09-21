@@ -31,6 +31,8 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
 
     private final WeakHashMap<Player, Long> active = new WeakHashMap<>();
 
+    private double damage;
+
     @Inject
     public Takedown(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -49,7 +51,7 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
                 "",
                 "Hurl yourself towards an opponent.",
                 "If you collide with them, you <white>both",
-                "take damage and receive Slow 4",
+                "take <val>" + damage + "</val> damage and receive Slow IV",
                 "for <val>" + (1 + level) + "</val> seconds.",
                 "",
                 "Cannot be used while grounded.",
@@ -126,11 +128,11 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
     public void doTakedown(Player player, Player target) {
         UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <alt>" + target.getName() + "</alt> with <alt>" + getName());
 
-        UtilDamage.doCustomDamage(new CustomDamageEvent(target, player, null, DamageCause.CUSTOM, 10, false, "Takedown"));
+        UtilDamage.doCustomDamage(new CustomDamageEvent(target, player, null, DamageCause.CUSTOM, damage, false, "Takedown"));
 
 
         UtilMessage.simpleMessage(target, getClassType().getName(), "<alt>" + player.getName() + "</alt> hit you with <alt>" + getName());
-        UtilDamage.doCustomDamage(new CustomDamageEvent(player, target, null, DamageCause.CUSTOM, 10, false, "Takedown Recoil"));
+        UtilDamage.doCustomDamage(new CustomDamageEvent(player, target, null, DamageCause.CUSTOM, damage, false, "Takedown Recoil"));
 
         PotionEffect pot = new PotionEffect(PotionEffectType.SLOW, (int) (1 + (getLevel(player) * 0.5)) * 20, 2);
         player.addPotionEffect(pot);
@@ -159,5 +161,10 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
     @Override
     public Action[] getActions() {
         return SkillActions.RIGHT_CLICK;
+    }
+
+    @Override
+    public void loadSkillConfig(){
+        damage = getConfig("damage", 10.0, Double.class);
     }
 }
