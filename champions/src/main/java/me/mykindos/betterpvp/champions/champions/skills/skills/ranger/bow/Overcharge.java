@@ -41,6 +41,10 @@ public class Overcharge extends Skill implements InteractSkill, Listener {
     private final List<Arrow> arrows = new ArrayList<>();
     private final Set<UUID> charging = new HashSet<>();
 
+    private int damageIncrement;
+
+    private double durationIncrement;
+
     @Inject
     public Overcharge(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -56,7 +60,7 @@ public class Overcharge extends Skill implements InteractSkill, Listener {
 
         return new String[]{
                 "Draw back harder on your bow, giving",
-                "2 bonus damage per 0.8 seconds",
+                "<val>" + damageIncrement + "</val> bonus damage per <val>" + durationIncrement + "</val> seconds",
                 "",
                 "Maximum Damage: <val>" + (2 + level)
         };
@@ -137,7 +141,7 @@ public class Overcharge extends Skill implements InteractSkill, Listener {
                     continue;
                 }
 
-                if (UtilTime.elapsed(data.getLastCharge(), 800)) {
+                if (UtilTime.elapsed(data.getLastCharge(), durationIncrement * 1000)) {
                     if (data.getCharge() < data.getMaxCharge()) {
                         data.addCharge();
                         UtilMessage.simpleMessage(player, getClassType().getName(), "%s: <yellow>+%d<gray> Bonus Damage", getName(), data.getCharge());
@@ -160,7 +164,7 @@ public class Overcharge extends Skill implements InteractSkill, Listener {
     @Override
     public void activate(Player player, int level) {
         if (!data.containsKey(player)) {
-            data.put(player, new OverchargeData(player.getUniqueId(), 2, (1 + level)));
+            data.put(player, new OverchargeData(player.getUniqueId(), damageIncrement, (1 + level)));
             charging.add(player.getUniqueId());
         }
     }
@@ -201,5 +205,8 @@ public class Overcharge extends Skill implements InteractSkill, Listener {
         }
 
     }
-
+    public void loadSkillConfig() {
+        damageIncrement = getConfig("damageIncrement", 2, Integer.class);
+        durationIncrement = getConfig("durationIncrement", 0.8, Double.class);
+    }
 }
