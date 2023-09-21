@@ -59,7 +59,7 @@ public class Flash extends Skill implements InteractSkill, Listener {
                 "Instantly teleport forwards 8 Blocks.",
                 "Cannot be used while Slowed.",
                 "",
-                "Stores up to 4 charges.",
+                "Stores up to <val>" + maxCharges + "</val> charges.",
                 "",
                 "Cannot be used while Slowed.",
                 "Recharge: 1 charge per <val>" + (timeBetweenCharges - level) + "</val> seconds."

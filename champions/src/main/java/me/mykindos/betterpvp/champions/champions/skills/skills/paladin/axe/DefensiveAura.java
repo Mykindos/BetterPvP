@@ -23,6 +23,8 @@ import org.bukkit.potion.PotionEffectType;
 @BPvPListener
 public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill {
 
+    private double duration;
+
     @Inject
     public DefensiveAura(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -40,7 +42,7 @@ public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill
                 "Right click with a axe to Activate",
                 "",
                 "Gives you, and all allies within <val>" + (6 + level) + "</val> blocks",
-                "2 bonus hearts",
+                "2 bonus hearts for: <val>" + duration + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -67,13 +69,13 @@ public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill
 
     @Override
     public void activate(Player player, int level) {
-        player.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, 200, 0));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, (int) duration * 20, 0));
         AttributeInstance playerMaxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
         if (playerMaxHealth != null) {
             player.setHealth(Math.min(player.getHealth() + 4, playerMaxHealth.getValue()));
             for (Player target : UtilPlayer.getNearbyAllies(player, player.getLocation(), (6 + level))) {
 
-                target.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, 200, 0));
+                target.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, (int) duration * 20, 0));
                 AttributeInstance targetMaxHealth = target.getAttribute(Attribute.GENERIC_MAX_HEALTH);
                 if (targetMaxHealth != null) {
                     target.setHealth(Math.min(target.getHealth() + 4, targetMaxHealth.getValue()));
@@ -81,6 +83,11 @@ public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill
 
             }
         }
+    }
+
+    @Override
+    public void loadSkillConfig() {
+        duration = getConfig("duration", 10.0, Double.class);
     }
 
     @Override

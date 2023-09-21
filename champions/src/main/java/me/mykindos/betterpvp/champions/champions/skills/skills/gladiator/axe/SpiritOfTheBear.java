@@ -43,7 +43,7 @@ public class SpiritOfTheBear extends Skill implements InteractSkill, CooldownSki
                 "",
                 "Call upon the spirit of the bear",
                 "granting all allies within <val>" + (radius + (level)) + "</val> blocks",
-                "Resistance II for 5 seconds.",
+                "Resistance II for <val>" + duration + "</val> seconds.",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
