@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.gladiator.passiv
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.WeakHashMap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -14,7 +15,6 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -22,8 +22,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
-import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -50,7 +48,7 @@ public class Stampede extends Skill implements PassiveSkill {
         return new String[]{
                 "You slowly build up speed as you",
                 "sprint. You gain a level of Speed",
-                "for every " + ChatColor.GREEN + (7 - level) + ChatColor.GRAY + " seconds, up to a max",
+                "for every <val>" + (7 - level) + "</val> seconds, up to a max",
                 "of Speed II.",
                 "",
                 "Attacking during stampede deals",

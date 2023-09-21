@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.clans.clans.commands.subcommands;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
@@ -15,11 +16,8 @@ import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.slf4j.MDC;
-
-import java.util.Optional;
 
 @Slf4j
 @Singleton
@@ -60,8 +58,7 @@ public class DisbandClanSubCommand extends ClanSubCommand {
             }
 
             if (System.currentTimeMillis() < clan.getLastTntedTime()) {
-                UtilMessage.message(player, "Clans", "You cannot disband your clan for "
-                        + ChatColor.GREEN + UtilTime.getTime(clan.getLastTntedTime() - System.currentTimeMillis(), UtilTime.TimeUnit.BEST, 1));
+                UtilMessage.simpleMessage(player, "Clans", "You cannot disband your clan for <alt>" + UtilTime.getTime(clan.getLastTntedTime() - System.currentTimeMillis(), UtilTime.TimeUnit.BEST, 1));
                 return;
             }
 

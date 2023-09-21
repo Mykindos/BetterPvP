@@ -1,6 +1,8 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.sword;
 
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillDequipEvent;
@@ -12,7 +14,6 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -20,10 +21,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
 
 @Singleton
 @BPvPListener
@@ -47,9 +44,9 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener 
         return new String[]{
                 "Right click with a sword to activate.",
                 "",
-                "Your next hit blinds the target for " + ChatColor.GREEN + (durationPerLevel * level) + ChatColor.GRAY + " seconds.",
+                "Your next hit blinds the target for <val>" + (durationPerLevel * level) + "</val> seconds.",
                 "",
-                "Cooldown: " + ChatColor.GREEN + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level)
         };
     }
 
@@ -88,8 +85,8 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener 
         if (active.contains(damager.getUniqueId())) {
             e.setReason("Concussion");
             damagee.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, (int) (level * durationPerLevel) * 20, 0));
-            UtilMessage.message(damager, getName(), "You gave " + ChatColor.GREEN + damagee.getName() + ChatColor.GRAY + " a concussion.");
-            UtilMessage.message(damagee, getName(), ChatColor.GREEN + damager.getName() + ChatColor.GRAY + " gave you a concussion.");
+            UtilMessage.simpleMessage(damager, getName(), "You gave <alt>" + damagee.getName() + "</alt> a concussion.");
+            UtilMessage.simpleMessage(damagee, getName(), "<alt>" + damager.getName() + "</alt> gave you a concussion.");
             active.remove(damager.getUniqueId());
         }
 
@@ -99,7 +96,7 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener 
     @Override
     public boolean canUse(Player player) {
         if (active.contains(player.getUniqueId())) {
-            UtilMessage.message(player, getClassType().getName(), ChatColor.GREEN + getName() + ChatColor.GRAY + " is already active.");
+            UtilMessage.simpleMessage(player, getClassType().getName(), "<alt>" + getName() + "</alt> is already active.");
             return false;
         }
 

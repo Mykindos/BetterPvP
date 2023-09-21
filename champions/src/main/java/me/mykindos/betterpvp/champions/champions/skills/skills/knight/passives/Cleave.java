@@ -15,7 +15,6 @@ import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -43,7 +42,7 @@ public class Cleave extends Skill implements PassiveSkill, Listener {
         return new String[]{
                 "Your axe attacks cleave onto nearby targets and deal damage.",
                 "",
-                "Distance: " + ChatColor.GREEN + (baseDistance + level) + ChatColor.GRAY,
+                "Distance: <val>" + (baseDistance + level),
                 "",
                 "Only applies to axes."
         };

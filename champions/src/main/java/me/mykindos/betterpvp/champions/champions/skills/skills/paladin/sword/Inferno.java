@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.paladin.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.WeakHashMap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
@@ -21,7 +22,6 @@ import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.ArmorStand;
@@ -33,8 +33,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
-
-import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -63,7 +61,7 @@ public class Inferno extends ChannelSkill implements InteractSkill, EnergySkill 
                 "You spray fire at high speed,",
                 "igniting anything it hits.",
                 "",
-                "Energy / Second: " + ChatColor.GREEN + getEnergy(level)
+                "Energy / Second: <val>" + getEnergy(level)
         };
     }
 

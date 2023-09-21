@@ -12,7 +12,9 @@ import me.mykindos.betterpvp.shops.Shops;
 import me.mykindos.betterpvp.shops.commands.loader.ShopsCommandLoader;
 import me.mykindos.betterpvp.shops.listener.ShopsListenerLoader;
 import me.mykindos.betterpvp.shops.shops.shopkeepers.ShopkeeperManager;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -75,7 +77,7 @@ public class ShopsCommand extends Command implements IConsoleCommand {
                 return;
             }
 
-            shopkeeperManager.saveShopkeeper(args[0], ChatColor.BOLD.toString() + ChatColor.GREEN + args[1], player.getLocation());
+            shopkeeperManager.saveShopkeeper(args[0], Component.text(args[1], NamedTextColor.GREEN, TextDecoration.BOLD), player.getLocation());
             shopkeeperManager.loadShopsFromConfig();
         }
     }

@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.warlock.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.WeakHashMap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillDequipEvent;
@@ -14,7 +15,6 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.*;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -33,8 +33,6 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
-
-import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -59,9 +57,9 @@ public class Wreath extends PrepareSkill implements CooldownSkill {
                 "Right click with a sword to prepare.",
                 "",
                 "Your next 3 attacks will release a barrage of teeth",
-                "that deal " + ChatColor.GREEN + String.format("%.2f", (2 + (level / 1.5))) + ChatColor.GRAY + " damage and slow their target.",
+                "that deal <val>" + String.format("%.2f", (2 + (level / 1.5))) + "</val> damage and slow their target.",
                 "",
-                "Recharge: " + ChatColor.GREEN + getCooldown(level)
+                "Recharge: <val>" + getCooldown(level)
         };
     }
 

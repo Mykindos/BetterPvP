@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.WeakHashMap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -14,15 +15,12 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-
-import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -49,10 +47,10 @@ public class WolvesFury extends Skill implements InteractSkill, CooldownSkill, L
                 "Right click with a axe to activate.",
                 "",
                 "Summon the power of the wolf, gaining",
-                "Strength 1 for " + ChatColor.GREEN + (baseDuration + level) + ChatColor.GRAY + " seconds, and giving",
+                "Strength 1 for <val>" + (baseDuration + level) + "</val> seconds, and giving",
                 "no knockback on your attacks.",
                 "",
-                "Cooldown: " + ChatColor.GREEN + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level)
         };
     }
 

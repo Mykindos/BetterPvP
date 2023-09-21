@@ -45,10 +45,10 @@ public class BattleTaunt extends ChannelSkill implements InteractSkill, Cooldown
 
         return new String[]{"Hold Block with a sword to Channel.",
                 "",
-                "While channelling, any enemies within " + ChatColor.GREEN + (2 + level) + ChatColor.GRAY + " blocks",
+                "While channelling, any enemies within <val>" + (2 + level) + "</val> blocks",
                 "are slowly pulled in towards you",
                 "",
-                "Energy / Second: " + ChatColor.GREEN + getEnergy(level)};
+                "Energy / Second: <val>" + getEnergy(level)};
     }
 
     @Override

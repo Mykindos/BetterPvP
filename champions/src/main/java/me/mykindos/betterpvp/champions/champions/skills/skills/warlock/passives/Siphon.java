@@ -14,7 +14,6 @@ import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
@@ -40,10 +39,10 @@ public class Siphon extends Skill implements PassiveSkill {
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Siphon energy from all enemies within " + ChatColor.GREEN + (4 + level) + ChatColor.GRAY + " blocks,",
+                "Siphon energy from all enemies within <val>" + (4 + level) + "</val> blocks,",
                 "Granting you Speed II and sometimes a small amount of health.",
                 "",
-                "Energy siphoned per second: " + ChatColor.GREEN + 5
+                "Energy siphoned per second: <val>" + 5
         };
     }
 

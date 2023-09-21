@@ -1,6 +1,10 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.passives;
 
 
+import java.util.ArrayList;
+import java.util.List;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -13,17 +17,10 @@ import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.util.ArrayList;
-import java.util.List;
-
 
 @Singleton
 @BPvPListener
@@ -47,7 +44,7 @@ public class SilencingStrikes extends Skill implements PassiveSkill, Listener {
 
         return new String[]{
                 "Hit a player 3 times within 2 seconds",
-                "to silence them for " + ChatColor.GREEN + (level) + ChatColor.GRAY + " seconds."
+                "to silence them for <val>" + (level) + "</val> seconds."
         };
     }
 

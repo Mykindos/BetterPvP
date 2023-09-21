@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.passives;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.WeakHashMap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -12,14 +13,11 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
-import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -43,10 +41,10 @@ public class HuntersThrill extends Skill implements PassiveSkill {
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "For each consecutive hit within " + ChatColor.GREEN + (maxTimeBetweenShots + level) + ChatColor.GRAY + " seconds of each other",
+                "For each consecutive hit within <val>" + (maxTimeBetweenShots + level) + "</val> seconds of each other",
                 "you gain increased movement speed",
                 "",
-                "Max consecutive hits: " + ChatColor.GREEN + maxConsecutiveHits
+                "Max consecutive hits: <val>" + maxConsecutiveHits
         };
     }
 

@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.clans.clans.commands.subcommands;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.Optional;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
@@ -15,10 +16,7 @@ import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-
-import java.util.Optional;
 
 @Singleton
 @SubCommand(ClanCommand.class)
@@ -91,7 +89,7 @@ public class KickSubCommand extends ClanSubCommand {
                 UtilServer.callEvent(new ClanKickMemberEvent(player, clan, target));
 
             } else {
-                UtilMessage.message(player, "Clans", ChatColor.YELLOW + target.getName() + ChatColor.GRAY + " is not in your clan");
+                UtilMessage.simpleMessage(player, "Clans", "<alt2>" + target.getName() + "</alt2> is not in your clan");
             }
 
         }

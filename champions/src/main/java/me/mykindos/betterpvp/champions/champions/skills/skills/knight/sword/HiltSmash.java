@@ -15,7 +15,6 @@ import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEven
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.*;
-import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -24,7 +23,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.EquipmentSlot;
-
 
 @Singleton
 @BPvPListener
@@ -46,11 +44,11 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener {
                 "Right click with a sword to activate.",
                 "",
                 "Smash the hilt of your sword into",
-                "your opponent, dealing " + ChatColor.GREEN + (3 + (level)) + ChatColor.GRAY + " damage",
-                "and applying shock for " + ChatColor.GREEN + (level / 2) + ChatColor.GRAY + " seconds.",
-                "Silences enemy for " + ChatColor.GREEN + (level / 2) + ChatColor.GRAY + " seconds",
+                "your opponent, dealing <val>" + (3 + (level)) + "</val> damage",
+                "and applying shock for <val>" + (level / 2) + "</val> seconds.",
+                "Silences enemy for <val>" + (level / 2) + "</val> seconds",
                 "",
-                "Recharge: " + ChatColor.GREEN + getCooldown(level)
+                "Recharge: <val>" + getCooldown(level)
         };
     }
 

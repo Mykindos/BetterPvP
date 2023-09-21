@@ -13,7 +13,6 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
-import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
@@ -43,10 +42,10 @@ public class SpiritOfTheBear extends Skill implements InteractSkill, CooldownSki
                 "Right click with a axe to activate.",
                 "",
                 "Call upon the spirit of the bear",
-                "granting all allies within " + ChatColor.GREEN + (radius + (level)) + ChatColor.GRAY + " blocks",
+                "granting all allies within <val>" + (radius + (level)) + "</val> blocks",
                 "Resistance II for 5 seconds.",
                 "",
-                "Cooldown: " + ChatColor.GREEN + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level)
         };
     }
 

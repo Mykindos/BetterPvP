@@ -14,7 +14,6 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
-import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -42,7 +41,7 @@ public class Swim extends Skill implements PassiveSkill, EnergySkill {
         return new String[]{
                 "Tap crouch to Swim forwards.",
                 "",
-                "Energy: " + ChatColor.GREEN + getEnergy(level)};
+                "Energy: <val>" + getEnergy(level)};
     }
 
     @Override

@@ -62,7 +62,7 @@ public class Flash extends Skill implements InteractSkill, Listener {
                 "Stores up to 4 charges.",
                 "",
                 "Cannot be used while Slowed.",
-                "Recharge: 1 charge per " + ChatColor.GREEN + (timeBetweenCharges - level) + ChatColor.GRAY + " seconds."
+                "Recharge: 1 charge per <val>" + (timeBetweenCharges - level) + "</val> seconds."
         };
     }
 
@@ -113,7 +113,7 @@ public class Flash extends Skill implements InteractSkill, Listener {
 
             if (UtilTime.elapsed(lastRecharge.get(player), (long) ((timeBetweenCharges * 1000L) - (level * 1000L)))) {
                 charges.put(player, Math.min(maxCharges, charge + 1));
-                UtilMessage.message(player, getClassType().getName(), "Flash Charges: " + ChatColor.GREEN + (charge + 1));
+                UtilMessage.simpleMessage(player, getClassType().getName(), "Flash Charges: <alt>" + (charge + 1));
                 lastRecharge.put(player, System.currentTimeMillis());
             }
         }
@@ -166,7 +166,7 @@ public class Flash extends Skill implements InteractSkill, Listener {
             UtilMessage.message(player, getClassType().getName(), "The target location was invalid, You will be refunded a charge shortly.");
             UtilServer.runTaskLater(champions, () -> {
                 charges.put(player, Math.min(maxCharges, charges.get(player) + 1));
-                UtilMessage.message(player, getClassType().getName(), "Flash Charges: " + ChatColor.GREEN + charges.get(player));
+                UtilMessage.simpleMessage(player, getClassType().getName(), "Flash Charges: <alt>" + charges.get(player));
                 lastRecharge.put(player, System.currentTimeMillis());
             }, 20);
 
@@ -185,7 +185,7 @@ public class Flash extends Skill implements InteractSkill, Listener {
 
         if (charges.containsKey(player)) {
             if (charges.get(player) == 0) {
-                UtilMessage.message(player, getClassType().getName(), "You don't have any " + ChatColor.GREEN + getName() + ChatColor.GRAY + " charges.");
+                UtilMessage.simpleMessage(player, getClassType().getName(), "You don't have any <alt>" + getName() + "</alt> charges.");
                 return false;
             }
         }

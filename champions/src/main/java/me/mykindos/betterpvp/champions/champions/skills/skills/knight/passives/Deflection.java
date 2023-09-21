@@ -2,6 +2,8 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.knight.passives;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.Optional;
+import java.util.WeakHashMap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -15,14 +17,10 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-
-import java.util.Optional;
-import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -50,7 +48,7 @@ public class Deflection extends Skill implements PassiveSkill {
         return new String[]{
                 "Prepare to deflect incoming attacks",
                 "You gain 1 charge every 3 seconds.",
-                "You can store a maximum of " + ChatColor.GREEN + (level) + ChatColor.GRAY + " charges",
+                "You can store a maximum of <val>" + (level) + "</val> charges",
                 "",
                 "When attacked, the damage you take is",
                 "reduced by the number of your charges",

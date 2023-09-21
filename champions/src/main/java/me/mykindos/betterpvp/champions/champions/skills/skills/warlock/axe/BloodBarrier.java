@@ -2,6 +2,8 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.warlock.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.HashMap;
+import java.util.UUID;
 import lombok.Data;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
@@ -18,7 +20,6 @@ import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -28,9 +29,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.PlayerDeathEvent;
-
-import java.util.HashMap;
-import java.util.UUID;
 
 @Singleton
 @BPvPListener
@@ -57,13 +55,13 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
         return new String[]{
                 "Right click with a axe to activate.",
                 "",
-                "Sacrifice " + ChatColor.GREEN + UtilMath.round(100 - (0.50 + (level * 0.05)) * 100, 2) + "%" + ChatColor.GRAY + " of your health to grant",
+                "Sacrifice <val>" + UtilMath.round(100 - (0.50 + (level * 0.05)) * 100, 2) + "%</val> of your health to grant",
                 "yourself and all nearby allies a barrier which reduces",
                 "the damage of the next 3 incoming attacks by 30%",
                 "",
                 "Barrier lasts up to 1 minute total, and does not stack.",
                 "",
-                "Recharge: " + ChatColor.GREEN + getCooldown(level)
+                "Recharge: <val>" + getCooldown(level)
         };
     }
 

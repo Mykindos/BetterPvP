@@ -18,7 +18,6 @@ import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Item;
@@ -56,10 +55,10 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
 
         return new String[]{
                 "Launch a lightning orb. Directly hitting a player",
-                "will strike all enemies within " + ChatColor.GREEN + (3 + (level * 0.5)) + ChatColor.GRAY + " blocks",
+                "will strike all enemies within <val>" + (3 + (level * 0.5)) + "</val> blocks",
                 "with lightning, giving them Slowness II for 4 seconds.",
                 "",
-                "Recharge: " + ChatColor.GREEN + getCooldown(level)
+                "Recharge: <val>" + getCooldown(level)
         };
     }
 

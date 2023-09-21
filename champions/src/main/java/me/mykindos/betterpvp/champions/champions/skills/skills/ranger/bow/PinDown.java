@@ -38,9 +38,9 @@ public class PinDown extends PrepareArrowSkill {
         return new String[]{
                 "Left click with a bow to instantly fire",
                 "an arrow, which gives anybody hit ",
-                "Slowness IV for " + net.md_5.bungee.api.ChatColor.GREEN + (level * 1.5) + net.md_5.bungee.api.ChatColor.GRAY + " seconds.",
+                "Slowness IV for <val>" + (level * 1.5) + "</val> seconds.",
                 "",
-                "Cooldown: " + ChatColor.GREEN + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level)
         };
     }
 
