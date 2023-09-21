@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.champions.champions.builds.menus;
 
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 import me.mykindos.betterpvp.champions.champions.builds.BuildSkill;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
@@ -12,16 +14,24 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.menu.Button;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.interfaces.IRefreshingMenu;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.Tag;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class SkillMenu extends Menu implements IRefreshingMenu {
 
+    /**
+     * The tag resolver for skill descriptions.
+     * It will parse all tags with the name 'val'
+     */
+    public static final TagResolver TAG_RESOLVER = TagResolver.resolver("val", Tag.styling(NamedTextColor.GREEN));
+    
     private final Role role;
 
     private final SkillManager skillManager;
@@ -29,7 +39,7 @@ public class SkillMenu extends Menu implements IRefreshingMenu {
     private final RoleBuild roleBuild;
 
     public SkillMenu(Player player, GamerBuilds builds, Role role, int buildNumber, SkillManager skillManager) {
-        super(player, 54, "Skill Page");
+        super(player, 54, Component.text("Skill Page", NamedTextColor.GREEN));
         this.role = role;
         this.skillManager = skillManager;
 
@@ -85,21 +95,22 @@ public class SkillMenu extends Menu implements IRefreshingMenu {
     }
 
     public SkillButton buildButton(Skill skill, int slot, int level) {
-        String[] lore;
-        lore = skill.getDescription(level);
+        String[] lore = skill.getDescription(level);
 
-        List<String> tempLore = new ArrayList<>();
+        List<Component> tempLore = new ArrayList<>();
         for (String str : lore) {
-            tempLore.add(ChatColor.GRAY + str);
+            Component component = MiniMessage.miniMessage().deserialize("<gray>" + str, TAG_RESOLVER);
+            tempLore.add(component);
         }
-        ItemStack book = null;
-        String name = "";
+
+        ItemStack book;
+        Component name;
         if (isSkillActive(skill)) {
             book = new ItemStack(Material.ENCHANTED_BOOK);
-            name = ChatColor.GREEN.toString() + ChatColor.BOLD + skill.getName() + " (" + level + " / " + skill.getMaxLevel() + ")";
+            name = Component.text(skill.getName() + " (" + level + " / " + skill.getMaxLevel() + ")", NamedTextColor.GREEN, TextDecoration.BOLD);
         } else {
             book = new ItemStack(Material.BOOK);
-            name = ChatColor.RED + skill.getName();
+            name = Component.text(skill.getName(), NamedTextColor.RED);
         }
 
 
@@ -118,13 +129,13 @@ public class SkillMenu extends Menu implements IRefreshingMenu {
     }
 
     private void addDefaultButtons() {
-        addButton(new Button(0, new ItemStack(Material.IRON_SWORD), ChatColor.GREEN.toString() + ChatColor.BOLD + "Sword Skills"));
-        addButton(new Button(9, new ItemStack(Material.IRON_AXE), ChatColor.GREEN.toString() + ChatColor.BOLD + "Axe Skills"));
-        addButton(new Button(18, new ItemStack(Material.BOW), ChatColor.GREEN.toString() + ChatColor.BOLD + "Bow Skills"));
-        addButton(new Button(27, new ItemStack(Material.RED_DYE, 1), ChatColor.GREEN.toString() + ChatColor.BOLD + "Class Passive A Skills"));
-        addButton(new Button(36, new ItemStack(Material.ORANGE_DYE, 1), ChatColor.GREEN.toString() + ChatColor.BOLD + "Class Passive B Skills"));
-        addButton(new Button(45, new ItemStack(Material.YELLOW_DYE, 1), ChatColor.GREEN.toString() + ChatColor.BOLD + "Global Passive Skills"));
-        addButton(new Button(8, new ItemStack(Material.EMERALD, roleBuild.getPoints()), ChatColor.GREEN.toString() + ChatColor.BOLD + "Skill Points"));
+        addButton(new Button(0, new ItemStack(Material.IRON_SWORD), Component.text("Sword Skills", NamedTextColor.GREEN, TextDecoration.BOLD)));
+        addButton(new Button(9, new ItemStack(Material.IRON_AXE), Component.text("Axe Skills", NamedTextColor.GREEN, TextDecoration.BOLD)));
+        addButton(new Button(18, new ItemStack(Material.BOW), Component.text("Bow Skills", NamedTextColor.GREEN, TextDecoration.BOLD)));
+        addButton(new Button(27, new ItemStack(Material.RED_DYE), Component.text("Class Passive A Skills", NamedTextColor.GREEN, TextDecoration.BOLD)));
+        addButton(new Button(36, new ItemStack(Material.ORANGE_DYE), Component.text("Class Passive B Skills", NamedTextColor.GREEN, TextDecoration.BOLD)));
+        addButton(new Button(45, new ItemStack(Material.YELLOW_DYE), Component.text("Global Passive Skills", NamedTextColor.GREEN, TextDecoration.BOLD)));
+        addButton(new Button(8, new ItemStack(Material.EMERALD, roleBuild.getPoints()), Component.text("Skill Points", NamedTextColor.GREEN, TextDecoration.BOLD)));
     }
 
 }

@@ -2,6 +2,9 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.paladin.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.Iterator;
+import java.util.Map.Entry;
+import java.util.WeakHashMap;
 import me.libraryaddict.disguise.DisguiseAPI;
 import me.libraryaddict.disguise.disguisetypes.DisguiseType;
 import me.libraryaddict.disguise.disguisetypes.MobDisguise;
@@ -19,7 +22,6 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
-import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -29,10 +31,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
-import java.util.Iterator;
-import java.util.Map.Entry;
-import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -60,12 +58,12 @@ public class Polymorph extends PrepareSkill implements CooldownSkill {
                 "Right click with a sword to prepare.",
                 "",
                 "The next player you hit, is polymorphed",
-                "into a sheep for " + ChatColor.GREEN + polymorphDuration + ChatColor.GRAY + " seconds.",
+                "into a sheep for <val>" + polymorphDuration + "</val> seconds.",
                 "",
                 "While a player is polymorphed, they cannot deal",
                 "or take any damage.",
                 "",
-                "Cooldown: " + ChatColor.GREEN + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level)
         };
     }
 

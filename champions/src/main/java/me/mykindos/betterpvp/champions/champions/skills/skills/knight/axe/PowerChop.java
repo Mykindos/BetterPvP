@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.knight.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.WeakHashMap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
@@ -16,16 +17,12 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
-import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-
-import java.util.WeakHashMap;
-
 
 @Singleton
 @BPvPListener
@@ -52,12 +49,12 @@ public class PowerChop extends PrepareSkill implements CooldownSkill {
         return new String[]{
                 "Put more strength into your",
                 "next axe attack, causing it",
-                "to deal " + ChatColor.GREEN + (Math.max(1, (level + 2))) + ChatColor.GRAY + " bonus damage.",
+                "to deal <val>" + (Math.max(1, (level + 2))) + "</val> bonus damage.",
                 "",
                 "Attack must be made within",
-                ChatColor.GREEN.toString() + timeToHit + ChatColor.GRAY + " seconds of being used.",
+                "<val>" + timeToHit + "</val> seconds of being used.",
                 "",
-                "Cooldown: " + ChatColor.GREEN + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level)
         };
     }
 

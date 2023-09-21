@@ -13,7 +13,6 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
-import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
@@ -41,11 +40,11 @@ public class ThreateningShout extends Skill implements InteractSkill, CooldownSk
                 "Right click with a axe to activate.",
                 "",
                 "Release a roar, which frightens all enemies",
-                "within " + ChatColor.GREEN + (radius + level) + ChatColor.GRAY + " blocks",
-                "and grants them Vulnerability for " + ChatColor.GREEN + (duration + level),
+                "within <val>" + (radius + level) + "</val> blocks",
+                "and grants them Vulnerability for <val>" + (duration + level),
                 "seconds.",
                 "",
-                "Cooldown: " + ChatColor.GREEN + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level)
         };
     }
 

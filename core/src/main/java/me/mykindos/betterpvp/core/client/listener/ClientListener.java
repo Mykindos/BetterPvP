@@ -3,8 +3,8 @@ package me.mykindos.betterpvp.core.client.listener;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketContainer;
-import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import com.google.inject.Inject;
+import java.util.Optional;
 import lombok.SneakyThrows;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.ClientManager;
@@ -17,11 +17,13 @@ import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.events.lunar.LunarClientEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
@@ -31,8 +33,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
-
-import java.util.Optional;
 
 @BPvPListener
 public class ClientListener implements Listener {
@@ -58,9 +58,9 @@ public class ClientListener implements Listener {
             clientManager.addObject(uuid, client);
             clientManager.getRepository().save(client);
 
-            event.joinMessage(Component.text(ChatColor.GREEN + "New> " + ChatColor.GRAY + event.getPlayer().getName()));
+            event.joinMessage(UtilMessage.deserialize("<green>New> <gray>%s", event.getPlayer().getName()));
         } else {
-            event.joinMessage(Component.text(ChatColor.GREEN + "Login> " + ChatColor.GRAY + event.getPlayer().getName()));
+            event.joinMessage(UtilMessage.deserialize("<green>Login> <gray>%s", event.getPlayer().getName()));
             client = clientOptional.get();
         }
 
@@ -94,14 +94,14 @@ public class ClientListener implements Listener {
         clientManager.getClientByName(event.getPlayer().getName()).ifPresent(client -> {
             ClientQuitEvent quitEvent = UtilServer.callEvent(new ClientQuitEvent(client, event.getPlayer()));
             if (!quitEvent.isCancelled()) {
-                event.quitMessage(Component.text(quitEvent.getQuitMessage()));
+                event.quitMessage(quitEvent.getQuitMessage());
             }
         });
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onClientQuit(ClientQuitEvent event) {
-        event.setQuitMessage(ChatColor.RED + "Leave> " + ChatColor.GRAY + event.getPlayer().getName());
+        event.setQuitMessage(UtilMessage.deserialize("<red>Leave> <gray>%s", event.getPlayer().getName()));
     }
 
     @EventHandler
@@ -123,15 +123,20 @@ public class ClientListener implements Listener {
 
         PacketContainer pc = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.PLAYER_LIST_HEADER_FOOTER);
 
-        var title = WrappedChatComponent.fromText(ChatColor.RED.toString() + ChatColor.BOLD + "Welcome to BetterPvP Clans!\n"
-                + ChatColor.RED + ChatColor.BOLD + "Visit our website at: " + ChatColor.YELLOW + ChatColor.BOLD + "https://betterpvp.net");
+        var titleTop = Component.text("Welcome to BetterPvP Clans!\n", NamedTextColor.RED, TextDecoration.BOLD);
+        var titleBot = Component.text("Visit our website at: ", NamedTextColor.RED, TextDecoration.BOLD)
+                .append(Component.text("https://betterpvp.net", NamedTextColor.YELLOW, TextDecoration.BOLD));
+        var header = titleTop.append(Component.newline()).append(titleBot);
 
-        var info = WrappedChatComponent.fromText(ChatColor.GOLD.toString() + ChatColor.BOLD + "Ping: "
-                + ChatColor.YELLOW + UtilPlayer.getPing(player) + ChatColor.GOLD + ChatColor.BOLD
-                + " Online: " + ChatColor.YELLOW + Bukkit.getOnlinePlayers().size());
+        var footerLeft = Component.text("Ping: ", NamedTextColor.GOLD, TextDecoration.BOLD)
+                .append(Component.text(UtilPlayer.getPing(player), NamedTextColor.YELLOW, TextDecoration.BOLD));
+        var footerRight = Component.text("Online: ", NamedTextColor.GOLD, TextDecoration.BOLD)
+                .append(Component.text(Bukkit.getOnlinePlayers().size(), NamedTextColor.YELLOW, TextDecoration.BOLD));
+        var footer = footerLeft.append(Component.space()).append(footerRight);
 
-        pc.getChatComponents().write(0, title).write(1, info);
-        ProtocolLibrary.getProtocolManager().sendServerPacket(player, pc);
+        player.sendPlayerListHeaderAndFooter(header, footer);
+//        pc.getChatComponents().write(0, title).write(1, info);
+//        ProtocolLibrary.getProtocolManager().sendServerPacket(player, pc);
     }
 
     @EventHandler

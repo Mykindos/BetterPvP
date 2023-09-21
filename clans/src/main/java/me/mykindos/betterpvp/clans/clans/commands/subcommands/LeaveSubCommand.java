@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.clans.clans.commands.subcommands;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.Optional;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
@@ -15,10 +16,7 @@ import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-
-import java.util.Optional;
 
 @Singleton
 @SubCommand(ClanCommand.class)
@@ -59,7 +57,7 @@ public class LeaveSubCommand extends ClanSubCommand {
                 ClanMember leader = leaderOptional.get();
                 if (leader.getUuid().equals(player.getUniqueId().toString())) {
                     if (clan.getMembers().size() > 1) {
-                        UtilMessage.message(player, "Clans", "You must pass on " + ChatColor.GREEN + "Leadership" + ChatColor.GRAY + " before leaving.");
+                        UtilMessage.message(player, "Clans", "You must pass on <alt>Leadership</alt> before leaving.");
                         return;
                     } else if (clan.getMembers().size() == 1) {
                         UtilServer.callEvent(new ClanDisbandEvent(player, clan));
@@ -71,8 +69,7 @@ public class LeaveSubCommand extends ClanSubCommand {
         }
 
         if (System.currentTimeMillis() < clan.getLastTntedTime()) {
-            UtilMessage.message(player, "Clans", "You cannot leave your clan for "
-                    + ChatColor.GREEN + UtilTime.getTime(clan.getLastTntedTime() - System.currentTimeMillis(), UtilTime.TimeUnit.BEST, 1));
+            UtilMessage.message(player, "Clans", "You cannot leave your clan for <alt>" + UtilTime.getTime(clan.getLastTntedTime() - System.currentTimeMillis(), UtilTime.TimeUnit.BEST, 1));
             return;
         }
 

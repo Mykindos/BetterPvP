@@ -13,7 +13,6 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -37,7 +36,7 @@ public class HolyLight extends Skill implements PassiveSkill {
 
         return new String[]{
                 "Create an aura that gives", "yourself and all allies within",
-                ChatColor.GREEN.toString() + (8 + level) + ChatColor.GRAY + " blocks extra regeneration"};
+                "<val>" + (8 + level) + "</val> blocks extra regeneration"};
     }
 
     @Override

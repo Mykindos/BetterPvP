@@ -6,7 +6,9 @@ import me.mykindos.betterpvp.champions.champions.skills.SkillManager;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.menu.Button;
 import me.mykindos.betterpvp.core.menu.MenuManager;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -20,7 +22,7 @@ public class ClassSelectionButton extends Button {
 
 
     public ClassSelectionButton(GamerBuilds builds, Role role, SkillManager skillManager, int slot, ItemStack item) {
-        super(slot, item, ChatColor.GREEN.toString() + ChatColor.BOLD + role.getName());
+        super(slot, item, Component.text(role.getName(), NamedTextColor.GREEN, TextDecoration.BOLD));
         this.builds = builds;
         this.role = role;
         this.skillManager = skillManager;

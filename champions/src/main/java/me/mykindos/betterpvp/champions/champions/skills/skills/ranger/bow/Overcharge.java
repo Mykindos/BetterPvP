@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.bow;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.*;
 import lombok.Data;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
@@ -19,7 +20,6 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Arrow;
@@ -31,8 +31,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.meta.CrossbowMeta;
-
-import java.util.*;
 
 @Singleton
 @BPvPListener
@@ -60,7 +58,7 @@ public class Overcharge extends Skill implements InteractSkill, Listener {
                 "Draw back harder on your bow, giving",
                 "2 bonus damage per " + ChatColor.GREEN + (0.9 - (level * 0.1)) + ChatColor.GRAY + " seconds",
                 "",
-                "Maximum Damage: " + ChatColor.GREEN + (5 + level)
+                "Maximum Damage: <val>" + (2 + ((level-1) * 2))
         };
     }
 

@@ -11,7 +11,6 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -40,9 +39,9 @@ public class StunningShot extends PrepareArrowSkill {
                 "Left click to activate.",
                 "",
                 "Shoot an arrow",
-                "stunning anyone hit for " + ChatColor.GREEN + String.format("%.2f", (level * 0.40)) + ChatColor.GRAY + " seconds",
+                "stunning anyone hit for <val>" + String.format("%.2f", (level * 0.40)) + "</val> seconds",
                 "",
-                "Cooldown: " + ChatColor.GREEN + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level)
         };
     }
 

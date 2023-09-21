@@ -14,8 +14,6 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -46,7 +44,7 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
                 "Right click with a axe to activate.",
                 "",
                 "You take a great leap",
-                "Cooldown: " + ChatColor.GREEN + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level)
         };
     }
 
@@ -65,7 +63,7 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
             Vector vec = player.getLocation().getDirection();
             vec.setY(0);
             UtilVelocity.velocity(player, vec, 0.9D, false, 0.0D, 0.8D, 2.0D, true);
-            UtilMessage.message(player, getClassType().getName(), "You used " + ChatColor.GREEN + "Wall Kick" + ChatColor.GRAY + ".");
+            UtilMessage.message(player, getClassType().getName(), "You used <alt>Wall Kick</alt>.");
         }
 
         player.getWorld().spawnEntity(player.getLocation(), EntityType.LLAMA_SPIT);
@@ -99,10 +97,8 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
                             if (!UtilBlock.airFoliage(back)) {
                                 if (back.getLocation().getY() == Math.floor(player.getLocation().getY())
                                         || back.getLocation().getY() == Math.floor(player.getLocation().getY() - 0.25)) {
-                                    if (back.getRelative(BlockFace.UP).getType() == Material.AIR) {
-                                        if (player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() != Material.AIR) {
-                                            continue;
-                                        }
+                                    if (UtilBlock.airFoliage(back.getRelative(BlockFace.UP).getType())) {
+                                        continue;
                                     }
                                 }
                                 Block forward = null;

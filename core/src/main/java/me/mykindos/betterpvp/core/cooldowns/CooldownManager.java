@@ -2,17 +2,16 @@ package me.mykindos.betterpvp.core.cooldowns;
 
 
 import com.google.inject.Singleton;
-import lombok.Synchronized;
-import lombok.extern.slf4j.Slf4j;
-import me.mykindos.betterpvp.core.framework.manager.Manager;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.entity.Player;
-
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.Synchronized;
+import lombok.extern.slf4j.Slf4j;
+import me.mykindos.betterpvp.core.framework.manager.Manager;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.entity.Player;
 
 @Slf4j
 @Singleton
@@ -46,8 +45,7 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
             if (isCooling(player, ability)) {
 
                 if (inform) {
-                    player.sendMessage(ChatColor.BLUE + "Cooldown> " + ChatColor.GRAY + "You cannot use " + ChatColor.GREEN + ability + ChatColor.GRAY + " for "
-                            + ChatColor.GREEN + "" + Math.max(0, getAbilityRecharge(player, ability).getRemaining()) + " seconds" + ChatColor.GRAY + ".");
+                    UtilMessage.simpleMessage(player, "Cooldown", "You cannot use <alt>%s</alt> for <alt>%s</alt> seconds.", ability, Math.max(0, getAbilityRecharge(player, ability).getRemaining()));
                 }
 
                 return false;
@@ -89,7 +87,7 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
             if (cooldowns.containsKey(ability)) {
                 cooldowns.remove(ability);
                 if (!silent) {
-                    player.sendMessage(ChatColor.BLUE + "Recharge> " + ChatColor.GREEN + ability + ChatColor.GRAY + " has been recharged.");
+                    UtilMessage.simpleMessage(player, "Recharge", "<alt>%s</alt> has been recharged.", ability);
                 }
             }
 
@@ -105,7 +103,7 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
                     if (cd.isInform()) {
                         Player player = Bukkit.getPlayer(UUID.fromString(key));
                         if (player != null) {
-                            player.sendMessage(ChatColor.BLUE + "Cooldown> " + ChatColor.GREEN + entry.getKey() + ChatColor.GRAY + " has been recharged.");
+                            UtilMessage.simpleMessage(player, "Cooldown", "<alt>%s</alt> has been recharged.", entry.getKey());
                         }
                     }
                     return true;

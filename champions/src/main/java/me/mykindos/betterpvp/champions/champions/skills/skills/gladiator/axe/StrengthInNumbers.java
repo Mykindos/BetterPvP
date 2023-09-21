@@ -13,7 +13,6 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
-import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
@@ -41,13 +40,13 @@ public class StrengthInNumbers extends Skill implements InteractSkill, CooldownS
         return new String[]{
                 "Right click with a axe to activate.",
                 "",
-                "Grant all allies within " + ChatColor.GREEN + radius + ChatColor.GRAY + " blocks",
-                "Strength I for " + ChatColor.GREEN + (duration + level),
+                "Grant all allies within <val>" + radius + "</val> blocks",
+                "Strength I for <val>" + (duration + level),
                 "seconds.",
                 "",
                 "This does not give you the buff.",
                 "",
-                "Cooldown: " + ChatColor.GREEN + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level)
 
         };
     }

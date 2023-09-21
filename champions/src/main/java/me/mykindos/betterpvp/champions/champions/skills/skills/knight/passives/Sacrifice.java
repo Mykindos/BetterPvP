@@ -10,7 +10,6 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -34,9 +33,10 @@ public class Sacrifice extends Skill implements PassiveSkill {
     public String[] getDescription(int level) {
 
         double percentage = ((level * 0.08) * 100);
-        return new String[]{"Deal an extra " + ChatColor.GREEN + percentage + "%" + ChatColor.GRAY + " damage",
+        return new String[]{
+                "Deal an extra <val>" + percentage + "%" + "</val> damage",
                 "But you now also take",
-                ChatColor.GREEN.toString() + percentage + "%" + ChatColor.GRAY + " extra damage from melee attacks"
+                "<val>" + percentage + "%" + "</val> extra damage from melee attacks"
         };
     }
 

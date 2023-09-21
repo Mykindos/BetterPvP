@@ -90,7 +90,6 @@ INSERT IGNORE INTO property_map VALUES ("CLAN_CHAT", "boolean");
 INSERT IGNORE INTO property_map VALUES ("STAFF_CHAT", "boolean");
 INSERT IGNORE INTO property_map VALUES ("BLOCKS_PLACED", "int");
 INSERT IGNORE INTO property_map VALUES ("BLOCKS_BROKEN", "int");
-INSERT IGNORE INTO property_map VALUES ("BLOCKS_BROKEN", "int");
 INSERT IGNORE INTO property_map VALUES ("DAMAGE_DEALT", "double");
 INSERT IGNORE INTO property_map VALUES ("DAMAGE_TAKEN", "double");
 INSERT IGNORE INTO property_map VALUES ("COOLDOWN_DISPLAY", "boolean");

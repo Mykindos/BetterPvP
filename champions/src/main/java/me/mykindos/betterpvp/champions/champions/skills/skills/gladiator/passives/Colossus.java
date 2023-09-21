@@ -10,7 +10,6 @@ import me.mykindos.betterpvp.core.combat.events.CustomKnockbackEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -36,7 +35,8 @@ public class Colossus extends Skill implements PassiveSkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "You take " + ChatColor.GREEN + (reductionPerLevel * level) + "% " + ChatColor.GRAY + "reduced knockback."};
+                "You take <val>" + (reductionPerLevel * level) + "%</val> reduced knockback."
+        };
     }
 
     @Override

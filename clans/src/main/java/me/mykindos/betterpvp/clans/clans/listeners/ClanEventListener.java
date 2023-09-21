@@ -1,6 +1,8 @@
 package me.mykindos.betterpvp.clans.clans.listeners;
 
 import com.google.inject.Inject;
+import java.util.Optional;
+import java.util.UUID;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
@@ -26,15 +28,13 @@ import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-
-import java.util.Optional;
-import java.util.UUID;
 
 @BPvPListener
 public class ClanEventListener extends ClanListener {
@@ -78,8 +78,7 @@ public class ClanEventListener extends ClanListener {
         clan.getTerritory().add(new ClanTerritory(chunkString));
         clanManager.getRepository().saveClanTerritory(clan, chunkString);
 
-        UtilMessage.message(player, "Clans", "You claimed Territory " + ChatColor.YELLOW
-                + UtilWorld.chunkToPrettyString(chunk) + ChatColor.GRAY + ".");
+        UtilMessage.simpleMessage(player, "Clans", "You claimed Territory <yellow>" + UtilWorld.chunkToPrettyString(chunk) + "</yellow>.");
 
         clan.messageClan(String.format("<yellow>%s<gray> claimed territory <yellow>%s<gray>.", player.getName(),
                 UtilWorld.chunkToPrettyString(chunk)), player.getUniqueId(), true);
@@ -97,8 +96,7 @@ public class ClanEventListener extends ClanListener {
 
         String chunkString = UtilWorld.chunkToFile(chunk);
 
-        UtilMessage.message(player, "Clans", "You unclaimed territory " + ChatColor.YELLOW
-                + UtilWorld.chunkToPrettyString(chunk) + ChatColor.GRAY + ".");
+        UtilMessage.simpleMessage(player, "Clans", "You unclaimed territory <alt2>" + UtilWorld.chunkToPrettyString(chunk) + "</alt2>.");
 
         targetClan.messageClan(String.format("<yellow>%s<gray> unclaimed territory <yellow>%s<gray>.", player.getName(),
                         UtilWorld.chunkToPrettyString(chunk)), player.getUniqueId(), true);
@@ -123,7 +121,7 @@ public class ClanEventListener extends ClanListener {
         clan.saveProperty(ClanProperty.POINTS, defaultValues.getDefaultPoints());
         clan.saveProperty(ClanProperty.ENERGY, defaultValues.getDefaultEnergy());
         clan.saveProperty(ClanProperty.NO_DOMINANCE_COOLDOWN, System.currentTimeMillis() + (3_600_000L * 24));
-        clan.saveProperty(ClanProperty.LAST_TNTED, 0);
+        clan.saveProperty(ClanProperty.LAST_TNTED, 0L);
         clan.saveProperty(ClanProperty.BALANCE, 0);
 
         UtilMessage.simpleMessage(event.getPlayer(), "Clans", "Successfully created clan <aqua>%s", clan.getName());
@@ -154,8 +152,8 @@ public class ClanEventListener extends ClanListener {
         clanManager.getRepository().delete(clan);
         clanManager.getObjects().remove(clan.getName());
 
-        UtilMessage.broadcast("Clans", ChatColor.YELLOW + event.getPlayer().getName() + ChatColor.GRAY + " disbanded "
-                + ChatColor.YELLOW + "Clan " + clan.getName() + ChatColor.GRAY + ".");
+        UtilMessage.broadcast("Clans", "<alt2>" + event.getPlayer().getName() + "</alt2> disbanded <alt2>Clan " + clan.getName() + "</alt2>.");
+        UtilMessage.broadcast("Clans", "<alt2>Clan " + clan.getName() + "</alt2> has been disbanded.");
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -167,18 +165,16 @@ public class ClanEventListener extends ClanListener {
         Player target = event.getTarget();
 
 
-        UtilMessage.message(player, "Clans", "You invited " + ChatColor.YELLOW + target.getName() + ChatColor.GRAY + " to join your Clan.");
-        clan.messageClan(String.format("<yellow>%s<gray> invited <yellow>%s<gray> to join your Clan.", player.getName(), target.getName()),
-                player.getUniqueId(), true);
+        UtilMessage.simpleMessage(player, "Clans", "You invited <alt2>" + target.getName() + "</alt2> to join your Clan.");
+        
+        clan.messageClan(String.format("<yellow>%s<gray> invited <yellow>%s<gray> to join your Clan.", player.getName(), target.getName()), player.getUniqueId(), true);
 
-        UtilMessage.message(target, "Clans", ChatColor.YELLOW + player.getName() + ChatColor.GRAY + " invited you to join " + ChatColor.YELLOW
-                + "Clan " + clan.getName() + ChatColor.GRAY + ".");
+        UtilMessage.simpleMessage(target, "Clans", "<alt2>" + player.getName() + "</alt2> invited you to join <alt2>Clan " + clan.getName() + "</alt2>.");
 
-        Component inviteMessage = Component.text(ChatColor.GOLD.toString() + ChatColor.UNDERLINE + "Click Here")
+        Component inviteMessage = Component.text("Click Here", NamedTextColor.GOLD, TextDecoration.UNDERLINED)
                 .clickEvent(ClickEvent.runCommand("/c join " + clan.getName()))
-                .append(Component.text(ChatColor.GRAY + " or type '"
-                        + ChatColor.YELLOW + "/c join " + clan.getName() + ChatColor.GRAY + "'" + ChatColor.GRAY + " to accept!"));
-        UtilMessage.message(target, "Clans", inviteMessage);
+                .append(UtilMessage.deserialize(" or type '<alt2>/c join" + clan.getName() + "</alt2>' to accept!"));
+        UtilMessage.simpleMessage(target, "Clans", inviteMessage);
 
         Gamer targetGamer = gamerManager.getObject(target.getUniqueId().toString()).orElseThrow(() -> new NoSuchGamerException(target.getName()));
         inviteHandler.createInvite(clan, targetGamer, "Invite", 20);
@@ -195,13 +191,12 @@ public class ClanEventListener extends ClanListener {
 
         if (!targetGamer.getClient().isAdministrating()) {
             if (!inviteHandler.isInvited(targetGamer, clan, "Invite")) {
-                UtilMessage.message(player, "Clans", "You are not invited to " + ChatColor.YELLOW + "Clan "
-                        + clan.getName() + ChatColor.GRAY + ".");
+                UtilMessage.simpleMessage(player, "Clans", "You are not invited to <alt2>Clan " + clan.getName() + "</alt2>.");
                 return;
             }
 
             if (clan.getSquadCount() >= maxClanMembers) {
-                UtilMessage.message(player, "Clans", ChatColor.YELLOW + "Clan " + clan.getName() + ChatColor.GRAY + " has too many members or allies");
+                UtilMessage.simpleMessage(player, "Clans", "<alt2>Clan " + clan.getName() + "</alt2> has too many members or allies");
                 return;
             }
         }
@@ -215,7 +210,7 @@ public class ClanEventListener extends ClanListener {
         inviteHandler.removeInvite(targetGamer, clan, "Invite");
 
         clan.messageClan(String.format("<yellow>%s<gray> has joined your Clan.", player.getName()), player.getUniqueId(), true);
-        UtilMessage.message(player, "Clans", "You joined " + ChatColor.YELLOW + "Clan " + clan.getName() + ChatColor.GRAY + ".");
+        UtilMessage.simpleMessage(player, "Clans", "You joined <alt2>Clan " + clan.getName() + "</alt2>.");
 
     }
 
@@ -233,7 +228,7 @@ public class ClanEventListener extends ClanListener {
             clanManager.getRepository().deleteClanMember(clan, clanMember);
             clan.getMembers().remove(clanMember);
 
-            UtilMessage.message(player, "Clans", "You left " + ChatColor.YELLOW + "Clan " + clan.getName() + ChatColor.GRAY + ".");
+            UtilMessage.simpleMessage(player, "Clans", "You left <alt2>Clan " + clan.getName() + "</alt2>.");
             clan.messageClan(String.format("<yellow>%s<gray> left your Clan.", player.getName()), player.getUniqueId(), true);
         }
 
@@ -254,12 +249,12 @@ public class ClanEventListener extends ClanListener {
             clanManager.getRepository().deleteClanMember(clan, clanMember);
             clan.getMembers().remove(clanMember);
 
-            UtilMessage.message(player, "Clans", "You kicked " + ChatColor.YELLOW + target.getName() + ChatColor.GRAY + ".");
+            UtilMessage.simpleMessage(player, "Clans", "You kicked <alt2>" + target.getName() + "</alt2>.");
             clan.messageClan(String.format("<yellow>%s<gray> was kicked from your Clan.", player.getName()), player.getUniqueId(), true);
 
             Player targetPlayer = Bukkit.getPlayer(target.getName());
             if (targetPlayer != null) {
-                UtilMessage.message(targetPlayer, "Clans", "You were kicked from " + ChatColor.YELLOW + clan.getName());
+                UtilMessage.simpleMessage(targetPlayer, "Clans", "You were kicked from <alt2>" + clan.getName());
             }
         }
 

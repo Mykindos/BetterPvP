@@ -10,6 +10,8 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilPlayer;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -18,22 +20,28 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 @Singleton
 @BPvPListener
-public class Fury extends Skill implements PassiveSkill, Listener {
+public class LevelField extends Skill implements PassiveSkill, Listener {
 
     @Inject
-    public Fury(Champions champions, ChampionsManager championsManager) {
+    public LevelField(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
 
     @Override
     public String getName() {
-        return "Fury";
+        return "Level Field";
     }
 
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Your attacks deal a bonus <val>" + (level * 0.5) + "</val> damage"
+                "For every enemy within 10 blocks,",
+                "You deal " + ChatColor.GREEN + (10 + ((level - 1) * 5)) + ".0%" + ChatColor.GRAY + " extra damage",
+                "Up to a maximum of 60% extra damage",
+                "",
+                "For every ally within 10 blocks,",
+                "You deal " + ChatColor.GREEN + (10 + ((level - 1) * 5)) + ".0%" + ChatColor.GRAY + " less damage",
+                "Down to a minimum of " + ChatColor.GREEN + (60 - ((level - 1) * 15)) + ChatColor.GRAY + "% less damage"
         };
     }
 
@@ -46,7 +54,7 @@ public class Fury extends Skill implements PassiveSkill, Listener {
     public SkillType getType() {
         return SkillType.PASSIVE_A;
     }
-
+  
     @EventHandler(priority = EventPriority.HIGH)
     public void onHit(CustomDamageEvent event) {
         if (event.isCancelled()) return;
@@ -55,10 +63,14 @@ public class Fury extends Skill implements PassiveSkill, Listener {
 
         int level = getLevel(player);
         if (level > 0) {
-            event.setDamage(event.getDamage() + (level * 0.5));
-        }
+            int nearbyEnemies = UtilPlayer.getNearbyEnemies(player, player.getLocation(), 10).size();
+            int nearbyAllies = UtilPlayer.getNearbyAllies(player, player.getLocation(), 10).size();
+            int nearbyDifference = ((nearbyEnemies - 1) - nearbyAllies);
 
+            nearbyDifference = (nearbyDifference < -3 ? -3 : Math.min(nearbyDifference, 3));
+            event.setDamage(event.getDamage() * (1 + (nearbyDifference * (nearbyDifference > 0 ? 0.20 : (0.20 - ((level - 1) * 0.05))))));
+
+        }
     }
 
 }
-

@@ -13,7 +13,6 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -37,7 +36,7 @@ public class Bloodthirst extends Skill implements PassiveSkill {
     public String[] getDescription(int level) {
         return new String[]{
                 "Your senses are heightened, ",
-                "allowing you to detect nearby enemies below " + ChatColor.GREEN + (25 + (5 * level)) + "% " + ChatColor.GRAY + "health.",
+                "allowing you to detect nearby enemies below <val>" + (25 + (5 * level)) + "%</val> health.",
                 "",
                 "While running towards weak enemies, you receive Speed I."
         };

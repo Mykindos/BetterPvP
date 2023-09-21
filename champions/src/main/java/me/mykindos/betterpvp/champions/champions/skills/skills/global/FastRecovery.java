@@ -11,7 +11,6 @@ import me.mykindos.betterpvp.champions.energy.events.RegenerateEnergyEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 
@@ -36,7 +35,7 @@ public class FastRecovery extends Skill implements PassiveSkill {
 
         return new String[]{
                 "Increase your energy regeneration speed,",
-                "by " + ChatColor.GREEN + (percentagePerLevel * level) + "%",
+                "by <val>" + (percentagePerLevel * level) + "%",
                 "",
                 "Does not work with legendary items equipped."
 

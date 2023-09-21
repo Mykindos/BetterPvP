@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.clans.world;
 
 import com.google.inject.Inject;
+import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.framework.ModuleLoadedEvent;
@@ -12,7 +13,6 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.*;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -32,8 +32,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
-
-import java.util.*;
 
 @Slf4j
 @BPvPListener
@@ -72,7 +70,7 @@ public class WorldListener implements Listener {
     @EventHandler
     public void handleBucket(PlayerBucketFillEvent event) {
         event.setCancelled(true);
-        UtilMessage.message(event.getPlayer(), "Game", "Your " + ChatColor.YELLOW + "Bucket" + ChatColor.GRAY + " broke!");
+        UtilMessage.simpleMessage(event.getPlayer(), "Game", "Your <alt2>>Bucket</alt2> broke!");
         ItemStack replacement = new ItemStack(Material.IRON_INGOT, event.getPlayer().getInventory().getItemInMainHand().getAmount() * 3);
         event.getPlayer().getInventory().setItemInMainHand(replacement);
     }
@@ -152,9 +150,7 @@ public class WorldListener implements Listener {
                     || event.getInventory().getType() == InventoryType.STONECUTTER
                     || event.getInventory().getType() == InventoryType.SMITHING
                     || event.getInventory().getType() == InventoryType.BEACON) {
-                UtilMessage.message(player, "Game",
-                        ChatColor.YELLOW + UtilFormat.cleanString(event.getInventory().getType().toString())
-                                + ChatColor.GRAY + " is disabled.");
+                UtilMessage.simpleMessage(player, "Game", "<alt2>" + UtilFormat.cleanString(event.getInventory().getType().toString()) + "</alt2> is disabled.");
                 event.setCancelled(true);
             }
 
@@ -231,8 +227,7 @@ public class WorldListener implements Listener {
                 if (block.getType().name().contains("OBSIDIAN") || block.getType() == Material.BEDROCK || block.getType() == Material.WATER_BUCKET
                         || block.getType() == Material.SPAWNER || block.getType() == Material.COBWEB
                         || block.getType() == Material.BREWING_STAND || block.getType().name().contains("_BED")) {
-                    UtilMessage.message(player, "Server", "You cannot place " + ChatColor.YELLOW
-                            + WordUtils.capitalizeFully(block.getType().toString()) + ChatColor.GRAY + ".");
+                    UtilMessage.simpleMessage(player, "Server", "You cannot place <alt2>" + WordUtils.capitalizeFully(block.getType().toString()) + "</alt2>.");
                     event.setCancelled(true);
                 }
             }

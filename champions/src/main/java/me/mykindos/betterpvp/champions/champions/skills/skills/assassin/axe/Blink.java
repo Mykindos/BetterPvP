@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.WeakHashMap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -16,7 +17,6 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.*;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
-import org.bukkit.ChatColor;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -27,8 +27,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
-
-import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -63,7 +61,7 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
                 "returning you to your original location.",
                 "Cannot be used while Slowed.",
                 "",
-                "Cooldown: " + ChatColor.GREEN + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level)
         };
     }
 
@@ -123,9 +121,9 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
             if (!championsManager.getCooldowns().isCooling(player, "Deblink") || force) {
 
                 if (!force) {
-                    UtilMessage.message(player, getClassType().getName(), "You used " + ChatColor.GREEN + "Deblink" + " " + getLevel(player) + ChatColor.GRAY + ".");
+                    UtilMessage.simpleMessage(player, getClassType().getName(), "You used <alt>Deblink " + getLevel(player) + "</alt>.");
                 } else {
-                    UtilMessage.message(player, getClassType().getName(), "The target location was invalid, Blink cooldown has been reduced.");
+                    UtilMessage.simpleMessage(player, getClassType().getName(), "The target location was invalid, Blink cooldown has been reduced.");
                     championsManager.getCooldowns().removeCooldown(player, "Blink", true);
                     championsManager.getCooldowns().add(player, "Blink", 2, true);
                 }
@@ -169,13 +167,12 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
 
 
         if (player.hasPotionEffect(PotionEffectType.SLOW)) {
-            UtilMessage.message(player, getClassType().getName(), "You cannot use " + getName() + " while Slowed.");
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You cannot use " + getName() + " while Slowed.");
             return false;
         }
 
         if (championsManager.getEffects().hasEffect(player, EffectType.STUN)) {
-            UtilMessage.message(player, getClassType().getName(), "You cannot use " + ChatColor.GREEN
-                    + getName() + ChatColor.GRAY + " while stunned.");
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You cannot use <alt>%s</alt> while stunned.", getName());
             return false;
         }
 

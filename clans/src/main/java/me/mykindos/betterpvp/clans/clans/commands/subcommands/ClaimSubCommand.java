@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.clans.clans.commands.subcommands;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.Optional;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
@@ -14,13 +15,10 @@ import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-
-import java.util.Optional;
 
 @Singleton
 @SubCommand(ClanCommand.class)
@@ -74,8 +72,7 @@ public class ClaimSubCommand extends ClanSubCommand {
             if (locationClan.equals(clan)) {
                 UtilMessage.message(player, "Clans", "Your clan already owns this territory");
             } else {
-                UtilMessage.message(player, "Clans", "This territory is owned by " + ChatColor.YELLOW + "Clan "
-                        + locationClan.getName() + ChatColor.GRAY + ".");
+                UtilMessage.message(player, "Clans", "This territory is owned by <alt2>Clan " + locationClan.getName() + "</alt2>.");
             }
             return;
         }
