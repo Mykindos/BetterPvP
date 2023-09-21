@@ -31,6 +31,10 @@ public class Bloodlust extends Skill implements PassiveSkill {
 
     private double duration;
 
+    private int radius;
+
+    private int maxStacks;
+
     @Inject
     public Bloodlust(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -45,11 +49,11 @@ public class Bloodlust extends Skill implements PassiveSkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "When an enemy dies within 15 blocks,",
+                "When an enemy dies within <val>" + radius + "</val> blocks,",
                 "you go into a Bloodlust, receiving",
-                "Speed 1 and Strength 1 for <val>" + (duration + level) + "</val> seconds.",
+                "Speed I and Strength I for <val>" + (duration + level) + "</val> seconds.",
                 "",
-                "Bloodlust can stack up to 3 times,",
+                "Bloodlust can stack up to <val>" + maxStacks + "</val> times,",
                 "boosting the level of Speed and Strength."};
     }
 
@@ -61,14 +65,14 @@ public class Bloodlust extends Skill implements PassiveSkill {
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
 
-        for (Player target : UtilPlayer.getNearbyEnemies(event.getEntity(), event.getEntity().getLocation(), 15)) {
+        for (Player target : UtilPlayer.getNearbyEnemies(event.getEntity(), event.getEntity().getLocation(), radius)) {
             int level = getLevel(target);
             if (level > 0) {
                 int tempStr = 0;
                 if (str.containsKey(target)) {
                     tempStr = str.get(target) + 1;
                 }
-                tempStr = Math.min(tempStr, 3);
+                tempStr = Math.min(tempStr, maxStacks);
                 str.put(target, tempStr);
                 time.put(target, (long) (System.currentTimeMillis() + duration * 1000));
                 if (target.hasPotionEffect(PotionEffectType.SPEED)) {
@@ -111,7 +115,7 @@ public class Bloodlust extends Skill implements PassiveSkill {
     @Override
     public void loadSkillConfig(){
         duration = getConfig("duration", 5.0, Double.class);
+        radius = getConfig("radius", 15, Integer.class);
+        maxStacks = getConfig("maxStacks", 3, Integer.class);
     }
-
-
 }
