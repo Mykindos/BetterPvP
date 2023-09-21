@@ -179,7 +179,7 @@ public class UtilMessage {
      * @param hover   Hover event to add to the message
      */
     public static void simpleMessage(CommandSender sender, String prefix, String message, Component hover) {
-        simpleMessage(sender, prefix, Component.text(message), hover);
+        simpleMessage(sender, prefix, deserialize(message), hover);
     }
 
     /**
