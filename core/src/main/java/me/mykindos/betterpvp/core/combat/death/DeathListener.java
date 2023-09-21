@@ -102,9 +102,9 @@ public class DeathListener implements Listener {
     public void finishCustomDeath(CustomDeathEvent event) {
         if (event.isCancelled()) return;
 
-        Component hoverComponent = Component.text("Damage Breakdown", NamedTextColor.GOLD);
+        Component hoverComponent = Component.text("Damage Breakdown", NamedTextColor.GOLD).appendNewline();
         for (var breakdown : damageLogManager.getDamageBreakdown(event.getKilled())) {
-            hoverComponent = hoverComponent.append(Component.text("\n" + breakdown.getKey() + ": ", NamedTextColor.YELLOW)
+            hoverComponent = hoverComponent.append(Component.text(breakdown.getKey() + ": ", NamedTextColor.YELLOW)
                     .append(Component.text(UtilMath.round(breakdown.getValue(), 1), NamedTextColor.GREEN)));
         }
 
