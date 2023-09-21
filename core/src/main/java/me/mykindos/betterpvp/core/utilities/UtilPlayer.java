@@ -15,6 +15,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -61,19 +62,7 @@ public class UtilPlayer {
     }
 
     public static int getPing(Player player) {
-        try {
-
-            Method getHandleMethod = player.getClass().getDeclaredMethod("getHandle");
-            Object entityPlayer = getHandleMethod.invoke(player);
-            Field pingField = entityPlayer.getClass().getDeclaredField("ping");
-            pingField.setAccessible(true);
-
-            int ping = pingField.getInt(entityPlayer);
-
-            return Math.max(ping, 0);
-        } catch (Exception e) {
-            return 1;
-        }
+        return player.getPing();
     }
 
     public static boolean isCreativeOrSpectator(Entity entity) {

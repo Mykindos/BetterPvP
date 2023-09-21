@@ -1,6 +1,6 @@
 create table if not exists ${tablePrefix}shopitems
 (
-    id         varchar(36)  not null,
+    id         int          auto_increment not null,
     Shopkeeper varchar(255) not null,
     Material   varchar(255) not null,
     ItemName   varchar(255) null,
@@ -11,12 +11,14 @@ create table if not exists ${tablePrefix}shopitems
     BuyPrice   int          not null,
     SellPrice  int          not null,
     constraint ${tablePrefix}shopitems_id_pk
-        primary key (id)
+        primary key (id),
+    constraint ${tablePrefix}shopitems_shopkeeper_material_itemname_uk
+        unique key (Shopkeeper, Material, ItemName)
 );
 
 create table if not exists ${tablePrefix}shopitems_dynamic_pricing
 (
-    shopItemId    varchar(36) not null,
+    shopItemId    int         not null,
     MinSellPrice  int         not null,
     BaseSellPrice int         not null,
     MaxSellPrice  int         not null,
@@ -32,9 +34,10 @@ create table if not exists ${tablePrefix}shopitems_dynamic_pricing
 
 create table if not exists ${tablePrefix}shopitems_flags
 (
-    id         int auto_increment primary key,
-    shopItemId varchar(36)  not null,
-    Flag       varchar(255) not null,
+    id              int auto_increment primary key,
+    shopItemId      int          not null,
+    PersistentKey   varchar(255) not null,
+    PersistentValue varchar(255) not null,
     constraint ${tablePrefix}shopitems_flags_shopitems_id_fk
         foreign key (shopItemId) references ${tablePrefix}shopitems (id)
 );
