@@ -2,17 +2,17 @@ package me.mykindos.betterpvp.shops.shops.shopkeepers;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.Objects;
+import java.util.UUID;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 import me.mykindos.betterpvp.shops.Shops;
 import me.mykindos.betterpvp.shops.shops.shopkeepers.types.*;
-import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
-
-import java.util.Objects;
-import java.util.UUID;
 
 @Singleton
 public class ShopkeeperManager extends Manager<IShopkeeper> {
@@ -34,12 +34,13 @@ public class ShopkeeperManager extends Manager<IShopkeeper> {
 
         configSection.getKeys(false).forEach(key -> {
             String type = shops.getConfig().getString("shopkeepers." + key + ".type");
-            String name = shops.getConfig().getString("shopkeepers." + key + ".name");
+            String rawName = shops.getConfig().getString("shopkeepers." + key + ".name", "");
+            TextComponent name = LegacyComponentSerializer.legacyAmpersand().deserialize(rawName);
             World world = Bukkit.getWorld(Objects.requireNonNull(shops.getConfig().getString("shopkeepers." + key + ".world")));
             double x = shops.getConfig().getDouble("shopkeepers." + key + ".x");
             double y = shops.getConfig().getDouble("shopkeepers." + key + ".y");
             double z = shops.getConfig().getDouble("shopkeepers." + key + ".z");
-
+            
             if(type == null) return;
 
             switch (type.toUpperCase()) {
@@ -63,10 +64,10 @@ public class ShopkeeperManager extends Manager<IShopkeeper> {
         });
     }
 
-    public void saveShopkeeper(String type, Component name, Location location) {
+    public void saveShopkeeper(String type, String rawName, Location location) {
         String tag = UUID.randomUUID().toString();
         shops.getConfig().set("shopkeepers." + tag + ".type", type);
-        shops.getConfig().set("shopkeepers." + tag + ".name", name);
+        shops.getConfig().set("shopkeepers." + tag + ".name", rawName);
         shops.getConfig().set("shopkeepers." + tag + ".world", location.getWorld().getName());
         shops.getConfig().set("shopkeepers." + tag + ".x", location.getX());
         shops.getConfig().set("shopkeepers." + tag + ".y", location.getY());
