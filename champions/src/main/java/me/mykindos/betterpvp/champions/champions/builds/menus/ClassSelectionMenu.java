@@ -5,12 +5,17 @@ import me.mykindos.betterpvp.champions.champions.builds.menus.buttons.ClassSelec
 import me.mykindos.betterpvp.champions.champions.skills.SkillManager;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.menu.Menu;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.awt.*;
+
 public class ClassSelectionMenu extends Menu {
     public ClassSelectionMenu(Player player, GamerBuilds builds, SkillManager skillManager) {
-        super(player, 36, "Class Customisation");
+        super(player, 36, Component.text("Class Customisation", NamedTextColor.GREEN).decorate(TextDecoration.BOLD));
         load(builds, skillManager);
     }
 

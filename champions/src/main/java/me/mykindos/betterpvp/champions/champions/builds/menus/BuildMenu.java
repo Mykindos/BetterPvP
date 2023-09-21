@@ -11,6 +11,9 @@ import me.mykindos.betterpvp.core.menu.Button;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.interfaces.IRefreshingMenu;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -24,7 +27,7 @@ public class BuildMenu extends Menu implements IRefreshingMenu {
     private final SkillManager skillManager;
 
     public BuildMenu(Player player, GamerBuilds builds, Role role, SkillManager skillManager) {
-        super(player, 54, ChatColor.GREEN.toString() + ChatColor.BOLD + role.getName() + " builds");
+        super(player, 54, Component.text(role.getName() + " builds", NamedTextColor.GREEN).decorate(TextDecoration.BOLD));
         this.builds = builds;
         this.role = role;
         this.skillManager = skillManager;

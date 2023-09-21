@@ -11,7 +11,6 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
 import org.bukkit.ChatColor;
@@ -109,8 +108,6 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
                     return;
                 }
 
-                UtilMessage.message(damager, getClassType().getName(), "You hit a " + ChatColor.YELLOW + UtilFormat.cleanString(damagee.getType().toString())
-                        + ChatColor.GRAY + " with " + ChatColor.GREEN + getName() + ChatColor.GRAY + ".");
                 running.remove(damager.getUniqueId());
             }
         }

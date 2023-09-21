@@ -14,7 +14,6 @@ import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
-import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 
@@ -72,7 +71,7 @@ public class ClansChatListener extends ClanListener {
 
                 event.cancel("Player has clan chat enabled");
 
-                String message = ChatColor.AQUA + playerName  + " " + ChatColor.DARK_AQUA + PlainTextComponentSerializer.plainText().serialize(event.getMessage());
+                String message = "<aqua>" + playerName  + " <dark_aqua>" +  PlainTextComponentSerializer.plainText().serialize(event.getMessage());
                 clan.messageClan(message, null, false);
 
             }
@@ -83,7 +82,7 @@ public class ClansChatListener extends ClanListener {
             if (allyChat) {
                 event.cancel("Player has ally chat enabled");
 
-                String message = ChatColor.DARK_GREEN + playerName + " " + ChatColor.GREEN + PlainTextComponentSerializer.plainText().serialize(event.getMessage());
+                String message = "dark_green" + playerName + " <green>" + PlainTextComponentSerializer.plainText().serialize(event.getMessage());
 
                 clan.getAlliances().forEach(alliance -> {
                     alliance.getClan().messageClan(message, null, false);
