@@ -67,7 +67,9 @@ public class LevelField extends Skill implements PassiveSkill, Listener {
             int nearbyAllies = UtilPlayer.getNearbyAllies(player, player.getLocation(), 10).size();
             int nearbyDifference = ((nearbyEnemies - 1) - nearbyAllies);
 
+            nearbyDifference = (nearbyDifference < -3 ? -3 : Math.min(nearbyDifference, 3));
             event.setDamage(event.getDamage() * (1 + (nearbyDifference * (nearbyDifference > 0 ? 0.20 : (0.20 - ((level - 1) * 0.05))))));
+
         }
     }
 
