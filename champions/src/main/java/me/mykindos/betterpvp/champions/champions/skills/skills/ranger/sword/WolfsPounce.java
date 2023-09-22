@@ -109,7 +109,7 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
     @Override
     public void loadSkillConfig(){
         baseCharge = getConfig("baseCharge", 40.0, Double.class);
-        baseDamage = getConfig("baseDamage", 40.0, Double.class);
+        baseDamage = getConfig("baseDamage", 2.0, Double.class);
     }
 
     @Override
