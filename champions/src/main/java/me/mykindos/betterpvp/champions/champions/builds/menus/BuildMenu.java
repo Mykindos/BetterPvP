@@ -26,7 +26,7 @@ public class BuildMenu extends Menu implements IRefreshingMenu {
     private final SkillManager skillManager;
 
     public BuildMenu(Player player, GamerBuilds builds, Role role, SkillManager skillManager) {
-        super(player, 54, Component.text(role.getName() + " builds", NamedTextColor.GREEN).decorate(TextDecoration.BOLD));
+        super(player, 54, Component.text(role.getName() + " Builds", NamedTextColor.BLACK).decorate(TextDecoration.BOLD));
         this.builds = builds;
         this.role = role;
         this.skillManager = skillManager;
