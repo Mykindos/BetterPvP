@@ -21,7 +21,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 @BPvPListener
 public class Vengeance extends Skill implements PassiveSkill, Listener {
 
-    private WeakHashMap<Player, Integer> playerNumHitsMap;
+    private final WeakHashMap<Player, Integer> playerNumHitsMap = new WeakHashMap<>();
 
     @Inject
     public Vengeance(Champions champions, ChampionsManager championsManager) {
