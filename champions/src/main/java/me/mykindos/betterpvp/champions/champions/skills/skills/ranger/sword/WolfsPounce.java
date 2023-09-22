@@ -39,6 +39,7 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
     private final WeakHashMap<Player, PounceData> pounceData = new WeakHashMap<>();
 
     private double baseCharge;
+    private double baseDamage;
 
     @Inject
     public WolfsPounce(Champions champions, ChampionsManager championsManager) {
@@ -61,7 +62,7 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
                 "",
                 "Charges <val>" + getChargePerSecond(level) + "%</val> per second.",
                 "Colliding with another player",
-                "mid-air deals up to #2#1 damage",
+                "mid-air deals up to <val>" + getDamage(level) + "</val> damage",
                 "and Slow 2 for 3 seconds.",
                 "",
                 "Recharge: <val>" + getCooldown(level)
@@ -75,6 +76,10 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
             return false;
         }
         return true;
+    }
+
+    private double getDamage(int level) {
+        return baseDamage + (level - 1);
     }
 
     private double getChargePerSecond(int level) {
@@ -104,6 +109,7 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
     @Override
     public void loadSkillConfig(){
         baseCharge = getConfig("baseCharge", 40.0, Double.class);
+        baseDamage = getConfig("baseDamage", 40.0, Double.class);
     }
 
     @Override
@@ -128,7 +134,7 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
 
     private void collide(Player damager, LivingEntity damagee, PounceData pounceData) {
         final int level = pounceData.getLevel();
-        double damage = (2 + level) * pounceData.getCharge();
+        double damage = getDamage(level) * pounceData.getCharge();
 
         // Effects & Damage
         UtilDamage.doCustomDamage(new CustomDamageEvent(damagee, damager, null, EntityDamageEvent.DamageCause.CUSTOM, damage, true, getName()));
