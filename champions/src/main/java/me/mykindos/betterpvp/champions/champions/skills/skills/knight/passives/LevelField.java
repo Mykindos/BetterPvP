@@ -22,6 +22,8 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 @BPvPListener
 public class LevelField extends Skill implements PassiveSkill, Listener {
 
+    //9/21/2023 Student TODO: Figure out what config values make sense
+    private int radius;
     @Inject
     public LevelField(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -35,11 +37,11 @@ public class LevelField extends Skill implements PassiveSkill, Listener {
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "For every enemy within 10 blocks,",
+                "For every enemy within <val>" + radius + "</val> blocks,",
                 "You deal <val>" +  (10 + ((level - 1) * 5)) + ".0%</val> extra damage",
                 "Up to a maximum of 60% extra damage",
                 "",
-                "For every ally within 10 blocks,",
+                "For every ally within <val>" + radius + "</val> blocks,",
                 "You deal <val>" + (10 + ((level - 1) * 5)) + ".0%</val> less damage",
                 "Down to a minimum of <val>" + (60 - ((level - 1) * 15)) + "%</val> less damage"
         };
@@ -63,8 +65,8 @@ public class LevelField extends Skill implements PassiveSkill, Listener {
 
         int level = getLevel(player);
         if (level > 0) {
-            int nearbyEnemies = UtilPlayer.getNearbyEnemies(player, player.getLocation(), 10).size();
-            int nearbyAllies = UtilPlayer.getNearbyAllies(player, player.getLocation(), 10).size();
+            int nearbyEnemies = UtilPlayer.getNearbyEnemies(player, player.getLocation(), radius).size();
+            int nearbyAllies = UtilPlayer.getNearbyAllies(player, player.getLocation(), radius).size();
             int nearbyDifference = ((nearbyEnemies - 1) - nearbyAllies);
 
             nearbyDifference = (nearbyDifference < -3 ? -3 : Math.min(nearbyDifference, 3));
@@ -72,5 +74,7 @@ public class LevelField extends Skill implements PassiveSkill, Listener {
 
         }
     }
-
+    public void loadSkillConfig() {
+        radius = getConfig("radius", 10, Integer.class);
+    }
 }
