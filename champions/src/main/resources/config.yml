@@ -111,6 +111,9 @@ skills:
     fury:
       enabled: true
       maxlevel: 3
+    vengeance:
+      enabled: true
+      maxlevel: 5
     thorns:
       enabled: true
       maxlevel: 3
