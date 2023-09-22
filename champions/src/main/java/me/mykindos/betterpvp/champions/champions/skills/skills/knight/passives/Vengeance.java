@@ -17,6 +17,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
+import java.util.WeakHashMap;
+
 @Singleton
 @BPvPListener
 public class Vengeance extends Skill implements PassiveSkill, Listener {
@@ -26,8 +28,6 @@ public class Vengeance extends Skill implements PassiveSkill, Listener {
     @Inject
     public Vengeance(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
-        playerNumHitsMap = new WeakHashMap<>();
-
     }
 
     @Override
@@ -60,25 +60,23 @@ public class Vengeance extends Skill implements PassiveSkill, Listener {
 
         int level = getLevel(player);
         if (level > 0) {
-            if(numHits>1){
+            int numHits = playerNumHitsMap.getOrDefault(player, 0);
+            if(numHits > 1){
                 player.getWorld().playSound(player.getLocation(), Sound.BLOCK_FIRE_EXTINGUISH, (float)2.0, (float)(1.5));
             }
-            numHits=0;
+            playerNumHitsMap.put(player, 0); 
         }
-
     }
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onHit(CustomDamageEvent event) {
         if (!(event.getDamager() instanceof Player player)) return;
+        if (event.isCancelled()) return;
+        if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
 
         int numHits = playerNumHitsMap.getOrDefault(player, 0);
         numHits++;
         playerNumHitsMap.put(player, numHits);
-        
-        if (event.isCancelled()) return;
-        if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
-        if (!(event.getDamager() instanceof Player player)) return;
 
         int level = getLevel(player);
         if (level > 0) {
