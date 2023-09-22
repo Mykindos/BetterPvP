@@ -36,7 +36,6 @@ public class Sever extends PrepareSkill implements CooldownSkill, Listener {
         return "Sever";
     }
 
-    //9/21/2023 Student TODO: Figure out how this skill actually works, and update the description/config
     @Override
     public String[] getDescription(int level) {
 

@@ -22,7 +22,6 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 @BPvPListener
 public class LevelField extends Skill implements PassiveSkill, Listener {
 
-    //9/21/2023 Student TODO: Figure out what config values make sense
     private int radius;
     @Inject
     public LevelField(Champions champions, ChampionsManager championsManager) {

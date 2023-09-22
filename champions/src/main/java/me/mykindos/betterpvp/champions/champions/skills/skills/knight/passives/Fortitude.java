@@ -30,7 +30,6 @@ public class Fortitude extends Skill implements PassiveSkill, Listener {
 
     private double heal;
 
-    //9/21/2023 Student TODO: Figure out how the health restoration work to give a good value in config
     @Inject
     public Fortitude(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
