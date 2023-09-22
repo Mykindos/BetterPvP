@@ -21,11 +21,13 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 @BPvPListener
 public class Vengeance extends Skill implements PassiveSkill, Listener {
 
-    private int numHits;
+    private WeakHashMap<Player, Integer> playerNumHitsMap;
 
     @Inject
     public Vengeance(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
+        playerNumHitsMap = new WeakHashMap<>();
+
     }
 
     @Override
@@ -68,7 +70,12 @@ public class Vengeance extends Skill implements PassiveSkill, Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onHit(CustomDamageEvent event) {
-        numHits+=1;
+        if (!(event.getDamager() instanceof Player player)) return;
+
+        int numHits = playerNumHitsMap.getOrDefault(player, 0);
+        numHits++;
+        playerNumHitsMap.put(player, numHits);
+        
         if (event.isCancelled()) return;
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
         if (!(event.getDamager() instanceof Player player)) return;
