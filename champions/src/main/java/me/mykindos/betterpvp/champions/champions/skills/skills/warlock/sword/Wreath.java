@@ -63,7 +63,7 @@ public class Wreath extends PrepareSkill implements CooldownSkill {
                 "that deal <val>" + String.format("%.2f", (2 + (level / 1.5))) + "</val> damage and",
                 "apply Slowness II to their target for <val>" + slowDuration + "</val> seconds.",
                 "",
-                "Recharge: <val>" + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level)
         };
     }
 

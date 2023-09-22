@@ -59,7 +59,7 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
                 "with lightning, shocking them for <val>" + shockDuration + "</val> and",
                 "giving them Slowness II for <val>" + slowDuration + "</val> seconds.",
                 "",
-                "Recharge: <val>" + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level)
         };
     }
 
