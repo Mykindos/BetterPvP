@@ -35,6 +35,7 @@ public class DefensiveStance extends ChannelSkill implements InteractSkill, Ener
 
     private final WeakHashMap<Player, Long> gap = new WeakHashMap<>();
 
+    private double damage;
     @Inject
     public DefensiveStance(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -55,7 +56,7 @@ public class DefensiveStance extends ChannelSkill implements InteractSkill, Ener
                 "While active, you are immune to all",
                 "melee damage from attacks infront of you.",
                 "",
-                "Players who attack you receive damage,",
+                "Players who attack you receive <val>" + damage + "</val> damage,",
                 "and get knocked back.",
                 "",
                 "Energy / Second: <val>" + getEnergy(level)};
@@ -94,7 +95,7 @@ public class DefensiveStance extends ChannelSkill implements InteractSkill, Ener
 
             event.getDamager().setVelocity(event.getDamagee().getEyeLocation().getDirection().add(new Vector(0, 0.5, 0)).multiply(1));
 
-            CustomDamageEvent customDamageEvent = new CustomDamageEvent(event.getDamager(), event.getDamagee(), null, DamageCause.CUSTOM, 2, false, getName());
+            CustomDamageEvent customDamageEvent = new CustomDamageEvent(event.getDamager(), event.getDamagee(), null, DamageCause.CUSTOM, damage, false, getName());
             UtilDamage.doCustomDamage(customDamageEvent);
 
             event.cancel(getName());
@@ -153,5 +154,10 @@ public class DefensiveStance extends ChannelSkill implements InteractSkill, Ener
     @Override
     public Action[] getActions() {
         return SkillActions.RIGHT_CLICK;
+    }
+
+    @Override
+    public void loadSkillConfig() {
+        damage = getConfig("damage", 2.0, Double.class);
     }
 }

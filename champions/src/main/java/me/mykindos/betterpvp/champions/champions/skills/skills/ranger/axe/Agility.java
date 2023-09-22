@@ -37,6 +37,8 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
 
     private double baseDuration;
 
+    private double damageReduction;
+
     @Inject
     public Agility(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -55,7 +57,7 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
                 "",
                 "Sprint with great agility, gaining",
                 "Speed I for <val>" + (baseDuration + level) + "</val> seconds.",
-                "You also take 60% reduced damage while active.",
+                "You also take <val>" + damageReduction + "%</val> reduced damage while active.",
                 "Agility ends if you interact",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
@@ -98,7 +100,7 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
         if (!(event.getDamager() instanceof Player damager)) return;
 
         if (active.contains(damagee.getUniqueId())) {
-            event.setDamage(event.getDamage() * 0.40);
+            event.setDamage(event.getDamage() * (1 - damageReduction));
             event.setKnockback(false);
             UtilMessage.message(damager, getClassType().getName(), damagee.getName() + " is using " + getName());
             damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 0.5F, 2.0F);
@@ -133,5 +135,6 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
     @Override
     public void loadSkillConfig() {
         baseDuration = getConfig("baseDuration", 3.0, Double.class);
+        damageReduction = getConfig("damageReduction", 0.60, Double.class);
     }
 }

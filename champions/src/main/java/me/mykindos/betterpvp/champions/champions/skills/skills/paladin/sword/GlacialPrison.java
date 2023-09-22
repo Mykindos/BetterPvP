@@ -53,7 +53,7 @@ public class GlacialPrison extends Skill implements InteractSkill, CooldownSkill
                 "Right click with a sword to Activate",
                 "",
                 "Launches an orb, trapping any players",
-                "within 5 blocks of it in a prison of ice for 5 seconds",
+                "within <val>" + sphereSize  + "</val> blocks of it in a prison of ice for <val>" + duration + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };

@@ -140,7 +140,7 @@ public class SmokeBomb extends Skill implements ToggleSkill, CooldownSkill, List
                 "Instantly vanish before your foes for a",
                 "maximum of <val>" + (3 + level) + "</val> seconds",
                 "hitting an enemy or using abilities",
-                " will make you reappear",
+                "will make you reappear",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };

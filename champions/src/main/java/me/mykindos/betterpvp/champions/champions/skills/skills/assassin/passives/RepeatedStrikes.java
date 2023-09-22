@@ -25,7 +25,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 @BPvPListener
 public class RepeatedStrikes extends Skill implements PassiveSkill, Listener {
 
-    private final WeakHashMap<Player, Integer> repeat = new WeakHashMap<>();
+    private final WeakHashMap<Player, Double> repeat = new WeakHashMap<>();
     private final WeakHashMap<Player, Long> last = new WeakHashMap<>();
 
     @Inject
@@ -39,15 +39,18 @@ public class RepeatedStrikes extends Skill implements PassiveSkill, Listener {
         return "Repeated Strikes";
     }
 
+    private double damageIncrement;
+    private double duration;
+
     @Override
     public String[] getDescription(int level) {
 
         return new String[]{
                 "Each time you attack, your damage",
-                "increases by 1",
-                "You can get up to <val>" + level + "</val> bonus damage.",
+                "increases by <val>" + damageIncrement + "</val>",
+                "You can deal up to <val>" + (level * damageIncrement) + "</val> bonus damage.",
                 "",
-                "Not attacking for 2 seconds clears",
+                "Not attacking for <val>" + duration + "</val> seconds clears",
                 "your bonus damage."};
     }
 
@@ -72,10 +75,10 @@ public class RepeatedStrikes extends Skill implements PassiveSkill, Listener {
         if (level > 0) {
 
             if (!repeat.containsKey(damager)) {
-                repeat.put(damager, 0);
+                repeat.put(damager, 0.0);
             }
             event.setDamage(event.getDamage() + repeat.get(damager));
-            repeat.put(damager, Math.min(level, repeat.get(damager) + 1));
+            repeat.put(damager, Math.min((level * damageIncrement), repeat.get(damager) + damageIncrement));
             last.put(damager, System.currentTimeMillis());
             event.setReason(getName());
 
@@ -89,7 +92,7 @@ public class RepeatedStrikes extends Skill implements PassiveSkill, Listener {
         HashSet<Player> remove = new HashSet<>();
 
         for (Player player : repeat.keySet()) {
-            if (UtilTime.elapsed(last.get(player), 2000)) {
+            if (UtilTime.elapsed(last.get(player), (long) duration * 1000)) {
                 remove.add(player);
             }
         }
@@ -99,5 +102,9 @@ public class RepeatedStrikes extends Skill implements PassiveSkill, Listener {
             last.remove(player);
         }
     }
-
+    @Override
+    public void loadSkillConfig(){
+        damageIncrement = getConfig("damageIncrement", 1.0, Double.class);
+        duration = getConfig("duration", 2.0, Double.class);
+    }
 }

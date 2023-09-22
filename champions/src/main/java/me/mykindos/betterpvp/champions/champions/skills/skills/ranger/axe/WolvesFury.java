@@ -47,7 +47,7 @@ public class WolvesFury extends Skill implements InteractSkill, CooldownSkill, L
                 "Right click with a axe to activate.",
                 "",
                 "Summon the power of the wolf, gaining",
-                "Strength 1 for <val>" + (baseDuration + level) + "</val> seconds, and giving",
+                "Strength I for <val>" + (baseDuration + level) + "</val> seconds, and giving",
                 "no knockback on your attacks.",
                 "",
                 "Cooldown: <val>" + getCooldown(level)

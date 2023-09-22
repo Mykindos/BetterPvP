@@ -28,6 +28,8 @@ public class Fortitude extends Skill implements PassiveSkill, Listener {
     private final WeakHashMap<Player, Integer> health = new WeakHashMap<>();
     private final WeakHashMap<Player, Long> last = new WeakHashMap<>();
 
+    private double heal;
+
     @Inject
     public Fortitude(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -45,7 +47,7 @@ public class Fortitude extends Skill implements PassiveSkill, Listener {
         return new String[]{
                 "After taking damage, you slowly",
                 "regenerate up to <val>" + (3 + (level - 1)) + "</val> health, at a",
-                "rate of 1 health per 1 seconds.",
+                "rate of <val>" + heal + "</val> health per second.",
                 "",
                 "This does not stack, and is reset",
                 "if you are hit again."};
@@ -93,5 +95,7 @@ public class Fortitude extends Skill implements PassiveSkill, Listener {
             last.remove(cur);
         }
     }
-
+    public void loadSkillConfig() {
+        heal = getConfig("heal", 1.0, Double.class);
+    }
 }

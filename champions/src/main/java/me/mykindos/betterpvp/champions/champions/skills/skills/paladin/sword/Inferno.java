@@ -59,7 +59,7 @@ public class Inferno extends ChannelSkill implements InteractSkill, EnergySkill 
                 "Hold Block with a sword to Channel.",
                 "",
                 "You spray fire at high speed,",
-                "igniting anything it hits.",
+                "igniting anything it hits for <val>" + ((double)fireTicks/ (double)20) + "</val> seconds.",
                 "",
                 "Energy / Second: <val>" + getEnergy(level)
         };
