@@ -13,6 +13,8 @@ public class CustomKnockbackEvent extends CustomCancellableEvent {
     private double damage;
     private final CustomDamageEvent customDamageEvent;
 
+    private boolean canBypassMinimum = false;
+
     public CustomKnockbackEvent(LivingEntity damagee, LivingEntity damager, double damage, CustomDamageEvent customDamageEvent) {
         this.damagee = damagee;
         this.damager = damager;

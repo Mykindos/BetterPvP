@@ -11,8 +11,8 @@ public class DynamicShopItem extends ShopItem {
     private final PolynomialFunctionLagrangeForm buyPolynomial;
     private final PolynomialFunctionLagrangeForm sellPolynomial;
 
-    public DynamicShopItem(String store, String itemName, Material material, int slot, int page, byte data, PolynomialData polynomialData) {
-        super(store, itemName, material, slot, page, data);
+    public DynamicShopItem(String store, String itemName, Material material, byte data, int slot, int page, int amount, PolynomialData polynomialData) {
+        super(store, itemName, material, data, slot, page, amount);
         this.polynomialData = polynomialData;
 
         var buyX = new double[]{0, polynomialData.getBaseStock(), polynomialData.getMaxStock()};

@@ -10,6 +10,8 @@ import me.mykindos.betterpvp.core.combat.events.CustomKnockbackEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -58,7 +60,10 @@ public class Colossus extends Skill implements PassiveSkill {
         if(cause == DamageCause.ENTITY_ATTACK || cause == DamageCause.PROJECTILE) {
             int level = getLevel(player);
             if(level > 0) {
+                event.setCanBypassMinimum(true);
+                Bukkit.broadcast(Component.text("A: " + event.getDamage()));
                 event.setDamage(event.getDamage() * (1 - ((reductionPerLevel * 0.01) * level)));
+                Bukkit.broadcast(Component.text("B: " + event.getDamage()));
             }
         }
 
