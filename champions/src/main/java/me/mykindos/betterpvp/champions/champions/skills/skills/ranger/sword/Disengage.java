@@ -57,7 +57,7 @@ public class Disengage extends PrepareSkill implements CooldownSkill {
                 "and your attacker receives Slow IV",
                 "for <val>" + (baseSlowDuration + level) + "</val> seconds.",
                 "",
-                "Recharge: <val>" + getCooldown(level)};
+                "Cooldown: <val>" + getCooldown(level)};
     }
 
     @Override

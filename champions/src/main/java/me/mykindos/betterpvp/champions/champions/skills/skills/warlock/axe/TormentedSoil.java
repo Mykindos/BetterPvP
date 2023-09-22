@@ -61,7 +61,7 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
                 "Players within the ring take <val>" + (damageIncrease * 100) + "%</val> more damage.",
                 "",
                 "Range: <val>" + (radius + (level / 2)) + "</val> blocks.",
-                "Recharge: <val>" + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level)
         };
     }
 

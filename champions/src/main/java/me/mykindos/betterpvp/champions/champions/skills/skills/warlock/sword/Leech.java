@@ -65,7 +65,7 @@ public class Leech extends PrepareSkill implements CooldownSkill {
                 "Linked targets have <val>" + leechedHealth + "</val> health leeched per second.",
                 "All leeched health is given to the caster.",
                 "",
-                "Recharge: <val>" + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level)
         };
     }
 
