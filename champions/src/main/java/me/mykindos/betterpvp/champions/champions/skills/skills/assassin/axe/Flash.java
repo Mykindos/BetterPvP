@@ -56,7 +56,7 @@ public class Flash extends Skill implements InteractSkill, Listener {
         return new String[]{
                 "Right click with a axe to activate.",
                 "",
-                "Instantly teleport forwards <val>8</val> Blocks.", //Student 9/21/2023: How does maxTravelDistance work?
+                "Instantly teleport forwards <val>8</val> Blocks.",
                 "Cannot be used while Slowed.",
                 "",
                 "Stores up to <val>" + maxCharges + "</val> charges.",

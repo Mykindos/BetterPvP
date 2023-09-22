@@ -57,7 +57,7 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
                 "",
                 "Sacrifice <val>" + UtilMath.round(100 - (0.50 + (level * 0.05)) * 100, 2) + "%</val> of your health to grant",
                 "yourself and allies within <val>" + (range + level) + "</val> blocks a barrier which reduces",
-                "the damage of the next <val>3</val> incoming attacks by <val>30%</val>", //Student 9/21/2023 this should probably be in config
+                "the damage of the next <val>3</val> incoming attacks by <val>30%</val>",
                 "",
                 "Barrier lasts up to <val>" + duration + "</val> , and does not stack.",
                 "",

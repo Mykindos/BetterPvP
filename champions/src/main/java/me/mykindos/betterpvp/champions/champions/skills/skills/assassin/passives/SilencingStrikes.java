@@ -45,7 +45,6 @@ public class SilencingStrikes extends Skill implements PassiveSkill, Listener {
     public String[] getDescription(int level) {
 
         return new String[]{
-                //Student 9/21/2023 reworded description to match how the skill actually works
                 "Hit a player <val>" + hitsNeeded + "</val> consecutive times without letting",
                 "<val>" + timeSpan + "</van> seconds pass.",
                 "to silence them for <val>" + (level) + "</val> seconds."
@@ -95,8 +94,6 @@ public class SilencingStrikes extends Skill implements PassiveSkill, Listener {
 
     @UpdateEvent
     public void onUpdate() {
-        //Student 9/21/2023 This seems to be the area where we reset if we have not hit
-        //This does not match the original skill description with original value of 800
         data.removeIf(silenceData -> UtilTime.elapsed(silenceData.getLastHit(), (long) timeSpan * 1000));
     }
 

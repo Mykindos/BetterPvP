@@ -78,7 +78,7 @@ public class RepeatedStrikes extends Skill implements PassiveSkill, Listener {
                 repeat.put(damager, 0.0);
             }
             event.setDamage(event.getDamage() + repeat.get(damager));
-            repeat.put(damager, Math.min((level * damageIncrement), repeat.get(damager) + damageIncrement)); //Student 9/21/2023: changed to double
+            repeat.put(damager, Math.min((level * damageIncrement), repeat.get(damager) + damageIncrement));
             last.put(damager, System.currentTimeMillis());
             event.setReason(getName());
 
