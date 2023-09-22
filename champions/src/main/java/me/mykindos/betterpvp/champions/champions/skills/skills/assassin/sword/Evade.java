@@ -58,7 +58,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
                 "teleport behind the attacker.",
                 "Crouch and Evade to teleport backwards.",
                 "",
-                "2 second internal cooldown.",
+                "<val>" + getCooldown(level) + "</val> second internal cooldown.",
                 "",
                 "Energy / second: <val>" + (10 * getEnergy(level))};
     }

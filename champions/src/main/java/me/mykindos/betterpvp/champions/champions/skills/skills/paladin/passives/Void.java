@@ -26,6 +26,9 @@ import org.bukkit.potion.PotionEffectType;
 @BPvPListener
 public class Void extends ActiveToggleSkill implements EnergySkill {
 
+    public int damageReduction;
+
+    public int energyReduction;
     @Inject
     public Void(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -45,8 +48,8 @@ public class Void extends ActiveToggleSkill implements EnergySkill {
                 "While in void form, you receive",
                 "Slownesss III, and take no Knockback",
                 "",
-                "Reduces incoming damage by 5, but",
-                "burns 20 of your energy",
+                "Reduces incoming damage by <val>" + damageReduction + "</val>, but",
+                "burns <val>" + energyReduction + "</val> of your energy",
                 "",
                 "Energy / Second: <val>" + getEnergy(level)
         };
@@ -100,13 +103,11 @@ public class Void extends ActiveToggleSkill implements EnergySkill {
 
         int level = getLevel(damagee);
         if (level > 0) {
-            event.setDamage(event.getDamage() - 5);
-            championsManager.getEnergy().degenerateEnergy(damagee, 0.20);
+            event.setDamage(event.getDamage() - damageReduction);
+            championsManager.getEnergy().degenerateEnergy(damagee, energyReduction * 0.01);
 
             event.setKnockback(false);
         }
-
-
     }
 
     @Override
@@ -132,5 +133,10 @@ public class Void extends ActiveToggleSkill implements EnergySkill {
                 UtilMessage.simpleMessage(player, getClassType().getName(), "Void: <green>On");
             }
         }
+    }
+
+    public void loadSkillConfig() {
+        damageReduction = getConfig("damageReduction", 5, Integer.class);
+        energyReduction = getConfig("energyReduction", 20, Integer.class);
     }
 }

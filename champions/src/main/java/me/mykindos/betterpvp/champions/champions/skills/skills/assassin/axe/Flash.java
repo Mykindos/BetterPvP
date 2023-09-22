@@ -56,10 +56,10 @@ public class Flash extends Skill implements InteractSkill, Listener {
         return new String[]{
                 "Right click with a axe to activate.",
                 "",
-                "Instantly teleport forwards 8 Blocks.",
+                "Instantly teleport forwards <val>8</val> Blocks.",
                 "Cannot be used while Slowed.",
                 "",
-                "Stores up to 4 charges.",
+                "Stores up to <val>" + maxCharges + "</val> charges.",
                 "",
                 "Cannot be used while Slowed.",
                 "Recharge: 1 charge per <val>" + (timeBetweenCharges - level) + "</val> seconds."

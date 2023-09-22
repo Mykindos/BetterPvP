@@ -32,8 +32,8 @@ public class Resistance extends Skill implements PassiveSkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "You take <val>" + (level * 15) + "</val>% less damage",
-                "but you deal <val>" + (level * 15) + "</val>% less as well"
+                "You take <val>" + (level * 15) + "%</val> less damage",
+                "but you deal <val>" + (level * 15) + "%</val> less as well"
         };
     }
 

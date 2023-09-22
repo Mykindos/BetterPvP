@@ -47,7 +47,7 @@ public class Deflection extends Skill implements PassiveSkill {
 
         return new String[]{
                 "Prepare to deflect incoming attacks",
-                "You gain 1 charge every 3 seconds.",
+                "You gain <val>1</val> charge every <val>" + timeBetweenCharges + "</val> seconds.",
                 "You can store a maximum of <val>" + (level) + "</val> charges",
                 "",
                 "When attacked, the damage you take is",

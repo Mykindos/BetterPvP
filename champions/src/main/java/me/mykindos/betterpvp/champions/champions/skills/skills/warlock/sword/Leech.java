@@ -39,6 +39,9 @@ public class Leech extends PrepareSkill implements CooldownSkill {
     private final List<LeechData> leechData = new ArrayList<>();
     private final List<LeechData> removeList = new ArrayList<>();
 
+    private int range;
+
+    private double leechedHealth;
     @Inject
     public Leech(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -54,10 +57,10 @@ public class Leech extends PrepareSkill implements CooldownSkill {
     public String[] getDescription(int level) {
         return new String[]{"Right click with a sword to activate.",
                 "",
-                "Create a soul link between all enemies within 7 blocks",
+                "Create a soul link between all enemies within <val>" + range + "</val> blocks",
                 "of your target, and all enemies within 7 blocks of them",
                 "",
-                "Linked targets have 1 health leeched per second.",
+                "Linked targets have <val>" + leechedHealth + "</val> health leeched per second.",
                 "All leeched health is given to the caster.",
                 "",
                 "Recharge: <val>" + getCooldown(level)
@@ -90,7 +93,7 @@ public class Leech extends PrepareSkill implements CooldownSkill {
 
     private void chainEnemies(Player player, LivingEntity link) {
         List<LivingEntity> temp = new ArrayList<>();
-        for (var entAData : UtilEntity.getNearbyEntities(player, link.getLocation(), 7, EntityProperty.ENEMY)) {
+        for (var entAData : UtilEntity.getNearbyEntities(player, link.getLocation(), range, EntityProperty.ENEMY)) {
             LivingEntity entA = entAData.get();
             if (isNotLinked(player, entA)) {
                 leechData.add(new LeechData(player, link, entA));
@@ -101,7 +104,7 @@ public class Leech extends PrepareSkill implements CooldownSkill {
         }
 
         for (LivingEntity entA : temp) {
-            for (var entBData : UtilEntity.getNearbyEntities(player, entA.getLocation(), 7, EntityProperty.ENEMY)) {
+            for (var entBData : UtilEntity.getNearbyEntities(player, entA.getLocation(), range, EntityProperty.ENEMY)) {
                 LivingEntity entB = entBData.get();
                 if (isNotLinked(player, entB)) {
                     leechData.add(new LeechData(player, entA, entB));
@@ -243,10 +246,10 @@ public class Leech extends PrepareSkill implements CooldownSkill {
     @UpdateEvent(delay = 1000)
     public void dealDamage() {
         for (LeechData leech : leechData) {
-            CustomDamageEvent leechDmg = new CustomDamageEvent(leech.getTarget(), leech.getOwner(), null, EntityDamageEvent.DamageCause.MAGIC, 1, false, getName());
+            CustomDamageEvent leechDmg = new CustomDamageEvent(leech.getTarget(), leech.getOwner(), null, EntityDamageEvent.DamageCause.MAGIC, leechedHealth, false, getName());
             leechDmg.setIgnoreArmour(true);
             UtilDamage.doCustomDamage(leechDmg);
-            UtilPlayer.health(leech.getOwner(), 1);
+            UtilPlayer.health(leech.getOwner(), leechedHealth);
         }
     }
 
@@ -270,6 +273,12 @@ public class Leech extends PrepareSkill implements CooldownSkill {
     }
 
 
+    @Override
+    public void loadSkillConfig(){
+        range = getConfig("range", 7, Integer.class);
+        leechedHealth = getConfig("leechedHealth", 1.0, Double.class);
+    }
+
     @Data
     private static class LeechData {
         private final Player owner;
@@ -278,4 +287,7 @@ public class Leech extends PrepareSkill implements CooldownSkill {
         private final LivingEntity target;
 
     }
+
+
+
 }

@@ -34,6 +34,7 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergySkill
 
     private final WeakHashMap<Snowball, Player> snow = new WeakHashMap<>();
 
+    private double slowDuration;
     @Inject
     public Blizzard(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -52,7 +53,7 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergySkill
                 "Hold Right click with a sword to activate.",
                 "",
                 "While channeling, release a blizzard",
-                "that slows anyone hit for 2 seconds.",
+                "that gives Slowness III to anyone hit for <val>" + slowDuration + "</val> seconds.",
                 "",
                 "Energy: <val>" + getEnergy(level)
         };
@@ -88,7 +89,7 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergySkill
                 }
 
                 damagee.setVelocity(event.getProjectile().getVelocity().multiply(0.1).add(new Vector(0, 0.25, 0)));
-                damagee.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 2));
+                damagee.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) slowDuration * 20, 2));
 
                 event.cancel("Snowball");
                 snow.remove(snowball);
@@ -132,5 +133,9 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergySkill
     @Override
     public Action[] getActions() {
         return SkillActions.RIGHT_CLICK;
+    }
+
+    public void loadSkillConfig() {
+        slowDuration = getConfig("slowDuration", 2.0, Double.class);
     }
 }

@@ -40,7 +40,7 @@ public class LevitatingShot extends PrepareArrowSkill {
                 "Left click to activate.",
                 "",
                 "Your next arrow is tipped with mysterious magic,",
-                "causing the next target you hit to receive Levitation for <val>" + (3.5 + (level * .5)) + "</val> seconds.",
+                "causing the next target you hit to receive Levitation II for <val>" + (3.5 + (level * .5)) + "</val> seconds.",
                 "",
                 "Players with levitation are unable to use abilities.",
                 "",
