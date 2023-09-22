@@ -38,6 +38,8 @@ public class MoltenBlast extends Skill implements InteractSkill, CooldownSkill, 
 
     public final List<LargeFireball> fireballs = new ArrayList<>();
 
+    private double damage;
+
     @Inject
     public MoltenBlast(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -56,7 +58,7 @@ public class MoltenBlast extends Skill implements InteractSkill, CooldownSkill, 
                 "Right click with an Axe to Activate",
                 "",
                 "Shoot a large fireball that deals",
-                "area of effect damage, and igniting any players hit",
+                "<val>" + damage + "</val> area of effect damage, and igniting any players hit",
                 "for <val>" + (level * 0.5) + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
@@ -116,7 +118,7 @@ public class MoltenBlast extends Skill implements InteractSkill, CooldownSkill, 
             if (fireball instanceof LargeFireball && fireball.getShooter() instanceof Player player) {
 
                 event.setKnockback(true);
-                event.setDamage(6);
+                event.setDamage(damage);
                 event.setReason(getName());
                 UtilServer.runTaskLater(champions, () -> event.getDamagee().setFireTicks((int) (20 * (0 + (getLevel(player) * 0.5)))), 2);
 
@@ -162,6 +164,7 @@ public class MoltenBlast extends Skill implements InteractSkill, CooldownSkill, 
     @Override
     public void loadSkillConfig(){
         speed = getConfig("speed", 2.0, Double.class);
+        damage = getConfig("damage", 6.0, Double.class);
     }
 
     @Override

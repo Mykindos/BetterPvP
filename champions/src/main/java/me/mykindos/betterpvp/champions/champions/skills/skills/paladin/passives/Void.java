@@ -103,7 +103,7 @@ public class Void extends ActiveToggleSkill implements EnergySkill {
 
         int level = getLevel(damagee);
         if (level > 0) {
-            event.setDamage(event.getDamage() - 5);
+            event.setDamage(event.getDamage() - damageReduction);
             championsManager.getEnergy().degenerateEnergy(damagee, energyReduction * 0.01);
 
             event.setKnockback(false);
