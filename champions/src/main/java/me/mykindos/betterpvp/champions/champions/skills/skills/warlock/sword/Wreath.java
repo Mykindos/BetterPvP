@@ -41,6 +41,9 @@ public class Wreath extends PrepareSkill implements CooldownSkill {
     private final WeakHashMap<Player, Integer> actives = new WeakHashMap<>();
     private final WeakHashMap<Player, Long> cooldowns = new WeakHashMap<>();
 
+    private int numAttacks;
+    private double slowDuration;
+
     @Inject
     public Wreath(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -56,8 +59,9 @@ public class Wreath extends PrepareSkill implements CooldownSkill {
         return new String[]{
                 "Right click with a sword to prepare.",
                 "",
-                "Your next <val>3</val> attacks will release a barrage of teeth",
-                "that deal <val>" + String.format("%.2f", (2 + (level / 1.5))) + "</val> damage and slow their target.",
+                "Your next <val>" + numAttacks + "</val> attacks will release a barrage of teeth",
+                "that deal <val>" + String.format("%.2f", (2 + (level / 1.5))) + "</val> damage and",
+                "apply Slowness II to their target for <val>" + slowDuration + "</val> seconds.",
                 "",
                 "Recharge: <val>" + getCooldown(level)
         };
@@ -153,7 +157,7 @@ public class Wreath extends PrepareSkill implements CooldownSkill {
                     for (LivingEntity target : UtilEntity.getNearbyEnemies(player, fangs.getLocation(), 1.5)) {
                         CustomDamageEvent dmg = new CustomDamageEvent(target, player, null, EntityDamageEvent.DamageCause.CUSTOM, 2 + (level / 1.5), false, getName());
                         UtilDamage.doCustomDamage(dmg);
-                        target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 1));
+                        target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) (slowDuration * 20), 1));
                     }
 
                 }
@@ -205,5 +209,10 @@ public class Wreath extends PrepareSkill implements CooldownSkill {
         }
 
         return true;
+    }
+    @Override
+    public void loadSkillConfig(){
+        numAttacks = getConfig("numAttacks", 3, Integer.class);
+        slowDuration = getConfig("slowDuration", 2.0, Double.class);
     }
 }
