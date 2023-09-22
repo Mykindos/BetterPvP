@@ -281,6 +281,11 @@ skills:
       radius: 10
       duration: 2.0
   ranger:
+    wolfspounce:
+      enabled: true
+      maxlevel: 4
+      cooldown: 8
+      baseCharge: 40.0
     stunningshot:
       enabled: true
       maxlevel: 5
