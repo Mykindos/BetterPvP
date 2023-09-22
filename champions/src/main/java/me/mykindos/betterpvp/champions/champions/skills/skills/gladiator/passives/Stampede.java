@@ -53,7 +53,7 @@ public class Stampede extends Skill implements PassiveSkill {
                 "of Speed III.",
                 "",
                 "Attacking during stampede deals",
-                "<val>" + damage + "bonus damage per speed level."};
+                "<val>" + damage + "</val> bonus damage per speed level."};
     }
 
     @Override
