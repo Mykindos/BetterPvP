@@ -34,7 +34,7 @@ public class FastRecovery extends Skill implements PassiveSkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Increase your energy regeneration speed",
+                "Increase your energy regeneration speed,",
                 "by <val>" + ((percentagePerLevel * 100) * level) + "%",
                 "",
                 "Does not work with legendary items equipped."
