@@ -41,6 +41,8 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
     private double baseCharge;
     private double baseDamage;
 
+    private double slowDuration;
+
     @Inject
     public WolfsPounce(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -63,7 +65,7 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
                 "Charges <val>" + getChargePerSecond(level) + "%</val> per second.",
                 "Colliding with another player",
                 "mid-air deals up to <val>" + getDamage(level) + "</val> damage",
-                "and Slow 2 for 3 seconds.",
+                "and Slowness II for <val>" + slowDuration + "</val> seconds.",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -110,6 +112,7 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
     public void loadSkillConfig(){
         baseCharge = getConfig("baseCharge", 40.0, Double.class);
         baseDamage = getConfig("baseDamage", 2.0, Double.class);
+        slowDuration = getConfig("slowDuration", 3.0, Double.class);
     }
 
     @Override
@@ -138,7 +141,7 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
 
         // Effects & Damage
         UtilDamage.doCustomDamage(new CustomDamageEvent(damagee, damager, null, EntityDamageEvent.DamageCause.CUSTOM, damage, true, getName()));
-        damagee.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 3 * 20, 1));
+        damagee.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) slowDuration * 20, 1));
 
         // Cues
         UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit <alt2>%s</alt2> with <alt>%s %s</alt>.", damagee.getName(), getName(), level);
