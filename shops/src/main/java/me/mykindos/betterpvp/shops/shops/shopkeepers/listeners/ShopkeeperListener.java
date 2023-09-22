@@ -7,13 +7,19 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
 import me.mykindos.betterpvp.shops.shops.shopkeepers.ShopkeeperManager;
+import me.mykindos.betterpvp.shops.shops.shopkeepers.types.IShopkeeper;
 import me.mykindos.betterpvp.shops.shops.shopkeepers.types.ParrotShopkeeper;
+import net.minecraft.world.entity.LivingEntity;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Jukebox;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.Optional;
 
 @BPvPListener
 public class ShopkeeperListener implements Listener {
@@ -23,6 +29,14 @@ public class ShopkeeperListener implements Listener {
     @Inject
     public ShopkeeperListener(ShopkeeperManager shopkeeperManager) {
         this.shopkeeperManager = shopkeeperManager;
+    }
+
+    @EventHandler
+    public void onInteract(PlayerInteractEntityEvent event) {
+        if (event.getHand() == EquipmentSlot.OFF_HAND) return;
+        if (!(event.getRightClicked() instanceof LivingEntity target)) return;
+
+        Optional<IShopkeeper> shopkeeperOptional = shopkeeperManager.getObject(target.getUUID());
     }
 
     @EventHandler
