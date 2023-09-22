@@ -26,6 +26,9 @@ import org.bukkit.util.Vector;
 @BPvPListener
 public class Siphon extends Skill implements PassiveSkill {
 
+    private int radius;
+
+    private double energySiphoned;
     @Inject
     public Siphon(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -39,10 +42,10 @@ public class Siphon extends Skill implements PassiveSkill {
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Siphon energy from all enemies within <val>" + (4 + level) + "</val> blocks,",
+                "Siphon energy from all enemies within <val>" + (radius + level) + "</val> blocks,",
                 "Granting you Speed II and sometimes a small amount of health.",
                 "",
-                "Energy siphoned per second: <val>" + 5
+                "Energy siphoned per second: <val>" + energySiphoned
         };
     }
 
@@ -56,8 +59,8 @@ public class Siphon extends Skill implements PassiveSkill {
         for (Player player : Bukkit.getOnlinePlayers()) {
             int level = getLevel(player);
             if(level > 0) {
-                for(Player target : UtilPlayer.getNearbyEnemies(player, player.getLocation(), 4+ level)) {;
-                    championsManager.getEnergy().degenerateEnergy(target, 0.1f);
+                for(Player target : UtilPlayer.getNearbyEnemies(player, player.getLocation(), radius + level)) {;
+                    championsManager.getEnergy().degenerateEnergy(target, ((float) energySiphoned)/10.0f);
                     new BukkitRunnable() {
                         private final Location position = target.getLocation().add(0, 1, 0);
 
@@ -95,4 +98,9 @@ public class Siphon extends Skill implements PassiveSkill {
         return SkillType.PASSIVE_B;
     }
 
+    @Override
+    public void loadSkillConfig() {
+        radius = getConfig("radius", 4, Integer.class);
+        energySiphoned = getConfig("energySiphoned", 1.0, Double.class);
+    }
 }

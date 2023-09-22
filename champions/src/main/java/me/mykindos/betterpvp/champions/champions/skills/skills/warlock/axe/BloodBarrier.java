@@ -39,6 +39,10 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
     private double duration;
     private int range;
 
+    private double damageReduction;
+
+    private int numAttacksToReduce;
+
     @Inject
     public BloodBarrier(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -57,7 +61,7 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
                 "",
                 "Sacrifice <val>" + UtilMath.round(100 - (0.50 + (level * 0.05)) * 100, 2) + "%</val> of your health to grant",
                 "yourself and allies within <val>" + (range + level) + "</val> blocks a barrier which reduces",
-                "the damage of the next <val>3</val> incoming attacks by <val>30%</val>",
+                "the damage of the next <val>" + numAttacksToReduce + "</val> incoming attacks by <val>" + (damageReduction * 100) + "%</val>",
                 "",
                 "Barrier lasts up to <val>" + duration + "</val> , and does not stack.",
                 "",
@@ -83,7 +87,7 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
 
             ShieldData shieldData = shieldDataMap.get(player.getUniqueId());
             if (shieldData != null) {
-                event.setDamage(event.getDamage() * 0.70);
+                event.setDamage(event.getDamage() * (1 - damageReduction));
                 shieldData.count--;
             }
         }
@@ -153,9 +157,9 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
 
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_EVOKER_PREPARE_ATTACK, 2.0f, 1.0f);
 
-        shieldDataMap.put(player.getUniqueId(), new ShieldData((long) (duration * 1000)));
+        shieldDataMap.put(player.getUniqueId(), new ShieldData((long) (duration * 1000), numAttacksToReduce));
         for (Player ally : UtilPlayer.getNearbyAllies(player, player.getLocation(), range + level)) {
-            shieldDataMap.put(ally.getUniqueId(), new ShieldData((long) (duration * 1000)));
+            shieldDataMap.put(ally.getUniqueId(), new ShieldData((long) (duration * 1000), numAttacksToReduce));
         }
     }
 
@@ -168,6 +172,8 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
     public void loadSkillConfig(){
         range = getConfig("range", 8, Integer.class);
         duration = getConfig("duration", 60.0, Double.class);
+        damageReduction = getConfig("damageReduction", 0.30, Double.class);
+        numAttacksToReduce = getConfig("numAttacksToReduce", 3, Integer.class);
     }
 
     @Data
@@ -177,8 +183,9 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
 
         public int count = 3;
 
-        public ShieldData(long length) {
+        public ShieldData(long length, int count) {
             this.endTime = System.currentTimeMillis() + length;
+            this.count = count;
         }
 
     }
