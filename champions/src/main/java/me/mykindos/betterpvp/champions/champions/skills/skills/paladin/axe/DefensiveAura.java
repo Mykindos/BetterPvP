@@ -80,7 +80,6 @@ public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill
                 if (targetMaxHealth != null) {
                     target.setHealth(Math.min(target.getHealth() + 4, targetMaxHealth.getValue()));
                 }
-
             }
         }
     }

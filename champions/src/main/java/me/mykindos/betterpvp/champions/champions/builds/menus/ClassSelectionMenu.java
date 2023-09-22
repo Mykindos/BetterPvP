@@ -15,7 +15,7 @@ import java.awt.*;
 
 public class ClassSelectionMenu extends Menu {
     public ClassSelectionMenu(Player player, GamerBuilds builds, SkillManager skillManager) {
-        super(player, 36, Component.text("Class Customisation", NamedTextColor.GREEN).decorate(TextDecoration.BOLD));
+        super(player, 36, Component.text("Class Customisation", NamedTextColor.BLACK).decorate(TextDecoration.BOLD));
         load(builds, skillManager);
     }
 
