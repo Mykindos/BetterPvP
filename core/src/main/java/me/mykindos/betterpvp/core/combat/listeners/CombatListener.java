@@ -303,9 +303,6 @@ public class CombatListener implements Listener {
             }
         }
 
-        if (knockback < 2.0D) knockback = 2.0D;
-        knockback = Math.log10(knockback);
-
         event.setDamage(knockback);
     }
 
@@ -313,15 +310,25 @@ public class CombatListener implements Listener {
     public void onFinalKB(CustomKnockbackEvent event) {
 
         double knockback = event.getDamage();
-        if (knockback < 2.0D) knockback = 2.0D;
+        if (knockback < 2.0D && !event.isCanBypassMinimum()) knockback = 2.0D;
         knockback = Math.log10(knockback);
 
         Vector trajectory = UtilVelocity.getTrajectory2d(event.getDamager(), event.getDamagee());
-        trajectory.multiply(0.8D * knockback);
+        trajectory.multiply(0.6D * knockback);
         trajectory.setY(Math.abs(trajectory.getY()));
 
+        if (event.getCustomDamageEvent().getProjectile() != null)
+        {
+            trajectory =event.getCustomDamageEvent().getProjectile().getVelocity();
+            trajectory.setY(0);
+            trajectory.multiply(0.37 * knockback / trajectory.length());
+            trajectory.setY(0.06);
+        }
+
+        double velocity = 0.2D + trajectory.length() * 0.8D;
+
         UtilVelocity.velocity(event.getDamagee(),
-                trajectory, 0.3D + trajectory.length() * 0.8D, false, 0.0D, Math.abs(0.2D * knockback), 0.4D + 0.04D * knockback, true);
+                trajectory, velocity, false, 0.0D, Math.abs(0.2D * knockback), 0.4D + (0.04D * knockback), true);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)

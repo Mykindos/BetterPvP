@@ -48,7 +48,7 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener {
                 "and applying shock for <val>" + (level / 2) + "</val> seconds.",
                 "Silences enemy for <val>" + (level / 2) + "</val> seconds",
                 "",
-                "Recharge: <val>" + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level)
         };
     }
 

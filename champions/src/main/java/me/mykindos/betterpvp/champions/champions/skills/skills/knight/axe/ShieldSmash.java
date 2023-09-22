@@ -2,6 +2,8 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.knight.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+
+import java.util.Collection;
 import java.util.List;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
@@ -15,10 +17,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilDamage;
-import me.mykindos.betterpvp.core.utilities.UtilEntity;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import me.mykindos.betterpvp.core.utilities.*;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -55,7 +54,7 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
                 "Smash your shield into an enemy",
                 "dealing <val>" + (int) (getKnockbackMultiplier(level) * 100) + "%</val> knockback.",
                 "",
-                "Recharge: <val>" + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level)
         };
     }
 
@@ -97,8 +96,9 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
         bashLocation.add(player.getLocation().getDirection().setY(0).normalize().multiply(1.5));
 
         // Visual Cues
-        Particle.CLOUD.builder().extra(0.05f).count(6).location(bashLocation).receivers(60, true).spawn();
-        Particle.EXPLOSION_LARGE.builder().extra(0).count(1).location(bashLocation).receivers(60, true).spawn();
+        Collection<Player> receivers = player.getWorld().getNearbyPlayers(player.getLocation(), 60);
+        Particle.CLOUD.builder().extra(0.05f).count(6).location(bashLocation).receivers(receivers).spawn();
+        Particle.EXPLOSION_LARGE.builder().extra(0).count(1).location(bashLocation).receivers(receivers).spawn();
 
         // Skill
         Vector direction = player.getLocation().getDirection();

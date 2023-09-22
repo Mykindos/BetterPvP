@@ -11,11 +11,12 @@ public interface IShopItem {
     String getStore();
     String getItemName();
     Material getMaterial();
-
+    byte getData();
     int getSlot();
     int getPage();
+    int getAmount();
 
-    byte getData();
+
 
 
 }

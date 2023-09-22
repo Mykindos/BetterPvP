@@ -41,6 +41,8 @@ public class Leech extends PrepareSkill implements CooldownSkill {
 
     private int range;
 
+    private int maxRangeFromCaster;
+
     private double leechedHealth;
     @Inject
     public Leech(Champions champions, ChampionsManager championsManager) {
@@ -58,12 +60,12 @@ public class Leech extends PrepareSkill implements CooldownSkill {
         return new String[]{"Right click with a sword to activate.",
                 "",
                 "Create a soul link between all enemies within <val>" + range + "</val> blocks",
-                "of your target, and all enemies within 7 blocks of them",
+                "of your target, and all enemies within <val>" + range + "</val> blocks of them and within <val>" + maxRangeFromCaster + "</val> blocks of you",
                 "",
                 "Linked targets have <val>" + leechedHealth + "</val> health leeched per second.",
                 "All leeched health is given to the caster.",
                 "",
-                "Recharge: <val>" + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level)
         };
     }
 
@@ -200,7 +202,7 @@ public class Leech extends PrepareSkill implements CooldownSkill {
                 continue;
             }
 
-            if (leech.getTarget().getLocation().distance(leech.getLinkedTo().getLocation()) > 7
+            if (leech.getTarget().getLocation().distance(leech.getLinkedTo().getLocation()) > range
                     || leech.getTarget().getLocation().distance(leech.getOwner().getLocation()) > 21) {
                 if (leech.getLinkedTo().getUniqueId().equals(leech.getOwner().getUniqueId())) {
                     breakChain(leech);
@@ -277,6 +279,7 @@ public class Leech extends PrepareSkill implements CooldownSkill {
     public void loadSkillConfig(){
         range = getConfig("range", 7, Integer.class);
         leechedHealth = getConfig("leechedHealth", 1.0, Double.class);
+        maxRangeFromCaster = getConfig("maxRangeFromCaster", 21, Integer.class);
     }
 
     @Data

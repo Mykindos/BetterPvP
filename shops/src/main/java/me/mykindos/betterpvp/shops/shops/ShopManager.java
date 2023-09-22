@@ -20,6 +20,7 @@ public class ShopManager {
     @Inject
     public ShopManager(ShopItemRepository shopItemRepository) {
         this.shopItemRepository = shopItemRepository;
+        loadShopItems();
     }
 
     public void loadShopItems() {

@@ -39,7 +39,7 @@ public class SkillMenu extends Menu implements IRefreshingMenu {
     private final RoleBuild roleBuild;
 
     public SkillMenu(Player player, GamerBuilds builds, Role role, int buildNumber, SkillManager skillManager) {
-        super(player, 54, Component.text("Skill Page", NamedTextColor.GREEN));
+        super(player, 54, Component.text("Skill Page", NamedTextColor.BLACK));
         this.role = role;
         this.skillManager = skillManager;
 

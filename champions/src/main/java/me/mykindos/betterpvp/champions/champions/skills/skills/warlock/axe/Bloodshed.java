@@ -44,7 +44,7 @@ public class Bloodshed extends Skill implements InteractSkill, CooldownSkill, Li
                 "Sacrifice <val>" + UtilMath.round(100 - ((0.50 + (level * 0.05)) * 100), 2) + "%" + "</val> of your health to grant",
                 "yourself Speed III for <val>" + duration + "</val> seconds.",
                 "",
-                "Recharge: <val>" + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level)
         };
     }
 
