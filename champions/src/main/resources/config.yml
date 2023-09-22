@@ -140,6 +140,13 @@ skills:
       enabled: true
       cooldown: 12
       maxlevel: 5
+    boulder:
+      enabled: true
+      cooldown: 25
+      maxlevel: 5
+      radius: 5.0
+      baseHeal: 2.0
+      baseDamage: 3.0
     inferno:
       enabled: true
       maxlevel: 5
