@@ -42,7 +42,7 @@ public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill
                 "Right click with a axe to Activate",
                 "",
                 "Gives you, and all allies within <val>" + (6 + level) + "</val> blocks",
-                "Health Boost I for <val>" + duration + "</val> seconds",
+                "<effect>Health Boost I</effect> for <stat>" + duration + "</stat> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
