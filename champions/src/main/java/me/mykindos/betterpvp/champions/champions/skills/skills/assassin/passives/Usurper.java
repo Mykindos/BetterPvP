@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.ToggleSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.CustomKnockbackEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
@@ -21,6 +22,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.potion.PotionEffect;
@@ -48,10 +50,14 @@ public class Usurper extends Skill implements ToggleSkill, CooldownSkill, Listen
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Must be above half health to use",
+                "Drop Sword / Axe to Activate",
                 "",
-                "Reduce yourself to 3 hearts and take double knockback,",
-                "But receive <val>"+ (70 + ((level - 1) * 5)) +"%</val> reduced damage and speed III for <val>" + (baseDuration + (level-1) * 0.5) + "</val> seconds",
+                "Must be above 50% health",
+                "",
+                "You reduce yourself to 3 hearts",
+                "And take double knockback",
+                "But receive <val>"+ (70 + ((level - 1) * 5)) +"%</val> reduced damage",
+                "And speed III for <val>" + (baseDuration + (level-1) * 0.5) + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -75,9 +81,12 @@ public class Usurper extends Skill implements ToggleSkill, CooldownSkill, Listen
             Particle.EXPLOSION_NORMAL.builder().location(player.getLocation()).receivers(30).spawn();
             active.add(player.getUniqueId());
 
-
+            Bukkit.getScheduler().runTaskLater(champions, () -> {
+                active.remove(player.getUniqueId());
+            }, (long) ((baseDuration + level) * 20));
         }
     }
+
 
     @EventHandler
     public void onDamage(CustomDamageEvent event) {
@@ -89,12 +98,23 @@ public class Usurper extends Skill implements ToggleSkill, CooldownSkill, Listen
             UtilMessage.message(damager, getClassType().getName(), damagee.getName() + " is using " + getName());
             damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.5F, 2.0F);
         }
-
-        if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
-            active.remove(damager.getUniqueId());
-        }
-
     }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onKB(CustomKnockbackEvent event) {
+        if(!(event.getDamagee() instanceof Player player)) return;
+
+        if(!active.contains(player.getUniqueId())) return;
+
+        EntityDamageEvent.DamageCause cause = event.getCustomDamageEvent().getCause();
+        if(cause == EntityDamageEvent.DamageCause.ENTITY_ATTACK || cause == EntityDamageEvent.DamageCause.PROJECTILE) {
+            int level = getLevel(player);
+            if(level > 0) {
+                event.setDamage(event.getDamage() * 2);
+            }
+        }
+    }
+
 
     @UpdateEvent(delay = 500)
     public void onUpdate() {
