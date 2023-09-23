@@ -140,7 +140,11 @@ public class ShieldListener implements Listener {
                     RoleBuild build = builds.getActiveBuilds().get(role.getName());
                     if (build != null) {
                         if (build.getActiveSkills().stream().anyMatch(s -> s instanceof ChannelSkill)) {
-                            player.getInventory().setItemInOffHand(new ItemStack(Material.SHIELD));
+                            var shield = new ItemStack(Material.SHIELD);
+                            var itemMeta = shield.getItemMeta();
+                            itemMeta.setCustomModelData(1);
+                            shield.setItemMeta(itemMeta);
+                            player.getInventory().setItemInOffHand(shield);
                         }
                     }
                 }, () -> {
@@ -172,7 +176,11 @@ public class ShieldListener implements Listener {
         if (event.getSkill() instanceof ChannelSkill) {
             Player player = event.getPlayer();
             if (UtilChampions.isUsableWithShield(player.getInventory().getItemInMainHand())) {
-                player.getInventory().setItemInOffHand(new ItemStack(Material.SHIELD));
+                var shield = new ItemStack(Material.SHIELD);
+                var itemMeta = shield.getItemMeta();
+                itemMeta.setCustomModelData(1);
+                shield.setItemMeta(itemMeta);
+                player.getInventory().setItemInOffHand(shield);
             }
         }
     }

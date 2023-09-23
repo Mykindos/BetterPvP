@@ -54,6 +54,13 @@ public class WorldListener implements Listener {
     public void blockFlint(PlayerInteractEvent event) {
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 
+            Optional<Gamer> gamerOptional = gamerManager.getObject(event.getPlayer().getUniqueId());
+            if(gamerOptional.isPresent()) {
+                if(gamerOptional.get().getClient().isAdministrating()){
+                    return;
+                }
+            }
+
             if (event.getPlayer().getInventory().getItemInMainHand().getType() == Material.FLINT_AND_STEEL) {
                 Block clickedBlock = event.getClickedBlock();
                 if (clickedBlock != null && clickedBlock.getType() != Material.TNT && clickedBlock.getType() != Material.NETHERRACK) {

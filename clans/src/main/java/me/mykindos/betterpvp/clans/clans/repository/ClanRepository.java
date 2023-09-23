@@ -96,7 +96,7 @@ public class ClanRepository implements IRepository<Clan> {
                     default -> Class.forName(type).cast(result.getObject(2));
                 };
 
-                clan.putProperty(value, property);
+                clan.putProperty(value, property, true);
             }
         } catch (SQLException | ClassNotFoundException ex) {
             ex.printStackTrace();

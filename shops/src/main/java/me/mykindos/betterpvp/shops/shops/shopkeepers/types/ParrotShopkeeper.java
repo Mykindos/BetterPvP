@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.shops.shops.shopkeepers.types;
 
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.RandomSource;
@@ -26,8 +27,11 @@ public class ParrotShopkeeper extends Parrot implements IShopkeeper {
     @Getter
     private final CraftEntity entity;
 
+    private String shopkeeperName;
+
     public ParrotShopkeeper(Location location, Component name) {
         this(EntityType.PARROT, location, name);
+        this.shopkeeperName = PlainTextComponentSerializer.plainText().serialize(name);
     }
 
     public ParrotShopkeeper(EntityType<? extends Parrot> type, Location location, Component name) {
@@ -148,4 +152,8 @@ public class ParrotShopkeeper extends Parrot implements IShopkeeper {
         return getBukkitEntity();
     }
 
+    @Override
+    public String getShopkeeperName() {
+        return shopkeeperName;
+    }
 }

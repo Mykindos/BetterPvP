@@ -61,10 +61,7 @@ public class Colossus extends Skill implements PassiveSkill {
             int level = getLevel(player);
             if(level > 0) {
                 event.setCanBypassMinimum(true);
-                Bukkit.broadcast(Component.text("A: " + event.getDamage()));
                 event.setDamage(event.getDamage() * (1 - ((reductionPerLevel) * level)));
-                Bukkit.broadcast(Component.text("B: " + event.getDamage()));
-
             }
         }
 

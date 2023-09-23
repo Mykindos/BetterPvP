@@ -26,4 +26,8 @@ public class ShopManager {
     public void loadShopItems() {
         shopItems = shopItemRepository.getAllShopItems();
     }
+
+    public List<IShopItem> getShopItems(String shopkeeper) {
+        return shopItems.get(shopkeeper);
+    }
 }
