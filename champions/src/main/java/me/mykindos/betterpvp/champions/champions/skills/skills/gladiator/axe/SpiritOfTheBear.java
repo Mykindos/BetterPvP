@@ -39,11 +39,11 @@ public class SpiritOfTheBear extends Skill implements InteractSkill, CooldownSki
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Right click with a axe to activate.",
+                "Right click with an Axe to activate",
                 "",
-                "Call upon the spirit of the bear",
+                "Call upon the spirit of the bear,",
                 "granting all allies within <val>" + (radius + (level)) + "</val> blocks",
-                "Resistance II for <val>" + duration + "</val> seconds.",
+                "<effect>Resistance II</effect< for <stat>" + (int)duration + "</stat> seconds.",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
