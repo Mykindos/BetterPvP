@@ -77,8 +77,10 @@ public class Usurper extends Skill implements ToggleSkill, CooldownSkill, Listen
         if (!active.contains(player.getUniqueId())) {
             player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) ((baseDuration + level) * 20), 2));
             player.setHealth(6);
+            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WARDEN_ANGRY, 1.0F, 1.0F);
             Particle.EXPLOSION_NORMAL.builder().location(player.getLocation()).receivers(30).spawn();
             active.add(player.getUniqueId());
+
 
         }
     }
@@ -91,7 +93,7 @@ public class Usurper extends Skill implements ToggleSkill, CooldownSkill, Listen
         if (active.contains(damagee.getUniqueId())) {
             event.setDamage(event.getDamage() * (0.30 - ((damagee.getLevel() - 1) * 5)));
             UtilMessage.message(damager, getClassType().getName(), damagee.getName() + " is using " + getName());
-            damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_ARMOR_STAND_BREAK, 0.5F, 2.0F);
+            damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.5F, 2.0F);
         }
 
         if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
