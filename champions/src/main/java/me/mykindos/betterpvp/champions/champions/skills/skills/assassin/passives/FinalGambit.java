@@ -30,20 +30,20 @@ import org.bukkit.potion.PotionEffectType;
 
 @Singleton
 @BPvPListener
-public class Usurper extends Skill implements ToggleSkill, CooldownSkill, Listener {
+public class FinalGambit extends Skill implements ToggleSkill, CooldownSkill, Listener {
 
     private final Set<UUID> active = new HashSet<>();
 
     private double baseDuration;
 
     @Inject
-    public Usurper(Champions champions, ChampionsManager championsManager) {
+    public FinalGambit(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
 
     @Override
     public String getName() {
-        return "Usurper";
+        return "Final Gambit";
     }
 
     @Override
@@ -52,24 +52,13 @@ public class Usurper extends Skill implements ToggleSkill, CooldownSkill, Listen
         return new String[]{
                 "Drop Sword / Axe to Activate",
                 "",
-                "Must be above 50% health",
-                "",
-                "You reduce yourself to 3 hearts",
+                "Reduce yourself to half a heart",
                 "and take double knockback, but",
                 "become invulnerable and gain",
-                "speed III for <val>" + (baseDuration + (level-1) * 0.5) + "</val> seconds",
+                "Speed III for <val>" + (baseDuration + (level-1) * 0.5) + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
-    }
-
-    @Override
-    public boolean canUse(Player player) {
-        if (player.getHealth()<10) {
-            UtilMessage.message(player, getClassType().getName(), "You do not have enough health to sacrifice.");
-            return false;
-        }
-        return true;
     }
 
     @Override

@@ -21,7 +21,7 @@ skills:
       enabled: true
       cooldown: 50
       maxlevel: 5
-    Usurper:
+    finalgambit:
       enabled: true
       cooldown: 30
       maxlevel: 5
