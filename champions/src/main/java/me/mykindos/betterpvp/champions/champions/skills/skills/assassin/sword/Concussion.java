@@ -42,9 +42,10 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener 
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Right click with a sword to activate.",
+                "Right click with a Sword to prepare",
                 "",
-                "Your next hit blinds the target for <val>" + (durationPerLevel * level) + "</val> seconds.",
+                "Your next hit will <effect>blind</effect> the target ",
+                "for <val>" + (durationPerLevel * level) + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };

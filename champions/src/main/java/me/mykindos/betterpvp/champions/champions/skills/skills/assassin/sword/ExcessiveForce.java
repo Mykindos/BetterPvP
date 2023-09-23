@@ -43,12 +43,12 @@ public class ExcessiveForce extends Skill implements InteractSkill, CooldownSkil
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Right click with a Sword to activate.",
+                "Right click with a Sword to activate",
                 "",
-                "For the next <val>" + (3 + ((level - 1) * 0.5)) + "</val> seconds",
+                "For the next <val>" + (3 + ((level - 1) * 0.5)) + "</val> seconds,",
                 "your attacks deal knockback to enemies",
                 "",
-                "Does not ignore anti-knockback abilities.",
+                "Does not ignore anti-knockback abilities",
                 "",
                 "Cooldown: <val>" + getCooldown(level)};
     }
