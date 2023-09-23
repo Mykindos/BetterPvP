@@ -34,7 +34,7 @@ public class SkillMenu extends Menu implements IRefreshingMenu {
     public static final TagResolver TAG_RESOLVER = TagResolver.resolver(
             TagResolver.resolver("val", Tag.styling(NamedTextColor.GREEN)),
             TagResolver.resolver("effect", Tag.styling(NamedTextColor.WHITE)),
-            TagResolver.resolver("stat", Tag.styling(NamedTextColor.GOLD))
+            TagResolver.resolver("stat", Tag.styling(NamedTextColor.YELLOW))
     );
     
     private final Role role;
