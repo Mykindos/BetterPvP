@@ -1,7 +1,7 @@
 package me.mykindos.betterpvp.champions.champions.builds.menus;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+
 import lombok.Getter;
 import me.mykindos.betterpvp.champions.champions.builds.BuildSkill;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
@@ -23,6 +23,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 public class SkillMenu extends Menu implements IRefreshingMenu {
 
@@ -30,7 +31,11 @@ public class SkillMenu extends Menu implements IRefreshingMenu {
      * The tag resolver for skill descriptions.
      * It will parse all tags with the name 'val'
      */
-    public static final TagResolver TAG_RESOLVER = TagResolver.resolver("val", Tag.styling(NamedTextColor.GREEN));
+    public static final TagResolver TAG_RESOLVER = TagResolver.resolver(
+            TagResolver.resolver("val", Tag.styling(NamedTextColor.GREEN)),
+            TagResolver.resolver("effect", Tag.styling(NamedTextColor.WHITE)),
+            TagResolver.resolver("stat", Tag.styling(NamedTextColor.GOLD))
+    );
     
     private final Role role;
 
