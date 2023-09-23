@@ -9,6 +9,7 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 public class Button {
@@ -16,7 +17,7 @@ public class Button {
     private final int slot;
     private final ItemStack itemStack;
     private final Component name;
-    private final Component[] lore;
+    private final List<Component> lore;
 
     public Button(int slot, ItemStack item, String name, String... lore){
         this(slot, item, name, List.of(lore));
@@ -31,10 +32,17 @@ public class Button {
     }
 
     public Button(int slot, ItemStack item, Component name, List<Component> lore) {
-        this.lore = lore.stream().map(line -> line.decoration(TextDecoration.ITALIC, false)).toArray(Component[]::new);
+        this.lore = lore.stream().map(line -> line.decoration(TextDecoration.ITALIC, false)).collect(Collectors.toList());
         this.slot = slot;
         this.name = name.decoration(TextDecoration.ITALIC, false);
-        this.itemStack = UtilItem.removeAttributes(UtilItem.setItemNameAndLore(item, this.name, List.of(this.lore)));
+        this.itemStack = UtilItem.removeAttributes(UtilItem.setItemNameAndLore(item, this.name, this.lore));
+    }
+
+    public Button(int slot, ItemStack item) {
+        this.slot= slot;
+        this.lore = item.getItemMeta().lore();
+        this.name = item.displayName().decoration(TextDecoration.ITALIC, false);
+        this.itemStack = item;
     }
 
     public void onClick(Player player, ClickType clickType) {

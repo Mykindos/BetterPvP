@@ -18,6 +18,10 @@ public class MyConcurrentHashMap<K, V> {
         listeners.forEach(l -> l.onMapValueChanged(key.toString(), value));
     }
 
+    public void putSilent(K key, V value) {
+        myMap.put(key, value);
+    }
+
     public V get(K key) {
         return myMap.get(key);
     }

@@ -55,15 +55,15 @@ public class ShopItemRepository {
                 String dynamicPricingQuery = "SELECT * FROM " + databasePrefix + "shopitems_dynamic_pricing WHERE shopItemId = ?";
                 CachedRowSet dynamicPricingResult = database.executeQuery(new Statement(dynamicPricingQuery, new IntegerStatementValue(id)));
                 if(dynamicPricingResult.next()) {
-                    int minSellPrice = dynamicPricingResult.getInt(3);
-                    int baseSellPrice = dynamicPricingResult.getInt(4);
-                    int maxSellPrice = dynamicPricingResult.getInt(5);
-                    int minBuyPrice = dynamicPricingResult.getInt(6);
-                    int baseBuyPrice = dynamicPricingResult.getInt(7);
-                    int maxBuyPrice = dynamicPricingResult.getInt(8);
-                    int baseStock = dynamicPricingResult.getInt(9);
-                    int maxStock = dynamicPricingResult.getInt(10);
-                    int currentStock = dynamicPricingResult.getInt(11);
+                    int minSellPrice = dynamicPricingResult.getInt(2);
+                    int baseSellPrice = dynamicPricingResult.getInt(3);
+                    int maxSellPrice = dynamicPricingResult.getInt(4);
+                    int minBuyPrice = dynamicPricingResult.getInt(5);
+                    int baseBuyPrice = dynamicPricingResult.getInt(6);
+                    int maxBuyPrice = dynamicPricingResult.getInt(7);
+                    int baseStock = dynamicPricingResult.getInt(8);
+                    int maxStock = dynamicPricingResult.getInt(9);
+                    int currentStock = dynamicPricingResult.getInt(10);
 
                     PolynomialData polynomialData = new PolynomialData(minBuyPrice, baseBuyPrice, maxBuyPrice, minSellPrice, baseSellPrice, maxSellPrice, maxStock, baseStock, currentStock);
                     shopItem = new DynamicShopItem(shopKeeper, itemName, material, (byte) data, menuSlot, menuPage, amount, polynomialData);
