@@ -53,7 +53,7 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
                 "Right click with an Axe to activate.",
                 "",
                 "Enter a rage, gaining massive movement speed",
-                "and slowing anything you hit for <val>" + slowDuration + "</val> seconds",
+                "and giving Slowness III to anything you hit for <val>" + slowDuration + "</val> seconds",
                 "",
                 "While charging, you take no knockback.",
                 "",

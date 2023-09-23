@@ -51,7 +51,7 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
                 "",
                 "Hurl yourself towards an opponent.",
                 "If you collide with them, you <white>both",
-                "take <val>" + damage + "</val> damage and receive Slow IV",
+                "take <val>" + damage + "</val> damage and receive Slowness IV",
                 "for <val>" + (1 + level) + "</val> seconds.",
                 "",
                 "Cannot be used while grounded.",

@@ -59,7 +59,7 @@ public class Pestilence extends PrepareSkill implements CooldownSkill {
                 "Your next hit will apply Pestilence to the target.",
                 "Pestilence poisons the target, and spreads to",
                 "nearby enemies. While enemies are infected,",
-                "they deal <val>" + enemyDamageReduction + "%</val> reduced damage",
+                "they deal <val>" + (enemyDamageReduction * 100) + "%</val> reduced damage",
                 "Pestilence lasts <val>" + infectionDuration + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
@@ -188,7 +188,7 @@ public class Pestilence extends PrepareSkill implements CooldownSkill {
     @Override
     public void loadSkillConfig() {
         infectionDuration = getConfig("duration", 5.0, Double.class);
-        enemyDamageReduction = getConfig("duration", 0.20, Double.class);
+        enemyDamageReduction = getConfig("enemyDamageReduction", 0.20, Double.class);
     }
 
     @Data
