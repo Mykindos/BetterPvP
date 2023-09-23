@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.shops.shops.shopkeepers.types;
 import java.util.Objects;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.RandomSource;
@@ -26,8 +27,12 @@ public class StandardShopkeeper extends Mob implements IShopkeeper{
     @Getter
     private final CraftEntity entity;
 
+    private final String shopkeeperName;
+
+
     public StandardShopkeeper(EntityType<? extends Mob> type, Location location, Component name) {
         super(type, ((CraftWorld) location.getWorld()).getHandle());
+        this.shopkeeperName = PlainTextComponentSerializer.plainText().serialize(name);
 
         goalSelector.removeAllGoals(Objects::nonNull);
         goalSelector.addGoal(1, new LookAtPlayerGoal(this, Player.class, 16.0F));
@@ -120,4 +125,8 @@ public class StandardShopkeeper extends Mob implements IShopkeeper{
         return getBukkitEntity();
     }
 
+    @Override
+    public String getShopkeeperName() {
+        return shopkeeperName;
+    }
 }

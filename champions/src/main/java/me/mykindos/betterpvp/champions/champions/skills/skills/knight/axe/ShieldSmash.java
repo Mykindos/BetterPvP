@@ -16,18 +16,18 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
+import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.*;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
@@ -95,6 +95,11 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
         final Location bashLocation = player.getLocation().add(0, 0.8, 0);
         bashLocation.add(player.getLocation().getDirection().setY(0).normalize().multiply(1.5));
 
+        if(player.getInventory().getItemInOffHand().getType() != Material.SHIELD) {
+            var shield = new ItemStack(Material.SHIELD);
+            player.getInventory().setItemInOffHand(shield);
+        }
+
         // Visual Cues
         Collection<Player> receivers = player.getWorld().getNearbyPlayers(player.getLocation(), 60);
         Particle.CLOUD.builder().extra(0.05f).count(6).location(bashLocation).receivers(receivers).spawn();
@@ -129,6 +134,17 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
             UtilMessage.simpleMessage(player, "Skill", "You missed <alt>%s %s</alt>.", getName(), level);
         }
 
+    }
+
+    @UpdateEvent(delay = 100)
+    public void onCheckShield() {
+        for(Player player : Bukkit.getOnlinePlayers()) {
+            if(hasSkill(player)) {
+                if(player.getInventory().getItemInOffHand().getType() != Material.SHIELD) {
+                    player.getInventory().setItemInOffHand(new ItemStack(Material.SHIELD));
+                }
+            }
+        }
     }
 
     @Override

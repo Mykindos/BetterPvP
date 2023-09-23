@@ -21,7 +21,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 @BPvPListener
 public class Colossus extends Skill implements PassiveSkill {
 
-    private int reductionPerLevel;
+    private double reductionPerLevel;
 
     @Inject
     public Colossus(Champions champions, ChampionsManager championsManager) {
@@ -37,7 +37,7 @@ public class Colossus extends Skill implements PassiveSkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "You take <val>" + (reductionPerLevel * level) + "%</val> reduced knockback."
+                "You take <val>" + ((reductionPerLevel * 100) * level) + "%</val> reduced knockback."
         };
     }
 
@@ -61,9 +61,7 @@ public class Colossus extends Skill implements PassiveSkill {
             int level = getLevel(player);
             if(level > 0) {
                 event.setCanBypassMinimum(true);
-                Bukkit.broadcast(Component.text("A: " + event.getDamage()));
-                event.setDamage(event.getDamage() * (1 - ((reductionPerLevel * 0.01) * level)));
-                Bukkit.broadcast(Component.text("B: " + event.getDamage()));
+                event.setDamage(event.getDamage() * (1 - ((reductionPerLevel) * level)));
             }
         }
 
@@ -71,7 +69,7 @@ public class Colossus extends Skill implements PassiveSkill {
 
     @Override
     public void loadSkillConfig(){
-        reductionPerLevel = getConfig("reductionPerLevel", 25, Integer.class);
+        reductionPerLevel = getConfig("reductionPerLevel", 0.25, Double.class);
     }
 
 }

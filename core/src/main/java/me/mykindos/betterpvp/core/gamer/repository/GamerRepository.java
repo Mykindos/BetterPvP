@@ -82,7 +82,7 @@ public class GamerRepository implements IRepository<Gamer> {
                     default -> Class.forName(type).cast(result.getObject(2));
                 };
 
-                gamer.putProperty(value, property);
+                gamer.putProperty(value, property, true);
             }
         } catch (SQLException | ClassNotFoundException ex) {
             ex.printStackTrace();
@@ -103,6 +103,7 @@ public class GamerRepository implements IRepository<Gamer> {
     public void saveProperty(Gamer gamer, String property, Object value) {
         String savePropertyQuery = "INSERT INTO " + databasePrefix + "gamer_properties (Gamer, Property, Value) VALUES (?, ?, ?)"
                 + " ON DUPLICATE KEY UPDATE Value = ?";
+
         Statement statement = new Statement(savePropertyQuery,
                 new StringStatementValue(gamer.getUuid()),
                 new StringStatementValue(property),

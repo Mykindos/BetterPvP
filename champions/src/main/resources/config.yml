@@ -53,9 +53,9 @@ skills:
     flash:
       enabled: true
       maxlevel: 5
-      maxCharges: 4
-      timeBetweenCharges: 11.0
-      maxTravelDistance: 8
+      baseMaxCharges: 1
+      baseRechargeSeconds: 4.0
+      teleportDistance: 5.0
     markedfordeath:
       enabled: true
       maxlevel: 5
@@ -139,6 +139,15 @@ skills:
       maxlevel: 5
       cooldown: 10
   paladin:
+    staticlazer:
+      enabled: true
+      maxlevel: 5
+      cooldown: 9
+      energy: 24
+      baseCharge: 40.0
+      baseDamage: 2.0
+      baseRange: 20.0
+      energyPerSecond: 32.0
     rupture:
       enabled: true
       cooldown: 12
@@ -257,7 +266,7 @@ skills:
     colossus:
       enabled: true
       maxlevel: 3
-      reductionPerLevel: 25
+      reductionPerLevel: 0.25
     takedown:
       enabled: true
       maxlevel: 5
@@ -433,7 +442,7 @@ skills:
     fastrecovery:
       enabled: true
       maxlevel: 5
-      percentagePerLevel: 20
+      percentagePerLevel: 0.20
     swim:
       enabled: true
       maxlevel: 5

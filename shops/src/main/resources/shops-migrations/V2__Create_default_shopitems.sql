@@ -3,37 +3,37 @@
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Armor', 'LEATHER_HELMET', 'Assassin Helmet', 0, 0, 1, 1, 5000, 1250);
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Armor', 'LEATHER_CHESTPLATE', 'Assassin Chestplate', 0, 9, 1, 1, 8000, 2000);
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Armor', 'LEATHER_LEGGINGS', 'Assassin Leggings', 0, 18, 1, 1, 7000, 1750);
-INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Armor', 'LEATHER_LEGGINGS', 'Assassin Boots', 0, 27, 1, 1, 4000, 1000);
+INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Armor', 'LEATHER_BOOTS', 'Assassin Boots', 0, 27, 1, 1, 4000, 1000);
 
 -- Knight
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Armor', 'IRON_HELMET', 'Knight Helmet', 0, 1, 1, 1, 5000, 1250);
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Armor', 'IRON_CHESTPLATE', 'Knight Chestplate', 0, 10, 1, 1, 8000, 2000);
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Armor', 'IRON_LEGGINGS', 'Knight Leggings', 0, 19, 1, 1, 7000, 1750);
-INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Armor', 'IRON_LEGGINGS', 'Knight Boots', 0, 28, 1, 1, 4000, 1000);
+INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Armor', 'IRON_BOOTS', 'Knight Boots', 0, 28, 1, 1, 4000, 1000);
 
 -- Brute
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Armor', 'DIAMOND_HELMET', 'Brute Helmet', 0, 2, 1, 1, 5000, 1250);
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Armor', 'DIAMOND_CHESTPLATE', 'Brute Chestplate', 0, 11, 1, 1, 8000, 2000);
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Armor', 'DIAMOND_LEGGINGS', 'Brute Leggings', 0, 20, 1, 1, 7000, 1750);
-INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Armor', 'DIAMOND_LEGGINGS', 'Brute Boots', 0, 29, 1, 1, 4000, 1000);
+INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Armor', 'DIAMOND_BOOTS', 'Brute Boots', 0, 29, 1, 1, 4000, 1000);
 
 -- Mage
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Armor', 'GOLDEN_HELMET', 'Mage Helmet', 0, 3, 1, 1, 5000, 1250);
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Armor', 'GOLDEN_CHESTPLATE', 'Mage Chestplate', 0, 12, 1, 1, 8000, 2000);
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Armor', 'GOLDEN_LEGGINGS', 'Mage Leggings', 0, 21, 1, 1, 7000, 1750);
-INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Armor', 'GOLDEN_LEGGINGS', 'Mage Boots', 0, 30, 1, 1, 4000, 1000);
+INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Armor', 'GOLDEN_BOOTS', 'Mage Boots', 0, 30, 1, 1, 4000, 1000);
 
 -- Ranger
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Armor', 'CHAINMAIL_HELMET', 'Ranger Helmet', 0, 4, 1, 1, 5000, 1250);
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Armor', 'CHAINMAIL_CHESTPLATE', 'Ranger Chestplate', 0, 13, 1, 1, 8000, 2000);
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Armor', 'CHAINMAIL_LEGGINGS', 'Ranger Leggings', 0, 22, 1, 1, 7000, 1750);
-INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Armor', 'CHAINMAIL_LEGGINGS', 'Ranger Boots', 0, 31, 1, 1, 4000, 1000);
+INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Armor', 'CHAINMAIL_BOOTS', 'Ranger Boots', 0, 31, 1, 1, 4000, 1000);
 
 -- Warlock
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Armor', 'NETHERITE_HELMET', 'Warlock Helmet', 0, 5, 1, 1, 5000, 1250);
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Armor', 'NETHERITE_CHESTPLATE', 'Warlock Chestplate', 0, 14, 1, 1, 8000, 2000);
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Armor', 'NETHERITE_LEGGINGS', 'Warlock Leggings', 0, 23, 1, 1, 7000, 1750);
-INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Armor', 'NETHERITE_LEGGINGS', 'Warlock Boots', 0, 32, 1, 1, 4000, 1000);
+INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Armor', 'NETHERITE_BOOTS', 'Warlock Boots', 0, 32, 1, 1, 4000, 1000);
 
 -- Blocks
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Building', 'STONE', 'Stone', 0, 0, 1, 1, 40, 10);
@@ -104,7 +104,7 @@ INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Resources', 'EMERALD_BLOCK', 'Emerald Block', 0, 12, 1, 1, 9000, 2250);
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Resources', 'NETHERITE_INGOT', 'Netherite Ingot', 0, 4, 1, 1, 1000, 250);
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Resources', 'NETHERITE_BLOCK', 'Netherite Block', 0, 13, 1, 1, 9000, 2250);
-INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Resources', 'LEATHER', 'Leather', 0, 4, 1, 1, 1000, 250);
+INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Resources', 'LEATHER', 'Leather', 0, 5, 1, 1, 1000, 250);
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Resources', 'TNT', 'TNT', 0, 8, 1, 1, 150000, 75000);
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Resources', 'REDSTONE', 'Redstone', 0, 27, 1, 1, 200, 100);
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Resources', 'REDSTONE_BLOCK', 'Redstone Block', 0, 28, 1, 1, 1800, 900);
@@ -171,8 +171,8 @@ INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data
 SELECT id INTO @shopItemId FROM ${tablePrefix}shopItems WHERE Shopkeeper = 'Farming' AND Material = 'BEEHIVE';
 INSERT IGNORE INTO ${tablePrefix}shopitems_dynamic_pricing VALUES (@shopItemId, 10, 25, 40, 50, 55, 60, 50000, 100000, 50000);
 
-INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Farming', 'PUMPKIN_SEEDS', 'Pumpkin Seeds', 0, 10, 1, 1, 5, 1);
-INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Farming', 'MELON_SEEDS', 'Melon Seeds', 0, 19, 1, 1, 5, 1);
+INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Farming', 'PUMPKIN_SEEDS', 'Pumpkin Seeds', 0, 9, 1, 1, 5, 1);
+INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Farming', 'MELON_SEEDS', 'Melon Seeds', 0, 10, 1, 1, 5, 1);
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Farming', 'BEETROOT_SEEDS', 'Beetroot Seeds', 0, 40, 1, 1, 5, 1);
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Farming', 'WHEAT_SEEDS', 'Seeds', 0, 4, 1, 1, 5, 1);
 
