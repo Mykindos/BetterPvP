@@ -53,7 +53,7 @@ public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listene
                 "",
                 "Teleports you back to where you ",
                 "were located <val>" + (1.5 + (level)) + "</val> seconds ago",
-                "Increases health by <val>" + (percentHealthRecovered * 100) + "%</val> of the health you had",
+                "Increases health by <stat>" + (percentHealthRecovered * 100) + "%</stat> of the health you had",
                 "<val>" + (1.5 + (level)) + "</val> seconds ago",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
@@ -155,6 +155,6 @@ public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listene
 
     @Override
     public void loadSkillConfig(){
-        percentHealthRecovered = getConfig("maxTravelDistance", 0.25, Double.class);
+        percentHealthRecovered = getConfig("percentHealthRecovered", 0.25, Double.class);
     }
 }
