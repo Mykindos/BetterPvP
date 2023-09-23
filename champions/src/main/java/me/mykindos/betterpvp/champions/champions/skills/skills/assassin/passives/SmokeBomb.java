@@ -137,9 +137,13 @@ public class SmokeBomb extends Skill implements ToggleSkill, CooldownSkill, List
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Instantly vanish before your foes for a",
-                "maximum of <val>" + (3 + level) + "</val> seconds",
-                "hitting an enemy or using abilities",
+                "Drop your Sword / Axe to activate",
+                "",
+                "Instantly vanish, gaining <effect>invisibility</effect> ",
+                "for a maximum of <val>" + (3 + level) + "</val> seconds,",
+                "<effect>blinding</effect> every enemy within <stat>2.5</stat> blocks of you",
+                "",
+                "Hitting an enemy or using abilities",
                 "will make you reappear",
                 "",
                 "Cooldown: <val>" + getCooldown(level)

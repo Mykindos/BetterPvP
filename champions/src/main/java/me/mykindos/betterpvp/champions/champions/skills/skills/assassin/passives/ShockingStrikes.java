@@ -37,8 +37,8 @@ public class ShockingStrikes extends Skill implements PassiveSkill, Listener {
 
         return new String[]{
                 "Your attacks shock targets for",
-                "<val>" + (level) + "</val> second, giving them Slowness I",
-                "and Screen-Shake."
+                "<val>" + (level) + "</val> second, giving them <effect>Slowness I</effect>",
+                "and <effect>Screen-Shake</effect>."
         };
     }
 

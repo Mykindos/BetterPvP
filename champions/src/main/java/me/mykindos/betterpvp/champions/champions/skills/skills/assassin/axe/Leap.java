@@ -41,9 +41,13 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Right click with a axe to activate.",
+                "Right click with an Axe to activate",
                 "",
-                "You take a great leap",
+                "Take a great leap forward",
+                "",
+                "Using near a wall will activate a wall-kick",
+                "Wall-kicks do not affect the cooldown",
+                "",
                 "Cooldown: <val>" + getCooldown(level)
         };
     }

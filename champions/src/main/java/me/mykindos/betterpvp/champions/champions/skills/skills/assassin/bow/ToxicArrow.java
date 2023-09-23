@@ -37,8 +37,10 @@ public class ToxicArrow extends PrepareArrowSkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Your next arrow will poison your target, and give them",
-                "nausea for <val>" + (6 + level) + "</val> seconds.",
+                "Left click with a Bow to prepare",
+                "",
+                "Your next arrow will give your target <effect>poison</effect> and",
+                "<effect>nausea</effect> for <val>" + (6 + level) + "</val> seconds.",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
 

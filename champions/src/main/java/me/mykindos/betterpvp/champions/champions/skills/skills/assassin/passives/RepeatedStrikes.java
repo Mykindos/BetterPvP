@@ -47,10 +47,10 @@ public class RepeatedStrikes extends Skill implements PassiveSkill, Listener {
 
         return new String[]{
                 "Each time you attack, your damage",
-                "increases by <val>" + damageIncrement + "</val>",
+                "increases by <stat>" + (int)damageIncrement + "</stat>",
                 "You can deal up to <val>" + (level * damageIncrement) + "</val> bonus damage.",
                 "",
-                "Not attacking for <val>" + duration + "</val> seconds clears",
+                "Not attacking for <stat>" + (int)duration + "</stat> seconds clears",
                 "your bonus damage."};
     }
 
