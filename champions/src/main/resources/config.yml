@@ -263,7 +263,7 @@ skills:
     colossus:
       enabled: true
       maxlevel: 3
-      reductionPerLevel: 25
+      reductionPerLevel: 0.25
     takedown:
       enabled: true
       maxlevel: 5
@@ -439,7 +439,7 @@ skills:
     fastrecovery:
       enabled: true
       maxlevel: 5
-      percentagePerLevel: 20
+      percentagePerLevel: 0.20
     swim:
       enabled: true
       maxlevel: 5

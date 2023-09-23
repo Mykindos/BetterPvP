@@ -38,7 +38,7 @@ public class LevelField extends Skill implements PassiveSkill, Listener {
         return new String[]{
                 "For every enemy within <val>" + radius + "</val> blocks,",
                 "You deal <val>" +  (10 + ((level - 1) * 5)) + ".0%</val> extra damage",
-                "Up to a maximum of 60% extra damage",
+                "Up to a maximum of <val>60%</val> extra damage",
                 "",
                 "For every ally within <val>" + radius + "</val> blocks,",
                 "You deal <val>" + (10 + ((level - 1) * 5)) + ".0%</val> less damage",

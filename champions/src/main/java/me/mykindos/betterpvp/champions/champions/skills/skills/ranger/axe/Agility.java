@@ -57,7 +57,7 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
                 "",
                 "Sprint with great agility, gaining",
                 "Speed I for <val>" + (baseDuration + level) + "</val> seconds.",
-                "You also take <val>" + damageReduction + "%</val> reduced damage while active.",
+                "You also take <val>" + (damageReduction * 100) + "%</val> reduced damage while active.",
                 "Agility ends if you interact",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
