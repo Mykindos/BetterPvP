@@ -42,7 +42,7 @@ public class SmokeArrow extends PrepareArrowSkill {
                 "Left click your Bow to prepare",
                 "",
                 "Your next arrow will give <effect>Blindness</effect>",
-                "and <effect>Slow 2</effect> to the target for <val>" + getEffectDuration(level) + "</val> seconds.",
+                "and <effect>Slowness II</effect> to the target for <val>" + getEffectDuration(level) + "</val> seconds.",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };

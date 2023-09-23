@@ -22,6 +22,7 @@ import org.bukkit.potion.PotionEffectType;
 @BPvPListener
 public class ToxicArrow extends PrepareArrowSkill {
 
+    private double baseDuration;
 
     @Inject
     public ToxicArrow(Champions champions, ChampionsManager championsManager) {
@@ -39,8 +40,8 @@ public class ToxicArrow extends PrepareArrowSkill {
         return new String[]{
                 "Left click with a Bow to prepare",
                 "",
-                "Your next arrow will give your target <effect>poison</effect> and",
-                "<effect>nausea</effect> for <val>" + (6 + level) + "</val> seconds.",
+                "Your next arrow will give your target <effect>Poison I</effect> and",
+                "<effect>Nausea</effect> for <val>" + (baseDuration + level) + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
 
@@ -60,7 +61,7 @@ public class ToxicArrow extends PrepareArrowSkill {
     @Override
     public double getCooldown(int level) {
 
-        return 14 - ((level - 1));
+        return cooldown - ((level - 1));
     }
 
 
@@ -82,12 +83,16 @@ public class ToxicArrow extends PrepareArrowSkill {
         if (target.hasPotionEffect(PotionEffectType.CONFUSION)) {
             target.removePotionEffect(PotionEffectType.CONFUSION);
         }
-        target.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, (6 + level) * 20, 0));
-        target.addPotionEffect(new PotionEffect(PotionEffectType.POISON, (6 + level) * 20, 0));
+        target.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, (int) (baseDuration + level) * 20, 0));
+        target.addPotionEffect(new PotionEffect(PotionEffectType.POISON, (int) (baseDuration + level) * 20, 0));
     }
 
     @Override
     public void displayTrail(Location location) {
         Particle.REDSTONE.builder().location(location).color(0, 255, 0).count(3).extra(0).receivers(60, true).spawn();
+    }
+
+    public void loadSkillConfig(){
+        baseDuration = getConfig("baseDuration", 6.0, Double.class);
     }
 }

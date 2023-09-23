@@ -38,6 +38,12 @@ import org.bukkit.potion.PotionEffectType;
 @BPvPListener
 public class SmokeBomb extends Skill implements ToggleSkill, CooldownSkill, Listener {
 
+    private double baseDuration;
+
+    private double blindDuration;
+
+    private double blindRadius;
+
     private final WeakHashMap<Player, Integer> smoked = new WeakHashMap<>();
 
     @Inject
@@ -137,11 +143,10 @@ public class SmokeBomb extends Skill implements ToggleSkill, CooldownSkill, List
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Drop your Sword / Axe to activate",
-                "",
-                "Instantly vanish, gaining <effect>invisibility</effect> ",
-                "for a maximum of <val>" + (3 + level) + "</val> seconds,",
-                "<effect>blinding</effect> every enemy within <stat>2.5</stat> blocks of you",
+                "Instantly <effect>Vanish</effect> before your foes for a",
+                "maximum of <val>" + (baseDuration + level) + "</val> seconds,",
+                "causing <effect>Blindness II</effect> to all enemies",
+                "within <stat>" + blindRadius + "</stat> for <stat>" + blindDuration + "</stat> seconds",
                 "",
                 "Hitting an enemy or using abilities",
                 "will make you reappear",
@@ -170,8 +175,8 @@ public class SmokeBomb extends Skill implements ToggleSkill, CooldownSkill, List
     public void toggle(Player player, int level) {
         player.playSound(player.getLocation(), Sound.BLOCK_CONDUIT_AMBIENT, 2.0f, 1.f);
 
-        championsManager.getEffects().addEffect(player, EffectType.INVISIBILITY, (5 + level * 1000L));
-        smoked.put(player, (5 + level));
+        championsManager.getEffects().addEffect(player, EffectType.INVISIBILITY, (long) ((baseDuration + level) * 1000L));
+        smoked.put(player, (int) (baseDuration + level));
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
             onlinePlayer.hidePlayer(champions, player);
         }
@@ -184,11 +189,18 @@ public class SmokeBomb extends Skill implements ToggleSkill, CooldownSkill, List
         // Display particle to those only within 30 blocks
         Particle.EXPLOSION_HUGE.builder().location(player.getLocation()).receivers(30).spawn();
 
-        for (Player target : UtilPlayer.getNearbyEnemies(player, player.getLocation(), 2.5)) {
-            target.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 35, 1));
+        for (Player target : UtilPlayer.getNearbyEnemies(player, player.getLocation(), blindRadius)) {
+            target.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, (int) (blindDuration * 20), 1));
         }
 
         UtilServer.callEvent(new EffectClearEvent(player));
 
     }
+
+    public void loadSkillConfig(){
+        baseDuration = getConfig("baseDuration", 3.0, Double.class);
+        blindDuration = getConfig("blindDuration", 1.75, Double.class);
+        blindRadius = getConfig("blindRadius", 2.5, Double.class);
+    }
+
 }

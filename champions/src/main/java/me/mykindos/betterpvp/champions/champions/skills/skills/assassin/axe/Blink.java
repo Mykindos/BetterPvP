@@ -56,7 +56,7 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
                 "",
                 "Instantly teleport forwards <stat>15</stat> Blocks",
                 "",
-                "Using again within 5 seconds De-Blinks,",
+                "Using again within <stat>5</stat> seconds De-Blinks,",
                 "returning you to your original location",
                 "",
                 "Cannot be used while <effect>Slowed</effect>",

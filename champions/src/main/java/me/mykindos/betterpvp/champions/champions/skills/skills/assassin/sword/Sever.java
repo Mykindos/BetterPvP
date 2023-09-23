@@ -42,7 +42,7 @@ public class Sever extends PrepareSkill implements CooldownSkill, Listener {
         return new String[]{
                 "Right click with a Sword to prepare",
                 "",
-                "Your next hit applies a <val>" + (level) + "</val> second <effect>bleed</effect>",
+                "Your next hit applies a <val>" + (level) + "</val> second <effect>Bleed</effect>",
                 "dealing <stat>1</stat> heart per second",
                 "",
                 "Cooldown: <val>" + getCooldown(level)

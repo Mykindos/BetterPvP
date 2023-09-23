@@ -22,6 +22,8 @@ import org.bukkit.event.block.Action;
 @BPvPListener
 public class SilencingArrow extends PrepareArrowSkill {
 
+    private double baseDuration;
+
     @Inject
     public SilencingArrow(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -64,7 +66,7 @@ public class SilencingArrow extends PrepareArrowSkill {
     @Override
     public void onHit(Player damager, LivingEntity target, int level) {
         if (!(target instanceof Player damagee)) return;
-        championsManager.getEffects().addEffect(damagee, EffectType.SILENCE, ((3 + level) * 1000L));
+        championsManager.getEffects().addEffect(damagee, EffectType.SILENCE, (long) ((baseDuration + level) * 1000L));
         if (championsManager.getEffects().hasEffect(damagee, EffectType.IMMUNETOEFFECTS)) {
             UtilMessage.simpleMessage(damager, getClassType().getName(), "<alt>" + damagee.getName() + "</alt> is immune to your silence!");
         }
@@ -85,5 +87,10 @@ public class SilencingArrow extends PrepareArrowSkill {
     @Override
     public Action[] getActions() {
         return SkillActions.LEFT_CLICK;
+    }
+
+    @Override
+    public void loadSkillConfig(){
+        baseDuration = getConfig("baseDuration", 3.0, Double.class);
     }
 }

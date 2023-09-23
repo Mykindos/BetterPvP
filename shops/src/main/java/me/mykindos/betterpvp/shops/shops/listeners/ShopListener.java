@@ -1,8 +1,10 @@
-package me.mykindos.betterpvp.shops.shops.shopkeepers.listeners;
+package me.mykindos.betterpvp.shops.shops.listeners;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.components.shops.events.PlayerBuyItemEvent;
+import me.mykindos.betterpvp.core.components.shops.events.PlayerSellItemEvent;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateLoreEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.items.ItemHandler;
@@ -22,24 +24,24 @@ import org.bukkit.block.Block;
 import org.bukkit.block.Jukebox;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
-import java.text.NumberFormat;
 import java.util.Optional;
 
 @Singleton
 @BPvPListener
-public class ShopkeeperListener implements Listener {
+public class ShopListener implements Listener {
 
     private final ShopkeeperManager shopkeeperManager;
     private final ShopManager shopManager;
     private final ItemHandler itemHandler;
 
     @Inject
-    public ShopkeeperListener(ShopkeeperManager shopkeeperManager, ShopManager shopManager, ItemHandler itemHandler) {
+    public ShopListener(ShopkeeperManager shopkeeperManager, ShopManager shopManager, ItemHandler itemHandler) {
         this.shopkeeperManager = shopkeeperManager;
         this.shopManager = shopManager;
         this.itemHandler = itemHandler;
@@ -59,13 +61,14 @@ public class ShopkeeperListener implements Listener {
         });
     }
 
-    @EventHandler
-    public void onItemUpdateLore(ItemUpdateLoreEvent event) {
-        if(!event.getItemMeta().getPersistentDataContainer().has(ShopsNamespacedKeys.SHOP_ITEM)) return;
+    @EventHandler (priority = EventPriority.MONITOR)
+    public void onFinalBuyItem(PlayerBuyItemEvent event) {
+        if(event.isCancelled()) return;
+    }
 
-
-
-        //var item = event.g
+    @EventHandler (priority = EventPriority.MONITOR)
+    public void onFinalSellItem(PlayerSellItemEvent event) {
+        if(event.isCancelled()) return;
     }
 
     @EventHandler
