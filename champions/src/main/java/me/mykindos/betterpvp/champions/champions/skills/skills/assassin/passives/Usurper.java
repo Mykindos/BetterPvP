@@ -55,9 +55,9 @@ public class Usurper extends Skill implements ToggleSkill, CooldownSkill, Listen
                 "Must be above 50% health",
                 "",
                 "You reduce yourself to 3 hearts",
-                "And take double knockback",
-                "But become invulnerable",
-                "And gain speed III for <val>" + (baseDuration + (level-1) * 0.5) + "</val> seconds",
+                "and take double knockback, but",
+                "become invulnerable and gain",
+                "speed III for <val>" + (baseDuration + (level-1) * 0.5) + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
