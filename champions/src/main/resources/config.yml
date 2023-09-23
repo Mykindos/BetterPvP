@@ -136,6 +136,15 @@ skills:
       maxlevel: 5
       cooldown: 10
   paladin:
+    staticlazer:
+      enabled: true
+      maxlevel: 5
+      cooldown: 9
+      energy: 24
+      baseCharge: 40.0
+      baseDamage: 2.0
+      baseRange: 20.0
+      energyPerSecond: 32.0
     rupture:
       enabled: true
       cooldown: 12
