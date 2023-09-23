@@ -3,25 +3,19 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.passive
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-import java.util.WeakHashMap;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
-import me.mykindos.betterpvp.champions.champions.skills.skills.assassin.data.RecallData;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.ToggleSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.effects.EffectType;
-import me.mykindos.betterpvp.core.effects.events.EffectClearEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -57,7 +51,7 @@ public class Usurper extends Skill implements ToggleSkill, CooldownSkill, Listen
                 "Must be above half health to use",
                 "",
                 "Reduce yourself to 3 hearts and take double knockback,",
-                "But receive <val>"+ (70 + ((level - 1) * 5)) +"</val> reduced damage and speed III for 2 <val>" + (baseDuration + level * 0.5) + "</val> seconds",
+                "But receive <val>"+ (70 + ((level - 1) * 5)) +"</val> reduced damage and speed III for <val>" + (baseDuration + level * 0.5) + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
