@@ -56,8 +56,8 @@ public class Usurper extends Skill implements ToggleSkill, CooldownSkill, Listen
                 "",
                 "You reduce yourself to 3 hearts",
                 "And take double knockback",
-                "But receive <val>"+ (70 + ((level - 1) * 5)) +"%</val> reduced damage",
-                "And speed III for <val>" + (baseDuration + (level-1) * 0.5) + "</val> seconds",
+                "But become invulnerable",
+                "And gain speed III for <val>" + (baseDuration + (level-1) * 0.5) + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -78,7 +78,7 @@ public class Usurper extends Skill implements ToggleSkill, CooldownSkill, Listen
             player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) ((baseDuration + level) * 20), 2));
             player.setHealth(6);
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WARDEN_DEATH, 1.0F, 1.0F);
-            player.getWorld().spawnParticle(Particle.SCULK_CHARGE_POP, player.getLocation(), 10, null);
+            player.getWorld().spawnParticle(Particle.SCULK_SOUL, player.getLocation(), 10, null);
             active.add(player.getUniqueId());
 
             Bukkit.getScheduler().runTaskLater(champions, () -> {
@@ -94,7 +94,7 @@ public class Usurper extends Skill implements ToggleSkill, CooldownSkill, Listen
         if (!(event.getDamager() instanceof Player damager)) return;
 
         if (active.contains(damagee.getUniqueId())) {
-            event.setDamage(event.getDamage() * (0.30 - ((damagee.getLevel() - 1) * 5)));
+            event.setDamage(0);
             UtilMessage.message(damager, getClassType().getName(), damagee.getName() + " is using " + getName());
             damagee.getWorld().playSound(damagee.getLocation(), Sound.ITEM_SHIELD_BLOCK, 0.5F, 2.0F);
         }
