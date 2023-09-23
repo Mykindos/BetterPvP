@@ -8,17 +8,35 @@ import org.bukkit.craftbukkit.v1_20_R1.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BlockIterator;
+import org.bukkit.util.BoundingBox;
+import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 public class UtilBlock {
 
     public static HashSet<Material> blockAirFoliageSet = new HashSet<>();
     public static HashSet<Material> blockPassSet = new HashSet<>();
     public static HashSet<Material> blockUseSet = new HashSet<>();
+
+    public static Collection<BoundingBox> getBoundingBoxes(final Block block) {
+        return block.getCollisionShape().getBoundingBoxes().stream().map(boundingBox -> {
+            final org.bukkit.util.Vector min = boundingBox.getMin().add(block.getLocation().toVector());
+            final Vector max = boundingBox.getMax().add(block.getLocation().toVector());
+            return BoundingBox.of(min, max);
+        }).toList();
+    }
+
+    public static boolean doesBoundingBoxCollide(final BoundingBox boundingBox, final Block block) {
+        final Collection<BoundingBox> boundingBoxes = getBoundingBoxes(block);
+        for (final BoundingBox box : boundingBoxes) {
+            if (box.overlaps(boundingBox)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     /**
      * Check if a Player is in Lava
