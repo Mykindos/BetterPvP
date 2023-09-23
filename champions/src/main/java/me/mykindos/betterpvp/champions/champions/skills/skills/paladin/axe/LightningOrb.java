@@ -54,10 +54,10 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Launch an orb. Directly hitting a player",
+                "Launch an electric orb that upon directly hitting a player",
                 "will strike up to <stat>" + maxTargets + "</stat> targets within <val>" + (spreadDistance + (level * 0.5)) + "</val> blocks",
                 "with lightning, <effect>Shocking</effect> them for <stat>" + shockDuration + "</stat> seconds and",
-                "giving them <effect>Slowness II</effect> for <stat>" + slowDuration + "</stat> seconds.",
+                "giving them <effect>Slowness II</effect> for <stat>" + slowDuration + "</stat> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };

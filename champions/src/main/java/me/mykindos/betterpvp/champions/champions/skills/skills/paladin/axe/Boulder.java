@@ -50,8 +50,10 @@ public class Boulder extends Skill implements Listener, InteractSkill, CooldownS
     @Override
     public String[] getDescription(int level) {
         return new String[] {
-                "Throw a boulder forward that, upon",
-                "contact, deals <val>" + getDamage(level) + "</val> damage to all nearby",
+                "Right click with an Axe to activate",
+                "",
+                "Throw a boulder forward that",
+                "deals <val>" + getDamage(level) + "</val> damage to all nearby",
                 "enemies and heals surrounding allies for",
                 "<val>" + getHeal(level) + "</val> health in a radius of <val>" + getRadius(level) + "</val> blocks.",
                 "",
