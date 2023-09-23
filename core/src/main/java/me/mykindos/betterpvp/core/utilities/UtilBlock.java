@@ -21,7 +21,7 @@ public class UtilBlock {
 
     public static Collection<BoundingBox> getBoundingBoxes(final Block block) {
         return block.getCollisionShape().getBoundingBoxes().stream().map(boundingBox -> {
-            final org.bukkit.util.Vector min = boundingBox.getMin().add(block.getLocation().toVector());
+            final Vector min = boundingBox.getMin().add(block.getLocation().toVector());
             final Vector max = boundingBox.getMax().add(block.getLocation().toVector());
             return BoundingBox.of(min, max);
         }).toList();

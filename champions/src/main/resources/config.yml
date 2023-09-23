@@ -53,9 +53,9 @@ skills:
     flash:
       enabled: true
       maxlevel: 5
-      maxCharges: 4
-      timeBetweenCharges: 11.0
-      maxTravelDistance: 8
+      baseMaxCharges: 1
+      baseRechargeSeconds: 4.0
+      teleportDistance: 5.0
     markedfordeath:
       enabled: true
       maxlevel: 5
