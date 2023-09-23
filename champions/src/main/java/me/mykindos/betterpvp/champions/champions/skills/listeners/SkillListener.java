@@ -2,13 +2,14 @@ package me.mykindos.betterpvp.champions.champions.skills.listeners;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.Arrays;
-import java.util.Optional;
 import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
 import me.mykindos.betterpvp.champions.champions.builds.BuildSkill;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
+import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillDequipEvent;
+import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillEquipEvent;
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
+import me.mykindos.betterpvp.champions.champions.roles.events.RoleChangeEvent;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.champions.champions.skills.types.*;
@@ -36,8 +37,12 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.potion.PotionEffectType;
+
+import java.util.Arrays;
+import java.util.Optional;
 
 @Singleton
 @BPvPListener
@@ -292,6 +297,60 @@ public class SkillListener implements Listener {
         if (effectManager.hasEffect(player, EffectType.SILENCE)) {
             UtilMessage.simpleMessage(player, skill.getClassType().getName(), "You cannot use <green>%s<gray> while silenced.", skill.getName());
             event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onSkillEquip(SkillEquipEvent event) {
+        event.getSkill().trackPlayer(event.getPlayer());
+    }
+
+    @EventHandler
+    public void onSkillDequip(SkillDequipEvent event) {
+        event.getSkill().invalidatePlayer(event.getPlayer());
+    }
+
+    @EventHandler
+    public void onJoin(PlayerJoinEvent event) {
+        final Player player = event.getPlayer();
+
+        Role role = roleManager.getObject(player.getUniqueId().toString()).orElse(null);
+        Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(player.getUniqueId().toString());
+        if (gamerBuildsOptional.isPresent()) {
+            GamerBuilds builds = gamerBuildsOptional.get();
+
+            // Track new skills
+            String name = role == null ? null : role.getName();
+            RoleBuild build = builds.getActiveBuilds().get(name);
+            if (build != null) {
+                build.getActiveSkills().forEach(skill -> skill.invalidatePlayer(player));
+            }
+        }
+    }
+
+    @EventHandler
+    public void onRoleChange(RoleChangeEvent event) {
+        final Role newRole = event.getRole();
+        final Role previousRole = event.getPrevious();
+        final Player player = event.getPlayer();
+
+        Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(player.getUniqueId().toString());
+        if (gamerBuildsOptional.isPresent()) {
+            GamerBuilds builds = gamerBuildsOptional.get();
+
+            // Invalidate old skills
+            String name = previousRole == null ? null : previousRole.getName();
+            RoleBuild build = builds.getActiveBuilds().get(name);
+            if (build != null) {
+                build.getActiveSkills().forEach(skill -> skill.invalidatePlayer(player));
+            }
+
+            // Track with new skills
+            name = newRole == null ? null : newRole.getName();
+            build = builds.getActiveBuilds().get(name);
+            if (build != null) {
+                build.getActiveSkills().forEach(skill -> skill.trackPlayer(player));
+            }
         }
     }
 
