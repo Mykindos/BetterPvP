@@ -65,7 +65,7 @@ public class FinalGambit extends Skill implements ToggleSkill, CooldownSkill, Li
     public void toggle(Player player, int level) {
         if (!active.contains(player.getUniqueId())) {
             player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) ((baseDuration + level) * 20), 2));
-            player.setHealth(6);
+            player.setHealth(1);
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WARDEN_DEATH, 1.0F, 1.0F);
             player.getWorld().spawnParticle(Particle.SCULK_SOUL, player.getLocation(), 10, null);
             active.add(player.getUniqueId());
