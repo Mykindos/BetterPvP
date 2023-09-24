@@ -19,6 +19,7 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Horse;
@@ -57,12 +58,12 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
         return new String[]{
                 "Right click with a Sword to activate",
                 "",
-                "Mount a valliant steed which will ",
+                "Mount a valiant steed which will ",
                 "last for <val>" + (lifespan + (level-1)) + "</val> seconds",
                 "",
                 "The horse will have <val>" + (horseHealth + ((level-1) *5)) + "</val> health",
                 "",
-                "If you dismount the horse it will dissapear",
+                "If you dismount the horse it will disappear",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -70,10 +71,11 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
 
     public void activate(Player player, int level) {
         if (!canUse(player)) {
-            UtilMessage.message(player, getClassType().getName(), "Cannot summon horse now");
             return;
         }
         active.add(player.getUniqueId());
+
+        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_HORSE_ANGRY, 2.0f, 0.5f);
 
         Horse horse = player.getWorld().spawn(player.getLocation(), Horse.class);
         horse.setTamed(true);
@@ -100,7 +102,6 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
                 if (horse != null && !horse.isDead()) {
                     horse.remove();
                     horseData.remove(player);
-                    UtilMessage.message(player, getClassType().getName(), "Your horse has evaporated");
                 }
             }
         }.runTaskLater(champions, (long) (lifespan + (level - 1)) * 20L);
@@ -129,6 +130,7 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
         if (data != null) {
             Horse horse = data.getHorse();
             if (!horse.isDead()) {
+                UtilMessage.message(player, getClassType().getName(), "You have already summoned a horse.");
                 return false;
             }
         }
@@ -143,7 +145,7 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
 
             HorseData data = horseData.get(player);
             if (data != null && data.getHorse().equals(horse)) {
-                UtilMessage.message(player, getClassType().getName(), "Your horse has evaporated");
+                UtilMessage.message(player, getClassType().getName(), "Your horse has disappeared.");
                 horse.remove();
                 horseData.remove(player);
             }
