@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.clans.fields.block;
 import com.google.inject.Inject;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.fields.model.CustomOre;
+import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
@@ -83,8 +84,7 @@ public class GoldChunkOre extends CustomOre implements Listener {
         final ItemStack itemStack = new ItemStack(material, 1);
         final ItemMeta meta = itemStack.getItemMeta();
         final PersistentDataContainer pdc = meta.getPersistentDataContainer();
-        final NamespacedKey key = new NamespacedKey("clans", "gold-chunk");
-        pdc.set(key, PersistentDataType.INTEGER, gold);
+        pdc.set(ClansNamespacedKeys.FIELDS_GOLD_CHUNK, PersistentDataType.INTEGER, gold);
         itemStack.setItemMeta(meta);
         return itemStack;
     }
@@ -92,7 +92,7 @@ public class GoldChunkOre extends CustomOre implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onBlockPickup(InventoryPickupItemEvent event) {
         final PersistentDataContainer pdc = event.getItem().getItemStack().getItemMeta().getPersistentDataContainer();
-        final NamespacedKey key = new NamespacedKey("clans", "gold-chunk");
+        final NamespacedKey key = ClansNamespacedKeys.FIELDS_GOLD_CHUNK;
         if (!pdc.has(key, PersistentDataType.INTEGER)) {
             return; // Not a gold chunk
         }
@@ -104,7 +104,7 @@ public class GoldChunkOre extends CustomOre implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onItemPick(EntityPickupItemEvent event) {
         final PersistentDataContainer pdc = event.getItem().getItemStack().getItemMeta().getPersistentDataContainer();
-        final NamespacedKey key = new NamespacedKey("clans", "gold-chunk");
+        final NamespacedKey key = ClansNamespacedKeys.FIELDS_GOLD_CHUNK;
         if (!pdc.has(key, PersistentDataType.INTEGER)) {
             return; // Not a gold chunk
         }
