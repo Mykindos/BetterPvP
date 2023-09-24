@@ -40,6 +40,7 @@ public class Clans extends BPvPPlugin {
 
     @Inject
     @Config(path = "clans.database.prefix", defaultValue = "clans_")
+    @Getter
     private String databasePrefix;
 
     private ClanManager clanManager;

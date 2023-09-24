@@ -128,3 +128,91 @@ command:
     reload:
       enabled: true
       requiredRank: ADMIN
+fields:
+  blocks:
+    goldchunk:
+      maxCoins: 150
+      minCoins: 50
+      respawn: 1800.0
+    condensedgoldore:
+      respawn: 1800.0
+      min: 1
+      max: 1
+    condensedironore:
+      respawn: 1800.0
+      min: 1
+      max: 1
+    emeraldore:
+      respawn: 1800.0
+      min: 1
+      max: 1
+    lootchest:
+      respawn: 1800.0
+      dropCount: 1
+      drops:
+        DIAMOND:
+          categoryWeight: 1
+          weight: 1
+          min: 1
+          max: 5
+    diamondore:
+      respawn: 1800.0
+      min: 1
+      max: 1
+    condensedcoalore:
+      respawn: 1800.0
+      min: 1
+      max: 1
+    goldore:
+      respawn: 1800.0
+      min: 1
+      max: 1
+    redstoneore:
+      respawn: 1800.0
+      min: 1
+      max: 1
+    coalore:
+      respawn: 1800.0
+      min: 1
+      max: 1
+    condenseddiamondore:
+      respawn: 1800.0
+      min: 1
+      max: 1
+    condensedredstoneore:
+      respawn: 1800.0
+      min: 1
+      max: 1
+    lapisore:
+      respawn: 1800.0
+      min: 1
+      max: 1
+    quartzore:
+      respawn: 1800.0
+      min: 1
+      max: 1
+    condensedlapisore:
+      respawn: 1800.0
+      min: 1
+      max: 1
+    condensedemeraldore:
+      respawn: 1800.0
+      min: 1
+      max: 1
+    ironore:
+      respawn: 1800.0
+      min: 1
+      max: 1
+    leatherore:
+      respawn: 1800.0
+      min: 1
+      max: 1
+    condensedleatherore:
+      respawn: 1800.0
+      min: 1
+      max: 1
+  playerCountSpeeds:
+    '25': 1.5
+    '50': 2
+    '75': 2.5
+    '100': 3
