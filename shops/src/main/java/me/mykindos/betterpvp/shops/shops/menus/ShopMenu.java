@@ -25,11 +25,16 @@ public class ShopMenu extends Menu {
         loadShop();
     }
 
+    @Override
+    public void construct() {
+        loadShop();
+    }
+
     private void loadShop() {
         for (IShopItem shopItem : shopItems) {
             var itemStack = new ItemStack(shopItem.getMaterial(), shopItem.getAmount());
 
-            addButton(new ShopItemButton(shopItem.getSlot(), shopItem, addShopLore(itemHandler.updateNames(itemStack), shopItem)));
+            addButton(new ShopItemButton(this, shopItem.getSlot(), shopItem, addShopLore(itemHandler.updateNames(itemStack), shopItem)));
         }
     }
 
