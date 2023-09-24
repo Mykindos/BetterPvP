@@ -33,7 +33,6 @@ public class ItemHandler {
     private final Enchantment glowEnchantment;
 
 
-
     @Inject
     @Config(path = "items.hideAttributes", defaultValue = "true")
     private boolean hideAttributes;
@@ -75,7 +74,7 @@ public class ItemHandler {
             itemMeta.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS);
         }
 
-        if(hideEnchants) {
+        if (hideEnchants) {
             itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         }
 
@@ -88,18 +87,18 @@ public class ItemHandler {
             itemMeta.lore(loreUpdateEvent.getItemLore());
 
             PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
-            if(!dataContainer.has(CoreNamespaceKeys.UUID_KEY)){
+            if (!dataContainer.has(CoreNamespaceKeys.UUID_KEY)) {
                 dataContainer.set(CoreNamespaceKeys.UUID_KEY, PersistentDataType.STRING, UUID.randomUUID().toString());
             }
 
             if (item.isGlowing() || dataContainer.has(CoreNamespaceKeys.GLOW_KEY)) {
                 itemMeta.addEnchant(glowEnchantment, 1, true);
-            }else{
-                for(Map.Entry<Enchantment, Integer> entry : itemStack.getEnchantments().entrySet()){
+            } else {
+                for (Map.Entry<Enchantment, Integer> entry : itemStack.getEnchantments().entrySet()) {
                     itemStack.removeEnchantment(entry.getKey());
                 }
             }
-        }else{
+        } else {
             itemMeta.displayName(Component.text(UtilFormat.cleanString(material.name())).color(NamedTextColor.YELLOW));
         }
 
@@ -108,13 +107,24 @@ public class ItemHandler {
         return itemStack;
     }
 
+    public BPVPItem getItemByType(Material material) {
+        return itemMap.getOrDefault(material,
+                new BPVPItem(
+                        material,
+                        Component.text(UtilFormat.cleanString(material.name())).color(NamedTextColor.YELLOW),
+                        new ArrayList<>(),
+                        false
+                )
+        );
+    }
+
     private void registerEnchantment(Enchantment enchantment) {
         try {
             Field accept = Enchantment.class.getDeclaredField("acceptingNew");
             accept.setAccessible(true);
             accept.set(null, true);
             Enchantment.registerEnchantment(enchantment);
-        }catch(Exception ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }

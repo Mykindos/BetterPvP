@@ -87,12 +87,12 @@ public class ClansSidebarListener implements Listener {
                 sidebarObjective.getScore(ChatColor.YELLOW.toString() + ChatColor.BOLD + "Clan").setScore(15);
                 String name = clan.getName();
 
-                sidebarObjective.getScore(ChatColor.AQUA.toString() + ChatColor.BOLD + name + ChatColor.RESET).setScore(14);
+                sidebarObjective.getScore(ChatColor.AQUA.toString() + name + ChatColor.RESET).setScore(14);
                 sidebarObjective.getScore(ChatColor.RED + "").setScore(13);
 
                 if (clan.getTerritory().size() > 0) {
                     sidebarObjective.getScore(ChatColor.YELLOW.toString() + ChatColor.BOLD + "Clan Energy").setScore(12);
-                    sidebarObjective.getScore(ChatColor.GREEN.toString() + ChatColor.BOLD + clan.getEnergyTimeRemaining()).setScore(11);
+                    sidebarObjective.getScore(ChatColor.GREEN.toString() + clan.getEnergyTimeRemaining()).setScore(11);
                     sidebarObjective.getScore(ChatColor.BLUE + "").setScore(10);
                 }
             }
@@ -101,7 +101,7 @@ public class ClansSidebarListener implements Listener {
             Optional<Integer> coinsOptional = gamer.getProperty(GamerProperty.BALANCE);
             if (coinsOptional.isPresent()) {
                 sidebarObjective.getScore(ChatColor.YELLOW.toString() + ChatColor.BOLD + "Coins").setScore(9);
-                sidebarObjective.getScore(ChatColor.GOLD.toString() + ChatColor.BOLD + UtilFormat.formatNumber(coinsOptional.get())).setScore(8);
+                sidebarObjective.getScore(ChatColor.GOLD.toString() + UtilFormat.formatNumber(coinsOptional.get())).setScore(8);
             }
 
 
@@ -111,9 +111,9 @@ public class ClansSidebarListener implements Listener {
             if (standingOptional.isPresent()) {
                 Clan standing = standingOptional.get();
                 sidebarObjective.getScore(clanManager.getRelation(clan, standing).getPrimaryAsChatColor().toString()
-                        + ChatColor.BOLD + standing.getName()).setScore(5);
+                        + standing.getName()).setScore(5);
             } else {
-                sidebarObjective.getScore(ChatColor.GREEN.toString() + ChatColor.BOLD + "Wilderness").setScore(5);
+                sidebarObjective.getScore(ChatColor.GRAY.toString() + "Wilderness").setScore(5);
             }
 
             // TODO world event

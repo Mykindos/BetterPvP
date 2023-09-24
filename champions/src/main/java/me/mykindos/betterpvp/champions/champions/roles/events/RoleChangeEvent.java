@@ -12,4 +12,5 @@ public class RoleChangeEvent extends CustomCancellableEvent {
 
     private final Player player;
     private final Role role;
+    private final Role previous;
 }

@@ -10,16 +10,19 @@ import me.mykindos.betterpvp.core.combat.events.CustomKnockbackEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
+
 @Singleton
 @BPvPListener
 public class Colossus extends Skill implements PassiveSkill {
 
-    private int reductionPerLevel;
+    private double reductionPerLevel;
 
     @Inject
     public Colossus(Champions champions, ChampionsManager championsManager) {
@@ -35,7 +38,7 @@ public class Colossus extends Skill implements PassiveSkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "You take <val>" + (reductionPerLevel * level) + "%</val> reduced knockback."
+                "You take <val>" + ((reductionPerLevel * 100) * level) + "%</val> reduced knockback."
         };
     }
 
@@ -58,7 +61,9 @@ public class Colossus extends Skill implements PassiveSkill {
         if(cause == DamageCause.ENTITY_ATTACK || cause == DamageCause.PROJECTILE) {
             int level = getLevel(player);
             if(level > 0) {
-                event.setDamage(event.getDamage() * (1 - ((reductionPerLevel * 0.01) * level)));
+                event.setCanBypassMinimum(true);
+                double proposedKB = event.getDamage() * (1 - ((reductionPerLevel) * level));
+                event.setDamage(Math.max(proposedKB, 1));
             }
         }
 
@@ -66,7 +71,7 @@ public class Colossus extends Skill implements PassiveSkill {
 
     @Override
     public void loadSkillConfig(){
-        reductionPerLevel = getConfig("reductionPerLevel", 25, Integer.class);
+        reductionPerLevel = getConfig("reductionPerLevel", 0.25, Double.class);
     }
 
 }

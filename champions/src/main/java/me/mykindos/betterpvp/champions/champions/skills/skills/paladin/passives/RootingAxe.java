@@ -30,7 +30,7 @@ import org.bukkit.potion.PotionEffectType;
 @BPvPListener
 public class RootingAxe extends Skill implements PassiveSkill, CooldownSkill {
 
-
+    private double duration;
     @Inject
     public RootingAxe(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -47,7 +47,7 @@ public class RootingAxe extends Skill implements PassiveSkill, CooldownSkill {
         return new String[]{
                 "Your axe rips players downward into",
                 "the earth disrupting their movement,",
-                "and stops them from jumping for 2 seconds",
+                "and stops them from jumping for <val>" + duration + "</val> seconds",
                 "",
                 "Internal Cooldown: <val>" + getCooldown(level)
         };
@@ -88,7 +88,7 @@ public class RootingAxe extends Skill implements PassiveSkill, CooldownSkill {
                     if (championsManager.getCooldowns().add(damager, getName(), 11 - (level * 1.5), false)) {
                         damagee.teleport(damagee.getLocation().add(0, -0.9, 0));
                         damagee.getWorld().playEffect(damagee.getLocation(), Effect.STEP_SOUND, damagee.getLocation().getBlock().getType());
-                        damagee.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 40, -5));
+                        damagee.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, (int) duration * 20, -5));
                     }
                 }
             }
@@ -105,5 +105,9 @@ public class RootingAxe extends Skill implements PassiveSkill, CooldownSkill {
     @Override
     public double getCooldown(int level) {
         return cooldown - ((level - 1) * 2);
+    }
+
+    public void loadSkillConfig() {
+        duration = getConfig("duration", 2.0, Double.class);
     }
 }

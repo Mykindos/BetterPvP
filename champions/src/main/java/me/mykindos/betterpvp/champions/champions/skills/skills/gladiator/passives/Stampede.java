@@ -31,6 +31,7 @@ public class Stampede extends Skill implements PassiveSkill {
     private final WeakHashMap<Player, Integer> sprintStr = new WeakHashMap<>();
 
     private double durationPerStack;
+    private double damage;
 
     @Inject
     public Stampede(Champions champions, ChampionsManager championsManager) {
@@ -48,11 +49,11 @@ public class Stampede extends Skill implements PassiveSkill {
         return new String[]{
                 "You slowly build up speed as you",
                 "sprint. You gain a level of Speed",
-                "for every <val>" + (7 - level) + "</val> seconds, up to a max",
-                "of Speed II.",
+                "for every <val>" + (durationPerStack - level) + "</val> seconds, up to a max",
+                "of Speed III.",
                 "",
                 "Attacking during stampede deals",
-                "2 bonus damage per speed level."};
+                "<val>" + damage + "</val> bonus damage per speed level."};
     }
 
     @Override
@@ -102,8 +103,6 @@ public class Stampede extends Skill implements PassiveSkill {
                 }
             }
         }
-
-
     }
 
 
@@ -120,13 +119,12 @@ public class Stampede extends Skill implements PassiveSkill {
 
         event.setKnockback(false);
         UtilVelocity.velocity(event.getDamagee(), UtilVelocity.getTrajectory2d(damager, event.getDamagee()), 2.0D, true, 0.0D, 0.4D, 1.0D, true);
-        event.setDamage(event.getDamage() + str);
+        event.setDamage(event.getDamage() + (str * damage));
     }
 
     @Override
     public void loadSkillConfig() {
         durationPerStack = getConfig("durationPerStack", 8.0, Double.class);
+        damage = getConfig("durationPerStack", 2.0, Double.class);
     }
-
-
 }

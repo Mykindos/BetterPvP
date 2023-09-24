@@ -47,6 +47,8 @@ public class Swarm extends ChannelSkill implements InteractSkill, EnergySkill, L
 
     private double batLifespan;
 
+    private double batDamage;
+
     @Inject
     public Swarm(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -167,7 +169,7 @@ public class Swarm extends ChannelSkill implements InteractSkill, EnergySkill, L
                         vector.setY(vector.getY() + 0.4d);
 
                     other.setFallDistance(0);
-                    UtilDamage.doCustomDamage(new CustomDamageEvent(other, player, null, DamageCause.CUSTOM, 1, false, getName()));
+                    UtilDamage.doCustomDamage(new CustomDamageEvent(other, player, null, DamageCause.CUSTOM, batDamage, false, getName()));
 
                     other.setVelocity(bat.getLocation().getDirection().add(new Vector(0, .4F, 0)).multiply(0.50));
 
@@ -221,7 +223,7 @@ public class Swarm extends ChannelSkill implements InteractSkill, EnergySkill, L
     @Override
     public void loadSkillConfig() {
         batLifespan = getConfig("batLifespan", 2.0, Double.class);
-
+        batDamage = getConfig("batDamage", 1.0, Double.class);
     }
 
     @Override

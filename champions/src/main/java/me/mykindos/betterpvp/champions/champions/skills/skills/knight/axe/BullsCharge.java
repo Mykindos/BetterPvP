@@ -35,6 +35,8 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
 
     private final HashMap<UUID, Long> running = new HashMap<>();
 
+    private double slowDuration;
+
     @Inject
     public BullsCharge(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -51,7 +53,7 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
                 "Right click with an Axe to activate.",
                 "",
                 "Enter a rage, gaining massive movement speed",
-                "and slowing anything you hit for 3 seconds",
+                "and giving Slowness III to anything you hit for <val>" + slowDuration + "</val> seconds",
                 "",
                 "While charging, you take no knockback.",
                 "",
@@ -93,7 +95,7 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
 
                 event.setKnockback(false);
 
-                damagee.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 60, 2));
+                damagee.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) slowDuration * 20, 2));
                 damager.removePotionEffect(PotionEffectType.SPEED);
 
                 damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_ENDERMAN_SCREAM, 1.5F, 0.0F);
@@ -135,6 +137,10 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
     @Override
     public SkillType getType() {
         return SkillType.AXE;
+    }
+
+    public void loadSkillConfig() {
+        slowDuration = getConfig("slowDuration", 3.0, Double.class);
     }
 
 }

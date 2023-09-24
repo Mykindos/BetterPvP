@@ -40,10 +40,10 @@ public class HoldPosition extends Skill implements InteractSkill, CooldownSkill,
 
         return new String[]{
                 "Hold your position, gaining",
-                "Protection II, Slow III and no",
+                "Protection II, Slowness IV and no",
                 "knockback for <val>" + (5 + ((level - 1) * 0.5)) + "</val> seconds.",
                 "",
-                "Recharge: <val>" + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level)
         };
     }
 

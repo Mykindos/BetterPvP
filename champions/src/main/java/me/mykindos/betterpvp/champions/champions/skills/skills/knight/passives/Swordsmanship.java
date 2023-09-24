@@ -30,6 +30,8 @@ public class Swordsmanship extends Skill implements PassiveSkill {
     private double timeBetweenCharges;
     private double timeOutOfCombat;
 
+    private double damagePerCharge;
+
     private final WeakHashMap<Player, Integer> charges = new WeakHashMap<>();
 
     @Inject
@@ -47,11 +49,11 @@ public class Swordsmanship extends Skill implements PassiveSkill {
 
         return new String[]{
                 "Prepare a powerful sword attack,",
-                "You gain 1 charge every 3 seconds.",
+                "You gain 1 charge every <val>" + timeBetweenCharges + "</val> seconds.",
                 "You can store a maximum of <val>" + (level) + "</val> charges",
                 "",
                 "When you attack, your damage is",
-                "increased by 0.5 for each charge you have",
+                "increased by <val>" + damagePerCharge + "</val> for each charge you have",
                 "and then your charges are reset to 0.",
                 "",
                 "This only applies to swords."
@@ -80,7 +82,7 @@ public class Swordsmanship extends Skill implements PassiveSkill {
         int level = getLevel(player);
         if (level > 0) {
             int charge = charges.get(player);
-            event.setDamage(event.getDamage() + (charge * 0.5));
+            event.setDamage(event.getDamage() + (charge * damagePerCharge));
             charges.remove(player);
         }
     }
@@ -116,6 +118,7 @@ public class Swordsmanship extends Skill implements PassiveSkill {
     public void loadSkillConfig() {
         timeBetweenCharges = getConfig("timeBetweenCharges", 2.0, Double.class);
         timeOutOfCombat = getConfig("timeOutOfCombat", 2.5, Double.class);
+        damagePerCharge = getConfig("timeOutOfCombat", 0.5, Double.class);
     }
 
 }

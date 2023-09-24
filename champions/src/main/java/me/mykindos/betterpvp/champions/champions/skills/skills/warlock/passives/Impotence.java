@@ -19,6 +19,8 @@ import org.bukkit.event.EventPriority;
 @BPvPListener
 public class Impotence extends Skill implements PassiveSkill {
 
+    private int radius;
+    private int maxEnemies;
     @Inject
     public Impotence(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -32,12 +34,14 @@ public class Impotence extends Skill implements PassiveSkill {
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "For each enemy within <val>" + (3 + level) + "</val> blocks",
-                "you take reduced damage from all sources, at a maximum of 3 players.",
+                "For each enemy within <val>" + (radius + level) + "</val> blocks",
+                "you take reduced damage from all sources, ",
+                "at a maximum of <val>" + maxEnemies + "</val> players.",
                 "",
                 "Damage Reduction:",
-                "1 nearby enemy = 20%",
-                "3 nearby enemies = 30%"
+                "1 nearby enemy = <val>" + (calculateReduction(1) * 100)  + "%</val>",
+                "2 nearby enemies = <val>" + (calculateReduction(2) * 100) + "%</val>",
+                "3 nearby enemies = <val>" + (calculateReduction(3) * 100) + "%</val>"
         };
     }
 
@@ -57,9 +61,19 @@ public class Impotence extends Skill implements PassiveSkill {
 
         int level = getLevel(player);
         if (level > 0) {
-            int nearby = UtilPlayer.getNearbyEnemies(player, player.getLocation(), 3 + level).size();
-            event.setDamage(event.getDamage() * (1 - ((15 + (Math.min(nearby, 3) * 5)) * 0.01)));
+            int nearby = UtilPlayer.getNearbyEnemies(player, player.getLocation(), radius + level).size();
+            event.setDamage(event.getDamage() * (1 - calculateReduction(nearby)));
         }
+    }
 
+    private double calculateReduction(int nearby) {
+        double rawDecrease = 15 + (Math.min(nearby, maxEnemies) * 5);
+        return rawDecrease * 0.01;
+    }
+
+    @Override
+    public void loadSkillConfig() {
+        radius = getConfig("radius", 3, Integer.class);
+        maxEnemies = getConfig("maxEnemies", 3, Integer.class);
     }
 }

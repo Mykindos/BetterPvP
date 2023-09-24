@@ -4,46 +4,47 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
-import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillEquipEvent;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.skills.assassin.data.FlashData;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.*;
-import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
-import org.bukkit.*;
+import me.mykindos.betterpvp.core.utilities.model.VectorLine;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
+import java.util.Iterator;
+import java.util.Map;
 import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
 public class Flash extends Skill implements InteractSkill, Listener {
 
-    private int maxCharges;
-    private double timeBetweenCharges;
-    private int maxTravelDistance;
+    private final WeakHashMap<Player, FlashData> charges = new WeakHashMap<>();
 
-    private final WeakHashMap<Player, Location> loc = new WeakHashMap<>();
-    private final WeakHashMap<Player, Integer> charges = new WeakHashMap<>();
-    private final WeakHashMap<Player, Long> lastRecharge = new WeakHashMap<>();
-    private final WeakHashMap<Player, Long> blinkTime = new WeakHashMap<>();
+    private int baseMaxCharges;
+    private double baseRechargeSeconds;
+    private double teleportDistance;
 
     @Inject
     public Flash(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
-
 
     @Override
     public String getName() {
@@ -52,18 +53,29 @@ public class Flash extends Skill implements InteractSkill, Listener {
 
     @Override
     public String[] getDescription(int level) {
-
-        return new String[]{
-                "Right click with a axe to activate.",
+        return new String[] {
+                "Teleport a short distance horizontally",
+                "in the direction you are facing.",
                 "",
-                "Instantly teleport forwards 8 Blocks.",
-                "Cannot be used while Slowed.",
+                "Uses up to <val>" + getMaxCharges(level) + "</val> charges.",
                 "",
-                "Stores up to 4 charges.",
-                "",
-                "Cannot be used while Slowed.",
-                "Recharge: 1 charge per <val>" + (timeBetweenCharges - level) + "</val> seconds."
+                "Gain a charge every: <stat>" + getRechargeSeconds(level) + "</stat> seconds."
         };
+    }
+
+    private int getMaxCharges(int level) {
+        return baseMaxCharges + (level - 1);
+    }
+
+    private double getRechargeSeconds(int level) {
+        return baseRechargeSeconds;
+    }
+
+    @Override
+    public void loadSkillConfig() {
+        baseMaxCharges = getConfig("baseMaxCharges", 1, Integer.class);
+        baseRechargeSeconds = getConfig("baseRechargeSeconds", 4.0, Double.class);
+        teleportDistance = getConfig("teleportDistance", 5.0, Double.class);
     }
 
     @Override
@@ -76,173 +88,174 @@ public class Flash extends Skill implements InteractSkill, Listener {
         return SkillType.AXE;
     }
 
+    @Override
+    public Action[] getActions() {
+        return SkillActions.RIGHT_CLICK;
+    }
 
-    @EventHandler
-    public void skillEquipEvent(SkillEquipEvent event) {
-        if (event.getSkill().getName().equalsIgnoreCase(getName())) {
-            if (!charges.containsKey(event.getPlayer())) {
-                charges.put(event.getPlayer(), 0);
+    @Override
+    public boolean displayWhenUsed() {
+        return false;
+    }
+
+    private void notifyCharges(Player player, int charges) {
+        UtilMessage.simpleMessage(player, getClassType().getName(), "Flash Charges: <alt2>" + charges);
+    }
+
+    @Override
+    public boolean canUse(Player player) {
+        if (charges.containsKey(player) && charges.get(player).getCharges() > 0) {
+            return true;
+        }
+
+        UtilMessage.simpleMessage(player, getClassType().getName(), "You don't have any <alt>" + getName() + "</alt> charges.");
+        return false;
+    }
+
+    private boolean wouldCollide(Block block, BoundingBox boundingBox) {
+        return !block.isPassable() && UtilBlock.doesBoundingBoxCollide(boundingBox, block);
+    }
+
+    @Override
+    public void invalidatePlayer(Player player) {
+        charges.remove(player);
+    }
+
+    @Override
+    public void trackPlayer(Player player) {
+        charges.computeIfAbsent(player, k -> new FlashData());
+    }
+
+    @Override
+    public void activate(Player player, int level) {
+        // Iterate from their location to their destination
+        // Modify the base location by the direction they are facing
+        Location teleportLocation = player.getLocation();
+        final Vector direction = player.getEyeLocation().getDirection();
+
+        final int iterations = (int) Math.ceil(teleportDistance / 0.2f);
+        for (int i = 0; i < iterations; i++) {
+            // Extend their location by the direction they are facing by 0.2 blocks per iteration
+            final Vector increment = direction.clone().multiply(0.2 * i);
+            final Location newLocation = player.getLocation().add(increment);
+
+            // Get the bounding box of the player as if they were standing on the new location
+            BoundingBox relativeBoundingBox = UtilLocation.copyAABBToLocation(player.getBoundingBox(), newLocation);
+
+            // Only cancel for collision if the block isn't passable AND we hit its collision shape
+            final Location blockOnTop = newLocation.clone().add(0, 1.0, 0);
+            if (wouldCollide(blockOnTop.getBlock(), relativeBoundingBox)) {
+                break;
             }
 
-            if (!lastRecharge.containsKey(event.getPlayer())) {
-                lastRecharge.put(event.getPlayer(), System.currentTimeMillis());
+            // We know they won't suffocate because we checked the block above them
+            // Now check their feet and see if we can skip this block to allow for through-block flash
+            Location newTeleportLocation = newLocation;
+            if (wouldCollide(newLocation.getBlock(), relativeBoundingBox)) {
+                // If the block at their feet is not passable, try to skip it IF
+                // and ONLY IF there isn't a third block above forming a 1x1 gap
+                // This allows for through-block flash
+                if (!blockOnTop.clone().add(0.0, 1.0, 0.0).getBlock().isPassable()) {
+//                if (wouldCollide(blockOnTop.clone().add(0.0, 1.0, 0.0).getBlock(), relativeBoundingBox)) {
+                    break;
+                }
+
+                // At this point, we can ATTEMPT to skip the block at their feet
+                final Vector horizontalIncrement = increment.clone().setY(0);
+                final Location frontLocation = player.getLocation().add(horizontalIncrement);
+                relativeBoundingBox = UtilLocation.copyAABBToLocation(player.getBoundingBox(), frontLocation);
+                if (wouldCollide(frontLocation.getBlock(), relativeBoundingBox)) {
+                    continue; // Cancel if that block we're skipping to is not passable
+                }
+
+                newTeleportLocation = frontLocation;
             }
+
+            final Location headBlock = newLocation.clone().add(0.0, relativeBoundingBox.getHeight(), 0.0);
+            if (wouldCollide(headBlock.getBlock(), relativeBoundingBox)) {
+                break; // Stop raying if we hit a block above their head
+            }
+
+            if (!player.hasLineOfSight(newLocation) && !player.hasLineOfSight(headBlock)) {
+                break; // Stop raying if we don't have line of sight
+            }
+
+            teleportLocation = newTeleportLocation;
+        }
+
+        // Adjust pitch and yaw to match the direction they are facing
+        teleportLocation.setPitch(player.getLocation().getPitch());
+        teleportLocation.setYaw(player.getLocation().getYaw());
+
+        // Shift them out of the location to avoid PHASING and SUFFOCATION
+        player.leaveVehicle();
+        teleportLocation = UtilLocation.shiftOutOfBlocks(teleportLocation, player.getBoundingBox());
+
+        // Teleport
+        // Asynchronously because, for some reason, spigot fires PlayerInteractEvent twice if the player looks at a block
+        // causing them to use the skill again after being teleported
+        // teleportAsync somehow fixes that
+        player.teleportAsync(teleportLocation);
+
+        // Lessen charges and add cooldown to prevent from instantly getting a flash charge if they're full
+        final int curCharges = charges.get(player).getCharges();
+        if (curCharges >= getMaxCharges(level)) {
+            championsManager.getCooldowns().add(player, getName(), getRechargeSeconds(level), false, true, true);
+        }
+        final int newCharges = curCharges - 1;
+        charges.get(player).setCharges(newCharges);
+
+        // Cues
+        notifyCharges(player, newCharges);
+        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WITHER_SHOOT, 0.4F, 1.2F);
+        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SILVERFISH_DEATH, 1.0F, 1.6F);
+        final Location lineStart = player.getLocation().add(0.0, player.getHeight() / 2, 0.0);
+        final Location lineEnd = teleportLocation.clone().add(0.0, player.getHeight() / 2, 0.0);
+        final VectorLine line = VectorLine.withStepSize(lineStart, lineEnd, 0.25f);
+        for (Location point : line.toLocations()) {
+            Particle.FIREWORKS_SPARK.builder().location(point).count(2).receivers(100).extra(0).spawn();
         }
     }
 
     @UpdateEvent(delay = 100)
     public void recharge() {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-
-            int level = getLevel(player);
-            if (level <= 0) continue;
-
-            if (!lastRecharge.containsKey(player)) {
-                lastRecharge.put(player, System.currentTimeMillis());
-            }
-
-            if(!charges.containsKey(player)) {
-                charges.put(player, 0);
-            }
-
-            int charge = charges.get(player);
-            if (charge == maxCharges) {
-                lastRecharge.put(player, System.currentTimeMillis());
+        final Iterator<Map.Entry<Player, FlashData>> iterator = charges.entrySet().iterator();
+        while (iterator.hasNext()) {
+            final Map.Entry<Player, FlashData> entry = iterator.next();
+            final Player player = entry.getKey();
+            final int level = getLevel(player);
+            if (level <= 0) {
+                iterator.remove();
                 continue;
             }
 
-            if (UtilTime.elapsed(lastRecharge.get(player), (long) ((timeBetweenCharges * 1000L) - (level * 1000L)))) {
-                charges.put(player, Math.min(maxCharges, charge + 1));
-                UtilMessage.simpleMessage(player, getClassType().getName(), "Flash Charges: <alt>" + (charge + 1));
-                lastRecharge.put(player, System.currentTimeMillis());
+            final FlashData data = entry.getValue();
+            final int maxCharges = getMaxCharges(level);
+
+            // Cues
+            if (UtilPlayer.isHoldingItem(player, getItemsBySkillType())) {
+                // Only display charges in hotbar if holding the weapon
+                final int newCharges = data.getCharges();
+                Component actionBar = Component.text(getName() + " ").color(NamedTextColor.WHITE).decorate(TextDecoration.BOLD)
+                        .append(Component.text("\u25A0".repeat(newCharges)).color(NamedTextColor.GREEN))
+                        .append(Component.text("\u25A0".repeat(newCharges >= maxCharges ? 0 : 1)).color(NamedTextColor.YELLOW))
+                        .append(Component.text("\u25A0".repeat(Math.max(0, maxCharges - newCharges - 1))).color(NamedTextColor.RED));
+
+                player.sendActionBar(actionBar);
             }
+
+            if (data.getCharges() >= maxCharges) {
+                continue; // skip if already at max charges
+            }
+
+            if (!championsManager.getCooldowns().add(player, getName(), getRechargeSeconds(level), false, true, true)) {
+                continue; // skip if not enough time has passed
+            }
+
+            // add a charge
+            data.addCharge();
+            notifyCharges(player, data.getCharges());
         }
     }
 
-
-    @EventHandler
-    public void onCustomDamage(CustomDamageEvent event) {
-        if (event.getCause() != DamageCause.SUFFOCATION) return;
-        if (event.getDamager() == null) return;
-        if (!(event.getDamagee() instanceof Player player)) return;
-
-        if (blinkTime.containsKey(player)) {
-            if (!UtilTime.elapsed(blinkTime.get(player), 500)) {
-                deblink(player);
-            }
-
-        }
-    }
-
-    @UpdateEvent(delay = 100)
-    public void onDetectGlass() {
-        for (Player player : blinkTime.keySet()) {
-            if (UtilTime.elapsed(blinkTime.get(player), 250)) continue;
-            if (isInInvalidBlock(player)) {
-                deblink(player);
-            }
-        }
-    }
-
-    private boolean isInInvalidBlock(Player player) {
-        for (double x = -0.3; x <= 0.3; x += 0.3) {
-            for (double z = -0.3; z <= 0.3; z += 0.3) {
-                Location loc = new Location(player.getWorld(), Math.floor(player.getLocation().getX() + x),
-                        player.getLocation().getY(), Math.floor(player.getLocation().getZ() + z));
-
-                if (loc.getBlock().getType().name().contains("GLASS") || loc.getBlock().getType().name().contains("DOOR")) {
-                    return true;
-
-                }
-            }
-        }
-
-        return false;
-    }
-
-    public void deblink(Player player) {
-        UtilServer.runTaskLater(champions, () -> {
-
-            UtilMessage.message(player, getClassType().getName(), "The target location was invalid, You will be refunded a charge shortly.");
-            UtilServer.runTaskLater(champions, () -> {
-                charges.put(player, Math.min(maxCharges, charges.get(player) + 1));
-                UtilMessage.simpleMessage(player, getClassType().getName(), "Flash Charges: <alt>" + charges.get(player));
-                lastRecharge.put(player, System.currentTimeMillis());
-            }, 20);
-
-
-            Location target = this.loc.remove(player);
-
-            player.teleport(target);
-            player.getWorld().playEffect(player.getLocation(), Effect.BLAZE_SHOOT, 0, 15);
-
-        }, 1);
-
-    }
-
-    @Override
-    public boolean canUse(Player player) {
-
-        if (charges.containsKey(player)) {
-            if (charges.get(player) == 0) {
-                UtilMessage.simpleMessage(player, getClassType().getName(), "You don't have any <alt>" + getName() + "</alt> charges.");
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-
-    @Override
-    public void activate(Player player, int level) {
-        if (charges.getOrDefault(player, 0) <= 0) return;
-
-        charges.put(player, charges.getOrDefault(player, 1) - 1);
-        UtilServer.runTaskLater(champions, () -> {
-            Vector direction = player.getLocation().getDirection();
-            Location targetLocation = player.getLocation().add(0, 1, 0);
-
-            double maxDistance = maxTravelDistance;
-
-            for (double currentDistance = 0; currentDistance < maxDistance; currentDistance += 1) {
-                Location testLocation = targetLocation.clone().add(direction.clone());
-                Block testBlock = testLocation.getBlock();
-                if (!UtilBlock.isWall(testBlock)) {
-                    targetLocation = testLocation;
-                    Particle.FIREWORKS_SPARK.builder().location(targetLocation).count(2).receivers(100).extra(0).spawn();
-
-                    if (!UtilPlayer.getNearbyPlayers(player, targetLocation, 0.5D, EntityProperty.ENEMY).isEmpty()) {
-                        break;
-                    }
-                } else {
-                    break;
-                }
-            }
-
-            blinkTime.put(player, System.currentTimeMillis());
-            loc.put(player, player.getLocation());
-
-            Location finalLocation = targetLocation.add(direction.clone().multiply(-1));
-            player.leaveVehicle();
-            player.teleport(finalLocation);
-
-            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WITHER_SHOOT, 0.4F, 1.2F);
-            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SILVERFISH_DEATH, 1.0F, 1.6F);
-        }, 1);
-
-    }
-
-    @Override
-    public void loadSkillConfig() {
-        maxCharges = getConfig("maxCharges", 4, Integer.class);
-        timeBetweenCharges = getConfig("timeBetweenCharges", 11.0, Double.class);
-        maxTravelDistance = getConfig("maxTravelDistance", 16, Integer.class);
-    }
-
-
-    @Override
-    public Action[] getActions() {
-        return SkillActions.RIGHT_CLICK;
-    }
 }

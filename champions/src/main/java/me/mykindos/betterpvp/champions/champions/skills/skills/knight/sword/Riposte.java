@@ -37,6 +37,7 @@ public class Riposte extends PrepareSkill implements CooldownSkill, Listener {
     public HashMap<String, Long> prepare = new HashMap<>();
     private final HashMap<String, Long> riposting = new HashMap<>();
 
+    private double damageReduction;
     @Inject
     public Riposte(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -53,7 +54,7 @@ public class Riposte extends PrepareSkill implements CooldownSkill, Listener {
         return new String[]{
                 "Right click with a sword to activate.",
                 "",
-                "Reduce all melee damage by 75% for <val>" + (1 + (level * 0.5)) + "</val> seconds.",
+                "Reduce all melee damage by <val>" + (damageReduction * 100) + "%</val> for <val>" + (1 + (level * 0.5)) + "</val> seconds.",
                 "Impervious to knockback while active.",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
@@ -129,7 +130,7 @@ public class Riposte extends PrepareSkill implements CooldownSkill, Listener {
                     }
 
                     target.getWorld().playSound(target.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1.0F, 1.0F);
-                    event.setDamage(event.getDamage() * 0.25);
+                    event.setDamage(event.getDamage() * (1 - damageReduction));
                     event.setKnockback(false);
 
                 }
@@ -195,5 +196,11 @@ public class Riposte extends PrepareSkill implements CooldownSkill, Listener {
     @Override
     public Action[] getActions() {
         return SkillActions.RIGHT_CLICK;
+    }
+
+
+    @Override
+    public void loadSkillConfig() {
+        damageReduction = getConfig("damageReduction", 0.75, Double.class);
     }
 }

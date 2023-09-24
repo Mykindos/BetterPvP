@@ -6,4 +6,6 @@ public interface IShopkeeper {
 
     CraftEntity getEntity();
 
+    String getShopkeeperName();
+
 }

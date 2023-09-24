@@ -33,6 +33,7 @@ public class SkillManager extends Manager<Skill> {
         Set<Class<? extends Skill>> classes = reflections.getSubTypesOf(Skill.class);
         for (var clazz : classes) {
             if(clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers())) continue;
+            if(clazz.isAnnotationPresent(Deprecated.class)) continue;
             Skill skill = champions.getInjector().getInstance(clazz);
             champions.getInjector().injectMembers(skill);
 

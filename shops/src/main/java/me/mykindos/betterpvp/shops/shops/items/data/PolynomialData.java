@@ -1,8 +1,10 @@
 package me.mykindos.betterpvp.shops.shops.items.data;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 public class PolynomialData {
 
     private final int minBuyPrice;

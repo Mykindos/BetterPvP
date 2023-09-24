@@ -137,7 +137,6 @@ public class CraftingListener implements Listener {
         });
 
         if (hasImbuement) {
-            System.out.println("Update name: has imbuement = true");
             event.setItemName(
                     Component.text("Imbued ").color(NamedTextColor.AQUA)
                             .append(event.getItemName().color(NamedTextColor.AQUA))

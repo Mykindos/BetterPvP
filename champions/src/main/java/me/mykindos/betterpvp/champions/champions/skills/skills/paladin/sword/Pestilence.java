@@ -38,6 +38,7 @@ public class Pestilence extends PrepareSkill implements CooldownSkill {
     private final HashMap<UUID, PestilenceData> pestilenceData = new HashMap<>();
 
     private double infectionDuration;
+    private double enemyDamageReduction;
 
     @Inject
     public Pestilence(Champions champions, ChampionsManager championsManager) {
@@ -58,7 +59,8 @@ public class Pestilence extends PrepareSkill implements CooldownSkill {
                 "Your next hit will apply Pestilence to the target.",
                 "Pestilence poisons the target, and spreads to",
                 "nearby enemies. While enemies are infected,",
-                "they deal 20% reduced damage",
+                "they deal <val>" + (enemyDamageReduction * 100) + "%</val> reduced damage",
+                "Pestilence lasts <val>" + infectionDuration + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -147,7 +149,7 @@ public class Pestilence extends PrepareSkill implements CooldownSkill {
         if (!event.getDamager().hasPotionEffect(PotionEffectType.POISON)) return;
 
         if (isInfected(event.getDamager())) {
-            event.setDamage(event.getDamage() * 0.80);
+            event.setDamage(event.getDamage() * (1 - enemyDamageReduction));
         }
 
     }
@@ -186,6 +188,7 @@ public class Pestilence extends PrepareSkill implements CooldownSkill {
     @Override
     public void loadSkillConfig() {
         infectionDuration = getConfig("duration", 5.0, Double.class);
+        enemyDamageReduction = getConfig("enemyDamageReduction", 0.20, Double.class);
     }
 
     @Data

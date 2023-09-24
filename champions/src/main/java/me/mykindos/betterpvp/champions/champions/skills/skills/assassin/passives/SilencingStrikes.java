@@ -33,6 +33,8 @@ public class SilencingStrikes extends Skill implements PassiveSkill, Listener {
         super(champions, championsManager);
     }
 
+    private int hitsNeeded;
+    private double timeSpan;
 
     @Override
     public String getName() {
@@ -43,8 +45,9 @@ public class SilencingStrikes extends Skill implements PassiveSkill, Listener {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Hit a player 3 times within 2 seconds",
-                "to silence them for <val>" + (level) + "</val> seconds."
+                "Hit a player <stat>" + hitsNeeded + "</stat> consecutive times without letting",
+                "<stat>" + timeSpan + "</stat> seconds pass.",
+                "to <effect>Silence</effect> them for <val>" + (level) + "</val> seconds."
         };
     }
 
@@ -76,7 +79,7 @@ public class SilencingStrikes extends Skill implements PassiveSkill, Listener {
             silenceData.addCount();
             silenceData.setLastHit(System.currentTimeMillis());
             event.setReason(getName());
-            if (silenceData.getCount() == 3) {
+            if (silenceData.getCount() == hitsNeeded) {
                 championsManager.getEffects().addEffect(damagee, EffectType.SILENCE, (long) ((level * 1000L) * 0.75));
                 //if (championsManager.getEffects().hasEffect(damagee, EffectType.IMMUNETOEFFECTS)) {
                 //    UtilMessage.message(damager, getClassType().getName(), "%s is immune to your silence!",
@@ -91,7 +94,7 @@ public class SilencingStrikes extends Skill implements PassiveSkill, Listener {
 
     @UpdateEvent
     public void onUpdate() {
-        data.removeIf(silenceData -> UtilTime.elapsed(silenceData.getLastHit(), 800));
+        data.removeIf(silenceData -> UtilTime.elapsed(silenceData.getLastHit(), (long) timeSpan * 1000));
     }
 
     public SilencingStrikesData getSilencingStrikesData(Player damager, Player damagee) {
@@ -104,5 +107,8 @@ public class SilencingStrikes extends Skill implements PassiveSkill, Listener {
         }
         return null;
     }
-
+    public void loadSkillConfig(){
+        hitsNeeded = getConfig("hitsNeeded", 3, Integer.class);
+        timeSpan = getConfig("timeSpan", 0.8, Double.class);
+    }
 }

@@ -33,7 +33,7 @@ import java.util.WeakHashMap;
 public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listener {
 
     public WeakHashMap<Player, RecallData> data = new WeakHashMap<>();
-
+    public double percentHealthRecovered;
     @Inject
     public Recall(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -53,7 +53,7 @@ public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listene
                 "",
                 "Teleports you back to where you ",
                 "were located <val>" + (1.5 + (level)) + "</val> seconds ago",
-                "Increases health by 1/4 of the health you had",
+                "Increases health by <stat>" + (percentHealthRecovered * 100) + "%</stat> of the health you had",
                 "<val>" + (1.5 + (level)) + "</val> seconds ago",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
@@ -145,11 +145,16 @@ public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listene
         RecallData recallData = data.get(player);
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 2.0F, 2.0F);
         player.teleport(recallData.getLocation());
-        UtilEntity.setHealth(player, player.getHealth() + (recallData.getHealth() / 4));
+        UtilEntity.setHealth(player, player.getHealth() + (recallData.getHealth() * percentHealthRecovered));
 
         player.getWorld().playEffect(data.get(player).getLocation(), Effect.STEP_SOUND, Material.EMERALD_BLOCK);
 
         UtilServer.callEvent(new EffectClearEvent(player));
 
+    }
+
+    @Override
+    public void loadSkillConfig(){
+        percentHealthRecovered = getConfig("percentHealthRecovered", 0.25, Double.class);
     }
 }

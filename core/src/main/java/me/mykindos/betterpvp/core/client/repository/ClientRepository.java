@@ -73,7 +73,7 @@ public class ClientRepository implements IRepository<Client> {
                     default -> Class.forName(type).cast(result.getObject(2));
                 };
 
-                client.putProperty(value, property);
+                client.putProperty(value, property, true);
             }
         } catch (SQLException | ClassNotFoundException ex) {
             ex.printStackTrace();

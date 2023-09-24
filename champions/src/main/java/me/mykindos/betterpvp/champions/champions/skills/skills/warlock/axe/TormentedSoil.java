@@ -38,6 +38,8 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
     private int radius;
     private double duration;
 
+    private double damageIncrease;
+
     @Inject
     public TormentedSoil(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -56,10 +58,10 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
                 "",
                 "Corrupt the earth around you, creating a ring that",
                 "debuffs enemies within it for <val>" + duration + "</val> seconds.",
-                "Player within the ring take 33% more damage.",
+                "Players within the ring take <val>" + (damageIncrease * 100) + "%</val> more damage.",
                 "",
                 "Range: <val>" + (radius + (level / 2)) + "</val> blocks.",
-                "Recharge: <val>" + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level)
         };
     }
 
@@ -72,7 +74,7 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
     @EventHandler
     public void onDamage(CustomDamageEvent event) {
         if (isInTorment(event.getDamagee())) {
-            event.setDamage(event.getDamage() * 1.33);
+            event.setDamage(event.getDamage() * (1 + damageIncrease));
         }
     }
 
@@ -166,6 +168,7 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
     public void loadSkillConfig() {
         duration = getConfig("duration", 7.0, Double.class);
         radius = getConfig("radius", 5, Integer.class);
+        damageIncrease = getConfig("damageIncrease", 0.33, Double.class);
     }
 
     @Data

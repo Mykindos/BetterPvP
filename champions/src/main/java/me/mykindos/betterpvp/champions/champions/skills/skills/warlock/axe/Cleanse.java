@@ -50,7 +50,7 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
                 "You and your allies also receive an immunity against",
                 "negative effects for <val>" + (duration + (level / 2)) + "</val> seconds.",
                 "",
-                "Recharge: <val>" + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level)
         };
     }
 

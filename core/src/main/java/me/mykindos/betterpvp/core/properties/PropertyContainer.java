@@ -54,7 +54,22 @@ public abstract class PropertyContainer {
      * @param object The value of the property.
      */
     public void putProperty(String key, Object object) {
-        properties.put(key, object);
+        putProperty(key, object, false);
+    }
+
+    /**
+     * Put a property.
+     *
+     * @param key    The key of the property.
+     * @param object The value of the property.
+     * @param silent Whether to update the property in the database
+     */
+    public void putProperty(String key, Object object, boolean silent) {
+        if (!silent) {
+            properties.put(key, object);
+        } else {
+            properties.putSilent(key, object);
+        }
     }
 
     /**

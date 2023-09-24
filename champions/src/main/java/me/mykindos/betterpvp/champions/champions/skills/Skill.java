@@ -83,6 +83,22 @@ public abstract class Skill implements ISkill {
         loadSkillConfig();
     }
 
+    /**
+     * Called when a player, for any reason, equips this skill.
+     * i.e: Logging in, changing classes, editing build.
+     * @param player The player that equipped the skill
+     */
+    public void trackPlayer(Player player) {
+    }
+
+    /**
+     * Called when a player, for any reason, unequips this skill.
+     * i.e: Logging out, changing classes, editing build.
+     * @param player The player that unequipped the skill
+     */
+    public void invalidatePlayer(Player player) {
+    }
+
     public void loadSkillConfig() {
     }
 

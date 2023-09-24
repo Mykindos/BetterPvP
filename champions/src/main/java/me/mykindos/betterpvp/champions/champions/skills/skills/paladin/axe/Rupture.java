@@ -43,6 +43,10 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
     private final WeakHashMap<Player, ArrayList<LivingEntity>> cooldownJump = new WeakHashMap<>();
     private final WeakHashMap<ArmorStand, Long> stands = new WeakHashMap<>();
 
+    private double damage;
+
+    private double slowDuration;
+
     @Inject
     public Rupture(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -60,8 +64,9 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
                 "Right click with a axe to activate.",
                 "",
                 "Rupture the earth in the direction",
-                "you are facing, damaging, knocking up",
-                "and slowing any enemies hit.",
+                "you are facing, dealing <val>" + damage + "</val> damage,",
+                "knocking up and giving Slowness III to enemies",
+                "hit for <val>" + slowDuration + "</val> seconds.",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -154,8 +159,8 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
                         if (!cooldownJump.get(player).contains(ent)) {
 
                             UtilVelocity.velocity(ent, 0.5, 1, 2.0, false);
-                            ent.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 30, 2));
-                            UtilDamage.doCustomDamage(new CustomDamageEvent(ent, player, null, DamageCause.CUSTOM, 8.0, false, getName()));
+                            ent.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) slowDuration * 20, 2));
+                            UtilDamage.doCustomDamage(new CustomDamageEvent(ent, player, null, DamageCause.CUSTOM, damage, false, getName()));
 
                             cooldownJump.get(player).add(ent);
                         }
@@ -183,5 +188,10 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
     @Override
     public Action[] getActions() {
         return SkillActions.RIGHT_CLICK;
+    }
+
+    public void loadSkillConfig() {
+        damage = getConfig("damage", 8.0, Double.class);
+        slowDuration = getConfig("slowDuration", 1.5, Double.class);
     }
 }

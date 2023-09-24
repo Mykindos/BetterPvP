@@ -60,6 +60,7 @@ public abstract class PrepareArrowSkill extends PrepareSkill implements Cooldown
             active.remove(player.getUniqueId());
             championsManager.getCooldowns().removeCooldown(player, getName(), true);
             championsManager.getCooldowns().add(player, getName(), getCooldown(level), showCooldownFinished(), false);
+            onFire(player);
         }
     }
 
@@ -131,5 +132,9 @@ public abstract class PrepareArrowSkill extends PrepareSkill implements Cooldown
     public abstract void onHit(Player damager, LivingEntity target, int level);
 
     public abstract void displayTrail(Location location);
+
+    public void onFire(Player shooter) {
+        // Overridable - Not abstract to avoid breaking existing skills
+    }
 
 }

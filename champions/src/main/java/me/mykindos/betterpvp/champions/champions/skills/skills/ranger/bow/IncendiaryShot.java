@@ -13,9 +13,11 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityShootBowEvent;
 
 @Singleton
 @BPvPListener
@@ -64,6 +66,12 @@ public class IncendiaryShot extends PrepareArrowSkill {
     @Override
     public void onHit(Player damager, LivingEntity target, int level) {
         UtilServer.runTaskLater(champions, () -> target.setFireTicks(level * 30), 2);
+    }
+
+    @Override
+    public void processEntityShootBowEvent(EntityShootBowEvent event, Player player, int level, Arrow arrow) {
+        arrows.add(arrow);
+        arrow.setFireTicks(200);
     }
 
     @Override

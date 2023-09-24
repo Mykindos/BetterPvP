@@ -14,6 +14,10 @@ skills:
     shockingstrikes:
       enabled: true
       maxlevel: 3
+    viperstrikes:
+      enabled: true
+      maxlevel: 3
+      baseSeconds: 2.0
     backstab:
       enabled: true
       maxlevel: 5
@@ -30,6 +34,11 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 15
+    smokearrow:
+      enabled: true
+      maxlevel: 4
+      cooldown: 20
+      baseDuration: 3.0
     silencingstrikes:
       enabled: true
       maxlevel: 3
@@ -53,9 +62,9 @@ skills:
     flash:
       enabled: true
       maxlevel: 5
-      maxCharges: 4
-      timeBetweenCharges: 11.0
-      maxTravelDistance: 8
+      baseMaxCharges: 1
+      baseRechargeSeconds: 4.0
+      teleportDistance: 5.0
     markedfordeath:
       enabled: true
       maxlevel: 5
@@ -75,6 +84,11 @@ skills:
       cooldown: 2
       energy: 6
   knight:
+    shieldsmash:
+      enabled: true
+      maxlevel: 5
+      cooldown: 15
+      baseMultiplier: 1.6
     bullscharge:
       enabled: true
       cooldown: 14
@@ -131,10 +145,26 @@ skills:
       maxlevel: 5
       cooldown: 10
   paladin:
+    staticlazer:
+      enabled: true
+      maxlevel: 5
+      cooldown: 9
+      energy: 24
+      baseCharge: 40.0
+      baseDamage: 2.0
+      baseRange: 20.0
+      energyPerSecond: 32.0
     rupture:
       enabled: true
       cooldown: 12
       maxlevel: 5
+    boulder:
+      enabled: true
+      cooldown: 25
+      maxlevel: 5
+      radius: 5.0
+      baseHeal: 2.0
+      baseDamage: 3.0
     inferno:
       enabled: true
       maxlevel: 5
@@ -242,7 +272,7 @@ skills:
     colossus:
       enabled: true
       maxlevel: 3
-      reductionPerLevel: 25
+      reductionPerLevel: 0.25
     takedown:
       enabled: true
       maxlevel: 5
@@ -286,6 +316,12 @@ skills:
       radius: 10
       duration: 2.0
   ranger:
+    wolfspounce:
+      enabled: true
+      maxlevel: 4
+      cooldown: 8
+      baseCharge: 40.0
+      baseDamage: 2.0
     stunningshot:
       enabled: true
       maxlevel: 5
@@ -412,7 +448,7 @@ skills:
     fastrecovery:
       enabled: true
       maxlevel: 5
-      percentagePerLevel: 20
+      percentagePerLevel: 0.20
     swim:
       enabled: true
       maxlevel: 5

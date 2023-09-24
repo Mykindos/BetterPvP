@@ -1,7 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.roles.listeners;
 
 import com.google.inject.Inject;
-import java.util.Optional;
 import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
@@ -34,6 +33,8 @@ import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
+
+import java.util.Optional;
 
 @BPvPListener
 public class RoleListener implements Listener {
@@ -167,15 +168,16 @@ public class RoleListener implements Listener {
     private void equipRole(Player player, Role role) {
         if (role == null) {
             if (roleManager.getObjects().containsKey(player.getUniqueId().toString())) {
+                final Optional<Role> previous = roleManager.getObject(player.getUniqueId().toString());
                 roleManager.removeObject(player.getUniqueId().toString());
-                UtilServer.callEvent(new RoleChangeEvent(player, null));
+                UtilServer.callEvent(new RoleChangeEvent(player, null, previous.orElse(null)));
             }
             return;
         }
 
         Optional<Role> roleOptional = roleManager.getObject(player.getUniqueId().toString());
         if (roleOptional.isEmpty() || roleOptional.get() != role) {
-            UtilServer.callEvent(new RoleChangeEvent(player, role));
+            UtilServer.callEvent(new RoleChangeEvent(player, role, roleOptional.orElse(null)));
         }
     }
 

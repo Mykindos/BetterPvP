@@ -39,7 +39,7 @@ public class StunningShot extends PrepareArrowSkill {
                 "Left click to activate.",
                 "",
                 "Shoot an arrow",
-                "stunning anyone hit for <val>" + String.format("%.2f", (level * 0.40)) + "</val> seconds",
+                "stunning anyone hit for <val>" + String.format("%.1f", (level * 0.40)) + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
