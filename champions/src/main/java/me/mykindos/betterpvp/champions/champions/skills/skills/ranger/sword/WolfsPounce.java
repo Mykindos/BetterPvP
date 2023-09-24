@@ -57,15 +57,17 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
     @Override
     public String[] getDescription(int level) {
         return new String[] {
-                "Hold Block to charge pounce.",
-                "Release Block to pounce.",
+                "Hold right click with a Sword to channel",
                 "",
-                "Taking damage cancels charge.",
+                "Charges <val>" + getChargePerSecond(level) + "%</val> per second",
                 "",
-                "Charges <val>" + getChargePerSecond(level) + "%</val> per second.",
+                "Release right click to pounce forward in the direction you are looking",
+                "",
                 "Colliding with another player",
-                "mid-air deals up to <val>" + getDamage(level) + "</val> damage",
-                "and Slowness II for <val>" + slowDuration + "</val> seconds.",
+                "mid-air will deal up to <val>" + getDamage(level) + "</val> damage",
+                "and apply <effect>Slowness II</effect> for <val>" + slowDuration + "</val> seconds",
+                "",
+                "Taking damage cancels charge",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };

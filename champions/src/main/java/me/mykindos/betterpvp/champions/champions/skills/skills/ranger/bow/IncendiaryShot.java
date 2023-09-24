@@ -37,10 +37,10 @@ public class IncendiaryShot extends PrepareArrowSkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Left click to activate.",
+                "Left click with a Bow to prepare",
                 "",
-                "Shoot an ignited arrow",
-                "burning anyone hit for <val>" + (level * 1.5) + "</val> seconds",
+                "Shoot an ignited arrow that",
+                "<effect>burns</effect> anyone hit for <val>" + (level * 1.5) + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };

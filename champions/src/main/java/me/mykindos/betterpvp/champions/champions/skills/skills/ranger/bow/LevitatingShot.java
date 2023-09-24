@@ -37,12 +37,12 @@ public class LevitatingShot extends PrepareArrowSkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Left click to activate.",
+                "Left click with a Bow to prepare",
                 "",
                 "Your next arrow is tipped with mysterious magic,",
-                "causing the next target you hit to receive Levitation II for <val>" + (3.5 + (level * .5)) + "</val> seconds.",
+                "causing the target to receive <effect>Levitation II</effect> for <val>" + (3.5 + (level * .5)) + "</val> seconds",
                 "",
-                "Players with levitation are unable to use abilities.",
+                "Players with levitation are unable to use abilities",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };

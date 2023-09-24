@@ -51,8 +51,10 @@ public class Longshot extends Skill implements PassiveSkill {
 
         return new String[]{
                 "Shoot an arrow that gains additional",
-                "damage the further the target hit is",
+                "damage the further it travels",
+                "",
                 "Caps out at <val>" + (baseDamage + level) + "</val> damage",
+                "",
                 "Cannot be used in own territory"};
     }
 

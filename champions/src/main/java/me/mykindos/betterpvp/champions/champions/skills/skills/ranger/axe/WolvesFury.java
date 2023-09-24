@@ -44,11 +44,11 @@ public class WolvesFury extends Skill implements InteractSkill, CooldownSkill, L
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Right click with a axe to activate.",
+                "Right click with an Axe to activate",
                 "",
                 "Summon the power of the wolf, gaining",
-                "Strength I for <val>" + (baseDuration + level) + "</val> seconds, and giving",
-                "no knockback on your attacks.",
+                "<effect>Strength I</effect> for <val>" + (baseDuration + level) + "</val> seconds, and giving",
+                "no knockback on your attacks",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
