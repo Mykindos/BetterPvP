@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.champions.champions.commands.menu;
 
 import me.mykindos.betterpvp.core.components.champions.Role;
+import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.menu.Button;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -19,7 +20,7 @@ public class KitButton extends Button {
     }
 
     @Override
-    public void onClick(Player player, ClickType clickType) {
+    public void onClick(Player player, Gamer gamer, ClickType clickType) {
         player.getInventory().clear();
         player.getInventory().setHelmet(new ItemStack(role.getHelmet()));
         player.getInventory().setChestplate(new ItemStack(role.getChestplate()));

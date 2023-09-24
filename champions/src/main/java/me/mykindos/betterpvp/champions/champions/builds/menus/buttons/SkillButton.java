@@ -6,8 +6,11 @@ import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillDequip
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillEquipEvent;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillUpdateEvent;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.menu.Button;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.UtilSound;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -28,10 +31,16 @@ public class SkillButton extends Button {
     }
 
     @Override
-    public void onClick(Player player, ClickType type) {
+    public void onClick(Player player, Gamer gamer, ClickType type) {
 
         if (type == ClickType.LEFT) {
             if (roleBuild.getPoints() > 0) {
+
+                if(!skill.isEnabled()) {
+                    UtilMessage.simpleMessage(player, "Skills", "This skill is not enabled.");
+                    UtilSound.playSound(player, Sound.ENTITY_ITEM_BREAK, 1f, 1f, false);
+                    return;
+                }
 
                 BuildSkill buildSkill = roleBuild.getBuildSkill(skill.getType());
                 if (buildSkill == null) {

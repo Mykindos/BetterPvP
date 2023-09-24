@@ -38,6 +38,10 @@ public class Gamer extends PropertyContainer implements Invitable, IMapListener 
         return (int) getProperty(GamerProperty.BALANCE).orElse(0);
     }
 
+    public int getIntProperty(Enum<?> key) {
+        return (int) getProperty(key).orElse(0);
+    }
+
     @Override
     public void saveProperty(String key, Object object, boolean updateScoreboard) {
         properties.put(key, object);

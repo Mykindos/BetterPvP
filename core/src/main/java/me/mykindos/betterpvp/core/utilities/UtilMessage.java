@@ -233,6 +233,10 @@ public class UtilMessage {
         Bukkit.getServer().broadcast(getPrefix(prefix).append(deserialize(String.format(message, args))));
     }
 
+    public static void simpleBroadcast(String prefix, String message, Component hover) {
+        Bukkit.getServer().broadcast(getPrefix(prefix).append(deserialize(message)).hoverEvent(HoverEvent.showText(hover)));
+    }
+
     public static Component getMiniMessage(String message, Object... args) {
         return deserialize(String.format(message, args)).decoration(TextDecoration.ITALIC, false);
     }
