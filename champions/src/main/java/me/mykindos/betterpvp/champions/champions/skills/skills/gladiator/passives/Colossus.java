@@ -17,6 +17,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
+
 @Singleton
 @BPvPListener
 public class Colossus extends Skill implements PassiveSkill {
@@ -61,7 +62,8 @@ public class Colossus extends Skill implements PassiveSkill {
             int level = getLevel(player);
             if(level > 0) {
                 event.setCanBypassMinimum(true);
-                event.setDamage(event.getDamage() * (1 - ((reductionPerLevel) * level)));
+                double proposedKB = event.getDamage() * (1 - ((reductionPerLevel) * level));
+                event.setDamage(Math.max(proposedKB, 1));
             }
         }
 
