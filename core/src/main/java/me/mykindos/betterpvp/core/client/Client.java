@@ -22,6 +22,8 @@ public class Client extends PropertyContainer implements IMapListener {
 
     boolean administrating;
 
+    UUID mimicClan;
+
     public Client(String uuid, String name, Rank rank) {
         this.uuid = uuid;
         this.name = name;
@@ -48,5 +50,9 @@ public class Client extends PropertyContainer implements IMapListener {
     @Override
     public void onMapValueChanged(String key, Object value) {
         UtilServer.callEvent(new ClientPropertyUpdateEvent(this, key, value));
+    }
+
+    public void setMimicClan (UUID clanID) {
+        this.mimicClan = clanID;
     }
 }
