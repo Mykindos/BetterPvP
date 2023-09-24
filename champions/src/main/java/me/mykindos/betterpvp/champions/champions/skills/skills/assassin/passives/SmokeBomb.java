@@ -148,7 +148,7 @@ public class SmokeBomb extends Skill implements ToggleSkill, CooldownSkill, List
                 "Instantly <effect>Vanish</effect> before your foes for a",
                 "maximum of <val>" + (baseDuration + level) + "</val> seconds,",
                 "inflicting <effect>Blindness II</effect> to enemies",
-                "within <stat>" + blindRadius + "</stat> for <stat>" + blindDuration + "</stat> seconds",
+                "within <stat>" + blindRadius + "</stat> blocks for <stat>" + blindDuration + "</stat> seconds",
                 "",
                 "Hitting an enemy or using abilities",
                 "will make you reappear",
