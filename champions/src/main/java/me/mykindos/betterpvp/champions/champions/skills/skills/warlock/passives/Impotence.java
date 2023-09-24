@@ -39,9 +39,9 @@ public class Impotence extends Skill implements PassiveSkill {
                 "at a maximum of <stat>" + maxEnemies + "</stat> players",
                 "",
                 "Damage Reduction:",
-                "1 nearby enemy = <val>" + (calculateReduction(1) * 100)  + "%</val>",
-                "2 nearby enemies = <val>" + (calculateReduction(2) * 100) + "%</val>",
-                "3 nearby enemies = <val>" + (calculateReduction(3) * 100) + "%</val>"
+                "1 nearby enemy = <stat>" + (calculateReduction(1) * 100)  + "%</stat>",
+                "2 nearby enemies = <stat>" + (calculateReduction(2) * 100) + "%</stat>",
+                "3 nearby enemies = <stat>" + (calculateReduction(3) * 100) + "%</stat>"
         };
     }
 

@@ -56,7 +56,7 @@ public class DefensiveStance extends ChannelSkill implements InteractSkill, Ener
                 "While active, you are immune to all",
                 "melee damage from attacks in front of you",
                 "",
-                "Players who attack you receive <stat>" + damage + "</star> damage,",
+                "Players who attack you receive <stat>" + damage + "</stat> damage,",
                 "and get knocked back",
                 "",
                 "Energy / Second: <val>" + getEnergy(level)};

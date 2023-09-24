@@ -57,11 +57,12 @@ public class Pestilence extends PrepareSkill implements CooldownSkill {
                 "Right click with a Sword to prepare",
                 "",
                 "Your next hit will apply <effect>Pestilence</effect> to the target,",
-                "poisoning them, and spreading to nearby enemies",
+                "<effect>Poisoning</effect> them, and spreading to nearby enemies",
                 "",
                 "While enemies are infected,",
                 "they deal <stat>" + (enemyDamageReduction * 100) + "%</stat> reduced damage",
-                "Pestilence lasts <stat>" + infectionDuration + "</stat> seconds",
+                "",
+                "<effect>Pestilence</effect> lasts <stat>" + infectionDuration + "</stat> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };

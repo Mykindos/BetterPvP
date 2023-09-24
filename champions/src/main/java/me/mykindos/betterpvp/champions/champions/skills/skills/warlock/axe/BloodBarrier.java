@@ -63,7 +63,7 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
                 "yourself and allies within <val>" + (range + level) + "</val> blocks a barrier which reduces",
                 "the damage of the next <stat>" + numAttacksToReduce + "</stat> incoming attacks by <stat>" + (damageReduction * 100) + "%</stat>",
                 "",
-                "Barrier lasts for <stat>" + duration + "</stat> , and does not stack",
+                "Barrier lasts for <stat>" + duration + "</stat>, and does not stack",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };

@@ -54,7 +54,7 @@ public class Bloodlust extends Skill implements PassiveSkill {
                 "<effect>Speed I</effect> and <effect>Strength I</effect> for <val>" + (duration + level) + "</val> seconds.",
                 "",
                 "Bloodlust can stack up to <stat>" + maxStacks + "</stat> times,",
-                "boosting the level of <stat>Speed</stat> and <stat>Strength</stat>"};
+                "boosting the level of <effect>Speed</effect> and <effect>Strength</effect>"};
     }
 
     @Override

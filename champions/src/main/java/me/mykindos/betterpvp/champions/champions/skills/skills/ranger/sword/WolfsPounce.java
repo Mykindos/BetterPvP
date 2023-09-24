@@ -65,7 +65,7 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
                 "",
                 "Colliding with another player",
                 "mid-air will deal up to <val>" + getDamage(level) + "</val> damage",
-                "and apply <effect>Slowness II</effect> for <val>" + slowDuration + "</val> seconds",
+                "and apply <effect>Slowness II</effect> for <stat>" + slowDuration + "</stat> seconds",
                 "",
                 "Taking damage cancels charge",
                 "",

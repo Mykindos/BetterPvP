@@ -37,7 +37,7 @@ public class Overwhelm extends Skill implements PassiveSkill {
                 "You deal <stat>1</stat> bonus damage for every",
                 "<stat>2</stat> more health you have than your target",
                 "",
-                "You can deal a maximum of<val>" + String.format("%.1f", (0.0 + (level * 0.5))) + "</val> bonus damage"
+                "You can deal a maximum of <val>" + String.format("%.1f", (0.0 + (level * 0.5))) + "</val> bonus damage"
         };
     }
 

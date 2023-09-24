@@ -57,8 +57,8 @@ public class Grasp extends Skill implements InteractSkill, CooldownSkill, Listen
                 "Right click with a Sword to activate",
                 "",
                 "Create a wall of skulls that closes in on you",
-                "from <val>" + (10 + ((level * 10) / 2)) +"</val> blocks away,",
-                "dragging along all enemies and dealing <val>" + (1 + (level - 1)) +"</val damage",
+                "from <val>" + (10 + ((level * 10) / 2)) +"</val> blocks away, dragging along",
+                "all enemies and dealing <val>" + (1 + (level - 1)) +"</val> damage",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
 
