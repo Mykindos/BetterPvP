@@ -23,20 +23,20 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 @Singleton
 @BPvPListener
-public class SyphoningStrikes extends Skill implements PassiveSkill, Listener {
+public class SiphoningStrikes extends Skill implements PassiveSkill, Listener {
 
     private final WeakHashMap<Player, Double> repeat = new WeakHashMap<>();
     private final WeakHashMap<Player, Long> last = new WeakHashMap<>();
 
     @Inject
-    public SyphoningStrikes(Champions champions, ChampionsManager championsManager) {
+    public SiphoningStrikes(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
 
 
     @Override
     public String getName() {
-        return "Syphoning Strikes";
+        return "Siphoning Strikes";
     }
 
     private double healthIncrement;

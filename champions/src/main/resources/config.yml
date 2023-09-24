@@ -25,7 +25,7 @@ skills:
       enabled: true
       cooldown: 50
       maxlevel: 5
-    syphoningstrikes:
+    siphoningstrikes:
       enabled: true
       maxlevel: 3
       duration: 2
