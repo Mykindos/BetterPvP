@@ -57,13 +57,13 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Right click with a axe to activate.",
+                "Right click with an Axe to activate",
                 "",
                 "Sacrifice <val>" + UtilMath.round(100 - (0.50 + (level * 0.05)) * 100, 2) + "%</val> of your health to grant",
                 "yourself and allies within <val>" + (range + level) + "</val> blocks a barrier which reduces",
-                "the damage of the next <val>" + numAttacksToReduce + "</val> incoming attacks by <val>" + (damageReduction * 100) + "%</val>",
+                "the damage of the next <stat>" + numAttacksToReduce + "</stat> incoming attacks by <stat>" + (damageReduction * 100) + "%</stat>",
                 "",
-                "Barrier lasts up to <val>" + duration + "</val> , and does not stack.",
+                "Barrier lasts for <stat>" + duration + "</stat> , and does not stack",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
