@@ -42,4 +42,13 @@ public class DynamicShopItem extends ShopItem {
     public void setCurrentStock(int amount) {
         polynomialData.setCurrentStock(amount);
     }
+
+    public int getBaseStock() {
+        return polynomialData.getBaseStock();
+    }
+
+    public int getMaxStock() {
+        return polynomialData.getMaxStock();
+    }
+
 }

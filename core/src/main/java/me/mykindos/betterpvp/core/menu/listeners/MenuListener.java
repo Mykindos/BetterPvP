@@ -2,6 +2,9 @@ package me.mykindos.betterpvp.core.menu.listeners;
 
 import com.google.inject.Inject;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
+import me.mykindos.betterpvp.core.gamer.Gamer;
+import me.mykindos.betterpvp.core.gamer.GamerManager;
+import me.mykindos.betterpvp.core.gamer.exceptions.NoSuchGamerException;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.menu.Button;
 import me.mykindos.betterpvp.core.menu.Menu;
@@ -28,11 +31,13 @@ public class MenuListener implements Listener {
 
     private final MenuManager menuManager;
     private final CooldownManager cooldownManager;
+    private final GamerManager gamerManager;
 
     @Inject
-    public MenuListener(MenuManager menuManager, CooldownManager cooldownManager) {
+    public MenuListener(MenuManager menuManager, CooldownManager cooldownManager, GamerManager gamerManager) {
         this.menuManager = menuManager;
         this.cooldownManager = cooldownManager;
+        this.gamerManager = gamerManager;
     }
 
     @EventHandler
@@ -44,6 +49,9 @@ public class MenuListener implements Listener {
     public void onInventoryClick(InventoryClickEvent event) {
 
         if (event.getWhoClicked() instanceof Player player) {
+
+            Gamer gamer = gamerManager.getObject(player.getUniqueId()).orElseThrow(() -> new NoSuchGamerException(player.getUniqueId()));
+
             String menuTitle = PlainTextComponentSerializer.plainText().serialize(event.getView().title());
             Optional<Menu> menuOptional = menuManager.getMenu(player, menuTitle);
             menuOptional.ifPresent(menu -> {
@@ -54,7 +62,7 @@ public class MenuListener implements Listener {
                     if (cooldownManager.add(player, "Button Click", button.getClickCooldown(), false)) {
                         ButtonPreClickEvent buttonClickEvent = UtilServer.callEvent(new ButtonPreClickEvent(player, menu, button, event.getClick(), event.getSlot()));
                         if (!buttonClickEvent.isCancelled()) {
-                            buttonClickEvent.getButton().onClick(player, event.getClick());
+                            buttonClickEvent.getButton().onClick(player, gamer, event.getClick());
                             UtilServer.callEvent(new ButtonPostClickEvent(player, menu, button));
 
                         }
