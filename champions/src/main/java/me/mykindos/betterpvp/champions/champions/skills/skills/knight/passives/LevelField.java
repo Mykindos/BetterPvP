@@ -36,11 +36,11 @@ public class LevelField extends Skill implements PassiveSkill, Listener {
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "For every enemy within <val>" + radius + "</val> blocks,",
+                "For every enemy that outnumbers you within <stat>" + radius + "</stat> blocks,",
                 "You deal <val>" +  (10 + ((level - 1) * 5)) + ".0%</val> extra damage",
-                "Up to a maximum of <val>60%</val> extra damage",
+                "Up to a maximum of <stat>60%</stat> extra damage",
                 "",
-                "For every ally within <val>" + radius + "</val> blocks,",
+                "For every enemy you outnumber within <stat>" + radius + "</stat> blocks,",
                 "You deal <val>" + (10 + ((level - 1) * 5)) + ".0%</val> less damage",
                 "Down to a minimum of <val>" + (60 - ((level - 1) * 15)) + "%</val> less damage"
         };

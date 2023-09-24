@@ -35,7 +35,7 @@ public class MoltenShield extends Skill implements PassiveSkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "You are immune to lava and fire damage."
+                "You are immune to lava and fire damage"
         };
     }
 

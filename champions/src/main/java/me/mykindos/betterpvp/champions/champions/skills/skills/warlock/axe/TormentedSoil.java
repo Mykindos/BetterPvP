@@ -54,13 +54,14 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Right click with a axe to activate.",
+                "Right click with an Axe to activate",
                 "",
                 "Corrupt the earth around you, creating a ring that",
-                "debuffs enemies within it for <val>" + duration + "</val> seconds.",
-                "Players within the ring take <val>" + (damageIncrease * 100) + "%</val> more damage.",
+                "debuffs enemies within it for <stat>" + duration + "</stat> seconds.",
+                "Players within the ring take <stat>" + (damageIncrease * 100) + "%</stat> more damage.",
                 "",
                 "Range: <val>" + (radius + (level / 2)) + "</val> blocks.",
+                "",
                 "Cooldown: <val>" + getCooldown(level)
         };
     }

@@ -54,13 +54,15 @@ public class Pestilence extends PrepareSkill implements CooldownSkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Right click with a sword to activate.",
+                "Right click with a Sword to prepare",
                 "",
-                "Your next hit will apply Pestilence to the target.",
-                "Pestilence poisons the target, and spreads to",
-                "nearby enemies. While enemies are infected,",
-                "they deal <val>" + (enemyDamageReduction * 100) + "%</val> reduced damage",
-                "Pestilence lasts <val>" + infectionDuration + "</val> seconds",
+                "Your next hit will apply <effect>Pestilence</effect> to the target,",
+                "<effect>Poisoning</effect> them, and spreading to nearby enemies",
+                "",
+                "While enemies are infected,",
+                "they deal <stat>" + (enemyDamageReduction * 100) + "%</stat> reduced damage",
+                "",
+                "<effect>Pestilence</effect> lasts <stat>" + infectionDuration + "</stat> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
