@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.passives;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import javax.inject.Inject;
@@ -54,8 +55,8 @@ public class FinalGambit extends Skill implements ToggleSkill, CooldownSkill, Li
                 "",
                 "Reduce yourself to half a heart",
                 "and take double knockback, but",
-                "become invulnerable and gain",
-                "Speed III for <val>" + (baseDuration + (level-1) * 0.5) + "</val> seconds",
+                "become <effect>Invulnerable</effect> and gain",
+                "<effect>Speed III</effect> for <val>" + (baseDuration + (level-1) * 0.5) + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
