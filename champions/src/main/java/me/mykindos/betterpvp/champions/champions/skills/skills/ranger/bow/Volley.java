@@ -39,7 +39,8 @@ public class Volley extends PrepareArrowSkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Left click with a bow to Prepare",
+                "Left click with a Bow to prepare",
+                "",
                 "Your next shot is instant, and shoots",
                 "a volley of arrows in the direction you are facing",
                 "",

@@ -37,7 +37,7 @@ public class FastRecovery extends Skill implements PassiveSkill {
                 "Increase your energy regeneration speed",
                 "by <val>" + ((percentagePerLevel * 100) * level) + "%",
                 "",
-                "Does not work with legendary items equipped."
+                "Does not work with legendary items equipped"
 
         };
     }

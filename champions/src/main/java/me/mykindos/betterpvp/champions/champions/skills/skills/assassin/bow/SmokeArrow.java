@@ -39,6 +39,8 @@ public class SmokeArrow extends PrepareArrowSkill {
     @Override
     public String[] getDescription(int level) {
         return new String[] {
+                "Left click with a Bow to prepare",
+                "",
                 "Your next arrow will give <effect>Blindness</effect>",
                 "and <effect>Slowness II</effect> to the target for <val>" + getEffectDuration(level) + "</val> seconds.",
                 "",

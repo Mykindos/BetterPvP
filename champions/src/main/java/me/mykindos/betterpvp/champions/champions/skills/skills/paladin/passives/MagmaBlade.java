@@ -34,9 +34,9 @@ public class MagmaBlade extends Skill implements PassiveSkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Your sword scorches opponents,",
+                "Your sword is fueled by flames,",
                 "dealing an additional <val>" + (level) + "</val> damage",
-                "to players who are on fire."};
+                "to players who are on fire"};
     }
 
     @Override

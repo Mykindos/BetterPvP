@@ -46,8 +46,8 @@ public class RootingAxe extends Skill implements PassiveSkill, CooldownSkill {
 
         return new String[]{
                 "Your axe rips players downward into",
-                "the earth disrupting their movement,",
-                "and stops them from jumping for <val>" + duration + "</val> seconds",
+                "the earth, disrupting their movement,",
+                "and stopping them from jumping for <stat>" + duration + "</stat> seconds",
                 "",
                 "Internal Cooldown: <val>" + getCooldown(level)
         };

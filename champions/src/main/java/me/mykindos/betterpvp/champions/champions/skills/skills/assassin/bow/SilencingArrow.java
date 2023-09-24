@@ -38,9 +38,11 @@ public class SilencingArrow extends PrepareArrowSkill {
     public String[] getDescription(int level) {
 
         return new String[]{
+                "Left click with a Bow to prepare",
+                "",
                 "Your next arrow will <effect>Silence</effect> your",
-                "target for <val>" + (baseDuration + level) + "</val> seconds.",
-                "Making them unable to use any active skills",
+                "target for <val>" + (baseDuration + level) + "</val> seconds,",
+                "making them unable to use any non-passive skills",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };

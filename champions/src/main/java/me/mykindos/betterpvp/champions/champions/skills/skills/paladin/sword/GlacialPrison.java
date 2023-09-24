@@ -50,10 +50,10 @@ public class GlacialPrison extends Skill implements InteractSkill, CooldownSkill
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Right click with a sword to Activate",
+                "Right click with a Sword to activate",
                 "",
-                "Launches an orb, trapping any players",
-                "within <val>" + sphereSize  + "</val> blocks of it in a prison of ice for <val>" + duration + "</val> seconds",
+                "Launches an icy orb, trapping any players",
+                "within <stat>" + sphereSize  + "</stat> blocks of it in a prison of ice for <stat>" + duration + "</stat> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };

@@ -59,8 +59,10 @@ public class Overcharge extends Skill implements InteractSkill, Listener {
     public String[] getDescription(int level) {
 
         return new String[]{
+                "Hold right click with a Bow to use",
+                "",
                 "Draw back harder on your bow, giving",
-                "<val>" + damageIncrement + "</val> bonus damage per <val>" + durationIncrement + "</val> seconds",
+                "<stat>" + damageIncrement + "</stat> bonus damage per <stat>" + durationIncrement + "</stat> seconds",
                 "",
                 "Maximum Damage: <val>" + (2 + level)
         };
