@@ -42,9 +42,7 @@ public class HuntersThrill extends Skill implements PassiveSkill {
     public String[] getDescription(int level) {
         return new String[]{
                 "For each consecutive hit within <val>" + (maxTimeBetweenShots + level) + "</val> seconds of each other",
-                "you gain increased movement speed",
-                "",
-                "Max consecutive hits: <val>" + maxConsecutiveHits
+                "you gain increased movement speed up to a maximum of <effect>Speed IV</effect>",
         };
     }
 

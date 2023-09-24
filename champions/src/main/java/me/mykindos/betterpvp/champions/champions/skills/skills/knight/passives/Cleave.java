@@ -40,11 +40,9 @@ public class Cleave extends Skill implements PassiveSkill, Listener {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Your axe attacks cleave onto nearby targets and deal damage.",
+                "Your axe attacks cleave onto nearby targets and deal damage",
                 "",
                 "Distance: <val>" + (baseDistance + level),
-                "",
-                "Only applies to axes."
         };
     }
 

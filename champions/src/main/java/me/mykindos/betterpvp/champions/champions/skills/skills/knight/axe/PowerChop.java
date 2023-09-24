@@ -47,12 +47,14 @@ public class PowerChop extends PrepareSkill implements CooldownSkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Put more strength into your",
-                "next axe attack, causing it",
-                "to deal <val>" + (Math.max(1, (level + 2))) + "</val> bonus damage.",
+                "Right click with an Axe to prepare",
                 "",
-                "Attack must be made within",
-                "<val>" + timeToHit + "</val> seconds of being used.",
+
+                "Your next axe attack will",
+                "deal <val>" + (Math.max(1, (level + 2))) + "</val> bonus damage.",
+                "",
+                "The attack must be made within",
+                "<stat>" + timeToHit + "</stat> seconds of being used",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };

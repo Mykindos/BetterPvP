@@ -43,10 +43,11 @@ public class BattleTaunt extends ChannelSkill implements InteractSkill, Cooldown
     @Override
     public String[] getDescription(int level) {
 
-        return new String[]{"Hold Block with a sword to Channel.",
+        return new String[]{
+                "Hold right click with a Sword to channel",
                 "",
                 "While channelling, any enemies within <val>" + (2 + level) + "</val> blocks",
-                "are slowly pulled in towards you",
+                "get slowly pulled towards you",
                 "",
                 "Energy / Second: <val>" + getEnergy(level)};
     }

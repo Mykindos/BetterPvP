@@ -50,12 +50,12 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Right click with an Axe to activate.",
+                "Right click with an Axe to activate",
                 "",
-                "Enter a rage, gaining massive movement speed",
-                "and giving Slowness III to anything you hit for <val>" + slowDuration + "</val> seconds",
+                "Enter a rage, gaining <effect>Speed II</effect>",
+                "and giving <effect>Slowness III</effect> to anything you hit for <stat>" + slowDuration + "</stat> seconds",
                 "",
-                "While charging, you take no knockback.",
+                "While charging, you take no knockback",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };

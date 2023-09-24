@@ -37,7 +37,7 @@ public class HolyLight extends Skill implements PassiveSkill {
         return new String[]{
                 "Create an aura that gives",
                 "yourself and all allies within",
-                "<val>" + (8 + level) + "</val> blocks Regeneration I"};
+                "<val>" + (8 + level) + "</val> blocks <effect>Regeneration I</effect>"};
     }
 
     @Override

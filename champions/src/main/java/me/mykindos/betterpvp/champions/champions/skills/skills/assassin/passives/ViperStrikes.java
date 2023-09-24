@@ -37,7 +37,7 @@ public class ViperStrikes extends Skill implements PassiveSkill, Listener {
     public String[] getDescription(int level) {
         return new String[]{
                 "Your attacks give enemies",
-                "Poison 1 for <val>" + getSeconds(level) + "</val> seconds."
+                "<effect>Poison 1</effect> for <val>" + getSeconds(level) + "</val> seconds"
         };
     }
 

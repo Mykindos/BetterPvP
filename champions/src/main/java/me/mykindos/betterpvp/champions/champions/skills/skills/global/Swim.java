@@ -39,7 +39,7 @@ public class Swim extends Skill implements PassiveSkill, EnergySkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Tap crouch to Swim forwards.",
+                "Tap crouch to Swim forwards",
                 "",
                 "Energy: <val>" + getEnergy(level)};
     }

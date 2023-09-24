@@ -47,10 +47,8 @@ public class Fortitude extends Skill implements PassiveSkill, Listener {
         return new String[]{
                 "After taking damage, you slowly",
                 "regenerate up to <val>" + (3 + (level - 1)) + "</val> health, at a",
-                "rate of <val>" + heal + "</val> health per second.",
-                "",
-                "This does not stack, and is reset",
-                "if you are hit again."};
+                "rate of <stat>" + heal + "</stat> health per second"
+        };
     }
 
     @Override
