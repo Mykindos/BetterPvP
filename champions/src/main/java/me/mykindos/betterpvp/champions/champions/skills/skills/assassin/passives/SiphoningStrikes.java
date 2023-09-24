@@ -79,7 +79,7 @@ public class SiphoningStrikes extends Skill implements PassiveSkill, Listener {
 
             currentIncrement = Math.min(currentIncrement + healthIncrement, level * healthIncrement);
 
-            double healthToAdd = damager.getMaxHealth() * (currentIncrement / 100);
+            double healthToAdd = event.getDamage() * (currentIncrement / 100);
             damager.setHealth(Math.min(damager.getHealth() + healthToAdd, damager.getMaxHealth()));
 
             repeat.put(damager, currentIncrement);
