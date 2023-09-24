@@ -34,8 +34,8 @@ public class Sacrifice extends Skill implements PassiveSkill {
 
         double percentage = ((level * 0.08) * 100);
         return new String[]{
-                "Deal an extra <val>" + percentage + "%" + "</val> damage",
-                "But you now also take",
+                "Deal an extra <val>" + percentage + "%" + "</val> damage,",
+                "but you now also take",
                 "<val>" + percentage + "%" + "</val> extra damage from melee attacks"
         };
     }

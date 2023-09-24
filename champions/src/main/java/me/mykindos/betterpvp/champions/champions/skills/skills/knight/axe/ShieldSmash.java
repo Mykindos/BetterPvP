@@ -51,8 +51,10 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Smash your shield into an enemy",
-                "dealing <val>" + (int) (getKnockbackMultiplier(level) * 100) + "%</val> knockback.",
+                "Right click with an Axe to activate",
+                "",
+                "Smash your shield into an enemy,",
+                "dealing <val>" + (int) (getKnockbackMultiplier(level) * 100) + "%</val> knockback",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };

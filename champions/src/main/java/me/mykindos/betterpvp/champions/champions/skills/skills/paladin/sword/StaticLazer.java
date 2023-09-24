@@ -65,14 +65,16 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, Cooldown
     @Override
     public String[] getDescription(int level) {
         return new String[] {
-                "Hold Block to charge static electricity.",
-                "Release Block to fire static lazer.",
+                "Hold right click with a Sword to channel",
                 "",
-                "Charges <val>" + getChargePerSecond(level) + "%</val> per second.",
-                "Taking damage cancels charge.",
+                "Charge static electricity and",
+                "release right click to fire a lazer",
                 "",
-                "Deals <val>" + getDamage(level) + "</val> damage and travels up to",
-                "<val>" + getRange(level) + "</val> blocks.",
+                "Charges <val>" + getChargePerSecond(level) + "%</val> per second,",
+                "dealing up to <val>" + getDamage(level) + "</val> damage and traveling up to",
+                "<val>" + getRange(level) + "</val> blocks",
+                "",
+                "Taking damage cancels charge",
                 "",
                 "Cooldown: <val>" + getCooldown(level),
                 "Energy: <val>" + getEnergyPerSecond(level)

@@ -37,7 +37,7 @@ public class Cyclone extends Skill implements InteractSkill, CooldownSkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Right click with a sword to activate.",
+                "Right click with a Sword to activate",
                 "",
                 "Pulls all enemies within",
                 "<val>" + (minimumDistance + level) + "</val> blocks towards you",

@@ -39,9 +39,11 @@ public class HoldPosition extends Skill implements InteractSkill, CooldownSkill,
     public String[] getDescription(int level) {
 
         return new String[]{
+                "Right click with an Axe to activate",
+                "",
                 "Hold your position, gaining",
-                "Protection II, Slowness IV and no",
-                "knockback for <val>" + (5 + ((level - 1) * 0.5)) + "</val> seconds.",
+                "<effect>Protection II, Slowness IV</effect> and no",
+                "knockback for <val>" + (5 + ((level - 1) * 0.5)) + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };

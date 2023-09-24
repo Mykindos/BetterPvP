@@ -57,11 +57,11 @@ public class Wreath extends PrepareSkill implements CooldownSkill {
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Right click with a sword to prepare.",
+                "Right click with a Sword to prepare",
                 "",
-                "Your next <val>" + numAttacks + "</val> attacks will release a barrage of teeth",
+                "Your next <stat>" + numAttacks + "</stat> attacks will release a barrage of teeth",
                 "that deal <val>" + String.format("%.2f", (2 + (level / 1.5))) + "</val> damage and",
-                "apply Slowness II to their target for <val>" + slowDuration + "</val> seconds.",
+                "apply <effect>Slowness II</effect> to their target for <stat>" + slowDuration + "</stat> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };

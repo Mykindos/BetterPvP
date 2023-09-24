@@ -38,11 +38,11 @@ public class SpiritOfTheWolf extends Skill implements InteractSkill, CooldownSki
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Right click with a axe to activate.",
+                "Right click with an Axe to activate",
                 "",
-                "Call upon the spirit of the wolf",
+                "Call upon the spirit of the wolf,",
                 "granting all allies within <val>" + (radius + (level)) + "</val> blocks",
-                "Speed II for <val>" + duration + "</val> seconds.",
+                "<effect>Speed II</effect> for <stat>" + duration + "</stat> seconds.",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };

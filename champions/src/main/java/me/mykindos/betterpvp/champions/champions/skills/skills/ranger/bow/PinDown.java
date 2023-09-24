@@ -36,9 +36,10 @@ public class PinDown extends PrepareArrowSkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Left click with a bow to instantly fire",
-                "an arrow, which gives anybody hit ",
-                "Slowness IV for <val>" + (level * 1.5) + "</val> seconds.",
+                "Left click with a Bow to activate",
+                "",
+                "Quickly launch an arrow that gives enemies",
+                "<effect>Slowness IV</effect> for <val>" + (level * 1.5) + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };

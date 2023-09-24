@@ -47,14 +47,15 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Right click with a sword to activate.",
+                "Right click with a Sword to activate",
                 "",
-                "Hurl yourself towards an opponent.",
-                "If you collide with them, you <white>both",
-                "take <val>" + damage + "</val> damage and receive Slowness IV",
-                "for <val>" + (1 + level) + "</val> seconds.",
+                "Hurl yourself forwards",
                 "",
-                "Cannot be used while grounded.",
+                "If you collide with an enemy, you both",
+                "take <stat>" + damage + "</stat> damage and receive <effect>Slowness IV</effect>",
+                "for <val>" + (1 + level) + "</val> seconds",
+                "",
+                "Cannot be used while grounded",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };

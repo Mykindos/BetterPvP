@@ -55,10 +55,10 @@ public class MoltenBlast extends Skill implements InteractSkill, CooldownSkill, 
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Right click with an Axe to Activate",
+                "Right click with an Axe to activate",
                 "",
                 "Shoot a large fireball that deals",
-                "<val>" + damage + "</val> area of effect damage, and igniting any players hit",
+                "<stat>" + damage + "</stat> area of effect damage, and igniting any players hit",
                 "for <val>" + (level * 0.5) + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
