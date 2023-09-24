@@ -71,15 +71,15 @@ public class SiphoningStrikes extends Skill implements PassiveSkill, Listener {
     public void onDamage(CustomDamageEvent event) {
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
         if (!(event.getDamager() instanceof Player damager)) return;
-        if (!championsManager.getRoles().hasRole(damager, Role.ASSASSIN)) return;
+        if (!(event.getDamagee() instanceof Player)) return;
 
         int level = getLevel(damager);
         if (level > 0) {
             double currentIncrement = repeat.getOrDefault(damager, 2 * healthIncrement);
 
-            currentIncrement = Math.min(currentIncrement + healthIncrement, level * healthIncrement);
+            currentIncrement = Math.min(currentIncrement + healthIncrement, (level * healthIncrement) + (2 * healthIncrement));
 
-            double healthToAdd = event.getDamage() * (currentIncrement / 100);
+            double healthToAdd = event.getDamage() * currentIncrement;
             damager.setHealth(Math.min(damager.getHealth() + healthToAdd, damager.getMaxHealth()));
 
             repeat.put(damager, currentIncrement);
