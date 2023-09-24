@@ -12,6 +12,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.animal.Parrot;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_20_R1.CraftWorld;
@@ -146,6 +147,11 @@ public class ParrotShopkeeper extends Parrot implements IShopkeeper {
         return true;
     }
 
+    @Override
+    public void tame(@NotNull Player player) {
+
+    }
+
     public CraftEntity spawn(Location loc) {
         this.absMoveTo(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
         this.level().addFreshEntity(this, CreatureSpawnEvent.SpawnReason.CUSTOM);
@@ -156,4 +162,5 @@ public class ParrotShopkeeper extends Parrot implements IShopkeeper {
     public String getShopkeeperName() {
         return shopkeeperName;
     }
+
 }

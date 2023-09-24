@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.menu;
 
 import lombok.Data;
+import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -45,7 +46,7 @@ public class Button {
         this.itemStack = item;
     }
 
-    public void onClick(Player player, ClickType clickType) {
+    public void onClick(Player player, Gamer gamer, ClickType clickType) {
 
     }
 
