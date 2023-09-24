@@ -47,13 +47,13 @@ public class SyphoningStrikes extends Skill implements PassiveSkill, Listener {
 
         return new String[]{
                 "Each time you attack, you siphon health",
-                "from the enemy, starting at <stat>" + (healthIncrement * 2) + "%</stat>",
-                "and increasing by <val>" + healthIncrement + "%</val> for each hit",
+                "from the enemy, starting at <stat>" + ((healthIncrement * 100) * 2) + "%</stat>",
+                "and increasing by <val>" + (healthIncrement * 100) + "%</val> for each hit",
                 "",
-                "You can gain up to <val>" + (level * healthIncrement) + "</val> health per hit",
+                "You can gain up to <val>" + (20+(level * (healthIncrement * 100))) + "%</val> health per hit",
                 "",
-                "Not attacking for <stat>" + duration + "</stat> seconds clears",
-                "your bonus damage."};
+                "Not attacking for <stat>" + duration + "</stat> seconds resets",
+                "your bonus health back to <stat>" +((healthIncrement * 100) * 2)+"%"};
     }
 
     @Override
