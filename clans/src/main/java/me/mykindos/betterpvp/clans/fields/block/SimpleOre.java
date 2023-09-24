@@ -77,8 +77,8 @@ public enum SimpleOre implements FieldsOre {
     @Override
     public void loadConfig(ExtendedYamlConfiguration config) {
         final String key = "fields.blocks." + getName().toLowerCase().replace(" ", "");
-        min = config.getOrSaveInt(key + ".min", 1);
-        max = config.getOrSaveInt(key + ".max", 1);
+        min = config.getOrSaveInt(key + ".min", min);
+        max = config.getOrSaveInt(key + ".max", max);
     }
 
 }
