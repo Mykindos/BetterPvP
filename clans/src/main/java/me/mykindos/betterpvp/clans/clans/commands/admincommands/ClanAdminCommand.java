@@ -55,7 +55,8 @@ public class ClanAdminCommand extends Command {
             return;
         }
 
-        Gamer adminGamer = gamerManager.getObject(player.getUniqueId().toString())
+        Optional<Gamer> adminGamer = gamerManager.getObject(player.getUniqueId().toString());
+
         Clan targetClan = targetClanOptional.get();
 
         adminGamer.getClient().setMimicClan(targetClan.getId());
