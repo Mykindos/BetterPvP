@@ -1,7 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.passives;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import javax.inject.Inject;
@@ -28,12 +27,15 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import java.util.Map;
+import java.util.HashMap;
 
 @Singleton
 @BPvPListener
 public class FinalGambit extends Skill implements ToggleSkill, CooldownSkill, Listener {
 
     private final Set<UUID> active = new HashSet<>();
+    private final Map<UUID, Integer> particleTasks = new HashMap<>();
 
     private double baseDuration;
 
@@ -65,15 +67,29 @@ public class FinalGambit extends Skill implements ToggleSkill, CooldownSkill, Li
     @Override
     public void toggle(Player player, int level) {
         if (!active.contains(player.getUniqueId())) {
-            player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) ((baseDuration + level) * 20), 2));
+            player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) ((baseDuration + (level * 0.5)) * 20), 2));
             player.setHealth(1);
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WARDEN_DEATH, 1.0F, 1.0F);
-            player.getWorld().spawnParticle(Particle.SCULK_SOUL, player.getLocation(), 10, null);
             active.add(player.getUniqueId());
+
+            int taskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(champions, () -> {
+                player.getWorld().spawnParticle(Particle.SCULK_SOUL, player.getLocation(), 5, null);
+            }, 0L, 2L);
+
+            particleTasks.put(player.getUniqueId(), taskId);
 
             Bukkit.getScheduler().runTaskLater(champions, () -> {
                 active.remove(player.getUniqueId());
-            }, (long) ((baseDuration + level) * 20));
+
+                if (particleTasks.containsKey(player.getUniqueId())) {
+                    Bukkit.getScheduler().cancelTask(particleTasks.get(player.getUniqueId()));
+                    particleTasks.remove(player.getUniqueId());
+                }
+            }, (long) ((baseDuration + (level * 0.5)) * 20));
+
+            Bukkit.getScheduler().runTaskLater(champions, () -> {
+                active.remove(player.getUniqueId());
+            }, (long) ((baseDuration + (level * 0.5)) * 20));
         }
     }
 
@@ -100,7 +116,7 @@ public class FinalGambit extends Skill implements ToggleSkill, CooldownSkill, Li
         if(cause == EntityDamageEvent.DamageCause.ENTITY_ATTACK || cause == EntityDamageEvent.DamageCause.PROJECTILE) {
             int level = getLevel(player);
             if(level > 0) {
-                event.setDamage(event.getDamage() * 2);
+                event.setDamage(event.getDamage() * 1000);
             }
         }
     }
@@ -123,7 +139,7 @@ public class FinalGambit extends Skill implements ToggleSkill, CooldownSkill, Li
 
     @Override
     public void loadSkillConfig() {
-        baseDuration = getConfig("baseDuration", 1.0, Double.class);
+        baseDuration = getConfig("baseDuration", 0.5, Double.class);
     }
 
     @Override
