@@ -97,7 +97,7 @@ public class EffectListener implements Listener {
     public void shockUpdate() {
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (effectManager.hasEffect(player, EffectType.SHOCK)) {
-                player.playEffect(EntityEffect.HURT);
+                player.playHurtAnimation(0);
             }
         }
 

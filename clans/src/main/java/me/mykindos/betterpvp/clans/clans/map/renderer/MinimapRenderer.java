@@ -48,7 +48,7 @@ public class MinimapRenderer extends MapRenderer implements Listener {
     private int maxProcess;
 
     @Inject
-    @Config(path = "clans.map.maxMapDistance", defaultValue = "512")
+    @Config(path = "clans.map.maxMapDistance", defaultValue = "640")
     private int maxDistance;
 
     @Inject
