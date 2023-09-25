@@ -75,7 +75,7 @@ INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Weapons / Tools', 'ENDER_PEARL', 'Purifying Capsule', 0, 43, 1, 1, 2500, 1000);
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Weapons / Tools', 'GOLDEN_AXE', 'Fire axe', 0, 3, 1, 1, 5000, 0);
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Weapons / Tools', 'DIAMOND_SWORD', 'Power Sword', 0, 0, 1, 1, 5000, 0);
-INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Weapons / Tools', 'GOLDEN_SWORD', 'Radiant Sword', 0, 9, 1, 1, 5000, 2500);
+INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Weapons / Tools', 'GOLDEN_SWORD', 'Booster Sword', 0, 9, 1, 1, 5000, 2500);
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Weapons / Tools', 'IRON_SWORD', 'Standard Sword', 0, 18, 1, 1, 2000, 0);
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Weapons / Tools', 'BOW', 'Bow', 0, 45, 1, 1, 300, 0);
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Weapons / Tools', 'ARROW', 'Arrow', 0, 46, 1, 1, 12, 0);
@@ -86,7 +86,7 @@ INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Weapons / Tools', 'IRON_SHOVEL', 'Iron Shovel', 0, 16, 1, 1, 500, 0);
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Weapons / Tools', 'IRON_HOE', 'Iron Hoe', 0, 17, 1, 1, 1000, 0);
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Weapons / Tools', 'DIAMOND_AXE', 'Power Axe', 0, 1, 1, 1, 6000, 3000);
-INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Weapons / Tools', 'GOLDEN_AXE', 'Radiant Axe', 0, 10, 1, 1, 6000, 3000);
+INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Weapons / Tools', 'GOLDEN_AXE', 'Booster Axe', 0, 10, 1, 1, 6000, 3000);
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Weapons / Tools', 'FLINT_AND_STEEL', 'Flint and Steel', 0, 39, 1, 1, 1500, 100);
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Weapons / Tools', 'IRON_AXE', 'Standard Axe', 0, 19, 1, 1, 3000, 750);
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Weapons / Tools', 'CROSSBOW', 'Crossbow', 0, 36, 1, 1, 2500, 750);
