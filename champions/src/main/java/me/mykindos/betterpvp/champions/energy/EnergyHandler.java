@@ -1,8 +1,10 @@
 package me.mykindos.betterpvp.champions.energy;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.energy.events.DegenerateEnergyEvent;
 import me.mykindos.betterpvp.champions.energy.events.RegenerateEnergyEvent;
+import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -13,6 +15,10 @@ import org.bukkit.entity.Player;
 
 @Singleton
 public class EnergyHandler {
+
+    @Inject
+    @Config(path = "energy.nerf-energy-regen", defaultValue = "true")
+    private boolean nerfEnergyRegen;
 
     public static double baseEnergy = 150.0D;
     public static double playerEnergy = 0.0D;
@@ -74,8 +80,10 @@ public class EnergyHandler {
         }
         double energy = 0.006D;
 
-        if (cur.isSprinting() || UtilBlock.isInLiquid(cur) || cur.isGliding()) {
-            energy = 0.0008D;
+        if (nerfEnergyRegen) {
+            if (cur.isSprinting() || UtilBlock.isInLiquid(cur) || cur.isGliding()) {
+                energy = 0.0008D;
+            }
         }
 
         Bukkit.getPluginManager().callEvent(new RegenerateEnergyEvent(cur, energy));

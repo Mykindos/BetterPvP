@@ -31,9 +31,12 @@ public class ConfigProvider<T> implements Provider<T> {
         }else if(type == double.class){
             castedDefault = Double.parseDouble(defaultValue);
             type = (Class<T>) Double.class;
-        }else if(type == boolean.class){
+        }else if(type == boolean.class) {
             castedDefault = Boolean.parseBoolean(defaultValue);
             type = (Class<T>) Boolean.class;
+        }else if(type == float.class) {
+            castedDefault = Float.parseFloat(defaultValue);
+            type = (Class<T>) Float.class;
         }else if(type == long.class) {
             castedDefault = Long.parseLong(defaultValue);
             type = (Class<T>) Long.class;
