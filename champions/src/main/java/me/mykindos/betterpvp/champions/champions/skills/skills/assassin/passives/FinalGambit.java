@@ -17,9 +17,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import org.bukkit.Bukkit;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -55,10 +53,9 @@ public class FinalGambit extends Skill implements ToggleSkill, CooldownSkill, Li
         return new String[]{
                 "Drop Sword / Axe to Activate",
                 "",
-                "Reduce yourself to half a heart",
-                "and take double knockback, but",
-                "become <effect>Invulnerable</effect> and gain",
-                "<effect>Speed III</effect> for <val>" + (baseDuration + (level-1) * 0.5) + "</val> seconds",
+                "Sacrifice half of your health in exchange",
+                "for <stat>90%</stat> damage reduction and <effect>Speed III",
+                "that lasts for <val>" + (baseDuration + (level-1) * 0.5) + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -68,13 +65,13 @@ public class FinalGambit extends Skill implements ToggleSkill, CooldownSkill, Li
     public void toggle(Player player, int level) {
         if (!active.contains(player.getUniqueId())) {
             player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) ((baseDuration + (level * 0.5)) * 20), 2));
-            player.setHealth(1);
+            player.setHealth(player.getHealth()/2.0);
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WARDEN_DEATH, 1.0F, 1.0F);
             active.add(player.getUniqueId());
 
             int taskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(champions, () -> {
-                player.getWorld().spawnParticle(Particle.SCULK_SOUL, player.getLocation(), 5, null);
-            }, 0L, 2L);
+                player.getWorld().playEffect(player.getLocation(), Effect.STEP_SOUND, Material.REDSTONE_BLOCK);
+            }, 0L, 1L);
 
             particleTasks.put(player.getUniqueId(), taskId);
 
@@ -100,27 +97,11 @@ public class FinalGambit extends Skill implements ToggleSkill, CooldownSkill, Li
         if (!(event.getDamager() instanceof Player damager)) return;
 
         if (active.contains(damagee.getUniqueId())) {
-            event.setDamage(0);
+            event.setDamage(0.1);
             UtilMessage.message(damager, getClassType().getName(), damagee.getName() + " is using " + getName());
             damagee.getWorld().playSound(damagee.getLocation(), Sound.ITEM_SHIELD_BLOCK, 0.5F, 2.0F);
         }
     }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onKB(CustomKnockbackEvent event) {
-        if(!(event.getDamagee() instanceof Player player)) return;
-
-        if(!active.contains(player.getUniqueId())) return;
-
-        EntityDamageEvent.DamageCause cause = event.getCustomDamageEvent().getCause();
-        if(cause == EntityDamageEvent.DamageCause.ENTITY_ATTACK || cause == EntityDamageEvent.DamageCause.PROJECTILE) {
-            int level = getLevel(player);
-            if(level > 0) {
-                event.setDamage(event.getDamage() * 1000);
-            }
-        }
-    }
-
 
     @UpdateEvent(delay = 500)
     public void onUpdate() {
@@ -139,7 +120,7 @@ public class FinalGambit extends Skill implements ToggleSkill, CooldownSkill, Li
 
     @Override
     public void loadSkillConfig() {
-        baseDuration = getConfig("baseDuration", 0.5, Double.class);
+        baseDuration = getConfig("baseDuration", 1.0, Double.class);
     }
 
     @Override
