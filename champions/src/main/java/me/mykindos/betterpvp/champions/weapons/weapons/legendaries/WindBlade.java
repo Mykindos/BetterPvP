@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.champions.weapons.types.InteractWeapon;
 import me.mykindos.betterpvp.champions.weapons.types.LegendaryWeapon;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseItemEvent;
+import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
@@ -32,6 +33,14 @@ import org.bukkit.util.Vector;
 @Singleton
 @BPvPListener
 public class WindBlade extends ChannelWeapon implements InteractWeapon, LegendaryWeapon, Listener {
+
+    @Inject
+    @Config(path = "weapons.wind-blade.energy-per-tick", defaultValue = "1.0")
+    private float energyPerTick;
+
+    @Inject
+    @Config(path = "weapons.wind-blade.initial-energy-cost", defaultValue = "10.0")
+    private float initialEnergyCost;
 
     private final EnergyHandler energyHandler;
 
@@ -73,7 +82,7 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
                 continue;
             }
 
-            if (!energyHandler.use(player, "Wind Blade", 1.0, true)) {
+            if (!energyHandler.use(player, "Wind Blade", energyPerTick, true)) {
                 active.remove(player.getUniqueId());
                 continue;
             }
@@ -128,7 +137,7 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
 
     @Override
     public float getEnergy() {
-        return 10;
+        return initialEnergyCost;
     }
 
     @Override

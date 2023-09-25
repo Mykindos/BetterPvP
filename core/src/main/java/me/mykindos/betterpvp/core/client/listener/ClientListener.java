@@ -41,6 +41,14 @@ public class ClientListener implements Listener {
     @Config(path = "pvp.enableOldPvP", defaultValue = "true")
     private boolean enableOldPvP;
 
+    @Inject
+    @Config(path = "tab.title", defaultValue = "Welcome to Mineplex Clans!")
+    private String tabTitle;
+
+    @Inject
+    @Config(path = "tab.website", defaultValue = "https://mineplex.com")
+    private String website;
+
     private final ClientManager clientManager;
 
     @Inject
@@ -121,13 +129,10 @@ public class ClientListener implements Listener {
 
     @SneakyThrows
     public void updateTab(Player player) {
-
-        PacketContainer pc = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.PLAYER_LIST_HEADER_FOOTER);
-
-        var titleTop = Component.text("Welcome to BetterPvP Clans!\n", NamedTextColor.RED, TextDecoration.BOLD);
+        var titleTop = Component.text(tabTitle, NamedTextColor.RED, TextDecoration.BOLD);
         var titleBot = Component.text("Visit our website at: ", NamedTextColor.RED, TextDecoration.BOLD)
-                .append(Component.text("https://betterpvp.net", NamedTextColor.YELLOW, TextDecoration.BOLD));
-        var header = titleTop.append(Component.newline()).append(titleBot);
+                .append(Component.text(website, NamedTextColor.YELLOW, TextDecoration.BOLD));
+        var header = titleTop.appendNewline().append(titleBot);
 
         var footerLeft = Component.text("Ping: ", NamedTextColor.GOLD, TextDecoration.BOLD)
                 .append(Component.text(UtilPlayer.getPing(player), NamedTextColor.YELLOW, TextDecoration.BOLD));
@@ -136,8 +141,6 @@ public class ClientListener implements Listener {
         var footer = footerLeft.append(Component.space()).append(footerRight);
 
         player.sendPlayerListHeaderAndFooter(header, footer);
-//        pc.getChatComponents().write(0, title).write(1, info);
-//        ProtocolLibrary.getProtocolManager().sendServerPacket(player, pc);
     }
 
     @EventHandler
