@@ -127,7 +127,7 @@ public class ShopListener implements Listener {
 
         ItemStack boughtItem = new ItemStack(event.getShopItem().getMaterial(), amount);
         UtilItem.insert(event.getPlayer(), itemHandler.updateNames(boughtItem));
-        UtilMessage.simpleMessage(event.getPlayer(), "Shop", "You have purchased <alt2>%d %s</alt2> for <alt2>%d %s</alt2>.",
+        UtilMessage.simpleMessage(event.getPlayer(), "Shop", "You have purchased <alt2>%d %s</alt2> for <alt2>%s %s</alt2>.",
                 amount, event.getShopItem().getItemName(), NumberFormat.getInstance().format(cost), event.getCurrency().name().toLowerCase());
         UtilSound.playSound(event.getPlayer(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 2f, false);
 
@@ -190,7 +190,7 @@ public class ShopListener implements Listener {
                         }
 
                         UtilSound.playSound(event.getPlayer(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 2f, false);
-                        UtilMessage.simpleMessage(event.getPlayer(), "Shop", "You have sold <alt2>%d %s</alt2> for <alt2>%d %s</alt2>.",
+                        UtilMessage.simpleMessage(event.getPlayer(), "Shop", "You have sold <alt2>%d %s</alt2> for <alt2>%s %s</alt2>.",
                                 amount, event.getShopItem().getItemName(), cost, event.getCurrency().name().toLowerCase());
 
                         return;
