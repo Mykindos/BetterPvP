@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillEquipE
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.champions.champions.roles.events.RoleChangeEvent;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
+import me.mykindos.betterpvp.champions.combat.events.PlayerCheckShieldEvent;
 import me.mykindos.betterpvp.champions.utilities.UtilChampions;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
@@ -128,6 +129,21 @@ public class ShieldListener implements Listener {
     public void onRoleChange(RoleChangeEvent event) {
         Player player = event.getPlayer();
         giveShieldIfRequired(player);
+    }
+
+    @UpdateEvent
+    public void checkShields() {
+        Bukkit.getOnlinePlayers().forEach(player -> {
+            if(player.getInventory().getItemInOffHand().getType() == Material.SHIELD) return;
+            var event = UtilServer.callEvent(new PlayerCheckShieldEvent(player));
+            if(event.isShouldHaveShield()) {
+                var shield = new ItemStack(Material.SHIELD);
+                var itemMeta = shield.getItemMeta();
+                itemMeta.setCustomModelData(1);
+                shield.setItemMeta(itemMeta);
+                player.getInventory().setItemInOffHand(shield);
+            }
+        });
     }
 
     private void giveShieldIfRequired(Player player) {

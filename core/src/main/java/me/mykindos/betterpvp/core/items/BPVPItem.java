@@ -18,5 +18,6 @@ public class BPVPItem {
     private final Component name;
     private final List<Component> lore;
     private final boolean glowing;
+    private final boolean giveUUID;
 
 }
