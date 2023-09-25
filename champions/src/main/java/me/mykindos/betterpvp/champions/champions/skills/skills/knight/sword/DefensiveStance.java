@@ -53,8 +53,8 @@ public class DefensiveStance extends ChannelSkill implements InteractSkill, Ener
         return new String[]{
                 "Hold right click with a Sword to channel",
                 "",
-                "While active, you are immune to all",
-                "melee damage from attacks in front of you",
+                "While active, you are immune to all melee",
+                "damage from attacks in front of you",
                 "",
                 "Players who attack you receive <stat>" + damage + "</stat> damage,",
                 "and get knocked back",

@@ -46,8 +46,7 @@ public class SilencingStrikes extends Skill implements PassiveSkill, Listener {
 
         return new String[]{
                 "Hit a player <stat>" + hitsNeeded + "</stat> consecutive times without letting",
-                "<stat>" + timeSpan + "</stat> seconds pass.",
-                "to <effect>Silence</effect> them for <val>" + (level) + "</val> seconds."
+                "<stat>" + timeSpan + "</stat> seconds pass to <effect>Silence</effect> them for <val>" + (level) + "</val> seconds"
         };
     }
 

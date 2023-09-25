@@ -58,8 +58,8 @@ public class Inferno extends ChannelSkill implements InteractSkill, EnergySkill 
         return new String[]{
                 "Hold right click with a Sword to chennel",
                 "",
-                "You spray fire at high speed,",
-                "igniting anything it hits for <stat>" + ((double)fireTicks/ (double)20) + "</stat> seconds.",
+                "You spray fire at high speed igniting",
+                "anything it hits for <stat>" + ((double)fireTicks/ (double)20) + "</stat> seconds",
                 "",
                 "Energy / Second: <val>" + getEnergy(level)
         };

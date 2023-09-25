@@ -49,8 +49,8 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill {
         return new String[]{
                 "Drop your Sword / Axe to toggle",
                 "",
-                "Ignite yourself in flaming fury,",
-                "receiving <effect>Speed II</effect> and <effect>Fire Resistance</effect>",
+                "Ignite yourself in flaming fury, gaining",
+                "<effect>Speed II</effect> and <effect>Fire Resistance</effect>",
                 "",
                 "You leave a trail of fire, which",
                 "burns players that go near it",
