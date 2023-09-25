@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
+import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.shops.shops.items.data.PolynomialData;
 import org.bukkit.Material;
 
@@ -47,7 +48,7 @@ public class ShopItemRepository {
                 int buyPrice = result.getInt(9);
                 int sellPrice = result.getInt(10);
 
-                if(!shopItems.containsKey(shopKeeper)) {
+                if (!shopItems.containsKey(shopKeeper)) {
                     shopItems.put(shopKeeper, new ArrayList<>());
                 }
 
@@ -55,7 +56,7 @@ public class ShopItemRepository {
 
                 String dynamicPricingQuery = "SELECT * FROM " + databasePrefix + "shopitems_dynamic_pricing WHERE shopItemId = ?";
                 CachedRowSet dynamicPricingResult = database.executeQuery(new Statement(dynamicPricingQuery, new IntegerStatementValue(id)));
-                if(dynamicPricingResult.next()) {
+                if (dynamicPricingResult.next()) {
                     int minSellPrice = dynamicPricingResult.getInt(2);
                     int baseSellPrice = dynamicPricingResult.getInt(3);
                     int maxSellPrice = dynamicPricingResult.getInt(4);
@@ -67,14 +68,14 @@ public class ShopItemRepository {
                     int currentStock = dynamicPricingResult.getInt(10);
 
                     PolynomialData polynomialData = new PolynomialData(minBuyPrice, baseBuyPrice, maxBuyPrice, minSellPrice, baseSellPrice, maxSellPrice, maxStock, baseStock, currentStock);
-                    shopItem = new DynamicShopItem(shopKeeper, itemName, material, (byte) data, menuSlot, menuPage, amount, polynomialData);
+                    shopItem = new DynamicShopItem(id, shopKeeper, itemName, material, (byte) data, menuSlot, menuPage, amount, polynomialData);
                 } else {
-                    shopItem = new NormalShopItem(shopKeeper, itemName, material, (byte) data, menuSlot, menuPage, amount, buyPrice, sellPrice);
+                    shopItem = new NormalShopItem(id, shopKeeper, itemName, material, (byte) data, menuSlot, menuPage, amount, buyPrice, sellPrice);
                 }
 
                 String itemFlagQuery = "SELECT * FROM " + databasePrefix + "shopitems_flags WHERE shopItemId = ?";
                 CachedRowSet itemFlagResult = database.executeQuery(new Statement(itemFlagQuery, new IntegerStatementValue(id)));
-                while(itemFlagResult.next()) {
+                while (itemFlagResult.next()) {
                     String key = itemFlagResult.getString(3);
                     String value = itemFlagResult.getString(4);
                     shopItem.getItemFlags().put(key, value);
@@ -88,6 +89,16 @@ public class ShopItemRepository {
         }
 
         return shopItems;
+    }
+
+    public void updateStock(List<DynamicShopItem> dynamicShopItems) {
+        List<Statement> updateQueries = new ArrayList<>();
+        String query = "UPDATE " + databasePrefix + "shopitems_dynamic_pricing SET currentStock = ? WHERE shopItemId = ?";
+        dynamicShopItems.forEach(dynamicShopItem -> {
+            updateQueries.add(new Statement(query, new IntegerStatementValue(dynamicShopItem.getCurrentStock()), new IntegerStatementValue(dynamicShopItem.getId())));
+        });
+
+        database.executeBatch(updateQueries, true);
     }
 
 }

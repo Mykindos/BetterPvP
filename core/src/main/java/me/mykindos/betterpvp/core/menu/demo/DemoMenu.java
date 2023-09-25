@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.menu.demo;
 
+import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.menu.Button;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
@@ -25,7 +26,7 @@ public class DemoMenu extends Menu {
         }
 
         @Override
-        public void onClick(Player player, ClickType clickType) {
+        public void onClick(Player player, Gamer gamer, ClickType clickType) {
             player.setHealth(0);
             UtilSound.playSound(player, Sound.ITEM_GOAT_HORN_SOUND_5, 0.1f, 1, false);
             UtilSound.playSound(player.getWorld(), player.getLocation(), Sound.MUSIC_DISC_PIGSTEP, 0.1f, 1);
@@ -40,7 +41,7 @@ public class DemoMenu extends Menu {
         }
 
         @Override
-        public void onClick(Player player, ClickType clickType) {
+        public void onClick(Player player, Gamer gamer, ClickType clickType) {
 
             UtilSound.playSound(player, Sound.MUSIC_DISC_OTHERSIDE, 0.1f, 1, true);
         }

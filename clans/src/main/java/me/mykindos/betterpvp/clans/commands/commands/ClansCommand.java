@@ -3,7 +3,9 @@ package me.mykindos.betterpvp.clans.commands.commands;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.Clans;
+import me.mykindos.betterpvp.clans.clans.map.MapHandler;
 import me.mykindos.betterpvp.clans.commands.ClansCommandLoader;
+import me.mykindos.betterpvp.clans.fields.Fields;
 import me.mykindos.betterpvp.clans.listener.ClansListenerLoader;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
@@ -55,6 +57,8 @@ public class ClansCommand extends Command implements IConsoleCommand {
         @Inject
         private ClansListenerLoader listenerLoader;
 
+        @Inject
+        private Fields fields;
 
         @Override
         public String getName() {
@@ -77,6 +81,9 @@ public class ClansCommand extends Command implements IConsoleCommand {
 
             commandLoader.reload(clans.getClass().getPackageName());
             listenerLoader.reload(clans.getClass().getPackageName());
+            fields.reload(clans);
+            clans.getInjector().injectMembers(clans.getInjector().getInstance(MapHandler.class));
+
 
             UtilMessage.message(sender, "Clans", "Successfully reloaded clans");
         }
