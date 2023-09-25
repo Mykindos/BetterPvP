@@ -73,13 +73,13 @@ INSERT IGNORE INTO items (Material, Module, Name, Glow) VALUES
 
 -- Weapons
 INSERT IGNORE INTO items (Material, Module, Name, Glow) VALUES
-    ("GOLDEN_AXE", "Champions", "<yellow>Radiant Axe", 0);
+    ("GOLDEN_AXE", "Champions", "<yellow>Booster Axe", 0);
 
 INSERT IGNORE INTO itemlore
     VALUES ((SELECT id FROM items WHERE Material = "GOLDEN_AXE" AND Module = "Champions"), 0, "<gray>Damage: <green>5");
 
 INSERT IGNORE INTO items (Material, Module, Name, Glow) VALUES
-    ("GOLDEN_SWORD", "Champions", "<yellow>Radiant Sword", 0);
+    ("GOLDEN_SWORD", "Champions", "<yellow>Booster Sword", 0);
 
 INSERT IGNORE INTO itemlore
     VALUES ((SELECT id FROM items WHERE Material = "GOLDEN_SWORD" AND Module = "Champions"), 0, "<gray>Damage: <green>6");
