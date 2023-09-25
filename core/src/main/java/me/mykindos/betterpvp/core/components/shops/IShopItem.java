@@ -1,9 +1,10 @@
-package me.mykindos.betterpvp.shops.shops.items;
+package me.mykindos.betterpvp.core.components.shops;
 
 import org.bukkit.Material;
 
 public interface IShopItem {
 
+    int getId();
     int getBuyPrice();
 
     int getSellPrice();

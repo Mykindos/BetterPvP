@@ -56,13 +56,13 @@ public class Polymorph extends PrepareSkill implements CooldownSkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Right click with a sword to prepare.",
+                "Right click with a Sword to prepare",
                 "",
                 "The next player you hit, is polymorphed",
-                "into a sheep for <val>" + polymorphDuration + "</val> seconds.",
+                "into a sheep for <stat>" + polymorphDuration + "</stat> seconds",
                 "",
                 "While a player is polymorphed, they cannot deal",
-                "or take any damage.",
+                "or take any damage",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };

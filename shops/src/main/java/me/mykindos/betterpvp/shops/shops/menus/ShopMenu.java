@@ -1,18 +1,13 @@
 package me.mykindos.betterpvp.shops.shops.menus;
 
+import me.mykindos.betterpvp.core.components.shops.IShopItem;
 import me.mykindos.betterpvp.core.items.ItemHandler;
-import me.mykindos.betterpvp.core.menu.Button;
 import me.mykindos.betterpvp.core.menu.Menu;
-import me.mykindos.betterpvp.core.utilities.UtilItem;
-import me.mykindos.betterpvp.shops.shops.items.IShopItem;
-import me.mykindos.betterpvp.shops.shops.items.ShopItem;
 import me.mykindos.betterpvp.shops.shops.menus.buttons.ShopItemButton;
-import me.mykindos.betterpvp.shops.shops.utilities.ShopsNamespacedKeys;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.persistence.PersistentDataType;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -30,17 +25,16 @@ public class ShopMenu extends Menu {
         loadShop();
     }
 
+    @Override
+    public void construct() {
+        loadShop();
+    }
+
     private void loadShop() {
         for (IShopItem shopItem : shopItems) {
             var itemStack = new ItemStack(shopItem.getMaterial(), shopItem.getAmount());
-            var itemMeta = itemStack.getItemMeta();
-            if (itemMeta != null) {
-                itemMeta.getPersistentDataContainer().set(ShopsNamespacedKeys.SHOP_ITEM, PersistentDataType.STRING, "true");
-                itemMeta.getPersistentDataContainer().set(ShopsNamespacedKeys.SHOP_CURRENCY, PersistentDataType.STRING, "coins");
-                itemStack.setItemMeta(itemMeta);
-            }
 
-            addButton(new ShopItemButton(shopItem.getSlot(), addShopLore(itemHandler.updateNames(itemStack), shopItem)));
+            addButton(new ShopItemButton(this, shopItem.getSlot(), shopItem, addShopLore(itemHandler.updateNames(itemStack), shopItem)));
         }
     }
 

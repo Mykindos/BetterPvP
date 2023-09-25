@@ -39,10 +39,10 @@ public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Right click with a axe to Activate",
+                "Right click with an Axe to activate",
                 "",
                 "Gives you, and all allies within <val>" + (6 + level) + "</val> blocks",
-                "Health Boost I for <val>" + duration + "</val> seconds",
+                "<effect>Health Boost I</effect> for <stat>" + duration + "</stat> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };

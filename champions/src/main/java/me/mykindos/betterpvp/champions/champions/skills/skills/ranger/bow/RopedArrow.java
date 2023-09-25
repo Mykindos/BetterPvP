@@ -39,10 +39,10 @@ public class RopedArrow extends PrepareArrowSkill {
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Left click with a bow to prepare.",
+                "Left click with a Bow to prepare",
                 "",
                 "Your next arrow will pull you",
-                "in after it hits",
+                "towards the location it hits",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };

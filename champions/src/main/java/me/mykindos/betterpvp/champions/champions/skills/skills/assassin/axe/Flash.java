@@ -54,12 +54,14 @@ public class Flash extends Skill implements InteractSkill, Listener {
     @Override
     public String[] getDescription(int level) {
         return new String[] {
-                "Teleport a short distance horizontally",
-                "in the direction you are facing.",
+                "Right click with an Axe to activate",
                 "",
-                "Uses up to <val>" + getMaxCharges(level) + "</val> charges.",
+                "Teleport <stat>" + teleportDistance + "</stat> blocks forward",
+                "in the direction you are facing",
                 "",
-                "Gain a charge every: <val>" + getRechargeSeconds(level) + "</val> seconds."
+                "Store up to <val>" + getMaxCharges(level) + "</val> charges",
+                "",
+                "Gain a charge every: <stat>" + getRechargeSeconds(level) + "</stat> seconds"
         };
     }
 

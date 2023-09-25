@@ -41,12 +41,12 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener {
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Right click with a sword to activate.",
+                "Right click with a Sword to activate",
                 "",
                 "Smash the hilt of your sword into",
-                "your opponent, dealing <val>" + (3 + (level)) + "</val> damage",
-                "and applying shock for <val>" + (level / 2) + "</val> seconds.",
-                "Silences enemy for <val>" + (level / 2) + "</val> seconds",
+                "your opponent, dealing <val>" + (3 + (level)) + "</val> damage,",
+                "applying <effect>Shock</effect> for <val>" + (level / 2) + "</val> seconds,",
+                "and <effect>Silence</effect> the enemy for <val>" + (level / 2) + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };

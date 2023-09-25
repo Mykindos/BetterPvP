@@ -50,10 +50,11 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergySkill
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Hold Right click with a sword to activate.",
+                "Hold right click with a Sword to channel.",
                 "",
                 "While channeling, release a blizzard",
-                "that gives Slowness III to anyone hit for <val>" + slowDuration + "</val> seconds.",
+                "that gives <effect>Slowness III</effect> to anyone hit ",
+                "for <stat>" + slowDuration + "</stat> seconds",
                 "",
                 "Energy: <val>" + getEnergy(level)
         };

@@ -49,12 +49,10 @@ public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listene
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Drop Sword / Axe to Activate",
+                "Drop your Sword / Axe to activate",
                 "",
-                "Teleports you back to where you ",
-                "were located <val>" + (1.5 + (level)) + "</val> seconds ago",
-                "Increases health by <val>" + (percentHealthRecovered * 100) + "%</val> of the health you had",
-                "<val>" + (1.5 + (level)) + "</val> seconds ago",
+                "Teleports you back in time <val>" + (1.5 + (level)) + "</val> seconds, increasing",
+                "your health by <stat>" + (percentHealthRecovered * 100) + "%</stat> of the health you had",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -155,6 +153,6 @@ public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listene
 
     @Override
     public void loadSkillConfig(){
-        percentHealthRecovered = getConfig("maxTravelDistance", 0.25, Double.class);
+        percentHealthRecovered = getConfig("percentHealthRecovered", 0.25, Double.class);
     }
 }

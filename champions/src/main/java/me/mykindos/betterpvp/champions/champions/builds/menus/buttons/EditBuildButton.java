@@ -4,6 +4,7 @@ import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.menus.SkillMenu;
 import me.mykindos.betterpvp.champions.champions.skills.SkillManager;
 import me.mykindos.betterpvp.core.components.champions.Role;
+import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.menu.Button;
 import me.mykindos.betterpvp.core.menu.MenuManager;
 import net.kyori.adventure.text.Component;
@@ -31,7 +32,7 @@ public class EditBuildButton extends Button {
     }
 
     @Override
-    public void onClick(Player player, ClickType clickType) {
+    public void onClick(Player player, Gamer gamer, ClickType clickType) {
         MenuManager.openMenu(player, new SkillMenu(player, builds, role, buildNumber, skillManager));
         player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1.0F, 2.0F);
     }

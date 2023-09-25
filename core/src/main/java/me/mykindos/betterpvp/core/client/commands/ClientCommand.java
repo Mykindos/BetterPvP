@@ -2,18 +2,20 @@ package me.mykindos.betterpvp.core.client.commands;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.ClientManager;
 import me.mykindos.betterpvp.core.client.Rank;
+import me.mykindos.betterpvp.core.client.events.ClientAdministrateEvent;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Singleton
 public class ClientCommand extends Command {
@@ -50,7 +52,8 @@ public class ClientCommand extends Command {
         @Override
         public void execute(Player player, Client client, String[] args) {
             client.setAdministrating(!client.isAdministrating());
-            
+            new ClientAdministrateEvent(client, player, client.isAdministrating()).callEvent();
+
             Component status = client.isAdministrating() ? Component.text("enabled", NamedTextColor.GREEN) : Component.text("disabled", NamedTextColor.RED);
             UtilMessage.simpleMessage(player, "Command", Component.text("Client admin: ").append(status));
         }
@@ -91,8 +94,8 @@ public class ClientCommand extends Command {
             clientOptional.ifPresentOrElse(target -> {
                 List<Component> result = new ArrayList<>();
                 result.add(UtilMessage.deserialize("<alt2>%s</alt2> Client Details", target.getName()));
-                //event.getResult().add(ChatColor.YELLOW + "IP Address: "
-                //        + (client.hasRank(Rank.ADMIN, false) ? ChatColor.GRAY + target.getIP() : ChatColor.RED + "N/A"));
+                //result.add(Component.text("IP Address: ", NamedTextColor.YELLOW).append(Component.text(target.getIP(), NamedTextColor.GRAY)));
+                //        + (client.hasRank(Rank.ADMIN) ? ChatColor.GRAY + target.getIP() : ChatColor.RED + "N/A"));
                 //event.getResult().add(ChatColor.YELLOW + "Previous Name: " + ChatColor.GRAY + target.getOldName());
                 //event.getResult().add(ChatColor.YELLOW + "IP Alias: " + ChatColor.GRAY + (client.hasRank(Rank.ADMIN, false)
                 //        ? ClientUtilities.getDetailedIPAlias(target, false) : ClientUtilities.getDetailedIPAlias(target, true)));
@@ -151,6 +154,51 @@ public class ClientCommand extends Command {
                     }
                 }else{
                     UtilMessage.simpleMessage(player, "Client", "<alt2>%s</alt2> already has the highest rank.", targetClient.getName());
+                }
+            }
+        }
+    }
+
+    @Singleton
+    @SubCommand(ClientCommand.class)
+    private static class DemoteSubCommand extends Command {
+
+        @Inject
+        private ClientManager clientManager;
+
+        @Override
+        public String getName() {
+            return "demote";
+        }
+
+        @Override
+        public String getDescription() {
+            return "Demote a client to a higher rank";
+        }
+
+        @Override
+        public void execute(Player player, Client client, String... args) {
+            if (args.length == 0) {
+                UtilMessage.message(player, "Client", "You must specify a client");
+                return;
+            }
+
+            Optional<Client> clientOptional = clientManager.getClientByName(args[0]);
+            if (clientOptional.isPresent()) {
+                Client targetClient = clientOptional.get();
+                Rank targetRank = Rank.getRank(targetClient.getRank().getId() - 1);
+                if(targetRank != null) {
+                    if (client.getRank().getId() < targetRank.getId() || player.isOp()) {
+                        targetClient.setRank(targetRank);
+
+                        final Component msg = UtilMessage.deserialize("<alt2>%s</alt2> has been demoted to ", targetClient.getName()).append(targetRank.getTag(true));
+                        UtilMessage.simpleMessage(player, "Client", msg);
+                        clientManager.getRepository().save(targetClient);
+                    }else{
+                        UtilMessage.message(player, "Client", "You cannot demote someone that is higher rank than you.");
+                    }
+                }else{
+                    UtilMessage.simpleMessage(player, "Client", "<alt2>%s</alt2> already has the lowest rank.", targetClient.getName());
                 }
             }
         }

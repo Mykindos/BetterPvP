@@ -52,15 +52,16 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Hold right click with a sword to activate.",
+                "Hold right click with a Sword to channel",
                 "",
-                "While evading you block attacks, and",
-                "teleport behind the attacker.",
-                "Crouch and Evade to teleport backwards.",
+                "If a player hits you while evading,",
+                "you will teleport behind the attacker",
                 "",
-                "<val>" + getCooldown(level) + "</val> second internal cooldown.",
+                "Hold Crouch while Evading to teleport backwards",
                 "",
-                "Energy / second: <val>" + (10 * getEnergy(level))};
+                "<stat>" + getCooldown(level) + "</stat> second internal cooldown",
+                "",
+                "Energy / Second: <val>" + (10 * getEnergy(level))};
     }
 
     @Override

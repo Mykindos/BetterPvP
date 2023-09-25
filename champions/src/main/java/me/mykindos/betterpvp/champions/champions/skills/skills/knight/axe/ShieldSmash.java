@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 
 import java.util.Collection;
 import java.util.List;
+
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -51,8 +52,10 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Smash your shield into an enemy",
-                "dealing <val>" + (int) (getKnockbackMultiplier(level) * 100) + "%</val> knockback.",
+                "Right click with an Axe to activate",
+                "",
+                "Smash your shield into an enemy,",
+                "dealing <val>" + (int) (getKnockbackMultiplier(level) * 100) + "%</val> knockback",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -80,7 +83,7 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
         }
     }
 
-    private double getKnockbackMultiplier(int level){
+    private double getKnockbackMultiplier(int level) {
         return baseMultiplier + ((level - 1) * 0.2);
     }
 
@@ -95,7 +98,7 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
         final Location bashLocation = player.getLocation().add(0, 0.8, 0);
         bashLocation.add(player.getLocation().getDirection().setY(0).normalize().multiply(1.5));
 
-        if(player.getInventory().getItemInOffHand().getType() != Material.SHIELD) {
+        if (player.getInventory().getItemInOffHand().getType() != Material.SHIELD) {
             var shield = new ItemStack(Material.SHIELD);
             player.getInventory().setItemInOffHand(shield);
         }
@@ -115,7 +118,7 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
             final LivingEntity ent = bashedEntry.getKey();
 
             // Add velocity and damage
-            UtilVelocity.velocity(ent, direction,  strength,false, 0, 0.3, 0.8 + 0.05 * level, true);
+            UtilVelocity.velocity(ent, direction, strength, false, 0, 0.3, 0.8 + 0.05 * level, true);
             UtilDamage.doCustomDamage(new CustomDamageEvent(ent, player, null, EntityDamageEvent.DamageCause.FALL, 0.0, false, getName()));
 
             // Cancel fall damage if they're friendly
@@ -138,9 +141,10 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
 
     @UpdateEvent(delay = 100)
     public void onCheckShield() {
-        for(Player player : Bukkit.getOnlinePlayers()) {
-            if(hasSkill(player)) {
-                if(player.getInventory().getItemInOffHand().getType() != Material.SHIELD) {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (hasSkill(player)) {
+                if (!UtilItem.isAxe(player.getInventory().getItemInMainHand().getType())) continue;
+                if (player.getInventory().getItemInOffHand().getType() != Material.SHIELD) {
                     player.getInventory().setItemInOffHand(new ItemStack(Material.SHIELD));
                 }
             }

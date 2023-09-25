@@ -49,12 +49,12 @@ public class Bloodlust extends Skill implements PassiveSkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "When an enemy dies within <val>" + radius + "</val> blocks,",
+                "When an enemy dies within <stat>" + radius + "</stat> blocks,",
                 "you go into a Bloodlust, receiving",
-                "Speed I and Strength I for <val>" + (duration + level) + "</val> seconds.",
+                "<effect>Speed I</effect> and <effect>Strength I</effect> for <val>" + (duration + level) + "</val> seconds.",
                 "",
-                "Bloodlust can stack up to <val>" + maxStacks + "</val> times,",
-                "boosting the level of Speed and Strength."};
+                "Bloodlust can stack up to <stat>" + maxStacks + "</stat> times,",
+                "boosting the level of <effect>Speed</effect> and <effect>Strength</effect>"};
     }
 
     @Override

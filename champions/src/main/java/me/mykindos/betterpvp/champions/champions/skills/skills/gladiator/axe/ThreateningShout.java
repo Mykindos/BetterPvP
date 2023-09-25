@@ -37,12 +37,11 @@ public class ThreateningShout extends Skill implements InteractSkill, CooldownSk
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Right click with a axe to activate.",
+                "Right click with an Axe to activate",
                 "",
-                "Release a roar, which frightens all enemies",
-                "within <val>" + (radius + level) + "</val> blocks and grants",
-                "them Vulnerability for <val>" + (duration + level),
-                "seconds.",
+                "Release a roar, which frightens all",
+                "enemies within <val>" + (radius + level) + "</val> blocks and grants",
+                "them <effect>Vulnerability</effect> for <val>" + (duration + level) +"</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };

@@ -63,11 +63,11 @@ public class Swarm extends ChannelSkill implements InteractSkill, EnergySkill, L
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Hold Block with a sword to Channel",
+                "Hold right click with a Sword to channel",
                 "",
-                "Release a swarm of bats",
-                "which damage, and knockback",
-                "any enemies they come in contact with",
+                "Release a swarm of bats which",
+                "damage and knock back any enemies",
+                "they come in contact with",
                 "",
                 "Energy: <val>" + getEnergy(level)
         };

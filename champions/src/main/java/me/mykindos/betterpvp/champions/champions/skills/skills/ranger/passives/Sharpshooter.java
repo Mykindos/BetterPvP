@@ -39,10 +39,10 @@ public class Sharpshooter extends Skill implements PassiveSkill {
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "You deal <val>" + (level * 0.75) + "</val> extra damage for each consecutive hit",
-                "After <val>" + maxTimeBetweenShots + "</val> seconds, bonus damage resets.",
+                "You deal <val>" + (level * 0.75) + "</val> extra damage for",
+                "each consecutive hit up to a maximum of <stat>"+ maxConsecutiveHits +"</stat> hits",
                 "",
-                "Maximum consecutive hits: <val>" + maxConsecutiveHits
+                "After <stat>" + maxTimeBetweenShots + "</stat> seconds, bonus damage resets",
         };
     }
 

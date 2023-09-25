@@ -1,7 +1,7 @@
 package me.mykindos.betterpvp.shops.shops.items;
 
-import lombok.Builder;
 import lombok.Data;
+import me.mykindos.betterpvp.core.components.shops.IShopItem;
 import org.bukkit.Material;
 
 import java.util.HashMap;
@@ -9,6 +9,7 @@ import java.util.HashMap;
 @Data
 public abstract class ShopItem implements IShopItem {
 
+    private final int id;
     private final String store;
     private final String itemName;
     private final Material material;

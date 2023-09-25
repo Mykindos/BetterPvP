@@ -52,9 +52,10 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Hold Block with a sword to Channel.",
+                "Hold right click with a Sword to channel",
                 "",
-                "Fire a hook at an enemy, pulling them towards you",
+                "Charge a hook that latches onto enemies, pulling them towards you",
+                "",
                 "Higher Charge time = faster hook",
                 "",
                 "Cooldown: <val>" + getCooldown(level),

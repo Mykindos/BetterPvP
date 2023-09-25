@@ -57,13 +57,14 @@ public class Leech extends PrepareSkill implements CooldownSkill {
 
     @Override
     public String[] getDescription(int level) {
-        return new String[]{"Right click with a sword to activate.",
+        return new String[]{
+                "Right click with a Sword to activate",
                 "",
-                "Create a soul link between all enemies within <val>" + range + "</val> blocks",
-                "of your target, and all enemies within <val>" + range + "</val> blocks of them and within <val>" + maxRangeFromCaster + "</val> blocks of you",
+                "Create a soul link between all enemies within",
+                "<stat>" + range + "</stat> blocks of your target, and all enemies within",
+                "<stat>" + range + "</stat> blocks of them and within <stat>" + maxRangeFromCaster + "</stat> blocks of you",
                 "",
-                "Linked targets have <val>" + leechedHealth + "</val> health leeched per second.",
-                "All leeched health is given to the caster.",
+                "Linked targets have <stat>" + leechedHealth + "</stat> health leeched per second",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };

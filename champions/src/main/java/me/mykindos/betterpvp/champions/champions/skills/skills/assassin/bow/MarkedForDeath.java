@@ -40,10 +40,11 @@ public class MarkedForDeath extends PrepareArrowSkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Your next arrow will mark players",
-                "for death, giving them Vulnerability I",
-                "for <val>" + (baseDuration + level) + "</val> seconds",
-                "Causing them to take 25% additional damage",
+                "Left click with a Bow to prepare",
+                "",
+                "Your next arrow will give players <effect>Vulnerability I</effect>",
+                "for <val>" + (baseDuration + level) + "</val> seconds,",
+                "causing them to take <stat>25%</stat> additional damage",
                 "from all targets.",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
