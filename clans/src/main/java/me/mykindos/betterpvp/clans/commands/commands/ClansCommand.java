@@ -82,6 +82,7 @@ public class ClansCommand extends Command implements IConsoleCommand {
             listenerLoader.reload(clans.getClass().getPackageName());
             fields.reload(clans);
 
+
             UtilMessage.message(sender, "Clans", "Successfully reloaded clans");
         }
     }

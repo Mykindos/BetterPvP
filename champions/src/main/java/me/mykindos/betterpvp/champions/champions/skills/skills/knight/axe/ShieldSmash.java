@@ -143,7 +143,7 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
     public void onCheckShield() {
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (hasSkill(player)) {
-                if (!UtilItem.isAxe(player.getInventory().getItemInOffHand().getType())) continue;
+                if (!UtilItem.isAxe(player.getInventory().getItemInMainHand().getType())) continue;
                 if (player.getInventory().getItemInOffHand().getType() != Material.SHIELD) {
                     player.getInventory().setItemInOffHand(new ItemStack(Material.SHIELD));
                 }
