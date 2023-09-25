@@ -35,10 +35,11 @@ public class Bloodthirst extends Skill implements PassiveSkill {
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Your senses are heightened, ",
-                "allowing you to detect nearby enemies below <val>" + (25 + (5 * level)) + "%</val> health",
+                "Your senses are heightened, allowing you",
+                "to detect nearby enemies below <val>" + (25 + (5 * level)) + "%</val> health",
                 "",
-                "While running towards weak enemies, you receive <effect>Speed I</effect>"
+                "While running towards weak enemies,",
+                "you receive <effect>Speed I</effect>"
         };
     }
 

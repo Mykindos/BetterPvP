@@ -50,7 +50,7 @@ public class Stampede extends Skill implements PassiveSkill {
                 "You slowly build up speed as you",
                 "sprint, gaining one level of <effect>Speed</effect>",
                 "for every <val>" + (durationPerStack - level) + "</val> seconds, up to a max",
-                "of <effect>Speed III</effect>",
+                "of <effect>Speed II</effect>",
                 "",
                 "Attacking during stampede deals",
                 "<stat>" + damage + "</stat> bonus damage per speed level"};
