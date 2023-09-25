@@ -38,8 +38,8 @@ public class StunningShot extends PrepareArrowSkill {
         return new String[]{
                 "Left click with a Bow to prepare",
                 "",
-                "Shoot an arrow that",
-                "<effect>Stuns</effect> anyone hit for <val>" + String.format("%.1f", (level * 0.40)) + "</val> seconds",
+                "Shoot an arrow that <effect>Stuns</effect>",
+                "anyone hit for <val>" + String.format("%.1f", (level * 0.40)) + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };

@@ -62,8 +62,8 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Jump and slam the ground, knocking up all opponents",
-                "within <stat>" + radius + "</stat> blocks",
+                "Jump and slam the ground, knocking",
+                "up all opponents within <stat>" + radius + "</stat> blocks",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };

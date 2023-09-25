@@ -51,8 +51,8 @@ public class Swordsmanship extends Skill implements PassiveSkill {
                 "You gain 1 charge every <stat>" + timeBetweenCharges + "</stat> seconds,",
                 "storing up to a maximum of <val>" + (level) + "</val> charges",
                 "",
-                "When you attack, your damage is",
-                "increased by <stat>" + damagePerCharge + "</stat> for each charge you have",
+                "When you attack, your damage is increased",
+                "by <stat>" + damagePerCharge + "</stat> for each charge you have",
                 "",
                 "This only applies to swords"
         };

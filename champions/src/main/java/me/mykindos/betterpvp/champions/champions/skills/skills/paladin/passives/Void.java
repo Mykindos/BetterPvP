@@ -48,8 +48,8 @@ public class Void extends ActiveToggleSkill implements EnergySkill {
                 "While in void form, you receive",
                 "<effect>Slownesss III</effect>, and take no Knockback",
                 "",
-                "Reduces incoming damage by <stat>" + damageReduction + "</stat>, but",
-                "burns <stat>" + energyReduction + "</stat> of your energy",
+                "Reduces incoming damage by <stat>" + damageReduction + "</stat>,",
+                "but burns <stat>" + energyReduction + "</stat> of your energy",
                 "",
                 "Energy / Second: <val>" + getEnergy(level)
         };
