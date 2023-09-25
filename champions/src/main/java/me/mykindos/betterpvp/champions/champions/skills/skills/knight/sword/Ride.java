@@ -36,9 +36,7 @@ import org.spigotmc.event.entity.EntityDismountEvent;
 @BPvPListener
 public class Ride extends Skill implements InteractSkill, CooldownSkill, Listener {
 
-    private WeakHashMap<Player, HorseData> horseData = new WeakHashMap<>();
-
-    private final Set<UUID> active = new HashSet<>();
+    private final WeakHashMap<Player, HorseData> horseData = new WeakHashMap<>();
 
     private double lifespan;
     private double horseHealth;
@@ -70,10 +68,6 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
     }
 
     public void activate(Player player, int level) {
-        if (!canUse(player)) {
-            return;
-        }
-        active.add(player.getUniqueId());
 
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_HORSE_ANGRY, 2.0f, 0.5f);
 
@@ -82,7 +76,10 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
         horse.setOwner(player);
         horse.setColor(Horse.Color.WHITE);
         horse.setStyle(Horse.Style.NONE);
-        horse.setMaxHealth(horseHealth + ((level - 1) * 5));
+        AttributeInstance horseMaxHealth = horse.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+        if(horseMaxHealth != null) {
+            horseMaxHealth.setBaseValue(horseHealth + ((level - 1) * 5));
+        }
         horse.setHealth(horseHealth + ((level - 1) * 5));
         horse.setJumpStrength(1.5D);
         horse.getInventory().setArmor(new ItemStack(Material.LEATHER_HORSE_ARMOR));
@@ -91,7 +88,7 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
         if (horseSpeed != null) {
             horseSpeed.setBaseValue(0.35D);
         }
-        horse.setPassenger(player);
+        horse.addPassenger(player);
         HorseData data = new HorseData(horse, System.currentTimeMillis());
         horseData.put(player, data);
 
@@ -99,7 +96,7 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (horse != null && !horse.isDead()) {
+                if (!horse.isDead()) {
                     horse.remove();
                     horseData.remove(player);
                 }
@@ -125,6 +122,7 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
         }
     }
 
+    @Override
     public boolean canUse(Player player) {
         HorseData data = horseData.get(player);
         if (data != null) {
@@ -139,10 +137,7 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
 
     @EventHandler
     public void onPlayerDismount(EntityDismountEvent event) {
-        if (event.getEntity() instanceof Player && event.getDismounted() instanceof Horse) {
-            Player player = (Player) event.getEntity();
-            Horse horse = (Horse) event.getDismounted();
-
+        if (event.getEntity() instanceof Player player && event.getDismounted() instanceof Horse horse) {
             HorseData data = horseData.get(player);
             if (data != null && data.getHorse().equals(horse)) {
                 UtilMessage.message(player, getClassType().getName(), "Your horse has disappeared.");
