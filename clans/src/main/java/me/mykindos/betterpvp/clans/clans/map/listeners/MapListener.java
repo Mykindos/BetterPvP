@@ -454,14 +454,10 @@ public class MapListener implements Listener {
         ClanRelation clanRelation = clanManager.getRelation(playerClan, otherClan);
         MapColor materialColor = clanRelation.getMaterialColor();
 
-        if (otherClan == null) {
-            return materialColor;
-        }
-
         if (otherClan.isSafe()) {
             materialColor = MapColor.SNOW;
         } else if (otherClan.isAdmin()) {
-            if (otherClan.getName().equals("Outskirts") || otherClan.getName().equalsIgnoreCase("Outskirts")) {
+            if (otherClan.getName().equalsIgnoreCase("Outskirts")) {
                 materialColor = MapColor.COLOR_ORANGE;
             } else {
                 materialColor = MapColor.COLOR_RED;
