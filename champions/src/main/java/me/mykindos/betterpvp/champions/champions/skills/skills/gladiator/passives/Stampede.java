@@ -125,6 +125,6 @@ public class Stampede extends Skill implements PassiveSkill {
     @Override
     public void loadSkillConfig() {
         durationPerStack = getConfig("durationPerStack", 8.0, Double.class);
-        damage = getConfig("durationPerStack", 2.0, Double.class);
+        damage = getConfig("damageMultiplier", 2.0, Double.class);
     }
 }
