@@ -54,8 +54,8 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill {
         return new String[]{
                 "Drop your Sword / Axe to toggle",
                 "",
-                "Create a freezing area around you",
-                "in a <val>" + (minRadius + level) + "</val> Block radius",
+                "Create a freezing area around",
+                "you in a <val>" + (minRadius + level) + "</val> Block radius",
                 "",
                 "Allies inside this area receive <effect>Protection I</effect>, and",
                 "enemies inside this area receive <effect>Slowness I</effect>",

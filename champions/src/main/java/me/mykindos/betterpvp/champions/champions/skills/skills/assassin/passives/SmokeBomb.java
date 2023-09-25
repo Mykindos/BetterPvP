@@ -145,8 +145,8 @@ public class SmokeBomb extends Skill implements ToggleSkill, CooldownSkill, List
         return new String[]{
                 "Drop your Sword / Axe to activate",
                 "",
-                "Instantly <effect>Vanish</effect> before your foes for a",
-                "maximum of <val>" + (baseDuration + level) + "</val> seconds,",
+                "Instantly <effect>Vanish</effect> before your foes",
+                "for a maximum of <val>" + (baseDuration + level) + "</val> seconds,",
                 "inflicting <effect>Blindness II</effect> to enemies",
                 "within <stat>" + blindRadius + "</stat> blocks for <stat>" + blindDuration + "</stat> seconds",
                 "",

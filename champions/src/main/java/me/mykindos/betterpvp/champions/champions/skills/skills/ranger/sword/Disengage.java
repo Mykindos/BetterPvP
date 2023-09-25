@@ -50,10 +50,10 @@ public class Disengage extends PrepareSkill implements CooldownSkill {
         return new String[]{
                 "Right click with a Sword to prepare",
                 "",
-                "If you are attacked",
-                "within <val>" + (level * 0.5) + "</val> seconds you successfully disengage,",
-                "leaping backwards and giving your attacker",
-                "<effect>Slowness IV</effect> for <val>" + (baseSlowDuration + level) + "</val> seconds",
+                "If you are attacked within <val>" + (level * 0.5) + "</val> seconds",
+                "you successfully disengage, leaping backwards",
+                "and giving your attacker <effect>Slowness IV</effect> for",
+                "<val>" + (baseSlowDuration + level) + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)};
     }
