@@ -80,15 +80,17 @@ public class ItemHandler {
 
         BPVPItem item = itemMap.get(material);
         if (item != null) {
-            var nameUpdateEvent = UtilServer.callEvent(new ItemUpdateNameEvent(itemMeta, item.getName()));
+            var nameUpdateEvent = UtilServer.callEvent(new ItemUpdateNameEvent(itemStack, itemMeta, item.getName()));
             itemMeta.displayName(nameUpdateEvent.getItemName());
 
-            var loreUpdateEvent = UtilServer.callEvent(new ItemUpdateLoreEvent(itemMeta, new ArrayList<>(item.getLore())));
+            var loreUpdateEvent = UtilServer.callEvent(new ItemUpdateLoreEvent(itemStack, itemMeta, new ArrayList<>(item.getLore())));
             itemMeta.lore(loreUpdateEvent.getItemLore());
 
             PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
-            if (!dataContainer.has(CoreNamespaceKeys.UUID_KEY)) {
-                dataContainer.set(CoreNamespaceKeys.UUID_KEY, PersistentDataType.STRING, UUID.randomUUID().toString());
+            if(item.isGiveUUID()) {
+                if (!dataContainer.has(CoreNamespaceKeys.UUID_KEY)) {
+                    dataContainer.set(CoreNamespaceKeys.UUID_KEY, PersistentDataType.STRING, UUID.randomUUID().toString());
+                }
             }
 
             if (item.isGlowing() || dataContainer.has(CoreNamespaceKeys.GLOW_KEY)) {
@@ -113,6 +115,7 @@ public class ItemHandler {
                         material,
                         Component.text(UtilFormat.cleanString(material.name())).color(NamedTextColor.YELLOW),
                         new ArrayList<>(),
+                        false,
                         false
                 )
         );

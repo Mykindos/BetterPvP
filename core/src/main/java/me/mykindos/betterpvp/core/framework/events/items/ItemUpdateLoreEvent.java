@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import me.mykindos.betterpvp.core.framework.events.CustomEvent;
 import net.kyori.adventure.text.Component;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.List;
 @Data
 public class ItemUpdateLoreEvent extends CustomEvent {
 
+    private final ItemStack itemStack;
     private final ItemMeta itemMeta;
     private List<Component> itemLore;
     

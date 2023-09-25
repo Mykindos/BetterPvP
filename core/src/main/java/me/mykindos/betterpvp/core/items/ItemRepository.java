@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
+import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.database.repository.IRepository;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -36,17 +37,19 @@ public class ItemRepository implements IRepository<BPVPItem> {
 
     public List<BPVPItem> getItemsForModule(String module) {
         List<BPVPItem> items = new ArrayList<>();
-        String query = "SELECT * FROM " + databasePrefix + "items WHERE Module = '" + module + "'";
-        CachedRowSet result = database.executeQuery(new Statement(query));
+        String query = "SELECT * FROM " + databasePrefix + "items WHERE Module = ?";
+        CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(module)));
         try{
             while (result.next()) {
                 int id = result.getInt(1);
                 Material material = Material.getMaterial(result.getString(2));
                 Component name = MiniMessage.miniMessage().deserialize(result.getString(4)).decoration(TextDecoration.ITALIC, false);
                 boolean glowing = result.getBoolean(5);
+                boolean uuid = result.getBoolean(6);
+
                 List<Component> lore = getLoreForItem(id);
 
-                items.add(new BPVPItem(material, name, lore, glowing));
+                items.add(new BPVPItem(material, name, lore, glowing, uuid));
             }
         }catch (Exception ex) {
             ex.printStackTrace();
