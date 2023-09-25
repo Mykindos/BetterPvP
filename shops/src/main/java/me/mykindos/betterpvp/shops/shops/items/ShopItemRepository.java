@@ -68,9 +68,9 @@ public class ShopItemRepository {
                     int currentStock = dynamicPricingResult.getInt(10);
 
                     PolynomialData polynomialData = new PolynomialData(minBuyPrice, baseBuyPrice, maxBuyPrice, minSellPrice, baseSellPrice, maxSellPrice, maxStock, baseStock, currentStock);
-                    shopItem = new DynamicShopItem(shopKeeper, itemName, material, (byte) data, menuSlot, menuPage, amount, polynomialData);
+                    shopItem = new DynamicShopItem(id, shopKeeper, itemName, material, (byte) data, menuSlot, menuPage, amount, polynomialData);
                 } else {
-                    shopItem = new NormalShopItem(shopKeeper, itemName, material, (byte) data, menuSlot, menuPage, amount, buyPrice, sellPrice);
+                    shopItem = new NormalShopItem(id, shopKeeper, itemName, material, (byte) data, menuSlot, menuPage, amount, buyPrice, sellPrice);
                 }
 
                 String itemFlagQuery = "SELECT * FROM " + databasePrefix + "shopitems_flags WHERE shopItemId = ?";
@@ -93,10 +93,9 @@ public class ShopItemRepository {
 
     public void updateStock(List<DynamicShopItem> dynamicShopItems) {
         List<Statement> updateQueries = new ArrayList<>();
-        String query = "UPDATE " + databasePrefix + "shopitems_dynamic_pricing SET currentStock = ? WHERE Store = ? AND ItemName = ?";
+        String query = "UPDATE " + databasePrefix + "shopitems_dynamic_pricing SET currentStock = ? WHERE shopItemId = ?";
         dynamicShopItems.forEach(dynamicShopItem -> {
-            updateQueries.add(new Statement(query, new IntegerStatementValue(dynamicShopItem.getCurrentStock()),
-                    new StringStatementValue(dynamicShopItem.getStore()), new StringStatementValue(dynamicShopItem.getItemName())));
+            updateQueries.add(new Statement(query, new IntegerStatementValue(dynamicShopItem.getCurrentStock()), new IntegerStatementValue(dynamicShopItem.getId())));
         });
 
         database.executeBatch(updateQueries, true);
