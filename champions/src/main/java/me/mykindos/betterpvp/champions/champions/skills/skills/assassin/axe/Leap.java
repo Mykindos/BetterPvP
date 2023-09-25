@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -101,8 +102,10 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
                             if (!UtilBlock.airFoliage(back)) {
                                 if (back.getLocation().getY() == Math.floor(player.getLocation().getY())
                                         || back.getLocation().getY() == Math.floor(player.getLocation().getY() - 0.25)) {
-                                    if (UtilBlock.airFoliage(back.getRelative(BlockFace.UP).getType())) {
-                                        continue;
+                                    if (back.getRelative(BlockFace.UP).getType() == Material.AIR) {
+                                        if (player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() != Material.AIR) {
+                                            continue;
+                                        }
                                     }
                                 }
                                 Block forward = null;
