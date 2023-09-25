@@ -26,7 +26,7 @@ public class MapSettings {
         CLOSEST(0),
         CLOSE(1),
         NORMAL(2),
-        FAR(3),
+        FAR(4),
         FARTHEST(5);
 
         private final byte value;
