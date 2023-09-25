@@ -41,8 +41,8 @@ public class SilencingArrow extends PrepareArrowSkill {
                 "Left click with a Bow to prepare",
                 "",
                 "Your next arrow will <effect>Silence</effect> your",
-                "target for <val>" + (baseDuration + level) + "</val> seconds,",
-                "making them unable to use any non-passive skills",
+                "target for <val>" + (baseDuration + level) + "</val> seconds, making them",
+                "unable to use any non-passive skills",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
