@@ -102,8 +102,8 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
                             if (!UtilBlock.airFoliage(back)) {
                                 if (back.getLocation().getY() == Math.floor(player.getLocation().getY())
                                         || back.getLocation().getY() == Math.floor(player.getLocation().getY() - 0.25)) {
-                                    if (back.getRelative(BlockFace.UP).getType() == Material.AIR) {
-                                        if (player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() != Material.AIR) {
+                                    if (UtilBlock.airFoliage(back.getRelative(BlockFace.UP).getType())) {
+                                        if (!UtilBlock.airFoliage(player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType())) {
                                             continue;
                                         }
                                     }
