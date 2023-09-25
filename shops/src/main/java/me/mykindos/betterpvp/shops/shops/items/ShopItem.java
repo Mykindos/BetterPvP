@@ -9,6 +9,7 @@ import java.util.HashMap;
 @Data
 public abstract class ShopItem implements IShopItem {
 
+    private final int id;
     private final String store;
     private final String itemName;
     private final Material material;

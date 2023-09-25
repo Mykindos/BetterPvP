@@ -50,7 +50,7 @@ public class Stampede extends Skill implements PassiveSkill {
                 "You slowly build up speed as you",
                 "sprint, gaining one level of <effect>Speed</effect>",
                 "for every <val>" + (durationPerStack - level) + "</val> seconds, up to a max",
-                "of <effect>Speed III</effect>",
+                "of <effect>Speed II</effect>",
                 "",
                 "Attacking during stampede deals",
                 "<stat>" + damage + "</stat> bonus damage per speed level"};
@@ -125,6 +125,6 @@ public class Stampede extends Skill implements PassiveSkill {
     @Override
     public void loadSkillConfig() {
         durationPerStack = getConfig("durationPerStack", 8.0, Double.class);
-        damage = getConfig("durationPerStack", 2.0, Double.class);
+        damage = getConfig("damageMultiplier", 2.0, Double.class);
     }
 }

@@ -39,8 +39,8 @@ public class LevitatingShot extends PrepareArrowSkill {
         return new String[]{
                 "Left click with a Bow to prepare",
                 "",
-                "Your next arrow is tipped with mysterious magic,",
-                "causing the target to receive <effect>Levitation II</effect> for <val>" + (3.5 + (level * .5)) + "</val> seconds",
+                "Your next arrow is tipped with mysterious magic causing",
+                "the target to receive <effect>Levitation II</effect> for <val>" + (3.5 + (level * .5)) + "</val> seconds",
                 "",
                 "Players with levitation are unable to use abilities",
                 "",

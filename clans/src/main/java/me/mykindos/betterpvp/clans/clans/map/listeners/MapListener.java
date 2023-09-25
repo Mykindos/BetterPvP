@@ -1,10 +1,12 @@
 package me.mykindos.betterpvp.clans.clans.map.listeners;
 
 import com.google.inject.Inject;
+
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
@@ -455,7 +457,7 @@ public class MapListener implements Listener {
         if (otherClan.isSafe()) {
             materialColor = MapColor.SNOW;
         } else if (otherClan.isAdmin()) {
-            if (otherClan.getName().equals("Outskirts") || otherClan.getName().equalsIgnoreCase("Outskirts")) {
+            if (otherClan.getName().equalsIgnoreCase("Outskirts")) {
                 materialColor = MapColor.COLOR_ORANGE;
             } else {
                 materialColor = MapColor.COLOR_RED;

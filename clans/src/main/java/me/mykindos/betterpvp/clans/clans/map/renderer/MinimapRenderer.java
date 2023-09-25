@@ -38,11 +38,6 @@ import java.util.Queue;
 @Singleton
 public class MinimapRenderer extends MapRenderer implements Listener {
 
-
-
-
-
-
     private final MapHandler mapHandler;
     private final Clans clans;
     protected Map<String, Map<Integer, Map<Integer, MapPixel>>> worldCacheMap = new HashMap<>();
@@ -53,7 +48,7 @@ public class MinimapRenderer extends MapRenderer implements Listener {
     private int maxProcess;
 
     @Inject
-    @Config(path = "clans.map.maxMapDistance", defaultValue = "512")
+    @Config(path = "clans.map.maxMapDistance", defaultValue = "640")
     private int maxDistance;
 
     @Inject

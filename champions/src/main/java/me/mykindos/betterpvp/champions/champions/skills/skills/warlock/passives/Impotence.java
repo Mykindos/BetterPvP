@@ -34,9 +34,9 @@ public class Impotence extends Skill implements PassiveSkill {
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "For each enemy within <val>" + (radius + level) + "</val> blocks",
-                "you take reduced damage from all sources, ",
-                "at a maximum of <stat>" + maxEnemies + "</stat> players",
+                "For each enemy within <val>" + (radius + level) + "</val> blocks you take",
+                "reduced damage from all sources, at a",
+                "maximum of <stat>" + maxEnemies + "</stat> players",
                 "",
                 "Damage Reduction:",
                 "1 nearby enemy = <stat>" + (calculateReduction(1) * 100)  + "%</stat>",
