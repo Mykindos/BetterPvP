@@ -52,5 +52,9 @@ public class ShopItemButton extends Button {
         parent.construct();
     }
 
+    @Override
+    public double getClickCooldown() {
+        return 0.25;
+    }
 
 }

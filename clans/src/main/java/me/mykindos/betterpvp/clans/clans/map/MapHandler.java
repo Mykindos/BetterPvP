@@ -51,7 +51,6 @@ public class MapHandler {
     @Inject
     public MapHandler(Clans clans) {
         this.clans = clans;
-        System.out.println("TEST");
         UtilServer.runTaskTimerAsync(clans, this::saveMapData, 6000, 6000);
     }
 

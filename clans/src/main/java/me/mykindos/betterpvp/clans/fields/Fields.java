@@ -53,7 +53,7 @@ public class Fields {
     }
 
     public void reload(@NotNull Clans clans) {
-        for (FieldsInteractable type : blocks.keySet()) {
+        for (FieldsInteractable type : getBlockTypes()) {
             final String name = type.getName().toLowerCase().replace(" ", "");
             final Double delay = clans.getConfig().getOrSaveObject("fields.blocks." + name + ".respawn", 60.0, Double.class);
             Objects.requireNonNull(delay, "Delay must be present");
