@@ -10,8 +10,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Objects;
-
 public class KitButton extends Button {
 
     private final Role role;
