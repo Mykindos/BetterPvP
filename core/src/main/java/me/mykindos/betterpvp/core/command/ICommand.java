@@ -60,8 +60,6 @@ public interface ICommand {
 
     }
 
-
-
     default String getArgumentType(int argCount) {
         return ArgumentType.SUBCOMMAND.name();
     }
