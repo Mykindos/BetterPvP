@@ -15,6 +15,8 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 @Singleton
@@ -44,6 +46,8 @@ public class ClanHelpSubCommand extends ClanSubCommand {
     @Override
     public void execute(Player player, Client client, String... args) {;
         List<ICommand> clanSubCommands = clanCommand.getSubCommands();
+
+        Collections.sort(clanSubCommands, Comparator.comparing(ICommand::getName));
 
         Component component = Component.text("Help:", NamedTextColor.GOLD).appendNewline();
 
