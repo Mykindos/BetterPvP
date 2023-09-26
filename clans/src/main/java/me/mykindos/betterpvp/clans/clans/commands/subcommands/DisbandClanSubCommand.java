@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.clans.clans.commands.subcommands;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
@@ -18,6 +17,8 @@ import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.slf4j.MDC;
+
+import java.util.Optional;
 
 @Slf4j
 @Singleton

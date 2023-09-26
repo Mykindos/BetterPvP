@@ -6,7 +6,6 @@ import lombok.Getter;
 import me.mykindos.betterpvp.core.components.champions.weapons.IWeapon;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
-import org.bukkit.event.Listener;
 
 import java.util.ArrayList;
 import java.util.List;

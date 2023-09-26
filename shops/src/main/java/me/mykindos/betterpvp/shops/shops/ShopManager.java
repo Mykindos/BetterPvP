@@ -4,7 +4,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.components.shops.IShopItem;
-import me.mykindos.betterpvp.shops.shops.items.DynamicShopItem;
 import me.mykindos.betterpvp.shops.shops.items.ShopItemRepository;
 
 import java.util.HashMap;

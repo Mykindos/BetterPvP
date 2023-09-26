@@ -1,11 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.sword;
 
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.WeakHashMap;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -22,6 +17,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener

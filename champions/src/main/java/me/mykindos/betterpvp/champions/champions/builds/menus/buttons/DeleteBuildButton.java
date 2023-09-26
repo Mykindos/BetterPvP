@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.champions.champions.builds.menus.buttons;
 
-import java.util.Optional;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.DeleteBuildEvent;
@@ -16,6 +15,8 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.Optional;
 
 public class DeleteBuildButton extends Button {
 

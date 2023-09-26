@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.clans.clans.commands.chatcommands;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.Optional;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.gamer.Gamer;
@@ -12,6 +11,8 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
+
+import java.util.Optional;
 
 @Singleton
 public class AllyChatCommand extends Command {
