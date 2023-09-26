@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.combat.events.PlayerCheckShieldEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -139,14 +140,13 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
 
     }
 
-    @UpdateEvent(delay = 100)
-    public void onCheckShield() {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            if (hasSkill(player)) {
-                if (!UtilItem.isAxe(player.getInventory().getItemInMainHand().getType())) continue;
-                if (player.getInventory().getItemInOffHand().getType() != Material.SHIELD) {
-                    player.getInventory().setItemInOffHand(new ItemStack(Material.SHIELD));
-                }
+    @EventHandler
+    public void onShieldCheck(PlayerCheckShieldEvent event) {
+        Player player = event.getPlayer();
+        if (hasSkill(player)) {
+            if(UtilItem.isAxe(event.getPlayer().getInventory().getItemInMainHand().getType())) {
+                event.setShouldHaveShield(true);
+                event.setCustomModelData(0);
             }
         }
     }

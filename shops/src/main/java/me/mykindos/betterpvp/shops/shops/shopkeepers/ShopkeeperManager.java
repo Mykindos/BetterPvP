@@ -4,7 +4,10 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import java.util.Objects;
 import java.util.UUID;
+
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.shops.Shops;
 import me.mykindos.betterpvp.shops.shops.shopkeepers.types.*;
 import net.kyori.adventure.text.TextComponent;
@@ -15,6 +18,7 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 
 @Singleton
+@Slf4j
 public class ShopkeeperManager extends Manager<IShopkeeper> {
 
     private final Shops shops;
@@ -37,6 +41,11 @@ public class ShopkeeperManager extends Manager<IShopkeeper> {
             String rawName = shops.getConfig().getString("shopkeepers." + key + ".name", "");
             TextComponent name = LegacyComponentSerializer.legacyAmpersand().deserialize(rawName);
             World world = Bukkit.getWorld(Objects.requireNonNull(shops.getConfig().getString("shopkeepers." + key + ".world")));
+            if(world == null) {
+                log.warn("Could not load shopkeeper {} because the world was null", key);
+                return;
+            }
+
             double x = shops.getConfig().getDouble("shopkeepers." + key + ".x");
             double y = shops.getConfig().getDouble("shopkeepers." + key + ".y");
             double z = shops.getConfig().getDouble("shopkeepers." + key + ".z");

@@ -136,7 +136,7 @@ public class Flash extends Skill implements InteractSkill, Listener {
         final Vector direction = player.getEyeLocation().getDirection();
 
         final int iterations = (int) Math.ceil(teleportDistance / 0.2f);
-        for (int i = 0; i < iterations; i++) {
+        for (int i = 1; i <= iterations; i++) {
             // Extend their location by the direction they are facing by 0.2 blocks per iteration
             final Vector increment = direction.clone().multiply(0.2 * i);
             final Location newLocation = player.getLocation().add(increment);
