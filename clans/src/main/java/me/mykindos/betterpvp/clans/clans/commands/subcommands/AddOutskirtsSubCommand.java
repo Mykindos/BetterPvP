@@ -33,6 +33,10 @@ public class AddOutskirtsSubCommand extends ClanSubCommand {
         return "addoutskirts";
     }
 
+    public String getUsage() {
+        return super.getUsage() + " [borderSize]";
+    }
+
     @Override
     public String getDescription() {
         return "Adds outskirt claims around all of your claims";
