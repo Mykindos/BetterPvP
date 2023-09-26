@@ -37,8 +37,6 @@ public interface ICommand {
     Optional<ICommand> getSubCommand(String name);
     List<ICommand> getSubCommands();
 
-    boolean requiresServerAdmin();
-
     default boolean showTabCompletion(CommandSender sender) {
         return true;
     }

@@ -48,10 +48,6 @@ public abstract class Command implements ICommand {
                 || subCommand.getAliases().contains(name)).findFirst();
     }
 
-    public boolean requiresServerAdmin() {
-        return false;
-    }
-
     @Override
     public List<String> processTabComplete(CommandSender sender, String[] args) {
         List<String> tabCompletions = new ArrayList<>();
@@ -83,4 +79,6 @@ public abstract class Command implements ICommand {
 
         return tabCompletions;
     }
+
+
 }
