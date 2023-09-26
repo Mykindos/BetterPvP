@@ -5,6 +5,7 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.Command;
+import me.mykindos.betterpvp.core.command.CommandManager;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
@@ -21,7 +22,6 @@ public abstract class ClanSubCommand extends Command {
 
     protected final ClanManager clanManager;
     protected final GamerManager gamerManager;
-
     public ClanSubCommand(ClanManager clanManager, GamerManager gamerManager) {
         this.clanManager = clanManager;
         this.gamerManager = gamerManager;
