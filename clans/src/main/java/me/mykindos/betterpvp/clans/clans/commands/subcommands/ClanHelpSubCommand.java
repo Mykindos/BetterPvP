@@ -29,13 +29,13 @@ import org.bukkit.Bukkit;
 @SubCommand(ClanCommand.class)
 public class ClanHelpSubCommand extends ClanSubCommand {
 
-    //private final List<ICommand> subCommands;
+    private final ClanCommand clanCommand;
     @Inject
-    public ClanHelpSubCommand(ClanManager clanManager, GamerManager gamerManager) {
+    public ClanHelpSubCommand(ClanManager clanManager, GamerManager gamerManager, ClanCommand clanCommand) {
         super(clanManager, gamerManager);
         aliases.addAll(List.of("?", "h"));
 
-        // = getSubCommands();
+        this.clanCommand = clanCommand;
     }
 
     @Override
@@ -50,33 +50,18 @@ public class ClanHelpSubCommand extends ClanSubCommand {
 
 
     @Override
-    public void execute(Player player, Client client, String... args) {
+    public void execute(Player player, Client client, String... args) {;
+        List<ICommand> clanSubCommands = clanCommand.getSubCommands();
 
-        Component description = Component.text("Description: ", NamedTextColor.GOLD);
-
-        Component usage = Component.text("Usage: ", NamedTextColor.GOLD);
-
-        /*Component component = Component.text("Help:", NamedTextColor.WHITE).appendNewline()
-                .append(Component.text("Clans:", NamedTextColor.YELLOW).appendNewline())
-                .append(description).append(Component.text("Base command for clans. Gets your clan information.", NamedTextColor.GRAY)).appendNewline()
-                .append(usage).append(Component.text("[subcommand]", NamedTextColor.GRAY)).appendNewline()
-                .append(Component.text("Sub Commands:", NamedTextColor.WHITE)).appendNewline()
-                .append(Component.text("Info: ", NamedTextColor.YELLOW).appendNewline())
-                .append(description).append(Component.text("Get the information of the specified clan.", NamedTextColor.GRAY)).appendNewline()
-                .append(usage).append(Component.text("info <clan>", NamedTextColor.GRAY)).appendNewline();
-        */
-        Bukkit.broadcast(Component.text("subCommands empty?" + subCommands.isEmpty()));
         Component component = Component.text("Help:", NamedTextColor.WHITE).appendNewline();
 
-        for (ICommand subCommand : subCommands) {
-            component = component.append(Component.text(subCommand.getName(), NamedTextColor.YELLOW).append(Component.text(": ", NamedTextColor.YELLOW))
-                    .append(Component.text(subCommand.getDescription())));
-        }
+        for (ICommand subCommand : clanSubCommands) {
+            NamedTextColor color = (subCommand.requiresServerAdmin() ? NamedTextColor.RED : NamedTextColor.GOLD);
+            if (!subCommand.requiresServerAdmin() || client.hasRank(Rank.ADMIN)) {
+                component = component.append(Component.text(subCommand.getName(), color).append(Component.text(": ", color))
+                        .append(Component.text(subCommand.getDescription(), NamedTextColor.GRAY)).appendNewline());
+            }
 
-        if (client.hasRank(Rank.ADMIN)) {
-            component = component.append(Component.text("Set Dominance:", NamedTextColor.YELLOW)).appendNewline()
-                    .append(description).append(Component.text("sets the dominance against the target clan. Dominance must be 0 - 99.", NamedTextColor.GRAY)).appendNewline()
-                    .append(usage).append(Component.text("setdominance <clan> <dominance>", NamedTextColor.GRAY));
         }
 
         UtilMessage.message(player, "Clans", component);

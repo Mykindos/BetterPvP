@@ -108,10 +108,6 @@ public abstract class ClanSubCommand extends Command {
         return ClanMember.MemberRank.RECRUIT;
     }
 
-    public boolean requiresServerAdmin() {
-        return false;
-    }
-
     public boolean canExecuteWithoutClan() {
         return false;
     }
