@@ -49,7 +49,7 @@ public class Revival extends Skill implements ToggleSkill, CooldownSkill, Listen
                 "",
                 "If you die within the next <val>"+ (baseDuration + ((level-1) * 0.5)) +"</val> seconds,",
                 "you will be revived, giving you <effect>Invulnerability</effect> for <stat>2</stat> seconds",
-                "and giving you <effect>Regeneration I </effect> and <effect>Strength I</effect> for <val>"+(4 + (level-1))+"</val> seconds",
+                "and giving you <effect>Regeneration III </effect> and <effect>Strength II</effect> for <val>"+(4 + (level-1))+"</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -93,8 +93,8 @@ public class Revival extends Skill implements ToggleSkill, CooldownSkill, Listen
             damagee.setHealth(1);
             damagee.getWorld().playSound(damagee.getLocation(),Sound.ITEM_TOTEM_USE, 2.0F,0.8F);
 
-            damagee.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, (int) (effectDuration + (damagee.getLevel()-1)) * 20, 0));
-            damagee.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, (int) (effectDuration + (damagee.getLevel()-1)) * 20, 0));
+            damagee.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, (int) (effectDuration + (damagee.getLevel()-1)) * 20, 1));
+            damagee.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, (int) (effectDuration + (damagee.getLevel()-1)) * 20, 2));
 
             damagee.setMetadata("RevivalDamageReduction", new FixedMetadataValue(champions, true));
 
@@ -105,10 +105,11 @@ public class Revival extends Skill implements ToggleSkill, CooldownSkill, Listen
             }, (long) effectDuration * 20);
 
             active.remove(damagee.getUniqueId());
-            if (particleTasks.containsKey(damagee.getUniqueId())) {
-                Bukkit.getScheduler().cancelTask(particleTasks.get(damagee.getUniqueId()));
-                particleTasks.remove(damagee.getUniqueId());
-            }
+            Bukkit.getScheduler().runTaskLater(champions, () -> {
+                if (damagee.hasMetadata("RevivalDamageReduction")) {
+                    damagee.removeMetadata("RevivalDamageReduction", champions);
+                }
+            }, 40L);
         }
 
         if (damagee.hasMetadata("RevivalDamageReduction")) {
