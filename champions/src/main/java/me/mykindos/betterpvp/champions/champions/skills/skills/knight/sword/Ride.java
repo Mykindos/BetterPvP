@@ -59,9 +59,8 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
                 "Mount a valiant steed which will ",
                 "last for <val>" + (lifespan + (level-1)) + "</val> seconds",
                 "",
-                "The horse will have <val>" + (horseHealth + ((level-1) *5)) + "</val> health",
-                "",
-                "If you dismount the horse it will disappear",
+                "If the horse takes any damage or you",
+                "dismount, the horse it will disappear",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -78,7 +77,7 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
         horse.setStyle(Horse.Style.NONE);
         AttributeInstance horseMaxHealth = horse.getAttribute(Attribute.GENERIC_MAX_HEALTH);
         if(horseMaxHealth != null) {
-            horseMaxHealth.setBaseValue(horseHealth + ((level - 1) * 5));
+            horseMaxHealth.setBaseValue(horseHealth);
         }
         horse.setHealth(horseHealth + ((level - 1) * 5));
         horse.setJumpStrength(1.5D);
@@ -170,8 +169,8 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
 
     @Override
     public void loadSkillConfig() {
-        lifespan = getConfig("lifespan", 6.0, Double.class);
-        horseHealth = getConfig("horseHealth", 5.0, Double.class);
+        lifespan = getConfig("lifespan", 2.0, Double.class);
+        horseHealth = getConfig("horseHealth", 1.0, Double.class);
     }
 
 }
