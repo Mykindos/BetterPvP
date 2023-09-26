@@ -9,6 +9,8 @@ import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
 import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
+import me.mykindos.betterpvp.core.command.Command;
+import me.mykindos.betterpvp.core.command.ICommand;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -21,14 +23,19 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.bukkit.Bukkit;
+
 @Singleton
 @SubCommand(ClanCommand.class)
 public class ClanHelpSubCommand extends ClanSubCommand {
 
+    //private final List<ICommand> subCommands;
     @Inject
     public ClanHelpSubCommand(ClanManager clanManager, GamerManager gamerManager) {
         super(clanManager, gamerManager);
         aliases.addAll(List.of("?", "h"));
+
+        // = getSubCommands();
     }
 
     @Override
@@ -49,7 +56,7 @@ public class ClanHelpSubCommand extends ClanSubCommand {
 
         Component usage = Component.text("Usage: ", NamedTextColor.GOLD);
 
-        Component component = Component.text("Help:", NamedTextColor.WHITE).appendNewline()
+        /*Component component = Component.text("Help:", NamedTextColor.WHITE).appendNewline()
                 .append(Component.text("Clans:", NamedTextColor.YELLOW).appendNewline())
                 .append(description).append(Component.text("Base command for clans. Gets your clan information.", NamedTextColor.GRAY)).appendNewline()
                 .append(usage).append(Component.text("[subcommand]", NamedTextColor.GRAY)).appendNewline()
@@ -57,6 +64,14 @@ public class ClanHelpSubCommand extends ClanSubCommand {
                 .append(Component.text("Info: ", NamedTextColor.YELLOW).appendNewline())
                 .append(description).append(Component.text("Get the information of the specified clan.", NamedTextColor.GRAY)).appendNewline()
                 .append(usage).append(Component.text("info <clan>", NamedTextColor.GRAY)).appendNewline();
+        */
+        Bukkit.broadcast(Component.text("subCommands empty?" + subCommands.isEmpty()));
+        Component component = Component.text("Help:", NamedTextColor.WHITE).appendNewline();
+
+        for (ICommand subCommand : subCommands) {
+            component = component.append(Component.text(subCommand.getName(), NamedTextColor.YELLOW).append(Component.text(": ", NamedTextColor.YELLOW))
+                    .append(Component.text(subCommand.getDescription())));
+        }
 
         if (client.hasRank(Rank.ADMIN)) {
             component = component.append(Component.text("Set Dominance:", NamedTextColor.YELLOW)).appendNewline()
