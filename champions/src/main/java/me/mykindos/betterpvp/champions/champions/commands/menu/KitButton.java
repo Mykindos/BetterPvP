@@ -10,6 +10,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Objects;
+
 public class KitButton extends Button {
 
     private final Role role;
@@ -29,8 +31,19 @@ public class KitButton extends Button {
 
         player.getInventory().addItem(new ItemStack(Material.IRON_SWORD));
         player.getInventory().addItem(new ItemStack(Material.IRON_AXE));
-        player.getInventory().addItem(new ItemStack(Material.BOW));
-        player.getInventory().addItem(new ItemStack(Material.ARROW, 64));
+        if((role == Role.ASSASSIN) || (role == Role.RANGER)) {
+            player.getInventory().addItem(new ItemStack(Material.BOW));
+
+            int numArrows;
+
+            if (role == Role.RANGER) {
+                numArrows = 64;
+            }
+            else {
+                numArrows = 16;
+            }
+            player.getInventory().addItem(new ItemStack(Material.ARROW, numArrows));
+        }
         player.getInventory().addItem(new ItemStack(Material.BOOK));
 
         player.closeInventory();
