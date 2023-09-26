@@ -60,7 +60,7 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
                 "last for <val>" + (lifespan + (level-1)) + "</val> seconds",
                 "",
                 "If the horse takes any damage or you",
-                "dismount, the horse it will disappear",
+                "dismount, the horse will disappear",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
