@@ -44,12 +44,18 @@ public class ItemRepository implements IRepository<BPVPItem> {
                 int id = result.getInt(1);
                 Material material = Material.getMaterial(result.getString(2));
                 Component name = MiniMessage.miniMessage().deserialize(result.getString(4)).decoration(TextDecoration.ITALIC, false);
-                boolean glowing = result.getBoolean(5);
-                boolean uuid = result.getBoolean(6);
+                int customModelData = result.getInt(5);
+                boolean glowing = result.getBoolean(6);
+                boolean uuid = result.getBoolean(7);
 
                 List<Component> lore = getLoreForItem(id);
 
-                items.add(new BPVPItem(material, name, lore, glowing, uuid));
+                if(material == null){
+                    System.out.println("Material is null for item " + id);
+                    continue;
+                }
+
+                items.add(new BPVPItem(material, name, lore, customModelData, glowing, uuid));
             }
         }catch (Exception ex) {
             ex.printStackTrace();

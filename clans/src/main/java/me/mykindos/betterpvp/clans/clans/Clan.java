@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.clans.clans;
 
-import java.util.*;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.clans.clans.events.ClanPropertyUpdateEvent;
@@ -23,6 +22,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.*;
 
 @Slf4j
 @Data

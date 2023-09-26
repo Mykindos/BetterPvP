@@ -11,8 +11,6 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.awt.*;
-
 public class ClassSelectionMenu extends Menu {
     public ClassSelectionMenu(Player player, GamerBuilds builds, SkillManager skillManager) {
         super(player, 36, Component.text("Class Customisation", NamedTextColor.BLACK).decorate(TextDecoration.BOLD));

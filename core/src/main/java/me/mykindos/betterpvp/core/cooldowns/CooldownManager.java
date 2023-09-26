@@ -2,9 +2,6 @@ package me.mykindos.betterpvp.core.cooldowns;
 
 
 import com.google.inject.Singleton;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
@@ -12,6 +9,10 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
+
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Singleton

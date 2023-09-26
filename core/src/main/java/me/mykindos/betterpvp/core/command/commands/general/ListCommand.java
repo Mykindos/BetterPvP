@@ -1,8 +1,6 @@
 package me.mykindos.betterpvp.core.command.commands.general;
 
 import com.google.inject.Singleton;
-import java.util.ArrayList;
-import java.util.List;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -11,6 +9,9 @@ import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Singleton
 public class ListCommand extends Command {

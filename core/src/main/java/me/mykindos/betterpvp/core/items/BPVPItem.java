@@ -17,6 +17,7 @@ public class BPVPItem {
     private final Material material;
     private final Component name;
     private final List<Component> lore;
+    private int customModelData;
     private final boolean glowing;
     private final boolean giveUUID;
 

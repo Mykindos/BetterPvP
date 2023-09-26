@@ -1,10 +1,6 @@
 package me.mykindos.betterpvp.core.client.listener;
 
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.events.PacketContainer;
 import com.google.inject.Inject;
-import java.util.Optional;
 import lombok.SneakyThrows;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.ClientManager;
@@ -33,6 +29,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+
+import java.util.Optional;
 
 @BPvPListener
 public class ClientListener implements Listener {

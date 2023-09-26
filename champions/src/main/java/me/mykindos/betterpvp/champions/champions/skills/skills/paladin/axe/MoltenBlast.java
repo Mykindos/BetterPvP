@@ -3,9 +3,6 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.paladin.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -29,6 +26,10 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 @Singleton
 @BPvPListener

@@ -1,7 +1,5 @@
 package me.mykindos.betterpvp.champions.champions.builds.menus;
 
-import java.util.*;
-
 import lombok.Getter;
 import me.mykindos.betterpvp.champions.champions.builds.BuildSkill;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
@@ -23,7 +21,9 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SkillMenu extends Menu implements IRefreshingMenu {
 

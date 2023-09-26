@@ -2,8 +2,6 @@ package me.mykindos.betterpvp.core.chat;
 
 import com.google.inject.Inject;
 import io.papermc.paper.event.player.AsyncChatEvent;
-import java.util.Optional;
-import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.chat.events.ChatReceivedEvent;
 import me.mykindos.betterpvp.core.chat.events.ChatSentEvent;
@@ -25,6 +23,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+
+import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @BPvPListener

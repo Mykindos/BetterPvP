@@ -1,7 +1,5 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.sword;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.roles.events.RoleChangeEvent;
@@ -21,6 +19,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 @Singleton
 @BPvPListener
