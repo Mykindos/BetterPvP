@@ -173,7 +173,7 @@ public class ClanEventListener extends ClanListener {
 
         Component inviteMessage = Component.text("Click Here", NamedTextColor.GOLD, TextDecoration.UNDERLINED)
                 .clickEvent(ClickEvent.runCommand("/c join " + clan.getName()))
-                .append(UtilMessage.deserialize(" or type '<alt2>/c join" + clan.getName() + "</alt2>' to accept!"));
+                .append(UtilMessage.deserialize(" or type '<alt2>/c join " + clan.getName() + "</alt2>' to accept!"));
         UtilMessage.simpleMessage(target, "Clans", inviteMessage);
 
         Gamer targetGamer = gamerManager.getObject(target.getUniqueId().toString()).orElseThrow(() -> new NoSuchGamerException(target.getName()));

@@ -25,6 +25,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.Arrays;
@@ -46,29 +47,30 @@ public class WeaponListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onSkillActivate(PlayerInteractEvent event) {
+    public void onWeaponActivate(PlayerInteractEvent event) {
         if (event.getAction() == Action.PHYSICAL) return;
         if (event.getHand() == EquipmentSlot.OFF_HAND) return;
 
         Player player = event.getPlayer();
         ItemStack item = player.getInventory().getItemInMainHand();
-        if (!item.getItemMeta().getPersistentDataContainer().has(ChampionsNamespacedKeys.IS_CUSTOM_WEAPON)) return;
+        ItemMeta itemMeta = item.getItemMeta();
+        if (itemMeta == null) return;
+        if (!itemMeta.getPersistentDataContainer().has(ChampionsNamespacedKeys.IS_CUSTOM_WEAPON)) return;
 
         Optional<IWeapon> weaponOptional = weaponManager.getWeaponByType(item.getType());
         if (weaponOptional.isEmpty()) return;
 
 
-
         IWeapon weapon = weaponOptional.get();
 
-        var checkUsageEvent = UtilServer.callEvent(new PlayerUseItemEvent(player, weapon, true));
-        if(checkUsageEvent.isCancelled()) {
-            UtilMessage.simpleMessage(player, "You cannot use this weapon here.");
-            return;
+        if (weapon instanceof InteractWeapon interactWeapon) {
+            if (Arrays.stream(interactWeapon.getActions()).noneMatch(action -> action == event.getAction())) return;
         }
 
-        if(weapon instanceof InteractWeapon interactWeapon) {
-            if (Arrays.stream(interactWeapon.getActions()).noneMatch(action -> action == event.getAction())) return;
+        var checkUsageEvent = UtilServer.callEvent(new PlayerUseItemEvent(player, weapon, true));
+        if (checkUsageEvent.isCancelled()) {
+            UtilMessage.simpleMessage(player, "Restriction", "You cannot use this weapon here.");
+            return;
         }
 
         if (!weapon.canUse(player)) {
@@ -100,7 +102,7 @@ public class WeaponListener implements Listener {
     @EventHandler
     public void onUpdateName(ItemUpdateNameEvent event) {
         Optional<IWeapon> weaponOptional = weaponManager.getWeaponByType(event.getItemStack().getType());
-        if(weaponOptional.isPresent()) {
+        if (weaponOptional.isPresent()) {
             IWeapon weapon = weaponOptional.get();
 
             event.getItemMeta().getPersistentDataContainer().set(ChampionsNamespacedKeys.IS_CUSTOM_WEAPON, PersistentDataType.STRING, "true");
@@ -111,7 +113,7 @@ public class WeaponListener implements Listener {
     @EventHandler
     public void onUpdateLore(ItemUpdateLoreEvent event) {
         Optional<IWeapon> weaponOptional = weaponManager.getWeaponByType(event.getItemStack().getType());
-        if(weaponOptional.isPresent()) {
+        if (weaponOptional.isPresent()) {
             IWeapon weapon = weaponOptional.get();
 
             event.getItemMeta().getPersistentDataContainer().set(ChampionsNamespacedKeys.IS_CUSTOM_WEAPON, PersistentDataType.STRING, "true");

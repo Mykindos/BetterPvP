@@ -36,11 +36,11 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
 
     @Inject
     @Config(path = "weapons.wind-blade.energy-per-tick", defaultValue = "1.0")
-    private float energyPerTick;
+    private double energyPerTick;
 
     @Inject
     @Config(path = "weapons.wind-blade.initial-energy-cost", defaultValue = "10.0")
-    private float initialEnergyCost;
+    private double initialEnergyCost;
 
     private final EnergyHandler energyHandler;
 
@@ -73,7 +73,7 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
 
             var checkUsageEvent = UtilServer.callEvent(new PlayerUseItemEvent(player, this, true));
             if(checkUsageEvent.isCancelled()) {
-                UtilMessage.simpleMessage(player, "You cannot use this weapon here.");
+                UtilMessage.simpleMessage(player, "Restriction", "You cannot use this weapon here.");
                 continue;
             }
 
@@ -109,13 +109,6 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
     }
 
     @EventHandler
-    public void onCheckShield(PlayerCheckShieldEvent event) {
-        if (event.getPlayer().getInventory().getItemInMainHand().getType() == Material.MUSIC_DISC_MELLOHI) {
-            event.setShouldHaveShield(true);
-        }
-    }
-
-    @EventHandler
     public void onFall(EntityDamageEvent event) {
         if (event.getEntity() instanceof Player player) {
             if (event.getCause() == EntityDamageEvent.DamageCause.FALL) {
@@ -136,7 +129,7 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
 
 
     @Override
-    public float getEnergy() {
+    public double getEnergy() {
         return initialEnergyCost;
     }
 

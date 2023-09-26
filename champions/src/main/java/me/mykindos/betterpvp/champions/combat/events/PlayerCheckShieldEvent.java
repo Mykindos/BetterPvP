@@ -8,11 +8,11 @@ import org.bukkit.entity.Player;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
+@Setter
 public class PlayerCheckShieldEvent extends CustomEvent {
 
     private final Player player;
-
-    @Setter
     private boolean shouldHaveShield;
+    private int customModelData;
 
 }
