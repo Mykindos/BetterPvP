@@ -53,17 +53,15 @@ public class ClanHelpSubCommand extends ClanSubCommand {
     public void execute(Player player, Client client, String... args) {;
         List<ICommand> clanSubCommands = clanCommand.getSubCommands();
 
-        Component component = Component.text("Help:", NamedTextColor.WHITE).appendNewline();
+        Component component = Component.text("Help:", NamedTextColor.GOLD).appendNewline();
 
         for (ICommand subCommand : clanSubCommands) {
-            boolean requiresAdmin = false;
             if(subCommand instanceof ClanSubCommand clanSubCommand) {
-                if (clanSubCommand.requiresServerAdmin()) requiresAdmin = true;
-            }
-            NamedTextColor color = (requiresAdmin ? NamedTextColor.RED : NamedTextColor.GOLD);
-            if (!requiresAdmin || client.hasRank(Rank.ADMIN)) {
-                component = component.append(Component.text(subCommand.getName(), color).append(Component.text(": ", color))
-                        .append(Component.text(subCommand.getDescription(), NamedTextColor.GRAY)).appendNewline());
+                NamedTextColor color = (clanSubCommand.requiresServerAdmin() ? NamedTextColor.RED : NamedTextColor.GOLD);
+                if (!clanSubCommand.requiresServerAdmin() || client.hasRank(Rank.ADMIN)) {
+                    component = component.append(Component.text(clanSubCommand.getName(), color).append(Component.text(": ", color))
+                            .append(Component.text(clanSubCommand.getDescription(), NamedTextColor.GRAY)).appendNewline());
+                }
             }
         }
 
