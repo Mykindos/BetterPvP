@@ -15,9 +15,11 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
+import javax.naming.Name;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 @Singleton
 @SubCommand(ClanCommand.class)
@@ -45,28 +47,74 @@ public class ClanHelpSubCommand extends ClanSubCommand {
 
     @Override
     public void execute(Player player, Client client, String... args) {;
+        int numPerPage = 10;
+        int pageNumber = 1;
+        String commandName = "";
+
+        if (args.length == 1) {
+            try {
+                pageNumber = Integer.parseInt(args[0]);
+            } catch (NumberFormatException e) {
+                commandName = args[0];
+            }
+        }
+
         List<ICommand> clanSubCommands = clanCommand.getSubCommands();
 
         Collections.sort(clanSubCommands, Comparator.comparing(ICommand::getName));
 
-        Component component = Component.text("Help:", NamedTextColor.GOLD).appendNewline();
 
-        for (ICommand subCommand : clanSubCommands) {
-            if(subCommand instanceof ClanSubCommand clanSubCommand) {
-                NamedTextColor color = (clanSubCommand.requiresServerAdmin() ? NamedTextColor.RED : NamedTextColor.GOLD);
-                if (!clanSubCommand.requiresServerAdmin() || client.hasRank(Rank.ADMIN)) {
-                    component = component.append(Component.text(clanSubCommand.getName(), color).append(Component.text(": ", color))
-                            .append(Component.text(clanSubCommand.getDescription(), NamedTextColor.GRAY)).appendNewline());
+
+        Component component = Component.text("Help", NamedTextColor.GOLD).appendNewline();
+
+        int count = 0;
+
+        if (!commandName.isEmpty()){
+            Optional<ICommand> subCommandOptional = clanCommand.getSubCommand(commandName);
+            if(subCommandOptional.isPresent()) {
+                ICommand subCommand = subCommandOptional.get();
+                if(subCommand instanceof ClanSubCommand clanSubCommand) {
+                    component = component.append(addHelpCommandComponent(clanSubCommand, client));
+                }
+            } else {
+                component = Component.text("No Clan command named ", NamedTextColor.RED).append(Component.text(commandName, NamedTextColor.GOLD).append(Component.text(" exists.", NamedTextColor.RED)));
+            }
+        } else {
+            int start = (pageNumber - 1) * numPerPage;
+            int end = start + numPerPage;
+            int size = clanSubCommands.size();
+
+            if (start <= size) {
+                if (end > size) end = size;
+                for (ICommand subCommand : clanSubCommands.subList(start, end)) {
+                    if (count == numPerPage) break;
+                    if (subCommand instanceof ClanSubCommand clanSubCommand) {
+                        component = component.append(addHelpCommandComponent(clanSubCommand, client));
+                    }
+                    count++;
                 }
             }
         }
-
         UtilMessage.message(player, "Clans", component);
 
     }
 
+    private Component addHelpCommandComponent(ClanSubCommand command, Client client) {
+        Component component = Component.text("");
+        NamedTextColor color = (command.requiresServerAdmin() ? NamedTextColor.RED : NamedTextColor.GOLD);
+        if (!command.requiresServerAdmin() || client.hasRank(Rank.ADMIN)) {
+            component = Component.text(command.getName(), color).append(Component.text(": ", color))
+                    .append(Component.text(command.getDescription(), NamedTextColor.GRAY)).appendNewline();
+        }
+        return component;
+    }
+
     @Override
     public String getArgumentType(int arg) {
+        if (arg == 1) {
+            return ArgumentType.SUBCOMMAND.name();
+        }
+
         return ArgumentType.NONE.name();
     }
 
