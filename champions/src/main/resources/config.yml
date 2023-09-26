@@ -58,9 +58,8 @@ skills:
       enabled: true
       maxlevel: 3
       cooldown: 35.0
-      percentHealthRecovered: 25.0
       baseDuration: 0.5
-      effectDuration: 5.0
+      effectDuration: 4.0
     flash:
       enabled: true
       maxlevel: 5

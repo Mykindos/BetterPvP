@@ -16,6 +16,7 @@ import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -24,7 +25,6 @@ import java.util.*;
 @Singleton
 @BPvPListener
 public class Revival extends Skill implements ToggleSkill, CooldownSkill, Listener {
-    public double percentHealthRecovered;
     public double baseDuration;
     public double effectDuration;
 
@@ -48,9 +48,8 @@ public class Revival extends Skill implements ToggleSkill, CooldownSkill, Listen
                 "Drop your Sword / Axe to activate",
                 "",
                 "If you die within the next <val>"+ (baseDuration + ((level-1) * 0.5)) +"</val> seconds,",
-                "you will be revived, setting your health to <stat>" + percentHealthRecovered + "%",
-                "of your maximum HP, and receiving <effect>Regeneration I",
-                "and <effect>Strength I</effect> for <stat>5<stat> seconds",
+                "you will be revived, giving you <effect>Invulnerability</effect> for <stat>2</stat> seconds",
+                "and giving you <effect>Regeneration I </effect> and <effect>Strength I</effect> for <val>"+(4 + (level-1))+"</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -91,17 +90,29 @@ public class Revival extends Skill implements ToggleSkill, CooldownSkill, Listen
         if (active.contains(damagee.getUniqueId()) && damagee.getHealth() <= event.getDamage()) {
             event.setCancelled(true);
 
-            damagee.setHealth(damagee.getMaxHealth() * (percentHealthRecovered / 100));
+            damagee.setHealth(1);
             damagee.getWorld().playSound(damagee.getLocation(),Sound.ITEM_TOTEM_USE, 2.0F,0.8F);
 
-            damagee.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, (int) effectDuration * 20, 0));
-            damagee.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, (int) effectDuration * 20, 0));
+            damagee.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, (int) (effectDuration + (damagee.getLevel()-1)) * 20, 0));
+            damagee.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, (int) (effectDuration + (damagee.getLevel()-1)) * 20, 0));
+
+            damagee.setMetadata("RevivalDamageReduction", new FixedMetadataValue(champions, true));
+
+            Bukkit.getScheduler().runTaskLater(champions, () -> {
+                if (damagee.hasMetadata("RevivalDamageReduction")) {
+                    damagee.removeMetadata("RevivalDamageReduction", champions);
+                }
+            }, (long) effectDuration * 20);
 
             active.remove(damagee.getUniqueId());
             if (particleTasks.containsKey(damagee.getUniqueId())) {
                 Bukkit.getScheduler().cancelTask(particleTasks.get(damagee.getUniqueId()));
                 particleTasks.remove(damagee.getUniqueId());
             }
+        }
+
+        if (damagee.hasMetadata("RevivalDamageReduction")) {
+            event.setDamage(0);
         }
     }
 
@@ -121,8 +132,7 @@ public class Revival extends Skill implements ToggleSkill, CooldownSkill, Listen
         return cooldown - ((level - 1) * 2.5);
     }
     public void loadSkillConfig(){
-        percentHealthRecovered = getConfig("percentHealthRecovered", 25.0, Double.class);
         baseDuration = getConfig("baseDuration", 0.5, Double.class);
-        effectDuration = getConfig("effectDuration", 5.0, Double.class);
+        effectDuration = getConfig("effectDuration", 4.0, Double.class);
     }
 }
