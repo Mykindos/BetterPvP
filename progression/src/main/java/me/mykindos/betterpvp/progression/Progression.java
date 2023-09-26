@@ -1,11 +1,11 @@
-package me.mykindos.betterpvp.fishing;
+package me.mykindos.betterpvp.progression;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.Setter;
-import me.mykindos.betterpvp.fishing.commands.loader.ProgressionCommandLoader;
+import me.mykindos.betterpvp.progression.commands.loader.ProgressionCommandLoader;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.config.ConfigInjectorModule;
@@ -13,8 +13,8 @@ import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.ModuleLoadedEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
-import me.mykindos.betterpvp.fishing.injector.ProgressionInjectorModule;
-import me.mykindos.betterpvp.fishing.listener.ProgressionListenerLoader;
+import me.mykindos.betterpvp.progression.injector.ProgressionInjectorModule;
+import me.mykindos.betterpvp.progression.listener.ProgressionListenerLoader;
 import org.bukkit.Bukkit;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
@@ -57,13 +57,11 @@ public class Progression extends BPvPPlugin {
 
             Bukkit.getPluginManager().callEvent(new ModuleLoadedEvent("Progression"));
 
-            var shopsListenerLoader = injector.getInstance(ProgressionListenerLoader.class);
-            shopsListenerLoader.registerListeners(PACKAGE);
+            var listenerLoader = injector.getInstance(ProgressionListenerLoader.class);
+            listenerLoader.registerListeners(PACKAGE);
 
-            var shopsCommandLoader = injector.getInstance(ProgressionCommandLoader.class);
-            shopsCommandLoader.loadCommands(PACKAGE);
-
-
+            var commandLoader = injector.getInstance(ProgressionCommandLoader.class);
+            commandLoader.loadCommands(PACKAGE);
 
             updateEventExecutor.loadPlugin(this);
         }

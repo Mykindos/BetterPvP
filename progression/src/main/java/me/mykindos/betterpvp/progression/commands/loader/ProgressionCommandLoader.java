@@ -1,8 +1,8 @@
-package me.mykindos.betterpvp.fishing.commands.loader;
+package me.mykindos.betterpvp.progression.commands.loader;
 
 import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
-import me.mykindos.betterpvp.fishing.Progression;
+import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.CommandManager;
 import me.mykindos.betterpvp.core.command.SubCommand;

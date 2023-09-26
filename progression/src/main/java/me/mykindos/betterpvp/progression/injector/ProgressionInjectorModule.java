@@ -1,7 +1,7 @@
-package me.mykindos.betterpvp.fishing.injector;
+package me.mykindos.betterpvp.progression.injector;
 
 import com.google.inject.AbstractModule;
-import me.mykindos.betterpvp.fishing.Progression;
+import me.mykindos.betterpvp.progression.Progression;
 
 public class ProgressionInjectorModule extends AbstractModule {
 

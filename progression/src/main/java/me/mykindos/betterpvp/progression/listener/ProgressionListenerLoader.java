@@ -1,7 +1,7 @@
-package me.mykindos.betterpvp.fishing.listener;
+package me.mykindos.betterpvp.progression.listener;
 
 import com.google.inject.Inject;
-import me.mykindos.betterpvp.fishing.Progression;
+import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.listener.loader.ListenerLoader;
 import org.bukkit.event.Listener;
