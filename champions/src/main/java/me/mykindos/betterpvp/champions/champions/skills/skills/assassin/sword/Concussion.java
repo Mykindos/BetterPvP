@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -44,7 +45,8 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener 
         return new String[]{
                 "Right click with a Sword to prepare",
                 "",
-                "Your next hit will <effect>Blind</effect> the target for <val>" + (durationPerLevel * level) + "</val> seconds",
+                "Your next hit will <effect>Blind</effect> the target and for ",
+                "<val>" + (durationPerLevel * level) + "</val> seconds, and rotate them 180 degrees",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -87,6 +89,11 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener 
             damagee.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, (int) (level * durationPerLevel) * 20, 0));
             UtilMessage.simpleMessage(damager, getName(), "You gave <alt>" + damagee.getName() + "</alt> a concussion.");
             UtilMessage.simpleMessage(damagee, getName(), "<alt>" + damager.getName() + "</alt> gave you a concussion.");
+
+            Location loc = damagee.getLocation();
+            loc.setYaw(loc.getYaw() + 180);
+            damagee.teleport(loc);
+
             active.remove(damager.getUniqueId());
         }
 
