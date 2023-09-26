@@ -65,7 +65,7 @@ public class ClanHelpSubCommand extends ClanSubCommand {
 
 
 
-        Component component = Component.text("Help", NamedTextColor.GOLD).appendNewline();
+        Component component = Component.text("Help", NamedTextColor.GOLD);
 
         int count = 0;
 
@@ -100,11 +100,11 @@ public class ClanHelpSubCommand extends ClanSubCommand {
     }
 
     private Component addHelpCommandComponent(ClanSubCommand command, Client client) {
-        Component component = Component.text("");
+        Component component = Component.empty().appendNewline();
         NamedTextColor color = (command.requiresServerAdmin() ? NamedTextColor.RED : NamedTextColor.GOLD);
         if (!command.requiresServerAdmin() || client.hasRank(Rank.ADMIN)) {
-            component = Component.text(command.getName(), color).append(Component.text(": ", color))
-                    .append(Component.text(command.getDescription(), NamedTextColor.GRAY)).appendNewline();
+            component = component.append(Component.text(command.getName(), color).append(Component.text(": ", color))
+                    .append(Component.text(command.getDescription(), NamedTextColor.GRAY)));
         }
         return component;
     }
