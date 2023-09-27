@@ -22,7 +22,7 @@ public class Client extends PropertyContainer implements IMapListener {
 
     boolean administrating;
 
-    UUID mimicClan;
+    private UUID mimicClan = null;
 
     public Client(String uuid, String name, Rank rank) {
         this.uuid = uuid;
@@ -54,5 +54,13 @@ public class Client extends PropertyContainer implements IMapListener {
 
     public void setMimicClan (UUID clanID) {
         this.mimicClan = clanID;
+    }
+
+    public UUID getMimicClan() {
+        return this.mimicClan;
+    }
+
+    public boolean isMimicking() {
+        return this.mimicClan != null;
     }
 }

@@ -42,6 +42,7 @@ public class AdminCommand extends ClanSubCommand {
     public void execute(Player player, Client client, String... args) {
         if (args.length == 0) {
             client.setMimicClan(null);
+            UtilMessage.message(player, "Clan Admin", "Reset mimicked clan");
         }
 
         if (args.length != 1) return;
@@ -55,7 +56,7 @@ public class AdminCommand extends ClanSubCommand {
         Clan targetClan = targetClanOptional.get();
 
         client.setMimicClan(targetClan.getId());
-        UtilMessage.message(player, "Clans", "Now mimicking Clan <yellow>" + targetClan.getName());
+        UtilMessage.message(player, "Clan Admin", "Now mimicking Clan <yellow>" + targetClan.getName());
 
     }
 
