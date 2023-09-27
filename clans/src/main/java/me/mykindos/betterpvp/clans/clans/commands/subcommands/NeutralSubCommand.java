@@ -37,6 +37,11 @@ public class NeutralSubCommand extends ClanSubCommand {
     }
 
     @Override
+    public String getUsage() {
+        return super.getUsage() + " <clan>";
+    }
+
+    @Override
     public void execute(Player player, Client client, String... args) {
         if(args.length == 0) {
             UtilMessage.message(player, "Clans", "You must specify a clan to request neutral status with.");
