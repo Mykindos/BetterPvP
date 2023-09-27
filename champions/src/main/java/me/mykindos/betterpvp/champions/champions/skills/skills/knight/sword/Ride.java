@@ -35,7 +35,6 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
     private final WeakHashMap<Player, HorseData> horseData = new WeakHashMap<>();
 
     private double lifespan;
-    private double horseHealth;
     @Inject
     public Ride(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -55,9 +54,7 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
                 "Mount a valiant steed which will ",
                 "last for <val>" + (lifespan + (level-1)) + "</val> seconds",
                 "",
-                "The horse will have <val>" + (horseHealth + ((level-1) *5)) + "</val> health",
-                "",
-                "If you dismount the horse it will disappear",
+                "If the horse takes damage or you dismount, it will disappear",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -65,7 +62,7 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
 
     public void activate(Player player, int level) {
 
-        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_HORSE_ANGRY, 2.0f, 0.5f);
+        player.getWorld().playSound(player.getLocation(), Sound.ITEM_GOAT_HORN_SOUND_0, 2.0f, 1f);
 
         Horse horse = player.getWorld().spawn(player.getLocation(), Horse.class);
         horse.setTamed(true);
@@ -74,9 +71,9 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
         horse.setStyle(Horse.Style.NONE);
         AttributeInstance horseMaxHealth = horse.getAttribute(Attribute.GENERIC_MAX_HEALTH);
         if(horseMaxHealth != null) {
-            horseMaxHealth.setBaseValue(horseHealth + ((level - 1) * 5));
+            horseMaxHealth.setBaseValue(1);
         }
-        horse.setHealth(horseHealth + ((level - 1) * 5));
+        horse.setHealth(1);
         horse.setJumpStrength(1.5D);
         horse.getInventory().setArmor(new ItemStack(Material.LEATHER_HORSE_ARMOR));
         horse.getInventory().setSaddle(new ItemStack(Material.SADDLE));
@@ -166,8 +163,7 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
 
     @Override
     public void loadSkillConfig() {
-        lifespan = getConfig("lifespan", 6.0, Double.class);
-        horseHealth = getConfig("horseHealth", 5.0, Double.class);
+        lifespan = getConfig("lifespan", 2.0, Double.class);
     }
 
 }
