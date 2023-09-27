@@ -47,9 +47,8 @@ public class ClanAdminCommand extends Command {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        Optional<Gamer> adminGamer = gamerManager.getObject(player.getUniqueId().toString());
         if (args.length == 0) {
-            adminGamer.setMimicClan(0);
+            client.setMimicClan(null);
         }
 
         if (args.length != 1) return;
@@ -60,11 +59,9 @@ public class ClanAdminCommand extends Command {
             return;
         }
 
-
-
         Clan targetClan = targetClanOptional.get();
 
-        adminGamer.getClient().setMimicClan(targetClan.getId());
+        client.setMimicClan(targetClan.getId());
         UtilMessage.message(player, "Clans", "Now mimicking Clan <yellow>" + targetClan.getName());
 
     }

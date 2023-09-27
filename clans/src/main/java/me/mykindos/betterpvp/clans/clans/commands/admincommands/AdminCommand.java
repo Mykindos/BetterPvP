@@ -19,14 +19,10 @@ import java.util.Optional;
 @SubCommand(ClanCommand.class)
 public class AdminCommand extends ClanSubCommand {
 
-    private final ClanManager clanManager;
-    private final GamerManager gamerManager;
-
     @WithReflection
     @Inject
     public AdminCommand(ClanManager clanManager, GamerManager gamerManager) {
-        this.clanManager = clanManager;
-        this.gamerManager = gamerManager;
+        super(clanManager, gamerManager);
 
         aliases.addAll(List.of("mimic", "admin"));
 
@@ -44,9 +40,8 @@ public class AdminCommand extends ClanSubCommand {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        Optional<Gamer> adminGamer = gamerManager.getObject(player.getUniqueId().toString());
         if (args.length == 0) {
-            adminGamer.setMimicClan(0);
+            client.setMimicClan(null);
         }
 
         if (args.length != 1) return;
@@ -57,11 +52,9 @@ public class AdminCommand extends ClanSubCommand {
             return;
         }
 
-
-
         Clan targetClan = targetClanOptional.get();
 
-        adminGamer.getClient().setMimicClan(targetClan.getId());
+        client.setMimicClan(targetClan.getId());
         UtilMessage.message(player, "Clans", "Now mimicking Clan <yellow>" + targetClan.getName());
 
     }
