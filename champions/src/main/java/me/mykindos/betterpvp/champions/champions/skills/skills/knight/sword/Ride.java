@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.clans.clans.ClanManager;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
@@ -126,8 +127,12 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
     @EventHandler
     public void onCustomHorseDamage(CustomDamageEvent event) {
         if (event.getDamagee() instanceof Horse && activeHorses.contains(event.getDamagee())) {
-            if (!(event.getDamager() instanceof Player)) {
-                event.setCancelled(true);
+            Clan clan1 = ClanManager.getClanByPlayer(event.getDamager());
+            Clan clan2 = ClanManager.getClanByPlayer(((Horse) event.getDamagee()).getOwner());
+            if(ClanManager.getRelation(clan1, clan2)==ClanRelation.SELF||ClanManager.getRelation(clan1, clan2)==ClanRelation.ALLY||ClanManager.getRelation(clan1, clan2)==ClanRelation.ALLY_TRUST){
+                if (!(event.getDamager() instanceof Player)) {
+                    event.setCancelled(true);
+                }
             }
         }
     }
