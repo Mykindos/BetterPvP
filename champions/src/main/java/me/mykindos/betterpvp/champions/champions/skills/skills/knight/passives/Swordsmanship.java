@@ -95,7 +95,7 @@ public class Swordsmanship extends Skill implements PassiveSkill {
                 if (charges.containsKey(cur)) {
                     championsManager.getGamers().getObject(cur.getUniqueId().toString()).ifPresent(gamer -> {
                         if (UtilTime.elapsed(gamer.getLastDamaged(), (long) timeOutOfCombat * 1000)) {
-                            if (!championsManager.getCooldowns().add(cur, getName(), timeBetweenCharges, false)) return;
+                            if (!championsManager.getCooldowns().use(cur, getName(), timeBetweenCharges, false)) return;
                             int charge = charges.get(cur);
                             if (charge < level) {
                                 charge = Math.min(level, charge + 1);

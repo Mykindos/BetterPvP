@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.components.champions;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 public interface ISkill {
@@ -31,5 +32,7 @@ public interface ISkill {
     default boolean ignoreNegativeEffects() {
         return false;
     }
+
+    Material[] getItemsBySkillType();
 
 }
