@@ -53,7 +53,7 @@ public class SpongeListener implements Listener {
             return;
         }
 
-        if (cooldownManager.add(player, "Sponge", 0.8, false)) {
+        if (cooldownManager.use(player, "Sponge", 0.8, false)) {
 
             player.setVelocity(new Vector(0.0D, 1.8D, 0.0D));
             player.getWorld().playEffect(player.getLocation(), Effect.BLAZE_SHOOT, 0, 15);

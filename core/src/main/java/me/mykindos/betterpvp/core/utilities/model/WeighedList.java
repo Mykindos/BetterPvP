@@ -2,11 +2,9 @@ package me.mykindos.betterpvp.core.utilities.model;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Represents a list of categories with weights, and elements within those categories with weights.
@@ -21,7 +19,7 @@ import java.util.Random;
  * </code>.
  * @param <T> The type of element to store
  */
-public class WeighedList<T> {
+public class WeighedList<T> implements Iterable<T>{
 
     private final Random rnd = new Random();
     private final Map<Integer, Multimap<Integer, T>> map = new HashMap<>();
@@ -36,6 +34,10 @@ public class WeighedList<T> {
 
     public Collection<T> getElements() {
         return map.values().stream().flatMap(m -> m.values().stream()).toList();
+    }
+
+    public int size() {
+        return map.values().stream().mapToInt(Multimap::size).sum();
     }
 
     /**
@@ -82,4 +84,13 @@ public class WeighedList<T> {
         return map.keySet().stream().mapToInt(Integer::intValue).sum();
     }
 
+    @NotNull
+    @Override
+    public Iterator<T> iterator() {
+        return getElements().iterator();
+    }
+
+    public void clear() {
+        map.clear();
+    }
 }

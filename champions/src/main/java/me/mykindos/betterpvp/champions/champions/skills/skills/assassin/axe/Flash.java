@@ -11,12 +11,14 @@ import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
+import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilLocation;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.model.VectorLine;
+import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -32,6 +34,7 @@ import org.bukkit.util.Vector;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Optional;
 import java.util.WeakHashMap;
 
 @Singleton
@@ -39,6 +42,24 @@ import java.util.WeakHashMap;
 public class Flash extends Skill implements InteractSkill, Listener {
 
     private final WeakHashMap<Player, FlashData> charges = new WeakHashMap<>();
+
+    // Action bar
+    private final PermanentComponent actionBarComponent = new PermanentComponent(gamer -> {
+        final Player player = gamer.getPlayer();
+
+        // Only display charges in hotbar if holding the weapon
+        if (player == null || !charges.containsKey(player) || !UtilPlayer.isHoldingItem(player, getItemsBySkillType())) {
+            return null; // Skip if not online or not charging
+        }
+
+        final int maxCharges = getMaxCharges(getLevel(player));
+        final int newCharges = charges.get(player).getCharges();
+
+        return Component.text(getName() + " ").color(NamedTextColor.WHITE).decorate(TextDecoration.BOLD)
+                .append(Component.text("\u25A0".repeat(newCharges)).color(NamedTextColor.GREEN))
+                .append(Component.text("\u25A0".repeat(newCharges >= maxCharges ? 0 : 1)).color(NamedTextColor.YELLOW))
+                .append(Component.text("\u25A0".repeat(Math.max(0, maxCharges - newCharges - 1))).color(NamedTextColor.RED));
+    });
 
     private int baseMaxCharges;
     private double baseRechargeSeconds;
@@ -124,11 +145,17 @@ public class Flash extends Skill implements InteractSkill, Listener {
     @Override
     public void invalidatePlayer(Player player) {
         charges.remove(player);
+        // Action bar
+        final Optional<Gamer> gamerOpt = championsManager.getGamers().getObject(player.getUniqueId());
+        gamerOpt.ifPresent(gamer -> gamer.getActionBar().remove(actionBarComponent));
     }
 
     @Override
     public void trackPlayer(Player player) {
         charges.computeIfAbsent(player, k -> new FlashData());
+        // Action bar
+        final Optional<Gamer> gamerOpt = championsManager.getGamers().getObject(player.getUniqueId());
+        gamerOpt.ifPresent(gamer -> gamer.getActionBar().add(900, actionBarComponent));
     }
 
     @Override
@@ -205,7 +232,7 @@ public class Flash extends Skill implements InteractSkill, Listener {
         // Lessen charges and add cooldown to prevent from instantly getting a flash charge if they're full
         final int curCharges = charges.get(player).getCharges();
         if (curCharges >= getMaxCharges(level)) {
-            championsManager.getCooldowns().add(player, getName(), getRechargeSeconds(level), false, true, true);
+            championsManager.getCooldowns().use(player, getName(), getRechargeSeconds(level), false, true, true);
         }
         final int newCharges = curCharges - 1;
         charges.get(player).setCharges(newCharges);
@@ -237,23 +264,11 @@ public class Flash extends Skill implements InteractSkill, Listener {
             final FlashData data = entry.getValue();
             final int maxCharges = getMaxCharges(level);
 
-            // Cues
-            if (UtilPlayer.isHoldingItem(player, getItemsBySkillType())) {
-                // Only display charges in hotbar if holding the weapon
-                final int newCharges = data.getCharges();
-                Component actionBar = Component.text(getName() + " ").color(NamedTextColor.WHITE).decorate(TextDecoration.BOLD)
-                        .append(Component.text("\u25A0".repeat(newCharges)).color(NamedTextColor.GREEN))
-                        .append(Component.text("\u25A0".repeat(newCharges >= maxCharges ? 0 : 1)).color(NamedTextColor.YELLOW))
-                        .append(Component.text("\u25A0".repeat(Math.max(0, maxCharges - newCharges - 1))).color(NamedTextColor.RED));
-
-                player.sendActionBar(actionBar);
-            }
-
             if (data.getCharges() >= maxCharges) {
                 continue; // skip if already at max charges
             }
 
-            if (!championsManager.getCooldowns().add(player, getName(), getRechargeSeconds(level), false, true, true)) {
+            if (!championsManager.getCooldowns().use(player, getName(), getRechargeSeconds(level), false, true, true)) {
                 continue; // skip if not enough time has passed
             }
 

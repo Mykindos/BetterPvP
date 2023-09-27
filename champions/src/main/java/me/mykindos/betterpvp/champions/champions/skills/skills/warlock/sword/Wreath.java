@@ -113,7 +113,7 @@ public class Wreath extends PrepareSkill implements CooldownSkill {
 
             if (actives.get(player) == 0) {
                 championsManager.getCooldowns().removeCooldown(player, getName(), true);
-                if (championsManager.getCooldowns().add(player, getName(), getCooldown(level), showCooldownFinished())) {
+                if (championsManager.getCooldowns().use(player, getName(), getCooldown(level), showCooldownFinished())) {
 
                 }
             }
