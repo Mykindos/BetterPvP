@@ -14,10 +14,12 @@ public class SimpleFishType implements FishType {
     private final String name;
     private int minWeight;
     private int maxWeight;
+    private int frequency;
 
     @Override
     public void loadConfig(ExtendedYamlConfiguration config) {
         final String key = name.toLowerCase().replace(" ", "_");
+        this.frequency = config.getInt("fishing.fish." + key + ".frequency");
         this.minWeight = config.getInt("fishing.fish." + key + ".minWeight");
         this.maxWeight = config.getInt("fishing.fish." + key + ".maxWeight");
     }

@@ -15,9 +15,8 @@ public abstract class ProgressionData<T extends ProgressionTree> {
      */
     private @Range(from = 0, to = Integer.MAX_VALUE) int experience;
 
-    /**
-     * The tree this data is for.
-     */
-    private final T tree;
+    public void grantExperience(@Range(from = 0, to = Integer.MAX_VALUE) int amount) {
+        this.experience += amount;
+    }
 
 }

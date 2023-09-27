@@ -23,4 +23,9 @@ public interface FishType extends ConfigAccessor {
      */
     int getMaxWeight();
 
+    /**
+     * @return The frequency of the fish. The higher the frequency, the more common the fish is.
+     */
+    int getFrequency();
+
 }

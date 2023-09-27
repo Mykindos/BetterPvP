@@ -10,6 +10,12 @@ import org.jetbrains.annotations.NotNull;
 public interface FishingRodType extends ConfigAccessor {
 
     /**
+     * A unique ID for the fishing rod type, DO NOT CHANGE
+     * @return The ID of the fishing rod type
+     */
+    int getId();
+
+    /**
      * @return The name of the fishing rod type
      */
     @NotNull String getName();

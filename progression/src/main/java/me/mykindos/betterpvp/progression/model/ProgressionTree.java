@@ -22,4 +22,6 @@ public interface ProgressionTree extends ConfigAccessor {
         return (int) Math.floor(Math.cbrt(level ^ 4) + (double) (50 * level) / 4);
     }
 
+    <T extends ProgressionTree> Leaderboard<T> getLeaderboard();
+
 }
