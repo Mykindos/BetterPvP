@@ -54,6 +54,10 @@ skills:
       cooldown: 13
       maxlevel: 5
       maxTravelDistance: 16
+    endurance:
+      enabled: true
+      maxlevel: 3
+      cooldown: 25
     flash:
       enabled: true
       maxlevel: 5
