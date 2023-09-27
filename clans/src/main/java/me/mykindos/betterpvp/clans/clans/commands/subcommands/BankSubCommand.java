@@ -39,6 +39,11 @@ public class BankSubCommand extends ClanSubCommand {
     }
 
     @Override
+    public String getUsage() {
+        return super.getUsage() + " [deposit|withdraw]";
+    }
+
+    @Override
     public void execute(Player player, Client client, String... args) {
 
         Clan clan = clanManager.getClanByPlayer(player).orElseThrow();
@@ -79,6 +84,11 @@ public class BankSubCommand extends ClanSubCommand {
         @Override
         public String getDescription() {
             return "Withdraw money from your clans bank";
+        }
+
+        @Override
+        public String getUsage() {
+            return super.getUsage() + " <amount>";
         }
 
         @Override
@@ -157,6 +167,11 @@ public class BankSubCommand extends ClanSubCommand {
         @Override
         public String getDescription() {
             return "Deposit money into your clans bank";
+        }
+
+        @Override
+        public String getUsage() {
+            return super.getUsage() + " <amount>";
         }
 
         @Override

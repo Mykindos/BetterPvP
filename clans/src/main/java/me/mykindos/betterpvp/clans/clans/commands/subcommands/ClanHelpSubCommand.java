@@ -44,6 +44,10 @@ public class ClanHelpSubCommand extends ClanSubCommand {
         return "List all available commands.";
     }
 
+    @Override public String getUsage() {
+        return super.getUsage() + " [pageNumber|commandName]";
+    }
+
 
     @Override
     public void execute(Player player, Client client, String... args) {;

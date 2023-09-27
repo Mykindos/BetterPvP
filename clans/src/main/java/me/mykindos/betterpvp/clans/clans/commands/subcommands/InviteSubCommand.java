@@ -43,6 +43,11 @@ public class InviteSubCommand extends ClanSubCommand {
     }
 
     @Override
+    public String getUsage() {
+        return super.getUsage() + " <player>";
+    }
+
+    @Override
     public void execute(Player player, Client client, String... args) {
         if(args.length == 0) {
             UtilMessage.message(player, "Clans", "You did not input a player to invite.");
