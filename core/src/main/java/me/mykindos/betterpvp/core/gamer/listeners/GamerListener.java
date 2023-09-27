@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.gamer.listeners;
 
+import com.destroystokyo.paper.event.server.ServerTickStartEvent;
 import com.google.inject.Inject;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.events.ClientLoginEvent;
@@ -34,6 +35,11 @@ public class GamerListener implements Listener {
     public GamerListener(Core core, GamerManager gamerManager){
         this.core = core;
         this.gamerManager = gamerManager;
+    }
+
+    @EventHandler
+    public void onTick(ServerTickStartEvent event) {
+        gamerManager.getObjects().values().forEach(gamer -> gamer.getActionBar().show(gamer));
     }
 
     @EventHandler

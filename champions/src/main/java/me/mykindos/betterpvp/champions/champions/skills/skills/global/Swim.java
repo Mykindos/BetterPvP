@@ -71,7 +71,7 @@ public class Swim extends Skill implements PassiveSkill, EnergySkill {
 
         int level = getLevel(player);
         if (level > 0) {
-            if (championsManager.getCooldowns().add(player, getName(), internalCooldown, false)){
+            if (championsManager.getCooldowns().use(player, getName(), internalCooldown, false)){
                 if (championsManager.getEnergy().use(player, getName(), getEnergy(level), true)) {
                     UtilVelocity.velocity(player, 0.6D, 0.2D, 0.6D, false);
                     player.getWorld().playSound(player.getLocation(), Sound.ENTITY_GENERIC_SPLASH, 0.3F, 2.0F);

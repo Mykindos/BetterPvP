@@ -16,10 +16,11 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
+import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.*;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
+import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
+import me.mykindos.betterpvp.core.utilities.model.actionbar.PermanentComponent;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Firework;
@@ -37,14 +38,27 @@ import org.bukkit.util.Vector;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class StaticLazer extends ChannelSkill implements InteractSkill, CooldownSkill, EnergySkill {
+public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySkill, CooldownSkill {
 
     // Percentage (0 -> 1)
     private final WeakHashMap<Player, LazerData> charging = new WeakHashMap<>();
+
+    // Action bar
+    private final PermanentComponent actionBarComponent = new PermanentComponent(gamer -> {
+        final Player player = gamer.getPlayer();
+        if (player == null || !charging.containsKey(player) || !UtilPlayer.isHoldingItem(player, getItemsBySkillType())) {
+            return null; // Skip if not online or not charging
+        }
+
+        final LazerData charge = charging.get(player);
+        ProgressBar progressBar = ProgressBar.withProgress((float) charge.getCharge());
+        return progressBar.build();
+    });
 
     private double baseCharge;
     private double baseDamage;
@@ -113,6 +127,11 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, Cooldown
     }
 
     @Override
+    public boolean shouldDisplayActionBar(Gamer gamer) {
+        return false;
+    }
+
+    @Override
     public SkillType getType() {
         return SkillType.SWORD;
     }
@@ -131,19 +150,25 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, Cooldown
     }
 
     @Override
+    public void trackPlayer(Player player) {
+        // Action bar
+        final Optional<Gamer> gamerOpt = championsManager.getGamers().getObject(player.getUniqueId());
+        gamerOpt.ifPresent(gamer -> gamer.getActionBar().add(900, actionBarComponent));
+    }
+
+    @Override
+    public void invalidatePlayer(Player player) {
+        // Action bar
+        final Optional<Gamer> gamerOpt = championsManager.getGamers().getObject(player.getUniqueId());
+        gamerOpt.ifPresent(gamer -> gamer.getActionBar().remove(actionBarComponent));
+    }
+
+    @Override
     public void activate(Player player, int level) {
         charging.put(player, new LazerData(level));
     }
 
     private void showCharge(Player player, LazerData charge) {
-        // Action bar
-        int green = (int) Math.round(charge.getCharge() * 15);
-        int red = 15 - green;
-
-        String msg = "<green><bold>" + "\u258B".repeat(Math.max(0, green)) + "<red><bold>" + "\u258B".repeat(Math.max(0, red));
-        final Component bar = MiniMessage.miniMessage().deserialize(msg);
-        player.sendActionBar(bar);
-
         // Sound
         if (!UtilTime.elapsed(charge.getLastSound(), 150)) {
             return;
@@ -184,7 +209,13 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, Cooldown
 
     private void shoot(Player player, float charge, int level) {
         // Cooldown
-        championsManager.getCooldowns().add(player, getName(), getCooldown(level), showCooldownFinished());
+        championsManager.getCooldowns().use(player,
+                getName(),
+                getCooldown(level),
+                true,
+                true,
+                isCancellable(),
+                gmr -> gmr.getPlayer() != null && UtilPlayer.isHoldingItem(gmr.getPlayer(), getItemsBySkillType()));
 
         final float range = getRange(level);
         final Vector direction = player.getEyeLocation().getDirection();

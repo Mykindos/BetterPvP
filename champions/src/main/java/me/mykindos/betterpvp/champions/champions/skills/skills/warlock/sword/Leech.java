@@ -90,7 +90,7 @@ public class Leech extends PrepareSkill implements CooldownSkill {
             active.remove(damager.getUniqueId());
 
             championsManager.getCooldowns().removeCooldown(damager, getName(), true);
-            championsManager.getCooldowns().add(damager, getName(), getCooldown(level), showCooldownFinished());
+            championsManager.getCooldowns().use(damager, getName(), getCooldown(level), showCooldownFinished());
         }
 
     }
