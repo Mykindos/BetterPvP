@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -22,10 +23,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.spigotmc.event.entity.EntityDismountEvent;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.WeakHashMap;
 
 @Singleton
@@ -33,6 +37,7 @@ import java.util.WeakHashMap;
 public class Ride extends Skill implements InteractSkill, CooldownSkill, Listener {
 
     private final WeakHashMap<Player, HorseData> horseData = new WeakHashMap<>();
+    private final Collection<Horse> activeHorses = new HashSet<>();
 
     private double lifespan;
     @Inject
@@ -84,6 +89,7 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
         horse.addPassenger(player);
         HorseData data = new HorseData(horse, System.currentTimeMillis());
         horseData.put(player, data);
+        activeHorses.add(horse);
 
 
         new BukkitRunnable() {
@@ -92,6 +98,8 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
                 if (!horse.isDead()) {
                     horse.remove();
                     horseData.remove(player);
+                    activeHorses.remove(horse);
+
                 }
             }
         }.runTaskLater(champions, (long) (lifespan + (level - 1)) * 20L);
@@ -112,6 +120,15 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
 
         public long getSpawnTime() {
             return spawnTime;
+        }
+    }
+
+    @EventHandler
+    public void onCustomHorseDamage(CustomDamageEvent event) {
+        if (event.getDamagee() instanceof Horse && activeHorses.contains(event.getDamagee())) {
+            if (!(event.getDamager() instanceof Player)) {
+                event.setCancelled(true);
+            }
         }
     }
 
@@ -136,6 +153,7 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
                 UtilMessage.message(player, getClassType().getName(), "Your horse has disappeared.");
                 horse.remove();
                 horseData.remove(player);
+                activeHorses.remove(horse);
             }
         }
     }
