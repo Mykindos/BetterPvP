@@ -35,6 +35,11 @@ public class SetDominanceSubCommand extends ClanSubCommand {
     }
 
     @Override
+    public String getUsage() {
+        return super.getUsage() + " <clan> <dominance>";
+    }
+
+    @Override
     public void execute(Player player, Client client, String... args) {
 
         int dominance = Integer.parseInt(args[1]);
