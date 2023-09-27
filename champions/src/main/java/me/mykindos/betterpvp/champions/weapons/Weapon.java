@@ -17,10 +17,15 @@ public abstract class Weapon implements IWeapon {
 
     private final Material material;
     private final Component name;
+    private final int model;
     private final List<Component> lore;
 
-    public Weapon(Material material, Component name){
-        this(material, name, new ArrayList<>());
+    public Weapon(Material material, Component name) {
+        this(material, name, 0, new ArrayList<>());
+    }
+
+    public Weapon(Material material, int model, Component name) {
+        this(material, name, model, new ArrayList<>());
     }
 
 }

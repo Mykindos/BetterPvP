@@ -353,6 +353,7 @@ public class MapListener implements Listener {
 
     }
 
+    // TODO do this without loading chunks
     private void loadChunks(Player player) {
         if (!mapHandler.clanMapData.containsKey(player.getUniqueId())) {
             mapHandler.clanMapData.put(player.getUniqueId(), new HashSet<>());
