@@ -131,7 +131,7 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
                         iterator.remove();
 
                         championsManager.getCooldowns().removeCooldown(player, getName(), true);
-                        championsManager.getCooldowns().add(player, getName(), getCooldown(level), showCooldownFinished());
+                        championsManager.getCooldowns().use(player, getName(), getCooldown(level), showCooldownFinished());
                     }
                 }
             }

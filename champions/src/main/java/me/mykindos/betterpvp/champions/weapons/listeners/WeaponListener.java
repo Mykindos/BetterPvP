@@ -80,7 +80,7 @@ public class WeaponListener implements Listener {
         String name = PlainTextComponentSerializer.plainText().serialize(weapon.getName());
 
         if (weapon instanceof CooldownWeapon cooldownWeapon) {
-            if (!cooldownManager.add(player, name, cooldownWeapon.getCooldown(),
+            if (!cooldownManager.use(player, name, cooldownWeapon.getCooldown(),
                     cooldownWeapon.showCooldownFinished(), true, false)) {
                 return;
             }

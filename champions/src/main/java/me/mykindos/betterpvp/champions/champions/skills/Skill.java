@@ -157,7 +157,7 @@ public abstract class Skill implements ISkill {
         return level;
     }
 
-    protected Material[] getItemsBySkillType() {
+    public Material[] getItemsBySkillType() {
         return switch (getType()) {
             case SWORD -> SkillWeapons.SWORDS;
             case AXE -> SkillWeapons.AXES;
@@ -165,4 +165,5 @@ public abstract class Skill implements ISkill {
             default -> new Material[]{};
         };
     }
+
 }

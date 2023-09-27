@@ -60,7 +60,7 @@ public abstract class PrepareArrowSkill extends PrepareSkill implements Cooldown
             processEntityShootBowEvent(event, player, level, arrow);
             active.remove(player.getUniqueId());
             championsManager.getCooldowns().removeCooldown(player, getName(), true);
-            championsManager.getCooldowns().add(player, getName(), getCooldown(level), showCooldownFinished(), false);
+            championsManager.getCooldowns().use(player, getName(), getCooldown(level), showCooldownFinished(), false);
             onFire(player);
         }
     }
