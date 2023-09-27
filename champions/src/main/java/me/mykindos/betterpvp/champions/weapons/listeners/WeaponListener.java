@@ -28,6 +28,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
+import javax.sql.rowset.Predicate;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -81,7 +82,7 @@ public class WeaponListener implements Listener {
 
         if (weapon instanceof CooldownWeapon cooldownWeapon) {
             if (!cooldownManager.use(player, name, cooldownWeapon.getCooldown(),
-                    cooldownWeapon.showCooldownFinished(), true, false)) {
+                    cooldownWeapon.showCooldownFinished(), true, false, true)) {
                 return;
             }
         }
