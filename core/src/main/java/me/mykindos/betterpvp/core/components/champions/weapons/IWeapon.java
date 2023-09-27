@@ -10,6 +10,7 @@ public interface IWeapon {
 
     Material getMaterial();
     Component getName();
+    int getModel();
     List<Component> getLore();
 
     void activate(Player player);
