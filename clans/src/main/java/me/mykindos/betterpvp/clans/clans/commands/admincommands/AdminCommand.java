@@ -23,9 +23,6 @@ public class AdminCommand extends ClanSubCommand {
     @Inject
     public AdminCommand(ClanManager clanManager, GamerManager gamerManager) {
         super(clanManager, gamerManager);
-
-        aliases.addAll(List.of("mimic", "admin"));
-
     }
 
     @Override
@@ -66,5 +63,10 @@ public class AdminCommand extends ClanSubCommand {
 
     public boolean canExecuteWithoutClan() {
         return true;
+    }
+
+    @Override
+    public String getArgumentType(int arg) {
+        return ClanArgumentType.CLAN.name();
     }
 }

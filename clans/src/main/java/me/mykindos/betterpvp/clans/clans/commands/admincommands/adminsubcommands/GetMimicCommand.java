@@ -53,4 +53,9 @@ public class GetMimicCommand extends AdminCommand {
 
         UtilMessage.message(player, "Clan Admin", component);
     }
+
+    public String getArgumentType(int arg) {
+        return ArgumentType.NONE.name();
+    }
+
 }
