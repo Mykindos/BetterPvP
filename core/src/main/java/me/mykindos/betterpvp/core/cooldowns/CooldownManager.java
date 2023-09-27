@@ -38,11 +38,15 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
     }
 
     public boolean use(Player player, String ability, double duration, boolean inform, boolean removeOnDeath) {
-        return use(player, ability, duration, inform, removeOnDeath, false);
+        return use(player, ability, duration, inform, removeOnDeath, false, x -> false);
     }
 
     public boolean use(Player player, String ability, double duration, boolean inform, boolean removeOnDeath, boolean cancellable) {
-        return use(player, ability, duration, inform, removeOnDeath, false, null);
+        return use(player, ability, duration, inform, removeOnDeath, cancellable, x -> false);
+    }
+
+    public boolean use(Player player, String ability, double duration, boolean inform, boolean removeOnDeath, boolean cancellable, boolean actionBar) {
+        return use(player, ability, duration, inform, removeOnDeath, cancellable, x -> actionBar);
     }
 
     public boolean use(Player player, String ability, double duration, boolean inform, boolean removeOnDeath, boolean cancellable, @Nullable Predicate<Gamer> actionBarCondition) {
