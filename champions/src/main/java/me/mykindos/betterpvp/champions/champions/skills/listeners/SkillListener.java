@@ -54,7 +54,6 @@ public class SkillListener implements Listener {
     private final EnergyHandler energyHandler;
     private final EffectManager effectManager;
 
-
     @Inject
     public SkillListener(BuildManager buildManager, RoleManager roleManager, CooldownManager cooldownManager,
                          EnergyHandler energyHandler, EffectManager effectManager) {
@@ -79,8 +78,8 @@ public class SkillListener implements Listener {
         }
 
         if (skill instanceof CooldownSkill cooldownSkill) {
-            if (!cooldownManager.add(player, skill.getName(), cooldownSkill.getCooldown(level),
-                    cooldownSkill.showCooldownFinished(), true, cooldownSkill.isCancellable())) {
+            if (!cooldownManager.use(player, skill.getName(), cooldownSkill.getCooldown(level),
+                    cooldownSkill.showCooldownFinished(), true, cooldownSkill.isCancellable(), cooldownSkill::shouldDisplayActionBar)) {
                 event.setCancelled(true);
                 return;
             }

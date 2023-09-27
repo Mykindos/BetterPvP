@@ -10,7 +10,6 @@ import lombok.SneakyThrows;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
-import net.kyori.adventure.text.Component;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -71,10 +70,6 @@ public class UtilPlayer {
 
     public static boolean isHoldingItem(Player player, Material[] items) {
         return Arrays.stream(items).anyMatch(item -> item == player.getInventory().getItemInMainHand().getType());
-    }
-
-    public static void sendActionBar(Player player, Component msg) {
-        player.sendActionBar(msg);
     }
 
     /**
