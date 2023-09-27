@@ -42,6 +42,11 @@ public class KickSubCommand extends ClanSubCommand {
     }
 
     @Override
+    public String getUsage() {
+        return super.getUsage() + " <player>";
+    }
+
+    @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length == 0) {
             UtilMessage.message(player, "Clans", "You must specify a member to kick.");
