@@ -46,8 +46,8 @@ public class Endurance extends Skill implements ToggleSkill, CooldownSkill, List
 
     @Override
     public void toggle(Player player, int level) {
-        player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,(effectDuration+(level-1)) , 2,true,true));
-        player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,(effectDuration+(level-1)) , 1,true,true));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,(5+(level-1)) , 2,true,true));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST,(5+(level-1)) , 1,true,true));
 
     }
 
