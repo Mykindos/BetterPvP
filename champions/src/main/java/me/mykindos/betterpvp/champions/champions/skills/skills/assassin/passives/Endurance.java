@@ -59,11 +59,19 @@ public class Endurance extends Skill implements ToggleSkill, CooldownSkill{
         AttributeInstance maxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
         if (maxHealth != null) {
             maxHealth.setBaseValue(26.0);
-            if (player.getHealth() < 26.0) player.setHealth(player.getHealth()+6);
+            if ((player.getHealth()+6) > 26.0) {
+                player.setHealth(26);
+            }
+            else{
+                player.setHealth(player.getHealth()+6);
+            }
         }
 
         Bukkit.getScheduler().runTaskLater(champions, () -> {
             if (maxHealth != null) {
+                if(player.getHealth()>20){
+                    player.setHealth(20);
+                }
                 maxHealth.setBaseValue(20.0);
             }
         }, (5 + (level - 1)) * 20L);
