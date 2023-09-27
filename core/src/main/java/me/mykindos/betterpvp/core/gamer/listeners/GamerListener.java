@@ -40,6 +40,7 @@ public class GamerListener implements Listener {
     @EventHandler
     public void onTick(ServerTickStartEvent event) {
         gamerManager.getObjects().values().forEach(gamer -> gamer.getActionBar().show(gamer));
+        gamerManager.getObjects().values().forEach(gamer -> gamer.getTitleQueue().show(gamer));
     }
 
     @EventHandler

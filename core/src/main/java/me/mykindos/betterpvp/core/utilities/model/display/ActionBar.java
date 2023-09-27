@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.utilities.model.actionbar;
+package me.mykindos.betterpvp.core.utilities.model.display;
 
 import me.mykindos.betterpvp.core.gamer.Gamer;
 import net.kyori.adventure.text.Component;
@@ -12,7 +12,7 @@ import java.util.UUID;
 
 public class ActionBar {
 
-    private static final Component EMPTY = Component.empty();
+    static final Component EMPTY = Component.empty();
 
     /**
      * These components are sent to the player for a set amount of seconds, in order of priority, and are removed after being shown.

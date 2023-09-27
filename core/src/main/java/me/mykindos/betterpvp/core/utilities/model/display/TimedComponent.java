@@ -1,8 +1,9 @@
-package me.mykindos.betterpvp.core.utilities.model.actionbar;
+package me.mykindos.betterpvp.core.utilities.model.display;
 
 import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.gamer.Gamer;
+import me.mykindos.betterpvp.core.utilities.UtilTime;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -14,11 +15,11 @@ import java.util.function.Function;
  * Represents a component that is shown on the action bar and expires after [seconds] seconds.
  */
 @Getter
-public final class TimedComponent extends DisplayComponent {
+public class TimedComponent extends DisplayComponent {
 
     private final double seconds;
     private final boolean waitToExpire;
-    private boolean hasStarted = false;
+    private long startTime = -1;
 
     /**
      * @param seconds      The amount of seconds to show the component for.
@@ -31,12 +32,21 @@ public final class TimedComponent extends DisplayComponent {
         this.waitToExpire = waitToExpire;
     }
 
+    public long getRemaining() {
+        long millisDuration = (long) (seconds * 1000);
+        return (startTime + millisDuration) - System.currentTimeMillis();
+    }
+
+    public boolean hasStarted() {
+        return startTime != -1;
+    }
+
     void startTime() {
-        if (hasStarted) {
+        if (hasStarted()) {
             return;
         }
 
-        hasStarted = true;
+        startTime = System.currentTimeMillis();
         Bukkit.getScheduler().runTaskLater(JavaPlugin.getPlugin(Core.class), () -> {
             setInvalid(true);
         }, (long) (seconds * 20L));

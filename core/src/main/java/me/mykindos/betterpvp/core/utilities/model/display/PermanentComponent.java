@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.utilities.model.actionbar;
+package me.mykindos.betterpvp.core.utilities.model.display;
 
 import me.mykindos.betterpvp.core.gamer.Gamer;
 import net.kyori.adventure.text.Component;
