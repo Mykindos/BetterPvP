@@ -32,10 +32,6 @@ public class GamerManager extends Manager<Gamer> {
         return objects.values().stream().filter(gamer -> gamer.getClient().getName().equalsIgnoreCase(name)).findFirst();
     }
 
-    public Collection<Gamer> getObjectsValues() {
-        return objects.values();
-    }
-
     @Override
     public void loadFromList(List<Gamer> objects) {
         objects.forEach(gamer -> {

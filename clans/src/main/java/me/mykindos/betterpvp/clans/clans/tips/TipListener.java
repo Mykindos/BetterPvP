@@ -48,26 +48,25 @@ public class TipListener extends ClanListener {
 
     @UpdateEvent(delay = 10 * 1000, isAsync = true)
     public void tipSender() {
-        gamerManager.getObjectsValues().forEach(gamer -> {
-            if (gamer.getPlayer() != null){
-                UtilServer.runTaskLaterAsync(clans, () -> UtilServer.callEvent(new TipEvent(gamer)), 5);
-            }
+        Bukkit.getOnlinePlayers().forEach(player -> {
+            UtilServer.runTaskLaterAsync(clans, () -> UtilServer.callEvent(new TipEvent(player)), 5);
         });
-
     }
 
     @EventHandler
     public void onTip(TipEvent event) {
-        Gamer gamer = event.getGamer();
-        Player player = gamer.getPlayer();
-        if (player != null) {
-            if ((boolean) gamer.getProperty(GamerProperty.TIPS_ENABLED).orElse(true) &&
-                    UtilTime.elapsed(gamer.getLastTip(), (long) timeBetweenTips * 1000) &&
-                    clanManager.getClanByPlayer(player).isEmpty() &&
-                    gamer.getPlayer() != null) {
-                UtilMessage.message(gamer.getPlayer(), "Tips", Component.text("You can create a Clan by running /c create <name>"));
-                gamer.setLastTip(System.currentTimeMillis());
-            }
+        Player player = event.getPlayer();
+        Optional<Gamer> gamerOptional = gamerManager.getObject(player.getUniqueId());
+        if (gamerOptional.isEmpty()) {
+            event.cancel("Gamer not found.");
+            return;
+        }
+        Gamer gamer = gamerOptional.get();
+        if ((boolean) gamer.getProperty(GamerProperty.TIPS_ENABLED).orElse(true) &&
+                UtilTime.elapsed(gamer.getLastTip(), (long) 1 * 1000) &&
+                clanManager.getClanByPlayer(player).isEmpty()) {
+            UtilMessage.message(player, "Tips", Component.text("You can create a Clan by running /c create <name>"));
+            gamer.setLastTip(System.currentTimeMillis());
         }
     }
 
