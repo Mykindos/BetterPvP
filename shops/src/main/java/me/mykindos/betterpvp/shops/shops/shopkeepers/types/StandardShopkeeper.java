@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.shops.shops.shopkeepers.types;
 
-import java.util.Objects;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -21,6 +20,8 @@ import org.bukkit.craftbukkit.v1_20_R1.entity.CraftEntity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 
 public class StandardShopkeeper extends Mob implements IShopkeeper{
 

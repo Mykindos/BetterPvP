@@ -85,7 +85,7 @@ public class RootingAxe extends Skill implements PassiveSkill, CooldownSkill {
             if (UtilBlock.airFoliage(blockUnder) && !UtilBlock.airFoliage(blockMoreUnder)) {
                 if (!UtilBlock.airFoliage(block) && !block.isLiquid() && !blockMoreUnder.isLiquid()) {
 
-                    if (championsManager.getCooldowns().add(damager, getName(), 11 - (level * 1.5), false)) {
+                    if (championsManager.getCooldowns().use(damager, getName(), 11 - (level * 1.5), false)) {
                         damagee.teleport(damagee.getLocation().add(0, -0.9, 0));
                         damagee.getWorld().playEffect(damagee.getLocation(), Effect.STEP_SOUND, damagee.getLocation().getBlock().getType());
                         damagee.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, (int) duration * 20, -5));

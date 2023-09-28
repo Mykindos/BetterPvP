@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.clans.settings.menus;
 
-import java.util.Optional;
 import me.mykindos.betterpvp.clans.settings.buttons.ClansSettingButton;
 import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.gamer.properties.GamerProperty;
@@ -12,6 +11,8 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.Optional;
 
 public class ClansSettingsMenu extends SettingSubMenu implements IRefreshingMenu {
 

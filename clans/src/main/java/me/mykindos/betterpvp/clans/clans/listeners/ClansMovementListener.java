@@ -77,11 +77,11 @@ public class ClansMovementListener extends ClanListener {
 
             if (locationClan.isAdmin()) {
                 if (locationClan.isSafe()) {
-                    component = Component.text(NamedTextColor.WHITE + locationClan.getName());
-                    append = UtilMessage.deserialize("<white>(<aqua>Safe</aqua>)</white>");
+                    component = Component.text(locationClan.getName(), NamedTextColor.WHITE);
+                    append = UtilMessage.deserialize(" <white>(<aqua>Safe</aqua>)</white>");
                 }
             } else if (relation == ClanRelation.ALLY_TRUST) {
-                append = UtilMessage.deserialize("<gray>(<yellow>Safe</yellow>)</gray>");
+                append = UtilMessage.deserialize(" <gray>(<yellow>Trusted</yellow>)</gray>");
             } else if (relation == ClanRelation.ENEMY) {
                 if (clan != null) {
                     append = UtilMessage.deserialize(clan.getDominanceString(locationClan));

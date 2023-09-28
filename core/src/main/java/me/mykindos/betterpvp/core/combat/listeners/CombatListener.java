@@ -85,20 +85,14 @@ public class CombatListener implements Listener {
 
     private void damage(CustomDamageEvent event) {
 
-        // TODO handle this elsewhere
-        //if (event.getDamagee() instanceof Sheep) {
-        //    Sheep sheep = (Sheep) event.getDamagee();
-        //    if (sheep.getCustomName() != null) {
-        //        event.setCancelled("Combat Log Sheep");
-        //        return;
-        //    }
-        //}
-
-
         if (event.getDamagee().getHealth() > 0) {
             if (event.getDamage() >= 0) {
 
                 damageDataList.add(new DamageData(event.getDamagee().getUniqueId().toString(), event.getCause(), event.getDamageDelay()));
+
+                if (isMythicMobsEnabled) {
+                    customDamageAdapter.processKnockbackAdapter(event, false);
+                }
 
                 if (event.isKnockback()) {
                     if (event.getDamager() != null) {

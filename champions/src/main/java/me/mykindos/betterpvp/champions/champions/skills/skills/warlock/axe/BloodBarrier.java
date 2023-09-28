@@ -2,8 +2,6 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.warlock.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.HashMap;
-import java.util.UUID;
 import lombok.Data;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
@@ -29,6 +27,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.PlayerDeathEvent;
+
+import java.util.HashMap;
+import java.util.UUID;
 
 @Singleton
 @BPvPListener

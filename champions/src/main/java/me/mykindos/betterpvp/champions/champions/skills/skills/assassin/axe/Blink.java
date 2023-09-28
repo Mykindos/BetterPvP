@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.WeakHashMap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -27,6 +26,8 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
+
+import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -118,14 +119,14 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
 
     public void deblink(Player player, boolean force) {
         UtilServer.runTaskLater(champions, () -> {
-            if (!championsManager.getCooldowns().isCooling(player, "Deblink") || force) {
+            if (!championsManager.getCooldowns().hasCooldown(player, "Deblink") || force) {
 
                 if (!force) {
                     UtilMessage.simpleMessage(player, getClassType().getName(), "You used <alt>Deblink " + getLevel(player) + "</alt>.");
                 } else {
                     UtilMessage.simpleMessage(player, getClassType().getName(), "The target location was invalid, Blink cooldown has been reduced.");
                     championsManager.getCooldowns().removeCooldown(player, "Blink", true);
-                    championsManager.getCooldowns().add(player, "Blink", 2, true);
+                    championsManager.getCooldowns().use(player, "Blink", 2, true);
                 }
 
                 Block lastSmoke = player.getLocation().getBlock();
@@ -227,7 +228,7 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
             player.leaveVehicle();
             player.teleport(finalLocation);
 
-            championsManager.getCooldowns().add(player, "Deblink", 0.25, false);
+            championsManager.getCooldowns().use(player, "Deblink", 0.25, false);
             player.getWorld().playEffect(player.getLocation(), Effect.BLAZE_SHOOT, 0);
         }, 1);
 

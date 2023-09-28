@@ -26,6 +26,10 @@ public class ResourcePackListener implements Listener {
     @Config(path = "resourcepack.force", defaultValue = "false")
     private boolean forceResourcePack;
 
+    @Inject
+    @Config(path = "resourcepack.enabled", defaultValue = "false")
+    private boolean resourcePackEnabled;
+
     private final Core core;
 
     @Inject
@@ -36,15 +40,19 @@ public class ResourcePackListener implements Listener {
     @EventHandler
     public void onClientLogin(ClientLoginEvent event) {
 
-        UtilServer.runTaskLater(core, () -> {
-            event.getPlayer().setResourcePack(resourcePackUrl, resourcePackSha);
-        }, 2L);
+        if(resourcePackEnabled) {
+            UtilServer.runTaskLater(core, () -> {
+                event.getPlayer().setResourcePack(resourcePackUrl, resourcePackSha);
+            }, 2L);
+        }
 
 
     }
 
     @EventHandler
     public void onTexturepackStatus(PlayerResourcePackStatusEvent e) {
+        if(!resourcePackEnabled) return;
+
         if (forceResourcePack) {
             if (e.getStatus() == PlayerResourcePackStatusEvent.Status.DECLINED) {
                 e.getPlayer().kick(Component.text("You must allow the resource pack"));

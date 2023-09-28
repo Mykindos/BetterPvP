@@ -2,10 +2,12 @@ create table if not exists ${tablePrefix}items
 (
     id       int auto_increment
         primary key,
-    Material varchar(255) not null,
-    Module   varchar(255) not null,
-    Name     varchar(255) not null,
-    Glow     tinyint      not null,
+    Material  varchar(255) not null,
+    Module    varchar(255) not null,
+    Name      varchar(255) not null,
+    ModelData int          not null default 0,
+    Glow      tinyint      not null,
+    hasUUID   tinyint      not null default 0,
     constraint items_uk
         unique (Material, Module)
 );

@@ -1,7 +1,5 @@
 package me.mykindos.betterpvp.clans.settings.buttons;
 
-import java.util.Optional;
-
 import me.mykindos.betterpvp.clans.settings.menus.ClansSettingsMenu;
 import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.menu.Button;

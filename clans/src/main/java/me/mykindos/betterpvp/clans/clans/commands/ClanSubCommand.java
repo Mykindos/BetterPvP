@@ -27,6 +27,10 @@ public abstract class ClanSubCommand extends Command {
         this.gamerManager = gamerManager;
     }
 
+    public String getUsage() {
+        return getName();
+    }
+
     @Override
     public void process(Player player, Client client, String... args) {
         if (!canExecuteWithoutClan()) {

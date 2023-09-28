@@ -15,6 +15,8 @@ import me.mykindos.betterpvp.shops.shops.shopkeepers.ShopkeeperManager;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.Arrays;
+
 @Singleton
 public class ShopsCommand extends Command implements IConsoleCommand {
 
@@ -74,7 +76,7 @@ public class ShopsCommand extends Command implements IConsoleCommand {
                 return;
             }
             
-            shopkeeperManager.saveShopkeeper(args[0], args[1], player.getLocation());
+            shopkeeperManager.saveShopkeeper(args[0], String.join(" ", Arrays.copyOfRange(args, 1, args.length)), player.getLocation());
             shopkeeperManager.loadShopsFromConfig();
         }
     }

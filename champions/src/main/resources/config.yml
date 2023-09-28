@@ -89,6 +89,12 @@ skills:
       maxlevel: 5
       cooldown: 15
       baseMultiplier: 1.6
+    ride:
+      enabled: true
+      cooldown: 30
+      maxlevel: 5
+      lifespan: 6.0
+      horseHealth: 5.0
     bullscharge:
       enabled: true
       cooldown: 14
