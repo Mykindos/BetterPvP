@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.warlock.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.WeakHashMap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillDequipEvent;
@@ -34,6 +33,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
+import java.util.WeakHashMap;
+
 @Singleton
 @BPvPListener
 public class Wreath extends PrepareSkill implements CooldownSkill {
@@ -57,11 +58,11 @@ public class Wreath extends PrepareSkill implements CooldownSkill {
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Right click with a sword to prepare.",
+                "Right click with a Sword to prepare",
                 "",
-                "Your next <val>" + numAttacks + "</val> attacks will release a barrage of teeth",
-                "that deal <val>" + String.format("%.2f", (2 + (level / 1.5))) + "</val> damage and",
-                "apply Slowness II to their target for <val>" + slowDuration + "</val> seconds.",
+                "Your next <stat>" + numAttacks + "</stat> attacks will release a barrage of",
+                "teeth that deal <val>" + String.format("%.2f", (2 + (level / 1.5))) + "</val> damage and apply <effect>Slowness II</effect>",
+                "to their target for <stat>" + slowDuration + "</stat> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -112,7 +113,7 @@ public class Wreath extends PrepareSkill implements CooldownSkill {
 
             if (actives.get(player) == 0) {
                 championsManager.getCooldowns().removeCooldown(player, getName(), true);
-                if (championsManager.getCooldowns().add(player, getName(), getCooldown(level), showCooldownFinished())) {
+                if (championsManager.getCooldowns().use(player, getName(), getCooldown(level), showCooldownFinished())) {
 
                 }
             }

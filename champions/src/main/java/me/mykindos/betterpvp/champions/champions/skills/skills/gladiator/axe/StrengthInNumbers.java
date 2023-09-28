@@ -38,13 +38,12 @@ public class StrengthInNumbers extends Skill implements InteractSkill, CooldownS
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Right click with a axe to activate.",
+                "Right click with an Axe to activate",
                 "",
-                "Grant all allies within <val>" + radius + "</val> blocks",
-                "Strength I for <val>" + (duration + level),
-                "seconds.",
+                "Grant all allies within <stat>" + radius + "</stat> blocks",
+                "<effect>Strength</effect> I for <val>" + (duration + level) + "</val> seconds",
                 "",
-                "This does not give you the buff.",
+                "This does not give you the buff",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
 

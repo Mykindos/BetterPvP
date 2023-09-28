@@ -33,7 +33,6 @@ public class ConfigInjectorModule extends AbstractModule {
 
             Config conf = new ConfigImpl(config.path(), config.defaultValue());
 
-
             Class<?> type = field.getType();
             if (type == List.class) {
                 bind(new TypeLiteral<List<String>>() {}).annotatedWith(conf).toProvider(getProvider(config.path(), config.defaultValue(), type));

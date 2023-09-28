@@ -1,7 +1,6 @@
 package me.mykindos.betterpvp.core.menu;
 
 import lombok.Data;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;

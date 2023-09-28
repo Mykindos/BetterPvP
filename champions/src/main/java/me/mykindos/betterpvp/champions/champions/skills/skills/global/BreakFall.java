@@ -33,7 +33,7 @@ public class BreakFall extends Skill implements PassiveSkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "You roll when you hit the ground.",
+                "You roll when you hit the ground",
                 "",
                 "Fall damage is reduced by <val>" + (damageReduction + level)};
     }

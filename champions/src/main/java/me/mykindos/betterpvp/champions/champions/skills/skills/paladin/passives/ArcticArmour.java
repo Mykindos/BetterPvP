@@ -2,9 +2,6 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.paladin.passives
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.UUID;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.types.ActiveToggleSkill;
@@ -27,6 +24,10 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.UUID;
 
 @Singleton
 @BPvPListener
@@ -52,13 +53,13 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Drop Axe/Sword to Toggle.",
+                "Drop your Sword / Axe to toggle",
                 "",
-                "Create a freezing area around you",
-                "in a <val>" + (minRadius + level) + "</val> Block radius. Allies inside",
-                "this area receive Protection I.",
-                "Enemies inside this area receive",
-                "Slowness I",
+                "Create a freezing area around",
+                "you in a <val>" + (minRadius + level) + "</val> Block radius",
+                "",
+                "Allies inside this area receive <effect>Protection I</effect>, and",
+                "enemies inside this area receive <effect>Slowness I</effect>",
                 "",
                 "Energy / Second: <val>" + getEnergy(level)
         };

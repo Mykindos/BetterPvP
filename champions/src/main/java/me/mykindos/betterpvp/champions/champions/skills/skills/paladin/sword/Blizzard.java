@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.paladin.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.WeakHashMap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
@@ -28,6 +27,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
+import java.util.WeakHashMap;
+
 @Singleton
 @BPvPListener
 public class Blizzard extends ChannelSkill implements InteractSkill, EnergySkill {
@@ -50,10 +51,11 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergySkill
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Hold Right click with a sword to activate.",
+                "Hold right click with a Sword to channel.",
                 "",
                 "While channeling, release a blizzard",
-                "that gives Slowness III to anyone hit for <val>" + slowDuration + "</val> seconds.",
+                "that gives <effect>Slowness III</effect> to anyone hit ",
+                "for <stat>" + slowDuration + "</stat> seconds",
                 "",
                 "Energy: <val>" + getEnergy(level)
         };

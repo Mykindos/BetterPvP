@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.warlock.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.*;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -33,6 +32,8 @@ import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
 
+import java.util.*;
+
 @Singleton
 @BPvPListener
 public class Grasp extends Skill implements InteractSkill, CooldownSkill, Listener {
@@ -54,14 +55,13 @@ public class Grasp extends Skill implements InteractSkill, CooldownSkill, Listen
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Right click with a sword to activate.",
+                "Right click with a Sword to activate",
                 "",
-                "Create a wall of skulls that closes in on you from a distance",
-                "and drags all enemies with it.",
+                "Create a wall of skulls that closes in on",
+                "you from <val>" + (10 + ((level * 10) / 2)) +"</val> blocks away, dragging along",
+                "all enemies and dealing <val>" + (1 + (level - 1)) +"</val> damage",
                 "",
-                "Cooldown: <val>" + getCooldown(level),
-                "Max range: <val>" + (10 + ((level * 10) / 2)),
-                "Damage: <val>" + (1 + (level - 1))
+                "Cooldown: <val>" + getCooldown(level)
 
         };
     }

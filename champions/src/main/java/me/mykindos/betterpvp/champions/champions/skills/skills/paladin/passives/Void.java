@@ -2,8 +2,6 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.paladin.passives
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.Iterator;
-import java.util.UUID;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.types.ActiveToggleSkill;
@@ -21,6 +19,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+
+import java.util.Iterator;
+import java.util.UUID;
 
 @Singleton
 @BPvPListener
@@ -43,13 +44,13 @@ public class Void extends ActiveToggleSkill implements EnergySkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Drop Axe/Sword to Toggle.",
+                "Drop your Sword / Axe to toggle",
                 "",
                 "While in void form, you receive",
-                "Slownesss III, and take no Knockback",
+                "<effect>Slownesss III</effect>, and take no Knockback",
                 "",
-                "Reduces incoming damage by <val>" + damageReduction + "</val>, but",
-                "burns <val>" + energyReduction + "</val> of your energy",
+                "Reduces incoming damage by <stat>" + damageReduction + "</stat>,",
+                "but burns <stat>" + energyReduction + "</stat> of your energy",
                 "",
                 "Energy / Second: <val>" + getEnergy(level)
         };

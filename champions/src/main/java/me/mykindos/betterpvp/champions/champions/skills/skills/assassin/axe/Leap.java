@@ -41,9 +41,13 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Right click with a axe to activate.",
+                "Right click with an Axe to activate.",
                 "",
-                "You take a great leap",
+                "Take a great leap forward",
+                "",
+                "Activate while your back is to a wall to perform",
+                "a wall-kick, which will not affect the cooldown",
+                "",
                 "Cooldown: <val>" + getCooldown(level)
         };
     }
@@ -73,7 +77,7 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
 
     public boolean wallKick(Player player) {
 
-        if (championsManager.getCooldowns().add(player, "Wall Kick", 0.25, false)) {
+        if (championsManager.getCooldowns().use(player, "Wall Kick", 0.25, false)) {
             Vector vec = player.getLocation().getDirection();
 
             boolean xPos = true;
@@ -98,7 +102,9 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
                                 if (back.getLocation().getY() == Math.floor(player.getLocation().getY())
                                         || back.getLocation().getY() == Math.floor(player.getLocation().getY() - 0.25)) {
                                     if (UtilBlock.airFoliage(back.getRelative(BlockFace.UP).getType())) {
-                                        continue;
+                                        if (!UtilBlock.airFoliage(player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType())) {
+                                            continue;
+                                        }
                                     }
                                 }
                                 Block forward = null;

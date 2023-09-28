@@ -2,25 +2,25 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.knight.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-
-import java.util.Collection;
-import java.util.List;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.combat.events.PlayerCheckShieldEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
-import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.*;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
-import org.bukkit.*;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -30,6 +30,9 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
+
+import java.util.Collection;
+import java.util.List;
 
 @Singleton
 @BPvPListener
@@ -51,8 +54,10 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Smash your shield into an enemy",
-                "dealing <val>" + (int) (getKnockbackMultiplier(level) * 100) + "%</val> knockback.",
+                "Right click with an Axe to activate",
+                "",
+                "Smash your shield into an enemy,",
+                "dealing <val>" + (int) (getKnockbackMultiplier(level) * 100) + "%</val> knockback",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -80,7 +85,7 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
         }
     }
 
-    private double getKnockbackMultiplier(int level){
+    private double getKnockbackMultiplier(int level) {
         return baseMultiplier + ((level - 1) * 0.2);
     }
 
@@ -95,7 +100,7 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
         final Location bashLocation = player.getLocation().add(0, 0.8, 0);
         bashLocation.add(player.getLocation().getDirection().setY(0).normalize().multiply(1.5));
 
-        if(player.getInventory().getItemInOffHand().getType() != Material.SHIELD) {
+        if (player.getInventory().getItemInOffHand().getType() != Material.SHIELD) {
             var shield = new ItemStack(Material.SHIELD);
             player.getInventory().setItemInOffHand(shield);
         }
@@ -115,7 +120,7 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
             final LivingEntity ent = bashedEntry.getKey();
 
             // Add velocity and damage
-            UtilVelocity.velocity(ent, direction,  strength,false, 0, 0.3, 0.8 + 0.05 * level, true);
+            UtilVelocity.velocity(ent, direction, strength, false, 0, 0.3, 0.8 + 0.05 * level, true);
             UtilDamage.doCustomDamage(new CustomDamageEvent(ent, player, null, EntityDamageEvent.DamageCause.FALL, 0.0, false, getName()));
 
             // Cancel fall damage if they're friendly
@@ -136,13 +141,13 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
 
     }
 
-    @UpdateEvent(delay = 100)
-    public void onCheckShield() {
-        for(Player player : Bukkit.getOnlinePlayers()) {
-            if(hasSkill(player)) {
-                if(player.getInventory().getItemInOffHand().getType() != Material.SHIELD) {
-                    player.getInventory().setItemInOffHand(new ItemStack(Material.SHIELD));
-                }
+    @EventHandler
+    public void onShieldCheck(PlayerCheckShieldEvent event) {
+        Player player = event.getPlayer();
+        if (hasSkill(player)) {
+            if(UtilItem.isAxe(event.getPlayer().getInventory().getItemInMainHand().getType())) {
+                event.setShouldHaveShield(true);
+                event.setCustomModelData(0);
             }
         }
     }

@@ -13,7 +13,6 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -70,7 +69,7 @@ public class ClansMovementListener extends ClanListener {
             clan = clanOptional.get();
         }
 
-        String append = "";
+        Component append = Component.empty();
 
         if (locationClan != null) {
             ClanRelation relation = clanManager.getRelation(clan, locationClan);
@@ -78,33 +77,26 @@ public class ClansMovementListener extends ClanListener {
 
             if (locationClan.isAdmin()) {
                 if (locationClan.isSafe()) {
-                    component = Component.text(NamedTextColor.WHITE + locationClan.getName());
-                    append = NamedTextColor.WHITE + " (" + NamedTextColor.AQUA + "Safe" + NamedTextColor.WHITE + ")";
+                    component = Component.text(locationClan.getName(), NamedTextColor.WHITE);
+                    append = UtilMessage.deserialize(" <white>(<aqua>Safe</aqua>)</white>");
                 }
             } else if (relation == ClanRelation.ALLY_TRUST) {
-                append = NamedTextColor.GRAY + " (" + NamedTextColor.YELLOW + "Trusted" + NamedTextColor.GRAY + ")";
-
+                append = UtilMessage.deserialize(" <gray>(<yellow>Trusted</yellow>)</gray>");
             } else if (relation == ClanRelation.ENEMY) {
                 if (clan != null) {
-                    append = clan.getDominanceString(locationClan);
+                    append = UtilMessage.deserialize(clan.getDominanceString(locationClan));
                 }
-
             }
         }
 
         if (locationClan != null) {
             if (locationClan.getName().equals("Fields") || locationClan.getName().equals("Lake")) {
-                append = NamedTextColor.RED.toString() + TextDecoration.BOLD + "                    Warning! "
-                        + NamedTextColor.GRAY + TextDecoration.BOLD + "PvP Hotspot";
+                append = UtilMessage.deserialize("<red><bold>                    Warning! <gray> PvP Hotspot</gray></bold></red>");
             }
 
-            UtilMessage.simpleMessage(player, "Territory",
-                    component.append(Component.text(append)),
-                    clanManager.getClanTooltip(player, locationClan)
-            );
-
+            UtilMessage.simpleMessage(player, "Territory", component.append(append), clanManager.getClanTooltip(player, locationClan));
         } else {
-            UtilMessage.message(player, "Territory", component.append(Component.text(append)));
+            UtilMessage.message(player, "Territory", component.append(append));
         }
 
     }

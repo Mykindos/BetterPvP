@@ -1,9 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.passives;
 
 
-import java.util.Optional;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -21,6 +18,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.util.Optional;
 
 @Singleton
 @BPvPListener
@@ -41,8 +42,8 @@ public class Backstab extends Skill implements PassiveSkill, Listener {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Hitting an enemy from behind will increased",
-                "your damage dealt by <val>" + (2 + level) + "0%"};
+                "Hitting an enemy from behind will",
+                "increase your damage by <val>" + (2 + level) + "0%"};
     }
 
     @EventHandler

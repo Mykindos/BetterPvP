@@ -3,7 +3,6 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.knight.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.WeakHashMap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
@@ -29,6 +28,8 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.util.Vector;
 
+import java.util.WeakHashMap;
+
 @Singleton
 @BPvPListener
 public class DefensiveStance extends ChannelSkill implements InteractSkill, EnergySkill {
@@ -51,13 +52,13 @@ public class DefensiveStance extends ChannelSkill implements InteractSkill, Ener
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Hold Block with a sword to Channel.",
+                "Hold right click with a Sword to channel",
                 "",
-                "While active, you are immune to all",
-                "melee damage from attacks infront of you.",
+                "While active, you are immune to all melee",
+                "damage from attacks in front of you",
                 "",
-                "Players who attack you receive <val>" + damage + "</val> damage,",
-                "and get knocked back.",
+                "Players who attack you receive <stat>" + damage + "</stat> damage,",
+                "and get knocked back",
                 "",
                 "Energy / Second: <val>" + getEnergy(level)};
     }

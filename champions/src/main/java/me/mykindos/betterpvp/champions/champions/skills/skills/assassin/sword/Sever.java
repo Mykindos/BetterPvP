@@ -1,7 +1,5 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.sword;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.roles.events.RoleChangeEvent;
@@ -22,6 +20,9 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 @Singleton
 @BPvPListener
 public class Sever extends PrepareSkill implements CooldownSkill, Listener {
@@ -40,7 +41,7 @@ public class Sever extends PrepareSkill implements CooldownSkill, Listener {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Right click with a sword to activate",
+                "Right click with a Sword to prepare",
                 "",
                 "Your next hit applies a <val>" + (level) + "</val> second <effect>Bleed</effect>",
                 "dealing <stat>1</stat> heart per second",
@@ -84,7 +85,7 @@ public class Sever extends PrepareSkill implements CooldownSkill, Listener {
         active.remove(player.getUniqueId());
 
         championsManager.getCooldowns().removeCooldown(player, getName(), true);
-        championsManager.getCooldowns().add(player, getName(), getCooldown(level), showCooldownFinished());
+        championsManager.getCooldowns().use(player, getName(), getCooldown(level), showCooldownFinished());
     }
 
     private void runSever(Player damager, Player damagee, int level) {
@@ -96,7 +97,7 @@ public class Sever extends PrepareSkill implements CooldownSkill, Listener {
                 if (count >= (level) || damagee == null || damager == null || damagee.getHealth() <= 0) {
                     this.cancel();
                 } else {
-                    if (championsManager.getCooldowns().add(damagee, "Sever-Damage", 0.75, false)) {
+                    if (championsManager.getCooldowns().use(damagee, "Sever-Damage", 0.75, false)) {
                         UtilDamage.doCustomDamage(new CustomDamageEvent(damagee, damager, null,
                                 DamageCause.CUSTOM, 1.5, false, getName()));
                     }

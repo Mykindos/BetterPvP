@@ -2,9 +2,6 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.warlock.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ListIterator;
 import lombok.Data;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
@@ -28,6 +25,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
 
 @Singleton
 @BPvPListener
@@ -54,13 +55,14 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Right click with a axe to activate.",
+                "Right click with an Axe to activate",
                 "",
                 "Corrupt the earth around you, creating a ring that",
-                "debuffs enemies within it for <val>" + duration + "</val> seconds.",
-                "Players within the ring take <val>" + (damageIncrease * 100) + "%</val> more damage.",
+                "debuffs enemies within it for <stat>" + duration + "</stat> seconds.",
+                "Players within the ring take <stat>" + (damageIncrease * 100) + "%</stat> more damage.",
                 "",
-                "Range: <val>" + (radius + (level / 2)) + "</val> blocks.",
+                "Range: <val>" + (radius + (level / 2.0)) + "</val> blocks.",
+                "",
                 "Cooldown: <val>" + getCooldown(level)
         };
     }

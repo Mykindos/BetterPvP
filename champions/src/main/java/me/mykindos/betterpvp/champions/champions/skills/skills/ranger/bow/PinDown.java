@@ -10,7 +10,10 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
-import org.bukkit.*;
+import org.bukkit.Effect;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -36,9 +39,10 @@ public class PinDown extends PrepareArrowSkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Left click with a bow to instantly fire",
-                "an arrow, which gives anybody hit ",
-                "Slowness IV for <val>" + (level * 1.5) + "</val> seconds.",
+                "Left click with a Bow to activate",
+                "",
+                "Quickly launch an arrow that gives enemies",
+                "<effect>Slowness IV</effect> for <val>" + (level * 1.5) + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };

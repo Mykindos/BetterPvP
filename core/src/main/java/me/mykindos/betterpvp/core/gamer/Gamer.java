@@ -10,8 +10,11 @@ import me.mykindos.betterpvp.core.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.gamer.properties.GamerPropertyUpdateEvent;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.model.display.ActionBar;
+import me.mykindos.betterpvp.core.utilities.model.display.TitleQueue;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
@@ -25,6 +28,8 @@ public class Gamer extends PropertyContainer implements Invitable, IMapListener 
 
     private final Client client;
     private final String uuid;
+    private ActionBar actionBar = new ActionBar();
+    private TitleQueue titleQueue = new TitleQueue();
 
     private long lastDamaged;
 
@@ -34,8 +39,20 @@ public class Gamer extends PropertyContainer implements Invitable, IMapListener 
         properties.registerListener(this);
     }
 
+    public @Nullable Player getPlayer() {
+        return Bukkit.getPlayer(UUID.fromString(uuid));
+    }
+
+    public boolean isOnline() {
+        return getPlayer() != null;
+    }
+
     public int getBalance() {
         return (int) getProperty(GamerProperty.BALANCE).orElse(0);
+    }
+
+    public int getIntProperty(Enum<?> key) {
+        return (int) getProperty(key).orElse(0);
     }
 
     @Override

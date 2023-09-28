@@ -11,7 +11,6 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -36,13 +35,14 @@ public class LevelField extends Skill implements PassiveSkill, Listener {
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "For every enemy within <val>" + radius + "</val> blocks,",
+                "For every enemy within <stat>" + radius + "</stat> blocks,",
                 "You deal <val>" +  (10 + ((level - 1) * 5)) + ".0%</val> extra damage",
-                "Up to a maximum of <val>60%</val> extra damage",
                 "",
-                "For every ally within <val>" + radius + "</val> blocks,",
+                "For every ally <stat>" + radius + "</stat> blocks,",
                 "You deal <val>" + (10 + ((level - 1) * 5)) + ".0%</val> less damage",
-                "Down to a minimum of <val>" + (60 - ((level - 1) * 15)) + "%</val> less damage"
+                "",
+                "Maximum extra damage: <stat>60%",
+                "Minimum extra damage: <val>"+ (60 - ((level - 1) * 15)),
         };
     }
 

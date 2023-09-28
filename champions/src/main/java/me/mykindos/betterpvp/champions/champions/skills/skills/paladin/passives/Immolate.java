@@ -2,8 +2,6 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.paladin.passives
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.Iterator;
-import java.util.UUID;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.types.ActiveToggleSkill;
@@ -28,6 +26,9 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
+import java.util.Iterator;
+import java.util.UUID;
+
 @Singleton
 @BPvPListener
 public class Immolate extends ActiveToggleSkill implements EnergySkill {
@@ -47,14 +48,13 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Drop Axe/Sword to Toggle.",
+                "Drop your Sword / Axe to toggle",
                 "",
-                "Ignite yourself in flaming fury.",
-                "You receive Speed II and",
-                "Fire Resistance",
+                "Ignite yourself in flaming fury, gaining",
+                "<effect>Speed II</effect> and <effect>Fire Resistance</effect>",
                 "",
                 "You leave a trail of fire, which",
-                "burns players that go near it.",
+                "burns players that go near it",
                 "",
                 "Energy / Second: <val>" + getEnergy(level)
 

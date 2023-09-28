@@ -1,10 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.passives;
 
 
-import java.util.ArrayList;
-import java.util.List;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -21,6 +17,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.util.ArrayList;
+import java.util.List;
 
 @Singleton
 @BPvPListener
@@ -46,8 +47,7 @@ public class SilencingStrikes extends Skill implements PassiveSkill, Listener {
 
         return new String[]{
                 "Hit a player <stat>" + hitsNeeded + "</stat> consecutive times without letting",
-                "<stat>" + timeSpan + "</stat> seconds pass.",
-                "to <effect>Silence</effect> them for <val>" + (level) + "</val> seconds."
+                "<stat>" + timeSpan + "</stat> seconds pass to <effect>Silence</effect> them for <val>" + (level) + "</val> seconds"
         };
     }
 

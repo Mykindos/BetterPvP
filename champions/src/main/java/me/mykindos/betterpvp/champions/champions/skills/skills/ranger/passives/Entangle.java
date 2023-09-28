@@ -36,8 +36,8 @@ public class Entangle extends Skill implements PassiveSkill {
     @Override
     public String[] getDescription(int level) {
         return new String[] {
-                "Your arrows apply Slowness II",
-                "to any damageable target for <val>" + (baseDuration + (level * 0.5)) + "</val> seconds"
+                "Your arrows apply <effect>Slowness II</effect> to any",
+                "damageable target for <val>" + (baseDuration + (level * 0.5)) + "</val> seconds"
         };
     }
 

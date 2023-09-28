@@ -253,12 +253,8 @@ public class ClanManager extends Manager<Clan> {
 
         return relation != ClanRelation.SELF && relation != ClanRelation.ALLY && relation != ClanRelation.ALLY_TRUST;
     }
-
+    
     public boolean canCast(Player player) {
-        return canCast(player, true);
-    }
-
-    public boolean canCast(Player player, boolean message) {
         Optional<Clan> locationClanOptional = getClanByLocation(player.getLocation());
         if (locationClanOptional.isPresent()) {
             Clan locationClan = locationClanOptional.get();
@@ -274,9 +270,6 @@ public class ClanManager extends Manager<Clan> {
                     }
                 }
 
-                if (message) {
-                    UtilMessage.message(player, "Restriction", "You are not allowed to cast abilities here!");
-                }
                 return false;
             }
         }

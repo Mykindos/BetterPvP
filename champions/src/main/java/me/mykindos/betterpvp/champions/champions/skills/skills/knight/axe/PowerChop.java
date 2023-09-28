@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.knight.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.WeakHashMap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
@@ -23,6 +22,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+
+import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -47,12 +48,14 @@ public class PowerChop extends PrepareSkill implements CooldownSkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Put more strength into your",
-                "next axe attack, causing it",
-                "to deal <val>" + (Math.max(1, (level + 2))) + "</val> bonus damage.",
+                "Right click with an Axe to prepare",
                 "",
-                "Attack must be made within",
-                "<val>" + timeToHit + "</val> seconds of being used.",
+
+                "Your next axe attack will",
+                "deal <val>" + (Math.max(1, (level + 2))) + "</val> bonus damage.",
+                "",
+                "The attack must be made within",
+                "<stat>" + timeToHit + "</stat> seconds of being used",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };

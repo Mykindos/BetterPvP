@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.WeakHashMap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
@@ -24,6 +23,8 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
+
+import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -48,14 +49,12 @@ public class Disengage extends PrepareSkill implements CooldownSkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Right click with a sword to prepare",
+                "Right click with a Sword to prepare",
                 "",
-                "If you are attacked",
-                "within <val>" + (level * 0.5) + "</val> seconds you successfully disengage",
-                "",
-                "If successful, you leap backwards",
-                "and your attacker receives Slowness IV",
-                "for <val>" + (baseSlowDuration + level) + "</val> seconds.",
+                "If you are attacked within <val>" + (level * 0.5) + "</val> seconds",
+                "you successfully disengage, leaping backwards",
+                "and giving your attacker <effect>Slowness IV</effect> for",
+                "<val>" + (baseSlowDuration + level) + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)};
     }

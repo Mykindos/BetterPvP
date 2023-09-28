@@ -1,9 +1,5 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.knight.axe;
 
-import java.util.HashMap;
-import java.util.UUID;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -29,6 +25,11 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.util.HashMap;
+import java.util.UUID;
+
 @Singleton
 @BPvPListener
 public class BullsCharge extends Skill implements Listener, InteractSkill, CooldownSkill {
@@ -50,12 +51,12 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Right click with an Axe to activate.",
+                "Right click with an Axe to activate",
                 "",
-                "Enter a rage, gaining massive movement speed",
-                "and giving Slowness III to anything you hit for <val>" + slowDuration + "</val> seconds",
+                "Enter a rage, gaining <effect>Speed II</effect>",
+                "and giving <effect>Slowness III</effect> to anything you hit for <stat>" + slowDuration + "</stat> seconds",
                 "",
-                "While charging, you take no knockback.",
+                "While charging, you take no knockback",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };

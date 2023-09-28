@@ -1,10 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.passives;
 
 
-import java.util.HashSet;
-import java.util.WeakHashMap;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -20,6 +16,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.util.HashSet;
+import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -46,12 +47,13 @@ public class RepeatedStrikes extends Skill implements PassiveSkill, Listener {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Each time you attack, your damage",
-                "increases by <stat>" + damageIncrement + "</stat>",
-                "You can deal up to <val>" + (level * damageIncrement) + "</val> bonus damage.",
+                "Each time you attack, your",
+                "damage increases by <stat>" + damageIncrement + "</stat>",
                 "",
-                "Not attacking for <stat>" + duration + "</stat> seconds clears",
-                "your bonus damage."};
+                "You can deal up to <val>" + (level * damageIncrement) + "</val> bonus damage",
+                "",
+                "Not attacking for <stat>" + duration + "</stat> seconds",
+                "will reset your bonus damage"};
     }
 
     @Override

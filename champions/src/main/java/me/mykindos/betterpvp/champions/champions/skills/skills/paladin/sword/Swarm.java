@@ -3,11 +3,6 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.paladin.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.ListIterator;
-import java.util.Map.Entry;
-import java.util.WeakHashMap;
 import lombok.Data;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
@@ -38,6 +33,12 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.ListIterator;
+import java.util.Map.Entry;
+import java.util.WeakHashMap;
+
 @Singleton
 @BPvPListener
 public class Swarm extends ChannelSkill implements InteractSkill, EnergySkill, Listener {
@@ -63,11 +64,11 @@ public class Swarm extends ChannelSkill implements InteractSkill, EnergySkill, L
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Hold Block with a sword to Channel",
+                "Hold right click with a Sword to channel",
                 "",
-                "Release a swarm of bats",
-                "which damage, and knockback",
-                "any enemies they come in contact with",
+                "Release a swarm of bats which",
+                "damage and knock back any enemies",
+                "they come in contact with",
                 "",
                 "Energy: <val>" + getEnergy(level)
         };

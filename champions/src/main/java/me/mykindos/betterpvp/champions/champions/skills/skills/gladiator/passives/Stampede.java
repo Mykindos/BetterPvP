@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.gladiator.passiv
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.WeakHashMap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -22,6 +21,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+
+import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -48,12 +49,12 @@ public class Stampede extends Skill implements PassiveSkill {
 
         return new String[]{
                 "You slowly build up speed as you",
-                "sprint. You gain a level of Speed",
+                "sprint, gaining one level of <effect>Speed</effect>",
                 "for every <val>" + (durationPerStack - level) + "</val> seconds, up to a max",
-                "of Speed III.",
+                "of <effect>Speed II</effect>",
                 "",
                 "Attacking during stampede deals",
-                "<val>" + damage + "</val> bonus damage per speed level."};
+                "<stat>" + damage + "</stat> bonus damage per speed level"};
     }
 
     @Override
@@ -125,6 +126,6 @@ public class Stampede extends Skill implements PassiveSkill {
     @Override
     public void loadSkillConfig() {
         durationPerStack = getConfig("durationPerStack", 8.0, Double.class);
-        damage = getConfig("durationPerStack", 2.0, Double.class);
+        damage = getConfig("damageMultiplier", 2.0, Double.class);
     }
 }

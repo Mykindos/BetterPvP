@@ -15,7 +15,10 @@ import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Effect;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -43,10 +46,11 @@ public class BattleTaunt extends ChannelSkill implements InteractSkill, Cooldown
     @Override
     public String[] getDescription(int level) {
 
-        return new String[]{"Hold Block with a sword to Channel.",
+        return new String[]{
+                "Hold right click with a Sword to channel",
                 "",
                 "While channelling, any enemies within <val>" + (2 + level) + "</val> blocks",
-                "are slowly pulled in towards you",
+                "get slowly pulled towards you",
                 "",
                 "Energy / Second: <val>" + getEnergy(level)};
     }

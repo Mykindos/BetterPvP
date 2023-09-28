@@ -1,8 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.sword;
 
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillDequipEvent;
@@ -21,6 +19,9 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 @Singleton
 @BPvPListener
@@ -42,9 +43,9 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener 
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Right click with a sword to activate.",
+                "Right click with a Sword to prepare",
                 "",
-                "Your next hit blinds the target for <val>" + (durationPerLevel * level) + "</val> seconds.",
+                "Your next hit will <effect>Blind</effect> the target for <val>" + (durationPerLevel * level) + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };

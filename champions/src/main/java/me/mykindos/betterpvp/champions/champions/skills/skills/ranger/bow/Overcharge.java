@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.bow;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.*;
 import lombok.Data;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
@@ -32,6 +31,8 @@ import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.meta.CrossbowMeta;
 
+import java.util.*;
+
 @Singleton
 @BPvPListener
 public class Overcharge extends Skill implements InteractSkill, Listener {
@@ -59,8 +60,10 @@ public class Overcharge extends Skill implements InteractSkill, Listener {
     public String[] getDescription(int level) {
 
         return new String[]{
+                "Hold right click with a Bow to use",
+                "",
                 "Draw back harder on your bow, giving",
-                "<val>" + damageIncrement + "</val> bonus damage per <val>" + durationIncrement + "</val> seconds",
+                "<stat>" + damageIncrement + "</stat> bonus damage per <stat>" + durationIncrement + "</stat> seconds",
                 "",
                 "Maximum Damage: <val>" + (2 + level)
         };

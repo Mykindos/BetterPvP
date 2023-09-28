@@ -2,9 +2,6 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.Iterator;
-import java.util.UUID;
-import java.util.WeakHashMap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
@@ -31,6 +28,10 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.util.Vector;
 
+import java.util.Iterator;
+import java.util.UUID;
+import java.util.WeakHashMap;
+
 @Singleton
 @BPvPListener
 public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill, EnergySkill {
@@ -52,15 +53,16 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Hold right click with a sword to activate.",
+                "Hold right click with a Sword to channel",
                 "",
-                "While evading you block attacks, and",
-                "teleport behind the attacker.",
-                "Crouch and Evade to teleport backwards.",
+                "If a player hits you while evading,",
+                "you will teleport behind the attacker",
                 "",
-                "<val>" + getCooldown(level) + "</val> second internal cooldown.",
+                "Hold Crouch while Evading to teleport backwards",
                 "",
-                "Energy / second: <val>" + (10 * getEnergy(level))};
+                "<stat>" + getCooldown(level) + "</stat> second internal cooldown",
+                "",
+                "Energy / Second: <val>" + (10 * getEnergy(level))};
     }
 
     @Override

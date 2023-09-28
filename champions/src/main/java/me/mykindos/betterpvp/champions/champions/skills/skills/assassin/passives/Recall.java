@@ -21,7 +21,10 @@ import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Effect;
+import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -49,12 +52,10 @@ public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listene
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Drop Sword / Axe to Activate",
+                "Drop your Sword / Axe to activate",
                 "",
-                "Teleports you back to where you ",
-                "were located <val>" + (1.5 + (level)) + "</val> seconds ago",
-                "Increases health by <stat>" + (percentHealthRecovered * 100) + "%</stat> of the health you had",
-                "<val>" + (1.5 + (level)) + "</val> seconds ago",
+                "Teleports you back in time <val>" + (1.5 + (level)) + "</val> seconds, increasing",
+                "your health by <stat>" + (percentHealthRecovered * 100) + "%</stat> of the health you had",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };

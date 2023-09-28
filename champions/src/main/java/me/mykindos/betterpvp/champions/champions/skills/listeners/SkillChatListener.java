@@ -1,8 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.skills.listeners;
 
 import com.google.inject.Inject;
-import java.util.Map;
-import java.util.Optional;
 import me.mykindos.betterpvp.champions.champions.builds.menus.SkillMenu;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.SkillManager;
@@ -21,6 +19,9 @@ import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+
+import java.util.Map;
+import java.util.Optional;
 
 @BPvPListener
 public class SkillChatListener implements Listener {

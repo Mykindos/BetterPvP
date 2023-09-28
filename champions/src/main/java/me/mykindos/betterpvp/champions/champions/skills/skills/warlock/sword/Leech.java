@@ -2,8 +2,6 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.warlock.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.Data;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
@@ -32,6 +30,9 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Singleton
 @BPvPListener
 public class Leech extends PrepareSkill implements CooldownSkill {
@@ -57,13 +58,14 @@ public class Leech extends PrepareSkill implements CooldownSkill {
 
     @Override
     public String[] getDescription(int level) {
-        return new String[]{"Right click with a sword to activate.",
+        return new String[]{
+                "Right click with a Sword to activate",
                 "",
-                "Create a soul link between all enemies within <val>" + range + "</val> blocks",
-                "of your target, and all enemies within <val>" + range + "</val> blocks of them and within <val>" + maxRangeFromCaster + "</val> blocks of you",
+                "Create a soul link between all enemies within",
+                "<stat>" + range + "</stat> blocks of your target, and all enemies within",
+                "<stat>" + range + "</stat> blocks of them and within <stat>" + maxRangeFromCaster + "</stat> blocks of you",
                 "",
-                "Linked targets have <val>" + leechedHealth + "</val> health leeched per second.",
-                "All leeched health is given to the caster.",
+                "Linked targets have <stat>" + leechedHealth + "</stat> health leeched per second",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -88,7 +90,7 @@ public class Leech extends PrepareSkill implements CooldownSkill {
             active.remove(damager.getUniqueId());
 
             championsManager.getCooldowns().removeCooldown(damager, getName(), true);
-            championsManager.getCooldowns().add(damager, getName(), getCooldown(level), showCooldownFinished());
+            championsManager.getCooldowns().use(damager, getName(), getCooldown(level), showCooldownFinished());
         }
 
     }

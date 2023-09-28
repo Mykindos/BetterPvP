@@ -3,7 +3,6 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.knight.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.HashMap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
@@ -29,6 +28,8 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.HashMap;
+
 @Singleton
 @BPvPListener
 public class Riposte extends PrepareSkill implements CooldownSkill, Listener {
@@ -52,10 +53,11 @@ public class Riposte extends PrepareSkill implements CooldownSkill, Listener {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Right click with a sword to activate.",
+                "Right click with a Sword to activate",
                 "",
-                "Reduce all melee damage by <val>" + (damageReduction * 100) + "%</val> for <val>" + (1 + (level * 0.5)) + "</val> seconds.",
-                "Impervious to knockback while active.",
+                "Reduce all melee damage by <stat>" + (damageReduction * 100) + "%</stat> for <val>" + (1 + (level * 0.5)) + "</val> seconds",
+                "",
+                "You are impervious to knockback while active",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };

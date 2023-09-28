@@ -2,9 +2,6 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.warlock.passives
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 import lombok.Data;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
@@ -22,6 +19,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @Singleton
 @BPvPListener
@@ -42,12 +43,13 @@ public class SoulHarvest extends Skill implements PassiveSkill {
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Harvest the soul of nearby dead players.",
+                "When enemies die, they will drop a soul",
+                "which is only visible to Warlocks",
                 "",
-                "Collected souls give bursts of Speed II and Regeneration II.",
-                "Souls are visible by Warlocks only",
+                "Collected souls give bursts of",
+                "<effect>Speed II</effect> and <effect>Regeneration II</effect>",
                 "",
-                "Buff duration: <val>" + ((40 + (level * 20)) / 20) + "</val> seconds."
+                "Buff duration: <val>" + ((40 + (level * 20)) / 20) + "</val> seconds"
         };
     }
 

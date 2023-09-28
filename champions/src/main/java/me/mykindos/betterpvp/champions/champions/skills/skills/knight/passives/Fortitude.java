@@ -3,8 +3,6 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.knight.passives;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.HashSet;
-import java.util.WeakHashMap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -20,6 +18,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+
+import java.util.HashSet;
+import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -47,10 +48,8 @@ public class Fortitude extends Skill implements PassiveSkill, Listener {
         return new String[]{
                 "After taking damage, you slowly",
                 "regenerate up to <val>" + (3 + (level - 1)) + "</val> health, at a",
-                "rate of <val>" + heal + "</val> health per second.",
-                "",
-                "This does not stack, and is reset",
-                "if you are hit again."};
+                "rate of <stat>" + heal + "</stat> health per second"
+        };
     }
 
     @Override

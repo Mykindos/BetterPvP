@@ -3,7 +3,6 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.paladin.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.WeakHashMap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
@@ -34,6 +33,8 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
+import java.util.WeakHashMap;
+
 @Singleton
 @BPvPListener
 public class Inferno extends ChannelSkill implements InteractSkill, EnergySkill {
@@ -56,10 +57,10 @@ public class Inferno extends ChannelSkill implements InteractSkill, EnergySkill 
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Hold Block with a sword to Channel.",
+                "Hold right click with a Sword to chennel",
                 "",
-                "You spray fire at high speed,",
-                "igniting anything it hits for <val>" + ((double)fireTicks/ (double)20) + "</val> seconds.",
+                "You spray fire at high speed igniting",
+                "anything it hits for <stat>" + ((double)fireTicks/ (double)20) + "</stat> seconds",
                 "",
                 "Energy / Second: <val>" + getEnergy(level)
         };

@@ -1,11 +1,5 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.passives;
 
-import java.util.Iterator;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.WeakHashMap;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -33,6 +27,13 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.util.Iterator;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -143,12 +144,15 @@ public class SmokeBomb extends Skill implements ToggleSkill, CooldownSkill, List
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Instantly <effect>Vanish</effect> before your foes for a",
-                "maximum of <val>" + (baseDuration + level) + "</val> seconds",
-                "hitting an enemy or using abilities",
+                "Drop your Sword / Axe to activate",
+                "",
+                "Instantly <effect>Vanish</effect> before your foes",
+                "for a maximum of <val>" + (baseDuration + level) + "</val> seconds,",
+                "inflicting <effect>Blindness II</effect> to enemies",
+                "within <stat>" + blindRadius + "</stat> blocks for <stat>" + blindDuration + "</stat> seconds",
+                "",
+                "Hitting an enemy or using abilities",
                 "will make you reappear",
-                "gives <effect>Blindness II</effect> to enemies",
-                "within <stat>" + blindRadius + "</stat> for <stat>" + blindDuration + "</stat> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };

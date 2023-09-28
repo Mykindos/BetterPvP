@@ -18,7 +18,10 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.*;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -52,9 +55,10 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Hold Block with a sword to Channel.",
+                "Hold right click with a Sword to channel",
                 "",
-                "Fire a hook at an enemy, pulling them towards you",
+                "Charge a hook that latches onto enemies, pulling them towards you",
+                "",
                 "Higher Charge time = faster hook",
                 "",
                 "Cooldown: <val>" + getCooldown(level),
@@ -127,7 +131,7 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
                         iterator.remove();
 
                         championsManager.getCooldowns().removeCooldown(player, getName(), true);
-                        championsManager.getCooldowns().add(player, getName(), getCooldown(level), showCooldownFinished());
+                        championsManager.getCooldowns().use(player, getName(), getCooldown(level), showCooldownFinished());
                     }
                 }
             }

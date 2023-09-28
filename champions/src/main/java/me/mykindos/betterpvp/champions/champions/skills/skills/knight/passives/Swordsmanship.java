@@ -3,7 +3,6 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.knight.passives;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.WeakHashMap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -22,6 +21,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+
+import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -48,15 +49,13 @@ public class Swordsmanship extends Skill implements PassiveSkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Prepare a powerful sword attack,",
-                "You gain 1 charge every <val>" + timeBetweenCharges + "</val> seconds.",
-                "You can store a maximum of <val>" + (level) + "</val> charges",
+                "You gain 1 charge every <stat>" + timeBetweenCharges + "</stat> seconds,",
+                "storing up to a maximum of <val>" + (level) + "</val> charges",
                 "",
-                "When you attack, your damage is",
-                "increased by <val>" + damagePerCharge + "</val> for each charge you have",
-                "and then your charges are reset to 0.",
+                "When you attack, your damage is increased",
+                "by <stat>" + damagePerCharge + "</stat> for each charge you have",
                 "",
-                "This only applies to swords."
+                "This only applies to swords"
         };
     }
 
@@ -96,7 +95,7 @@ public class Swordsmanship extends Skill implements PassiveSkill {
                 if (charges.containsKey(cur)) {
                     championsManager.getGamers().getObject(cur.getUniqueId().toString()).ifPresent(gamer -> {
                         if (UtilTime.elapsed(gamer.getLastDamaged(), (long) timeOutOfCombat * 1000)) {
-                            if (!championsManager.getCooldowns().add(cur, getName(), timeBetweenCharges, false)) return;
+                            if (!championsManager.getCooldowns().use(cur, getName(), timeBetweenCharges, false)) return;
                             int charge = charges.get(cur);
                             if (charge < level) {
                                 charge = Math.min(level, charge + 1);

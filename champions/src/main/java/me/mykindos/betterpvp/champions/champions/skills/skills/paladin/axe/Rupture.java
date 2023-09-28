@@ -1,9 +1,5 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.paladin.axe;
 
-import java.util.ArrayList;
-import java.util.WeakHashMap;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -36,6 +32,11 @@ import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.util.ArrayList;
+import java.util.WeakHashMap;
+
 @Singleton
 @BPvPListener
 public class Rupture extends Skill implements Listener, InteractSkill, CooldownSkill {
@@ -61,12 +62,12 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Right click with a axe to activate.",
+                "Right click with an Axe to activate",
                 "",
                 "Rupture the earth in the direction",
-                "you are facing, dealing <val>" + damage + "</val> damage,",
-                "knocking up and giving Slowness III to enemies",
-                "hit for <val>" + slowDuration + "</val> seconds.",
+                "you are facing, dealing <stat>" + damage + "</stat> damage,",
+                "knocking up and giving <effect>Slowness III</effect> to enemies",
+                "hit for <stat>" + slowDuration + "</stat> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };

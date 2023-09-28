@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.WeakHashMap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -21,6 +20,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+
+import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -44,11 +45,11 @@ public class WolvesFury extends Skill implements InteractSkill, CooldownSkill, L
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Right click with a axe to activate.",
+                "Right click with an Axe to activate",
                 "",
                 "Summon the power of the wolf, gaining",
-                "Strength I for <val>" + (baseDuration + level) + "</val> seconds, and giving",
-                "no knockback on your attacks.",
+                "<effect>Strength I</effect> for <val>" + (baseDuration + level) + "</val> seconds, and giving",
+                "no knockback on your attacks",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };

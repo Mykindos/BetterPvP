@@ -19,11 +19,11 @@ public class ClansSettingButton extends SettingsButton {
     }
 
     @Override
-    public void onClick(Player player, ClickType clickType) {
+    public void onClick(Player player, Gamer gamer, ClickType clickType) {
         if(clickType == ClickType.LEFT) {
-            gamer.saveProperty(setting, true, true);
+            this.gamer.saveProperty(setting, true, true);
         }else if(clickType == ClickType.RIGHT){
-            gamer.saveProperty(setting, false, true);
+            this.gamer.saveProperty(setting, false, true);
         }
 
         UtilSound.playSound(player, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1, false);

@@ -5,15 +5,18 @@ import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
+import me.mykindos.betterpvp.clans.clans.events.TerritoryInteractEvent;
 import me.mykindos.betterpvp.clans.clans.insurance.InsuranceType;
 import me.mykindos.betterpvp.core.client.events.ClientLoginEvent;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
+import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.gamer.exceptions.NoSuchGamerException;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.*;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
@@ -22,6 +25,7 @@ import org.bukkit.block.data.type.Gate;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.*;
@@ -90,12 +94,6 @@ public class ClansWorldListener extends ClanListener {
             if (!locationClan.equals(clan)) {
                 ClanRelation relation = clanManager.getRelation(clan, locationClan);
 
-                if (locationClan.isAdmin()) {
-                    if (locationClan.getName().contains("Fields")) {
-                        return;
-                    }
-                }
-
                 // TODO this stuff
 
                 //if (!(locationClan instanceof AdminClan)) {
@@ -105,22 +103,44 @@ public class ClansWorldListener extends ClanListener {
                 //}
 
                 if (clanManager.getPillageHandler().isPillaging(clan, locationClan)) {
+                    final TerritoryInteractEvent tie = new TerritoryInteractEvent(player, locationClan, block, Event.Result.DEFAULT, TerritoryInteractEvent.InteractionType.BREAK);
+                    tie.callEvent();
+                    if (tie.getResult() == Event.Result.DENY) {
+                        event.setCancelled(true);
+                        return;
+                    }
                     clanManager.addInsurance(locationClan, block, InsuranceType.BREAK);
                     return;
                 }
 
-                UtilMessage.simpleMessage(player, "Clans", "You cannot break <green>%s <gray>in %s<gray>.",
-                        UtilFormat.cleanString(block.getType().name()),
-                        relation.getPrimaryMiniColor() + "Clan " + locationClan.getName()
-                );
+                final TerritoryInteractEvent tie = new TerritoryInteractEvent(player, locationClan, block, Event.Result.DENY, TerritoryInteractEvent.InteractionType.BREAK);
+                tie.callEvent();
+                if (tie.getResult() != Event.Result.DENY) {
+                    return;
+                }
+
                 event.setCancelled(true);
 
+                if (tie.isInform()) {
+                    UtilMessage.simpleMessage(player, "Clans", "You cannot break <green>%s <gray>in %s<gray>.",
+                            UtilFormat.cleanString(block.getType().name()),
+                            relation.getPrimaryMiniColor() + "Clan " + locationClan.getName()
+                    );
+                }
 
             } else {
                 if (!clan.getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.MEMBER)) {
-                    UtilMessage.message(player, "Clans", "Clan Recruits cannot break blocks.");
+                    final TerritoryInteractEvent tie = new TerritoryInteractEvent(player, locationClan, block, Event.Result.DENY, TerritoryInteractEvent.InteractionType.BREAK);
+                    tie.callEvent();
+                    if (tie.getResult() != Event.Result.DENY) {
+                        return;
+                    }
+
                     event.setCancelled(true);
 
+                    if (tie.isInform()) {
+                        UtilMessage.message(player, "Clans", "Clan Recruits cannot break blocks.");
+                    }
                 }
             }
         });
@@ -151,28 +171,61 @@ public class ClansWorldListener extends ClanListener {
             ClanRelation relation = clanManager.getRelation(clan, locationClan);
 
             if (block.getType().hasGravity()) {
-                UtilMessage.simpleMessage(player, "Clans", "You cannot place <green>%s <gray> in %s<gray>.",
-                        UtilFormat.cleanString(block.getType().toString()), relation.getPrimaryMiniColor() + locationClan.getName());
+                final TerritoryInteractEvent tie = new TerritoryInteractEvent(player, locationClan, block, Event.Result.DENY, TerritoryInteractEvent.InteractionType.PLACE);
+                tie.callEvent();
+                if (tie.getResult() != Event.Result.DENY) {
+                    return;
+                }
+
                 event.setCancelled(true);
+
+                if (tie.isInform()) {
+                    UtilMessage.simpleMessage(player, "Clans", "You cannot place <green>%s <gray> in %s<gray>.",
+                            UtilFormat.cleanString(block.getType().toString()), relation.getPrimaryMiniColor() + locationClan.getName());
+                }
                 return;
             }
 
             if (!locationClan.equals(clan)) {
 
                 if (clanManager.getPillageHandler().isPillaging(clan, locationClan)) {
+                    final TerritoryInteractEvent tie = new TerritoryInteractEvent(player, locationClan, block, Event.Result.DEFAULT, TerritoryInteractEvent.InteractionType.PLACE);
+                    tie.callEvent();
+                    if (tie.getResult() == Event.Result.DENY) {
+                        event.setCancelled(true);
+                        return;
+                    }
+
                     clanManager.addInsurance(locationClan, block, InsuranceType.PLACE);
                     return;
                 }
 
-                UtilMessage.simpleMessage(player, "Clans", "You cannot place <green>%s <gray>in %s<gray>.",
-                        UtilFormat.cleanString(block.getType().name()),
-                        relation.getPrimaryMiniColor() + "Clan " + locationClan.getName()
-                );
+                final TerritoryInteractEvent tie = new TerritoryInteractEvent(player, locationClan, block, Event.Result.DENY, TerritoryInteractEvent.InteractionType.PLACE);
+                tie.callEvent();
+                if (tie.getResult() != Event.Result.DENY) {
+                    return;
+                }
+
                 event.setCancelled(true);
+
+                if (tie.isInform()) {
+                    UtilMessage.simpleMessage(player, "Clans", "You cannot place <green>%s <gray>in %s<gray>.",
+                            UtilFormat.cleanString(block.getType().name()),
+                            relation.getPrimaryMiniColor() + "Clan " + locationClan.getName()
+                    );
+                }
             } else {
                 if (!clan.getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.MEMBER)) {
-                    UtilMessage.simpleMessage(player, "Clans", "Clan Recruits cannot place blocks.");
+                    final TerritoryInteractEvent tie = new TerritoryInteractEvent(player, locationClan, block, Event.Result.DENY, TerritoryInteractEvent.InteractionType.PLACE);
+                    tie.callEvent();
+                    if (tie.getResult() != Event.Result.DENY) {
+                        return;
+                    }
+
                     event.setCancelled(true);
+                    if (tie.isInform()) {
+                        UtilMessage.simpleMessage(player, "Clans", "Clan Recruits cannot place blocks.");
+                    }
                 }
             }
         });
@@ -204,12 +257,22 @@ public class ClansWorldListener extends ClanListener {
                 ClanRelation relation = clanManager.getRelation(clan, locationClan);
 
                 if (locationClan.isAdmin() && material == Material.ENCHANTING_TABLE) return;
-                if (material == Material.REDSTONE_ORE) return;
+                if (material == Material.REDSTONE_ORE || material == Material.DEEPSLATE_REDSTONE_ORE) return;
                 if (relation == ClanRelation.ALLY_TRUST && material.isInteractable()) {
+                    final TerritoryInteractEvent tie = new TerritoryInteractEvent(player, locationClan, block, Event.Result.DEFAULT, TerritoryInteractEvent.InteractionType.INTERACT);
+                    tie.callEvent();
+                    if (tie.getResult() == Event.Result.DENY) {
+                        event.setCancelled(true);
+                    }
                     return;
                 }
 
                 if (clanManager.getPillageHandler().isPillaging(clan, locationClan)) {
+                    final TerritoryInteractEvent tie = new TerritoryInteractEvent(player, locationClan, block, Event.Result.DEFAULT, TerritoryInteractEvent.InteractionType.INTERACT);
+                    tie.callEvent();
+                    if (tie.getResult() == Event.Result.DENY) {
+                        event.setCancelled(true);
+                    }
                     return;
                 }
 
@@ -217,20 +280,38 @@ public class ClansWorldListener extends ClanListener {
 
                     if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
                         if (material == Material.ENDER_CHEST) return;
-
                     }
-                    UtilMessage.simpleMessage(player, "Clans", "You cannot use <green>%s <gray>in %s<gray>.",
-                            UtilFormat.cleanString(material.toString()),
-                            relation.getPrimaryMiniColor() + "Clan " + locationClan.getName()
-                    );
+
+                    final TerritoryInteractEvent tie = new TerritoryInteractEvent(player, locationClan, block, Event.Result.DENY, TerritoryInteractEvent.InteractionType.INTERACT);
+                    tie.callEvent();
+                    if (tie.getResult() != Event.Result.DENY) {
+                        return;
+                    }
+
                     event.setCancelled(true);
+
+                    if (tie.isInform()) {
+                        UtilMessage.simpleMessage(player, "Clans", "You cannot use <green>%s <gray>in %s<gray>.",
+                                UtilFormat.cleanString(material.toString()),
+                                relation.getPrimaryMiniColor() + "Clan " + locationClan.getName()
+                        );
+                    }
                 }
             } else {
                 if (!clan.getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.MEMBER)) {
                     if (block.getState() instanceof Container) {
-                        UtilMessage.simpleMessage(player, "Clans", "Clan Recruits cannot access <green%s<gray>.",
-                                UtilFormat.cleanString(material.toString()));
+                        final TerritoryInteractEvent tie = new TerritoryInteractEvent(player, locationClan, block, Event.Result.DENY, TerritoryInteractEvent.InteractionType.INTERACT);
+                        tie.callEvent();
+                        if (tie.getResult() != Event.Result.DENY) {
+                            return;
+                        }
+
                         event.setCancelled(true);
+
+                        if (tie.isInform()) {
+                            UtilMessage.simpleMessage(player, "Clans", "Clan Recruits cannot access <green%s<gray>.",
+                                    UtilFormat.cleanString(material.toString()));
+                        }
                     }
                 }
             }
@@ -544,5 +625,61 @@ public class ClansWorldListener extends ClanListener {
                 });
             }
         });
+    }
+
+    @UpdateEvent(delay = 250)
+    public void checkGamemode() {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR) {
+                continue;
+            }
+
+            if (!player.getWorld().getName().equals("world")) {
+                if (player.getGameMode() == GameMode.SURVIVAL) {
+                    player.setGameMode(GameMode.ADVENTURE);
+                }
+                continue;
+            }
+
+            Optional<Clan> locationClanOptional = clanManager.getClanByLocation(player.getLocation());
+            if (locationClanOptional.isEmpty()) {
+                if (player.getGameMode() == GameMode.ADVENTURE) {
+                    player.setGameMode(GameMode.SURVIVAL);
+                }
+                continue;
+            }
+
+            Clan locationClan = locationClanOptional.get();
+
+            if(locationClan.getName().equalsIgnoreCase("Fields")) {
+                if(player.getGameMode() == GameMode.ADVENTURE) {
+                    player.setGameMode(GameMode.SURVIVAL);
+                }
+                continue;
+            }
+
+            clanManager.getClanByPlayer(player).ifPresentOrElse(playerClan -> {
+                if(locationClan.equals(playerClan)) {
+                    if(player.getGameMode() == GameMode.ADVENTURE) {
+                        player.setGameMode(GameMode.SURVIVAL);
+                    }
+                    return;
+                }
+
+                if(clanManager.getPillageHandler().isPillaging(playerClan, locationClan)){
+                    if(player.getGameMode() == GameMode.ADVENTURE) {
+                        player.setGameMode(GameMode.SURVIVAL);
+                    }
+                    return;
+                }
+
+                // TODO check location clans farming levels
+
+                player.setGameMode(GameMode.ADVENTURE);
+
+            }, () -> player.setGameMode(GameMode.ADVENTURE));
+
+
+        }
     }
 }

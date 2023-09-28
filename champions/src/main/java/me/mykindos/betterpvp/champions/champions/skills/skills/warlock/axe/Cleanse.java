@@ -42,13 +42,13 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Right click with a axe to activate.",
+                "Right click with an aAxe to activate",
                 "",
-                "Sacrifice <val>" + UtilMath.round(100 - ((0.50 + (level * 0.05)) * 100), 2) + "%" + "</val> of your health to purge",
-                "all negative effects from yourself and allies within <val>" + (distance + level) + "</val> blocks.",
+                "Sacrifice <val>" + UtilMath.round(100 - ((0.50 + (level * 0.05)) * 100), 2) + "%" + "</val> of your health to purge all negative",
+                "effects from yourself and allies within <val>" + (distance + level) + "</val> blocks",
                 "",
-                "You and your allies also receive an immunity against",
-                "negative effects for <val>" + (duration + (level / 2)) + "</val> seconds.",
+                "You and your allies also receive an immunity against negative",
+                "effects for <val>" + (duration + (level / 2)) + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };

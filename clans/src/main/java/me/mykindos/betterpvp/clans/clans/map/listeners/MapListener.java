@@ -1,10 +1,6 @@
 package me.mykindos.betterpvp.clans.clans.map.listeners;
 
 import com.google.inject.Inject;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
@@ -22,9 +18,9 @@ import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
+import me.mykindos.betterpvp.core.utilities.model.display.TimedComponent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.world.level.material.MapColor;
@@ -48,6 +44,11 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 
 @BPvPListener
 public class MapListener implements Listener {
@@ -95,6 +96,8 @@ public class MapListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerJoin(PlayerJoinEvent event) {
         loadChunks(event.getPlayer());
+
+
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -352,6 +355,7 @@ public class MapListener implements Listener {
 
     }
 
+    // TODO do this without loading chunks
     private void loadChunks(Player player) {
         if (!mapHandler.clanMapData.containsKey(player.getUniqueId())) {
             mapHandler.clanMapData.put(player.getUniqueId(), new HashSet<>());
@@ -409,7 +413,7 @@ public class MapListener implements Listener {
         }
         final MapSettings mapSettings = mapHandler.mapSettingsMap.get(player.getUniqueId());
 
-        if (!cooldownManager.add(player, "Map Zoom", 0.1, false, false)) {
+        if (!cooldownManager.use(player, "Map Zoom", 0.1, false, false)) {
             return;
         }
 
@@ -417,6 +421,7 @@ public class MapListener implements Listener {
         if (gamerOptional.isPresent()) {
             Gamer gamer = gamerOptional.get();
 
+            MapSettings.Scale scale;
             if (event.getAction().name().contains("RIGHT")) {
                 MapSettings.Scale curScale = mapSettings.getScale();
 
@@ -426,7 +431,8 @@ public class MapListener implements Listener {
                     return;
                 }
 
-                UtilPlayer.sendActionBar(player, createZoomBar(mapSettings.setScale(MapSettings.Scale.values()[curScale.ordinal() + 1])));
+                scale = mapSettings.setScale(MapSettings.Scale.values()[curScale.ordinal() + 1]);
+                gamer.getActionBar().add(500, new TimedComponent(1.5, false, gmr -> createZoomBar(scale)));
                 mapSettings.setUpdate(true);
             } else if (event.getAction().name().contains("LEFT")) {
                 MapSettings.Scale curScale = mapSettings.getScale();
@@ -434,7 +440,9 @@ public class MapListener implements Listener {
                 if (curScale == MapSettings.Scale.CLOSEST) {
                     return;
                 }
-                UtilPlayer.sendActionBar(player, createZoomBar(mapSettings.setScale(MapSettings.Scale.values()[curScale.ordinal() - 1])));
+
+                scale = mapSettings.setScale(MapSettings.Scale.values()[curScale.ordinal() - 1]);
+                gamer.getActionBar().add(500, new TimedComponent(1.5, false, gmr -> createZoomBar(scale)));
                 mapSettings.setUpdate(true);
             }
 
@@ -455,7 +463,7 @@ public class MapListener implements Listener {
         if (otherClan.isSafe()) {
             materialColor = MapColor.SNOW;
         } else if (otherClan.isAdmin()) {
-            if (otherClan.getName().equals("Outskirts") || otherClan.getName().equalsIgnoreCase("Outskirts")) {
+            if (otherClan.getName().equalsIgnoreCase("Outskirts")) {
                 materialColor = MapColor.COLOR_ORANGE;
             } else {
                 materialColor = MapColor.COLOR_RED;

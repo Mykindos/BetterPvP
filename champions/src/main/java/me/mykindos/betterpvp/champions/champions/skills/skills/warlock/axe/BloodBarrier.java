@@ -2,8 +2,6 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.warlock.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.HashMap;
-import java.util.UUID;
 import lombok.Data;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
@@ -29,6 +27,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.PlayerDeathEvent;
+
+import java.util.HashMap;
+import java.util.UUID;
 
 @Singleton
 @BPvPListener
@@ -57,13 +58,13 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Right click with a axe to activate.",
+                "Right click with an Axe to activate",
                 "",
-                "Sacrifice <val>" + UtilMath.round(100 - (0.50 + (level * 0.05)) * 100, 2) + "%</val> of your health to grant",
-                "yourself and allies within <val>" + (range + level) + "</val> blocks a barrier which reduces",
-                "the damage of the next <val>" + numAttacksToReduce + "</val> incoming attacks by <val>" + (damageReduction * 100) + "%</val>",
+                "Sacrifice <val>" + UtilMath.round(100 - (0.50 + (level * 0.05)) * 100, 2) + "%</val> of your health to grant yourself and",
+                "allies within <val>" + (range + level) + "</val> blocks a barrier which reduces the damage",
+                "of the next <stat>" + numAttacksToReduce + "</stat> incoming attacks by <stat>" + (damageReduction * 100) + "%</stat>",
                 "",
-                "Barrier lasts up to <val>" + duration + "</val> , and does not stack.",
+                "Barrier lasts for <stat>" + duration + "</stat>, and does not stack",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };

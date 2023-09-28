@@ -1,11 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.sword;
 
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.WeakHashMap;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -22,6 +17,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -43,12 +44,12 @@ public class ExcessiveForce extends Skill implements InteractSkill, CooldownSkil
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Right click with a Sword to activate.",
+                "Right click with a Sword to activate",
                 "",
                 "For the next <val>" + (3 + ((level - 1) * 0.5)) + "</val> seconds",
                 "your attacks deal knockback to enemies",
                 "",
-                "Does not ignore anti-knockback abilities.",
+                "Does not ignore anti-knockback abilities",
                 "",
                 "Cooldown: <val>" + getCooldown(level)};
     }
