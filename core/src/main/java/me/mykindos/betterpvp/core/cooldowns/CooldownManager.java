@@ -69,7 +69,7 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
             // Show READY after cooldown has been removed, not expired.
             // If it has expired that means that the cooldown remaining time is 0 or -1, and we want to show full bar for that
             if (cooldown == null || cooldown.getRemaining() <= 0) {
-                return Component.join(JoinConfiguration.separator(Component.space()), cooldownName, Component.text("Ready!").color(NamedTextColor.GREEN));
+                return Component.join(JoinConfiguration.separator(Component.space()), cooldownName.decorate(TextDecoration.BOLD).color(NamedTextColor.GREEN), Component.text("Recharged").decorate(TextDecoration.BOLD).color(NamedTextColor.GREEN));
             }
 
             final double progress = Math.min(1f, Math.max(0, (duration - cooldown.getRemaining()) / duration));
