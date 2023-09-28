@@ -47,6 +47,14 @@ public class ClientListener implements Listener {
     @Config(path = "tab.website", defaultValue = "https://mineplex.com")
     private String website;
 
+    @Inject
+    @Config(path = "tab.shop", defaultValue = "mineplex.com/shop")
+    private String shop;
+
+    @Inject
+    @Config(path = "tab.server", defaultValue = "Clans-1")
+    private String server;
+
     private final ClientManager clientManager;
 
     @Inject
@@ -127,16 +135,15 @@ public class ClientListener implements Listener {
 
     @SneakyThrows
     public void updateTab(Player player) {
-        var titleTop = Component.text(tabTitle, NamedTextColor.RED, TextDecoration.BOLD);
-        var titleBot = Component.text("Visit our website at: ", NamedTextColor.RED, TextDecoration.BOLD)
-                .append(Component.text(website, NamedTextColor.YELLOW, TextDecoration.BOLD));
-        var header = titleTop.appendNewline().append(titleBot);
+        var titleBot = Component.text("Mineplex ", NamedTextColor.GOLD)
+                .append(Component.text("Network  ", NamedTextColor.WHITE))
+                .append(Component.text(server, NamedTextColor.GREEN));
+        var header = titleBot;
 
-        var footerLeft = Component.text("Ping: ", NamedTextColor.GOLD, TextDecoration.BOLD)
-                .append(Component.text(UtilPlayer.getPing(player), NamedTextColor.YELLOW, TextDecoration.BOLD));
-        var footerRight = Component.text("Online: ", NamedTextColor.GOLD, TextDecoration.BOLD)
-                .append(Component.text(Bukkit.getOnlinePlayers().size(), NamedTextColor.YELLOW, TextDecoration.BOLD));
-        var footer = footerLeft.append(Component.space()).append(footerRight);
+        var footerLeft = Component.text("Visit ", NamedTextColor.WHITE)
+                .append(Component.text(shop, NamedTextColor.YELLOW))
+                .append(Component.text(" for cool perks!", NamedTextColor.WHITE));
+        var footer = footerLeft;
 
         player.sendPlayerListHeaderAndFooter(header, footer);
     }
