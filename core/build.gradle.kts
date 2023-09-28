@@ -5,6 +5,7 @@ plugins {
     kotlin("jvm") version "1.7.10"
     id("com.github.johnrengelman.shadow") version "7.1.2"
     id("org.flywaydb.flyway") version "9.0.1"
+    `maven-publish`
 }
 
 version = 1.0
@@ -22,6 +23,18 @@ kotlin {
 val shadowJar: ShadowJar by tasks
 shadowJar.apply {
     mergeServiceFiles()
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = "me.mykindos.betterpvp"
+            artifactId = "core"
+            version = "1.0"
+
+            from(components["java"])
+        }
+    }
 }
 
 
