@@ -5,6 +5,7 @@ pluginManagement {
     }
 }
 
+var enableEventsModule = File("./events/").exists()
 
 rootProject.name = "BetterPvP"
 
@@ -13,3 +14,7 @@ include("core")
 include("lunar")
 include("champions")
 include("shops")
+
+if(enableEventsModule) {
+    include("events")
+}
