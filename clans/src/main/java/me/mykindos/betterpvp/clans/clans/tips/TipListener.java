@@ -53,7 +53,7 @@ public class TipListener extends ClanListener {
         });
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onTip(TipEvent event) {
         Player player = event.getPlayer();
         Optional<Gamer> gamerOptional = gamerManager.getObject(player.getUniqueId());
