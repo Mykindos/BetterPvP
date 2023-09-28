@@ -15,6 +15,8 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 
@@ -50,7 +52,6 @@ public class TipListener extends ClanListener {
             if (gamer.getPlayer() != null){
                 UtilServer.runTaskLaterAsync(clans, () -> UtilServer.callEvent(new TipEvent(gamer)), 5);
             }
-
         });
 
     }
@@ -58,10 +59,16 @@ public class TipListener extends ClanListener {
     @EventHandler
     public void onTip(TipEvent event) {
         Gamer gamer = event.getGamer();
-        if ((boolean) gamer.getProperty(GamerProperty.TIPS_ENABLED).orElse(true) && UtilTime.elapsed(gamer.getLastTip(), 30 * 1000) && gamer.getPlayer() != null) {
-            UtilMessage.message(gamer.getPlayer(), "Clans", Component.text("You can create a CLan by running /c create <name>"));
+        Player player = gamer.getPlayer();
+        if (player != null) {
+            if ((boolean) gamer.getProperty(GamerProperty.TIPS_ENABLED).orElse(true) &&
+                    UtilTime.elapsed(gamer.getLastTip(), (long) timeBetweenTips * 1000) &&
+                    clanManager.getClanByPlayer(player).isEmpty() &&
+                    gamer.getPlayer() != null) {
+                UtilMessage.message(gamer.getPlayer(), "Tips", Component.text("You can create a Clan by running /c create <name>"));
+                gamer.setLastTip(System.currentTimeMillis());
+            }
         }
-
     }
 
 }
