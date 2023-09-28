@@ -4,9 +4,6 @@ pluginManagement {
         maven("https://papermc.io/repo/repository/maven-public/")
     }
 }
-
-var enableEventsModule = File("./events/").exists()
-
 rootProject.name = "BetterPvP"
 
 include("clans")
@@ -15,6 +12,6 @@ include("lunar")
 include("champions")
 include("shops")
 
-if(enableEventsModule) {
+if(File("./events/").exists()) {
     include("events")
 }
