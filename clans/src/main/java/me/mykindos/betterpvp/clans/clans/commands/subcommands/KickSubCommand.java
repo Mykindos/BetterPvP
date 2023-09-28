@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.clans.clans.commands.subcommands;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.Optional;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
@@ -17,6 +16,8 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+
+import java.util.Optional;
 
 @Singleton
 @SubCommand(ClanCommand.class)
@@ -38,6 +39,11 @@ public class KickSubCommand extends ClanSubCommand {
     @Override
     public String getDescription() {
         return "Kick a member from your clan";
+    }
+
+    @Override
+    public String getUsage() {
+        return super.getUsage() + " <player>";
     }
 
     @Override

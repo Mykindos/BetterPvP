@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillEquipE
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.champions.champions.roles.events.RoleChangeEvent;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
+import me.mykindos.betterpvp.champions.combat.events.PlayerCheckShieldEvent;
 import me.mykindos.betterpvp.champions.utilities.UtilChampions;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
@@ -28,6 +29,7 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import javax.inject.Inject;
 import java.util.Optional;
@@ -48,7 +50,7 @@ public class ShieldListener implements Listener {
 
     @EventHandler
     public void onJoinShield(PlayerJoinEvent event) {
-        UtilServer.runTaskLater(champions, () -> giveShieldIfRequired(event.getPlayer()), 20);
+        UtilServer.runTaskLater(champions, () -> UtilServer.callEvent(new PlayerCheckShieldEvent(event.getPlayer())), 20);
 
     }
 
@@ -58,7 +60,7 @@ public class ShieldListener implements Listener {
             ItemStack item = event.getItem().getItemStack();
             UtilServer.runTaskLater(champions, () -> {
                 if (player.getInventory().getItemInMainHand().getType() == item.getType()) {
-                    giveShieldIfRequired(player);
+                    UtilServer.callEvent(new PlayerCheckShieldEvent(player));
                 }
             }, 10);
         }
@@ -71,7 +73,7 @@ public class ShieldListener implements Listener {
             if (player != null) {
                 UtilServer.runTaskLater(champions, () -> {
                     if (player.getInventory().getItemInMainHand().getType() == event.getItem().getType()) {
-                        giveShieldIfRequired(player);
+                        UtilServer.callEvent(new PlayerCheckShieldEvent(player));
                     }
                 }, 10);
 
@@ -84,7 +86,7 @@ public class ShieldListener implements Listener {
         Player player = event.getPlayer();
         ItemStack item = player.getInventory().getItem(event.getNewSlot());
         if (item != null) {
-            UtilServer.runTaskLater(champions, () -> giveShieldIfRequired(player), 1);
+            UtilServer.runTaskLater(champions, () -> UtilServer.callEvent(new PlayerCheckShieldEvent(player)), 1);
         } else {
             player.getInventory().setItemInOffHand(null);
         }
@@ -127,40 +129,66 @@ public class ShieldListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onRoleChange(RoleChangeEvent event) {
         Player player = event.getPlayer();
-        giveShieldIfRequired(player);
+        UtilServer.callEvent(new PlayerCheckShieldEvent(player));
     }
 
-    private void giveShieldIfRequired(Player player) {
+    //@UpdateEvent
+    //public void checkShields() {
+    //    Bukkit.getOnlinePlayers().forEach(player -> {
+    //         UtilServer.callEvent(new PlayerCheckShieldEvent(player));
+    //    });
+    //}
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onFinalShieldCheck(PlayerCheckShieldEvent event) {
+        Player player = event.getPlayer();
+
+        if (!event.isShouldHaveShield()) {
+            if (player.getInventory().getItemInOffHand().getType() == Material.SHIELD) {
+                player.getInventory().setItemInOffHand(null);
+            }
+            return;
+        }
+
+        ItemStack offhand = player.getInventory().getItemInOffHand();
+        ItemMeta itemMeta = offhand.getItemMeta();
+        if (offhand.getType() == Material.SHIELD) {
+            if (itemMeta != null) {
+                if (itemMeta.hasCustomModelData()) {
+                    if (itemMeta.getCustomModelData() != event.getCustomModelData()) {
+                        itemMeta.setCustomModelData(event.getCustomModelData());
+                        offhand.setItemMeta(itemMeta);
+                        player.getInventory().setItemInOffHand(offhand);
+                    }
+                }
+            }
+        } else {
+            ItemStack shield = new ItemStack(Material.SHIELD);
+            ItemMeta shieldMeta = shield.getItemMeta();
+            shieldMeta.setCustomModelData(event.getCustomModelData());
+            shield.setItemMeta(shieldMeta);
+            player.getInventory().setItemInOffHand(shield);
+        }
+    }
+
+    @EventHandler
+    public void onShieldCheck(PlayerCheckShieldEvent event) {
+        Player player = event.getPlayer();
         if (UtilChampions.isUsableWithShield(player.getInventory().getItemInMainHand())) {
             Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(player.getUniqueId());
             if (gamerBuildsOptional.isPresent()) {
                 GamerBuilds builds = gamerBuildsOptional.get();
                 Optional<Role> roleOptional = roleManager.getObject(player.getUniqueId());
-                roleOptional.ifPresentOrElse(role -> {
+                roleOptional.ifPresent(role -> {
                     RoleBuild build = builds.getActiveBuilds().get(role.getName());
                     if (build != null) {
                         if (build.getActiveSkills().stream().anyMatch(s -> s instanceof ChannelSkill)) {
-                            var shield = new ItemStack(Material.SHIELD);
-                            var itemMeta = shield.getItemMeta();
-                            itemMeta.setCustomModelData(1);
-                            shield.setItemMeta(itemMeta);
-                            player.getInventory().setItemInOffHand(shield);
+                            event.setShouldHaveShield(true);
+                            event.setCustomModelData(1);
                         }
                     }
-                }, () -> {
-                    // TODO legendary check
-                    player.getInventory().setItemInOffHand(null);
                 });
-
-                // TODO
-                //Weapon weapon = WeaponManager.getWeapon(e.getPlayer().getInventory().getItemInMainHand());
-                //if (weapon != null && weapon instanceof ChannelWeapon) {
-                //    e.getPlayer().getInventory().setItemInOffHand(new ItemStack(Material.SHIELD));
-                //}
             }
-
-        } else {
-            player.getInventory().setItemInOffHand(null);
         }
     }
 
@@ -175,13 +203,7 @@ public class ShieldListener implements Listener {
     public void onSkillEquip(SkillEquipEvent event) {
         if (event.getSkill() instanceof ChannelSkill) {
             Player player = event.getPlayer();
-            if (UtilChampions.isUsableWithShield(player.getInventory().getItemInMainHand())) {
-                var shield = new ItemStack(Material.SHIELD);
-                var itemMeta = shield.getItemMeta();
-                itemMeta.setCustomModelData(1);
-                shield.setItemMeta(itemMeta);
-                player.getInventory().setItemInOffHand(shield);
-            }
+            UtilServer.callEvent(new PlayerCheckShieldEvent(player));
         }
     }
 

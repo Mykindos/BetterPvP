@@ -1,9 +1,5 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.knight.axe;
 
-import java.util.HashMap;
-import java.util.UUID;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -28,6 +24,11 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.util.HashMap;
+import java.util.UUID;
 
 @Singleton
 @BPvPListener

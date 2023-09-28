@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerCanUseSkillEvent;
+import me.mykindos.betterpvp.core.components.champions.events.PlayerUseItemEvent;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
@@ -82,6 +83,13 @@ public class ClansSkillListener implements Listener {
     @EventHandler
     public void disableSafezone(PlayerCanUseSkillEvent event) {
         if(!clanManager.canCast(event.getPlayer())) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void disableSafezoneItems(PlayerUseItemEvent event) {
+        if(!clanManager.canCast(event.getPlayer()) && event.isDangerous()) {
             event.setCancelled(true);
         }
     }

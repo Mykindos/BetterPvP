@@ -2,8 +2,6 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.warlock.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.Data;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
@@ -31,6 +29,9 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.util.Vector;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Singleton
 @BPvPListener
@@ -89,7 +90,7 @@ public class Leech extends PrepareSkill implements CooldownSkill {
             active.remove(damager.getUniqueId());
 
             championsManager.getCooldowns().removeCooldown(damager, getName(), true);
-            championsManager.getCooldowns().add(damager, getName(), getCooldown(level), showCooldownFinished());
+            championsManager.getCooldowns().use(damager, getName(), getCooldown(level), showCooldownFinished());
         }
 
     }

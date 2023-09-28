@@ -9,12 +9,14 @@ import me.mykindos.betterpvp.clans.clans.events.TerritoryInteractEvent;
 import me.mykindos.betterpvp.clans.clans.insurance.InsuranceType;
 import me.mykindos.betterpvp.core.client.events.ClientLoginEvent;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
+import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.gamer.exceptions.NoSuchGamerException;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.*;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
@@ -623,5 +625,61 @@ public class ClansWorldListener extends ClanListener {
                 });
             }
         });
+    }
+
+    @UpdateEvent(delay = 250)
+    public void checkGamemode() {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR) {
+                continue;
+            }
+
+            if (!player.getWorld().getName().equals("world")) {
+                if (player.getGameMode() == GameMode.SURVIVAL) {
+                    player.setGameMode(GameMode.ADVENTURE);
+                }
+                continue;
+            }
+
+            Optional<Clan> locationClanOptional = clanManager.getClanByLocation(player.getLocation());
+            if (locationClanOptional.isEmpty()) {
+                if (player.getGameMode() == GameMode.ADVENTURE) {
+                    player.setGameMode(GameMode.SURVIVAL);
+                }
+                continue;
+            }
+
+            Clan locationClan = locationClanOptional.get();
+
+            if(locationClan.getName().equalsIgnoreCase("Fields")) {
+                if(player.getGameMode() == GameMode.ADVENTURE) {
+                    player.setGameMode(GameMode.SURVIVAL);
+                }
+                continue;
+            }
+
+            clanManager.getClanByPlayer(player).ifPresentOrElse(playerClan -> {
+                if(locationClan.equals(playerClan)) {
+                    if(player.getGameMode() == GameMode.ADVENTURE) {
+                        player.setGameMode(GameMode.SURVIVAL);
+                    }
+                    return;
+                }
+
+                if(clanManager.getPillageHandler().isPillaging(playerClan, locationClan)){
+                    if(player.getGameMode() == GameMode.ADVENTURE) {
+                        player.setGameMode(GameMode.SURVIVAL);
+                    }
+                    return;
+                }
+
+                // TODO check location clans farming levels
+
+                player.setGameMode(GameMode.ADVENTURE);
+
+            }, () -> player.setGameMode(GameMode.ADVENTURE));
+
+
+        }
     }
 }

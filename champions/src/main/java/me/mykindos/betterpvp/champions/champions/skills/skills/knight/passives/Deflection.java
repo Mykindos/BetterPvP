@@ -2,8 +2,6 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.knight.passives;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.Optional;
-import java.util.WeakHashMap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -21,6 +19,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+
+import java.util.Optional;
+import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -90,7 +91,7 @@ public class Deflection extends Skill implements PassiveSkill {
                     Optional<Gamer> gamerOptional = championsManager.getGamers().getObject(cur.getUniqueId().toString());
                     gamerOptional.ifPresent(gamer -> {
                         if (UtilTime.elapsed(gamer.getLastDamaged(), (long) timeOutOfCombat * 1000)) {
-                            if (!championsManager.getCooldowns().add(cur, getName(), timeBetweenCharges, false)) return;
+                            if (!championsManager.getCooldowns().use(cur, getName(), timeBetweenCharges, false)) return;
                             int charge = charges.get(cur);
                             if (charge < level) {
                                 charge = Math.min(level, charge + 1);

@@ -1,31 +1,85 @@
 package me.mykindos.betterpvp.core.cooldowns;
 
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
+import me.mykindos.betterpvp.core.gamer.Gamer;
+import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
+import me.mykindos.betterpvp.core.utilities.model.display.TimedComponent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.JoinConfiguration;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
 
 @Slf4j
 @Singleton
 public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>> {
 
-    public boolean add(Player player, String ability, double duration, boolean inform) {
-        return add(player, ability, duration, inform, true);
+    @Inject
+    private GamerManager gamerManager;
+
+    public boolean use(Player player, String ability, double duration, boolean inform) {
+        return use(player, ability, duration, inform, true);
     }
 
-    public boolean add(Player player, String ability, double duration, boolean inform, boolean removeOnDeath) {
-        return add(player, ability, duration, inform, removeOnDeath, false);
+    public boolean use(Player player, String ability, double duration, boolean inform, boolean removeOnDeath) {
+        return use(player, ability, duration, inform, removeOnDeath, false, x -> false);
     }
 
-    public boolean add(Player player, String ability, double duration, boolean inform, boolean removeOnDeath, boolean cancellable) {
+    public boolean use(Player player, String ability, double duration, boolean inform, boolean removeOnDeath, boolean cancellable) {
+        return use(player, ability, duration, inform, removeOnDeath, cancellable, x -> false);
+    }
+
+    public boolean use(Player player, String ability, double duration, boolean inform, boolean removeOnDeath, boolean cancellable, boolean actionBar) {
+        return use(player, ability, duration, inform, removeOnDeath, cancellable, x -> actionBar);
+    }
+
+    public boolean use(Player player, String ability, double duration, boolean inform, boolean removeOnDeath, boolean cancellable, @Nullable Predicate<Gamer> actionBarCondition) {
+        final Gamer gamer = gamerManager.getObject(player.getUniqueId()).orElseThrow();
+
+        // We add 1.5f to the duration in seconds, so they can see that it expired, and it doesn't instantly disappear
+        final TimedComponent actionBarComponent = new TimedComponent(duration + 1.5, false, g -> {
+            if (actionBarCondition == null || !actionBarCondition.test(gamer)) {
+                return null; // Skip if we should not send the action bar message;
+            }
+
+            final TextComponent cooldownName = Component.text(ability).decorate(TextDecoration.BOLD).color(NamedTextColor.WHITE);
+            final Optional<ConcurrentHashMap<String, Cooldown>> cooldowns = getObject(player.getUniqueId());
+            if (cooldowns.isEmpty()) {
+                return null; // Skip
+            }
+
+            final Cooldown cooldown = cooldowns.get().get(ability);
+
+            // Show READY after cooldown has been removed, not expired.
+            // If it has expired that means that the cooldown remaining time is 0 or -1, and we want to show full bar for that
+            if (cooldown == null || cooldown.getRemaining() <= 0) {
+                return Component.join(JoinConfiguration.separator(Component.space()), cooldownName.decorate(TextDecoration.BOLD).color(NamedTextColor.GREEN), Component.text("Recharged").decorate(TextDecoration.BOLD).color(NamedTextColor.GREEN));
+            }
+
+            final double progress = Math.min(1f, Math.max(0, (duration - cooldown.getRemaining()) / duration));
+            final ProgressBar progressBar = ProgressBar.withProgress((float) progress);
+
+            final TextComponent bar = progressBar.build();
+            final double remainingSeconds = Math.max(0.0, cooldown.getRemaining());
+            final TextComponent cooldownRemaining = Component.text(String.format("%.1fs", remainingSeconds)).color(NamedTextColor.WHITE);
+            return Component.join(JoinConfiguration.separator(Component.space()), cooldownName, bar, cooldownRemaining);
+        });
 
         var cooldownOptional = getObject(player.getUniqueId().toString()).or(() -> {
             ConcurrentHashMap<String, Cooldown> cooldowns = new ConcurrentHashMap<>();
@@ -42,7 +96,7 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
                 }
             }
 
-            if (isCooling(player, ability)) {
+            if (hasCooldown(player, ability)) {
 
                 if (inform) {
                     UtilMessage.simpleMessage(player, "Cooldown", "You cannot use <alt>%s</alt> for <alt>%s</alt> seconds.", ability, Math.max(0, getAbilityRecharge(player, ability).getRemaining()));
@@ -52,6 +106,7 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
             }
 
             cooldowns.put(ability, new Cooldown(duration, System.currentTimeMillis(), removeOnDeath, inform, cancellable));
+            gamer.getActionBar().add(1_000, actionBarComponent);
             return true;
         }
 
@@ -59,7 +114,7 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
         return false;
     }
 
-    public boolean isCooling(Player player, String ability) {
+    public boolean hasCooldown(Player player, String ability) {
 
         Optional<ConcurrentHashMap<String, Cooldown>> cooldownOptional = getObject(player.getUniqueId().toString());
         if (cooldownOptional.isPresent()) {

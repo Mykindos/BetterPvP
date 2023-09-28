@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
+import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateLoreEvent;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateNameEvent;
 import me.mykindos.betterpvp.core.items.enchants.GlowEnchant;
@@ -29,7 +30,7 @@ public class ItemHandler {
 
     private final WeaponManager weaponManager;
     private final ItemRepository itemRepository;
-    private final HashMap<Material, BPVPItem> itemMap = new HashMap<>();
+    private final HashMap<String, BPVPItem> itemMap = new HashMap<>();
     private final Enchantment glowEnchantment;
 
 
@@ -53,7 +54,7 @@ public class ItemHandler {
 
     public void loadItemData(String module) {
         List<BPVPItem> items = itemRepository.getItemsForModule(module);
-        items.forEach(item -> itemMap.put(item.getMaterial(), item));
+        items.forEach(item -> itemMap.put(item.getMaterial().name() + item.getCustomModelData(), item));
     }
 
     /**
@@ -68,6 +69,7 @@ public class ItemHandler {
 
         Material material = itemStack.getType();
         ItemMeta itemMeta = itemStack.getItemMeta();
+        int modelData = itemMeta.hasCustomModelData() ? itemMeta.getCustomModelData() : 0;
 
         if (hideAttributes) {
             itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
@@ -78,17 +80,19 @@ public class ItemHandler {
             itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         }
 
-        BPVPItem item = itemMap.get(material);
+        BPVPItem item = itemMap.get(material.name() + modelData);
         if (item != null) {
-            var nameUpdateEvent = UtilServer.callEvent(new ItemUpdateNameEvent(itemMeta, item.getName()));
+            var nameUpdateEvent = UtilServer.callEvent(new ItemUpdateNameEvent(itemStack, itemMeta, item.getName()));
             itemMeta.displayName(nameUpdateEvent.getItemName());
 
-            var loreUpdateEvent = UtilServer.callEvent(new ItemUpdateLoreEvent(itemMeta, new ArrayList<>(item.getLore())));
+            var loreUpdateEvent = UtilServer.callEvent(new ItemUpdateLoreEvent(itemStack, itemMeta, new ArrayList<>(item.getLore())));
             itemMeta.lore(loreUpdateEvent.getItemLore());
 
             PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
-            if (!dataContainer.has(CoreNamespaceKeys.UUID_KEY)) {
-                dataContainer.set(CoreNamespaceKeys.UUID_KEY, PersistentDataType.STRING, UUID.randomUUID().toString());
+            if(item.isGiveUUID()) {
+                if (!dataContainer.has(CoreNamespaceKeys.UUID_KEY)) {
+                    dataContainer.set(CoreNamespaceKeys.UUID_KEY, PersistentDataType.STRING, UUID.randomUUID().toString());
+                }
             }
 
             if (item.isGlowing() || dataContainer.has(CoreNamespaceKeys.GLOW_KEY)) {
@@ -105,17 +109,6 @@ public class ItemHandler {
         itemStack.setItemMeta(itemMeta);
 
         return itemStack;
-    }
-
-    public BPVPItem getItemByType(Material material) {
-        return itemMap.getOrDefault(material,
-                new BPVPItem(
-                        material,
-                        Component.text(UtilFormat.cleanString(material.name())).color(NamedTextColor.YELLOW),
-                        new ArrayList<>(),
-                        false
-                )
-        );
     }
 
     private void registerEnchantment(Enchantment enchantment) {

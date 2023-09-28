@@ -42,7 +42,7 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Right click with an aAxe to activate",
+                "Right click with an Axe to activate",
                 "",
                 "Sacrifice <val>" + UtilMath.round(100 - ((0.50 + (level * 0.05)) * 100), 2) + "%" + "</val> of your health to purge all negative",
                 "effects from yourself and allies within <val>" + (distance + level) + "</val> blocks",

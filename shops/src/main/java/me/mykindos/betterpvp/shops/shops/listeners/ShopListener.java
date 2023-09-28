@@ -3,7 +3,6 @@ package me.mykindos.betterpvp.shops.shops.listeners;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
-import me.mykindos.betterpvp.core.components.shops.IShopItem;
 import me.mykindos.betterpvp.core.components.shops.ShopCurrency;
 import me.mykindos.betterpvp.core.components.shops.events.PlayerBuyItemEvent;
 import me.mykindos.betterpvp.core.components.shops.events.PlayerSellItemEvent;
@@ -68,9 +67,7 @@ public class ShopListener implements Listener {
         Optional<IShopkeeper> shopkeeperOptional = shopkeeperManager.getObject(target.getUniqueId());
         shopkeeperOptional.ifPresent(shopkeeper -> {
             var shopkeeperItems = shopManager.getShopItems(shopkeeper.getShopkeeperName());
-            if(shopkeeperItems.size() == 0) {
-                return;
-            }
+            if(shopkeeperItems == null || shopkeeperItems.isEmpty()) return;
 
             var menu = new ShopMenu(event.getPlayer(), Component.text(shopkeeper.getShopkeeperName()),
                     shopkeeperItems, itemHandler);

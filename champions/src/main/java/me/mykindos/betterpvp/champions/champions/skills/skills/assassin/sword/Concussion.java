@@ -1,8 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.sword;
 
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillDequipEvent;
@@ -21,6 +19,9 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 @Singleton
 @BPvPListener

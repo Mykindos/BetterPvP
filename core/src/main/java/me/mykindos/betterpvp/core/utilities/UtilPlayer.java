@@ -10,18 +10,14 @@ import lombok.SneakyThrows;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
-import net.kyori.adventure.text.Component;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -74,10 +70,6 @@ public class UtilPlayer {
 
     public static boolean isHoldingItem(Player player, Material[] items) {
         return Arrays.stream(items).anyMatch(item -> item == player.getInventory().getItemInMainHand().getType());
-    }
-
-    public static void sendActionBar(Player player, Component msg) {
-        player.sendActionBar(msg);
     }
 
     /**

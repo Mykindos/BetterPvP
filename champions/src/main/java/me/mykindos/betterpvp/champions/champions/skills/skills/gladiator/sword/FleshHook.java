@@ -18,7 +18,10 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.*;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -128,7 +131,7 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
                         iterator.remove();
 
                         championsManager.getCooldowns().removeCooldown(player, getName(), true);
-                        championsManager.getCooldowns().add(player, getName(), getCooldown(level), showCooldownFinished());
+                        championsManager.getCooldowns().use(player, getName(), getCooldown(level), showCooldownFinished());
                     }
                 }
             }

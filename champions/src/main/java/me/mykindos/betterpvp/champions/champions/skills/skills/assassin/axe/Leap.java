@@ -77,7 +77,7 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
 
     public boolean wallKick(Player player) {
 
-        if (championsManager.getCooldowns().add(player, "Wall Kick", 0.25, false)) {
+        if (championsManager.getCooldowns().use(player, "Wall Kick", 0.25, false)) {
             Vector vec = player.getLocation().getDirection();
 
             boolean xPos = true;
@@ -102,7 +102,9 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
                                 if (back.getLocation().getY() == Math.floor(player.getLocation().getY())
                                         || back.getLocation().getY() == Math.floor(player.getLocation().getY() - 0.25)) {
                                     if (UtilBlock.airFoliage(back.getRelative(BlockFace.UP).getType())) {
-                                        continue;
+                                        if (!UtilBlock.airFoliage(player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType())) {
+                                            continue;
+                                        }
                                     }
                                 }
                                 Block forward = null;
