@@ -6,7 +6,6 @@ import lombok.Getter;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 import me.mykindos.betterpvp.core.gamer.repository.GamerRepository;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
