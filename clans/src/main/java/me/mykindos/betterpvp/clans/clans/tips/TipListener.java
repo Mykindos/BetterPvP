@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.utilities.model.WeighedList;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -68,18 +69,34 @@ public class TipListener extends ClanListener {
             return;
         }
         Gamer gamer = gamerOptional.get();
+
+        WeighedList<Tip> tipWeighedList = new WeighedList<Tip>();
+
         if ((boolean) gamer.getProperty(GamerProperty.TIPS_ENABLED).orElse(true) &&
                 UtilTime.elapsed(gamer.getLastTip(), (long) 1 * 1000)
                 ) {
             Optional<Clan> clanOptional = clanManager.getClanByPlayer(player);
             if (clanOptional.isEmpty()) {
-                sendTip(player, Tip.ClAN_CREATE);
+                tipWeighedList.add(10, 1, Tip.ClAN_CREATE);
+                /*sendTip(player, Tip.ClAN_CREATE);
                 gamer.setLastTipNow();
-                return;
+                return;*/
             }
-            Clan clan = clanOptional.get();
-            if (clan.getSquadCount() == 1) {
-                sendTip(player, Tip.CLAN_INVITE);
+            //do stuff that non-clan members get tips for
+
+            if (clanOptional.isPresent()) {
+                Clan clan = clanOptional.get();
+                if (clan.getSquadCount() == 1) {
+                    tipWeighedList.add(2, 1, Tip.CLAN_INVITE);
+                /*sendTip(player, Tip.CLAN_INVITE);
+                gamer.setLastTipNow();
+                return;*/
+                }
+            }
+
+            if (tipWeighedList.size() > 0) {
+                Tip tip = tipWeighedList.random();
+                sendTip(player, tip);
                 gamer.setLastTipNow();
             }
         }
