@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.clans.clans.tips;
 
 import com.google.inject.Inject;
 import me.mykindos.betterpvp.clans.Clans;
+import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.listeners.ClanListener;
 import me.mykindos.betterpvp.core.client.events.ClientLoginEvent;
@@ -53,6 +54,11 @@ public class TipListener extends ClanListener {
         });
     }
 
+    public void sendTip(Player player, Tip tip){
+        UtilMessage.message(player, "Tips", tip.getComponent());
+
+    }
+
     @EventHandler(priority = EventPriority.MONITOR)
     public void onTip(TipEvent event) {
         Player player = event.getPlayer();
@@ -63,11 +69,19 @@ public class TipListener extends ClanListener {
         }
         Gamer gamer = gamerOptional.get();
         if ((boolean) gamer.getProperty(GamerProperty.TIPS_ENABLED).orElse(true) &&
-                UtilTime.elapsed(gamer.getLastTip(), (long) timeBetweenTips * 1000) &&
-                clanManager.getClanByPlayer(player).isEmpty()) {
-            UtilMessage.message(player, "Tips", Component.text("You can create a Clan by running /c create <name>"));
-            gamer.setLastTip(System.currentTimeMillis());
+                UtilTime.elapsed(gamer.getLastTip(), (long) 1 * 1000)
+                ) {
+            Optional<Clan> clanOptional = clanManager.getClanByPlayer(player);
+            if (clanOptional.isEmpty()) {
+                sendTip(player, Tip.ClAN_CREATE);
+                gamer.setLastTipNow();
+                return;
+            }
+            Clan clan = clanOptional.get();
+            if (clan.getSquadCount() == 1) {
+                sendTip(player, Tip.CLAN_INVITE);
+                gamer.setLastTipNow();
+            }
         }
     }
-
 }

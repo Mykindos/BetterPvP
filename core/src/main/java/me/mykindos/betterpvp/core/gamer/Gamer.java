@@ -74,4 +74,7 @@ public class Gamer extends PropertyContainer implements Invitable, IMapListener 
         UtilServer.callEvent(new GamerPropertyUpdateEvent( this, key, value));
     }
 
+    public void setLastTipNow() {
+        setLastTip(System.currentTimeMillis());
+    }
 }
