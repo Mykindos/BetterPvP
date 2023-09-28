@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.utilities.model.display;
 
+import com.google.common.base.Preconditions;
 import me.mykindos.betterpvp.core.gamer.Gamer;
 import net.kyori.adventure.text.Component;
 
@@ -14,6 +15,7 @@ public abstract class DisplayComponent {
     private boolean isInvalid = false;
 
     protected DisplayComponent(Function<Gamer, Component> provider) {
+        Preconditions.checkNotNull(provider, "provider");
         this.provider = provider;
     }
 

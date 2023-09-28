@@ -78,7 +78,7 @@ public class WorldListener implements Listener {
     @EventHandler
     public void handleBucket(PlayerBucketFillEvent event) {
         event.setCancelled(true);
-        UtilMessage.simpleMessage(event.getPlayer(), "Game", "Your <alt2>>Bucket</alt2> broke!");
+        UtilMessage.simpleMessage(event.getPlayer(), "Game", "Your <alt2>Bucket</alt2> broke!");
         ItemStack replacement = new ItemStack(Material.IRON_INGOT, event.getPlayer().getInventory().getItemInMainHand().getAmount() * 3);
         event.getPlayer().getInventory().setItemInMainHand(replacement);
     }

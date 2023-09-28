@@ -18,9 +18,17 @@ import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.model.ProgressionRepository;
 import me.mykindos.betterpvp.progression.tree.fishing.Fishing;
 import me.mykindos.betterpvp.progression.tree.fishing.data.FishingData;
-import me.mykindos.betterpvp.progression.tree.fishing.model.FishType;
+import me.mykindos.betterpvp.progression.tree.fishing.fish.FishTypeLoader;
+import me.mykindos.betterpvp.progression.tree.fishing.fish.SimpleFishType;
+import me.mykindos.betterpvp.progression.tree.fishing.loot.SwimmerLoader;
+import me.mykindos.betterpvp.progression.tree.fishing.loot.SwimmerType;
+import me.mykindos.betterpvp.progression.tree.fishing.loot.TreasureLoader;
+import me.mykindos.betterpvp.progression.tree.fishing.loot.TreasureType;
+import me.mykindos.betterpvp.progression.tree.fishing.model.FishingLootType;
 import me.mykindos.betterpvp.progression.tree.fishing.model.FishingRodType;
+import me.mykindos.betterpvp.progression.tree.fishing.model.LootTypeLoader;
 import me.mykindos.betterpvp.progression.tree.fishing.rod.SimpleFishingRod;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -45,10 +53,15 @@ import java.util.concurrent.TimeUnit;
 public class FishingRepository implements ProgressionRepository<Fishing, FishingData>, Listener, ConfigAccessor {
 
     @Getter
-    private final WeighedList<FishType> fishTypes = new WeighedList<>();
+    private final WeighedList<FishingLootType> lootTypes = new WeighedList<>();
     @Getter
     private final Set<FishingRodType> rodTypes = new HashSet<>();
     private final AsyncLoadingCache<UUID, FishingData> dataCache;
+    private final LootTypeLoader<?>[] loaders = new LootTypeLoader<?>[]{
+            new SwimmerLoader(),
+            new FishTypeLoader(),
+            new TreasureLoader()
+    };
 
     private final Database database;
     private final Progression plugin;
@@ -61,27 +74,57 @@ public class FishingRepository implements ProgressionRepository<Fishing, Fishing
                 .expireAfterAccess(5, TimeUnit.MINUTES)
                 .evictionListener((UUID uuid, FishingData data, RemovalCause cause) -> save(uuid))
                 .buildAsync((AsyncCacheLoader<? super UUID, FishingData>) ((key, executor) -> loadOrCreate(key)));
-
-        reloadTypes();
     }
 
-    private void reloadTypes() {
+    @Override
+    public void loadConfig(ExtendedYamlConfiguration config) {
         // Clear
-        fishTypes.clear();
+        lootTypes.clear();
         rodTypes.clear();
 
         // Load fish types
         Reflections reflections = new Reflections(Fishing.class.getPackageName());
-        Set<Class<? extends FishType>> classes = reflections.getSubTypesOf(FishType.class);
+        Set<Class<? extends FishingLootType>> classes = reflections.getSubTypesOf(FishingLootType.class);
         for (var clazz : classes) {
             if (clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers()) || clazz.isEnum()) continue;
             if (clazz.isAnnotationPresent(Deprecated.class)) continue;
-            FishType type = plugin.getInjector().getInstance(clazz);
+            if (clazz == SimpleFishType.class) continue; // Skip config fish type
+            if (clazz == SwimmerType.class) continue; // Skip config fish type
+            if (clazz == TreasureType.class) continue;
+            FishingLootType type = plugin.getInjector().getInstance(clazz);
             plugin.getInjector().injectMembers(type);
+
             // We do a weight of 1 because we want fish with the same frequency to be equally likely
-            fishTypes.add(type.getFrequency(), 1, type);
+            type.loadConfig(config);
+            lootTypes.add(type.getFrequency(), 1, type);
         }
-        log.info("Loaded " + fishTypes.size() + " fish types");
+
+        // Create dynamic loot types
+        ConfigurationSection customFishSection = config.getConfigurationSection("fishing.loot");
+        if (customFishSection == null) {
+            customFishSection = config.createSection("fishing.loot");
+        }
+
+        for (String key : customFishSection.getKeys(false)) {
+            final ConfigurationSection section = customFishSection.getConfigurationSection(key);
+            final String type = section.getString("type");
+
+            boolean found = false;
+            for (LootTypeLoader<?> loader : loaders) {
+                if (loader.getTypeKey().equalsIgnoreCase(type)) {
+                    final FishingLootType loaded = loader.read(section);
+                    loaded.loadConfig(config);
+                    lootTypes.add(loaded.getFrequency(), 1, loaded);
+                    found = true;
+                }
+            }
+
+            if (!found) {
+                throw new IllegalArgumentException("Unknown loot type: " + type);
+            }
+        }
+
+        log.info("Loaded " + lootTypes.size() + " loot types");
 
         Set<Class<? extends FishingRodType>> rodClasses = reflections.getSubTypesOf(FishingRodType.class);
         for (var clazz : rodClasses) {
@@ -89,15 +132,11 @@ public class FishingRepository implements ProgressionRepository<Fishing, Fishing
             if (clazz.isAnnotationPresent(Deprecated.class)) continue;
             FishingRodType type = plugin.getInjector().getInstance(clazz);
             plugin.getInjector().injectMembers(type);
+            type.loadConfig(config);
             rodTypes.add(type);
         }
         rodTypes.addAll(List.of(SimpleFishingRod.values()));
         log.info("Loaded " + rodTypes.size() + " rod types");
-    }
-
-    @Override
-    public void loadConfig(ExtendedYamlConfiguration config) {
-        fishTypes.forEach(type -> plugin.getInjector().injectMembers(type));
     }
 
     @Override

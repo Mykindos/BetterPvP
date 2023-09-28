@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.progression.tree.fishing.model;
 
 import me.mykindos.betterpvp.core.utilities.model.ConfigAccessor;
+import me.mykindos.betterpvp.progression.tree.fishing.fish.FishType;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -21,10 +22,10 @@ public interface FishingRodType extends ConfigAccessor {
     @NotNull String getName();
 
     /**
-     * Determines if the fishing rod can reel in the fish
-     * @param fish The fish to reel in
-     * @return {@code true} if the fishing rod can reel in the fish, {@code false} otherwise
+     * Determines if the fishing rod can reel in the loot
+     * @param loot The loot
+     * @return {@code true} if the fishing rod can reel in the loot, {@code false} otherwise
      */
-    boolean canReel(@NotNull Fish fish);
+    boolean canReel(@NotNull FishingLoot loot);
 
 }

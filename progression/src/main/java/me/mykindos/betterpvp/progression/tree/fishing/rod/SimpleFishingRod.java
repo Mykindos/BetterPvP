@@ -2,7 +2,8 @@ package me.mykindos.betterpvp.progression.tree.fishing.rod;
 
 import lombok.Getter;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
-import me.mykindos.betterpvp.progression.tree.fishing.model.Fish;
+import me.mykindos.betterpvp.progression.tree.fishing.fish.Fish;
+import me.mykindos.betterpvp.progression.tree.fishing.model.FishingLoot;
 import me.mykindos.betterpvp.progression.tree.fishing.model.FishingRodType;
 import org.checkerframework.common.value.qual.IntRange;
 import org.jetbrains.annotations.NotNull;
@@ -30,8 +31,8 @@ public enum SimpleFishingRod implements FishingRodType {
     }
 
     @Override
-    public boolean canReel(@NotNull Fish fish) {
-        return fish.getWeight() <= maxWeight;
+    public boolean canReel(@NotNull FishingLoot loot) {
+        return !(loot instanceof Fish fish) || fish.getWeight() <= maxWeight;
     }
 
     @Override

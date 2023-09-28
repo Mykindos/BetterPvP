@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.progression.model.ProgressionData;
 import me.mykindos.betterpvp.progression.tree.fishing.Fishing;
-import me.mykindos.betterpvp.progression.tree.fishing.model.Fish;
+import me.mykindos.betterpvp.progression.tree.fishing.fish.Fish;
 
 @Getter
 @Setter

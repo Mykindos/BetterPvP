@@ -6,7 +6,7 @@ import me.mykindos.betterpvp.core.utilities.model.WeighedList;
 import me.mykindos.betterpvp.progression.model.Leaderboard;
 import me.mykindos.betterpvp.progression.model.ProgressionTree;
 import me.mykindos.betterpvp.progression.tree.fishing.data.FishingLeaderboard;
-import me.mykindos.betterpvp.progression.tree.fishing.model.FishType;
+import me.mykindos.betterpvp.progression.tree.fishing.model.FishingLootType;
 import me.mykindos.betterpvp.progression.tree.fishing.model.FishingRodType;
 import me.mykindos.betterpvp.progression.tree.fishing.repository.FishingRepository;
 import me.mykindos.betterpvp.progression.tree.fishing.rod.SimpleFishingRod;
@@ -41,8 +41,8 @@ public class Fishing implements ProgressionTree {
         return null;
     }
 
-    public WeighedList<FishType> getFishTypes() {
-        return repository.getFishTypes();
+    public WeighedList<FishingLootType> getLootTypes() {
+        return repository.getLootTypes();
     }
 
     public Set<FishingRodType> getRodTypes() {
@@ -68,7 +68,5 @@ public class Fishing implements ProgressionTree {
     @Override
     public void loadConfig(ExtendedYamlConfiguration config) {
         repository.loadConfig(config);
-        getFishTypes().forEach(fishType -> fishType.loadConfig(config));
-        getRodTypes().forEach(rodType -> rodType.loadConfig(config));
     }
 }

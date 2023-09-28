@@ -63,6 +63,9 @@ public class Progression extends BPvPPlugin {
             var commandLoader = injector.getInstance(ProgressionCommandLoader.class);
             commandLoader.loadCommands(PACKAGE);
 
+            var trees = injector.getInstance(ProgressionsLoader.class);
+            trees.loadTrees();
+
             updateEventExecutor.loadPlugin(this);
         }
     }
