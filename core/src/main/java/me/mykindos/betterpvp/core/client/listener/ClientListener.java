@@ -1,10 +1,6 @@
 package me.mykindos.betterpvp.core.client.listener;
 
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.events.PacketContainer;
 import com.google.inject.Inject;
-import java.util.Optional;
 import lombok.SneakyThrows;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.ClientManager;
@@ -34,12 +30,30 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 
+import java.util.Optional;
+
 @BPvPListener
 public class ClientListener implements Listener {
 
     @Inject
     @Config(path = "pvp.enableOldPvP", defaultValue = "true")
     private boolean enableOldPvP;
+
+    @Inject
+    @Config(path = "tab.title", defaultValue = "Welcome to Mineplex Clans!")
+    private String tabTitle;
+
+    @Inject
+    @Config(path = "tab.website", defaultValue = "https://mineplex.com")
+    private String website;
+
+    @Inject
+    @Config(path = "tab.shop", defaultValue = "mineplex.com/shop")
+    private String shop;
+
+    @Inject
+    @Config(path = "tab.server", defaultValue = "Clans-1")
+    private String server;
 
     private final ClientManager clientManager;
 
@@ -121,23 +135,17 @@ public class ClientListener implements Listener {
 
     @SneakyThrows
     public void updateTab(Player player) {
+        var titleBot = Component.text("Mineplex ", NamedTextColor.GOLD)
+                .append(Component.text("Network  ", NamedTextColor.WHITE))
+                .append(Component.text(server, NamedTextColor.GREEN));
+        var header = titleBot;
 
-        PacketContainer pc = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.PLAYER_LIST_HEADER_FOOTER);
-
-        var titleTop = Component.text("Welcome to BetterPvP Clans!\n", NamedTextColor.RED, TextDecoration.BOLD);
-        var titleBot = Component.text("Visit our website at: ", NamedTextColor.RED, TextDecoration.BOLD)
-                .append(Component.text("https://betterpvp.net", NamedTextColor.YELLOW, TextDecoration.BOLD));
-        var header = titleTop.append(Component.newline()).append(titleBot);
-
-        var footerLeft = Component.text("Ping: ", NamedTextColor.GOLD, TextDecoration.BOLD)
-                .append(Component.text(UtilPlayer.getPing(player), NamedTextColor.YELLOW, TextDecoration.BOLD));
-        var footerRight = Component.text("Online: ", NamedTextColor.GOLD, TextDecoration.BOLD)
-                .append(Component.text(Bukkit.getOnlinePlayers().size(), NamedTextColor.YELLOW, TextDecoration.BOLD));
-        var footer = footerLeft.append(Component.space()).append(footerRight);
+        var footerLeft = Component.text("Visit ", NamedTextColor.WHITE)
+                .append(Component.text(shop, NamedTextColor.YELLOW))
+                .append(Component.text(" for cool perks!", NamedTextColor.WHITE));
+        var footer = footerLeft;
 
         player.sendPlayerListHeaderAndFooter(header, footer);
-//        pc.getChatComponents().write(0, title).write(1, info);
-//        ProtocolLibrary.getProtocolManager().sendServerPacket(player, pc);
     }
 
     @EventHandler
