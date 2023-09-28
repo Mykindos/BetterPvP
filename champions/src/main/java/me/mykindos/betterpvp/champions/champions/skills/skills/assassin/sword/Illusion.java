@@ -39,7 +39,7 @@ public class Illusion extends Skill implements CooldownSkill, InteractSkill, Lis
     private Map<Player, Skeleton> activeIllusions = new HashMap<>();
     private Map<Player, Long> swapCooldowns = new HashMap<>();
     private static final long SWAP_COOLDOWN_DURATION = 1000;
-    private Map<Player, BukkitTask> illusionWalkingTasks = new HashMap<>();
+    private Map<Player, Integer> illusionWalkingTasks = new HashMap<>();
 
     @Inject
     public Illusion(Champions champions, ChampionsManager championsManager) {
@@ -127,13 +127,13 @@ public class Illusion extends Skill implements CooldownSkill, InteractSkill, Lis
                 activeIllusions.remove(player);
             }, (long) (baseDuration + level) * 20);
 
-            BukkitTask task = Bukkit.getScheduler().scheduleSyncRepeatingTask(champions, () -> {
+            Integer taskID = Bukkit.getScheduler().scheduleSyncRepeatingTask(champions, () -> {
                 if (activeIllusions.containsKey(player) && illusion.isValid()) {
                     illusion.setVelocity(player.getLocation().getDirection().multiply(1.2));
                 }
-            }, 1L, 1L); // This will run every tick (20 times a second)
+            }, 1L, 1L);
 
-            illusionWalkingTasks.put(player, task);
+            illusionWalkingTasks.put(player, taskID);
 
             Bukkit.getScheduler().scheduleSyncDelayedTask(champions, () -> {
                 illusion.remove();
@@ -141,7 +141,7 @@ public class Illusion extends Skill implements CooldownSkill, InteractSkill, Lis
 
                 // Cancel the illusion's walking task here
                 if (illusionWalkingTasks.containsKey(player)) {
-                    illusionWalkingTasks.get(player).cancel();
+                    Bukkit.getScheduler().cancelTask(illusionWalkingTasks.get(player));
                     illusionWalkingTasks.remove(player);
                 }
             }, (long) (baseDuration + level) * 20);
@@ -159,7 +159,7 @@ public class Illusion extends Skill implements CooldownSkill, InteractSkill, Lis
             }
             activeIllusions.remove(player);
             if (illusionWalkingTasks.containsKey(player)) {
-                illusionWalkingTasks.get(player).cancel();
+                Bukkit.getScheduler().cancelTask(illusionWalkingTasks.get(player));
                 illusionWalkingTasks.remove(player);
             }
         }
@@ -181,7 +181,7 @@ public class Illusion extends Skill implements CooldownSkill, InteractSkill, Lis
                 activeIllusions.remove(owner);
 
                 if (illusionWalkingTasks.containsKey(owner)) {
-                    illusionWalkingTasks.get(owner).cancel();
+                    Bukkit.getScheduler().cancelTask(illusionWalkingTasks.get(owner));
                     illusionWalkingTasks.remove(owner);
                 }
             }
