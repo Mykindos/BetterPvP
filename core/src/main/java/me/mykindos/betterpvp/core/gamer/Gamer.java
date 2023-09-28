@@ -33,6 +33,8 @@ public class Gamer extends PropertyContainer implements Invitable, IMapListener 
 
     private long lastDamaged;
 
+    private long lastTip;
+
     public Gamer(Client client, String uuid){
         this.client = client;
         this.uuid = uuid;

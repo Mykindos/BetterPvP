@@ -11,6 +11,8 @@ public enum GamerProperty {
     // Misc
     SIDEBAR_ENABLED,
 
+    TIPS_ENABLED,
+
     // Chat modes
     CLAN_CHAT,
     ALLY_CHAT,
@@ -28,7 +30,10 @@ public enum GamerProperty {
     DAMAGE_DEALT,
     DAMAGE_TAKEN,
 
-    COOLDOWN_DISPLAY;
+    COOLDOWN_DISPLAY,
+
+
+    ;
 
 
 }

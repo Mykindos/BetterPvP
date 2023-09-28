@@ -6,6 +6,7 @@ import lombok.Getter;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 import me.mykindos.betterpvp.core.gamer.repository.GamerRepository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,6 +30,10 @@ public class GamerManager extends Manager<Gamer> {
      */
     public Optional<Gamer> getGamerByName(String name) {
         return objects.values().stream().filter(gamer -> gamer.getClient().getName().equalsIgnoreCase(name)).findFirst();
+    }
+
+    public Collection<Gamer> getObjectsValues() {
+        return objects.values();
     }
 
     @Override
