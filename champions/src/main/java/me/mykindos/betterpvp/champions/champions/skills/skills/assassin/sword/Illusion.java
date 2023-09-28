@@ -24,6 +24,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.util.Vector;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -88,65 +89,93 @@ public class Illusion extends Skill implements CooldownSkill, InteractSkill, Lis
     @Override
     public void activate(Player player, int level) {
         if (activeIllusions.containsKey(player)) {
-
-            if (swapCooldowns.containsKey(player)) {
-                long lastSwapTime = swapCooldowns.get(player);
-                long currentTime = System.currentTimeMillis();
-                long timePassed = currentTime - lastSwapTime;
-
-                if (timePassed < SWAP_COOLDOWN_DURATION) {
-                    UtilMessage.simpleMessage(player, getClassType().getName(), "<alt>Body Swap</alt> cannot be used for " + (SWAP_COOLDOWN_DURATION - timePassed) / 1000 + " seconds");
-                    return;
-                }
-            }
-
-            Skeleton illusion = activeIllusions.get(player);
-            Location tempLoc = player.getLocation().clone();
-            player.teleport(illusion);
-            illusion.teleport(tempLoc);
-
-            swapCooldowns.put(player, System.currentTimeMillis());
-        }else {
-            Skeleton illusion = player.getWorld().spawn(player.getLocation(), Skeleton.class);
-            illusion.setAI(true);
-            illusion.setVelocity(player.getLocation().getDirection().multiply(1.2)); // running speed
-            illusion.getEquipment().setArmorContents(player.getEquipment().getArmorContents());
-            illusion.getEquipment().setItemInMainHand(player.getEquipment().getItemInMainHand());
-
-            Bukkit.getScheduler().scheduleSyncRepeatingTask(champions, () -> {
-                if (activeIllusions.containsKey(player) && illusion.isValid()) {
-                    illusion.getEquipment().setItemInMainHand(player.getEquipment().getItemInMainHand());
-                    illusion.setRotation(player.getLocation().getYaw(), player.getLocation().getPitch());
-                }
-            }, 0, 5);
-
-            activeIllusions.put(player, illusion);
-
-            Bukkit.getScheduler().scheduleSyncDelayedTask(champions, () -> {
-                illusion.remove();
-                activeIllusions.remove(player);
-            }, (long) (baseDuration + level) * 20);
-
-            Integer taskID = Bukkit.getScheduler().scheduleSyncRepeatingTask(champions, () -> {
-                if (activeIllusions.containsKey(player) && illusion.isValid()) {
-                    illusion.setVelocity(player.getLocation().getDirection().multiply(1.2));
-                }
-            }, 1L, 1L);
-
-            illusionWalkingTasks.put(player, taskID);
-
-            Bukkit.getScheduler().scheduleSyncDelayedTask(champions, () -> {
-                illusion.remove();
-                activeIllusions.remove(player);
-
-                // Cancel the illusion's walking task here
-                if (illusionWalkingTasks.containsKey(player)) {
-                    Bukkit.getScheduler().cancelTask(illusionWalkingTasks.get(player));
-                    illusionWalkingTasks.remove(player);
-                }
-            }, (long) (baseDuration + level) * 20);
-
+            bodySwap(player);
+        } else {
+            createIllusion(player, level);
         }
+    }
+
+    private void bodySwap(Player player) {
+        if (swapCooldowns.containsKey(player)) {
+            long lastSwapTime = swapCooldowns.get(player);
+            long currentTime = System.currentTimeMillis();
+            long timePassed = currentTime - lastSwapTime;
+
+            if (timePassed < SWAP_COOLDOWN_DURATION) {
+                UtilMessage.simpleMessage(player, getClassType().getName(), "<alt>Body Swap</alt> cannot be used for " + (SWAP_COOLDOWN_DURATION - timePassed) / 1000 + " seconds");
+                return;
+            }
+        }
+
+        Skeleton illusion = activeIllusions.get(player);
+        Location tempLoc = player.getLocation().clone();
+        player.teleport(illusion);
+        illusion.teleport(tempLoc);
+
+        swapCooldowns.put(player, System.currentTimeMillis());
+    }
+
+    private void createIllusion(Player player, int level) {
+        Skeleton illusion = player.getWorld().spawn(player.getLocation(), Skeleton.class);
+        setupIllusionAttributes(player, illusion);
+
+        scheduleIllusionUpdate(player, illusion);
+
+        activeIllusions.put(player, illusion);
+
+        scheduleIllusionRemoval(player, illusion, level);
+
+        Integer taskID = scheduleIllusionWalkingTask(player, illusion);
+
+        illusionWalkingTasks.put(player, taskID);
+
+        scheduleWalkingTaskCancellation(player, illusion, level, taskID);
+    }
+
+    private void setupIllusionAttributes(Player player, Skeleton illusion) {
+        illusion.setAI(true);
+        Vector direction = player.getLocation().getDirection().multiply(0.2);
+        direction.setY(-0.5);
+        illusion.setVelocity(direction);
+        illusion.getEquipment().setArmorContents(player.getEquipment().getArmorContents());
+        illusion.getEquipment().setItemInMainHand(player.getEquipment().getItemInMainHand());
+    }
+
+    private void scheduleIllusionUpdate(Player player, Skeleton illusion) {
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(champions, () -> {
+            if (activeIllusions.containsKey(player) && illusion.isValid()) {
+                illusion.getEquipment().setItemInMainHand(player.getEquipment().getItemInMainHand());
+                illusion.setRotation(player.getLocation().getYaw(), player.getLocation().getPitch());
+            }
+        }, 0, 5);
+    }
+
+    private void scheduleIllusionRemoval(Player player, Skeleton illusion, int level) {
+        Bukkit.getScheduler().scheduleSyncDelayedTask(champions, () -> {
+            illusion.remove();
+            activeIllusions.remove(player);
+        }, (long) (baseDuration + level) * 20);
+    }
+
+    private Integer scheduleIllusionWalkingTask(Player player, Skeleton illusion) {
+        return Bukkit.getScheduler().scheduleSyncRepeatingTask(champions, () -> {
+            if (activeIllusions.containsKey(player) && illusion.isValid()) {
+                Vector taskDirection = player.getLocation().getDirection().multiply(0.2);
+                taskDirection.setY(-0.5);
+                illusion.setVelocity(taskDirection);
+            }
+        }, 1L, 1L);
+    }
+
+    private void scheduleWalkingTaskCancellation(Player player, Skeleton illusion, int level, Integer taskID) {
+        Bukkit.getScheduler().scheduleSyncDelayedTask(champions, () -> {
+            illusion.remove();
+            activeIllusions.remove(player);
+            if (illusionWalkingTasks.containsKey(player)) {
+                Bukkit.getScheduler().cancelTask(taskID);
+                illusionWalkingTasks.remove(player);
+            }
+        }, (long) (baseDuration + level) * 20);
     }
 
     @EventHandler
