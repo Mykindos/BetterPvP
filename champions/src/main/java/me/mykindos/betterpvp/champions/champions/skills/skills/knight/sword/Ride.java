@@ -20,6 +20,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Horse;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -128,15 +129,7 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
     @EventHandler
     public void onCustomHorseDamage(CustomDamageEvent event) {
         if (event.getDamagee() instanceof Horse && activeHorses.contains(event.getDamagee())) {
-            if (event.getDamager() instanceof Player) {
-                Player damagerPlayer = (Player) event.getDamager();
-                Location damageLocation = damagerPlayer.getLocation();
-                List<Player> nearbyEnemies = UtilPlayer.getNearbyEnemies(damagerPlayer, damageLocation, 100);
-
-                if (!nearbyEnemies.contains(damagerPlayer)) {
-                    event.setCancelled(true);
-                }
-            } else {
+            if (!(event.getDamager() instanceof Player)) {
                 event.setCancelled(true);
             }
         }
