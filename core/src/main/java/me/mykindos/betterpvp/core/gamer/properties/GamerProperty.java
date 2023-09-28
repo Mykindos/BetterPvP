@@ -30,10 +30,7 @@ public enum GamerProperty {
     DAMAGE_DEALT,
     DAMAGE_TAKEN,
 
-    COOLDOWN_DISPLAY,
-
-
-    ;
+    COOLDOWN_DISPLAY;
 
 
 }
