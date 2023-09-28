@@ -63,7 +63,7 @@ public class TipListener extends ClanListener {
         }
         Gamer gamer = gamerOptional.get();
         if ((boolean) gamer.getProperty(GamerProperty.TIPS_ENABLED).orElse(true) &&
-                UtilTime.elapsed(gamer.getLastTip(), (long) 1 * 1000) &&
+                UtilTime.elapsed(gamer.getLastTip(), (long) timeBetweenTips * 1000) &&
                 clanManager.getClanByPlayer(player).isEmpty()) {
             UtilMessage.message(player, "Tips", Component.text("You can create a Clan by running /c create <name>"));
             gamer.setLastTip(System.currentTimeMillis());
