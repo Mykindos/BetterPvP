@@ -135,15 +135,13 @@ public class ClientListener implements Listener {
 
     @SneakyThrows
     public void updateTab(Player player) {
-        var titleBot = Component.text("Mineplex ", NamedTextColor.GOLD)
-                .append(Component.text("Network  ", NamedTextColor.WHITE))
+        var header = Component.text("Mineplex ", NamedTextColor.GOLD)
+                .append(Component.text("Network ", NamedTextColor.WHITE))
                 .append(Component.text(server, NamedTextColor.GREEN));
-        var header = titleBot;
 
-        var footerLeft = Component.text("Visit ", NamedTextColor.WHITE)
+        var footer = Component.text("Visit ", NamedTextColor.WHITE)
                 .append(Component.text(shop, NamedTextColor.YELLOW))
                 .append(Component.text(" for cool perks!", NamedTextColor.WHITE));
-        var footer = footerLeft;
 
         player.sendPlayerListHeaderAndFooter(header, footer);
     }
