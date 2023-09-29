@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -19,11 +20,10 @@ import org.bukkit.entity.Skeleton;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
-import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
 import javax.inject.Inject;
@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+
 @Singleton
 @BPvPListener
 public class Illusion extends Skill implements CooldownSkill, InteractSkill, Listener {
@@ -39,8 +40,9 @@ public class Illusion extends Skill implements CooldownSkill, InteractSkill, Lis
     private double baseDuration;
     private Map<Player, Skeleton> activeIllusions = new HashMap<>();
     private Map<Player, Long> swapCooldowns = new HashMap<>();
-    private static final long SWAP_COOLDOWN_DURATION = 1000;
+    private static final long SWAP_COOLDOWN_DURATION = 1500;
     private Map<Player, Integer> illusionWalkingTasks = new HashMap<>();
+    private Map<Player, Long> illusionStartTime = new HashMap<>();
 
     @Inject
     public Illusion(Champions champions, ChampionsManager championsManager) {
@@ -63,7 +65,7 @@ public class Illusion extends Skill implements CooldownSkill, InteractSkill, Lis
                 "Send out a copy of yourself that will run forwards in whatever direction you look",
                 "Right clicking while the illusion is alive will swap places with it",
                 "",
-                "There is an internal cooldown of 1 second to illusion swapping",
+                "There is an internal cooldown of 1.5 second to illusion swapping",
                 "",
                 "Illusion lasts <val>" + (baseDuration + (level)) + "</val> seconds and can be destroyed",
                 "",
@@ -86,42 +88,46 @@ public class Illusion extends Skill implements CooldownSkill, InteractSkill, Lis
 
         return cooldown - ((level - 1) * 3);
     }
+
+    private void bodySwap(Player player, Boolean force) {
+        if (!championsManager.getCooldowns().hasCooldown(player, "Body Swap") || force) {
+
+            if (!force) {
+                UtilMessage.simpleMessage(player, getClassType().getName(), "You used <alt>Body Swap " + getLevel(player) + "</alt>.");
+            } else {
+                championsManager.getCooldowns().removeCooldown(player, "Illusion", true);
+                championsManager.getCooldowns().use(player, "Illusion", 2, true);
+            }
+
+            if (swapCooldowns.containsKey(player)) {
+                long lastSwapTime = swapCooldowns.get(player);
+                long currentTime = System.currentTimeMillis();
+                long timePassed = currentTime - lastSwapTime;
+
+                if (timePassed < SWAP_COOLDOWN_DURATION) {
+                    UtilMessage.simpleMessage(player, getClassType().getName(), "<alt>Body Swap</alt> cannot be used for " + String.format("%.1f", (SWAP_COOLDOWN_DURATION - timePassed) / 1000.0) + " seconds");
+                    return;
+                }
+            }
+
+            Skeleton illusion = activeIllusions.get(player);
+            Location tempLoc = player.getLocation().clone();
+            player.teleport(illusion);
+            illusion.teleport(tempLoc);
+
+            swapCooldowns.put(player, System.currentTimeMillis());
+        }
+    }
+
     @Override
     public void activate(Player player, int level) {
-        if (activeIllusions.containsKey(player)) {
-            bodySwap(player);
-        } else {
-            createIllusion(player, level);
-        }
-    }
-
-    private void bodySwap(Player player) {
-        if (swapCooldowns.containsKey(player)) {
-            long lastSwapTime = swapCooldowns.get(player);
-            long currentTime = System.currentTimeMillis();
-            long timePassed = currentTime - lastSwapTime;
-
-            if (timePassed < SWAP_COOLDOWN_DURATION) {
-                UtilMessage.simpleMessage(player, getClassType().getName(), "<alt>Body Swap</alt> cannot be used for " + (SWAP_COOLDOWN_DURATION - timePassed) / 1000 + " seconds");
-                return;
-            }
-        }
-
-        Skeleton illusion = activeIllusions.get(player);
-        Location tempLoc = player.getLocation().clone();
-        player.teleport(illusion);
-        illusion.teleport(tempLoc);
-
-        swapCooldowns.put(player, System.currentTimeMillis());
-    }
-
-    private void createIllusion(Player player, int level) {
         Skeleton illusion = player.getWorld().spawn(player.getLocation(), Skeleton.class);
         setupIllusionAttributes(player, illusion);
 
         scheduleIllusionUpdate(player, illusion);
 
         activeIllusions.put(player, illusion);
+        illusionStartTime.put(player, System.currentTimeMillis());
 
         scheduleIllusionRemoval(player, illusion, level);
 
@@ -132,16 +138,25 @@ public class Illusion extends Skill implements CooldownSkill, InteractSkill, Lis
         scheduleWalkingTaskCancellation(player, illusion, level, taskID);
     }
 
-    private void setupIllusionAttributes(Player player, Skeleton illusion) {
+    public boolean canUse(Player player) {
+        if ((illusionStartTime.containsKey(player) && activeIllusions.containsKey(player)) && (!UtilTime.elapsed(illusionStartTime.get(player), (long)((baseDuration + getLevel(player)) * 1000L)))) {
+                bodySwap(player, false);
+                return false;
+            }
+        return true;
+    }
+
+    public void setupIllusionAttributes(Player player, Skeleton illusion) {
         illusion.setAI(true);
         Vector direction = player.getLocation().getDirection().multiply(0.2);
         direction.setY(-0.5);
         illusion.setVelocity(direction);
         illusion.getEquipment().setArmorContents(player.getEquipment().getArmorContents());
         illusion.getEquipment().setItemInMainHand(player.getEquipment().getItemInMainHand());
+        illusion.setHealth(10.0);
     }
 
-    private void scheduleIllusionUpdate(Player player, Skeleton illusion) {
+    public void scheduleIllusionUpdate(Player player, Skeleton illusion) {
         Bukkit.getScheduler().scheduleSyncRepeatingTask(champions, () -> {
             if (activeIllusions.containsKey(player) && illusion.isValid()) {
                 illusion.getEquipment().setItemInMainHand(player.getEquipment().getItemInMainHand());
@@ -150,14 +165,77 @@ public class Illusion extends Skill implements CooldownSkill, InteractSkill, Lis
         }, 0, 5);
     }
 
-    private void scheduleIllusionRemoval(Player player, Skeleton illusion, int level) {
-        Bukkit.getScheduler().scheduleSyncDelayedTask(champions, () -> {
-            illusion.remove();
+    @EventHandler
+    public void onIllusionFallDamage(EntityDamageEvent event) {
+        if (event.getEntity() instanceof Skeleton) {
+            Skeleton damagedSkeleton = (Skeleton) event.getEntity();
+            if (activeIllusions.containsValue(damagedSkeleton) && event.getCause() == EntityDamageEvent.DamageCause.FALL) {
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    private void removeIllusionWithEffects(Skeleton illusion) {
+        illusion.getWorld().spawnParticle(Particle.SMOKE_LARGE, illusion.getLocation(), 30, 0.5, 0.5, 0.5, 0.1);
+        illusion.getWorld().playSound(illusion.getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 1.0f, 1.0f);
+        illusion.remove();
+    }
+
+    @EventHandler
+    public void onPlayerDeath(PlayerDeathEvent event) {
+        Player player = event.getEntity();
+        if (activeIllusions.containsKey(player)) {
+            Skeleton illusion = activeIllusions.get(player);
+            if (illusion.isValid()) {
+                removeIllusionWithEffects(illusion);
+            }
             activeIllusions.remove(player);
+            if (illusionWalkingTasks.containsKey(player)) {
+                Bukkit.getScheduler().cancelTask(illusionWalkingTasks.get(player));
+                illusionWalkingTasks.remove(player);
+            }
+        }
+        swapCooldowns.remove(player);
+    }
+
+    @EventHandler
+    public void onEntityTarget(EntityTargetEvent event) {
+        if (event.getEntity() instanceof Skeleton) {
+            Skeleton skeleton = (Skeleton) event.getEntity();
+            if (activeIllusions.containsValue(skeleton)) {
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onIllusionDamage(EntityDamageByEntityEvent event) {
+        if (event.getEntity() instanceof Skeleton) {
+            Skeleton damagedSkeleton = (Skeleton) event.getEntity();
+            if (activeIllusions.containsValue(damagedSkeleton)) {
+                Player owner = getKeyByValue(activeIllusions, damagedSkeleton);
+                if (event.getDamager() instanceof Player) {
+                    Player damager = (Player) event.getDamager();
+                    if (damager.equals(owner)) {
+                        event.setCancelled(true);
+                        UtilMessage.simpleMessage(damager, getClassType().getName(), "You cannot damage your own illusion.");
+                    }
+                }
+            }
+        }
+    }
+
+    public void scheduleIllusionRemoval(Player player, Skeleton illusion, int level) {
+        Bukkit.getScheduler().scheduleSyncDelayedTask(champions, () -> {
+            if (activeIllusions.containsKey(player)) {
+                removeIllusionWithEffects(illusion);
+                UtilMessage.simpleMessage(player, getClassType().getName(), "Your illusion disappeared.");
+                activeIllusions.remove(player);
+            }
         }, (long) (baseDuration + level) * 20);
     }
 
-    private Integer scheduleIllusionWalkingTask(Player player, Skeleton illusion) {
+    public Integer scheduleIllusionWalkingTask(Player player, Skeleton illusion) {
         return Bukkit.getScheduler().scheduleSyncRepeatingTask(champions, () -> {
             if (activeIllusions.containsKey(player) && illusion.isValid()) {
                 Vector taskDirection = player.getLocation().getDirection().multiply(0.2);
@@ -167,7 +245,7 @@ public class Illusion extends Skill implements CooldownSkill, InteractSkill, Lis
         }, 1L, 1L);
     }
 
-    private void scheduleWalkingTaskCancellation(Player player, Skeleton illusion, int level, Integer taskID) {
+    public void scheduleWalkingTaskCancellation(Player player, Skeleton illusion, int level, Integer taskID) {
         Bukkit.getScheduler().scheduleSyncDelayedTask(champions, () -> {
             illusion.remove();
             activeIllusions.remove(player);
@@ -201,19 +279,16 @@ public class Illusion extends Skill implements CooldownSkill, InteractSkill, Lis
         Entity entity = event.getEntity();
         if (entity instanceof Skeleton && activeIllusions.containsValue(entity)) {
             Player owner = getKeyByValue(activeIllusions, (Skeleton) entity);
-
-            entity.getWorld().spawnParticle(Particle.SMOKE_LARGE, entity.getLocation(), 30, 0.5, 0.5, 0.5, 0.1);
-            entity.getWorld().playSound(entity.getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 1.0f, 1.0f);
-
             if (owner != null) {
-                owner.sendMessage("Your illusion has disappeared");
+                UtilMessage.simpleMessage(owner, getClassType().getName(), "Your illusion was killed.");
                 activeIllusions.remove(owner);
-
+                removeIllusionWithEffects((Skeleton) entity);
                 if (illusionWalkingTasks.containsKey(owner)) {
                     Bukkit.getScheduler().cancelTask(illusionWalkingTasks.get(owner));
                     illusionWalkingTasks.remove(owner);
                 }
             }
+            event.getDrops().clear();
         }
     }
 
