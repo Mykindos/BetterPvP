@@ -72,7 +72,10 @@ public class SiphoningStrikes extends Skill implements PassiveSkill, Listener {
 
         int level = getLevel(damager);
         if (level > 0) {
-            damager.setHealth(damager.getHealth()+(event.getDamage() * (healthIncrement + (0.1 * (level - 1)))));
+            if (damager.getHealth() + (event.getDamage() * (healthIncrement + (0.1 * (level - 1)))) > 20){
+                damager.setHealth(20);
+            }
+            damager.setHealth(damager.getHealth() + (event.getDamage() * (healthIncrement + (0.1 * (level - 1)))));
         }
     }
     @Override
