@@ -68,7 +68,7 @@ public class TipListener extends ClanListener {
         TipList tipList = new TipList();
 
         if ((boolean) gamer.getProperty(GamerProperty.TIPS_ENABLED).orElse(true) &&
-                UtilTime.elapsed(gamer.getLastTip(), (long) timeBetweenTips * 1000)
+                UtilTime.elapsed(gamer.getLastTip(), (long) 1 * 1000)
                 ) {
             Optional<Clan> clanOptional = clanManager.getClanByPlayer(player);
             if (clanOptional.isEmpty()) {
