@@ -28,7 +28,7 @@ import java.util.Optional;
 public class TipListener extends ClanListener {
 
     @Inject
-    @Config(path = "clans.tips.timeBetweenTips", defaultValue = "300")
+    @Config(path = "clans.tips.timeBetweenTips", defaultValue = "150")
     private int timeBetweenTips;
 
     private final Clans clans;
@@ -44,7 +44,7 @@ public class TipListener extends ClanListener {
         Gamer gamer;
         if (gamerOptional.isPresent()) {
             gamer = gamerOptional.get();
-            gamer.setLastTip(System.currentTimeMillis());
+            gamer.setLastTipNow();
         }
     }
 
@@ -53,11 +53,6 @@ public class TipListener extends ClanListener {
         Bukkit.getOnlinePlayers().forEach(player -> {
             UtilServer.runTaskLaterAsync(clans, () -> UtilServer.callEvent(new TipEvent(player)), 5);
         });
-    }
-
-    public void sendTip(Player player, Tip tip){
-        UtilMessage.message(player, "Tips", tip.getComponent());
-
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -78,27 +73,20 @@ public class TipListener extends ClanListener {
             Optional<Clan> clanOptional = clanManager.getClanByPlayer(player);
             if (clanOptional.isEmpty()) {
                 tipList.add(Tip.ClAN_CREATE);
-                /*sendTip(player, Tip.ClAN_CREATE);
-                gamer.setLastTipNow();
-                return;*/
             }
 
             tipList.add(Tip.CLAN_HELP);
-            //do stuff that non-clan members get tips for
 
             if (clanOptional.isPresent()) {
                 Clan clan = clanOptional.get();
                 if (clan.getSquadCount() == 1) {
                     tipList.add(Tip.CLAN_INVITE);
-                /*sendTip(player, Tip.CLAN_INVITE);
-                gamer.setLastTipNow();
-                return;*/
                 }
             }
 
             if (tipList.size() > 0) {
                 Tip tip = tipList.random();
-                sendTip(player, tip);
+                UtilMessage.message(player, "Tips", tip.getComponent());
                 gamer.setLastTipNow();
             }
         }
