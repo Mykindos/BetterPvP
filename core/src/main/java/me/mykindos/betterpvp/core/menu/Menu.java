@@ -15,7 +15,7 @@ import java.util.List;
 @Data
 public abstract class Menu {
 
-    private final Player player;
+    protected final Player player;
     private final int size;
     private final Component title;
     private final List<Button> buttons;
