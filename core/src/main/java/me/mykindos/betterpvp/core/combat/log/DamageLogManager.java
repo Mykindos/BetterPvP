@@ -3,6 +3,8 @@ package me.mykindos.betterpvp.core.combat.log;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.LivingEntity;
 
 import java.util.ArrayList;
@@ -56,7 +58,7 @@ public class DamageLogManager extends Manager<ConcurrentLinkedDeque<DamageLog>> 
         List<KeyValue<String, Double>> breakdown = new ArrayList<>();
         ConcurrentLinkedDeque<DamageLog> logQueue = objects.get(damagee.getUniqueId().toString());
         if (logQueue != null) {
-            var collector = Collectors.groupingBy(log -> log.getDamager() != null ? log.getDamager().getName() : "Other",
+            var collector = Collectors.groupingBy(log -> log.getDamager() != null ? UtilFormat.stripColor(log.getDamager().getName()) : "Other",
                     Collectors.summingDouble(DamageLog::getDamage));
             logQueue.stream().collect(collector).forEach((key, value) -> breakdown.add(new KeyValue<>(key, value)));
         }

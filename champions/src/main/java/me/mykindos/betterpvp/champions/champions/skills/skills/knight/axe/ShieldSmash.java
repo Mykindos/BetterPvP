@@ -120,7 +120,7 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
             final LivingEntity ent = bashedEntry.getKey();
 
             // Add velocity and damage
-            UtilVelocity.velocity(ent, direction, strength, false, 0, 0.3, 0.8 + 0.05 * level, true);
+            UtilVelocity.velocity(ent, direction, strength, false, 0, 0.3, 0.8 + 0.05 * level, true, true);
             UtilDamage.doCustomDamage(new CustomDamageEvent(ent, player, null, EntityDamageEvent.DamageCause.FALL, 0.0, false, getName()));
 
             // Cancel fall damage if they're friendly
