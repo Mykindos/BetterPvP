@@ -111,7 +111,7 @@ public class SkillMenu extends Menu implements IRefreshingMenu {
         ItemStack book;
         Component name;
         if (isSkillActive(skill)) {
-            book = new ItemStack(Material.ENCHANTED_BOOK);
+            book = new ItemStack(Material.WRITTEN_BOOK, (level));
             name = Component.text(skill.getName() + " (" + level + " / " + skill.getMaxLevel() + ")", NamedTextColor.GREEN, TextDecoration.BOLD);
         } else {
             book = new ItemStack(Material.BOOK);
@@ -140,7 +140,7 @@ public class SkillMenu extends Menu implements IRefreshingMenu {
         addButton(new Button(27, new ItemStack(Material.RED_DYE), Component.text("Class Passive A Skills", NamedTextColor.GREEN, TextDecoration.BOLD)));
         addButton(new Button(36, new ItemStack(Material.ORANGE_DYE), Component.text("Class Passive B Skills", NamedTextColor.GREEN, TextDecoration.BOLD)));
         addButton(new Button(45, new ItemStack(Material.YELLOW_DYE), Component.text("Global Passive Skills", NamedTextColor.GREEN, TextDecoration.BOLD)));
-        addButton(new Button(8, new ItemStack(Material.EMERALD, roleBuild.getPoints()), Component.text("Skill Points", NamedTextColor.GREEN, TextDecoration.BOLD)));
+        addButton(new Button(8, new ItemStack(Material.GOLD_INGOT, roleBuild.getPoints()), Component.text("Skill Points", NamedTextColor.GREEN, TextDecoration.BOLD)));
     }
 
 }
