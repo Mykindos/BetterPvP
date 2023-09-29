@@ -25,6 +25,10 @@ skills:
       enabled: true
       cooldown: 50
       maxlevel: 5
+    siphoningstrikes:
+      enabled: true
+      maxlevel: 3
+      healthIncrement: 0.20
     silencingarrow:
       enabled: true
       maxlevel: 5
