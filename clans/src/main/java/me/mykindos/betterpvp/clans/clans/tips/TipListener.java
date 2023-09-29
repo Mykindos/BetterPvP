@@ -70,14 +70,14 @@ public class TipListener extends ClanListener {
         }
         Gamer gamer = gamerOptional.get();
 
-        WeighedList<Tip> tipWeighedList = new WeighedList<Tip>();
+        TipList tipList = new TipList();
 
         if ((boolean) gamer.getProperty(GamerProperty.TIPS_ENABLED).orElse(true) &&
                 UtilTime.elapsed(gamer.getLastTip(), (long) 1 * 1000)
                 ) {
             Optional<Clan> clanOptional = clanManager.getClanByPlayer(player);
             if (clanOptional.isEmpty()) {
-                tipWeighedList.add(10, 1, Tip.ClAN_CREATE);
+                tipList.add(Tip.ClAN_CREATE);
                 /*sendTip(player, Tip.ClAN_CREATE);
                 gamer.setLastTipNow();
                 return;*/
@@ -87,15 +87,15 @@ public class TipListener extends ClanListener {
             if (clanOptional.isPresent()) {
                 Clan clan = clanOptional.get();
                 if (clan.getSquadCount() == 1) {
-                    tipWeighedList.add(2, 1, Tip.CLAN_INVITE);
+                    tipList.add(Tip.CLAN_INVITE);
                 /*sendTip(player, Tip.CLAN_INVITE);
                 gamer.setLastTipNow();
                 return;*/
                 }
             }
 
-            if (tipWeighedList.size() > 0) {
-                Tip tip = tipWeighedList.random();
+            if (tipList.size() > 0) {
+                Tip tip = tipList.random();
                 sendTip(player, tip);
                 gamer.setLastTipNow();
             }
