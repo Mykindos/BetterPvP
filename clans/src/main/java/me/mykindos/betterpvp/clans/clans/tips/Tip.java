@@ -15,7 +15,6 @@ public enum Tip {
     ClAN_CREATE(2, 1, TipType.COMMAND_SUGGEST, "You can create a clan by running ", "/clan create <name>", "/clan create ", "/clan create <name>", 0),
     CLAN_INVITE(2, 1, TipType.COMMAND_SUGGEST, "You can invite a player by running ", "/clan invite <player>", "/clan invite ", "/clan invite <player>", 1),
 
-
     CLAN_HELP(1, 1, TipType.COMMAND_RUN, "You can see a list of commands by running ", "/clan help", "/clan help", "/clan help", 2);
 
     @Getter
