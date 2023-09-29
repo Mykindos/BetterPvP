@@ -325,6 +325,8 @@ public class CombatListener implements Listener {
                 trajectory, velocity, false, 0.0D, Math.abs(0.2D * knockback), 0.4D + (0.04D * knockback), true);
     }
 
+
+
     @EventHandler(priority = EventPriority.LOWEST)
     public void onDamageReduction(CustomDamageReductionEvent event) {
         event.setDamage(armourManager.getDamageReduced(event.getDamage(), event.getCustomDamageEvent().getDamagee()));

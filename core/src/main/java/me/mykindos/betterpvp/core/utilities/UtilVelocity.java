@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.utilities;
 
+import me.mykindos.betterpvp.core.combat.events.CustomEntityVelocityEvent;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
@@ -21,7 +22,7 @@ public class UtilVelocity {
         return to.subtract(from).setY(0).normalize();
     }
 
-    public static void velocity(Entity ent, Vector vec, double str, boolean ySet, double yBase, double yAdd, double yMax, boolean groundBoost) {
+    public static void velocity(Entity ent, Vector vec, double str, boolean ySet, double yBase, double yAdd, double yMax, boolean groundBoost, boolean velocityEvent) {
         if (!Double.isNaN(vec.getX()) && !Double.isNaN(vec.getY()) && !Double.isNaN(vec.getZ()) && vec.length() != 0.0D) {
             if (ySet) {
                 vec.setY(yBase);
@@ -39,8 +40,20 @@ public class UtilVelocity {
             }
 
             ent.setFallDistance(0.0F);
-            ent.setVelocity(vec);
+
+            if (velocityEvent) {
+                var ceve = UtilServer.callEvent(new CustomEntityVelocityEvent(ent, vec));
+                if (ceve.isCancelled()) return;
+                ent.setVelocity(ceve.getVector());
+            } else {
+                ent.setVelocity(vec);
+            }
         }
+    }
+
+    public static void velocity(Entity ent, Vector vec, double str, boolean ySet, double yBase, double yAdd, double yMax, boolean groundBoost) {
+        velocity(ent, vec, str, ySet, yBase, yAdd, yMax, groundBoost, false);
+
     }
 
     public static Vector getTrajectory(Entity from, Entity to) {

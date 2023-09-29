@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.CustomEntityVelocityEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
@@ -88,39 +89,47 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
 
         if (hasSkill(player)) {
 
-            if (ent != null) {
-                if (!delay.containsKey(player)) {
-                    delay.put(player, 0L);
+            if (!delay.containsKey(player)) {
+                delay.put(player, 0L);
+            }
+
+            event.setKnockback(false);
+            event.cancel("Skill Evade");
+            if (UtilTime.elapsed(delay.get(player), 500)) {
+                for (int i = 0; i < 3; i++) {
+                    player.getWorld().playEffect(player.getLocation(), Effect.SMOKE, 5);
+                }
+                Location target;
+                if (player.isSneaking()) {
+                    target = findLocationBack(ent, player);
+                } else {
+                    target = findLocationBehind(ent, player);
                 }
 
-                event.setKnockback(false);
-                event.cancel("Skill Evade");
-                if (UtilTime.elapsed(delay.get(player), 500)) {
-                    for (int i = 0; i < 3; i++) {
-                        player.getWorld().playEffect(player.getLocation(), Effect.SMOKE, 5);
-                    }
-                    Location target;
-                    if (player.isSneaking()) {
-                        target = findLocationBack(ent, player);
-                    } else {
-                        target = findLocationBehind(ent, player);
-                    }
-
-                    if (target != null) {
-                        player.teleport(target);
-                    }
-
-                    UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s<gray>.", getName());
-                    if (ent instanceof Player temp) {
-                        UtilMessage.simpleMessage(temp, getClassType().getName(), "<yellow>%s<gray> used evade!", player.getName());
-                    }
-
-                    delay.put(player, System.currentTimeMillis());
+                if (target != null) {
+                    player.teleport(target);
                 }
+
+                UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s<gray>.", getName());
+                if (ent instanceof Player temp) {
+                    UtilMessage.simpleMessage(temp, getClassType().getName(), "<yellow>%s<gray> used evade!", player.getName());
+                }
+
+                delay.put(player, System.currentTimeMillis());
             }
 
         }
 
+    }
+
+    @EventHandler
+    public void onCustomVelcity(CustomEntityVelocityEvent event) {
+        if (!(event.getEntity() instanceof Player player)) return;
+        if (!active.contains(player.getUniqueId())) return;
+
+        if (hasSkill(player)) {
+            event.setCancelled(true);
+        }
     }
 
     @UpdateEvent(delay = 100)
