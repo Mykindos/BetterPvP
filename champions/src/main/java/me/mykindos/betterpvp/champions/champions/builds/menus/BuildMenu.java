@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.champions.champions.skills.SkillManager;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.menu.Button;
 import me.mykindos.betterpvp.core.menu.Menu;
+import me.mykindos.betterpvp.core.menu.buttons.BackButton;
 import me.mykindos.betterpvp.core.menu.interfaces.IRefreshingMenu;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import net.kyori.adventure.text.Component;
@@ -35,7 +36,7 @@ public class BuildMenu extends Menu implements IRefreshingMenu {
 
     @Override
     public void refresh() {
-        addButton(new Button(0, new ItemStack(Material.EMERALD_BLOCK), Component.text("Back", NamedTextColor.GREEN, TextDecoration.BOLD)));
+        addButton(new BackButton(0, new ItemStack(Material.EMERALD_BLOCK), new ClassSelectionMenu(player, builds, skillManager)));
         addButton(new Button(18, new ItemStack(role.getHelmet()), Component.text(role.getName() + " Helmet", NamedTextColor.GREEN, TextDecoration.BOLD)));
         addButton(new Button(27, new ItemStack(role.getChestplate()), Component.text(role.getName() + " Chestplate", NamedTextColor.GREEN, TextDecoration.BOLD)));
         addButton(new Button(36, new ItemStack(role.getLeggings()), Component.text(role.getName() + " Leggings", NamedTextColor.GREEN, TextDecoration.BOLD)));
