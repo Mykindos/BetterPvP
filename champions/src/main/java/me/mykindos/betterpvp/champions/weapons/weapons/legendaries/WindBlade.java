@@ -102,7 +102,7 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
                 event.setDamage(7D);
                 Vector vec = player.getLocation().getDirection();
                 vec.setY(0);
-                UtilVelocity.velocity(event.getDamagee(), vec, 2D, false, 0.0D, 0.5D, 1.0D, true);
+                UtilVelocity.velocity(event.getDamagee(), vec, 2D, false, 0.0D, 0.5D, 1.0D, true, true);
             }
         }
     }

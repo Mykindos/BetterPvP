@@ -119,7 +119,7 @@ public class Stampede extends Skill implements PassiveSkill {
         damager.removePotionEffect(PotionEffectType.SPEED);
 
         event.setKnockback(false);
-        UtilVelocity.velocity(event.getDamagee(), UtilVelocity.getTrajectory2d(damager, event.getDamagee()), 2.0D, true, 0.0D, 0.4D, 1.0D, true);
+        UtilVelocity.velocity(event.getDamagee(), UtilVelocity.getTrajectory2d(damager, event.getDamagee()), 2.0D, true, 0.0D, 0.4D, 1.0D, true, true);
         event.setDamage(event.getDamage() + (str * damage));
     }
 
