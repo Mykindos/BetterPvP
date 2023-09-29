@@ -82,6 +82,8 @@ public class TipListener extends ClanListener {
                 gamer.setLastTipNow();
                 return;*/
             }
+
+            tipList.add(Tip.CLAN_HELP);
             //do stuff that non-clan members get tips for
 
             if (clanOptional.isPresent()) {
