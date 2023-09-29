@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.utilities.model.WeighedList;
 import me.mykindos.betterpvp.progression.model.Leaderboard;
 import me.mykindos.betterpvp.progression.model.ProgressionTree;
 import me.mykindos.betterpvp.progression.tree.fishing.data.FishingLeaderboard;
+import me.mykindos.betterpvp.progression.tree.fishing.model.BaitType;
 import me.mykindos.betterpvp.progression.tree.fishing.model.FishingLootType;
 import me.mykindos.betterpvp.progression.tree.fishing.model.FishingRodType;
 import me.mykindos.betterpvp.progression.tree.fishing.repository.FishingRepository;
@@ -49,6 +50,10 @@ public class Fishing implements ProgressionTree {
         return Collections.unmodifiableSet(repository.getRodTypes());
     }
 
+    public Set<BaitType> getBaitTypes() {
+        return Collections.unmodifiableSet(repository.getBaitTypes());
+    }
+
     public Optional<FishingRodType> getRodType(ItemStack itemStack) {
         if (itemStack == null || !itemStack.getType().equals(Material.FISHING_ROD)) {
             return Optional.empty();
@@ -62,6 +67,22 @@ public class Fishing implements ProgressionTree {
         final int rodId = pdc.get(ProgressionNamespacedKeys.FISHING_ROD_TYPE, PersistentDataType.INTEGER);
         return getRodTypes().stream()
                 .filter(rodType -> rodType.getId() == rodId)
+                .findFirst();
+    }
+
+    public Optional<BaitType> getBaitType(ItemStack itemStack) {
+        if (itemStack == null) {
+            return Optional.empty();
+        }
+
+        final PersistentDataContainer pdc = itemStack.getItemMeta().getPersistentDataContainer();
+        if (!pdc.has(ProgressionNamespacedKeys.FISHING_BAIT_TYPE)) {
+            return Optional.empty(); // Default is wooden
+        }
+
+        final String type = pdc.get(ProgressionNamespacedKeys.FISHING_BAIT_TYPE, PersistentDataType.STRING);
+        return getBaitTypes().stream()
+                .filter(baitType -> baitType.getName().equalsIgnoreCase(type))
                 .findFirst();
     }
 

@@ -4,12 +4,14 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
-import me.mykindos.betterpvp.progression.tree.fishing.model.FishingLootType;
 import me.mykindos.betterpvp.progression.tree.fishing.model.FishingLoot;
+import me.mykindos.betterpvp.progression.tree.fishing.model.FishingLootType;
 import me.mykindos.betterpvp.progression.utility.ProgressionNamespacedKeys;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Skeleton;
+import org.bukkit.entity.Zombie;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.persistence.PersistentDataType;
@@ -51,6 +53,12 @@ public class SwimmerType implements FishingLootType {
                         .add(new Vector(0, 0.25, 0));
 
                 location.getWorld().spawnEntity(location, entityType, CreatureSpawnEvent.SpawnReason.CUSTOM, entity -> {
+                    if (entity instanceof Zombie zombie) {
+                        zombie.setShouldBurnInDay(false);
+                    }
+                    if (entity instanceof Skeleton skeleton) {
+                        skeleton.setShouldBurnInDay(false);
+                    }
                     entity.setVelocity(direction);
                     entity.getPersistentDataContainer().set(ProgressionNamespacedKeys.FISHING_SWIMMER, PersistentDataType.BOOLEAN, true);
                 });

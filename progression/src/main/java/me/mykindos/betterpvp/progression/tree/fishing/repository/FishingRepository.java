@@ -17,6 +17,9 @@ import me.mykindos.betterpvp.core.utilities.model.WeighedList;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.model.ProgressionRepository;
 import me.mykindos.betterpvp.progression.tree.fishing.Fishing;
+import me.mykindos.betterpvp.progression.tree.fishing.bait.SimpleBaitType;
+import me.mykindos.betterpvp.progression.tree.fishing.bait.speed.SpeedBaitLoader;
+import me.mykindos.betterpvp.progression.tree.fishing.bait.speed.SpeedBaitType;
 import me.mykindos.betterpvp.progression.tree.fishing.data.FishingData;
 import me.mykindos.betterpvp.progression.tree.fishing.fish.FishTypeLoader;
 import me.mykindos.betterpvp.progression.tree.fishing.fish.SimpleFishType;
@@ -24,9 +27,10 @@ import me.mykindos.betterpvp.progression.tree.fishing.loot.SwimmerLoader;
 import me.mykindos.betterpvp.progression.tree.fishing.loot.SwimmerType;
 import me.mykindos.betterpvp.progression.tree.fishing.loot.TreasureLoader;
 import me.mykindos.betterpvp.progression.tree.fishing.loot.TreasureType;
+import me.mykindos.betterpvp.progression.tree.fishing.model.BaitType;
 import me.mykindos.betterpvp.progression.tree.fishing.model.FishingLootType;
 import me.mykindos.betterpvp.progression.tree.fishing.model.FishingRodType;
-import me.mykindos.betterpvp.progression.tree.fishing.model.LootTypeLoader;
+import me.mykindos.betterpvp.progression.tree.fishing.model.FishingConfigLoader;
 import me.mykindos.betterpvp.progression.tree.fishing.rod.SimpleFishingRod;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.EventHandler;
@@ -56,8 +60,13 @@ public class FishingRepository implements ProgressionRepository<Fishing, Fishing
     private final WeighedList<FishingLootType> lootTypes = new WeighedList<>();
     @Getter
     private final Set<FishingRodType> rodTypes = new HashSet<>();
+    @Getter
+    private final Set<BaitType> baitTypes = new HashSet<>();
     private final AsyncLoadingCache<UUID, FishingData> dataCache;
-    private final LootTypeLoader<?>[] loaders = new LootTypeLoader<?>[]{
+    private final FishingConfigLoader<?>[] baitLoaders = new FishingConfigLoader<?>[]{
+            new SpeedBaitLoader()
+    };
+    private final FishingConfigLoader<?>[] lootLoaders = new FishingConfigLoader<?>[]{
             new SwimmerLoader(),
             new FishTypeLoader(),
             new TreasureLoader()
@@ -81,6 +90,7 @@ public class FishingRepository implements ProgressionRepository<Fishing, Fishing
         // Clear
         lootTypes.clear();
         rodTypes.clear();
+        baitTypes.clear();
 
         // Load fish types
         Reflections reflections = new Reflections(Fishing.class.getPackageName());
@@ -110,9 +120,9 @@ public class FishingRepository implements ProgressionRepository<Fishing, Fishing
             final String type = section.getString("type");
 
             boolean found = false;
-            for (LootTypeLoader<?> loader : loaders) {
+            for (FishingConfigLoader<?> loader : lootLoaders) {
                 if (loader.getTypeKey().equalsIgnoreCase(type)) {
-                    final FishingLootType loaded = loader.read(section);
+                    final FishingLootType loaded = (FishingLootType) loader.read(section);
                     loaded.loadConfig(config);
                     lootTypes.add(loaded.getFrequency(), 1, loaded);
                     found = true;
@@ -123,8 +133,47 @@ public class FishingRepository implements ProgressionRepository<Fishing, Fishing
                 throw new IllegalArgumentException("Unknown loot type: " + type);
             }
         }
-
         log.info("Loaded " + lootTypes.size() + " loot types");
+
+        // Load bait types
+        Set<Class<? extends BaitType>> baitClasses = reflections.getSubTypesOf(BaitType.class);
+        for (var clazz : baitClasses) {
+            if (clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers()) || clazz.isEnum()) continue;
+            if (clazz.isAnnotationPresent(Deprecated.class)) continue;
+            if (clazz == SimpleBaitType.class) continue; // Skip config fish type
+            if (clazz == SpeedBaitType.class) continue; // Skip config fish type
+            BaitType type = plugin.getInjector().getInstance(clazz);
+            plugin.getInjector().injectMembers(type);
+
+            type.loadConfig(config);
+            baitTypes.add(type);
+        }
+
+        // Create dynamic loot types
+        ConfigurationSection customBaitSection = config.getConfigurationSection("fishing.bait");
+        if (customBaitSection == null) {
+            customBaitSection = config.createSection("fishing.bait");
+        }
+
+        for (String key : customBaitSection.getKeys(false)) {
+            final ConfigurationSection section = customBaitSection.getConfigurationSection(key);
+            final String type = section.getString("type");
+
+            boolean found = false;
+            for (FishingConfigLoader<?> loader : baitLoaders) {
+                if (loader.getTypeKey().equalsIgnoreCase(type)) {
+                    final BaitType loaded = (BaitType) loader.read(section);
+                    loaded.loadConfig(config);
+                    baitTypes.add(loaded);
+                    found = true;
+                }
+            }
+
+            if (!found) {
+                throw new IllegalArgumentException("Unknown bait type: " + type);
+            }
+        }
+        log.info("Loaded " + baitTypes.size() + " bait types");
 
         Set<Class<? extends FishingRodType>> rodClasses = reflections.getSubTypesOf(FishingRodType.class);
         for (var clazz : rodClasses) {

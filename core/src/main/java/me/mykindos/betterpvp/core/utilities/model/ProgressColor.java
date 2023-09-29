@@ -15,7 +15,7 @@ public class ProgressColor {
         this.progress = progress;
     }
 
-    public static ProgressColor fromProgress(float progress){
+    public static ProgressColor of(float progress){
         return new ProgressColor(progress);
     }
 

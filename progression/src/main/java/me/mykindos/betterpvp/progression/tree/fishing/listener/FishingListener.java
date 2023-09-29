@@ -2,20 +2,22 @@ package me.mykindos.betterpvp.progression.tree.fishing.listener;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.google.common.collect.ArrayListMultimap;
 import com.google.inject.Inject;
+import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.display.TitleComponent;
+import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.tree.fishing.Fishing;
 import me.mykindos.betterpvp.progression.tree.fishing.fish.Fish;
-import me.mykindos.betterpvp.progression.tree.fishing.model.FishingLoot;
-import me.mykindos.betterpvp.progression.tree.fishing.model.FishingLootType;
-import me.mykindos.betterpvp.progression.tree.fishing.model.FishingRodType;
+import me.mykindos.betterpvp.progression.tree.fishing.model.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -27,12 +29,13 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.util.Vector;
 
-import java.util.Iterator;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @BPvPListener
 public class FishingListener implements Listener {
@@ -40,13 +43,27 @@ public class FishingListener implements Listener {
     private static final Random RANDOM = new Random();
 
     @Inject
+    private Progression progression;
+
+    @Inject
     private Fishing fishing;
 
     @Inject
     private GamerManager gamerManager;
 
+    @Inject
+    @Config(path = "fishing.minWaitTime", defaultValue = "5.0")
+    private double minWaitTime = 5;
+
+    @Inject
+    @Config(path = "fishing.maxWaitTime", defaultValue = "20.0")
+    private double maxWaitTime = 20;
+
     private int animatedDot = 1;
     private int direction = 1;
+
+    private final ArrayListMultimap<Player, Bait> activeBaits = ArrayListMultimap.create();
+    private final WeakHashMap<FishHook, Boolean> activeHooks = new WeakHashMap<>();
 
     // Saving it so depending on fish weight the time to reel and lure time can be adjusted
     // Also make it refresh every X seconds, so it doesn't feel like you're bound to one fish
@@ -54,6 +71,7 @@ public class FishingListener implements Listener {
             .weakKeys()
             .build(key -> getRandomLoot());
 
+    // Title display
     @UpdateEvent(delay = 500)
     public void waitCue() {
         final Iterator<Player> iterator = fish.asMap().keySet().iterator();
@@ -97,6 +115,47 @@ public class FishingListener implements Listener {
         }
     }
 
+    // Fishing determination
+    @UpdateEvent
+    public void updateFishingStatus() {
+        // Clear baits
+        activeBaits.asMap().keySet().removeIf(player -> player == null || !player.isOnline());
+        activeBaits.values().removeIf(Bait::hasExpired);
+
+        final Iterator<FishHook> iterator = activeHooks.keySet().iterator();
+        while (iterator.hasNext()) {
+            final FishHook fishHook = iterator.next();
+            if (fishHook == null || !fishHook.isValid()) {
+                iterator.remove();
+                continue;
+            }
+
+            final Player player = (Player) fishHook.getShooter();
+            final boolean inWater = fishHook.getState().equals(FishHook.HookState.BOBBING);
+            if (inWater) {
+                if (activeHooks.get(fishHook)) {
+                    continue; // Already fishing
+                }
+                this.activeHooks.put(fishHook, true);
+                Bukkit.getScheduler().runTaskLater(progression, () -> startFishing(player, fishHook), 1L);
+            }
+        }
+    }
+
+    private void startFishing(Player player, FishHook hook) {
+        this.fish.get(player); // store a new fish in the cache for them
+
+        // Process baits
+        activeBaits.values().stream()
+                .filter(bait -> bait.doesAffect(hook))
+                .collect(Collectors.toMap(Bait::getType, // This makes sure that there can't be repeated types
+                        Function.identity(),
+                        (existing, replacement) -> existing))
+                .values()
+                .forEach(bait -> bait.track(hook));
+        hook.setWaitTime(Math.max(1, hook.getWaitTime())); // If it gets to 0, it will be stuck in the water
+    }
+
     @EventHandler(priority = EventPriority.HIGH)
     public void onFish(PlayerFishEvent event) {
         final Player player = event.getPlayer();
@@ -105,15 +164,12 @@ public class FishingListener implements Listener {
             case FISHING -> {
                 // they cast their rod
                 final FishHook hook = event.getHook();
-                final FishingLoot loot = this.fish.get(player); // nullable
-
-                // todo: implement bait to increase rate of catching fish
-                // todo: make fish change wait and lure time
-
-                hook.setWaitTime(5 * 20, 20 * 20);
-                hook.setLureTime(2 * 20, 4 * 20);
+                // Set defaults
+                hook.setWaitTime((int) (minWaitTime * 20), (int) (maxWaitTime * 20));
+                hook.setLureTime(1 * 20, 2 * 20);
                 hook.setSkyInfluenced(false);
                 hook.setRainInfluenced(false);
+                activeHooks.put(hook, false);
             }
             case BITE -> {
                 // something bit their hook but hasn't been reeled in yet
@@ -145,7 +201,7 @@ public class FishingListener implements Listener {
                 boolean canMainReel = main.map(rod -> rod.canReel(caught)).orElse(false);
                 boolean canOffReel = off.map(rod -> rod.canReel(caught)).orElse(false);
                 if (!canMainReel && !canOffReel) {
-                    UtilMessage.message(event.getPlayer(), "Fishing", "<red>Your rod couldn't reel this %s!", caught.getType().getName());
+                    UtilMessage.message(event.getPlayer(), "Fishing", "<red>Your rod couldn't reel this <dark_red>%s</dark_red>!", caught.getType().getName());
                     entity.remove();
                     return; // Cancel if neither of the rods in your hand can reel
                 }
@@ -175,6 +231,31 @@ public class FishingListener implements Listener {
         }
 
         event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onBaitThrow(PlayerInteractEvent event) {
+        if (event.getHand() != EquipmentSlot.HAND || event.getItem() == null) {
+            return; // Return if they don't interact with the main hand, or they don't have an item on it
+        }
+
+        if (!event.getAction().isLeftClick()) {
+            return; // Return if they don't left-click
+        }
+
+        final Optional<BaitType> typeOpt = fishing.getBaitType(event.getItem());
+        if (typeOpt.isEmpty()) {
+            return; // Return if they don't have a bait item
+        }
+
+        event.setCancelled(true);
+        event.getItem().subtract();
+        final BaitType baitType = typeOpt.get();
+        final Vector velocity = event.getPlayer().getLocation().getDirection().normalize().multiply(new Vector(1.5, 2.0, 1.5));
+        final Location location = event.getPlayer().getEyeLocation();
+        final Bait bait = baitType.generateBait();
+        bait.spawn(progression, location, velocity);
+        activeBaits.put(event.getPlayer(), bait);
     }
 
     private void splash(Location hookLocation) {
