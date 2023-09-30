@@ -14,11 +14,9 @@ import me.mykindos.betterpvp.core.framework.events.lunar.LunarClientEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -28,7 +26,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
 
 import java.util.Optional;
 
@@ -166,9 +163,6 @@ public class ClientListener implements Listener {
         clientManager.getRepository().processStatUpdates(true);
     }
 
-    @EventHandler
-    public void onRespawn(PlayerRespawnEvent event) {
-        event.setRespawnLocation(event.getPlayer().getWorld().getSpawnLocation());
-    }
+
 
 }

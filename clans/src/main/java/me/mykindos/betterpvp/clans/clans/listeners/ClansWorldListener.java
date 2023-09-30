@@ -9,6 +9,8 @@ import me.mykindos.betterpvp.clans.clans.events.TerritoryInteractEvent;
 import me.mykindos.betterpvp.clans.clans.insurance.InsuranceType;
 import me.mykindos.betterpvp.core.client.events.ClientLoginEvent;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
+import me.mykindos.betterpvp.core.effects.EffectManager;
+import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
@@ -45,9 +47,12 @@ import java.util.UUID;
 @BPvPListener
 public class ClansWorldListener extends ClanListener {
 
+    private final EffectManager effectManager;
+
     @Inject
-    public ClansWorldListener(ClanManager clanManager, GamerManager gamerManager) {
+    public ClansWorldListener(ClanManager clanManager, GamerManager gamerManager, EffectManager effectManager) {
         super(clanManager, gamerManager);
+        this.effectManager = effectManager;
     }
 
     @EventHandler
@@ -69,6 +74,18 @@ public class ClansWorldListener extends ClanListener {
 
             clan.setOnline(false);
         });
+    }
+
+    @UpdateEvent(delay = 1000)
+    public void giveNoFallToPlayersInSpawn() {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (player.getLocation().getY() < 150) continue;
+            clanManager.getClanByLocation(player.getLocation()).ifPresent(clan -> {
+                if (clan.isAdmin() && clan.getName().toLowerCase().contains("spawn")) {
+                    effectManager.addEffect(player, EffectType.NOFALL, 7000);
+                }
+            });
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -651,23 +668,23 @@ public class ClansWorldListener extends ClanListener {
 
             Clan locationClan = locationClanOptional.get();
 
-            if(locationClan.getName().equalsIgnoreCase("Fields")) {
-                if(player.getGameMode() == GameMode.ADVENTURE) {
+            if (locationClan.getName().equalsIgnoreCase("Fields")) {
+                if (player.getGameMode() == GameMode.ADVENTURE) {
                     player.setGameMode(GameMode.SURVIVAL);
                 }
                 continue;
             }
 
             clanManager.getClanByPlayer(player).ifPresentOrElse(playerClan -> {
-                if(locationClan.equals(playerClan)) {
-                    if(player.getGameMode() == GameMode.ADVENTURE) {
+                if (locationClan.equals(playerClan)) {
+                    if (player.getGameMode() == GameMode.ADVENTURE) {
                         player.setGameMode(GameMode.SURVIVAL);
                     }
                     return;
                 }
 
-                if(clanManager.getPillageHandler().isPillaging(playerClan, locationClan)){
-                    if(player.getGameMode() == GameMode.ADVENTURE) {
+                if (clanManager.getPillageHandler().isPillaging(playerClan, locationClan)) {
+                    if (player.getGameMode() == GameMode.ADVENTURE) {
                         player.setGameMode(GameMode.SURVIVAL);
                     }
                     return;
