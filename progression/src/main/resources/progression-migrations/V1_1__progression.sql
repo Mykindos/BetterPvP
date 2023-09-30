@@ -1,17 +1,17 @@
 create table if not exists ${tablePrefix}exp
 (
-    gamer varchar(36) not null
+    Gamer varchar(36) not null
         primary key,
-    fishing bigint default 0 not null,
-    mining bigint default 0 not null,
-    woodcutting bigint default 0 not null,
-    farming bigint default 0 not null
+    Fishing bigint default 0 not null,
+    Mining bigint default 0 not null,
+    Woodcutting bigint default 0 not null,
+    Farming bigint default 0 not null
 );
 
 create table ${tablePrefix}fishing
 (
-    gamer     varchar(36)             not null,
-    type      varchar(36)             not null,
-    weight    int                     not null,
+    Gamer     varchar(36)             not null,
+    Type      varchar(36)             not null,
+    Weight    int                     not null,
     timestamp timestamp default now() not null
 );

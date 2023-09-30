@@ -35,6 +35,9 @@ public class Fish implements FishingLoot {
 
     private static final Random RANDOM = new Random();
 
+    FishType type;
+    int weight;
+
     public static boolean isFishItem(ItemStack itemStack) {
         if (itemStack == null || itemStack.getType() == Material.AIR) {
             return false;
@@ -48,9 +51,6 @@ public class Fish implements FishingLoot {
         final PersistentDataContainer pdc = meta.getPersistentDataContainer();
         return pdc.has(ProgressionNamespacedKeys.FISHING_FISH_TYPE, PersistentDataType.STRING);
     }
-
-    FishType type;
-    int weight;
 
     @Override
     public void processCatch(PlayerFishEvent event) {

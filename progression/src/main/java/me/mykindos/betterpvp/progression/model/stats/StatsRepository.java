@@ -31,12 +31,12 @@ public abstract class StatsRepository<T extends ProgressionTree, K extends Progr
     private final AsyncLoadingCache<UUID, K> dataCache;
     protected final Database database;
     protected final Progression plugin;
-    protected final String tableName;
+    protected final String treeName;
 
-    protected StatsRepository(Database database, Progression plugin, String tableName) {
+    protected StatsRepository(Database database, Progression plugin, String treeName) {
         this.database = database;
         this.plugin = plugin;
-        this.tableName = tableName;
+        this.treeName = treeName;
         this.dataCache = Caffeine.newBuilder()
                 .expireAfterAccess(5, TimeUnit.MINUTES)
                 .buildAsync((AsyncCacheLoader<? super UUID, K>) ((key, executor) -> loadCompleteDataAsync(key)));
@@ -49,7 +49,8 @@ public abstract class StatsRepository<T extends ProgressionTree, K extends Progr
         // Save repo-specific data
         saveQueue.forEach((uuid, data) -> data.prepareUpdates(uuid, database, plugin.getDatabasePrefix()));
         // Save experience
-        String expStmt = "INSERT INTO " + plugin.getDatabasePrefix() + "exp (gamer, " + tableName + ") VALUES (?, ?) ON DUPLICATE KEY UPDATE " + tableName + " = VALUES(" + tableName + ");";
+        System.out.println("Saving " + saveQueue.size() + " players.");
+        String expStmt = "INSERT INTO " + plugin.getDatabasePrefix() + "exp (Gamer, " + treeName + ") VALUES (?, ?) ON DUPLICATE KEY UPDATE " + treeName + " = VALUES(" + treeName + ");";
         List<Statement> statements = new ArrayList<>();
         saveQueue.forEach((uuid, data) -> statements.add(new Statement(expStmt,
                 new StringStatementValue(uuid.toString()),
@@ -112,12 +113,12 @@ public abstract class StatsRepository<T extends ProgressionTree, K extends Progr
 
     private CompletableFuture<K> loadCompleteDataAsync(UUID player) {
         return loadDataAsync(player).thenApplyAsync(data -> {
-            String expStmt = "SELECT " + tableName + " FROM " + plugin.getDatabasePrefix() + "exp WHERE gamer = ?;";
+            String expStmt = "SELECT " + treeName + " FROM " + plugin.getDatabasePrefix() + "exp WHERE gamer = ?;";
             final Statement query = new Statement(expStmt, new StringStatementValue(player.toString()));
             final CachedRowSet result = database.executeQuery(query);
             try {
                 if (result.next()) {
-                    data.setExperience(result.getLong(tableName));
+                    data.setExperience(result.getLong(treeName));
                 }
             } catch (Exception e) {
                 e.printStackTrace();

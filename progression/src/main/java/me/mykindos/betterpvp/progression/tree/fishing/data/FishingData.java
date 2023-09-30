@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
+import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
 import me.mykindos.betterpvp.progression.model.stats.ProgressionData;
 import me.mykindos.betterpvp.progression.tree.fishing.Fishing;
 import me.mykindos.betterpvp.progression.tree.fishing.fish.Fish;
@@ -37,11 +38,11 @@ public final class FishingData extends ProgressionData<Fishing> {
 
     @Override
     protected void prepareUpdates(@NotNull UUID uuid, @NotNull Database database, String databasePrefix) {
-        final String stmt = "INSERT INTO " + databasePrefix + "fishing (gamer, type, weight) VALUES (?, ?, ?);";
+        final String stmt = "INSERT INTO " + databasePrefix + "fishing (Gamer, Type, Weight) VALUES (?, ?, ?);";
         List<Statement> statements = new ArrayList<>();
         for (Fish fish : catchesToSave) {
             Statement statement = new Statement(stmt,
-                    new StringStatementValue(uuid.toString()),
+                    new UuidStatementValue(uuid),
                     new StringStatementValue(fish.getType().getName()),
                     new IntegerStatementValue(fish.getWeight()));
             statements.add(statement);

@@ -63,7 +63,7 @@ public class FishingRepository extends StatsRepository<Fishing, FishingData> imp
 
     @Inject
     protected FishingRepository(Database database, Progression progression) {
-        super(database, progression, "fishing");
+        super(database, progression, "Fishing");
     }
 
     @Override

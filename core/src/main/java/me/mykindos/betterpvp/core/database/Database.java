@@ -63,13 +63,9 @@ public class Database {
     }
 
     public void executeBatch(List<Statement> statements, boolean async) {
-        if (statements.isEmpty()) {
-            return;
-        }
-
-        if(async) {
+        if (async) {
             UtilServer.runTaskAsync(core, () -> executeBatch(statements));
-        }else{
+        } else {
             executeBatch(statements);
         }
     }
@@ -80,19 +76,18 @@ public class Database {
             return;
         }
         try {
-            connection.setAutoCommit(false);
             // Assume all statement queries are the same
+            connection.setAutoCommit(false);
             @Cleanup
             PreparedStatement preparedStatement = connection.prepareStatement(statements.get(0).getQuery());
             for (Statement statement : statements) {
-                for (int i = 0; i < statement.getValues().length; i++) {
-                    StatementValue<?> val = statement.getValues()[i];
+                for (int i = 1; i <= statement.getValues().length; i++) {
+                    StatementValue<?> val = statement.getValues()[i - 1];
                     preparedStatement.setObject(i, val.getValue(), val.getType());
                 }
-                preparedStatement.addBatch(statement.getQuery());
+                preparedStatement.addBatch();
             }
             preparedStatement.executeBatch();
-            connection.commit();
         } catch (SQLException ex) {
             ex.printStackTrace();
             try {
@@ -104,7 +99,7 @@ public class Database {
             try {
                 connection.setAutoCommit(true);
             } catch (SQLException e) {
-                e.printStackTrace();
+                log.error("Failed to enable autocommit after batch", e);
             }
         }
     }
