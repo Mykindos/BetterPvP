@@ -1,11 +1,13 @@
 package me.mykindos.betterpvp.clans.clans.tips.tips;
 
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.tips.Tip;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
+@Singleton
 public class ClanEnergyTip extends Tip {
 
     ClanEnergyTip() {
