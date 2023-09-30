@@ -52,9 +52,9 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
         return new String[]{
                 "Drop your Sword / Axe to toggle",
                 "",
-                "Connect you and all your allies through the power of nature",
-                "",
-                "Your health is spread between all allies within <val>" + (minRadius + level) + "</val> blocks",
+                "Connect you and all your allies through",
+                "the power of nature, spreading your health",
+                "between all allies within <val>" + (minRadius + level) + "</val> blocks",
                 "",
                 "Energy / Second: <val>" + getEnergy(level)
 
@@ -142,7 +142,7 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
         for (var data : UtilPlayer.getNearbyPlayers(player, distance)) {
             Player target = data.getKey();
             boolean friendly = data.getValue() == EntityProperty.FRIENDLY;
-            if (friendly) {
+            if (friendly && target.getHealth() > 0) {
                 totalHealth += target.getHealth();
                 allies.add(target);
             }
@@ -150,7 +150,9 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
 
         double sharedHealth = totalHealth / allies.size();
         for (Player ally : allies) {
-            ally.setHealth(sharedHealth);
+            if (ally.getHealth() > 0) {
+                ally.setHealth(sharedHealth);
+            }
         }
     }
 
