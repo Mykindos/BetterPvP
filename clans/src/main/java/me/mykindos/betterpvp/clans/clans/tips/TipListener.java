@@ -82,6 +82,10 @@ public class TipListener extends ClanListener {
                 if (clan.getSquadCount() == 1) {
                     tipList.add(Tip.CLAN_INVITE);
                 }
+
+                if(clan.getHome() == null) {
+                    tipList.add(Tip.CLAN_HOME);
+                }
             }
 
             if (tipList.size() > 0) {

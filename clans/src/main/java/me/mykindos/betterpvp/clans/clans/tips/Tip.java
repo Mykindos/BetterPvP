@@ -1,21 +1,18 @@
 package me.mykindos.betterpvp.clans.clans.tips;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
-
-import static me.mykindos.betterpvp.clans.clans.tips.TipType.COMMAND_SUGGEST;
 
 public enum Tip {
-    ClAN_CREATE(2, 1, TipType.COMMAND_SUGGEST, "You can create a clan by running ", "/clan create <name>", "/clan create ", "/clan create <name>", 0),
-    CLAN_INVITE(2, 1, TipType.COMMAND_SUGGEST, "You can invite a player by running ", "/clan invite <player>", "/clan invite ", "/clan invite <player>", 1),
+    ClAN_CREATE(3, 1, "You can create a clan by running ", "/clan create <name>", "/clan create ", "/clan create <name>", 0),
+    CLAN_INVITE(2, 1, "You can invite a player by running ", "/clan invite <player>", "/clan invite ", "/clan invite <player>", 1),
 
-    CLAN_HELP(1, 1, TipType.COMMAND_RUN, "You can see a list of commands by running ", "/clan help", "/clan help", "/clan help", 2);
+    CLAN_HELP(1, 1, "You can see a list of commands by running ", "/clan help", 2),
+
+    CLAN_HOME(2, 1, "You can set a place you can teleport back to in your territory by running ", "/clan sethome", 3);
 
     @Getter
     private int weightCategory;
@@ -36,19 +33,17 @@ public enum Tip {
         this.id = id;
     }
 
-    Tip(int weightCategory, int weight, TipType type, String preCommand, String command, String commandSend, String hoverText, int id) {
-        Component component = Component.text(preCommand, NamedTextColor.GRAY);
-        switch (type) {
-            case COMMAND_SUGGEST -> {
-                component = component.append(suggestCommand(command, commandSend, hoverText));
-            }
-            case COMMAND_RUN -> {
-                component = component.append(runCommand(command, commandSend, hoverText));
-            }
-        }
+    Tip(int weightCategory, int weight, String preCommand, String command, int id) {
         this.weightCategory = weightCategory;
         this.weight = weight;
-        this.component = component;
+        this.component = Component.text(preCommand, NamedTextColor.GRAY).append(runCommand(command));
+        this.id = id;
+    }
+
+    Tip(int weightCategory, int weight, String preCommand, String command, String suggestCommand, String hoverText, int id) {
+        this.weightCategory = weightCategory;
+        this.weight = weight;
+        this.component =Component.text(preCommand, NamedTextColor.GRAY).append(suggestCommand(command, suggestCommand, hoverText));
         this.id = id;
     }
 
@@ -59,10 +54,10 @@ public enum Tip {
         return component;
     }
 
-    private Component runCommand(String command, String runCommand, String hoverText) {
+    private Component runCommand(String command) {
         Component component = Component.text(command, NamedTextColor.YELLOW)
-                .clickEvent(ClickEvent.runCommand(runCommand))
-                .hoverEvent(HoverEvent.showText(Component.text(hoverText)));
+                .clickEvent(ClickEvent.runCommand(command))
+                .hoverEvent(HoverEvent.showText(Component.text(command)));
         return component;
     }
 
