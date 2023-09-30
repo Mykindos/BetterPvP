@@ -36,36 +36,35 @@ public class UtilWorld {
             return null;
         }
 
-        String[] tokens = string.split(",");
+        String[] split = string.split(", ");
+        Location location = new Location(Bukkit.getWorld(split[0]), Double.parseDouble(split[1]), Double.parseDouble(split[2]), Double.parseDouble(split[3]));
 
-        try {
-            Iterator<World> var2 = Bukkit.getServer().getWorlds().iterator();
-
-            World cur;
-            do {
-                if (!var2.hasNext()) {
-                    return null;
-                }
-
-                cur = var2.next();
-            } while (!cur.getName().equalsIgnoreCase(tokens[0]));
-
-            return new Location(cur, Double.parseDouble(tokens[1]), Double.parseDouble(tokens[2]), Double.parseDouble(tokens[3]));
-        } catch (Exception var4) {
-            return null;
+        if (split.length >= 5) {
+            location.setYaw(Float.parseFloat(split[4]));
+            location.setPitch(Float.parseFloat(split[5]));
         }
+
+        return location;
 
     }
 
     /**
      * Converts a locations coordinates to a readable string
-     * Rounds to the nearest whole number
      *
      * @param location The location
      * @return Returns a string of a locations coordinates
      */
     public static String locationToString(Location location) {
-        return "(" + Math.round(location.getX()) + ", " + Math.round(location.getY()) + ", " + Math.round(location.getZ()) + ")";
+        return locationToString(location, true);
+    }
+
+    public static String locationToString(Location location, boolean display) {
+        if (display) {
+            return "(" + Math.round(location.getX()) + ", " + Math.round(location.getY()) + ", " + Math.round(location.getZ()) + ")";
+        }
+
+        return location.getWorld().getName() + ", " + location.getX() + ", " + location.getY() + ", " + location.getZ()
+                + ", " + location.getYaw() + ", " + location.getPitch();
     }
 
     public static Location locMerge(Location a, Location b) {
