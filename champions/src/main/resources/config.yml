@@ -89,6 +89,7 @@ skills:
       cooldown: 30
       maxlevel: 5
       lifespan: 2.0
+      health: 1.0
     bullscharge:
       enabled: true
       cooldown: 14
