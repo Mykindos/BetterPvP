@@ -201,6 +201,12 @@ skills:
       enabled: true
       maxlevel: 5
       energy: 11
+    lifebonds:
+      enabled: true
+      maxlevel: 5
+      energy: 10
+      minRadius: 2
+      duration: 2.0
     magmablade:
       enabled: true
       maxlevel: 3
