@@ -97,6 +97,10 @@ skills:
     fortitude:
       enabled: true
       maxlevel: 3
+    vengeance:
+      enabled: true
+      maxlevel: 3
+      damageIncrease: 0.25
     levelfield:
       enabled: true
       maxlevel: 3
