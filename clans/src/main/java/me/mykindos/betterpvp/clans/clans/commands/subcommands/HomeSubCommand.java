@@ -8,7 +8,7 @@ import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
 import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.SubCommand;
-import me.mykindos.betterpvp.core.framework.delayedactions.events.PlayerDelayedTeleportEvent;
+import me.mykindos.betterpvp.core.framework.delayedactions.events.ClanHomeTeleportEvent;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -41,6 +41,6 @@ public class HomeSubCommand extends ClanSubCommand {
             return;
         }
 
-        UtilServer.callEvent(new PlayerDelayedTeleportEvent(player, () -> player.teleport(playerClan.getHome())));
+        UtilServer.callEvent(new ClanHomeTeleportEvent(player, () -> player.teleport(playerClan.getHome())));
     }
 }
