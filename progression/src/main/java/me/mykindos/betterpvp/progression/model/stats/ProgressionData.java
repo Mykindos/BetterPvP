@@ -26,13 +26,14 @@ public abstract class ProgressionData<T extends ProgressionTree> {
      */
     private @Range(from = 0, to = Long.MAX_VALUE) long experience;
     private int level = 0;
+    private T tree;
 
     public final void grantExperience(@Range(from = 0, to = Integer.MAX_VALUE) long amount, @Nullable Player player) {
         final int previous = level;
         this.experience += amount;
         this.level = getLevelFromExperience((int) experience);
         if (player != null) {
-            final PlayerProgressionExperienceEvent event = new PlayerProgressionExperienceEvent(player, amount, this, level, previous);
+            final PlayerProgressionExperienceEvent event = new PlayerProgressionExperienceEvent(tree, player, amount, this, level, previous);
             UtilServer.runTask(JavaPlugin.getPlugin(Progression.class), () -> UtilServer.callEvent(event));
         }
     }
@@ -52,6 +53,10 @@ public abstract class ProgressionData<T extends ProgressionTree> {
 
     public int getLevel() {
         return level;
+    }
+
+    void setTree(T tree) {
+        this.tree = tree;
     }
 
     protected abstract void prepareUpdates(@NotNull UUID uuid, @NotNull Database database, String databasePrefix);

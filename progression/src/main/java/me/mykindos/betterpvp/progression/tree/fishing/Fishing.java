@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.utilities.model.WeighedList;
+import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.model.ProgressionTree;
 import me.mykindos.betterpvp.progression.tree.fishing.data.FishingLeaderboard;
 import me.mykindos.betterpvp.progression.tree.fishing.model.BaitType;
@@ -17,7 +18,6 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.Objects;
@@ -32,8 +32,8 @@ public class Fishing implements ProgressionTree {
     private final FishingLeaderboard leaderboard = new FishingLeaderboard();
 
     @Inject
-    public Fishing(@NotNull final FishingRepository repository) {
-        this.repository = repository;
+    public Fishing(Progression progression) {
+        this.repository = new FishingRepository(progression, this);
     }
 
     @Override
