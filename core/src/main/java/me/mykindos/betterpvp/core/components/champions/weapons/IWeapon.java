@@ -13,7 +13,8 @@ public interface IWeapon {
     int getModel();
     List<Component> getLore();
 
-    void activate(Player player);
-    boolean canUse(Player player);
+    boolean isHoldingWeapon(Player player);
+
+
 
 }
