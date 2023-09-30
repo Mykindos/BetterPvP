@@ -1,12 +1,11 @@
-create table ${tablePrefix}exp
+create table if not exists ${tablePrefix}exp
 (
-    gamer       varchar(36) not null,
-    fishing     bigint      not null,
-    mining      bigint      not null,
-    woodcutting bigint      null,
-    farming     bigint      not null,
-    constraint progression_exp_pk
-        primary key (gamer)
+    gamer varchar(36) not null
+        primary key,
+    fishing bigint default 0 not null,
+    mining bigint default 0 not null,
+    woodcutting bigint default 0 not null,
+    farming bigint default 0 not null
 );
 
 create table ${tablePrefix}fishing

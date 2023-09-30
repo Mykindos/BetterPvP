@@ -1,7 +1,7 @@
 package me.mykindos.betterpvp.progression.tree.fishing.data;
 
 import me.mykindos.betterpvp.progression.model.Leaderboard;
-import me.mykindos.betterpvp.progression.model.ProgressionData;
+import me.mykindos.betterpvp.progression.model.stats.ProgressionData;
 import me.mykindos.betterpvp.progression.tree.fishing.Fishing;
 
 import java.util.SortedMap;

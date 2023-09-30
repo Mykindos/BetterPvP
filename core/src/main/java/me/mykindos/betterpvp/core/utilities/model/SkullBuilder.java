@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.utilities.model;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
+import lombok.extern.slf4j.Slf4j;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -12,6 +13,7 @@ import java.net.URL;
 import java.util.Base64;
 import java.util.UUID;
 
+@Slf4j
 public class SkullBuilder {
 
     // We use a static UUID so that the skull items will match and can stack
@@ -33,7 +35,9 @@ public class SkullBuilder {
             try {
                 urlObject = new URL(url);
             } catch (MalformedURLException e) {
-                throw new RuntimeException("Invalid URL", exception);
+                log.error("Invalid skull texture URL: {}", url, e);
+                itemStack = new ItemStack(Material.PLAYER_HEAD);
+                return;
             }
         }
         textures.setSkin(urlObject); // Set the skin of the player profile to the URL

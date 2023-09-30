@@ -10,9 +10,12 @@ import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.display.TitleComponent;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.tree.fishing.Fishing;
+import me.mykindos.betterpvp.progression.tree.fishing.event.PlayerStartFishingEvent;
+import me.mykindos.betterpvp.progression.tree.fishing.event.PlayerStopFishingEvent;
 import me.mykindos.betterpvp.progression.tree.fishing.fish.Fish;
 import me.mykindos.betterpvp.progression.tree.fishing.model.*;
 import net.kyori.adventure.text.Component;
@@ -98,7 +101,7 @@ public class FishingListener implements Listener {
         while (iterator.hasNext()) {
             final Player player = iterator.next();
             final FishHook fishHook = player.getFishHook();
-            if (fishHook == null) {
+            if (fishHook == null || !fishHook.isValid()) {
                 iterator.remove();
                 continue;
             }
@@ -143,7 +146,7 @@ public class FishingListener implements Listener {
     }
 
     private void startFishing(Player player, FishHook hook) {
-        this.fish.get(player); // store a new fish in the cache for them
+        final FishingLoot loot = this.fish.get(player);// store a new fish in the cache for them
 
         // Process baits
         activeBaits.values().stream()
@@ -154,6 +157,8 @@ public class FishingListener implements Listener {
                 .values()
                 .forEach(bait -> bait.track(hook));
         hook.setWaitTime(Math.max(1, hook.getWaitTime())); // If it gets to 0, it will be stuck in the water
+
+        UtilServer.callEvent(new PlayerStartFishingEvent(player, loot));
     }
 
     @EventHandler(priority = EventPriority.HIGH)
@@ -177,6 +182,7 @@ public class FishingListener implements Listener {
             }
             case REEL_IN -> {
                 // They reeled in before
+                UtilServer.callEvent(new PlayerStopFishingEvent(player, null, fish.getIfPresent(player), PlayerStopFishingEvent.FishingResult.EARLY_REEL));
                 fish.invalidate(player);
             }
             case FAILED_ATTEMPT -> {
@@ -201,6 +207,8 @@ public class FishingListener implements Listener {
                 boolean canMainReel = main.map(rod -> rod.canReel(caught)).orElse(false);
                 boolean canOffReel = off.map(rod -> rod.canReel(caught)).orElse(false);
                 if (!canMainReel && !canOffReel) {
+                    FishingRodType rod = main.orElse(off.orElse(null));
+                    UtilServer.callEvent(new PlayerStopFishingEvent(player, rod, caught, PlayerStopFishingEvent.FishingResult.BAD_ROD));
                     UtilMessage.message(event.getPlayer(), "Fishing", "<red>Your rod couldn't reel this <dark_red>%s</dark_red>!", caught.getType().getName());
                     entity.remove();
                     return; // Cancel if neither of the rods in your hand can reel
@@ -209,6 +217,9 @@ public class FishingListener implements Listener {
                 entity.setCanMobPickup(false);
                 caught.processCatch(event);
                 player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 5f, 0F);
+
+                FishingRodType rod = canMainReel ? main.get() : off.get();
+                UtilServer.callEvent(new PlayerStopFishingEvent(player, rod, caught, PlayerStopFishingEvent.FishingResult.CATCH));
 
                 // todo announce if they got on leaderboard and play firework sound
             }

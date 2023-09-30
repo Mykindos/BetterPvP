@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.progression.model;
 
+import me.mykindos.betterpvp.progression.model.stats.ProgressionData;
+
 import java.util.SortedMap;
 
 /**

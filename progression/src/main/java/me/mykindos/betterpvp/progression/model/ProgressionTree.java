@@ -1,6 +1,8 @@
 package me.mykindos.betterpvp.progression.model;
 
 import me.mykindos.betterpvp.core.utilities.model.ConfigAccessor;
+import me.mykindos.betterpvp.progression.model.stats.StatsRepository;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Represents a progression tree, with skills, buffs, and ways of gaining experience.
@@ -13,15 +15,7 @@ public interface ProgressionTree extends ConfigAccessor {
      */
     String getName();
 
-    /**
-     * Get how much experience is required to a level
-     * @param level The level to get the experience required for
-     * @return The amount of experience required.
-     */
-    default int getXpRequired(int level) {
-        return (int) Math.floor(Math.cbrt(level ^ 4) + (double) (50 * level) / 4);
-    }
+    @Nullable Leaderboard<?> getLeaderboard();
 
-    <T extends ProgressionTree> Leaderboard<T> getLeaderboard();
-
+    StatsRepository<?, ?> getStatsRepository();
 }

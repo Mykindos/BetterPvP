@@ -9,7 +9,7 @@ import me.mykindos.betterpvp.core.command.IConsoleCommand;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.progression.Progression;
-import me.mykindos.betterpvp.progression.ProgressionsLoader;
+import me.mykindos.betterpvp.progression.ProgressionsManager;
 import me.mykindos.betterpvp.progression.commands.loader.ProgressionCommandLoader;
 import me.mykindos.betterpvp.progression.listener.ProgressionListenerLoader;
 import org.bukkit.command.CommandSender;
@@ -62,7 +62,7 @@ public class ProgressionCommand extends Command implements IConsoleCommand {
         private ProgressionListenerLoader listenerLoader;
 
         @Inject
-        private ProgressionsLoader progressionsLoader;
+        private ProgressionsManager progressionsManager;
 
         @Override
         public String getName() {
@@ -85,7 +85,7 @@ public class ProgressionCommand extends Command implements IConsoleCommand {
 
             commandLoader.reload(progression.getClass().getPackageName());
             listenerLoader.reload(progression.getClass().getPackageName());
-            progressionsLoader.loadTrees();
+            progressionsManager.loadTrees();
 
             UtilMessage.message(sender, "Progression", "Successfully reloaded progression");
         }

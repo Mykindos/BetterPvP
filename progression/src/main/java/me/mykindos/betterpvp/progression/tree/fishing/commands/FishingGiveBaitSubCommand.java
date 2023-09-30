@@ -58,7 +58,7 @@ public class FishingGiveBaitSubCommand extends Command {
 
     @Override
     public List<String> processTabComplete(CommandSender sender, String[] args) {
-        if (args.length == 0) {
+        if (args.length == 1) {
             return fishing.getBaitTypes().stream().map(bait -> bait.getName().toLowerCase()).toList();
         }
         return new ArrayList<>();

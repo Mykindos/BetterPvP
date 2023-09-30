@@ -63,6 +63,10 @@ public class Database {
     }
 
     public void executeBatch(List<Statement> statements, boolean async) {
+        if (statements.isEmpty()) {
+            return;
+        }
+
         if(async) {
             UtilServer.runTaskAsync(core, () -> executeBatch(statements));
         }else{
@@ -76,23 +80,31 @@ public class Database {
             return;
         }
         try {
+            connection.setAutoCommit(false);
             // Assume all statement queries are the same
             @Cleanup
             PreparedStatement preparedStatement = connection.prepareStatement(statements.get(0).getQuery());
             for (Statement statement : statements) {
-                for (int i = 1; i <= statement.getValues().length; i++) {
-                    StatementValue<?> val = statement.getValues()[i - 1];
+                for (int i = 0; i < statement.getValues().length; i++) {
+                    StatementValue<?> val = statement.getValues()[i];
                     preparedStatement.setObject(i, val.getValue(), val.getType());
                 }
-                preparedStatement.addBatch();
+                preparedStatement.addBatch(statement.getQuery());
             }
             preparedStatement.executeBatch();
+            connection.commit();
         } catch (SQLException ex) {
             ex.printStackTrace();
             try {
                 connection.rollback();
             } catch (SQLException rollbackException) {
                 ex.printStackTrace();
+            }
+        } finally {
+            try {
+                connection.setAutoCommit(true);
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
         }
     }

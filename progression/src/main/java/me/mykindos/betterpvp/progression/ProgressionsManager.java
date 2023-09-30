@@ -13,14 +13,14 @@ import java.util.Set;
 
 @Singleton
 @Slf4j
-public class ProgressionsLoader {
+public class ProgressionsManager {
 
     private final List<ProgressionTree> trees = new ArrayList<>();
 
     private final Progression progression;
 
     @Inject
-    public ProgressionsLoader(Progression progression) {
+    public ProgressionsManager(Progression progression) {
         this.progression = progression;
         Reflections reflections = new Reflections(getClass().getPackageName());
         Set<Class<? extends ProgressionTree>> classes = reflections.getSubTypesOf(ProgressionTree.class);
@@ -35,6 +35,10 @@ public class ProgressionsLoader {
 
         log.info("Loaded " + trees.size() + " skills");
         progression.saveConfig();
+    }
+
+    public List<ProgressionTree> getTrees() {
+        return trees;
     }
 
     public void loadTrees() {

@@ -5,7 +5,6 @@ import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.Setter;
-import me.mykindos.betterpvp.progression.commands.loader.ProgressionCommandLoader;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.config.ConfigInjectorModule;
@@ -13,6 +12,7 @@ import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.ModuleLoadedEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
+import me.mykindos.betterpvp.progression.commands.loader.ProgressionCommandLoader;
 import me.mykindos.betterpvp.progression.injector.ProgressionInjectorModule;
 import me.mykindos.betterpvp.progression.listener.ProgressionListenerLoader;
 import org.bukkit.Bukkit;
@@ -38,8 +38,11 @@ public class Progression extends BPvPPlugin {
     private UpdateEventExecutor updateEventExecutor;
 
     @Inject
-    @Config(path = "progression.database.prefix", defaultValue = "fishing_")
+    @Config(path = "progression.database.prefix", defaultValue = "progression_")
+    @Getter
     private String databasePrefix;
+
+    private ProgressionsManager progressionsManager;
 
     @Override
     public void onEnable() {
@@ -63,10 +66,16 @@ public class Progression extends BPvPPlugin {
             var commandLoader = injector.getInstance(ProgressionCommandLoader.class);
             commandLoader.loadCommands(PACKAGE);
 
-            var trees = injector.getInstance(ProgressionsLoader.class);
-            trees.loadTrees();
+            progressionsManager = injector.getInstance(ProgressionsManager.class);
+            progressionsManager.loadTrees();
 
             updateEventExecutor.loadPlugin(this);
         }
     }
+
+    @Override
+    public void onDisable() {
+        progressionsManager.getTrees().forEach(tree -> tree.getStatsRepository().shutdown());
+    }
+
 }

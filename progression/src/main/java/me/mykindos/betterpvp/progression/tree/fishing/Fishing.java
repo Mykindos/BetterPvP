@@ -1,9 +1,10 @@
 package me.mykindos.betterpvp.progression.tree.fishing;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.utilities.model.WeighedList;
-import me.mykindos.betterpvp.progression.model.Leaderboard;
 import me.mykindos.betterpvp.progression.model.ProgressionTree;
 import me.mykindos.betterpvp.progression.tree.fishing.data.FishingLeaderboard;
 import me.mykindos.betterpvp.progression.tree.fishing.model.BaitType;
@@ -19,11 +20,14 @@ import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+@Singleton
 public class Fishing implements ProgressionTree {
 
+    @Getter
     private final FishingRepository repository;
     private final FishingLeaderboard leaderboard = new FishingLeaderboard();
 
@@ -38,8 +42,13 @@ public class Fishing implements ProgressionTree {
     }
 
     @Override
-    public <T extends ProgressionTree> Leaderboard<T> getLeaderboard() {
-        return null;
+    public FishingLeaderboard getLeaderboard() {
+        return leaderboard;
+    }
+
+    @Override
+    public FishingRepository getStatsRepository() {
+        return repository;
     }
 
     public WeighedList<FishingLootType> getLootTypes() {
@@ -64,7 +73,7 @@ public class Fishing implements ProgressionTree {
             return Optional.of(SimpleFishingRod.WOODEN); // Default is wooden
         }
 
-        final int rodId = pdc.get(ProgressionNamespacedKeys.FISHING_ROD_TYPE, PersistentDataType.INTEGER);
+        final int rodId = Objects.requireNonNull(pdc.get(ProgressionNamespacedKeys.FISHING_ROD_TYPE, PersistentDataType.INTEGER));
         return getRodTypes().stream()
                 .filter(rodType -> rodType.getId() == rodId)
                 .findFirst();
