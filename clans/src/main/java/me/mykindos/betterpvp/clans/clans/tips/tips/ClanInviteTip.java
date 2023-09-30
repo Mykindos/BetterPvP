@@ -23,6 +23,6 @@ public class ClanInviteTip extends Tip implements ISuggestCommand {
 
     @Override
     public  boolean isValid(Player player, Clan clan) {
-        return clan != null && clan.getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.ADMIN);
+        return clan != null && clan.getAdminsAsPlayers().contains(player);
     }
 }
