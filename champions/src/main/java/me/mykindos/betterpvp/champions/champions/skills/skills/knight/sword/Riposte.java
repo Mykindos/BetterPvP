@@ -7,10 +7,7 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
-import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.PrepareSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.*;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -30,6 +27,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
@@ -39,12 +37,13 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class Riposte extends PrepareSkill implements CooldownSkill, Listener, InteractSkill, EnergySkill {
+public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkill {
 
 
-    public HashMap<String, Long> prepare = new HashMap<>();
     private final HashMap<String, Long> riposting = new HashMap<>();
-    private final WeakHashMap<Player, Long> delay = new WeakHashMap<>();
+    private final HashMap<Player, Long> handRaisedTime = new HashMap<>();
+    private final HashMap<Player, Long> boostedAttackTime = new HashMap<>();
+    private final HashMap<Player, Double> boostedDamage = new HashMap<>();
 
     @Inject
     public Riposte(Champions champions, ChampionsManager championsManager) {
@@ -94,14 +93,8 @@ public class Riposte extends PrepareSkill implements CooldownSkill, Listener, In
 
             riposting.remove(player.getName());
             UtilMessage.message(player, getClassType().getName(), "You are no longer riposting.");
-
+            player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
         }
-    }
-
-    @EventHandler
-    public void onRiposteDeath(PlayerDeathEvent event) {
-        Player player = event.getEntity();
-        riposting.remove(player.getName());
     }
 
     @EventHandler
@@ -112,30 +105,18 @@ public class Riposte extends PrepareSkill implements CooldownSkill, Listener, In
         if (event.getDamager() == null) return;
         LivingEntity ent = event.getDamager();
 
-
         if (hasSkill(player)) {
-
-            if (!delay.containsKey(player)) {
-                delay.put(player, 0L);
-            }
-
             event.setKnockback(false);
-            event.cancel("Skill Riposte");
-            if (UtilTime.elapsed(delay.get(player), 500)) {
-                for (int i = 0; i < 3; i++) {
-                    player.getWorld().playEffect(player.getLocation(), Effect.SMOKE, 5);
-                }
-                //add functionality
-
-
-                UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s<gray>.", getName());
-                if (ent instanceof Player temp) {
-                    UtilMessage.simpleMessage(temp, getClassType().getName(), "<yellow>%s<gray> used evade!", player.getName());
-                }
-
-                delay.put(player, System.currentTimeMillis());
+            event.setDamage(0);
+            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 2.0f, 1.3f);
+            int level = getLevel(player);
+            boostedDamage.put(player, 6.0 + level);
+            boostedAttackTime.put(player, System.currentTimeMillis());
+            handRaisedTime.remove(player);
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s<gray>.", getName());
+            if (ent instanceof Player temp) {
+                UtilMessage.simpleMessage(temp, getClassType().getName(), "<yellow>%s<gray> used riposte!", player.getName());
             }
-
         }
     }
 
@@ -147,43 +128,94 @@ public class Riposte extends PrepareSkill implements CooldownSkill, Listener, In
         Particle.SMOKE_LARGE.builder().location(player.getLocation().add(0, 0.25, 0)).receivers(20).extra(0).spawn();
     }
 
+    @UpdateEvent(delay = 100)
+    public void onUpdateEffect() {
+        Iterator<UUID> it = active.iterator();
+        while (it.hasNext()) {
+            Player player = Bukkit.getPlayer(it.next());
+            if (player != null) {
+                if (player.isHandRaised()) {
+                    player.getWorld().playEffect(player.getLocation(), Effect.STEP_SOUND, Material.IRON_BLOCK);
+                }
+            } else {
+                it.remove();
+            }
+        }
+    }
+
     @UpdateEvent
     public void onUpdate() {
         Iterator<UUID> it = active.iterator();
+        long currentTime = System.currentTimeMillis();
+
         while (it.hasNext()) {
             Player player = Bukkit.getPlayer(it.next());
             if (player != null) {
                 int level = getLevel(player);
                 if (level > 0) {
-                    if (player.isHandRaised()) {
-                        if (!championsManager.getEnergy().use(player, getName(), getEnergy(getLevel(player)) / 2, true)) {
-                            it.remove();
-                        } else if (!UtilPlayer.isHoldingItem(player, SkillWeapons.SWORDS)) {
-                            it.remove();
-                        } else if (UtilBlock.isInLiquid(player)) {
-                            it.remove();
-                        } else if (championsManager.getEffects().hasEffect(player, EffectType.SILENCE)) {
-                            it.remove();
-                        } else if (championsManager.getEffects().hasEffect(player, EffectType.STUN)) {
-                            it.remove();
-                        }
-                    } else {
-                        if (gap.containsKey(player)) {
-                            if (UtilTime.elapsed(gap.get(player), 250)) {
-                                gap.remove(player);
-                                it.remove();
 
-                            }
-                        }
+                    if (player.isHandRaised() && !handRaisedTime.containsKey(player)) {
+                        handRaisedTime.put(player, System.currentTimeMillis());
+                    }
 
+                    if (!player.isHandRaised() && handRaisedTime.containsKey(player) && !boostedDamage.containsKey(player)) {
+                        if (UtilTime.elapsed(handRaisedTime.get(player), 750)) {
+                            handRaisedTime.remove(player);
+                            it.remove();
+                            UtilMessage.message(player, getClassType().getName(), "Your Riposte failed.");
+                            player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
+                        } else {
+                            handRaisedTime.remove(player);
+                            it.remove();
+                            UtilMessage.message(player, getClassType().getName(), "Your Riposte failed.");
+                            player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
+                        }
+                    }
+
+                    if (player.isHandRaised() && handRaisedTime.containsKey(player) && UtilTime.elapsed(handRaisedTime.get(player), 750) && !boostedDamage.containsKey(player)) {
+                        handRaisedTime.remove(player);
+                        UtilMessage.message(player, getClassType().getName(), "Your Riposte failed.");
+                        player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
+                        it.remove();
+                    }
+
+                    if (boostedAttackTime.containsKey(player) && UtilTime.elapsed(boostedAttackTime.get(player), 2000)) {
+                        boostedAttackTime.remove(player);
+                        boostedDamage.remove(player);
+                        UtilMessage.message(player, getClassType().getName(), "You lost your boosted attack.");
+                        player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
                     }
                 } else {
                     it.remove();
                 }
             }
+        }
+    }
+
+    @EventHandler
+    public void onAttack(CustomDamageEvent event) {
+        if (!(event.getDamager() instanceof Player player)) return;
+        if (boostedDamage.containsKey(player)) {
+            event.setDamage(event.getDamage() + boostedDamage.get(player));
+            boostedDamage.remove(player);
+            boostedAttackTime.remove(player);
+            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 2.0f, 1.0f);
 
         }
+    }
 
+    @EventHandler
+    public void onRiposteDeath(PlayerDeathEvent event) {
+        Player player = event.getEntity();
+        riposting.remove(player.getName());
+        active.remove(player.getUniqueId());
+    }
+
+    @EventHandler
+    public void onPlayerLogout(PlayerQuitEvent event) {
+        Player player = event.getPlayer();
+        riposting.remove(player.getName());
+        active.remove(player.getUniqueId());
     }
 
 
