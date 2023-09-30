@@ -66,6 +66,9 @@ public class WeaponListener implements Listener {
 
         if (weapon instanceof InteractWeapon interactWeapon) {
             if (Arrays.stream(interactWeapon.getActions()).noneMatch(action -> action == event.getAction())) return;
+            if (!interactWeapon.canUse(player)) {
+                return;
+            }
         }
 
         var checkUsageEvent = UtilServer.callEvent(new PlayerUseItemEvent(player, weapon, true));
@@ -74,15 +77,12 @@ public class WeaponListener implements Listener {
             return;
         }
 
-        if (!weapon.canUse(player)) {
-            return;
-        }
 
         String name = PlainTextComponentSerializer.plainText().serialize(weapon.getName());
 
         if (weapon instanceof CooldownWeapon cooldownWeapon) {
             if (!cooldownManager.use(player, name, cooldownWeapon.getCooldown(),
-                    cooldownWeapon.showCooldownFinished(), true, false, true)) {
+                    cooldownWeapon.showCooldownFinished(), true, false, x -> weapon.isHoldingWeapon(player))) {
                 return;
             }
         }
@@ -96,7 +96,9 @@ public class WeaponListener implements Listener {
 
         }
 
-        weapon.activate(player);
+        if (weapon instanceof InteractWeapon interactWeapon) {
+            interactWeapon.activate(player);
+        }
 
     }
 
