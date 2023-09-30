@@ -43,6 +43,8 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
     private final Collection<Horse> activeHorses = new HashSet<>();
 
     private double lifespan;
+    private double health;
+    
     @Inject
     public Ride(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -81,7 +83,7 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
         if(horseMaxHealth != null) {
             horseMaxHealth.setBaseValue(1);
         }
-        horse.setHealth(1);
+        horse.setHealth(health);
         horse.setJumpStrength(1.5D);
         horse.getInventory().setArmor(new ItemStack(Material.LEATHER_HORSE_ARMOR));
         horse.getInventory().setSaddle(new ItemStack(Material.SADDLE));
@@ -185,6 +187,7 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
     @Override
     public void loadSkillConfig() {
         lifespan = getConfig("lifespan", 2.0, Double.class);
+        health = getConfig("health", 1.0, Double.class);
     }
 
 }
