@@ -170,6 +170,12 @@ public class CombatListener implements Listener {
     public void onPreDamage(PreCustomDamageEvent event) {
         CustomDamageEvent cde = event.getCustomDamageEvent();
 
+        if(isMythicMobsEnabled) {
+            if(!customDamageAdapter.processPreCustomDamage(cde)) {
+                return;
+            }
+        }
+
         if (cde.getDamager() != null) {
             if (cde.getDamager().equals(cde.getDamagee())) {
                 event.setCancelled(true);
