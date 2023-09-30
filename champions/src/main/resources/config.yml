@@ -205,7 +205,7 @@ skills:
       enabled: true
       maxlevel: 5
       energy: 9
-      minRadius: 2
+      minRadius: 2.0
       duration: 2.0
     magmablade:
       enabled: true

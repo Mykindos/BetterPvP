@@ -15,24 +15,20 @@ import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
-import net.minecraft.world.item.ItemStack;
 import org.bukkit.*;
-import org.bukkit.util.Vector;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 
 
 
 import java.util.*;
 
-import static net.minecraft.world.item.Items.*;
 
 @Singleton
 @BPvPListener
 public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
 
-    private int minRadius;
+    private double minRadius;
     private double duration;
 
 
@@ -96,11 +92,11 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
                 if (level <= 0 || !championsManager.getEnergy().use(player, getName(), getEnergy(level) / 2, true) || championsManager.getEffects().hasEffect(player, EffectType.SILENCE)) {
                     iterator.remove();
                 } else {
-                    int distance = (minRadius + level);
+                    double distance = minRadius + level;
+
                     HashMap<Block, Double> blocks = UtilBlock.getInRadius(player.getLocation(), distance);
 
                     shareHealth(player, distance);
-
                     spawnParticlesAboveAllies(player, distance);
                 }
             } else {
@@ -109,32 +105,26 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
         }
     }
 
-    private void spawnParticlesAboveAllies(Player player, int distance) {
+    private void spawnParticlesAboveAllies(Player player, double distance) {
         List<Player> allies = getAllAllies(player, distance);
         for (Player ally : allies) {
             spawnParticleAboveHead(ally);
         }
     }
 
-    private List<Player> getAllAllies(Player player, int distance) {
-        List<Player> allies = new ArrayList<>();
+    private List<Player> getAllAllies(Player player, double distance) {
+        List<Player> allies = UtilPlayer.getNearbyAllies(player, player.getLocation(), distance);
         allies.add(player);
-        for (var data : UtilPlayer.getNearbyPlayers(player, distance)) {
-            Player target = data.getKey();
-            boolean friendly = data.getValue() == EntityProperty.FRIENDLY;
-            if (friendly) {
-                allies.add(target);
-            }
-        }
         return allies;
     }
+
 
     private void spawnParticleAboveHead(Player player) {
         Location loc = player.getLocation().add(0, 1, 0);
         player.getWorld().spawnParticle(Particle.CHERRY_LEAVES, loc, 2, 0.2, 0.2, 0.2, 0);
     }
 
-    private void shareHealth(Player player, int distance) {
+    private void shareHealth(Player player, double distance) {
         List<Player> allies = new ArrayList<>();
         double totalHealth = player.getHealth();
         allies.add(player);
@@ -180,7 +170,7 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
 
     @Override
     public void loadSkillConfig() {
-        minRadius = getConfig("minRadius", 2, Integer.class);
+        minRadius = getConfig("minRadius", 2.0, Double.class);
         duration = getConfig("duration", 2.0, Double.class);
     }
 }
