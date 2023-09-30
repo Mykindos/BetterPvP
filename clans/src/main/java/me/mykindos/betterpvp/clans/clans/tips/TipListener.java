@@ -15,8 +15,6 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
-import me.mykindos.betterpvp.core.utilities.model.WeighedList;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -72,27 +70,27 @@ public class TipListener extends ClanListener {
                 ) {
             Optional<Clan> clanOptional = clanManager.getClanByPlayer(player);
             if (clanOptional.isEmpty()) {
-                tipList.add(Tip.ClAN_CREATE);
+                tipList.add(TipOld.ClAN_CREATE);
             }
 
-            tipList.add(Tip.CLAN_HELP);
+            tipList.add(TipOld.CLAN_HELP);
 
             if (clanOptional.isPresent()) {
                 Clan clan = clanOptional.get();
                 if (clan.getSquadCount() == 1) {
-                    tipList.add(Tip.CLAN_INVITE);
+                    tipList.add(TipOld.CLAN_INVITE);
                 }
 
                 if (clan.getHome() == null) {
-                    tipList.add(Tip.CLAN_HOME);
+                    tipList.add(TipOld.CLAN_HOME);
                 }
 
-                tipList.add(Tip.CLAN_ENERGY);
+                tipList.add(TipOld.CLAN_ENERGY);
             }
 
             if (tipList.size() > 0) {
-                Tip tip = tipList.random();
-                UtilMessage.message(player, "Tips", tip.getComponent());
+                TipOld tipOld = tipList.random();
+                UtilMessage.message(player, "Tips", tipOld.getComponent());
                 gamer.setLastTipNow();
             }
         }
