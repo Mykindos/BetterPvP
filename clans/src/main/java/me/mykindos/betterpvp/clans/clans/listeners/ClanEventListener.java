@@ -391,8 +391,15 @@ public class ClanEventListener extends ClanListener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onClanSetHome(ClanSetHomeEvent event) {
         if (event.isCancelled()) return;
+
         Clan clan = event.getClan();
         Player player = event.getPlayer();
+
+        Optional<Clan> clanOptional = clanManager.getClanByLocation(player.getLocation());
+        if (clanOptional.isEmpty() || !clanOptional.get().equals(clan)) {
+            UtilMessage.simpleMessage(player, "Clans", "You can only set the clan home in your own territory.");
+            return;
+        }
 
         clan.setHome(player.getLocation());
         UtilMessage.simpleMessage(player, "Clans", "You set the clan home to <yellow>%s<gray>.",
