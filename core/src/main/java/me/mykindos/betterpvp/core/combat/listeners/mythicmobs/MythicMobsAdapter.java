@@ -7,8 +7,31 @@ import io.lumine.mythic.core.skills.SkillMetadataImpl;
 import io.lumine.mythic.core.skills.SkillTriggers;
 import me.mykindos.betterpvp.core.combat.adapters.CustomDamageAdapter;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 
 public class MythicMobsAdapter implements CustomDamageAdapter {
+
+    @Override
+    public boolean processPreCustomDamage(CustomDamageEvent event) {
+        if(event.getDamager() == null) return true;
+        ActiveMob damagerMythicMob = MythicBukkit.inst().getMobManager().getActiveMob(event.getDamager().getUniqueId()).orElse(null);
+        if (damagerMythicMob != null) {
+
+            if(event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
+                var damagedMetaData = new SkillMetadataImpl(SkillTriggers.ATTACK, damagerMythicMob, new BukkitEntity(event.getDamagee()));
+                setMetaData(event, event.getDamage(), damagerMythicMob, damagedMetaData);
+            }
+
+            if(damagerMythicMob.getEntity().getMetadata("doing-skill-damage").isEmpty()) {
+                event.setCancelled(true);
+                return false;
+            }
+
+            // Allow to return false so damage sounds can play
+        }
+
+        return true;
+    }
 
     @Override
     public boolean processCustomDamageAdapter(CustomDamageEvent event, double damage) {
