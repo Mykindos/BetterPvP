@@ -63,7 +63,7 @@ public class TNTCannon extends Weapon implements Listener, InteractWeapon, Coold
 
     @Override
     public boolean canUse(Player player) {
-        return player.getInventory().contains(Material.TNT);
+        return player.getInventory().contains(Material.TNT) && isHoldingWeapon(player);
     }
 
     @Override
