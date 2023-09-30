@@ -12,8 +12,9 @@ public enum Tip {
 
     CLAN_HELP(1, 1, "You can see a list of commands by running ", "/clan help", 2),
 
-    CLAN_HOME(2, 1, "You can set a place you can teleport back to in your territory by running ", "/clan sethome", 3);
+    CLAN_HOME(2, 1, "You can set a place you can teleport back to in your territory by running ", "/clan sethome", 3),
 
+    CLAN_ENERGY(2, 1, Component.text("You can purchase energy in the shops", NamedTextColor.GRAY), 4);
     @Getter
     private int weightCategory;
 

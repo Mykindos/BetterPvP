@@ -83,9 +83,11 @@ public class TipListener extends ClanListener {
                     tipList.add(Tip.CLAN_INVITE);
                 }
 
-                if(clan.getHome() == null) {
+                if (clan.getHome() == null) {
                     tipList.add(Tip.CLAN_HOME);
                 }
+
+                tipList.add(Tip.CLAN_ENERGY);
             }
 
             if (tipList.size() > 0) {
