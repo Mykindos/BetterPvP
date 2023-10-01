@@ -17,6 +17,11 @@ public class ClanHelpTip extends Tip implements IRunCommand {
 
     }
 
+    @Override
+    public String getName() {
+        return "clanhelp";
+    }
+
     private Component generateComponent() {
         Component runComponent = runCommand("/c help");
         Component component = Component.text("You can see a list of commands by running ", NamedTextColor.GRAY).append(runComponent);

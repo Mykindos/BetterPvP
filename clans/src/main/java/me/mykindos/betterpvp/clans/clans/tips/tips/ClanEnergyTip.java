@@ -15,6 +15,11 @@ public class ClanEnergyTip extends Tip {
     }
 
     @Override
+    public String getName() {
+        return "clanenergy";
+    }
+
+    @Override
     public  boolean isValid(Player player, Clan clan) {
         return clan != null;
     }

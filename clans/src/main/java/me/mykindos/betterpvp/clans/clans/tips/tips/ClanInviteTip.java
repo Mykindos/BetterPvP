@@ -17,6 +17,12 @@ public class ClanInviteTip extends Tip implements ISuggestCommand {
         setComponent(generateComponent());
     }
 
+    @Override
+    public String getName() {
+        return "claninvite";
+    }
+
+
     private Component generateComponent() {
         Component suggestComponent = suggestCommand("/c invite <player>", "/c invite ");
         Component component = Component.text("You can invite a player to your clan by running ", NamedTextColor.GRAY).append(suggestComponent);

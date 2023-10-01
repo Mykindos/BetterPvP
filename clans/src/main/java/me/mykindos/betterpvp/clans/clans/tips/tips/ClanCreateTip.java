@@ -15,6 +15,11 @@ public class ClanCreateTip extends Tip implements ISuggestCommand {
         setComponent(generateComponent());
     }
 
+    @Override
+    public String getName() {
+        return "clancreate";
+    }
+
     private Component generateComponent() {
         Component suggestComponent = suggestCommand("/c create <name>", "/c create ");
         Component component = Component.text("You can create a clan by running ", NamedTextColor.GRAY).append(suggestComponent);

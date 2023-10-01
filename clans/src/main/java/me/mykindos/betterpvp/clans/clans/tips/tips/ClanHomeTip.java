@@ -16,6 +16,11 @@ public class ClanHomeTip extends Tip implements IRunCommand {
         setComponent(generateComponent());
     }
 
+    @Override
+    public String getName() {
+        return "clanhome";
+    }
+
     private Component generateComponent() {
         Component runComponent = runCommand("/clan sethome");
         Component component = Component.text("You can set a place you can teleport back to in your territory by running ", NamedTextColor.GRAY).append(runComponent);

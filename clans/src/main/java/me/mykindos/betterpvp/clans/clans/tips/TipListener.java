@@ -30,10 +30,13 @@ public class TipListener extends ClanListener {
     private int timeBetweenTips;
 
     private final Clans clans;
+
+    private final TipManager tipManager;
     @Inject
-    public TipListener(Clans clans, ClanManager clanManager, GamerManager gamerManager) {
+    public TipListener(Clans clans, ClanManager clanManager, GamerManager gamerManager, TipManager tipManager) {
         super(clanManager, gamerManager);
         this.clans = clans;
+        this.tipManager = tipManager;
     }
 
     @EventHandler(priority = EventPriority.LOW)

@@ -29,6 +29,8 @@ public abstract class Tip {
         this.weight = weight;
     }
 
+    public abstract String getName();
+
     public boolean isValid(Player player, Clan clan) {
         return true;
     }
