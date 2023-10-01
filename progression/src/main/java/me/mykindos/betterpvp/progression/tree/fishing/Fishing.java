@@ -7,7 +7,8 @@ import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.utilities.model.WeighedList;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.model.ProgressionTree;
-import me.mykindos.betterpvp.progression.tree.fishing.data.FishingLeaderboard;
+import me.mykindos.betterpvp.progression.tree.fishing.data.FishingCountLeaderboard;
+import me.mykindos.betterpvp.progression.tree.fishing.data.FishingWeightLeaderboard;
 import me.mykindos.betterpvp.progression.tree.fishing.model.BaitType;
 import me.mykindos.betterpvp.progression.tree.fishing.model.FishingLootType;
 import me.mykindos.betterpvp.progression.tree.fishing.model.FishingRodType;
@@ -18,6 +19,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.Objects;
@@ -25,42 +27,35 @@ import java.util.Optional;
 import java.util.Set;
 
 @Singleton
+@Getter
 public class Fishing implements ProgressionTree {
 
-    @Getter
-    private final FishingRepository repository;
-    private final FishingLeaderboard leaderboard = new FishingLeaderboard();
+    private final FishingRepository statsRepository;
+    private final FishingWeightLeaderboard weightLeaderboard;
+    private final FishingCountLeaderboard countLeaderboard;
 
     @Inject
-    public Fishing(Progression progression) {
-        this.repository = new FishingRepository(progression, this);
+    public Fishing(Progression progression, FishingWeightLeaderboard weightLeaderboard, FishingCountLeaderboard countLeaderboard) {
+        this.statsRepository = new FishingRepository(progression, this);
+        this.weightLeaderboard = weightLeaderboard;
+        this.countLeaderboard = countLeaderboard;
     }
 
     @Override
-    public String getName() {
+    public @NotNull String getName() {
         return "Fishing";
     }
 
-    @Override
-    public FishingLeaderboard getLeaderboard() {
-        return leaderboard;
-    }
-
-    @Override
-    public FishingRepository getStatsRepository() {
-        return repository;
-    }
-
     public WeighedList<FishingLootType> getLootTypes() {
-        return repository.getLootTypes();
+        return statsRepository.getLootTypes();
     }
 
     public Set<FishingRodType> getRodTypes() {
-        return Collections.unmodifiableSet(repository.getRodTypes());
+        return Collections.unmodifiableSet(statsRepository.getRodTypes());
     }
 
     public Set<BaitType> getBaitTypes() {
-        return Collections.unmodifiableSet(repository.getBaitTypes());
+        return Collections.unmodifiableSet(statsRepository.getBaitTypes());
     }
 
     public Optional<FishingRodType> getRodType(ItemStack itemStack) {
@@ -97,6 +92,6 @@ public class Fishing implements ProgressionTree {
 
     @Override
     public void loadConfig(ExtendedYamlConfiguration config) {
-        repository.loadConfig(config);
+        statsRepository.loadConfig(config);
     }
 }

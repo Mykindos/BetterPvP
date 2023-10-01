@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.event.PlayerProgressionExperienceEvent;
 import me.mykindos.betterpvp.progression.model.ProgressionTree;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -48,7 +49,7 @@ public abstract class ProgressionData<T extends ProgressionTree> {
     }
 
     private int getLevelFromExperience(int experience) {
-        return (int) (Math.sqrt(experience) * Math.log10(experience) / 22);
+        return (int) (Math.sqrt(experience) * Math.log10(experience) / 22) + 1;
     }
 
     public int getLevel() {
@@ -60,4 +61,6 @@ public abstract class ProgressionData<T extends ProgressionTree> {
     }
 
     protected abstract void prepareUpdates(@NotNull UUID uuid, @NotNull Database database, String databasePrefix);
+
+    public abstract Component[] getDescription();
 }

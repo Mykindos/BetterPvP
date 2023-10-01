@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.model.display.TimedComponent;
 import me.mykindos.betterpvp.core.utilities.model.display.TitleComponent;
+import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.ProgressionsManager;
 import me.mykindos.betterpvp.progression.event.PlayerProgressionExperienceEvent;
 import net.kyori.adventure.text.Component;
@@ -30,10 +31,13 @@ public class ProgressionListener implements Listener {
     @Inject
     private ProgressionsManager progressionsManager;
 
-    @UpdateEvent(delay = 10_000, isAsync = true)
-//    @UpdateEvent(delay = 60 * 5 * 1000, isAsync = true)
+    @Inject
+    private Progression progression;
+
+//    @UpdateEvent(delay = 5_000, isAsync = true)
+    @UpdateEvent(delay = 60 * 5 * 1000, isAsync = true)
     public void cycleSave() {
-        progressionsManager.getTrees().forEach(tree -> tree.getStatsRepository().saveAll());
+        progressionsManager.getTrees().forEach(tree -> tree.getStatsRepository().saveAll(true));
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

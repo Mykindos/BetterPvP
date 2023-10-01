@@ -53,7 +53,7 @@ dependencies {
     implementation("org.flywaydb:flyway-mysql:9.0.4")
     implementation("org.apache.commons:commons-lang3:3.12.0")
     implementation("com.squareup.okhttp3:okhttp:4.10.0")
-
+    implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
 
     compileOnly("io.papermc.paper:paper-api:1.20.1-R0.1-SNAPSHOT")
     compileOnly("org.projectlombok:lombok:1.18.24")

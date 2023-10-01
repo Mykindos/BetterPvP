@@ -15,3 +15,23 @@ create table ${tablePrefix}fishing
     Weight    int                     not null,
     timestamp timestamp default now() not null
 );
+
+CREATE PROCEDURE GetTopFishingByWeight(IN days DOUBLE, IN maxResults INT)
+BEGIN
+    SELECT Gamer, SUM(Weight)
+    FROM ${tablePrefix}fishing
+    WHERE timestamp > NOW() - INTERVAL days DAY
+    GROUP BY Gamer
+    ORDER BY SUM(Weight) DESC
+    LIMIT maxResults;
+END;
+
+CREATE PROCEDURE GetTopFishingByCount(IN days DOUBLE, IN maxResults INT)
+BEGIN
+    SELECT Gamer, COUNT(*)
+    FROM ${tablePrefix}fishing
+    WHERE timestamp > NOW() - INTERVAL days DAY
+    GROUP BY Gamer
+    ORDER BY COUNT(*) DESC
+    LIMIT maxResults;
+END;
