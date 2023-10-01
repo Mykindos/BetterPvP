@@ -27,6 +27,7 @@ public abstract class Tip {
     protected Tip(int categoryWeight, int weight) {
         this.categoryWeight = categoryWeight;
         this.weight = weight;
+        this.component = generateComponent();
     }
 
     public abstract String getName();

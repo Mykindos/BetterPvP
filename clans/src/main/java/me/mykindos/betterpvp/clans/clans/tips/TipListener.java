@@ -15,6 +15,8 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.utilities.model.WeighedList;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -58,6 +60,7 @@ public class TipListener extends ClanListener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onTip(TipEvent event) {
+        if (event.isCancelled()) return;
         Player player = event.getPlayer();
         Optional<Gamer> gamerOptional = gamerManager.getObject(player.getUniqueId());
         if (gamerOptional.isEmpty()) {
@@ -66,34 +69,23 @@ public class TipListener extends ClanListener {
         }
         Gamer gamer = gamerOptional.get();
 
-        TipList tipList = new TipList();
+        WeighedList<Tip> tipList = new WeighedList<Tip>();
 
         if ((boolean) gamer.getProperty(GamerProperty.TIPS_ENABLED).orElse(true) &&
                 UtilTime.elapsed(gamer.getLastTip(), (long) 1 * 1000)
                 ) {
             Optional<Clan> clanOptional = clanManager.getClanByPlayer(player);
-            if (clanOptional.isEmpty()) {
-                tipList.add(TipOld.ClAN_CREATE);
-            }
+            final Clan clan = clanOptional.orElse(null);;
 
-            tipList.add(TipOld.CLAN_HELP);
-
-            if (clanOptional.isPresent()) {
-                Clan clan = clanOptional.get();
-                if (clan.getSquadCount() == 1) {
-                    tipList.add(TipOld.CLAN_INVITE);
+            tipManager.getTips().forEach(tip -> {
+                if (tip.isValid(player, clan)) {
+                    tipList.add(tip.getCategoryWeight(), tip.getWeight(), tip);
                 }
-
-                if (clan.getHome() == null) {
-                    tipList.add(TipOld.CLAN_HOME);
-                }
-
-                tipList.add(TipOld.CLAN_ENERGY);
-            }
+            });
 
             if (tipList.size() > 0) {
-                TipOld tipOld = tipList.random();
-                UtilMessage.message(player, "Tips", tipOld.getComponent());
+                Tip tip = tipList.random();
+                UtilMessage.message(player, "Tips", tip.getComponent());
                 gamer.setLastTipNow();
             }
         }

@@ -14,6 +14,7 @@ public class ClanHelpTip extends Tip implements IRunCommand {
 
     ClanHelpTip() {
         super(1, 1);
+        setComponent(generateComponent());
 
     }
 
