@@ -285,21 +285,6 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
         return lastValid;
     }
 
-
-    //@EventHandler
-    //public void onInteractEntity(PlayerInteractEntityEvent event) {
-    //    Player player = event.getPlayer();
-    //
-    //    Role role = Role.getRole(player);
-    //    if (role != null && role instanceof Assassin) {
-    //        if (hasSkill(player, this)) {
-    //            if (Arrays.asList(getMaterials()).contains(player.getInventory().getItemInMainHand().getType())) {
-    //                activate(player, GamerManager.getOnlineGamer(event.getPlayer()));
-    //            }
-    //        }
-    //    }
-    //}
-
     @Override
     public double getCooldown(int level) {
         return cooldown;

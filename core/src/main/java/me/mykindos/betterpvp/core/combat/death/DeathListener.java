@@ -58,7 +58,7 @@ public class DeathListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onCustomDeath(CustomDeathEvent event) {
         if (event.getKiller() == null) {
-            if (event.getReason().equals("")) {
+            if (event.getReason() == null || event.getReason().equals("")) {
                 event.setCustomDeathMessage(String.format("<yellow>%s<gray> was killed.", event.getKilled().getName()));
             } else {
                 event.setCustomDeathMessage(String.format("<yellow>%s<gray> was killed by <yellow>%s<gray>.",
