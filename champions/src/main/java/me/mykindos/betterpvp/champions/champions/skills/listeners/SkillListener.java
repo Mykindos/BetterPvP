@@ -42,6 +42,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Optional;
 
 @Singleton
@@ -341,14 +342,14 @@ public class SkillListener implements Listener {
             String name = previousRole == null ? null : previousRole.getName();
             RoleBuild build = builds.getActiveBuilds().get(name);
             if (build != null) {
-                build.getActiveSkills().forEach(skill -> skill.invalidatePlayer(player));
+                build.getActiveSkills().stream().filter(Objects::nonNull).forEach(skill -> skill.invalidatePlayer(player));
             }
 
             // Track with new skills
             name = newRole == null ? null : newRole.getName();
             build = builds.getActiveBuilds().get(name);
             if (build != null) {
-                build.getActiveSkills().forEach(skill -> skill.trackPlayer(player));
+                build.getActiveSkills().stream().filter(Objects::nonNull).forEach(skill -> skill.trackPlayer(player));
             }
         }
     }

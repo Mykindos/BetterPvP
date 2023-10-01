@@ -248,26 +248,27 @@ public class MapListener implements Listener {
                 }
 
                 mapHandler.clanMapData.get(online.getUniqueId()).removeIf(chunkData -> chunkData.getClan().equals(clan));
+
                 for (ClanTerritory claim : clan.getTerritory()) {
+                    String[] tokens = claim.getChunk().split("/ ");
+                    if (tokens.length != 3) continue;
+                    int chunkX = Integer.parseInt(tokens[1]);
+                    int chunkZ = Integer.parseInt(tokens[2]);
 
-                    Chunk chunk = UtilWorld.stringToChunk(claim.getChunk());
-                    if (chunk != null) {
-                        ChunkData chunkData = new ChunkData("world", materialColor, chunk.getX(), chunk.getZ(), clan);
-                        for (int i = 0; i < 4; i++) {
-                            BlockFace blockFace = BlockFace.values()[i];
-                            Chunk targetChunk = online.getWorld().getChunkAt(chunk.getX() + blockFace.getModX(), chunk.getZ() + blockFace.getModZ());
-                            Clan other = clanManager.getClanByChunk(targetChunk).orElse(null);
-                            if (chunkData.getClan().equals(other)) {
-                                chunkData.getBlockFaceSet().add(blockFace);
-                            }
-                        }
-
-                        Set<ChunkData> chunkDataset = mapHandler.clanMapData.get(online.getUniqueId());
-                        if (chunkDataset.stream().noneMatch(cd -> cd.equals(chunkData))) {
-                            chunkDataset.add(chunkData);
+                    ChunkData chunkData = new ChunkData("world", materialColor, chunkX, chunkZ, clan);
+                    for (int i = 0; i < 4; i++) {
+                        BlockFace blockFace = BlockFace.values()[i];
+                        String targetChunkString = "world/ " + (chunkX + blockFace.getModX()) + "/ " + (chunkZ + blockFace.getModZ());
+                        Clan other = clanManager.getClanByChunkString(targetChunkString).orElse(null);
+                        if (chunkData.getClan().equals(other)) {
+                            chunkData.getBlockFaceSet().add(blockFace);
                         }
                     }
 
+                    Set<ChunkData> chunkDataset = mapHandler.clanMapData.get(online.getUniqueId());
+                    if (chunkDataset.stream().noneMatch(cd -> cd.equals(chunkData))) {
+                        chunkDataset.add(chunkData);
+                    }
                 }
                 updateStatus(online);
             }
@@ -355,7 +356,6 @@ public class MapListener implements Listener {
 
     }
 
-    // TODO do this without loading chunks
     private void loadChunks(Player player) {
         if (!mapHandler.clanMapData.containsKey(player.getUniqueId())) {
             mapHandler.clanMapData.put(player.getUniqueId(), new HashSet<>());
@@ -370,19 +370,23 @@ public class MapListener implements Listener {
             MapColor materialColor = getColourForClan(pClan, clan);
 
             for (ClanTerritory claim : clan.getTerritory()) {
-                Chunk chunk = UtilWorld.stringToChunk(claim.getChunk());
-                if (chunk != null) {
-                    ChunkData chunkData = new ChunkData("world", materialColor, chunk.getX(), chunk.getZ(), clan);
-                    for (int i = 0; i < 4; i++) {
-                        BlockFace blockFace = BlockFace.values()[i];
-                        Chunk targetChunk = player.getWorld().getChunkAt(chunk.getX() + blockFace.getModX(), chunk.getZ() + blockFace.getModZ());
-                        Clan other = clanManager.getClanByChunk(targetChunk).orElse(null);
-                        if (chunkData.getClan().equals(other)) {
-                            chunkData.getBlockFaceSet().add(blockFace);
-                        }
+                String[] tokens = claim.getChunk().split("/ ");
+                if (tokens.length != 3) continue;
+                int chunkX = Integer.parseInt(tokens[1]);
+                int chunkZ = Integer.parseInt(tokens[2]);
+
+
+                ChunkData chunkData = new ChunkData("world", materialColor, chunkX, chunkZ, clan);
+                for (int i = 0; i < 4; i++) {
+                    BlockFace blockFace = BlockFace.values()[i];
+                    String targetChunkString = "world/ " + (chunkX + blockFace.getModX()) + "/ " + (chunkZ + blockFace.getModZ());
+                    Clan other = clanManager.getClanByChunkString(targetChunkString).orElse(null);
+                    if (chunkData.getClan().equals(other)) {
+                        chunkData.getBlockFaceSet().add(blockFace);
                     }
-                    chunkClaimColor.add(chunkData);
                 }
+                chunkClaimColor.add(chunkData);
+
 
             }
 

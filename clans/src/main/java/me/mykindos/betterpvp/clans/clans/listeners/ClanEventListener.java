@@ -153,7 +153,7 @@ public class ClanEventListener extends ClanListener {
         clanManager.getRepository().delete(clan);
         clanManager.getObjects().remove(clan.getName());
 
-        UtilMessage.broadcast("Clans", "<alt2>" + event.getPlayer().getName() + "</alt2> disbanded <alt2>Clan " + clan.getName() + "</alt2>.");
+        //UtilMessage.broadcast("Clans", "<alt2>" + event.getPlayer().getName() + "</alt2> disbanded <alt2>Clan " + clan.getName() + "</alt2>.");
         UtilMessage.broadcast("Clans", "<alt2>Clan " + clan.getName() + "</alt2> has been disbanded.");
     }
 
