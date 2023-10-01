@@ -111,7 +111,7 @@ public class SkillMenu extends Menu implements IRefreshingMenu {
         ItemStack book;
         Component name;
         if (isSkillActive(skill)) {
-            book = new ItemStack(Material.WRITTEN_BOOK, (level));
+            book = new ItemStack(Material.WRITTEN_BOOK, level);
             name = Component.text(skill.getName() + " (" + level + " / " + skill.getMaxLevel() + ")", NamedTextColor.GREEN, TextDecoration.BOLD);
         } else {
             book = new ItemStack(Material.BOOK);
