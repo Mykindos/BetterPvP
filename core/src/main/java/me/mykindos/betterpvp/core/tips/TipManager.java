@@ -34,7 +34,7 @@ public class TipManager extends Manager<Tip> {
 
         }
 
-        log.info("Loaded " + objects.size() + " tips");
+        log.info("Loaded " + objects.size() + " TIPS TIPS TIPS TIPS");
         core.saveConfig();
     }
 
