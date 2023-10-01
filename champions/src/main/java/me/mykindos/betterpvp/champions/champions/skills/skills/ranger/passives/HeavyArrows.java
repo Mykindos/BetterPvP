@@ -86,7 +86,7 @@ public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill{
 
                 if (!player.isSneaking()) {
 
-                    if (championsManager.getEnergy().use(player, getName(), getEnergy(level) / 2, false)) {
+                    if (championsManager.getEnergy().use(player, getName(), getEnergy(level), false)) {
                         Vector pushback = player.getLocation().getDirection().multiply(-1);
 
                         float charge = event.getForce();
