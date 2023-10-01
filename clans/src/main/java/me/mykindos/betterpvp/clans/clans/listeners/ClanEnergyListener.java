@@ -38,7 +38,7 @@ public class ClanEnergyListener extends ClanListener{
         this.clans = clans;
     }
 
-    @UpdateEvent(delay = 30 * 1000, isAsync = true)
+    @UpdateEvent(delay = 300 * 1000, isAsync = true)
     public void checkEnergy() {
         Bukkit.getOnlinePlayers().forEach(player -> {
             Optional<Clan> clanOptional = clanManager.getClanByPlayer(player);
