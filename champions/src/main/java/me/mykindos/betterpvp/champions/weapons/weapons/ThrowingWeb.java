@@ -111,7 +111,7 @@ public class ThrowingWeb extends Weapon implements Listener, InteractWeapon, Coo
 
     @Override
     public boolean canUse(Player player) {
-        return true;
+        return isHoldingWeapon(player);
     }
 
     @Override

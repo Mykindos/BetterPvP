@@ -213,6 +213,7 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
 
     @EventHandler
     public void onDamageReceived(CustomDamageEvent event) {
+        if(event.isCancelled()) return;
         if (!(event.getDamagee() instanceof Player player)) return;
 
         if (hasSkill(player) && charging.containsKey(player)) {

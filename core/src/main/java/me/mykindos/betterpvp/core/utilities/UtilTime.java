@@ -65,9 +65,9 @@ public class UtilTime {
             return "Seconds";
         } else if (d >= 60000L && d <= 3600000L) {
             return "Minutes";
-        } else if (d >= 3600000L && d <= 86400000L) {
+        } else if (d >= 3600000L && d < 86400000L) {
             return "Hours";
-        } else if (d >= 86400000L && d <= 31536000000L) {
+        } else if (d >= 86400000L && d < 31536000000L) {
             return "Days";
         }
         return "Years";

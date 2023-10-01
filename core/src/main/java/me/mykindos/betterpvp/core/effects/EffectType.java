@@ -18,6 +18,6 @@ public enum EffectType {
     FRAILTY,
     TEXTURELOADING,
     IMMUNETOEFFECTS,
-    LEVITATION
+    LEVITATION,
 
 }

@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
 import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -36,6 +37,7 @@ public class ClansCombatListener implements Listener {
         CustomDamageEvent cde = event.getCustomDamageEvent();
         if (cde.getDamager() instanceof Player damager && cde.getDamagee() instanceof Player damagee) {
             if (!clanManager.canHurt(damager, damagee)) {
+                UtilMessage.message(damager, "Clans", "You cannot hurt <yellow>%s<gray>.", damagee.getName());
                 event.setCancelled(true);
                 return;
             }
