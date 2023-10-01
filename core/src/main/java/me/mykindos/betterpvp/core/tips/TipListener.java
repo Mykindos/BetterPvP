@@ -31,11 +31,15 @@ public class TipListener implements Listener {
     private final Core core;
 
     private final TipManager tipManager;
+
+    private final GamerManager gamerManager;
     @Inject
     public TipListener(Core core, GamerManager gamerManager, TipManager tipManager) {
-        super(gamerManager);
+        super();
         this.core = core;
+        this.gamerManager = gamerManager;
         this.tipManager = tipManager;
+
     }
 
     @EventHandler(priority = EventPriority.LOW)
@@ -51,7 +55,7 @@ public class TipListener implements Listener {
     @UpdateEvent(delay = 10 * 1000, isAsync = true)
     public void tipSender() {
         Bukkit.getOnlinePlayers().forEach(player -> {
-            UtilServer.runTaskLaterAsync(clans, () -> UtilServer.callEvent(new TipEvent(player)), 5);
+            UtilServer.runTaskLaterAsync(core, () -> UtilServer.callEvent(new TipEvent(player)), 5);
         });
     }
 
