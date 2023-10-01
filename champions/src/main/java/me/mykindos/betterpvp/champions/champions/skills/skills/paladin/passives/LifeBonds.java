@@ -18,7 +18,8 @@ import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.entity.EntityDamageEvent;
 
 
 import java.util.*;
@@ -52,6 +53,8 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
                 "the power of nature, spreading your health",
                 "between all allies within <val>" + (minRadius + level) + "</val> blocks",
                 "",
+                "While life bonds is active you take double damage",
+                "",
                 "Energy / Second: <val>" + getEnergy(level)
 
         };
@@ -68,6 +71,16 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
                 sendState(player, true);
             }
 
+        }
+    }
+
+    @EventHandler
+    public void onDamage(EntityDamageEvent event) {
+        if (event.getEntity() instanceof Player) {
+            Player player = (Player) event.getEntity();
+            if (active.contains(player.getUniqueId())) {
+                event.setDamage(event.getDamage() * 2); // Double the damage
+            }
         }
     }
 
