@@ -2,9 +2,8 @@ package me.mykindos.betterpvp.clans.clans.tips.tips;
 
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.clans.Clan;
-import me.mykindos.betterpvp.clans.clans.tips.Tip;
 import me.mykindos.betterpvp.clans.clans.tips.types.ISuggestCommand;
-import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
+import me.mykindos.betterpvp.core.tips.Tip;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
@@ -30,7 +29,7 @@ public class ClanInviteTip extends Tip implements ISuggestCommand {
     }
 
     @Override
-    public  boolean isValid(Player player, Clan clan) {
+    public boolean isValid(Player player, Clan clan) {
         return clan != null && clan.getAdminsAsPlayers().contains(player);
     }
 }

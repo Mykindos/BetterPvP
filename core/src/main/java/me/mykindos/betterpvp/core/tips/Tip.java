@@ -1,9 +1,8 @@
-package me.mykindos.betterpvp.clans.clans.tips;
+package me.mykindos.betterpvp.core.tips;
 
 import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.Setter;
-import me.mykindos.betterpvp.clans.clans.Clan;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 
@@ -32,7 +31,7 @@ public abstract class Tip {
 
     public abstract String getName();
 
-    public boolean isValid(Player player, Clan clan) {
+    public boolean isValid(Player player) {
         return true;
     }
 

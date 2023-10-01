@@ -1,10 +1,7 @@
-package me.mykindos.betterpvp.clans.clans.tips;
+package me.mykindos.betterpvp.core.tips;
 
 import com.google.inject.Inject;
-import me.mykindos.betterpvp.clans.Clans;
-import me.mykindos.betterpvp.clans.clans.Clan;
-import me.mykindos.betterpvp.clans.clans.ClanManager;
-import me.mykindos.betterpvp.clans.clans.listeners.ClanListener;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.events.ClientLoginEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
@@ -16,28 +13,28 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.WeighedList;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 
 import java.util.Optional;
 
 @BPvPListener
-public class TipListener extends ClanListener {
+public class TipListener implements Listener {
 
     @Inject
-    @Config(path = "clans.tips.timeBetweenTips", defaultValue = "150")
+    @Config(path = "core.tips.timeBetweenTips", defaultValue = "150")
     private int timeBetweenTips;
 
-    private final Clans clans;
+    private final Core core;
 
     private final TipManager tipManager;
     @Inject
-    public TipListener(Clans clans, ClanManager clanManager, GamerManager gamerManager, TipManager tipManager) {
-        super(clanManager, gamerManager);
-        this.clans = clans;
+    public TipListener(Core core, GamerManager gamerManager, TipManager tipManager) {
+        super(gamerManager);
+        this.core = core;
         this.tipManager = tipManager;
     }
 

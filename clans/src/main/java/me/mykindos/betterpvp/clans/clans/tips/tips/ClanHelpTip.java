@@ -1,13 +1,10 @@
 package me.mykindos.betterpvp.clans.clans.tips.tips;
 
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.clans.clans.Clan;
-import me.mykindos.betterpvp.clans.clans.tips.Tip;
 import me.mykindos.betterpvp.clans.clans.tips.types.IRunCommand;
-import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
+import me.mykindos.betterpvp.core.tips.Tip;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.entity.Player;
 
 @Singleton
 public class ClanHelpTip extends Tip implements IRunCommand {

@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.clans.clans.tips;
+package me.mykindos.betterpvp.core.tips;
 
 import lombok.Data;
 import lombok.Getter;
