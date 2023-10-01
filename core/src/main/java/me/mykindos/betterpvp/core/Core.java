@@ -77,7 +77,7 @@ public class Core extends BPvPPlugin {
         gamerManager.loadFromList(gamerManager.getGamerRepository().getAll());
 
         var tipManager = injector.getInstance(TipManager.class);
-        tipManager.loadTips(this, PACKAGE, Tip.class);
+        tipManager.loadTips(this, PACKAGE);
 
         var itemHandler = injector.getInstance(ItemHandler.class);
         itemHandler.loadItemData("Core");

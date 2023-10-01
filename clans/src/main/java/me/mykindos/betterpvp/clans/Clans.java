@@ -73,7 +73,7 @@ public class Clans extends BPvPPlugin {
             clansCommandLoader.loadCommands(PACKAGE);
 
             var tipManager = injector.getInstance(TipManager.class);
-            tipManager.loadTips(this, PACKAGE, ClanTip.class);
+            tipManager.loadTips(this, PACKAGE);
 
             clanManager = injector.getInstance(ClanManager.class);
             clanManager.loadFromList(clanManager.getRepository().getAll());

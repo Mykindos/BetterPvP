@@ -16,17 +16,20 @@ import java.util.Set;
 @Singleton
 public class TipManager extends Manager<Tip> {
 
-    public void loadTips(BPvPPlugin plugin, String packageName, Class type) {
+    public void loadTips(BPvPPlugin plugin, String packageName) {
         Reflections reflections = new Reflections(packageName);
-        Set<Class<? extends Tip>> classes = reflections.getSubTypesOf(type);
+        Set<Class<?>> classes = reflections.getTypesAnnotatedWith(BPvPTip.class);
         log.info(classes.toString());
         for (var clazz : classes) {
-            if(clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers())) continue;
-            if(clazz.isAnnotationPresent(Deprecated.class)) continue;
-            Tip tip = plugin.getInjector().getInstance(clazz);
-            plugin.getInjector().injectMembers(tip);
+            if (Tip.class.isAssignableFrom(clazz)) {
+                if(clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers())) continue;
+                if(clazz.isAnnotationPresent(Deprecated.class)) continue;
+                Tip tip = (Tip) plugin.getInjector().getInstance(clazz);
+                plugin.getInjector().injectMembers(tip);
 
-            addObject(tip.getName(), tip);
+                addObject(tip.getName(), tip);
+            }
+
 
         }
 
