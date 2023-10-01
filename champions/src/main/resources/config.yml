@@ -356,6 +356,7 @@ skills:
       enabled: true
       maxlevel: 5
       energy: 25
+      basePushBack: 1.25
     overcharge:
       enabled: true
       maxlevel: 5

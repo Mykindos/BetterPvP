@@ -30,6 +30,8 @@ public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill{
 
     private final WeakHashMap<Arrow, Location> arrows = new WeakHashMap<>();
 
+    public double basePushBack;
+
     @Inject
     public HeavyArrows(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -46,7 +48,10 @@ public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill{
                 "The arrows you shoot are heavy",
                 "",
                 "For every arrow you shoot you will be",
-                "pushed backwards (unless crouching)."};
+                "pushed backwards (unless crouching)",
+                "",
+                "Energy used per shot: <val>"+energy
+        };
     }
 
     @Override
@@ -86,7 +91,7 @@ public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill{
 
                         float charge = event.getForce();
 
-                        pushback.multiply(1.25 * charge);
+                        pushback.multiply(basePushBack * charge);
                         player.setVelocity(pushback);
                     }
                 }
@@ -102,5 +107,9 @@ public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill{
     @Override
     public SkillType getType() {
         return SkillType.PASSIVE_A;
+    }
+
+    public void loadSkillConfig(){
+        basePushBack = getConfig("basePushBack", 1.25, Double.class);
     }
 }
