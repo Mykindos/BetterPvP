@@ -29,7 +29,7 @@ public class ClanEnergyListener extends ClanListener{
 
 
     @Inject
-    @Config(path="clans.energy.energyWarnLevel", defaultValue = "4.0")
+    @Config(path="clans.energy.energyWarnLevel", defaultValue = "1.0")
     private double energyWarnLevel;
 
     @Inject
@@ -54,7 +54,7 @@ public class ClanEnergyListener extends ClanListener{
         if (event.isCancelled()) return;
         Player player = event.getPlayer();
         Clan clan = event.getClan();
-        if (clan.getEnergyRatio() < 36.0) {
+        if (clan.getEnergyRatio() < energyWarnLevel) {
             Component title = Component.text("CLAN ENERGY LOW", NamedTextColor.RED);
             Component subTitle = Component.text("Time Remaining: ", NamedTextColor.YELLOW).append(Component.text(clan.getEnergyTimeRemaining(), NamedTextColor.GREEN));
             player.showTitle(Title.title( title, subTitle));
