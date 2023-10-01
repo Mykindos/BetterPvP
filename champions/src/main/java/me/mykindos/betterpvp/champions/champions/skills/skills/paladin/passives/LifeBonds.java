@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.types.ActiveToggleSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
+import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
@@ -19,6 +20,7 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageEvent;
 
 
@@ -76,10 +78,9 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
 
     @EventHandler(priority = EventPriority.LOW)
     public void onDamage(CustomDamageEvent event) {
-        if (event.getEntity() instanceof Player) {
-            Player player = (Player) event.getEntity();
+        if (event.getDamagee() instanceof Player player) {
             if (active.contains(player.getUniqueId())) {
-                event.setDamage(event.getDamage() * 2); // Double the damage
+                event.setDamage(event.getDamage() * 2);
             }
         }
     }
