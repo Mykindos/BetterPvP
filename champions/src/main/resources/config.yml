@@ -37,7 +37,7 @@ skills:
     silencingstrikes:
       enabled: true
       maxlevel: 3
-    repeatedstrikes:
+    comboattack:
       enabled: true
       maxlevel: 3
     concussion:

@@ -24,20 +24,20 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class RepeatedStrikes extends Skill implements PassiveSkill, Listener {
+public class ComboAttack extends Skill implements PassiveSkill, Listener {
 
     private final WeakHashMap<Player, Double> repeat = new WeakHashMap<>();
     private final WeakHashMap<Player, Long> last = new WeakHashMap<>();
 
     @Inject
-    public RepeatedStrikes(Champions champions, ChampionsManager championsManager) {
+    public ComboAttack(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
 
 
     @Override
     public String getName() {
-        return "Repeated Strikes";
+        return "Combo Attack";
     }
 
     private double damageIncrement;
