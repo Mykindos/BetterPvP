@@ -40,7 +40,7 @@ public class TipManager extends Manager<Tip> {
 
     public void reloadTips() {
         getObjects().values().forEach(tip -> {
-            clans.getInjector().injectMembers(tip);
+            core.getInjector().injectMembers(tip);
         });
     }
 

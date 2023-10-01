@@ -26,13 +26,13 @@ public class TipListener implements Listener {
 
     @Inject
     @Config(path = "core.tips.timeBetweenTips", defaultValue = "150")
-    private int timeBetweenTips;
+    public int timeBetweenTips;
 
-    private final Core core;
+    public final Core core;
 
-    private final TipManager tipManager;
+    public final TipManager tipManager;
 
-    private final GamerManager gamerManager;
+    public final GamerManager gamerManager;
     @Inject
     public TipListener(Core core, GamerManager gamerManager, TipManager tipManager) {
         super();
@@ -75,11 +75,9 @@ public class TipListener implements Listener {
         if ((boolean) gamer.getProperty(GamerProperty.TIPS_ENABLED).orElse(true) &&
                 UtilTime.elapsed(gamer.getLastTip(), (long) 1 * 1000)
                 ) {
-            Optional<Clan> clanOptional = clanManager.getClanByPlayer(player);
-            final Clan clan = clanOptional.orElse(null);;
 
             tipManager.getTips().forEach(tip -> {
-                if (tip.isValid(player, clan)) {
+                if (!tip.isHandled() && tip.isValid(player)) {
                     tipList.add(tip.getCategoryWeight(), tip.getWeight(), tip);
                 }
             });
