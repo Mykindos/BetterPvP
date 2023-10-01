@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.injector.CoreInjectorModule;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.loader.CoreListenerLoader;
+import me.mykindos.betterpvp.core.tips.Tip;
 import me.mykindos.betterpvp.core.tips.TipManager;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import net.kyori.adventure.key.Key;
@@ -76,7 +77,7 @@ public class Core extends BPvPPlugin {
         gamerManager.loadFromList(gamerManager.getGamerRepository().getAll());
 
         var tipManager = injector.getInstance(TipManager.class);
-        tipManager.loadTips();
+        tipManager.loadTips(this, PACKAGE, Tip.class);
 
         var itemHandler = injector.getInstance(ItemHandler.class);
         itemHandler.loadItemData("Core");

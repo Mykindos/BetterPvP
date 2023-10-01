@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 import org.reflections.Reflections;
 
@@ -14,33 +15,28 @@ import java.util.Set;
 @Slf4j
 @Singleton
 public class TipManager extends Manager<Tip> {
-    private final Core core;
 
-    @Inject
-    public TipManager (Core core) {
-        this.core = core;
-    }
-
-    public void loadTips() {
-        Reflections reflections = new Reflections(getClass().getPackageName());
-        Set<Class<? extends Tip>> classes = reflections.getSubTypesOf(Tip.class);
+    public void loadTips(BPvPPlugin plugin, String packageName, Class type) {
+        Reflections reflections = new Reflections(packageName);
+        Set<Class<? extends Tip>> classes = reflections.getSubTypesOf(type);
+        log.info(classes.toString());
         for (var clazz : classes) {
             if(clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers())) continue;
             if(clazz.isAnnotationPresent(Deprecated.class)) continue;
-            Tip tip = core.getInjector().getInstance(clazz);
-            core.getInjector().injectMembers(tip);
+            Tip tip = plugin.getInjector().getInstance(clazz);
+            plugin.getInjector().injectMembers(tip);
 
             addObject(tip.getName(), tip);
 
         }
 
         log.info("Loaded " + objects.size() + " TIPS TIPS TIPS TIPS");
-        core.saveConfig();
+        plugin.saveConfig();
     }
 
-    public void reloadTips() {
+    public void reloadTips(BPvPPlugin plugin) {
         getObjects().values().forEach(tip -> {
-            core.getInjector().injectMembers(tip);
+            plugin.getInjector().injectMembers(tip);
         });
     }
 

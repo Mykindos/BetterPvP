@@ -1,9 +1,12 @@
 package me.mykindos.betterpvp.clans.clans.tips;
 
 import com.google.inject.Inject;
+import lombok.extern.slf4j.Slf4j;
+import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.framework.ModuleLoadedEvent;
 import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.gamer.properties.GamerProperty;
@@ -15,16 +18,24 @@ import me.mykindos.betterpvp.core.tips.TipManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.WeighedList;
+import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginManager;
+import org.reflections.Reflections;
 
+import java.lang.reflect.Modifier;
 import java.util.Optional;
+import java.util.Set;
 
 @BPvPListener
 public class ClanTipListener extends TipListener {
 
     public final ClanManager clanManager;
+
     @Inject
     ClanTipListener(Core core, ClanManager clanManager, GamerManager gamerManager, TipManager tipManager) {
         super(core, gamerManager, tipManager);
@@ -60,6 +71,7 @@ public class ClanTipListener extends TipListener {
 
         }
     }
+
 
 
 }

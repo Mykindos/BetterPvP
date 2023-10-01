@@ -14,7 +14,6 @@ public abstract class ClanTip extends Tip {
         super(categoryWeight, weight, component);
     }
 
-
     public boolean isValid(Player player, Clan clan) {
         return super.isValid(player);
     }
