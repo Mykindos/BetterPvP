@@ -45,6 +45,8 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
     private final HashMap<Player, Long> boostedAttackTime = new HashMap<>();
     private final HashMap<Player, Double> boostedDamage = new HashMap<>();
 
+    public double duration;
+
     @Inject
     public Riposte(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -61,7 +63,7 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
         return new String[]{
                 "Hold right click with a Sword to activate",
                 "",
-                "if an enemy hits you within 0.75 seconds,",
+                "if an enemy hits you within <stat>" + duration + "</stat> seconds,",
                 "",
                 "your next attack will deal <val>" + (6 + (level)) + "</val> extra damage",
                 "",
@@ -228,5 +230,10 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
     @Override
     public Action[] getActions() {
         return SkillActions.RIGHT_CLICK;
+    }
+
+    @Override
+    public void loadSkillConfig(){
+        duration = getConfig("duration", 0.75, Double.class);
     }
 }

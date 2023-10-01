@@ -113,6 +113,7 @@ skills:
       enabled: true
       maxlevel: 3
       cooldown: 12
+      duraiton: 0.75
     holdposition:
       enabled: true
       maxlevel: 5
