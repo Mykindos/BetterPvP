@@ -355,6 +355,7 @@ skills:
     heavyarrows:
       enabled: true
       maxlevel: 5
+      energy: 25
     overcharge:
       enabled: true
       maxlevel: 5

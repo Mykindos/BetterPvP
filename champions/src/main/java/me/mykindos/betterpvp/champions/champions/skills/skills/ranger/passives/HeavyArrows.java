@@ -87,7 +87,6 @@ public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill{
                         float charge = event.getForce();
 
                         pushback.multiply(1.25 * charge);
-                        championsManager.getEnergy().degenerateEnergy(player, 0.1);
                         player.setVelocity(pushback);
                     }
                 }
