@@ -211,16 +211,6 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
         });
     }
 
-    /**
-     * Send a title to all online clan members
-     * @param message
-     * @return
-     */
-
-    public void sendTitleClan(String title, String subtitle) {
-
-    }
-
     public String getEnergyTimeRemaining() {
 
         if (getTerritory().isEmpty()) {
