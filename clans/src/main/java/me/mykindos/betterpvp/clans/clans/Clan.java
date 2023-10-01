@@ -216,8 +216,12 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
         if (getTerritory().isEmpty()) {
             return "\u221E";
         }
-        return UtilTime.getTime((getEnergy() / (float) (getTerritory().size() * 25)) * 3600000, UtilTime.TimeUnit.BEST, 2);
+        return UtilTime.getTime(getEnergyRatio() * 3600000, UtilTime.TimeUnit.BEST, 2);
 
+    }
+
+    public double getEnergyRatio() {
+        return getEnergy() / (float) (getTerritory().size() * 25);
     }
 
     @Override
