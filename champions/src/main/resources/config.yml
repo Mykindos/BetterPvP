@@ -352,6 +352,9 @@ skills:
       maxlevel: 5
       baseDamage: 18.0
       deathMessageThreshold: 40.0
+    heavyarrows:
+      enabled: true
+      maxlevel: 5
     overcharge:
       enabled: true
       maxlevel: 5
