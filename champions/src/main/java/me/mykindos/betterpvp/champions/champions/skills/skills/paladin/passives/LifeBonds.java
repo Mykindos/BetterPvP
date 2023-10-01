@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.types.ActiveToggleSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
+import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
@@ -18,7 +19,8 @@ import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 
 
 import java.util.*;
@@ -52,6 +54,8 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
                 "the power of nature, spreading your health",
                 "between all allies within <val>" + (minRadius + level) + "</val> blocks",
                 "",
+                "While life bonds is active you take double damage",
+                "",
                 "Energy / Second: <val>" + getEnergy(level)
 
         };
@@ -68,6 +72,15 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
                 sendState(player, true);
             }
 
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOW)
+    public void onDamage(CustomDamageEvent event) {
+        if (event.getDamagee() instanceof Player player) {
+            if (active.contains(player.getUniqueId())) {
+                event.setDamage(event.getDamage() * 2);
+            }
         }
     }
 
