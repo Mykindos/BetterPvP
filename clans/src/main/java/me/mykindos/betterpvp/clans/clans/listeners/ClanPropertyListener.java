@@ -26,4 +26,5 @@ public class ClanPropertyListener extends ClanListener{
     public void processStatUpdates(){
         clanManager.getRepository().processPropertyUpdates(true);
     }
+
 }
