@@ -74,8 +74,8 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
         }
     }
 
-    @EventHandler
-    public void onDamage(EntityDamageEvent event) {
+    @EventHandler(priority = EventPriority.LOW)
+    public void onDamage(CustomDamageEvent event) {
         if (event.getEntity() instanceof Player) {
             Player player = (Player) event.getEntity();
             if (active.contains(player.getUniqueId())) {
