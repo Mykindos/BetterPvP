@@ -12,6 +12,7 @@ import org.bukkit.Particle;
 import org.bukkit.craftbukkit.v1_20_R1.CraftWorld;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.FishHook;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.EulerAngle;
@@ -163,6 +164,7 @@ public abstract class Bait {
                         // Play random splash particles in nearby water
                         final double radius = getType().getRadius();
                         int particleCount = (int) (radius * 25);
+                        final Collection<Player> nearby = getLocation().getWorld().getNearbyPlayers(getLocation(), 60);
                         for (int i = 0; i < particleCount; i++) {
                             // Generate random location
                             final int angle = RANDOM.nextInt(360);
@@ -180,7 +182,7 @@ public abstract class Bait {
                             }
 
                             final Location loc = particleLocation.get().add(0.0, 1.05, 0.0);
-                            Particle.WATER_SPLASH.builder().location(loc).receivers(60, true).spawn();
+                            Particle.WATER_SPLASH.builder().location(loc).receivers(nearby).spawn();
                         }
                     }
                 } else {
