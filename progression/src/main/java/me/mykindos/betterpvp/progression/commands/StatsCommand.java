@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.progression.model.ProgressionTree;
 import me.mykindos.betterpvp.progression.model.stats.ProgressionData;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import java.util.concurrent.CompletableFuture;
@@ -44,9 +45,9 @@ public class StatsCommand extends Command {
                 .findAny()
                 .orElseThrow();
 
-        Player target = player;
+        OfflinePlayer target = player;
         if (args.length > 1) {
-            target = Bukkit.getPlayer(args[1]);
+            target = Bukkit.getOfflinePlayer(args[1]);
         }
 
         if (target == null) {

@@ -147,6 +147,7 @@ public class FishingListener implements Listener {
 
     private void startFishing(Player player, FishHook hook) {
         final FishingLoot loot = this.fish.get(player);// store a new fish in the cache for them
+        UtilServer.callEvent(new PlayerStartFishingEvent(player, loot));
 
         // Process baits
         activeBaits.values().stream()
@@ -157,8 +158,6 @@ public class FishingListener implements Listener {
                 .values()
                 .forEach(bait -> bait.track(hook));
         hook.setWaitTime(Math.max(1, hook.getWaitTime())); // If it gets to 0, it will be stuck in the water
-
-        UtilServer.callEvent(new PlayerStartFishingEvent(player, loot));
     }
 
     @EventHandler(priority = EventPriority.HIGH)

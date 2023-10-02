@@ -42,6 +42,7 @@ public class Progression extends BPvPPlugin {
     @Getter
     private String databasePrefix;
 
+    @Getter
     private ProgressionsManager progressionsManager;
 
     @Override

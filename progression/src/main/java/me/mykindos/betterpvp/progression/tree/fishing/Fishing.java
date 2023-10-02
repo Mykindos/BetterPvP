@@ -28,7 +28,7 @@ import java.util.Set;
 
 @Singleton
 @Getter
-public class Fishing implements ProgressionTree {
+public class Fishing extends ProgressionTree {
 
     private final FishingRepository statsRepository;
     private final FishingWeightLeaderboard weightLeaderboard;
