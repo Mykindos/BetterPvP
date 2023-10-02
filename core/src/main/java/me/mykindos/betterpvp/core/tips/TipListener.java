@@ -70,14 +70,14 @@ public class TipListener implements Listener {
         }
         Gamer gamer = gamerOptional.get();
 
-        WeighedList<Tip> tipList = new WeighedList<Tip>();
+        WeighedList<Tip> tipList = event.getTipList();
 
         if ((boolean) gamer.getProperty(GamerProperty.TIPS_ENABLED).orElse(true) &&
                 UtilTime.elapsed(gamer.getLastTip(), (long) 1 * 1000)
                 ) {
 
             tipManager.getTips().forEach(tip -> {
-                if (!tip.isHandled() && tip.isValid(player)) {
+                if (tip.isValid(player)) {
                     tipList.add(tip.getCategoryWeight(), tip.getWeight(), tip);
                 }
             });

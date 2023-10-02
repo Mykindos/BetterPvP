@@ -62,10 +62,9 @@ public class ClanTipListener extends TipListener {
 
             tipManager.getTips().forEach(tip -> {
                 if (tip instanceof ClanTip clanTip) {
-                    if (!clanTip.isHandled() && clanTip.isValid(player, clan)) {
+                    if (clanTip.isValid(player, clan)) {
                         tipList.add(tip.getCategoryWeight(), tip.getWeight(), tip);
                     }
-                    clanTip.setHandled(true);
                 }
             });
 

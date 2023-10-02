@@ -17,9 +17,6 @@ public abstract class Tip {
     @Setter
     private Component component;
 
-    @Setter
-    private boolean handled = false;
-
     protected Tip(int categoryWeight, int weight, Component component) {
         this.categoryWeight = categoryWeight;
         this.weight = weight;
@@ -35,7 +32,7 @@ public abstract class Tip {
     public abstract String getName();
 
     public boolean isValid(Player player) {
-        return true;
+        return false;
     }
 
 
