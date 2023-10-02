@@ -28,7 +28,7 @@ import java.util.Optional;
 public class TipListener implements Listener {
 
     @Inject
-    @Config(path = "core.tips.timeBetweenTips", defaultValue = "5")
+    @Config(path = "core.tips.timeBetweenTips", defaultValue = "5.0")
     public double timeBetweenTips;
 
     public final Core core;
