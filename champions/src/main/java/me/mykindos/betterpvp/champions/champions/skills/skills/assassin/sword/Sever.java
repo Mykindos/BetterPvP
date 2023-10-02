@@ -98,8 +98,10 @@ public class Sever extends PrepareSkill implements CooldownSkill, Listener {
                     this.cancel();
                 } else {
                     if (championsManager.getCooldowns().use(damagee, "Sever-Damage", 0.75, false)) {
-                        UtilDamage.doCustomDamage(new CustomDamageEvent(damagee, damager, null,
-                                DamageCause.CUSTOM, 1.5, false, getName()));
+                        var cde = new CustomDamageEvent(damagee, damager, null,
+                                DamageCause.CUSTOM, 1.5, false, getName());
+                        cde.setIgnoreArmour(true);
+                        UtilDamage.doCustomDamage(cde);
                     }
                     count++;
                 }
