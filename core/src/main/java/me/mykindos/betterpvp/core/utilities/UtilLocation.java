@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.utilities;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Predicate;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -152,10 +153,26 @@ public class UtilLocation {
      * @return The closest surface block, or {@link Optional#empty()} if none was found
      */
     public static Optional<Location> getClosestSurfaceBlock(final Location location, final double maxHeightDifference, final boolean keepXZ) {
+        return getClosestSurfaceBlock(location, maxHeightDifference, keepXZ, UtilBlock::solid);
+    }
+
+    /**
+     * Get the closest surface block relative to a {@link Location}. The location is scanned from its height down until it finds
+     * a surface block, or from its height up until it finds a surface block.
+     * <p>
+     * A surface block is a block that does not have a <b>solid</b> block above it, and is relative to the center location's height.
+     *
+     * @param location            The location to scan from
+     * @param maxHeightDifference The maximum height difference to scan the block from
+     * @param keepXZ              Whether to keep the x and z coordinates of the location. If false, thee x and z coordinates will be those of the block
+     * @param filter              The filter to apply to the blocks
+     * @return The closest surface block, or {@link Optional#empty()} if none was found
+     */
+    public static Optional<Location> getClosestSurfaceBlock(final Location location, final double maxHeightDifference, final boolean keepXZ, final Predicate<Block> filter) {
         Preconditions.checkState(maxHeightDifference > 0, "Max height difference must be greater than 0");
         final int y = location.getBlockY();
         Block block = location.getBlock();
-        while (UtilBlock.solid(block)) { // Replacing the solid block with the one above it until we hit a non-solid block
+        while (filter.test(block)) { // Replacing the solid block with the one above it until we hit a non-solid block
             block = block.getRelative(BlockFace.UP);
             if (Math.abs(y - block.getY()) > maxHeightDifference) {
                 return Optional.empty(); // If the block is too high, there wasn't a surface block
@@ -163,7 +180,7 @@ public class UtilLocation {
         }
         // At this point, we have the highest non-solid block closest to the block. This could mean we already looped to the first non-solid
         // or we never looped at all because the location was already non-solid, which means we need to loop down to find the first solid
-        while (!UtilBlock.solid(block.getRelative(BlockFace.DOWN))) {
+        while (!filter.test(block.getRelative(BlockFace.DOWN))) {
             block = block.getRelative(BlockFace.DOWN);
             if (Math.abs(y - block.getY()) > maxHeightDifference) {
                 return Optional.empty(); // If the block is too low, means there were no surface-blocks relative to the location

@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.commands.ClansCommandLoader;
 import me.mykindos.betterpvp.clans.injector.ClansInjectorModule;
 import me.mykindos.betterpvp.clans.listener.ClansListenerLoader;
+import me.mykindos.betterpvp.clans.progression.ProgressionAdapter;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.config.ConfigInjectorModule;
@@ -63,8 +64,8 @@ public class Clans extends BPvPPlugin {
 
             Bukkit.getPluginManager().callEvent(new ModuleLoadedEvent("Clans"));
 
-            var clansListenerLoader = injector.getInstance(ClansListenerLoader.class);
-            clansListenerLoader.registerListeners(PACKAGE);
+            var listenerLoader = injector.getInstance(ClansListenerLoader.class);
+            listenerLoader.registerListeners(PACKAGE);
 
             var clansCommandLoader = injector.getInstance(ClansCommandLoader.class);
             clansCommandLoader.loadCommands(PACKAGE);
@@ -73,6 +74,11 @@ public class Clans extends BPvPPlugin {
             clanManager.loadFromList(clanManager.getRepository().getAll());
 
             updateEventExecutor.loadPlugin(this);
+
+            var progression = Bukkit.getPluginManager().getPlugin("Progression");
+            if (progression != null) {
+                new ProgressionAdapter(this, (BPvPPlugin) progression, listenerLoader).load();
+            }
         }
     }
 

@@ -22,6 +22,10 @@ public class UtilMessage {
             TagResolver.resolver("alt2", Tag.styling(NamedTextColor.YELLOW))
     );
 
+    public static final Component DIVIDER = Component.text("                                            ")
+            .color(NamedTextColor.DARK_GRAY)
+            .decorate(TextDecoration.STRIKETHROUGH);
+
 
     /**
      * Sends a message to a player with appropriate formatting
