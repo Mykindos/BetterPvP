@@ -16,6 +16,7 @@ create table ${tablePrefix}fishing
     timestamp timestamp default now() not null
 );
 
+DROP PROCEDURE IF EXISTS GetTopFishingByWeight;
 CREATE PROCEDURE GetTopFishingByWeight(IN days DOUBLE, IN maxResults INT)
 BEGIN
     SELECT Gamer, SUM(Weight)
@@ -26,6 +27,7 @@ BEGIN
     LIMIT maxResults;
 END;
 
+DROP PROCEDURE IF EXISTS GetTopFishingByCount;
 CREATE PROCEDURE GetTopFishingByCount(IN days DOUBLE, IN maxResults INT)
 BEGIN
     SELECT Gamer, COUNT(*)
