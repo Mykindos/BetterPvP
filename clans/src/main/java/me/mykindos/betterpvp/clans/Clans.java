@@ -6,6 +6,7 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
+import me.mykindos.betterpvp.clans.tips.ClansTipLoader;
 import me.mykindos.betterpvp.clans.commands.ClansCommandLoader;
 import me.mykindos.betterpvp.clans.injector.ClansInjectorModule;
 import me.mykindos.betterpvp.clans.listener.ClansListenerLoader;
@@ -69,6 +70,9 @@ public class Clans extends BPvPPlugin {
 
             var clansCommandLoader = injector.getInstance(ClansCommandLoader.class);
             clansCommandLoader.loadCommands(PACKAGE);
+
+            var clanTipManager = injector.getInstance(ClansTipLoader.class);
+            clanTipManager.loadTips(PACKAGE);
 
             clanManager = injector.getInstance(ClanManager.class);
             clanManager.loadFromList(clanManager.getRepository().getAll());

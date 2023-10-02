@@ -126,6 +126,16 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
         return players;
     }
 
+    public List<Player> getAdminsAsPlayers() {
+        List<Player> playerAdmins = getMembersAsPlayers();
+        playerAdmins.forEach(player -> {
+            if (!getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.ADMIN)) {
+                playerAdmins.remove(player);
+            }
+        });
+        return playerAdmins;
+    }
+
     /**
      * @return The total amount of members in an entire alliance
      */
