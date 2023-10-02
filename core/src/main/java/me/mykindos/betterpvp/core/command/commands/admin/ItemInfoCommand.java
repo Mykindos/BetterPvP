@@ -30,7 +30,7 @@ public class ItemInfoCommand extends Command {
         var persistentData = player.getInventory().getItemInMainHand().getItemMeta().getPersistentDataContainer();
 
         persistentData.getKeys().forEach(key -> {
-            UtilMessage.simpleMessage(player, "Info", "<yellow>%s: <gray>%s", key.value(), persistentData.getOrDefault(key, PersistentDataType.STRING, ""));
+            UtilMessage.simpleMessage(player, "Info", "<yellow>%s: <gray>%s", key.asString(), persistentData.getOrDefault(key, PersistentDataType.STRING, ""));
         });
 
     }
@@ -46,7 +46,5 @@ public class ItemInfoCommand extends Command {
 
         return ArgumentType.NONE.name();
     }
-
-
 
 }

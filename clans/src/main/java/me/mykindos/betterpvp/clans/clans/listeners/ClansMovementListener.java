@@ -92,7 +92,7 @@ public class ClansMovementListener extends ClanListener {
         }
 
         if (locationClan != null) {
-            if (locationClan.getName().equals("Fields") || locationClan.getName().equals("Lake")) {
+            if (locationClan.getName().equalsIgnoreCase("Fields") || locationClan.getName().equalsIgnoreCase("Lake")) {
                 append = UtilMessage.deserialize("<red><bold>                    Warning! <gray> PvP Hotspot</gray></bold></red>");
             }
 

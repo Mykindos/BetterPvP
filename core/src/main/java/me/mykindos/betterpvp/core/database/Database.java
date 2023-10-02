@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.database;
 import com.google.inject.Singleton;
 import lombok.Cleanup;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.database.connection.IDatabaseConnection;
@@ -14,10 +15,9 @@ import javax.inject.Inject;
 import javax.sql.rowset.CachedRowSet;
 import javax.sql.rowset.RowSetFactory;
 import javax.sql.rowset.RowSetProvider;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.List;
+import java.util.function.Consumer;
 
 @Slf4j
 @Singleton
@@ -40,7 +40,6 @@ public class Database {
      */
     public void executeUpdateAsync(Statement statement) {
         UtilServer.runTaskAsync(core, () -> executeUpdate(statement));
-
     }
 
     /**
@@ -63,9 +62,9 @@ public class Database {
     }
 
     public void executeBatch(List<Statement> statements, boolean async) {
-        if(async) {
+        if (async) {
             UtilServer.runTaskAsync(core, () -> executeBatch(statements));
-        }else{
+        } else {
             executeBatch(statements);
         }
     }
@@ -77,6 +76,7 @@ public class Database {
         }
         try {
             // Assume all statement queries are the same
+            connection.setAutoCommit(false);
             @Cleanup
             PreparedStatement preparedStatement = connection.prepareStatement(statements.get(0).getQuery());
             for (Statement statement : statements) {
@@ -93,6 +93,12 @@ public class Database {
                 connection.rollback();
             } catch (SQLException rollbackException) {
                 ex.printStackTrace();
+            }
+        } finally {
+            try {
+                connection.setAutoCommit(true);
+            } catch (SQLException e) {
+                log.error("Failed to enable autocommit after batch", e);
             }
         }
     }
@@ -121,6 +127,30 @@ public class Database {
         }
 
         return rowset;
+    }
+
+    @SneakyThrows
+    public void executeProcedure(Statement statement, int fetchSize, Consumer<CachedRowSet> consumer) {
+        Connection connection = getConnection().getDatabaseConnection();
+        CachedRowSet result;
+
+        try {
+            RowSetFactory factory = RowSetProvider.newFactory();
+            result = factory.createCachedRowSet();
+            if (fetchSize != -1) result.setFetchSize(fetchSize);
+            @Cleanup
+            CallableStatement callable = connection.prepareCall(statement.getQuery());
+            for (int i = 1; i <= statement.getValues().length; i++) {
+                StatementValue<?> val = statement.getValues()[i - 1];
+                callable.setObject(i, val.getValue(), val.getType());
+            }
+            callable.execute();
+            result.populate(callable.getResultSet());
+            consumer.accept(result);
+            result.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
     }
 
 }
