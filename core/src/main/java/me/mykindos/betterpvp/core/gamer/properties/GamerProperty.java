@@ -11,6 +11,8 @@ public enum GamerProperty {
     // Misc
     SIDEBAR_ENABLED,
 
+    TIPS_ENABLED,
+
     // Chat modes
     CLAN_CHAT,
     ALLY_CHAT,

@@ -86,6 +86,11 @@ public class GamerListener implements Listener {
         if(sidebarOptional.isEmpty()){
             gamer.saveProperty(GamerProperty.SIDEBAR_ENABLED, true);
         }
+
+        Optional<Boolean> tipsOptional = gamer.getProperty(GamerProperty.TIPS_ENABLED);
+        if(tipsOptional.isEmpty()){
+            gamer.saveProperty(GamerProperty.TIPS_ENABLED, true);
+        }
     }
 
 }
