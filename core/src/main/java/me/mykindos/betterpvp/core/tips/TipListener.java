@@ -55,7 +55,7 @@ public class TipListener implements Listener {
         Bukkit.getOnlinePlayers().forEach(player -> {
             gamerManager.getObject(player.getUniqueId()).ifPresent(gamer -> {
                 if ((boolean) gamer.getProperty(GamerProperty.TIPS_ENABLED).orElse(true)) {
-                    if (UtilTime.elapsed(gamer.getLastTip(), (long) timeBetweenTips * 1000 * 60000)) {
+                    if (UtilTime.elapsed(gamer.getLastTip(), (long) timeBetweenTips * 60000)) {
                         UtilServer.runTaskAsync(core, () -> UtilServer.callEvent(new TipEvent(player, gamer)));
                     }
                 }
