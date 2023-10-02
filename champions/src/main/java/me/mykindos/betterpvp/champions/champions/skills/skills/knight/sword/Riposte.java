@@ -119,7 +119,7 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
                 UtilMessage.simpleMessage(temp, getClassType().getName(), "<yellow>%s<gray> used riposte!", player.getName());
             }
 
-            //active.remove(player.getUniqueId());
+            active.remove(player.getUniqueId());
             boostedAttackPlayers.add(player);
 
         }
@@ -187,7 +187,7 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
                     Iterator<Player> boostedIterator = boostedAttackPlayers.iterator();
                     while (boostedIterator.hasNext()) {
                         Player boostedPlayer = boostedIterator.next();
-                        if (boostedAttackTime.containsKey(player) && UtilTime.elapsed(boostedAttackTime.get(boostedPlayer), 2000)) {
+                        if (boostedAttackTime.containsKey(boostedPlayer) && UtilTime.elapsed(boostedAttackTime.get(boostedPlayer), 2000)) {
                             boostedAttackTime.remove(boostedPlayer);
                             boostedDamage.remove(boostedPlayer);
                             UtilMessage.message(boostedPlayer, getClassType().getName(), "You lost your boosted attack.");
