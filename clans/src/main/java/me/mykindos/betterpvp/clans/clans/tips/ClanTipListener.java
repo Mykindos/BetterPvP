@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.clans.clans.tips;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
@@ -31,6 +32,7 @@ import java.lang.reflect.Modifier;
 import java.util.Optional;
 import java.util.Set;
 
+@Singleton
 @BPvPListener
 public class ClanTipListener extends TipListener {
 
@@ -40,6 +42,11 @@ public class ClanTipListener extends TipListener {
     ClanTipListener(Core core, ClanManager clanManager, GamerManager gamerManager, TipManager tipManager) {
         super(core, gamerManager, tipManager);
         this.clanManager = clanManager;
+    }
+
+    @Override
+    public void tipSender() {
+        //Override and do nothing
     }
 
     @EventHandler(priority = EventPriority.LOW)

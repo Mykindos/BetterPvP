@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.tips;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.events.ClientLoginEvent;
 import me.mykindos.betterpvp.core.config.Config;
@@ -22,6 +23,7 @@ import org.bukkit.event.Listener;
 
 import java.util.Optional;
 
+@Singleton
 @BPvPListener
 public class TipListener implements Listener {
 
