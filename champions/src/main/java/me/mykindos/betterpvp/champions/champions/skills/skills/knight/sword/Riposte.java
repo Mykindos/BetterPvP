@@ -28,6 +28,8 @@ import org.bukkit.inventory.ItemStack;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.UUID;
+import java.util.Set;
+import java.util.HashSet;
 
 
 @Singleton
@@ -39,6 +41,8 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
     private final HashMap<Player, Long> handRaisedTime = new HashMap<>();
     private final HashMap<Player, Long> boostedAttackTime = new HashMap<>();
     private final HashMap<Player, Double> boostedDamage = new HashMap<>();
+    private final Set<Player> boostedAttackPlayers = new HashSet<>();
+
 
     public double duration;
 
@@ -102,7 +106,7 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
         if (event.getDamager() == null) return;
         LivingEntity ent = event.getDamager();
 
-        if (hasSkill(player)) {
+        if (hasSkill(player) && player.isHandRaised()) {
             event.setKnockback(false);
             event.setDamage(0);
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 2.0f, 1.3f);
@@ -114,6 +118,10 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
             if (ent instanceof Player temp) {
                 UtilMessage.simpleMessage(temp, getClassType().getName(), "<yellow>%s<gray> used riposte!", player.getName());
             }
+
+            //active.remove(player.getUniqueId());
+            boostedAttackPlayers.add(player);
+
         }
     }
 
@@ -176,11 +184,16 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
                         it.remove();
                     }
 
-                    if (boostedAttackTime.containsKey(player) && UtilTime.elapsed(boostedAttackTime.get(player), 2000)) {
-                        boostedAttackTime.remove(player);
-                        boostedDamage.remove(player);
-                        UtilMessage.message(player, getClassType().getName(), "You lost your boosted attack.");
-                        player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
+                    Iterator<Player> boostedIterator = boostedAttackPlayers.iterator();
+                    while (boostedIterator.hasNext()) {
+                        Player boostedPlayer = boostedIterator.next();
+                        if (boostedAttackTime.containsKey(player) && UtilTime.elapsed(boostedAttackTime.get(boostedPlayer), 2000)) {
+                            boostedAttackTime.remove(boostedPlayer);
+                            boostedDamage.remove(boostedPlayer);
+                            UtilMessage.message(boostedPlayer, getClassType().getName(), "You lost your boosted attack.");
+                            boostedPlayer.getWorld().playSound(boostedPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
+                            boostedIterator.remove();
+                        }
                     }
                 } else {
                     it.remove();
@@ -192,7 +205,7 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
     @EventHandler
     public void onAttack(CustomDamageEvent event) {
         if (!(event.getDamager() instanceof Player player)) return;
-        if (boostedDamage.containsKey(player)) {
+        if (boostedAttackPlayers.contains(player) && boostedDamage.containsKey(player)) {
             event.setDamage(event.getDamage() + boostedDamage.get(player));
             boostedDamage.remove(player);
             boostedAttackTime.remove(player);
