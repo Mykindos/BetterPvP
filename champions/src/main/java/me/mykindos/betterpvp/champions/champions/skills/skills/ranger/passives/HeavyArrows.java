@@ -50,7 +50,7 @@ public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill{
                 "For every arrow you shoot you will be",
                 "pushed backwards (unless crouching)",
                 "",
-                "Energy used per shot: <val>"+energy
+                "Energy used per shot: <val>"+ (energy - ((level - 2)))
         };
     }
 
@@ -70,6 +70,7 @@ public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill{
                 Player shooter = (Player) next.getShooter();
 
                 if (!shooter.isSneaking() && championsManager.getEnergy().use(shooter, getName(), getEnergy(getLevel(shooter)), false)) {
+                    //this line is bad and causes issues because it uses energy while the arrow is flying
                     Location location = next.getLocation().add(new Vector(0, 0.25, 0));
                     Particle.CRIT_MAGIC.builder().location(location).receivers(60).extra(0).spawn();
                 }
@@ -106,7 +107,7 @@ public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill{
     @Override
     public float getEnergy(int level) {
 
-        return energy - ((level - 1));
+        return energy - ((level - 2));
     }
     @Override
     public SkillType getType() {
