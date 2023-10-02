@@ -8,7 +8,6 @@ import net.kyori.adventure.title.Title;
 import net.kyori.adventure.title.TitlePart;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
 import java.util.Optional;
@@ -32,7 +31,7 @@ public class TitleComponent extends TimedComponent {
      */
     public TitleComponent(double fadeIn, double seconds, double fadeOut, boolean waitToExpire, Function<Gamer, Component> provider, Function<Gamer, Component> subtitleProvider) {
         super(fadeIn + seconds + fadeOut, waitToExpire, provider);
-        Preconditions.checkArgument(provider != null || subtitleProvider != null, "Both provider and subtitleProvider cannot be null!");
+        Preconditions.checkNotNull(subtitleProvider, "subtitleProvider");
         this.subtitleProvider = subtitleProvider;
         this.fadeIn = fadeIn;
         this.fadeOut = fadeOut;

@@ -5,7 +5,6 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
-import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateLoreEvent;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateNameEvent;
 import me.mykindos.betterpvp.core.items.enchants.GlowEnchant;
@@ -103,7 +102,10 @@ public class ItemHandler {
                 }
             }
         } else {
-            itemMeta.displayName(Component.text(UtilFormat.cleanString(material.name())).color(NamedTextColor.YELLOW));
+            final PersistentDataContainer pdc = itemMeta.getPersistentDataContainer();
+            if (!pdc.has(CoreNamespaceKeys.IMMUTABLE_KEY, PersistentDataType.BOOLEAN) || !pdc.get(CoreNamespaceKeys.IMMUTABLE_KEY, PersistentDataType.BOOLEAN)) {
+                itemMeta.displayName(Component.text(UtilFormat.cleanString(material.name())).color(NamedTextColor.YELLOW));
+            }
         }
 
         itemStack.setItemMeta(itemMeta);
