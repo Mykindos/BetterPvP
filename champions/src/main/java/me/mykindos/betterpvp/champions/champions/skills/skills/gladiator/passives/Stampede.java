@@ -79,7 +79,7 @@ public class Stampede extends Skill implements PassiveSkill {
                     sprintStr.put(player, 0);
                 }
 
-                if (!player.isSprinting()) {
+                if (!player.isSprinting() || player.isInWater()) {
                     sprintTime.remove(player);
                     sprintStr.remove(player);
                     player.removePotionEffect(PotionEffectType.SPEED);
