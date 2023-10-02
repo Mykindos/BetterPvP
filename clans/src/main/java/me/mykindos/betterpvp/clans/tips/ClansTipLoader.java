@@ -1,32 +1,34 @@
-package me.mykindos.betterpvp.clans.clans.tips;
+package me.mykindos.betterpvp.clans.tips;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.Clans;
+import me.mykindos.betterpvp.core.framework.BPvPPlugin;
+import me.mykindos.betterpvp.core.tips.TipLoader;
 import me.mykindos.betterpvp.core.tips.TipManager;
 import org.reflections.Reflections;
 
 import java.lang.reflect.Modifier;
 import java.util.Set;
 
-public class ClanTipManager {
+@Singleton
+public class ClansTipLoader extends TipLoader {
 
     @Inject
-    private Clans clans;
+    public ClansTipLoader(Clans plugin, TipManager tipManager) {
+        super(plugin, tipManager);
+    }
 
-    @Inject
-    private TipManager tipManager;
-
-    public void load() {
-        final Reflections reflections = new Reflections(getClass().getPackageName());
+    public void loadTips(String packageName) {
+        final Reflections reflections = new Reflections(packageName);
         final Set<Class<? extends ClanTip>> classes = reflections.getSubTypesOf(ClanTip.class);
         for (Class<? extends ClanTip> tipClass : classes) {
             if (tipClass.isInterface() || tipClass.getModifiers() == Modifier.ABSTRACT) {
                 continue;
             }
 
-            final ClanTip tip = clans.getInjector().getInstance(tipClass);
-            tipManager.registerTip(clans, tip);
+            load(tipClass);
         }
     }
-    
+
 }

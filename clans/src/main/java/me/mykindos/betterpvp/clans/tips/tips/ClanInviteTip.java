@@ -1,9 +1,9 @@
-package me.mykindos.betterpvp.clans.clans.tips.tips;
+package me.mykindos.betterpvp.clans.tips.tips;
 
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.clans.Clan;
-import me.mykindos.betterpvp.clans.clans.tips.ClanTip;
-import me.mykindos.betterpvp.clans.clans.tips.types.ISuggestCommand;
+import me.mykindos.betterpvp.clans.tips.ClanTip;
+import me.mykindos.betterpvp.clans.tips.types.ISuggestCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
@@ -21,11 +21,10 @@ public class ClanInviteTip extends ClanTip implements ISuggestCommand {
         return "claninvite";
     }
 
-
-    private Component generateComponent() {
+    @Override
+    public Component generateComponent() {
         Component suggestComponent = suggestCommand("/c invite <player>", "/c invite ");
-        Component component = Component.text("You can invite a player to your clan by running ", NamedTextColor.GRAY).append(suggestComponent);
-        return component;
+        return Component.text("You can invite a player to your clan by running ", NamedTextColor.GRAY).append(suggestComponent);
     }
 
     @Override

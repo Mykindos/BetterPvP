@@ -1,9 +1,9 @@
-package me.mykindos.betterpvp.clans.clans.tips.tips;
+package me.mykindos.betterpvp.clans.tips.tips;
 
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.clans.Clan;
-import me.mykindos.betterpvp.clans.clans.tips.ClanTip;
-import me.mykindos.betterpvp.clans.clans.tips.types.IRunCommand;
+import me.mykindos.betterpvp.clans.tips.ClanTip;
+import me.mykindos.betterpvp.clans.tips.types.IRunCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
@@ -22,10 +22,10 @@ public class ClanHelpTip extends ClanTip implements IRunCommand {
         return "clanhelp";
     }
 
-    private Component generateComponent() {
+    @Override
+    public Component generateComponent() {
         Component runComponent = runCommand("/c help");
-        Component component = Component.text("You can see a list of commands by running ", NamedTextColor.GRAY).append(runComponent);
-        return component;
+        return Component.text("You can see a list of commands by running ", NamedTextColor.GRAY).append(runComponent);
     }
 
     public boolean isValid(Player player, Clan clan) {

@@ -28,37 +28,38 @@ import java.util.Optional;
 public class TipListener implements Listener {
 
     @Inject
-    @Config(path = "core.tips.timeBetweenTips", defaultValue = "150")
-    public int timeBetweenTips;
+    @Config(path = "core.tips.timeBetweenTips", defaultValue = "5")
+    public double timeBetweenTips;
 
     public final Core core;
 
     public final TipManager tipManager;
 
     public final GamerManager gamerManager;
+
     @Inject
     public TipListener(Core core, GamerManager gamerManager, TipManager tipManager) {
         super();
         this.core = core;
         this.gamerManager = gamerManager;
         this.tipManager = tipManager;
-
     }
 
     @EventHandler(priority = EventPriority.LOW)
     public void onClientLogin(ClientLoginEvent event) {
-        Optional<Gamer> gamerOptional = gamerManager.getObject(event.getClient().getUuid());
-        Gamer gamer;
-        if (gamerOptional.isPresent()) {
-            gamer = gamerOptional.get();
-            gamer.setLastTipNow();
-        }
+        gamerManager.getObject(event.getClient().getUuid()).ifPresent(Gamer::setLastTipNow);
     }
 
     @UpdateEvent(delay = 10 * 1000, isAsync = true)
     public void tipSender() {
         Bukkit.getOnlinePlayers().forEach(player -> {
-            UtilServer.runTaskLaterAsync(core, () -> UtilServer.callEvent(new TipEvent(player)), 5);
+            gamerManager.getObject(player.getUniqueId()).ifPresent(gamer -> {
+                if ((boolean) gamer.getProperty(GamerProperty.TIPS_ENABLED).orElse(true)) {
+                    if (UtilTime.elapsed(gamer.getLastTip(), (long) timeBetweenTips * 1000 * 60000)) {
+                        UtilServer.runTaskAsync(core, () -> UtilServer.callEvent(new TipEvent(player, gamer)));
+                    }
+                }
+            });
         });
     }
 
@@ -66,30 +67,20 @@ public class TipListener implements Listener {
     public void onTip(TipEvent event) {
         if (event.isCancelled()) return;
         Player player = event.getPlayer();
-        Optional<Gamer> gamerOptional = gamerManager.getObject(player.getUniqueId());
-        if (gamerOptional.isEmpty()) {
-            event.cancel("Gamer not found.");
-            return;
-        }
-        Gamer gamer = gamerOptional.get();
 
         WeighedList<Tip> tipList = event.getTipList();
 
-        if ((boolean) gamer.getProperty(GamerProperty.TIPS_ENABLED).orElse(true) &&
-                UtilTime.elapsed(gamer.getLastTip(), (long) 1 * 1000)
-                ) {
-
-            tipManager.getTips().forEach(tip -> {
-                if (tip.isValid(player)) {
-                    tipList.add(tip.getCategoryWeight(), tip.getWeight(), tip);
-                }
-            });
-
-            if (tipList.size() > 0) {
-                Tip tip = tipList.random();
-                UtilMessage.message(player, "Tips", tip.getComponent());
-                gamer.setLastTipNow();
+        tipManager.getTips().forEach(tip -> {
+            if (tip.isValid(player)) {
+                tipList.add(tip.getCategoryWeight(), tip.getWeight(), tip);
             }
+        });
+
+        if (tipList.size() > 0) {
+            Tip tip = tipList.random();
+            UtilMessage.message(player, "Tips", tip.getComponent());
+            event.getGamer().setLastTipNow();
         }
+
     }
 }

@@ -1,9 +1,9 @@
-package me.mykindos.betterpvp.clans.clans.tips.tips;
+package me.mykindos.betterpvp.clans.tips.tips;
 
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.clans.Clan;
-import me.mykindos.betterpvp.clans.clans.tips.ClanTip;
-import me.mykindos.betterpvp.clans.clans.tips.types.IRunCommand;
+import me.mykindos.betterpvp.clans.tips.ClanTip;
+import me.mykindos.betterpvp.clans.tips.types.IRunCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
@@ -21,10 +21,10 @@ public class ClanHomeTip extends ClanTip implements IRunCommand {
         return "clanhome";
     }
 
-    private Component generateComponent() {
+    @Override
+    public Component generateComponent() {
         Component runComponent = runCommand("/clan sethome");
-        Component component = Component.text("You can set a place you can teleport back to in your territory by running ", NamedTextColor.GRAY).append(runComponent);
-        return component;
+        return Component.text("You can set a place you can teleport back to in your territory by running ", NamedTextColor.GRAY).append(runComponent);
     }
 
     @Override

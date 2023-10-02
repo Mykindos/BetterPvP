@@ -6,6 +6,8 @@ import lombok.Setter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 
+import java.util.function.Predicate;
+
 @Singleton
 @Getter
 public abstract class Tip {
@@ -17,17 +19,17 @@ public abstract class Tip {
     @Setter
     private Component component;
 
-    protected Tip(int categoryWeight, int weight, Component component) {
+    public Tip(int categoryWeight, int weight, Component component) {
         this.categoryWeight = categoryWeight;
         this.weight = weight;
         this.component = component;
     }
 
-    protected Tip(int categoryWeight, int weight) {
-        this.categoryWeight = categoryWeight;
-        this.weight = weight;
-        this.component = generateComponent();
+    public Tip(int categoryWeight, int weight) {
+        this(categoryWeight, weight, Component.empty());
     }
+
+
 
     public abstract String getName();
 
@@ -35,8 +37,8 @@ public abstract class Tip {
         return false;
     }
 
-
-    private Component generateComponent() {
+    public Component generateComponent() {
         return Component.empty();
     }
+
 }
