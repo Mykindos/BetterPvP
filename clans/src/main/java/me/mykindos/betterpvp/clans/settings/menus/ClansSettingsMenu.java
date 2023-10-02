@@ -19,7 +19,7 @@ public class ClansSettingsMenu extends SettingSubMenu implements IRefreshingMenu
     private final Gamer gamer;
 
     public ClansSettingsMenu(Player player, Gamer gamer) {
-        super(player, 9, Component.text("Clans Settings", NamedTextColor.GREEN).decorate(TextDecoration.BOLD));
+        super(player, 9, Component.text("Clans Settings", NamedTextColor.BLACK).decorate(TextDecoration.BOLD));
         this.gamer = gamer;
 
         refresh();
@@ -37,6 +37,19 @@ public class ClansSettingsMenu extends SettingSubMenu implements IRefreshingMenu
                     new ItemStack(Material.IRON_BARS),
                     "Sidebar",
                     Component.text("Whether to display the sidebar or not", NamedTextColor.GRAY)));
+
+        });
+
+        Optional<Boolean> tipSettingOptional = gamer.getProperty(GamerProperty.TIPS_ENABLED);
+        tipSettingOptional.ifPresent(tipSetting -> {
+            addButton(new ClansSettingButton(gamer,
+                    GamerProperty.TIPS_ENABLED,
+                    tipSetting,
+                    1,
+                    new ItemStack(Material.WRITABLE_BOOK),
+                    "Tips",
+                    Component.text("Whether to enable tips or not.", NamedTextColor.GRAY)));
+
         });
 
     }
