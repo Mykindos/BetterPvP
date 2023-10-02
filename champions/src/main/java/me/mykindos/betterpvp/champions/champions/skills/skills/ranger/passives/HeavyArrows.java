@@ -64,11 +64,15 @@ public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill{
         Iterator<Arrow> it = arrows.keySet().iterator();
         while (it.hasNext()) {
             Arrow next = it.next();
-            if (next == null || next.isDead()) {
+            if (next == null || next.isDead() || !(next.getShooter() instanceof Player)) {
                 it.remove();
             } else {
-                Location location = next.getLocation().add(new Vector(0, 0.25, 0));
-                Particle.CRIT_MAGIC.builder().location(location).receivers(60).extra(0).spawn();
+                Player shooter = (Player) next.getShooter();
+
+                if (!shooter.isSneaking() && championsManager.getEnergy().use(shooter, getName(), getEnergy(getLevel(shooter)), false)) {
+                    Location location = next.getLocation().add(new Vector(0, 0.25, 0));
+                    Particle.CRIT_MAGIC.builder().location(location).receivers(60).extra(0).spawn();
+                }
             }
         }
     }
