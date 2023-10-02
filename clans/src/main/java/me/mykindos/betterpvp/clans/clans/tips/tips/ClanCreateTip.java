@@ -5,7 +5,6 @@ import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.tips.ClanTip;
 import me.mykindos.betterpvp.clans.clans.tips.types.ISuggestCommand;
 import me.mykindos.betterpvp.core.tips.BPvPTip;
-import me.mykindos.betterpvp.core.tips.Tip;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
@@ -13,7 +12,7 @@ import org.bukkit.entity.Player;
 @Singleton
 @BPvPTip
 public class ClanCreateTip extends ClanTip implements ISuggestCommand {
-    ClanCreateTip() {
+    public ClanCreateTip() {
         super(10, 1);
         setComponent(generateComponent());
     }

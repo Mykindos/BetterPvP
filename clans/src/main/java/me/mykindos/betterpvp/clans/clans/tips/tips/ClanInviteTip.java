@@ -5,7 +5,6 @@ import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.tips.ClanTip;
 import me.mykindos.betterpvp.clans.clans.tips.types.ISuggestCommand;
 import me.mykindos.betterpvp.core.tips.BPvPTip;
-import me.mykindos.betterpvp.core.tips.Tip;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
@@ -14,7 +13,7 @@ import org.bukkit.entity.Player;
 @BPvPTip
 public class ClanInviteTip extends ClanTip implements ISuggestCommand {
 
-    ClanInviteTip() {
+    public ClanInviteTip() {
         super(2, 1);
         setComponent(generateComponent());
     }

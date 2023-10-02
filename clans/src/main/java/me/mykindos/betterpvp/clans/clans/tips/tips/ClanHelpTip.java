@@ -4,7 +4,6 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.clans.tips.ClanTip;
 import me.mykindos.betterpvp.clans.clans.tips.types.IRunCommand;
 import me.mykindos.betterpvp.core.tips.BPvPTip;
-import me.mykindos.betterpvp.core.tips.Tip;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
@@ -12,7 +11,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 @BPvPTip
 public class ClanHelpTip extends ClanTip implements IRunCommand {
 
-    ClanHelpTip() {
+    public ClanHelpTip() {
         super(1, 1);
         setComponent(generateComponent());
 
