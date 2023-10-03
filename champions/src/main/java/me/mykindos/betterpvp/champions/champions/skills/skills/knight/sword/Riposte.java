@@ -41,6 +41,7 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
 
 
     public double duration;
+    public double bonusDamage;
 
     @Inject
     public Riposte(Champions champions, ChampionsManager championsManager) {
@@ -58,9 +59,8 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
         return new String[]{
                 "Hold right click with a Sword to activate",
                 "",
-                "if an enemy hits you within <stat>" + duration + "</stat> seconds,",
-                "",
-                "your next attack will deal <val>" + (6 + (level)) + "</val> extra damage",
+                "If an enemy hits you within <stat>" + duration + "</stat> seconds,",
+                "your next attack will deal <val>" + (bonusDamage + (level)) + "</val> extra damage",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -92,7 +92,7 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
             event.setDamage(0);
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 2.0f, 1.3f);
             int level = getLevel(player);
-            boostedDamage.put(player, 6.0 + level);
+            boostedDamage.put(player, bonusDamage + level);
             boostedAttackTime.put(player, System.currentTimeMillis());
             handRaisedTime.remove(player);
 
@@ -229,5 +229,6 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
     @Override
     public void loadSkillConfig(){
         duration = getConfig("duration", 0.75, Double.class);
+        bonusDamage = getConfig("bonusDamage",3.0, Double.class);
     }
 }

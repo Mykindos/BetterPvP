@@ -114,6 +114,7 @@ skills:
       maxlevel: 3
       cooldown: 12
       duraiton: 0.75
+      bonusDamage: 3.0
     holdposition:
       enabled: true
       maxlevel: 5
