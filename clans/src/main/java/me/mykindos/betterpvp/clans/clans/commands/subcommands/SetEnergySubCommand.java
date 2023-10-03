@@ -46,7 +46,14 @@ public class SetEnergySubCommand extends ClanSubCommand {
     @Override
     public void execute(Player player, Client client, String... args) {
 
-        int energy = Integer.parseInt(args[0]);
+        int energy;
+        try {
+            energy = Integer.parseInt(args[0]);
+        } catch (NumberFormatException e) {
+            UtilMessage.message(player, "Clans", Component.text(args[0] + " is not a valid input. Input must be an integer."));
+            return;
+        }
+
 
         Clan playerClan = clanManager.getClanByPlayer(player).orElseThrow();
 
