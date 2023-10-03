@@ -87,6 +87,10 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
         putProperty(ClanProperty.BALANCE, balance);
     }
 
+    public void setEnergy(int energy) {
+        putProperty(ClanProperty.ENERGY, energy);
+    }
+
     public Optional<ClanMember> getLeader() {
         return members.stream().filter(clanMember -> clanMember.getRank() == ClanMember.MemberRank.LEADER).findFirst();
     }
