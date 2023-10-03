@@ -43,7 +43,7 @@ public class Siphon extends Skill implements PassiveSkill {
     public String[] getDescription(int level) {
         return new String[]{
                 "Siphon energy from all enemies within <val>" + (radius + level) + "</val> blocks, granting",
-                "you <effect>Speed II</effect> and sometimes a small amount of health",
+                "you <effect>Speed I</effect> and sometimes a small amount of health",
                 "",
                 "Energy siphoned per second: <stat>" + energySiphoned
         };

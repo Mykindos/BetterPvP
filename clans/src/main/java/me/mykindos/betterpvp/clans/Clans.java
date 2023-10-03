@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.ModuleLoadedEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
+import me.mykindos.betterpvp.core.items.ItemHandler;
 import org.bukkit.Bukkit;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
@@ -76,6 +77,9 @@ public class Clans extends BPvPPlugin {
 
             clanManager = injector.getInstance(ClanManager.class);
             clanManager.loadFromList(clanManager.getRepository().getAll());
+
+            var itemHandler = injector.getInstance(ItemHandler.class);
+            itemHandler.loadItemData("Clans");
 
             updateEventExecutor.loadPlugin(this);
 
