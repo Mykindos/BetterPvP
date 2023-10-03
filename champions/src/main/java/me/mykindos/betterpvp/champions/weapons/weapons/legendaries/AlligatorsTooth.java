@@ -18,9 +18,7 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -28,37 +26,38 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.util.Vector;
 
 @Singleton
 @BPvPListener
-public class WindBlade extends ChannelWeapon implements InteractWeapon, LegendaryWeapon, Listener {
+public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, LegendaryWeapon, Listener {
 
     @Inject
-    @Config(path = "weapons.wind-blade.energy-per-tick", defaultValue = "1.0")
+    @Config(path = "weapons.alligators-tooth.energy-per-tick", defaultValue = "1.0")
     private double energyPerTick;
 
     @Inject
-    @Config(path = "weapons.wind-blade.initial-energy-cost", defaultValue = "10.0")
+    @Config(path = "weapons.alligators-tooth.initial-energy-cost", defaultValue = "10.0")
     private double initialEnergyCost;
 
     @Inject
-    @Config(path = "weapons.wind-blade.base-damage", defaultValue = "7.0")
+    @Config(path = "weapons.alligators-tooth.base-damage", defaultValue = "8.0")
     private double baseDamage;
 
     @Inject
-    @Config(path = "weapons.wind-blade.strength", defaultValue = "0.7")
-    private double velocityStrength;
+    @Config(path = "weapons.alligators-tooth.bonus-damage", defaultValue = "4.0")
+    private double bonusDamage;
 
+    @Inject
+    @Config(path = "weapons.alligators-tooth.strength", defaultValue = "1.0")
+    private double velocityStrength;
 
     private final EnergyHandler energyHandler;
 
     @Inject
-    public WindBlade(EnergyHandler energyHandler) {
-        super(Material.MUSIC_DISC_MELLOHI, Component.text("Wind Blade", NamedTextColor.RED));
+    public AlligatorsTooth(EnergyHandler energyHandler) {
+        super(Material.MUSIC_DISC_MALL, Component.text("Alligators Tooth", NamedTextColor.RED));
         this.energyHandler = energyHandler;
     }
-
 
     @Override
     public void activate(Player player) {
@@ -66,11 +65,11 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
     }
 
     @UpdateEvent
-    public void doWindBlade() {
+    public void doAlligatorsTooth() {
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (!active.contains(player.getUniqueId())) continue;
 
-            if (player.getInventory().getItemInMainHand().getType() != Material.MUSIC_DISC_MELLOHI) {
+            if (player.getInventory().getItemInMainHand().getType() != getMaterial()) {
                 active.remove(player.getUniqueId());
                 continue;
             }
@@ -81,7 +80,7 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
             }
 
             var checkUsageEvent = UtilServer.callEvent(new PlayerUseItemEvent(player, this, true));
-            if(checkUsageEvent.isCancelled()) {
+            if (checkUsageEvent.isCancelled()) {
                 UtilMessage.simpleMessage(player, "Restriction", "You cannot use this weapon here.");
                 continue;
             }
@@ -91,46 +90,34 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
                 continue;
             }
 
-            if (!energyHandler.use(player, "Wind Blade", energyPerTick, true)) {
+            if (!energyHandler.use(player, "Alligators Tooth", energyPerTick, true)) {
                 active.remove(player.getUniqueId());
                 continue;
             }
 
-            UtilVelocity.velocity(player, velocityStrength, 0.11, 1.0, true);
-            player.getWorld().spawnEntity(player.getLocation(), EntityType.LLAMA_SPIT);
-            player.getWorld().playSound(player.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 0.5F, 1.5F);
+            UtilVelocity.velocity(player, velocityStrength, 0.11D, 1.0D, true);
+            player.getWorld().playEffect(player.getLocation(), Effect.STEP_SOUND, Material.LAPIS_BLOCK);
+            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_FISH_SWIM, 0.8F, 1.5F);
         }
     }
 
-    @EventHandler (priority = EventPriority.LOW)
+    @EventHandler(priority = EventPriority.LOW)
     public void onDamage(CustomDamageEvent event) {
-        if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
-            if (event.getDamager() instanceof Player player) {
-                if (player.getInventory().getItemInMainHand().getType() != Material.MUSIC_DISC_MELLOHI) return;
+        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
+        if (!(event.getDamager() instanceof Player player)) return;
+        if (!isHoldingWeapon(player)) return;
 
-                event.setKnockback(false);
-                event.setDamage(baseDamage);
-                Vector vec = player.getLocation().getDirection();
-                vec.setY(0);
-                UtilVelocity.velocity(event.getDamagee(), vec, 2D, false, 0.0D, 0.5D, 1.0D, true, true);
-            }
+        event.setDamage(baseDamage);
+        if (event.getDamager().getLocation().getBlock().isLiquid()) {
+            event.setDamage(event.getDamage() + bonusDamage);
         }
-    }
 
-    @EventHandler
-    public void onFall(EntityDamageEvent event) {
-        if (event.getEntity() instanceof Player player) {
-            if (event.getCause() == EntityDamageEvent.DamageCause.FALL) {
-                if (player.getInventory().getItemInMainHand().getType() != Material.MUSIC_DISC_MELLOHI) return;
-                event.setCancelled(true);
-            }
-        }
     }
 
     @Override
     public boolean canUse(Player player) {
-        if (UtilBlock.isInLiquid(player)) {
-            UtilMessage.simpleMessage(player, "Wind Blade", "You cannot use this weapon while in water!");
+        if (!player.isInWater()) {
+            UtilMessage.simpleMessage(player, "Alligators Tooth", "You can only use this weapon in water!");
             return false;
         }
         return true;
