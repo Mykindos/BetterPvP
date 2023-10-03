@@ -71,7 +71,8 @@ public class UtilBlock {
 
         Block block = p.getLocation().getBlock();
         return block.getType() == Material.WATER
-                || block.getType() == Material.BUBBLE_COLUMN;
+                || block.getType() == Material.BUBBLE_COLUMN
+                || block.getType() == Material.SEAGRASS;
     }
 
     /**
