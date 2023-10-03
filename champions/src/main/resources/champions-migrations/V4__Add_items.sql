@@ -165,10 +165,10 @@ INSERT IGNORE INTO items (Material, Module, Name, ModelData, Glow, HasUUID) VALU
     ('MUSIC_DISC_MELLOHI', 'Champions', '<red>Wind Blade', 1, 0, 1);
 
 INSERT IGNORE INTO items (Material, Module, Name, ModelData, Glow, HasUUID) VALUES
-    ('MUSIC_DISC_MALL', 'Champions', '<red>Alligators Tooth Blade', 1, 0, 1);
+    ('MUSIC_DISC_MALL', 'Champions', '<red>Alligators Tooth', 1, 0, 1);
 
 INSERT IGNORE INTO items (Material, Module, Name, ModelData, Glow, HasUUID) VALUES
-    ('MUSIC_DISC_MALL', 'Champions', '<red>Hyper Axe', 1, 0, 1);
+    ('MUSIC_DISC_BLOCKS', 'Champions', '<red>Hyper Axe', 1, 0, 1);
 
 INSERT IGNORE INTO items (Material, Module, Name, ModelData, Glow, HasUUID) VALUES
     ('ELYTRA', 'Champions', '<red>Wings of Zanzul', 1, 0, 1);
