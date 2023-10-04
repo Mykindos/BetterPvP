@@ -4,6 +4,7 @@ import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.components.clans.data.ClanTerritory;
+import org.bukkit.Bukkit;
 
 import java.util.List;
 import java.util.Optional;
@@ -45,6 +46,12 @@ public interface IClan {
     default Optional<ClanEnemy> getEnemy(IClan clan) {
         return getEnemies().stream().filter(enemy -> enemy.getClan().getName().equalsIgnoreCase(clan.getName())).findFirst();
     }
+
+    default int getOnlineMemberCount() {
+        return (int) getMembers().stream().filter(clanMember -> Bukkit.getPlayer(UUID.fromString(clanMember.getUuid()))!= null).count();
+    }
+
+    boolean isOnline();
 
 
 }

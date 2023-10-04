@@ -5,6 +5,7 @@ create table if not exists ${tablePrefix}clans
     Home      varchar(64) null,
     Admin     tinyint     null default 0,
     Safe      tinyint     null default 0,
+    Banner    TEXT        null default '',
     constraint clans_pk
         primary key (id)
 );

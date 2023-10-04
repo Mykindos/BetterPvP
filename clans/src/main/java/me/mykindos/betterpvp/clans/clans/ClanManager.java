@@ -79,6 +79,11 @@ public class ClanManager extends Manager<Clan> {
                 .filter(clan -> clan.getMemberByUUID(player.getUniqueId().toString()).isPresent()).findFirst();
     }
 
+    public Optional<Clan> getClanByPlayer(UUID uuid) {
+        return objects.values().stream()
+                .filter(clan -> clan.getMemberByUUID(uuid).isPresent()).findFirst();
+    }
+
     public Optional<Clan> getClanByName(String name) {
         return Optional.ofNullable(objects.get(name.toLowerCase()));
     }
