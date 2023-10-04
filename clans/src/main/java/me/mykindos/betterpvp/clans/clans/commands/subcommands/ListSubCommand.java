@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
+import me.mykindos.betterpvp.clans.clans.ClanRelation;
 import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
 import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
 import me.mykindos.betterpvp.core.client.Client;
@@ -17,10 +18,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import javax.inject.Named;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
 @Singleton
 @SubCommand(ClanCommand.class)
@@ -61,8 +61,8 @@ public class ListSubCommand extends ClanSubCommand {
             }
         }
 
-        List<Clan> clansList = clanManager.getRepository().getAll();
-
+        Collection<Clan> clansCollection = clanManager.getObjects().values();
+        List<Clan> clansList = new ArrayList<Clan>(clansCollection.stream().toList());
         Collections.sort(clansList, Comparator.comparing(Clan::getName));
 
         Component component = Component.text("Clans Page: ", NamedTextColor.YELLOW);
@@ -72,13 +72,16 @@ public class ListSubCommand extends ClanSubCommand {
         int end = start + numPerPage;
         int size = clansList.size();
 
+        Clan playerClan = clanManager.getClanByPlayer(player).orElse(null);
+
+
         component = component.append(Component.text(pageNumber, NamedTextColor.WHITE));
 
         if (start <= size) {
             if (end > size) end = size;
             for (Clan clan : clansList.subList(start, end)) {
                 if (count == numPerPage) break;
-                component = component.append(addClanComponent(clan));
+                component = component.append(addClanComponent(playerClan, clan));
                 count++;
             }
         }
@@ -87,14 +90,16 @@ public class ListSubCommand extends ClanSubCommand {
 
 
 
-    private Component addClanComponent(Clan clan) {
+    private Component addClanComponent(Clan playerClan, Clan clan) {
         Component component = Component.empty().appendNewline();
 
         List<ClanMember> clanMembers = clan.getMembers();
+        ClanRelation clanRelation = clanManager.getRelation(playerClan, clan);
 
-        int onlineMembers = (int) clanMembers.stream().filter(member -> Bukkit.getPlayer(member.getUuid()) != null).count();
+        //possible logic error, unable to test with multiple people in a Clan and one offline
+        int onlineMembers = (int) clanMembers.stream().filter(member -> Bukkit.getPlayer(member.getUuid()) == null).count();
 
-        NamedTextColor color = onlineMembers > 0 ? NamedTextColor.GREEN : NamedTextColor.RED;
+        NamedTextColor color = clanRelation.getPrimary();
 
         component = component.append(Component.text(clan.getName(), color))
                 .append(Component.text(" (", NamedTextColor.YELLOW))
