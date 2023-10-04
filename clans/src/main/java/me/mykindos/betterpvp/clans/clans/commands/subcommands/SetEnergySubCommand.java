@@ -45,7 +45,10 @@ public class SetEnergySubCommand extends ClanSubCommand {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-
+        if (args.length != 1) {
+            UtilMessage.message(player, "Clans", Component.text("This command requires 1 argument as input."));
+            return;
+        }
         int energy;
         try {
             energy = Integer.parseInt(args[0]);
@@ -54,6 +57,7 @@ public class SetEnergySubCommand extends ClanSubCommand {
             return;
         }
 
+        if (energy < 0) energy = 0;
 
         Clan playerClan = clanManager.getClanByPlayer(player).orElseThrow();
 
