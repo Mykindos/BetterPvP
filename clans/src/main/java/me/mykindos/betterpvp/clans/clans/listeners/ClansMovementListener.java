@@ -118,7 +118,6 @@ public class ClansMovementListener extends ClanListener {
             UtilMessage.message(event.getPlayer(), "Clans", "You can only teleport to your clan home from spawn or the wilderness.");
             event.setCancelled(true);
 
-
         }, () -> {
             event.setDelayInSeconds(30);
         });
