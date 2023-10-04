@@ -7,9 +7,9 @@ import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
-import me.mykindos.betterpvp.core.utilities.model.leaderboard.Leaderboard;
-import me.mykindos.betterpvp.core.utilities.model.leaderboard.SortType;
-import me.mykindos.betterpvp.core.utilities.model.leaderboard.TemporalSort;
+import me.mykindos.betterpvp.core.stats.Leaderboard;
+import me.mykindos.betterpvp.core.stats.sort.SortType;
+import me.mykindos.betterpvp.core.stats.sort.TemporalSort;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.tree.fishing.Fishing;
 import me.mykindos.betterpvp.progression.tree.fishing.event.PlayerStopFishingEvent;
@@ -71,10 +71,23 @@ public class FishingStatsListener implements Listener {
             data.addFish(fish);
 
             // Leaderboard
-            final Map<SortType, Integer> newPositionsWeight = fishing.getWeightLeaderboard().compute(event.getPlayer().getUniqueId(), data.getWeightCaught());
-            final Map<SortType, Integer> newPositionsCount = fishing.getCountLeaderboard().compute(event.getPlayer().getUniqueId(), data.getFishCaught());
-            announceIfPresent(event.getPlayer(), fishing.getWeightLeaderboard(), newPositionsWeight);
-            announceIfPresent(event.getPlayer(), fishing.getCountLeaderboard(), newPositionsCount);
+            fishing.getWeightLeaderboard().add(event.getPlayer().getUniqueId(), (long) fish.getWeight()).whenComplete((result, throwable3) -> {
+                if (throwable3 != null) {
+                    log.error("Failed to add weight to leaderboard for player " + event.getPlayer().getName(), throwable3);
+                    return;
+                }
+
+                announceIfPresent(event.getPlayer(), fishing.getWeightLeaderboard(), result);
+            });
+
+            fishing.getCountLeaderboard().add(event.getPlayer().getUniqueId(), 1L).whenComplete((result, throwable2) -> {
+                if (throwable2 != null) {
+                    log.error("Failed to add count to leaderboard for player " + event.getPlayer().getName(), throwable2);
+                    return;
+                }
+
+                announceIfPresent(event.getPlayer(), fishing.getCountLeaderboard(), result);
+            });
         }).exceptionally(throwable -> {
             throwable.printStackTrace();
             return null;
@@ -95,7 +108,7 @@ public class FishingStatsListener implements Listener {
                 "<dark_green>%s <green>has reached <dark_green>#%d</dark_green> on the %s %s leaderboard!",
                 playerName,
                 highestEntry.getValue(),
-                highestEntry.getKey().getName(),
+                highestEntry.getKey().getName().toLowerCase(),
                 leaderboard.getName());
 
         if (highestEntry.getKey() == TemporalSort.SEASONAL) {

@@ -94,4 +94,13 @@ public abstract class Menu {
         }
     }
 
+    protected void fillEmpty(ItemStack itemStack) {
+        for (int i = 0; i < size; i++) {
+            final ItemStack item = inventory.getItem(i);
+            if (item == null || item.getType() == Material.AIR) {
+                inventory.setItem(i, itemStack);
+            }
+        }
+    }
+
 }

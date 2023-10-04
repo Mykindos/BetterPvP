@@ -1,26 +1,22 @@
 package me.mykindos.betterpvp.progression.model.stats;
 
 import lombok.Getter;
-import me.mykindos.betterpvp.core.database.Database;
+import me.mykindos.betterpvp.core.stats.repository.PlayerData;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.event.PlayerProgressionExperienceEvent;
 import me.mykindos.betterpvp.progression.model.ProgressionTree;
-import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
-
-import java.util.UUID;
 
 /**
  * Represents a player's progression data within a single {@link ProgressionTree}
  * @param <T> The type of {@link ProgressionTree} this data is for.
  */
 @Getter
-public abstract class ProgressionData<T extends ProgressionTree> {
+public abstract class ProgressionData<T extends ProgressionTree> extends PlayerData {
 
     /**
      * Their total experience in this tree.
@@ -60,7 +56,4 @@ public abstract class ProgressionData<T extends ProgressionTree> {
         this.tree = tree;
     }
 
-    protected abstract void prepareUpdates(@NotNull UUID uuid, @NotNull Database database, String databasePrefix);
-
-    public abstract Component[] getDescription();
 }

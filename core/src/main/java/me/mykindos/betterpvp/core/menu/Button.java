@@ -16,9 +16,9 @@ import java.util.stream.Collectors;
 public class Button {
 
     private final int slot;
-    private final ItemStack itemStack;
-    private final Component name;
-    private final List<Component> lore;
+    protected Component name;
+    protected List<Component> lore;
+    protected ItemStack itemStack;
 
     public Button(int slot, ItemStack item, String name, String... lore){
         this(slot, item, name, List.of(lore));

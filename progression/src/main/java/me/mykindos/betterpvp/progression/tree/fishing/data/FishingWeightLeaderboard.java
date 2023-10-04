@@ -7,10 +7,11 @@ import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.DoubleStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
-import me.mykindos.betterpvp.core.utilities.model.leaderboard.Leaderboard;
-import me.mykindos.betterpvp.core.utilities.model.leaderboard.SortType;
-import me.mykindos.betterpvp.core.utilities.model.leaderboard.TemporalSort;
+import me.mykindos.betterpvp.core.stats.Leaderboard;
+import me.mykindos.betterpvp.core.stats.sort.SortType;
+import me.mykindos.betterpvp.core.stats.sort.TemporalSort;
 import me.mykindos.betterpvp.progression.Progression;
+import me.mykindos.betterpvp.progression.tree.fishing.repository.FishingRepository;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.SQLException;
@@ -18,13 +19,17 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 public class FishingWeightLeaderboard extends Leaderboard<UUID, Long> {
 
+    private final FishingRepository repository;
+
     @Inject
-    public FishingWeightLeaderboard(Progression progression) {
+    public FishingWeightLeaderboard(Progression progression, FishingRepository repository) {
         super(progression, progression.getDatabasePrefix());
+        this.repository = repository;
     }
 
     @Override
@@ -38,8 +43,19 @@ public class FishingWeightLeaderboard extends Leaderboard<UUID, Long> {
     }
 
     @Override
-    protected SortType[] acceptedSortTypes() {
+    public SortType[] acceptedSortTypes() {
         return TemporalSort.values();
+    }
+
+    @Override
+    protected Long join(Long value, Long add) {
+        return value + add;
+    }
+
+    @Override
+    protected CompletableFuture<Long> loadEntryData(SortType type, UUID entry) {
+        // todo get entry properly from database based on sort type
+        return repository.getDataAsync(entry).thenApply(FishingData::getWeightCaught);
     }
 
     @SneakyThrows

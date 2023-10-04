@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.progression.tree.fishing.repository;
 
+import com.google.inject.Inject;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
@@ -8,7 +9,7 @@ import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.utilities.model.WeighedList;
 import me.mykindos.betterpvp.progression.Progression;
-import me.mykindos.betterpvp.progression.model.stats.StatsRepository;
+import me.mykindos.betterpvp.progression.model.stats.ProgressionStatsRepository;
 import me.mykindos.betterpvp.progression.tree.fishing.Fishing;
 import me.mykindos.betterpvp.progression.tree.fishing.bait.SimpleBaitType;
 import me.mykindos.betterpvp.progression.tree.fishing.bait.speed.SpeedBaitLoader;
@@ -38,7 +39,7 @@ import java.util.concurrent.CompletableFuture;
 // The data should be saved as a fallback to the database every 5 minutes
 // The data should be saved on shutdown
 @Slf4j
-public class FishingRepository extends StatsRepository<Fishing, FishingData> {
+public class FishingRepository extends ProgressionStatsRepository<Fishing, FishingData> {
 
     @Getter
     private final WeighedList<FishingLootType> lootTypes = new WeighedList<>();
@@ -55,8 +56,9 @@ public class FishingRepository extends StatsRepository<Fishing, FishingData> {
             new TreasureLoader()
     };
 
-    public FishingRepository(Progression progression, Fishing fishing) {
-        super(progression.getInjector().getInstance(Database.class), progression, "Fishing", fishing);
+    @Inject
+    public FishingRepository(Progression progression) {
+        super(progression.getInjector().getInstance(Database.class), progression, "Fishing");
     }
 
     @Override
