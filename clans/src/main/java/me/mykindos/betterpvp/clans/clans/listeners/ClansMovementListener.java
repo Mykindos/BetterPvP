@@ -117,7 +117,6 @@ public class ClansMovementListener extends ClanListener {
 
             UtilMessage.message(event.getPlayer(), "Clans", "You can only teleport to your clan home from spawn or the wilderness.");
             event.setCancelled(true);
-
         }, () -> {
             event.setDelayInSeconds(30);
         });
@@ -135,8 +134,7 @@ public class ClansMovementListener extends ClanListener {
         if (territoryOptional.isEmpty()) {
             UtilMessage.message(player, "Clans", Component.text("You must be in a claimed territory to use ", NamedTextColor.GRAY)
                     .append(Component.text("/c stuck", NamedTextColor.YELLOW)));
-            event.setCancelReason("In wilderness");
-            event.setCountdown(true);
+           event.cancel("In wilderness.");
             return;
         }
 
@@ -144,9 +142,9 @@ public class ClansMovementListener extends ClanListener {
         ClanRelation relation = clanManager.getRelation(clanManager.getClanByPlayer(player).orElse(null), territoryOptional.get());
 
         if (relation == ClanRelation.ENEMY) {
-            event.setDelayInSeconds(3 * 60);
+            event.setDelayInSeconds(3 * 5);
         } else {
-            event.setDelayInSeconds(2 * 60);
+            event.setDelayInSeconds(2 * 5);
         }
     }
 

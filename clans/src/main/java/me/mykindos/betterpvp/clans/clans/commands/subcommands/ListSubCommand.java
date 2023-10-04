@@ -29,8 +29,6 @@ public class ListSubCommand extends ClanSubCommand {
     @Inject
     public ListSubCommand(ClanManager clanManager, GamerManager gamerManager) {
         super(clanManager, gamerManager);
-        aliases.addAll(List.of("?", "h"));
-
     }
 
     @Override
@@ -61,8 +59,7 @@ public class ListSubCommand extends ClanSubCommand {
             }
         }
 
-        Collection<Clan> clansCollection = clanManager.getObjects().values();
-        List<Clan> clansList = new ArrayList<Clan>(clansCollection.stream().toList());
+        List<Clan> clansList = new ArrayList<>(clanManager.getObjects().values());
         Collections.sort(clansList, Comparator.comparing(Clan::getName));
 
         Component component = Component.text("Clans Page: ", NamedTextColor.YELLOW);

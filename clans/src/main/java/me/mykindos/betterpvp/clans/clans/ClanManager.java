@@ -27,6 +27,7 @@ import net.minecraft.core.Direction;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
@@ -154,36 +155,43 @@ public class ClanManager extends Manager<Clan> {
     }
 
     public Location closestWilderness(Player player) {
-        List<Location> locations = new ArrayList<>();
-        //worst case scenario, we are stuck in the exact center of a 3x3 claim
-        for (int i = 0; i < ((16 + 8) + 1); i++) {
-            for (int d = 0; d < 4; d++) {
-                Location location = player.getLocation().toBlockLocation();
-                switch (d) {
-                    case 0:
-                        location.add(i, 0, 0);
+        int maxChunksToScan = 3;
+        List<Chunk> chunks = new ArrayList<>();
+
+        Chunk playerChunk = player.getChunk();
+        World world = player.getWorld();
+
+        for (int i = 1; i < maxChunksToScan; i++) {
+            int[] offset = {-i, 0, i};
+            for (int x : offset) {
+                for (int z: offset) {
+                    Chunk chunk = world.getChunkAt(playerChunk.getX() + x, playerChunk.getZ() + z);
+                    if (getClanByChunk(chunk).isEmpty()) {
+                        chunks.add(chunk);
                         break;
-                    case 1:
-                        location.add(0, 0, i);
-                        break;
-                    case 2:
-                        location.add(-i, 0, 0);
-                        break;
-                    case 3:
-                        location.add(0, 0, -i);
-                }
-                Optional<Clan> clanOptional = getClanByLocation(location);
-                if (clanOptional.isEmpty()) {
-                    locations.add(location);
+                    }
                 }
             }
         }
-        if (!locations.isEmpty()) {
-            locations.sort(Comparator.comparingInt(a -> (int) player.getLocation().distance(a)));
+
+        if (!chunks.isEmpty()) {
+            Chunk chunk = chunks.get(0);
+            List<Location> locations = new ArrayList<>();
+
+            int y = (int) player.getY();
+            for (int i = 0; i < 16; i++) {
+                for (int j = 0; j < 16; j++) {
+                    locations.add(chunk.getBlock(i, y, j).getLocation());
+                }
+            }
+
+            locations.sort(Comparator.comparingInt(a -> (int) player.getLocation().distanceSquared(a)));
             return locations.get(0);
         }
         return null;
     }
+
+
     public Location closestWildernessBackwards(Player player) {
         List<Location> locations = new ArrayList<>();
         for (int i = 0; i < 64; i++) {
