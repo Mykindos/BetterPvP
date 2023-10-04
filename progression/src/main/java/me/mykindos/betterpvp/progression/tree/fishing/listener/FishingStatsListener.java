@@ -40,8 +40,8 @@ public class FishingStatsListener implements Listener {
     private GamerManager gamerManager;
 
     @Inject
-    @Config(path = "fishing.xpPerPound", defaultValue = "0.05")
-    private double xpPerPound = 0.05;
+    @Config(path = "fishing.xpPerPound", defaultValue = "0.10")
+    private double xpPerPound;
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onCatch(PlayerStopFishingEvent event) {
