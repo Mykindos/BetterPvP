@@ -326,6 +326,13 @@ skills:
       cooldown: 20
       radius: 10
       duration: 2.0
+    blocktoss:
+      enabled: true
+      maxlevel: 5
+      cooldown: 4
+      baseCharge: 60.0
+      baseDamage: 8.0
+      duration: 4.0
   ranger:
     wolfspounce:
       enabled: true
