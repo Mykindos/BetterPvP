@@ -287,4 +287,13 @@ public class UtilMessage {
         Bukkit.getServer().broadcast(deserialize(message));
     }
 
+    /**
+     * Broadcasts a message to all players on the server with formatting
+     *
+     * @param message The message to be broadcasted
+     */
+    public static void broadcast(Component message) {
+        Bukkit.getServer().broadcast(message);
+    }
+
 }

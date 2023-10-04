@@ -26,7 +26,6 @@ public class ItemInfoCommand extends Command {
     @Override
     public void execute(Player player, Client client, String... args) {
 
-        var uuidKey = new NamespacedKey("core", "uuid");
         var persistentData = player.getInventory().getItemInMainHand().getItemMeta().getPersistentDataContainer();
 
         persistentData.getKeys().forEach(key -> {

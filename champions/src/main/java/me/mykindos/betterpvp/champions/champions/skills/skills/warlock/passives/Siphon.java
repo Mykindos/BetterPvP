@@ -59,7 +59,7 @@ public class Siphon extends Skill implements PassiveSkill {
         for (Player player : Bukkit.getOnlinePlayers()) {
             int level = getLevel(player);
             if(level > 0) {
-                for(Player target : UtilPlayer.getNearbyEnemies(player, player.getLocation(), radius + level)) {;
+                for(Player target : UtilPlayer.getNearbyEnemies(player, player.getLocation(), radius + level)) {
                     championsManager.getEnergy().degenerateEnergy(target, ((float) energySiphoned)/10.0f);
                     new BukkitRunnable() {
                         private final Location position = target.getLocation().add(0, 1, 0);
