@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.framework.delayedactions.events.ClanHomeTeleportEvent;
+import me.mykindos.betterpvp.core.framework.delayedactions.events.ClanStuckTeleportEvent;
 import me.mykindos.betterpvp.core.framework.events.scoreboard.ScoreboardUpdateEvent;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -117,10 +118,37 @@ public class ClansMovementListener extends ClanListener {
             UtilMessage.message(event.getPlayer(), "Clans", "You can only teleport to your clan home from spawn or the wilderness.");
             event.setCancelled(true);
 
+
         }, () -> {
             event.setDelayInSeconds(30);
         });
 
+    }
+
+    @EventHandler
+    public void onClanStuckTeleport(ClanStuckTeleportEvent event) {
+        if (event.isCancelled()) return;
+
+        Player player = event.getPlayer();
+
+        Optional<Clan> territoryOptional = clanManager.getClanByLocation(player.getLocation());
+
+        if (territoryOptional.isEmpty()) {
+            UtilMessage.message(player, "Clans", Component.text("You must be in a claimed territory to use ", NamedTextColor.GRAY)
+                    .append(Component.text("/c stuck", NamedTextColor.YELLOW)));
+            event.setCancelReason("In wilderness");
+            event.setCountdown(true);
+            return;
+        }
+
+
+        ClanRelation relation = clanManager.getRelation(clanManager.getClanByPlayer(player).orElse(null), territoryOptional.get());
+
+        if (relation == ClanRelation.ENEMY) {
+            event.setDelayInSeconds(3 * 60);
+        } else {
+            event.setDelayInSeconds(2 * 60);
+        }
     }
 
     @EventHandler

@@ -23,6 +23,7 @@ import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.utilities.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.minecraft.core.Direction;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -152,6 +153,37 @@ public class ClanManager extends Manager<Clan> {
         return relation == ClanRelation.SELF || relation == ClanRelation.ALLY_TRUST;
     }
 
+    public Location closestWilderness(Player player) {
+        List<Location> locations = new ArrayList<>();
+        //worst case scenario, we are stuck in the exact center of a 3x3 claim
+        for (int i = 0; i < ((16 + 8) + 1); i++) {
+            for (int d = 0; d < 4; d++) {
+                Location location = player.getLocation().toBlockLocation();
+                switch (d) {
+                    case 0:
+                        location.add(i, 0, 0);
+                        break;
+                    case 1:
+                        location.add(0, 0, i);
+                        break;
+                    case 2:
+                        location.add(-i, 0, 0);
+                        break;
+                    case 3:
+                        location.add(0, 0, -i);
+                }
+                Optional<Clan> clanOptional = getClanByLocation(location);
+                if (clanOptional.isEmpty()) {
+                    locations.add(location);
+                }
+            }
+        }
+        if (!locations.isEmpty()) {
+            locations.sort(Comparator.comparingInt(a -> (int) player.getLocation().distance(a)));
+            return locations.get(0);
+        }
+        return null;
+    }
     public Location closestWildernessBackwards(Player player) {
         List<Location> locations = new ArrayList<>();
         for (int i = 0; i < 64; i++) {
