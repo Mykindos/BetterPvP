@@ -16,6 +16,7 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.world.events.SpawnTeleportEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -129,12 +130,19 @@ public class ClansMovementListener extends ClanListener {
 
         Player player = event.getPlayer();
 
+        Location nearestWilderness = clanManager.closestWilderness(player);
+
+        if (nearestWilderness == null) {
+            UtilMessage.message(player, "Clans", Component.text("No wilderness found to teleport to", NamedTextColor.RED));
+            return;
+        }
+
         Optional<Clan> territoryOptional = clanManager.getClanByLocation(player.getLocation());
 
         if (territoryOptional.isEmpty()) {
             UtilMessage.message(player, "Clans", Component.text("You must be in a claimed territory to use ", NamedTextColor.GRAY)
                     .append(Component.text("/c stuck", NamedTextColor.YELLOW)));
-           event.cancel("In wilderness.");
+            event.cancel("In wilderness.");
             return;
         }
 

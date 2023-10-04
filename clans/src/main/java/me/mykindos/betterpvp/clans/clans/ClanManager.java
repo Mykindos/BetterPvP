@@ -155,33 +155,41 @@ public class ClanManager extends Manager<Clan> {
     }
 
     public Location closestWilderness(Player player) {
-        int maxChunksToScan = 3;
+        int maxChunksRadiusToScan = 3;
         List<Chunk> chunks = new ArrayList<>();
 
         Chunk playerChunk = player.getChunk();
         World world = player.getWorld();
 
-        for (int i = 1; i < maxChunksToScan; i++) {
+        boolean end = false;
+
+        for (int i = 1; i < maxChunksRadiusToScan; i++) {
             int[] offset = {-i, 0, i};
             for (int x : offset) {
                 for (int z: offset) {
                     Chunk chunk = world.getChunkAt(playerChunk.getX() + x, playerChunk.getZ() + z);
                     if (getClanByChunk(chunk).isEmpty()) {
                         chunks.add(chunk);
-                        break;
+                        end = true;
                     }
                 }
             }
+            if (end) break;
         }
 
         if (!chunks.isEmpty()) {
-            Chunk chunk = chunks.get(0);
+            Chunk chunk = UtilWorld.closestChunkToPlayer(chunks, player);
+
+            //this should not ever happen
+            if (chunk == null) return null;
+
+
             List<Location> locations = new ArrayList<>();
 
             int y = (int) player.getY();
             for (int i = 0; i < 16; i++) {
                 for (int j = 0; j < 16; j++) {
-                    locations.add(chunk.getBlock(i, y, j).getLocation());
+                    locations.add(chunk.getBlock(i, y, j).getLocation().toHighestLocation());
                 }
             }
 
