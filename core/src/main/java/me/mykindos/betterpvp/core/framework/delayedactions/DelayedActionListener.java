@@ -52,6 +52,13 @@ public class DelayedActionListener implements Listener {
         delayedActionMap.put(player, action);
     }
 
+    @EventHandler (priority = EventPriority.LOWEST)
+    public void onDuplicateDelayedAction(PlayerDelayedActionEvent event) {
+        if(delayedActionMap.containsKey(event.getPlayer())) {
+            event.cancel("Player already has an active delayedaction");
+        }
+    }
+
     @UpdateEvent(delay = 100)
     public void onDelayedActionUpdate() {
         delayedActionMap.entrySet().removeIf(entry -> {
