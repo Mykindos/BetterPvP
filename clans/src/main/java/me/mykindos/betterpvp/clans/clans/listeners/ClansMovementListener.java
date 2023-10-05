@@ -5,12 +5,14 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
-import me.mykindos.betterpvp.core.framework.delayedactions.events.PlayerDelayedTeleportEvent;
+import me.mykindos.betterpvp.core.client.Rank;
+import me.mykindos.betterpvp.core.framework.delayedactions.events.ClanHomeTeleportEvent;
 import me.mykindos.betterpvp.core.framework.events.scoreboard.ScoreboardUpdateEvent;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.world.events.SpawnTeleportEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
@@ -77,11 +79,11 @@ public class ClansMovementListener extends ClanListener {
 
             if (locationClan.isAdmin()) {
                 if (locationClan.isSafe()) {
-                    component = Component.text(NamedTextColor.WHITE + locationClan.getName());
-                    append = UtilMessage.deserialize("<white>(<aqua>Safe</aqua>)</white>");
+                    component = Component.text(locationClan.getName(), NamedTextColor.WHITE);
+                    append = UtilMessage.deserialize(" <white>(<aqua>Safe</aqua>)</white>");
                 }
             } else if (relation == ClanRelation.ALLY_TRUST) {
-                append = UtilMessage.deserialize("<gray>(<yellow>Safe</yellow>)</gray>");
+                append = UtilMessage.deserialize(" <gray>(<yellow>Trusted</yellow>)</gray>");
             } else if (relation == ClanRelation.ENEMY) {
                 if (clan != null) {
                     append = UtilMessage.deserialize(clan.getDominanceString(locationClan));
@@ -90,7 +92,7 @@ public class ClansMovementListener extends ClanListener {
         }
 
         if (locationClan != null) {
-            if (locationClan.getName().equals("Fields") || locationClan.getName().equals("Lake")) {
+            if (locationClan.getName().equalsIgnoreCase("Fields") || locationClan.getName().equalsIgnoreCase("Lake")) {
                 append = UtilMessage.deserialize("<red><bold>                    Warning! <gray> PvP Hotspot</gray></bold></red>");
             }
 
@@ -102,7 +104,7 @@ public class ClansMovementListener extends ClanListener {
     }
 
     @EventHandler
-    public void onDelayedTeleport(PlayerDelayedTeleportEvent event) {
+    public void onClanHomeTeleport(ClanHomeTeleportEvent event) {
         if (event.isCancelled()) return;
 
         clanManager.getClanByLocation(event.getPlayer().getLocation()).ifPresentOrElse(clan -> {
@@ -117,6 +119,26 @@ public class ClansMovementListener extends ClanListener {
 
         }, () -> {
             event.setDelayInSeconds(30);
+        });
+
+    }
+
+    @EventHandler
+    public void onSpawnTeleport(SpawnTeleportEvent event) {
+        if (event.isCancelled()) return;
+
+        gamerManager.getObject(event.getPlayer().getUniqueId()).ifPresent(gamer -> {
+            if (gamer.getClient().hasRank(Rank.ADMIN)) {
+                return;
+            }
+
+            if (clanManager.getClanByLocation(event.getPlayer().getLocation()).isPresent()) {
+                UtilMessage.message(event.getPlayer(), "Spawn", "You can only teleport to spawn from the wilderness.");
+                event.setCancelled(true);
+            } else {
+                event.setDelayInSeconds(30);
+            }
+
         });
 
     }

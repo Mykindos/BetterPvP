@@ -41,6 +41,10 @@ public class AllySubCommand extends ClanSubCommand {
         return "Form an alliance with another clan";
     }
 
+    public String getUsage() {
+        return super.getUsage() + " <clan>";
+    }
+
     @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length == 0) {

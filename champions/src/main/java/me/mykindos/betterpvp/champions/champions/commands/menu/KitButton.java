@@ -29,8 +29,11 @@ public class KitButton extends Button {
 
         player.getInventory().addItem(new ItemStack(Material.IRON_SWORD));
         player.getInventory().addItem(new ItemStack(Material.IRON_AXE));
-        player.getInventory().addItem(new ItemStack(Material.BOW));
-        player.getInventory().addItem(new ItemStack(Material.ARROW, 64));
+        if((role == Role.ASSASSIN) || (role == Role.RANGER)) {
+            player.getInventory().addItem(new ItemStack(Material.BOW));
+            int numArrows = (role == Role.RANGER ? 64 : 32);
+            player.getInventory().addItem(new ItemStack(Material.ARROW, numArrows));
+        }
         player.getInventory().addItem(new ItemStack(Material.BOOK));
 
         player.closeInventory();

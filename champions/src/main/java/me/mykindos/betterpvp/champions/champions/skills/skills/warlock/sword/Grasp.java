@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.warlock.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.*;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -32,6 +31,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
+
+import java.util.*;
 
 @Singleton
 @BPvPListener

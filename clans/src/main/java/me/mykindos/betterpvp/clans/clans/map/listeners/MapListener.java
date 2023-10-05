@@ -1,12 +1,6 @@
 package me.mykindos.betterpvp.clans.clans.map.listeners;
 
 import com.google.inject.Inject;
-
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
@@ -24,9 +18,9 @@ import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
+import me.mykindos.betterpvp.core.utilities.model.display.TimedComponent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.world.level.material.MapColor;
@@ -50,6 +44,11 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 
 @BPvPListener
 public class MapListener implements Listener {
@@ -97,6 +96,8 @@ public class MapListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerJoin(PlayerJoinEvent event) {
         loadChunks(event.getPlayer());
+
+
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -247,26 +248,27 @@ public class MapListener implements Listener {
                 }
 
                 mapHandler.clanMapData.get(online.getUniqueId()).removeIf(chunkData -> chunkData.getClan().equals(clan));
+
                 for (ClanTerritory claim : clan.getTerritory()) {
+                    String[] tokens = claim.getChunk().split("/ ");
+                    if (tokens.length != 3) continue;
+                    int chunkX = Integer.parseInt(tokens[1]);
+                    int chunkZ = Integer.parseInt(tokens[2]);
 
-                    Chunk chunk = UtilWorld.stringToChunk(claim.getChunk());
-                    if (chunk != null) {
-                        ChunkData chunkData = new ChunkData("world", materialColor, chunk.getX(), chunk.getZ(), clan);
-                        for (int i = 0; i < 4; i++) {
-                            BlockFace blockFace = BlockFace.values()[i];
-                            Chunk targetChunk = online.getWorld().getChunkAt(chunk.getX() + blockFace.getModX(), chunk.getZ() + blockFace.getModZ());
-                            Clan other = clanManager.getClanByChunk(targetChunk).orElse(null);
-                            if (chunkData.getClan().equals(other)) {
-                                chunkData.getBlockFaceSet().add(blockFace);
-                            }
-                        }
-
-                        Set<ChunkData> chunkDataset = mapHandler.clanMapData.get(online.getUniqueId());
-                        if (chunkDataset.stream().noneMatch(cd -> cd.equals(chunkData))) {
-                            chunkDataset.add(chunkData);
+                    ChunkData chunkData = new ChunkData("world", materialColor, chunkX, chunkZ, clan);
+                    for (int i = 0; i < 4; i++) {
+                        BlockFace blockFace = BlockFace.values()[i];
+                        String targetChunkString = "world/ " + (chunkX + blockFace.getModX()) + "/ " + (chunkZ + blockFace.getModZ());
+                        Clan other = clanManager.getClanByChunkString(targetChunkString).orElse(null);
+                        if (chunkData.getClan().equals(other)) {
+                            chunkData.getBlockFaceSet().add(blockFace);
                         }
                     }
 
+                    Set<ChunkData> chunkDataset = mapHandler.clanMapData.get(online.getUniqueId());
+                    if (chunkDataset.stream().noneMatch(cd -> cd.equals(chunkData))) {
+                        chunkDataset.add(chunkData);
+                    }
                 }
                 updateStatus(online);
             }
@@ -368,19 +370,23 @@ public class MapListener implements Listener {
             MapColor materialColor = getColourForClan(pClan, clan);
 
             for (ClanTerritory claim : clan.getTerritory()) {
-                Chunk chunk = UtilWorld.stringToChunk(claim.getChunk());
-                if (chunk != null) {
-                    ChunkData chunkData = new ChunkData("world", materialColor, chunk.getX(), chunk.getZ(), clan);
-                    for (int i = 0; i < 4; i++) {
-                        BlockFace blockFace = BlockFace.values()[i];
-                        Chunk targetChunk = player.getWorld().getChunkAt(chunk.getX() + blockFace.getModX(), chunk.getZ() + blockFace.getModZ());
-                        Clan other = clanManager.getClanByChunk(targetChunk).orElse(null);
-                        if (chunkData.getClan().equals(other)) {
-                            chunkData.getBlockFaceSet().add(blockFace);
-                        }
+                String[] tokens = claim.getChunk().split("/ ");
+                if (tokens.length != 3) continue;
+                int chunkX = Integer.parseInt(tokens[1]);
+                int chunkZ = Integer.parseInt(tokens[2]);
+
+
+                ChunkData chunkData = new ChunkData("world", materialColor, chunkX, chunkZ, clan);
+                for (int i = 0; i < 4; i++) {
+                    BlockFace blockFace = BlockFace.values()[i];
+                    String targetChunkString = "world/ " + (chunkX + blockFace.getModX()) + "/ " + (chunkZ + blockFace.getModZ());
+                    Clan other = clanManager.getClanByChunkString(targetChunkString).orElse(null);
+                    if (chunkData.getClan().equals(other)) {
+                        chunkData.getBlockFaceSet().add(blockFace);
                     }
-                    chunkClaimColor.add(chunkData);
                 }
+                chunkClaimColor.add(chunkData);
+
 
             }
 
@@ -411,7 +417,7 @@ public class MapListener implements Listener {
         }
         final MapSettings mapSettings = mapHandler.mapSettingsMap.get(player.getUniqueId());
 
-        if (!cooldownManager.add(player, "Map Zoom", 0.1, false, false)) {
+        if (!cooldownManager.use(player, "Map Zoom", 0.1, false, false)) {
             return;
         }
 
@@ -419,6 +425,7 @@ public class MapListener implements Listener {
         if (gamerOptional.isPresent()) {
             Gamer gamer = gamerOptional.get();
 
+            MapSettings.Scale scale;
             if (event.getAction().name().contains("RIGHT")) {
                 MapSettings.Scale curScale = mapSettings.getScale();
 
@@ -428,7 +435,8 @@ public class MapListener implements Listener {
                     return;
                 }
 
-                UtilPlayer.sendActionBar(player, createZoomBar(mapSettings.setScale(MapSettings.Scale.values()[curScale.ordinal() + 1])));
+                scale = mapSettings.setScale(MapSettings.Scale.values()[curScale.ordinal() + 1]);
+                gamer.getActionBar().add(500, new TimedComponent(1.5, false, gmr -> createZoomBar(scale)));
                 mapSettings.setUpdate(true);
             } else if (event.getAction().name().contains("LEFT")) {
                 MapSettings.Scale curScale = mapSettings.getScale();
@@ -436,7 +444,9 @@ public class MapListener implements Listener {
                 if (curScale == MapSettings.Scale.CLOSEST) {
                     return;
                 }
-                UtilPlayer.sendActionBar(player, createZoomBar(mapSettings.setScale(MapSettings.Scale.values()[curScale.ordinal() - 1])));
+
+                scale = mapSettings.setScale(MapSettings.Scale.values()[curScale.ordinal() - 1]);
+                gamer.getActionBar().add(500, new TimedComponent(1.5, false, gmr -> createZoomBar(scale)));
                 mapSettings.setUpdate(true);
             }
 

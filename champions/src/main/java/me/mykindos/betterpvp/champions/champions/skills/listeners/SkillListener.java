@@ -42,6 +42,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Optional;
 
 @Singleton
@@ -53,7 +54,6 @@ public class SkillListener implements Listener {
     private final CooldownManager cooldownManager;
     private final EnergyHandler energyHandler;
     private final EffectManager effectManager;
-
 
     @Inject
     public SkillListener(BuildManager buildManager, RoleManager roleManager, CooldownManager cooldownManager,
@@ -79,8 +79,8 @@ public class SkillListener implements Listener {
         }
 
         if (skill instanceof CooldownSkill cooldownSkill) {
-            if (!cooldownManager.add(player, skill.getName(), cooldownSkill.getCooldown(level),
-                    cooldownSkill.showCooldownFinished(), true, cooldownSkill.isCancellable())) {
+            if (!cooldownManager.use(player, skill.getName(), cooldownSkill.getCooldown(level),
+                    cooldownSkill.showCooldownFinished(), true, cooldownSkill.isCancellable(), cooldownSkill::shouldDisplayActionBar)) {
                 event.setCancelled(true);
                 return;
             }
@@ -342,14 +342,14 @@ public class SkillListener implements Listener {
             String name = previousRole == null ? null : previousRole.getName();
             RoleBuild build = builds.getActiveBuilds().get(name);
             if (build != null) {
-                build.getActiveSkills().forEach(skill -> skill.invalidatePlayer(player));
+                build.getActiveSkills().stream().filter(Objects::nonNull).forEach(skill -> skill.invalidatePlayer(player));
             }
 
             // Track with new skills
             name = newRole == null ? null : newRole.getName();
             build = builds.getActiveBuilds().get(name);
             if (build != null) {
-                build.getActiveSkills().forEach(skill -> skill.trackPlayer(player));
+                build.getActiveSkills().stream().filter(Objects::nonNull).forEach(skill -> skill.trackPlayer(player));
             }
         }
     }

@@ -5,3 +5,4 @@ plugins {
 subprojects {
     apply(plugin = "io.papermc.paperweight.userdev")
 }
+

@@ -1,16 +1,19 @@
 package me.mykindos.betterpvp.core.gamer.listeners;
 
+import com.destroystokyo.paper.event.server.ServerTickStartEvent;
 import com.google.inject.Inject;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.events.ClientLoginEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.events.scoreboard.ScoreboardUpdateEvent;
+import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
@@ -35,6 +38,17 @@ public class GamerListener implements Listener {
         this.core = core;
         this.gamerManager = gamerManager;
     }
+
+    @UpdateEvent
+    public void onUpdate() {
+        for(Player player : Bukkit.getOnlinePlayers()){
+            gamerManager.getObject(player.getUniqueId()).ifPresent(gamer -> {
+                gamer.getActionBar().show(gamer);
+                gamer.getTitleQueue().show(gamer);
+            });
+        }
+    }
+
 
     @EventHandler
     public void onClientLogin(ClientLoginEvent event) {
@@ -71,6 +85,11 @@ public class GamerListener implements Listener {
         Optional<Boolean> sidebarOptional = gamer.getProperty(GamerProperty.SIDEBAR_ENABLED);
         if(sidebarOptional.isEmpty()){
             gamer.saveProperty(GamerProperty.SIDEBAR_ENABLED, true);
+        }
+
+        Optional<Boolean> tipsOptional = gamer.getProperty(GamerProperty.TIPS_ENABLED);
+        if(tipsOptional.isEmpty()){
+            gamer.saveProperty(GamerProperty.TIPS_ENABLED, true);
         }
     }
 

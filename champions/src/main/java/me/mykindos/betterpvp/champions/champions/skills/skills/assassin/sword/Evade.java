@@ -2,9 +2,6 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.Iterator;
-import java.util.UUID;
-import java.util.WeakHashMap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
@@ -14,8 +11,10 @@ import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.CustomEntityVelocityEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.*;
@@ -30,6 +29,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.util.Vector;
+
+import java.util.Iterator;
+import java.util.UUID;
+import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -87,39 +90,47 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
 
         if (hasSkill(player)) {
 
-            if (ent != null) {
-                if (!delay.containsKey(player)) {
-                    delay.put(player, 0L);
+            if (!delay.containsKey(player)) {
+                delay.put(player, 0L);
+            }
+
+            event.setKnockback(false);
+            event.cancel("Skill Evade");
+            if (UtilTime.elapsed(delay.get(player), 500)) {
+                for (int i = 0; i < 3; i++) {
+                    player.getWorld().playEffect(player.getLocation(), Effect.SMOKE, 5);
+                }
+                Location target;
+                if (player.isSneaking()) {
+                    target = findLocationBack(ent, player);
+                } else {
+                    target = findLocationBehind(ent, player);
                 }
 
-                event.setKnockback(false);
-                event.cancel("Skill Evade");
-                if (UtilTime.elapsed(delay.get(player), 500)) {
-                    for (int i = 0; i < 3; i++) {
-                        player.getWorld().playEffect(player.getLocation(), Effect.SMOKE, 5);
-                    }
-                    Location target;
-                    if (player.isSneaking()) {
-                        target = findLocationBack(ent, player);
-                    } else {
-                        target = findLocationBehind(ent, player);
-                    }
-
-                    if (target != null) {
-                        player.teleport(target);
-                    }
-
-                    UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s<gray>.", getName());
-                    if (ent instanceof Player temp) {
-                        UtilMessage.simpleMessage(temp, getClassType().getName(), "<yellow>%s<gray> used evade!", player.getName());
-                    }
-
-                    delay.put(player, System.currentTimeMillis());
+                if (target != null) {
+                    player.teleport(target);
                 }
+
+                UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s<gray>.", getName());
+                if (ent instanceof Player temp) {
+                    UtilMessage.simpleMessage(temp, getClassType().getName(), "<yellow>%s<gray> used evade!", player.getName());
+                }
+
+                delay.put(player, System.currentTimeMillis());
             }
 
         }
 
+    }
+
+    @EventHandler
+    public void onCustomVelcity(CustomEntityVelocityEvent event) {
+        if (!(event.getEntity() instanceof Player player)) return;
+        if (!active.contains(player.getUniqueId())) return;
+
+        if (hasSkill(player)) {
+            event.setCancelled(true);
+        }
     }
 
     @UpdateEvent(delay = 100)
@@ -148,9 +159,15 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
                 int level = getLevel(player);
                 if (level > 0) {
                     if (player.isHandRaised()) {
-                        if (!championsManager.getEnergy().use(player, getName(), getEnergy(getLevel(player)) / 2, true)) {
+                        if (!championsManager.getEnergy().use(player, getName(), getEnergy(getLevel(player)), true)) {
                             it.remove();
                         } else if (!UtilPlayer.isHoldingItem(player, SkillWeapons.SWORDS)) {
+                            it.remove();
+                        } else if(UtilBlock.isInLiquid(player)){
+                            it.remove();
+                        } else if(championsManager.getEffects().hasEffect(player, EffectType.SILENCE)) {
+                            it.remove();
+                        }else if(championsManager.getEffects().hasEffect(player, EffectType.STUN)) {
                             it.remove();
                         }
                     } else {
@@ -267,21 +284,6 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
 
         return lastValid;
     }
-
-
-    //@EventHandler
-    //public void onInteractEntity(PlayerInteractEntityEvent event) {
-    //    Player player = event.getPlayer();
-    //
-    //    Role role = Role.getRole(player);
-    //    if (role != null && role instanceof Assassin) {
-    //        if (hasSkill(player, this)) {
-    //            if (Arrays.asList(getMaterials()).contains(player.getInventory().getItemInMainHand().getType())) {
-    //                activate(player, GamerManager.getOnlineGamer(event.getPlayer()));
-    //            }
-    //        }
-    //    }
-    //}
 
     @Override
     public double getCooldown(int level) {

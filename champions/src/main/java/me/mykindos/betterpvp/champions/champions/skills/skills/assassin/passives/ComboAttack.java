@@ -1,10 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.passives;
 
 
-import java.util.HashSet;
-import java.util.WeakHashMap;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -21,22 +17,27 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.util.HashSet;
+import java.util.WeakHashMap;
+
 @Singleton
 @BPvPListener
-public class RepeatedStrikes extends Skill implements PassiveSkill, Listener {
+public class ComboAttack extends Skill implements PassiveSkill, Listener {
 
     private final WeakHashMap<Player, Double> repeat = new WeakHashMap<>();
     private final WeakHashMap<Player, Long> last = new WeakHashMap<>();
 
     @Inject
-    public RepeatedStrikes(Champions champions, ChampionsManager championsManager) {
+    public ComboAttack(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
 
 
     @Override
     public String getName() {
-        return "Repeated Strikes";
+        return "Combo Attack";
     }
 
     private double damageIncrement;

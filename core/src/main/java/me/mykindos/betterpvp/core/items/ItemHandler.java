@@ -29,7 +29,7 @@ public class ItemHandler {
 
     private final WeaponManager weaponManager;
     private final ItemRepository itemRepository;
-    private final HashMap<Material, BPVPItem> itemMap = new HashMap<>();
+    private final HashMap<String, BPVPItem> itemMap = new HashMap<>();
     private final Enchantment glowEnchantment;
 
 
@@ -53,7 +53,7 @@ public class ItemHandler {
 
     public void loadItemData(String module) {
         List<BPVPItem> items = itemRepository.getItemsForModule(module);
-        items.forEach(item -> itemMap.put(item.getMaterial(), item));
+        items.forEach(item -> itemMap.put(item.getMaterial().name() + item.getCustomModelData(), item));
     }
 
     /**
@@ -68,6 +68,7 @@ public class ItemHandler {
 
         Material material = itemStack.getType();
         ItemMeta itemMeta = itemStack.getItemMeta();
+        int modelData = itemMeta.hasCustomModelData() ? itemMeta.getCustomModelData() : 0;
 
         if (hideAttributes) {
             itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
@@ -78,7 +79,7 @@ public class ItemHandler {
             itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         }
 
-        BPVPItem item = itemMap.get(material);
+        BPVPItem item = itemMap.get(material.name() + modelData);
         if (item != null) {
             var nameUpdateEvent = UtilServer.callEvent(new ItemUpdateNameEvent(itemStack, itemMeta, item.getName()));
             itemMeta.displayName(nameUpdateEvent.getItemName());
@@ -101,24 +102,15 @@ public class ItemHandler {
                 }
             }
         } else {
-            itemMeta.displayName(Component.text(UtilFormat.cleanString(material.name())).color(NamedTextColor.YELLOW));
+            final PersistentDataContainer pdc = itemMeta.getPersistentDataContainer();
+            if (!pdc.has(CoreNamespaceKeys.IMMUTABLE_KEY, PersistentDataType.BOOLEAN) || !pdc.get(CoreNamespaceKeys.IMMUTABLE_KEY, PersistentDataType.BOOLEAN)) {
+                itemMeta.displayName(Component.text(UtilFormat.cleanString(material.name())).color(NamedTextColor.YELLOW));
+            }
         }
 
         itemStack.setItemMeta(itemMeta);
 
         return itemStack;
-    }
-
-    public BPVPItem getItemByType(Material material) {
-        return itemMap.getOrDefault(material,
-                new BPVPItem(
-                        material,
-                        Component.text(UtilFormat.cleanString(material.name())).color(NamedTextColor.YELLOW),
-                        new ArrayList<>(),
-                        false,
-                        false
-                )
-        );
     }
 
     private void registerEnchantment(Enchantment enchantment) {

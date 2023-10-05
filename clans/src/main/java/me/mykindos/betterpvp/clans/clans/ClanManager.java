@@ -97,6 +97,12 @@ public class ClanManager extends Manager<Clan> {
                         .anyMatch(territory -> territory.getChunk().equalsIgnoreCase(UtilWorld.chunkToFile(chunk)))).findFirst();
     }
 
+    public Optional<Clan> getClanByChunkString(String chunk) {
+        return objects.values().stream()
+                .filter(clan -> clan.getTerritory().stream()
+                        .anyMatch(territory -> territory.getChunk().equalsIgnoreCase(chunk))).findFirst();
+    }
+
     public boolean isClanMember(Player player, Player target) {
         Optional<Clan> aClanOptional = getClanByPlayer(player);
         Optional<Clan> bClanOptional = getClanByPlayer(target);
@@ -253,12 +259,8 @@ public class ClanManager extends Manager<Clan> {
 
         return relation != ClanRelation.SELF && relation != ClanRelation.ALLY && relation != ClanRelation.ALLY_TRUST;
     }
-
+    
     public boolean canCast(Player player) {
-        return canCast(player, true);
-    }
-
-    public boolean canCast(Player player, boolean message) {
         Optional<Clan> locationClanOptional = getClanByLocation(player.getLocation());
         if (locationClanOptional.isPresent()) {
             Clan locationClan = locationClanOptional.get();
@@ -274,9 +276,6 @@ public class ClanManager extends Manager<Clan> {
                     }
                 }
 
-                if (message) {
-                    UtilMessage.message(player, "Restriction", "You are not allowed to cast abilities here!");
-                }
                 return false;
             }
         }

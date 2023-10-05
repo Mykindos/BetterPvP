@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.combat.log.DamageLog;
 import me.mykindos.betterpvp.core.combat.log.DamageLogManager;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -13,7 +14,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -58,7 +58,7 @@ public class DeathListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onCustomDeath(CustomDeathEvent event) {
         if (event.getKiller() == null) {
-            if (event.getReason().equals("")) {
+            if (event.getReason() == null || event.getReason().equals("")) {
                 event.setCustomDeathMessage(String.format("<yellow>%s<gray> was killed.", event.getKilled().getName()));
             } else {
                 event.setCustomDeathMessage(String.format("<yellow>%s<gray> was killed by <yellow>%s<gray>.",
@@ -105,9 +105,9 @@ public class DeathListener implements Listener {
         Component hoverComponent = Component.text("Damage Breakdown", NamedTextColor.GOLD).appendNewline();
         for (var breakdown : damageLogManager.getDamageBreakdown(event.getKilled())) {
             hoverComponent = hoverComponent.append(Component.text(breakdown.getKey() + ": ", NamedTextColor.YELLOW)
-                    .append(Component.text(UtilMath.round(breakdown.getValue(), 1), NamedTextColor.GREEN)));
+                    .append(Component.text(UtilMath.round(breakdown.getValue(), 1), NamedTextColor.GREEN))).appendNewline();
         }
 
-        UtilMessage.simpleMessage(event.getReceiver(), "Death", ChatColor.stripColor(event.getCustomDeathMessage()), hoverComponent);
+        UtilMessage.simpleMessage(event.getReceiver(), "Death", UtilFormat.stripColor(event.getCustomDeathMessage()), hoverComponent);
     }
 }

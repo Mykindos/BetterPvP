@@ -1,7 +1,6 @@
 package me.mykindos.betterpvp.clans.scoreboards;
 
 import com.google.inject.Inject;
-import java.util.Optional;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
@@ -15,6 +14,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
+
+import java.util.Optional;
 
 @BPvPListener
 public class ClansNameScoreboardListener implements Listener {

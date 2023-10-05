@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.clans.clans;
 
-import java.util.*;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.clans.clans.events.ClanPropertyUpdateEvent;
@@ -23,6 +22,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.*;
 
 @Slf4j
 @Data
@@ -125,6 +126,16 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
         return players;
     }
 
+    public List<Player> getAdminsAsPlayers() {
+        List<Player> playerAdmins = getMembersAsPlayers();
+        playerAdmins.forEach(player -> {
+            if (!getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.ADMIN)) {
+                playerAdmins.remove(player);
+            }
+        });
+        return playerAdmins;
+    }
+
     /**
      * @return The total amount of members in an entire alliance
      */
@@ -215,8 +226,12 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
         if (getTerritory().isEmpty()) {
             return "\u221E";
         }
-        return UtilTime.getTime((getEnergy() / (float) (getTerritory().size() * 25)) * 3600000, UtilTime.TimeUnit.BEST, 2);
+        return UtilTime.getTime(getEnergyRatio() * 3600000, UtilTime.TimeUnit.BEST, 2);
 
+    }
+
+    public double getEnergyRatio() {
+        return getEnergy() / (float) (getTerritory().size() * 25);
     }
 
     @Override

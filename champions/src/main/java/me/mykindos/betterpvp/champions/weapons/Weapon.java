@@ -6,7 +6,9 @@ import lombok.Getter;
 import me.mykindos.betterpvp.core.components.champions.weapons.IWeapon;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
-import org.bukkit.event.Listener;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,10 +20,31 @@ public abstract class Weapon implements IWeapon {
 
     private final Material material;
     private final Component name;
+    private final int model;
     private final List<Component> lore;
 
-    public Weapon(Material material, Component name){
-        this(material, name, new ArrayList<>());
+    public Weapon(Material material, Component name) {
+        this(material, name, 0, new ArrayList<>());
+    }
+
+    public Weapon(Material material, int model, Component name) {
+        this(material, name, model, new ArrayList<>());
+    }
+
+    @Override
+    public boolean isHoldingWeapon(Player player) {
+        ItemStack itemStack = player.getInventory().getItemInMainHand();
+        if (itemStack.getType() != material) return false;
+        if (model != 0) {
+            ItemMeta itemMeta = itemStack.getItemMeta();
+            if (itemMeta != null) {
+                if (itemMeta.hasCustomModelData()) {
+                    return itemMeta.getCustomModelData() == model;
+                }
+            }
+        }
+
+        return true;
     }
 
 }

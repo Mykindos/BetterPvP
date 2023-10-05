@@ -20,7 +20,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -112,7 +111,7 @@ public class ThrowingWeb extends Weapon implements Listener, InteractWeapon, Coo
 
     @Override
     public boolean canUse(Player player) {
-        return true;
+        return isHoldingWeapon(player);
     }
 
     @Override

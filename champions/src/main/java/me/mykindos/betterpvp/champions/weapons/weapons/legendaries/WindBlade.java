@@ -3,7 +3,6 @@ package me.mykindos.betterpvp.champions.weapons.weapons.legendaries;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
-import me.mykindos.betterpvp.champions.combat.events.PlayerCheckShieldEvent;
 import me.mykindos.betterpvp.champions.energy.EnergyHandler;
 import me.mykindos.betterpvp.champions.weapons.types.ChannelWeapon;
 import me.mykindos.betterpvp.champions.weapons.types.InteractWeapon;
@@ -25,6 +24,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -36,11 +36,20 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
 
     @Inject
     @Config(path = "weapons.wind-blade.energy-per-tick", defaultValue = "1.0")
-    private float energyPerTick;
+    private double energyPerTick;
 
     @Inject
     @Config(path = "weapons.wind-blade.initial-energy-cost", defaultValue = "10.0")
-    private float initialEnergyCost;
+    private double initialEnergyCost;
+
+    @Inject
+    @Config(path = "weapons.wind-blade.base-damage", defaultValue = "7.0")
+    private double baseDamage;
+
+    @Inject
+    @Config(path = "weapons.wind-blade.strength", defaultValue = "0.7")
+    private double velocityStrength;
+
 
     private final EnergyHandler energyHandler;
 
@@ -73,7 +82,7 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
 
             var checkUsageEvent = UtilServer.callEvent(new PlayerUseItemEvent(player, this, true));
             if(checkUsageEvent.isCancelled()) {
-                UtilMessage.simpleMessage(player, "You cannot use this weapon here.");
+                UtilMessage.simpleMessage(player, "Restriction", "You cannot use this weapon here.");
                 continue;
             }
 
@@ -87,31 +96,24 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
                 continue;
             }
 
-            UtilVelocity.velocity(player, 0.7, 0.11, 1.0, true);
+            UtilVelocity.velocity(player, velocityStrength, 0.11, 1.0, true);
             player.getWorld().spawnEntity(player.getLocation(), EntityType.LLAMA_SPIT);
             player.getWorld().playSound(player.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 0.5F, 1.5F);
         }
     }
 
-    @EventHandler
+    @EventHandler (priority = EventPriority.LOW)
     public void onDamage(CustomDamageEvent event) {
         if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
             if (event.getDamager() instanceof Player player) {
                 if (player.getInventory().getItemInMainHand().getType() != Material.MUSIC_DISC_MELLOHI) return;
 
                 event.setKnockback(false);
-                event.setDamage(7D);
+                event.setDamage(baseDamage);
                 Vector vec = player.getLocation().getDirection();
                 vec.setY(0);
-                UtilVelocity.velocity(event.getDamagee(), vec, 2D, false, 0.0D, 0.5D, 1.0D, true);
+                UtilVelocity.velocity(event.getDamagee(), vec, 2D, false, 0.0D, 0.5D, 1.0D, true, true);
             }
-        }
-    }
-
-    @EventHandler
-    public void onCheckShield(PlayerCheckShieldEvent event) {
-        if (event.getPlayer().getInventory().getItemInMainHand().getType() == Material.MUSIC_DISC_MELLOHI) {
-            event.setShouldHaveShield(true);
         }
     }
 
@@ -128,7 +130,7 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
     @Override
     public boolean canUse(Player player) {
         if (UtilBlock.isInLiquid(player)) {
-            UtilMessage.simpleMessage(player, "You cannot use this weapon while in water!");
+            UtilMessage.simpleMessage(player, "Wind Blade", "You cannot use this weapon while in water!");
             return false;
         }
         return true;
@@ -136,7 +138,7 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
 
 
     @Override
-    public float getEnergy() {
+    public double getEnergy() {
         return initialEnergyCost;
     }
 

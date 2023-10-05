@@ -1,7 +1,6 @@
 package me.mykindos.betterpvp.core.menu;
 
 import lombok.Data;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -16,7 +15,7 @@ import java.util.List;
 @Data
 public abstract class Menu {
 
-    private final Player player;
+    protected final Player player;
     private final int size;
     private final Component title;
     private final List<Button> buttons;

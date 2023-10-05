@@ -85,20 +85,14 @@ public class CombatListener implements Listener {
 
     private void damage(CustomDamageEvent event) {
 
-        // TODO handle this elsewhere
-        //if (event.getDamagee() instanceof Sheep) {
-        //    Sheep sheep = (Sheep) event.getDamagee();
-        //    if (sheep.getCustomName() != null) {
-        //        event.setCancelled("Combat Log Sheep");
-        //        return;
-        //    }
-        //}
-
-
         if (event.getDamagee().getHealth() > 0) {
             if (event.getDamage() >= 0) {
 
                 damageDataList.add(new DamageData(event.getDamagee().getUniqueId().toString(), event.getCause(), event.getDamageDelay()));
+
+                if (isMythicMobsEnabled) {
+                    customDamageAdapter.processKnockbackAdapter(event, false);
+                }
 
                 if (event.isKnockback()) {
                     if (event.getDamager() != null) {
@@ -175,6 +169,12 @@ public class CombatListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPreDamage(PreCustomDamageEvent event) {
         CustomDamageEvent cde = event.getCustomDamageEvent();
+
+        if(isMythicMobsEnabled) {
+            if(!customDamageAdapter.processPreCustomDamage(cde)) {
+                return;
+            }
+        }
 
         if (cde.getDamager() != null) {
             if (cde.getDamager().equals(cde.getDamagee())) {
@@ -330,6 +330,8 @@ public class CombatListener implements Listener {
         UtilVelocity.velocity(event.getDamagee(),
                 trajectory, velocity, false, 0.0D, Math.abs(0.2D * knockback), 0.4D + (0.04D * knockback), true);
     }
+
+
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onDamageReduction(CustomDamageReductionEvent event) {

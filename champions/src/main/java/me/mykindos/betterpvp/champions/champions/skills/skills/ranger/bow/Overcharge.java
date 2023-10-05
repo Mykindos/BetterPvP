@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.bow;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.*;
 import lombok.Data;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
@@ -31,6 +30,8 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.meta.CrossbowMeta;
+
+import java.util.*;
 
 @Singleton
 @BPvPListener

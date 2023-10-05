@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.gladiator.passiv
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.WeakHashMap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -22,6 +21,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+
+import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -78,7 +79,7 @@ public class Stampede extends Skill implements PassiveSkill {
                     sprintStr.put(player, 0);
                 }
 
-                if (!player.isSprinting()) {
+                if (!player.isSprinting() || player.isInWater()) {
                     sprintTime.remove(player);
                     sprintStr.remove(player);
                     player.removePotionEffect(PotionEffectType.SPEED);
@@ -118,7 +119,7 @@ public class Stampede extends Skill implements PassiveSkill {
         damager.removePotionEffect(PotionEffectType.SPEED);
 
         event.setKnockback(false);
-        UtilVelocity.velocity(event.getDamagee(), UtilVelocity.getTrajectory2d(damager, event.getDamagee()), 2.0D, true, 0.0D, 0.4D, 1.0D, true);
+        UtilVelocity.velocity(event.getDamagee(), UtilVelocity.getTrajectory2d(damager, event.getDamagee()), 2.0D, true, 0.0D, 0.4D, 1.0D, true, true);
         event.setDamage(event.getDamage() + (str * damage));
     }
 

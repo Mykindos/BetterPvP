@@ -8,7 +8,6 @@ import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.menu.Button;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import me.mykindos.betterpvp.shops.shops.menus.ShopMenu;
 import me.mykindos.betterpvp.shops.shops.utilities.ShopsNamespacedKeys;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -54,7 +53,7 @@ public class ShopItemButton extends Button {
 
     @Override
     public double getClickCooldown() {
-        return 0.25;
+        return 0.15;
     }
 
 }

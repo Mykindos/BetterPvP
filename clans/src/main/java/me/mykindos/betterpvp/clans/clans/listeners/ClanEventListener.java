@@ -1,8 +1,6 @@
 package me.mykindos.betterpvp.clans.clans.listeners;
 
 import com.google.inject.Inject;
-import java.util.Optional;
-import java.util.UUID;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
@@ -35,6 +33,9 @@ import org.bukkit.Chunk;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+
+import java.util.Optional;
+import java.util.UUID;
 
 @BPvPListener
 public class ClanEventListener extends ClanListener {
@@ -152,7 +153,7 @@ public class ClanEventListener extends ClanListener {
         clanManager.getRepository().delete(clan);
         clanManager.getObjects().remove(clan.getName());
 
-        UtilMessage.broadcast("Clans", "<alt2>" + event.getPlayer().getName() + "</alt2> disbanded <alt2>Clan " + clan.getName() + "</alt2>.");
+        //UtilMessage.broadcast("Clans", "<alt2>" + event.getPlayer().getName() + "</alt2> disbanded <alt2>Clan " + clan.getName() + "</alt2>.");
         UtilMessage.broadcast("Clans", "<alt2>Clan " + clan.getName() + "</alt2> has been disbanded.");
     }
 
@@ -173,7 +174,7 @@ public class ClanEventListener extends ClanListener {
 
         Component inviteMessage = Component.text("Click Here", NamedTextColor.GOLD, TextDecoration.UNDERLINED)
                 .clickEvent(ClickEvent.runCommand("/c join " + clan.getName()))
-                .append(UtilMessage.deserialize(" or type '<alt2>/c join" + clan.getName() + "</alt2>' to accept!"));
+                .append(UtilMessage.deserialize(" or type '<alt2>/c join " + clan.getName() + "</alt2>' to accept!"));
         UtilMessage.simpleMessage(target, "Clans", inviteMessage);
 
         Gamer targetGamer = gamerManager.getObject(target.getUniqueId().toString()).orElseThrow(() -> new NoSuchGamerException(target.getName()));
@@ -390,8 +391,15 @@ public class ClanEventListener extends ClanListener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onClanSetHome(ClanSetHomeEvent event) {
         if (event.isCancelled()) return;
+
         Clan clan = event.getClan();
         Player player = event.getPlayer();
+
+        Optional<Clan> clanOptional = clanManager.getClanByLocation(player.getLocation());
+        if (clanOptional.isEmpty() || !clanOptional.get().equals(clan)) {
+            UtilMessage.simpleMessage(player, "Clans", "You can only set the clan home in your own territory.");
+            return;
+        }
 
         clan.setHome(player.getLocation());
         UtilMessage.simpleMessage(player, "Clans", "You set the clan home to <yellow>%s<gray>.",

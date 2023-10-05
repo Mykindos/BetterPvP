@@ -1,10 +1,6 @@
 package me.mykindos.betterpvp.core.client.listener;
 
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.events.PacketContainer;
 import com.google.inject.Inject;
-import java.util.Optional;
 import lombok.SneakyThrows;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.ClientManager;
@@ -18,11 +14,9 @@ import me.mykindos.betterpvp.core.framework.events.lunar.LunarClientEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -32,7 +26,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
+
+import java.util.Optional;
 
 @BPvPListener
 public class ClientListener implements Listener {
@@ -48,6 +43,14 @@ public class ClientListener implements Listener {
     @Inject
     @Config(path = "tab.website", defaultValue = "https://mineplex.com")
     private String website;
+
+    @Inject
+    @Config(path = "tab.shop", defaultValue = "mineplex.com/shop")
+    private String shop;
+
+    @Inject
+    @Config(path = "tab.server", defaultValue = "Clans-1")
+    private String server;
 
     private final ClientManager clientManager;
 
@@ -129,16 +132,13 @@ public class ClientListener implements Listener {
 
     @SneakyThrows
     public void updateTab(Player player) {
-        var titleTop = Component.text(tabTitle, NamedTextColor.RED, TextDecoration.BOLD);
-        var titleBot = Component.text("Visit our website at: ", NamedTextColor.RED, TextDecoration.BOLD)
-                .append(Component.text(website, NamedTextColor.YELLOW, TextDecoration.BOLD));
-        var header = titleTop.appendNewline().append(titleBot);
+        var header = Component.text("Mineplex ", NamedTextColor.GOLD)
+                .append(Component.text("Network ", NamedTextColor.WHITE))
+                .append(Component.text(server, NamedTextColor.GREEN));
 
-        var footerLeft = Component.text("Ping: ", NamedTextColor.GOLD, TextDecoration.BOLD)
-                .append(Component.text(UtilPlayer.getPing(player), NamedTextColor.YELLOW, TextDecoration.BOLD));
-        var footerRight = Component.text("Online: ", NamedTextColor.GOLD, TextDecoration.BOLD)
-                .append(Component.text(Bukkit.getOnlinePlayers().size(), NamedTextColor.YELLOW, TextDecoration.BOLD));
-        var footer = footerLeft.append(Component.space()).append(footerRight);
+        var footer = Component.text("Visit ", NamedTextColor.WHITE)
+                .append(Component.text(shop, NamedTextColor.YELLOW))
+                .append(Component.text(" for cool perks!", NamedTextColor.WHITE));
 
         player.sendPlayerListHeaderAndFooter(header, footer);
     }
@@ -163,9 +163,6 @@ public class ClientListener implements Listener {
         clientManager.getRepository().processStatUpdates(true);
     }
 
-    @EventHandler
-    public void onRespawn(PlayerRespawnEvent event) {
-        event.setRespawnLocation(event.getPlayer().getWorld().getSpawnLocation());
-    }
+
 
 }

@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.components.champions.events.PlayerCanUseSkillE
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseItemEvent;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
 import org.bukkit.GameMode;
@@ -35,6 +36,7 @@ public class ClansSkillListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
     public void onChampionsSkill(PlayerUseSkillEvent event) {
         if (!clanManager.canCast(event.getPlayer())) {
+            UtilMessage.message(event.getPlayer(), "Restriction", "You cannot use this skill here.");
             event.setCancelled(true);
         }
     }
@@ -83,6 +85,7 @@ public class ClansSkillListener implements Listener {
     @EventHandler
     public void disableSafezone(PlayerCanUseSkillEvent event) {
         if(!clanManager.canCast(event.getPlayer())) {
+            UtilMessage.message(event.getPlayer(), "Restriction", "You cannot use this skill here.");
             event.setCancelled(true);
         }
     }

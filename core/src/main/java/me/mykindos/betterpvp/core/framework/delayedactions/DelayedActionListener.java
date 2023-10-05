@@ -1,8 +1,6 @@
 package me.mykindos.betterpvp.core.framework.delayedactions;
 
 import com.google.inject.Inject;
-import java.time.Duration;
-import java.util.WeakHashMap;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.framework.delayedactions.events.PlayerDelayedActionEvent;
@@ -20,6 +18,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
+
+import java.time.Duration;
+import java.util.WeakHashMap;
 
 @BPvPListener
 public class DelayedActionListener implements Listener {
@@ -49,6 +50,13 @@ public class DelayedActionListener implements Listener {
         action.setCountdownText(event.getCountdownText());
 
         delayedActionMap.put(player, action);
+    }
+
+    @EventHandler (priority = EventPriority.LOWEST)
+    public void onDuplicateDelayedAction(PlayerDelayedActionEvent event) {
+        if(delayedActionMap.containsKey(event.getPlayer())) {
+            event.cancel("Player already has an active delayedaction");
+        }
     }
 
     @UpdateEvent(delay = 100)

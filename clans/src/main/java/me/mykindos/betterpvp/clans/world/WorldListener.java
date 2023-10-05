@@ -1,7 +1,6 @@
 package me.mykindos.betterpvp.clans.world;
 
 import com.google.inject.Inject;
-import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.framework.ModuleLoadedEvent;
@@ -32,6 +31,8 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+
+import java.util.*;
 
 @Slf4j
 @BPvPListener
@@ -77,7 +78,7 @@ public class WorldListener implements Listener {
     @EventHandler
     public void handleBucket(PlayerBucketFillEvent event) {
         event.setCancelled(true);
-        UtilMessage.simpleMessage(event.getPlayer(), "Game", "Your <alt2>>Bucket</alt2> broke!");
+        UtilMessage.simpleMessage(event.getPlayer(), "Game", "Your <alt2>Bucket</alt2> broke!");
         ItemStack replacement = new ItemStack(Material.IRON_INGOT, event.getPlayer().getInventory().getItemInMainHand().getAmount() * 3);
         event.getPlayer().getInventory().setItemInMainHand(replacement);
     }

@@ -37,7 +37,7 @@ skills:
     silencingstrikes:
       enabled: true
       maxlevel: 3
-    repeatedstrikes:
+    comboattack:
       enabled: true
       maxlevel: 3
     concussion:
@@ -96,6 +96,10 @@ skills:
     fortitude:
       enabled: true
       maxlevel: 3
+    vengeance:
+      enabled: true
+      maxlevel: 3
+      damageIncrease: 0.25
     levelfield:
       enabled: true
       maxlevel: 3
@@ -200,6 +204,12 @@ skills:
       enabled: true
       maxlevel: 5
       energy: 11
+    lifebonds:
+      enabled: true
+      maxlevel: 5
+      energy: 9
+      minRadius: 2.0
+      duration: 2.0
     magmablade:
       enabled: true
       maxlevel: 3

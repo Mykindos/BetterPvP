@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.client.ClientManager;
 import me.mykindos.betterpvp.core.command.loader.CoreCommandLoader;
 import me.mykindos.betterpvp.core.config.Config;
@@ -17,7 +18,9 @@ import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.injector.CoreInjectorModule;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.loader.CoreListenerLoader;
+import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import net.kyori.adventure.key.Key;
+import org.bukkit.Location;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 
@@ -27,6 +30,7 @@ import java.util.Set;
 import static io.papermc.paper.network.ChannelInitializeListenerHolder.hasListener;
 import static io.papermc.paper.network.ChannelInitializeListenerHolder.removeListener;
 
+@Slf4j
 public class Core extends BPvPPlugin {
 
     private final String PACKAGE = getClass().getPackageName();
@@ -41,8 +45,6 @@ public class Core extends BPvPPlugin {
 
     private ClientManager clientManager;
     private GamerManager gamerManager;
-
-
 
     @Inject
     private UpdateEventExecutor updateEventExecutor;
@@ -78,6 +80,8 @@ public class Core extends BPvPPlugin {
         updateEventExecutor.loadPlugin(this);
         updateEventExecutor.initialize();
 
+        Location test = UtilWorld.stringToLocation(getConfig().getString("spawn.North"));
+        log.info("TEST: " + test);
     }
 
     @Override

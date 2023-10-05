@@ -45,6 +45,10 @@ public class CreateClanSubCommand extends ClanSubCommand {
         return "Create a clan";
     }
 
+    public String getUsage() {
+        return super.getUsage() + " <name>";
+    }
+
     @Override
     public void execute(Player player, Client client, String[] args) {
         if (args.length == 0) {

@@ -14,7 +14,6 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -78,7 +77,7 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
 
     public boolean wallKick(Player player) {
 
-        if (championsManager.getCooldowns().add(player, "Wall Kick", 0.25, false)) {
+        if (championsManager.getCooldowns().use(player, "Wall Kick", 0.25, false)) {
             Vector vec = player.getLocation().getDirection();
 
             boolean xPos = true;
