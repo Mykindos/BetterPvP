@@ -21,14 +21,16 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.util.Vector;
 
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill{
+public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill {
 
-    private final WeakHashMap<Arrow, Location> arrows = new WeakHashMap<>();
+    private final Set<Arrow> arrows = new HashSet<>(); // Changed to HashSet
 
     public double basePushBack;
 
@@ -61,17 +63,16 @@ public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill{
 
     @UpdateEvent
     public void update() {
-        Iterator<Arrow> it = arrows.keySet().iterator();
+        Iterator<Arrow> it = arrows.iterator();
         while (it.hasNext()) {
-            Arrow next = it.next();
-            if (next == null || next.isDead() || !(next.getShooter() instanceof Player)) {
+            Arrow arrow = it.next();
+            if (arrow == null || arrow.isDead() || !(arrow.getShooter() instanceof Player)) {
                 it.remove();
             } else {
-                Player shooter = (Player) next.getShooter();
+                Player shooter = (Player) arrow.getShooter();
 
-                if (!shooter.isSneaking() && championsManager.getEnergy().use(shooter, getName(), getEnergy(getLevel(shooter)), false)) {
-                    //this line is bad and causes issues because it uses energy while the arrow is flying
-                    Location location = next.getLocation().add(new Vector(0, 0.25, 0));
+                if (!shooter.isSneaking() && championsManager.getEnergy().getEnergy(shooter) >= getEnergy(getLevel(shooter))) {
+                    Location location = arrow.getLocation().add(new Vector(0, 0.25, 0));
                     Particle.CRIT_MAGIC.builder().location(location).receivers(60).extra(0).spawn();
                 }
             }
@@ -87,10 +88,9 @@ public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill{
         if (level > 0) {
             PlayerCanUseSkillEvent skillEvent = UtilServer.callEvent(new PlayerCanUseSkillEvent(player, this));
             if (!skillEvent.isCancelled()) {
-                arrows.put(arrow, arrow.getLocation());
+                arrows.add(arrow); // Add arrow to the set
 
                 if (!player.isSneaking()) {
-
                     if (championsManager.getEnergy().use(player, getName(), getEnergy(level), false)) {
                         Vector pushback = player.getLocation().getDirection().multiply(-1);
 
