@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -27,6 +28,28 @@ public class ClansCombatListener implements Listener {
     public ClansCombatListener(ClanManager clanManager, GamerManager gamerManager) {
         this.clanManager = clanManager;
         this.gamerManager = gamerManager;
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPlayerMountDamage(PreCustomDamageEvent event) {
+        if (event.isCancelled()) return;
+
+        CustomDamageEvent cde = event.getCustomDamageEvent();
+
+        if (cde.getDamagee() instanceof LivingEntity && cde.getDamager() instanceof Player) {
+            LivingEntity damagee = (LivingEntity) cde.getDamagee();
+            Player damager = (Player) cde.getDamager();
+
+            for (Entity passenger : damagee.getPassengers()) {
+                if (passenger instanceof Player) {
+                    Player mountedPlayer = (Player) passenger;
+                    if (!clanManager.canHurt(damager, mountedPlayer)) {
+                        event.setCancelled(true);
+                        return;
+                    }
+                }
+            }
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
