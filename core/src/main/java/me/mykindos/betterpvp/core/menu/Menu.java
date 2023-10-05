@@ -57,6 +57,12 @@ public abstract class Menu {
         inventory.setItem(button.getSlot(), button.getItemStack());
     }
 
+    public void refreshButton(Button button) {
+        if (buttons.contains(button)) {
+            inventory.setItem(button.getSlot(), button.getItemStack());
+        }
+    }
+
     public boolean isButton(ItemStack item) {
         if (item != null && item.getType() != Material.AIR) {
             if (item.hasItemMeta() && item.getItemMeta().hasDisplayName()) {

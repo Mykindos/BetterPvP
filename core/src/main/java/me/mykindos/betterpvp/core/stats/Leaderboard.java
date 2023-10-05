@@ -1,16 +1,22 @@
 package me.mykindos.betterpvp.core.stats;
 
+import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.stats.event.LeaderboardInitializeEvent;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardEntry;
+import me.mykindos.betterpvp.core.stats.repository.LeaderboardEntryKey;
 import me.mykindos.betterpvp.core.stats.sort.SortType;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Represents a sorted leaderboard for objects of type T.
@@ -21,15 +27,19 @@ import java.util.concurrent.*;
 public abstract class Leaderboard<E, T> {
 
     private final ConcurrentHashMap<SortType, TreeSet<LeaderboardEntry<E, T>>> topTen;
+    private final AsyncLoadingCache<LeaderboardEntryKey<E>, T> entryCache;
 
     protected Leaderboard(BPvPPlugin plugin, String tablePrefix) {
         Validate.isTrue(acceptedSortTypes().length > 0, "Leaderboard must accept at least one sort type.");
         final Database database = plugin.getInjector().getInstance(Database.class);
         this.topTen = new ConcurrentHashMap<>();
+        this.entryCache = Caffeine.newBuilder()
+                .expireAfterWrite(10, TimeUnit.MINUTES)
+                .buildAsync((key, executor) -> CompletableFuture.supplyAsync(() -> fetch(key.getSortType(), database, tablePrefix, key.getValue())));
 
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
             for (SortType sortType : acceptedSortTypes()) {
-                CompletableFuture.supplyAsync(() -> fetch(sortType, database, tablePrefix)).thenApply(fetch -> {
+                CompletableFuture.supplyAsync(() -> fetchAll(sortType, database, tablePrefix)).thenApply(fetch -> {
                     TreeSet<LeaderboardEntry<E, T>> set = new TreeSet<>(Comparator.comparing(LeaderboardEntry::getValue, getSorter()));
                     set.addAll(fetch.entrySet().stream().map(entry -> LeaderboardEntry.of(entry.getKey(), entry.getValue())).toList());
                     return set;
@@ -98,7 +108,7 @@ public abstract class Leaderboard<E, T> {
                 if (match.isPresent()) {
                     existingData = match.orElseThrow().getValue();
                 } else {
-                    existingData = loadEntryData(type, entryName).join(); // Reason for this to be async
+                    existingData = entryCache.get(LeaderboardEntryKey.of(type, entryName)).join(); // Reason for this to be async
                 }
 
                 entry.setValue(join(existingData, add));
@@ -176,15 +186,18 @@ public abstract class Leaderboard<E, T> {
                 .findFirst()
                 .map(LeaderboardEntry::getValue)
                 .map(CompletableFuture::completedFuture)
-                .orElseGet(() -> loadEntryData(sortType, entry));
+                .orElseGet(() -> entryCache.get(LeaderboardEntryKey.of(sortType, entry)));
     }
 
     /**
      * Loads the data for the given entry.
+     * @param sortType The type of sorting to use.
+     * @param database The database to fetch from.
+     * @param tablePrefix The prefix of the table.
      * @param entry The entry to load the data for.
      * @return The data for the given entry.
      */
-    protected abstract CompletableFuture<T> loadEntryData(SortType sortType, E entry);
+    protected abstract T fetch(SortType sortType, @NotNull Database database, @NotNull String tablePrefix, @NotNull E entry);
 
     /**
      * Fetches the top entries from the database.
@@ -192,6 +205,6 @@ public abstract class Leaderboard<E, T> {
      * @param database The database to fetch from.
      * @param tablePrefix The prefix of the table.
      */
-    protected abstract Map<E, T> fetch(@NotNull SortType sortType, @NotNull Database database, @NotNull String tablePrefix);
+    protected abstract Map<E, T> fetchAll(@NotNull SortType sortType, @NotNull Database database, @NotNull String tablePrefix);
 
 }

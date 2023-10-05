@@ -26,6 +26,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public class LeaderboardMenu extends Menu implements IRefreshingMenu {
 
@@ -122,8 +123,47 @@ public class LeaderboardMenu extends Menu implements IRefreshingMenu {
                 new ItemStack(Material.COPPER_INGOT),
                 Component.text("Top #3", getPositionColor(3), TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false)));
 
+        // Own data
+        try {
+            final Leaderboard<UUID, ?> lb = (Leaderboard<UUID, ?>) leaderboard;
+            final CompletableFuture<?> entryData = lb.getEntryData(selectedSortType, player.getUniqueId());
+            final Button button = new Button(49,
+                    new ItemStack(Material.PAPER),
+                    Component.text("Retrieving your data...", NamedTextColor.GRAY));
+
+            entryData.whenComplete((data, throwable) -> {
+                if (throwable != null) {
+                    button.setItemStack(getFailedItem(button.getItemStack()));
+                    return;
+                }
+
+                final Button replacement = getEntry(49,
+                        Component.text("Your Data", NamedTextColor.WHITE, TextDecoration.BOLD),
+                        button.getItemStack(),
+                        player.getName(),
+                        data.toString());
+                button.setItemStack(replacement.getItemStack());
+                LeaderboardMenu.this.refreshButton(button);
+            }).exceptionally(throwable -> {
+                throwable.printStackTrace();
+                button.setItemStack(getFailedItem(button.getItemStack()));
+                return null;
+            });
+
+            addButton(button);
+        } catch (ClassCastException ignored) {
+            // Not a leaderboard with UUID keys aka players
+        }
+
         // Fill empty
         fillEmpty(new ItemStack(Material.GRAY_STAINED_GLASS_PANE));
+    }
+
+    private ItemStack getFailedItem(ItemStack itemStack) {
+        final ItemMeta meta = itemStack.getItemMeta();
+        meta.displayName(Component.text("Failed to retrieve your data!", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
+        itemStack.setItemMeta(meta);
+        return itemStack;
     }
 
     private Button getEmpty(int slot, Component title) {
