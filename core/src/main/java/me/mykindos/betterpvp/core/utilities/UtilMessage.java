@@ -22,6 +22,10 @@ public class UtilMessage {
             TagResolver.resolver("alt2", Tag.styling(NamedTextColor.YELLOW))
     );
 
+    public static final Component DIVIDER = Component.text("                                            ")
+            .color(NamedTextColor.DARK_GRAY)
+            .decorate(TextDecoration.STRIKETHROUGH);
+
 
     /**
      * Sends a message to a player with appropriate formatting
@@ -281,6 +285,15 @@ public class UtilMessage {
      */
     public static void broadcast(String message) {
         Bukkit.getServer().broadcast(deserialize(message));
+    }
+
+    /**
+     * Broadcasts a message to all players on the server with formatting
+     *
+     * @param message The message to be broadcasted
+     */
+    public static void broadcast(Component message) {
+        Bukkit.getServer().broadcast(message);
     }
 
 }

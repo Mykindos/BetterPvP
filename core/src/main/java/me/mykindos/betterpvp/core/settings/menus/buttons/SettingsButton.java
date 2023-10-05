@@ -1,23 +1,38 @@
 package me.mykindos.betterpvp.core.settings.menus.buttons;
 
 import lombok.Getter;
+import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.menu.Button;
+import me.mykindos.betterpvp.core.utilities.UtilSound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Sound;
+import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 
-public abstract class SettingsButton extends Button {
+public class SettingsButton extends Button {
 
     @Getter
     protected final String setting;
 
-    public SettingsButton(Enum<?> key, boolean settingEnabled, int slot, ItemStack item, String name, Component... lore) {
-        this(key.name(), settingEnabled, slot, item, name, lore);
+    private final Gamer gamer;
+
+    public SettingsButton(Gamer gamer, Enum<?> setting, int slot, ItemStack item, Component name, Component... lore) {
+        super(slot, item, name, lore);
+        this.gamer = gamer;
+        this.setting = setting.name();
     }
 
-    public SettingsButton(String setting, boolean settingEnabled, int slot, ItemStack item, String name, Component... lore) {
-        super(slot, item, Component.text(name, settingEnabled ? NamedTextColor.GREEN : NamedTextColor.RED), lore);
-        this.setting = setting;
+    @Override
+    public void onClick(Player player, Gamer gamer, ClickType clickType) {
+        if(clickType == ClickType.LEFT) {
+            this.gamer.saveProperty(setting, true, true);
+        }else if(clickType == ClickType.RIGHT){
+            this.gamer.saveProperty(setting, false, true);
+        }
+
+        UtilSound.playSound(player, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1, false);
     }
 
     @Override

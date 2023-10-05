@@ -36,6 +36,7 @@ public class ClansSkillListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
     public void onChampionsSkill(PlayerUseSkillEvent event) {
         if (!clanManager.canCast(event.getPlayer())) {
+            UtilMessage.message(event.getPlayer(), "Restriction", "You cannot use this skill here.");
             event.setCancelled(true);
         }
     }
