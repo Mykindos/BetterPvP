@@ -31,7 +31,6 @@ public class UnclaimSubCommand extends ClanSubCommand {
     @Inject
     public UnclaimSubCommand(ClanManager clanManager, GamerManager gamerManager) {
         super(clanManager, gamerManager);
-        this.clientManager = clientManager;
     }
 
     @Override
