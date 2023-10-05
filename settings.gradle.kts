@@ -11,6 +11,7 @@ include("core")
 include("lunar")
 include("champions")
 include("shops")
+include("progression")
 
 if(File("./events/").exists()) {
     include("events")

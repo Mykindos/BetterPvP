@@ -97,6 +97,12 @@ public class ClanManager extends Manager<Clan> {
                         .anyMatch(territory -> territory.getChunk().equalsIgnoreCase(UtilWorld.chunkToFile(chunk)))).findFirst();
     }
 
+    public Optional<Clan> getClanByChunkString(String chunk) {
+        return objects.values().stream()
+                .filter(clan -> clan.getTerritory().stream()
+                        .anyMatch(territory -> territory.getChunk().equalsIgnoreCase(chunk))).findFirst();
+    }
+
     public boolean isClanMember(Player player, Player target) {
         Optional<Clan> aClanOptional = getClanByPlayer(player);
         Optional<Clan> bClanOptional = getClanByPlayer(target);

@@ -24,6 +24,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -40,6 +41,15 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
     @Inject
     @Config(path = "weapons.wind-blade.initial-energy-cost", defaultValue = "10.0")
     private double initialEnergyCost;
+
+    @Inject
+    @Config(path = "weapons.wind-blade.base-damage", defaultValue = "7.0")
+    private double baseDamage;
+
+    @Inject
+    @Config(path = "weapons.wind-blade.strength", defaultValue = "0.7")
+    private double velocityStrength;
+
 
     private final EnergyHandler energyHandler;
 
@@ -86,20 +96,20 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
                 continue;
             }
 
-            UtilVelocity.velocity(player, 0.7, 0.11, 1.0, true);
+            UtilVelocity.velocity(player, velocityStrength, 0.11, 1.0, true);
             player.getWorld().spawnEntity(player.getLocation(), EntityType.LLAMA_SPIT);
             player.getWorld().playSound(player.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 0.5F, 1.5F);
         }
     }
 
-    @EventHandler
+    @EventHandler (priority = EventPriority.LOW)
     public void onDamage(CustomDamageEvent event) {
         if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
             if (event.getDamager() instanceof Player player) {
                 if (player.getInventory().getItemInMainHand().getType() != Material.MUSIC_DISC_MELLOHI) return;
 
                 event.setKnockback(false);
-                event.setDamage(7D);
+                event.setDamage(baseDamage);
                 Vector vec = player.getLocation().getDirection();
                 vec.setY(0);
                 UtilVelocity.velocity(event.getDamagee(), vec, 2D, false, 0.0D, 0.5D, 1.0D, true, true);
@@ -120,7 +130,7 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
     @Override
     public boolean canUse(Player player) {
         if (UtilBlock.isInLiquid(player)) {
-            UtilMessage.simpleMessage(player, "You cannot use this weapon while in water!");
+            UtilMessage.simpleMessage(player, "Wind Blade", "You cannot use this weapon while in water!");
             return false;
         }
         return true;

@@ -159,7 +159,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
                 int level = getLevel(player);
                 if (level > 0) {
                     if (player.isHandRaised()) {
-                        if (!championsManager.getEnergy().use(player, getName(), getEnergy(getLevel(player)) / 2, true)) {
+                        if (!championsManager.getEnergy().use(player, getName(), getEnergy(getLevel(player)), true)) {
                             it.remove();
                         } else if (!UtilPlayer.isHoldingItem(player, SkillWeapons.SWORDS)) {
                             it.remove();
