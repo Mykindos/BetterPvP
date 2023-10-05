@@ -161,20 +161,13 @@ public class ClanManager extends Manager<Clan> {
         Chunk playerChunk = player.getChunk();
         World world = player.getWorld();
 
-        boolean end = false;
-
-        for (int i = 1; i < maxChunksRadiusToScan; i++) {
-            int[] offset = {-i, 0, i};
-            for (int x : offset) {
-                for (int z: offset) {
-                    Chunk chunk = world.getChunkAt(playerChunk.getX() + x, playerChunk.getZ() + z);
-                    if (getClanByChunk(chunk).isEmpty()) {
-                        chunks.add(chunk);
-                        end = true;
-                    }
+        for (int i = -maxChunksRadiusToScan; i < maxChunksRadiusToScan; i++) {
+            for (int j = -maxChunksRadiusToScan; j < maxChunksRadiusToScan; j++) {
+                Chunk chunk = world.getChunkAt(playerChunk.getX() + i, playerChunk.getZ() + j);
+                if (getClanByChunk(chunk).isEmpty()) {
+                    chunks.add(chunk);
                 }
             }
-            if (end) break;
         }
 
         if (!chunks.isEmpty()) {
@@ -182,7 +175,6 @@ public class ClanManager extends Manager<Clan> {
 
             //this should not ever happen
             if (chunk == null) return null;
-
 
             List<Location> locations = new ArrayList<>();
 
@@ -194,7 +186,9 @@ public class ClanManager extends Manager<Clan> {
             }
 
             locations.sort(Comparator.comparingInt(a -> (int) player.getLocation().distanceSquared(a)));
-            return locations.get(0);
+
+            //to prevent getting stuck in a block, add 1 to Y
+            return locations.get(0).add(0, 1, 0);
         }
         return null;
     }
