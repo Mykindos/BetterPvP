@@ -4,10 +4,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.knight.sword;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
-import java.util.WeakHashMap;
+import java.util.*;
 
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
@@ -15,10 +12,12 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -37,6 +36,7 @@ import org.spigotmc.event.entity.EntityDismountEvent;
 public class Ride extends Skill implements InteractSkill, CooldownSkill, Listener {
 
     private final WeakHashMap<Player, HorseData> horseData = new WeakHashMap<>();
+
 
     private double lifespan;
     private double horseHealth;
@@ -67,7 +67,6 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
     }
 
     public void activate(Player player, int level) {
-
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_HORSE_ANGRY, 2.0f, 0.5f);
 
         Horse horse = player.getWorld().spawn(player.getLocation(), Horse.class);
@@ -75,11 +74,6 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
         horse.setOwner(player);
         horse.setColor(Horse.Color.WHITE);
         horse.setStyle(Horse.Style.NONE);
-        AttributeInstance horseMaxHealth = horse.getAttribute(Attribute.GENERIC_MAX_HEALTH);
-        if(horseMaxHealth != null) {
-            horseMaxHealth.setBaseValue(horseHealth);
-        }
-        horse.setHealth(horseHealth + ((level - 1) * 5));
         horse.setJumpStrength(1.5D);
         horse.getInventory().setArmor(new ItemStack(Material.LEATHER_HORSE_ARMOR));
         horse.getInventory().setSaddle(new ItemStack(Material.SADDLE));
@@ -90,17 +84,19 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
         horse.addPassenger(player);
         HorseData data = new HorseData(horse, System.currentTimeMillis());
         horseData.put(player, data);
+    }
 
+    public void removeHorses() {
+        Iterator<Map.Entry<Player, HorseData>> iterator = horseData.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<Player, HorseData> data = iterator.next();
+            Horse horse = data.getValue().getHorse();
 
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (!horse.isDead()) {
-                    horse.remove();
-                    horseData.remove(player);
-                }
+            if (horse == null || horse.isDead() || UtilTime.elapsed(data.getValue().getSpawnTime(), (long) lifespan * 1000)) {
+                horse.remove();
+                iterator.remove();
             }
-        }.runTaskLater(champions, (long) (lifespan + (level - 1)) * 20L);
+        }
     }
 
     private static class HorseData {
@@ -132,6 +128,29 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
             }
         }
         return true;
+    }
+
+    @EventHandler
+    public void onHorseDamage(CustomDamageEvent event) {
+        if (!(event.getDamager() instanceof Player damager)) return;
+        if (!(event.getDamager() instanceof Horse damagee)) return;
+        HorseData data = horseData.get(damager);
+        if (data != null && data.getHorse().equals(damagee)) {
+            // If the horse belongs to the player who is damaging it, we ignore the event.
+            return;
+        }
+
+        if (damagee.getOwner() instanceof Player owner) {
+            if (owner.getUniqueId().equals(damager.getUniqueId())) {
+                // If the horse's owner is the player, we ignore the event.
+                return;
+            }
+
+            damagee.remove();
+            horseData.remove(owner);
+            UtilMessage.message(owner, getClassType().getName(), "Your horse has been killed.");
+        }
+
     }
 
     @EventHandler
@@ -170,7 +189,6 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
     @Override
     public void loadSkillConfig() {
         lifespan = getConfig("lifespan", 2.0, Double.class);
-        horseHealth = getConfig("horseHealth", 1.0, Double.class);
     }
 
 }
