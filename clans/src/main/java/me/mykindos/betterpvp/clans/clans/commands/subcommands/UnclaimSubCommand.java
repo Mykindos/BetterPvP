@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.client.ClientManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.config.Config;
+import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -27,10 +28,8 @@ public class UnclaimSubCommand extends ClanSubCommand {
     @Config(path = "clans.claims.additional", defaultValue = "3")
     private int additionalClaims;
 
-    private final ClientManager clientManager;
-
     @Inject
-    public UnclaimSubCommand(ClanManager clanManager, GamerManager gamerManager, ClientManager clientManager) {
+    public UnclaimSubCommand(ClanManager clanManager, GamerManager gamerManager) {
         super(clanManager, gamerManager);
         this.clientManager = clientManager;
     }
@@ -76,10 +75,11 @@ public class UnclaimSubCommand extends ClanSubCommand {
             }
 
             for (ClanMember clanMember : locationClan.getMembers()) {
-                Optional<Client> clientOptional = clientManager.getObject(clanMember.getUuid());
-                if (clientOptional.isPresent()) {
-                    if (clientOptional.get().isAdministrating()) {
+                Optional<Gamer> gamerOptional = gamerManager.getObject(clanMember.getUuid());
+                if (gamerOptional.isPresent()) {
+                    if (gamerOptional.get().getClient().isAdministrating()) {
                         UtilMessage.message(player, "Clans", "You may not unclaim territory from this Clan at this time.");
+                        return;
                     }
                 }
             }
