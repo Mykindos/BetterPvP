@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.stats.event.LeaderboardInitializeEvent;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardEntry;
+import me.mykindos.betterpvp.core.stats.repository.LeaderboardEntryComparator;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardEntryKey;
 import me.mykindos.betterpvp.core.stats.sort.SortType;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -19,6 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+
 /**
  * Represents a sorted leaderboard for objects of type T.
  * <p>
@@ -26,7 +28,7 @@ import java.util.concurrent.TimeUnit;
  * @param <T> The type of object to be sorted in this leaderboard.
  */
 @Slf4j
-public abstract class Leaderboard<E, T> {
+public abstract class Leaderboard<E, T extends Comparable<T>> {
 
     private final ConcurrentHashMap<SortType, TreeSet<LeaderboardEntry<E, T>>> topTen;
     private final AsyncLoadingCache<LeaderboardEntryKey<E>, T> entryCache;
@@ -42,7 +44,7 @@ public abstract class Leaderboard<E, T> {
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
             for (SortType sortType : acceptedSortTypes()) {
                 CompletableFuture.supplyAsync(() -> fetchAll(sortType, database, tablePrefix)).thenApply(fetch -> {
-                    TreeSet<LeaderboardEntry<E, T>> set = new TreeSet<>(Comparator.comparing(LeaderboardEntry::getValue, getSorter()));
+                    TreeSet<LeaderboardEntry<E, T>> set = new TreeSet<>(new LeaderboardEntryComparator<>());
                     set.addAll(fetch.entrySet().stream().map(entry -> LeaderboardEntry.of(entry.getKey(), entry.getValue())).toList());
                     return set;
                 }).exceptionally(ex -> {
@@ -125,7 +127,9 @@ public abstract class Leaderboard<E, T> {
                 }
 
                 // Only return this type if the entry was added
-                int indexNow = new ArrayList<>(set).indexOf(entry) + 1;
+                var newList = new ArrayList<>(set);
+
+                int indexNow = newList.indexOf(entry) + 1;
                 if (set.contains(entry) && indexBefore != indexNow) {
                     types.put(type, indexNow);
                 }
