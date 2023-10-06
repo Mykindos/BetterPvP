@@ -5,7 +5,6 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.utilities.model.WeighedList;
-import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.model.ProgressionTree;
 import me.mykindos.betterpvp.progression.tree.fishing.data.FishingCountLeaderboard;
 import me.mykindos.betterpvp.progression.tree.fishing.data.FishingWeightLeaderboard;
@@ -30,16 +29,14 @@ import java.util.Set;
 @Getter
 public class Fishing extends ProgressionTree {
 
-    private final FishingRepository statsRepository;
-    private final FishingWeightLeaderboard weightLeaderboard;
-    private final FishingCountLeaderboard countLeaderboard;
+    @Inject
+    private FishingRepository statsRepository;
 
     @Inject
-    public Fishing(Progression progression, FishingWeightLeaderboard weightLeaderboard, FishingCountLeaderboard countLeaderboard) {
-        this.statsRepository = new FishingRepository(progression, this);
-        this.weightLeaderboard = weightLeaderboard;
-        this.countLeaderboard = countLeaderboard;
-    }
+    private FishingWeightLeaderboard weightLeaderboard;
+
+    @Inject
+    private FishingCountLeaderboard countLeaderboard;
 
     @Override
     public @NotNull String getName() {
