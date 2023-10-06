@@ -1,8 +1,8 @@
-package me.mykindos.betterpvp.champions.energy;
+package me.mykindos.betterpvp.core.energy;
 
 import com.google.inject.Inject;
-import me.mykindos.betterpvp.champions.energy.events.DegenerateEnergyEvent;
-import me.mykindos.betterpvp.champions.energy.events.RegenerateEnergyEvent;
+import me.mykindos.betterpvp.core.energy.events.DegenerateEnergyEvent;
+import me.mykindos.betterpvp.core.energy.events.RegenerateEnergyEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.Bukkit;

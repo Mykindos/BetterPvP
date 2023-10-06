@@ -11,12 +11,14 @@ import me.mykindos.betterpvp.core.client.events.ClientLoginEvent;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.energy.EnergyHandler;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.gamer.exceptions.NoSuchGamerException;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.*;
+import net.minecraft.world.entity.EntityType;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -24,21 +26,18 @@ import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.Container;
 import org.bukkit.block.data.type.Gate;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.ItemFrame;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
-import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.util.Vector;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -48,11 +47,13 @@ import java.util.UUID;
 public class ClansWorldListener extends ClanListener {
 
     private final EffectManager effectManager;
+    private final EnergyHandler energyHandler;
 
     @Inject
-    public ClansWorldListener(ClanManager clanManager, GamerManager gamerManager, EffectManager effectManager) {
+    public ClansWorldListener(ClanManager clanManager, GamerManager gamerManager, EffectManager effectManager, EnergyHandler energyHandler) {
         super(clanManager, gamerManager);
         this.effectManager = effectManager;
+        this.energyHandler = energyHandler;
     }
 
     @EventHandler
@@ -697,6 +698,42 @@ public class ClansWorldListener extends ClanListener {
             }, () -> player.setGameMode(GameMode.ADVENTURE));
 
 
+        }
+    }
+
+    @EventHandler
+    public void onFishMechanics(PlayerFishEvent event) {
+        if (!energyHandler.use(event.getPlayer(), "Fishing Rod", 15.0, true)) {
+            event.setCancelled(true);
+            return;
+        }
+
+        if (event.getCaught() instanceof Player player) {
+            event.setCancelled(true);
+            event.getHook().remove();
+
+            if (player.equals(event.getPlayer())) return;
+
+            if (!clanManager.canHurt(event.getPlayer(), player)) {
+                return;
+            }
+
+            if (player.getLocation().distance(event.getPlayer().getLocation()) < 2) {
+                return;
+            }
+
+            var trajectory = UtilVelocity.getTrajectory(player, event.getPlayer()).normalize();
+            player.setVelocity(trajectory.multiply(2).setY(Math.min(20, trajectory.getY())));
+
+        }
+    }
+
+    @EventHandler
+    public void onFishingHookHit(ProjectileHitEvent event) {
+        if (!(event.getEntity() instanceof FishHook)) return;
+
+        if (event.getHitEntity() instanceof Item) {
+            event.setCancelled(true);
         }
     }
 }
