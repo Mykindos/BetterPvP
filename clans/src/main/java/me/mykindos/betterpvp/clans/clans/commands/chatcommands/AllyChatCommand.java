@@ -42,9 +42,9 @@ public class AllyChatCommand extends Command {
         if(gamerOptional.isPresent()) {
             boolean allyChatEnabled = true;
             Gamer gamer = gamerOptional.get();
-            Optional<Boolean> staffChatEnabledOptional = gamer.getProperty(GamerProperty.ALLY_CHAT);
-            if(staffChatEnabledOptional.isPresent()){
-                allyChatEnabled = !staffChatEnabledOptional.get();
+            Optional<Boolean> allyChatEnabledOptional = gamer.getProperty(GamerProperty.ALLY_CHAT);
+            if(allyChatEnabledOptional.isPresent()){
+                allyChatEnabled = !allyChatEnabledOptional.get();
             }
 
             gamer.saveProperty(GamerProperty.ALLY_CHAT, allyChatEnabled);
