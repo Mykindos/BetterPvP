@@ -3,10 +3,12 @@ package me.mykindos.betterpvp.core.utilities;
 import com.google.gson.Gson;
 import io.lumine.mythic.bukkit.utils.shadows.nbt.NBTTagCompound;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -49,7 +51,7 @@ public class UtilItem {
         im.displayName(Component.text(name));
         if (lore != null) {
             List<Component> components = new ArrayList<>();
-            for(String loreEntry : lore){
+            for (String loreEntry : lore) {
                 components.add(Component.text(loreEntry));
             }
             im.lore(components);
@@ -108,7 +110,7 @@ public class UtilItem {
     public static ItemStack addGlow(ItemStack item) {
         ItemMeta itemMeta = item.getItemMeta();
         Enchantment enchantment = Enchantment.getByName("Glow");
-        if(enchantment != null) {
+        if (enchantment != null) {
             itemMeta.addEnchant(enchantment, 1, true);
         }
 
@@ -220,5 +222,29 @@ public class UtilItem {
 
         return -1;
     }
-    
+
+    /**
+     * Create a simple ItemStack with a specific model
+     * @param material The material
+     * @param customModelData The model ID
+     * @return The ItemStack
+     */
+    public static ItemStack createItemStack(Material material, int customModelData) {
+        var itemStack = new ItemStack(material);
+        var itemMeta = itemStack.getItemMeta();
+        itemMeta.setCustomModelData(customModelData);
+        itemStack.setItemMeta(itemMeta);
+
+        return itemStack;
+    }
+
+    // Create a function to remove TextDecoration.ITALIC from List<Component>
+    public static List<Component> removeItalic(List<Component> components) {
+        List<Component> newComponents = new ArrayList<>();
+        for (Component component : components) {
+            newComponents.add(component.decoration(TextDecoration.ITALIC, false));
+        }
+        return newComponents;
+    }
+
 }
