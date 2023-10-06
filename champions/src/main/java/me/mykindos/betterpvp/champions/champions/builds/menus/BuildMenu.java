@@ -27,7 +27,7 @@ public class BuildMenu extends Menu implements IRefreshingMenu {
     private final SkillManager skillManager;
 
     public BuildMenu(Player player, GamerBuilds builds, Role role, SkillManager skillManager) {
-        super(player, 54, Component.text(role.getName() + " Builds", NamedTextColor.BLACK).decorate(TextDecoration.BOLD));
+        super(player, 45, Component.text(role.getName() + " Builds"));
         this.builds = builds;
         this.role = role;
         this.skillManager = skillManager;
@@ -36,23 +36,28 @@ public class BuildMenu extends Menu implements IRefreshingMenu {
 
     @Override
     public void refresh() {
-        addButton(new BackButton(0, new ItemStack(Material.EMERALD_BLOCK), new ClassSelectionMenu(player, builds, skillManager)));
-        addButton(new Button(18, new ItemStack(role.getHelmet()), Component.text(role.getName() + " Helmet", NamedTextColor.GREEN, TextDecoration.BOLD)));
-        addButton(new Button(27, new ItemStack(role.getChestplate()), Component.text(role.getName() + " Chestplate", NamedTextColor.GREEN, TextDecoration.BOLD)));
-        addButton(new Button(36, new ItemStack(role.getLeggings()), Component.text(role.getName() + " Leggings", NamedTextColor.GREEN, TextDecoration.BOLD)));
-        addButton(new Button(45, new ItemStack(role.getBoots()), Component.text(role.getName() + " Boots", NamedTextColor.GREEN, TextDecoration.BOLD)));
+        addButton(new BackButton(0, new ItemStack(Material.ARROW), new ClassSelectionMenu(player, builds, skillManager)));
+        addButton(new Button(9, new ItemStack(role.getHelmet()), Component.text(role.getName() + " Helmet", role.getColor(), TextDecoration.BOLD)));
+        addButton(new Button(18, new ItemStack(role.getChestplate()), Component.text(role.getName() + " Chestplate", role.getColor(), TextDecoration.BOLD)));
+        addButton(new Button(27, new ItemStack(role.getLeggings()), Component.text(role.getName() + " Leggings", role.getColor(), TextDecoration.BOLD)));
+        addButton(new Button(36, new ItemStack(role.getBoots()), Component.text(role.getName() + " Boots", role.getColor(), TextDecoration.BOLD)));
 
-        int slot = 9;
-
+        int slot = 11;
         for (int i = 1; i < 5; i++) {
-
             RoleBuild activeBuild = builds.getActiveBuilds().get(role.getName());
-            addButton(new ApplyBuildButton(builds, role, i, slot + 11, getApplyBuildItem(i, activeBuild.getId() == i)));
-            addButton(new EditBuildButton(builds, role, i, skillManager, slot + 20));
-            addButton(new DeleteBuildButton(builds, role, i, slot + 38));
+            final boolean selected = activeBuild.getId() == i;
+            Component buildName = Component.text("Build " + i, NamedTextColor.GRAY);
+            if (selected) {
+                buildName = Component.text("\u00BB Build " + i + " \u00AB", NamedTextColor.GREEN);
+            }
+            addButton(new ApplyBuildButton(builds, role, i, slot, getApplyBuildItem(i, selected), buildName));
+            addButton(new EditBuildButton(builds, role, i, skillManager, slot + 9));
+            addButton(new DeleteBuildButton(builds, role, i, slot + 18));
 
             slot += 2;
         }
+
+        fillEmpty(Menu.BACKGROUND);
     }
 
     @NotNull
@@ -60,10 +65,10 @@ public class BuildMenu extends Menu implements IRefreshingMenu {
 
         ItemStack itemStack;
         switch (id) {
-            case 1 -> itemStack = new ItemStack(Material.INK_SAC, 1);
-            case 2 -> itemStack = new ItemStack(Material.RED_DYE, 1);
-            case 3 -> itemStack = new ItemStack(Material.GREEN_DYE, 1);
-            case 4 -> itemStack = new ItemStack(Material.CYAN_DYE, 1);
+            case 1 -> itemStack = new ItemStack(Material.RED_DYE, 1);
+            case 2 -> itemStack = new ItemStack(Material.ORANGE_DYE, 1);
+            case 3 -> itemStack = new ItemStack(Material.YELLOW_DYE, 1);
+            case 4 -> itemStack = new ItemStack(Material.LIME_DYE, 1);
             default -> throw new IllegalStateException("Unexpected value: " + id);
         }
 

@@ -15,6 +15,7 @@ import java.util.List;
 @Data
 public abstract class Menu {
 
+    protected static final ItemStack BACKGROUND = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
     protected final Player player;
     private final int size;
     private final Component title;

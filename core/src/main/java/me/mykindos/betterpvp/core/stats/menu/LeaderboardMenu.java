@@ -156,7 +156,7 @@ public class LeaderboardMenu extends Menu implements IRefreshingMenu {
         }
 
         // Fill empty
-        fillEmpty(new ItemStack(Material.GRAY_STAINED_GLASS_PANE));
+        fillEmpty(Menu.BACKGROUND);
     }
 
     private ItemStack getFailedItem(ItemStack itemStack) {
