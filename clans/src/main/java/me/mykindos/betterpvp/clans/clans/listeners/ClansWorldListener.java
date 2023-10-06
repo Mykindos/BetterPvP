@@ -714,7 +714,7 @@ public class ClansWorldListener extends ClanListener {
 
             if (player.equals(event.getPlayer())) return;
 
-            if (!clanManager.canHurt(event.getPlayer(), player)) {
+            if (clanManager.isInSafeZone(player)) {
                 return;
             }
 
