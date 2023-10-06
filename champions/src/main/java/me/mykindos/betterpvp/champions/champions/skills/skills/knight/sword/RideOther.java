@@ -33,7 +33,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class Ride extends Skill implements InteractSkill, CooldownSkill, Listener {
+public class RideOther extends Skill implements InteractSkill, CooldownSkill, Listener {
 
     private final WeakHashMap<Player, HorseData> horseData = new WeakHashMap<>();
 
@@ -41,7 +41,7 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
     private double lifespan;
     private double horseHealth;
     @Inject
-    public Ride(Champions champions, ChampionsManager championsManager) {
+    public RideOther(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
 
@@ -92,10 +92,9 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
         Iterator<Map.Entry<Player, HorseData>> iterator = horseData.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<Player, HorseData> data = iterator.next();
-            Player player = data.getKey();
             Horse horse = data.getValue().getHorse();
 
-            if (horse == null || horse.isDead() || UtilTime.elapsed(data.getValue().getSpawnTime(), (long) (lifespan + (player.getLevel()-1)) * 1000)) {
+            if (horse == null || horse.isDead() || UtilTime.elapsed(data.getValue().getSpawnTime(), (long) lifespan * 1000)) {
                 horse.remove();
                 iterator.remove();
             }
