@@ -24,6 +24,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -111,7 +112,13 @@ public class LeaderboardMenu extends Menu implements IRefreshingMenu {
             }
 
             itemStack.setItemMeta(meta);
-            addButton(getEntry(slot, title, itemStack, keyRender, value.toString()));
+
+            if (value instanceof Number number) {
+                addButton(getEntry(slot, title, itemStack, keyRender, NumberFormat.getInstance().format(number)));
+            } else {
+                addButton(getEntry(slot, title, itemStack, keyRender, value.toString()));
+            }
+
         }
 
         // Podium spots
