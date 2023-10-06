@@ -8,7 +8,6 @@ import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomEntityVelocityEvent;
@@ -21,6 +20,7 @@ import me.mykindos.betterpvp.core.utilities.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.LivingEntity;
@@ -30,16 +30,18 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.util.Vector;
 
-import java.util.Iterator;
-import java.util.UUID;
-import java.util.WeakHashMap;
+import java.util.*;
 
 @Singleton
 @BPvPListener
-public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill, EnergySkill {
+public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill {
 
-    private final WeakHashMap<Player, Long> gap = new WeakHashMap<>();
     private final WeakHashMap<Player, Long> delay = new WeakHashMap<>();
+    private final WeakHashMap<Player, Long> activationTime = new WeakHashMap<>();
+    private final HashMap<Player, Long> handRaisedTime = new HashMap<>();
+    private final Set<Player> evadePlayers = new HashSet<>();
+
+    public double duration;
 
     @Inject
     public Evade(Champions champions, ChampionsManager championsManager) {
@@ -63,8 +65,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
                 "Hold Crouch while Evading to teleport backwards",
                 "",
                 "<stat>" + getCooldown(level) + "</stat> second internal cooldown",
-                "",
-                "Energy / Second: <val>" + (10 * getEnergy(level))};
+        };
     }
 
     @Override
@@ -87,8 +88,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
         if (event.getDamager() == null) return;
         LivingEntity ent = event.getDamager();
 
-
-        if (hasSkill(player)) {
+        if (hasSkill(player) && player.isHandRaised()) {
 
             if (!delay.containsKey(player)) {
                 delay.put(player, 0L);
@@ -117,6 +117,9 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
                 }
 
                 delay.put(player, System.currentTimeMillis());
+                active.remove(player.getUniqueId());
+                evadePlayers.add(player);
+
             }
 
         }
@@ -159,36 +162,37 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
                 int level = getLevel(player);
                 if (level > 0) {
                     if (player.isHandRaised()) {
-                        if (!championsManager.getEnergy().use(player, getName(), getEnergy(getLevel(player)), true)) {
-                            it.remove();
-                        } else if (!UtilPlayer.isHoldingItem(player, SkillWeapons.SWORDS)) {
-                            it.remove();
-                        } else if(UtilBlock.isInLiquid(player)){
-                            it.remove();
-                        } else if(championsManager.getEffects().hasEffect(player, EffectType.SILENCE)) {
-                            it.remove();
-                        }else if(championsManager.getEffects().hasEffect(player, EffectType.STUN)) {
-                            it.remove();
-                        }
-                    } else {
-                        if (gap.containsKey(player)) {
-                            if (UtilTime.elapsed(gap.get(player), 250)) {
-                                gap.remove(player);
-                                it.remove();
-
-                            }
-                        }
-
                     }
-                } else {
+                    if (!UtilPlayer.isHoldingItem(player, SkillWeapons.SWORDS)) {
+                        it.remove();
+                    } else if (UtilBlock.isInLiquid(player)) {
+                        it.remove();
+                    } else if (championsManager.getEffects().hasEffect(player, EffectType.SILENCE)) {
+                        it.remove();
+                    } else if (championsManager.getEffects().hasEffect(player, EffectType.STUN)) {
+                        it.remove();
+                    }
+                }
+                if (player.isHandRaised() && !handRaisedTime.containsKey(player)) {
+                    handRaisedTime.put(player, System.currentTimeMillis());
+                }
+                if (!player.isHandRaised() && handRaisedTime.containsKey(player) && !evadePlayers.contains(player)) {
+                    handRaisedTime.remove(player);
+                    it.remove();
+                    UtilMessage.message(player, getClassType().getName(), "Your Evade failed.");
+                    player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
+                }
+                if (player.isHandRaised() && handRaisedTime.containsKey(player) && UtilTime.elapsed(handRaisedTime.get(player), (long) (duration * 1000)) && !evadePlayers.contains(player)) {
+                    handRaisedTime.remove(player);
+                    UtilMessage.message(player, getClassType().getName(), "Your Evade failed.");
+                    player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
                     it.remove();
                 }
+            } else {
+                it.remove();
             }
-
         }
-
     }
-
 
     @EventHandler
     public void onDamage(CustomDamageEvent e) {
@@ -291,24 +295,18 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
     }
 
     @Override
-    public float getEnergy(int level) {
-
-        return (float) (energy - ((level - 1)));
-    }
-
-    @Override
-    public boolean canUse(Player player) {
-        return !active.contains(player.getUniqueId());
-    }
-
-    @Override
     public void activate(Player player, int level) {
         active.add(player.getUniqueId());
-        gap.put(player, System.currentTimeMillis());
+        activationTime.put(player, System.currentTimeMillis());
     }
 
     @Override
     public Action[] getActions() {
         return SkillActions.RIGHT_CLICK;
+    }
+
+    @Override
+    public void loadSkillConfig(){
+        duration = getConfig("duration", 1.0, Double.class);
     }
 }

@@ -77,7 +77,7 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 2
-      energy: 6
+      duration: 1.0
   knight:
     shieldsmash:
       enabled: true
