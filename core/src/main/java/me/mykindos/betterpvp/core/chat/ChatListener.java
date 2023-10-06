@@ -93,7 +93,7 @@ public class ChatListener implements Listener {
         Rank rank = event.getClient().getRank();
         if(rank.isDisplayPrefix()) {
             Component rankPrefix = Component.text(rank.getName() + " ", rank.getColor(), TextDecoration.BOLD);
-            event.setPrefix(rankPrefix.append(event.getPrefix()));
+            event.setPrefix(rankPrefix.append(event.getPrefix().decoration(TextDecoration.BOLD, false)));
         }
 
         Optional<Boolean> lunarClientOptional = event.getClient().getProperty(ClientProperty.LUNAR);

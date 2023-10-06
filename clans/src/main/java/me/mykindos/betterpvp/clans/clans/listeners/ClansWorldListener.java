@@ -197,7 +197,7 @@ public class ClansWorldListener extends ClanListener {
                 event.setCancelled(true);
 
                 if (tie.isInform()) {
-                    UtilMessage.simpleMessage(player, "Clans", "You cannot place <green>%s <gray> in %s<gray>.",
+                    UtilMessage.simpleMessage(player, "Clans", "You cannot place <green>%s <gray>in %s<gray>.",
                             UtilFormat.cleanString(block.getType().toString()), relation.getPrimaryMiniColor() + locationClan.getName());
                 }
                 return;
