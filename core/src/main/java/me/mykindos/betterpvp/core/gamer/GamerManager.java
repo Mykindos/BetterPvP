@@ -7,8 +7,10 @@ import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 import me.mykindos.betterpvp.core.gamer.repository.GamerRepository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Singleton
 public class GamerManager extends Manager<Gamer> {
@@ -32,7 +34,7 @@ public class GamerManager extends Manager<Gamer> {
         return objects.values().stream().filter(gamer -> gamer.getClient().getName().equalsIgnoreCase(name)).findFirst();
     }
 
-    public List<Gamer> getGamersOfRank(Rank rank) {
+    public List<Gamer> getOnlineOfRank(Rank rank) {
         return objects.values().stream().filter(gamer -> gamer.getClient().hasRank(rank)).toList();
     }
 
