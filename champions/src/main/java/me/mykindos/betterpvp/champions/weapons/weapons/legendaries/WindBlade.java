@@ -30,6 +30,9 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Singleton
 @BPvPListener
 public class WindBlade extends ChannelWeapon implements InteractWeapon, LegendaryWeapon, Listener {
@@ -57,6 +60,21 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
     public WindBlade(EnergyHandler energyHandler) {
         super(Material.MUSIC_DISC_MELLOHI, 1, UtilMessage.deserialize("<orange>Wind Blade"));
         this.energyHandler = energyHandler;
+
+    }
+
+    @Override
+    public List<Component> getLore() {
+        List<Component> lore = new ArrayList<>();
+        lore.add(Component.text("Long ago, a race of cloud dwellers", NamedTextColor.WHITE));
+        lore.add(Component.text("terrorized the skies. A remnant of", NamedTextColor.WHITE));
+        lore.add(Component.text("their tyranny, this airy blade is", NamedTextColor.WHITE));
+        lore.add(Component.text("the last surviving memoriam from", NamedTextColor.WHITE));
+        lore.add(Component.text("their final battle against the Titans.", NamedTextColor.WHITE));
+        lore.add(Component.text(""));
+        lore.add(UtilMessage.deserialize("<white>Deals <yellow>%.1f Damage <white>with attack", baseDamage));
+        lore.add(UtilMessage.deserialize("<yellow>Right-Click <white>to use <green>Flight"));
+        return lore;
     }
 
 
@@ -81,7 +99,7 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
             }
 
             var checkUsageEvent = UtilServer.callEvent(new PlayerUseItemEvent(player, this, true));
-            if(checkUsageEvent.isCancelled()) {
+            if (checkUsageEvent.isCancelled()) {
                 UtilMessage.simpleMessage(player, "Restriction", "You cannot use this weapon here.");
                 continue;
             }
@@ -102,28 +120,21 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
         }
     }
 
-    @EventHandler (priority = EventPriority.LOW)
+    @EventHandler(priority = EventPriority.LOW)
     public void onDamage(CustomDamageEvent event) {
-        if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
-            if (event.getDamager() instanceof Player player) {
-                if (player.getInventory().getItemInMainHand().getType() != Material.MUSIC_DISC_MELLOHI) return;
-
-                event.setKnockback(false);
-                event.setDamage(baseDamage);
-                Vector vec = player.getLocation().getDirection();
-                vec.setY(0);
-                UtilVelocity.velocity(event.getDamagee(), vec, 2D, false, 0.0D, 0.5D, 1.0D, true, true);
-            }
+        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
+        if (!(event.getDamager() instanceof Player damager)) return;
+        if (isHoldingWeapon(damager)) {
+            event.setDamage(baseDamage);
         }
     }
 
     @EventHandler
     public void onFall(EntityDamageEvent event) {
-        if (event.getEntity() instanceof Player player) {
-            if (event.getCause() == EntityDamageEvent.DamageCause.FALL) {
-                if (player.getInventory().getItemInMainHand().getType() != Material.MUSIC_DISC_MELLOHI) return;
-                event.setCancelled(true);
-            }
+        if (!(event.getEntity() instanceof Player player)) return;
+        if (event.getCause() != EntityDamageEvent.DamageCause.FALL) return;
+        if (isHoldingWeapon(player)) {
+            event.setCancelled(true);
         }
     }
 

@@ -9,10 +9,12 @@ import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateLoreEvent;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateNameEvent;
 import me.mykindos.betterpvp.core.items.enchants.GlowEnchant;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.weapons.WeaponManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
@@ -82,10 +84,10 @@ public class ItemHandler {
         BPVPItem item = itemMap.get(material.name() + modelData);
         if (item != null) {
             var nameUpdateEvent = UtilServer.callEvent(new ItemUpdateNameEvent(itemStack, itemMeta, item.getName()));
-            itemMeta.displayName(nameUpdateEvent.getItemName());
+            itemMeta.displayName(nameUpdateEvent.getItemName().decoration(TextDecoration.ITALIC, false));
 
             var loreUpdateEvent = UtilServer.callEvent(new ItemUpdateLoreEvent(itemStack, itemMeta, new ArrayList<>(item.getLore())));
-            itemMeta.lore(loreUpdateEvent.getItemLore());
+            itemMeta.lore(UtilItem.removeItalic(loreUpdateEvent.getItemLore()));
 
             PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
             if(item.isGiveUUID()) {
@@ -103,7 +105,7 @@ public class ItemHandler {
             }
         } else {
             final PersistentDataContainer pdc = itemMeta.getPersistentDataContainer();
-            if (!pdc.has(CoreNamespaceKeys.IMMUTABLE_KEY, PersistentDataType.BOOLEAN) || !pdc.get(CoreNamespaceKeys.IMMUTABLE_KEY, PersistentDataType.BOOLEAN)) {
+            if (!pdc.getOrDefault(CoreNamespaceKeys.IMMUTABLE_KEY, PersistentDataType.BOOLEAN, false)) {
                 itemMeta.displayName(Component.text(UtilFormat.cleanString(material.name())).color(NamedTextColor.YELLOW));
             }
         }

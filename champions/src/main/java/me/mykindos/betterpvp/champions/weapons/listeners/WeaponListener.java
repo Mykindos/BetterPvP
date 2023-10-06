@@ -27,12 +27,14 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -126,7 +128,36 @@ public class WeaponListener implements Listener {
             IWeapon weapon = weaponOptional.get();
 
             event.getItemMeta().getPersistentDataContainer().set(ChampionsNamespacedKeys.IS_CUSTOM_WEAPON, PersistentDataType.STRING, "true");
-            event.setItemLore(weapon.getLore());
+            var lore = new ArrayList<>(weapon.getLore());
+
+            var originalOwner = event.getItemMeta().getPersistentDataContainer().getOrDefault(ChampionsNamespacedKeys.ORIGINAL_OWNER, PersistentDataType.STRING, "");
+            if(!originalOwner.equals("")) {
+                lore.add(Component.text(""));
+                lore.add(Component.text("Original Owner: ", NamedTextColor.WHITE).append(Component.text(originalOwner, NamedTextColor.YELLOW)));
+            }
+
+            event.setItemLore(lore);
+        }
+    }
+
+    @EventHandler
+    public void onPickupWeapon(EntityPickupItemEvent event) {
+        if(!(event.getEntity() instanceof Player player)) return;
+        var itemStack = event.getItem().getItemStack();
+        Optional<IWeapon> weaponOptional = weaponManager.getWeaponByItemStack(event.getItem().getItemStack());
+        if (weaponOptional.isPresent()) {
+            IWeapon weapon = weaponOptional.get();
+            if(weapon instanceof LegendaryWeapon) {
+                var itemMeta = itemStack.getItemMeta();
+                if(itemMeta == null) return;
+
+                if(!itemMeta.getPersistentDataContainer().has(ChampionsNamespacedKeys.ORIGINAL_OWNER)) {
+                    itemMeta.getPersistentDataContainer().set(ChampionsNamespacedKeys.ORIGINAL_OWNER, PersistentDataType.STRING, player.getName());
+                }
+
+                itemStack.setItemMeta(itemMeta);
+                event.getItem().setItemStack(itemStack);
+            }
         }
     }
 
