@@ -136,14 +136,20 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
     @EventHandler
     public void onHorseDamage(CustomDamageEvent event) {
         if (!(event.getDamager() instanceof Player damager)) return;
-        if (!(event.getDamager() instanceof Horse damagee)) return;
 
-        if (damagee.getOwner() instanceof Player player) {
-            HorseData data = horseData.get(damager);
-            damagee.remove();
-            horseData.remove(player);
-            UtilMessage.message(player, getClassType().getName(), "Your horse has been killed.");
+        if (!(event.getDamagee() instanceof Horse damagee)) return;
+
+        if (!(damagee.getOwner() instanceof Player owner)) return;
+
+        if (damager.equals(owner)) {
+            event.setCancelled(true);
+            return;
         }
+
+        HorseData data = horseData.get(damager);
+        damagee.remove();
+        horseData.remove(owner);
+        UtilMessage.message(owner, getClassType().getName(), "Your horse has been killed.");
     }
 
     @EventHandler
