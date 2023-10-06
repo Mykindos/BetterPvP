@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.stats.menu;
 
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.menu.Button;
 import me.mykindos.betterpvp.core.menu.Menu;
@@ -28,6 +29,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+@Slf4j
 public class LeaderboardMenu extends Menu implements IRefreshingMenu {
 
     private static final int POSITION_INDEX = UtilMessage.DIVIDER.content().length() / 2 - 6;
@@ -145,6 +147,7 @@ public class LeaderboardMenu extends Menu implements IRefreshingMenu {
                 button.setItemStack(replacement.getItemStack());
                 LeaderboardMenu.this.refreshButton(button);
             }).exceptionally(throwable -> {
+                log.error("Failed to retrieve leaderboard data for " + player.getName(), throwable);
                 throwable.printStackTrace();
                 button.setItemStack(getFailedItem(button.getItemStack()));
                 return null;

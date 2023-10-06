@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.stats;
 
 import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.stats.event.LeaderboardInitializeEvent;
@@ -24,6 +25,7 @@ import java.util.concurrent.TimeUnit;
  * Currently, Leaderboards only support up to min-max of 10 entries only.
  * @param <T> The type of object to be sorted in this leaderboard.
  */
+@Slf4j
 public abstract class Leaderboard<E, T> {
 
     private final ConcurrentHashMap<SortType, TreeSet<LeaderboardEntry<E, T>>> topTen;
@@ -44,10 +46,12 @@ public abstract class Leaderboard<E, T> {
                     set.addAll(fetch.entrySet().stream().map(entry -> LeaderboardEntry.of(entry.getKey(), entry.getValue())).toList());
                     return set;
                 }).exceptionally(ex -> {
+                    log.error("Failed to fetch leaderboard data for " + sortType + "!", ex);
                     ex.printStackTrace();
                     return null;
                 }).whenComplete((set, ex) -> {
                     if (ex != null) {
+                        log.error("Failed to fetch leaderboard data for " + sortType + "!", ex);
                         ex.printStackTrace();
                         return;
                     }
@@ -76,6 +80,7 @@ public abstract class Leaderboard<E, T> {
      */
     public final SortedSet<LeaderboardEntry<E, T>> getTopTen(SortType sortType) {
         if (!Arrays.asList(acceptedSortTypes()).contains(sortType)) {
+            log.error("Sort type " + sortType + " is not accepted by this leaderboard.");
             throw new IllegalArgumentException("Sort type " + sortType + " is not accepted by this leaderboard.");
         }
         return Collections.unmodifiableSortedSet(topTen.get(sortType));
@@ -127,6 +132,7 @@ public abstract class Leaderboard<E, T> {
             }
             return types;
         }).exceptionally(ex -> {
+            log.error("Failed to add " + entryName + " to leaderboard!", ex);
             ex.printStackTrace();
             return null;
         });
