@@ -88,8 +88,7 @@ skills:
       enabled: true
       cooldown: 30
       maxlevel: 5
-      lifespan: 6.0
-      horseHealth: 5.0
+      lifespan: 2.0
     bullscharge:
       enabled: true
       cooldown: 14
