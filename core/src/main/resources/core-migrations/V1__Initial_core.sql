@@ -85,7 +85,7 @@ INSERT IGNORE INTO property_map VALUES ("CHAT_ENABLED", "boolean");
 INSERT IGNORE INTO property_map VALUES ("COINS", "int");
 INSERT IGNORE INTO property_map VALUES ("FRAGMENTS", "int");
 INSERT IGNORE INTO property_map VALUES ("SIDEBAR_ENABLED", "boolean");
-INSERT IGNORE INTO property_map VALUES ("TIPS_ENABLED", "boolean")
+INSERT IGNORE INTO property_map VALUES ("TIPS_ENABLED", "boolean");
 INSERT IGNORE INTO property_map VALUES ("ALLY_CHAT", "boolean");
 INSERT IGNORE INTO property_map VALUES ("CLAN_CHAT", "boolean");
 INSERT IGNORE INTO property_map VALUES ("STAFF_CHAT", "boolean");

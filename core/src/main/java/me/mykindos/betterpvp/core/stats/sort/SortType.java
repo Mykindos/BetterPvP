@@ -1,5 +1,6 @@
-package me.mykindos.betterpvp.core.utilities.model.leaderboard;
+package me.mykindos.betterpvp.core.stats.sort;
 
+import me.mykindos.betterpvp.core.stats.Leaderboard;
 import org.jetbrains.annotations.NotNull;
 
 /**

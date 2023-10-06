@@ -44,7 +44,7 @@ public class SkillMenu extends Menu implements IRefreshingMenu {
     private final RoleBuild roleBuild;
 
     public SkillMenu(Player player, GamerBuilds builds, Role role, int buildNumber, SkillManager skillManager) {
-        super(player, 54, Component.text("Skill Page", NamedTextColor.BLACK));
+        super(player, 54, Component.text("Edit Build"));
         this.role = role;
         this.skillManager = skillManager;
 
@@ -97,6 +97,7 @@ public class SkillMenu extends Menu implements IRefreshingMenu {
             }
         }
 
+        fillEmpty(Menu.BACKGROUND);
     }
 
     public SkillButton buildButton(Skill skill, int slot, int level) {
@@ -140,7 +141,7 @@ public class SkillMenu extends Menu implements IRefreshingMenu {
         addButton(new Button(27, new ItemStack(Material.RED_DYE), Component.text("Class Passive A Skills", NamedTextColor.GREEN, TextDecoration.BOLD)));
         addButton(new Button(36, new ItemStack(Material.ORANGE_DYE), Component.text("Class Passive B Skills", NamedTextColor.GREEN, TextDecoration.BOLD)));
         addButton(new Button(45, new ItemStack(Material.YELLOW_DYE), Component.text("Global Passive Skills", NamedTextColor.GREEN, TextDecoration.BOLD)));
-        addButton(new Button(8, new ItemStack(Material.GOLD_INGOT, roleBuild.getPoints()), Component.text("Skill Points", NamedTextColor.GREEN, TextDecoration.BOLD)));
+        addButton(new Button(8, new ItemStack(Material.GOLD_INGOT, roleBuild.getPoints()), Component.text(roleBuild.getPoints() + " Skill Points Remaining", NamedTextColor.GREEN, TextDecoration.BOLD)));
     }
 
 }

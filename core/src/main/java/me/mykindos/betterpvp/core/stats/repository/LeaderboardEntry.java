@@ -1,12 +1,14 @@
-package me.mykindos.betterpvp.core.utilities.model.leaderboard;
+package me.mykindos.betterpvp.core.stats.repository;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 public class LeaderboardEntry<E, T> {
 
     private final E key;
-    private final T value;
+    private T value;
 
     public static <E, T> LeaderboardEntry<E, T> of(E entryName, T value) {
         return new LeaderboardEntry<>(entryName, value);

@@ -24,7 +24,7 @@ public class UtilMessage {
             TagResolver.resolver("orange", Tag.styling(TextColor.color(0xFFA500)))
     );
 
-    public static final Component DIVIDER = Component.text("                                            ")
+    public static final TextComponent DIVIDER = Component.text("                                            ")
             .color(NamedTextColor.DARK_GRAY)
             .decorate(TextDecoration.STRIKETHROUGH);
 

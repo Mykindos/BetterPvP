@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.progression.model;
 
 import me.mykindos.betterpvp.core.utilities.model.ConfigAccessor;
 import me.mykindos.betterpvp.progression.model.stats.ProgressionData;
-import me.mykindos.betterpvp.progression.model.stats.StatsRepository;
+import me.mykindos.betterpvp.progression.model.stats.ProgressionStatsRepository;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -24,7 +24,7 @@ public abstract class ProgressionTree implements ConfigAccessor {
      */
     public abstract @NotNull String getName();
 
-    public abstract @NotNull StatsRepository<? extends ProgressionTree, ? extends ProgressionData<?>> getStatsRepository();
+    public abstract @NotNull ProgressionStatsRepository<? extends ProgressionTree, ? extends ProgressionData<?>> getStatsRepository();
 
     public final void addPerk(ProgressionPerk perk) {
         perks.add(perk);
