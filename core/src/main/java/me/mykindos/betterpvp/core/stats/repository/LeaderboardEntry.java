@@ -1,9 +1,12 @@
 package me.mykindos.betterpvp.core.stats.repository;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 public class LeaderboardEntry<E, T> {
 
@@ -16,7 +19,15 @@ public class LeaderboardEntry<E, T> {
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof LeaderboardEntry && ((LeaderboardEntry<?, ?>) obj).key.equals(key);
+        if (this == obj) {
+            return true;
+        }
+
+        if(!(obj instanceof LeaderboardEntry<?, ?> other)) {
+            return false;
+        }
+
+        return this.key.equals(other.key);
     }
 
     @Override
