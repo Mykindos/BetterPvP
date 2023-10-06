@@ -359,4 +359,13 @@ public class ClanManager extends Manager<Clan> {
 
         log.info("Loaded {} clans", objects.size());
     }
+
+    public boolean isInSafeZone(Player player) {
+        Optional<Clan> clanOptional = getClanByLocation(player.getLocation());
+        if (clanOptional.isPresent()) {
+            Clan clan = clanOptional.get();
+            return clan.isAdmin() && clan.isSafe();
+        }
+        return false;
+    }
 }

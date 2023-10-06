@@ -44,6 +44,10 @@ public class MapHandler {
     @Config(path = "clans.map.enabled", defaultValue = "true")
     public boolean enabled;
 
+    @Inject
+    @Config(path = "clans.map.update-interval", defaultValue = "1")
+    public int updateInterval;
+
     private final Clans clans;
     public final HashMap<UUID, Set<ChunkData>> clanMapData = new HashMap<>();
     public final Map<UUID, MapSettings> mapSettingsMap = new HashMap<>();
