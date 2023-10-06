@@ -27,7 +27,7 @@ public class ItemInfoCommand extends Command {
     public void execute(Player player, Client client, String... args) {
 
         var persistentData = player.getInventory().getItemInMainHand().getItemMeta().getPersistentDataContainer();
-
+        if (persistentData.getKeys().isEmpty()) return;
         persistentData.getKeys().forEach(key -> {
             UtilMessage.simpleMessage(player, "Info", "<yellow>%s: <gray>%s", key.asString(), persistentData.getOrDefault(key, PersistentDataType.STRING, ""));
         });

@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.components.champions.weapons.IWeapon;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
-import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 import org.reflections.Reflections;
 
 import java.lang.reflect.Modifier;
@@ -31,7 +31,7 @@ public class WeaponManager extends Manager<IWeapon> {
             Weapon weapon = champions.getInjector().getInstance(clazz);
             champions.getInjector().injectMembers(weapon);
 
-            addObject(weapon.getMaterial().name(), weapon);
+            addObject(weapon.getMaterial().name() + weapon.getModel(), weapon);
 
         }
 
@@ -39,8 +39,9 @@ public class WeaponManager extends Manager<IWeapon> {
         champions.saveConfig();
     }
 
-    public Optional<IWeapon> getWeaponByType(Material material) {
-        return getObject(material.name());
+    public Optional<IWeapon> getWeaponByItemStack(ItemStack itemStack) {
+        var meta = itemStack.getItemMeta();
+        return getObject(itemStack.getType().name() + (meta.hasCustomModelData() ? meta.getCustomModelData() : 0));
     }
 
 }

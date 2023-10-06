@@ -27,6 +27,10 @@ public abstract class ChannelWeapon extends Weapon implements IWeapon, Listener 
         super(material, name);
     }
 
+    public ChannelWeapon(Material material, int modelData, Component name) {
+        super(material, modelData, name);
+    }
+
     public abstract double getEnergy();
 
     @EventHandler
