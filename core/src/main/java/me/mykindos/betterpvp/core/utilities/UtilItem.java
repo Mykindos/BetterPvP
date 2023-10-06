@@ -73,7 +73,7 @@ public class UtilItem {
             im.lore(lore);
         }
 
-        im.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_POTION_EFFECTS);
+        im.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ITEM_SPECIFICS);
 
         item.setItemMeta(im);
         return item;

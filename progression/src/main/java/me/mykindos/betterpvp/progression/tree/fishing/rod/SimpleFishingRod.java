@@ -2,9 +2,12 @@ package me.mykindos.betterpvp.progression.tree.fishing.rod;
 
 import lombok.Getter;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.progression.tree.fishing.fish.Fish;
 import me.mykindos.betterpvp.progression.tree.fishing.model.FishingLoot;
 import me.mykindos.betterpvp.progression.tree.fishing.model.FishingRodType;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.checkerframework.common.value.qual.IntRange;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,10 +17,10 @@ import org.jetbrains.annotations.NotNull;
  */
 @Getter
 public enum SimpleFishingRod implements FishingRodType {
-    WOODEN(1, "Wooden Fishing Rod", 400),
-    ALUMINUM(2, "Aluminum Fishing Rod", 1000),
-    STEEL(3, "Steel Fishing Rod", 1500),
-    TITANIUM(4, "Titanium Fishing Rod", 2000),
+    WOODEN(1, "Wooden Rod", 400),
+    ALUMINUM(2, "Aluminum Rod", 1000),
+    STEEL(3, "Steel Rod", 1500),
+    TITANIUM(4, "Titanium Rod", 2000),
     ;
 
     private final int id;
@@ -33,6 +36,13 @@ public enum SimpleFishingRod implements FishingRodType {
     @Override
     public boolean canReel(@NotNull FishingLoot loot) {
         return !(loot instanceof Fish fish) || fish.getWeight() <= maxWeight;
+    }
+
+    @Override
+    public Component[] getDescription() {
+        return new Component[] {
+                UtilMessage.deserialize("<gray>Max Weight: <alt2>" + maxWeight + "</alt2>").decoration(TextDecoration.ITALIC, false),
+        };
     }
 
     @Override

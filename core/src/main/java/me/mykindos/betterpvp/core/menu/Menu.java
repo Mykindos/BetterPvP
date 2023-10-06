@@ -15,6 +15,7 @@ import java.util.List;
 @Data
 public abstract class Menu {
 
+    protected static final ItemStack BACKGROUND = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
     protected final Player player;
     private final int size;
     private final Component title;
@@ -57,6 +58,12 @@ public abstract class Menu {
         inventory.setItem(button.getSlot(), button.getItemStack());
     }
 
+    public void refreshButton(Button button) {
+        if (buttons.contains(button)) {
+            inventory.setItem(button.getSlot(), button.getItemStack());
+        }
+    }
+
     public boolean isButton(ItemStack item) {
         if (item != null && item.getType() != Material.AIR) {
             if (item.hasItemMeta() && item.getItemMeta().hasDisplayName()) {
@@ -91,6 +98,15 @@ public abstract class Menu {
     private void fillInventoryWithAir(){
         for (int i = 0; i < size; i++) {
             inventory.setItem(i, new ItemStack(Material.AIR));
+        }
+    }
+
+    protected void fillEmpty(ItemStack itemStack) {
+        for (int i = 0; i < size; i++) {
+            final ItemStack item = inventory.getItem(i);
+            if (item == null || item.getType() == Material.AIR) {
+                inventory.setItem(i, itemStack);
+            }
         }
     }
 

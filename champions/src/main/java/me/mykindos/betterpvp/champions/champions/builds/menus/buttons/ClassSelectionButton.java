@@ -8,7 +8,6 @@ import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.menu.Button;
 import me.mykindos.betterpvp.core.menu.MenuManager;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -23,7 +22,7 @@ public class ClassSelectionButton extends Button {
 
 
     public ClassSelectionButton(GamerBuilds builds, Role role, SkillManager skillManager, int slot, ItemStack item) {
-        super(slot, item, Component.text(role.getName(), NamedTextColor.GREEN, TextDecoration.BOLD));
+        super(slot, item, Component.text(role.getName(), role.getColor(), TextDecoration.BOLD));
         this.builds = builds;
         this.role = role;
         this.skillManager = skillManager;

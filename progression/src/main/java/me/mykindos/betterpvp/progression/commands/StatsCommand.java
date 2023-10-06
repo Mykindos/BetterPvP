@@ -12,8 +12,12 @@ import me.mykindos.betterpvp.progression.model.stats.ProgressionData;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 @Singleton
@@ -40,17 +44,22 @@ public class StatsCommand extends Command {
             return;
         }
 
-        final ProgressionTree tree = progressionsManager.getTrees().stream()
+        final Optional<ProgressionTree> treeOpt = progressionsManager.getTrees().stream()
                 .filter(query -> query.getName().equalsIgnoreCase(args[0]))
-                .findAny()
-                .orElseThrow();
+                .findAny();
 
+        if (treeOpt.isEmpty()) {
+            UtilMessage.message(player, "Stats", "Progression tree not found [<alt2>%s</alt2>].", args[0]);
+            return;
+        }
+
+        final ProgressionTree tree = treeOpt.get();
         OfflinePlayer target = player;
         if (args.length > 1) {
             target = Bukkit.getOfflinePlayer(args[1]);
         }
 
-        if (target == null) {
+        if (!target.hasPlayedBefore()) {
             UtilMessage.message(player, "Stats", "Player not found [<alt2>%s</alt2>].", args[1]);
             return;
         }
@@ -77,8 +86,16 @@ public class StatsCommand extends Command {
     }
 
     @Override
-    public boolean informInsufficientRank() {
-        return true;
+    public List<String> processTabComplete(CommandSender sender, String[] args) {
+        if (args.length == 1) {
+            return progressionsManager.getTrees().stream()
+                    .map(tree -> tree.getName().toLowerCase())
+                    .toList();
+        } else if (args.length == 2) {
+            return Bukkit.getOnlinePlayers().stream()
+                    .map(Player::getName)
+                    .toList();
+        }
+        return Collections.emptyList();
     }
-
 }
