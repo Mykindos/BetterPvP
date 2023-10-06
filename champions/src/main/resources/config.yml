@@ -54,6 +54,12 @@ skills:
       cooldown: 13
       maxlevel: 5
       maxTravelDistance: 16
+    clone:
+      enabled: true
+      cooldown: 25
+      maxlevel: 3
+      baseDuration: 3.0
+      swapCooldown: 1.0
     flash:
       enabled: true
       maxlevel: 5
