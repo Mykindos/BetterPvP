@@ -162,13 +162,13 @@ INSERT IGNORE INTO items (Material, Module, Name, ModelData, Glow, HasUUID) VALU
 
 -- Legendaries
 INSERT IGNORE INTO items (Material, Module, Name, ModelData, Glow, HasUUID) VALUES
-    ('MUSIC_DISC_MELLOHI', 'Champions', '<red>Wind Blade', 1, 0, 1);
+    ('MUSIC_DISC_MELLOHI', 'Champions', '<orange>Wind Blade', 1, 0, 1);
 
 INSERT IGNORE INTO items (Material, Module, Name, ModelData, Glow, HasUUID) VALUES
-    ('MUSIC_DISC_MALL', 'Champions', '<red>Alligators Tooth', 1, 0, 1);
+    ('MUSIC_DISC_MALL', 'Champions', '<orange>Alligators Tooth', 1, 0, 1);
 
 INSERT IGNORE INTO items (Material, Module, Name, ModelData, Glow, HasUUID) VALUES
-    ('MUSIC_DISC_BLOCKS', 'Champions', '<red>Hyper Axe', 1, 0, 1);
+    ('MUSIC_DISC_BLOCKS', 'Champions', '<orange>Hyper Axe', 1, 0, 1);
 
 INSERT IGNORE INTO items (Material, Module, Name, ModelData, Glow, HasUUID) VALUES
-    ('ELYTRA', 'Champions', '<red>Wings of Zanzul', 1, 0, 1);
+    ('ELYTRA', 'Champions', '<orange>Wings of Zanzul', 1, 0, 1);
