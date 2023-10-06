@@ -148,7 +148,6 @@ public class LeaderboardMenu extends Menu implements IRefreshingMenu {
                 LeaderboardMenu.this.refreshButton(button);
             }).exceptionally(throwable -> {
                 log.error("Failed to retrieve leaderboard data for " + player.getName(), throwable);
-                throwable.printStackTrace();
                 button.setItemStack(getFailedItem(button.getItemStack()));
                 return null;
             });

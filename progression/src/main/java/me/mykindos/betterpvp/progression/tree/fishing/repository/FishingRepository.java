@@ -79,7 +79,7 @@ public class FishingRepository extends ProgressionStatsRepository<Fishing, Fishi
             }
             return new FishingData();
         }).exceptionally(throwable -> {
-            throwable.printStackTrace();
+            log.error("Failed to get progression data for player " + player, throwable);
             return null;
         });
     }

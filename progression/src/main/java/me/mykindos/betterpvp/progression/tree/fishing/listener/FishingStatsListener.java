@@ -89,7 +89,7 @@ public class FishingStatsListener implements Listener {
                 announceIfPresent(event.getPlayer(), fishing.getCountLeaderboard(), result);
             });
         }).exceptionally(throwable -> {
-            throwable.printStackTrace();
+            log.error("Failed to get progression data for player " + event.getPlayer().getName(), throwable);
             return null;
         }).thenRun(() -> repository.saveAsync(event.getPlayer()));
     }

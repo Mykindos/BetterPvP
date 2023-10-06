@@ -63,7 +63,6 @@ public abstract class ProgressionStatsRepository<T extends ProgressionTree, K ex
                 }
             } catch (Exception e) {
                 log.error("Error loading XP for " + player, e);
-                e.printStackTrace();
             }
             data.setTree(tree);
             return data;

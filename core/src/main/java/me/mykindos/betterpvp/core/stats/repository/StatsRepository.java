@@ -114,7 +114,7 @@ public abstract class StatsRepository<T extends PlayerData> implements ConfigAcc
             return saved;
         }
         return loadDataAsync(player).exceptionally(throwable -> {
-            throwable.printStackTrace();
+            log.error("Error loading data for " + player, throwable);
             return null;
         });
     }
