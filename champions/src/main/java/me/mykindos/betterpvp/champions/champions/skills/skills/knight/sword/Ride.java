@@ -40,6 +40,7 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
 
     private double lifespan;
     private double horseHealth;
+
     @Inject
     public Ride(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -89,22 +90,31 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
 
     @UpdateEvent(delay = 500)
     public void removeHorses() {
-        Iterator<Map.Entry<Player, HorseData>> iterator = horseData.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<Player, HorseData> data = iterator.next();
+        Set<Player> toRemove = new HashSet<>();
+
+        for (Map.Entry<Player, HorseData> data : horseData.entrySet()) {
             Player player = data.getKey();
+            int level = getLevel(player);
             Horse horse = data.getValue().getHorse();
 
-            if (horse == null || horse.isDead() || UtilTime.elapsed(data.getValue().getSpawnTime(), (long) (lifespan + (player.getLevel()-1)) * 1000)) {
+            if (horse == null) {
+                toRemove.add(player);
+            } else if (horse.isDead() || UtilTime.elapsed(data.getValue().getSpawnTime(), (long) (lifespan + (level - 1)) * 1000)) {
                 horse.remove();
-                iterator.remove();
+                toRemove.add(player);
             }
+        }
+
+        // Now modify the original map outside of the iterator
+        for (Player player : toRemove) {
+            horseData.remove(player);
         }
     }
 
     private static class HorseData {
         private final Horse horse;
         private final long spawnTime;
+        private boolean wasKilled = false;  // Add this field
 
         public HorseData(Horse horse, long spawnTime) {
             this.horse = horse;
@@ -117,6 +127,14 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
 
         public long getSpawnTime() {
             return spawnTime;
+        }
+
+        public boolean wasKilled() {
+            return wasKilled;
+        }
+
+        public void setWasKilled(boolean wasKilled) {
+            this.wasKilled = wasKilled;
         }
     }
 
@@ -146,7 +164,8 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
             return;
         }
 
-        HorseData data = horseData.get(damager);
+        HorseData data = horseData.get(owner);
+        data.setWasKilled(true);
         damagee.remove();
         horseData.remove(owner);
         UtilMessage.message(owner, getClassType().getName(), "Your horse has been killed.");
@@ -157,7 +176,9 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
         if (event.getEntity() instanceof Player player && event.getDismounted() instanceof Horse horse) {
             HorseData data = horseData.get(player);
             if (data != null && data.getHorse().equals(horse)) {
-                UtilMessage.message(player, getClassType().getName(), "Your horse has disappeared.");
+                if (!data.wasKilled()) {
+                    UtilMessage.message(player, getClassType().getName(), "Your horse has disappeared.");
+                }
                 horse.remove();
                 horseData.remove(player);
             }
