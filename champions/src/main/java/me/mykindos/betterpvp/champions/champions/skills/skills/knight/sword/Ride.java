@@ -3,27 +3,30 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.knight.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.*;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import org.bukkit.Material;
+import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Horse;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.Material;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.spigotmc.event.entity.EntityDismountEvent;
 
 import java.util.WeakHashMap;
@@ -34,8 +37,10 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
 
     private final WeakHashMap<Player, HorseData> horseData = new WeakHashMap<>();
 
+
     private double lifespan;
     private double horseHealth;
+
     @Inject
     public Ride(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -55,9 +60,8 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
                 "Mount a valiant steed which will ",
                 "last for <val>" + (lifespan + (level-1)) + "</val> seconds",
                 "",
-                "The horse will have <val>" + (horseHealth + ((level-1) *5)) + "</val> health",
-                "",
-                "If you dismount the horse it will disappear",
+                "If the horse takes any damage or you",
+                "dismount, it will disappear",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -65,18 +69,13 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
 
     public void activate(Player player, int level) {
 
-        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_HORSE_ANGRY, 2.0f, 0.5f);
+        player.getWorld().playSound(player.getLocation(), Sound.ITEM_GOAT_HORN_SOUND_0, 2.0f, 1f);
 
         Horse horse = player.getWorld().spawn(player.getLocation(), Horse.class);
         horse.setTamed(true);
         horse.setOwner(player);
         horse.setColor(Horse.Color.WHITE);
         horse.setStyle(Horse.Style.NONE);
-        AttributeInstance horseMaxHealth = horse.getAttribute(Attribute.GENERIC_MAX_HEALTH);
-        if(horseMaxHealth != null) {
-            horseMaxHealth.setBaseValue(horseHealth + ((level - 1) * 5));
-        }
-        horse.setHealth(horseHealth + ((level - 1) * 5));
         horse.setJumpStrength(1.5D);
         horse.getInventory().setArmor(new ItemStack(Material.LEATHER_HORSE_ARMOR));
         horse.getInventory().setSaddle(new ItemStack(Material.SADDLE));
@@ -87,22 +86,34 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
         horse.addPassenger(player);
         HorseData data = new HorseData(horse, System.currentTimeMillis());
         horseData.put(player, data);
+    }
 
+    @UpdateEvent(delay = 500)
+    public void removeHorses() {
+        Set<Player> toRemove = new HashSet<>();
 
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (!horse.isDead()) {
-                    horse.remove();
-                    horseData.remove(player);
-                }
+        for (Map.Entry<Player, HorseData> data : horseData.entrySet()) {
+            Player player = data.getKey();
+            int level = getLevel(player);
+            Horse horse = data.getValue().getHorse();
+
+            if (horse == null) {
+                toRemove.add(player);
+            } else if (horse.isDead() || UtilTime.elapsed(data.getValue().getSpawnTime(), (long) (lifespan + (level - 1)) * 1000)) {
+                horse.remove();
+                toRemove.add(player);
             }
-        }.runTaskLater(champions, (long) (lifespan + (level - 1)) * 20L);
+        }
+
+        for (Player player : toRemove) {
+            horseData.remove(player);
+        }
     }
 
     private static class HorseData {
         private final Horse horse;
         private final long spawnTime;
+        private boolean wasKilled = false;  // Add this field
 
         public HorseData(Horse horse, long spawnTime) {
             this.horse = horse;
@@ -115,6 +126,14 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
 
         public long getSpawnTime() {
             return spawnTime;
+        }
+
+        public boolean wasKilled() {
+            return wasKilled;
+        }
+
+        public void setWasKilled(boolean wasKilled) {
+            this.wasKilled = wasKilled;
         }
     }
 
@@ -132,11 +151,33 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
     }
 
     @EventHandler
+    public void onHorseDamage(CustomDamageEvent event) {
+        if (!(event.getDamager() instanceof Player damager)) return;
+
+        if (!(event.getDamagee() instanceof Horse damagee)) return;
+
+        if (!(damagee.getOwner() instanceof Player owner)) return;
+
+        if (damager.equals(owner)) {
+            event.setCancelled(true);
+            return;
+        }
+
+        HorseData data = horseData.get(owner);
+        data.setWasKilled(true);
+        damagee.remove();
+        horseData.remove(owner);
+        UtilMessage.message(owner, getClassType().getName(), "Your horse has been killed.");
+    }
+
+    @EventHandler
     public void onPlayerDismount(EntityDismountEvent event) {
         if (event.getEntity() instanceof Player player && event.getDismounted() instanceof Horse horse) {
             HorseData data = horseData.get(player);
             if (data != null && data.getHorse().equals(horse)) {
-                UtilMessage.message(player, getClassType().getName(), "Your horse has disappeared.");
+                if (!data.wasKilled()) {
+                    UtilMessage.message(player, getClassType().getName(), "Your horse has disappeared.");
+                }
                 horse.remove();
                 horseData.remove(player);
             }
@@ -166,8 +207,7 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
 
     @Override
     public void loadSkillConfig() {
-        lifespan = getConfig("lifespan", 6.0, Double.class);
-        horseHealth = getConfig("horseHealth", 5.0, Double.class);
+        lifespan = getConfig("lifespan", 2.0, Double.class);
     }
 
 }
