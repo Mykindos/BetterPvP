@@ -42,6 +42,7 @@ public class Shops extends BPvPPlugin {
 
     @Inject
     @Config(path = "shops.database.prefix", defaultValue = "shops_")
+    @Getter
     private String databasePrefix;
 
     @Override

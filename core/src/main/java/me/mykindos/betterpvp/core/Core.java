@@ -49,6 +49,11 @@ public class Core extends BPvPPlugin {
     @Inject
     private UpdateEventExecutor updateEventExecutor;
 
+    @Inject
+    @Config(path = "core.database.prefix")
+    @Getter
+    private String databasePrefix;
+
     public void onEnable() {
         saveDefaultConfig();
 

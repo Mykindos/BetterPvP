@@ -8,8 +8,6 @@ import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.menu.Button;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -23,8 +21,8 @@ public class ApplyBuildButton extends Button {
     private final Role role;
     private final int buildNumber;
 
-    public ApplyBuildButton(GamerBuilds builds, Role role, int buildNumber, int slot, ItemStack item) {
-        super(slot, item, Component.text("Apply Build - " + buildNumber, NamedTextColor.GREEN, TextDecoration.BOLD));
+    public ApplyBuildButton(GamerBuilds builds, Role role, int buildNumber, int slot, ItemStack item, Component name) {
+        super(slot, item, name);
         this.builds = builds;
         this.role = role;
         this.buildNumber = buildNumber;

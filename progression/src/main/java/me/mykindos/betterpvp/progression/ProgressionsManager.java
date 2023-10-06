@@ -37,8 +37,8 @@ public class ProgressionsManager {
         progression.saveConfig();
     }
 
-    public ProgressionTree fromClass(Class<? extends ProgressionTree> clazz) {
-        return trees.stream().filter(clazz::isInstance).findFirst().orElseThrow();
+    public <T extends ProgressionTree> T fromClass(Class<T> clazz) {
+        return (T) trees.stream().filter(clazz::isInstance).findFirst().orElseThrow();
     }
 
     public List<ProgressionTree> getTrees() {
