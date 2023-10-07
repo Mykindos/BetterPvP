@@ -19,7 +19,7 @@ import java.util.Set;
 
 @PluginAdapter("Progression")
 @Slf4j
-public class ProgressionAdapter {
+public class ProgressionAdapter{
 
     private final Clans clans;
     private final Progression progression;
@@ -32,6 +32,7 @@ public class ProgressionAdapter {
         this.listenerLoader = listenerLoader;
         this.progression = Objects.requireNonNull((Progression) Bukkit.getPluginManager().getPlugin("Progression"));
         this.progressionsManager = progression.getProgressionsManager();
+
         load();
     }
 

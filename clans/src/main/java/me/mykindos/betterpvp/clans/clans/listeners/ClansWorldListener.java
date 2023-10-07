@@ -703,12 +703,12 @@ public class ClansWorldListener extends ClanListener {
 
     @EventHandler
     public void onFishMechanics(PlayerFishEvent event) {
-        if (!energyHandler.use(event.getPlayer(), "Fishing Rod", 15.0, true)) {
-            event.setCancelled(true);
-            return;
-        }
-
         if (event.getCaught() instanceof Player player) {
+            if (!energyHandler.use(event.getPlayer(), "Fishing Rod", 15.0, true)) {
+                event.setCancelled(true);
+                return;
+            }
+
             event.setCancelled(true);
             event.getHook().remove();
 
