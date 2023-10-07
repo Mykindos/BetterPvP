@@ -39,12 +39,12 @@ public class GamerManager extends Manager<Gamer> {
         return objects.values().stream().filter(gamer -> gamer.getClient().getName().equalsIgnoreCase(name)).findFirst();
     }
 
-    public List<Gamer> getOnlineOfRank(Rank rank) {
+    public List<Gamer> getGamersOfRank(Rank rank) {
         return objects.values().stream().filter(gamer -> gamer.getClient().hasRank(rank)).toList();
     }
 
     public void sendMessageToRank(String prefix, String message, Rank rank) {
-        List<Gamer> gamerList = getOnlineOfRank(rank);
+        List<Gamer> gamerList = getGamersOfRank(rank);
         gamerList.forEach(gamer -> {
             Player player = Bukkit.getPlayer(UUID.fromString(gamer.getUuid()));
             if (player != null) {
