@@ -4,7 +4,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 
+import java.util.Collection;
 import java.util.Iterator;
 
 public class UtilWorld {
@@ -47,6 +49,26 @@ public class UtilWorld {
 
         return location;
 
+    }
+
+    public static Chunk closestChunkToPlayer(Collection<Chunk> chunkList, Player player) {
+        if (chunkList.isEmpty()) {
+            return null;
+        }
+        Chunk closestChunk = (Chunk) chunkList.stream().findFirst().get();
+
+        int y = (int) player.getY();
+
+        double closestDistance = player.getLocation().distanceSquared(closestChunk.getBlock(8, y, 8).getLocation());
+
+        for (Chunk chunk : chunkList) {
+            double distance = player.getLocation().distanceSquared(chunk.getBlock(8, y, 8).getLocation());
+            if (closestDistance > distance) {
+                closestDistance = distance;
+                closestChunk = chunk;
+            }
+        }
+        return closestChunk;
     }
 
     /**

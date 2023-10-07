@@ -23,9 +23,11 @@ import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.utilities.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.minecraft.core.Direction;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
@@ -151,6 +153,46 @@ public class ClanManager extends Manager<Clan> {
 
         return relation == ClanRelation.SELF || relation == ClanRelation.ALLY_TRUST;
     }
+
+    public Location closestWilderness(Player player) {
+        int maxChunksRadiusToScan = 3;
+        List<Chunk> chunks = new ArrayList<>();
+
+        Chunk playerChunk = player.getChunk();
+        World world = player.getWorld();
+
+        for (int i = -maxChunksRadiusToScan; i < maxChunksRadiusToScan; i++) {
+            for (int j = -maxChunksRadiusToScan; j < maxChunksRadiusToScan; j++) {
+                Chunk chunk = world.getChunkAt(playerChunk.getX() + i, playerChunk.getZ() + j);
+                if (getClanByChunk(chunk).isEmpty()) {
+                    chunks.add(chunk);
+                }
+            }
+        }
+
+        if (!chunks.isEmpty()) {
+            Chunk chunk = UtilWorld.closestChunkToPlayer(chunks, player);
+
+            //this should not ever happen
+            if (chunk == null) return null;
+
+            List<Location> locations = new ArrayList<>();
+
+            int y = (int) player.getY();
+            for (int i = 0; i < 16; i++) {
+                for (int j = 0; j < 16; j++) {
+                    locations.add(chunk.getBlock(i, y, j).getLocation().toHighestLocation());
+                }
+            }
+
+            locations.sort(Comparator.comparingInt(a -> (int) player.getLocation().distanceSquared(a)));
+
+            //to prevent getting stuck in a block, add 1 to Y
+            return locations.get(0).add(0, 1, 0);
+        }
+        return null;
+    }
+
 
     public Location closestWildernessBackwards(Player player) {
         List<Location> locations = new ArrayList<>();

@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.framework.delayedactions.events.ClanHomeTeleportEvent;
+import me.mykindos.betterpvp.core.framework.delayedactions.events.ClanStuckTeleportEvent;
 import me.mykindos.betterpvp.core.framework.events.scoreboard.ScoreboardUpdateEvent;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -15,6 +16,7 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.world.events.SpawnTeleportEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -116,11 +118,42 @@ public class ClansMovementListener extends ClanListener {
 
             UtilMessage.message(event.getPlayer(), "Clans", "You can only teleport to your clan home from spawn or the wilderness.");
             event.setCancelled(true);
-
         }, () -> {
             event.setDelayInSeconds(30);
         });
 
+    }
+
+    @EventHandler
+    public void onClanStuckTeleport(ClanStuckTeleportEvent event) {
+        if (event.isCancelled()) return;
+
+        Player player = event.getPlayer();
+
+        Location nearestWilderness = clanManager.closestWilderness(player);
+
+        if (nearestWilderness == null) {
+            UtilMessage.message(player, "Clans", Component.text("No wilderness found to teleport to", NamedTextColor.RED));
+            return;
+        }
+
+        Optional<Clan> territoryOptional = clanManager.getClanByLocation(player.getLocation());
+
+        if (territoryOptional.isEmpty()) {
+            UtilMessage.message(player, "Clans", Component.text("You must be in a claimed territory to use ", NamedTextColor.GRAY)
+                    .append(Component.text("/c stuck", NamedTextColor.YELLOW)));
+            event.cancel("In wilderness.");
+            return;
+        }
+
+
+        ClanRelation relation = clanManager.getRelation(clanManager.getClanByPlayer(player).orElse(null), territoryOptional.get());
+
+        if (relation == ClanRelation.ENEMY) {
+            event.setDelayInSeconds(3 * 5);
+        } else {
+            event.setDelayInSeconds(2 * 5);
+        }
     }
 
     @EventHandler
