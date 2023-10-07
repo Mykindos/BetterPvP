@@ -49,6 +49,7 @@ public class ClanChatCommand extends Command {
 
             gamer.saveProperty(GamerProperty.CLAN_CHAT, clanChatEnabled);
             gamer.saveProperty(GamerProperty.ALLY_CHAT, false);
+            gamer.saveProperty(GamerProperty.STAFF_CHAT, false);
 
             Component result = Component.text((clanChatEnabled ? "enabled" : "disabled"), (clanChatEnabled ? NamedTextColor.GREEN : NamedTextColor.RED));
             UtilMessage.simpleMessage(player, "Command", Component.text("Clan Chat: ").append(result));

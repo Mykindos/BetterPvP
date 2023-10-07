@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.gamer;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
+import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 import me.mykindos.betterpvp.core.gamer.repository.GamerRepository;
 
@@ -29,6 +30,10 @@ public class GamerManager extends Manager<Gamer> {
      */
     public Optional<Gamer> getGamerByName(String name) {
         return objects.values().stream().filter(gamer -> gamer.getClient().getName().equalsIgnoreCase(name)).findFirst();
+    }
+
+    public List<Gamer> getGamersOfRank(Rank rank) {
+        return objects.values().stream().filter(gamer -> gamer.getClient().hasRank(rank)).toList();
     }
 
     @Override
