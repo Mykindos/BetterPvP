@@ -60,7 +60,7 @@ public class ClaimSubCommand extends ClanSubCommand {
             return;
         }
 
-        if (!clan.isAdmin()) {
+        if (!(clan.isAdmin() || client.isAdministrating())) {
             if (clan.getTerritory().size() >= clan.getMembers().size() + additionalClaims) { // Previously
                 UtilMessage.message(player, "Clans", "Your Clan cannot claim more Territory.");
                 return;
