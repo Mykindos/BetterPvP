@@ -162,6 +162,7 @@ public class ClansExplosionListener extends ClanListener {
         PURPUR(Material.PURPUR_BLOCK, Material.PURPUR_PILLAR),
         ENDSTONE(Material.END_STONE_BRICKS, Material.END_STONE),
         MOSSYSTONEBRICK(Material.MOSSY_STONE_BRICKS, Material.MOSSY_COBBLESTONE),
+        GLASS(Material.TINTED_GLASS, Material.GLASS),
         PRISMARINE(Material.DARK_PRISMARINE, Material.PRISMARINE_BRICKS, Material.PRISMARINE);
 
 

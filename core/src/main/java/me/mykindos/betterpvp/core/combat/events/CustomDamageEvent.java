@@ -19,6 +19,7 @@ public class CustomDamageEvent extends CustomCancellableEvent {
     private final Projectile projectile;
     private final DamageCause cause;
     private double damage;
+    private double rawDamage;
     private boolean knockback;
     private long damageDelay = 200;
     private LightningStrike lightning;

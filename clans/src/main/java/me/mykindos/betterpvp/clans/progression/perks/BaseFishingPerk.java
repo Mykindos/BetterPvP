@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
+import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.progression.Progression;
@@ -25,6 +26,10 @@ import java.util.Optional;
 @Singleton
 @Slf4j
 public class BaseFishingPerk implements Listener, ProgressionPerk {
+
+    @Config(path = "fishing.base-fishing-perk.level", defaultValue = "500")
+    @Inject(optional = true)
+    private int requiredLevel;
 
     @Inject(optional = true)
     private ClanManager manager;
@@ -49,7 +54,7 @@ public class BaseFishingPerk implements Listener, ProgressionPerk {
 
     @Override
     public boolean canUse(Player player, ProgressionData<?> data) {
-        return data.getLevel() > 1;
+        return data.getLevel() > requiredLevel;
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
