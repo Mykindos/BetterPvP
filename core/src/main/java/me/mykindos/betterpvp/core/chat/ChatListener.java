@@ -87,16 +87,9 @@ public class ChatListener implements Listener {
             if (staffChat) {
                 event.cancel("Player has staff chat enabled");
 
-                String message = "<light_purple>" + playerName + " <dark_purple>" +  PlainTextComponentSerializer.plainText().serialize(event.getMessage());
+                String message = "<dark_purple>" + playerName + " <light_purple>" + PlainTextComponentSerializer.plainText().serialize(event.getMessage());
 
-                List<Gamer> helperStaff  = gamerManager.getGamersOfRank(Rank.HELPER);
-
-                helperStaff.forEach(staff -> {
-                    Player player = Bukkit.getPlayer(UUID.fromString(staff.getUuid()));
-                    if (player != null) {
-                        UtilMessage.simpleMessage(player, message);
-                    }
-                });
+                gamerManager.sendMessageToRank("", message, Rank.HELPER);
             }
         });
     }
