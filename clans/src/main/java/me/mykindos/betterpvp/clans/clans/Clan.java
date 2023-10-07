@@ -13,11 +13,13 @@ import me.mykindos.betterpvp.core.framework.customtypes.IMapListener;
 import me.mykindos.betterpvp.core.framework.events.scoreboard.ScoreboardUpdateEvent;
 import me.mykindos.betterpvp.core.framework.inviting.Invitable;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -223,6 +225,23 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
             }
 
         });
+    }
+
+    public void clanChat(Player player, String message) {
+        String playerName = UtilFormat.spoofNameForLunar(player.getName());
+        String messageToSend = "<aqua>" + playerName  + " <dark_aqua>" +  message;
+        messageClan(messageToSend, null, false);
+    }
+
+    public void allyChat(Player player, String message) {
+        String playerName = UtilFormat.spoofNameForLunar(player.getName());
+        String messageToSend = "<dark_green>" + playerName + " <green>" + message;
+
+        getAlliances().forEach(alliance -> {
+            alliance.getClan().messageClan(messageToSend, null, false);
+        });
+
+        messageClan(messageToSend, null, false);
     }
 
     public String getEnergyTimeRemaining() {

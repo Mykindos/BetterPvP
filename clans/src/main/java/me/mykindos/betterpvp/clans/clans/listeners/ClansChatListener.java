@@ -63,16 +63,13 @@ public class ClansChatListener extends ClanListener {
         Gamer gamer = gamerOptional.get();
         Clan clan = clanOptional.get();
 
-        String playerName = UtilFormat.spoofNameForLunar(event.getPlayer().getName());
-
         Optional<Boolean> clanChatEnabledOptional = gamer.getProperty(GamerProperty.CLAN_CHAT);
         clanChatEnabledOptional.ifPresent(clanChat -> {
             if (clanChat) {
 
                 event.cancel("Player has clan chat enabled");
 
-                String message = "<aqua>" + playerName  + " <dark_aqua>" +  PlainTextComponentSerializer.plainText().serialize(event.getMessage());
-                clan.messageClan(message, null, false);
+                clan.clanChat(event.getPlayer(), PlainTextComponentSerializer.plainText().serialize(event.getMessage()));
 
             }
         });
@@ -82,13 +79,7 @@ public class ClansChatListener extends ClanListener {
             if (allyChat) {
                 event.cancel("Player has ally chat enabled");
 
-                String message = "<dark_green>" + playerName + " <green>" + PlainTextComponentSerializer.plainText().serialize(event.getMessage());
-
-                clan.getAlliances().forEach(alliance -> {
-                    alliance.getClan().messageClan(message, null, false);
-                });
-
-                clan.messageClan(message, null, false);
+                clan.allyChat(event.getPlayer(), PlainTextComponentSerializer.plainText().serialize(event.getMessage()));
             }
         });
 
