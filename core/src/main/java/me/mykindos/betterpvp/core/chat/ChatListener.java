@@ -89,7 +89,7 @@ public class ChatListener implements Listener {
 
                 String message = "<light_purple>" + playerName + " <dark_purple>" +  PlainTextComponentSerializer.plainText().serialize(event.getMessage());
 
-                List<Gamer> helperStaff  = gamerManager.getOnlineOfRank(Rank.HELPER);
+                List<Gamer> helperStaff  = gamerManager.getGamersOfRank(Rank.HELPER);
 
                 helperStaff.forEach(staff -> {
                     Player player = Bukkit.getPlayer(UUID.fromString(staff.getUuid()));
