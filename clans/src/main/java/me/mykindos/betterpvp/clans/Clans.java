@@ -6,17 +6,18 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
-import me.mykindos.betterpvp.clans.tips.ClansTipLoader;
 import me.mykindos.betterpvp.clans.commands.ClansCommandLoader;
 import me.mykindos.betterpvp.clans.injector.ClansInjectorModule;
 import me.mykindos.betterpvp.clans.listener.ClansListenerLoader;
-import me.mykindos.betterpvp.clans.progression.ProgressionAdapter;
+import me.mykindos.betterpvp.clans.tips.ClansTipLoader;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.config.ConfigInjectorModule;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.ModuleLoadedEvent;
+import me.mykindos.betterpvp.core.framework.adapter.Adapters;
+import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import org.bukkit.Bukkit;
@@ -83,10 +84,7 @@ public class Clans extends BPvPPlugin {
 
             updateEventExecutor.loadPlugin(this);
 
-            var progression = Bukkit.getPluginManager().getPlugin("Progression");
-            if (progression != null) {
-                new ProgressionAdapter(this, (BPvPPlugin) progression, listenerLoader).load();
-            }
+            new Adapters(this).loadAdapters(new Reflections(PACKAGE).getTypesAnnotatedWith(PluginAdapter.class));
         }
     }
 
