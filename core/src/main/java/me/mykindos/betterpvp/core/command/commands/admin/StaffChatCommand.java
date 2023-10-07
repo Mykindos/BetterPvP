@@ -1,8 +1,9 @@
-package me.mykindos.betterpvp.clans.clans.commands.chatcommands;
+package me.mykindos.betterpvp.core.command.commands.admin;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
@@ -15,44 +16,51 @@ import org.bukkit.entity.Player;
 import java.util.Optional;
 
 @Singleton
-public class AllyChatCommand extends Command {
+public class StaffChatCommand extends Command {
 
     private final GamerManager gamerManager;
 
     @Inject
-    public AllyChatCommand(GamerManager gamerManager){
+    public StaffChatCommand(GamerManager gamerManager){
         this.gamerManager = gamerManager;
 
-        aliases.add("ac");
+        aliases.add("sc");
     }
 
     @Override
     public String getName() {
-        return "allychat";
+        return "staffchat";
     }
 
     @Override
     public String getDescription() {
-        return "Toggle ally only chat";
+        return "Toggle staff only chat";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         Optional<Gamer> gamerOptional = gamerManager.getObject(player.getUniqueId().toString());
         if(gamerOptional.isPresent()) {
-            boolean allyChatEnabled = true;
+            boolean staffChatEnabled = true;
             Gamer gamer = gamerOptional.get();
-            Optional<Boolean> allyChatEnabledOptional = gamer.getProperty(GamerProperty.ALLY_CHAT);
-            if(allyChatEnabledOptional.isPresent()){
-                allyChatEnabled = !allyChatEnabledOptional.get();
+            Optional<Boolean> staffChatEnabledOptional = gamer.getProperty(GamerProperty.STAFF_CHAT);
+            if(staffChatEnabledOptional.isPresent()){
+                staffChatEnabled = !staffChatEnabledOptional.get();
             }
 
-            gamer.saveProperty(GamerProperty.ALLY_CHAT, allyChatEnabled);
+            gamer.saveProperty(GamerProperty.STAFF_CHAT, staffChatEnabled);
+            gamer.saveProperty(GamerProperty.ALLY_CHAT, false);
             gamer.saveProperty(GamerProperty.CLAN_CHAT, false);
-            gamer.saveProperty(GamerProperty.STAFF_CHAT, false);
 
-            Component result = Component.text((allyChatEnabled ? "enabled" : "disabled"), (allyChatEnabled ? NamedTextColor.GREEN : NamedTextColor.RED));
-            UtilMessage.simpleMessage(player, "Command", Component.text("Ally Chat: ").append(result));
+            Component result = Component.text((staffChatEnabled ? "enabled" : "disabled"), (staffChatEnabled ? NamedTextColor.GREEN : NamedTextColor.RED));
+            UtilMessage.simpleMessage(player, "Command", Component.text("Staff Chat: ").append(result));
         }
     }
+
+    @Override
+    public Rank getRequiredRank() {
+        return Rank.HELPER;
+    }
+
+
 }
