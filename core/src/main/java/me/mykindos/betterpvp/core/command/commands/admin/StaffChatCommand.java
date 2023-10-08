@@ -47,6 +47,7 @@ public class StaffChatCommand extends Command {
                 String playerName = UtilFormat.spoofNameForLunar(player.getName());
                 String message = "<dark_purple>" + playerName + " <light_purple>" + String.join(" ", args);
                 Component component = UtilMessage.deserialize(message);
+                gamerManager.sendMessageToRank("", component, Rank.HELPER);
                 return;
             }
             boolean staffChatEnabled = true;
