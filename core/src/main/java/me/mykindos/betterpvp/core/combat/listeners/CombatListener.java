@@ -4,18 +4,33 @@ import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.combat.adapters.CustomDamageAdapter;
 import me.mykindos.betterpvp.core.combat.armour.ArmourManager;
 import me.mykindos.betterpvp.core.combat.data.DamageData;
-import me.mykindos.betterpvp.core.combat.events.*;
+import me.mykindos.betterpvp.core.combat.events.CustomDamageDurabilityEvent;
+import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.CustomDamageReductionEvent;
+import me.mykindos.betterpvp.core.combat.events.CustomKnockbackEvent;
+import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.log.DamageLog;
 import me.mykindos.betterpvp.core.combat.log.DamageLogManager;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.*;
+import me.mykindos.betterpvp.core.utilities.UtilDamage;
+import me.mykindos.betterpvp.core.utilities.UtilPlayer;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.entity.*;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Arrow;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.EvokerFangs;
+import org.bukkit.entity.FishHook;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -106,9 +121,10 @@ public class CombatListener implements Listener {
                         continue;
                     }
 
-                    adapter.processCustomDamageAdapter(event);
-                    finalizeDamage(event);
-                    return;
+                    if(adapter.processCustomDamageAdapter(event)) {
+                        finalizeDamage(event);
+                        return;
+                    }
                 }
 
                 playDamageEffect(event);
