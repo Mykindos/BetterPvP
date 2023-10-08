@@ -100,7 +100,7 @@ public class ClanEventListener extends ClanListener {
         UtilMessage.simpleMessage(player, "Clans", "You unclaimed territory <alt2>" + UtilWorld.chunkToPrettyString(chunk) + "</alt2>.");
 
         targetClan.messageClan(String.format("<yellow>%s<gray> unclaimed territory <yellow>%s<gray>.", player.getName(),
-                        UtilWorld.chunkToPrettyString(chunk)), player.getUniqueId(), true);
+                UtilWorld.chunkToPrettyString(chunk)), player.getUniqueId(), true);
         clanManager.getRepository().deleteClanTerritory(targetClan, chunkString);
         targetClan.getTerritory().removeIf(territory -> territory.getChunk().equals(UtilWorld.chunkToFile(chunk)));
     }
@@ -167,7 +167,7 @@ public class ClanEventListener extends ClanListener {
 
 
         UtilMessage.simpleMessage(player, "Clans", "You invited <alt2>" + target.getName() + "</alt2> to join your Clan.");
-        
+
         clan.messageClan(String.format("<yellow>%s<gray> invited <yellow>%s<gray> to join your Clan.", player.getName(), target.getName()), player.getUniqueId(), true);
 
         UtilMessage.simpleMessage(target, "Clans", "<alt2>" + player.getName() + "</alt2> invited you to join <alt2>Clan " + clan.getName() + "</alt2>.");
@@ -210,6 +210,7 @@ public class ClanEventListener extends ClanListener {
         inviteHandler.removeInvite(clan, targetGamer, "Invite");
         inviteHandler.removeInvite(targetGamer, clan, "Invite");
 
+        clan.setOnline(true);
         clan.messageClan(String.format("<yellow>%s<gray> has joined your Clan.", player.getName()), player.getUniqueId(), true);
         UtilMessage.simpleMessage(player, "Clans", "You joined <alt2>Clan " + clan.getName() + "</alt2>.");
 
@@ -230,7 +231,16 @@ public class ClanEventListener extends ClanListener {
             clan.getMembers().remove(clanMember);
 
             UtilMessage.simpleMessage(player, "Clans", "You left <alt2>Clan " + clan.getName() + "</alt2>.");
-            clan.messageClan(String.format("<yellow>%s<gray> left your Clan.", player.getName()), player.getUniqueId(), true);
+
+            boolean isOnline = false;
+            for (ClanMember member : clan.getMembers()) {
+                Player playerMember = Bukkit.getPlayer(member.getUuid());
+                if (playerMember != null) {
+                    UtilMessage.message(playerMember, "Clans", "<yellow>%s<gray> left your Clan.", player.getName());
+                    isOnline = true;
+                }
+            }
+            clan.setOnline(isOnline);
         }
 
     }
@@ -410,7 +420,7 @@ public class ClanEventListener extends ClanListener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onMemberPromote(MemberPromoteEvent event) {
-        if(event.isCancelled()) return;
+        if (event.isCancelled()) return;
 
         Player player = event.getPlayer();
         Clan clan = event.getClan();
@@ -425,14 +435,14 @@ public class ClanEventListener extends ClanListener {
                 memberGamer.getClient().getName(), member.getName());
 
         Player memberPlayer = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
-        if(memberPlayer != null){
+        if (memberPlayer != null) {
             UtilMessage.simpleMessage(memberPlayer, "Clans", "You were promoted to <yellow>%s<gray>.", member.getName());
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onMemberDemote(MemberDemoteEvent event) {
-        if(event.isCancelled()) return;
+        if (event.isCancelled()) return;
 
         Player player = event.getPlayer();
         Clan clan = event.getClan();
@@ -443,13 +453,13 @@ public class ClanEventListener extends ClanListener {
 
         Gamer memberGamer = gamerManager.getObject(member.getUuid()).orElseThrow(() -> new NoSuchGamerException(member.getUuid()));
 
-        if(!player.getUniqueId().toString().equalsIgnoreCase(member.getUuid())) {
+        if (!player.getUniqueId().toString().equalsIgnoreCase(member.getUuid())) {
             UtilMessage.simpleMessage(player, "Clans", "You demoted <aqua>%s<gray> to <yellow>%s<gray>.",
                     memberGamer.getClient().getName(), member.getName());
         }
 
         Player memberPlayer = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
-        if(memberPlayer != null){
+        if (memberPlayer != null) {
             UtilMessage.simpleMessage(memberPlayer, "Clans", "You were demoted to <yellow>%s<gray>.", member.getName());
         }
     }
