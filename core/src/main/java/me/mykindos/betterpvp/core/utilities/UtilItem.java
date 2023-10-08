@@ -229,11 +229,13 @@ public class UtilItem {
      * @param customModelData The model ID
      * @return The ItemStack
      */
-    public static ItemStack createItemStack(Material material, int customModelData) {
-        var itemStack = new ItemStack(material);
-        var itemMeta = itemStack.getItemMeta();
-        itemMeta.setCustomModelData(customModelData);
-        itemStack.setItemMeta(itemMeta);
+    public static ItemStack createItemStack(Material material, int amount, int customModelData) {
+        var itemStack = new ItemStack(material, amount);
+        if(customModelData > 0) {
+            var itemMeta = itemStack.getItemMeta();
+            itemMeta.setCustomModelData(customModelData);
+            itemStack.setItemMeta(itemMeta);
+        }
 
         return itemStack;
     }
