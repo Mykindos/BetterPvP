@@ -373,7 +373,7 @@ skills:
       maxConsecutiveHits: 4
     precision:
       enabled: true
-      maxlevel: 5
+      maxlevel: 3
     entangle:
       enabled: true
       maxlevel: 3
