@@ -40,7 +40,9 @@ public class UtilWorld {
         }
 
         String[] split = string.split(", ");
-        Location location = new Location(Bukkit.getWorld(split[0]), Double.parseDouble(split[1]), Double.parseDouble(split[2]), Double.parseDouble(split[3]));
+        var world = Bukkit.getWorld(split[0]);
+
+        Location location = new Location(world, Double.parseDouble(split[1]), Double.parseDouble(split[2]), Double.parseDouble(split[3]));
 
         if (split.length >= 5) {
             location.setYaw(Float.parseFloat(split[4]));

@@ -3,7 +3,9 @@ package me.mykindos.betterpvp.core.utilities;
 import lombok.Getter;
 
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.Arrays;
+import java.util.Locale;
 
 public class UtilTime {
 
@@ -18,14 +20,15 @@ public class UtilTime {
         return System.currentTimeMillis() - from > required;
     }
 
-    public static double trim(double untrimmed, double d) {
-        String format = "#.#";
+    public static double trim(double untrimmed, int d) {
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.getDefault());
+        char decimalSeparator = symbols.getDecimalSeparator();
 
-        for (int i = 1; i < d; i++) {
-            format = format + "#";
-        }
-        DecimalFormat twoDec = new DecimalFormat(format);
-        return Double.parseDouble(twoDec.format(untrimmed));
+        // Replace dot with the decimal separator in the format string
+        String formatString = ("#." + "#".repeat(Math.max(0, d))).replace('.', decimalSeparator);
+
+        DecimalFormat decimalFormat = new DecimalFormat(formatString, symbols);
+        return Double.parseDouble(decimalFormat.format(untrimmed));
     }
 
     public static double convert(double d, TimeUnit unit, int decPoint) {
