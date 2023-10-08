@@ -89,7 +89,9 @@ public class ChatListener implements Listener {
 
                 String message = "<dark_purple>" + playerName + " <light_purple>" + PlainTextComponentSerializer.plainText().serialize(event.getMessage());
 
-                gamerManager.sendMessageToRank("", message, Rank.HELPER);
+                Component component = UtilMessage.deserialize(message);
+
+                gamerManager.sendMessageToRank("", component, Rank.HELPER);
             }
         });
     }

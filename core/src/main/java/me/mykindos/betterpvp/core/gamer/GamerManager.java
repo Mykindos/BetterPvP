@@ -43,12 +43,12 @@ public class GamerManager extends Manager<Gamer> {
         return objects.values().stream().filter(gamer -> gamer.getClient().hasRank(rank)).toList();
     }
 
-    public void sendMessageToRank(String prefix, String message, Rank rank) {
+    public void sendMessageToRank(String prefix, Component message, Rank rank) {
         List<Gamer> gamerList = getGamersOfRank(rank);
         gamerList.forEach(gamer -> {
             Player player = Bukkit.getPlayer(UUID.fromString(gamer.getUuid()));
             if (player != null) {
-                UtilMessage.simpleMessage(player, prefix, message);
+                UtilMessage.message(player, prefix, message);
             }
         });
     }
