@@ -75,6 +75,7 @@ public abstract class Command implements ICommand {
                     tabCompletions.add(sender instanceof Player player ? player.getLocation().getZ() + "" : "0");
             case "WORLD" -> tabCompletions.addAll(Bukkit.getWorlds().stream().map(World::getName)
                     .filter(name -> name.toLowerCase().startsWith(lowercaseArg)).toList());
+            case "BOOLEAN" -> tabCompletions.addAll(List.of("true", "false"));
         }
 
         return tabCompletions;
