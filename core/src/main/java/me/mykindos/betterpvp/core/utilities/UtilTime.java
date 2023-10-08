@@ -1,12 +1,14 @@
 package me.mykindos.betterpvp.core.utilities;
 
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.Locale;
 
+@Slf4j
 public class UtilTime {
 
     /**
@@ -21,14 +23,26 @@ public class UtilTime {
     }
 
     public static double trim(double untrimmed, int d) {
-        DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.getDefault());
-        char decimalSeparator = symbols.getDecimalSeparator();
+        // Create a NumberFormat instance for the default locale
+        NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.getDefault());
 
-        // Replace dot with the decimal separator in the format string
-        String formatString = ("#." + "#".repeat(Math.max(0, d))).replace('.', decimalSeparator);
+        if (numberFormat instanceof DecimalFormat) {
+            // If the number format is a DecimalFormat, set the desired number of decimal places
+            numberFormat.setMaximumFractionDigits(d);
+        }
 
-        DecimalFormat decimalFormat = new DecimalFormat(formatString, symbols);
-        return Double.parseDouble(decimalFormat.format(untrimmed));
+        // Format the untrimmed value using NumberFormat
+        String formattedValue = numberFormat.format(untrimmed);
+
+        try {
+            // Parse the formatted value back to a double
+            return numberFormat.parse(formattedValue).doubleValue();
+        } catch (Exception e) {
+            log.warn("Failed to parse value: " + formattedValue, e);
+        }
+
+        // Handle parsing errors gracefully
+        return untrimmed;
     }
 
     public static double convert(double d, TimeUnit unit, int decPoint) {
@@ -116,11 +130,11 @@ public class UtilTime {
         @Getter
         private final String shortVersion;
 
-        TimeUnit(String shortVersion){
+        TimeUnit(String shortVersion) {
             this.shortVersion = shortVersion;
         }
 
-        public static TimeUnit getByShortVersion(String shortVersion){
+        public static TimeUnit getByShortVersion(String shortVersion) {
             return Arrays.stream(values()).filter(u -> u.shortVersion.equalsIgnoreCase(shortVersion)).findFirst().orElse(null);
         }
     }
