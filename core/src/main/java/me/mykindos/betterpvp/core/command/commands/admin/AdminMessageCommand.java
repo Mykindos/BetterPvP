@@ -93,5 +93,13 @@ public class AdminMessageCommand extends Command {
         return Rank.HELPER;
     }
 
+    @Override
+    public String getArgumentType(int argCount) {
+        if (argCount == 1) {
+            return ArgumentType.PLAYER.name();
+        }
+        return ArgumentType.NONE.name();
+    }
+
 
 }
