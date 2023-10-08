@@ -36,7 +36,7 @@ public class SkillMenu extends Menu implements IRefreshingMenu {
             TagResolver.resolver("effect", Tag.styling(NamedTextColor.WHITE)),
             TagResolver.resolver("stat", Tag.styling(NamedTextColor.YELLOW))
     );
-    
+
     private final Role role;
 
     private final SkillManager skillManager;
@@ -68,6 +68,7 @@ public class SkillMenu extends Menu implements IRefreshingMenu {
         for (Skill skill : skillManager.getSkillsForRole(role)) {
             if (skill == null) continue;
             if (skill.getType() == null) continue;
+            if (!skill.isEnabled()) continue;
             if (skill.getType() == SkillType.SWORD) {
                 slotNumber = swordSlotNumber;
                 swordSlotNumber++;
