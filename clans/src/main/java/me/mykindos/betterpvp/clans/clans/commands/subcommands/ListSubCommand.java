@@ -69,10 +69,12 @@ public class ListSubCommand extends ClanSubCommand {
         int end = start + numPerPage;
         int size = clansList.size();
 
+        int totalPages = Math.round(0.49f + ((float) size /numPerPage ));
+
         Clan playerClan = clanManager.getClanByPlayer(player).orElse(null);
 
 
-        component = component.append(Component.text(pageNumber, NamedTextColor.WHITE));
+        component = component.append(UtilMessage.deserialize("<white>" + pageNumber + "<gray> / <white>" + totalPages));
 
         if (start <= size) {
             if (end > size) end = size;
