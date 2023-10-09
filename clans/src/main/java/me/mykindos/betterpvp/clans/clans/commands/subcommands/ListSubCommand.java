@@ -62,7 +62,7 @@ public class ListSubCommand extends ClanSubCommand {
         List<Clan> clansList = new ArrayList<>(clanManager.getObjects().values());
         Collections.sort(clansList, Comparator.comparing(Clan::getName));
 
-        Component component = Component.text("Clans Page: ", NamedTextColor.YELLOW);
+        Component component = UtilMessage.deserialize("<yellow>Clan List<gray>: ");
 
         int count = 0;
         int start = (pageNumber - 1) * numPerPage;
