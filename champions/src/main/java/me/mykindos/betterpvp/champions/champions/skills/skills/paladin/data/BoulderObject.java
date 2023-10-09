@@ -246,7 +246,7 @@ public class BoulderObject {
                 // Damage anybody else
                 damaged.add(ent);
                 Vector knockback = ent.getLocation().toVector().subtract(impactLocation.toVector());
-                final double strength = ent.getLocation().distanceSquared(impactLocation) * 0.5 / radius;
+                final double strength = (radius * radius - ent.getLocation().distanceSquared(impactLocation)) / (radius * radius);
                 UtilVelocity.velocity(ent, knockback, strength, false, 0.0, 0.0, 3.0, true);
                 UtilDamage.doCustomDamage(new CustomDamageEvent(ent, caster, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(), false, skill.getName()));
                 UtilMessage.simpleMessage(ent, skill.getName(), "<alt2>%s</alt2> hit you with <alt>%s</alt>.", caster.getName(), skill.getName());
