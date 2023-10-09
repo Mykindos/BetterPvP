@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.utilities.model;
+package me.mykindos.betterpvp.core.utilities.math;
 
 import com.google.common.base.Preconditions;
 import org.bukkit.Location;
@@ -24,7 +24,7 @@ public class VectorLine {
     @Contract(value = "_, _, _ -> new", pure = true)
     public static @NotNull VectorLine withStepSize(final @NotNull Location start, final @NotNull Location end, final double stepSize) {
         Preconditions.checkNotNull(start, "start");
-        Preconditions.checkNotNull(start, "end");
+        Preconditions.checkNotNull(end, "end");
         Preconditions.checkArgument(stepSize > 0, "stepSize must be greater than 0");
         Preconditions.checkArgument(start.getWorld().equals(end.getWorld()), "Locations are not in the same world");
         return new VectorLine(start, end, stepSize);
@@ -33,7 +33,7 @@ public class VectorLine {
     @Contract(value = "_, _, _ -> new", pure = true)
     public static @NotNull VectorLine withSteps(final @NotNull Location start, final @NotNull Location end, final int steps) {
         Preconditions.checkNotNull(start, "start");
-        Preconditions.checkNotNull(start, "end");
+        Preconditions.checkNotNull(end, "end");
         Preconditions.checkArgument(steps > 0, "steps must be greater than 0");
         final double distance = start.distance(end);
         final double stepSize = distance / steps;

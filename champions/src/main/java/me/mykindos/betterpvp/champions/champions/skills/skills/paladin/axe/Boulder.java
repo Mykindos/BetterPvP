@@ -13,19 +13,25 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.block.data.BlockData;
+import me.mykindos.betterpvp.core.utilities.math.Function3d;
+import me.mykindos.betterpvp.core.utilities.math.VectorParabola;
+import org.bukkit.*;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Transformation;
+import org.bukkit.util.Vector;
+import org.joml.AxisAngle4f;
+import org.joml.Vector3d;
+import org.joml.Vector3f;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Singleton
 @BPvPListener
@@ -90,29 +96,75 @@ public class Boulder extends Skill implements Listener, InteractSkill, CooldownS
 
     @Override
     public void activate(Player player, int level) {
-        final Location feetLocation = player.getLocation();
+        final int tickInterval = 5;
+        final double blocksPerCycle = 10 * tickInterval / 20d;
+        final double maxDistance = 50;
+        final int maxCycles = (int) (maxDistance / blocksPerCycle);
 
-    // Clone the blocks under the player to add realism
-    final List<BlockData> clonedBlocks = new ArrayList<>();
-        for (double x = -radius; x < radius; x++) {
-            for (double z = -radius; z < radius; z++) {
-                final Block block = feetLocation.clone().add(x, -1.0, z).getBlock();
-                if (UtilBlock.solid(block)) {
-                    clonedBlocks.add(block.getBlockData());
+        final Location loc = player.getEyeLocation();
+        final double pitch = loc.getPitch();
+        final double offset = pitch / 5;
+        final Function3d parabola = new VectorParabola(x -> (-Math.pow(x, 2) / 150) * Math.sqrt(Math.abs(pitch) + 1));
+        final Vector direction = loc.getDirection().setY(0).normalize().setY(1);
+        final Vector start = Vector.fromJOML(parabola.atDistance(offset)).multiply(direction);
+        loc.subtract(start); // start compensation
+
+        List<Vector3f> transformations = new ArrayList<>();
+        for (int cycle = 0; cycle < maxCycles; cycle++) {
+            double distance = cycle * blocksPerCycle;
+            final Vector3d vec = parabola.atDistance(distance + offset);
+            final Vector vector = Vector.fromJOML(vec);
+            final Vector multiply = vector.multiply(direction);
+            transformations.add(multiply.toVector3f());
+        }
+
+        List<Location> particleLocs = new ArrayList<>();
+        for (double distance = 0; distance <= maxDistance; distance += 0.1) {
+            final Vector3d vec = parabola.atDistance(distance + offset);
+            final Vector vector = Vector.fromJOML(vec);
+            final Vector multiply = vector.multiply(direction);
+            final Location particleLoc = multiply.toLocation(loc.getWorld()).add(loc);
+            particleLocs.add(particleLoc);
+        }
+
+        // Reset rotation for block displays
+        loc.setYaw(0);
+        loc.setPitch(0);
+        // Center this location
+//        loc.subtract(0.5, 0.5, 0.5);
+
+        BlockDisplay display = loc.getWorld().spawn(loc, BlockDisplay.class);
+        display.setGlowing(true);
+        display.setGlowColorOverride(Color.RED);
+        display.setBlock(Bukkit.createBlockData(Material.OBSIDIAN));
+        final Iterator<Vector3f> iterator = transformations.iterator();
+        AtomicInteger cycles = new AtomicInteger(0);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (cycles.incrementAndGet() > maxCycles) {
+                    display.remove();
+                    this.cancel();
+                    return;
+                }
+
+                if (iterator.hasNext()) {
+                    final Vector3f translation = iterator.next();
+                    final float angle = (float) Math.toRadians(45);
+
+                    display.setInterpolationDelay(0);
+                    display.setInterpolationDuration(tickInterval);
+                    display.setTransformation(new Transformation(new Vector3f(),
+                            new AxisAngle4f(angle, 0, 1, 0),
+                            display.getTransformation().getScale(),
+                            new AxisAngle4f()));
+                }
+
+                for (Location location : particleLocs) {
+                    Particle.REDSTONE.builder().color(255, 0, 0).location(location).receivers(60).spawn();
                 }
             }
-        }
-
-        if (clonedBlocks.isEmpty()) {
-            clonedBlocks.add(Bukkit.createBlockData(Material.DIRT));
-            clonedBlocks.add(Bukkit.createBlockData(Material.COBBLESTONE));
-            clonedBlocks.add(Bukkit.createBlockData(Material.STONE));
-        }
-
-        final BoulderObject boulder = new BoulderObject(champions, getHeal(level), getDamage(level), getRadius(level), radius, clonedBlocks, this);
-        boulder.spawn(player);
-
-        boulders.computeIfAbsent(player, key -> new ArrayList<>()).add(boulder);
+        }.runTaskTimer(champions, 0L, tickInterval);
     }
 
     @Override

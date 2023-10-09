@@ -104,7 +104,7 @@ public class UtilPlayer {
     }
 
     @SneakyThrows
-    public static void setGlowing(Player player, Player target, boolean glowing) {
+    public static void setGlowing(Player player, Entity target, boolean glowing) {
         PacketContainer packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.ENTITY_METADATA);
         packet.getIntegers().write(0, target.getEntityId()); //Set packet's entity id
         WrappedDataWatcher watcher = new WrappedDataWatcher(); //Create data watcher, the Entity Metadata packet requires this
