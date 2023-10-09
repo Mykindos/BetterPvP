@@ -7,12 +7,9 @@ import com.comphenix.protocol.wrappers.WrappedDataValue;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 import lombok.SneakyThrows;
-import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
-import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -89,8 +86,8 @@ public class UtilPlayer {
         if (health < 0.0D) {
             health = 0.0D;
         }
-        if (health > 20.0D) {
-            health = 20.0D;
+        if (health > UtilPlayer.getMaxHealth(player)) {
+            health = UtilPlayer.getMaxHealth(player);
         }
         player.setHealth(health);
     }
