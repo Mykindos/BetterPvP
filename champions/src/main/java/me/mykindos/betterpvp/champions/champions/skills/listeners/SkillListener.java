@@ -170,7 +170,6 @@ public class SkillListener implements Listener {
 
         if (UtilBlock.usable(event.getClickedBlock())) return;
 
-
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             Block block = event.getClickedBlock();
             if (block != null) {
