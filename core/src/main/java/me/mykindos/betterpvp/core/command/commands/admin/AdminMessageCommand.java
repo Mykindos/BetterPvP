@@ -76,8 +76,8 @@ public class AdminMessageCommand extends Command {
             gamer.setLastAdminMessenger(receivingGamer.getUuid());
             receivingGamer.setLastAdminMessenger(gamer.getUuid());
 
-            Component senderComponent = Component.text(playerName, sendRank.getColor()).hoverEvent(HoverEvent.showText(Component.text(sendRank.getName(), sendRank.getColor())));
-            Component receiverComponent = Component.text(receiver.getName(), receiveRank.getColor()).hoverEvent(HoverEvent.showText(Component.text(receiveRank.getName(), receiveRank.getColor())));
+            Component senderComponent = sendRank.getPlayerNameMouseOver(playerName);
+            Component receiverComponent = receiveRank.getPlayerNameMouseOver(receiver.getName());
             Component arrow = Component.text(" -> ", NamedTextColor.DARK_PURPLE);
             Component message = Component.text(" " + String.join(" ", Arrays.stream(args).toList().subList(1, args.length)), NamedTextColor.LIGHT_PURPLE);
             //Start with a Component.empty() to avoid the hoverEvent from propagating down

@@ -21,20 +21,20 @@ import java.util.Arrays;
 import java.util.Optional;
 
 @Singleton
-public class AdminReplyCommand extends Command {
+public class PlayerAdminCommand extends Command {
 
     private final GamerManager gamerManager;
 
     @Inject
-    public AdminReplyCommand(GamerManager gamerManager){
+    public PlayerAdminCommand(GamerManager gamerManager){
         this.gamerManager = gamerManager;
 
-        aliases.add("ra");
+        aliases.add("a");
     }
 
     @Override
     public String getName() {
-        return "replyadmin";
+        return "admin";
     }
 
     @Override
@@ -47,52 +47,23 @@ public class AdminReplyCommand extends Command {
         Optional<Gamer> gamerOptional = gamerManager.getObject(player.getUniqueId().toString());
         if(gamerOptional.isPresent()) {
             Gamer gamer = gamerOptional.get();
-            Gamer receivingGamer = null;
             if(args.length == 0) {
                 UtilMessage.message(player, "Core", "You must specify a message");
                 return;
             }
-            if (gamer.getLastAdminMessenger() == null) {
-                UtilMessage.message(player, "Core", UtilMessage.deserialize("<gray>No previous player to reply to"));
-                return;
-            }
-            Optional<Gamer> optionalReceivingGamer = gamerManager.getObject(gamer.getLastAdminMessenger());
-            Player receiver = null;
-            if (optionalReceivingGamer.isPresent()) {
-
-                receivingGamer = optionalReceivingGamer.get();
-                receiver = receivingGamer.getPlayer();
-
-            }
-            if (receiver == null) {
-                UtilMessage.message(player, "Core", UtilMessage.deserialize("<gray>No online player to reply to found"));
-                return;
-            }
-
             String playerName = UtilFormat.spoofNameForLunar(player.getName());
             Rank sendRank = gamer.getClient().getRank();
-            Rank receiveRank = receivingGamer.getClient().getRank();
-
-            gamer.setLastAdminMessenger(receivingGamer.getUuid());
-            receivingGamer.setLastAdminMessenger(gamer.getUuid());
-
-            Component senderComponent = sendRank.getPlayerNameMouseOver(playerName);
-            Component receiverComponent = receiveRank.getPlayerNameMouseOver(receiver.getName());
-            Component arrow = Component.text(" -> ", NamedTextColor.DARK_PURPLE);
+            Component senderComponent = Component.text(playerName, sendRank.getColor()).hoverEvent(HoverEvent.showText(Component.text(sendRank.getName(), sendRank.getColor())));
             Component message = Component.text(" " + String.join(" ", args), NamedTextColor.LIGHT_PURPLE);
             //Start with a Component.empty() to avoid the hoverEvent from propagating down
-            Component component = Component.empty().append(senderComponent).append(arrow).append(receiverComponent).append(message);
-            if (!receivingGamer.getClient().hasRank(Rank.HELPER)) {
+            Component component = Component.empty().append(senderComponent).append(message);
+            if (!gamer.getClient().hasRank(Rank.HELPER)) {
                 //dont send the message twice to a staff member
-                UtilMessage.message(receiver, component);
+                UtilMessage.message(player, component);
+                UtilMessage.message(player, "Core", "If a staff member is on this server, they have received this message");
             }
 
             gamerManager.sendMessageToRank("", component, Rank.HELPER);
         }
-    }
-
-    @Override
-    public Rank getRequiredRank() {
-        return Rank.HELPER;
     }
 }
