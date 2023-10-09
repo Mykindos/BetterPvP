@@ -54,7 +54,7 @@ public class BoulderObject {
         final Location location = caster.getEyeLocation().add(caster.getLocation().getDirection().normalize().multiply(0.5));
 
         // Throw sound cue
-        location.getWorld().playSound(location, Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 1f, 1f);
+        location.getWorld().playSound(location, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 2f, 0f);
 
         // Create reference armor stand
         // The block displays will follow this
@@ -264,7 +264,7 @@ public class BoulderObject {
             UtilMessage.simpleMessage(caster, skill.getName(), "You hit %s with <alt>%s</alt>.", nameList, skill.getName());
         }
 
-        impactLocation.getWorld().playSound(impactLocation, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1.5f, 0.5f);
+        impactLocation.getWorld().playSound(impactLocation, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1f, 0.5f);
     }
 
     private int getRandomNegative() {
