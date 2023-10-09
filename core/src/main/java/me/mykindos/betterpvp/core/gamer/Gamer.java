@@ -32,8 +32,8 @@ public class Gamer extends PropertyContainer implements Invitable, IMapListener 
     private TitleQueue titleQueue = new TitleQueue();
 
     private long lastDamaged;
-
     private long lastTip;
+    private String lastAdminMessenger;
 
     public Gamer(Client client, String uuid){
         this.client = client;
