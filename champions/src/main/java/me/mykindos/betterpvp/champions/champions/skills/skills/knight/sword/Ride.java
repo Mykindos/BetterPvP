@@ -84,7 +84,8 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
             horseSpeed.setBaseValue(0.35D);
         }
         horse.addPassenger(player);
-        HorseData data = new HorseData(horse, System.currentTimeMillis());
+        long calculatedLifespan = (long) (lifespan + (level - 1)) * 1000;
+        HorseData data = new HorseData(horse, System.currentTimeMillis(), calculatedLifespan);
         horseData.put(player, data);
     }
 
@@ -94,12 +95,11 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
 
         for (Map.Entry<Player, HorseData> data : horseData.entrySet()) {
             Player player = data.getKey();
-            int level = getLevel(player);
             Horse horse = data.getValue().getHorse();
 
             if (horse == null) {
                 toRemove.add(player);
-            } else if (horse.isDead() || UtilTime.elapsed(data.getValue().getSpawnTime(), (long) (lifespan + (level - 1)) * 1000)) {
+            } else if (horse.isDead() || UtilTime.elapsed(data.getValue().getSpawnTime(), data.getValue().getLifespan())) {
                 horse.remove();
                 toRemove.add(player);
             }
@@ -111,13 +111,19 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
     }
 
     private static class HorseData {
+        private final long lifespan;
         private final Horse horse;
         private final long spawnTime;
         private boolean wasKilled = false;  // Add this field
 
-        public HorseData(Horse horse, long spawnTime) {
+        public HorseData(Horse horse, long spawnTime, long lifespan) {
             this.horse = horse;
             this.spawnTime = spawnTime;
+            this.lifespan = lifespan; // Store lifespan
+        }
+
+        public long getLifespan() {
+            return lifespan;
         }
 
         public Horse getHorse() {
