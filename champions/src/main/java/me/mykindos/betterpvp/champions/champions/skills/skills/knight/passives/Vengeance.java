@@ -46,11 +46,11 @@ public class Vengeance extends Skill implements PassiveSkill, Listener {
     public String[] getDescription(int level) {
         return new String[]{
                 "For every subsequent hit, your damage",
-                "will increase by <val>" + ((level+1) * damageIncrease) +"</val>",
+                "will increase by <val>" + ((level + 1) * damageIncrease) + "</val>",
                 "",
                 "If you take damage, your damage will reset",
                 "",
-                "you can deal a maximum of <val>" + (level + 1) +"</val> extra damage"
+                "you can deal a maximum of <val>" + (level + 1) + "</val> extra damage"
         };
     }
 
@@ -71,8 +71,8 @@ public class Vengeance extends Skill implements PassiveSkill, Listener {
         int level = getLevel(player);
         if (level > 0) {
             int numHits = playerNumHitsMap.getOrDefault(player, 0);
-            if(numHits > 1){
-                player.playSound(player.getLocation(), Sound.BLOCK_FIRE_EXTINGUISH, (float)2.0, (float)1.5);
+            if (numHits > 1) {
+                player.playSound(player.getLocation(), Sound.BLOCK_FIRE_EXTINGUISH, (float) 2.0, (float) 1.5);
             }
             playerNumHitsMap.put(player, 0);
         }
@@ -96,20 +96,23 @@ public class Vengeance extends Skill implements PassiveSkill, Listener {
                 event.setDamage(event.getDamage() + damageIncrease);
                 UtilMessage.simpleMessage(player, getClassType().getName(), "%s: <yellow>+%2.2f<gray> Bonus Damage", getName(), damageIncrease);
             }
-        }
-        if (playerTasks.containsKey(player)) {
-            playerTasks.get(player).cancel();
-            playerTasks.remove(player);
-        }
-        BukkitTask task = Bukkit.getScheduler().runTaskLater(champions, () -> {
-            playerNumHitsMap.put(player, 0);
-            playerTasks.remove(player);
-            if (!player.isDead()) {
-                player.playSound(player.getLocation(), Sound.BLOCK_FIRE_EXTINGUISH, (float)2.0, (float)1.5);
-            }
-        }, 100L);
 
-        playerTasks.put(player, task);
+            if (playerTasks.containsKey(player)) {
+                playerTasks.get(player).cancel();
+                playerTasks.remove(player);
+            }
+
+            BukkitTask task = Bukkit.getScheduler().runTaskLater(champions, () -> {
+                playerNumHitsMap.put(player, 0);
+                playerTasks.remove(player);
+                if (!player.isDead()) {
+                    player.playSound(player.getLocation(), Sound.BLOCK_FIRE_EXTINGUISH, (float) 2.0, (float) 1.5);
+                }
+            }, 100L);
+
+            playerTasks.put(player, task);
+        }
+
     }
 
     @EventHandler
@@ -123,7 +126,7 @@ public class Vengeance extends Skill implements PassiveSkill, Listener {
     }
 
     @Override
-    public void loadSkillConfig(){
+    public void loadSkillConfig() {
         damageIncrease = getConfig("damageIncrease", 0.25, Double.class);
     }
 
