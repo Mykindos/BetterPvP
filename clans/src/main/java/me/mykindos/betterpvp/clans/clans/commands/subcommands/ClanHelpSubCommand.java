@@ -91,8 +91,10 @@ public class ClanHelpSubCommand extends ClanSubCommand {
             int start = (pageNumber - 1) * numPerPage;
             int end = start + numPerPage;
             int size = clanSubCommands.size();
-            //add 0.49f to always get the correct page number
-            int totalPages = Math.round(0.49f + ((float) size /numPerPage ));
+            int totalPages = size /numPerPage;
+            if (size % numPerPage > 0) {
+                totalPages++;
+            }
 
             component = component.append(UtilMessage.deserialize("<white>" + pageNumber + "<gray> / <white>" + totalPages));
 

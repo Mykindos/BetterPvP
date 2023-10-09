@@ -68,8 +68,10 @@ public class ListSubCommand extends ClanSubCommand {
         int start = (pageNumber - 1) * numPerPage;
         int end = start + numPerPage;
         int size = clansList.size();
-
-        int totalPages = Math.round(0.49f + ((float) size /numPerPage ));
+        int totalPages = size /numPerPage;
+        if (size % numPerPage > 0) {
+            totalPages++;
+        }
 
         Clan playerClan = clanManager.getClanByPlayer(player).orElse(null);
 
