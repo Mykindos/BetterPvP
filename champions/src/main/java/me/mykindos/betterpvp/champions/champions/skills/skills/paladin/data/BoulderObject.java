@@ -33,7 +33,6 @@ public class BoulderObject {
     private final double heal;
     private final double damage;
     private final double radius;
-    private final double maxRadius;
     private final List<BlockData> blockPool;
     private final Skill skill;
 
@@ -198,7 +197,7 @@ public class BoulderObject {
         // Particles
         final int maxRadiusTicks = 5; // Expand to max radius over half a second
         new BukkitRunnable() {
-            double radius = 0;
+            double particleRadius = 0;
             double ticks = 0;
             @Override
             public void run() {
@@ -209,9 +208,9 @@ public class BoulderObject {
                 }
 
                 // Particle ring
-                radius += maxRadius / maxRadiusTicks;
+                particleRadius += radius / maxRadiusTicks;
                 for (int degree = 0; degree <= 360; degree += 15) {
-                    final Location absRingPoint = UtilLocation.fromFixedAngleDistance(impactLocation, radius, degree);
+                    final Location absRingPoint = UtilLocation.fromFixedAngleDistance(impactLocation, particleRadius, degree);
                     final Optional<Location> ringPoint = UtilLocation.getClosestSurfaceBlock(absRingPoint, 3.0, true);
                     if (ringPoint.isEmpty()) {
                         continue;
@@ -226,6 +225,10 @@ public class BoulderObject {
 
         // Damage and heal
         final List<KeyValue<LivingEntity, EntityProperty>> nearby = UtilEntity.getNearbyEntities(caster, impactLocation, radius, EntityProperty.ALL);
+        if (caster.getLocation().distanceSquared(impactLocation) <= radius * radius) {
+            nearby.add(new KeyValue<>(caster, EntityProperty.FRIENDLY));
+        }
+
         final List<Player> healed = new ArrayList<>();
         final List<LivingEntity> damaged = new ArrayList<>();
         for (KeyValue<LivingEntity, EntityProperty> nearbyEntry : nearby) {
