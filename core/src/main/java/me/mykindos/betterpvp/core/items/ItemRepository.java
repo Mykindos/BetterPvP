@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.items;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Singleton
+@Slf4j
 public class ItemRepository implements IRepository<BPVPItem> {
 
     @Inject
@@ -51,7 +53,7 @@ public class ItemRepository implements IRepository<BPVPItem> {
                 List<Component> lore = getLoreForItem(id);
 
                 if (material == null) {
-                    System.out.println("Material is null for item " + id);
+                    log.info("Material is null for item {}", id);
                     continue;
                 }
 

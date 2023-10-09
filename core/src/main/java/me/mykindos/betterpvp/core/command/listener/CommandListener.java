@@ -31,7 +31,6 @@ public class CommandListener implements Listener {
         this.commandManager = commandManager;
     }
 
-
     @EventHandler
     public void onPlayerCommandPreProcess(PlayerCommandPreprocessEvent event) {
         Optional<Client> clientOptional = clientManager.getObject(event.getPlayer().getUniqueId().toString());
