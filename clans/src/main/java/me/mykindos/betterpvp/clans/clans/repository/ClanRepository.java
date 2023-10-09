@@ -283,6 +283,14 @@ public class ClanRepository implements IRepository<Clan> {
 
         return alliances;
     }
+
+    public void saveTrust(IClan clan, ClanAlliance alliance) {
+        String query = "UPDATE " + databasePrefix + "clan_alliances SET Trusted = ? WHERE Clan = ? AND AllyClan = ?;";
+        database.executeUpdateAsync(new Statement(query,
+                new BooleanStatementValue(alliance.isTrusted()),
+                new UuidStatementValue(clan.getId()),
+                new UuidStatementValue(alliance.getClan().getId())));
+    }
     //endregion
 
     //region Clan enemies

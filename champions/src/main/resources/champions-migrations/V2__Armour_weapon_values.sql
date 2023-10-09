@@ -7,15 +7,15 @@ create table if not exists ${tablePrefix}damagevalues
 );
 
 INSERT IGNORE INTO ${tableprefix}damagevalues VALUES ("DIAMOND_SWORD", 6);
+INSERT IGNORE INTO ${tableprefix}damagevalues VALUES ("DIAMOND_AXE", 6);
 INSERT IGNORE INTO ${tableprefix}damagevalues VALUES ("GOLDEN_SWORD", 5);
+INSERT IGNORE INTO ${tableprefix}damagevalues VALUES ("GOLDEN_AXE", 5);
 INSERT IGNORE INTO ${tableprefix}damagevalues VALUES ("NETHERITE_SWORD", 6);
+INSERT IGNORE INTO ${tableprefix}damagevalues VALUES ("NETHERITE_AXE", 6);
 INSERT IGNORE INTO ${tableprefix}damagevalues VALUES ("IRON_SWORD", 5);
+INSERT IGNORE INTO ${tableprefix}damagevalues VALUES ("IRON_AXE", 5);
 INSERT IGNORE INTO ${tableprefix}damagevalues VALUES ("STONE_SWORD", 3);
 INSERT IGNORE INTO ${tableprefix}damagevalues VALUES ("WOODEN_SWORD", 2);
-INSERT IGNORE INTO ${tableprefix}damagevalues VALUES ("DIAMOND_AXE", 5);
-INSERT IGNORE INTO ${tableprefix}damagevalues VALUES ("GOLDEN_AXE", 4);
-INSERT IGNORE INTO ${tableprefix}damagevalues VALUES ("NETHERITE_AXE", 5);
-INSERT IGNORE INTO ${tableprefix}damagevalues VALUES ("IRON_AXE", 4);
 INSERT IGNORE INTO ${tableprefix}damagevalues VALUES ("STONE_AXE", 2);
 INSERT IGNORE INTO ${tableprefix}damagevalues VALUES ("WOODEN_AXE", 1);
 INSERT IGNORE INTO ${tableprefix}damagevalues VALUES ("TRIDENT", 2);

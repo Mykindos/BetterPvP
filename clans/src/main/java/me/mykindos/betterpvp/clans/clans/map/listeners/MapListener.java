@@ -83,7 +83,7 @@ public class MapListener implements Listener {
     //    }
     //}
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerQuit(PlayerQuitEvent event) {
         final Player player = event.getPlayer();
         mapHandler.clanMapData.remove(player.getUniqueId());
@@ -93,14 +93,14 @@ public class MapListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerJoin(PlayerJoinEvent event) {
         loadChunks(event.getPlayer());
 
 
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerDeath(PlayerDeathEvent event) {
         event.getDrops().removeIf(itemStack -> itemStack.getType() == Material.FILLED_MAP);
     }
@@ -121,7 +121,7 @@ public class MapListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.HIGHEST)
     private void onEvent(PrepareItemCraftEvent event) {
         for (ItemStack item : event.getInventory().getMatrix()) {
             if (item != null && item.getType() == Material.FILLED_MAP) {
@@ -130,7 +130,7 @@ public class MapListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.HIGHEST)
     private void onEvent(PlayerDropItemEvent event) {
         ItemStack item = event.getItemDrop().getItemStack();
         if (item.getType() == Material.FILLED_MAP) {
@@ -138,7 +138,7 @@ public class MapListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onClanAlly(ClanRelationshipEvent event) {
         UtilServer.runTaskLater(clans, () -> {
             event.getClan().getMembers().forEach(this::updateClanChunks);
@@ -146,30 +146,30 @@ public class MapListener implements Listener {
         }, 1);
     }
 
-    //@EventHandler(priority = EventPriority.MONITOR)
+    //@EventHandler(priority = EventPriority.HIGHEST)
     //public void onClanEnemy(ClanEnemyEvent event) {
     //    updateClanRelation(event.getClan(), event.getOther());
     //}
 //
-    //@EventHandler(priority = EventPriority.MONITOR)
+    //@EventHandler(priority = EventPriority.HIGHEST)
     //public void onClanTrust(ClanTrustEvent event) {
     //    updateClanRelation(event.getClan(), event.getOther());
     //}
 //
-    //@EventHandler(priority = EventPriority.MONITOR)
+    //@EventHandler(priority = EventPriority.HIGHEST)
     //public void onClanNeutral(ClanNeutralEvent event) {
     //    updateClanRelation(event.getClan(), event.getOther());
     //}
 //
-    //@EventHandler(priority = EventPriority.MONITOR)
+    //@EventHandler(priority = EventPriority.HIGHEST)
     //public void onClanRevokeTrust(ClanRevokeTrustEvent event) {
     //    updateClanRelation(event.getClan(), event.getOther());
     //}
 //
-    //@EventHandler(priority = EventPriority.MONITOR)
+    //@EventHandler(priority = EventPriority.HIGHEST)
     //public void onClanPillageStart(ClanPillageStartEvent event) { updateClanRelation(event.getPillager(), event.getPillagee()); }
 //
-    //@EventHandler(priority = EventPriority.MONITOR)
+    //@EventHandler(priority = EventPriority.HIGHEST)
     //public void onClanPillageEnd(ClanPillageEndEvent event) { updateClanRelation(event.getPillager(), event.getPillagee()); }
 //
     ////TODO ADD PILLAGE EVENT
@@ -230,7 +230,7 @@ public class MapListener implements Listener {
 //
 
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onClaim(ClanTerritoryEvent event) {
         if (event.isCancelled()) return;
         updateClaims(event.getClan());
@@ -284,7 +284,7 @@ public class MapListener implements Listener {
     }
 
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onClanLeave(MemberLeaveClanEvent event) {
         if (event.isCancelled()) return;
         UtilServer.runTaskLater(clans, () -> {
@@ -303,7 +303,7 @@ public class MapListener implements Listener {
     }
 
     //
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onDisband(ClanDisbandEvent event) {
         if (event.isCancelled()) return;
         UtilServer.runTaskLater(clans, () -> {
@@ -311,7 +311,7 @@ public class MapListener implements Listener {
                 if (!mapHandler.clanMapData.containsKey(online.getUniqueId())) {
                     mapHandler.clanMapData.put(online.getUniqueId(), new HashSet<>());
                 }
-                mapHandler.clanMapData.get(online.getUniqueId()).removeIf(chunkData -> clanManager.getObject(chunkData.getClan().getName()).isEmpty());
+                mapHandler.clanMapData.get(online.getUniqueId()).removeIf(chunkData -> event.getClan().getName().equalsIgnoreCase(chunkData.getClan().getName()));
                 for (ChunkData chunkData : mapHandler.clanMapData.get(online.getUniqueId())) {
                     final IClan clan = chunkData.getClan();
                     if (clan != null && !clan.isAdmin()) {
@@ -325,7 +325,7 @@ public class MapListener implements Listener {
 
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerJoinClan(MemberJoinClanEvent event) {
         if (event.isCancelled()) return;
         UtilServer.runTaskLater(clans, () -> {
@@ -387,9 +387,7 @@ public class MapListener implements Listener {
                 }
                 chunkClaimColor.add(chunkData);
 
-
             }
-
         }
 
         updateStatus(player);
@@ -464,12 +462,12 @@ public class MapListener implements Listener {
         ClanRelation clanRelation = clanManager.getRelation(playerClan, otherClan);
         MapColor materialColor = clanRelation.getMaterialColor();
 
-        if(otherClan != null) {
+        if (otherClan != null) {
             if (otherClan.isSafe()) {
                 materialColor = MapColor.SNOW;
             } else if (otherClan.isAdmin()) {
                 if (otherClan.getName().equalsIgnoreCase("Outskirts")) {
-                    materialColor = MapColor.COLOR_ORANGE;
+                    materialColor = MapColor.TERRACOTTA_PINK;
                 } else {
                     materialColor = MapColor.COLOR_RED;
                 }

@@ -139,6 +139,14 @@ public class ClanManager extends Manager<Clan> {
         Optional<Clan> playerClanOptional = getClanByPlayer(player);
         Optional<Clan> locationClanOptional = getClanByLocation(location);
 
+        Optional<Gamer> gamerOptional = gamerManager.getObject(player.getUniqueId());
+        if(gamerOptional.isPresent()) {
+            Gamer gamer = gamerOptional.get();
+            if(gamer.getClient().isAdministrating()) {
+                return true;
+            }
+        }
+
         if (locationClanOptional.isEmpty()) return true;
         if (playerClanOptional.isEmpty()) return false;
 
