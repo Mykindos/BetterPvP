@@ -51,14 +51,14 @@ public class AddOutskirtsSubCommand extends ClanSubCommand {
             try {
                 borderSize = Integer.parseInt(args[0]);
             } catch (NumberFormatException e) {
-                UtilMessage.message(player, "Clans", "<yellow>%s<gray> is not an integer.", args[0]);
+                UtilMessage.message(player, "Clans", "<yellow>%s<gray> is not an integer", args[0]);
                 return;
             }
         }
 
         Optional<Clan> outskirtsOptional = clanManager.getClanByName("Outskirts");
         if (outskirtsOptional.isEmpty()) {
-            UtilMessage.message(player, "Clans", "Outskirts clan does not exist, create it first.");
+            UtilMessage.message(player, "Clans", "Outskirts clan does not exist, create it first");
             return;
         }
 

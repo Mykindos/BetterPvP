@@ -42,7 +42,16 @@ public class SetDominanceSubCommand extends ClanSubCommand {
 
     @Override
     public void execute(Player player, Client client, String... args) {
+        if (args.length < 2) {
+            UtilMessage.message(player, "Clans", getUsage());
+        }
 
+        try {
+            int dominance = Integer.parseInt(args[1]);
+        } catch (NumberFormatException e) {
+            UtilMessage.message(player, "Clans", "<yellow>%s<gray> is not an integer", args[1]);
+            return;
+        }
         int dominance = Integer.parseInt(args[1]);
         if(dominance > 99) {
             UtilMessage.message(player, "Clans", "Dominance must be between 0-99");
