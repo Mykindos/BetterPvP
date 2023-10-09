@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
 import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
@@ -78,6 +79,10 @@ public class SetDominanceSubCommand extends ClanSubCommand {
                         + " <gray>has been set to <green>" + dominance + "%", null, true);
         targetClan.messageClan("<gray>Your dominance against <red>" + targetClan.getName()
                 + " <gray>has been set to <red>-" + dominance + "%", null, true);
+
+        gamerManager.sendMessageToRank("Clans",
+                UtilMessage.deserialize("<yellow>%s<gray> set the dominance of <yellow>%s<gray> against <yellow>%s<gray> to <green>%s",
+                        player.getName(), playerClan.getName(), targetClan.getName(), dominance), Rank.HELPER);
     }
 
     @Override
