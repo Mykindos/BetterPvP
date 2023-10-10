@@ -3,20 +3,12 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 plugins {
     java
     id("com.github.johnrengelman.shadow") version "7.1.2"
-    id("org.sonarqube") version "4.2.1.3168"
 }
 
 version = 1.0
 
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(17))
-}
-
-sonar {
-    properties {
-        property("sonar.projectKey", "Mykindos_BetterPvP_AYsY-joZlXMIEAL7aBHC")
-        property("sonar.projectName", "BetterPvP")
-    }
 }
 
 val shadowJar: ShadowJar by tasks
@@ -42,15 +34,15 @@ dependencies {
     implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
 
     compileOnly("io.papermc.paper:paper-api:1.20.1-R0.1-SNAPSHOT")
-    compileOnly("org.projectlombok:lombok:1.18.24")
+    compileOnly("org.projectlombok:lombok:1.18.26")
     compileOnly("com.comphenix.protocol:ProtocolLib:4.6.1-SNAPSHOT")
     compileOnly(project(":core"))
-    annotationProcessor("org.projectlombok:lombok:1.18.24")
+    annotationProcessor("org.projectlombok:lombok:1.18.26")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
-    testCompileOnly("org.projectlombok:lombok:1.18.24")
-    testAnnotationProcessor("org.projectlombok:lombok:1.18.24")
+    testCompileOnly("org.projectlombok:lombok:1.18.26")
+    testAnnotationProcessor("org.projectlombok:lombok:1.18.26")
 }
 
 tasks {
