@@ -62,17 +62,21 @@ public class ListSubCommand extends ClanSubCommand {
         List<Clan> clansList = new ArrayList<>(clanManager.getObjects().values());
         Collections.sort(clansList, Comparator.comparing(Clan::getName));
 
-        Component component = Component.text("Clans Page: ", NamedTextColor.YELLOW);
+        Component component = UtilMessage.deserialize("<yellow>Clan List<gray>: ");
 
         int count = 0;
         int start = (pageNumber - 1) * numPerPage;
         int end = start + numPerPage;
         int size = clansList.size();
+        int totalPages = size /numPerPage;
+        if (size % numPerPage > 0) {
+            totalPages++;
+        }
 
         Clan playerClan = clanManager.getClanByPlayer(player).orElse(null);
 
 
-        component = component.append(Component.text(pageNumber, NamedTextColor.WHITE));
+        component = component.append(UtilMessage.deserialize("<white>" + pageNumber + "<gray> / <white>" + totalPages));
 
         if (start <= size) {
             if (end > size) end = size;
