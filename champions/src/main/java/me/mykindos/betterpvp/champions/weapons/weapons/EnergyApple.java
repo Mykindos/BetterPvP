@@ -3,7 +3,7 @@ package me.mykindos.betterpvp.champions.weapons.weapons;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
-import me.mykindos.betterpvp.champions.energy.EnergyHandler;
+import me.mykindos.betterpvp.core.energy.EnergyHandler;
 import me.mykindos.betterpvp.champions.weapons.Weapon;
 import me.mykindos.betterpvp.champions.weapons.types.CooldownWeapon;
 import me.mykindos.betterpvp.champions.weapons.types.InteractWeapon;

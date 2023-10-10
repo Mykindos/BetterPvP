@@ -20,6 +20,8 @@ public class ClanMapRenderer extends MapRenderer {
 
     private final MapHandler mapHandler;
 
+    private int currentInterval;
+
     @Inject
     public ClanMapRenderer(MapHandler mapHandler) {
         super(true);
@@ -30,6 +32,12 @@ public class ClanMapRenderer extends MapRenderer {
     @Override
     public void render(@NotNull MapView mapView, @NotNull MapCanvas mapCanvas, @NotNull Player player) {
         if (!mapHandler.enabled) return;
+        currentInterval++;
+        if(currentInterval < mapHandler.updateInterval){
+            return;
+        }
+        currentInterval = 0;
+
         if (player.getInventory().getItemInMainHand().getType() != Material.FILLED_MAP) return;
         if (!player.getWorld().getName().equals("world")) return;
 

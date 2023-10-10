@@ -37,3 +37,20 @@ BEGIN
     ORDER BY COUNT(*) DESC
     LIMIT maxResults;
 END;
+
+DROP PROCEDURE IF EXISTS GetGamerFishingWeight;
+CREATE PROCEDURE GetGamerFishingWeight(IN gamerName VARCHAR(36), IN days DOUBLE)
+BEGIN
+    SELECT SUM(Weight) AS TotalWeight
+    FROM ${tablePrefix}fishing
+    WHERE Gamer = gamerName AND timestamp > NOW() - INTERVAL days DAY;
+END;
+
+
+DROP PROCEDURE IF EXISTS GetGamerFishingCount;
+CREATE PROCEDURE GetGamerFishingCount(IN gamerName VARCHAR(36), IN days DOUBLE)
+BEGIN
+    SELECT COUNT(*) AS FishCount
+    FROM ${tablePrefix}fishing
+    WHERE Gamer = gamerName AND timestamp > NOW() - INTERVAL days DAY;
+END;

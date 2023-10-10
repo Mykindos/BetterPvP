@@ -100,7 +100,7 @@ public class ClanEventListener extends ClanListener {
         UtilMessage.simpleMessage(player, "Clans", "You unclaimed territory <alt2>" + UtilWorld.chunkToPrettyString(chunk) + "</alt2>.");
 
         targetClan.messageClan(String.format("<yellow>%s<gray> unclaimed territory <yellow>%s<gray>.", player.getName(),
-                        UtilWorld.chunkToPrettyString(chunk)), player.getUniqueId(), true);
+                UtilWorld.chunkToPrettyString(chunk)), player.getUniqueId(), true);
         clanManager.getRepository().deleteClanTerritory(targetClan, chunkString);
         targetClan.getTerritory().removeIf(territory -> territory.getChunk().equals(UtilWorld.chunkToFile(chunk)));
     }
@@ -167,7 +167,7 @@ public class ClanEventListener extends ClanListener {
 
 
         UtilMessage.simpleMessage(player, "Clans", "You invited <alt2>" + target.getName() + "</alt2> to join your Clan.");
-        
+
         clan.messageClan(String.format("<yellow>%s<gray> invited <yellow>%s<gray> to join your Clan.", player.getName(), target.getName()), player.getUniqueId(), true);
 
         UtilMessage.simpleMessage(target, "Clans", "<alt2>" + player.getName() + "</alt2> invited you to join <alt2>Clan " + clan.getName() + "</alt2>.");
@@ -210,6 +210,7 @@ public class ClanEventListener extends ClanListener {
         inviteHandler.removeInvite(clan, targetGamer, "Invite");
         inviteHandler.removeInvite(targetGamer, clan, "Invite");
 
+        clan.setOnline(true);
         clan.messageClan(String.format("<yellow>%s<gray> has joined your Clan.", player.getName()), player.getUniqueId(), true);
         UtilMessage.simpleMessage(player, "Clans", "You joined <alt2>Clan " + clan.getName() + "</alt2>.");
 
@@ -230,7 +231,16 @@ public class ClanEventListener extends ClanListener {
             clan.getMembers().remove(clanMember);
 
             UtilMessage.simpleMessage(player, "Clans", "You left <alt2>Clan " + clan.getName() + "</alt2>.");
-            clan.messageClan(String.format("<yellow>%s<gray> left your Clan.", player.getName()), player.getUniqueId(), true);
+
+            boolean isOnline = false;
+            for (ClanMember member : clan.getMembers()) {
+                Player playerMember = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
+                if (playerMember != null) {
+                    UtilMessage.message(playerMember, "Clans", "<yellow>%s<gray> left your Clan.", player.getName());
+                    isOnline = true;
+                }
+            }
+            clan.setOnline(isOnline);
         }
 
     }
@@ -298,6 +308,63 @@ public class ClanEventListener extends ClanListener {
 
         clanManager.getRepository().saveClanAlliance(clan, clanAlliance);
         clanManager.getRepository().saveClanAlliance(target, targetAlliance);
+    }
+
+    @EventHandler
+    public void onClanRequestTrust(ClanRequestTrustEvent event) {
+        if (event.isCancelled()) return;
+
+        Clan clan = event.getClan();
+        Clan target = event.getTargetClan();
+
+        if (inviteHandler.isInvited(clan, target, "Trust") || inviteHandler.isInvited(target, clan, "Trust")) {
+
+            UtilServer.callEvent(new ClanTrustEvent(event.getPlayer(), clan, target));
+            return;
+        }
+
+        inviteHandler.createInvite(clan, target, "Trust", 10);
+        UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You have requested to form a trust with <yellow>%s<gray>.", target.getName());
+        target.messageClan("<yellow>Clan " + clan.getName() + "<gray> has requested to form a trust with your clan.", null, true);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onClanTrust(ClanTrustEvent event) {
+        if (event.isCancelled()) return;
+        Clan clan = event.getClan();
+        Clan target = event.getTargetClan();
+
+        inviteHandler.removeInvite(clan, target, "Trust");
+        inviteHandler.removeInvite(target, clan, "Trust");
+
+        ClanAlliance clanAlliance = event.getClan().getAlliance(target).orElseThrow();
+        ClanAlliance targetAlliance = event.getTargetClan().getAlliance(clan).orElseThrow();
+        clanAlliance.setTrusted(true);
+        targetAlliance.setTrusted(true);
+
+        clan.messageClan("<yellow>Clan " + target.getName() + "<gray> is now a trusted ally.", null, true);
+        target.messageClan("<yellow>Clan " + clan.getName() + "<gray> is now a trusted ally.", null, true);
+
+        clanManager.getRepository().saveTrust(clan, clanAlliance);
+        clanManager.getRepository().saveTrust(target, targetAlliance);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onClanUntrust(ClanUntrustEvent event) {
+        if (event.isCancelled()) return;
+        Clan clan = event.getClan();
+        Clan target = event.getTargetClan();
+
+        ClanAlliance clanAlliance = event.getClan().getAlliance(target).orElseThrow();
+        ClanAlliance targetAlliance = event.getTargetClan().getAlliance(clan).orElseThrow();
+        clanAlliance.setTrusted(false);
+        targetAlliance.setTrusted(false);
+
+        clan.messageClan("<yellow>Clan " + target.getName() + "<gray> is no longer a trusted ally.", null, true);
+        target.messageClan("<yellow>Clan " + clan.getName() + "<gray> is no longer a trusted ally.", null, true);
+
+        clanManager.getRepository().saveTrust(clan, clanAlliance);
+        clanManager.getRepository().saveTrust(target, targetAlliance);
     }
 
     @EventHandler
@@ -410,7 +477,7 @@ public class ClanEventListener extends ClanListener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onMemberPromote(MemberPromoteEvent event) {
-        if(event.isCancelled()) return;
+        if (event.isCancelled()) return;
 
         Player player = event.getPlayer();
         Clan clan = event.getClan();
@@ -425,14 +492,14 @@ public class ClanEventListener extends ClanListener {
                 memberGamer.getClient().getName(), member.getName());
 
         Player memberPlayer = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
-        if(memberPlayer != null){
+        if (memberPlayer != null) {
             UtilMessage.simpleMessage(memberPlayer, "Clans", "You were promoted to <yellow>%s<gray>.", member.getName());
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onMemberDemote(MemberDemoteEvent event) {
-        if(event.isCancelled()) return;
+        if (event.isCancelled()) return;
 
         Player player = event.getPlayer();
         Clan clan = event.getClan();
@@ -443,13 +510,13 @@ public class ClanEventListener extends ClanListener {
 
         Gamer memberGamer = gamerManager.getObject(member.getUuid()).orElseThrow(() -> new NoSuchGamerException(member.getUuid()));
 
-        if(!player.getUniqueId().toString().equalsIgnoreCase(member.getUuid())) {
+        if (!player.getUniqueId().toString().equalsIgnoreCase(member.getUuid())) {
             UtilMessage.simpleMessage(player, "Clans", "You demoted <aqua>%s<gray> to <yellow>%s<gray>.",
                     memberGamer.getClient().getName(), member.getName());
         }
 
         Player memberPlayer = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
-        if(memberPlayer != null){
+        if (memberPlayer != null) {
             UtilMessage.simpleMessage(memberPlayer, "Clans", "You were demoted to <yellow>%s<gray>.", member.getName());
         }
     }

@@ -3,7 +3,7 @@ package me.mykindos.betterpvp.champions.weapons.weapons.legendaries;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
-import me.mykindos.betterpvp.champions.energy.EnergyHandler;
+import me.mykindos.betterpvp.core.energy.EnergyHandler;
 import me.mykindos.betterpvp.champions.weapons.types.ChannelWeapon;
 import me.mykindos.betterpvp.champions.weapons.types.InteractWeapon;
 import me.mykindos.betterpvp.champions.weapons.types.LegendaryWeapon;
@@ -55,7 +55,7 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
 
     @Inject
     public AlligatorsTooth(EnergyHandler energyHandler) {
-        super(Material.MUSIC_DISC_MALL, Component.text("Alligators Tooth", NamedTextColor.RED));
+        super(Material.MUSIC_DISC_MALL, 1,UtilMessage.deserialize("<orange>Alligators Tooth"));
         this.energyHandler = energyHandler;
     }
 

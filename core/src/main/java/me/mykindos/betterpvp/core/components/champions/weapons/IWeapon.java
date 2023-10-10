@@ -15,6 +15,4 @@ public interface IWeapon {
 
     boolean isHoldingWeapon(Player player);
 
-
-
 }

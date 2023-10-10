@@ -44,7 +44,7 @@ public class BalanceCommand extends Command {
     @Override
     public void execute(Player player, Client client, String... args) {
         Gamer gamer = gamerManager.getObject(player.getUniqueId()).orElseThrow(() -> new NoSuchGamerException(player.getUniqueId()));
-        UtilMessage.simpleMessage(player, "Economy", "<yellow>Balance: <green>$%d", gamer.getProperty(GamerProperty.BALANCE).orElse(0));
+        UtilMessage.simpleMessage(player, "Economy", "<yellow>Balance: <green>$%,d", gamer.getProperty(GamerProperty.BALANCE).orElse(0));
     }
 
     @Singleton
@@ -105,11 +105,11 @@ public class BalanceCommand extends Command {
                 gamer.saveProperty(GamerProperty.BALANCE, gamer.getBalance() - amountToPay);
                 targetGamer.saveProperty(GamerProperty.BALANCE, targetGamer.getBalance() + amountToPay);
 
-                UtilMessage.simpleMessage(player, "Economy", "You paid <yellow>%s <green>$%d<gray>.", targetGamer.getClient().getName(), amountToPay);
+                UtilMessage.simpleMessage(player, "Economy", "You paid <yellow>%s <green>$%,d<gray>.", targetGamer.getClient().getName(), amountToPay);
 
                 Player targetPlayer = Bukkit.getPlayer(UUID.fromString(targetGamer.getUuid()));
                 if(targetPlayer != null) {
-                    UtilMessage.simpleMessage(targetPlayer, "Economy", "You received <green>$%d <gray>from <yellow>%s<gray>.", amountToPay, player.getName());
+                    UtilMessage.simpleMessage(targetPlayer, "Economy", "You received <green>$%,d <gray>from <yellow>%s<gray>.", amountToPay, player.getName());
                 }
 
                 log.info("{} paid {} ${}", player.getName(), targetGamer.getClient().getName(), amountToPay);

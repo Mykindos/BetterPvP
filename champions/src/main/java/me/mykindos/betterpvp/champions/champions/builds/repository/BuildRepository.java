@@ -92,6 +92,8 @@ public class BuildRepository implements IRepository<RoleBuild> {
         if (value != null && !value.equals("")) {
             String[] split = value.split(",");
             Skill skill = skillManager.getObjects().get(split[0]);
+            if(skill == null) return;
+            if (!skill.isEnabled()) return;
 
             int level = Integer.parseInt(split[1]);
             build.setSkill(type, skill, level);
@@ -197,7 +199,7 @@ public class BuildRepository implements IRepository<RoleBuild> {
         }
 
         builds.forEach(build -> {
-            if(build.getId() == 1) {
+            if (build.getId() == 1) {
                 build.setActive(true);
             }
 

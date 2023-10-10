@@ -5,8 +5,10 @@ import me.mykindos.betterpvp.champions.weapons.Weapon;
 import me.mykindos.betterpvp.champions.weapons.types.LegendaryWeapon;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -19,7 +21,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 public class HyperAxe extends Weapon implements LegendaryWeapon, Listener {
 
     public HyperAxe() {
-        super(Material.MUSIC_DISC_BLOCKS, 1, Component.text("Hyper Axe", NamedTextColor.RED));
+        super(Material.MUSIC_DISC_BLOCKS, 1, UtilMessage.deserialize("<orange>Hyper Axe"));
     }
 
     @EventHandler(priority = EventPriority.LOW)

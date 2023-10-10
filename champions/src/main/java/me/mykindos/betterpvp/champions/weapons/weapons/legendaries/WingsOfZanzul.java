@@ -4,6 +4,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.weapons.Weapon;
 import me.mykindos.betterpvp.champions.weapons.types.LegendaryWeapon;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
@@ -18,7 +19,7 @@ import java.util.List;
 @BPvPListener
 public class WingsOfZanzul extends Weapon implements LegendaryWeapon, Listener {
     public WingsOfZanzul() {
-        super(Material.ELYTRA, 0, Component.text("Wings of Zanzul", NamedTextColor.RED));
+        super(Material.ELYTRA, 1, UtilMessage.deserialize("<orange>Wings of Zanzul"));
     }
 
     @EventHandler

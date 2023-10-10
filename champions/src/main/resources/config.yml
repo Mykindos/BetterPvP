@@ -167,7 +167,7 @@ skills:
       enabled: true
       cooldown: 25
       maxlevel: 5
-      radius: 5.0
+      baseRadius: 4.0
       baseHeal: 2.0
       baseDamage: 3.0
     inferno:
@@ -365,6 +365,11 @@ skills:
       maxlevel: 5
       baseDamage: 18.0
       deathMessageThreshold: 40.0
+    heavyarrows:
+      enabled: true
+      maxlevel: 5
+      energy: 20
+      basePushBack: 1.25
     overcharge:
       enabled: true
       maxlevel: 5
@@ -375,7 +380,7 @@ skills:
       maxConsecutiveHits: 4
     precision:
       enabled: true
-      maxlevel: 5
+      maxlevel: 3
     entangle:
       enabled: true
       maxlevel: 3

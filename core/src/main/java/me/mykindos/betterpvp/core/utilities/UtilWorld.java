@@ -4,7 +4,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 
+import java.util.Collection;
 import java.util.Iterator;
 
 public class UtilWorld {
@@ -38,7 +40,9 @@ public class UtilWorld {
         }
 
         String[] split = string.split(", ");
-        Location location = new Location(Bukkit.getWorld(split[0]), Double.parseDouble(split[1]), Double.parseDouble(split[2]), Double.parseDouble(split[3]));
+        var world = Bukkit.getWorld(split[0]);
+
+        Location location = new Location(world, Double.parseDouble(split[1]), Double.parseDouble(split[2]), Double.parseDouble(split[3]));
 
         if (split.length >= 5) {
             location.setYaw(Float.parseFloat(split[4]));
@@ -47,6 +51,26 @@ public class UtilWorld {
 
         return location;
 
+    }
+
+    public static Chunk closestChunkToPlayer(Collection<Chunk> chunkList, Player player) {
+        if (chunkList.isEmpty()) {
+            return null;
+        }
+        Chunk closestChunk = (Chunk) chunkList.stream().findFirst().get();
+
+        int y = (int) player.getY();
+
+        double closestDistance = player.getLocation().distanceSquared(closestChunk.getBlock(8, y, 8).getLocation());
+
+        for (Chunk chunk : chunkList) {
+            double distance = player.getLocation().distanceSquared(chunk.getBlock(8, y, 8).getLocation());
+            if (closestDistance > distance) {
+                closestDistance = distance;
+                closestChunk = chunk;
+            }
+        }
+        return closestChunk;
     }
 
     /**

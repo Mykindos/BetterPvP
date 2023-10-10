@@ -2,14 +2,15 @@ package me.mykindos.betterpvp.core.items;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.database.repository.IRepository;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.apache.commons.lang.NotImplementedException;
 import org.bukkit.Material;
 
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Singleton
+@Slf4j
 public class ItemRepository implements IRepository<BPVPItem> {
 
     @Inject
@@ -39,25 +41,25 @@ public class ItemRepository implements IRepository<BPVPItem> {
         List<BPVPItem> items = new ArrayList<>();
         String query = "SELECT * FROM " + databasePrefix + "items WHERE Module = ?";
         CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(module)));
-        try{
+        try {
             while (result.next()) {
                 int id = result.getInt(1);
                 Material material = Material.getMaterial(result.getString(2));
-                Component name = MiniMessage.miniMessage().deserialize(result.getString(4)).decoration(TextDecoration.ITALIC, false);
+                Component name = UtilMessage.deserialize(result.getString(4)).decoration(TextDecoration.ITALIC, false);
                 int customModelData = result.getInt(5);
                 boolean glowing = result.getBoolean(6);
                 boolean uuid = result.getBoolean(7);
 
                 List<Component> lore = getLoreForItem(id);
 
-                if(material == null){
-                    System.out.println("Material is null for item " + id);
+                if (material == null) {
+                    log.info("Material is null for item {}", id);
                     continue;
                 }
 
                 items.add(new BPVPItem(material, name, lore, customModelData, glowing, uuid));
             }
-        }catch (Exception ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
         return items;
@@ -68,11 +70,11 @@ public class ItemRepository implements IRepository<BPVPItem> {
         String query = "SELECT * FROM " + databasePrefix + "itemlore WHERE Item = " + id + " ORDER BY Priority ASC";
         CachedRowSet result = database.executeQuery(new Statement(query));
 
-        try{
+        try {
             while (result.next()) {
-                lore.add(MiniMessage.miniMessage().deserialize(result.getString(3)).decoration(TextDecoration.ITALIC, false));
+                lore.add(UtilMessage.deserialize(result.getString(3)).decoration(TextDecoration.ITALIC, false));
             }
-        }catch (Exception ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
         return lore;

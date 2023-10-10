@@ -10,9 +10,9 @@ import org.bukkit.ChatColor;
 @Getter
 public enum ClanRelation {
 
-    PILLAGE(NamedTextColor.LIGHT_PURPLE, NamedTextColor.DARK_PURPLE, MapColor.COLOR_PURPLE),
+    PILLAGE(NamedTextColor.LIGHT_PURPLE, NamedTextColor.DARK_PURPLE, MapColor.COLOR_MAGENTA),
     ALLY(NamedTextColor.GREEN, NamedTextColor.DARK_GREEN, MapColor.COLOR_LIGHT_GREEN),
-    ALLY_TRUST(NamedTextColor.DARK_GREEN, NamedTextColor.GREEN, MapColor.COLOR_GREEN),
+    ALLY_TRUST(NamedTextColor.DARK_GREEN, NamedTextColor.GREEN, MapColor.COLOR_LIGHT_GREEN),
     ENEMY(NamedTextColor.RED, NamedTextColor.DARK_RED, MapColor.COLOR_RED),
     SAFE(NamedTextColor.AQUA, NamedTextColor.DARK_AQUA, MapColor.SNOW),
     NEUTRAL(NamedTextColor.YELLOW, NamedTextColor.GOLD, MapColor.GOLD),

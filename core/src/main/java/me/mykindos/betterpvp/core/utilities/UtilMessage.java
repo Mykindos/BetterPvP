@@ -6,6 +6,7 @@ import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -19,10 +20,11 @@ public class UtilMessage {
 
     private static final TagResolver tagResolver = TagResolver.resolver(
             TagResolver.resolver("alt", Tag.styling(NamedTextColor.GREEN)),
-            TagResolver.resolver("alt2", Tag.styling(NamedTextColor.YELLOW))
+            TagResolver.resolver("alt2", Tag.styling(NamedTextColor.YELLOW)),
+            TagResolver.resolver("orange", Tag.styling(TextColor.color(0xFFA500)))
     );
 
-    public static final Component DIVIDER = Component.text("                                            ")
+    public static final TextComponent DIVIDER = Component.text("                                            ")
             .color(NamedTextColor.DARK_GRAY)
             .decorate(TextDecoration.STRIKETHROUGH);
 
@@ -47,7 +49,7 @@ public class UtilMessage {
      * @param message Message to send to the CommandSender
      */
     public static void message(CommandSender sender, String prefix, String message) {
-       message(sender, prefix, MiniMessage.miniMessage().deserialize(message, tagResolver));
+        message(sender, prefix, MiniMessage.miniMessage().deserialize(message, tagResolver));
     }
 
     /**
@@ -213,8 +215,8 @@ public class UtilMessage {
     /**
      * Sends a message utilizing <a href="https://docs.adventure.kyori.net/minimessage">MiniMessage</a> from Adventure API
      *
-     * @param sender  The CommandSender
-     * @param prefix  The message
+     * @param sender    The CommandSender
+     * @param prefix    The message
      * @param component Message to send to the CommandSender
      */
     public static void simpleMessage(CommandSender sender, String prefix, Component component) {
@@ -281,10 +283,30 @@ public class UtilMessage {
     /**
      * Broadcasts a message to all players on the server with formatting
      *
+     * @param prefix  The prefix of the message
+     * @param message The message to be broadcasted
+     * @param args    The args to interpolate in the string
+     */
+    public static void broadcast(String prefix, String message, Object... args) {
+        Bukkit.getServer().broadcast(getPrefix(prefix).append(deserialize(message, args)));
+    }
+
+    /**
+     * Broadcasts a message to all players on the server with formatting
+     *
      * @param message The message to be broadcasted
      */
     public static void broadcast(String message) {
         Bukkit.getServer().broadcast(deserialize(message));
+    }
+
+    /**
+     * Broadcasts a message to all players on the server with formatting
+     *
+     * @param message The message to be broadcasted
+     */
+    public static void broadcast(Component message) {
+        Bukkit.getServer().broadcast(message);
     }
 
 }

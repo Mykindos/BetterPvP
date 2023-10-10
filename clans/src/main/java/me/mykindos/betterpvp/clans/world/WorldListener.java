@@ -382,19 +382,9 @@ public class WorldListener implements Listener {
      * Updates the names of items that are picked up from the ground (sets there name to be yellow from wh ite)
      * Other than enchanted armour
      */
-    @EventHandler
+    @EventHandler (priority = EventPriority.MONITOR)
     public void onPickup(EntityPickupItemEvent event) {
         if (event.getEntity() instanceof Player) {
-            // TODO implement weapons
-            //Weapon w = WeaponManager.getWeapon(event.getItem().getItemStack());
-            //if (w != null) {
-            //    if (w instanceof EnchantedWeapon) {
-//
-            //        return;
-            //    }
-//
-            //}
-
             itemHandler.updateNames(event.getItem().getItemStack());
         }
     }

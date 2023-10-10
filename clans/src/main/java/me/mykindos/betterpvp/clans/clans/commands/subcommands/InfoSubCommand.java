@@ -66,9 +66,9 @@ public class InfoSubCommand extends ClanSubCommand {
         Component component = Component.text(target.getName() + " Information: ", clanRelation.getPrimary()).appendNewline()
                 .append(Component.text("Age: ", NamedTextColor.WHITE)).append(Component.text(target.getAge(), NamedTextColor.YELLOW)).appendNewline()
                 .append(Component.text("Territory: ", NamedTextColor.WHITE)).append(Component.text(target.getTerritory().size() + "/" + (3 + target.getMembers().size()), NamedTextColor.YELLOW)).appendNewline()
-                .append(Component.text("Allies: ", NamedTextColor.WHITE)).append(UtilMessage.getMiniMessage(clanManager.getAllianceList(player, target))).appendNewline()
-                .append(Component.text("Enemies: ", NamedTextColor.WHITE)).append(UtilMessage.getMiniMessage(clanManager.getEnemyListDom(player, target))).appendNewline()
-                .append(Component.text("Members: ", NamedTextColor.WHITE)).append(UtilMessage.getMiniMessage(clanManager.getMembersList(target))).appendNewline()
+                .append(Component.text("Allies: ", NamedTextColor.WHITE)).append(UtilMessage.deserialize(clanManager.getAllianceList(player, target))).appendNewline()
+                .append(Component.text("Enemies: ", NamedTextColor.WHITE)).append(UtilMessage.deserialize(clanManager.getEnemyListDom(player, target))).appendNewline()
+                .append(Component.text("Members: ", NamedTextColor.WHITE)).append(UtilMessage.deserialize(clanManager.getMembersList(target))).appendNewline()
                 .append(Component.text("Energy: ", NamedTextColor.WHITE)).append(Component.text(target.getEnergy() + " - (", NamedTextColor.YELLOW)
                         .append(Component.text(target.getEnergyTimeRemaining(), NamedTextColor.GOLD).append(Component.text(")", NamedTextColor.YELLOW)))).appendNewline()
                 .append(Component.text("Level: ", NamedTextColor.WHITE)).append(Component.text(target.getLevel(), NamedTextColor.GOLD)).appendNewline();

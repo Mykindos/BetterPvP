@@ -117,7 +117,6 @@ public class ClientListener implements Listener {
 
     @EventHandler
     public void onLunarEvent(LunarClientEvent event) {
-        System.out.println(event.getPlayer().getName());
         Optional<Client> clientOptional = clientManager.getObject(event.getPlayer().getUniqueId().toString());
         clientOptional.ifPresent(client -> {
             client.putProperty(ClientProperty.LUNAR, event.isRegistered());

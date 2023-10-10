@@ -170,6 +170,13 @@ public class ClanRepository implements IRepository<Clan> {
                 new UuidStatementValue(clan.getId())));
     }
 
+    public void updateClanSafe(Clan clan) {
+        String query = "UPDATE " + databasePrefix + "clans SET Safe = ? WHERE id = ?;";
+        database.executeUpdateAsync(new Statement(query,
+                new BooleanStatementValue(clan.isSafe()),
+                new UuidStatementValue(clan.getId())));
+    }
+
     //region Clan territory
     public void saveClanTerritory(IClan clan, String chunk) {
         String query = "INSERT INTO " + databasePrefix + "clan_territory (Clan, Chunk) VALUES (?, ?);";
@@ -275,6 +282,14 @@ public class ClanRepository implements IRepository<Clan> {
         }
 
         return alliances;
+    }
+
+    public void saveTrust(IClan clan, ClanAlliance alliance) {
+        String query = "UPDATE " + databasePrefix + "clan_alliances SET Trusted = ? WHERE Clan = ? AND AllyClan = ?;";
+        database.executeUpdateAsync(new Statement(query,
+                new BooleanStatementValue(alliance.isTrusted()),
+                new UuidStatementValue(clan.getId()),
+                new UuidStatementValue(alliance.getClan().getId())));
     }
     //endregion
 
