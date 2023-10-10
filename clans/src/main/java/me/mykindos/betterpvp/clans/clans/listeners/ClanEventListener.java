@@ -128,7 +128,7 @@ public class ClanEventListener extends ClanListener {
 
         UtilMessage.simpleMessage(event.getPlayer(), "Clans", "Successfully created clan <aqua>%s", clan.getName());
         if (clan.isAdmin()) {
-            gamerManager.sendMessageToRank("Clans", UtilMessage.deserialize("<yellow>%s<gray> created admin clan <yellow>%s", event.getPlayer(), clan.getName()), Rank.HELPER);
+            gamerManager.sendMessageToRank("Clans", UtilMessage.deserialize("<yellow>%s<gray> created admin clan <yellow>%s", event.getPlayer().getName(), clan.getName()), Rank.HELPER);
         }
     }
 
