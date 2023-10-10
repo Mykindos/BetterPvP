@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
 import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
 import me.mykindos.betterpvp.clans.clans.events.ChunkClaimEvent;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanTerritory;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
@@ -47,12 +48,17 @@ public class AddOutskirtsSubCommand extends ClanSubCommand {
 
         int borderSize = 1;
         if (args.length > 0) {
-            borderSize = Integer.parseInt(args[0]);
+            try {
+                borderSize = Integer.parseInt(args[0]);
+            } catch (NumberFormatException e) {
+                UtilMessage.message(player, "Clans", "<yellow>%s<gray> is not an integer", args[0]);
+                return;
+            }
         }
 
         Optional<Clan> outskirtsOptional = clanManager.getClanByName("Outskirts");
         if (outskirtsOptional.isEmpty()) {
-            UtilMessage.message(player, "Clans", "Outskirts clan does not exist, create it first.");
+            UtilMessage.message(player, "Clans", "Outskirts clan does not exist, create it first");
             return;
         }
 
@@ -76,8 +82,10 @@ public class AddOutskirtsSubCommand extends ClanSubCommand {
                 }
             }
         }
+        String message = "Added <yellow>%s<gray> claims to the outskirts";
 
-        UtilMessage.simpleMessage(player, "Clans", "Added <yellow>%s<gray> claims to the outskirts", claims);
+        UtilMessage.simpleMessage(player, "Clans", message, claims);
+        gamerManager.sendMessageToRank("Clans", UtilMessage.deserialize("<yellow>%s<gray> " + message.toLowerCase(), player.getName(), claims), Rank.HELPER);
     }
 
     @Override

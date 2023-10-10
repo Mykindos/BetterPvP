@@ -8,8 +8,10 @@ import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
 import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
 import me.mykindos.betterpvp.clans.clans.insurance.Insurance;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.entity.Player;
 
 import java.util.Collections;
@@ -37,6 +39,8 @@ public class ClanRecoveryCommand extends ClanSubCommand {
     @Override
     public void execute(Player player, Client client, String... args) {
         Clan clan = clanManager.getClanByPlayer(player).orElseThrow();
+
+        gamerManager.sendMessageToRank("Clans", UtilMessage.deserialize("<yellow>%s<gray> triggered clan recovery for <yellow>%s", player.getName(), clan.getName()), Rank.HELPER);
 
         List<Insurance> insuranceList = clan.getInsurance();
         insuranceList.sort(Collections.reverseOrder());
