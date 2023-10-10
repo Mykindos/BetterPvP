@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.combat.events.CustomKnockbackEvent;
 import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.log.DamageLog;
 import me.mykindos.betterpvp.core.combat.log.DamageLogManager;
+import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.gamer.properties.GamerProperty;
@@ -121,7 +122,7 @@ public class CombatListener implements Listener {
                         continue;
                     }
 
-                    if(adapter.processCustomDamageAdapter(event)) {
+                    if (adapter.processCustomDamageAdapter(event)) {
                         finalizeDamage(event);
                         return;
                     }
@@ -488,18 +489,6 @@ public class CombatListener implements Listener {
     public void onFireDamage(CustomDamageEvent event) {
         if (event.getCause() == EntityDamageEvent.DamageCause.FIRE_TICK) {
             event.setIgnoreArmour(true);
-        }
-    }
-
-    /**
-     * Disable bow critical hits
-     *
-     * @param event The event
-     */
-    @EventHandler
-    public void onShootBow(EntityShootBowEvent event) {
-        if (event.getProjectile() instanceof Arrow arrow) {
-            arrow.setCritical(false);
         }
     }
 
