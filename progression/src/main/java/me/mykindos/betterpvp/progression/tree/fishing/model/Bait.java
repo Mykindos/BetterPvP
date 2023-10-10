@@ -2,14 +2,13 @@ package me.mykindos.betterpvp.progression.tree.fishing.model;
 
 import lombok.Getter;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
-import me.mykindos.betterpvp.core.framework.customtypes.CustomArmourStand;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilLocation;
 import me.mykindos.betterpvp.core.utilities.model.ProgressColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
-import org.bukkit.craftbukkit.v1_20_R1.CraftWorld;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.FishHook;
 import org.bukkit.entity.Player;
@@ -99,9 +98,9 @@ public abstract class Bait {
         final ItemStack skull = type.getRawItem();
 
         // Spawn the armor stands
-        this.referenceEntity = createUtilityArmorStand(location);
+        this.referenceEntity = UtilEntity.createUtilityArmorStand(location);
         this.referenceEntity.setVelocity(velocity);
-        this.floatingEntity = createUtilityArmorStand(location);
+        this.floatingEntity = UtilEntity.createUtilityArmorStand(location);
         this.floatingEntity.getEquipment().setHelmet(skull, true);
 
        new BukkitRunnable() {
@@ -197,20 +196,6 @@ public abstract class Bait {
 
     private boolean isInWater(Location location) {
         return location.getBlock().getType().equals(Material.WATER);
-    }
-
-    private static ArmorStand createUtilityArmorStand(@NotNull Location location) {
-        CustomArmourStand as = new CustomArmourStand(((CraftWorld) location.getWorld()).getHandle());
-        ArmorStand armorStand = (ArmorStand) as.spawn(location);
-        armorStand.setSmall(true);
-        armorStand.setGravity(true);
-        armorStand.setSilent(true); // Remove sounds the armor stand makes like when it falls or in water
-        armorStand.setPortalCooldown(Integer.MAX_VALUE); // We don't want them using portals
-        armorStand.setInvulnerable(true); // We don't want them taking damage
-        armorStand.setVisualFire(false); // We don't want them to have fire
-        armorStand.setPersistent(false); // We don't want them to be saved in the world
-        armorStand.setCollidable(false); // We don't want them to collide with anything
-        return armorStand;
     }
 
 }
