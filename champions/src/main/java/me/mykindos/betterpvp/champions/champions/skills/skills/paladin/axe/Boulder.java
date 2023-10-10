@@ -35,7 +35,7 @@ public class Boulder extends Skill implements Listener, InteractSkill, CooldownS
 
     private double baseHeal;
     private double baseDamage;
-    private double radius;
+    private double baseRadius;
 
     @Inject
     public Boulder(Champions champions, ChampionsManager championsManager) {
@@ -62,7 +62,7 @@ public class Boulder extends Skill implements Listener, InteractSkill, CooldownS
     }
 
     private double getRadius(int level) {
-        return radius + 0.5 * (level - 1);
+        return baseRadius + 0.5 * (level - 1);
     }
 
     private double getDamage(int level) {
@@ -92,10 +92,10 @@ public class Boulder extends Skill implements Listener, InteractSkill, CooldownS
     public void activate(Player player, int level) {
         final Location feetLocation = player.getLocation();
 
-    // Clone the blocks under the player to add realism
-    final List<BlockData> clonedBlocks = new ArrayList<>();
-        for (double x = -radius; x < radius; x++) {
-            for (double z = -radius; z < radius; z++) {
+        // Clone the blocks under the player to add realism
+        final List<BlockData> clonedBlocks = new ArrayList<>();
+        for (double x = -baseRadius; x < baseRadius; x++) {
+            for (double z = -baseRadius; z < baseRadius; z++) {
                 final Block block = feetLocation.clone().add(x, -1.0, z).getBlock();
                 if (UtilBlock.solid(block)) {
                     clonedBlocks.add(block.getBlockData());
@@ -109,7 +109,7 @@ public class Boulder extends Skill implements Listener, InteractSkill, CooldownS
             clonedBlocks.add(Bukkit.createBlockData(Material.STONE));
         }
 
-        final BoulderObject boulder = new BoulderObject(champions, getHeal(level), getDamage(level), getRadius(level), radius, clonedBlocks, this);
+        final BoulderObject boulder = new BoulderObject(champions, getHeal(level), getDamage(level), getRadius(level), clonedBlocks, this);
         boulder.spawn(player);
 
         boulders.computeIfAbsent(player, key -> new ArrayList<>()).add(boulder);
@@ -124,7 +124,7 @@ public class Boulder extends Skill implements Listener, InteractSkill, CooldownS
     public void loadSkillConfig() {
         baseHeal = getConfig("baseHeal", 2.0, Double.class);
         baseDamage = getConfig("baseDamage", 3.0, Double.class);
-        radius = getConfig("radius", 4.0, Double.class);
+        baseRadius = getConfig("baseRadius", 4.0, Double.class);
     }
 
     @UpdateEvent

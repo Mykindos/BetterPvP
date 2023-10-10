@@ -3,19 +3,16 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.paladin.data;
 import lombok.Data;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.framework.customtypes.CustomArmourStand;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.utilities.*;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
+import org.bukkit.*;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.v1_20_R1.CraftWorld;
 import org.bukkit.entity.*;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.BoundingBox;
@@ -36,12 +33,12 @@ public class BoulderObject {
     private final double heal;
     private final double damage;
     private final double radius;
-    private final double maxRadius;
     private final List<BlockData> blockPool;
     private final Skill skill;
 
     private ArmorStand referenceEntity;
     private List<Display> displayBlocks;
+    private List<ArmorStand> vehicles = new ArrayList<>();
     private BukkitTask task;
 
     public BoundingBox getBoundingBox() {
@@ -57,7 +54,7 @@ public class BoulderObject {
         final Location location = caster.getEyeLocation().add(caster.getLocation().getDirection().normalize().multiply(0.5));
 
         // Throw sound cue
-        location.getWorld().playSound(location, Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 1f, 1f);
+        location.getWorld().playSound(location, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 2f, 0f);
 
         // Create reference armor stand
         // The block displays will follow this
@@ -144,19 +141,24 @@ public class BoulderObject {
         final Location impactLocation = getCenterLocation();
 
         // Deconstruction of the boulder
-        final int tickDelay = 5;
-        Map<Display, Vector> directions = new HashMap<>();
+        final int tickDelay = 10;
         for (Display display : displayBlocks) {
-            // reset transformations
-            display.setTransformation(new Transformation(new Vector3f(0), new Quaternionf(), new Vector3f(1f), new Quaternionf()));
-            display.teleport(referenceEntity.getLocation().add(-0.5, 0.0, -0.5)); // locate them in the center bottom, so they can start rolling
-            display.setRotation(0f, 0f);
-
             // get a random direction to throw this pebble to
             final Vector direction = new Vector(RANDOM.nextFloat() * getRandomNegative(), 0, RANDOM.nextFloat() * getRandomNegative()).normalize();
+
+            // Assign a new armorstand to move
+            final ArmorStand vehicle = UtilEntity.createUtilityArmorStand(impactLocation);
             referenceEntity.removePassenger(display);
-            direction.setY(0);
-            directions.put(display, direction);
+            vehicle.addPassenger(display);
+            vehicles.add(vehicle);
+
+            // reset transformations
+            final float height = (float) vehicle.getHeight();
+            display.setTransformation(new Transformation(new Vector3f(0, -height, 0), new Quaternionf(), new Vector3f(1f), new Quaternionf()));
+            display.setRotation(0f, 0f);
+
+            // Shoot them out
+            vehicle.setVelocity(direction.multiply(0.7));
         }
 
         final int maxDeconstructTicks = 40;
@@ -172,6 +174,7 @@ public class BoulderObject {
                     return;
                 }
 
+                // Make the pbbles smaller and rotate them
                 scale = scale.mul(0.9f);
                 for (Display display : displayBlocks) {
                     display.setInterpolationDelay(0);
@@ -181,31 +184,12 @@ public class BoulderObject {
                     final Transformation transformation = display.getTransformation();
                     final Vector3f translation = transformation.getTranslation();
 
-                    // Gravity
-                    // get location of the translation and check if it's grounded by X amount of blocks
-                    // if it is not, then add gravity
-                    final Location location = display.getLocation().add(new Vector(translation.x, translation.y, translation.z));
-                    final Block under = location.getBlock().getRelative(BlockFace.DOWN);
-                    float xGravityFactor = 1;
-                    float yGravityDelta = 0;
-                    if (UtilBlock.airFoliage(under) || !UtilBlock.solid(under)) {
-                        xGravityFactor = 0.2f;
-                        yGravityDelta = -2f;
-                    }
-
-                    final Vector dir = directions.get(display);
-                    Vector3f newTranslation = new Vector3f(
-                                    (float) dir.getX() * xGravityFactor * ticks / tickDelay,
-                                    -0.07f * ticks / tickDelay + yGravityDelta,
-                                    (float) dir.getZ() * xGravityFactor * ticks / tickDelay);
-
                     // rotations
                     final Quaternionf leftRotation = transformation.getLeftRotation();
                     leftRotation.rotateAxis((float) Math.toRadians(10), getRandomNegative(), 1, getRandomNegative());
                     final Quaternionf rightRotation = transformation.getRightRotation();
-                    //                    rightRotation.rotateAxis((float) Math.toRadians(10), 0, 1, 0);
 
-                    display.setTransformation(new Transformation(newTranslation, leftRotation, scale, rightRotation));
+                    display.setTransformation(new Transformation(translation, leftRotation, scale, rightRotation));
                 }
             }
         }.runTaskTimer(champions, 0L, tickDelay);
@@ -213,7 +197,7 @@ public class BoulderObject {
         // Particles
         final int maxRadiusTicks = 5; // Expand to max radius over half a second
         new BukkitRunnable() {
-            double radius = 0;
+            double particleRadius = 0;
             double ticks = 0;
             @Override
             public void run() {
@@ -224,9 +208,9 @@ public class BoulderObject {
                 }
 
                 // Particle ring
-                radius += maxRadius / maxRadiusTicks;
+                particleRadius += radius / maxRadiusTicks;
                 for (int degree = 0; degree <= 360; degree += 15) {
-                    final Location absRingPoint = UtilLocation.fromFixedAngleDistance(impactLocation, radius, degree);
+                    final Location absRingPoint = UtilLocation.fromFixedAngleDistance(impactLocation, particleRadius, degree);
                     final Optional<Location> ringPoint = UtilLocation.getClosestSurfaceBlock(absRingPoint, 3.0, true);
                     if (ringPoint.isEmpty()) {
                         continue;
@@ -241,6 +225,10 @@ public class BoulderObject {
 
         // Damage and heal
         final List<KeyValue<LivingEntity, EntityProperty>> nearby = UtilEntity.getNearbyEntities(caster, impactLocation, radius, EntityProperty.ALL);
+        if (caster.getLocation().distanceSquared(impactLocation) <= radius * radius) {
+            nearby.add(new KeyValue<>(caster, EntityProperty.FRIENDLY));
+        }
+
         final List<Player> healed = new ArrayList<>();
         final List<LivingEntity> damaged = new ArrayList<>();
         for (KeyValue<LivingEntity, EntityProperty> nearbyEntry : nearby) {
@@ -252,12 +240,16 @@ public class BoulderObject {
                 healed.add(ally);
                 UtilPlayer.health(ally, getHeal());
                 Particle.VILLAGER_HAPPY.builder().location(ally.getLocation()).offset(0.0, ally.getHeight() + 0.2, 0.0).receivers(60, true).spawn();
+                ally.getWorld().playSound(ally.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 2f);
+                UtilMessage.simpleMessage(ally, skill.getName(), "<alt2>%s</alt2> healed you for <alt>%s</alt> health.", caster.getName(), getHeal());
             } else {
                 // Damage anybody else
                 damaged.add(ent);
                 Vector knockback = ent.getLocation().toVector().subtract(impactLocation.toVector());
-                final double strength = ent.getLocation().distanceSquared(impactLocation) * 0.5 / radius;
+                final double strength = (radius * radius - ent.getLocation().distanceSquared(impactLocation)) / (radius * radius);
                 UtilVelocity.velocity(ent, knockback, strength, false, 0.0, 0.0, 3.0, true);
+                UtilDamage.doCustomDamage(new CustomDamageEvent(ent, caster, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(), false, skill.getName()));
+                UtilMessage.simpleMessage(ent, skill.getName(), "<alt2>%s</alt2> hit you with <alt>%s</alt>.", caster.getName(), skill.getName());
             }
         }
 
@@ -265,24 +257,14 @@ public class BoulderObject {
             caster.getWorld().playSound(caster.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 2f);
             final String nameList = healed.stream().map(player -> "<alt2>" + player.getName() + "</alt2>").collect(Collectors.joining(", "));
             UtilMessage.simpleMessage(caster, skill.getName(), "You healed %s for <alt>%s</alt> health.", nameList, getHeal());
-
-            healed.forEach(player -> {
-                player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 2f);
-                UtilMessage.simpleMessage(player, skill.getName(), "<alt2>%s</alt2> healed you for <alt>%s</alt> health.", caster.getName(), getHeal());
-            });
         }
 
         if (!damaged.isEmpty()) {
             final String nameList = damaged.stream().map(player -> "<alt2>" + player.getName() + "</alt2>").collect(Collectors.joining(", "));
             UtilMessage.simpleMessage(caster, skill.getName(), "You hit %s with <alt>%s</alt>.", nameList, skill.getName());
-
-            healed.forEach(player -> {
-                player.getWorld().playSound(impactLocation, Sound.ENTITY_PLAYER_LEVELUP, 1f, 2f);
-                UtilMessage.simpleMessage(player, skill.getName(), "<alt2>%s</alt2> hit you with <alt>%s</alt>.", caster.getName(), skill.getName());
-            });
         }
 
-        impactLocation.getWorld().playSound(impactLocation, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1.5f, 0.5f);
+        impactLocation.getWorld().playSound(impactLocation, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1f, 0.5f);
     }
 
     private int getRandomNegative() {
@@ -296,6 +278,9 @@ public class BoulderObject {
             public void run() {
                 for (Display display : displayBlocks) {
                     display.remove();
+                }
+                for (ArmorStand vehicle : vehicles) {
+                    vehicle.remove();
                 }
             }
         }.runTaskLater(champions, 25L);
