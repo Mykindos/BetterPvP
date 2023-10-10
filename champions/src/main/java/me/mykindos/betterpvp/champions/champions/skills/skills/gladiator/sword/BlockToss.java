@@ -80,6 +80,9 @@ public class BlockToss extends ChannelSkill implements InteractSkill, CooldownSk
                 "",
                 "Higher Charge time = Stronger Block and Farther Distance",
                 "",
+                "Charges <val>" + getChargePerSecond(level) + "%</val> per second,",
+                "dealing up to <val>" + (baseDamage+level) + "</val> damage.",
+                "",
                 "Cooldown: <val>" + getCooldown(level),
         };
     }
@@ -121,7 +124,7 @@ public class BlockToss extends ChannelSkill implements InteractSkill, CooldownSk
         return (baseDamage+level)*charge;
     }
     private double getChargePerSecond(int level) {
-        return (float) baseCharge + (15 * (level - 1)); // Increment of 15% per level
+        return (float) (baseCharge*100) + (15 * (level - 1)); // Increment of 15% per level
     }
 
     public void setCharge(double chargePercent){
@@ -357,7 +360,7 @@ public class BlockToss extends ChannelSkill implements InteractSkill, CooldownSk
 
     @Override
     public void loadSkillConfig(){
-        baseCharge = getConfig("baseCharge", 60.0, Double.class);
+        baseCharge = getConfig("baseCharge", 0.60, Double.class);
         baseDamage = getConfig("baseDamage", 8.0, Double.class);
         duration = getConfig("duration", 4.0, Double.class);
 

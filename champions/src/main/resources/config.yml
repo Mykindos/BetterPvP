@@ -330,7 +330,7 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 4
-      baseCharge: 60.0
+      baseCharge: 0.60
       baseDamage: 8.0
       duration: 4.0
   ranger:
