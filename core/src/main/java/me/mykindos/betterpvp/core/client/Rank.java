@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.client;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 
@@ -35,6 +36,10 @@ public enum Rank {
             tag = tag.decorate(TextDecoration.BOLD);
         }
         return tag;
+    }
+
+    public Component getPlayerNameMouseOver (String name) {
+        return Component.text(name, getColor()).hoverEvent(HoverEvent.showText(Component.text(getName(), getColor())));
     }
 
     public static Rank getRank(int id) {
