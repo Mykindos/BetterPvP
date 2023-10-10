@@ -8,7 +8,9 @@ import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
 import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
 import me.mykindos.betterpvp.clans.clans.insurance.Insurance;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.SubCommand;
+import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.entity.Player;
@@ -43,6 +45,8 @@ public class SetSafeCommand extends ClanSubCommand {
             clan.setSafe(isSafe);
             UtilMessage.message(player, "Clans", "Updated clan safe status to " + isSafe);
             clanManager.getRepository().updateClanSafe(clan);
+            gamerManager.sendMessageToRank("Clans", UtilMessage.deserialize( "<yellow>%s<gray> set <yellow>%s<gray> as a safezone: <green>%s",
+                    player.getName(), clan.getName(), isSafe), Rank.HELPER);
         } else {
             UtilMessage.message(player, "Clans", "Correct usage: /clan setsafe <true/false>");
         }
