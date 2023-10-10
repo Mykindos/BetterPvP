@@ -10,8 +10,10 @@ import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerCanUseSkillEvent;
+import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -69,7 +71,6 @@ public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill {
             if (arrow == null || arrow.isDead() || !(arrow.getShooter() instanceof Player)) {
                 it.remove();
             } else {
-                Player shooter = (Player) arrow.getShooter();
                 Location location = arrow.getLocation().add(new Vector(0, 0.25, 0));
                 Particle.CRIT_MAGIC.builder().location(location).receivers(60).extra(0).spawn();
             }
@@ -81,12 +82,21 @@ public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill {
         if (!(event.getEntity() instanceof Player player)) return;
         if (!(event.getProjectile() instanceof Arrow arrow)) return;
 
+        if (UtilBlock.isInLiquid(player)
+                || championsManager.getEffects().hasEffect(player, EffectType.SILENCE)
+                || championsManager.getEffects().hasEffect(player, EffectType.STUN)) {
+            return;
+        }
+
         int level = getLevel(player);
         if (level > 0) {
             PlayerCanUseSkillEvent skillEvent = UtilServer.callEvent(new PlayerCanUseSkillEvent(player, this));
             if (!skillEvent.isCancelled()) {
 
-                boolean hasEnoughEnergy = championsManager.getEnergy().use(player, getName(), getEnergy(level), false);
+                float charge = event.getForce();
+                float scaledEnergy = getEnergy(level) * charge;
+
+                boolean hasEnoughEnergy = championsManager.getEnergy().use(player, getName(), scaledEnergy, false);
 
                 if (!player.isSneaking() && hasEnoughEnergy) {
                     arrows.add(arrow);
@@ -94,7 +104,6 @@ public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill {
 
                 if (!player.isSneaking() && hasEnoughEnergy) {
                     Vector pushback = player.getLocation().getDirection().multiply(-1);
-                    float charge = event.getForce();
                     pushback.multiply(basePushBack * charge);
                     player.setVelocity(pushback);
                 }
