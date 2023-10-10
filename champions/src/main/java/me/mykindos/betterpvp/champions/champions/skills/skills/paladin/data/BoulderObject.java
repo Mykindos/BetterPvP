@@ -10,7 +10,7 @@ import me.mykindos.betterpvp.core.utilities.*;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import org.bukkit.*;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.craftbukkit.v1_20_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_20_R2.CraftWorld;
 import org.bukkit.entity.*;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.scheduler.BukkitRunnable;
