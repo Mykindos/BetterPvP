@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.entity.Player;
@@ -42,16 +43,22 @@ public class StaffChatCommand extends Command {
     @Override
     public void execute(Player player, Client client, String... args) {
         Optional<Gamer> gamerOptional = gamerManager.getObject(player.getUniqueId().toString());
+
         if(gamerOptional.isPresent()) {
+            Gamer gamer = gamerOptional.get();
             if(args.length > 0) {
                 String playerName = UtilFormat.spoofNameForLunar(player.getName());
-                String message = "<dark_purple>" + playerName + " <light_purple>" + String.join(" ", args);
-                Component component = UtilMessage.deserialize(message);
+                Rank sendRank = gamer.getClient().getRank();
+                Component senderComponent = sendRank.getPlayerNameMouseOver(playerName);
+                Component message = Component.text(" " + String.join(" ", args), NamedTextColor.LIGHT_PURPLE);
+                //Start with a Component.empty() to avoid the hoverEvent from propagating down
+                Component component = Component.empty().append(senderComponent).append(message);
+
                 gamerManager.sendMessageToRank("", component, Rank.HELPER);
                 return;
             }
             boolean staffChatEnabled = true;
-            Gamer gamer = gamerOptional.get();
+
             Optional<Boolean> staffChatEnabledOptional = gamer.getProperty(GamerProperty.STAFF_CHAT);
             if(staffChatEnabledOptional.isPresent()){
                 staffChatEnabled = !staffChatEnabledOptional.get();
