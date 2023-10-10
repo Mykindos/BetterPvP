@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
 import me.mykindos.betterpvp.clans.clans.events.ChunkUnclaimEvent;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.ClientManager;
+import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.config.Config;
@@ -18,6 +19,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.entity.Player;
 
+import java.util.Objects;
 import java.util.Optional;
 
 @Singleton
@@ -78,6 +80,9 @@ public class UnclaimSubCommand extends ClanSubCommand {
                 if (gamerOptional.isPresent()) {
                     if (gamerOptional.get().getClient().isAdministrating()) {
                         UtilMessage.message(player, "Clans", "You may not unclaim territory from this Clan at this time.");
+                        gamerManager.sendMessageToRank("Clans",
+                                UtilMessage.deserialize("<yellow>%s<gray> prevented <yellow>%s<gray> from unclaiming <yellow>%s<gray>'s territory because they are in adminstrator mode",
+                                        Objects.requireNonNull(gamerOptional.get().getPlayer()).getName(), player.getName(), locationClan.getName()), Rank.HELPER);
                         return;
                     }
                 }
