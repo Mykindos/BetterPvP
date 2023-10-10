@@ -3,12 +3,20 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 plugins {
     java
     id("com.github.johnrengelman.shadow") version "7.1.2"
+    id("org.sonarqube") version "4.2.1.3168"
 }
 
 version = 1.0
 
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+}
+
+sonar {
+    properties {
+        property("sonar.projectKey", "Mykindos_BetterPvP_AYsY-joZlXMIEAL7aBHC")
+        property("sonar.projectName", "BetterPvP")
+    }
 }
 
 

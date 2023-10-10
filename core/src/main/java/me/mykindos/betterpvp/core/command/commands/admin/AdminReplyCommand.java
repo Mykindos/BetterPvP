@@ -21,20 +21,20 @@ import java.util.Arrays;
 import java.util.Optional;
 
 @Singleton
-public class AdminMessageCommand extends Command {
+public class AdminReplyCommand extends Command {
 
     private final GamerManager gamerManager;
 
     @Inject
-    public AdminMessageCommand(GamerManager gamerManager){
+    public AdminReplyCommand(GamerManager gamerManager){
         this.gamerManager = gamerManager;
 
-        aliases.add("ma");
+        aliases.add("ra");
     }
 
     @Override
     public String getName() {
-        return "messageadmin";
+        return "replyadmin";
     }
 
     @Override
@@ -49,14 +49,14 @@ public class AdminMessageCommand extends Command {
             Gamer gamer = gamerOptional.get();
             Gamer receivingGamer = null;
             if(args.length == 0) {
-                UtilMessage.message(player, "Core", "Usage: <player> <message>");
-                return;
-            }
-            if(args.length == 1) {
                 UtilMessage.message(player, "Core", "You must specify a message");
                 return;
             }
-            Optional<Gamer> optionalReceivingGamer = gamerManager.getGamerByName(args[0]);
+            if (gamer.getLastAdminMessenger() == null) {
+                UtilMessage.message(player, "Core", UtilMessage.deserialize("<gray>No previous player to reply to"));
+                return;
+            }
+            Optional<Gamer> optionalReceivingGamer = gamerManager.getObject(gamer.getLastAdminMessenger());
             Player receiver = null;
             if (optionalReceivingGamer.isPresent()) {
 
@@ -65,7 +65,7 @@ public class AdminMessageCommand extends Command {
 
             }
             if (receiver == null) {
-                UtilMessage.message(player, "Core", UtilMessage.deserialize("<gray>No player named <yellow>" + args[0] + "<gray> found"));
+                UtilMessage.message(player, "Core", UtilMessage.deserialize("<gray>No online player to reply to found"));
                 return;
             }
 
@@ -79,7 +79,7 @@ public class AdminMessageCommand extends Command {
             Component senderComponent = sendRank.getPlayerNameMouseOver(playerName);
             Component receiverComponent = receiveRank.getPlayerNameMouseOver(receiver.getName());
             Component arrow = Component.text(" -> ", NamedTextColor.DARK_PURPLE);
-            Component message = Component.text(" " + String.join(" ", Arrays.stream(args).toList().subList(1, args.length)), NamedTextColor.LIGHT_PURPLE);
+            Component message = Component.text(" " + String.join(" ", args), NamedTextColor.LIGHT_PURPLE);
             //Start with a Component.empty() to avoid the hoverEvent from propagating down
             Component component = Component.empty().append(senderComponent).append(arrow).append(receiverComponent).append(message);
             if (!receivingGamer.getClient().hasRank(Rank.HELPER)) {
@@ -95,14 +95,4 @@ public class AdminMessageCommand extends Command {
     public Rank getRequiredRank() {
         return Rank.HELPER;
     }
-
-    @Override
-    public String getArgumentType(int argCount) {
-        if (argCount == 1) {
-            return ArgumentType.PLAYER.name();
-        }
-        return ArgumentType.NONE.name();
-    }
-
-
 }

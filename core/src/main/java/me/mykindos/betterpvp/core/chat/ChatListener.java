@@ -87,9 +87,10 @@ public class ChatListener implements Listener {
             if (staffChat) {
                 event.cancel("Player has staff chat enabled");
 
-                String message = "<dark_purple>" + playerName + " <light_purple>" + PlainTextComponentSerializer.plainText().serialize(event.getMessage());
-
-                Component component = UtilMessage.deserialize(message);
+                Rank sendRank = gamer.getClient().getRank();
+                Component senderComponent = sendRank.getPlayerNameMouseOver(playerName);
+                Component message = Component.text(" " + PlainTextComponentSerializer.plainText().serialize(event.getMessage()), NamedTextColor.LIGHT_PURPLE);
+                Component component = Component.empty().append(senderComponent).append(message);
 
                 gamerManager.sendMessageToRank("", component, Rank.HELPER);
             }
