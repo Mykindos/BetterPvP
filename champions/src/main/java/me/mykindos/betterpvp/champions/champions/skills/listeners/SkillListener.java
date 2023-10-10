@@ -78,9 +78,19 @@ public class SkillListener implements Listener {
             return;
         }
 
-        if (skill instanceof CooldownSkill cooldownSkill) {
+        if (skill instanceof CooldownSkill cooldownSkill && !(skill instanceof PrepareArrowSkill)) {
             if (!cooldownManager.use(player, skill.getName(), cooldownSkill.getCooldown(level),
                     cooldownSkill.showCooldownFinished(), true, cooldownSkill.isCancellable(), cooldownSkill::shouldDisplayActionBar)) {
+                event.setCancelled(true);
+                return;
+            }
+        } else if (skill instanceof PrepareArrowSkill) {
+            if (cooldownManager.hasCooldown(player, skill.getName())) {
+
+                if (((PrepareArrowSkill) skill).showCooldownFinished()) {
+                    UtilMessage.simpleMessage(player, "Cooldown", "You cannot use <alt>%s</alt> for <alt>%s</alt> seconds.", skill.getName(),
+                            Math.max(0, cooldownManager.getAbilityRecharge(player, skill.getName()).getRemaining()));
+                }
                 event.setCancelled(true);
                 return;
             }

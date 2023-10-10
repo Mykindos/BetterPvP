@@ -57,11 +57,11 @@ public abstract class PrepareArrowSkill extends PrepareSkill implements Cooldown
 
         int level = getLevel(player);
         if (level > 0) {
-            processEntityShootBowEvent(event, player, level, arrow);
-            active.remove(player.getUniqueId());
-            championsManager.getCooldowns().removeCooldown(player, getName(), true);
-            championsManager.getCooldowns().use(player, getName(), getCooldown(level), showCooldownFinished(), false);
-            onFire(player);
+            if(championsManager.getCooldowns().use(player, getName(), getCooldown(level), showCooldownFinished(), false, isCancellable(), this::shouldDisplayActionBar)) {
+                processEntityShootBowEvent(event, player, level, arrow);
+                active.remove(player.getUniqueId());
+                onFire(player);
+            }
         }
     }
 
@@ -100,19 +100,6 @@ public abstract class PrepareArrowSkill extends PrepareSkill implements Cooldown
             int level = getLevel(player);
             if (level <= 0) {
                 it.remove();
-                continue;
-            }
-
-            if (!UtilPlayer.isHoldingItem(player, SkillWeapons.BOWS)) {
-                Cooldown cooldown = championsManager.getCooldowns().getAbilityRecharge(player, getName());
-                if (cooldown != null) {
-                    if (cooldown.isCancellable()) {
-                        championsManager.getCooldowns().removeCooldown(player, getName(), true);
-                        UtilMessage.simpleMessage(player, getClassType().getName(), "<alt>%s</alt> was cancelled.", getName() + " " + level);
-                        it.remove();
-                    }
-                }
-
             }
 
         }
