@@ -172,6 +172,6 @@ public class WeaponListener implements Listener {
                     .append(Component.text(" dropped a legendary ", NamedTextColor.GRAY))
                     .append(weapon.getName().hoverEvent(itemStack)));
         }
-
     }
+
 }
