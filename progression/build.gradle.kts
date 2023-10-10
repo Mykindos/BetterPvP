@@ -27,13 +27,13 @@ repositories {
 }
 
 dependencies {
-    paperweight.paperDevBundle("1.20.1-R0.1-SNAPSHOT")
+    paperweight.paperDevBundle("1.20.2-R0.1-SNAPSHOT")
 
     implementation("com.google.inject:guice:5.1.0")
     implementation("org.reflections:reflections:0.10.2")
     implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
 
-    compileOnly("io.papermc.paper:paper-api:1.20.1-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.20.2-R0.1-SNAPSHOT")
     compileOnly("org.projectlombok:lombok:1.18.26")
     compileOnly("com.comphenix.protocol:ProtocolLib:4.6.1-SNAPSHOT")
     compileOnly(project(":core"))
