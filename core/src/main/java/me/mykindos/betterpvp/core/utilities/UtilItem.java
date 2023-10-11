@@ -17,6 +17,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class UtilItem {
 
@@ -75,7 +76,7 @@ public class UtilItem {
         ItemMeta im = item.getItemMeta();
         im.displayName(name);
         if (lore != null) {
-            im.lore(lore);
+            im.lore(removeItalic(lore));
         }
 
         im.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ITEM_SPECIFICS);
@@ -95,6 +96,22 @@ public class UtilItem {
         ItemMeta itemMeta = item.getItemMeta();
         itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
         item.setItemMeta(itemMeta);
+
+
+        return item;
+    }
+
+    /**
+     * Removes Enchants from an ItemStack (e.g. the `Sharpness iV` that is visible
+     * on a diamond sword's lore)
+     *
+     * @param item ItemStack to update
+     * @return Returns an itemstack without its attributes
+     */
+    public static ItemStack removeEnchants(ItemStack item) {
+        for (Map.Entry<Enchantment, Integer> entry : item.getEnchantments().entrySet()) {
+            item.removeEnchantment(entry.getKey());
+        }
 
 
         return item;
