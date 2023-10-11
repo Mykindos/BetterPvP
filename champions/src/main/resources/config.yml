@@ -11,6 +11,7 @@ skills:
       enabled: true
       cooldown: 20
       maxlevel: 3
+      damagePerSecond: 2.0
     shockingstrikes:
       enabled: true
       maxlevel: 3

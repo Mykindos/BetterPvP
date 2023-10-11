@@ -27,6 +27,8 @@ import javax.inject.Singleton;
 @BPvPListener
 public class Sever extends PrepareSkill implements CooldownSkill, Listener {
 
+    private double damagePerSecond;
+
     @Inject
     public Sever(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -99,7 +101,7 @@ public class Sever extends PrepareSkill implements CooldownSkill, Listener {
                 } else {
                     if (championsManager.getCooldowns().use(damagee, "Sever-Damage", 0.75, false)) {
                         var cde = new CustomDamageEvent(damagee, damager, null,
-                                DamageCause.CUSTOM, 1.5, false, getName());
+                                DamageCause.CUSTOM, damagePerSecond, false, getName());
                         cde.setIgnoreArmour(true);
                         UtilDamage.doCustomDamage(cde);
                     }
@@ -107,6 +109,12 @@ public class Sever extends PrepareSkill implements CooldownSkill, Listener {
                 }
             }
         }.runTaskTimer(champions, 20, 20);
+    }
+
+    @Override
+    public void loadSkillConfig() {
+        damagePerSecond = getConfig("damagePerSecond", 2.0, Double.class);
+
     }
 
 
