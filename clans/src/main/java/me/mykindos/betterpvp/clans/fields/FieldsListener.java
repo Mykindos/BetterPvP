@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.events.TerritoryInteractEvent;
 import me.mykindos.betterpvp.clans.clans.listeners.ClanListener;
+import me.mykindos.betterpvp.clans.fields.event.FieldsInteractableUseEvent;
 import me.mykindos.betterpvp.clans.fields.model.FieldsBlock;
 import me.mykindos.betterpvp.clans.fields.model.FieldsInteractable;
 import me.mykindos.betterpvp.core.client.events.ClientAdministrateEvent;
@@ -13,6 +14,7 @@ import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.gamer.exceptions.NoSuchGamerException;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.block.Block;
@@ -104,6 +106,7 @@ public class FieldsListener extends ClanListener {
             event.getBlock().setBlockData(type.getReplacement());
             block.setLastUsed(System.currentTimeMillis());
             block.setActive(false);
+            UtilServer.callEvent(new FieldsInteractableUseEvent(fields, type, block, event.getPlayer()));
         }
     }
 
@@ -158,7 +161,7 @@ public class FieldsListener extends ClanListener {
                         return; // The block is already the interactable, ignore
                     }
 
-                    final Block block = interactable.toLocation().getBlock();
+                    final Block block = interactable.getLocation().getBlock();
                     block.setType(type.getType().getMaterial());
                     block.setBlockData(type.getType());
                     interactable.setActive(true);

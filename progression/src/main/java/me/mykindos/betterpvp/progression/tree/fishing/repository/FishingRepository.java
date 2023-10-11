@@ -1,10 +1,10 @@
 package me.mykindos.betterpvp.progression.tree.fishing.repository;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
-import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.utilities.model.WeighedList;
@@ -39,6 +39,7 @@ import java.util.concurrent.CompletableFuture;
 // The data should be saved as a fallback to the database every 5 minutes
 // The data should be saved on shutdown
 @Slf4j
+@Singleton
 public class FishingRepository extends ProgressionStatsRepository<Fishing, FishingData> {
 
     @Getter
@@ -58,11 +59,11 @@ public class FishingRepository extends ProgressionStatsRepository<Fishing, Fishi
 
     @Inject
     public FishingRepository(Progression progression) {
-        super(progression.getInjector().getInstance(Database.class), progression, "Fishing");
+        super(progression, "Fishing");
     }
 
     @Override
-    public CompletableFuture<FishingData> loadDataAsync(UUID player) {
+    public CompletableFuture<FishingData> fetchDataAsync(UUID player) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 String stmt = "SELECT COUNT(*), SUM(Weight) FROM " + plugin.getDatabasePrefix() + "fishing WHERE gamer = ?;";
@@ -75,11 +76,11 @@ public class FishingRepository extends ProgressionStatsRepository<Fishing, Fishi
                 }
                 return data;
             } catch (SQLException e) {
-                log.error("Failed to get progression data for player " + player, e);
+                log.error("Failed to get fishing data for player " + player, e);
             }
             return new FishingData();
         }).exceptionally(throwable -> {
-            log.error("Failed to get progression data for player " + player, throwable);
+            log.error("Failed to get fishing data for player " + player, throwable);
             return null;
         });
     }

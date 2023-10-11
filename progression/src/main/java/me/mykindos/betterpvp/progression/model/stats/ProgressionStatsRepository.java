@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.progression.model.stats;
 
 import com.google.common.reflect.TypeToken;
 import lombok.extern.slf4j.Slf4j;
-import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.LongStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
@@ -24,8 +23,8 @@ public abstract class ProgressionStatsRepository<T extends ProgressionTree, K ex
 
     protected T tree;
 
-    protected ProgressionStatsRepository(Database database, Progression plugin, String tableName) {
-        super(database, plugin, tableName);
+    protected ProgressionStatsRepository(Progression plugin, String tableName) {
+        super(plugin, tableName);
     }
 
     @Override
