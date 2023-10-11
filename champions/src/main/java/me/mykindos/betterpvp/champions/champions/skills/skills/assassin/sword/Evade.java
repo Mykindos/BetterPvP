@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomEntityVelocityEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -35,13 +36,13 @@ import java.util.*;
 @Singleton
 @BPvPListener
 public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill {
-
-    private final WeakHashMap<Player, Long> delay = new WeakHashMap<>();
     private final WeakHashMap<Player, Long> activationTime = new WeakHashMap<>();
     private final HashMap<Player, Long> handRaisedTime = new HashMap<>();
-    private final Set<Player> evadePlayers = new HashSet<>();
 
     public double duration;
+
+    @Inject
+    private CooldownManager cooldownManager;
 
     @Inject
     public Evade(Champions champions, ChampionsManager championsManager) {
@@ -59,10 +60,11 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
         return new String[]{
                 "Hold right click with a Sword to channel",
                 "",
-                "If a player hits you while evading,",
+                "If a player hits you while Evading,",
                 "you will teleport behind the attacker",
+                "and your cooldown will be set to 1 second",
                 "",
-                "Hold Crouch while Evading to teleport backwards",
+                "Hold crouch while Evading to teleport backwards",
                 "",
                 "<stat>" + getCooldown(level) + "</stat> second internal cooldown",
         };
@@ -86,44 +88,37 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
         if (!(event.getDamagee() instanceof Player player)) return;
         if (!active.contains(player.getUniqueId())) return;
         if (event.getDamager() == null) return;
+
         LivingEntity ent = event.getDamager();
 
-        if (hasSkill(player) && player.isHandRaised()) {
+        event.setKnockback(false);
+        event.cancel("Skill Evade");
 
-            if (!delay.containsKey(player)) {
-                delay.put(player, 0L);
-            }
-
-            event.setKnockback(false);
-            event.cancel("Skill Evade");
-            if (UtilTime.elapsed(delay.get(player), 500)) {
-                for (int i = 0; i < 3; i++) {
-                    player.getWorld().playEffect(player.getLocation(), Effect.SMOKE, 5);
-                }
-                Location target;
-                if (player.isSneaking()) {
-                    target = findLocationBack(ent, player);
-                } else {
-                    target = findLocationBehind(ent, player);
-                }
-
-                if (target != null) {
-                    player.teleport(target);
-                }
-
-                UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s<gray>.", getName());
-                if (ent instanceof Player temp) {
-                    UtilMessage.simpleMessage(temp, getClassType().getName(), "<yellow>%s<gray> used evade!", player.getName());
-                }
-
-                delay.put(player, System.currentTimeMillis());
-                active.remove(player.getUniqueId());
-                evadePlayers.add(player);
-
-            }
-
+        for (int i = 0; i < 3; i++) {
+            player.getWorld().playEffect(player.getLocation(), Effect.SMOKE, 5);
         }
 
+        Location target;
+        if (player.isSneaking()) {
+            target = findLocationBack(ent, player);
+        } else {
+            target = findLocationBehind(ent, player);
+        }
+
+        if (target != null) {
+            player.teleport(target);
+            cooldownManager.removeCooldown(player, getName(), true);
+            cooldownManager.use(player, getName(), 1.0, true);
+            handRaisedTime.remove(player);
+        }
+
+        UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s<gray>.", getName());
+
+        if (ent instanceof Player temp) {
+            UtilMessage.simpleMessage(temp, getClassType().getName(), "<yellow>%s<gray> used evade!", player.getName());
+        }
+
+        active.remove(player.getUniqueId());
     }
 
     @EventHandler
@@ -175,14 +170,15 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
                 }
                 if (player.isHandRaised() && !handRaisedTime.containsKey(player)) {
                     handRaisedTime.put(player, System.currentTimeMillis());
+
                 }
-                if (!player.isHandRaised() && handRaisedTime.containsKey(player) && !evadePlayers.contains(player)) {
+                if (!player.isHandRaised() && handRaisedTime.containsKey(player)) {
                     handRaisedTime.remove(player);
                     it.remove();
                     UtilMessage.message(player, getClassType().getName(), "Your Evade failed.");
                     player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
                 }
-                if (player.isHandRaised() && handRaisedTime.containsKey(player) && UtilTime.elapsed(handRaisedTime.get(player), (long) (duration * 1000)) && !evadePlayers.contains(player)) {
+                if (player.isHandRaised() && handRaisedTime.containsKey(player) && UtilTime.elapsed(handRaisedTime.get(player), (long) (duration * 1000))) {
                     handRaisedTime.remove(player);
                     UtilMessage.message(player, getClassType().getName(), "Your Evade failed.");
                     player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
@@ -291,7 +287,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
 
     @Override
     public double getCooldown(int level) {
-        return cooldown;
+        return cooldown - level;
     }
 
     @Override
