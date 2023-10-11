@@ -23,6 +23,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.inventory.ItemStack;
 
 import javax.sql.rowset.CachedRowSet;
 import java.sql.SQLException;
@@ -39,7 +40,6 @@ public class ClanRepository implements IRepository<Clan> {
 
     private final Clans clans;
     private final Database database;
-
     private final ConcurrentHashMap<String, Statement> queuedPropertyUpdates;
 
     @Inject
@@ -61,12 +61,17 @@ public class ClanRepository implements IRepository<Clan> {
                 Location home = UtilWorld.stringToLocation(result.getString(3));
                 boolean admin = result.getBoolean(4);
                 boolean safe = result.getBoolean(5);
+                String banner = result.getString(6);
 
                 Clan clan = new Clan(clanId);
                 clan.setName(name);
                 clan.setHome(home);
                 clan.setAdmin(admin);
                 clan.setSafe(safe);
+
+                if(banner != null && !banner.equals("")) {
+                    clan.setBanner(ItemStack.deserializeBytes(Base64.getDecoder().decode(banner)));
+                }
 
                 loadProperties(clan);
                 clanList.add(clan);
@@ -167,6 +172,13 @@ public class ClanRepository implements IRepository<Clan> {
         String query = "UPDATE " + databasePrefix + "clans SET Home = ? WHERE id = ?;";
         database.executeUpdateAsync(new Statement(query,
                 new StringStatementValue(UtilWorld.locationToString(clan.getHome(), false)),
+                new UuidStatementValue(clan.getId())));
+    }
+
+    public void updateClanBanner(Clan clan) {
+        String query = "UPDATE " + databasePrefix + "clans SET Banner = ? WHERE id = ?;";
+        database.executeUpdateAsync(new Statement(query,
+                new StringStatementValue(Base64.getEncoder().encodeToString(clan.getBanner().serializeAsBytes())),
                 new UuidStatementValue(clan.getId())));
     }
 

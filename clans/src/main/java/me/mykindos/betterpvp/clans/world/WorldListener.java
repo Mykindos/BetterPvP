@@ -157,7 +157,6 @@ public class WorldListener implements Listener {
                     || event.getInventory().getType() == InventoryType.GRINDSTONE
                     || event.getInventory().getType() == InventoryType.LECTERN
                     || event.getInventory().getType() == InventoryType.SHULKER_BOX
-                    || event.getInventory().getType() == InventoryType.LOOM
                     || event.getInventory().getType() == InventoryType.STONECUTTER
                     || event.getInventory().getType() == InventoryType.SMITHING
                     || event.getInventory().getType() == InventoryType.BEACON) {

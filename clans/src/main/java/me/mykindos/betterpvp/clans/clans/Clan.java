@@ -22,8 +22,15 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.DyeColor;
+import org.bukkit.block.banner.Pattern;
+import org.bukkit.block.banner.PatternType;
+import org.bukkit.inventory.meta.BannerMeta;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -37,6 +44,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
     private boolean admin;
     private boolean safe;
     private boolean online;
+    private ItemStack banner = new ItemStack(Material.WHITE_BANNER);
 
     private List<ClanMember> members = new ArrayList<>();
     private List<ClanAlliance> alliances = new ArrayList<>();
@@ -164,6 +172,32 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
         return getEnemies().stream().anyMatch(enemy -> enemy.getClan().getEnemy(this).orElseThrow().getDominance() >= 90);
     }
 
+    public int getOnlineEnemyCount() {
+        int onlineCount = 0;
+        List<ClanEnemy> enemies = getEnemies();
+
+        for (ClanEnemy enemy : enemies) {
+            if (enemy.getClan().isOnline()) {
+                onlineCount++;
+            }
+        }
+
+        return onlineCount;
+    }
+
+    public int getOnlineAllyCount() {
+        int onlineCount = 0;
+        List<ClanAlliance> alliances = getAlliances();
+
+        for (ClanAlliance alliance : alliances) {
+            if (alliance.getClan().isOnline()) {
+                onlineCount++;
+            }
+        }
+
+        return onlineCount;
+    }
+
 
     public String getDominanceString(IClan clan) {
         Optional<ClanEnemy> enemyOptional = getEnemy(clan);
@@ -229,7 +263,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
 
     public void clanChat(Player player, String message) {
         String playerName = UtilFormat.spoofNameForLunar(player.getName());
-        String messageToSend = "<aqua>" + playerName  + " <dark_aqua>" +  message;
+        String messageToSend = "<aqua>" + playerName + " <dark_aqua>" + message;
         messageClan(messageToSend, null, false);
     }
 
@@ -255,6 +289,22 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
 
     public double getEnergyRatio() {
         return getEnergy() / (float) (getTerritory().size() * 25);
+    }
+
+    public ClanRelation getRelation(@Nullable Clan targetClan) {
+        if (targetClan == null) {
+            return ClanRelation.NEUTRAL;
+        }
+
+        if (targetClan.equals(this)) {
+            return ClanRelation.SELF;
+        } else if (targetClan.isAllied(this)) {
+            return ClanRelation.ALLY;
+        } else if (targetClan.isEnemy(this)) {
+            return ClanRelation.ENEMY;
+        }
+
+        return ClanRelation.NEUTRAL;
     }
 
     @Override

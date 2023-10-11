@@ -40,9 +40,23 @@ public class ClanMember {
             return Arrays.stream(values()).filter(memberRank -> memberRank.getPrivilege() == privilege).findFirst().orElse(null);
         }
 
+        public String getName() {
+            String name = name().toLowerCase();
+            return name.substring(0, 1).toUpperCase() + name.substring(1);
+        }
+
         public boolean hasRank(MemberRank memberRank) {
             return this.privilege >= memberRank.privilege;
         }
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(!(obj instanceof ClanMember clanMember))
+            return false;
+
+        return this.uuid.equals(clanMember.getUuid());
+    }
+
 
 }
