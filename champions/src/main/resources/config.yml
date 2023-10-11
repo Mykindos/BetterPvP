@@ -269,6 +269,10 @@ skills:
       energy: 15
       maxlevel: 5
       cooldown: 0
+    intimidation:
+      enabled: true
+      maxlevel: 3
+      radius: 7.0
     seismicslam:
       enabled: true
       maxlevel: 5
