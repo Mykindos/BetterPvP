@@ -40,6 +40,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
     private final HashMap<Player, Long> handRaisedTime = new HashMap<>();
 
     public double duration;
+    public double internalCD;
 
     @Inject
     private CooldownManager cooldownManager;
@@ -62,11 +63,11 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
                 "",
                 "If a player hits you while Evading,",
                 "you will teleport behind the attacker",
-                "and your cooldown will be set to 1 second",
+                "and your cooldown will be set to <stat>" + internalCD + "</stat> second",
                 "",
                 "Hold crouch while Evading to teleport backwards",
                 "",
-                "<stat>" + getCooldown(level) + "</stat> second internal cooldown",
+                "Cooldown: <val>" + getCooldown(level) + "</val> seconds",
         };
     }
 
@@ -303,6 +304,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
 
     @Override
     public void loadSkillConfig(){
-        duration = getConfig("duration", 1.0, Double.class);
+        duration = getConfig("duration", 1.25, Double.class);
+        internalCD = getConfig("internalCD", 1.0, Double.class);
     }
 }
