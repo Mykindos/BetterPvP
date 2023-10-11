@@ -76,7 +76,7 @@ skills:
     evade:
       enabled: true
       maxlevel: 5
-      cooldown: 2
+      cooldown: 15
       duration: 1.0
   knight:
     shieldsmash:
