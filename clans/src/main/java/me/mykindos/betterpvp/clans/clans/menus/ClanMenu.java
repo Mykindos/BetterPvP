@@ -44,7 +44,7 @@ public class ClanMenu extends Menu {
         addButton(new TerritoryButton(17, player, clan));
         addButton(new EnergyButton(26, player, clan));
         addButton(new AlliesButton(8, playerClan, clan));
-        addButton(new ClanButton(22, clan, player, playerClan.getRelation(clan)));
+        addButton(new ClanButton(22, clan, player, clan.getRelation(playerClan)));
 
         List<ClanMember> members = clan.getMembers();
         loadPlayerHeads(members);
