@@ -83,7 +83,6 @@ public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill {
         if (!(event.getProjectile() instanceof Arrow arrow)) return;
 
         if (UtilBlock.isInLiquid(player)
-                || championsManager.getEffects().hasEffect(player, EffectType.SILENCE)
                 || championsManager.getEffects().hasEffect(player, EffectType.STUN)) {
             return;
         }
@@ -96,13 +95,11 @@ public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill {
                 float charge = event.getForce();
                 float scaledEnergy = getEnergy(level) * charge;
 
-                boolean hasEnoughEnergy = championsManager.getEnergy().use(player, getName(), scaledEnergy, false);
+                // Ensure the player isn't sneaking before using energy
+                boolean hasEnoughEnergy = !player.isSneaking() && championsManager.getEnergy().use(player, getName(), scaledEnergy, false);
 
-                if (!player.isSneaking() && hasEnoughEnergy) {
+                if (hasEnoughEnergy) {
                     arrows.add(arrow);
-                }
-
-                if (!player.isSneaking() && hasEnoughEnergy) {
                     Vector pushback = player.getLocation().getDirection().multiply(-1);
                     pushback.multiply(basePushBack * charge);
                     player.setVelocity(pushback);
