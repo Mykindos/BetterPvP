@@ -79,7 +79,7 @@ skills:
       maxlevel: 5
       cooldown: 15
       duration: 1.25
-      internalCD: 1.0
+      internalCD: 1.5
   knight:
     shieldsmash:
       enabled: true

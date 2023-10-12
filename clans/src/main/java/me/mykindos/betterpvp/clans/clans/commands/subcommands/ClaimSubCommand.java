@@ -61,16 +61,15 @@ public class ClaimSubCommand extends ClanSubCommand {
             return;
         }
 
-        if (!(clan.isAdmin() || client.isAdministrating())) {
-            if (clan.getTerritory().size() >= clan.getMembers().size() + additionalClaims) {
+        if (clan.getTerritory().size() >= clan.getMembers().size() + additionalClaims ) {
+            if(!(clan.isAdmin() || client.isAdministrating())) {
                 UtilMessage.message(player, "Clans", "Your Clan cannot claim more Territory.");
                 return;
+            }else{
+                gamerManager.sendMessageToRank("Clans",
+                        UtilMessage.deserialize("<yellow>%s<gray> is attempting to claim territory over the limit for <yellow>%s",
+                                player.getName(), clan.getName()), Rank.HELPER);
             }
-        } else {
-            //This wording is because this is run before other validation checks are ran, so it may not go through
-            gamerManager.sendMessageToRank("Clans",
-                    UtilMessage.deserialize("<yellow>%s<gray> is attempting to claim teritory over the limit for <yellow>%s",
-                            player.getName(), clan.getName()), Rank.HELPER);
         }
 
         Optional<Clan> locationClanOptional = clanManager.getClanByLocation(player.getLocation());

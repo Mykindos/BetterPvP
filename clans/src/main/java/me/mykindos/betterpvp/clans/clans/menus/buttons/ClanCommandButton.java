@@ -17,7 +17,7 @@ import java.util.ArrayList;
 public class ClanCommandButton extends Button {
 
     public ClanCommandButton(int slot) {
-        super(slot, new ItemStack(Material.PAPER));
+        super(slot, UtilItem.createItemStack(Material.PAPER, 6));
 
         this.name = Component.text("Clan Commands", NamedTextColor.LIGHT_PURPLE).decoration(TextDecoration.ITALIC,false);
         this.lore = new ArrayList<>();

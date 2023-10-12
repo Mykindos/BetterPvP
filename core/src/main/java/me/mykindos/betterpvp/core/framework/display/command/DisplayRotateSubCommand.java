@@ -47,6 +47,12 @@ public class DisplayRotateSubCommand extends Command {
     }
 
     @Override
+    public String getArgumentType(int arg) {
+
+        return ArgumentType.NONE.name();
+    }
+
+    @Override
     public void execute(Player player, Client client, String... args) {
         args = Arrays.copyOfRange(args, 1, args.length);
         if (args.length != 7 && args.length != 6) {

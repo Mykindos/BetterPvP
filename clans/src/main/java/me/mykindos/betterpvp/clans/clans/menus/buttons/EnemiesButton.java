@@ -5,6 +5,7 @@ import me.mykindos.betterpvp.clans.clans.menus.EnemiesMenu;
 import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.menu.Button;
 import me.mykindos.betterpvp.core.menu.MenuManager;
+import me.mykindos.betterpvp.core.utilities.UtilItem;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -19,7 +20,7 @@ public class EnemiesButton extends Button {
     private final Clan clan;
 
     public EnemiesButton(int slot, Clan playerClan, Clan clan) {
-        super(slot, new ItemStack(Material.PAPER), Component.text("Enemies", NamedTextColor.DARK_RED).decoration(TextDecoration.ITALIC, false),
+        super(slot, UtilItem.createItemStack(Material.PAPER, 7), Component.text("Enemies", NamedTextColor.DARK_RED).decoration(TextDecoration.ITALIC, false),
                 Component.text(clan.getOnlineEnemyCount() + "/" + (clan.getEnemies().size()) + " Online", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
         this.playerClan = playerClan;
         this.clan = clan;

@@ -36,8 +36,8 @@ import java.util.*;
 @Singleton
 @BPvPListener
 public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill {
-    private final WeakHashMap<Player, Long> activationTime = new WeakHashMap<>();
-    private final HashMap<Player, Long> handRaisedTime = new HashMap<>();
+
+    private final HashMap<UUID, Long> handRaisedTime = new HashMap<>();
 
     public double duration;
     public double internalCD;
@@ -110,7 +110,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
             player.teleport(target);
             cooldownManager.removeCooldown(player, getName(), true);
             cooldownManager.use(player, getName(), 1.0, true);
-            handRaisedTime.remove(player);
+            handRaisedTime.remove(player.getUniqueId());
         }
 
         UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s<gray>.", getName());
@@ -148,7 +148,6 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
 
     }
 
-
     @UpdateEvent
     public void onUpdate() {
         Iterator<UUID> it = active.iterator();
@@ -157,9 +156,14 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
             if (player != null) {
                 int level = getLevel(player);
                 if (level > 0) {
-                    if (player.isHandRaised()) {
-                    }
-                    if (!UtilPlayer.isHoldingItem(player, SkillWeapons.SWORDS)) {
+                    if (!player.isHandRaised()) {
+                        handRaisedTime.remove(player.getUniqueId());
+                        it.remove();
+                        UtilMessage.message(player, getClassType().getName(), "Your Evade failed.");
+                        player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
+                    } else if (!handRaisedTime.containsKey(player.getUniqueId())) {
+                        it.remove();
+                    } else if (!UtilPlayer.isHoldingItem(player, SkillWeapons.SWORDS)) {
                         it.remove();
                     } else if (UtilBlock.isInLiquid(player)) {
                         it.remove();
@@ -167,24 +171,14 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
                         it.remove();
                     } else if (championsManager.getEffects().hasEffect(player, EffectType.STUN)) {
                         it.remove();
+                    } else if (UtilTime.elapsed(handRaisedTime.get(player.getUniqueId()), (long) duration * 1000)) {
+                        handRaisedTime.remove(player.getUniqueId());
+                        UtilMessage.message(player, getClassType().getName(), "Your Evade failed.");
+                        player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
+                        it.remove();
                     }
                 }
-                if (player.isHandRaised() && !handRaisedTime.containsKey(player)) {
-                    handRaisedTime.put(player, System.currentTimeMillis());
 
-                }
-                if (!player.isHandRaised() && handRaisedTime.containsKey(player)) {
-                    handRaisedTime.remove(player);
-                    it.remove();
-                    UtilMessage.message(player, getClassType().getName(), "Your Evade failed.");
-                    player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
-                }
-                if (player.isHandRaised() && handRaisedTime.containsKey(player) && UtilTime.elapsed(handRaisedTime.get(player), (long) (duration * 1000))) {
-                    handRaisedTime.remove(player);
-                    UtilMessage.message(player, getClassType().getName(), "Your Evade failed.");
-                    player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
-                    it.remove();
-                }
             } else {
                 it.remove();
             }
@@ -217,7 +211,6 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
 
                 return lastValid2;
             }
-
 
 
             if ((!UtilBlock.airFoliage(loc.getBlock())) || (!UtilBlock.airFoliage(loc.getBlock().getRelative(BlockFace.UP)))) {
@@ -294,7 +287,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
     @Override
     public void activate(Player player, int level) {
         active.add(player.getUniqueId());
-        activationTime.put(player, System.currentTimeMillis());
+        handRaisedTime.put(player.getUniqueId(), System.currentTimeMillis());
     }
 
     @Override
@@ -303,7 +296,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
     }
 
     @Override
-    public void loadSkillConfig(){
+    public void loadSkillConfig() {
         duration = getConfig("duration", 1.25, Double.class);
         internalCD = getConfig("internalCD", 1.0, Double.class);
     }
