@@ -22,7 +22,7 @@ public class TerritoryButton extends Button {
     private final ClanMember.MemberRank rank; // to store the rank of the player in the clan
 
     public TerritoryButton(int slot, Player player, Clan clan) {
-        super(slot, new ItemStack(Material.PAPER));
+        super(slot, UtilItem.createItemStack(Material.PAPER, 3));
         ClanMember member = clan.getMemberByUUID(player.getUniqueId()).orElse(null);
         this.ownClan = member != null;
         this.rank = member != null ? member.getRank() : null;

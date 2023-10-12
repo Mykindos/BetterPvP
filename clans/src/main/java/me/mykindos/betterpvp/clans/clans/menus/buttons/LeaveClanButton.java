@@ -21,7 +21,7 @@ public class LeaveClanButton extends Button {
     private final ClanMember.MemberRank rank; // to store the rank of the player in the clan
 
     public LeaveClanButton(int slot, Clan clan, Player player) {
-        super(slot, new ItemStack(Material.PAPER));
+        super(slot, UtilItem.createItemStack(Material.PAPER, 5));
 
         ClanMember member = clan.getMemberByUUID(player.getUniqueId()).orElse(null);
         this.rank = member != null ? member.getRank() : null;

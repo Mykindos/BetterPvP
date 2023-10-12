@@ -257,6 +257,10 @@ public class UtilItem {
         return itemStack;
     }
 
+    public static ItemStack createItemStack(Material material, int customModelData) {
+        return createItemStack(material, 1, customModelData);
+    }
+
     // Create a function to remove TextDecoration.ITALIC from List<Component>
     public static List<Component> removeItalic(List<Component> components) {
         List<Component> newComponents = new ArrayList<>();

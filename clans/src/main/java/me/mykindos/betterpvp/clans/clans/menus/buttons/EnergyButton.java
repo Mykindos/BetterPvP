@@ -21,7 +21,7 @@ public class EnergyButton extends Button {
     private boolean ownClan;
 
     public EnergyButton(int slot, Player player, Clan clan) {
-        super(slot, new ItemStack(Material.PAPER));
+        super(slot, UtilItem.createItemStack(Material.PAPER, 4));
         this.clan = clan;
         this.ownClan = clan.getMemberByUUID(player.getUniqueId()).isPresent();
 
