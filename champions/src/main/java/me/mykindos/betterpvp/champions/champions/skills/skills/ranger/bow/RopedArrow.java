@@ -108,11 +108,6 @@ public class RopedArrow extends PrepareArrowSkill {
     }
 
     @Override
-    public boolean shouldDisplayActionBar(Gamer gamer) {
-        return false;
-    }
-
-    @Override
     public void processEntityShootBowEvent(EntityShootBowEvent event, Player player, int level, Arrow arrow) {
         super.processEntityShootBowEvent(event, player, level, arrow);
         championsManager.getCooldowns().removeCooldown(player, getName(), true);
@@ -122,7 +117,7 @@ public class RopedArrow extends PrepareArrowSkill {
                 showCooldownFinished(),
                 false,
                 isCancellable(),
-                true);
+                this::shouldDisplayActionBar);
     }
 
     @Override
@@ -161,14 +156,16 @@ public class RopedArrow extends PrepareArrowSkill {
     public boolean canUse(Player player) {
         if (active.contains(player.getUniqueId())) {
             // Meaning they have already prepared a shot
-            strength.compute(player, (p, curStrength) -> {
-                final int newStrength = Optional.ofNullable(curStrength).orElse(0) + 1;
+            int curStrength = strength.compute(player, (p, current) -> {
+                final int newStrength = Optional.ofNullable(current).orElse(0) + 1;
                 if (newStrength > MAX_STRENGTH) {
                     return 1;
                 } else {
                     return newStrength;
                 }
             });
+
+            player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.4f + curStrength * 0.2f);
             return false;
         }
         return super.canUse(player);
