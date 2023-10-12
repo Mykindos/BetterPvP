@@ -9,8 +9,14 @@ import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -19,12 +25,35 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.util.Vector;
+
+import java.util.Optional;
+import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
 public class RopedArrow extends PrepareArrowSkill {
+
+    private static final int MAX_STRENGTH = 3;
+
+    private final WeakHashMap<Player, Integer> strength = new WeakHashMap<>();
+
+    // Action bar
+    private final PermanentComponent actionBarComponent = new PermanentComponent(gamer -> {
+        final Player player = gamer.getPlayer();
+
+        // Only display charges in hotbar if holding the weapon
+        if (player == null || !strength.containsKey(player) || !UtilPlayer.isHoldingItem(player, getItemsBySkillType())) {
+            return null; // Skip if not online or not charging
+        }
+
+        final int curStrength = strength.get(player);
+        return Component.text(getName() + " Strength ").color(NamedTextColor.WHITE).decorate(TextDecoration.BOLD)
+                .append(Component.text("\u25A0".repeat(curStrength)).color(NamedTextColor.GREEN))
+                .append(Component.text("\u25A0".repeat(Math.max(0, MAX_STRENGTH - curStrength))).color(NamedTextColor.RED));
+    });
 
     @Inject
     public RopedArrow(Champions champions, ChampionsManager championsManager) {
@@ -44,8 +73,28 @@ public class RopedArrow extends PrepareArrowSkill {
                 "Your next arrow will pull you",
                 "towards the location it hits",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Left click when your shot is already",
+                "prepared to cycle pull strengths. Your",
+                "cooldown will be doubled for each strength",
+                "level",
+                "",
+                "Cooldown: <val>" + getCooldown(level) + "</val>"
         };
+    }
+
+    @Override
+    public void invalidatePlayer(Player player) {
+        strength.remove(player);
+        // Action bar
+        final Optional<Gamer> gamerOpt = championsManager.getGamers().getObject(player.getUniqueId());
+        gamerOpt.ifPresent(gamer -> gamer.getActionBar().remove(actionBarComponent));
+    }
+
+    @Override
+    public void trackPlayer(Player player) {
+        // Action bar
+        final Optional<Gamer> gamerOpt = championsManager.getGamers().getObject(player.getUniqueId());
+        gamerOpt.ifPresent(gamer -> gamer.getActionBar().add(900, actionBarComponent));
     }
 
     @Override
@@ -55,41 +104,79 @@ public class RopedArrow extends PrepareArrowSkill {
 
     @Override
     public SkillType getType() {
-
         return SkillType.BOW;
+    }
+
+    @Override
+    public boolean shouldDisplayActionBar(Gamer gamer) {
+        return false;
+    }
+
+    @Override
+    public void processEntityShootBowEvent(EntityShootBowEvent event, Player player, int level, Arrow arrow) {
+        super.processEntityShootBowEvent(event, player, level, arrow);
+        championsManager.getCooldowns().removeCooldown(player, getName(), true);
+        championsManager.getCooldowns().use(player,
+                getName(),
+                getCooldown(level) / Optional.ofNullable(this.strength.get(player)).map(i -> Math.pow(2, i - 1)).orElse(1d),
+                showCooldownFinished(),
+                false,
+                isCancellable(),
+                true);
     }
 
     @Override
     public void activate(Player player, int level) {
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
         active.add(player.getUniqueId());
+        strength.put(player, 1);
     }
 
     @EventHandler
-    public void ArrowHit(ProjectileHitEvent event) {
+    public void onArrowHit(ProjectileHitEvent event) {
         if (!(event.getEntity() instanceof Arrow arrow)) return;
         if (!(arrow.getShooter() instanceof Player player)) return;
         if (!arrows.contains(arrow)) return;
         if (!hasSkill(player)) return;
 
-
         Vector vec = UtilVelocity.getTrajectory(player, arrow);
+        final int curStrength = this.strength.remove(player);
         double mult = arrow.getVelocity().length() / 3.0D;
 
-        UtilVelocity.velocity(player, vec,
-                2.5D + mult, false, 0.4D, 0.3D * mult, 1.5D * mult, true);
+        UtilVelocity.velocity(player,
+                vec,
+                2.5D + mult * curStrength,
+                false,
+                0.8D,
+                0.3D * mult,
+                1.5D * mult,
+                true);
 
         arrow.getWorld().playSound(arrow.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
         arrows.remove(arrow);
         championsManager.getEffects().addEffect(player, EffectType.NOFALL, 5000);
-
-
     }
 
+    @Override
+    public boolean canUse(Player player) {
+        if (active.contains(player.getUniqueId())) {
+            // Meaning they have already prepared a shot
+            strength.compute(player, (p, curStrength) -> {
+                final int newStrength = Optional.ofNullable(curStrength).orElse(0) + 1;
+                if (newStrength > MAX_STRENGTH) {
+                    return 1;
+                } else {
+                    return newStrength;
+                }
+            });
+            return false;
+        }
+        return super.canUse(player);
+    }
 
     @Override
     public void onHit(Player damager, LivingEntity target, int level) {
-
+        // No implementation - ignore
     }
 
     @Override
@@ -104,8 +191,7 @@ public class RopedArrow extends PrepareArrowSkill {
 
     @Override
     public double getCooldown(int level) {
-
-        return cooldown - ((level - 1));
+        return (double) cooldown - (level - 1);
     }
 
 }
