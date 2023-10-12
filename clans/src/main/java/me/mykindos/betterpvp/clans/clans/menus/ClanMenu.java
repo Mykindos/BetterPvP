@@ -169,7 +169,7 @@ public class ClanMenu extends Menu {
 
     private List<ClanEnemy> getTopEnemiesByDominance() {
         List<ClanEnemy> enemies = clan.getEnemies();
-        enemies.sort(Comparator.comparingInt((ClanEnemy e) -> Math.abs(e.getDominance())).reversed());
+        enemies.sort(Comparator.comparingDouble((ClanEnemy e) -> Math.abs(e.getDominance())).reversed());
 
         return enemies.subList(0, Math.min(5, enemies.size()));
     }
