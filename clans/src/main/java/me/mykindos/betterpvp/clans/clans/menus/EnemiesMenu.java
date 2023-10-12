@@ -27,7 +27,7 @@ public class EnemiesMenu extends Menu {
 
     public void fillPage() {
         List<ClanEnemy> enemies = new ArrayList<>(clan.getEnemies());
-        enemies.sort(Comparator.comparingInt(e -> Math.abs(e.getDominance())));
+        enemies.sort(Comparator.comparingDouble(e -> Math.abs(e.getDominance())));
 
         int slot = 0;
         for (ClanEnemy enemy : enemies) {

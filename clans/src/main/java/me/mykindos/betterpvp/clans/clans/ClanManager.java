@@ -44,7 +44,7 @@ public class ClanManager extends Manager<Clan> {
     @Getter
     private final PillageHandler pillageHandler;
 
-    private Map<Integer, Integer> dominanceScale;
+    private Map<Integer, Double> dominanceScale;
 
     @Getter
     private final ConcurrentLinkedQueue<Insurance> insuranceQueue;
@@ -351,7 +351,7 @@ public class ClanManager extends Manager<Clan> {
 
         int sizeOffset = Math.min(6, 6 - Math.min(killerSize - killedSize, 6));
 
-        int dominance = dominanceScale.getOrDefault(sizeOffset, 6);
+        double dominance = dominanceScale.getOrDefault(sizeOffset, 6D);
 
         // If the killed players clan has no dominance on the killer players clan, then give dominance to the killer
         if (killedEnemy.getDominance() == 0) {

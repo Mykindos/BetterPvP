@@ -311,7 +311,7 @@ public class ClanRepository implements IRepository<Clan> {
         database.executeUpdateAsync(new Statement(query,
                 new UuidStatementValue(clan.getId()),
                 new UuidStatementValue(enemy.getClan().getId()),
-                new IntegerStatementValue(enemy.getDominance())));
+                new DoubleStatementValue(enemy.getDominance())));
     }
 
     public void deleteClanEnemy(IClan clan, ClanEnemy enemy) {
@@ -324,7 +324,7 @@ public class ClanRepository implements IRepository<Clan> {
     public void updateDominance(IClan clan, ClanEnemy enemy) {
         String query = "UPDATE " + databasePrefix + "clan_enemies SET Dominance = ? WHERE Clan = ? AND EnemyClan = ?;";
         database.executeUpdateAsync(new Statement(query,
-                new IntegerStatementValue(enemy.getDominance()),
+                new DoubleStatementValue(enemy.getDominance()),
                 new UuidStatementValue(clan.getId()),
                 new UuidStatementValue(enemy.getClan().getId())));
     }
@@ -349,13 +349,13 @@ public class ClanRepository implements IRepository<Clan> {
     }
     //endregion
 
-    public Map<Integer, Integer> getDominanceScale() {
-        HashMap<Integer, Integer> dominanceScale = new HashMap<>();
+    public Map<Integer, Double> getDominanceScale() {
+        HashMap<Integer, Double> dominanceScale = new HashMap<>();
         String query = "SELECT * FROM " + databasePrefix + "dominance_scale;";
         CachedRowSet result = database.executeQuery(new Statement(query));
         try {
             if (result.next()) {
-                dominanceScale.put(result.getInt(1), result.getInt(2));
+                dominanceScale.put(result.getInt(1), result.getDouble(2));
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
