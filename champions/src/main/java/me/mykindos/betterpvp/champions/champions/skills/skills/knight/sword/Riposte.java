@@ -6,8 +6,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
-import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.PrepareSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.*;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -15,30 +14,34 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
-import org.bukkit.Bukkit;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.PlayerItemHeldEvent;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.event.player.PlayerQuitEvent;
 
-import java.util.HashMap;
+import java.util.*;
+
 
 @Singleton
 @BPvPListener
-public class Riposte extends PrepareSkill implements CooldownSkill, Listener {
+public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkill {
 
 
-    public HashMap<String, Long> prepare = new HashMap<>();
     private final HashMap<String, Long> riposting = new HashMap<>();
+    private final HashMap<Player, Long> handRaisedTime = new HashMap<>();
+    private final HashMap<UUID, Long> boostedAttackTime = new HashMap<>();
+    private final HashMap<Player, Double> boostedDamage = new HashMap<>();
+    private final Set<UUID> boostedAttackPlayers = new HashSet<>();
 
-    private double damageReduction;
+    public double duration;
+    public double bonusDamage;
+
+    public double healing;
+
     @Inject
     public Riposte(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -53,11 +56,11 @@ public class Riposte extends PrepareSkill implements CooldownSkill, Listener {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Right click with a Sword to activate",
+                "Hold right click with a Sword to activate",
                 "",
-                "Reduce all melee damage by <stat>" + (damageReduction * 100) + "%</stat> for <val>" + (1 + (level * 0.5)) + "</val> seconds",
-                "",
-                "You are impervious to knockback while active",
+                "If an enemy hits you within <stat>" + duration + "</stat> seconds,",
+                "You will heal <val>" + (healing + (level -1 )) +"</val> health and your next",
+                "attack will deal <val>" + (bonusDamage + (level - 1)) + "</val> extra damage",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -73,121 +76,152 @@ public class Riposte extends PrepareSkill implements CooldownSkill, Listener {
         return SkillType.SWORD;
     }
 
-    /**
-     * Cancel riposte if the player swaps to any weapon other than another sword
-     */
     @EventHandler
-    public void onSwapItems(PlayerItemHeldEvent event) {
-        Player player = event.getPlayer();
-        if (!riposting.containsKey(player.getName())) return;
+    public void onRiposte(CustomDamageEvent event) {
+        if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
+        if (!(event.getDamagee() instanceof Player player)) return;
+        if (!active.contains(player.getUniqueId())) return;
+        if (event.getDamager() == null) return;
+        LivingEntity ent = event.getDamager();
 
-        ItemStack newItem = player.getInventory().getItem(event.getNewSlot());
-        if (newItem == null) return;
-        if (!newItem.getType().name().contains("SWORD")) {
+        if (hasSkill(player) && player.isHandRaised()) {
+            event.setKnockback(false);
+            event.setDamage(0);
+            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 2.0f, 1.3f);
+            int level = getLevel(player);
+            boostedDamage.put(player, bonusDamage + (level - 1));
+            double newHealth = player.getHealth() + (healing + (level - 1));
+            if (newHealth > 20) {
+                player.setHealth(20);
+            } else {
+                player.setHealth(newHealth);
+            }
 
-            riposting.remove(player.getName());
-            UtilMessage.message(player, getClassType().getName(), "You are no longer riposting.");
+            handRaisedTime.remove(player);
+
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s<gray>.", getName());
+            if (ent instanceof Player temp) {
+                UtilMessage.simpleMessage(temp, getClassType().getName(), "<yellow>%s<gray> used riposte!", player.getName());
+            }
+
+            active.remove(player.getUniqueId());
+            boostedAttackPlayers.add(player.getUniqueId());
+            boostedAttackTime.put(player.getUniqueId(), System.currentTimeMillis());
 
         }
     }
 
     @EventHandler
-    public void onRiposteHit(CustomDamageEvent event) {
-        if (event.isCancelled()) return;
-        if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
-        if (!(event.getDamagee() instanceof Player target)) return;
-        if (event.getDamager() == null) return;
+    public void onAttack(CustomDamageEvent event) {
+        if (!(event.getDamager() instanceof Player player)) return;
+        if (boostedAttackPlayers.contains(player.getUniqueId()) && boostedDamage.containsKey(player)) {
+            event.setDamage(event.getDamage() + boostedDamage.get(player));
+            boostedDamage.remove(player);
+            boostedAttackPlayers.remove(player.getUniqueId());
+            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 2.0f, 1.0f);
+        }
+    }
 
-        int level = getLevel(target);
-        if (level > 0) {
-            LivingEntity damager = event.getDamager();
-            if (prepare.containsKey(target.getName())) {
+    @Override
+    public void activate(Player player, int level) {
+        active.add(player.getUniqueId());
+        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_IRON_GOLEM_ATTACK, 2.0f, 1.3f);
 
-                prepare.remove(target.getName());
-                if (damager instanceof Player) {
-                    UtilMessage.simpleMessage(target, getClassType().getName(), "Countered an attack from <yellow>%s<gray>.", damager.getName());
-                    UtilMessage.simpleMessage(target, getClassType().getName(), "You <light_purple>Riposted <gray>against <yellow>%s<gray>.", damager.getName());
+        Particle.SMOKE_LARGE.builder().location(player.getLocation().add(0, 0.25, 0)).receivers(20).extra(0).spawn();
+    }
+
+    @UpdateEvent(delay = 100)
+    public void onUpdateEffect() {
+        Iterator<UUID> it = active.iterator();
+        while (it.hasNext()) {
+            Player player = Bukkit.getPlayer(it.next());
+            if (player != null) {
+                if (player.isHandRaised()) {
+                    player.getWorld().playEffect(player.getLocation(), Effect.STEP_SOUND, Material.IRON_BLOCK);
+                }
+            } else {
+                it.remove();
+            }
+        }
+    }
+
+    @UpdateEvent
+    public void onUpdate() {
+        Iterator<UUID> it = active.iterator();
+        long currentTime = System.currentTimeMillis();
+
+        while (it.hasNext()) {
+            Player player = Bukkit.getPlayer(it.next());
+            if (player != null) {
+                if (player.isHandRaised() && !handRaisedTime.containsKey(player)) {
+                    handRaisedTime.put(player, System.currentTimeMillis());
                 }
 
-                target.getWorld().playSound(target.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1.0F, 1.0F);
-                riposting.put(target.getName(), (long) (System.currentTimeMillis() + ((level * 0.5)) * 1000));
-                event.cancel("Riposte");
+                if (!player.isHandRaised() && handRaisedTime.containsKey(player) && !boostedDamage.containsKey(player)) {
+                    handRaisedTime.remove(player);
+                    it.remove();
+                    UtilMessage.message(player, getClassType().getName(), "Your Riposte failed.");
+                    player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
+                }
 
-            } else {
-
-                if (riposting.containsKey(target.getName())) {
-
-                    long time = riposting.get(target.getName()) - System.currentTimeMillis();
-                    double remaining = UtilTime.convert(time,
-                            UtilTime.TimeUnit.SECONDS, 1);
-
-                    if (time <= 0) {
-                        riposting.remove(target.getName());
-                        return;
-                    }
-
-                    if (damager instanceof Player player) {
-                        UtilMessage.simpleMessage(player, getClassType().getName(),
-                                "<yellow>%s<gray> is resistant to melee attacks for <green>%.1f<gray> seconds.", target.getName(), remaining);
-                    }
-
-                    target.getWorld().playSound(target.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1.0F, 1.0F);
-                    event.setDamage(event.getDamage() * (1 - damageReduction));
-                    event.setKnockback(false);
-
+                if (player.isHandRaised() && handRaisedTime.containsKey(player) && UtilTime.elapsed(handRaisedTime.get(player), 750) && !boostedDamage.containsKey(player)) {
+                    handRaisedTime.remove(player);
+                    UtilMessage.message(player, getClassType().getName(), "Your Riposte failed.");
+                    player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
+                    it.remove();
                 }
             }
         }
+    }
 
+    @UpdateEvent
+    public void processBoostedPlayers() {
+        Iterator<UUID> uuidIterator = boostedAttackPlayers.iterator();
+        while (uuidIterator.hasNext()) {
+            UUID uuid = uuidIterator.next();
+            Player player = Bukkit.getPlayer(uuid);
+            if (player == null) {
+                uuidIterator.remove();
+                continue;
+            }
+            int level = getLevel(player);
+            List<UUID> toRemove = new ArrayList<>();
+            for (UUID boostedUuid : boostedAttackPlayers) {
+                Player boostedPlayer = Bukkit.getPlayer(boostedUuid);
+                if (boostedPlayer == null) {
+                    toRemove.add(boostedUuid);
+                    continue;
+                }
 
+                if (boostedAttackTime.containsKey(boostedUuid) && UtilTime.elapsed(boostedAttackTime.get(boostedUuid), 2000)) {
+                    boostedAttackTime.remove(boostedUuid);
+                    boostedDamage.remove(boostedPlayer);
+                    UtilMessage.message(boostedPlayer, getClassType().getName(), "You lost your boosted attack.");
+                    boostedPlayer.getWorld().playSound(boostedPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
+                    toRemove.add(boostedUuid);
+                }
+            }
+            boostedAttackPlayers.removeAll(toRemove);
+        }
     }
 
     @EventHandler
     public void onRiposteDeath(PlayerDeathEvent event) {
         Player player = event.getEntity();
-        riposting.remove(player.getName());
+        boostedAttackPlayers.remove(player.getUniqueId());
+        active.remove(player.getUniqueId());
+        boostedAttackTime.remove(player.getUniqueId());
     }
 
-    @UpdateEvent(delay = 100)
-    public void removeFailures() {
-        prepare.entrySet().removeIf(entry -> {
-            if (UtilTime.elapsed(entry.getValue(), 1000)) {
-
-                Player player = Bukkit.getPlayer(entry.getKey());
-                if (player != null) {
-                    UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s<gray>.", getName());
-                    player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
-                }
-
-                return true;
-            }
-            return false;
-        });
+    @EventHandler
+    public void onPlayerLogout(PlayerQuitEvent event) {
+        Player player = event.getPlayer();
+        boostedAttackPlayers.remove(player.getUniqueId());
+        active.remove(player.getUniqueId());
+        boostedDamage.remove(player);
+        boostedAttackTime.remove(player.getUniqueId());
     }
 
-    @UpdateEvent
-    public void removeCompleted() {
-        riposting.entrySet().removeIf(entry -> {
-            if (entry.getValue() - System.currentTimeMillis() <= 0) {
-                Player player = Bukkit.getPlayer(entry.getKey());
-                if (player != null) {
-                    UtilMessage.message(player, getClassType().getName(), "You are no longer riposting");
-                }
-                return true;
-            }
-            return false;
-        });
-    }
-
-
-    @Override
-    public void activate(Player player, int level) {
-        prepare.put(player.getName(), System.currentTimeMillis());
-        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_IRON_GOLEM_ATTACK, 2.0f, 1.3f);
-
-        Particle.SMOKE_LARGE.builder().location(player.getLocation().add(0, 0.25, 0)).receivers(20).extra(0).spawn();
-
-    }
 
     @Override
     public double getCooldown(int level) {
@@ -200,9 +234,10 @@ public class Riposte extends PrepareSkill implements CooldownSkill, Listener {
         return SkillActions.RIGHT_CLICK;
     }
 
-
     @Override
-    public void loadSkillConfig() {
-        damageReduction = getConfig("damageReduction", 0.75, Double.class);
+    public void loadSkillConfig(){
+        duration = getConfig("duration", 1.0, Double.class);
+        bonusDamage = getConfig("bonusDamage", 1.0, Double.class);
+        healing = getConfig("healing", 1.0, Double.class);
     }
 }
