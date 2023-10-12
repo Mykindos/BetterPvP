@@ -114,7 +114,10 @@ skills:
     riposte:
       enabled: true
       maxlevel: 3
-      cooldown: 20
+      cooldown: 12
+      duration: 1.0
+      bonusDamage: 1.0
+      healing: 1.0
     holdposition:
       enabled: true
       maxlevel: 5
