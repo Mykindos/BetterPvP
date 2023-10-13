@@ -39,6 +39,17 @@ public class ClansSettingsMenu extends SettingSubMenu implements IRefreshingMenu
 
         });
 
+        Optional<Boolean> clanMenuSettingOptional = gamer.getProperty(GamerProperty.CLAN_MENU_ENABLED);
+        clanMenuSettingOptional.ifPresent(clanMenuSetting -> {
+            addButton(new SettingsButton(gamer,
+                    GamerProperty.CLAN_MENU_ENABLED,
+                    1,
+                    new ItemStack(Material.BAMBOO_HANGING_SIGN),
+                    Component.text("Clan Menu", clanMenuSetting ? NamedTextColor.GREEN : NamedTextColor.RED),
+                    Component.text("Whether to display a menu or chat message when doing /clan", NamedTextColor.GRAY)));
+
+        });
+
     }
 
 

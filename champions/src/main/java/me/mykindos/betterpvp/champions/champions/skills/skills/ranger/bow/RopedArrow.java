@@ -135,7 +135,7 @@ public class RopedArrow extends PrepareArrowSkill {
         if (!hasSkill(player)) return;
 
         Vector vec = UtilVelocity.getTrajectory(player, arrow);
-        final int curStrength = this.strength.remove(player);
+        final int curStrength = this.strength.getOrDefault(player, 0);
         double mult = arrow.getVelocity().length() / 3.0D;
 
         UtilVelocity.velocity(player,
@@ -149,6 +149,7 @@ public class RopedArrow extends PrepareArrowSkill {
 
         arrow.getWorld().playSound(arrow.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
         arrows.remove(arrow);
+        strength.remove(player);
         championsManager.getEffects().addEffect(player, EffectType.NOFALL, 5000);
     }
 
