@@ -194,4 +194,8 @@ public class FishingRepository extends ProgressionStatsRepository<Fishing, Fishi
         log.info("Loaded " + lootTypes.size() + " loot types");
     }
 
+    @Override
+    protected Class<Fishing> getTreeClass() {
+        return Fishing.class;
+    }
 }

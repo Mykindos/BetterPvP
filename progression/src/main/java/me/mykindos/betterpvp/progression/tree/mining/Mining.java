@@ -30,7 +30,6 @@ public class Mining extends ProgressionTree {
     @Override
     public void loadConfig(ExtendedYamlConfiguration config) {
         statsRepository.loadConfig(config);
-        miningService.loadConfig(config);
         leaderboard.forceUpdate(); // Force update because mining service reloads tracked blocks
     }
 

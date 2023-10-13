@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.progression.model.stats;
 
-import com.google.common.reflect.TypeToken;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.LongStatementValue;
@@ -27,6 +26,8 @@ public abstract class ProgressionStatsRepository<T extends ProgressionTree, K ex
         super(plugin, tableName);
     }
 
+    protected abstract Class<T> getTreeClass();
+
     @Override
     protected void postSaveAll() {
         String expStmt = "INSERT INTO " + plugin.getDatabasePrefix() + "exp (Gamer, " + tableName + ") VALUES (?, ?) ON DUPLICATE KEY UPDATE " + tableName + " = VALUES(" + tableName + ");";
@@ -45,10 +46,7 @@ public abstract class ProgressionStatsRepository<T extends ProgressionTree, K ex
         }
 
         if (tree == null) {
-            @SuppressWarnings("unchecked")
-            final Class<T> clazz = (Class<T>) new TypeToken<>(getClass()) {
-            }.getType();
-            tree = ((Progression) plugin).getProgressionsManager().fromClass(clazz);
+            tree = ((Progression) plugin).getProgressionsManager().fromClass(getTreeClass());
         }
 
         // Otherwise, these people were just loaded from the database, so load their XP

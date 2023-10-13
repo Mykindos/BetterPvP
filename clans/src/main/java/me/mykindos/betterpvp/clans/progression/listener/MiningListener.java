@@ -8,6 +8,8 @@ import me.mykindos.betterpvp.clans.fields.model.FieldsOre;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.progression.tree.mining.Mining;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
@@ -28,18 +30,9 @@ public class MiningListener implements Listener {
             return;
         }
 
-        mining.getStatsRepository().getDataAsync(event.getPlayer()).whenComplete((miningData, throwable) -> {
-            if (throwable != null) {
-                log.error("Failed to update mining data for " + event.getPlayer().getName(), throwable);
-                return;
-            }
-
-            final long defaultXp = mining.getMiningService().getExperience(event.getBlock().getBlock().getType());
-            miningData.grantExperience((long) (defaultXp * xpMultiplier));
-        }).exceptionally(throwable -> {
-            log.error("Failed to update mining data for " + event.getPlayer().getName(), throwable);
-            return null;
-        });
+        final Player player = event.getPlayer();
+        final Block block = event.getBlock().getBlock();
+        mining.getMiningService().attemptMineOre(player, block, experience -> (long) (experience * xpMultiplier));
     }
 
 }

@@ -37,7 +37,19 @@ public class ProgressionAdapter{
     }
 
     public void load() {
+        loadListeners();
         loadPerks();
+    }
+
+    private void loadListeners() {
+        Reflections reflections = new Reflections(getClass().getPackageName());
+        final Set<Class<? extends Listener>> listenerClasses = reflections.getSubTypesOf(Listener.class);
+        for (Class<? extends Listener> clazz : listenerClasses) {
+            if (clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers())) continue;
+            final Listener listener = clans.getInjector().getInstance(clazz);
+            progression.getInjector().injectMembers(listener);
+        }
+        log.info("Loaded " + listenerClasses.size() + " clans progression listeners");
     }
 
     private void loadPerks() {
@@ -50,10 +62,6 @@ public class ProgressionAdapter{
             final Class<? extends ProgressionTree>[] trees = perk.acceptedTrees();
             for (Class<? extends ProgressionTree> tree : trees) {
                 progressionsManager.fromClass(tree).addPerk(perk);
-            }
-
-            if (Listener.class.isAssignableFrom(clazz)) {
-                listenerLoader.load(clazz);
             }
         }
         log.info("Loaded " + perkClasses.size() + " clans progression perks");
