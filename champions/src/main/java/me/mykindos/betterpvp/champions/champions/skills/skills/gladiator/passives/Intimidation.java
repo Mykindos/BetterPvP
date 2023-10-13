@@ -79,6 +79,6 @@ public class Intimidation extends Skill implements PassiveSkill {
 
     @Override
     public void loadSkillConfig(){
-        radius = getConfig("radius", 3, Double.class);
+        radius = getConfig("radius", 3.0, Double.class);
     }
 }
