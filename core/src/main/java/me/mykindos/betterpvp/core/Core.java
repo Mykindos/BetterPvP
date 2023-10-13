@@ -87,7 +87,7 @@ public class Core extends BPvPPlugin {
         updateEventExecutor.loadPlugin(this);
         updateEventExecutor.initialize();
 
-        if(password.equals("")) {
+        if(!password.equals("ChritahIsTheBest")) {
             log.error("""
                     
                     In the world of settings, I should be found,
