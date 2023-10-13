@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.Vector;
 
 import java.util.List;
 
@@ -37,31 +38,30 @@ public class Intimidation extends Skill implements PassiveSkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Give every enemy within <val" + (radius + level) + "<val> blocks <effect>Slowness 1",
-                "Hold shift to reduce the radius to <val>"+ ((radius + level)/2) + "</val> blocks",
-                "and give enemies <effect>Slowness II</effect> instead"};
+                "Every enemy facing away from you within <val" + (radius + (level-1)) + "<val> blocks will get <effect>Slowness 1",
+        };
     }
 
-    @UpdateEvent(delay = 250)
+    private boolean isFacingAway(Player source, Player target) {
+        Vector toTarget = target.getLocation().subtract(source.getLocation()).toVector().normalize();
+        Vector direction = source.getLocation().getDirection();
+
+        return toTarget.dot(direction) < 0;
+    }
+
     public void intimidate(Player player) {
         int level = getLevel(player);
         if(level>0) {
             double currentRadius;
             PotionEffectType slownessType = PotionEffectType.SLOW;
-            int slownessLevel;
-
-            if(player.isSneaking()) {
-                currentRadius = (radius + level) / 2;
-                slownessLevel = 1;
-            } else {
-                currentRadius = radius + level;
-                slownessLevel = 0;
-            }
+            currentRadius = radius + (level-1);
 
             List<Player> nearbyEnemies = UtilPlayer.getNearbyEnemies(player, player.getLocation(), currentRadius);
 
             for(Player enemy : nearbyEnemies) {
-                enemy.addPotionEffect(new PotionEffect(slownessType, 1, slownessLevel, false, true));
+                if(isFacingAway(enemy, player)) {
+                    enemy.addPotionEffect(new PotionEffect(slownessType, 1, 0, false, true));
+                }
             }
         }
     }
@@ -79,6 +79,6 @@ public class Intimidation extends Skill implements PassiveSkill {
 
     @Override
     public void loadSkillConfig(){
-        radius = getConfig("radius", 7.0, Double.class);
+        radius = getConfig("radius", 3, Double.class);
     }
 }
