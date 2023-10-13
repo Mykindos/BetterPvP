@@ -5,18 +5,22 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanProperty;
+import me.mykindos.betterpvp.clans.clans.insurance.Insurance;
 import me.mykindos.betterpvp.clans.clans.pillage.events.PillageEndEvent;
 import me.mykindos.betterpvp.clans.clans.pillage.events.PillageStartEvent;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 import java.text.DecimalFormat;
+import java.util.Collections;
+import java.util.List;
 
 @BPvPListener
 public class PillageListener implements Listener {
@@ -70,13 +74,24 @@ public class PillageListener implements Listener {
         clanManager.getRepository().deleteClanEnemy(pillage.getPillaged(), pillagedEnemy);
 
         if(pillage.getPillaged() instanceof Clan pillagedClan) {
-            pillagedClan.putProperty(ClanProperty.NO_DOMINANCE_COOLDOWN, System.currentTimeMillis() + (3_600_000L * noDominanceCooldownHours));
+            pillagedClan.putProperty(ClanProperty.NO_DOMINANCE_COOLDOWN, (System.currentTimeMillis() + (3_600_000L * noDominanceCooldownHours)));
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPillageEnd(PillageEndEvent event) {
         pillageHandler.endPillage(event.getPillage());
+        Clan clan = (Clan) event.getPillage().getPillaged();
+
+        clan.messageClan("The raid on your clan has ended, and your base will begin to regenerate in <green>2</green> minutes.", null, true);
+
+        UtilServer.runTaskLater(clans, () -> {
+            List<Insurance> insuranceList = clan.getInsurance();
+            insuranceList.sort(Collections.reverseOrder());
+            clanManager.getInsuranceQueue().addAll(insuranceList);
+            clanManager.getRepository().deleteInsuranceForClan(clan);
+            clan.getInsurance().clear();
+        }, 20 * 60 * 2);
     }
 
     @UpdateEvent(delay = 30000)

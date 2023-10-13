@@ -10,6 +10,7 @@ public enum GamerProperty {
 
     // Misc
     SIDEBAR_ENABLED,
+    CLAN_MENU_ENABLED,
 
     TIPS_ENABLED,
 

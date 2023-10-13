@@ -91,6 +91,11 @@ public class GamerListener implements Listener {
         if(tipsOptional.isEmpty()){
             gamer.saveProperty(GamerProperty.TIPS_ENABLED, true);
         }
+
+        Optional<Boolean> clanMenuOptional = gamer.getProperty(GamerProperty.CLAN_MENU_ENABLED);
+        if(clanMenuOptional.isEmpty()){
+            gamer.saveProperty(GamerProperty.CLAN_MENU_ENABLED, true);
+        }
     }
 
 }
