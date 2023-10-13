@@ -346,7 +346,7 @@ skills:
     ropedarrow:
       enabled: true
       maxlevel: 5
-      cooldown: 4
+      cooldown: 8
     levitatingshot:
       enabled: true
       maxlevel: 5
