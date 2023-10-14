@@ -88,6 +88,9 @@ public class SmokeBomb extends Skill implements ToggleSkill, CooldownSkill, List
                     reappear(next.getKey());
                     it.remove();
                 }
+            } else {
+                reappear(next.getKey());
+                it.remove();
             }
         }
 
@@ -95,11 +98,7 @@ public class SmokeBomb extends Skill implements ToggleSkill, CooldownSkill, List
 
     private void reappear(Player player) {
         championsManager.getEffects().removeEffect(player, EffectType.INVISIBILITY);
-        Bukkit.getOnlinePlayers().forEach(onlinePlayer -> {
-            if (!onlinePlayer.canSee(player)) {
-                onlinePlayer.showPlayer(champions, player);
-            }
-        });
+
         UtilMessage.message(player, getClassType().getName(), "You have reappeared.");
     }
 
@@ -180,9 +179,7 @@ public class SmokeBomb extends Skill implements ToggleSkill, CooldownSkill, List
 
         championsManager.getEffects().addEffect(player, EffectType.INVISIBILITY, (long) ((baseDuration + level) * 1000L));
         smoked.put(player, (int) (baseDuration + level));
-        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-            onlinePlayer.hidePlayer(champions, player);
-        }
+
 
         for (int i = 0; i < 3; i++) {
 
@@ -200,7 +197,7 @@ public class SmokeBomb extends Skill implements ToggleSkill, CooldownSkill, List
 
     }
 
-    public void loadSkillConfig(){
+    public void loadSkillConfig() {
         baseDuration = getConfig("baseDuration", 3.0, Double.class);
         blindDuration = getConfig("blindDuration", 1.75, Double.class);
         blindRadius = getConfig("blindRadius", 2.5, Double.class);
