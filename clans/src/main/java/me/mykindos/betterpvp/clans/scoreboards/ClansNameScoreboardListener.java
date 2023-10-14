@@ -139,6 +139,7 @@ public class ClansNameScoreboardListener implements Listener {
             } else {
                 team.prefix(Component.text("", NamedTextColor.YELLOW));
             }
+
             team.color(NamedTextColor.YELLOW);
             team.suffix(Component.text(""));
         }

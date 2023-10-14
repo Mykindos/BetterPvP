@@ -211,9 +211,9 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
 
             String text;
             if (enemy.getDominance() > 0) {
-                text = "<green>" + enemy.getDominance() + "%";
+                text = "<green>+" + enemy.getDominance() + "%";
             } else if (theirEnemy.getDominance() > 0) {
-                text = "<red>" + theirEnemy.getDominance() + "%";
+                text = "<red>-" + theirEnemy.getDominance() + "%";
             } else {
                 return "";
             }
@@ -234,9 +234,9 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
                 return Component.text(" 0", NamedTextColor.WHITE);
             }
             if (theirEnemy.getDominance() > 0) {
-                return Component.text(" " + theirEnemy.getDominance() + "%", NamedTextColor.GREEN);
+                return Component.text(" +" + theirEnemy.getDominance() + "%", NamedTextColor.GREEN);
             } else {
-                return Component.text(" " + enemy.getDominance() + "%", NamedTextColor.RED);
+                return Component.text(" -" + enemy.getDominance() + "%", NamedTextColor.DARK_RED);
             }
 
         }
