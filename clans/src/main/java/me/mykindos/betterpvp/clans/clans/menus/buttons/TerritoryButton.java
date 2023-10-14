@@ -6,13 +6,14 @@ import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.menu.Button;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.model.ItemView;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.ItemFlag;
 
 import java.util.ArrayList;
 
@@ -22,11 +23,12 @@ public class TerritoryButton extends Button {
     private final ClanMember.MemberRank rank; // to store the rank of the player in the clan
 
     public TerritoryButton(int slot, Player player, Clan clan) {
-        super(slot, UtilItem.createItemStack(Material.PAPER, 3));
+        super(slot, ItemView.builder().material(Material.PAPER).customModelData(3).fallbackMaterial(Material.CREEPER_BANNER_PATTERN).build().toItemStack());
         ClanMember member = clan.getMemberByUUID(player.getUniqueId()).orElse(null);
         this.ownClan = member != null;
         this.rank = member != null ? member.getRank() : null;
 
+        this.itemStack.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS);
         this.name = Component.text("Territory", NamedTextColor.DARK_GREEN).decoration(TextDecoration.ITALIC,false);
         this.lore = new ArrayList<>();
         lore.add(UtilMessage.deserialize("%d/%d claimed", clan.getTerritory().size(), Math.min(clan.getMembers().size() + 3, 9)));

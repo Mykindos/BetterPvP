@@ -5,14 +5,13 @@ import me.mykindos.betterpvp.clans.clans.menus.AlliesMenu;
 import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.menu.Button;
 import me.mykindos.betterpvp.core.menu.MenuManager;
-import me.mykindos.betterpvp.core.utilities.UtilItem;
+import me.mykindos.betterpvp.core.utilities.model.ItemView;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
-import org.bukkit.inventory.ItemStack;
 
 public class AlliesButton extends Button {
 
@@ -20,7 +19,8 @@ public class AlliesButton extends Button {
     private final Clan clan;
 
     public AlliesButton(int slot, Clan playerClan, Clan clan) {
-        super(slot, UtilItem.createItemStack(Material.PAPER, 2), Component.text("Allies", NamedTextColor.GREEN).decoration(TextDecoration.ITALIC,false),
+        super(slot, ItemView.builder().material(Material.PAPER).customModelData(2).fallbackMaterial(Material.EMERALD).build().toItemStack(),
+                Component.text("Allies", NamedTextColor.GREEN).decoration(TextDecoration.ITALIC,false),
                 Component.text(clan.getOnlineAllyCount() + "/" + (clan.getAlliances().size()) + " Online",NamedTextColor.GRAY).decoration(TextDecoration.ITALIC,false));
         this.playerClan = playerClan;
         this.clan = clan;

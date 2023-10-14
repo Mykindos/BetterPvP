@@ -3,21 +3,20 @@ package me.mykindos.betterpvp.clans.clans.menus.buttons;
 import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.menu.Button;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.model.ItemView;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 
 public class ClanCommandButton extends Button {
 
     public ClanCommandButton(int slot) {
-        super(slot, UtilItem.createItemStack(Material.PAPER, 6));
+        super(slot, ItemView.builder().material(Material.PAPER).customModelData(6).fallbackMaterial(Material.FILLED_MAP).build().toItemStack());
 
         this.name = Component.text("Clan Commands", NamedTextColor.LIGHT_PURPLE).decoration(TextDecoration.ITALIC,false);
         this.lore = new ArrayList<>();
