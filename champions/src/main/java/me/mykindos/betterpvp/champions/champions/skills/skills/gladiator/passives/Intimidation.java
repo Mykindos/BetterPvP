@@ -57,14 +57,16 @@ public class Intimidation extends Skill implements PassiveSkill {
 
     @Override
     public void invalidatePlayer(Player player) {
-        trackedEnemies.remove(player);
+        for (Player tracked : trackedEnemies.remove(player)) {
+            UtilPlayer.clearWarningEffect(tracked); // Clear them if they are no longer in front
+        }
     }
 
     public double getRadius(int level) {
         return baseRadius + (level - 1);
     }
 
-    @UpdateEvent(delay = (DURATION_TICKS - 1) * 50)
+    @UpdateEvent
     public void onUpdate() {
         final boolean sounds = soundTicks.get() == 0;
         final Iterator<Player> iterator = trackedEnemies.keySet().iterator();
@@ -84,8 +86,7 @@ public class Intimidation extends Skill implements PassiveSkill {
             intimidateNearby(player, level, sounds);
         }
 
-        soundTicks.getAndAdd(DURATION_TICKS);
-        if (soundTicks.get() >= 20) {
+        if (soundTicks.addAndGet(1) >= 20) {
             soundTicks.set(0); // Play sound every second
         }
     }
