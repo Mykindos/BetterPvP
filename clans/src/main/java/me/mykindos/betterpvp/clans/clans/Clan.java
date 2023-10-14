@@ -201,48 +201,6 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
     }
 
 
-    public String getDominanceString(IClan clan) {
-        Optional<ClanEnemy> enemyOptional = getEnemy(clan);
-        Optional<ClanEnemy> theirEnemyOptional = clan.getEnemy(this);
-        if (enemyOptional.isPresent() && theirEnemyOptional.isPresent()) {
-
-            ClanEnemy enemy = enemyOptional.get();
-            ClanEnemy theirEnemy = theirEnemyOptional.get();
-
-            String text;
-            if (enemy.getDominance() > 0) {
-                text = "<green>+" + enemy.getDominance() + "%";
-            } else if (theirEnemy.getDominance() > 0) {
-                text = "<red>-" + theirEnemy.getDominance() + "%";
-            } else {
-                return "";
-            }
-            return "<gray> (" + text + "<gray>)";
-        }
-        return "";
-    }
-
-    public Component getSimpleDominanceString(IClan clan) {
-        Optional<ClanEnemy> enemyOptional = getEnemy(clan);
-        Optional<ClanEnemy> theirEnemyOptional = clan.getEnemy(this);
-        if (enemyOptional.isPresent() && theirEnemyOptional.isPresent()) {
-
-            ClanEnemy enemy = enemyOptional.get();
-            ClanEnemy theirEnemy = theirEnemyOptional.get();
-
-            if (theirEnemy.getDominance() == 0 && enemy.getDominance() == 0) {
-                return Component.text(" 0", NamedTextColor.WHITE);
-            }
-            if (theirEnemy.getDominance() > 0) {
-                return Component.text(" +" + theirEnemy.getDominance() + "%", NamedTextColor.GREEN);
-            } else {
-                return Component.text(" -" + enemy.getDominance() + "%", NamedTextColor.DARK_RED);
-            }
-
-        }
-        return Component.empty();
-    }
-
     /**
      * Send message to all online clan members
      *
