@@ -42,6 +42,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -100,7 +101,9 @@ public class CombatListener implements Listener {
         if (event.getDamagee().getHealth() > 0) {
             if (event.getDamage() >= 0) {
 
-                damageDataList.add(new DamageData(event.getDamagee().getUniqueId().toString(), event.getCause(), event.getDamageDelay()));
+                String damagerUuid = event.getDamager() == null ? null : event.getDamager().getUniqueId().toString();
+
+                damageDataList.add(new DamageData(event.getDamagee().getUniqueId().toString(), event.getCause(), damagerUuid, event.getDamageDelay()));
 
                 if (event.isKnockback()) {
                     if (event.getDamager() != null) {
@@ -209,7 +212,7 @@ public class CombatListener implements Listener {
             return;
         }
 
-        if (hasDamageData(cde.getDamagee().getUniqueId().toString(), cde.getCause())) {
+        if (hasDamageData(cde.getDamagee(), cde.getCause(), cde.getDamager())) {
             event.setCancelled(true);
             return;
         }
@@ -354,8 +357,19 @@ public class CombatListener implements Listener {
         damageDataList.removeIf(damageData -> UtilTime.elapsed(damageData.getTimeOfDamage(), damageData.getDamageDelay()));
     }
 
-    public boolean hasDamageData(String uuid, EntityDamageEvent.DamageCause cause) {
-        return damageDataList.stream().anyMatch(damageData -> damageData.getUuid().equalsIgnoreCase(uuid) && damageData.getCause() == cause);
+    public boolean hasDamageData(LivingEntity damagee, EntityDamageEvent.DamageCause cause, @Nullable LivingEntity damager) {
+        return damageDataList.stream().anyMatch(damageData -> {
+            if (damageData.getUuid().equalsIgnoreCase(damagee.getUniqueId().toString())
+                    && damageData.getCause() == cause) {
+                if (damager == null) {
+                    return true;
+                } else {
+                    return damageData.getDamager().equalsIgnoreCase(damager.getUniqueId().toString());
+                }
+            }
+
+            return false;
+        });
     }
 
     private Projectile getProjectile(EntityDamageEvent event) {
