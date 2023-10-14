@@ -145,9 +145,9 @@ public class ClanManager extends Manager<Clan> {
         Optional<Clan> locationClanOptional = getClanByLocation(location);
 
         Optional<Gamer> gamerOptional = gamerManager.getObject(player.getUniqueId());
-        if(gamerOptional.isPresent()) {
+        if (gamerOptional.isPresent()) {
             Gamer gamer = gamerOptional.get();
-            if(gamer.getClient().isAdministrating()) {
+            if (gamer.getClient().isAdministrating()) {
                 return true;
             }
         }
@@ -272,7 +272,7 @@ public class ClanManager extends Manager<Clan> {
         if (!clan.getEnemies().isEmpty()) {
             for (ClanEnemy enemy : clan.getEnemies()) {
                 ClanRelation relation = getRelation(playerClan, enemy.getClan());
-                enemies.add((relation.getPrimaryMiniColor() + enemy.getClan().getName() + " " + clan.getDominanceString(enemy.getClan())).trim());
+                enemies.add((relation.getPrimaryMiniColor() + enemy.getClan().getName() + " " + getDominanceString(clan, enemy.getClan())).trim());
             }
         }
         return String.join("<gray>, ", enemies);
@@ -314,7 +314,7 @@ public class ClanManager extends Manager<Clan> {
 
         return relation != ClanRelation.SELF && relation != ClanRelation.ALLY && relation != ClanRelation.ALLY_TRUST;
     }
-    
+
     public boolean canCast(Player player) {
         Optional<Clan> locationClanOptional = getClanByLocation(player.getLocation());
         if (locationClanOptional.isPresent()) {
@@ -388,6 +388,55 @@ public class ClanManager extends Manager<Clan> {
                 UtilServer.callEvent(new ScoreboardUpdateEvent(player));
             }
         });
+    }
+
+    public String getDominanceString(IClan clan, IClan enemyClan) {
+        Optional<ClanEnemy> enemyOptional = clan.getEnemy(enemyClan);
+        Optional<ClanEnemy> theirEnemyOptional = enemyClan.getEnemy(clan);
+        if (enemyOptional.isPresent() && theirEnemyOptional.isPresent()) {
+
+            ClanEnemy enemy = enemyOptional.get();
+            ClanEnemy theirEnemy = theirEnemyOptional.get();
+
+
+            String text;
+            if (enemy.getDominance() > 0) {
+                boolean nextKillDoms = enemy.getDominance() + getDominanceForKill(enemyClan.getSquadCount(), clan.getSquadCount()) >= 100;
+                text = (nextKillDoms ? "<light_purple>+" : "<green>+") + enemy.getDominance() + "%";
+            } else if (theirEnemy.getDominance() > 0) {
+                boolean nextKillDoms = theirEnemy.getDominance() + getDominanceForKill(clan.getSquadCount(), enemyClan.getSquadCount()) >= 100;
+                text = (nextKillDoms ? "<light_purple>-" : "<red>-") + theirEnemy.getDominance() + "%";
+            } else {
+                return "";
+            }
+            return "<gray> (" + text + "<gray>)";
+        }
+        return "";
+    }
+
+    public Component getSimpleDominanceString(IClan clan, IClan enemyClan) {
+        Optional<ClanEnemy> enemyOptional = clan.getEnemy(enemyClan);
+        Optional<ClanEnemy> theirEnemyOptional = enemyClan.getEnemy(clan);
+        if (enemyOptional.isPresent() && theirEnemyOptional.isPresent()) {
+
+            ClanEnemy enemy = enemyOptional.get();
+            ClanEnemy theirEnemy = theirEnemyOptional.get();
+
+
+
+            if (theirEnemy.getDominance() == 0 && enemy.getDominance() == 0) {
+                return Component.text(" 0", NamedTextColor.WHITE);
+            }
+            if (theirEnemy.getDominance() > 0) {
+                boolean nextKillDoms = theirEnemy.getDominance() + getDominanceForKill(clan.getSquadCount(), enemyClan.getSquadCount()) >= 100;
+                return Component.text(" +" + theirEnemy.getDominance() + "%", nextKillDoms ? NamedTextColor.LIGHT_PURPLE : NamedTextColor.GREEN);
+            } else {
+                boolean nextKillDoms = enemy.getDominance() + getDominanceForKill(enemyClan.getSquadCount(), clan.getSquadCount()) >= 100;
+                return Component.text(" -" + enemy.getDominance() + "%", nextKillDoms ? NamedTextColor.LIGHT_PURPLE : NamedTextColor.DARK_RED);
+            }
+
+        }
+        return Component.empty();
     }
 
     /**

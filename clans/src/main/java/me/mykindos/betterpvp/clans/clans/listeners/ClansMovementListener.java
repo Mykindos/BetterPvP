@@ -88,7 +88,7 @@ public class ClansMovementListener extends ClanListener {
                 append = UtilMessage.deserialize(" <gray>(<yellow>Trusted</yellow>)</gray>");
             } else if (relation == ClanRelation.ENEMY) {
                 if (clan != null) {
-                    append = UtilMessage.deserialize(clan.getDominanceString(locationClan));
+                    append = UtilMessage.deserialize(clanManager.getDominanceString(clan, locationClan));
                 }
             }
         }
