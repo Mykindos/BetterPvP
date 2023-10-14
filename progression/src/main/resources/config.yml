@@ -1,0 +1,97 @@
+progression:
+  database:
+    prefix: progression_
+
+mining:
+  minLeaderboardBlockXp: 45
+  xpPerBlock:
+    STONE: 15
+    ANDESITE: 15
+    GRANITE: 15
+    COBBLESTONE: 15
+    REDSTONE_ORE: 50
+    DIAMOND_ORE: 50
+    GOLD_ORE: 50
+    COPPER_ORE: 50
+    IRON_ORE: 50
+    COAL_ORE: 50
+    LAPIS_ORE: 50
+    EMERALD_ORE: 50
+    DEEPSLATE_REDSTONE_ORE: 50
+    DEEPSLATE_DIAMOND_ORE: 50
+    DEEPSLATE_GOLD_ORE: 50
+    DEEPSLATE_COPPER_ORE: 50
+    DEEPSLATE_IRON_ORE: 50
+    DEEPSLATE_COAL_ORE: 50
+    DEEPSLATE_LAPIS_ORE: 50
+    DEEPSLATE_EMERALD_ORE: 50
+
+
+fishing:
+  minWaitTime: 5.0
+  maxWaitTime: 20.0
+  bait:
+    speedy:
+      type: speed
+      seconds: 200.0
+      name: Speedy Bait
+      radius: 5.0
+      multiplier: 10.0
+      texture: http://textures.minecraft.net/texture/eb7a8d0d7365de95f23ac375498024cb31ae4e8d6d06d12a621e43cf1b7667d6
+    test:
+      type: speed
+      seconds: 200.0
+      name: Test Bait
+      radius: 5.0
+      multiplier: 20.0
+      texture: http://textures.minecraft.net/texture/1713f2a526e9e681092dd09e2180fcc00fc9fc33d288954c52fea6b959bc4e6e
+  #    meaty:
+  #      type: weight
+  #      name: Fat Bait
+  #      seconds: 5.0
+  #      radius: 2.5
+  #      weightAdd: 100
+  loot:
+    scepter:
+      type: treasure
+      material: DIAMOND
+      customModelData: 70
+      frequency: 100
+      minAmount: 1
+      maxAmount: 10
+    zombie:
+      type: entity
+      entity: DROWNED
+      frequency: 100
+    tuna:
+      type: fish
+      name: Tuna
+      maxWeight: 400
+      minWeight: 1
+      frequency: 50
+    barracuda:
+      type: fish
+      name: Barracuda
+      maxWeight: 401
+      minWeight: 401
+      frequency: 10000
+  xpPerPound: 0.05
+command:
+  progression:
+    enabled: true
+    requiredRank: ADMIN
+    reload:
+      enabled: true
+      requiredRank: ADMIN
+  fishing:
+    enabled: true
+    requiredRank: ADMIN
+    givebait:
+      enabled: true
+      requiredRank: ADMIN
+    giverod:
+      enabled: true
+      requiredRank: ADMIN
+  stats:
+    enabled: true
+    requiredRank: ADMIN

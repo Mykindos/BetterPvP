@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.progression.tree.fishing.data;
+package me.mykindos.betterpvp.progression.tree.mining.data;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -6,13 +6,13 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
-import me.mykindos.betterpvp.core.database.query.values.DoubleStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
-import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
+import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.stats.Leaderboard;
 import me.mykindos.betterpvp.core.stats.sort.SortType;
 import me.mykindos.betterpvp.core.stats.sort.TemporalSort;
 import me.mykindos.betterpvp.progression.Progression;
+import me.mykindos.betterpvp.progression.tree.mining.repository.MiningRepository;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.SQLException;
@@ -20,20 +20,22 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
 @Singleton
-public class FishingCountLeaderboard extends Leaderboard<UUID, Long> {
+public class MiningOresMinedLeaderboard extends Leaderboard<UUID, Long> {
+
+    private final MiningRepository repository;
 
     @Inject
-    public FishingCountLeaderboard(Progression progression) {
+    public MiningOresMinedLeaderboard(Progression progression, MiningRepository repository) {
         super(progression, progression.getDatabasePrefix());
+        this.repository = repository;
     }
 
     @Override
     public String getName() {
-        return "Total Fish Caught";
+        return "Total Ores Mined";
     }
 
     @Override
@@ -43,7 +45,7 @@ public class FishingCountLeaderboard extends Leaderboard<UUID, Long> {
 
     @Override
     public SortType[] acceptedSortTypes() {
-        return TemporalSort.values();
+        return new SortType[]{TemporalSort.SEASONAL};
     }
 
     @Override
@@ -53,33 +55,27 @@ public class FishingCountLeaderboard extends Leaderboard<UUID, Long> {
 
     @Override
     protected Long fetch(SortType sortType, @NotNull Database database, @NotNull String tablePrefix, @NotNull UUID entry) {
-        AtomicLong count = new AtomicLong();
-        final TemporalSort type = (TemporalSort) sortType;
-        Statement statement = new Statement("CALL GetGamerFishingCount(?, ?)",
-                new UuidStatementValue(entry),
-                new DoubleStatementValue(type.getDays())); // Top 10
-        database.executeProcedure(statement, -1, result -> {
-            try {
-                if (result.next()) {
-                    count.set(result.getLong(1));
-                }
-            } catch (SQLException e) {
-                log.error("Error fetching leaderboard data", e);
-            }
-        });
+        if (sortType != TemporalSort.SEASONAL) {
+            log.error("Attempted to fetch leaderboard data for " + entry + " with invalid sort type " + sortType);
+            return 0L;
+        }
 
-        return count.get();
+        return repository.fetchDataAsync(entry).join().getOresMined();
     }
 
     @SneakyThrows
     @Override
     protected Map<UUID, Long> fetchAll(@NotNull SortType sortType, @NotNull Database database, @NotNull String tablePrefix) {
-        Map<UUID, Long> leaderboard = new HashMap<>();
+        if (sortType != TemporalSort.SEASONAL) {
+            log.error("Attempted to fetch leaderboard data for all with invalid sort type " + sortType);
+            return new HashMap<>();
+        }
 
-        final TemporalSort type = (TemporalSort) sortType;
-        Statement statement = new Statement("CALL GetTopFishingByCount(?, ?)",
-                new DoubleStatementValue(type.getDays()),
-                new IntegerStatementValue(10)); // Top 10
+        Map<UUID, Long> leaderboard = new HashMap<>();
+        Statement statement = new Statement("CALL GetTopMiningByOre(?, ?, ?)",
+                new IntegerStatementValue(10),
+                new StringStatementValue(repository.getDbMaterialsList()),
+                new StringStatementValue(tablePrefix));
         database.executeProcedure(statement, -1, result -> {
             try {
                 while (result.next()) {
