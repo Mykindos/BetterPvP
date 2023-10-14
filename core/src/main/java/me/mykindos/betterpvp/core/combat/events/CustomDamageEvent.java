@@ -38,7 +38,7 @@ public class CustomDamageEvent extends CustomCancellableEvent {
      * @param damage    The amount of damage to be dealt
      * @param knockback Whether or not the damage should knockback
      */
-    public CustomDamageEvent(LivingEntity damagee, LivingEntity damager, Projectile proj, DamageCause cause, double damage, boolean knockback) {
+    public CustomDamageEvent(@NotNull LivingEntity damagee, LivingEntity damager, Projectile proj, DamageCause cause, double damage, boolean knockback) {
         this.damagee = damagee;
         this.damager = damager;
         this.projectile = proj;

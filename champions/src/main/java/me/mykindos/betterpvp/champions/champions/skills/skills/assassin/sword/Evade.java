@@ -94,7 +94,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
 
         event.setKnockback(false);
         event.cancel("Skill Evade");
-        event.setForceDamageDelay(400);
+        event.getDamagee().setNoDamageTicks(1);
 
         for (int i = 0; i < 3; i++) {
             player.getWorld().playEffect(player.getLocation(), Effect.SMOKE, 5);
