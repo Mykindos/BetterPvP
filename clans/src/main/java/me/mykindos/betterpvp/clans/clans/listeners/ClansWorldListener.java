@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.clans.clans.listeners;
 
 import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
+import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
@@ -18,7 +19,6 @@ import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.gamer.exceptions.NoSuchGamerException;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.*;
-import net.minecraft.world.entity.EntityType;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -37,7 +37,6 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.util.Vector;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -46,12 +45,14 @@ import java.util.UUID;
 @BPvPListener
 public class ClansWorldListener extends ClanListener {
 
+    private final Clans clans;
     private final EffectManager effectManager;
     private final EnergyHandler energyHandler;
 
     @Inject
-    public ClansWorldListener(ClanManager clanManager, GamerManager gamerManager, EffectManager effectManager, EnergyHandler energyHandler) {
+    public ClansWorldListener(ClanManager clanManager, GamerManager gamerManager, Clans clans, EffectManager effectManager, EnergyHandler energyHandler) {
         super(clanManager, gamerManager);
+        this.clans = clans;
         this.effectManager = effectManager;
         this.energyHandler = energyHandler;
     }
@@ -65,16 +66,20 @@ public class ClansWorldListener extends ClanListener {
     @EventHandler
     public void onLogout(PlayerQuitEvent event) {
         Optional<Clan> clanOptional = clanManager.getClanByPlayer(event.getPlayer());
-        clanOptional.ifPresent(clan -> {
-            for (ClanMember member : clan.getMembers()) {
-                Player player = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
-                if (player != null) {
-                    return;
-                }
-            }
 
-            clan.setOnline(false);
-        });
+        UtilServer.runTaskLater(clans, () -> {
+            clanOptional.ifPresent(clan -> {
+                for (ClanMember member : clan.getMembers()) {
+                    Player player = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
+                    if (player != null) {
+                        return;
+                    }
+                }
+
+                clan.setOnline(false);
+            });
+        }, 5L);
+
     }
 
     @UpdateEvent(delay = 1000)

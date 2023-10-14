@@ -98,11 +98,11 @@ public class UtilTime {
 
     public static String getTimeUnit(TimeUnit unit) {
         return switch (unit) {
-            case SECONDS -> "Seconds";
-            case MINUTES -> "Minutes";
-            case HOURS -> "Hours";
-            case DAYS -> "Days";
-            case YEARS -> "Years";
+            case SECONDS -> "seconds";
+            case MINUTES -> "minutes";
+            case HOURS -> "hours";
+            case DAYS -> "days";
+            case YEARS -> "years";
             default -> "";
         };
 

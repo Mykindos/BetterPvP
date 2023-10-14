@@ -28,6 +28,7 @@ public class CustomDamageEvent extends CustomCancellableEvent {
 
     private boolean doVanillaEvent;
 
+    private long forceDamageDelay = 0;
 
     /**
      * @param damagee   The entity taking damage

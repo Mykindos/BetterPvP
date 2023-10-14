@@ -80,6 +80,11 @@ public class CombatListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void damageEvent(CustomDamageEvent event) {
 
+        if(event.getForceDamageDelay() != 0 && event.isCancelled()) {
+            String damagerUuid = event.getDamager() == null ? null : event.getDamager().getUniqueId().toString();
+            damageDataList.add(new DamageData(event.getDamagee().getUniqueId().toString(), event.getCause(), damagerUuid, event.getForceDamageDelay()));
+        }
+
         if (event.isCancelled()) {
             return;
         }

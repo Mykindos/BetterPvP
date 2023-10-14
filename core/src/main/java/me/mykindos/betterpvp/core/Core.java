@@ -19,6 +19,7 @@ import me.mykindos.betterpvp.core.injector.CoreInjectorModule;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.loader.CoreListenerLoader;
 import net.kyori.adventure.key.Key;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 
@@ -54,7 +55,7 @@ public class Core extends BPvPPlugin {
 
     @Inject
     @Config(path = "core.password", defaultValue = "")
-    private String password;
+    public String password;
 
     public void onEnable() {
         saveDefaultConfig();
@@ -86,26 +87,6 @@ public class Core extends BPvPPlugin {
 
         updateEventExecutor.loadPlugin(this);
         updateEventExecutor.initialize();
-
-        if(!password.equals("ChritahIsTheBest")) {
-            log.error("""
-                    
-                    In the world of settings, I should be found,
-                    But I'm missing, causing a puzzling sound.
-                    Without me, things are chaotic, you see,
-                    A configuration gone, a mystery to be.
-                                        
-                    I'm like a piece in a jigsaw puzzle game,
-                    Without me, things will never be the same.
-                    In the system's heart, where I should reside,
-                    I'm absent now, causing strife far and wide.
-                                        
-                    What am I, this absence so dire,
-                    Leaving systems and users to inquire?
-                    
-                    """);
-            getServer().getPluginManager().disablePlugin(this);
-        }
 
     }
 
