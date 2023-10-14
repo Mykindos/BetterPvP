@@ -48,6 +48,7 @@ public class ProgressionAdapter{
             if (clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers())) continue;
             final Listener listener = clans.getInjector().getInstance(clazz);
             progression.getInjector().injectMembers(listener);
+            listenerLoader.load(clazz);
         }
         log.info("Loaded " + listenerClasses.size() + " clans progression listeners");
     }
@@ -59,6 +60,7 @@ public class ProgressionAdapter{
             if (clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers())) continue;
             final ProgressionPerk perk = clans.getInjector().getInstance(clazz);
             progression.getInjector().injectMembers(perk);
+            clans.getInjector().injectMembers(perk);
             final Class<? extends ProgressionTree>[] trees = perk.acceptedTrees();
             for (Class<? extends ProgressionTree> tree : trees) {
                 progressionsManager.fromClass(tree).addPerk(perk);

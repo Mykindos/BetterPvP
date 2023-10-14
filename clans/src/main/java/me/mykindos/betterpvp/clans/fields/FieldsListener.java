@@ -102,11 +102,11 @@ public class FieldsListener extends ClanListener {
 
         if (allow) {
             event.setInform(false); // Block the message that they cant break
-            event.getBlock().setType(type.getReplacement().getMaterial()); // Then replace the block
-            event.getBlock().setBlockData(type.getReplacement());
             block.setLastUsed(System.currentTimeMillis());
             block.setActive(false);
             UtilServer.callEvent(new FieldsInteractableUseEvent(fields, type, block, event.getPlayer()));
+            event.getBlock().setType(type.getReplacement().getMaterial()); // Then replace the block
+            event.getBlock().setBlockData(type.getReplacement());
         }
     }
 
