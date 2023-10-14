@@ -30,16 +30,13 @@ import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.TNTPrimeEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.WeakHashMap;
+import java.util.*;
 
 @Slf4j
 @BPvPListener
@@ -191,7 +188,8 @@ public class ClansExplosionListener extends ClanListener {
         if (event.getEntity().getType() != EntityType.PRIMED_TNT) return;
         event.getEntity().getWorld().playSound(event.getEntity().getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2.0f, 1.0f);
         event.setYield(2.5f);
-        for (Block block : UtilBlock.getInRadius(event.getLocation(), event.getYield()).keySet()) {
+        final Set<Block> blocks = UtilBlock.getInRadius(event.getLocation(), event.getYield()).keySet();
+        for (Block block : blocks) {
             if (protectedBlocks.contains(block.getType())) continue;
             if (worldBlockHandler.isRestoreBlock(block)) continue;
             if (block.getType().isAir()) continue;
@@ -211,6 +209,10 @@ public class ClansExplosionListener extends ClanListener {
         Clan attackedClan = null;
 
         boolean schedulingRollback = false;
+
+        // todo: allow changing yield
+        final BlockExplodeEvent explodeEvent = new BlockExplodeEvent(event.getLocation().getBlock(), new ArrayList<>(blocks), 1.0f, null);
+        UtilServer.callEvent(explodeEvent);
 
         for (Block block : event.blockList()) {
             if (protectedBlocks.contains(block.getType())) continue;

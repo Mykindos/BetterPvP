@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 
 /**
  * Represents an ore in the Fields zone.
@@ -24,8 +25,12 @@ public class FieldsBlock {
         return Bukkit.getWorld(world);
     }
 
-    public Location toLocation() {
+    public Location getLocation() {
         return new Location(getWorld(), x, y, z);
+    }
+
+    public Block getBlock() {
+        return getLocation().getBlock();
     }
 
 }

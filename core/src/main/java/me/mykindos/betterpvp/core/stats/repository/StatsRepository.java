@@ -26,8 +26,8 @@ public abstract class StatsRepository<T extends PlayerData> implements ConfigAcc
     protected final BPvPPlugin plugin;
     protected final String tableName;
 
-    protected StatsRepository(Database database, BPvPPlugin plugin, String tableName) {
-        this.database = database;
+    protected StatsRepository(BPvPPlugin plugin, String tableName) {
+        this.database = plugin.getInjector().getInstance(Database.class);
         this.plugin = plugin;
         this.tableName = tableName;
         this.dataCache = Caffeine.newBuilder()
@@ -113,12 +113,19 @@ public abstract class StatsRepository<T extends PlayerData> implements ConfigAcc
             dataCache.put(player, saved);
             return saved;
         }
-        return loadDataAsync(player).exceptionally(throwable -> {
+        return fetchDataAsync(player).exceptionally(throwable -> {
             log.error("Error loading data for " + player, throwable);
             return null;
         });
     }
 
-    protected abstract CompletableFuture<T> loadDataAsync(UUID player);
+    /**
+     * Fetches the data for the given player directly from the database.
+     *
+     * <b>NOTE: Use with caution. This is a direct database call. For common use call {@link StatsRepository#getDataAsync}</b>
+     * @param player
+     * @return
+     */
+    public abstract CompletableFuture<T> fetchDataAsync(UUID player);
 
 }
