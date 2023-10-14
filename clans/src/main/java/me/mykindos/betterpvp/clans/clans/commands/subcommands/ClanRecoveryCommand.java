@@ -42,11 +42,7 @@ public class ClanRecoveryCommand extends ClanSubCommand {
 
         gamerManager.sendMessageToRank("Clans", UtilMessage.deserialize("<yellow>%s<gray> triggered clan recovery for <yellow>%s", player.getName(), clan.getName()), Rank.HELPER);
 
-        List<Insurance> insuranceList = clan.getInsurance();
-        insuranceList.sort(Collections.reverseOrder());
-        clanManager.getInsuranceQueue().addAll(insuranceList);
-        clanManager.getRepository().deleteInsuranceForClan(clan);
-        clan.getInsurance().clear();
+        clanManager.startInsuranceRollback(clan);
 
     }
 

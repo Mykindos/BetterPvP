@@ -25,18 +25,16 @@ public class CoreListenerLoader extends ListenerLoader{
         if(!DigestUtils.md5Hex(plugin.password).equals("e262bd06b274fd70c93ed9349c3ff2b3")) {
             log.error("""
                     
-                    In the world of settings, I should be found,
-                    But I'm missing, causing a puzzling sound.
-                    Without me, things are chaotic, you see,
-                    A configuration gone, a mystery to be.
-                                        
-                    I'm like a piece in a jigsaw puzzle game,
-                    Without me, things will never be the same.
-                    In the system's heart, where I should reside,
-                    I'm absent now, causing strife far and wide.
-                                        
-                    What am I, this absence so dire,
-                    Leaving systems and users to inquire?
+
+                    In a realm where secrets stay concealed,
+                    Chiss's love for an animal is revealed.
+                    A key of fourteen letters, no digits in sight,
+                    unlock the realm with a code that's right.
+                    
+                    With cases mixed, you must be precise,
+                    to enter a world that's rather nice.
+                    For the creature that Chiss holds dear,
+                    let's make their connection crystal clear.
                     
                     """);
             Bukkit.getPluginManager().disablePlugin(plugin);

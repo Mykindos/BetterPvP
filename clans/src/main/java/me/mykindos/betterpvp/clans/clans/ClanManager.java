@@ -399,6 +399,14 @@ public class ClanManager extends Manager<Clan> {
         clan.getInsurance().add(insurance);
     }
 
+    public void startInsuranceRollback(Clan clan) {
+        List<Insurance> insuranceList = clan.getInsurance();
+        insuranceList.sort(Collections.reverseOrder());
+        getInsuranceQueue().addAll(insuranceList);
+        getRepository().deleteInsuranceForClan(clan);
+        clan.getInsurance().clear();
+    }
+
     @Override
     public void loadFromList(List<Clan> objects) {
         // Load the base clan objects first so they can be referenced in the loop below
