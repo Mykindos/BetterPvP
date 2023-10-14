@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.effects;
 
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.core.effects.events.EffectExpireEvent;
 import me.mykindos.betterpvp.core.effects.events.EffectReceiveEvent;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -42,8 +43,15 @@ public class EffectManager extends Manager<List<Effect>> {
     public void removeEffect(Player player, EffectType type) {
         Optional<List<Effect>> effectsOptional = getObject(player.getUniqueId().toString());
         effectsOptional.ifPresent(effects -> {
-            effects.removeIf(effect -> effect.getUuid().equals(player.getUniqueId().toString()) && effect.getEffectType() == type);
+            effects.removeIf(effect -> {
+                if(effect.getUuid().equals(player.getUniqueId().toString()) && effect.getEffectType() == type) {
+                    UtilServer.callEvent(new EffectExpireEvent(player, effect));
+                    return true;
+                }
+                return false;
+            });
         });
+
     }
 
 

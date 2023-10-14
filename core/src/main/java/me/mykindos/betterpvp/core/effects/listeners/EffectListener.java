@@ -1,15 +1,18 @@
 package me.mykindos.betterpvp.core.effects.listeners;
 
 import com.google.inject.Inject;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.effects.Effect;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.effects.events.EffectClearEvent;
+import me.mykindos.betterpvp.core.effects.events.EffectExpireEvent;
 import me.mykindos.betterpvp.core.effects.events.EffectReceiveEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -31,10 +34,12 @@ import java.util.UUID;
 @BPvPListener
 public class EffectListener implements Listener {
 
+    private final Core core;
     private final EffectManager effectManager;
 
     @Inject
-    public EffectListener(EffectManager effectManager) {
+    public EffectListener(Core core, EffectManager effectManager) {
+        this.core = core;
         this.effectManager = effectManager;
     }
 
@@ -109,13 +114,15 @@ public class EffectListener implements Listener {
         effectManager.getObjects().forEach((key, value) -> {
             value.removeIf(effect -> {
                 if (effect.hasExpired()) {
-                    if (effect.getEffectType() == EffectType.VULNERABILITY) {
-                        Player player = Bukkit.getPlayer(UUID.fromString(key));
-                        if (player != null) {
+                    Player player = Bukkit.getPlayer(UUID.fromString(key));
+
+                    if (player != null) {
+                        if (effect.getEffectType() == EffectType.VULNERABILITY) {
                             UtilMessage.message(player, "Condition", "Your vulnerability has worn off!");
                         }
-                    }
 
+                        UtilServer.callEvent(new EffectExpireEvent(player, effect));
+                    }
                     return true;
                 }
 
@@ -216,6 +223,24 @@ public class EffectListener implements Listener {
             if (type == EffectType.SILENCE || type == EffectType.SHOCK || type == EffectType.VULNERABILITY
                     || type == EffectType.STUN || type == EffectType.FRAILTY) {
                 event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onInvisibilityGiven(EffectReceiveEvent event) {
+        if (event.getEffect().getEffectType() == EffectType.INVISIBILITY) {
+            for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                onlinePlayer.hidePlayer(core, event.getPlayer());
+            }
+        }
+    }
+
+    @EventHandler
+    public void onInvisibilityRemoved(EffectExpireEvent event) {
+        if (event.getEffect().getEffectType() == EffectType.INVISIBILITY) {
+            for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                onlinePlayer.showPlayer(core, event.getPlayer());
             }
         }
     }

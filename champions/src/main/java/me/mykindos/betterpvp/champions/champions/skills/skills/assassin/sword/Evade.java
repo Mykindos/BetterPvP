@@ -17,7 +17,11 @@ import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.*;
+import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilPlayer;
+import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Location;
@@ -31,7 +35,9 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.util.Vector;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.UUID;
 
 @Singleton
 @BPvPListener
@@ -41,6 +47,8 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
 
     public double duration;
     public double internalCD;
+
+    public int forcedDamageDelay;
 
     @Inject
     private CooldownManager cooldownManager;
@@ -94,7 +102,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
 
         event.setKnockback(false);
         event.cancel("Skill Evade");
-        event.getDamagee().setNoDamageTicks(1);
+        event.setForceDamageDelay(forcedDamageDelay);
 
         for (int i = 0; i < 3; i++) {
             player.getWorld().playEffect(player.getLocation(), Effect.SMOKE, 5);
@@ -300,5 +308,6 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
     public void loadSkillConfig() {
         duration = getConfig("duration", 1.25, Double.class);
         internalCD = getConfig("internalCD", 1.0, Double.class);
+        forcedDamageDelay = getConfig("forcedDamageDelay", 400, Integer.class);
     }
 }
