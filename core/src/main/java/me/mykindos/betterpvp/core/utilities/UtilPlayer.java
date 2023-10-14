@@ -10,9 +10,7 @@ import lombok.SneakyThrows;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -24,6 +22,21 @@ import java.util.List;
 
 public class UtilPlayer {
 
+    public static void setWarningEffect(Player player, int warningDelaySeconds) {
+        final WorldBorder curBorder = player.getWorld().getWorldBorder();
+        final WorldBorder newWorldBorder = Bukkit.getServer().createWorldBorder();
+        newWorldBorder.setCenter(curBorder.getCenter());
+        newWorldBorder.setSize(curBorder.getSize());
+        newWorldBorder.setWarningDistance((int) curBorder.getMaxSize());
+        newWorldBorder.setDamageAmount(0);
+        newWorldBorder.setDamageBuffer(0);
+        newWorldBorder.setWarningTime(warningDelaySeconds);
+        player.setWorldBorder(newWorldBorder);
+    }
+
+    public static void clearWarningEffect(Player player) {
+        player.setWorldBorder(player.getWorld().getWorldBorder());
+    }
 
     public static List<Player> getNearbyEnemies(Player player, Location location, double radius) {
         List<Player> enemies = new ArrayList<>();

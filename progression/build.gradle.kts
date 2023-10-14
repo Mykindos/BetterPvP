@@ -35,7 +35,7 @@ dependencies {
 
     compileOnly("io.papermc.paper:paper-api:1.20.2-R0.1-SNAPSHOT")
     compileOnly("org.projectlombok:lombok:1.18.26")
-    compileOnly("com.comphenix.protocol:ProtocolLib:4.6.1-SNAPSHOT")
+    compileOnly("com.comphenix.protocol:ProtocolLib:5.1.0")
     compileOnly(project(":core"))
     annotationProcessor("org.projectlombok:lombok:1.18.26")
 

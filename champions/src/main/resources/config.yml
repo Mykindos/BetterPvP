@@ -272,7 +272,7 @@ skills:
     intimidation:
       enabled: true
       maxlevel: 3
-      radius: 3.0
+      baseRadius: 3.0
     seismicslam:
       enabled: true
       maxlevel: 5
