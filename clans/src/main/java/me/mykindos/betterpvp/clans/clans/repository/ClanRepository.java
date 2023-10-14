@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
+import me.mykindos.betterpvp.clans.clans.ClanProperty;
 import me.mykindos.betterpvp.clans.clans.insurance.Insurance;
 import me.mykindos.betterpvp.clans.clans.insurance.InsuranceType;
 import me.mykindos.betterpvp.core.components.clans.IClan;
@@ -72,6 +73,8 @@ public class ClanRepository implements IRepository<Clan> {
                 if(banner != null && !banner.equals("")) {
                     clan.setBanner(ItemStack.deserializeBytes(Base64.getDecoder().decode(banner)));
                 }
+
+                clan.putProperty(ClanProperty.TNT_PROTECTION, 0L);
 
                 loadProperties(clan);
                 clanList.add(clan);

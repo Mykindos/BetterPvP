@@ -30,6 +30,10 @@ public class MyConcurrentHashMap<K, V> {
         return myMap.getOrDefault(key, defaultValue);
     }
 
+    public void remove(K key) {
+        myMap.remove(key);
+    }
+
     public void registerListener(IMapListener listener) {
         listeners.add(listener);
     }
