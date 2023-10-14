@@ -174,13 +174,13 @@ public class CombatListener implements Listener {
         if (event.getDamagee() instanceof Player damagee) {
             gamerManager.getObject(damagee.getUniqueId()).ifPresent(gamer -> {
                 gamer.setLastDamaged(System.currentTimeMillis());
-                gamer.saveProperty(GamerProperty.DAMAGE_TAKEN, (double) gamer.getProperty(GamerProperty.DAMAGE_TAKEN).orElse(0) + event.getDamage());
+                gamer.saveProperty(GamerProperty.DAMAGE_TAKEN, (double) gamer.getProperty(GamerProperty.DAMAGE_TAKEN).orElse(0D) + event.getDamage());
             });
         }
 
         if (event.getDamager() instanceof Player damager) {
             gamerManager.getObject(damager.getUniqueId()).ifPresent(gamer -> {
-                gamer.saveProperty(GamerProperty.DAMAGE_DEALT, (double) gamer.getProperty(GamerProperty.DAMAGE_DEALT).orElse(0) + event.getDamage());
+                gamer.saveProperty(GamerProperty.DAMAGE_DEALT, (double) gamer.getProperty(GamerProperty.DAMAGE_DEALT).orElse(0D) + event.getDamage());
             });
         }
 
