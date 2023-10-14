@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.utilities;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
+import org.bukkit.scheduler.BukkitTask;
 
 public class UtilServer {
 
@@ -38,20 +39,22 @@ public class UtilServer {
         runTask(plugin, true, task);
     }
 
-    public static void runTaskLater(BPvPPlugin plugin, boolean async, Runnable task, long delay) {
+    public static BukkitTask runTaskLater(BPvPPlugin plugin, boolean async, Runnable task, long delay) {
         if (plugin.isEnabled()) {
             if (async) {
-                Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, task, delay);
+                return Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, task, delay);
             } else {
-                Bukkit.getScheduler().runTaskLater(plugin, task, delay);
+                return Bukkit.getScheduler().runTaskLater(plugin, task, delay);
             }
         } else {
             task.run();
         }
+
+        return null;
     }
 
-    public static void runTaskLater(BPvPPlugin plugin, Runnable task, long delay) {
-        runTaskLater(plugin, false, task, delay);
+    public static BukkitTask runTaskLater(BPvPPlugin plugin, Runnable task, long delay) {
+        return runTaskLater(plugin, false, task, delay);
     }
 
     public static void runTaskLaterAsync(BPvPPlugin plugin, Runnable task, long delay) {

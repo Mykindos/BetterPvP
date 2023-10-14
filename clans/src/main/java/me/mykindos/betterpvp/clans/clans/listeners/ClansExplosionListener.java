@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.clans.clans.listeners;
 import com.google.inject.Inject;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanProperty;
@@ -15,6 +16,7 @@ import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
 import org.bukkit.Material;
@@ -34,7 +36,6 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -75,13 +76,19 @@ public class ClansExplosionListener extends ClanListener {
     @Config(path = "clans.tnt.protectionAdditionalMinutesPerMember", defaultValue = "2.5")
     private double protectionAdditionalMinutesPerMember;
 
+    @Inject
+    @Config(path = "clans.tnt.regenerationTimeInMinutes", defaultValue = "5.0")
+    private double regenerationTimeInMinutes;
+
 
     private final WorldBlockHandler worldBlockHandler;
+    private final Clans clans;
 
     @Inject
-    public ClansExplosionListener(ClanManager clanManager, GamerManager gamerManager, WorldBlockHandler worldBlockHandler) {
+    public ClansExplosionListener(ClanManager clanManager, GamerManager gamerManager, WorldBlockHandler worldBlockHandler, Clans clans) {
         super(clanManager, gamerManager);
         this.worldBlockHandler = worldBlockHandler;
+        this.clans = clans;
     }
 
     @UpdateEvent(delay = 2000)
@@ -201,49 +208,62 @@ public class ClansExplosionListener extends ClanListener {
         }
 
         Clan attackingClan = tntMap.get(event.getEntity());
+        Clan attackedClan = null;
+
+        boolean schedulingRollback = false;
 
         for (Block block : event.blockList()) {
             if (protectedBlocks.contains(block.getType())) continue;
             if (worldBlockHandler.isRestoreBlock(block)) continue;
 
-            Optional<Clan> clanOptional = clanManager.getClanByLocation(block.getLocation());
-            if (clanOptional.isPresent()) {
-                Clan clan = clanOptional.get();
+            if (attackedClan == null) {
+                Optional<Clan> clanOptional = clanManager.getClanByLocation(block.getLocation());
+                if (clanOptional.isPresent()) {
+                    attackedClan = clanOptional.get();
+                }
 
-                Optional<ClanEnemy> enemyOptional = attackingClan.getEnemy(clan);
+            } else {
+
+                Optional<Long> tntProtectionOptional = attackedClan.getProperty(ClanProperty.TNT_PROTECTION);
+                if (tntProtectionOptional.isPresent()) {
+                    long tntProtection = tntProtectionOptional.get();
+                    if (System.currentTimeMillis() > tntProtection) {
+                        attackingClan.messageClan("You cannot TNT <red>" + attackedClan.getName() + "</red> because they have offline TNT protection</red>.", null, true);
+                        break;
+                    }
+                }
+
+                Optional<ClanEnemy> enemyOptional = attackingClan.getEnemy(attackedClan);
                 if (enemyOptional.isPresent()) {
 
                     ClanEnemy enemy = enemyOptional.get();
                     if (enemy.getDominance() <= dominanceRequired) {
-                        attackingClan.messageClan("You cannot TNT <red>" + clan.getName() + "</red> because you have less than <red>" + dominanceRequired + "%</red> dominance on them.", null, true);
+                        attackingClan.messageClan("You cannot TNT <red>" + attackedClan.getName() + "</red> because you have less than <red>" + dominanceRequired + "%</red> dominance on them.", null, true);
                         break;
                     }
 
-                    if (clan.isNoDominanceCooldownActive()) {
-                        attackingClan.messageClan("You cannot TNT <red>" + clan.getName() + "</red> because they are a new clan or were raided too recently.", null, true);
+                    if (attackedClan.isNoDominanceCooldownActive()) {
+                        attackingClan.messageClan("You cannot TNT <red>" + attackedClan.getName() + "</red> because they are a new clan or were raided too recently.", null, true);
                         break;
+                    }
+
+                    if (!clanManager.getPillageHandler().isPillaging(enemy.getClan(), attackedClan)) {
+                        schedulingRollback = true;
                     }
 
                 } else {
-                    attackingClan.messageClan("You cannot TNT <yellow>" + clan.getName() + "</yellow> because you are not enemies.", null, true);
+                    attackingClan.messageClan("You cannot TNT <yellow>" + attackedClan.getName() + "</yellow> because you are not enemies.", null, true);
                     break;
                 }
-                if (clan.isAdmin() || clan.isSafe()) continue;
-                Optional<Long> tntProtectionOptional = clan.getProperty(ClanProperty.TNT_PROTECTION);
-                if(tntProtectionOptional.isPresent()) {
-                    long tntProtection = tntProtectionOptional.get();
-                    if (System.currentTimeMillis() > tntProtection) {
-                        attackingClan.messageClan("You cannot TNT <red>" + clan.getName() + "</red> because they have offline TNT protection</red>.", null, true);
-                        break;
-                    }
-                }
+                if (attackedClan.isAdmin() || attackedClan.isSafe()) continue;
 
 
-                clanManager.addInsurance(clan, block, InsuranceType.BREAK);
+                clanManager.addInsurance(attackedClan, block, InsuranceType.BREAK);
 
                 if (tntCooldownEnabled) {
-                    clan.saveProperty(ClanProperty.LAST_TNTED.name(), (long) (System.currentTimeMillis() + (tntCooldownMinutes * 60_000)));
+                    attackedClan.saveProperty(ClanProperty.LAST_TNTED.name(), (long) (System.currentTimeMillis() + (tntCooldownMinutes * 60_000)));
                 }
+
 
             }
 
@@ -253,6 +273,21 @@ public class ClansExplosionListener extends ClanListener {
 
             block.breakNaturally();
 
+        }
+
+        if (schedulingRollback) {
+            if (attackedClan.getTntRecoveryRunnable() != null) {
+                attackedClan.getTntRecoveryRunnable().cancel();
+            }
+
+            attackedClan.messageClan("Your clan has been TNT'd by <red>" + attackingClan.getName()
+                    + "</red>! Your blocks will be restored in <green>" + regenerationTimeInMinutes + "</green> minutes.", null, true);
+
+            Clan finalAttackedClan = attackedClan;
+            attackedClan.setTntRecoveryRunnable(UtilServer.runTaskLater(clans, () -> {
+                clanManager.startInsuranceRollback(finalAttackedClan);
+                finalAttackedClan.messageClan("Commencing restore of blocks destroyed by TNT...", null, true);
+            }, (long) (1200L * (regenerationTimeInMinutes))));
         }
 
         tntMap.remove(event.getEntity());

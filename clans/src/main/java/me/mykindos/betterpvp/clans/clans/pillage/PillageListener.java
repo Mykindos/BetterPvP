@@ -75,6 +75,11 @@ public class PillageListener implements Listener {
 
         if(pillage.getPillaged() instanceof Clan pillagedClan) {
             pillagedClan.putProperty(ClanProperty.NO_DOMINANCE_COOLDOWN, (System.currentTimeMillis() + (3_600_000L * noDominanceCooldownHours)));
+
+            if(pillagedClan.getTntRecoveryRunnable() != null) {
+                pillagedClan.getTntRecoveryRunnable().cancel();
+                pillagedClan.setTntRecoveryRunnable(null);
+            }
         }
     }
 

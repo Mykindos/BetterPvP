@@ -19,20 +19,20 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.DyeColor;
-import org.bukkit.block.banner.Pattern;
-import org.bukkit.block.banner.PatternType;
-import org.bukkit.inventory.meta.BannerMeta;
+import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Data
@@ -51,6 +51,8 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
     private List<ClanEnemy> enemies = new ArrayList<>();
     private List<ClanTerritory> territory = new ArrayList<>();
     private List<Insurance> insurance = Collections.synchronizedList(new ArrayList<>());
+
+    private BukkitTask tntRecoveryRunnable = null;
 
     public long getTimeCreated() {
         return (long) getProperty(ClanProperty.TIME_CREATED).orElse(0);
