@@ -6,6 +6,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.skills.knight.data.RiposteData;
 import me.mykindos.betterpvp.champions.champions.skills.types.*;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -13,6 +14,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.*;
 import org.bukkit.entity.LivingEntity;
@@ -30,16 +32,11 @@ import java.util.*;
 @BPvPListener
 public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkill {
 
-
-    private final HashMap<String, Long> riposting = new HashMap<>();
-    private final HashMap<Player, Long> handRaisedTime = new HashMap<>();
-    private final HashMap<UUID, Long> boostedAttackTime = new HashMap<>();
-    private final HashMap<Player, Double> boostedDamage = new HashMap<>();
-    private final Set<UUID> boostedAttackPlayers = new HashSet<>();
+    private final WeakHashMap<Player, Long> handRaisedTime = new WeakHashMap<>();
+    private final HashMap<UUID, RiposteData> riposteData = new HashMap<>();
 
     public double duration;
     public double bonusDamage;
-
     public double healing;
 
     @Inject
@@ -59,7 +56,7 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
                 "Hold right click with a Sword to activate",
                 "",
                 "If an enemy hits you within <stat>" + duration + "</stat> seconds,",
-                "You will heal <val>" + (healing + (level -1 )) +"</val> health and your next",
+                "You will heal <val>" + (healing + (level - 1)) + "</val> health and your next",
                 "attack will deal <val>" + (bonusDamage + (level - 1)) + "</val> extra damage",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
@@ -82,44 +79,41 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
         if (!(event.getDamagee() instanceof Player player)) return;
         if (!active.contains(player.getUniqueId())) return;
         if (event.getDamager() == null) return;
+        if (!player.isHandRaised()) return;
         LivingEntity ent = event.getDamager();
 
-        if (hasSkill(player) && player.isHandRaised()) {
+        int level = getLevel(player);
+        if (level > 0) {
             event.setKnockback(false);
             event.setDamage(0);
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 2.0f, 1.3f);
-            int level = getLevel(player);
-            boostedDamage.put(player, bonusDamage + (level - 1));
-            double newHealth = player.getHealth() + (healing + (level - 1));
-            if (newHealth > 20) {
-                player.setHealth(20);
-            } else {
-                player.setHealth(newHealth);
-            }
 
-            handRaisedTime.remove(player);
+            double newHealth = player.getHealth() + (healing + (level - 1));
+            UtilPlayer.health(player, newHealth);
 
             UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s<gray>.", getName());
-            if (ent instanceof Player temp) {
-                UtilMessage.simpleMessage(temp, getClassType().getName(), "<yellow>%s<gray> used riposte!", player.getName());
+            if (ent instanceof Player target) {
+                UtilMessage.simpleMessage(target, getClassType().getName(), "<yellow>%s<gray> used riposte!", player.getName());
             }
 
             active.remove(player.getUniqueId());
-            boostedAttackPlayers.add(player.getUniqueId());
-            boostedAttackTime.put(player.getUniqueId(), System.currentTimeMillis());
+            handRaisedTime.remove(player);
+
+            riposteData.put(player.getUniqueId(), new RiposteData(System.currentTimeMillis(), bonusDamage + (level - 1)));
 
         }
     }
 
     @EventHandler
     public void onAttack(CustomDamageEvent event) {
+        if (event.isCancelled()) return;
+        if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
         if (!(event.getDamager() instanceof Player player)) return;
-        if (boostedAttackPlayers.contains(player.getUniqueId()) && boostedDamage.containsKey(player)) {
-            event.setDamage(event.getDamage() + boostedDamage.get(player));
-            boostedDamage.remove(player);
-            boostedAttackPlayers.remove(player.getUniqueId());
-            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 2.0f, 1.0f);
-        }
+        if (!riposteData.containsKey(player.getUniqueId())) return;
+
+        RiposteData data = riposteData.remove(player.getUniqueId());
+        event.setDamage(event.getDamage() + data.getBoostedDamage());
+        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 2.0f, 1.0f);
     }
 
     @Override
@@ -148,78 +142,76 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
     @UpdateEvent
     public void onUpdate() {
         Iterator<UUID> it = active.iterator();
-        long currentTime = System.currentTimeMillis();
 
         while (it.hasNext()) {
             Player player = Bukkit.getPlayer(it.next());
             if (player != null) {
                 if (player.isHandRaised() && !handRaisedTime.containsKey(player)) {
                     handRaisedTime.put(player, System.currentTimeMillis());
+                    continue;
                 }
 
-                if (!player.isHandRaised() && handRaisedTime.containsKey(player) && !boostedDamage.containsKey(player)) {
-                    handRaisedTime.remove(player);
+                if (riposteData.containsKey(player.getUniqueId())) continue;
+
+                if (!player.isHandRaised() && handRaisedTime.containsKey(player)) {
+                    failRiposte(player);
                     it.remove();
-                    UtilMessage.message(player, getClassType().getName(), "Your Riposte failed.");
-                    player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
+                    continue;
                 }
 
-                if (player.isHandRaised() && handRaisedTime.containsKey(player) && UtilTime.elapsed(handRaisedTime.get(player), 750) && !boostedDamage.containsKey(player)) {
-                    handRaisedTime.remove(player);
-                    UtilMessage.message(player, getClassType().getName(), "Your Riposte failed.");
-                    player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
+                if (player.isHandRaised() && handRaisedTime.containsKey(player) && UtilTime.elapsed(handRaisedTime.get(player), 750)) {
+                    failRiposte(player);
                     it.remove();
                 }
+            } else {
+                it.remove();
             }
         }
     }
 
+    private void failRiposte(Player player) {
+        handRaisedTime.remove(player);
+        UtilMessage.message(player, getClassType().getName(), "Your Riposte failed.");
+        player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
+    }
+
     @UpdateEvent
     public void processBoostedPlayers() {
-        Iterator<UUID> uuidIterator = boostedAttackPlayers.iterator();
-        while (uuidIterator.hasNext()) {
-            UUID uuid = uuidIterator.next();
+        Iterator<Map.Entry<UUID, RiposteData>> boostedIterator = riposteData.entrySet().iterator();
+        while (boostedIterator.hasNext()) {
+            Map.Entry<UUID, RiposteData> next = boostedIterator.next();
+
+            UUID uuid = next.getKey();
+            RiposteData riposteData = next.getValue();
+
             Player player = Bukkit.getPlayer(uuid);
             if (player == null) {
-                uuidIterator.remove();
+                boostedIterator.remove();
                 continue;
             }
-            int level = getLevel(player);
-            List<UUID> toRemove = new ArrayList<>();
-            for (UUID boostedUuid : boostedAttackPlayers) {
-                Player boostedPlayer = Bukkit.getPlayer(boostedUuid);
-                if (boostedPlayer == null) {
-                    toRemove.add(boostedUuid);
-                    continue;
-                }
 
-                if (boostedAttackTime.containsKey(boostedUuid) && UtilTime.elapsed(boostedAttackTime.get(boostedUuid), 2000)) {
-                    boostedAttackTime.remove(boostedUuid);
-                    boostedDamage.remove(boostedPlayer);
-                    UtilMessage.message(boostedPlayer, getClassType().getName(), "You lost your boosted attack.");
-                    boostedPlayer.getWorld().playSound(boostedPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
-                    toRemove.add(boostedUuid);
-                }
+            if (UtilTime.elapsed(riposteData.getBoostedAttackTime(), 2000)) {
+                UtilMessage.message(player, getClassType().getName(), "You lost your boosted attack.");
+                player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
+                boostedIterator.remove();
             }
-            boostedAttackPlayers.removeAll(toRemove);
+
         }
+
     }
 
     @EventHandler
     public void onRiposteDeath(PlayerDeathEvent event) {
         Player player = event.getEntity();
-        boostedAttackPlayers.remove(player.getUniqueId());
+        riposteData.remove(player.getUniqueId());
         active.remove(player.getUniqueId());
-        boostedAttackTime.remove(player.getUniqueId());
     }
 
     @EventHandler
     public void onPlayerLogout(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        boostedAttackPlayers.remove(player.getUniqueId());
         active.remove(player.getUniqueId());
-        boostedDamage.remove(player);
-        boostedAttackTime.remove(player.getUniqueId());
+        riposteData.remove(player.getUniqueId());
     }
 
 
@@ -235,7 +227,7 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
     }
 
     @Override
-    public void loadSkillConfig(){
+    public void loadSkillConfig() {
         duration = getConfig("duration", 1.0, Double.class);
         bonusDamage = getConfig("bonusDamage", 1.0, Double.class);
         healing = getConfig("healing", 1.0, Double.class);
