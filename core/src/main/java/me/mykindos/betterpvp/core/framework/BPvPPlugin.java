@@ -55,9 +55,7 @@ public abstract class BPvPPlugin extends JavaPlugin {
 
     @Override
     public void saveDefaultConfig() {
-        if (!configFile.exists()) {
-            saveResource("config.yml", false);
-        }
+        super.saveDefaultConfig();
     }
 
 }

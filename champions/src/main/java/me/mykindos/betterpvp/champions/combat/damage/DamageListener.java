@@ -51,7 +51,7 @@ public class DamageListener implements Listener {
             Optional<Role> roleOptional = roleManager.getObject(player.getUniqueId());
             if (roleOptional.isPresent()) {
                 Role role = roleOptional.get();
-                if (role != Role.RANGER) {
+                if (role != Role.RANGER && role != Role.ASSASSIN) {
                     reduction = 0.50;
                 }
             } else {
