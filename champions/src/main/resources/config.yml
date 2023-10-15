@@ -118,6 +118,7 @@ skills:
       duration: 1.0
       bonusDamage: 1.0
       healing: 1.0
+      bonusDamageDuration: 2.0
     holdposition:
       enabled: true
       maxlevel: 5

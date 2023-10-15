@@ -35,9 +35,10 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
     private final HashMap<UUID, Long> handRaisedTime = new HashMap<>();
     private final HashMap<UUID, RiposteData> riposteData = new HashMap<>();
 
-    public double duration;
-    public double bonusDamage;
-    public double healing;
+    private double duration;
+    private double bonusDamageDuration;
+    private double bonusDamage;
+    private double healing;
 
     @Inject
     public Riposte(Champions champions, ChampionsManager championsManager) {
@@ -190,7 +191,7 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
                 continue;
             }
 
-            if (UtilTime.elapsed(riposteData.getBoostedAttackTime(), 2000)) {
+            if (UtilTime.elapsed(riposteData.getBoostedAttackTime(), (long) (bonusDamageDuration * 1000))) {
                 UtilMessage.message(player, getClassType().getName(), "You lost your boosted attack.");
                 player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
                 boostedIterator.remove();
@@ -229,6 +230,7 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
     @Override
     public void loadSkillConfig() {
         duration = getConfig("duration", 0.75, Double.class);
+        bonusDamageDuration = getConfig("bonusDamageDuration", 2.0, Double.class);
         bonusDamage = getConfig("bonusDamage", 1.0, Double.class);
         healing = getConfig("healing", 1.0, Double.class);
     }
