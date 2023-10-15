@@ -22,29 +22,34 @@ public class ActionBar {
      */
     private final PriorityQueue<Pair<Integer, DisplayComponent>> components = new PriorityQueue<>((o1, o2) -> Integer.compare(o1.getLeft(), o2.getLeft()) * -1);
 
-    /**
-     * Add a component to the action bar for a set amount of seconds.
-     *
-     * @param priority  The priority of the component. Lower numbers are shown first.
-     * @param component The component to add.
-     */
+    // Use a lock to synchronize access to the components PriorityQueue
+    private final Object lock = new Object();
+
     public void add(int priority, DisplayComponent component) {
-        components.add(Pair.of(priority, component));
-        if (component instanceof TimedComponent timed && !timed.isWaitToExpire()) {
-            timed.startTime();
+        synchronized (lock) {
+            components.add(Pair.of(priority, component));
+            if (component instanceof TimedComponent timed && !timed.isWaitToExpire()) {
+                timed.startTime();
+            }
         }
     }
 
     public void remove(DisplayComponent component) {
-        components.removeIf(pair -> pair.getRight().equals(component));
+        synchronized (lock) {
+            components.removeIf(pair -> pair.getRight().equals(component));
+        }
     }
 
     public void clear() {
-        components.clear();
+        synchronized (lock) {
+            components.clear();
+        }
     }
 
     public boolean hasComponentsQueued() {
-        return !components.isEmpty();
+        synchronized (lock) {
+            return !components.isEmpty();
+        }
     }
 
     public void show(Gamer gamer) {
@@ -52,7 +57,10 @@ public class ActionBar {
         cleanUp();
 
         // The component to show
-        Component component = hasComponentsQueued() ?  nextComponent(gamer) : EMPTY;
+        Component component;
+        synchronized (lock) {
+            component = hasComponentsQueued() ?  nextComponent(gamer) : EMPTY;
+        }
 
         if (component == null) {
             component = EMPTY;
@@ -66,33 +74,36 @@ public class ActionBar {
     }
 
     private Component nextComponent(Gamer gamer) {
-        if (components.isEmpty()) {
-            return EMPTY;
+        synchronized (lock) {
+            if (components.isEmpty()) {
+                return EMPTY;
+            }
+
+            final Iterator<Pair<Integer, DisplayComponent>> iterator = components.iterator();
+            DisplayComponent display;
+            Component advComponent;
+
+            // Loop through the components until we find one that is not null
+            // If we find one that is null, skip it and move on to the next one
+            do {
+                display = iterator.next().getRight();
+                advComponent = display.getProvider().apply(gamer);
+            } while (iterator.hasNext() && advComponent == null);
+
+            // At this point, the `component` will not be null because we know that there is at least one element in the queue
+            if (display instanceof TimedComponent timed) {
+                timed.startTime();
+            }
+
+            // But we don't know if its `advComponent` will be null
+            return advComponent;
         }
-
-        final Iterator<Pair<Integer, DisplayComponent>> iterator = components.iterator();
-        DisplayComponent display;
-        Component advComponent;
-
-        // Loop through the components until we find one that is not null
-        // If we find one that is null, skip it and move on to the next one
-        do {
-            display = iterator.next().getRight();
-            advComponent = display.getProvider().apply(gamer);
-        } while (iterator.hasNext() && advComponent == null);
-
-        // At this point, the `component` will not be null because we know that there is at least one element in the queue
-        if (display instanceof TimedComponent timed) {
-            timed.startTime();
-        }
-
-        // But we don't know if its `advComponent` will be null
-        return advComponent;
     }
 
     private void cleanUp() {
-        // Clean up dynamic components that have expired
-        components.removeIf(pair -> pair.getRight().isInvalid());
+        synchronized (lock) {
+            // Clean up dynamic components that have expired
+            components.removeIf(pair -> pair.getRight().isInvalid());
+        }
     }
-
 }

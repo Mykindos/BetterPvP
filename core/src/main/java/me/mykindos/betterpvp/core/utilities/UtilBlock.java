@@ -319,15 +319,8 @@ public class UtilBlock {
     }
 
     public static boolean isInLiquid(Entity ent) {
-        Block bottomBlock = ent.getLocation().getBlock();
-        Block topBlock = ent.getLocation().add(0, 1, 0).getBlock();
 
-        if (bottomBlock.isLiquid() || bottomBlock.getType().name().contains("SEAGRASS") || bottomBlock.getType().name().contains("KELP")
-                || topBlock.isLiquid() || topBlock.getType().name().contains("SEAGRASS") || bottomBlock.getType().name().contains("KELP")) {
-            return true;
-        }
-
-        return false;
+        return ent.isInWater() || ent.isInLava() || ent.isInBubbleColumn();
     }
 
     public static boolean isWall(Block block) {
