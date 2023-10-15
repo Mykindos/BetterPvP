@@ -49,7 +49,7 @@ public class ClanMenu extends Menu {
         List<ClanMember> members = clan.getMembers();
         loadPlayerHeads(members);
 
-        // Only add the below buttons if it is the players clan
+        // Only add the below buttons if it is the player's clan
         if (clan.getMemberByUUID(player.getUniqueId()).isPresent()) {
             addButton(new EnemiesButton(0, playerClan, clan));
             addButton(new LeaveClanButton(49, clan, player));
