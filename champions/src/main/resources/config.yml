@@ -87,7 +87,7 @@ skills:
       cooldown: 15
       baseMultiplier: 1.6
     ride:
-      enabled: true
+      enabled: false
       cooldown: 30
       maxlevel: 5
       lifespan: 6.0
@@ -151,7 +151,7 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 10
-  paladin:
+  mage:
     staticlazer:
       enabled: true
       maxlevel: 5
@@ -263,7 +263,7 @@ skills:
       enabled: true
       maxlevel: 3
       cooldown: 8
-  gladiator:
+  brute:
     battletaunt:
       enabled: true
       energy: 15
@@ -479,7 +479,7 @@ class:
     receiveKnockback: true
 chat:
   skill:
-    preview: true
+    preview: false
 command:
   kit:
     enabled: true

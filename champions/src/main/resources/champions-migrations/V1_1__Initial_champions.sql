@@ -25,8 +25,8 @@ INSERT IGNORE INTO property_map VALUES ("RANGER_EQUIPPED", "int");
 # noinspection SqlResolve
 INSERT IGNORE INTO property_map VALUES ("WARLOCK_EQUIPPED", "int");
 # noinspection SqlResolve
-INSERT IGNORE INTO property_map VALUES ("PALADIN_EQUIPPED", "int");
+INSERT IGNORE INTO property_map VALUES ("MAGE_EQUIPPED", "int");
 # noinspection SqlResolve
-INSERT IGNORE INTO property_map VALUES ("GLADIATOR_EQUIPPED", "int");
+INSERT IGNORE INTO property_map VALUES ("BRUTE_EQUIPPED", "int");
 # noinspection SqlResolve
 INSERT IGNORE INTO property_map VALUES ("SKILL_CHAT_PREVIEW", "boolean");

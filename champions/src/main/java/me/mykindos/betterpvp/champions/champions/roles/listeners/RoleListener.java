@@ -233,11 +233,11 @@ public class RoleListener implements Listener {
                             damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_BLAZE_HURT, 1.0F, 0.7F);
                     case ASSASSIN ->
                             damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1.0F, 2.0F);
-                    case GLADIATOR ->
+                    case BRUTE ->
                             damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_BLAZE_HURT, 1.0F, 0.9F);
                     case RANGER ->
                             damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.4F);
-                    case PALADIN, WARLOCK ->
+                    case MAGE, WARLOCK ->
                             damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.8F);
                 }
         }
