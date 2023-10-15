@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.client.ClientManager;
+import me.mykindos.betterpvp.core.combat.hitbox.HitboxHandler;
 import me.mykindos.betterpvp.core.command.loader.CoreCommandLoader;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.config.ConfigInjectorModule;
@@ -86,13 +87,13 @@ public class Core extends BPvPPlugin {
 
         updateEventExecutor.loadPlugin(this);
         updateEventExecutor.initialize();
-
     }
 
     @Override
     public void onDisable() {
         clientManager.getRepository().processStatUpdates(false);
         gamerManager.getGamerRepository().processStatUpdates(false);
+        injector.getInstance(HitboxHandler.class).clearAll();
 
         if (hasListener(listenerKey)) {
             removeListener(listenerKey);
