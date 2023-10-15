@@ -38,13 +38,13 @@ INSERT IGNORE INTO ${tablePrefix}armour (Item, Reduction) VALUES ('IRON_CHESTPLA
 INSERT IGNORE INTO ${tablePrefix}armour (Item, Reduction) VALUES ('IRON_HELMET', 7);
 INSERT IGNORE INTO ${tablePrefix}armour (Item, Reduction) VALUES ('IRON_LEGGINGS', 22);
 INSERT IGNORE INTO ${tablePrefix}armour (Item, Reduction) VALUES ('LEATHER_BOOTS', 6);
-INSERT IGNORE INTO ${tablePrefix}armour (Item, Reduction) VALUES ('LEATHER_CHESTPLATE', 9);
-INSERT IGNORE INTO ${tablePrefix}armour (Item, Reduction) VALUES ('LEATHER_HELMET', 6);
-INSERT IGNORE INTO ${tablePrefix}armour (Item, Reduction) VALUES ('LEATHER_LEGGINGS', 8);
+INSERT IGNORE INTO ${tablePrefix}armour (Item, Reduction) VALUES ('LEATHER_CHESTPLATE', 13);
+INSERT IGNORE INTO ${tablePrefix}armour (Item, Reduction) VALUES ('LEATHER_HELMET', 7);
+INSERT IGNORE INTO ${tablePrefix}armour (Item, Reduction) VALUES ('LEATHER_LEGGINGS', 10);
 INSERT IGNORE INTO ${tablePrefix}armour (Item, Reduction) VALUES ('NETHERITE_BOOTS', 8);
-INSERT IGNORE INTO ${tablePrefix}armour (Item, Reduction) VALUES ('NETHERITE_CHESTPLATE', 24);
-INSERT IGNORE INTO ${tablePrefix}armour (Item, Reduction) VALUES ('NETHERITE_HELMET', 8);
-INSERT IGNORE INTO ${tablePrefix}armour (Item, Reduction) VALUES ('NETHERITE_LEGGINGS', 20);
+INSERT IGNORE INTO ${tablePrefix}armour (Item, Reduction) VALUES ('NETHERITE_CHESTPLATE', 22);
+INSERT IGNORE INTO ${tablePrefix}armour (Item, Reduction) VALUES ('NETHERITE_HELMET', 10);
+INSERT IGNORE INTO ${tablePrefix}armour (Item, Reduction) VALUES ('NETHERITE_LEGGINGS', 18);
 
 create table if not exists ${tablePrefix}client_properties
 (
