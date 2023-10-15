@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.data.CustomDataType;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Interaction;
@@ -17,10 +18,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.*;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -36,6 +34,13 @@ public class HitboxHandler extends Manager<Hitbox> implements Listener {
             hitbox.remove();
         }
         getObjects().clear();
+    }
+
+    @EventHandler
+    public void onRespawn(PlayerRespawnEvent event) {
+        getObject(event.getPlayer().getUniqueId()).ifPresent(hitbox -> {
+            UtilServer.runTaskLater(core, hitbox::relocate, 1L);
+        });
     }
 
     @EventHandler
