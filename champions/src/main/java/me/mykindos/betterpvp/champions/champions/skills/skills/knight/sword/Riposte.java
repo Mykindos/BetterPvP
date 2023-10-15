@@ -159,7 +159,7 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
                     continue;
                 }
 
-                if (player.isHandRaised() && handRaisedTime.containsKey(player) && UtilTime.elapsed(handRaisedTime.get(player), 750)) {
+                if (player.isHandRaised() && handRaisedTime.containsKey(player) && UtilTime.elapsed(handRaisedTime.get(player), (long) duration * 1000L)) {
                     failRiposte(player);
                     it.remove();
                 }
@@ -228,7 +228,7 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
 
     @Override
     public void loadSkillConfig() {
-        duration = getConfig("duration", 1.0, Double.class);
+        duration = getConfig("duration", 0.75, Double.class);
         bonusDamage = getConfig("bonusDamage", 1.0, Double.class);
         healing = getConfig("healing", 1.0, Double.class);
     }
