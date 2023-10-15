@@ -118,7 +118,7 @@ public class Intimidation extends Skill implements PassiveSkill {
 
     @Override
     public Role getClassType() {
-        return Role.GLADIATOR;
+        return Role.BRUTE;
     }
 
     @Override
