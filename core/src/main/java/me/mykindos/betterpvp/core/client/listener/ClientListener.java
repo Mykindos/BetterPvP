@@ -25,6 +25,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.Optional;
@@ -78,6 +79,18 @@ public class ClientListener implements Listener {
         checkUnsetProperties(client);
 
         Bukkit.getPluginManager().callEvent(new ClientLoginEvent(client, event.getPlayer()));
+    }
+
+    @EventHandler
+    public void onPlayerLogin(PlayerLoginEvent event) {
+        if(event.getResult() == PlayerLoginEvent.Result.KICK_FULL || event.getResult() == PlayerLoginEvent.Result.KICK_WHITELIST) {
+            String uuid = event.getPlayer().getUniqueId().toString();
+            clientManager.getObject(uuid).ifPresent(client -> {
+                if(client.hasRank(Rank.TRIAL_MOD)) {
+                    event.allow();
+                }
+            });
+        }
     }
 
     @EventHandler
