@@ -4,7 +4,6 @@ import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.menu.Button;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -19,7 +18,7 @@ public class ClanVaultButton extends Button {
     private final Clan clan;
 
     public ClanVaultButton(int slot, Clan clan) {
-        super(slot, new ItemStack(Material.PAPER));
+        super(slot, new ItemStack(Material.ENDER_CHEST));
         this.clan = clan;
 
         this.name = Component.text("Clan Vault", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC,false);

@@ -18,7 +18,7 @@ public class ClanUpgradesButton extends Button {
     private final Clan clan;
 
     public ClanUpgradesButton(int slot, Clan clan) {
-        super(slot, new ItemStack(Material.PAPER));
+        super(slot, new ItemStack(Material.BEACON));
         this.clan = clan;
 
         this.name = Component.text("Clan Upgrades", NamedTextColor.BLUE).decoration(TextDecoration.ITALIC,false);
