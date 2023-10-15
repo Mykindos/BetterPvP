@@ -106,6 +106,8 @@ skills:
     levelfield:
       enabled: true
       maxlevel: 3
+      radius: 10
+      damagePerPlayer: 0.5
     cleave:
       enabled: true
       maxlevel: 3
