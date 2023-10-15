@@ -22,6 +22,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 public class LevelField extends Skill implements PassiveSkill, Listener {
 
     private int radius;
+    private double damagePerPlayer;
     @Inject
     public LevelField(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -35,14 +36,14 @@ public class LevelField extends Skill implements PassiveSkill, Listener {
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "For every enemy within <stat>" + radius + "</stat> blocks,",
-                "You deal <val>" +  (10 + ((level - 1) * 5)) + ".0%</val> extra damage",
+                "Within <stat>" + radius + "</stat> blocks",
+                "For every enemy that outnumbers you,",
+                "you take and deal <val>" + (damagePerPlayer * level) + "</val> extra damage",
                 "",
-                "For every ally <stat>" + radius + "</stat> blocks,",
-                "You deal <val>" + (10 + ((level - 1) * 5)) + ".0%</val> less damage",
+                "For every enemy that you outnumber,",
+                "you take and deal <val>" + (damagePerPlayer * level) + "</val> less damage",
                 "",
-                "Maximum extra damage: <stat>60%",
-                "Minimum extra damage: <val>"+ (60 - ((level - 1) * 15)),
+                "You cannot go below your weapons base damage",
         };
     }
 
@@ -65,15 +66,36 @@ public class LevelField extends Skill implements PassiveSkill, Listener {
         int level = getLevel(player);
         if (level > 0) {
             int nearbyEnemies = UtilPlayer.getNearbyEnemies(player, player.getLocation(), radius).size();
-            int nearbyAllies = UtilPlayer.getNearbyAllies(player, player.getLocation(), radius).size();
-            int nearbyDifference = ((nearbyEnemies - 1) - nearbyAllies);
+            int nearbyAllies = UtilPlayer.getNearbyAllies(player, player.getLocation(), radius).size() + 1;
+            int nearbyDifference = (nearbyEnemies - nearbyAllies);
 
-            nearbyDifference = (nearbyDifference < -3 ? -3 : Math.min(nearbyDifference, 3));
-            event.setDamage(event.getDamage() * (1 + (nearbyDifference * (nearbyDifference > 0 ? 0.20 : (0.20 - ((level - 1) * 0.05))))));
+            double damageAdded = Math.max(0, (nearbyDifference * (damagePerPlayer * level)));
+
+            event.setDamage(event.getDamage() + damageAdded);
 
         }
     }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onDamage(CustomDamageEvent event){
+        if (event.isCancelled()) return;
+        if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
+        if (!(event.getDamager() instanceof Player player)) return;
+
+        int level = getLevel(player);
+        if (level > 0) {
+            int nearbyEnemies = UtilPlayer.getNearbyEnemies(player, player.getLocation(), radius).size();
+            int nearbyAllies = UtilPlayer.getNearbyAllies(player, player.getLocation(), radius).size() + 1;
+            int nearbyDifference = (nearbyEnemies - nearbyAllies);
+
+            double damageSubtracted = Math.min(0, (nearbyDifference * -1) * (damagePerPlayer * level));
+
+            event.setDamage(event.getDamage() + damageSubtracted);
+        }
+    }
+    
     public void loadSkillConfig() {
         radius = getConfig("radius", 10, Integer.class);
+        damagePerPlayer = getConfig("damagePerPlayer", 0.5, Double.class);
     }
 }
