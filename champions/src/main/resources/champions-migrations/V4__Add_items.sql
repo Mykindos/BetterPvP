@@ -48,28 +48,28 @@ INSERT IGNORE INTO items (Material, Module, Name, ModelData, Glow, HasUUID) VALU
     ('CHAINMAIL_BOOTS', 'Champions', '<yellow>Ranger Boots', 0, 0, 0);
 
 INSERT IGNORE INTO items (Material, Module, Name, ModelData, Glow, HasUUID) VALUES
-    ('GOLDEN_HELMET', 'Champions', '<yellow>Paladin Helmet', 0, 0, 0);
+    ('GOLDEN_HELMET', 'Champions', '<yellow>Mage Helmet', 0, 0, 0);
 
 INSERT IGNORE INTO items (Material, Module, Name, ModelData, Glow, HasUUID) VALUES
-    ('GOLDEN_CHESTPLATE', 'Champions', '<yellow>Paladin Vest', 0, 0, 0);
+    ('GOLDEN_CHESTPLATE', 'Champions', '<yellow>Mage Vest', 0, 0, 0);
 
 INSERT IGNORE INTO items (Material, Module, Name, ModelData, Glow, HasUUID) VALUES
-    ('GOLDEN_LEGGINGS', 'Champions', '<yellow>Paladin Leggings', 0, 0, 0);
+    ('GOLDEN_LEGGINGS', 'Champions', '<yellow>Mage Leggings', 0, 0, 0);
 
 INSERT IGNORE INTO items (Material, Module, Name, ModelData, Glow, HasUUID) VALUES
-    ('GOLDEN_BOOTS', 'Champions', '<yellow>Paladin Boots', 0, 0, 0);
+    ('GOLDEN_BOOTS', 'Champions', '<yellow>Mage Boots', 0, 0, 0);
 
 INSERT IGNORE INTO items (Material, Module, Name, ModelData, Glow, HasUUID) VALUES
-    ('DIAMOND_HELMET', 'Champions', '<yellow>Gladiator Helmet', 0, 0, 0);
+    ('DIAMOND_HELMET', 'Champions', '<yellow>Brute Helmet', 0, 0, 0);
 
 INSERT IGNORE INTO items (Material, Module, Name, ModelData, Glow, HasUUID) VALUES
-    ('DIAMOND_CHESTPLATE', 'Champions', '<yellow>Gladiator Chestplate', 0, 0, 0);
+    ('DIAMOND_CHESTPLATE', 'Champions', '<yellow>Brute Chestplate', 0, 0, 0);
 
 INSERT IGNORE INTO items (Material, Module, Name, ModelData, Glow, HasUUID) VALUES
-    ('DIAMOND_LEGGINGS', 'Champions', '<yellow>Gladiator Leggings', 0, 0, 0);
+    ('DIAMOND_LEGGINGS', 'Champions', '<yellow>Brute Leggings', 0, 0, 0);
 
 INSERT IGNORE INTO items (Material, Module, Name, ModelData, Glow, HasUUID) VALUES
-    ('DIAMOND_BOOTS', 'Champions', '<yellow>Gladiator Boots', 0, 0, 0);
+    ('DIAMOND_BOOTS', 'Champions', '<yellow>Brute Boots', 0, 0, 0);
 
 -- Weapons
 INSERT IGNORE INTO items (Material, Module, Name, ModelData, Glow, HasUUID) VALUES
