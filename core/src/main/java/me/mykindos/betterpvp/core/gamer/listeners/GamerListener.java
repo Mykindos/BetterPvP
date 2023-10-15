@@ -39,7 +39,7 @@ public class GamerListener implements Listener {
         this.gamerManager = gamerManager;
     }
 
-    @UpdateEvent
+    @UpdateEvent (isAsync = true)
     public void onUpdate() {
         for(Player player : Bukkit.getOnlinePlayers()){
             gamerManager.getObject(player.getUniqueId()).ifPresent(gamer -> {

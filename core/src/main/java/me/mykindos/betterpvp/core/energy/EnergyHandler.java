@@ -75,9 +75,14 @@ public class EnergyHandler {
     }
 
     public void updateEnergy(Player cur) {
+        if (cur.getExp() >= 0.999F) {
+            return;
+        }
+
         if (cur.isDead()) {
             return;
         }
+
         double energy = 0.006D;
 
         if (nerfEnergyRegen) {
