@@ -32,7 +32,7 @@ import java.util.*;
 @BPvPListener
 public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkill {
 
-    private final WeakHashMap<Player, Long> handRaisedTime = new WeakHashMap<>();
+    private final HashMap<UUID, Long> handRaisedTime = new HashMap<>();
     private final HashMap<UUID, RiposteData> riposteData = new HashMap<>();
 
     public double duration;
@@ -97,7 +97,7 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
             }
 
             active.remove(player.getUniqueId());
-            handRaisedTime.remove(player);
+            handRaisedTime.remove(player.getUniqueId());
 
             riposteData.put(player.getUniqueId(), new RiposteData(System.currentTimeMillis(), bonusDamage + (level - 1)));
 
@@ -146,20 +146,20 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
         while (it.hasNext()) {
             Player player = Bukkit.getPlayer(it.next());
             if (player != null) {
-                if (player.isHandRaised() && !handRaisedTime.containsKey(player)) {
-                    handRaisedTime.put(player, System.currentTimeMillis());
+                if (player.isHandRaised() && !handRaisedTime.containsKey(player.getUniqueId())) {
+                    handRaisedTime.put(player.getUniqueId(), System.currentTimeMillis());
                     continue;
                 }
 
                 if (riposteData.containsKey(player.getUniqueId())) continue;
 
-                if (!player.isHandRaised() && handRaisedTime.containsKey(player)) {
+                if (!player.isHandRaised() && handRaisedTime.containsKey(player.getUniqueId())) {
                     failRiposte(player);
                     it.remove();
                     continue;
                 }
 
-                if (player.isHandRaised() && handRaisedTime.containsKey(player) && UtilTime.elapsed(handRaisedTime.get(player), (long) duration * 1000L)) {
+                if (player.isHandRaised() && UtilTime.elapsed(handRaisedTime.getOrDefault(player.getUniqueId(), 0L), (long) duration * 1000L)) {
                     failRiposte(player);
                     it.remove();
                 }
@@ -170,7 +170,7 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
     }
 
     private void failRiposte(Player player) {
-        handRaisedTime.remove(player);
+        handRaisedTime.remove(player.getUniqueId());
         UtilMessage.message(player, getClassType().getName(), "Your Riposte failed.");
         player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
     }
