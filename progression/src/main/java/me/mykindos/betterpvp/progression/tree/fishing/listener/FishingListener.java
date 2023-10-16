@@ -295,8 +295,9 @@ public class FishingListener implements Listener {
                 }
 
                 @Override
-                public void processCatch(PlayerFishEvent event) {
+                public ItemStack processCatch(PlayerFishEvent event) {
                     UtilMessage.message(event.getPlayer(), "Fishing", "<red>No fish registered! Please report this to an admin!");
+                    return null;
                 }
             };
         }

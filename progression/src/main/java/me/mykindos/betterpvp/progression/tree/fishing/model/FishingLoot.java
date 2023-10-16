@@ -15,6 +15,6 @@ public interface FishingLoot {
      * Called whenever this loot is caught
      * @param event The event
      */
-    void processCatch(PlayerFishEvent event);
+    ItemStack processCatch(PlayerFishEvent event);
 
 }
