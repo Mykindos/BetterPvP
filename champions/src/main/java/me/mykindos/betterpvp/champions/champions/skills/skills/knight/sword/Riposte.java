@@ -89,7 +89,7 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
             event.setDamage(0);
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 2.0f, 1.3f);
 
-            double newHealth = player.getHealth() + (healing + (level - 1));
+            double newHealth = (healing + (level - 1));
             UtilPlayer.health(player, newHealth);
 
             UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s<gray>.", getName());

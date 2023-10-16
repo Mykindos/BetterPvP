@@ -1,24 +1,27 @@
 package me.mykindos.betterpvp.champions.listeners;
 
+import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityShootBowEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
 import javax.inject.Inject;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 @BPvPListener
 public class ArrowListener implements Listener {
@@ -27,7 +30,18 @@ public class ArrowListener implements Listener {
     @Config(path = "combat.crit-arrows", defaultValue = "true")
     private boolean critArrowsEnabled;
 
+    @Inject
+    @Config(path = "combat.arrow-base-damage", defaultValue = "4.5")
+    private double baseArrowDamage;
+
     private final HashMap<Arrow, Float> arrows = new HashMap<>();
+
+    private final Champions champions;
+
+    @Inject
+    public ArrowListener(Champions champions) {
+        this.champions = champions;
+    }
 
 
     @UpdateEvent
@@ -58,10 +72,17 @@ public class ArrowListener implements Listener {
     public void onShootBow(EntityShootBowEvent event) {
         if (event.getProjectile() instanceof Arrow arrow) {
             arrow.setCritical(false);
-
+            if (event.getEntity() instanceof Player player) {
+                arrow.setMetadata("ShotWith", new FixedMetadataValue(champions, player.getInventory().getItemInMainHand().getType().name()));
+            }
             arrows.put(arrow, event.getForce());
+        }
+    }
 
-
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onBaseArrowDamage(CustomDamageEvent event) {
+        if (event.getProjectile() instanceof Arrow) {
+            event.setDamage(baseArrowDamage);
         }
     }
 
@@ -75,6 +96,16 @@ public class ArrowListener implements Listener {
             }
         }
 
+    }
+
+    /*
+     * Removes arrows when they hit the ground, or a player
+     */
+    @EventHandler
+    public void onArrowHit(ProjectileHitEvent event) {
+        if (event.getEntity() instanceof Arrow arrow) {
+            UtilServer.runTaskLater(champions, arrow::remove, 5L);
+        }
     }
 
 }
