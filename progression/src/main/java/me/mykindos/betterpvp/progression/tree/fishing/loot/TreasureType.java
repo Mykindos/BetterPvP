@@ -44,7 +44,7 @@ public class TreasureType implements FishingLootType {
             }
 
             @Override
-            public void processCatch(PlayerFishEvent event) {
+            public ItemStack processCatch(PlayerFishEvent event) {
                 final int count = RANDOM.ints(minAmount, maxAmount + 1)
                         .findFirst()
                         .orElse(minAmount);
@@ -53,6 +53,7 @@ public class TreasureType implements FishingLootType {
 
                 final Item item = (Item) Objects.requireNonNull(event.getCaught());
                 item.setItemStack(itemStack);
+                return itemStack;
             }
         };
     }

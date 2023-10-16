@@ -69,6 +69,7 @@ public class Progression extends BPvPPlugin {
 
             progressionsManager = injector.getInstance(ProgressionsManager.class);
             progressionsManager.loadTrees();
+            progressionsManager.loadPerks();
 
             updateEventExecutor.loadPlugin(this);
         }

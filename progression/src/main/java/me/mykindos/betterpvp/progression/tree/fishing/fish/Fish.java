@@ -53,7 +53,7 @@ public class Fish implements FishingLoot {
     }
 
     @Override
-    public void processCatch(PlayerFishEvent event) {
+    public ItemStack processCatch(PlayerFishEvent event) {
         // get a random fish bucket
         Material randomType = fishBuckets[RANDOM.nextInt(fishBuckets.length)];
         ItemStack item = new ItemStack(randomType);
@@ -84,5 +84,6 @@ public class Fish implements FishingLoot {
         final Item entity = (Item) event.getCaught();
         Objects.requireNonNull(entity).setItemStack(item);
         UtilMessage.message(event.getPlayer(), "Fishing", "You caught a <alt>%s</alt> (<alt2>%slb</alt2>)!", type.getName(), weight);
+        return item;
     }
 }
