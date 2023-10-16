@@ -43,7 +43,7 @@ public class SwimmerType implements FishingLootType {
             }
 
             @Override
-            public void processCatch(PlayerFishEvent event) {
+            public ItemStack processCatch(PlayerFishEvent event) {
                 final Entity item = Objects.requireNonNull(event.getCaught());
                 final Location location = item.getLocation();
                 item.remove();
@@ -63,6 +63,7 @@ public class SwimmerType implements FishingLootType {
                     entity.setVelocity(direction);
                     entity.getPersistentDataContainer().set(ProgressionNamespacedKeys.FISHING_SWIMMER, PersistentDataType.BOOLEAN, true);
                 });
+                return null;
             }
         };
     }
