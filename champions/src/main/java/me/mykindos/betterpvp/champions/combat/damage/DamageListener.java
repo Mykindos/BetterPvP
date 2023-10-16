@@ -21,12 +21,10 @@ import java.util.Optional;
 public class DamageListener implements Listener {
 
     private final ItemDamageManager itemDamageManager;
-    private final RoleManager roleManager;
 
     @Inject
-    public DamageListener(ItemDamageManager itemDamageManager, RoleManager roleManager) {
+    public DamageListener(ItemDamageManager itemDamageManager) {
         this.itemDamageManager = itemDamageManager;
-        this.roleManager = roleManager;
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -39,26 +37,8 @@ public class DamageListener implements Listener {
 
         Optional<ItemDamageValue> damageValue = itemDamageManager.getObject(material.name());
         damageValue.ifPresentOrElse(itemDamageValue -> event.setDamage(itemDamageValue.getDamage()),
-                () -> event.setDamage(event.getDamage() * 0.75));
+                () -> event.setDamage(event.getDamage() * 0.50));
 
     }
 
-    @EventHandler
-    public void onBowDamage(CustomDamageEvent event) {
-        if (!(event.getProjectile() instanceof Arrow arrow)) return;
-        double reduction = 0.70;
-        if (event.getDamager() instanceof Player player) {
-            Optional<Role> roleOptional = roleManager.getObject(player.getUniqueId());
-            if (roleOptional.isPresent()) {
-                Role role = roleOptional.get();
-                if (role != Role.RANGER && role != Role.ASSASSIN) {
-                    reduction = 0.50;
-                }
-            } else {
-                reduction = 0.50;
-            }
-        }
-
-        event.setDamage(event.getDamage() * reduction);
-    }
 }

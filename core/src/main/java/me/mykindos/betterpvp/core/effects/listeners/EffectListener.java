@@ -23,6 +23,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -102,7 +103,7 @@ public class EffectListener implements Listener {
     public void shockUpdate() {
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (effectManager.hasEffect(player, EffectType.SHOCK)) {
-                player.playHurtAnimation(0);
+                player.playHurtAnimation(270);
             }
         }
 
@@ -243,6 +244,17 @@ public class EffectListener implements Listener {
                 onlinePlayer.showPlayer(core, event.getPlayer());
             }
         }
+    }
+
+    @EventHandler
+    public void onRespawnInvisibility(PlayerRespawnEvent event) {
+        UtilServer.runTaskLater(core, () -> {
+            for(Player player : Bukkit.getOnlinePlayers()) {
+                if(!player.canSee(event.getPlayer())) {
+                    player.showPlayer(core, event.getPlayer());
+                }
+            }
+        }, 2);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

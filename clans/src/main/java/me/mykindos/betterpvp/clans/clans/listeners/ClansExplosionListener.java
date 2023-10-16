@@ -224,13 +224,15 @@ public class ClansExplosionListener extends ClanListener {
                     attackedClan = clanOptional.get();
                 }
 
-            } else {
+            }
+
+            if (attackedClan != null) {
 
                 Optional<Long> tntProtectionOptional = attackedClan.getProperty(ClanProperty.TNT_PROTECTION);
                 if (tntProtectionOptional.isPresent()) {
                     long tntProtection = tntProtectionOptional.get();
                     if (System.currentTimeMillis() > tntProtection) {
-                        attackingClan.messageClan("You cannot TNT <red>" + attackedClan.getName() + "</red> because they have offline TNT protection</red>.", null, true);
+                        attackingClan.messageClan("You cannot TNT <red>" + attackedClan.getName() + "</red> because they have offline TNT protection.", null, true);
                         break;
                     }
                 }

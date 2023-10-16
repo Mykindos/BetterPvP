@@ -457,16 +457,6 @@ public class WorldListener implements Listener {
         }
     }
 
-    /*
-     * Removes arrows when they hit the ground, or a player
-     */
-    @EventHandler
-    public void onArrowHit(ProjectileHitEvent event) {
-        if (event.getEntity() instanceof Arrow arrow) {
-            arrow.remove();
-        }
-    }
-
     @EventHandler
     public void onPhantomSpawn(CreatureSpawnEvent event) {
         if (event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.NATURAL) {
