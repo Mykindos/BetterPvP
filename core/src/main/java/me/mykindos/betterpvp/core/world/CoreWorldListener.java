@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.world;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import org.bukkit.craftbukkit.v1_20_R2.CraftWorld;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerRespawnEvent;
@@ -24,6 +25,8 @@ public class CoreWorldListener implements Listener {
         if(event.getWorld().getName().equals("world")) {
             worldHandler.loadSpawnLocations();
         }
+
+        ((CraftWorld) event.getWorld()).getHandle().getLevel().paperConfig().misc.disableRelativeProjectileVelocity = true;
     }
 
     @EventHandler

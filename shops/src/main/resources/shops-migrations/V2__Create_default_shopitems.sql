@@ -120,55 +120,55 @@ INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data
 
 -- Farming
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Farming', 'PUMPKIN', 'Pumpkin', 0, 0, 1, 1, 60, 30);
-SELECT id INTO @shopItemId FROM ${tablePrefix}shopItems WHERE Shopkeeper = 'Farming' AND Material = 'PUMPKIN';
+SELECT id INTO @shopItemId FROM ${tablePrefix}shopitems WHERE Shopkeeper = 'Farming' AND Material = 'PUMPKIN';
 INSERT IGNORE INTO ${tablePrefix}shopitems_dynamic_pricing VALUES (@shopItemId, 10, 20, 30, 60, 70, 80, 100000, 200000, 100000);
 
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Farming', 'COD', 'Fish', 0, 53, 1, 1, 40, 20);
-SELECT id INTO @shopItemId FROM ${tablePrefix}shopItems WHERE Shopkeeper = 'Farming' AND Material = 'COD';
+SELECT id INTO @shopItemId FROM ${tablePrefix}shopitems WHERE Shopkeeper = 'Farming' AND Material = 'COD';
 INSERT IGNORE INTO ${tablePrefix}shopitems_dynamic_pricing VALUES (@shopItemId, 10, 25, 35, 35, 40, 45, 50000, 200000, 50000);
 
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Farming', 'COCOA_BEANS', 'Cocoa Beans', 3, 45, 1, 1, 50, 25);
-SELECT id INTO @shopItemId FROM ${tablePrefix}shopItems WHERE Shopkeeper = 'Farming' AND Material = 'COCOA_BEANS';
+SELECT id INTO @shopItemId FROM ${tablePrefix}shopitems WHERE Shopkeeper = 'Farming' AND Material = 'COCOA_BEANS';
 INSERT IGNORE INTO ${tablePrefix}shopitems_dynamic_pricing VALUES (@shopItemId, 5, 25, 30, 40, 50, 60, 25000, 50000, 25000);
 
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Farming', 'SUGAR_CANE', 'Sugar Canes', 0, 36, 1, 1, 10, 5);
-SELECT id INTO @shopItemId FROM ${tablePrefix}shopItems WHERE Shopkeeper = 'Farming' AND Material = 'SUGAR_CANE';
+SELECT id INTO @shopItemId FROM ${tablePrefix}shopitems WHERE Shopkeeper = 'Farming' AND Material = 'SUGAR_CANE';
 INSERT IGNORE INTO ${tablePrefix}shopitems_dynamic_pricing VALUES (@shopItemId, 10, 20, 25, 30, 35, 40, 50000, 100000, 50000);
 
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Farming', 'MELON', 'Melon', 0, 1, 1, 1, 20, 10);
-SELECT id INTO @shopItemId FROM ${tablePrefix}shopItems WHERE Shopkeeper = 'Farming' AND Material = 'MELON';
+SELECT id INTO @shopItemId FROM ${tablePrefix}shopitems WHERE Shopkeeper = 'Farming' AND Material = 'MELON';
 INSERT IGNORE INTO ${tablePrefix}shopitems_dynamic_pricing VALUES (@shopItemId, 10, 30, 40, 65, 75, 85, 50000, 100000, 50000);
 
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Farming', 'CARROT', 'Carrot', 0, 27, 1, 1, 40, 20);
-SELECT id INTO @shopItemId FROM ${tablePrefix}shopItems WHERE Shopkeeper = 'Farming' AND Material = 'CARROT';
+SELECT id INTO @shopItemId FROM ${tablePrefix}shopitems WHERE Shopkeeper = 'Farming' AND Material = 'CARROT';
 INSERT IGNORE INTO ${tablePrefix}shopitems_dynamic_pricing VALUES (@shopItemId, 10, 25, 40, 40, 45, 50, 50000, 100000, 50000);
 
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Farming', 'POTATO', 'Potato', 0, 36, 1, 1, 40, 20);
-SELECT id INTO @shopItemId FROM ${tablePrefix}shopItems WHERE Shopkeeper = 'Farming' AND Material = 'POTATO';
+SELECT id INTO @shopItemId FROM ${tablePrefix}shopitems WHERE Shopkeeper = 'Farming' AND Material = 'POTATO';
 INSERT IGNORE INTO ${tablePrefix}shopitems_dynamic_pricing VALUES (@shopItemId, 10, 25, 40, 40, 45, 50, 50000, 100000, 50000);
 
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Farming', 'NETHER_WART', 'Nether Wart', 0, 35, 1, 1, 50, 25);
-SELECT id INTO @shopItemId FROM ${tablePrefix}shopItems WHERE Shopkeeper = 'Farming' AND Material = 'NETHER_WART';
+SELECT id INTO @shopItemId FROM ${tablePrefix}shopitems WHERE Shopkeeper = 'Farming' AND Material = 'NETHER_WART';
 INSERT IGNORE INTO ${tablePrefix}shopitems_dynamic_pricing VALUES (@shopItemId, 10, 25, 40, 45, 55, 65, 50000, 100000, 50000);
 
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Farming', 'WHEAT', 'Wheat', 0, 3, 1, 1, 60, 30);
-SELECT id INTO @shopItemId FROM ${tablePrefix}shopItems WHERE Shopkeeper = 'Farming' AND Material = 'WHEAT';
+SELECT id INTO @shopItemId FROM ${tablePrefix}shopitems WHERE Shopkeeper = 'Farming' AND Material = 'WHEAT';
 INSERT IGNORE INTO ${tablePrefix}shopitems_dynamic_pricing VALUES (@shopItemId, 10, 25, 40, 50, 55, 60, 50000, 100000, 50000);
 
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Farming', 'BEETROOT', 'Beetroot', 0, 39, 1, 1, 60, 30);
-SELECT id INTO @shopItemId FROM ${tablePrefix}shopItems WHERE Shopkeeper = 'Farming' AND Material = 'BEETROOT';
+SELECT id INTO @shopItemId FROM ${tablePrefix}shopitems WHERE Shopkeeper = 'Farming' AND Material = 'BEETROOT';
 INSERT IGNORE INTO ${tablePrefix}shopitems_dynamic_pricing VALUES (@shopItemId, 10, 25, 40, 50, 55, 60, 50000, 100000, 50000);
 
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Farming', 'SWEET_BERRIES', 'Sweet Berries', 0, 30, 1, 1, 40, 20);
-SELECT id INTO @shopItemId FROM ${tablePrefix}shopItems WHERE Shopkeeper = 'Farming' AND Material = 'SWEET_BERRIES';
+SELECT id INTO @shopItemId FROM ${tablePrefix}shopitems WHERE Shopkeeper = 'Farming' AND Material = 'SWEET_BERRIES';
 INSERT IGNORE INTO ${tablePrefix}shopitems_dynamic_pricing VALUES (@shopItemId, 7, 23, 35, 40, 45, 50, 50000, 100000, 50000);
 
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Farming', 'HONEYCOMB', 'Honeycomb', 0, 8, 1, 1, 3334, 600);
-SELECT id INTO @shopItemId FROM ${tablePrefix}shopItems WHERE Shopkeeper = 'Farming' AND Material = 'HONEYCOMB';
+SELECT id INTO @shopItemId FROM ${tablePrefix}shopitems WHERE Shopkeeper = 'Farming' AND Material = 'HONEYCOMB';
 INSERT IGNORE INTO ${tablePrefix}shopitems_dynamic_pricing VALUES (@shopItemId, 400, 750, 1000, 3333, 3333, 3600, 5000, 10000, 5000);
 
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Farming', 'BEEHIVE', 'Beehive', 0, 17, 1, 1, 10000, 5000);
-SELECT id INTO @shopItemId FROM ${tablePrefix}shopItems WHERE Shopkeeper = 'Farming' AND Material = 'BEEHIVE';
+SELECT id INTO @shopItemId FROM ${tablePrefix}shopitems WHERE Shopkeeper = 'Farming' AND Material = 'BEEHIVE';
 INSERT IGNORE INTO ${tablePrefix}shopitems_dynamic_pricing VALUES (@shopItemId, 10, 25, 40, 50, 55, 60, 50000, 100000, 50000);
 
 INSERT IGNORE INTO ${tablePrefix}shopitems (Shopkeeper, Material, ItemName, Data, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Farming', 'PUMPKIN_SEEDS', 'Pumpkin Seeds', 0, 9, 1, 1, 5, 1);

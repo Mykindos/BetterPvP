@@ -3,7 +3,11 @@ package me.mykindos.betterpvp.core.utilities;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
+import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 import java.util.HashSet;
 import java.util.Random;
@@ -13,6 +17,25 @@ import java.util.concurrent.ThreadLocalRandom;
 public class UtilMath {
 
     public static Random random = new Random(System.nanoTime());
+
+    public static Transformation rotateAround(Transformation transformation, Quaternionf left, Quaternionf right, Vector3f relativePivot) {
+        // Apply rotations
+        Quaternionf rotation = new Quaternionf();
+        left.mul(right, rotation);
+
+        Matrix4f transformationMatrix = new Matrix4f();
+        transformationMatrix.translate(relativePivot);
+        transformationMatrix.rotate(rotation);
+        transformationMatrix.translate(relativePivot.negate());
+        final com.mojang.math.Transformation result = new com.mojang.math.Transformation(transformationMatrix);
+
+        return new Transformation(
+                transformation.getTranslation().add(result.getTranslation()),
+                result.getLeftRotation(),
+                result.getScale(),
+                result.getRightRotation()
+        );
+    }
 
 
     /**

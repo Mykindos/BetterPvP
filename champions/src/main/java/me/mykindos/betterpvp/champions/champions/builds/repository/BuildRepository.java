@@ -92,6 +92,8 @@ public class BuildRepository implements IRepository<RoleBuild> {
         if (value != null && !value.equals("")) {
             String[] split = value.split(",");
             Skill skill = skillManager.getObjects().get(split[0]);
+            if(skill == null) return;
+            if (!skill.isEnabled()) return;
 
             int level = Integer.parseInt(split[1]);
             build.setSkill(type, skill, level);
@@ -157,12 +159,12 @@ public class BuildRepository implements IRepository<RoleBuild> {
             assassin.setSkill(SkillType.PASSIVE_B, skillManager.getObjects().get("Smoke Bomb"), 3);
             assassin.takePoints(12);
 
-            RoleBuild gladiator = new RoleBuild(uuid, Role.valueOf("GLADIATOR"), d);
-            gladiator.setSkill(SkillType.SWORD, skillManager.getObjects().get("Takedown"), 5);
-            gladiator.setSkill(SkillType.AXE, skillManager.getObjects().get("Seismic Slam"), 3);
-            gladiator.setSkill(SkillType.PASSIVE_A, skillManager.getObjects().get("Colossus"), 1);
-            gladiator.setSkill(SkillType.PASSIVE_B, skillManager.getObjects().get("Stampede"), 3);
-            gladiator.takePoints(12);
+            RoleBuild brute = new RoleBuild(uuid, Role.valueOf("BRUTE"), d);
+            brute.setSkill(SkillType.SWORD, skillManager.getObjects().get("Takedown"), 5);
+            brute.setSkill(SkillType.AXE, skillManager.getObjects().get("Seismic Slam"), 3);
+            brute.setSkill(SkillType.PASSIVE_A, skillManager.getObjects().get("Colossus"), 1);
+            brute.setSkill(SkillType.PASSIVE_B, skillManager.getObjects().get("Stampede"), 3);
+            brute.takePoints(12);
 
             RoleBuild ranger = new RoleBuild(uuid, Role.valueOf("RANGER"), d);
             ranger.setSkill(SkillType.SWORD, skillManager.getObjects().get("Disengage"), 3);
@@ -171,12 +173,12 @@ public class BuildRepository implements IRepository<RoleBuild> {
             ranger.setSkill(SkillType.PASSIVE_B, skillManager.getObjects().get("Sharpshooter"), 1);
             ranger.takePoints(12);
 
-            RoleBuild paladin = new RoleBuild(uuid, Role.valueOf("PALADIN"), d);
-            paladin.setSkill(SkillType.SWORD, skillManager.getObjects().get("Inferno"), 5);
-            paladin.setSkill(SkillType.AXE, skillManager.getObjects().get("Molten Blast"), 3);
-            paladin.setSkill(SkillType.PASSIVE_A, skillManager.getObjects().get("Holy Light"), 2);
-            paladin.setSkill(SkillType.PASSIVE_B, skillManager.getObjects().get("Immolate"), 2);
-            paladin.takePoints(12);
+            RoleBuild mage = new RoleBuild(uuid, Role.valueOf("MAGE"), d);
+            mage.setSkill(SkillType.SWORD, skillManager.getObjects().get("Inferno"), 5);
+            mage.setSkill(SkillType.AXE, skillManager.getObjects().get("Molten Blast"), 3);
+            mage.setSkill(SkillType.PASSIVE_A, skillManager.getObjects().get("Holy Light"), 2);
+            mage.setSkill(SkillType.PASSIVE_B, skillManager.getObjects().get("Immolate"), 2);
+            mage.takePoints(12);
 
             RoleBuild knight = new RoleBuild(uuid, Role.valueOf("KNIGHT"), d);
             knight.setSkill(SkillType.SWORD, skillManager.getObjects().get("Riposte"), 3);
@@ -192,12 +194,12 @@ public class BuildRepository implements IRepository<RoleBuild> {
             warlock.setSkill(SkillType.PASSIVE_B, skillManager.getObjects().get("Soul Harvest"), 2);
             warlock.takePoints(12);
 
-            builds.addAll(List.of(knight, ranger, gladiator, paladin, assassin, warlock));
+            builds.addAll(List.of(knight, ranger, brute, mage, assassin, warlock));
 
         }
 
         builds.forEach(build -> {
-            if(build.getId() == 1) {
+            if (build.getId() == 1) {
                 build.setActive(true);
             }
 

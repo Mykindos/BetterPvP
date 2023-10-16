@@ -72,6 +72,11 @@ public class EnemySubCommand extends ClanSubCommand {
             return;
         }
 
+        if(playerClan.isAllied(targetClan)) {
+            UtilMessage.message(player, "Clans", "You cannot enemy a clan you are allied with.");
+            return;
+        }
+
         if (clanManager.getPillageHandler().isPillaging(playerClan, targetClan)
                 || clanManager.getPillageHandler().isPillaging(targetClan, playerClan)) {
             UtilMessage.message(player, "Clans", "You cannot enemy this clan while a pillage is active.");

@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.progression.tree.fishing.data;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.database.Database;
@@ -22,6 +23,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
+@Singleton
 public class FishingWeightLeaderboard extends Leaderboard<UUID, Long> {
 
     @Inject

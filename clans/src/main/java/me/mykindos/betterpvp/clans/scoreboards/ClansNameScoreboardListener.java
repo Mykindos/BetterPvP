@@ -118,7 +118,7 @@ public class ClansNameScoreboardListener implements Listener {
             } else if (relation == ClanRelation.ENEMY) {
                 team.prefix(Component.text(prefix + " ", NamedTextColor.DARK_RED));
                 team.color(NamedTextColor.RED);
-                team.suffix(targetClan.getSimpleDominanceString(playerClan));
+                team.suffix(clanManager.getSimpleDominanceString(targetClan, playerClan));
             } else if (relation == ClanRelation.PILLAGE) {
                 team.prefix(Component.text(prefix + " ", NamedTextColor.DARK_PURPLE));
                 team.color(NamedTextColor.LIGHT_PURPLE);
@@ -139,6 +139,7 @@ public class ClansNameScoreboardListener implements Listener {
             } else {
                 team.prefix(Component.text("", NamedTextColor.YELLOW));
             }
+
             team.color(NamedTextColor.YELLOW);
             team.suffix(Component.text(""));
         }

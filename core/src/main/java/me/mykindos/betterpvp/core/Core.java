@@ -18,9 +18,8 @@ import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.injector.CoreInjectorModule;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.loader.CoreListenerLoader;
-import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import net.kyori.adventure.key.Key;
-import org.bukkit.Location;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 
@@ -54,6 +53,10 @@ public class Core extends BPvPPlugin {
     @Getter
     private String databasePrefix;
 
+    @Inject
+    @Config(path = "core.password", defaultValue = "")
+    public String password;
+
     public void onEnable() {
         saveDefaultConfig();
 
@@ -85,8 +88,6 @@ public class Core extends BPvPPlugin {
         updateEventExecutor.loadPlugin(this);
         updateEventExecutor.initialize();
 
-        Location test = UtilWorld.stringToLocation(getConfig().getString("spawn.North"));
-        log.info("TEST: " + test);
     }
 
     @Override

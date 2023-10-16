@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
+import me.mykindos.betterpvp.clans.clans.ClanProperty;
 import me.mykindos.betterpvp.clans.clans.insurance.Insurance;
 import me.mykindos.betterpvp.clans.clans.insurance.InsuranceType;
 import me.mykindos.betterpvp.core.components.clans.IClan;
@@ -23,6 +24,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.inventory.ItemStack;
 
 import javax.sql.rowset.CachedRowSet;
 import java.sql.SQLException;
@@ -39,7 +41,6 @@ public class ClanRepository implements IRepository<Clan> {
 
     private final Clans clans;
     private final Database database;
-
     private final ConcurrentHashMap<String, Statement> queuedPropertyUpdates;
 
     @Inject
@@ -61,12 +62,19 @@ public class ClanRepository implements IRepository<Clan> {
                 Location home = UtilWorld.stringToLocation(result.getString(3));
                 boolean admin = result.getBoolean(4);
                 boolean safe = result.getBoolean(5);
+                String banner = result.getString(6);
 
                 Clan clan = new Clan(clanId);
                 clan.setName(name);
                 clan.setHome(home);
                 clan.setAdmin(admin);
                 clan.setSafe(safe);
+
+                if(banner != null && !banner.equals("")) {
+                    clan.setBanner(ItemStack.deserializeBytes(Base64.getDecoder().decode(banner)));
+                }
+
+                clan.putProperty(ClanProperty.TNT_PROTECTION, 0L);
 
                 loadProperties(clan);
                 clanList.add(clan);
@@ -167,6 +175,20 @@ public class ClanRepository implements IRepository<Clan> {
         String query = "UPDATE " + databasePrefix + "clans SET Home = ? WHERE id = ?;";
         database.executeUpdateAsync(new Statement(query,
                 new StringStatementValue(UtilWorld.locationToString(clan.getHome(), false)),
+                new UuidStatementValue(clan.getId())));
+    }
+
+    public void updateClanBanner(Clan clan) {
+        String query = "UPDATE " + databasePrefix + "clans SET Banner = ? WHERE id = ?;";
+        database.executeUpdateAsync(new Statement(query,
+                new StringStatementValue(Base64.getEncoder().encodeToString(clan.getBanner().serializeAsBytes())),
+                new UuidStatementValue(clan.getId())));
+    }
+
+    public void updateClanSafe(Clan clan) {
+        String query = "UPDATE " + databasePrefix + "clans SET Safe = ? WHERE id = ?;";
+        database.executeUpdateAsync(new Statement(query,
+                new BooleanStatementValue(clan.isSafe()),
                 new UuidStatementValue(clan.getId())));
     }
 
@@ -276,6 +298,14 @@ public class ClanRepository implements IRepository<Clan> {
 
         return alliances;
     }
+
+    public void saveTrust(IClan clan, ClanAlliance alliance) {
+        String query = "UPDATE " + databasePrefix + "clan_alliances SET Trusted = ? WHERE Clan = ? AND AllyClan = ?;";
+        database.executeUpdateAsync(new Statement(query,
+                new BooleanStatementValue(alliance.isTrusted()),
+                new UuidStatementValue(clan.getId()),
+                new UuidStatementValue(alliance.getClan().getId())));
+    }
     //endregion
 
     //region Clan enemies
@@ -284,7 +314,7 @@ public class ClanRepository implements IRepository<Clan> {
         database.executeUpdateAsync(new Statement(query,
                 new UuidStatementValue(clan.getId()),
                 new UuidStatementValue(enemy.getClan().getId()),
-                new IntegerStatementValue(enemy.getDominance())));
+                new DoubleStatementValue(enemy.getDominance())));
     }
 
     public void deleteClanEnemy(IClan clan, ClanEnemy enemy) {
@@ -297,7 +327,7 @@ public class ClanRepository implements IRepository<Clan> {
     public void updateDominance(IClan clan, ClanEnemy enemy) {
         String query = "UPDATE " + databasePrefix + "clan_enemies SET Dominance = ? WHERE Clan = ? AND EnemyClan = ?;";
         database.executeUpdateAsync(new Statement(query,
-                new IntegerStatementValue(enemy.getDominance()),
+                new DoubleStatementValue(enemy.getDominance()),
                 new UuidStatementValue(clan.getId()),
                 new UuidStatementValue(enemy.getClan().getId())));
     }
@@ -322,13 +352,13 @@ public class ClanRepository implements IRepository<Clan> {
     }
     //endregion
 
-    public Map<Integer, Integer> getDominanceScale() {
-        HashMap<Integer, Integer> dominanceScale = new HashMap<>();
+    public Map<Integer, Double> getDominanceScale() {
+        HashMap<Integer, Double> dominanceScale = new HashMap<>();
         String query = "SELECT * FROM " + databasePrefix + "dominance_scale;";
         CachedRowSet result = database.executeQuery(new Statement(query));
         try {
             if (result.next()) {
-                dominanceScale.put(result.getInt(1), result.getInt(2));
+                dominanceScale.put(result.getInt(1), result.getDouble(2));
             }
         } catch (SQLException ex) {
             ex.printStackTrace();

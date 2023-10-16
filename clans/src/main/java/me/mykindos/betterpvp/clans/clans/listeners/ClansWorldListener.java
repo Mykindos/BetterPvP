@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.clans.clans.listeners;
 
 import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
+import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
@@ -11,6 +12,7 @@ import me.mykindos.betterpvp.core.client.events.ClientLoginEvent;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.energy.EnergyHandler;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
@@ -24,20 +26,16 @@ import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.Container;
 import org.bukkit.block.data.type.Gate;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.ItemFrame;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
-import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.EquipmentSlot;
 
 import java.util.Optional;
@@ -47,12 +45,16 @@ import java.util.UUID;
 @BPvPListener
 public class ClansWorldListener extends ClanListener {
 
+    private final Clans clans;
     private final EffectManager effectManager;
+    private final EnergyHandler energyHandler;
 
     @Inject
-    public ClansWorldListener(ClanManager clanManager, GamerManager gamerManager, EffectManager effectManager) {
+    public ClansWorldListener(ClanManager clanManager, GamerManager gamerManager, Clans clans, EffectManager effectManager, EnergyHandler energyHandler) {
         super(clanManager, gamerManager);
+        this.clans = clans;
         this.effectManager = effectManager;
+        this.energyHandler = energyHandler;
     }
 
     @EventHandler
@@ -64,16 +66,20 @@ public class ClansWorldListener extends ClanListener {
     @EventHandler
     public void onLogout(PlayerQuitEvent event) {
         Optional<Clan> clanOptional = clanManager.getClanByPlayer(event.getPlayer());
-        clanOptional.ifPresent(clan -> {
-            for (ClanMember member : clan.getMembers()) {
-                Player player = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
-                if (player != null) {
-                    return;
-                }
-            }
 
-            clan.setOnline(false);
-        });
+        UtilServer.runTaskLater(clans, () -> {
+            clanOptional.ifPresent(clan -> {
+                for (ClanMember member : clan.getMembers()) {
+                    Player player = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
+                    if (player != null) {
+                        return;
+                    }
+                }
+
+                clan.setOnline(false);
+            });
+        }, 5L);
+
     }
 
     @UpdateEvent(delay = 1000)
@@ -197,7 +203,7 @@ public class ClansWorldListener extends ClanListener {
                 event.setCancelled(true);
 
                 if (tie.isInform()) {
-                    UtilMessage.simpleMessage(player, "Clans", "You cannot place <green>%s <gray> in %s<gray>.",
+                    UtilMessage.simpleMessage(player, "Clans", "You cannot place <green>%s <gray>in %s<gray>.",
                             UtilFormat.cleanString(block.getType().toString()), relation.getPrimaryMiniColor() + locationClan.getName());
                 }
                 return;
@@ -697,6 +703,42 @@ public class ClansWorldListener extends ClanListener {
             }, () -> player.setGameMode(GameMode.ADVENTURE));
 
 
+        }
+    }
+
+    @EventHandler
+    public void onFishMechanics(PlayerFishEvent event) {
+        if (event.getCaught() instanceof Player player) {
+            if (!energyHandler.use(event.getPlayer(), "Fishing Rod", 15.0, true)) {
+                event.setCancelled(true);
+                return;
+            }
+
+            event.setCancelled(true);
+            event.getHook().remove();
+
+            if (player.equals(event.getPlayer())) return;
+
+            if (clanManager.isInSafeZone(player)) {
+                return;
+            }
+
+            if (player.getLocation().distance(event.getPlayer().getLocation()) < 2) {
+                return;
+            }
+
+            var trajectory = UtilVelocity.getTrajectory(player, event.getPlayer()).normalize();
+            player.setVelocity(trajectory.multiply(2).setY(Math.min(20, trajectory.getY())));
+
+        }
+    }
+
+    @EventHandler
+    public void onFishingHookHit(ProjectileHitEvent event) {
+        if (!(event.getEntity() instanceof FishHook)) return;
+
+        if (event.getHitEntity() instanceof Item) {
+            event.setCancelled(true);
         }
     }
 }

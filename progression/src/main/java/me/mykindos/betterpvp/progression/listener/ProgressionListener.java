@@ -40,14 +40,24 @@ public class ProgressionListener implements Listener {
         progressionsManager.getTrees().forEach(tree -> tree.getStatsRepository().saveAll(true));
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onGainExperience(PlayerProgressionExperienceEvent event) {
         final Player player = event.getPlayer();
         gamerManager.getObject(player.getUniqueId()).ifPresent(gamer -> {
             // Action bar XP
             final String tree = event.getTree().getName();
             final long amount = event.getGainedExp();
-            final TextComponent actionBarText = Component.text("+" + amount + " " + tree + " XP", NamedTextColor.DARK_AQUA);
+            final TextComponent actionBarText;
+            if (amount > 0) {
+                actionBarText = Component.text("+" + amount + " " + tree + " XP", NamedTextColor.DARK_AQUA);
+            } else {
+                String amountString = String.valueOf(amount);
+                if (amount == 0) {
+                    amountString = "+" + amountString;
+                }
+                actionBarText = Component.text(amountString + " " + tree + " XP", NamedTextColor.RED);
+            }
+
             final TimedComponent component = new TimedComponent(1.0, false, gmr -> actionBarText);
             gamer.getActionBar().add(250, component);
 

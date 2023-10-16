@@ -228,20 +228,18 @@ public class RoleListener implements Listener {
         Optional<Role> roleOptional = roleManager.getObject(damagee.getUniqueId().toString());
         if (roleOptional.isPresent()) {
             Role role = roleOptional.get();
-            if (cooldownManager.use(damagee, "DamageSound", 0.7, false)) {
                 switch (role) {
                     case KNIGHT ->
                             damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_BLAZE_HURT, 1.0F, 0.7F);
                     case ASSASSIN ->
                             damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1.0F, 2.0F);
-                    case GLADIATOR ->
+                    case BRUTE ->
                             damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_BLAZE_HURT, 1.0F, 0.9F);
                     case RANGER ->
                             damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.4F);
-                    case PALADIN, WARLOCK ->
+                    case MAGE, WARLOCK ->
                             damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.8F);
                 }
-            }
         }
     }
 
@@ -255,11 +253,14 @@ public class RoleListener implements Listener {
             return;
         }
 
-        roleManager.getObject(player.getUniqueId()).ifPresent(role -> {
+        roleManager.getObject(player.getUniqueId()).ifPresentOrElse(role -> {
             if (role != Role.ASSASSIN && role != Role.RANGER) {
-                UtilMessage.message(player, "Bow", "You can't shoot a bow with this class.");
+                UtilMessage.message(player, "Bow", "You can't shoot a bow without Assassin or Ranger equipped.");
                 event.setCancelled(true);
             }
+        }, () -> {
+            UtilMessage.message(player, "Bow", "You can't shoot a bow without Assassin or Ranger equipped.");
+            event.setCancelled(true);
         });
     }
 

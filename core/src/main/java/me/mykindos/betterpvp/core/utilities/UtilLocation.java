@@ -6,6 +6,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
@@ -25,6 +26,25 @@ public class UtilLocation {
                 new Location(world, boundingBox.getMaxX(), boundingBox.getMaxY(), boundingBox.getMinZ()),
                 new Location(world, boundingBox.getMaxX(), boundingBox.getMaxY(), boundingBox.getMaxZ())
         ));
+    }
+
+    /**
+     * Check if a location is in front of an entity's screen, even if there's an obstacle between.
+     *
+     * @param entity The entity to check.
+     * @param other  The location to check.
+     * @return Whether the location is in front of the entity.
+     */
+    public static boolean isInFront(final LivingEntity entity, final Location other) {
+        if (!entity.hasLineOfSight(other)) {
+            return false;
+        }
+
+        float fov = 73;
+        final Vector direction = entity.getEyeLocation().getDirection(); // This is already normalized
+        final Vector lineToLocation = other.subtract(entity.getEyeLocation()).toVector().normalize();
+        final double angle = Math.toDegrees(lineToLocation.angle(direction));
+        return Math.abs(angle) <= fov;
     }
 
     /**

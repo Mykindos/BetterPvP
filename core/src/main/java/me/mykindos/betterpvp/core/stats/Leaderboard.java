@@ -7,10 +7,17 @@ import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.stats.event.LeaderboardInitializeEvent;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardEntry;
+import me.mykindos.betterpvp.core.stats.repository.LeaderboardEntryComparator;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardEntryKey;
 import me.mykindos.betterpvp.core.stats.sort.SortType;
+import me.mykindos.betterpvp.core.stats.sort.TemporalSort;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.UtilSound;
 import org.apache.commons.lang3.Validate;
+import org.bukkit.Bukkit;
+import org.bukkit.Sound;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -19,6 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+
 /**
  * Represents a sorted leaderboard for objects of type T.
  * <p>
@@ -26,41 +34,46 @@ import java.util.concurrent.TimeUnit;
  * @param <T> The type of object to be sorted in this leaderboard.
  */
 @Slf4j
-public abstract class Leaderboard<E, T> {
+public abstract class Leaderboard<E, T extends Comparable<T>> {
 
     private final ConcurrentHashMap<SortType, TreeSet<LeaderboardEntry<E, T>>> topTen;
     private final AsyncLoadingCache<LeaderboardEntryKey<E>, T> entryCache;
+    private final Database database;
+    private final String tablePrefix;
 
     protected Leaderboard(BPvPPlugin plugin, String tablePrefix) {
         Validate.isTrue(acceptedSortTypes().length > 0, "Leaderboard must accept at least one sort type.");
-        final Database database = plugin.getInjector().getInstance(Database.class);
+        this.database = plugin.getInjector().getInstance(Database.class);
+        this.tablePrefix = tablePrefix;
         this.topTen = new ConcurrentHashMap<>();
         this.entryCache = Caffeine.newBuilder()
                 .expireAfterWrite(10, TimeUnit.MINUTES)
                 .buildAsync((key, executor) -> CompletableFuture.supplyAsync(() -> fetch(key.getSortType(), database, tablePrefix, key.getValue())));
 
-        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
-            for (SortType sortType : acceptedSortTypes()) {
-                CompletableFuture.supplyAsync(() -> fetchAll(sortType, database, tablePrefix)).thenApply(fetch -> {
-                    TreeSet<LeaderboardEntry<E, T>> set = new TreeSet<>(Comparator.comparing(LeaderboardEntry::getValue, getSorter()));
-                    set.addAll(fetch.entrySet().stream().map(entry -> LeaderboardEntry.of(entry.getKey(), entry.getValue())).toList());
-                    return set;
-                }).exceptionally(ex -> {
-                    log.error("Failed to fetch leaderboard data for " + sortType + "!", ex);
-                    ex.printStackTrace();
-                    return null;
-                }).whenComplete((set, ex) -> {
-                    if (ex != null) {
-                        log.error("Failed to fetch leaderboard data for " + sortType + "!", ex);
-                        ex.printStackTrace();
-                        return;
-                    }
-                    topTen.put(sortType, set);
-                });
-            }
-        }, 0L, 10L, TimeUnit.MINUTES);
+        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(this::forceUpdate, 0L, 10L, TimeUnit.MINUTES);
 
         UtilServer.callEvent(new LeaderboardInitializeEvent(this));
+    }
+
+    public void forceUpdate() {
+        for (SortType sortType : acceptedSortTypes()) {
+            CompletableFuture.supplyAsync(() -> fetchAll(sortType, database, tablePrefix)).thenApply(fetch -> {
+                TreeSet<LeaderboardEntry<E, T>> set = new TreeSet<>(new LeaderboardEntryComparator<>());
+                set.addAll(fetch.entrySet().stream().map(entry -> LeaderboardEntry.of(entry.getKey(), entry.getValue())).toList());
+                return set;
+            }).exceptionally(ex -> {
+                log.error("Failed to fetch leaderboard data for " + sortType + "!", ex);
+                ex.printStackTrace();
+                return null;
+            }).whenComplete((set, ex) -> {
+                if (ex != null) {
+                    log.error("Failed to fetch leaderboard data for " + sortType + "!", ex);
+                    ex.printStackTrace();
+                    return;
+                }
+                topTen.put(sortType, set);
+            });
+        }
     }
 
     public abstract String getName();
@@ -125,7 +138,9 @@ public abstract class Leaderboard<E, T> {
                 }
 
                 // Only return this type if the entry was added
-                int indexNow = new ArrayList<>(set).indexOf(entry) + 1;
+                var newList = new ArrayList<>(set);
+
+                int indexNow = newList.indexOf(entry) + 1;
                 if (set.contains(entry) && indexBefore != indexNow) {
                     types.put(type, indexNow);
                 }
@@ -212,5 +227,29 @@ public abstract class Leaderboard<E, T> {
      * @param tablePrefix The prefix of the table.
      */
     protected abstract Map<E, T> fetchAll(@NotNull SortType sortType, @NotNull Database database, @NotNull String tablePrefix);
+
+    public void attemptAnnounce(Player player, Map<SortType, Integer> newPositions) {
+        if (newPositions.isEmpty()) {
+            return;
+        }
+
+        final Map.Entry<TemporalSort, Integer> highestEntry = newPositions.entrySet().stream()
+                .map(entry -> Map.entry((TemporalSort) entry.getKey(), entry.getValue()))
+                .max(Map.Entry.comparingByKey(Comparator.comparing(TemporalSort::getDays)))
+                .orElseThrow();
+
+        if (highestEntry.getKey() == TemporalSort.SEASONAL && highestEntry.getValue() <= 3) {
+            final String playerName = player.getName();
+            UtilMessage.simpleBroadcast("Leaderboard", "<dark_green>%s <green>has reached <dark_green>#%d</dark_green> on the %s %s leaderboard!",
+                    playerName,
+                    highestEntry.getValue(),
+                    highestEntry.getKey().getName().toLowerCase(),
+                    this.getName());
+
+            for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                UtilSound.playSound(onlinePlayer, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 1.0F, 1.0F, true);
+            }
+        }
+    }
 
 }

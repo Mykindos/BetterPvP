@@ -23,9 +23,11 @@ import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.utilities.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.minecraft.core.Direction;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
@@ -42,7 +44,7 @@ public class ClanManager extends Manager<Clan> {
     @Getter
     private final PillageHandler pillageHandler;
 
-    private Map<Integer, Integer> dominanceScale;
+    private Map<Integer, Double> dominanceScale;
 
     @Getter
     private final ConcurrentLinkedQueue<Insurance> insuranceQueue;
@@ -75,6 +77,11 @@ public class ClanManager extends Manager<Clan> {
     public Optional<Clan> getClanByPlayer(Player player) {
         return objects.values().stream()
                 .filter(clan -> clan.getMemberByUUID(player.getUniqueId().toString()).isPresent()).findFirst();
+    }
+
+    public Optional<Clan> getClanByPlayer(UUID uuid) {
+        return objects.values().stream()
+                .filter(clan -> clan.getMemberByUUID(uuid).isPresent()).findFirst();
     }
 
     public Optional<Clan> getClanByName(String name) {
@@ -137,6 +144,14 @@ public class ClanManager extends Manager<Clan> {
         Optional<Clan> playerClanOptional = getClanByPlayer(player);
         Optional<Clan> locationClanOptional = getClanByLocation(location);
 
+        Optional<Gamer> gamerOptional = gamerManager.getObject(player.getUniqueId());
+        if (gamerOptional.isPresent()) {
+            Gamer gamer = gamerOptional.get();
+            if (gamer.getClient().isAdministrating()) {
+                return true;
+            }
+        }
+
         if (locationClanOptional.isEmpty()) return true;
         if (playerClanOptional.isEmpty()) return false;
 
@@ -151,6 +166,46 @@ public class ClanManager extends Manager<Clan> {
 
         return relation == ClanRelation.SELF || relation == ClanRelation.ALLY_TRUST;
     }
+
+    public Location closestWilderness(Player player) {
+        int maxChunksRadiusToScan = 3;
+        List<Chunk> chunks = new ArrayList<>();
+
+        Chunk playerChunk = player.getChunk();
+        World world = player.getWorld();
+
+        for (int i = -maxChunksRadiusToScan; i < maxChunksRadiusToScan; i++) {
+            for (int j = -maxChunksRadiusToScan; j < maxChunksRadiusToScan; j++) {
+                Chunk chunk = world.getChunkAt(playerChunk.getX() + i, playerChunk.getZ() + j);
+                if (getClanByChunk(chunk).isEmpty()) {
+                    chunks.add(chunk);
+                }
+            }
+        }
+
+        if (!chunks.isEmpty()) {
+            Chunk chunk = UtilWorld.closestChunkToPlayer(chunks, player);
+
+            //this should not ever happen
+            if (chunk == null) return null;
+
+            List<Location> locations = new ArrayList<>();
+
+            int y = (int) player.getY();
+            for (int i = 0; i < 16; i++) {
+                for (int j = 0; j < 16; j++) {
+                    locations.add(chunk.getBlock(i, y, j).getLocation().toHighestLocation());
+                }
+            }
+
+            locations.sort(Comparator.comparingInt(a -> (int) player.getLocation().distanceSquared(a)));
+
+            //to prevent getting stuck in a block, add 1 to Y
+            return locations.get(0).add(0, 1, 0);
+        }
+        return null;
+    }
+
 
     public Location closestWildernessBackwards(Player player) {
         List<Location> locations = new ArrayList<>();
@@ -217,7 +272,7 @@ public class ClanManager extends Manager<Clan> {
         if (!clan.getEnemies().isEmpty()) {
             for (ClanEnemy enemy : clan.getEnemies()) {
                 ClanRelation relation = getRelation(playerClan, enemy.getClan());
-                enemies.add((relation.getPrimaryMiniColor() + enemy.getClan().getName() + " " + clan.getDominanceString(enemy.getClan())).trim());
+                enemies.add((relation.getPrimaryMiniColor() + enemy.getClan().getName() + " " + getDominanceString(clan, enemy.getClan())).trim());
             }
         }
         return String.join("<gray>, ", enemies);
@@ -259,7 +314,7 @@ public class ClanManager extends Manager<Clan> {
 
         return relation != ClanRelation.SELF && relation != ClanRelation.ALLY && relation != ClanRelation.ALLY_TRUST;
     }
-    
+
     public boolean canCast(Player player) {
         Optional<Clan> locationClanOptional = getClanByLocation(player.getLocation());
         if (locationClanOptional.isPresent()) {
@@ -283,6 +338,14 @@ public class ClanManager extends Manager<Clan> {
         return true;
     }
 
+    public double getDominanceForKill(int killedSquadSize, int killerSquadSize) {
+
+        int sizeOffset = Math.min(6, 6 - Math.min(killerSquadSize - killedSquadSize, 6));
+
+        return dominanceScale.getOrDefault(sizeOffset, 6D);
+
+    }
+
     public void applyDominance(IClan killed, IClan killer) {
         if (killed == null || killer == null) return;
         if (killed.equals(killer)) return;
@@ -292,11 +355,9 @@ public class ClanManager extends Manager<Clan> {
         ClanEnemy killerEnemy = killer.getEnemy(killed).orElseThrow();
 
         int killerSize = killer.getSquadCount();
-        int killedSize = killer.getSquadCount();
+        int killedSize = killed.getSquadCount();
 
-        int sizeOffset = Math.min(6, 6 - Math.min(killerSize - killedSize, 6));
-
-        int dominance = dominanceScale.getOrDefault(sizeOffset, 6);
+        double dominance = getDominanceForKill(killedSize, killerSize);
 
         // If the killed players clan has no dominance on the killer players clan, then give dominance to the killer
         if (killedEnemy.getDominance() == 0) {
@@ -329,6 +390,55 @@ public class ClanManager extends Manager<Clan> {
         });
     }
 
+    public String getDominanceString(IClan clan, IClan enemyClan) {
+        Optional<ClanEnemy> enemyOptional = clan.getEnemy(enemyClan);
+        Optional<ClanEnemy> theirEnemyOptional = enemyClan.getEnemy(clan);
+        if (enemyOptional.isPresent() && theirEnemyOptional.isPresent()) {
+
+            ClanEnemy enemy = enemyOptional.get();
+            ClanEnemy theirEnemy = theirEnemyOptional.get();
+
+
+            String text;
+            if (enemy.getDominance() > 0) {
+                boolean nextKillDoms = enemy.getDominance() + getDominanceForKill(enemyClan.getSquadCount(), clan.getSquadCount()) >= 100;
+                text = (nextKillDoms ? "<light_purple>+" : "<green>+") + enemy.getDominance() + "%";
+            } else if (theirEnemy.getDominance() > 0) {
+                boolean nextKillDoms = theirEnemy.getDominance() + getDominanceForKill(clan.getSquadCount(), enemyClan.getSquadCount()) >= 100;
+                text = (nextKillDoms ? "<light_purple>-" : "<red>-") + theirEnemy.getDominance() + "%";
+            } else {
+                return "";
+            }
+            return "<gray> (" + text + "<gray>)";
+        }
+        return "";
+    }
+
+    public Component getSimpleDominanceString(IClan clan, IClan enemyClan) {
+        Optional<ClanEnemy> enemyOptional = clan.getEnemy(enemyClan);
+        Optional<ClanEnemy> theirEnemyOptional = enemyClan.getEnemy(clan);
+        if (enemyOptional.isPresent() && theirEnemyOptional.isPresent()) {
+
+            ClanEnemy enemy = enemyOptional.get();
+            ClanEnemy theirEnemy = theirEnemyOptional.get();
+
+
+
+            if (theirEnemy.getDominance() == 0 && enemy.getDominance() == 0) {
+                return Component.text(" 0", NamedTextColor.WHITE);
+            }
+            if (theirEnemy.getDominance() > 0) {
+                boolean nextKillDoms = theirEnemy.getDominance() + getDominanceForKill(clan.getSquadCount(), enemyClan.getSquadCount()) >= 100;
+                return Component.text(" +" + theirEnemy.getDominance() + "%", nextKillDoms ? NamedTextColor.LIGHT_PURPLE : NamedTextColor.GREEN);
+            } else {
+                boolean nextKillDoms = enemy.getDominance() + getDominanceForKill(enemyClan.getSquadCount(), clan.getSquadCount()) >= 100;
+                return Component.text(" -" + enemy.getDominance() + "%", nextKillDoms ? NamedTextColor.LIGHT_PURPLE : NamedTextColor.DARK_RED);
+            }
+
+        }
+        return Component.empty();
+    }
+
     /**
      * Save insurance data for a particular block
      *
@@ -342,6 +452,14 @@ public class ClanManager extends Manager<Clan> {
 
         repository.saveInsurance(clan, insurance);
         clan.getInsurance().add(insurance);
+    }
+
+    public void startInsuranceRollback(Clan clan) {
+        List<Insurance> insuranceList = clan.getInsurance();
+        insuranceList.sort(Collections.reverseOrder());
+        getInsuranceQueue().addAll(insuranceList);
+        getRepository().deleteInsuranceForClan(clan);
+        clan.getInsurance().clear();
     }
 
     @Override
@@ -358,5 +476,14 @@ public class ClanManager extends Manager<Clan> {
         });
 
         log.info("Loaded {} clans", objects.size());
+    }
+
+    public boolean isInSafeZone(Player player) {
+        Optional<Clan> clanOptional = getClanByLocation(player.getLocation());
+        if (clanOptional.isPresent()) {
+            Clan clan = clanOptional.get();
+            return clan.isAdmin() && clan.isSafe();
+        }
+        return false;
     }
 }

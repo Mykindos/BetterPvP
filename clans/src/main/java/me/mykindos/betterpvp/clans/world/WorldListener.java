@@ -1,5 +1,8 @@
 package me.mykindos.betterpvp.clans.world;
 
+import com.comphenix.protocol.ProtocolLib;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.events.PacketListener;
 import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -154,7 +157,6 @@ public class WorldListener implements Listener {
                     || event.getInventory().getType() == InventoryType.GRINDSTONE
                     || event.getInventory().getType() == InventoryType.LECTERN
                     || event.getInventory().getType() == InventoryType.SHULKER_BOX
-                    || event.getInventory().getType() == InventoryType.LOOM
                     || event.getInventory().getType() == InventoryType.STONECUTTER
                     || event.getInventory().getType() == InventoryType.SMITHING
                     || event.getInventory().getType() == InventoryType.BEACON) {
@@ -382,19 +384,9 @@ public class WorldListener implements Listener {
      * Updates the names of items that are picked up from the ground (sets there name to be yellow from wh ite)
      * Other than enchanted armour
      */
-    @EventHandler
+    @EventHandler (priority = EventPriority.MONITOR)
     public void onPickup(EntityPickupItemEvent event) {
         if (event.getEntity() instanceof Player) {
-            // TODO implement weapons
-            //Weapon w = WeaponManager.getWeapon(event.getItem().getItemStack());
-            //if (w != null) {
-            //    if (w instanceof EnchantedWeapon) {
-//
-            //        return;
-            //    }
-//
-            //}
-
             itemHandler.updateNames(event.getItem().getItemStack());
         }
     }
@@ -462,16 +454,6 @@ public class WorldListener implements Listener {
     public void itemDamage(EntityDamageEvent event) {
         if (event.getEntity() instanceof Item) {
             event.setCancelled(true);
-        }
-    }
-
-    /*
-     * Removes arrows when they hit the ground, or a player
-     */
-    @EventHandler
-    public void onArrowHit(ProjectileHitEvent event) {
-        if (event.getEntity() instanceof Arrow arrow) {
-            arrow.remove();
         }
     }
 

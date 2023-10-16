@@ -75,6 +75,11 @@ public class AllySubCommand extends ClanSubCommand {
             return;
         }
 
+        if(clan.isEnemy(targetClan)) {
+            UtilMessage.message(player, "Clans", "You cannot ally with a clan you are at war with.");
+            return;
+        }
+
         int ownSquadSize = clan.getSquadCount();
         if (ownSquadSize + targetClan.getMembers().size() >= maxClanMembers) {
             UtilMessage.message(player, "Clans", "Your clan has too many members / allies to ally another clan.");

@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.framework.customtypes.IMapListener;
 import me.mykindos.betterpvp.core.framework.events.scoreboard.ScoreboardUpdateEvent;
 import me.mykindos.betterpvp.core.framework.inviting.Invitable;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
@@ -20,10 +21,18 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Data
@@ -35,12 +44,15 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
     private boolean admin;
     private boolean safe;
     private boolean online;
+    private ItemStack banner = new ItemStack(Material.WHITE_BANNER);
 
     private List<ClanMember> members = new ArrayList<>();
     private List<ClanAlliance> alliances = new ArrayList<>();
     private List<ClanEnemy> enemies = new ArrayList<>();
     private List<ClanTerritory> territory = new ArrayList<>();
     private List<Insurance> insurance = Collections.synchronizedList(new ArrayList<>());
+
+    private BukkitTask tntRecoveryRunnable = null;
 
     public long getTimeCreated() {
         return (long) getProperty(ClanProperty.TIME_CREATED).orElse(0);
@@ -72,7 +84,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
     }
 
     public boolean isNoDominanceCooldownActive() {
-        return getNoDominanceCooldown() - System.currentTimeMillis() <= 0;
+        return (getNoDominanceCooldown() - System.currentTimeMillis() >= 0);
     }
 
     public long getLastTntedTime() {
@@ -85,6 +97,10 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
 
     public void setBalance(int balance) {
         putProperty(ClanProperty.BALANCE, balance);
+    }
+
+    public void setEnergy(int energy) {
+        putProperty(ClanProperty.ENERGY, energy);
     }
 
     public Optional<ClanMember> getLeader() {
@@ -158,48 +174,32 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
         return getEnemies().stream().anyMatch(enemy -> enemy.getClan().getEnemy(this).orElseThrow().getDominance() >= 90);
     }
 
+    public int getOnlineEnemyCount() {
+        int onlineCount = 0;
+        List<ClanEnemy> enemies = getEnemies();
 
-    public String getDominanceString(IClan clan) {
-        Optional<ClanEnemy> enemyOptional = getEnemy(clan);
-        Optional<ClanEnemy> theirEnemyOptional = clan.getEnemy(this);
-        if (enemyOptional.isPresent() && theirEnemyOptional.isPresent()) {
-
-            ClanEnemy enemy = enemyOptional.get();
-            ClanEnemy theirEnemy = theirEnemyOptional.get();
-
-            String text;
-            if (enemy.getDominance() > 0) {
-                text = "<green>" + enemy.getDominance() + "%";
-            } else if (theirEnemy.getDominance() > 0) {
-                text = "<red>" + theirEnemy.getDominance() + "%";
-            } else {
-                return "";
+        for (ClanEnemy enemy : enemies) {
+            if (enemy.getClan().isOnline()) {
+                onlineCount++;
             }
-            return "<gray> (" + text + "<gray>)";
         }
-        return "";
+
+        return onlineCount;
     }
 
-    public Component getSimpleDominanceString(IClan clan) {
-        Optional<ClanEnemy> enemyOptional = getEnemy(clan);
-        Optional<ClanEnemy> theirEnemyOptional = clan.getEnemy(this);
-        if (enemyOptional.isPresent() && theirEnemyOptional.isPresent()) {
+    public int getOnlineAllyCount() {
+        int onlineCount = 0;
+        List<ClanAlliance> alliances = getAlliances();
 
-            ClanEnemy enemy = enemyOptional.get();
-            ClanEnemy theirEnemy = theirEnemyOptional.get();
-
-            if (theirEnemy.getDominance() == 0 && enemy.getDominance() == 0) {
-                return Component.text(" 0", NamedTextColor.WHITE);
+        for (ClanAlliance alliance : alliances) {
+            if (alliance.getClan().isOnline()) {
+                onlineCount++;
             }
-            if (theirEnemy.getDominance() > 0) {
-                return Component.text(" " + theirEnemy.getDominance() + "%", NamedTextColor.GREEN);
-            } else {
-                return Component.text(" " + enemy.getDominance() + "%", NamedTextColor.RED);
-            }
-
         }
-        return Component.empty();
+
+        return onlineCount;
     }
+
 
     /**
      * Send message to all online clan members
@@ -221,6 +221,23 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
         });
     }
 
+    public void clanChat(Player player, String message) {
+        String playerName = UtilFormat.spoofNameForLunar(player.getName());
+        String messageToSend = "<aqua>" + playerName + " <dark_aqua>" + message;
+        messageClan(messageToSend, null, false);
+    }
+
+    public void allyChat(Player player, String message) {
+        String playerName = UtilFormat.spoofNameForLunar(player.getName());
+        String messageToSend = "<dark_green>" + playerName + " <green>" + message;
+
+        getAlliances().forEach(alliance -> {
+            alliance.getClan().messageClan(messageToSend, null, false);
+        });
+
+        messageClan(messageToSend, null, false);
+    }
+
     public String getEnergyTimeRemaining() {
 
         if (getTerritory().isEmpty()) {
@@ -232,6 +249,22 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
 
     public double getEnergyRatio() {
         return getEnergy() / (float) (getTerritory().size() * 25);
+    }
+
+    public ClanRelation getRelation(@Nullable Clan targetClan) {
+        if (targetClan == null) {
+            return ClanRelation.NEUTRAL;
+        }
+
+        if (targetClan.equals(this)) {
+            return ClanRelation.SELF;
+        } else if (targetClan.isAllied(this)) {
+            return ClanRelation.ALLY;
+        } else if (targetClan.isEnemy(this)) {
+            return ClanRelation.ENEMY;
+        }
+
+        return ClanRelation.NEUTRAL;
     }
 
     @Override

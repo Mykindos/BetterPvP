@@ -69,7 +69,7 @@ public class ClanHelpSubCommand extends ClanSubCommand {
 
 
 
-        Component component = Component.text("Help ", NamedTextColor.YELLOW);
+        Component component = UtilMessage.deserialize("<yellow>Help<grey>: ");
 
         if (!commandName.isEmpty()){
             Optional<ICommand> subCommandOptional = clanCommand.getSubCommand(commandName);
@@ -91,8 +91,12 @@ public class ClanHelpSubCommand extends ClanSubCommand {
             int start = (pageNumber - 1) * numPerPage;
             int end = start + numPerPage;
             int size = clanSubCommands.size();
+            int totalPages = size /numPerPage;
+            if (size % numPerPage > 0) {
+                totalPages++;
+            }
 
-            component = component.append(Component.text(pageNumber, NamedTextColor.YELLOW));
+            component = component.append(UtilMessage.deserialize("<white>" + pageNumber + "<gray> / <white>" + totalPages));
 
             if (start <= size) {
                 if (end > size) end = size;
@@ -113,7 +117,7 @@ public class ClanHelpSubCommand extends ClanSubCommand {
         Component component = Component.empty().appendNewline();
         NamedTextColor color = (command.requiresServerAdmin() ? NamedTextColor.RED : NamedTextColor.YELLOW);
         if (!command.requiresServerAdmin() || client.hasRank(Rank.ADMIN)) {
-            component = component.append(Component.text(command.getName(), color).append(Component.text(": ", color))
+            component = component.append(Component.text("/c " + command.getName(), color).append(Component.text(": ", color))
                     .append(Component.text(command.getDescription(), NamedTextColor.GRAY)));
         }
         return component;

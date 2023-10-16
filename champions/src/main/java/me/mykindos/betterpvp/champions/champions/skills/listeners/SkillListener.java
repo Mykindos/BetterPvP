@@ -13,7 +13,7 @@ import me.mykindos.betterpvp.champions.champions.roles.events.RoleChangeEvent;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.champions.champions.skills.types.*;
-import me.mykindos.betterpvp.champions.energy.EnergyHandler;
+import me.mykindos.betterpvp.core.energy.EnergyHandler;
 import me.mykindos.betterpvp.core.components.champions.ISkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -78,9 +78,19 @@ public class SkillListener implements Listener {
             return;
         }
 
-        if (skill instanceof CooldownSkill cooldownSkill) {
+        if (skill instanceof CooldownSkill cooldownSkill && !(skill instanceof PrepareArrowSkill)) {
             if (!cooldownManager.use(player, skill.getName(), cooldownSkill.getCooldown(level),
                     cooldownSkill.showCooldownFinished(), true, cooldownSkill.isCancellable(), cooldownSkill::shouldDisplayActionBar)) {
+                event.setCancelled(true);
+                return;
+            }
+        } else if (skill instanceof PrepareArrowSkill) {
+            if (cooldownManager.hasCooldown(player, skill.getName())) {
+
+                if (((PrepareArrowSkill) skill).showCooldownFinished()) {
+                    UtilMessage.simpleMessage(player, "Cooldown", "You cannot use <alt>%s</alt> for <alt>%s</alt> seconds.", skill.getName(),
+                            Math.max(0, cooldownManager.getAbilityRecharge(player, skill.getName()).getRemaining()));
+                }
                 event.setCancelled(true);
                 return;
             }
@@ -169,7 +179,6 @@ public class SkillListener implements Listener {
         }
 
         if (UtilBlock.usable(event.getClickedBlock())) return;
-
 
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             Block block = event.getClickedBlock();

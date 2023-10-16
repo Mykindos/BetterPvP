@@ -3,10 +3,12 @@ package me.mykindos.betterpvp.core.utilities;
 import com.google.gson.Gson;
 import io.lumine.mythic.bukkit.utils.shadows.nbt.NBTTagCompound;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_20_R2.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -15,6 +17,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class UtilItem {
 
@@ -49,7 +52,7 @@ public class UtilItem {
         im.displayName(Component.text(name));
         if (lore != null) {
             List<Component> components = new ArrayList<>();
-            for(String loreEntry : lore){
+            for (String loreEntry : lore) {
                 components.add(Component.text(loreEntry));
             }
             im.lore(components);
@@ -73,7 +76,7 @@ public class UtilItem {
         ItemMeta im = item.getItemMeta();
         im.displayName(name);
         if (lore != null) {
-            im.lore(lore);
+            im.lore(removeItalic(lore));
         }
 
         im.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ITEM_SPECIFICS);
@@ -99,6 +102,22 @@ public class UtilItem {
     }
 
     /**
+     * Removes Enchants from an ItemStack (e.g. the `Sharpness iV` that is visible
+     * on a diamond sword's lore)
+     *
+     * @param item ItemStack to update
+     * @return Returns an itemstack without its attributes
+     */
+    public static ItemStack removeEnchants(ItemStack item) {
+        for (Map.Entry<Enchantment, Integer> entry : item.getEnchantments().entrySet()) {
+            item.removeEnchantment(entry.getKey());
+        }
+
+
+        return item;
+    }
+
+    /**
      * Add the 'enchanted' glowing effect to any ItemStack
      *
      * @param item Item to update
@@ -108,7 +127,7 @@ public class UtilItem {
     public static ItemStack addGlow(ItemStack item) {
         ItemMeta itemMeta = item.getItemMeta();
         Enchantment enchantment = Enchantment.getByName("Glow");
-        if(enchantment != null) {
+        if (enchantment != null) {
             itemMeta.addEnchant(enchantment, 1, true);
         }
 
@@ -220,5 +239,35 @@ public class UtilItem {
 
         return -1;
     }
-    
+
+    /**
+     * Create a simple ItemStack with a specific model
+     * @param material The material
+     * @param customModelData The model ID
+     * @return The ItemStack
+     */
+    public static ItemStack createItemStack(Material material, int amount, int customModelData) {
+        var itemStack = new ItemStack(material, amount);
+        if(customModelData > 0) {
+            var itemMeta = itemStack.getItemMeta();
+            itemMeta.setCustomModelData(customModelData);
+            itemStack.setItemMeta(itemMeta);
+        }
+
+        return itemStack;
+    }
+
+    public static ItemStack createItemStack(Material material, int customModelData) {
+        return createItemStack(material, 1, customModelData);
+    }
+
+    // Create a function to remove TextDecoration.ITALIC from List<Component>
+    public static List<Component> removeItalic(List<Component> components) {
+        List<Component> newComponents = new ArrayList<>();
+        for (Component component : components) {
+            newComponents.add(component.decoration(TextDecoration.ITALIC, false));
+        }
+        return newComponents;
+    }
+
 }

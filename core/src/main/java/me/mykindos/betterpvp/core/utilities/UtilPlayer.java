@@ -10,9 +10,7 @@ import lombok.SneakyThrows;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -24,6 +22,21 @@ import java.util.List;
 
 public class UtilPlayer {
 
+    public static void setWarningEffect(Player player, int warningDelaySeconds) {
+        final WorldBorder curBorder = player.getWorld().getWorldBorder();
+        final WorldBorder newWorldBorder = Bukkit.getServer().createWorldBorder();
+        newWorldBorder.setCenter(curBorder.getCenter());
+        newWorldBorder.setSize(curBorder.getSize());
+        newWorldBorder.setWarningDistance((int) curBorder.getMaxSize());
+        newWorldBorder.setDamageAmount(0);
+        newWorldBorder.setDamageBuffer(0);
+        newWorldBorder.setWarningTime(warningDelaySeconds);
+        player.setWorldBorder(newWorldBorder);
+    }
+
+    public static void clearWarningEffect(Player player) {
+        player.setWorldBorder(player.getWorld().getWorldBorder());
+    }
 
     public static List<Player> getNearbyEnemies(Player player, Location location, double radius) {
         List<Player> enemies = new ArrayList<>();
@@ -86,8 +99,8 @@ public class UtilPlayer {
         if (health < 0.0D) {
             health = 0.0D;
         }
-        if (health > 20.0D) {
-            health = 20.0D;
+        if (health > UtilPlayer.getMaxHealth(player)) {
+            health = UtilPlayer.getMaxHealth(player);
         }
         player.setHealth(health);
     }
@@ -101,7 +114,7 @@ public class UtilPlayer {
     }
 
     @SneakyThrows
-    public static void setGlowing(Player player, Player target, boolean glowing) {
+    public static void setGlowing(Player player, Entity target, boolean glowing) {
         PacketContainer packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.ENTITY_METADATA);
         packet.getIntegers().write(0, target.getEntityId()); //Set packet's entity id
         WrappedDataWatcher watcher = new WrappedDataWatcher(); //Create data watcher, the Entity Metadata packet requires this
@@ -132,5 +145,4 @@ public class UtilPlayer {
         packet.getDataValueCollectionModifier().write(0, wrappedDataValueList);
         ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet);
     }
-
 }

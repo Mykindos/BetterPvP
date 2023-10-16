@@ -39,7 +39,7 @@ public class GamerListener implements Listener {
         this.gamerManager = gamerManager;
     }
 
-    @UpdateEvent
+    @UpdateEvent (isAsync = true)
     public void onUpdate() {
         for(Player player : Bukkit.getOnlinePlayers()){
             gamerManager.getObject(player.getUniqueId()).ifPresent(gamer -> {
@@ -90,6 +90,11 @@ public class GamerListener implements Listener {
         Optional<Boolean> tipsOptional = gamer.getProperty(GamerProperty.TIPS_ENABLED);
         if(tipsOptional.isEmpty()){
             gamer.saveProperty(GamerProperty.TIPS_ENABLED, true);
+        }
+
+        Optional<Boolean> clanMenuOptional = gamer.getProperty(GamerProperty.CLAN_MENU_ENABLED);
+        if(clanMenuOptional.isEmpty()){
+            gamer.saveProperty(GamerProperty.CLAN_MENU_ENABLED, true);
         }
     }
 

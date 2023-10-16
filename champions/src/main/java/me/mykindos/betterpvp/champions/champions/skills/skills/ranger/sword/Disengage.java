@@ -51,7 +51,7 @@ public class Disengage extends PrepareSkill implements CooldownSkill {
         return new String[]{
                 "Right click with a Sword to prepare",
                 "",
-                "If you are attacked within <val>" + (level * 0.5) + "</val> seconds",
+                "If you are attacked within <stat>1</stat> second",
                 "you successfully disengage, leaping backwards",
                 "and giving your attacker <effect>Slowness IV</effect> for",
                 "<val>" + (baseSlowDuration + level) + "</val> seconds",
@@ -104,7 +104,7 @@ public class Disengage extends PrepareSkill implements CooldownSkill {
 
     @Override
     public void activate(Player player, int level) {
-        disengages.put(player, (long) (System.currentTimeMillis() + ((0 + (level * 0.5)) * 1000L)));
+        disengages.put(player, System.currentTimeMillis() + 1000L);
 
     }
 

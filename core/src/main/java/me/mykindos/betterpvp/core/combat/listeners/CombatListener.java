@@ -1,32 +1,46 @@
 package me.mykindos.betterpvp.core.combat.listeners;
 
 import lombok.extern.slf4j.Slf4j;
-import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.combat.adapters.CustomDamageAdapter;
 import me.mykindos.betterpvp.core.combat.armour.ArmourManager;
 import me.mykindos.betterpvp.core.combat.data.DamageData;
-import me.mykindos.betterpvp.core.combat.events.*;
+import me.mykindos.betterpvp.core.combat.events.CustomDamageDurabilityEvent;
+import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.CustomDamageReductionEvent;
+import me.mykindos.betterpvp.core.combat.events.CustomKnockbackEvent;
+import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.log.DamageLog;
 import me.mykindos.betterpvp.core.combat.log.DamageLogManager;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.*;
+import me.mykindos.betterpvp.core.utilities.UtilDamage;
+import me.mykindos.betterpvp.core.utilities.UtilPlayer;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.entity.*;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Arrow;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.EvokerFangs;
+import org.bukkit.entity.FishHook;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -36,28 +50,25 @@ import java.util.List;
 @BPvPListener
 public class CombatListener implements Listener {
 
-    private final Core core;
     private final List<DamageData> damageDataList;
     private final GamerManager gamerManager;
     private final ArmourManager armourManager;
     private final DamageLogManager damageLogManager;
 
-    private final boolean isMythicMobsEnabled;
-    private CustomDamageAdapter customDamageAdapter;
-
+    private final List<CustomDamageAdapter> customDamageAdapters;
 
     @Inject
-    public CombatListener(Core core, GamerManager gamerManager, ArmourManager armourManager, DamageLogManager damageLogManager) {
-        this.core = core;
+    public CombatListener(GamerManager gamerManager, ArmourManager armourManager, DamageLogManager damageLogManager) {
         this.gamerManager = gamerManager;
         this.armourManager = armourManager;
         this.damageLogManager = damageLogManager;
         damageDataList = new ArrayList<>();
-        this.isMythicMobsEnabled = Bukkit.getPluginManager().getPlugin("MythicMobs") != null;
+        customDamageAdapters = new ArrayList<>();
 
+        boolean isMythicMobsEnabled = Bukkit.getPluginManager().getPlugin("MythicMobs") != null;
         try {
             if (isMythicMobsEnabled) {
-                customDamageAdapter = (CustomDamageAdapter) Class.forName("me.mykindos.betterpvp.core.combat.listeners.mythicmobs.MythicMobsAdapter").getDeclaredConstructor().newInstance();
+                customDamageAdapters.add((CustomDamageAdapter) Class.forName("me.mykindos.betterpvp.core.combat.listeners.mythicmobs.MythicMobsAdapter").getDeclaredConstructor().newInstance());
             }
         } catch (Exception ex) {
             log.warn("Could not find MythicMobs plugin, adapter not loaded");
@@ -66,6 +77,11 @@ public class CombatListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void damageEvent(CustomDamageEvent event) {
+
+        if(event.getForceDamageDelay() != 0 && event.isCancelled()) {
+            String damagerUuid = event.getDamager() == null ? null : event.getDamager().getUniqueId().toString();
+            damageDataList.add(new DamageData(event.getDamagee().getUniqueId().toString(), event.getCause(), damagerUuid, event.getForceDamageDelay()));
+        }
 
         if (event.isCancelled()) {
             return;
@@ -88,39 +104,44 @@ public class CombatListener implements Listener {
         if (event.getDamagee().getHealth() > 0) {
             if (event.getDamage() >= 0) {
 
-                damageDataList.add(new DamageData(event.getDamagee().getUniqueId().toString(), event.getCause(), event.getDamageDelay()));
+                String damagerUuid = event.getDamager() == null ? null : event.getDamager().getUniqueId().toString();
 
-                if (isMythicMobsEnabled) {
-                    customDamageAdapter.processKnockbackAdapter(event, false);
-                }
+                damageDataList.add(new DamageData(event.getDamagee().getUniqueId().toString(), event.getCause(), damagerUuid, event.getDamageDelay()));
 
                 if (event.isKnockback()) {
                     if (event.getDamager() != null) {
-                        CustomKnockbackEvent cke = new CustomKnockbackEvent(event.getDamagee(), event.getDamager(), event.getDamage(), event);
-                        Bukkit.getPluginManager().callEvent(cke);
+                        CustomKnockbackEvent cke = UtilServer.callEvent(new CustomKnockbackEvent(event.getDamagee(), event.getDamager(), event.getDamage(), event));
+                        if (!cke.isCancelled()) {
+                            applyKB(cke);
+                        }
                     }
                 }
 
-                CustomDamageReductionEvent customDamageReductionEvent = new CustomDamageReductionEvent(event, event.getDamage());
-                UtilServer.callEvent(customDamageReductionEvent);
+                CustomDamageReductionEvent customDamageReductionEvent = UtilServer.callEvent(new CustomDamageReductionEvent(event, event.getDamage()));
+                customDamageReductionEvent.setDamage(armourManager.getDamageReduced(event.getDamage(), event.getDamagee()));
 
-                double damage = event.isIgnoreArmour() ? event.getDamage() : customDamageReductionEvent.getDamage();
+                event.setRawDamage(event.getDamage());
+                event.setDamage(event.isIgnoreArmour() ? event.getDamage() : customDamageReductionEvent.getDamage());
 
-                if (isMythicMobsEnabled) {
-                    if (customDamageAdapter.processCustomDamageAdapter(event, damage)) {
-                        finalizeDamage(event, damage);
+                for (CustomDamageAdapter adapter : customDamageAdapters) {
+                    if (!adapter.isValid(event)) {
+                        continue;
+                    }
+
+                    if (adapter.processCustomDamageAdapter(event)) {
+                        finalizeDamage(event);
                         return;
                     }
                 }
 
                 playDamageEffect(event);
-                finalizeDamage(event, damage);
+                finalizeDamage(event);
             }
         }
 
     }
 
-    private void finalizeDamage(CustomDamageEvent event, double damage) {
+    private void finalizeDamage(CustomDamageEvent event) {
         updateDurability(event);
 
         if (!event.getDamagee().isDead()) {
@@ -128,41 +149,40 @@ public class CombatListener implements Listener {
             if (event.getDamagee() instanceof Player player) {
                 if (player.getInventory().getItemInMainHand().getType() == Material.BOOK) {
                     player.sendMessage("");
-                    player.sendMessage("Damage: " + event.getDamage());
-                    player.sendMessage("Damage Reduced: " + damage);
+                    player.sendMessage("Initial Damage: " + event.getRawDamage());
+                    player.sendMessage("Damage after reduction: " + event.getDamage());
                     player.sendMessage("Delay: " + event.getDamageDelay());
                     player.sendMessage("Cause: " + event.getCause().name());
 
                 }
             }
 
-            processDamageData(event, damage);
+            processDamageData(event);
 
-            if (event.getDamagee().getHealth() - damage < 1.0) {
+            if (event.getDamagee().getHealth() - event.getDamage() < 1.0) {
                 event.getDamagee().setHealth(0);
             } else {
-                event.getDamagee().setHealth(event.getDamagee().getHealth() - damage);
+                event.getDamagee().setHealth(event.getDamagee().getHealth() - event.getDamage());
             }
-
 
         }
     }
 
-    private void processDamageData(CustomDamageEvent event, double damage) {
+    private void processDamageData(CustomDamageEvent event) {
         if (event.getDamagee() instanceof Player damagee) {
             gamerManager.getObject(damagee.getUniqueId()).ifPresent(gamer -> {
                 gamer.setLastDamaged(System.currentTimeMillis());
-                gamer.saveProperty(GamerProperty.DAMAGE_TAKEN, damage);
+                gamer.saveProperty(GamerProperty.DAMAGE_TAKEN, (double) gamer.getProperty(GamerProperty.DAMAGE_TAKEN).orElse(0D) + event.getDamage());
             });
         }
 
         if (event.getDamager() instanceof Player damager) {
             gamerManager.getObject(damager.getUniqueId()).ifPresent(gamer -> {
-                gamer.saveProperty(GamerProperty.DAMAGE_DEALT, damage);
+                gamer.saveProperty(GamerProperty.DAMAGE_DEALT, (double) gamer.getProperty(GamerProperty.DAMAGE_DEALT).orElse(0D) + event.getDamage());
             });
         }
 
-        DamageLog damageLog = new DamageLog(event.getDamager(), event.getCause(), damage, event.getReason());
+        DamageLog damageLog = new DamageLog(event.getDamager(), event.getCause(), event.getDamage(), event.getReason());
         damageLogManager.add(event.getDamagee(), damageLog);
     }
 
@@ -170,10 +190,17 @@ public class CombatListener implements Listener {
     public void onPreDamage(PreCustomDamageEvent event) {
         CustomDamageEvent cde = event.getCustomDamageEvent();
 
-        if(isMythicMobsEnabled) {
-            if(!customDamageAdapter.processPreCustomDamage(cde)) {
+        for (CustomDamageAdapter adapter : customDamageAdapters) {
+            if (!adapter.isValid(event.getCustomDamageEvent())) {
+
+                continue;
+            }
+
+            if (!adapter.processPreCustomDamage(event.getCustomDamageEvent())) {
+                event.setCancelled(true);
                 return;
             }
+            break;
         }
 
         if (cde.getDamager() != null) {
@@ -188,7 +215,7 @@ public class CombatListener implements Listener {
             return;
         }
 
-        if (hasDamageData(cde.getDamagee().getUniqueId().toString(), cde.getCause())) {
+        if (hasDamageData(cde.getDamagee(), cde.getCause(), cde.getDamager())) {
             event.setCancelled(true);
             return;
         }
@@ -306,9 +333,7 @@ public class CombatListener implements Listener {
         event.setDamage(knockback);
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onFinalKB(CustomKnockbackEvent event) {
-
+    public void applyKB(CustomKnockbackEvent event) {
         double knockback = event.getDamage();
         if (knockback < 2.0D && !event.isCanBypassMinimum()) knockback = 2.0D;
         knockback = Math.log10(knockback);
@@ -317,9 +342,8 @@ public class CombatListener implements Listener {
         trajectory.multiply(0.6D * knockback);
         trajectory.setY(Math.abs(trajectory.getY()));
 
-        if (event.getCustomDamageEvent().getProjectile() != null)
-        {
-            trajectory =event.getCustomDamageEvent().getProjectile().getVelocity();
+        if (event.getCustomDamageEvent().getProjectile() != null) {
+            trajectory = event.getCustomDamageEvent().getProjectile().getVelocity();
             trajectory.setY(0);
             trajectory.multiply(0.37 * knockback / trajectory.length());
             trajectory.setY(0.06);
@@ -331,20 +355,24 @@ public class CombatListener implements Listener {
                 trajectory, velocity, false, 0.0D, Math.abs(0.2D * knockback), 0.4D + (0.04D * knockback), true);
     }
 
-
-
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onDamageReduction(CustomDamageReductionEvent event) {
-        event.setDamage(armourManager.getDamageReduced(event.getDamage(), event.getCustomDamageEvent().getDamagee()));
-    }
-
     @UpdateEvent
     public void delayUpdater() {
         damageDataList.removeIf(damageData -> UtilTime.elapsed(damageData.getTimeOfDamage(), damageData.getDamageDelay()));
     }
 
-    public boolean hasDamageData(String uuid, EntityDamageEvent.DamageCause cause) {
-        return damageDataList.stream().anyMatch(damageData -> damageData.getUuid().equalsIgnoreCase(uuid) && damageData.getCause() == cause);
+    public boolean hasDamageData(LivingEntity damagee, EntityDamageEvent.DamageCause cause, @Nullable LivingEntity damager) {
+        return damageDataList.stream().anyMatch(damageData -> {
+            if (damageData.getUuid().equalsIgnoreCase(damagee.getUniqueId().toString())
+                    && damageData.getCause() == cause) {
+                if (damager == null) {
+                    return true;
+                } else {
+                    return damageData.getDamager().equalsIgnoreCase(damager.getUniqueId().toString());
+                }
+            }
+
+            return false;
+        });
     }
 
     private Projectile getProjectile(EntityDamageEvent event) {
@@ -382,7 +410,7 @@ public class CombatListener implements Listener {
     }
 
     private void playDamageEffect(CustomDamageEvent event) {
-        event.getDamagee().playHurtAnimation(0);
+        event.getDamagee().playHurtAnimation(270);
         if (event.getProjectile() instanceof Arrow) {
             if (event.getDamager() instanceof Player player) {
 
@@ -478,18 +506,6 @@ public class CombatListener implements Listener {
     public void onFireDamage(CustomDamageEvent event) {
         if (event.getCause() == EntityDamageEvent.DamageCause.FIRE_TICK) {
             event.setIgnoreArmour(true);
-        }
-    }
-
-    /**
-     * Disable bow critical hits
-     *
-     * @param event The event
-     */
-    @EventHandler
-    public void onShootBow(EntityShootBowEvent event) {
-        if (event.getProjectile() instanceof Arrow arrow) {
-            arrow.setCritical(false);
         }
     }
 

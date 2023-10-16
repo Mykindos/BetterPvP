@@ -3,11 +3,19 @@ package me.mykindos.betterpvp.core.gamer;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
+import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 import me.mykindos.betterpvp.core.gamer.repository.GamerRepository;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Singleton
 public class GamerManager extends Manager<Gamer> {
@@ -29,6 +37,20 @@ public class GamerManager extends Manager<Gamer> {
      */
     public Optional<Gamer> getGamerByName(String name) {
         return objects.values().stream().filter(gamer -> gamer.getClient().getName().equalsIgnoreCase(name)).findFirst();
+    }
+
+    public List<Gamer> getGamersOfRank(Rank rank) {
+        return objects.values().stream().filter(gamer -> gamer.getClient().hasRank(rank)).toList();
+    }
+
+    public void sendMessageToRank(String prefix, Component message, Rank rank) {
+        List<Gamer> gamerList = getGamersOfRank(rank);
+        gamerList.forEach(gamer -> {
+            Player player = Bukkit.getPlayer(UUID.fromString(gamer.getUuid()));
+            if (player != null) {
+                UtilMessage.message(player, prefix, message);
+            }
+        });
     }
 
     @Override

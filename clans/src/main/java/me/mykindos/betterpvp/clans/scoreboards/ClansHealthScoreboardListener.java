@@ -28,7 +28,7 @@ public class ClansHealthScoreboardListener implements Listener {
         }
     }
 
-    @UpdateEvent(delay=200)
+    @UpdateEvent(delay=200, isAsync = true)
     public void updateHealth(){
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
             Objective health = onlinePlayer.getScoreboard().getObjective("healthDisplay");

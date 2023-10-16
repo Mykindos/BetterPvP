@@ -48,35 +48,38 @@ INSERT IGNORE INTO items (Material, Module, Name, ModelData, Glow, HasUUID) VALU
     ('CHAINMAIL_BOOTS', 'Champions', '<yellow>Ranger Boots', 0, 0, 0);
 
 INSERT IGNORE INTO items (Material, Module, Name, ModelData, Glow, HasUUID) VALUES
-    ('GOLDEN_HELMET', 'Champions', '<yellow>Paladin Helmet', 0, 0, 0);
+    ('GOLDEN_HELMET', 'Champions', '<yellow>Mage Helmet', 0, 0, 0);
 
 INSERT IGNORE INTO items (Material, Module, Name, ModelData, Glow, HasUUID) VALUES
-    ('GOLDEN_CHESTPLATE', 'Champions', '<yellow>Paladin Vest', 0, 0, 0);
+    ('GOLDEN_CHESTPLATE', 'Champions', '<yellow>Mage Vest', 0, 0, 0);
 
 INSERT IGNORE INTO items (Material, Module, Name, ModelData, Glow, HasUUID) VALUES
-    ('GOLDEN_LEGGINGS', 'Champions', '<yellow>Paladin Leggings', 0, 0, 0);
+    ('GOLDEN_LEGGINGS', 'Champions', '<yellow>Mage Leggings', 0, 0, 0);
 
 INSERT IGNORE INTO items (Material, Module, Name, ModelData, Glow, HasUUID) VALUES
-    ('GOLDEN_BOOTS', 'Champions', '<yellow>Paladin Boots', 0, 0, 0);
+    ('GOLDEN_BOOTS', 'Champions', '<yellow>Mage Boots', 0, 0, 0);
 
 INSERT IGNORE INTO items (Material, Module, Name, ModelData, Glow, HasUUID) VALUES
-    ('DIAMOND_HELMET', 'Champions', '<yellow>Gladiator Helmet', 0, 0, 0);
+    ('DIAMOND_HELMET', 'Champions', '<yellow>Brute Helmet', 0, 0, 0);
 
 INSERT IGNORE INTO items (Material, Module, Name, ModelData, Glow, HasUUID) VALUES
-    ('DIAMOND_CHESTPLATE', 'Champions', '<yellow>Gladiator Chestplate', 0, 0, 0);
+    ('DIAMOND_CHESTPLATE', 'Champions', '<yellow>Brute Chestplate', 0, 0, 0);
 
 INSERT IGNORE INTO items (Material, Module, Name, ModelData, Glow, HasUUID) VALUES
-    ('DIAMOND_LEGGINGS', 'Champions', '<yellow>Gladiator Leggings', 0, 0, 0);
+    ('DIAMOND_LEGGINGS', 'Champions', '<yellow>Brute Leggings', 0, 0, 0);
 
 INSERT IGNORE INTO items (Material, Module, Name, ModelData, Glow, HasUUID) VALUES
-    ('DIAMOND_BOOTS', 'Champions', '<yellow>Gladiator Boots', 0, 0, 0);
+    ('DIAMOND_BOOTS', 'Champions', '<yellow>Brute Boots', 0, 0, 0);
 
 -- Weapons
 INSERT IGNORE INTO items (Material, Module, Name, ModelData, Glow, HasUUID) VALUES
     ('GOLDEN_AXE', 'Champions', '<yellow>Booster Axe', 0, 0, 0);
 
 INSERT IGNORE INTO itemlore
-    VALUES ((SELECT id FROM items WHERE Material = 'GOLDEN_AXE' AND Module = 'Champions'), 0, '<gray>Damage: <green>5');
+    VALUES ((SELECT id FROM items WHERE Material = 'GOLDEN_AXE' AND Module = 'Champions'), 0, '<gray>Damage: <green>6');
+
+INSERT IGNORE INTO itemlore
+    VALUES ((SELECT id FROM items WHERE Material = 'GOLDEN_AXE' AND Module = 'Champions'), 1, '<gray>+1 Level to Axe Skills');
 
 INSERT IGNORE INTO items (Material, Module, Name, ModelData, Glow, HasUUID) VALUES
     ('GOLDEN_SWORD', 'Champions', '<yellow>Booster Sword', 0, 0, 0);
@@ -84,41 +87,38 @@ INSERT IGNORE INTO items (Material, Module, Name, ModelData, Glow, HasUUID) VALU
 INSERT IGNORE INTO itemlore
     VALUES ((SELECT id FROM items WHERE Material = 'GOLDEN_SWORD' AND Module = 'Champions'), 0, '<gray>Damage: <green>6');
 
+INSERT IGNORE INTO itemlore
+    VALUES ((SELECT id FROM items WHERE Material = 'GOLDEN_SWORD' AND Module = 'Champions'), 1, '<gray>+1 Level to Sword Skills');
+
 INSERT IGNORE INTO items (Material, Module, Name, ModelData, Glow, HasUUID) VALUES
     ('IRON_SWORD', 'Champions', '<yellow>Standard Sword', 0, 0, 0);
 
 INSERT IGNORE INTO itemlore
-    VALUES ((SELECT id FROM items WHERE Material = 'IRON_SWORD' AND Module = 'Champions'), 0, '<gray>Damage: <green>4.5');
+    VALUES ((SELECT id FROM items WHERE Material = 'IRON_SWORD' AND Module = 'Champions'), 0, '<gray>Damage: <green>6');
 
 INSERT IGNORE INTO items (Material, Module, Name, ModelData, Glow, HasUUID) VALUES
     ('IRON_AXE', 'Champions', '<yellow>Standard Axe', 0, 0, 0);
 
 INSERT IGNORE INTO itemlore
-    VALUES ((SELECT id FROM items WHERE Material = 'IRON_AXE' AND Module = 'Champions'), 0, '<gray>Damage: <green>3');
+    VALUES ((SELECT id FROM items WHERE Material = 'IRON_AXE' AND Module = 'Champions'), 0, '<gray>Damage: <green>6');
 
 INSERT IGNORE INTO items (Material, Module, Name, ModelData, Glow, HasUUID) VALUES
     ('DIAMOND_SWORD', 'Champions', '<yellow>Power Sword', 0, 0, 0);
 
 INSERT IGNORE INTO itemlore
-    VALUES ((SELECT id FROM items WHERE Material = 'DIAMOND_SWORD' AND Module = 'Champions'), 0, '<gray>Damage: <green>5');
-
-INSERT IGNORE INTO itemlore
-    VALUES ((SELECT id FROM items WHERE Material = 'DIAMOND_SWORD' AND Module = 'Champions'), 1, '<gray>+1 Level to Sword Skills');
+    VALUES ((SELECT id FROM items WHERE Material = 'DIAMOND_SWORD' AND Module = 'Champions'), 0, '<gray>Damage: <green>7');
 
 INSERT IGNORE INTO items (Material, Module, Name, ModelData, Glow, HasUUID) VALUES
     ('DIAMOND_AXE', 'Champions', '<yellow>Power Axe', 0, 0, 0);
 
 INSERT IGNORE INTO itemlore
-    VALUES ((SELECT id FROM items WHERE Material = 'DIAMOND_AXE' AND Module = 'Champions'), 0, '<gray>Damage: <green>4');
-
-INSERT IGNORE INTO itemlore
-    VALUES ((SELECT id FROM items WHERE Material = 'DIAMOND_AXE' AND Module = 'Champions'), 1, '<gray>+1 Level to Axe Skills');
+    VALUES ((SELECT id FROM items WHERE Material = 'DIAMOND_AXE' AND Module = 'Champions'), 0, '<gray>Damage: <green>7');
 
 INSERT IGNORE INTO items (Material, Module, Name, ModelData, Glow, HasUUID) VALUES
     ('NETHERITE_SWORD', 'Champions', '<yellow>Ancient Sword', 0, 0, 0);
 
 INSERT IGNORE INTO itemlore
-    VALUES ((SELECT id FROM items WHERE Material = 'NETHERITE_SWORD' AND Module = 'Champions'), 0, '<gray>Damage: <green>6');
+    VALUES ((SELECT id FROM items WHERE Material = 'NETHERITE_SWORD' AND Module = 'Champions'), 0, '<gray>Damage: <green>7');
 
 INSERT IGNORE INTO itemlore
     VALUES ((SELECT id FROM items WHERE Material = 'NETHERITE_SWORD' AND Module = 'Champions'), 1, '<gray>+1 Level to Sword Skills');
@@ -127,11 +127,23 @@ INSERT IGNORE INTO items (Material, Module, Name, ModelData, Glow, HasUUID) VALU
     ('NETHERITE_AXE', 'Champions', '<yellow>Ancient Axe', 0, 0, 0);
 
 INSERT IGNORE INTO itemlore
-    VALUES ((SELECT id FROM items WHERE Material = 'NETHERITE_AXE' AND Module = 'Champions'), 0, '<gray>Damage: <green>5');
+    VALUES ((SELECT id FROM items WHERE Material = 'NETHERITE_AXE' AND Module = 'Champions'), 0, '<gray>Damage: <green>7');
 
 INSERT IGNORE INTO itemlore
     VALUES ((SELECT id FROM items WHERE Material = 'NETHERITE_AXE' AND Module = 'Champions'), 1, '<gray>+1 Level to Axe Skills');
 
+
+INSERT IGNORE INTO items (Material, Module, Name, ModelData, Glow, HasUUID) VALUES
+    ('STONE_SWORD', 'Champions', '<yellow>Basic Sword', 0, 0, 0);
+
+INSERT IGNORE INTO itemlore
+    VALUES ((SELECT id FROM items WHERE Material = 'STONE_SWORD' AND Module = 'Champions'), 0, '<gray>Damage: <green>5');
+
+INSERT IGNORE INTO items (Material, Module, Name, ModelData, Glow, HasUUID) VALUES
+    ('STONE_AXE', 'Champions', '<yellow>Basic Axe', 0, 0, 0);
+
+INSERT IGNORE INTO itemlore
+    VALUES ((SELECT id FROM items WHERE Material = 'STONE_AXE' AND Module = 'Champions'), 0, '<gray>Damage: <green>5');
 
 -- Tools
 

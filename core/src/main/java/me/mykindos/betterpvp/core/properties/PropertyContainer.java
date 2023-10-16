@@ -100,4 +100,12 @@ public abstract class PropertyContainer {
      * @param updateScoreboard Whether to update the property holders scoreboard.
      */
     public abstract void saveProperty(String key, Object object, boolean updateScoreboard);
+
+    /**
+     * Delete a property from the property map
+     * @param key The key of the property to remove
+     */
+    public void removeProperty(String key) {
+        properties.remove(key);
+    }
 }

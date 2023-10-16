@@ -19,7 +19,7 @@ import java.util.List;
 @BPvPListener
 public class WingsOfZanzul extends Weapon implements LegendaryWeapon, Listener {
     public WingsOfZanzul() {
-        super(Material.ELYTRA, 0, UtilMessage.deserialize("<orange>Wings of Zanzul"));
+        super(Material.ELYTRA, 1, UtilMessage.deserialize("<orange>Wings of Zanzul"));
     }
 
     @EventHandler

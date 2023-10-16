@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
 import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
 import me.mykindos.betterpvp.clans.clans.events.ChunkClaimEvent;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.config.Config;
@@ -60,10 +61,14 @@ public class ClaimSubCommand extends ClanSubCommand {
             return;
         }
 
-        if (!clan.isAdmin()) {
-            if (clan.getTerritory().size() >= clan.getMembers().size() + additionalClaims) { // Previously
+        if (clan.getTerritory().size() >= clan.getMembers().size() + additionalClaims ) {
+            if(!(clan.isAdmin() || client.isAdministrating())) {
                 UtilMessage.message(player, "Clans", "Your Clan cannot claim more Territory.");
                 return;
+            }else{
+                gamerManager.sendMessageToRank("Clans",
+                        UtilMessage.deserialize("<yellow>%s<gray> is attempting to claim territory over the limit for <yellow>%s",
+                                player.getName(), clan.getName()), Rank.HELPER);
             }
         }
 

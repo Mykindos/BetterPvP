@@ -5,6 +5,7 @@ create table if not exists ${tablePrefix}clans
     Home      varchar(64) null,
     Admin     tinyint     null default 0,
     Safe      tinyint     null default 0,
+    Banner    TEXT        null,
     constraint clans_pk
         primary key (id)
 );
@@ -66,18 +67,20 @@ create unique index ${tablePrefix}clans_enemies_Clan_EnemyClan_uindex
 
 create table if not exists ${tablePrefix}dominance_scale
 (
-    ClanSize  int not null,
-    Dominance int not null,
+    ClanSize  int    not null,
+    Dominance double not null,
     constraint ${tablePrefix}dominance_scale_pk
         primary key (ClanSize)
 );
 
-INSERT IGNORE INTO ${tablePrefix}dominance_scale VALUES (1, 4);
-INSERT IGNORE INTO ${tablePrefix}dominance_scale VALUES (2, 4);
-INSERT IGNORE INTO ${tablePrefix}dominance_scale VALUES (3, 5);
-INSERT IGNORE INTO ${tablePrefix}dominance_scale VALUES (4, 5);
-INSERT IGNORE INTO ${tablePrefix}dominance_scale VALUES (5, 6);
-INSERT IGNORE INTO ${tablePrefix}dominance_scale VALUES (6, 6);
+INSERT IGNORE INTO ${tablePrefix}dominance_scale VALUES (1, 3.5);
+INSERT IGNORE INTO ${tablePrefix}dominance_scale VALUES (2, 3.5);
+INSERT IGNORE INTO ${tablePrefix}dominance_scale VALUES (3, 4);
+INSERT IGNORE INTO ${tablePrefix}dominance_scale VALUES (4, 4);
+INSERT IGNORE INTO ${tablePrefix}dominance_scale VALUES (5, 4.5);
+INSERT IGNORE INTO ${tablePrefix}dominance_scale VALUES (6, 4.5);
+INSERT IGNORE INTO ${tablePrefix}dominance_scale VALUES (7, 5);
+INSERT IGNORE INTO ${tablePrefix}dominance_scale VALUES (8, 5);
 
 create table if not exists ${tablePrefix}insurance
 (

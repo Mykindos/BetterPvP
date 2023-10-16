@@ -25,6 +25,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.Optional;
@@ -81,6 +82,18 @@ public class ClientListener implements Listener {
     }
 
     @EventHandler
+    public void onPlayerLogin(PlayerLoginEvent event) {
+        if(event.getResult() == PlayerLoginEvent.Result.KICK_FULL || event.getResult() == PlayerLoginEvent.Result.KICK_WHITELIST) {
+            String uuid = event.getPlayer().getUniqueId().toString();
+            clientManager.getObject(uuid).ifPresent(client -> {
+                if(client.hasRank(Rank.TRIAL_MOD)) {
+                    event.allow();
+                }
+            });
+        }
+    }
+
+    @EventHandler
     public void onClientLogin(ClientLoginEvent event) {
         if (enableOldPvP) {
             AttributeInstance attribute = event.getPlayer().getAttribute(Attribute.GENERIC_ATTACK_SPEED);
@@ -117,7 +130,6 @@ public class ClientListener implements Listener {
 
     @EventHandler
     public void onLunarEvent(LunarClientEvent event) {
-        System.out.println(event.getPlayer().getName());
         Optional<Client> clientOptional = clientManager.getObject(event.getPlayer().getUniqueId().toString());
         clientOptional.ifPresent(client -> {
             client.putProperty(ClientProperty.LUNAR, event.isRegistered());

@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
 import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
 import me.mykindos.betterpvp.clans.clans.events.MemberDemoteEvent;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.gamer.Gamer;
@@ -76,6 +77,11 @@ public class DemoteSubCommand extends ClanSubCommand {
                     && !client.isAdministrating()) {
                 UtilMessage.message(player, "Clans", "You can only demote players with a lower rank.");
                 return;
+            }
+            else if (client.isAdministrating() && targetMember.getRank().getPrivilege() >= member.getRank().getPrivilege()) {
+                gamerManager.sendMessageToRank("Clans",
+                        UtilMessage.deserialize("<yellow>%s<gray> force demoted <yellow>%s", player.getName(), targetGamer.getPlayer().getName()),
+                        Rank.HELPER);
             }
 
             UtilServer.callEvent(new MemberDemoteEvent(player, clan, targetMember));

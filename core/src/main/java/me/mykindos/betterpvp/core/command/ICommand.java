@@ -51,6 +51,7 @@ public interface ICommand {
             case "POSITION_X" -> tabCompletions.add(sender instanceof Player player ? player.getLocation().getX() + "" : "0");
             case "POSITION_Y" -> tabCompletions.add(sender instanceof Player player ? player.getLocation().getY() + "" : "0");
             case "POSITION_Z" -> tabCompletions.add(sender instanceof Player player ? player.getLocation().getZ() + "" : "0");
+            case "BOOLEAN" -> tabCompletions.addAll(List.of("true", "false"));
         }
 
 
@@ -69,7 +70,8 @@ public interface ICommand {
         POSITION_X,
         POSITION_Y,
         POSITION_Z,
-        WORLD
+        WORLD,
+        BOOLEAN
     }
 
 }

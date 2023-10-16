@@ -51,6 +51,8 @@ public class MinimapRenderer extends MapRenderer implements Listener {
     @Config(path = "clans.map.maxMapDistance", defaultValue = "640")
     private int maxDistance;
 
+    private int currentInterval = 1;
+
     @Inject
     public MinimapRenderer(MapHandler mapHandler, Clans clans) {
         super(true);
@@ -99,6 +101,12 @@ public class MinimapRenderer extends MapRenderer implements Listener {
     @Override
     public void render(@NotNull MapView map, @NotNull MapCanvas canvas, @NotNull Player player) {
         if (!mapHandler.enabled) return;
+        currentInterval++;
+        if(currentInterval < mapHandler.updateInterval){
+            return;
+        }
+        currentInterval = 0;
+
         if (player.getInventory().getItemInMainHand().getType() != Material.FILLED_MAP) return;
         if (!player.getWorld().getName().equals("world")) {
             for (int x = 0; x < 128; x++) {

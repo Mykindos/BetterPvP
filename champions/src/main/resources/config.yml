@@ -11,6 +11,7 @@ skills:
       enabled: true
       cooldown: 20
       maxlevel: 3
+      damagePerSecond: 2.0
     shockingstrikes:
       enabled: true
       maxlevel: 3
@@ -76,8 +77,9 @@ skills:
     evade:
       enabled: true
       maxlevel: 5
-      cooldown: 2
-      energy: 6
+      cooldown: 15
+      duration: 1.25
+      internalCD: 1.5
   knight:
     shieldsmash:
       enabled: true
@@ -85,7 +87,7 @@ skills:
       cooldown: 15
       baseMultiplier: 1.6
     ride:
-      enabled: true
+      enabled: false
       cooldown: 30
       maxlevel: 5
       lifespan: 2.0
@@ -111,7 +113,11 @@ skills:
     riposte:
       enabled: true
       maxlevel: 3
-      cooldown: 20
+      cooldown: 12
+      duration: 1.0
+      bonusDamage: 1.0
+      healing: 1.0
+      bonusDamageDuration: 2.0
     holdposition:
       enabled: true
       maxlevel: 5
@@ -148,7 +154,7 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 10
-  paladin:
+  mage:
     staticlazer:
       enabled: true
       maxlevel: 5
@@ -166,7 +172,7 @@ skills:
       enabled: true
       cooldown: 25
       maxlevel: 5
-      radius: 5.0
+      baseRadius: 4.0
       baseHeal: 2.0
       baseDamage: 3.0
     inferno:
@@ -260,12 +266,16 @@ skills:
       enabled: true
       maxlevel: 3
       cooldown: 8
-  gladiator:
+  brute:
     battletaunt:
       enabled: true
       energy: 15
       maxlevel: 5
       cooldown: 0
+    intimidation:
+      enabled: true
+      maxlevel: 3
+      baseRadius: 3.0
     seismicslam:
       enabled: true
       maxlevel: 5
@@ -343,7 +353,7 @@ skills:
     ropedarrow:
       enabled: true
       maxlevel: 5
-      cooldown: 17
+      cooldown: 4
     levitatingshot:
       enabled: true
       maxlevel: 5
@@ -372,7 +382,7 @@ skills:
       maxConsecutiveHits: 4
     precision:
       enabled: true
-      maxlevel: 5
+      maxlevel: 3
     entangle:
       enabled: true
       maxlevel: 3
@@ -476,7 +486,7 @@ class:
     receiveKnockback: true
 chat:
   skill:
-    preview: true
+    preview: false
 command:
   kit:
     enabled: true

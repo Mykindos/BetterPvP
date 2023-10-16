@@ -18,6 +18,10 @@ public class HungerListener implements Listener {
     @EventHandler
     public void onFoodLevelChange(FoodLevelChangeEvent event) {
         if(!hungerEnabled) {
+            if(event.getEntity().getFoodLevel() != 20) {
+                event.getEntity().setFoodLevel(20);
+                event.getEntity().setSaturation(0);
+            }
             event.setCancelled(true);
         }
     }
@@ -26,6 +30,7 @@ public class HungerListener implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         if(!hungerEnabled) {
             event.getPlayer().setFoodLevel(20);
+            event.getPlayer().setSaturation(0);
         }
     }
 
