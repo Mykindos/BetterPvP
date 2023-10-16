@@ -1,7 +1,6 @@
 package me.mykindos.betterpvp.progression.progression.perks;
 
 import me.mykindos.betterpvp.core.config.Config;
-import me.mykindos.betterpvp.core.utilities.UtilMath;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 
@@ -9,12 +8,25 @@ import java.util.Random;
 
 public interface DropMultiplier {
 
-    default int getExtraDrops(double chance) {
-        int multiplier = (int) Math.floor(chance/100);
+
+    int minLevel = 0;
+
+    int maxLevel = 1000;
+
+    double increasePerLevel = 0.25;
+
+    Random RANDOM = new Random();
+
+    default int getMultiplier(double chance) {
+        int multiplier = (int) Math.nextDown(chance/100);
         double newChance = chance % 100;
-        if (UtilMath.randomInt(0, 100) < newChance) {
+        if (RANDOM.nextInt(100) < newChance) {
             multiplier++;
         }
         return multiplier;
+    }
+
+    default int getMultiplier(int level) {
+        return getMultiplier(level * increasePerLevel);
     }
 }
