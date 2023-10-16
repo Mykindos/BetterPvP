@@ -1,8 +1,10 @@
 package me.mykindos.betterpvp.progression.progression.perks;
 
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -27,12 +29,26 @@ import java.util.Objects;
 @BPvPListener
 @Singleton
 @Slf4j
-public class DropMultiplierFishingPerk implements Listener, ProgressionPerk {
+public class DropMultiplierFishingPerk implements Listener, ProgressionPerk, DropMultiplier {
 
+    @Config(path = "fishing.perks.drop-multiplier.minLevel", defaultValue = "0")
+    @Inject
+    int minLevel;
+
+    @Config(path = "fishing.perks.drop-multiplier.maxLevel", defaultValue = "1000")
+    @Inject
+    int maxLevel;
+
+    @Config(path = "fishing.perks.drop-multiplier.increasePerLevel", defaultValue = "0.25")
+    @Inject
+    double increasePerLevel;
+
+    @Inject
     private Progression progression;
 
-
+    @Inject
     private Fishing fishing;
+
 
     @Override
     public String getName() {
@@ -48,16 +64,25 @@ public class DropMultiplierFishingPerk implements Listener, ProgressionPerk {
 
     @Override
     public boolean canUse(Player player, ProgressionData<?> data) {
-        return true;
+        return minLevel <= data.getLevel() && data.getLevel() <= maxLevel;
     }
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onCatch(PlayerStopFishingEvent event) {
         if (event.getReason() != PlayerStopFishingEvent.FishingResult.CATCH) return;
-        int multiplier = 5;
-        PlayerInventory inventory = event.getPlayer().getInventory();
-        for (int i = 1; i < 5; i++) {
-            inventory.addItem(event.getLoot().processCatch(event.getPlayerFishEvent()));
-        }
+        fishing.hasPerk(event.getPlayer(), getClass()).whenComplete((hasPerk, throwable) -> {
+
+            if (hasPerk) {
+                int multiplier = getMultiplier(fishing.getLevel(event.getPlayer()));
+                PlayerInventory inventory = event.getPlayer().getInventory();
+                for (int i = 0; i < multiplier; i++) {
+                    inventory.addItem(event.getLoot().processCatch(event.getPlayerFishEvent()));
+                }
+            }
+        }).exceptionally(throwable -> {
+            log.error("Failed to check if player " + event.getPlayer().getName() + " has perk " + getName(), throwable);
+            return null;
+        });
+
     }
 }

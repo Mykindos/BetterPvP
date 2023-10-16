@@ -45,6 +45,14 @@ public abstract class ProgressionTree implements ConfigAccessor {
         }).thenApply(data -> result);
     }
 
+    public final int getLevel(Player player) {
+        final int[] level = {0};
+        getStatsRepository().getDataAsync(player).whenComplete((data, throwable) -> {
+            level[0] = data.getLevel();
+        });
+        return level[0];
+    }
+
     public final CompletableFuture<Boolean> hasPerk(Player player, Class<?> perk) {
         return getPerks(player).thenApply(owned -> owned.stream().anyMatch(perk::isInstance));
     }
