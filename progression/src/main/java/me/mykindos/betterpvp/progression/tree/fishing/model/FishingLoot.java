@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.progression.tree.fishing.model;
 
 import org.bukkit.event.player.PlayerFishEvent;
+import org.bukkit.inventory.ItemStack;
 
 public interface FishingLoot {
 
@@ -14,6 +15,6 @@ public interface FishingLoot {
      * Called whenever this loot is caught
      * @param event The event
      */
-    void processCatch(PlayerFishEvent event);
+    ItemStack processCatch(PlayerFishEvent event);
 
 }

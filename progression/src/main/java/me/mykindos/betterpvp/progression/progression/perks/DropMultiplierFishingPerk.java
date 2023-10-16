@@ -1,10 +1,15 @@
 package me.mykindos.betterpvp.progression.progression.perks;
 
 
+<<<<<<< HEAD
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.config.Config;
+=======
+import com.google.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
+>>>>>>> 54b7ddd5 (Basic start for a fishing start multiplier)
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -15,20 +20,12 @@ import me.mykindos.betterpvp.progression.model.stats.ProgressionData;
 import me.mykindos.betterpvp.progression.tree.fishing.Fishing;
 import me.mykindos.betterpvp.progression.tree.fishing.event.PlayerStopFishingEvent;
 import me.mykindos.betterpvp.progression.tree.fishing.fish.Fish;
-import me.mykindos.betterpvp.progression.tree.fishing.fish.FishType;
-import me.mykindos.betterpvp.progression.tree.fishing.model.FishingLootType;
-import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-
-import java.util.Objects;
 
 @BPvPListener
 @Singleton
