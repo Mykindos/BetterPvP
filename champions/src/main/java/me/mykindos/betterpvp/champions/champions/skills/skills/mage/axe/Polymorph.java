@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.champions.champions.skills.skills.mage.sword;
+package me.mykindos.betterpvp.champions.champions.skills.skills.mage.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -34,7 +34,6 @@ import java.util.WeakHashMap;
 
 @Singleton
 //@BPvPListener
-@Deprecated(since = "1.0.0")
 public class Polymorph extends PrepareSkill implements CooldownSkill {
 
     public final WeakHashMap<LivingEntity, Long> polymorphed = new WeakHashMap<>();
@@ -56,9 +55,9 @@ public class Polymorph extends PrepareSkill implements CooldownSkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Right click with a Sword to prepare",
+                "Right click with an Axe to prepare",
                 "",
-                "The next player you hit, is polymorphed",
+                "The next player you hit is polymorphed",
                 "into a sheep for <stat>" + polymorphDuration + "</stat> seconds",
                 "",
                 "While a player is polymorphed, they cannot deal",
