@@ -6,13 +6,13 @@ pluginManagement {
 }
 rootProject.name = "BetterPvP"
 
-include("clans")
-include("core")
-include("lunar")
-include("champions")
-include("shops")
-include("progression")
+include(":clans")
+include(":core")
+include(":lunar")
+include(":champions")
+include(":shops")
+include(":progression")
 
-if(File("./events/").exists()) {
-    include("events")
+if (File("./private/").exists()) {
+    include(":private:events")
 }

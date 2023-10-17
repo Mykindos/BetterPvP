@@ -2,7 +2,11 @@ plugins {
     id("io.papermc.paperweight.userdev") version "1.5.5" apply false
 }
 
-subprojects {
-    apply(plugin = "io.papermc.paperweight.userdev")
+subprojects.forEach { subProject ->
+    run {
+        if (!subProject.name.equals("private")) {
+            subProject.plugins.apply("io.papermc.paperweight.userdev")
+        }
+    }
 }
 
