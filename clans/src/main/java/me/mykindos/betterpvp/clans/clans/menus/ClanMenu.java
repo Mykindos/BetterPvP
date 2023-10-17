@@ -41,10 +41,10 @@ public class ClanMenu extends Menu {
 
     public void fillPage() {
 
-        addButton(new TerritoryButton(17, player, clan));
-        addButton(new EnergyButton(26, player, clan));
+        addButton(new TerritoryButton(3, player, clan));
+        addButton(new EnergyButton(5, player, clan));
         addButton(new AlliesButton(8, playerClan, clan));
-        addButton(new ClanButton(22, clan, player, clan.getRelation(playerClan)));
+        addButton(new ClanButton(4, clan, player, clan.getRelation(playerClan)));
 
         List<ClanMember> members = clan.getMembers();
         loadPlayerHeads(members);
@@ -53,9 +53,9 @@ public class ClanMenu extends Menu {
         if (clan.getMemberByUUID(player.getUniqueId()).isPresent()) {
             addButton(new EnemiesButton(0, playerClan, clan));
             addButton(new LeaveClanButton(49, clan, player));
-            addButton(new ClanCommandButton(35));
-            addButton(new ClanVaultButton(44, clan));
-            addButton(new ClanUpgradesButton(53,clan));
+            addButton(new ClanCommandButton(53));
+            addButton(new ClanVaultButton(6, clan));
+            addButton(new ClanUpgradesButton(2,clan));
             List<ClanEnemy> topEnemies = getTopEnemiesByDominance();
             for (int i = 0; i < topEnemies.size(); i++) {
                 ClanEnemy enemy = topEnemies.get(i);
@@ -67,90 +67,128 @@ public class ClanMenu extends Menu {
     }
 
     private void loadPlayerHeads(List<ClanMember> members) {
-        members.sort((m1, m2) -> Integer.compare(m2.getRank().getPrivilege(), m1.getRank().getPrivilege()));
+        List<ClanMember> leaders = new ArrayList<>();
+        List<ClanMember> admins = new ArrayList<>();
+        List<ClanMember> memberRankList = new ArrayList<>();
+        List<ClanMember> recruits = new ArrayList<>();
+
+        for (ClanMember member : members) {
+            switch (member.getRank()) {
+                case LEADER -> leaders.add(member);
+                case ADMIN -> admins.add(member);
+                case MEMBER -> memberRankList.add(member);
+                case RECRUIT -> recruits.add(member);
+            }
+        }
+
+        if (!leaders.isEmpty()) {
+            addMemberToMenu(leaders.get(0), 13);
+        }
+
+        // define starting slots for each rank(to make rows)
+        int adminStartSlot = 18;
+        int memberStartSlot = 27;
+        int recruitStartSlot = 36;
+
+        addMembersToRow(admins, adminStartSlot);
+        addMembersToRow(memberRankList, memberStartSlot);
+        addMembersToRow(recruits, recruitStartSlot);
+    }
+
+    private void addMembersToRow(List<ClanMember> rankMembers, int startSlot) {
+        int middle = startSlot + 4; // gives the middle slot of a row
+
+        for (int i = 0; i < rankMembers.size(); i++) {
+            int offset = (i + 1) / 2; // calculate the offset from the middle
+
+            if (i % 2 == 1) { // check for if odd and then offset to the right
+                offset = -offset;
+            }
+
+            int slot = middle + offset;
+            addMemberToMenu(rankMembers.get(i), slot);
+        }
+    }
+
+    private void addMemberToMenu(ClanMember member, int slot) {
+        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(UUID.fromString(member.getUuid()));
+        if (offlinePlayer.getName() == null) return;
+
+        ItemStack playerHead;
+        NamedTextColor displayNameColor;
+
+        if (offlinePlayer.isOnline()) {
+            playerHead = new ItemStack(Material.PLAYER_HEAD);
+            displayNameColor = clan.getRelation(playerClan).getPrimary();
+        } else {
+            playerHead = new ItemStack(Material.SKELETON_SKULL);
+            displayNameColor = NamedTextColor.GRAY;
+        }
+
+        SkullMeta skullMeta = (SkullMeta) playerHead.getItemMeta();
+        skullMeta.setOwningPlayer(offlinePlayer);
+        skullMeta.displayName(Component.text(offlinePlayer.getName(), displayNameColor));
+        playerHead.setItemMeta(skullMeta);
+
+        List<Component> lore = new ArrayList<>();
+
+        TextColor rankColor = switch (member.getRank()) {
+            case RECRUIT -> NamedTextColor.DARK_GRAY;
+            case MEMBER -> NamedTextColor.GOLD;
+            case ADMIN -> NamedTextColor.RED;
+            case LEADER -> NamedTextColor.DARK_RED;
+        };
+        lore.add(Component.text(member.getRank().getName(), rankColor));
+        lore.add(Component.text("K/D/A: " + 0, NamedTextColor.GRAY));
+        lore.add(Component.text("Playtime: " + 0, NamedTextColor.GRAY));
+
         ClanMember viewingMember = clan.getMemberByUUID(player.getUniqueId()).orElse(null);
 
-        int[] slots = {13, 14, 23, 32, 31, 30, 21, 12};
-        for (int i = 0; i < members.size() && i < slots.length; i++) {
-            ClanMember member = members.get(i);
-            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(UUID.fromString(member.getUuid()));
-            if (offlinePlayer.getName() == null) continue;
+        if (viewingMember != null) {
+            boolean isAdmin = viewingMember.getRank() == ClanMember.MemberRank.ADMIN;
+            boolean isLeader = viewingMember.getRank() == ClanMember.MemberRank.LEADER;
 
-            ItemStack playerHead;
-            NamedTextColor displayNameColor;
-
-            if (offlinePlayer.isOnline()) {
-                playerHead = new ItemStack(Material.PLAYER_HEAD);
-                displayNameColor = clan.getRelation(playerClan).getPrimary();
-            } else {
-                playerHead = new ItemStack(Material.SKELETON_SKULL);
-                displayNameColor = NamedTextColor.GRAY;
+            if (isLeader && !member.getUuid().equals(viewingMember.getUuid())) {
+                lore.add(Component.text(""));
+                lore.add(Component.text("Left click to promote", NamedTextColor.DARK_GRAY));
+                lore.add(Component.text("Right click to demote", NamedTextColor.DARK_GRAY));
+                lore.add(Component.text("Shift left click to kick", NamedTextColor.DARK_GRAY));
+            } else if (isAdmin && !member.getUuid().equals(viewingMember.getUuid()) && (member.getRank() == ClanMember.MemberRank.RECRUIT || member.getRank() == ClanMember.MemberRank.MEMBER)) {
+                lore.add(Component.text(""));
+                lore.add(Component.text("Left click to promote", NamedTextColor.DARK_GRAY));
+                lore.add(Component.text("Right click to demote", NamedTextColor.DARK_GRAY));
+                lore.add(Component.text("Shift left click to kick", NamedTextColor.DARK_GRAY));
             }
-
-            SkullMeta skullMeta = (SkullMeta) playerHead.getItemMeta();
-            skullMeta.setOwningPlayer(offlinePlayer);
-            skullMeta.displayName(Component.text(offlinePlayer.getName(),displayNameColor));
-            playerHead.setItemMeta(skullMeta);
-
-            List<Component> lore = new ArrayList<>();
-
-            TextColor rankColor = switch (member.getRank()) {
-                case RECRUIT -> NamedTextColor.DARK_GRAY;
-                case MEMBER -> NamedTextColor.GOLD;
-                case ADMIN -> NamedTextColor.RED;
-                case LEADER -> NamedTextColor.DARK_RED;
-            };
-            lore.add(Component.text(member.getRank().getName(), rankColor));
-            lore.add(Component.text("K/D/A: " + 0, NamedTextColor.GRAY));
-            lore.add(Component.text("Playtime: " + 0, NamedTextColor.GRAY));
-            if (viewingMember != null) {
-                boolean isAdmin = viewingMember.getRank() == ClanMember.MemberRank.ADMIN;
-                boolean isLeader = viewingMember.getRank() == ClanMember.MemberRank.LEADER;
-
-                if (isLeader && !member.getUuid().equals(viewingMember.getUuid())) {
-                    lore.add(Component.text(""));
-                    lore.add(Component.text("Left click to promote", NamedTextColor.DARK_GRAY));
-                    lore.add(Component.text("Right click to demote", NamedTextColor.DARK_GRAY));
-                    lore.add(Component.text("Shift left click to kick", NamedTextColor.DARK_GRAY));
-                } else if (isAdmin && !member.getUuid().equals(viewingMember.getUuid()) && (member.getRank() == ClanMember.MemberRank.RECRUIT || member.getRank() == ClanMember.MemberRank.MEMBER)) {
-                    lore.add(Component.text(""));
-                    lore.add(Component.text("Left click to promote", NamedTextColor.DARK_GRAY));
-                    lore.add(Component.text("Right click to demote", NamedTextColor.DARK_GRAY));
-                    lore.add(Component.text("Shift left click to kick", NamedTextColor.DARK_GRAY));
-                }
-            }
-
-            ItemMeta itemMeta = playerHead.getItemMeta();
-            itemMeta.lore(lore);
-            playerHead.setItemMeta(itemMeta);
-
-            Component displayName = Component.text(offlinePlayer.getName(), displayNameColor);
-
-            Button memberButton = new Button(slots[i], playerHead, displayName, lore) {
-                @Override
-                public void onClick(Player player, Gamer gamer, ClickType clickType) {
-                    ClanMember viewingMember = clan.getMemberByUUID(player.getUniqueId()).orElse(null);
-
-                    if (viewingMember == null) return;  // Exit if the clicking player isn't a clan member.
-
-                    if (clickType.isLeftClick()) {
-                        // No promotion logic for leaders since they can't promote anyone.
-                        if (viewingMember.getRank() == ClanMember.MemberRank.ADMIN && !member.getUuid().equals(viewingMember.getUuid()) && (member.getRank() == ClanMember.MemberRank.RECRUIT || member.getRank() == ClanMember.MemberRank.MEMBER)) {
-                            // Promote member logic (Recruits to Members only)
-                        }
-                    } else if (clickType.isRightClick()) {
-                        if (viewingMember.getRank() == ClanMember.MemberRank.LEADER && !member.getUuid().equals(viewingMember.getUuid()) && member.getRank() != ClanMember.MemberRank.LEADER) {
-                            // Demote member logic (Can demote any rank other than leader)
-                        } else if (viewingMember.getRank() == ClanMember.MemberRank.ADMIN && !member.getUuid().equals(viewingMember.getUuid()) && member.getRank() != ClanMember.MemberRank.LEADER && member.getRank() != ClanMember.MemberRank.ADMIN) {
-                            // Demote member logic for admins (Can demote Recruits and Members only)
-                        }
-                    } else if (clickType.isShiftClick()) {
-                        // Kick member logic, you can expand on the conditions here.
-                    }
-                }
-            };
-            addButton(memberButton);
         }
+
+        ItemMeta itemMeta = playerHead.getItemMeta();
+        itemMeta.lore(lore);
+        playerHead.setItemMeta(itemMeta);
+
+        Component displayName = Component.text(offlinePlayer.getName(), displayNameColor);
+
+        Button memberButton = new Button(slot, playerHead, displayName, lore) {
+            @Override
+            public void onClick(Player player, Gamer gamer, ClickType clickType) {
+                ClanMember viewingMember = clan.getMemberByUUID(player.getUniqueId()).orElse(null);
+
+                if (viewingMember == null) return;  // Exit if the clicking player isn't a clan member.
+
+                if (clickType.isLeftClick()) {
+                    if (viewingMember.getRank() == ClanMember.MemberRank.ADMIN && !member.getUuid().equals(viewingMember.getUuid()) && (member.getRank() == ClanMember.MemberRank.RECRUIT || member.getRank() == ClanMember.MemberRank.MEMBER)) {
+                    }
+                } else if (clickType.isRightClick()) {
+                    if (viewingMember.getRank() == ClanMember.MemberRank.LEADER && !member.getUuid().equals(viewingMember.getUuid()) && member.getRank() != ClanMember.MemberRank.LEADER) {
+                        // Demote member logic for leader
+                    } else if (viewingMember.getRank() == ClanMember.MemberRank.ADMIN && !member.getUuid().equals(viewingMember.getUuid()) && member.getRank() != ClanMember.MemberRank.LEADER && member.getRank() != ClanMember.MemberRank.ADMIN) {
+                        // Demote member logic for admins
+                    }
+                } else if (clickType.isShiftClick()) {
+                    // Kick member logic
+                }
+            }
+        };
+        addButton(memberButton);
     }
 
     public ClanRelation getRelation(UUID uuid){
