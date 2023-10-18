@@ -237,8 +237,10 @@ public class RoleListener implements Listener {
                             damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_BLAZE_HURT, 1.0F, 0.9F);
                     case RANGER ->
                             damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.4F);
-                    case MAGE, WARLOCK ->
+                    case MAGE ->
                             damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.8F);
+                    case WARLOCK ->
+                            damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_BLAZE_HURT, 1.0F, 0.6F);
                 }
         }
     }
