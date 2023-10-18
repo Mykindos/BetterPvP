@@ -14,6 +14,9 @@ import me.mykindos.betterpvp.progression.model.ProgressionTree;
 import me.mykindos.betterpvp.progression.model.stats.ProgressionData;
 import me.mykindos.betterpvp.progression.tree.fishing.Fishing;
 import me.mykindos.betterpvp.progression.tree.fishing.event.PlayerStopFishingEvent;
+import me.mykindos.betterpvp.progression.tree.fishing.fish.Fish;
+import me.mykindos.betterpvp.progression.tree.fishing.fish.FishType;
+import me.mykindos.betterpvp.progression.tree.fishing.model.FishingLootType;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -71,19 +74,23 @@ public class DropMultiplierFishingPerk implements Listener, ProgressionPerk, Dro
     @EventHandler(priority = EventPriority.HIGH)
     public void onCatch(PlayerStopFishingEvent event) {
         if (event.getReason() != PlayerStopFishingEvent.FishingResult.CATCH) return;
-        Player player = event.getPlayer();
-        fishing.hasPerk(player, getClass()).whenComplete((hasPerk, throwable) -> {
-            if (hasPerk) {
-                int extraDrops = getMultiplier(fishing.getLevel(player));
-                Location playerLocation = player.getLocation();
-                for (int i = 0; i < extraDrops; i++) {
-                    playerLocation.getWorld().dropItemNaturally(playerLocation, event.getLoot().processCatch(event.getPlayerFishEvent()));
+        if (event.getLoot() instanceof Fish loot) {
+            Player player = event.getPlayer();
+            fishing.hasPerk(player, getClass()).whenComplete((hasPerk, throwable) -> {
+                if (hasPerk) {
+                    int extraDrops = getMultiplier(fishing.getLevel(player));
+                    Location playerLocation = player.getLocation();
+                    for (int i = 0; i < extraDrops; i++) {
+                        playerLocation.getWorld().dropItemNaturally(playerLocation, loot.getFishBucket());
+                    }
                 }
-            }
-        }).exceptionally(throwable -> {
-            log.error("Failed to check if player " + event.getPlayer().getName() + " has perk " + getName(), throwable);
-            return null;
-        });
+            }).exceptionally(throwable -> {
+                log.error("Failed to check if player " + event.getPlayer().getName() + " has perk " + getName(), throwable);
+                return null;
+            });
+        }
+
+
 
     }
 }

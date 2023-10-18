@@ -52,8 +52,7 @@ public class Fish implements FishingLoot {
         return pdc.has(ProgressionNamespacedKeys.FISHING_FISH_TYPE, PersistentDataType.STRING);
     }
 
-    @Override
-    public ItemStack processCatch(PlayerFishEvent event) {
+    public ItemStack getFishBucket() {
         // get a random fish bucket
         Material randomType = fishBuckets[RANDOM.nextInt(fishBuckets.length)];
         ItemStack item = new ItemStack(randomType);
@@ -81,9 +80,14 @@ public class Fish implements FishingLoot {
         pdc.set(CoreNamespaceKeys.IMMUTABLE_KEY, PersistentDataType.BOOLEAN, true);
 
         item.setItemMeta(meta);
+        return item;
+    }
+
+    @Override
+    public void processCatch(PlayerFishEvent event) {
+        ItemStack item = getFishBucket();
         final Item entity = (Item) event.getCaught();
         Objects.requireNonNull(entity).setItemStack(item);
         UtilMessage.message(event.getPlayer(), "Fishing", "You caught a <alt>%s</alt> (<alt2>%slb</alt2>)!", type.getName(), weight);
-        return item;
     }
 }
