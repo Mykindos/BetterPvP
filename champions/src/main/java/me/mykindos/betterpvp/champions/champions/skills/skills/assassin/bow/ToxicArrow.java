@@ -41,7 +41,7 @@ public class ToxicArrow extends PrepareArrowSkill {
                 "Left click with a Bow to prepare",
                 "",
                 "Your next arrow will give your target ",
-                "<effect>Poison I</effect> and <effect>Nausea</effect> for <val>" + (baseDuration + level) + "</val> seconds",
+                "<effect>Poison II</effect> for <val>" + (baseDuration + level) + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
 
@@ -80,11 +80,7 @@ public class ToxicArrow extends PrepareArrowSkill {
 
     @Override
     public void onHit(Player damager, LivingEntity target, int level) {
-        if (target.hasPotionEffect(PotionEffectType.CONFUSION)) {
-            target.removePotionEffect(PotionEffectType.CONFUSION);
-        }
-        target.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, (int) (baseDuration + level) * 20, 0));
-        target.addPotionEffect(new PotionEffect(PotionEffectType.POISON, (int) (baseDuration + level) * 20, 0));
+        target.addPotionEffect(new PotionEffect(PotionEffectType.POISON, (int) (baseDuration + level) * 20, 1));
     }
 
     @Override
