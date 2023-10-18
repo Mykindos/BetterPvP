@@ -6,8 +6,6 @@ import lombok.Setter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 
-import java.util.function.Predicate;
-
 @Singleton
 @Getter
 public abstract class Tip {

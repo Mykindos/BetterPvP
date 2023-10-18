@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.champions.weapons.listeners;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.core.energy.EnergyHandler;
 import me.mykindos.betterpvp.champions.utilities.ChampionsNamespacedKeys;
 import me.mykindos.betterpvp.champions.weapons.WeaponManager;
 import me.mykindos.betterpvp.champions.weapons.types.ChannelWeapon;
@@ -12,6 +11,7 @@ import me.mykindos.betterpvp.champions.weapons.types.LegendaryWeapon;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseItemEvent;
 import me.mykindos.betterpvp.core.components.champions.weapons.IWeapon;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
+import me.mykindos.betterpvp.core.energy.EnergyHandler;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateLoreEvent;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateNameEvent;
 import me.mykindos.betterpvp.core.framework.events.items.SpecialItemDropEvent;

@@ -2,11 +2,11 @@ package me.mykindos.betterpvp.progression.commands.loader;
 
 import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
-import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.CommandManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.command.loader.CommandLoader;
+import me.mykindos.betterpvp.progression.Progression;
 import org.reflections.Reflections;
 
 import java.util.Set;

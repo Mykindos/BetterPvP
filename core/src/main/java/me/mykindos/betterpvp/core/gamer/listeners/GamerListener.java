@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.core.gamer.listeners;
 
-import com.destroystokyo.paper.event.server.ServerTickStartEvent;
 import com.google.inject.Inject;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.events.ClientLoginEvent;

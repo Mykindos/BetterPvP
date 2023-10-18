@@ -19,7 +19,6 @@ import me.mykindos.betterpvp.core.injector.CoreInjectorModule;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.loader.CoreListenerLoader;
 import net.kyori.adventure.key.Key;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 

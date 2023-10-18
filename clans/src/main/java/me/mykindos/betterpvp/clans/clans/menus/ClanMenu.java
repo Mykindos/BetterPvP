@@ -3,7 +3,16 @@ package me.mykindos.betterpvp.clans.clans.menus;
 
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
-import me.mykindos.betterpvp.clans.clans.menus.buttons.*;
+import me.mykindos.betterpvp.clans.clans.menus.buttons.AlliesButton;
+import me.mykindos.betterpvp.clans.clans.menus.buttons.ClanButton;
+import me.mykindos.betterpvp.clans.clans.menus.buttons.ClanCommandButton;
+import me.mykindos.betterpvp.clans.clans.menus.buttons.ClanUpgradesButton;
+import me.mykindos.betterpvp.clans.clans.menus.buttons.ClanVaultButton;
+import me.mykindos.betterpvp.clans.clans.menus.buttons.EnemiesButton;
+import me.mykindos.betterpvp.clans.clans.menus.buttons.EnemyButton;
+import me.mykindos.betterpvp.clans.clans.menus.buttons.EnergyButton;
+import me.mykindos.betterpvp.clans.clans.menus.buttons.LeaveClanButton;
+import me.mykindos.betterpvp.clans.clans.menus.buttons.TerritoryButton;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.gamer.Gamer;
@@ -21,7 +30,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.UUID;
 
 public class ClanMenu extends Menu {
 

@@ -1,9 +1,9 @@
 package me.mykindos.betterpvp.progression.listener;
 
 import com.google.inject.Inject;
-import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.listener.loader.ListenerLoader;
+import me.mykindos.betterpvp.progression.Progression;
 import org.bukkit.event.Listener;
 import org.reflections.Reflections;
 

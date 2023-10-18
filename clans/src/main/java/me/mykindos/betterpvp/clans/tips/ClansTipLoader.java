@@ -3,7 +3,6 @@ package me.mykindos.betterpvp.clans.tips;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.Clans;
-import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.tips.TipLoader;
 import me.mykindos.betterpvp.core.tips.TipManager;
 import org.reflections.Reflections;
