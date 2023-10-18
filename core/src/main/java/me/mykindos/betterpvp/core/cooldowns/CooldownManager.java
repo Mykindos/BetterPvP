@@ -72,7 +72,8 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
                 return Component.join(JoinConfiguration.separator(Component.space()), cooldownName.decorate(TextDecoration.BOLD).color(NamedTextColor.GREEN), Component.text("Recharged").decorate(TextDecoration.BOLD).color(NamedTextColor.GREEN));
             }
 
-            final double progress = Math.min(1f, Math.max(0, (duration - cooldown.getRemaining()) / duration));
+            final double max = cooldown.getSeconds() / 1000;
+            final double progress = Math.min(1f, Math.max(0, (max - cooldown.getRemaining()) / max));
             final ProgressBar progressBar = ProgressBar.withProgress((float) progress);
 
             final TextComponent bar = progressBar.build();
