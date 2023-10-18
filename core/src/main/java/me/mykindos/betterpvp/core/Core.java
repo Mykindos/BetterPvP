@@ -86,7 +86,6 @@ public class Core extends BPvPPlugin {
 
         updateEventExecutor.loadPlugin(this);
         updateEventExecutor.initialize();
-
     }
 
     @Override

@@ -2,7 +2,11 @@ package me.mykindos.betterpvp.core.utilities;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
+import me.mykindos.betterpvp.core.utilities.math.VectorLine;
+import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -30,6 +34,45 @@ public class UtilLocation {
                 new Location(world, boundingBox.getMaxX(), boundingBox.getMaxY(), boundingBox.getMinZ()),
                 new Location(world, boundingBox.getMaxX(), boundingBox.getMaxY(), boundingBox.getMaxZ())
         ));
+    }
+
+    public static void drawBoundingBox(BoundingBox box) {
+        final double minX = box.getMinX();
+        final double minY = box.getMinY();
+        final double minZ = box.getMinZ();
+        final double maxX = box.getMaxX();
+        final double maxY = box.getMaxY();
+        final double maxZ = box.getMaxZ();
+        final World world = Bukkit.getWorlds().get(0);
+
+        final Location maxMaxMax = new Vector(maxX, maxY, maxZ).toLocation(world);
+        final Location maxMaxMin = new Vector(maxX, maxY, minZ).toLocation(world);
+        final Location maxMinMax = new Vector(maxX, minY, maxZ).toLocation(world);
+        final Location maxMinMin = new Vector(maxX, minY, minZ).toLocation(world);
+        final Location minMaxMax = new Vector(minX, maxY, maxZ).toLocation(world);
+        final Location minMaxMin = new Vector(minX, maxY, minZ).toLocation(world);
+        final Location minMinMax = new Vector(minX, minY, maxZ).toLocation(world);
+        final Location minMinMin = new Vector(minX, minY, minZ).toLocation(world);
+
+        drawBetween(maxMaxMax, maxMaxMin);
+        drawBetween(maxMaxMax, maxMinMax);
+        drawBetween(maxMaxMax, minMaxMax);
+        drawBetween(maxMaxMin, maxMinMin);
+        drawBetween(maxMaxMin, minMaxMin);
+        drawBetween(maxMinMax, maxMinMin);
+        drawBetween(maxMinMax, minMinMax);
+        drawBetween(minMaxMax, minMaxMin);
+        drawBetween(minMaxMax, minMinMax);
+        drawBetween(minMaxMin, minMinMin);
+        drawBetween(minMinMax, minMinMin);
+        drawBetween(maxMinMin, minMinMin);
+    }
+
+    public static void drawBetween(Location start, Location end) {
+        final VectorLine line = VectorLine.withStepSize(start, end, 0.15);
+        for (Location location : line.toLocations()) {
+            Particle.REDSTONE.builder().location(location).color(Color.RED).receivers(50).spawn();
+        }
     }
 
     /**
