@@ -37,15 +37,15 @@ public class DropMultiplierFishingPerk implements Listener, ProgressionPerk, Dro
 
     @Config(path = "fishing.perks.drop-multiplier.minLevel", defaultValue = "0")
     @Inject
-    int minLevel;
+    private int minLevel;
 
     @Config(path = "fishing.perks.drop-multiplier.maxLevel", defaultValue = "1000")
     @Inject
-    int maxLevel;
+    private int maxLevel;
 
     @Config(path = "fishing.perks.drop-multiplier.increasePerLevel", defaultValue = "0.25")
     @Inject
-    double increasePerLevel;
+    private double increasePerLevel;
 
     @Inject
     private Progression progression;
@@ -78,7 +78,7 @@ public class DropMultiplierFishingPerk implements Listener, ProgressionPerk, Dro
             Player player = event.getPlayer();
             fishing.hasPerk(player, getClass()).whenComplete((hasPerk, throwable) -> {
                 if (hasPerk) {
-                    int extraDrops = getMultiplier(fishing.getLevel(player));
+                    int extraDrops = getMultiplier(fishing.getLevel(player) * increasePerLevel);
                     Location playerLocation = player.getLocation();
                     for (int i = 0; i < extraDrops; i++) {
                         playerLocation.getWorld().dropItemNaturally(playerLocation, loot.getFishBucket());
