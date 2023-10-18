@@ -51,7 +51,7 @@ public class CombatTagListener implements Listener {
 
                         Particle.CRIT.builder()
                                 .location(player.getLocation().add(0, 2.5, 0).add(offsetX, offsetY, offsetZ))
-                                .receivers(10)
+                                .receivers(30)
                                 .spawn();
                     }
                 }
