@@ -80,9 +80,6 @@ public class ToxicArrow extends PrepareArrowSkill {
 
     @Override
     public void onHit(Player damager, LivingEntity target, int level) {
-        if (target.hasPotionEffect(PotionEffectType.CONFUSION)) {
-            target.removePotionEffect(PotionEffectType.CONFUSION);
-        }
         target.addPotionEffect(new PotionEffect(PotionEffectType.POISON, (int) (baseDuration + level) * 20, 1));
     }
 
