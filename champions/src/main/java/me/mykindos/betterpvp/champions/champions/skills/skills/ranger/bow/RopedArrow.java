@@ -110,10 +110,12 @@ public class RopedArrow extends PrepareArrowSkill {
     @Override
     public void processEntityShootBowEvent(EntityShootBowEvent event, Player player, int level, Arrow arrow) {
         super.processEntityShootBowEvent(event, player, level, arrow);
+        final int strengthLvl = this.strength.getOrDefault(player, 1);
+        final double cdMult = Math.pow(2, strengthLvl - 1d);
         championsManager.getCooldowns().removeCooldown(player, getName(), true);
         championsManager.getCooldowns().use(player,
                 getName(),
-                getCooldown(level) / Optional.ofNullable(this.strength.get(player)).map(i -> Math.pow(2, i - 1)).orElse(1d),
+                getCooldown(level) * cdMult,
                 showCooldownFinished(),
                 false,
                 isCancellable(),
