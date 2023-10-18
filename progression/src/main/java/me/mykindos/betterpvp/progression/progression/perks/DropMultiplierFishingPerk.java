@@ -68,7 +68,7 @@ public class DropMultiplierFishingPerk implements Listener, ProgressionPerk, Dro
 
     @Override
     public boolean canUse(Player player, ProgressionData<?> data) {
-        return minLevel <= data.getLevel() && data.getLevel() <= maxLevel;
+        return minLevel <= data.getLevel();
     }
 
     @EventHandler(priority = EventPriority.HIGH)
@@ -78,11 +78,18 @@ public class DropMultiplierFishingPerk implements Listener, ProgressionPerk, Dro
             Player player = event.getPlayer();
             fishing.hasPerk(player, getClass()).whenComplete((hasPerk, throwable) -> {
                 if (hasPerk) {
-                    int extraDrops = getMultiplier(fishing.getLevel(player) * increasePerLevel);
-                    Location playerLocation = player.getLocation();
-                    for (int i = 0; i < extraDrops; i++) {
-                        playerLocation.getWorld().dropItemNaturally(playerLocation, loot.getFishBucket());
-                    }
+                    fishing.getLevel(player).whenComplete((level, throwable1) -> {
+                        //cannot increase chance over the max level
+                        if (level > maxLevel) level = maxLevel;
+                        int extraDrops = getExtraDrops(level * increasePerLevel);
+                        Location playerLocation = player.getLocation();
+                        for (int i = 0; i < extraDrops; i++) {
+                            playerLocation.getWorld().dropItemNaturally(playerLocation, loot.getFishBucket());
+                        }
+                    }).exceptionally(throwable1 -> {
+                        log.error("Failed to check if player " + event.getPlayer().getName() + " has a level ", throwable);
+                        return null;
+                    });
                 }
             }).exceptionally(throwable -> {
                 log.error("Failed to check if player " + event.getPlayer().getName() + " has perk " + getName(), throwable);
