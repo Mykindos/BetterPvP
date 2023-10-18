@@ -70,7 +70,7 @@ public class UtilItem {
      */
     public static ItemStack setItemNameAndLore(ItemStack item, Component name, List<Component> lore) {
         ItemMeta im = item.getItemMeta();
-        im.displayName(name);
+        im.displayName(name.decoration(TextDecoration.ITALIC, false));
         if (lore != null) {
             im.lore(removeItalic(lore));
         }

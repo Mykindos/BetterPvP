@@ -35,14 +35,14 @@ public class ClansMovementListener extends ClanListener {
     }
 
     @EventHandler
-    public void onPlayerMoveEvent(PlayerMoveEvent e) {
+    public void onPlayerMoveEvent(PlayerMoveEvent event) {
 
-        if (e.getFrom().getBlockX() != e.getTo().getBlockX() || e.getFrom().getBlockZ() != e.getTo().getBlockZ()) {
+        if (event.getFrom().getBlockX() != event.getTo().getBlockX() || event.getFrom().getBlockZ() != event.getTo().getBlockZ()) {
 
 
             UtilServer.runTaskAsync(clans, () -> {
-                Optional<Clan> clanToOptional = clanManager.getClanByLocation(e.getTo());
-                Optional<Clan> clanFromOption = clanManager.getClanByLocation(e.getFrom());
+                Optional<Clan> clanToOptional = clanManager.getClanByLocation(event.getTo());
+                Optional<Clan> clanFromOption = clanManager.getClanByLocation(event.getFrom());
 
 
                 if (clanToOptional.isEmpty() && clanFromOption.isEmpty()) {
@@ -52,9 +52,9 @@ public class ClansMovementListener extends ClanListener {
 
                 if (clanFromOption.isEmpty() || clanToOptional.isEmpty()
                         || !clanFromOption.equals(clanToOptional)) {
-                    displayOwner(e.getPlayer(), clanToOptional.orElse(null));
+                    displayOwner(event.getPlayer(), clanToOptional.orElse(null));
 
-                    UtilServer.runTask(clans, () -> UtilServer.callEvent(new ScoreboardUpdateEvent(e.getPlayer())));
+                    UtilServer.runTask(clans, () -> UtilServer.callEvent(new ScoreboardUpdateEvent(event.getPlayer())));
 
                 }
             });

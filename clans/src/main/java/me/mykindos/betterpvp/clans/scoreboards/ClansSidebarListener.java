@@ -11,10 +11,13 @@ import me.mykindos.betterpvp.core.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.scoreboard.Criteria;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
@@ -69,12 +72,15 @@ public class ClansSidebarListener implements Listener {
 
             Objective sidebarObjective = scoreboard.getObjective("sidebar");
             if (sidebarObjective == null) {
-                Component title = Component.text(ChatColor.GOLD.toString() + ChatColor.BOLD + "  " + sidebarTitle + "  ");
-                sidebarObjective = scoreboard.registerNewObjective("sidebar", "dummy", title);
+                Component title = Component.text("  " + sidebarTitle + "  ", NamedTextColor.GOLD, TextDecoration.BOLD);
+                sidebarObjective = scoreboard.registerNewObjective("sidebar", Criteria.DUMMY, title);
                 sidebarObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
             }
 
             for (String s : scoreboard.getEntries()) {
+                if (!s.contains("\u00A7")) {
+                    continue;
+                }
                 scoreboard.resetScores(s);
             }
 
