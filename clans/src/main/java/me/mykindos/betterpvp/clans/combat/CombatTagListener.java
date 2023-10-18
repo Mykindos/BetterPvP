@@ -44,15 +44,14 @@ public class CombatTagListener implements Listener {
 
                     Random rand = new Random();
 
-                    for (int i = 0; i < 10; i++) {
-                        double offsetX = (rand.nextDouble() * 2 - 1) * 0.1;
-                        double offsetY = (rand.nextDouble() * 2 - 1) * 0.1;
-                        double offsetZ = (rand.nextDouble() * 2 - 1) * 0.1;
+                    for (int i = 0; i < 15; i++) {
+                        double offsetX = (rand.nextDouble() * 2 - 1) * 0.5;
+                        double offsetY = (rand.nextDouble() * 2 - 1) * 0.5;
+                        double offsetZ = (rand.nextDouble() * 2 - 1) * 0.5;
 
                         Particle.CRIT.builder()
-                                .location(player.getLocation().add(0, 2.5, 0).add(offsetX, offsetY, offsetZ))
-                                .receivers(30)
-                                .spawn();
+                                .location(player.getLocation().add(0, 2.25, 0).add(offsetX, offsetY, offsetZ))
+                                .extra(0).receivers(30).spawn();
                     }
                 }
             });
