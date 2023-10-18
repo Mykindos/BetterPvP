@@ -9,12 +9,6 @@ import java.util.Random;
 public interface DropMultiplier {
 
 
-    int minLevel = 0;
-
-    int maxLevel = 1000;
-
-    double increasePerLevel = 0.25;
-
     Random RANDOM = new Random();
 
     default int getMultiplier(double chance) {
@@ -24,9 +18,5 @@ public interface DropMultiplier {
             multiplier++;
         }
         return multiplier;
-    }
-
-    default int getMultiplier(int level) {
-        return getMultiplier(level * increasePerLevel);
     }
 }
