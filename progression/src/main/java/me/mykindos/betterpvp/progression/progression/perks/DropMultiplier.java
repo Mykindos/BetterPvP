@@ -18,7 +18,7 @@ public interface DropMultiplier {
     Random RANDOM = new Random();
 
     default int getMultiplier(double chance) {
-        int multiplier = (int) Math.nextDown(chance/100);
+        int multiplier = (int) Math.floor(chance/100);
         double newChance = chance % 100;
         if (RANDOM.nextInt(100) < newChance) {
             multiplier++;
