@@ -15,8 +15,6 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.entity.Player;
 
-import java.util.Optional;
-
 @Singleton
 @SubCommand(ClanCommand.class)
 public class SetHomeSubCommand extends ClanSubCommand {

@@ -7,7 +7,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.util.Collection;
-import java.util.Iterator;
 
 public class UtilWorld {
 

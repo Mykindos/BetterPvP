@@ -6,30 +6,17 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.weapons.Weapon;
 import me.mykindos.betterpvp.champions.weapons.types.CooldownWeapon;
 import me.mykindos.betterpvp.champions.weapons.types.InteractWeapon;
-import me.mykindos.betterpvp.core.combat.throwables.ThrowableItem;
-import me.mykindos.betterpvp.core.combat.throwables.events.ThrowableHitEntityEvent;
-import me.mykindos.betterpvp.core.combat.throwables.events.ThrowableHitGroundEvent;
 import me.mykindos.betterpvp.core.config.Config;
-import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.block.Block;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.persistence.PersistentDataType;
-
-import java.util.UUID;
 
 
 /**

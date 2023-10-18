@@ -2,9 +2,9 @@ package me.mykindos.betterpvp.core.energy;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.energy.events.DegenerateEnergyEvent;
 import me.mykindos.betterpvp.core.energy.events.RegenerateEnergyEvent;
-import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;

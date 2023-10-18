@@ -7,7 +7,6 @@ import me.mykindos.betterpvp.core.menu.Menu;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 
-
 import java.util.ArrayList;
 import java.util.List;
 

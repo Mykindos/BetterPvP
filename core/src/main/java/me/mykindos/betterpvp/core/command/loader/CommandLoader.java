@@ -2,7 +2,11 @@ package me.mykindos.betterpvp.core.command.loader;
 
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.client.Rank;
-import me.mykindos.betterpvp.core.command.*;
+import me.mykindos.betterpvp.core.command.Command;
+import me.mykindos.betterpvp.core.command.CommandManager;
+import me.mykindos.betterpvp.core.command.ICommand;
+import me.mykindos.betterpvp.core.command.SpigotCommandWrapper;
+import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.Loader;
 import org.bukkit.Bukkit;

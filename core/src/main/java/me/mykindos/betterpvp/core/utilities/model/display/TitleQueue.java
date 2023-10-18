@@ -2,15 +2,12 @@ package me.mykindos.betterpvp.core.utilities.model.display;
 
 import me.mykindos.betterpvp.core.gamer.Gamer;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.title.Title;
-import net.kyori.adventure.title.TitlePart;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.lang.ref.WeakReference;
 import java.util.Iterator;
-import java.util.Optional;
 import java.util.PriorityQueue;
 import java.util.UUID;
 

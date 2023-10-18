@@ -2,9 +2,9 @@ package me.mykindos.betterpvp.core.stats.repository;
 
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
+import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.stats.Leaderboard;
 import me.mykindos.betterpvp.core.stats.event.LeaderboardInitializeEvent;
-import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 

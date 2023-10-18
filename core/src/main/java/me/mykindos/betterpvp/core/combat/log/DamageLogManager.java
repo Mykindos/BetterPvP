@@ -4,7 +4,6 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.LivingEntity;
 
 import java.util.ArrayList;
