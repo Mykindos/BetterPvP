@@ -16,6 +16,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEvent;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
+import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Sound;
@@ -33,7 +34,7 @@ import java.util.Map.Entry;
 import java.util.WeakHashMap;
 
 @Singleton
-//@BPvPListener
+@BPvPListener
 public class Polymorph extends PrepareSkill implements CooldownSkill {
 
     public final WeakHashMap<LivingEntity, Long> polymorphed = new WeakHashMap<>();
@@ -133,7 +134,7 @@ public class Polymorph extends PrepareSkill implements CooldownSkill {
     @Override
     public SkillType getType() {
 
-        return SkillType.SWORD;
+        return SkillType.AXE;
     }
 
     @Override
