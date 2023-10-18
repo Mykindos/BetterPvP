@@ -9,7 +9,7 @@ import java.util.Random;
 
 public interface DropMultiplier {
 
-    default int getMultiplier(double chance) {
+    default int getExtraDrops(double chance) {
         int multiplier = (int) Math.floor(chance/100);
         double newChance = chance % 100;
         if (UtilMath.randomInt(0, 100) < newChance) {
