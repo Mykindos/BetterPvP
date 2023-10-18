@@ -16,6 +16,7 @@ import me.mykindos.betterpvp.progression.tree.fishing.Fishing;
 import me.mykindos.betterpvp.progression.tree.fishing.event.PlayerStopFishingEvent;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -70,13 +71,13 @@ public class DropMultiplierFishingPerk implements Listener, ProgressionPerk, Dro
     @EventHandler(priority = EventPriority.HIGH)
     public void onCatch(PlayerStopFishingEvent event) {
         if (event.getReason() != PlayerStopFishingEvent.FishingResult.CATCH) return;
-        fishing.hasPerk(event.getPlayer(), getClass()).whenComplete((hasPerk, throwable) -> {
-
+        Player player = event.getPlayer();
+        fishing.hasPerk(player, getClass()).whenComplete((hasPerk, throwable) -> {
             if (hasPerk) {
-                int multiplier = getMultiplier(fishing.getLevel(event.getPlayer()));
-                PlayerInventory inventory = event.getPlayer().getInventory();
-                for (int i = 0; i < multiplier; i++) {
-                    inventory.addItem(event.getLoot().processCatch(event.getPlayerFishEvent()));
+                int extraDrops = getMultiplier(fishing.getLevel(player));
+                Location playerLocation = player.getLocation();
+                for (int i = 0; i < extraDrops; i++) {
+                    playerLocation.getWorld().dropItemNaturally(playerLocation, event.getLoot().processCatch(event.getPlayerFishEvent()));
                 }
             }
         }).exceptionally(throwable -> {
