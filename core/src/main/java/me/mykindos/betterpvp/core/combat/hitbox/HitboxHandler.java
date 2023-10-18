@@ -2,143 +2,70 @@ package me.mykindos.betterpvp.core.combat.hitbox;
 
 import com.google.inject.Inject;
 import me.mykindos.betterpvp.core.Core;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
-import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
-import me.mykindos.betterpvp.core.framework.manager.Manager;
+import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilDamage;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
-import me.mykindos.betterpvp.core.utilities.model.data.CustomDataType;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Interaction;
-import org.bukkit.entity.LivingEntity;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.player.*;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.util.BoundingBox;
+import org.bukkit.util.Vector;
 
-import java.util.Objects;
-import java.util.UUID;
+import java.util.Collection;
 
 @BPvPListener
-public class HitboxHandler extends Manager<Hitbox> implements Listener {
+public class HitboxHandler implements Listener {
+
+    private static final double CREATIVE_ATTACK_REACH = 5.0D;
+    private static final double SURVIVAL_ATTACK_REACH = 3.0D;
 
     @Inject
     private Core core;
 
-    public void clearAll() {
-        for (Hitbox hitbox : getObjects().values()) {
-            hitbox.remove();
+    @Config(path = "pvp.hitboxExpansion", defaultValue = "0.0")
+    @Inject
+    private double hitboxExpansion = 0.0;
+
+    @EventHandler
+    public void onSwingBlock(PlayerInteractEvent event) {
+        if (event.getAction().isLeftClick() && event.getHand() == EquipmentSlot.HAND) {
+            hit(event.getPlayer());
         }
-        getObjects().clear();
     }
 
-    @EventHandler
-    public void onRespawn(PlayerRespawnEvent event) {
-        getObject(event.getPlayer().getUniqueId()).ifPresent(hitbox -> {
-            UtilServer.runTaskLater(core, hitbox::relocate, 1L);
-        });
-    }
-
-    @EventHandler
-    public void onJoin(PlayerJoinEvent event) {
-        addObject(event.getPlayer().getUniqueId(), new Hitbox(event.getPlayer(), core));
-    }
-
-    @EventHandler
-    public void onTeleport(PlayerTeleportEvent event) {
-        getObject(event.getPlayer().getUniqueId()).ifPresent(Hitbox::relocate);
-    }
-
-    @EventHandler
-    public void onQuit(PlayerQuitEvent event) {
-        getObject(event.getPlayer().getUniqueId()).ifPresent(hitbox -> {
-            removeObject(event.getPlayer().getUniqueId().toString());
-            hitbox.remove();
-        });
-    }
-
-    @EventHandler
-    public void onClick(PlayerInteractEntityEvent event) {
-        if (!(event.getRightClicked() instanceof Interaction interaction)) {
+    private void hit(Player player) {
+        if (hitboxExpansion <= 0) {
             return;
         }
 
-        if (!interaction.getPersistentDataContainer().has(CoreNamespaceKeys.OWNER, CustomDataType.UUID)) {
-            return;
+        final Location loc = player.getEyeLocation();
+        double reach = player.getGameMode().equals(GameMode.CREATIVE) ? CREATIVE_ATTACK_REACH : SURVIVAL_ATTACK_REACH;
+        final Vector attackStart = loc.toVector();
+        final Vector direction = loc.getDirection();
+
+        final Collection<Player> nearby = loc.getNearbyEntitiesByType(Player.class, reach + hitboxExpansion);
+        nearby.remove(player);
+        for (Player other : nearby) {
+            final BoundingBox box = other.getBoundingBox().clone().expand(hitboxExpansion, 0, hitboxExpansion);
+
+            // Get projection of the direction to the center of the hitbox
+            // over the direction of the attack to shift the hitbox by that
+            // vector and see if it overlaps with the start of the attack
+            final Vector distance = box.getCenter().subtract(attackStart);
+            final double projectionLength = direction.clone().dot(distance) / direction.length();
+            final Vector projection = direction.clone().multiply(projectionLength);
+
+            // Multiply the projection by -1 to get the vector from the center of the hitbox
+            // to the start of the attack
+            final BoundingBox shifted = box.clone().shift(projection.multiply(-1));
+            if (shifted.contains(attackStart)) {
+                player.attack(other);
+                return;
+            }
         }
-
-        event.setCancelled(true);
-    }
-
-    @EventHandler
-    public void onHit(EntityDamageByEntityEvent event) {
-        if (!(event.getEntity() instanceof Interaction interaction)) {
-            return;
-        }
-
-        if (!interaction.getPersistentDataContainer().has(CoreNamespaceKeys.OWNER, CustomDataType.UUID)) {
-            return;
-        }
-
-        final LivingEntity damager = getDamagerEntity(event);
-        final Projectile projectile = getProjectile(event);
-        if (damager == null) {
-            return;
-        }
-
-        UUID uuid = interaction.getPersistentDataContainer().get(CoreNamespaceKeys.OWNER, CustomDataType.UUID);
-        final Player player = Bukkit.getPlayer(Objects.requireNonNull(uuid));
-        if (player == null) {
-            return;
-        }
-
-        final CustomDamageEvent cde = new CustomDamageEvent(
-                player,
-                damager,
-                projectile,
-                event.getCause(),
-                event.getDamage(),
-                true);
-        UtilDamage.doCustomDamage(cde);
-        event.setCancelled(true);
-    }
-
-    private Projectile getProjectile(EntityDamageEvent event) {
-        if (!(event instanceof EntityDamageByEntityEvent ev)) {
-            return null;
-        }
-
-        if ((ev.getDamager() instanceof Projectile)) {
-            return (Projectile) ev.getDamager();
-        }
-        return null;
-    }
-
-    public static LivingEntity getDamagerEntity(EntityDamageEvent event) {
-
-        if (!(event instanceof EntityDamageByEntityEvent ev)) {
-            return null;
-        }
-
-        if ((ev.getDamager() instanceof LivingEntity)) {
-            return (LivingEntity) ev.getDamager();
-        }
-
-        if (!(ev.getDamager() instanceof Projectile projectile)) {
-            return null;
-        }
-
-        if (projectile.getShooter() == null) {
-            return null;
-        }
-        if (!(projectile.getShooter() instanceof LivingEntity)) {
-            return null;
-        }
-        return (LivingEntity) projectile.getShooter();
     }
 
 }
