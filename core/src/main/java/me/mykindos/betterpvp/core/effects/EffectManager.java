@@ -5,7 +5,7 @@ import me.mykindos.betterpvp.core.effects.events.EffectExpireEvent;
 import me.mykindos.betterpvp.core.effects.events.EffectReceiveEvent;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.LivingEntity;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,21 +13,21 @@ import java.util.Optional;
 @Singleton
 public class EffectManager extends Manager<List<Effect>> {
 
-    public void addEffect(Player player, EffectType type, long length) {
-        addEffect(player, type, 1, length);
+    public void addEffect(LivingEntity target, EffectType type, long length) {
+        addEffect(target, type, 1, length);
     }
 
-    public void addEffect(Player player, EffectType type, int level, long length) {
-       UtilServer.callEvent(new EffectReceiveEvent(player, new Effect(player.getUniqueId().toString(), type, level, length)));
+    public void addEffect(LivingEntity target, EffectType type, int level, long length) {
+       UtilServer.callEvent(new EffectReceiveEvent(target, new Effect(target.getUniqueId().toString(), type, level, length)));
 
     }
 
-    public Optional<Effect> getEffect(Player player, EffectType type) {
+    public Optional<Effect> getEffect(LivingEntity target, EffectType type) {
 
-        Optional<List<Effect>> effectsOptional = getObject(player.getUniqueId().toString());
+        Optional<List<Effect>> effectsOptional = getObject(target.getUniqueId().toString());
         if (effectsOptional.isPresent()) {
             List<Effect> effects = effectsOptional.get();
-            return effects.stream().filter(effect -> effect.getUuid().equalsIgnoreCase(player.getUniqueId().toString())
+            return effects.stream().filter(effect -> effect.getUuid().equalsIgnoreCase(target.getUniqueId().toString())
                     && effect.getEffectType() == type).findFirst();
         } else {
             return Optional.empty();
@@ -36,16 +36,16 @@ public class EffectManager extends Manager<List<Effect>> {
 
     }
 
-    public boolean hasEffect(Player player, EffectType type) {
-        return getEffect(player, type).isPresent();
+    public boolean hasEffect(LivingEntity target, EffectType type) {
+        return getEffect(target, type).isPresent();
     }
 
-    public void removeEffect(Player player, EffectType type) {
-        Optional<List<Effect>> effectsOptional = getObject(player.getUniqueId().toString());
+    public void removeEffect(LivingEntity target, EffectType type) {
+        Optional<List<Effect>> effectsOptional = getObject(target.getUniqueId().toString());
         effectsOptional.ifPresent(effects -> {
             effects.removeIf(effect -> {
-                if(effect.getUuid().equals(player.getUniqueId().toString()) && effect.getEffectType() == type) {
-                    UtilServer.callEvent(new EffectExpireEvent(player, effect));
+                if(effect.getUuid().equals(target.getUniqueId().toString()) && effect.getEffectType() == type) {
+                    UtilServer.callEvent(new EffectExpireEvent(target, effect));
                     return true;
                 }
                 return false;
@@ -55,8 +55,8 @@ public class EffectManager extends Manager<List<Effect>> {
     }
 
 
-    public void removeAllEffects(Player player){
-        objects.remove(player.getUniqueId().toString());
+    public void removeAllEffects(LivingEntity target){
+        objects.remove(target.getUniqueId().toString());
     }
 
 }

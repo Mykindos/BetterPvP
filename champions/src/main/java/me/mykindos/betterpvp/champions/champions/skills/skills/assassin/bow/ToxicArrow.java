@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -80,7 +81,7 @@ public class ToxicArrow extends PrepareArrowSkill {
 
     @Override
     public void onHit(Player damager, LivingEntity target, int level) {
-        target.addPotionEffect(new PotionEffect(PotionEffectType.POISON, (int) (baseDuration + level) * 20, 1));
+        championsManager.getEffects().addEffect(target, EffectType.POISON, 2, (long) ((baseDuration + level) * 1000L));
     }
 
     @Override
