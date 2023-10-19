@@ -79,7 +79,16 @@ public class GlacialPrison extends Skill implements InteractSkill, CooldownSkill
     @EventHandler
     public void onThrowableHit(ThrowableHitEvent event) {
         if (!event.getThrowable().getName().equals(getName())) return;
-        for (Location loc : UtilMath.sphere(event.getThrowable().getItem().getLocation(), sphereSize, true)) {
+
+        Location center = event.getThrowable().getItem().getLocation();
+
+        for (Location loc : UtilMath.sphere(center, sphereSize, true)) {
+            if (loc.getBlockX() == center.getBlockX() &&
+                    loc.getBlockZ() == center.getBlockZ() &&
+                    loc.getBlockY() == center.getBlockY() + sphereSize) {
+                continue;
+            }
+
             if (loc.getBlock().getType().name().contains("REDSTONE")) continue;
             if (loc.getBlock().getType() == Material.AIR || UtilBlock.airFoliage(loc.getBlock())) {
                 blockHandler.addRestoreBlock(loc.getBlock(), Material.ICE, (long) (duration * 1000));
@@ -102,7 +111,7 @@ public class GlacialPrison extends Skill implements InteractSkill, CooldownSkill
     @Override
     public void loadSkillConfig(){
         sphereSize = getConfig("sphereSize", 5, Integer.class);
-        duration = getConfig("duration", 4.0, Double.class);
+        duration = getConfig("duration", 5.0, Double.class);
         speed = getConfig("speed", 1.5, Double.class);
     }
 
