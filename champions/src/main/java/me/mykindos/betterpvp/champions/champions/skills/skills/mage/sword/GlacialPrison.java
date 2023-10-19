@@ -111,7 +111,7 @@ public class GlacialPrison extends Skill implements InteractSkill, CooldownSkill
     @Override
     public void loadSkillConfig(){
         sphereSize = getConfig("sphereSize", 5, Integer.class);
-        duration = getConfig("duration", 4.0, Double.class);
+        duration = getConfig("duration", 5.0, Double.class);
         speed = getConfig("speed", 1.5, Double.class);
     }
 
