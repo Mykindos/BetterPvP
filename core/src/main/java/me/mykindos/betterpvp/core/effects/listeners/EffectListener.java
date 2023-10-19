@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -51,33 +52,31 @@ public class EffectListener implements Listener {
         }
 
         Effect effect = event.getEffect();
-        Player player = event.getPlayer();
+        LivingEntity target = event.getTarget();
 
-        Optional<List<Effect>> effectsOptional = effectManager.getObject(player.getUniqueId()).or(() -> {
+        Optional<List<Effect>> effectsOptional = effectManager.getObject(target.getUniqueId()).or(() -> {
             List<Effect> effects = new ArrayList<>();
-            effectManager.addObject(player.getUniqueId().toString(), effects);
+            effectManager.addObject(target.getUniqueId().toString(), effects);
             return Optional.of(effects);
         });
         if (effectsOptional.isPresent()) {
             List<Effect> effects = effectsOptional.get();
-            if (effectManager.hasEffect(player, effect.getEffectType())) {
-                effectManager.removeEffect(player, effect.getEffectType());
+            if (effectManager.hasEffect(target, effect.getEffectType())) {
+                effectManager.removeEffect(target, effect.getEffectType());
             }
             if (effect.getEffectType() == EffectType.STRENGTH) {
-                player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, (int) ((effect.getRawLength() / 1000) * 20), effect.getLevel() - 1));
-            }
-            if (effect.getEffectType() == EffectType.SILENCE) {
-                player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 1F, 1.5F);
-                UtilMessage.simpleMessage(player, "Silence", "You have been silenced for <alt>%s</alt> seconds.", effect.getRawLength() / 1000);
+                target.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, (int) ((effect.getRawLength() / 1000) * 20), effect.getLevel() - 1));
+            } else if (effect.getEffectType() == EffectType.SILENCE) {
+                target.getWorld().playSound(target.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 1F, 1.5F);
+                UtilMessage.simpleMessage(target, "Silence", "You have been silenced for <alt>%s</alt> seconds.", effect.getRawLength() / 1000);
+            } else if (effect.getEffectType() == EffectType.VULNERABILITY) {
+                target.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, (int) ((effect.getRawLength() / 1000) * 20), 0));
+            } else if (effect.getEffectType() == EffectType.LEVITATION) {
+                target.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, (int) ((effect.getRawLength() / 1000) * 20), effect.getLevel()));
+            } else if(effect.getEffectType() == EffectType.POISON) {
+                target.addPotionEffect(new PotionEffect(PotionEffectType.POISON, (int) ((effect.getRawLength() / 1000) * 20), effect.getLevel()));
             }
 
-            if (effect.getEffectType() == EffectType.VULNERABILITY) {
-                player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, (int) ((effect.getRawLength() / 1000) * 20), 0));
-            }
-
-            if (effect.getEffectType() == EffectType.LEVITATION) {
-                player.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, (int) ((effect.getRawLength() / 1000) * 20), effect.getLevel()));
-            }
             effects.add(effect);
         }
     }
@@ -217,12 +216,18 @@ public class EffectListener implements Listener {
     }
 
     @EventHandler
+    public void poisonDamageMultiplier(CustomDamageEvent event) {
+        if(event.getCause() != EntityDamageEvent.DamageCause.POISON) return;
+        Optional<Effect> effectOptional = effectManager.getEffect(event.getDamagee(), EffectType.POISON);
+        effectOptional.ifPresent(effect -> event.setDamage(event.getDamage() * effect.getLevel()));
+    }
+
+    @EventHandler
     public void onImmuneToNegativity(EffectReceiveEvent event) {
-        if (effectManager.hasEffect(event.getPlayer(), EffectType.IMMUNETOEFFECTS)) {
+        if (effectManager.hasEffect(event.getTarget(), EffectType.IMMUNETOEFFECTS)) {
             EffectType type = event.getEffect().getEffectType();
 
-            if (type == EffectType.SILENCE || type == EffectType.SHOCK || type == EffectType.VULNERABILITY
-                    || type == EffectType.STUN || type == EffectType.FRAILTY) {
+            if (type.isNegative()) {
                 event.setCancelled(true);
             }
         }
@@ -230,18 +235,22 @@ public class EffectListener implements Listener {
 
     @EventHandler
     public void onInvisibilityGiven(EffectReceiveEvent event) {
-        if (event.getEffect().getEffectType() == EffectType.INVISIBILITY) {
-            for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-                onlinePlayer.hidePlayer(core, event.getPlayer());
+        if (event.getTarget() instanceof Player player) {
+            if (event.getEffect().getEffectType() == EffectType.INVISIBILITY) {
+                for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                    onlinePlayer.hidePlayer(core, player);
+                }
             }
         }
     }
 
     @EventHandler
     public void onInvisibilityRemoved(EffectExpireEvent event) {
-        if (event.getEffect().getEffectType() == EffectType.INVISIBILITY) {
-            for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-                onlinePlayer.showPlayer(core, event.getPlayer());
+        if (event.getTarget() instanceof Player player) {
+            if (event.getEffect().getEffectType() == EffectType.INVISIBILITY) {
+                for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                    onlinePlayer.showPlayer(core, player);
+                }
             }
         }
     }
@@ -249,8 +258,8 @@ public class EffectListener implements Listener {
     @EventHandler
     public void onRespawnInvisibility(PlayerRespawnEvent event) {
         UtilServer.runTaskLater(core, () -> {
-            for(Player player : Bukkit.getOnlinePlayers()) {
-                if(!player.canSee(event.getPlayer())) {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if (!player.canSee(event.getPlayer())) {
                     player.showPlayer(core, event.getPlayer());
                 }
             }
@@ -260,7 +269,7 @@ public class EffectListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onReceiveImmuneToEffect(EffectReceiveEvent event) {
         if (event.getEffect().getEffectType() == EffectType.IMMUNETOEFFECTS) {
-            removeNegativeEffects(event.getPlayer());
+            removeNegativeEffects(event.getTarget());
         }
     }
 
@@ -269,8 +278,8 @@ public class EffectListener implements Listener {
         removeNegativeEffects(event.getPlayer());
     }
 
-    private void removeNegativeEffects(Player player) {
-        for (PotionEffect pot : player.getActivePotionEffects()) {
+    private void removeNegativeEffects(LivingEntity target) {
+        for (PotionEffect pot : target.getActivePotionEffects()) {
 
             if (pot.getType().getName().contains("SLOW")
                     || pot.getType().getName().contains("CONFUSION")
@@ -278,16 +287,15 @@ public class EffectListener implements Listener {
                     || pot.getType().getName().contains("BLINDNESS")
                     || pot.getType().getName().contains("WITHER")
                     || pot.getType().getName().contains("LEVITATION")) {
-                player.removePotionEffect(pot.getType());
+                target.removePotionEffect(pot.getType());
             }
         }
 
-        effectManager.removeEffect(player, EffectType.SHOCK);
-        effectManager.removeEffect(player, EffectType.SILENCE);
-        effectManager.removeEffect(player, EffectType.STUN);
-        effectManager.removeEffect(player, EffectType.VULNERABILITY);
-        effectManager.removeEffect(player, EffectType.FRAILTY);
-        effectManager.removeEffect(player, EffectType.LEVITATION);
-        player.setFireTicks(0);
+        for (EffectType value : EffectType.values()) {
+            if(!value.isNegative()) continue;
+            effectManager.removeEffect(target, value);
+        }
+
+        target.setFireTicks(0);
     }
 }

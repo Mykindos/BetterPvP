@@ -1,23 +1,32 @@
 package me.mykindos.betterpvp.core.effects;
 
+import lombok.Getter;
+
+@Getter
 public enum EffectType {
 
-    SILENCE,
-    VULNERABILITY,
-    STUN,
-    SHOCK,
-    STRENGTH,
-    NOFALL,
-    SHARD_50,
-    SHARD_100,
-    PROTECTION,
-    PVPLOCK,
-    RESISTANCE,
-    INVISIBILITY,
-    INVULNERABILITY,
-    FRAILTY,
-    TEXTURELOADING,
-    IMMUNETOEFFECTS,
-    LEVITATION,
+    SILENCE(true),
+    VULNERABILITY(true),
+    STUN(true),
+    SHOCK(true),
+    STRENGTH(false),
+    NOFALL(false),
+    SHARD_50(false),
+    SHARD_100(false),
+    POISON(true),
+    PROTECTION(false),
+    PVPLOCK(false),
+    RESISTANCE(false),
+    INVISIBILITY(false),
+    INVULNERABILITY(false),
+    FRAILTY(true),
+    TEXTURELOADING(false),
+    IMMUNETOEFFECTS(false),
+    LEVITATION(true);
 
+    final boolean isNegative;
+
+    EffectType(boolean isNegative) {
+        this.isNegative = isNegative;
+    }
 }
