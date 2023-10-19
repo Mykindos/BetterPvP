@@ -86,11 +86,6 @@ skills:
       maxlevel: 5
       cooldown: 15
       baseMultiplier: 1.6
-    ride:
-      enabled: false
-      cooldown: 30
-      maxlevel: 5
-      lifespan: 2.0
     bullscharge:
       enabled: true
       cooldown: 14
@@ -350,6 +345,11 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 14
+    ride:
+      enabled: false
+      cooldown: 30
+      maxlevel: 5
+      lifespan: 2.0
     ropedarrow:
       enabled: true
       maxlevel: 5

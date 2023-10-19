@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.champions.champions.skills.skills.knight.sword;
+package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.sword;
 
 
 import com.google.inject.Inject;
@@ -194,7 +194,7 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
 
     @Override
     public Role getClassType() {
-        return Role.KNIGHT;
+        return Role.RANGER;
     }
 
     @Override
