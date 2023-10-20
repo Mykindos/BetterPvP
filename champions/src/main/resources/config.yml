@@ -367,6 +367,8 @@ skills:
       maxlevel: 5
       baseDamage: 23.0
       deathMessageThreshold: 40.0
+      blockScale: 3.0
+      damageScale: 1.0
     heavyarrows:
       enabled: true
       maxlevel: 5
