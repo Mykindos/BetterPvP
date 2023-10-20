@@ -81,7 +81,7 @@ public class DropMultiplierFishingPerk implements Listener, ProgressionPerk, Dro
                     fishing.getLevel(player).whenComplete((level, throwable1) -> {
                         //cannot increase chance over the max level
                         if (level > maxLevel) level = maxLevel;
-                        int extraDrops = getExtraDrops(level * increasePerLevel);
+                        int extraDrops = getExtraDrops((level - minLevel) * increasePerLevel);
                         Location playerLocation = player.getLocation();
                         for (int i = 0; i < extraDrops; i++) {
                             playerLocation.getWorld().dropItemNaturally(playerLocation, loot.getFishBucket());
