@@ -365,13 +365,13 @@ skills:
     longshot:
       enabled: true
       maxlevel: 5
-      baseDamage: 16.0
+      baseDamage: 23.0
       deathMessageThreshold: 40.0
     heavyarrows:
       enabled: true
       maxlevel: 5
       energy: 20
-      basePushBack: 1.25
+      basePushBack: 1.0
     overcharge:
       enabled: true
       maxlevel: 3

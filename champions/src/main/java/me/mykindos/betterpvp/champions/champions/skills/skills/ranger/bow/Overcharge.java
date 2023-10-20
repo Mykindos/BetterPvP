@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.passives;
+package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.bow;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -169,14 +170,15 @@ public class Overcharge extends Skill implements InteractSkill, Listener {
     @Override
     public SkillType getType() {
 
-        return SkillType.PASSIVE_A;
+        return SkillType.BOW;
     }
 
     @Override
     public void activate(Player player, int level) {
         if (!data.containsKey(player)) {
-            data.put(player, new OverchargeData(player.getUniqueId(), damageIncrement, (1 + level)));
+            data.put(player, new OverchargeData(player.getUniqueId(), damageIncrement, (3 + level)));
             charging.add(player.getUniqueId());
+
         }
     }
 

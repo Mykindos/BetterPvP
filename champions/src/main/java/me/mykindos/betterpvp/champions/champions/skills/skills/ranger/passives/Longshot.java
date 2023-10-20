@@ -53,7 +53,7 @@ public class Longshot extends Skill implements PassiveSkill {
 
         return new String[]{
                 "Your arrow damage is set to <stat>" + minDamage + "</stat>, but gains",
-                "<stat>1</stat> additional damage for every 4 blocks it travels",
+                "<stat>1.0</stat> additional damage for every <stat>3.0</stat> blocks it travels",
                 "",
                 "Caps out at <val>" + (baseDamage + level) + "</val> damage",
                 "",
@@ -107,9 +107,9 @@ public class Longshot extends Skill implements PassiveSkill {
 
         Location loc = arrows.remove(arrow);
         double length = UtilMath.offset(loc, event.getDamagee().getLocation());
-        double damage = Math.min(baseDamage + getLevel(damager),(length / 4) + minDamage);
+        double damage = Math.min(baseDamage + getLevel(damager), (length / 3) + minDamage);
 
-        event.setDamage(event.getDamage() + (damage));
+        event.setDamage(damage);
         event.setReason(getName() + (length > deathMessageThreshold ? " <gray>from <green>" + (int) length + "<gray> blocks" : ""));
 
     }
@@ -122,7 +122,7 @@ public class Longshot extends Skill implements PassiveSkill {
 
     @Override
     public void loadSkillConfig() {
-        baseDamage = getConfig("baseDamage", 16.0, Double.class);
+        baseDamage = getConfig("baseDamage", 23.0, Double.class);
         deathMessageThreshold = getConfig("deathMessageThreshold", 40.0, Double.class);
         minDamage = getConfig("minDamage", 1.0, Double.class);
     }
