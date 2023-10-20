@@ -87,7 +87,7 @@ public class DropMultiplierFishingPerk implements Listener, ProgressionPerk, Dro
                             playerLocation.getWorld().dropItemNaturally(playerLocation, loot.getFishBucket());
                         }
                     }).exceptionally(throwable1 -> {
-                        log.error("Failed to check if player " + event.getPlayer().getName() + " has a level ", throwable);
+                        log.error("Failed to check if player " + event.getPlayer().getName() + " has a level ", throwable1);
                         return null;
                     });
                 }
