@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.entity.ProjectileHitEvent;
 
 import java.util.WeakHashMap;
 
@@ -40,7 +41,7 @@ public class Sharpshooter extends Skill implements PassiveSkill {
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "You deal <val>" + (level * 0.75) + "</val> extra damage for",
+                "You deal <val>" + (level * 0.5) + "</val> extra damage for",
                 "each consecutive hit up to a maximum of <stat>"+ maxConsecutiveHits +"</stat> hits",
                 "",
                 "After <stat>" + maxTimeBetweenShots + "</stat> seconds, bonus damage resets",
@@ -68,6 +69,17 @@ public class Sharpshooter extends Skill implements PassiveSkill {
             event.setDamage(event.getDamage() + (Math.min(maxConsecutiveHits, hitData.getCharge()) * (level * 0.75)));
         }
 
+    }
+
+    @EventHandler
+    public void onArrowMiss(ProjectileHitEvent event) {
+        if(!(event.getEntity() instanceof Arrow)) return;
+        Arrow arrow = (Arrow) event.getEntity();
+        if(!(arrow.getShooter() instanceof Player)) return;
+        if(event.getHitEntity() != null) return;
+
+        Player shooter = (Player) arrow.getShooter();
+        data.remove(shooter);
     }
 
 

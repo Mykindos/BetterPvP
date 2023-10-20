@@ -34,7 +34,7 @@ public class Precision extends Skill implements PassiveSkill {
     public String[] getDescription(int level) {
 
         return new String[] {
-                "Your arrows deal <val>" + (level * 0.5) + "</val> bonus damage on hit"
+                "Your arrows deal <val>" + (0.5 + ((level - 1) * 0.25)) + "</val> bonus damage on hit"
         };
     }
 
@@ -57,7 +57,7 @@ public class Precision extends Skill implements PassiveSkill {
 
         int level = getLevel(damager);
         if(level > 0) {
-            event.setDamage(event.getDamage() + (level * 0.5));
+            event.setDamage(event.getDamage() + (0.5 + ((level - 1) * 0.25)));
         }
 
     }

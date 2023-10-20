@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.bow;
+package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.passives;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -72,7 +72,8 @@ public class Overcharge extends Skill implements InteractSkill, Listener {
                 "Draw back harder on your bow, giving",
                 "<stat>" + damageIncrement + "</stat> bonus damage per <stat>" + durationIncrement + "</stat> seconds",
                 "",
-                "Maximum Damage: <val>" + (2 + level)
+                "Maximum Damage: <val>" + (3 + level)
+
         };
     }
 
@@ -168,7 +169,7 @@ public class Overcharge extends Skill implements InteractSkill, Listener {
     @Override
     public SkillType getType() {
 
-        return SkillType.BOW;
+        return SkillType.PASSIVE_A;
     }
 
     @Override
@@ -216,7 +217,7 @@ public class Overcharge extends Skill implements InteractSkill, Listener {
 
     }
     public void loadSkillConfig() {
-        damageIncrement = getConfig("damageIncrement", 2, Integer.class);
-        durationIncrement = getConfig("durationIncrement", 0.8, Double.class);
+        damageIncrement = getConfig("damageIncrement", 1, Integer.class);
+        durationIncrement = getConfig("durationIncrement", 0.5, Double.class);
     }
 }

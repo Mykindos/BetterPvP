@@ -365,7 +365,7 @@ skills:
     longshot:
       enabled: true
       maxlevel: 5
-      baseDamage: 18.0
+      baseDamage: 16.0
       deathMessageThreshold: 40.0
     heavyarrows:
       enabled: true
@@ -374,7 +374,7 @@ skills:
       basePushBack: 1.25
     overcharge:
       enabled: true
-      maxlevel: 5
+      maxlevel: 3
     huntersthrill:
       enabled: true
       maxlevel: 5

@@ -35,6 +35,7 @@ public class Longshot extends Skill implements PassiveSkill {
 
     private double baseDamage;
     private double deathMessageThreshold;
+    private double minDamage;
 
     @Inject
     public Longshot(Champions champions, ChampionsManager championsManager) {
@@ -51,8 +52,8 @@ public class Longshot extends Skill implements PassiveSkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Shoot an arrow that gains additional",
-                "damage the further it travels",
+                "Your arrow damage is set to <stat>" + minDamage + "</stat>, but gains",
+                "<stat>1</stat> additional damage for every 4 blocks it travels",
                 "",
                 "Caps out at <val>" + (baseDamage + level) + "</val> damage",
                 "",
@@ -106,18 +107,12 @@ public class Longshot extends Skill implements PassiveSkill {
 
         Location loc = arrows.remove(arrow);
         double length = UtilMath.offset(loc, event.getDamagee().getLocation());
-        double damage = Math.min(baseDamage + getLevel(damager), length / 3.5);
+        double damage = Math.min(baseDamage + getLevel(damager),(length / 4) + minDamage);
 
         event.setDamage(event.getDamage() + (damage));
         event.setReason(getName() + (length > deathMessageThreshold ? " <gray>from <green>" + (int) length + "<gray> blocks" : ""));
 
     }
-
-    @EventHandler
-    public void onDeath(CustomDeathEvent event) {
-
-    }
-
 
     @Override
     public SkillType getType() {
@@ -126,9 +121,10 @@ public class Longshot extends Skill implements PassiveSkill {
     }
 
     @Override
-    public void loadSkillConfig(){
-        baseDamage = getConfig("baseDamage", 14.0, Double.class);
+    public void loadSkillConfig() {
+        baseDamage = getConfig("baseDamage", 16.0, Double.class);
         deathMessageThreshold = getConfig("deathMessageThreshold", 40.0, Double.class);
+        minDamage = getConfig("minDamage", 1.0, Double.class);
     }
 
 }
