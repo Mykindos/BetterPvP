@@ -20,7 +20,7 @@ public class Button {
     protected List<Component> lore;
     protected ItemStack itemStack;
 
-    public Button(int slot, ItemStack item, String name, String... lore){
+    public Button(int slot, ItemStack item, String name, String... lore) {
         this(slot, item, name, List.of(lore));
     }
 
@@ -40,17 +40,21 @@ public class Button {
     }
 
     public Button(int slot, ItemStack item) {
-        this.slot= slot;
+        this.slot = slot;
         this.lore = item.getItemMeta().lore();
         this.name = item.displayName().decoration(TextDecoration.ITALIC, false);
         this.itemStack = item;
+    }
+
+    public Button(int slot) {
+        this.slot = slot;
     }
 
     public void onClick(Player player, Gamer gamer, ClickType clickType) {
 
     }
 
-    public double getClickCooldown(){
+    public double getClickCooldown() {
         return 0.05;
     }
 }

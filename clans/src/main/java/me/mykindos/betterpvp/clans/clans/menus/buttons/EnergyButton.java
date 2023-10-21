@@ -1,8 +1,10 @@
 package me.mykindos.betterpvp.clans.clans.menus.buttons;
 
 import me.mykindos.betterpvp.clans.clans.Clan;
+import me.mykindos.betterpvp.clans.clans.menus.EnergyMenu;
 import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.menu.Button;
+import me.mykindos.betterpvp.core.menu.MenuManager;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.ItemView;
@@ -13,6 +15,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 
 public class EnergyButton extends Button {
@@ -25,12 +28,15 @@ public class EnergyButton extends Button {
         this.clan = clan;
         this.ownClan = clan.getMemberByUUID(player.getUniqueId()).isPresent();
 
-        this.name = Component.text("Energy",NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC,false);
+        this.name = Component.text("Energy", NamedTextColor.YELLOW);
         this.lore = new ArrayList<>();
-        lore.add(UtilMessage.deserialize("%d / ∞", clan.getEnergy()));
+        lore.add(UtilMessage.deserialize("Current Energy: <yellow>%s", NumberFormat.getInstance().format(clan.getEnergy())));
+        if (clan.getTerritory().size() > 0) {
+            lore.add(UtilMessage.deserialize("Disbands in: <yellow>%s", clan.getEnergyTimeRemaining()));
+        }
         if (ownClan) {
             lore.add(Component.text(""));
-            lore.add(Component.text("Left click to open the energy shop", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC,false));
+            lore.add(Component.text("Left click to open the energy shop", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
         }
 
         this.itemStack = UtilItem.removeAttributes(UtilItem.setItemNameAndLore(itemStack, name, lore)).clone();
@@ -42,7 +48,7 @@ public class EnergyButton extends Button {
         if (!ownClan) return;
 
         if (clickType.isLeftClick()) {
-            // TODO add clan shop menu later
+            MenuManager.openMenu(player, new EnergyMenu(player, clan));
         }
     }
 

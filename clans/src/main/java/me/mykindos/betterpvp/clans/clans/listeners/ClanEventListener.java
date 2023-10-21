@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.clans.clans.data.ClanDefaultValues;
 import me.mykindos.betterpvp.clans.clans.events.ChunkClaimEvent;
 import me.mykindos.betterpvp.clans.clans.events.ChunkUnclaimEvent;
 import me.mykindos.betterpvp.clans.clans.events.ClanAllianceEvent;
+import me.mykindos.betterpvp.clans.clans.events.ClanBuyEnergyEvent;
 import me.mykindos.betterpvp.clans.clans.events.ClanCreateEvent;
 import me.mykindos.betterpvp.clans.clans.events.ClanDisbandEvent;
 import me.mykindos.betterpvp.clans.clans.events.ClanEnemyEvent;
@@ -35,12 +36,17 @@ import me.mykindos.betterpvp.core.components.clans.events.ClanEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.events.scoreboard.ScoreboardUpdateEvent;
 import me.mykindos.betterpvp.core.framework.inviting.InviteHandler;
+import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.gamer.exceptions.NoSuchGamerException;
+import me.mykindos.betterpvp.core.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilLocation;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.UtilSound;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
 import net.kyori.adventure.text.Component;
@@ -49,10 +55,12 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 
+import java.text.NumberFormat;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -82,7 +90,7 @@ public class ClanEventListener extends ClanListener {
             Bukkit.getOnlinePlayers().forEach(player -> UtilServer.runTaskLater(clans,
                     () -> UtilServer.callEvent(new ScoreboardUpdateEvent(player)), 5));
         } else {
-            UtilServer.runTaskLater(clans, () -> UtilServer.callEvent(new ScoreboardUpdateEvent(event.getPlayer())), 5);
+            UtilServer.runTaskLater(clans, () -> event.getClan().updateScoreboards(), 5);
         }
     }
 
@@ -167,6 +175,16 @@ public class ClanEventListener extends ClanListener {
             enemy.getClan().getEnemies().removeIf(en -> en.getClan().getName().equalsIgnoreCase(clan.getName()));
         }
 
+        if (clan.getTerritory().isEmpty()) {
+            UtilMessage.broadcast("Clans", "<alt2>Clan " + clan.getName() + "</alt2> has been disbanded.");
+        } else {
+            Chunk chunk = UtilWorld.stringToChunk(clan.getTerritory().get(0).getChunk());
+            if(chunk != null) {
+                UtilMessage.broadcast("Clans", "<alt2>Clan " + clan.getName() + "</alt2> has been disbanded. (<yellow>%s</yellow>)",
+                        (chunk.getX() * 16 )+ "<gray>,</gray> " + (chunk.getZ() * 16));
+            }
+        }
+
         clan.getMembers().clear();
         clan.getTerritory().clear();
         clan.getEnemies().clear();
@@ -175,8 +193,6 @@ public class ClanEventListener extends ClanListener {
         clanManager.getRepository().delete(clan);
         clanManager.getObjects().remove(clan.getName());
 
-        //UtilMessage.broadcast("Clans", "<alt2>" + event.getPlayer().getName() + "</alt2> disbanded <alt2>Clan " + clan.getName() + "</alt2>.");
-        UtilMessage.broadcast("Clans", "<alt2>Clan " + clan.getName() + "</alt2> has been disbanded.");
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -222,8 +238,7 @@ public class ClanEventListener extends ClanListener {
                 UtilMessage.simpleMessage(player, "Clans", "<alt2>Clan " + clan.getName() + "</alt2> has too many members or allies");
                 return;
             }
-        }
-        else {
+        } else {
             gamerManager.sendMessageToRank("Clans", UtilMessage.deserialize("<yellow>%s<gray> force joined <yellow>%s", player.getName(), clan.getName()), Rank.HELPER);
         }
 
