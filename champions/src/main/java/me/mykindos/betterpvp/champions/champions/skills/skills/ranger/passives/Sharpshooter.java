@@ -46,7 +46,8 @@ public class Sharpshooter extends Skill implements PassiveSkill {
                 "You deal <val>" + (level * 0.75) + "</val> extra damage for",
                 "each consecutive hit up to a maximum of <stat>"+ maxConsecutiveHits +"</stat> hits",
                 "",
-                "After <stat>" + maxTimeBetweenShots + "</stat> seconds, bonus damage resets",
+                "After <stat>" + maxTimeBetweenShots + "</stat> seconds, or after missing <stat>"+numMisses+"</stat> times,",
+                "your arrow damage will reset"
         };
     }
 
@@ -80,11 +81,14 @@ public class Sharpshooter extends Skill implements PassiveSkill {
         if(event.getHitEntity() != null) return;
 
         Player shooter = (Player) arrow.getShooter();
+        int level = shooter.getLevel();
 
-        misses.put(shooter, misses.getOrDefault(shooter, 0) + 1);
-        if(misses.get(shooter) >= numMisses) {
-            data.remove(shooter);
-            misses.put(shooter, 0);
+        if(level > 0){
+            misses.put(shooter, misses.getOrDefault(shooter, 0) + 1);
+            if(misses.get(shooter) >= numMisses) {
+                data.remove(shooter);
+                misses.put(shooter, 0);
+            }
         }
     }
 
@@ -92,7 +96,7 @@ public class Sharpshooter extends Skill implements PassiveSkill {
     public void updateSharpshooterData() {
         data.entrySet().removeIf(entry -> {
             if(System.currentTimeMillis() > entry.getValue().getLastHit() + ((maxTimeBetweenShots + getLevel(entry.getKey())) * 1000L)) {
-                misses.put(entry.getKey(), 0);
+                misses.remove(entry.getKey());
                 return true;
             }
             return false;
