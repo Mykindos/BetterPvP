@@ -152,13 +152,15 @@ public class SkillListener implements Listener {
 
                 RoleBuild build = builds.getActiveBuilds().get(role.getName());
                 if (build == null) return;
-                if (build.getPassiveB() == null) return;
 
-                Skill skill = build.getPassiveB().getSkill();
+                BuildSkill passiveB = build.getPassiveB();
+                if (passiveB == null) return;
+
+                Skill skill = passiveB.getSkill();
                 if (!(skill instanceof ToggleSkill)) return;
 
-
-                int level = getLevel(player, build.getBuildSkill(SkillType.PASSIVE_B));
+                // Check if they have booster
+                int level = getLevel(player, passiveB);
 
                 UtilServer.callEvent(new PlayerUseToggleSkillEvent(player, skill, level));
                 event.setCancelled(true);

@@ -98,7 +98,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
     }
 
     public void setEnergy(int energy) {
-        putProperty(ClanProperty.ENERGY, energy);
+        saveProperty(ClanProperty.ENERGY.name(), energy, true);
     }
 
     public Optional<ClanMember> getLeader() {
@@ -138,6 +138,10 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
         }
 
         return players;
+    }
+
+    public void updateScoreboards() {
+        getMembersAsPlayers().forEach(player -> UtilServer.callEvent(new ScoreboardUpdateEvent(player)));
     }
 
     public List<Player> getAdminsAsPlayers() {
@@ -241,12 +245,15 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
         if (getTerritory().isEmpty()) {
             return "\u221E";
         }
-        return UtilTime.getTime(getEnergyRatio() * 3600000, UtilTime.TimeUnit.BEST, 2);
+        return UtilTime.getTime((getEnergy() / getEnergyRatio()) * 3600000, UtilTime.TimeUnit.BEST, 2);
 
     }
 
+    /**
+     * @return The amount of energy a clan will lose per hour
+     */
     public double getEnergyRatio() {
-        return getEnergy() / (float) (getTerritory().size() * 25);
+        return getTerritory().size() * 25;
     }
 
     public ClanRelation getRelation(@Nullable Clan targetClan) {
