@@ -400,6 +400,7 @@ skills:
       maxlevel: 3
       maxTimeBetweenShots: 5.0
       maxConsecutiveHits: 4
+      numMisses: 2
     agility:
       enabled: true
       maxlevel: 5

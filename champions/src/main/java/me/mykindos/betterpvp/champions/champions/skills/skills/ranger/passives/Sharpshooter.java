@@ -24,9 +24,11 @@ import java.util.WeakHashMap;
 public class Sharpshooter extends Skill implements PassiveSkill {
 
     private final WeakHashMap<Player, StackingHitData> data = new WeakHashMap<>();
+    private final WeakHashMap<Player, Integer> misses = new WeakHashMap<>();
 
     private double maxTimeBetweenShots;
     private int maxConsecutiveHits;
+    private int numMisses;
 
     @Inject
     public Sharpshooter(Champions champions, ChampionsManager championsManager) {
@@ -78,15 +80,25 @@ public class Sharpshooter extends Skill implements PassiveSkill {
         if(event.getHitEntity() != null) return;
 
         Player shooter = (Player) arrow.getShooter();
-        data.remove(shooter);
+
+        misses.put(shooter, misses.getOrDefault(shooter, 0) + 1);
+        if(misses.get(shooter) >= numMisses) {
+            data.remove(shooter);
+            misses.put(shooter, 0);
+        }
     }
-
-
 
     @UpdateEvent(delay=100)
     public void updateSharpshooterData() {
-        data.entrySet().removeIf(entry -> System.currentTimeMillis() > entry.getValue().getLastHit() + ((maxTimeBetweenShots + getLevel(entry.getKey())) * 1000L));
+        data.entrySet().removeIf(entry -> {
+            if(System.currentTimeMillis() > entry.getValue().getLastHit() + ((maxTimeBetweenShots + getLevel(entry.getKey())) * 1000L)) {
+                misses.put(entry.getKey(), 0);
+                return true;
+            }
+            return false;
+        });
     }
+
 
     @Override
     public SkillType getType() {
@@ -98,6 +110,7 @@ public class Sharpshooter extends Skill implements PassiveSkill {
     public void loadSkillConfig(){
         maxTimeBetweenShots = getConfig("maxTimeBetweenShots", 5.0, Double.class);
         maxConsecutiveHits = getConfig("maxConsecutiveHits", 4, Integer.class);
+        numMisses = getConfig("numMisses",2, Integer.class);
     }
 
 }
