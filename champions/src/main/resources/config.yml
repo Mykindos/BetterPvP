@@ -189,7 +189,7 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 25
-      duration: 4.0
+      duration: 5.0
       sphereSize: 5
       speed: 1.5
     lightningorb:

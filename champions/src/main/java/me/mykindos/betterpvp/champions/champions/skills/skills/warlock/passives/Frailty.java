@@ -98,7 +98,7 @@ public class Frailty extends Skill implements PassiveSkill {
             if (player != null) {
                 int level = getLevel(player);
                 if (level <= 0) return;
-                for (Player target : UtilPlayer.getNearbyAllies(player, player.getLocation(), 5)) {
+                for (Player target : UtilPlayer.getNearbyEnemies(player, player.getLocation(), 5)) {
                     if (target.getHealth() / UtilPlayer.getMaxHealth(target) * 100 < (40 + ((level - 1) * 10))) {
                         target.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 30, 0));
                     }

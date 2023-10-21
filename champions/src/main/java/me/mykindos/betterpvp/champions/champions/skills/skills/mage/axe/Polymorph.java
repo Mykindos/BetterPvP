@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.champions.champions.skills.skills.mage.sword;
+package me.mykindos.betterpvp.champions.champions.skills.skills.mage.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -16,6 +16,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEvent;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
+import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Sound;
@@ -33,8 +34,7 @@ import java.util.Map.Entry;
 import java.util.WeakHashMap;
 
 @Singleton
-//@BPvPListener
-@Deprecated(since = "1.0.0")
+@BPvPListener
 public class Polymorph extends PrepareSkill implements CooldownSkill {
 
     public final WeakHashMap<LivingEntity, Long> polymorphed = new WeakHashMap<>();
@@ -56,9 +56,9 @@ public class Polymorph extends PrepareSkill implements CooldownSkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Right click with a Sword to prepare",
+                "Right click with an Axe to prepare",
                 "",
-                "The next player you hit, is polymorphed",
+                "The next player you hit is polymorphed",
                 "into a sheep for <stat>" + polymorphDuration + "</stat> seconds",
                 "",
                 "While a player is polymorphed, they cannot deal",
@@ -134,7 +134,7 @@ public class Polymorph extends PrepareSkill implements CooldownSkill {
     @Override
     public SkillType getType() {
 
-        return SkillType.SWORD;
+        return SkillType.AXE;
     }
 
     @Override
