@@ -29,6 +29,7 @@ public abstract class Tip {
         this.defaultCategoryWeight = defaultCategoryWeight;
         this.defaultWeight = defaultWeight;
         this.component = component;
+        loadConfig();
     }
 
     public Tip(BPvPPlugin plugin, int defaultCategoryWeight, int defaultWeight) {
@@ -40,6 +41,10 @@ public abstract class Tip {
 
     public boolean isValid(Player player) {
         return false;
+    }
+
+    public boolean isEnabled() {
+        return this.enabled;
     }
 
     public Component generateComponent() {

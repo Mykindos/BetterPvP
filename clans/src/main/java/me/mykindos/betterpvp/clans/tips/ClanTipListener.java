@@ -42,7 +42,7 @@ public class ClanTipListener implements Listener {
 
         tipManager.getTips().forEach(tip -> {
             if (tip instanceof ClanTip clanTip) {
-                if (clanTip.isValid(player, clan)) {
+                if (clanTip.isEnabled() && clanTip.isValid(player, clan)) {
                     tipList.add(tip.getCategoryWeight(), tip.getWeight(), tip);
                 }
             }

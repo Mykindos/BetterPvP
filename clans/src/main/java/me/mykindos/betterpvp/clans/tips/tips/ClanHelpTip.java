@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.clans.tips.tips;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
@@ -12,6 +13,7 @@ import org.bukkit.entity.Player;
 @Singleton
 public class ClanHelpTip extends ClanTip implements IRunCommand {
 
+    @Inject
     public ClanHelpTip(Clans clans) {
         super(clans, 1, 1);
         setComponent(generateComponent());
