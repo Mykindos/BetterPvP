@@ -140,6 +140,9 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
                 double curRange = 0.0D;
                 Location target = this.loc.remove(player);
 
+                float currentYaw = player.getLocation().getYaw();
+                float currentPitch = player.getLocation().getPitch();
+
                 boolean done = false;
                 while (!done) {
                     Vector vec = UtilVelocity.getTrajectory(player.getLocation(),
@@ -162,7 +165,11 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
                     }
                 }
 
+                target.setYaw(currentYaw);
+                target.setPitch(currentPitch);
+
                 player.teleport(target);
+
                 player.getWorld().playEffect(player.getLocation(), Effect.BLAZE_SHOOT, 0, 15);
             }
         }, 1);
