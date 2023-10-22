@@ -36,6 +36,10 @@ public class HitboxHandler implements Listener {
     private double hitboxExpansion = 0.0;
 
     @Inject
+    @Config(path = "pvp.hitboxCooldown", defaultValue = "0.1")
+    private double hitboxCooldown;
+
+    @Inject
     private CooldownManager cooldownManager;
 
     @EventHandler
@@ -50,7 +54,7 @@ public class HitboxHandler implements Listener {
             return;
         }
 
-        if (!cooldownManager.use(player, "Hitbox", 0.4, false)) {
+        if (!cooldownManager.use(player, "Hitbox", hitboxCooldown, false)) {
             return;
         }
 
