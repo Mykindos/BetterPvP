@@ -31,9 +31,9 @@ public class HitboxHandler implements Listener {
     @Inject
     private Core core;
 
-    @Config(path = "pvp.hitboxExpansion", defaultValue = "0.0")
+    @Config(path = "pvp.hitboxExpansion", defaultValue = "0.1")
     @Inject
-    private double hitboxExpansion = 0.0;
+    private double hitboxExpansion;
 
     @Inject
     @Config(path = "pvp.hitboxCooldown", defaultValue = "0.1")
