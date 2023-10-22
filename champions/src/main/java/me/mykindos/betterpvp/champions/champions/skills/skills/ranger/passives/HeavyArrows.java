@@ -118,6 +118,6 @@ public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill {
     }
 
     public void loadSkillConfig(){
-        basePushBack = getConfig("basePushBack", 1.25, Double.class);
+        basePushBack = getConfig("basePushBack", 1.1, Double.class);
     }
 }

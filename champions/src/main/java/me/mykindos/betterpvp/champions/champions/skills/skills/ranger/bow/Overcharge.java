@@ -174,7 +174,7 @@ public class Overcharge extends Skill implements InteractSkill, Listener {
     @Override
     public void activate(Player player, int level) {
         if (!data.containsKey(player)) {
-            data.put(player, new OverchargeData(player.getUniqueId(), damageIncrement, (1 + level)));
+            data.put(player, new OverchargeData(player.getUniqueId(), damageIncrement, (2 + level)));
             charging.add(player.getUniqueId());
         }
     }
@@ -216,7 +216,7 @@ public class Overcharge extends Skill implements InteractSkill, Listener {
 
     }
     public void loadSkillConfig() {
-        damageIncrement = getConfig("damageIncrement", 2, Integer.class);
-        durationIncrement = getConfig("durationIncrement", 0.8, Double.class);
+        damageIncrement = getConfig("damageIncrement", 1, Integer.class);
+        durationIncrement = getConfig("durationIncrement", 0.4, Double.class);
     }
 }

@@ -371,10 +371,12 @@ skills:
       enabled: true
       maxlevel: 5
       energy: 20
-      basePushBack: 1.25
+      basePushBack: 1.1
     overcharge:
       enabled: true
       maxlevel: 5
+      damageIncrement: 1
+      durationIncrement: 0.4
     huntersthrill:
       enabled: true
       maxlevel: 5
@@ -400,6 +402,7 @@ skills:
       maxlevel: 3
       maxTimeBetweenShots: 5.0
       maxConsecutiveHits: 4
+      numMisses: 2
     agility:
       enabled: true
       maxlevel: 5
