@@ -1,6 +1,8 @@
 package me.mykindos.betterpvp.clans.tips.tips;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.tips.ClanTip;
 import me.mykindos.betterpvp.clans.tips.types.ISuggestCommand;
@@ -11,8 +13,9 @@ import org.bukkit.entity.Player;
 @Singleton
 public class ClanInviteTip extends ClanTip implements ISuggestCommand {
 
-    public ClanInviteTip() {
-        super(2, 1);
+    @Inject
+    public ClanInviteTip(Clans clans) {
+        super(clans, 2, 1);
         setComponent(generateComponent());
     }
 

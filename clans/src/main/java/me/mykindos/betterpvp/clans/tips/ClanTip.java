@@ -1,6 +1,8 @@
 package me.mykindos.betterpvp.clans.tips;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.core.tips.Tip;
 import net.kyori.adventure.text.Component;
@@ -9,12 +11,13 @@ import org.bukkit.entity.Player;
 @Singleton
 public abstract class ClanTip extends Tip {
 
-    public ClanTip(int categoryWeight, int weight, Component component) {
-        super(categoryWeight, weight, component);
+
+    public ClanTip(Clans clans, int defaultCategoryWeight, int defaultWeight, Component component) {
+        super(clans, defaultCategoryWeight, defaultWeight, component);
     }
 
-    public ClanTip(int categoryWeight, int weight) {
-        super(categoryWeight, weight);
+    public ClanTip(Clans clans, int defaultCategoryWeight, int defaultWeight) {
+        super(clans, defaultCategoryWeight, defaultWeight);
     }
 
     public boolean isValid(Player player, Clan clan) {
