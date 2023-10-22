@@ -48,7 +48,9 @@ public class ClanEnergyListener extends ClanListener {
             Optional<Clan> clanOptional = clanManager.getClanByPlayer(player);
             if (clanOptional.isPresent()) {
                 Clan clan = clanOptional.get();
-                UtilServer.runTaskLater(clans, () -> UtilServer.callEvent(new EnergyCheckEvent(player, clan)), 5);
+                if(!clan.getTerritory().isEmpty()) {
+                    UtilServer.runTaskLater(clans, () -> UtilServer.callEvent(new EnergyCheckEvent(player, clan)), 5);
+                }
             }
         });
     }
