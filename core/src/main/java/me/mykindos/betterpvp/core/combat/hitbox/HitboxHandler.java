@@ -1,22 +1,28 @@
 package me.mykindos.betterpvp.core.combat.hitbox;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.Config;
+import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilLocation;
+import org.bukkit.FluidCollisionMode;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.util.BoundingBox;
+import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
-import java.util.Collection;
+import java.util.Objects;
 
 @BPvPListener
+@Singleton
 public class HitboxHandler implements Listener {
 
     private static final double CREATIVE_ATTACK_REACH = 5.0D;
@@ -28,6 +34,13 @@ public class HitboxHandler implements Listener {
     @Config(path = "pvp.hitboxExpansion", defaultValue = "0.0")
     @Inject
     private double hitboxExpansion = 0.0;
+
+    @Inject
+    @Config(path = "pvp.hitboxCooldown", defaultValue = "0.1")
+    private double hitboxCooldown;
+
+    @Inject
+    private CooldownManager cooldownManager;
 
     @EventHandler
     public void onSwingBlock(PlayerInteractEvent event) {
@@ -41,32 +54,49 @@ public class HitboxHandler implements Listener {
             return;
         }
 
-        final Location loc = player.getEyeLocation();
+        if (!cooldownManager.use(player, "Hitbox", hitboxCooldown, false)) {
+            return;
+        }
+
         double reach = player.getGameMode().equals(GameMode.CREATIVE) ? CREATIVE_ATTACK_REACH : SURVIVAL_ATTACK_REACH;
-        final Vector attackStart = loc.toVector();
-        final Vector direction = loc.getDirection();
 
-        final Collection<Player> nearby = loc.getNearbyEntitiesByType(Player.class, reach + hitboxExpansion);
-        nearby.remove(player);
-        for (Player other : nearby) {
-            final BoundingBox box = other.getBoundingBox().clone().expand(hitboxExpansion, 0, hitboxExpansion);
+        final Location attackStart = player.getEyeLocation();
+        final Vector direction = attackStart.getDirection();
 
-            // Get projection of the direction to the center of the hitbox
-            // over the direction of the attack to shift the hitbox by that
-            // vector and see if it overlaps with the start of the attack
-            final Vector distance = box.getCenter().subtract(attackStart);
-            final double projectionLength = direction.clone().dot(distance) / direction.length();
-            final Vector projection = direction.clone().multiply(projectionLength);
+        final RayTraceResult entityHit = attackStart.getWorld().rayTraceEntities(
+                attackStart,
+                direction,
+                reach,
+                hitboxExpansion,
+                entity -> entity instanceof LivingEntity && entity != player && player.canSee(entity) && (player.hasLineOfSight(entity) || player.hasLineOfSight(entity.getLocation()))
+        );
 
-            // Multiply the projection by -1 to get the vector from the center of the hitbox
-            // to the start of the attack
-            final BoundingBox shifted = box.clone().shift(projection.multiply(-1));
-            if (shifted.contains(attackStart)) {
-                player.attack(other);
-                return;
+        if (entityHit == null) {
+            return; // No entity hit
+        }
+
+        final LivingEntity entity = (LivingEntity) Objects.requireNonNull(entityHit.getHitEntity());
+        final RayTraceResult blockHit = attackStart.getWorld().rayTraceBlocks(attackStart,
+                direction,
+                reach,
+                FluidCollisionMode.NEVER,
+                true);
+
+        final Vector startVector = attackStart.toVector();
+        if (blockHit != null) {
+            final Vector blockPosition = blockHit.getHitPosition();
+            final Vector hitPosition = entityHit.getHitPosition().setY(blockPosition.getY());
+            hitPosition.add(direction.multiply(hitboxExpansion));
+            if (hitPosition.distanceSquared(startVector) > blockPosition.distanceSquared(startVector)) {
+                return; // Return if the block is hit before the player
             }
         }
+
+        if (!UtilLocation.isInFront(player, entity.getLocation()) && !UtilLocation.isInFront(player, entity.getEyeLocation())) {
+            return; // Return if the entity is behind the player
+        }
+
+        player.attack(entity);
     }
 
 }
-
