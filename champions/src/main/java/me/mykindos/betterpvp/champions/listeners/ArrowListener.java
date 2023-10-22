@@ -71,7 +71,6 @@ public class ArrowListener implements Listener {
     @EventHandler
     public void onShootBow(EntityShootBowEvent event) {
         if (event.getProjectile() instanceof Arrow arrow) {
-            System.out.println(arrow.getVelocity().length() * 3);
             arrow.setCritical(false);
             if (event.getEntity() instanceof Player player) {
                 arrow.setMetadata("ShotWith", new FixedMetadataValue(champions, player.getInventory().getItemInMainHand().getType().name()));
