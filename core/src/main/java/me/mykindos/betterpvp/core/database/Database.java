@@ -15,10 +15,7 @@ import javax.inject.Inject;
 import javax.sql.rowset.CachedRowSet;
 import javax.sql.rowset.RowSetFactory;
 import javax.sql.rowset.RowSetProvider;
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -65,14 +62,18 @@ public class Database {
     }
 
     public void executeBatch(List<Statement> statements, boolean async) {
+        executeBatch(statements, async, null);
+    }
+
+    public void executeBatch(List<Statement> statements, boolean async, Consumer<ResultSet> callback) {
         if (async) {
-            UtilServer.runTaskAsync(core, () -> executeBatch(statements));
+            UtilServer.runTaskAsync(core, () -> executeBatch(statements, callback));
         } else {
-            executeBatch(statements);
+            executeBatch(statements, callback);
         }
     }
 
-    private void executeBatch(List<Statement> statements) {
+    private void executeBatch(List<Statement> statements, Consumer<ResultSet> callback) {
         Connection connection = getConnection().getDatabaseConnection();
         if (statements.isEmpty()) {
             return;
@@ -90,6 +91,10 @@ public class Database {
                 preparedStatement.addBatch();
             }
             preparedStatement.executeBatch();
+
+            if (callback != null) {
+                callback.accept(preparedStatement.getGeneratedKeys());
+            }
         } catch (SQLException ex) {
             ex.printStackTrace();
             try {

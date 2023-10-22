@@ -1,0 +1,24 @@
+package me.mykindos.betterpvp.core.combat.stats;
+
+import me.mykindos.betterpvp.core.database.Database;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.UUID;
+
+/**
+ * Loads attachments for {@link CombatData} objects.
+ */
+@FunctionalInterface
+public interface AttachmentLoader {
+
+    /**
+     * Loads an attachment for the given {@link CombatData} object.
+     * @param player The UUID of the player
+     * @param data The combat data
+     * @param database The database
+     * @param databasePrefix The database prefix
+     * @return The attachment
+     */
+    @NotNull ICombatDataAttachment loadAttachment(@NotNull UUID player, @NotNull CombatData data, @NotNull Database database, @NotNull String databasePrefix);
+
+}

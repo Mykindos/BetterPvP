@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
+import me.mykindos.betterpvp.core.utilities.model.ConfigAccessor;
 import me.mykindos.betterpvp.core.utilities.model.WeighedList;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.model.stats.ProgressionStatsRepository;
@@ -44,7 +45,7 @@ import java.util.concurrent.CompletableFuture;
 // The data should be saved on shutdown
 @Slf4j
 @Singleton
-public class FishingRepository extends ProgressionStatsRepository<Fishing, FishingData> {
+public class FishingRepository extends ProgressionStatsRepository<Fishing, FishingData> implements ConfigAccessor {
 
     @Getter
     private final WeighedList<FishingLootType> lootTypes = new WeighedList<>();
