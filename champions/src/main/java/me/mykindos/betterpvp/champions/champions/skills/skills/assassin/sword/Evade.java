@@ -71,9 +71,8 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
                 "",
                 "If a player hits you while Evading,",
                 "you will teleport behind the attacker",
-                "and your cooldown will be set between <stat>0</stat>",
-                "and  <stat>" + internalCD + "</stat> seconds depending on how long ",
-                "you held down the ability for",
+                "and your cooldown will be set to double",
+                "the duration you blocked for",
                 "",
                 "Hold crouch while Evading to teleport backwards",
                 "",
@@ -123,7 +122,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
 
             long channelTime = System.currentTimeMillis() - handRaisedTime.get(player.getUniqueId());
             double channelTimeInSeconds = channelTime / 1000.0;
-            double newCooldown = internalCD - (internalCD - channelTimeInSeconds);
+            double newCooldown = internalCD - (internalCD - (channelTimeInSeconds * 2));
 
             cooldownManager.use(player, getName(), newCooldown, true);
             handRaisedTime.remove(player.getUniqueId());
@@ -313,8 +312,8 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
 
     @Override
     public void loadSkillConfig() {
-        duration = getConfig("duration", 1.25, Double.class);
-        internalCD = getConfig("internalCD", 1.25, Double.class);
+        duration = getConfig("duration", 1.5, Double.class);
+        internalCD = getConfig("internalCD", 3.0, Double.class);
         forcedDamageDelay = getConfig("forcedDamageDelay", 400, Integer.class);
     }
 }

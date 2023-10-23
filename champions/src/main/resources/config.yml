@@ -78,8 +78,8 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 15
-      duration: 1.25
-      internalCD: 1.25
+      duration: 1.5
+      internalCD: 3.0
   knight:
     shieldsmash:
       enabled: true
@@ -371,7 +371,7 @@ skills:
       enabled: true
       maxlevel: 5
       energy: 20
-      basePushBack: 1.1
+      basePushBack: 1.0
     overcharge:
       enabled: true
       maxlevel: 5
