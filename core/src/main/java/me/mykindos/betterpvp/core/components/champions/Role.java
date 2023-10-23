@@ -23,6 +23,10 @@ public enum Role {
     private final Material leggings;
     private final Material boots;
 
+    private void loadRoles() {
+
+    }
+
     public String getPrefix() {
         return name.substring(0, 1);
     }
