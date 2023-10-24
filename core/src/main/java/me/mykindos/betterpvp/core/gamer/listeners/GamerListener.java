@@ -59,6 +59,8 @@ public class GamerListener implements Listener {
 
             gamerManager.addObject(event.getClient().getUuid(), gamer);
             gamerManager.getGamerRepository().save(gamer);
+
+            // TODO new player protection
         }else{
             gamer = gamerOptional.get();
 

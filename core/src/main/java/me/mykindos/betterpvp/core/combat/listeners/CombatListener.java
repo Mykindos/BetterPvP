@@ -9,8 +9,8 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageReductionEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomKnockbackEvent;
 import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
-import me.mykindos.betterpvp.core.combat.log.DamageLog;
-import me.mykindos.betterpvp.core.combat.log.DamageLogManager;
+import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
+import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.gamer.properties.GamerProperty;
@@ -511,6 +511,5 @@ public class CombatListener implements Listener {
             event.setIgnoreArmour(true);
         }
     }
-
 
 }

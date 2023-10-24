@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.combat.log;
+package me.mykindos.betterpvp.core.combat.damagelog;
 
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
