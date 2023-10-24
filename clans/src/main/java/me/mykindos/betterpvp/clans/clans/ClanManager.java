@@ -305,6 +305,15 @@ public class ClanManager extends Manager<Clan> {
         return membersString.toString();
     }
 
+    public boolean canTeleport(Player player) {
+        Optional<Gamer> gamerOptional = gamerManager.getObject(player.getUniqueId());
+        if (!gamerOptional.isPresent()) {
+            return false;
+        }
+        Gamer gamer = gamerOptional.get();
+        return UtilTime.elapsed(gamer.getLastDamaged(), 15000);
+    }
+
     public boolean canHurt(Player player, Player target) {
 
         Clan targetLocationClan = getClanByLocation(target.getLocation()).orElse(null);

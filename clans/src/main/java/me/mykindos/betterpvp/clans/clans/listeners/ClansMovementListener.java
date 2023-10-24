@@ -27,11 +27,13 @@ import java.util.Optional;
 public class ClansMovementListener extends ClanListener {
 
     private final Clans clans;
+    private final ClanManager clanManager;
 
     @Inject
     public ClansMovementListener(Clans clans, ClanManager clanManager, GamerManager gamerManager) {
         super(clanManager, gamerManager);
         this.clans = clans;
+        this.clanManager = clanManager;
     }
 
     @EventHandler
@@ -109,6 +111,14 @@ public class ClansMovementListener extends ClanListener {
     public void onClanHomeTeleport(ClanHomeTeleportEvent event) {
         if (event.isCancelled()) return;
 
+        Player player = event.getPlayer();
+
+        if (!clanManager.canTeleport(player)) {
+            UtilMessage.message(player, "Teleport", "You cannot teleport while combat tagged.");
+            event.setCancelled(true);
+            return;
+        }
+
         clanManager.getClanByLocation(event.getPlayer().getLocation()).ifPresentOrElse(clan -> {
             if (clan.isAdmin()) {
                 if (clan.isSafe() && clan.getName().contains("Spawn") && event.getPlayer().getLocation().getY() > 110) {
@@ -116,19 +126,29 @@ public class ClansMovementListener extends ClanListener {
                 }
             }
 
-            UtilMessage.message(event.getPlayer(), "Clans", "You can only teleport to your clan home from spawn or the wilderness.");
-            event.setCancelled(true);
+            if (clanManager.getRelation(clanManager.getClanByPlayer(event.getPlayer()).orElse(null), clan) == ClanRelation.ENEMY) {
+                UtilMessage.message(event.getPlayer(), "Clans", "You cannot teleport to your clan home from enemy territory.");
+                event.setCancelled(true);
+            } else {
+                event.setDelayInSeconds(30);
+            }
         }, () -> {
             event.setDelayInSeconds(30);
         });
-
     }
+
 
     @EventHandler
     public void onClanStuckTeleport(ClanStuckTeleportEvent event) {
         if (event.isCancelled()) return;
 
         Player player = event.getPlayer();
+
+        if (!clanManager.canTeleport(player)) {
+            UtilMessage.message(player, "Teleport", "You cannot teleport while combat tagged.");
+            event.setCancelled(true);
+            return;
+        }
 
         Location nearestWilderness = clanManager.closestWilderness(player);
 
@@ -146,33 +166,12 @@ public class ClansMovementListener extends ClanListener {
             return;
         }
 
-
         ClanRelation relation = clanManager.getRelation(clanManager.getClanByPlayer(player).orElse(null), territoryOptional.get());
 
         if (relation == ClanRelation.ENEMY) {
-            event.setDelayInSeconds(3 * 5);
+            event.setDelayInSeconds(120);
         } else {
-            event.setDelayInSeconds(2 * 5);
+            event.setDelayInSeconds(60);
         }
-    }
-
-    @EventHandler
-    public void onSpawnTeleport(SpawnTeleportEvent event) {
-        if (event.isCancelled()) return;
-
-        gamerManager.getObject(event.getPlayer().getUniqueId()).ifPresent(gamer -> {
-            if (gamer.getClient().hasRank(Rank.ADMIN)) {
-                return;
-            }
-
-            if (clanManager.getClanByLocation(event.getPlayer().getLocation()).isPresent()) {
-                UtilMessage.message(event.getPlayer(), "Spawn", "You can only teleport to spawn from the wilderness.");
-                event.setCancelled(true);
-            } else {
-                event.setDelayInSeconds(30);
-            }
-
-        });
-
     }
 }
