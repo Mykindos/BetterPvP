@@ -1,8 +1,10 @@
 package me.mykindos.betterpvp.core.tips;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.Setter;
+import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 
@@ -10,23 +12,29 @@ import org.bukkit.entity.Player;
 @Getter
 public abstract class Tip {
 
-    private final int categoryWeight;
+    BPvPPlugin plugin;
 
-    private final int weight;
+    private Boolean enabled;
+    private int categoryWeight;
+    private int weight;
+
+    private final int defaultCategoryWeight;
+    private final int defaultWeight;
 
     @Setter
     private Component component;
 
-    public Tip(int categoryWeight, int weight, Component component) {
-        this.categoryWeight = categoryWeight;
-        this.weight = weight;
+    public Tip(BPvPPlugin plugin, int defaultCategoryWeight, int defaultWeight, Component component) {
+        this.plugin = plugin;
+        this.defaultCategoryWeight = defaultCategoryWeight;
+        this.defaultWeight = defaultWeight;
         this.component = component;
+        loadConfig();
     }
 
-    public Tip(int categoryWeight, int weight) {
-        this(categoryWeight, weight, Component.empty());
+    public Tip(BPvPPlugin plugin, int defaultCategoryWeight, int defaultWeight) {
+        this(plugin, defaultCategoryWeight, defaultWeight, Component.empty());
     }
-
 
 
     public abstract String getName();
@@ -35,8 +43,29 @@ public abstract class Tip {
         return false;
     }
 
+    public boolean isEnabled() {
+        return this.enabled;
+    }
+
     public Component generateComponent() {
         return Component.empty();
+    }
+
+    protected <T> T getConfig(String name, Object defaultValue, Class<T> type) {
+        String path;
+        path = "tips." + getName().toLowerCase().replace(" ", "") + "." + name;
+        return this.plugin.getConfig().getOrSaveObject(path, defaultValue, type);
+    }
+
+    public final void loadConfig() {
+        enabled = getConfig("enabled", true, Boolean.class);
+        categoryWeight = getConfig("categoryWeight", this.defaultCategoryWeight, Integer.class);
+        weight = getConfig("weight", this.defaultWeight, Integer.class);
+        loadTipConfig();
+    }
+
+    public void loadTipConfig() {
+        //allows for the possibility of being overridden
     }
 
 }
