@@ -61,7 +61,7 @@ public class CombatTagListener implements Listener {
         }
     }
 
-    @UpdateEvent(delay = 100)
+    @UpdateEvent
     public void showSafetySubtitle() {
         for (final Player player : Bukkit.getOnlinePlayers()) {
             Optional<Gamer> gamerOptional = gamerManager.getObject(player.getUniqueId());
@@ -85,6 +85,7 @@ public class CombatTagListener implements Listener {
 
                     Component safeText = UtilMessage.deserialize("<green>Safe!");
                     player.sendTitlePart(TitlePart.TIMES, Title.Times.times(Duration.ofMillis(0), Duration.ofMillis(1500), Duration.ofMillis(500)));
+                    player.sendTitlePart(TitlePart.TITLE, Component.text(""));
                     player.sendTitlePart(TitlePart.SUBTITLE, safeText);
                 } else if (!clanManager.isInSafeZone(player) && playersShownSafeMessage.contains(playerId)) {
                     player.sendTitlePart(TitlePart.TIMES, Title.Times.times(Duration.ofMillis(0), Duration.ofMillis(1500), Duration.ofMillis(500)));
@@ -95,7 +96,4 @@ public class CombatTagListener implements Listener {
             });
         }
     }
-
-
-
 }
