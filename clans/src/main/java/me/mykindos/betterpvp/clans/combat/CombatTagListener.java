@@ -76,24 +76,26 @@ public class CombatTagListener implements Listener {
                         double remainingSeconds = remainingMillis / 1000.0;
 
                         Component subtitleText = UtilMessage.deserialize("<gray>Unsafe for: <red>" + String.format("%.1f", remainingSeconds) + "s");
-                        player.sendTitlePart(TitlePart.TIMES, Title.Times.times(Duration.ofMillis(0), Duration.ofMillis(250), Duration.ofMillis(0)));
+                        player.sendTitlePart(TitlePart.TIMES, Title.Times.times(Duration.ofMillis(0), Duration.ofMillis(400), Duration.ofMillis(0)));
+                        player.sendTitlePart(TitlePart.TITLE, Component.text(""));
                         player.sendTitlePart(TitlePart.SUBTITLE, subtitleText);
                     }
-                } else if (!playersShownSafeMessage.contains(playerId)) {
+                } else if (clanManager.isInSafeZone(player) && !playersShownSafeMessage.contains(playerId)) {
                     playersShownSafeMessage.add(playerId);
 
                     Component safeText = UtilMessage.deserialize("<green>Safe!");
-                    player.sendTitlePart(TitlePart.TIMES, Title.Times.times(Duration.ofMillis(0), Duration.ofMillis(1000), Duration.ofMillis(500)));
+                    player.sendTitlePart(TitlePart.TIMES, Title.Times.times(Duration.ofMillis(0), Duration.ofMillis(1500), Duration.ofMillis(500)));
                     player.sendTitlePart(TitlePart.SUBTITLE, safeText);
-                } else {
-                    if (playersShownSafeMessage.contains(playerId)) {
-                        player.sendTitlePart(TitlePart.TIMES, Title.Times.times(Duration.ofMillis(0), Duration.ofMillis(1000), Duration.ofMillis(500)));
-                        player.sendTitlePart(TitlePart.SUBTITLE, Component.empty());
-                    }
+                } else if (!clanManager.isInSafeZone(player) && playersShownSafeMessage.contains(playerId)) {
+                    player.sendTitlePart(TitlePart.TIMES, Title.Times.times(Duration.ofMillis(0), Duration.ofMillis(1500), Duration.ofMillis(500)));
+                    player.sendTitlePart(TitlePart.TITLE, Component.text(""));
+                    player.sendTitlePart(TitlePart.SUBTITLE, Component.empty());
                     playersShownSafeMessage.remove(playerId);
                 }
             });
         }
     }
+
+
 
 }
