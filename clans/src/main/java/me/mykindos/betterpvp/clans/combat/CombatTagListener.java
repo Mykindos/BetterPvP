@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.clans.combat;
 
 import com.google.inject.Inject;
+import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectType;
@@ -8,21 +9,24 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.title.Title;
+import net.kyori.adventure.title.TitlePart;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 
-import java.util.Optional;
-import java.util.Random;
+import java.time.Duration;
+import java.util.*;
 
 @BPvPListener
 public class CombatTagListener implements Listener {
-
+    private Set<UUID> playersShownSafeMessage = new HashSet<>();
     private final GamerManager gamerManager;
     private final EffectManager effectManager;
-
     private final ClanManager clanManager;
 
     @Inject
@@ -40,7 +44,7 @@ public class CombatTagListener implements Listener {
                 if (!UtilTime.elapsed(gamer.getLastDamaged(), 15000)) {
                     if (effectManager.hasEffect(player, EffectType.INVISIBILITY)) return;
 
-                    if (!clanManager.isInSafeZone(player)) return; // dont do this if player isnt in a safe zone
+                    if (!clanManager.isInSafeZone(player)) return; // don't do this if player isn't in a safe zone
 
                     Random rand = new Random();
 
@@ -57,4 +61,44 @@ public class CombatTagListener implements Listener {
             });
         }
     }
+
+    @UpdateEvent
+    public void showSafetySubtitle() {
+        for (final Player player : Bukkit.getOnlinePlayers()) {
+            Optional<Gamer> gamerOptional = gamerManager.getObject(player.getUniqueId());
+            gamerOptional.ifPresent(gamer -> {
+                UUID playerId = player.getUniqueId();
+
+                if (!UtilTime.elapsed(gamer.getLastDamaged(), 15000)) {
+                    if (clanManager.isInSafeZone(player)) {
+                        playersShownSafeMessage.remove(playerId);
+
+                        long remainingMillis = 15000 - (System.currentTimeMillis() - gamer.getLastDamaged());
+                        double remainingSeconds = remainingMillis / 1000.0;
+
+                        Component subtitleText = UtilMessage.deserialize("<gray>Unsafe for: <red>" + String.format("%.1f", remainingSeconds) + "s");
+                        player.sendTitlePart(TitlePart.TIMES, Title.Times.times(Duration.ofMillis(0), Duration.ofMillis(400), Duration.ofMillis(0)));
+                        player.sendTitlePart(TitlePart.TITLE, Component.text(""));
+                        player.sendTitlePart(TitlePart.SUBTITLE, subtitleText);
+                    }
+                } else if (clanManager.isInSafeZone(player) && !playersShownSafeMessage.contains(playerId)) {
+                    playersShownSafeMessage.add(playerId);
+
+                    Optional<Clan> chunkClanOpt = clanManager.getClanByLocation(player.getLocation());
+                    String clanName = chunkClanOpt.isPresent() ? chunkClanOpt.get().getName() : "No Clan";
+                    Component safeText = UtilMessage.deserialize("<white>" + clanName + " <white>(<aqua>Safe<white>)");
+
+                    player.sendTitlePart(TitlePart.TIMES, Title.Times.times(Duration.ofMillis(0), Duration.ofMillis(1500), Duration.ofMillis(500)));
+                    player.sendTitlePart(TitlePart.TITLE, Component.text(""));
+                    player.sendTitlePart(TitlePart.SUBTITLE, safeText);
+                } else if (!clanManager.isInSafeZone(player) && playersShownSafeMessage.contains(playerId)) {
+                    player.sendTitlePart(TitlePart.TIMES, Title.Times.times(Duration.ofMillis(0), Duration.ofMillis(1500), Duration.ofMillis(500)));
+                    player.sendTitlePart(TitlePart.TITLE, Component.text(""));
+                    player.sendTitlePart(TitlePart.SUBTITLE, Component.empty());
+                    playersShownSafeMessage.remove(playerId);
+                }
+            });
+        }
+    }
+
 }

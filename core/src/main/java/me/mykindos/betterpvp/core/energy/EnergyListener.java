@@ -54,7 +54,7 @@ public class EnergyListener implements Listener {
     @UpdateEvent
     public void update() {
         for (Player players : Bukkit.getOnlinePlayers()) {
-            if (players.getExp() == 0.999) continue;
+            if (players.getExp() >= 0.999) continue;
             energyHandler.updateEnergy(players);
         }
     }
