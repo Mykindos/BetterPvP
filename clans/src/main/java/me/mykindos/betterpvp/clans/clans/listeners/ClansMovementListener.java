@@ -119,21 +119,19 @@ public class ClansMovementListener extends ClanListener {
             return;
         }
 
-        clanManager.getClanByLocation(event.getPlayer().getLocation()).ifPresentOrElse(clan -> {
-            if (clan.isAdmin()) {
-                if (clan.isSafe() && clan.getName().contains("Spawn") && event.getPlayer().getLocation().getY() > 110) {
-                    return;
-                }
+        clanManager.getClanByLocation(player.getLocation()).ifPresentOrElse(clan -> {
+            if (clan.isAdmin() && clan.isSafe()) {
+                event.setDelayInSeconds(0);
+                return;
             }
 
-            if (clanManager.getRelation(clanManager.getClanByPlayer(event.getPlayer()).orElse(null), clan) == ClanRelation.ENEMY) {
-                UtilMessage.message(event.getPlayer(), "Clans", "You cannot teleport to your clan home from enemy territory.");
-                event.setCancelled(true);
+            if (clanManager.getRelation(clanManager.getClanByPlayer(player).orElse(null), clan) == ClanRelation.ENEMY) {
+                event.setDelayInSeconds(120);
             } else {
-                event.setDelayInSeconds(30);
+                event.setDelayInSeconds(60);
             }
         }, () -> {
-            event.setDelayInSeconds(30);
+            event.setDelayInSeconds(20);
         });
     }
 
@@ -173,5 +171,25 @@ public class ClansMovementListener extends ClanListener {
         } else {
             event.setDelayInSeconds(60);
         }
+    }
+
+    @EventHandler
+    public void onSpawnTeleport(SpawnTeleportEvent event) {
+        if (event.isCancelled()) return;
+
+        gamerManager.getObject(event.getPlayer().getUniqueId()).ifPresent(gamer -> {
+            if (gamer.getClient().hasRank(Rank.ADMIN)) {
+                return;
+            }
+
+            if (clanManager.getClanByLocation(event.getPlayer().getLocation()).isPresent()) {
+                UtilMessage.message(event.getPlayer(), "Spawn", "You can only teleport to spawn from the wilderness.");
+                event.setCancelled(true);
+            } else {
+                event.setDelayInSeconds(30);
+            }
+
+        });
+
     }
 }
