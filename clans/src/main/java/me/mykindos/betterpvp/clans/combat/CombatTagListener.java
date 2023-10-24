@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.clans.combat;
 
 import com.google.inject.Inject;
+import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectType;
@@ -83,7 +84,10 @@ public class CombatTagListener implements Listener {
                 } else if (clanManager.isInSafeZone(player) && !playersShownSafeMessage.contains(playerId)) {
                     playersShownSafeMessage.add(playerId);
 
-                    Component safeText = UtilMessage.deserialize("<green>Safe!");
+                    Optional<Clan> chunkClanOpt = clanManager.getClanByLocation(player.getLocation());
+                    String clanName = chunkClanOpt.isPresent() ? chunkClanOpt.get().getName() : "No Clan";
+                    Component safeText = UtilMessage.deserialize("<white>" + clanName + " <white>(<aqua>Safe<white>)");
+
                     player.sendTitlePart(TitlePart.TIMES, Title.Times.times(Duration.ofMillis(0), Duration.ofMillis(1500), Duration.ofMillis(500)));
                     player.sendTitlePart(TitlePart.TITLE, Component.text(""));
                     player.sendTitlePart(TitlePart.SUBTITLE, safeText);
@@ -96,4 +100,5 @@ public class CombatTagListener implements Listener {
             });
         }
     }
+
 }
