@@ -68,7 +68,7 @@ public class TipListener implements Listener {
         WeighedList<Tip> tipList = event.getTipList();
 
         tipManager.getTips().forEach(tip -> {
-            if (tip.isValid(player)) {
+            if (tip.isEnabled() && tip.isValid(player)) {
                 tipList.add(tip.getCategoryWeight(), tip.getWeight(), tip);
             }
         });
