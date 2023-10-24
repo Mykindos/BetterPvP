@@ -53,6 +53,10 @@ public class ClientListener implements Listener {
     @Config(path = "tab.server", defaultValue = "Clans-1")
     private String server;
 
+    @Inject
+    @Config(path = "server.unlimitedPlayers", defaultValue = "false")
+    public boolean unlimitedPlayers;
+
     private final ClientManager clientManager;
 
     @Inject
@@ -83,6 +87,11 @@ public class ClientListener implements Listener {
 
     @EventHandler
     public void onPlayerLogin(PlayerLoginEvent event) {
+        if(unlimitedPlayers && event.getResult() == PlayerLoginEvent.Result.KICK_FULL){
+            event.allow();
+            return;
+        }
+
         if(event.getResult() == PlayerLoginEvent.Result.KICK_FULL || event.getResult() == PlayerLoginEvent.Result.KICK_WHITELIST) {
             String uuid = event.getPlayer().getUniqueId().toString();
             clientManager.getObject(uuid).ifPresent(client -> {

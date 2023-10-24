@@ -48,7 +48,7 @@ public class Intimidation extends Skill implements PassiveSkill {
 
     @Override
     public String[] getDescription(int level) {
-        return new String[] {
+        return new String[]{
                 "Every enemy facing away from you within <val>" + getRadius(level) + "</val>",
                 "blocks will get <effect>Slowness 1",
         };
@@ -61,9 +61,11 @@ public class Intimidation extends Skill implements PassiveSkill {
 
     @Override
     public void invalidatePlayer(Player player) {
-        for (Player tracked : trackedEnemies.remove(player)) {
+        if (!trackedEnemies.containsKey(player)) return;
+        for (Player tracked : trackedEnemies.get(player)) {
             UtilPlayer.clearWarningEffect(tracked); // Clear them if they are no longer in front
         }
+        trackedEnemies.remove(player);
     }
 
     public double getRadius(int level) {
@@ -131,7 +133,7 @@ public class Intimidation extends Skill implements PassiveSkill {
     }
 
     @Override
-    public void loadSkillConfig(){
+    public void loadSkillConfig() {
         baseRadius = getConfig("baseRadius", 3.0, Double.class);
     }
 }
