@@ -2,8 +2,8 @@ package me.mykindos.betterpvp.champions.champions.roles.listeners;
 
 import com.google.inject.Inject;
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
-import me.mykindos.betterpvp.core.combat.log.DamageLog;
-import me.mykindos.betterpvp.core.combat.log.DamageLogManager;
+import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
+import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.entity.Player;

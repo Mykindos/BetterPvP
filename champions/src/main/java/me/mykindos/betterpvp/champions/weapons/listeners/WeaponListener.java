@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.champions.weapons.types.ChannelWeapon;
 import me.mykindos.betterpvp.champions.weapons.types.CooldownWeapon;
 import me.mykindos.betterpvp.champions.weapons.types.InteractWeapon;
 import me.mykindos.betterpvp.champions.weapons.types.LegendaryWeapon;
+import me.mykindos.betterpvp.core.combat.combatlog.events.PlayerCombatLogEvent;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseItemEvent;
 import me.mykindos.betterpvp.core.components.champions.weapons.IWeapon;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
@@ -22,6 +23,7 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -131,7 +133,7 @@ public class WeaponListener implements Listener {
             var lore = new ArrayList<>(weapon.getLore());
 
             var originalOwner = event.getItemMeta().getPersistentDataContainer().getOrDefault(ChampionsNamespacedKeys.ORIGINAL_OWNER, PersistentDataType.STRING, "");
-            if(!originalOwner.equals("")) {
+            if (!originalOwner.equals("")) {
                 lore.add(Component.text(""));
                 lore.add(Component.text("Original Owner: ", NamedTextColor.WHITE).append(Component.text(originalOwner, NamedTextColor.YELLOW)));
             }
@@ -142,16 +144,16 @@ public class WeaponListener implements Listener {
 
     @EventHandler
     public void onPickupWeapon(EntityPickupItemEvent event) {
-        if(!(event.getEntity() instanceof Player player)) return;
+        if (!(event.getEntity() instanceof Player player)) return;
         var itemStack = event.getItem().getItemStack();
         Optional<IWeapon> weaponOptional = weaponManager.getWeaponByItemStack(event.getItem().getItemStack());
         if (weaponOptional.isPresent()) {
             IWeapon weapon = weaponOptional.get();
-            if(weapon instanceof LegendaryWeapon) {
+            if (weapon instanceof LegendaryWeapon) {
                 var itemMeta = itemStack.getItemMeta();
-                if(itemMeta == null) return;
+                if (itemMeta == null) return;
 
-                if(!itemMeta.getPersistentDataContainer().has(ChampionsNamespacedKeys.ORIGINAL_OWNER)) {
+                if (!itemMeta.getPersistentDataContainer().has(ChampionsNamespacedKeys.ORIGINAL_OWNER)) {
                     itemMeta.getPersistentDataContainer().set(ChampionsNamespacedKeys.ORIGINAL_OWNER, PersistentDataType.STRING, player.getName());
                 }
 
@@ -165,12 +167,27 @@ public class WeaponListener implements Listener {
     public void onSpecialItemDrop(SpecialItemDropEvent event) {
         var itemStack = itemHandler.updateNames(event.getItem().getItemStack());
         Optional<IWeapon> weaponOptional = weaponManager.getWeaponByItemStack(itemStack);
-        if(weaponOptional.isPresent()) {
+        if (weaponOptional.isPresent()) {
             IWeapon weapon = weaponOptional.get();
-            if(!(weapon instanceof LegendaryWeapon)) return;
+            if (!(weapon instanceof LegendaryWeapon)) return;
             UtilMessage.broadcast(Component.text(event.getSource(), NamedTextColor.RED)
                     .append(Component.text(" dropped a legendary ", NamedTextColor.GRAY))
                     .append(weapon.getName().hoverEvent(itemStack)));
+        }
+    }
+
+    @EventHandler
+    public void onCombatLog(PlayerCombatLogEvent event) {
+        for (ItemStack itemStack : event.getPlayer().getInventory().getContents()) {
+            if (itemStack == null || itemStack.getType() == Material.AIR) continue;
+            Optional<IWeapon> weaponOptional = weaponManager.getWeaponByItemStack(itemStack);
+            if (weaponOptional.isPresent()) {
+                IWeapon weapon = weaponOptional.get();
+                if (!(weapon instanceof LegendaryWeapon)) return;
+
+                event.setSafe(false);
+                event.setDuration(System.currentTimeMillis()); // Permanent combat log
+            }
         }
     }
 
