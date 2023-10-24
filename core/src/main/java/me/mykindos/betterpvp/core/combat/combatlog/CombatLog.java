@@ -49,6 +49,7 @@ public class CombatLog {
         combatLogSheep.customName(Component.text("Right Click Me! ", NamedTextColor.YELLOW, TextDecoration.BOLD)
                 .append(Component.text(player.getName(), NamedTextColor.GRAY)));
         combatLogSheep.setCustomNameVisible(true);
+        combatLogSheep.setRemoveWhenFarAway(false);
 
     }
 
