@@ -6,7 +6,6 @@ import me.mykindos.betterpvp.champions.champions.builds.menus.buttons.ApplyBuild
 import me.mykindos.betterpvp.champions.champions.builds.menus.buttons.DeleteBuildButton;
 import me.mykindos.betterpvp.champions.champions.builds.menus.buttons.EditBuildButton;
 import me.mykindos.betterpvp.champions.champions.skills.SkillManager;
-import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.menu.Button;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.buttons.BackButton;

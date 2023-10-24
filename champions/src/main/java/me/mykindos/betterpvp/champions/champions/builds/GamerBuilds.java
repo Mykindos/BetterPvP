@@ -1,7 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.builds;
 
 import lombok.Data;
-import me.mykindos.betterpvp.core.components.champions.Role;
 
 import java.util.ArrayList;
 import java.util.HashMap;

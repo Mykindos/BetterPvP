@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.champions.roles;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
+import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.database.Database;
@@ -10,7 +11,6 @@ import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +52,7 @@ public class RoleRepository {
 
     private void loadRoles() {
         ExtendedYamlConfiguration config = champions.getConfig();
-        String path = "roles";
+        String path = "class";
         ConfigurationSection customRoleSection = config.getConfigurationSection(path);
         if (customRoleSection == null) {
             customRoleSection = config.createSection(path);

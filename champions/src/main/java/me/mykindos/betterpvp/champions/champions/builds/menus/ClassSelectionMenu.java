@@ -3,7 +3,6 @@ package me.mykindos.betterpvp.champions.champions.builds.menus;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.menus.buttons.ClassSelectionButton;
 import me.mykindos.betterpvp.champions.champions.skills.SkillManager;
-import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.menu.Menu;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;

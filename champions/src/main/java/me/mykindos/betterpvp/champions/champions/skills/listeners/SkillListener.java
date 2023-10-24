@@ -21,7 +21,6 @@ import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.ToggleSkill;
 import me.mykindos.betterpvp.core.components.champions.ISkill;
-import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseInteractSkillEvent;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEvent;

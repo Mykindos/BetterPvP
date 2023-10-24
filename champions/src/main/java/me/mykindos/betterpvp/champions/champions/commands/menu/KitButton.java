@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.champions.champions.commands.menu;
 
-import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.menu.Button;
 import net.kyori.adventure.text.Component;

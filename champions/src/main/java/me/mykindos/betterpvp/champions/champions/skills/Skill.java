@@ -12,7 +12,6 @@ import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
 import me.mykindos.betterpvp.core.components.champions.ISkill;
-import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;

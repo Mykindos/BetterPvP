@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.champions.champions.builds;
 
 import lombok.Data;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
-import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 
 import java.util.ArrayList;

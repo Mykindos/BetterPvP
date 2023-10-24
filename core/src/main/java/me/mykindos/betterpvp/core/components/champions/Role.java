@@ -1,37 +1,96 @@
 package me.mykindos.betterpvp.core.components.champions;
 
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
+import lombok.Data;
 import lombok.Getter;
+import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 
-@AllArgsConstructor
-@Getter
-public enum Role {
+@Data
+public class Role {
+    @Getter(AccessLevel.NONE)
+    private final String key;
 
-    ASSASSIN("Assassin", TextColor.color(224, 112, 0), Material.LEATHER_HELMET, Material.LEATHER_CHESTPLATE, Material.LEATHER_LEGGINGS, Material.LEATHER_BOOTS),
-    KNIGHT("Knight", TextColor.color(227, 227, 227), Material.IRON_HELMET, Material.IRON_CHESTPLATE, Material.IRON_LEGGINGS, Material.IRON_BOOTS),
-    BRUTE("Brute", TextColor.color(112, 255, 241), Material.DIAMOND_HELMET, Material.DIAMOND_CHESTPLATE, Material.DIAMOND_LEGGINGS, Material.DIAMOND_BOOTS),
-    RANGER("Ranger", TextColor.color(148, 148, 148), Material.CHAINMAIL_HELMET, Material.CHAINMAIL_CHESTPLATE, Material.CHAINMAIL_LEGGINGS, Material.CHAINMAIL_BOOTS),
-    MAGE("Mage", TextColor.color(255, 237, 69), Material.GOLDEN_HELMET, Material.GOLDEN_CHESTPLATE, Material.GOLDEN_LEGGINGS, Material.GOLDEN_BOOTS),
-    WARLOCK("Warlock", TextColor.color(117, 117, 117), Material.NETHERITE_HELMET, Material.NETHERITE_CHESTPLATE, Material.NETHERITE_LEGGINGS, Material.NETHERITE_BOOTS);
+    private String prefix;
 
-    private final String name;
-    private final TextColor color;
-    private final Material helmet;
-    private final Material chestplate;
-    private final Material leggings;
-    private final Material boots;
+    private TextColor color;
 
-    private void loadRoles() {
+    private Double maxHealth;
+    private Double arrowDamage;
 
-    }
+    private boolean dealKnockback;
+    private boolean takeKnockback;
 
-    public String getPrefix() {
-        return name.substring(0, 1);
+    private Sound damageSound;
+    private float damageVolume;
+    private float damagePitch;
+
+    private Material[] armor = new Material[4];
+
+    public void loadConfig(ExtendedYamlConfiguration config) {
+        String path = "class." + key;
+        prefix = config.getOrSaveString(path + "prefix", key.substring(0, 1));
+
+        int R = config.getOrSaveInt(path + "color.R", 0);
+        int G = config.getOrSaveInt(path + "color.G", 0);
+        int B = config.getOrSaveInt(path+ "color.B", 0);
+
+        color = TextColor.color(R, G, B);
+
+        maxHealth = config.getOrSaveObject(path + "maxHealth", 20.0, Double.class);
+        arrowDamage = config.getOrSaveObject(path + "arrowDamage", 0.0, Double.class);
+
+        dealKnockback = config.getOrSaveBoolean(path + "dealKnockback", true);
+        takeKnockback = config.getOrSaveBoolean(path + "takeKnockback", true);
+
+        String soundKey = config.getOrSaveString(path + "sound.damageSound", "ENTITY_BLAZE_HURT");
+        if (soundKey == null) {
+            throw new IllegalArgumentException("Sound key cannot be null!");
+        }
+        try {
+            this.damageSound = Sound.valueOf(soundKey.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid sound key: " + soundKey, e);
+        }
+
+        damageVolume = config.getOrSaveObject(path + "sound.volume", 1.0F, Float.class);
+        damagePitch = config.getOrSaveObject(path + "sound.pitch", 0.7F, Float.class);
+
+        String[] armorTypes = {"helmet", "chestplate", "leggings", "boots"};
+        for (int i = 0; i < armorTypes.length; i++) {
+            final String type = armorTypes[i];
+            final String materialKey = config.getOrSaveString(path, "LEATHER_" + type.toUpperCase());
+            if (materialKey == null) {
+                throw new IllegalArgumentException(type.toUpperCase() + " material key cannot be null!");
+            }
+            try {
+                this.armor[i] = Material.valueOf(materialKey.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Invalid material key: " + materialKey, e);
+            }
+        }
+
     }
 
     public String getName() {
-        return name;
+        return key;
+    }
+
+    public Material getHelmet() {
+        return armor[0];
+    }
+
+    public Material getChestplate() {
+        return armor[1];
+    }
+
+    public Material getLeggings() {
+        return armor[2];
+    }
+
+    public Material getBoots() {
+        return armor[3];
     }
 }
