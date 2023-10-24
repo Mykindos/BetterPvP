@@ -62,7 +62,7 @@ public class Colossus extends Skill implements PassiveSkill {
             if(level > 0) {
                 event.setCanBypassMinimum(true);
                 double proposedKB = event.getDamage() * (1 - ((reductionPerLevel) * level));
-                event.setDamage(Math.max(proposedKB, 1));
+                event.setDamage(proposedKB);
             }
         }
 

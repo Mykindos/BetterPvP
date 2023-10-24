@@ -78,6 +78,7 @@ public class ClansSidebarListener implements Listener {
             }
 
             for (String s : scoreboard.getEntries()) {
+                if (s == null) continue;
                 if (!s.contains("\u00A7")) {
                     continue;
                 }

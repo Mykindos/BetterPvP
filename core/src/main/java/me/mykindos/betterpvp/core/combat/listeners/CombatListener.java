@@ -78,7 +78,7 @@ public class CombatListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void damageEvent(CustomDamageEvent event) {
 
-        if(event.getForceDamageDelay() != 0 && event.isCancelled()) {
+        if (event.getForceDamageDelay() != 0 && event.isCancelled()) {
             String damagerUuid = event.getDamager() == null ? null : event.getDamager().getUniqueId().toString();
             damageDataList.add(new DamageData(event.getDamagee().getUniqueId().toString(), event.getCause(), damagerUuid, event.getForceDamageDelay()));
         }
@@ -336,7 +336,9 @@ public class CombatListener implements Listener {
     public void applyKB(CustomKnockbackEvent event) {
         double knockback = event.getDamage();
         if (knockback < 2.0D && !event.isCanBypassMinimum()) knockback = 2.0D;
-        knockback = Math.log10(knockback);
+
+        knockback = Math.max(0, Math.log10(knockback));
+        if (knockback == 0) return;
 
         Vector trajectory = UtilVelocity.getTrajectory2d(event.getDamager(), event.getDamagee());
         trajectory.multiply(0.6D * knockback);
