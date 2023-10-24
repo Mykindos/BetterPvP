@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.combat.log;
+package me.mykindos.betterpvp.core.combat.damagelog;
 
 import lombok.Data;
 import org.bukkit.entity.LivingEntity;

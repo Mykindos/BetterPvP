@@ -2,8 +2,8 @@ package me.mykindos.betterpvp.core.combat.death;
 
 import com.google.inject.Inject;
 import me.mykindos.betterpvp.core.combat.death.events.CustomDeathEvent;
-import me.mykindos.betterpvp.core.combat.log.DamageLog;
-import me.mykindos.betterpvp.core.combat.log.DamageLogManager;
+import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
+import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;

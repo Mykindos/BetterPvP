@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.clans.clans.listeners;
 import com.google.inject.Inject;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
+import me.mykindos.betterpvp.core.combat.combatlog.events.PlayerCombatLogEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
 import me.mykindos.betterpvp.core.gamer.Gamer;
@@ -37,13 +38,10 @@ public class ClansCombatListener implements Listener {
 
         CustomDamageEvent cde = event.getCustomDamageEvent();
 
-        if (cde.getDamagee() instanceof LivingEntity && cde.getDamager() instanceof Player) {
-            LivingEntity damagee = (LivingEntity) cde.getDamagee();
-            Player damager = (Player) cde.getDamager();
+        if (cde.getDamager() instanceof Player damager) {
 
-            for (Entity passenger : damagee.getPassengers()) {
-                if (passenger instanceof Player) {
-                    Player mountedPlayer = (Player) passenger;
+            for (Entity passenger : cde.getDamagee().getPassengers()) {
+                if (passenger instanceof Player mountedPlayer) {
                     if (!clanManager.canHurt(damager, mountedPlayer)) {
                         event.setCancelled(true);
                         return;
@@ -84,6 +82,34 @@ public class ClansCombatListener implements Listener {
             }
         }
 
+    }
+
+    @EventHandler
+    public void onCombatLog(PlayerCombatLogEvent event) {
+
+        Optional<Clan> clanOptional = clanManager.getClanByLocation(event.getPlayer().getLocation());
+        if (clanOptional.isPresent()) {
+            Clan locationClan = clanOptional.get();
+
+            Optional<Clan> playerClanOptional = clanManager.getClanByPlayer(event.getPlayer());
+            if (playerClanOptional.isPresent()) {
+                Clan playerClan = playerClanOptional.get();
+
+                if (!playerClan.equals(locationClan) && !locationClan.isSafe()) {
+
+                    if (playerClan.isEnemy(locationClan)) {
+                        event.setSafe(false);
+                        event.setDuration(30_000);
+                    } else if (!playerClan.isAllied(locationClan)) {
+                        event.setSafe(false);
+                    }
+                }
+            } else {
+                if (!locationClan.isSafe()) {
+                    event.setSafe(false);
+                }
+            }
+        }
     }
 
 

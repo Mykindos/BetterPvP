@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.craftbukkit.v1_20_R2.CraftWorld;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 
@@ -32,5 +33,12 @@ public class CoreWorldListener implements Listener {
     @EventHandler
     public void onRespawn(PlayerRespawnEvent event) {
         event.setRespawnLocation(worldHandler.getSpawnLocation());
+    }
+
+    @EventHandler
+    public void onJoin(PlayerJoinEvent event) {
+        if(!event.getPlayer().hasPlayedBefore()) {
+            event.getPlayer().teleport(worldHandler.getSpawnLocation());
+        }
     }
 }
