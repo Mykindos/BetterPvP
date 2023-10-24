@@ -114,7 +114,7 @@ public class ClansMovementListener extends ClanListener {
         Player player = event.getPlayer();
 
         if (!clanManager.canTeleport(player)) {
-            UtilMessage.message(player, "Teleport", "You cannot teleport while combat tagged.");
+            UtilMessage.message(player, "Clans", "You cannot teleport while combat tagged.");
             event.setCancelled(true);
             return;
         }
@@ -145,7 +145,7 @@ public class ClansMovementListener extends ClanListener {
         Player player = event.getPlayer();
 
         if (!clanManager.canTeleport(player)) {
-            UtilMessage.message(player, "Teleport", "You cannot teleport while combat tagged.");
+            UtilMessage.message(player, "Clans", "You cannot teleport while combat tagged.");
             event.setCancelled(true);
             return;
         }
