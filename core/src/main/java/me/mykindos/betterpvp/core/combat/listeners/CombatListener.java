@@ -178,6 +178,7 @@ public class CombatListener implements Listener {
 
         if (event.getDamager() instanceof Player damager) {
             gamerManager.getObject(damager.getUniqueId()).ifPresent(gamer -> {
+                gamer.setLastDamaged(System.currentTimeMillis());
                 gamer.saveProperty(GamerProperty.DAMAGE_DEALT, (double) gamer.getProperty(GamerProperty.DAMAGE_DEALT).orElse(0D) + event.getDamage());
             });
         }
