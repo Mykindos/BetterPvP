@@ -167,7 +167,7 @@ INSERT IGNORE INTO items (Material, Module, Name, ModelData, Glow, HasUUID) VALU
 
 -- Custom weapons
 INSERT IGNORE INTO items (Material, Module, Name, ModelData, Glow, HasUUID) VALUES
-    ('COBWEB', 'Champions', '<light_purple>Throwing Web', 1, 0, 0);
+    ('COBWEB', 'Champions', '<light_purple>Throwing Web', 0, 0, 0);
 
 INSERT IGNORE INTO items (Material, Module, Name, ModelData, Glow, HasUUID) VALUES
     ('APPLE', 'Champions', '<light_purple>Energy Apple', 0, 0, 0);
