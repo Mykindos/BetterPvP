@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.commands.menu;
 
+import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.menu.Button;
 import net.kyori.adventure.text.Component;
@@ -28,9 +29,9 @@ public class KitButton extends Button {
 
         player.getInventory().addItem(new ItemStack(Material.IRON_SWORD));
         player.getInventory().addItem(new ItemStack(Material.IRON_AXE));
-        if((role == Role.ASSASSIN) || (role == Role.RANGER)) {
+        if(role.getArrowDamage() > 0) {
             player.getInventory().addItem(new ItemStack(Material.BOW));
-            int numArrows = (role == Role.RANGER ? 64 : 32);
+            int numArrows = 64;
             player.getInventory().addItem(new ItemStack(Material.ARROW, numArrows));
         }
         player.getInventory().addItem(new ItemStack(Material.BOOK));

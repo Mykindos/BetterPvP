@@ -29,10 +29,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.Optional;
 
@@ -66,7 +68,7 @@ public class RoleListener implements Listener {
             UtilMessage.message(player, equipMessage(player, role));
 
             gamerManager.getObject(player.getUniqueId()).ifPresent(gamer -> {
-                String roleProperty = role.name() + "_EQUIPPED";
+                String roleProperty = role.getName() + "_EQUIPPED";
                 int timesEquipped = (int) gamer.getProperty(roleProperty).orElse(0) + 1;
                 gamer.saveProperty(roleProperty, timesEquipped);
             });
@@ -104,7 +106,7 @@ public class RoleListener implements Listener {
 
     private void checkEquippedRole(Player player) {
         EntityEquipment equipment = player.getEquipment();
-        for (Role role : Role.values()) {
+        for (Role role : roleManager.getRepository().getRoles()) {
             if (equipment.getHelmet().getType() == role.getHelmet()
                     && equipment.getChestplate().getType() == role.getChestplate()
                     && equipment.getLeggings().getType() == role.getLeggings()
@@ -121,16 +123,15 @@ public class RoleListener implements Listener {
     @EventHandler
     public void reduceDurability(CustomDamageDurabilityEvent event) {
         if (event.getCustomDamageEvent().getDamagee() instanceof Player player) {
-            roleManager.getObject(player.getUniqueId()).ifPresent(role -> {
-                if (role != Role.WARLOCK) {
-                    double chance = (float) Role.WARLOCK.getChestplate().getMaxDurability() / (float) role.getChestplate().getMaxDurability();
-                    if (UtilMath.randDouble(0, chance) >= 1) {
-                        event.setDamageeTakeDurability(false);
-                    }
+            Role role = roleManager.getRole(player);
+            if (!role.getChestplate().equals(Material.NETHERITE_CHESTPLATE)) {
+                double chance = (float) Material.NETHERITE_CHESTPLATE.getMaxDurability() / (float) role.getChestplate().getMaxDurability();
+                if (UtilMath.randDouble(0, chance) >= 1) {
+                    event.setDamageeTakeDurability(false);
                 }
-            });
-
+            }
         }
+
     }
 
     @EventHandler
@@ -228,7 +229,8 @@ public class RoleListener implements Listener {
         Optional<Role> roleOptional = roleManager.getObject(damagee.getUniqueId().toString());
         if (roleOptional.isPresent()) {
             Role role = roleOptional.get();
-                switch (role) {
+            damagee.getWorld().playSound(damagee.getLocation(), role.getDamageSound(), role.getDamageVolume(), role.getDamagePitch());
+            /*switch (role) {
                     case KNIGHT ->
                             damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_BLAZE_HURT, 1.0F, 0.7F);
                     case ASSASSIN ->
@@ -241,7 +243,7 @@ public class RoleListener implements Listener {
                             damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.8F);
                     case WARLOCK ->
                             damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_BLAZE_HURT, 1.0F, 0.6F);
-                }
+                }*/
         }
     }
 
@@ -283,4 +285,43 @@ public class RoleListener implements Listener {
         }
     }
 
-}
+    @EventHandler
+    public void onFallDamage(CustomDamageEvent event) {
+        if (event.getCause() != EntityDamageEvent.DamageCause.FALL) return;
+        if (!(event.getDamagee() instanceof Player damagee)) return;
+
+        if (roleManager.getRole(damagee).isTakeFallDamage()) {
+            event.cancel("Feather falling");
+        }
+
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onKnockback(CustomDamageEvent event) {
+        if (event.isCancelled()) return;
+        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
+
+        if (event.getDamager() instanceof Player damager) {
+            if (roleManager.getRole(damager).isDealKnockback()) {
+                event.setKnockback(false);
+            }
+        }
+
+        if (event.getDamagee() instanceof Player damagee) {
+            if (roleManager.getRole(damagee).isTakeKnockback()) {
+                event.setKnockback(false);
+            }
+        }
+
+    }
+
+    @UpdateEvent(delay = 500)
+    public void checkRoleBuffs() {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            Role role = roleManager.getRole(player);
+                if (role.getRoleBuff() != null) {
+                    player.addPotionEffect(role.getRoleBuff());
+                }
+            }
+        }
+    }

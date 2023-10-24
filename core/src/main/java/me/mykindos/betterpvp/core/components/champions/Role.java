@@ -7,6 +7,10 @@ import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+
+import java.util.Objects;
 
 @Data
 public class Role {
@@ -22,6 +26,9 @@ public class Role {
 
     private boolean dealKnockback;
     private boolean takeKnockback;
+    private boolean takeFallDamage;
+
+    private PotionEffect roleBuff = null;
 
     private Sound damageSound;
     private float damageVolume;
@@ -44,6 +51,17 @@ public class Role {
 
         dealKnockback = config.getOrSaveBoolean(path + "dealKnockback", true);
         takeKnockback = config.getOrSaveBoolean(path + "takeKnockback", true);
+        takeFallDamage = config.getOrSaveBoolean(path + "takeFallDamage", true);
+
+        String buffKey = config.getOrSaveString(path + "buff.name", "NONE");
+        int buffPower = config.getOrSaveInt(path + "buff.name", 0);
+        if (!buffKey.equals("NONE")) {
+            try {
+                this.roleBuff = new PotionEffect(Objects.requireNonNull(PotionEffectType.getByName(buffKey)), -1, buffPower);
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Invalid buff key: " + buffKey, e);
+            }
+        }
 
         String soundKey = config.getOrSaveString(path + "sound.damageSound", "ENTITY_BLAZE_HURT");
         if (soundKey == null) {
