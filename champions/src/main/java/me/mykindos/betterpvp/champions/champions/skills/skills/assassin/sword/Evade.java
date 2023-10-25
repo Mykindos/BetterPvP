@@ -46,8 +46,6 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
     private final HashMap<UUID, Long> handRaisedTime = new HashMap<>();
 
     public double duration;
-    public double internalCD;
-
     public int forcedDamageDelay;
 
     @Inject
@@ -69,9 +67,9 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
         return new String[]{
                 "Hold right click with a Sword to channel",
                 "",
-                "If a player hits you while Evading,",
-                "you will teleport behind the attacker",
-                "and your cooldown will be set to <stat>" + internalCD + "</stat> second",
+                "If a player hits you while Evading, you",
+                "will teleport behind the attacker and your",
+                "cooldown will be set the duration you blocked for",
                 "",
                 "Hold crouch while Evading to teleport backwards",
                 "",
@@ -118,7 +116,12 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
         if (target != null) {
             player.teleport(target);
             cooldownManager.removeCooldown(player, getName(), true);
-            cooldownManager.use(player, getName(), 1.0, true);
+
+            long channelTime = System.currentTimeMillis() - handRaisedTime.get(player.getUniqueId());
+            double channelTimeInSeconds = channelTime / 1000.0;
+            double newCooldown = channelTimeInSeconds;
+
+            cooldownManager.use(player, getName(), newCooldown, true);
             handRaisedTime.remove(player.getUniqueId());
         }
 
@@ -307,7 +310,6 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
     @Override
     public void loadSkillConfig() {
         duration = getConfig("duration", 1.25, Double.class);
-        internalCD = getConfig("internalCD", 1.0, Double.class);
         forcedDamageDelay = getConfig("forcedDamageDelay", 400, Integer.class);
     }
 }
