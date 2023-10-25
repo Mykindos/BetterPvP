@@ -123,7 +123,7 @@ public class ClansMovementListener extends ClanListener {
             return;
         }
 
-        clanManager.getClanByLocation(player.getLocation()).ifPresent(clan -> {
+        clanManager.getClanByLocation(player.getLocation()).ifPresentOrElse(clan -> {
             if (clan.isAdmin() && clan.isSafe()) {
                 event.setDelayInSeconds(0);
                 return;
@@ -133,23 +133,23 @@ public class ClansMovementListener extends ClanListener {
             if (playerClanOptional.isPresent()) {
                 Clan playerClan = playerClanOptional.get();
 
-                boolean hasEnemies = false;
+                if (clan.equals(playerClan)) {
+                    boolean hasEnemies = false;
 
-                for (ClanTerritory territory : playerClan.getTerritory()) {
-                    Chunk chunk = UtilWorld.stringToChunk(territory.getChunk());
-                    if (chunk == null) continue;
+                    for (ClanTerritory territory : playerClan.getTerritory()) {
+                        Chunk chunk = UtilWorld.stringToChunk(territory.getChunk());
+                        if (chunk == null) continue;
 
-                    for (Entity entity : chunk.getEntities()) {
-                        if (entity instanceof Player target && !entity.equals(player) && clanManager.canHurt(player, target)) {
-                            hasEnemies = true;
-                            break;
+                        for (Entity entity : chunk.getEntities()) {
+                            if (entity instanceof Player target && !entity.equals(player) && clanManager.canHurt(player, target)) {
+                                hasEnemies = true;
+                                break;
+                            }
                         }
+
+                        if (hasEnemies) break;
                     }
 
-                    if (hasEnemies) break;
-                }
-
-                if (clan.equals(playerClan)) {
                     if (hasEnemies) {
                         event.setDelayInSeconds(20);
                     } else {
@@ -167,6 +167,9 @@ public class ClansMovementListener extends ClanListener {
             } else {
                 event.setDelayInSeconds(20);
             }
+
+        }, () -> {
+            event.setDelayInSeconds(20);
         });
     }
 
