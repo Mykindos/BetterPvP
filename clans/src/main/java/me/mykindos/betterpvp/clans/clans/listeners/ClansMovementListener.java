@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
 import me.mykindos.betterpvp.core.client.Rank;
+import me.mykindos.betterpvp.core.components.clans.data.ClanTerritory;
 import me.mykindos.betterpvp.core.framework.delayedactions.events.ClanHomeTeleportEvent;
 import me.mykindos.betterpvp.core.framework.delayedactions.events.ClanStuckTeleportEvent;
 import me.mykindos.betterpvp.core.framework.events.scoreboard.ScoreboardUpdateEvent;
@@ -13,10 +14,13 @@ import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import me.mykindos.betterpvp.core.world.events.SpawnTeleportEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -119,19 +123,50 @@ public class ClansMovementListener extends ClanListener {
             return;
         }
 
-        clanManager.getClanByLocation(player.getLocation()).ifPresentOrElse(clan -> {
+        clanManager.getClanByLocation(player.getLocation()).ifPresent(clan -> {
             if (clan.isAdmin() && clan.isSafe()) {
                 event.setDelayInSeconds(0);
                 return;
             }
 
-            if (clanManager.getRelation(clanManager.getClanByPlayer(player).orElse(null), clan) == ClanRelation.ENEMY) {
-                event.setDelayInSeconds(120);
+            Optional<Clan> playerClanOptional = clanManager.getClanByPlayer(player);
+            if (playerClanOptional.isPresent()) {
+                Clan playerClan = playerClanOptional.get();
+
+                boolean hasEnemies = false;
+
+                for (ClanTerritory territory : playerClan.getTerritory()) {
+                    Chunk chunk = UtilWorld.stringToChunk(territory.getChunk());
+                    if (chunk == null) continue;
+
+                    for (Entity entity : chunk.getEntities()) {
+                        if (entity instanceof Player target && !entity.equals(player) && clanManager.canHurt(player, target)) {
+                            hasEnemies = true;
+                            break;
+                        }
+                    }
+
+                    if (hasEnemies) break;
+                }
+
+                if (clan.equals(playerClan)) {
+                    if (hasEnemies) {
+                        event.setDelayInSeconds(20);
+                    } else {
+                        event.setDelayInSeconds(0);
+                    }
+                    return;
+                }
+
+                if (clanManager.getRelation(playerClan, clan) == ClanRelation.ENEMY) {
+                    event.setDelayInSeconds(120);
+                } else {
+                    event.setDelayInSeconds(60);
+                }
+
             } else {
-                event.setDelayInSeconds(60);
+                event.setDelayInSeconds(20);
             }
-        }, () -> {
-            event.setDelayInSeconds(20);
         });
     }
 
