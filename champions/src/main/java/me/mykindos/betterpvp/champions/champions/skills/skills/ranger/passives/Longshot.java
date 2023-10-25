@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.death.events.CustomDeathEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerCanUseSkillEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
@@ -24,6 +25,7 @@ import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.util.Vector;
 
 import java.util.Iterator;
+import java.util.Set;
 import java.util.WeakHashMap;
 
 @Singleton
@@ -59,7 +61,7 @@ public class Longshot extends Skill implements PassiveSkill {
     }
 
     @Override
-    public Role getClassType() {
+    public Set<Role> getClassTypes() {
         return Role.RANGER;
     }
 

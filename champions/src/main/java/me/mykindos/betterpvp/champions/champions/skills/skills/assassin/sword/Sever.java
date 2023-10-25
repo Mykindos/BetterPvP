@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
@@ -21,6 +22,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.Set;
 
 @Singleton
 @BPvPListener
@@ -52,7 +54,7 @@ public class Sever extends PrepareSkill implements CooldownSkill, Listener {
     }
 
     @Override
-    public Role getClassType() {
+    public Set<Role> getClassTypes() {
         return Role.ASSASSIN;
     }
 

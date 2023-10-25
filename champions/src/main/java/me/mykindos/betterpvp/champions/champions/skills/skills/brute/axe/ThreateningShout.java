@@ -9,12 +9,15 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+
+import java.util.Set;
 
 @Singleton
 public class ThreateningShout extends Skill implements InteractSkill, CooldownSkill {
@@ -47,7 +50,7 @@ public class ThreateningShout extends Skill implements InteractSkill, CooldownSk
     }
 
     @Override
-    public Role getClassType() {
+    public Set<Role> getClassTypes() {
         return Role.BRUTE;
     }
 

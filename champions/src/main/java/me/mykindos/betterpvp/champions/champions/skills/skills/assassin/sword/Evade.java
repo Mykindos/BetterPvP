@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomEntityVelocityEvent;
+import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectType;
@@ -36,6 +37,7 @@ import org.bukkit.util.Vector;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.UUID;
 
 @Singleton
@@ -77,7 +79,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
     }
 
     @Override
-    public Role getClassType() {
+    public Set<Role> getClassTypes() {
         return Role.ASSASSIN;
     }
 

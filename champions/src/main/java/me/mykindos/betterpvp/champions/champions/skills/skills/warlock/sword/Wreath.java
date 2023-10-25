@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
@@ -36,6 +37,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
+import java.util.Set;
 import java.util.WeakHashMap;
 
 @Singleton
@@ -72,7 +74,7 @@ public class Wreath extends PrepareSkill implements CooldownSkill {
     }
 
     @Override
-    public Role getClassType() {
+    public Set<Role> getClassTypes() {
         return Role.WARLOCK;
     }
 

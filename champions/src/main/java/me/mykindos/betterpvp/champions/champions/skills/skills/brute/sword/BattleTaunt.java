@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -26,6 +27,7 @@ import org.bukkit.event.block.Action;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.UUID;
 
 @Singleton
@@ -55,7 +57,7 @@ public class BattleTaunt extends ChannelSkill implements InteractSkill, Cooldown
     }
 
     @Override
-    public Role getClassType() {
+    public Set<Role> getClassTypes() {
         return Role.BRUTE;
     }
 

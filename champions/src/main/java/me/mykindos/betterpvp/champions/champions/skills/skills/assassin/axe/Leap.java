@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
@@ -21,6 +22,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.util.Vector;
+
+import java.util.Set;
 
 @Singleton
 @BPvPListener
@@ -66,7 +69,7 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
             Vector vec = player.getLocation().getDirection();
             vec.setY(0);
             UtilVelocity.velocity(player, vec, 0.9D, false, 0.0D, 0.8D, 2.0D, true);
-            UtilMessage.message(player, getClassType().getName(), "You used <alt>Wall Kick</alt>.");
+            UtilMessage.message(player, getClassTypes().getName(), "You used <alt>Wall Kick</alt>.");
         }
 
         player.getWorld().spawnEntity(player.getLocation(), EntityType.LLAMA_SPIT);
@@ -164,7 +167,7 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
     }
 
     @Override
-    public Role getClassType() {
+    public Set<Role> getClassTypes() {
         return Role.ASSASSIN;
     }
 

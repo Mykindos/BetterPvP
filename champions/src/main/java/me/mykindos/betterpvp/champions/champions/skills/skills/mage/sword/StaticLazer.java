@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
@@ -45,10 +46,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.WeakHashMap;
+import java.util.*;
 
 @Singleton
 @BPvPListener
@@ -121,7 +119,7 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
     }
 
     @Override
-    public Role getClassType() {
+    public Set<Role> getClassTypes() {
         return Role.MAGE;
     }
 

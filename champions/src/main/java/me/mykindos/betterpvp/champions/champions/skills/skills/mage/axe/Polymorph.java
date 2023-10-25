@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEvent;
 import me.mykindos.betterpvp.core.effects.EffectType;
@@ -30,6 +31,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.util.Iterator;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.WeakHashMap;
 
 @Singleton
@@ -68,7 +70,7 @@ public class Polymorph extends PrepareSkill implements CooldownSkill {
     }
 
     @Override
-    public Role getClassType() {
+    public Set<Role> getClassTypes() {
         return Role.MAGE;
     }
 

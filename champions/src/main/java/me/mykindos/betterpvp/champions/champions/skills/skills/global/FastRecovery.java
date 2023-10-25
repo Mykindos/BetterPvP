@@ -7,11 +7,14 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
+import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.energy.events.RegenerateEnergyEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+
+import java.util.Set;
 
 @Singleton
 @BPvPListener
@@ -42,7 +45,7 @@ public class FastRecovery extends Skill implements PassiveSkill {
     }
 
     @Override
-    public Role getClassType() {
+    public Set<Role> getClassTypes() {
         return null;
     }
 

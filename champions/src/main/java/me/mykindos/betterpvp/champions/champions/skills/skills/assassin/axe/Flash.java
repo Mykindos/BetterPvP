@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.skills.assassin.data.FlashData;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.gamer.Gamer;
@@ -31,10 +32,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Optional;
-import java.util.WeakHashMap;
+import java.util.*;
 
 @Singleton
 @BPvPListener
@@ -104,7 +102,7 @@ public class Flash extends Skill implements InteractSkill, Listener {
     }
 
     @Override
-    public Role getClassType() {
+    public Set<Role> getClassTypes() {
         return Role.ASSASSIN;
     }
 

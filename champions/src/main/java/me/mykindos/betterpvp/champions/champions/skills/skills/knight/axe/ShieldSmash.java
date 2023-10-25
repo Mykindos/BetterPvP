@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.combat.events.PlayerCheckShieldEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
@@ -36,6 +37,7 @@ import org.bukkit.util.Vector;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @Singleton
 @BPvPListener
@@ -67,7 +69,7 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
     }
 
     @Override
-    public Role getClassType() {
+    public Set<Role> getClassTypes() {
         return Role.KNIGHT;
     }
 

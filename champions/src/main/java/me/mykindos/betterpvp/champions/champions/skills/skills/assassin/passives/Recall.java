@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.skills.assassin.data.RecallData;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.ToggleSkill;
+import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.events.EffectClearEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
@@ -28,6 +29,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
+import java.util.Set;
 import java.util.WeakHashMap;
 
 @Singleton
@@ -105,7 +107,7 @@ public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listene
 
 
     @Override
-    public Role getClassType() {
+    public Set<Role> getClassTypes() {
         return Role.ASSASSIN;
     }
 
