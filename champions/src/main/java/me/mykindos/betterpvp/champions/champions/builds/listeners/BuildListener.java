@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.champions.champions.builds.menus.ClassSelectionMenu
 import me.mykindos.betterpvp.champions.champions.builds.menus.SkillMenu;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.ApplyBuildEvent;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.DeleteBuildEvent;
+import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.champions.champions.skills.SkillManager;
 import me.mykindos.betterpvp.core.client.events.ClientLoginEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -32,11 +33,14 @@ public class BuildListener implements Listener {
     private final BuildManager buildManager;
     private final SkillManager skillManager;
 
+    private final RoleManager roleManager;
+
     @Inject
-    public BuildListener(Champions champions, BuildManager buildManager, SkillManager skillManager) {
+    public BuildListener(Champions champions, BuildManager buildManager, SkillManager skillManager, RoleManager roleManager) {
         this.champions = champions;
         this.buildManager = buildManager;
         this.skillManager = skillManager;
+        this.roleManager = roleManager;
     }
 
     @EventHandler
@@ -63,7 +67,7 @@ public class BuildListener implements Listener {
             if (block.getType() == Material.ENCHANTING_TABLE) {
                 Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(event.getPlayer().getUniqueId());
                 gamerBuildsOptional.ifPresent(builds -> {
-                    MenuManager.openMenu(event.getPlayer(), new ClassSelectionMenu(event.getPlayer(), builds, skillManager));
+                    MenuManager.openMenu(event.getPlayer(), new ClassSelectionMenu(event.getPlayer(), builds, skillManager, roleManager));
                     event.setCancelled(true);
                 });
             }

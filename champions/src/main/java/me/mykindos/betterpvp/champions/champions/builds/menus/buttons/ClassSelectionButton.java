@@ -2,7 +2,9 @@ package me.mykindos.betterpvp.champions.champions.builds.menus.buttons;
 
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.menus.BuildMenu;
+import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.champions.champions.skills.SkillManager;
+import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.menu.Button;
 import me.mykindos.betterpvp.core.menu.MenuManager;
@@ -19,6 +21,8 @@ public class ClassSelectionButton extends Button {
     private final Role role;
     private final SkillManager skillManager;
 
+    private final RoleManager roleManager;
+
 
     public ClassSelectionButton(GamerBuilds builds, Role role, SkillManager skillManager, int slot, ItemStack item) {
         super(slot, item, Component.text(role.getName(), role.getColor(), TextDecoration.BOLD));
@@ -29,7 +33,7 @@ public class ClassSelectionButton extends Button {
 
     @Override
     public void onClick(Player player, Gamer gamer, ClickType clickType) {
-        MenuManager.openMenu(player, new BuildMenu(player, builds, role, skillManager));
+        MenuManager.openMenu(player, new BuildMenu(player, builds, role, skillManager, roleManager));
         player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1.0F, 2.0F);
     }
 }

@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.reflections.Reflections;
 
 import java.util.Objects;
+import java.util.Set;
 
 
 @Singleton
@@ -43,6 +44,9 @@ public class RoleManager extends Manager<Role> {
         return objects.getOrDefault(player.getUniqueId().toString(), null);
     }
 
+    public Set<Role> getRoles() {
+        return repository.getRoles();
+    }
     /**
      * Check if a player has any role equipped
      * @param player The player

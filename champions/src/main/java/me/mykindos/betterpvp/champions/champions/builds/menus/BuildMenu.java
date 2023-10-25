@@ -5,7 +5,9 @@ import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.champions.champions.builds.menus.buttons.ApplyBuildButton;
 import me.mykindos.betterpvp.champions.champions.builds.menus.buttons.DeleteBuildButton;
 import me.mykindos.betterpvp.champions.champions.builds.menus.buttons.EditBuildButton;
+import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.champions.champions.skills.SkillManager;
+import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.menu.Button;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.buttons.BackButton;
@@ -25,17 +27,20 @@ public class BuildMenu extends Menu implements IRefreshingMenu {
     private final Role role;
     private final SkillManager skillManager;
 
-    public BuildMenu(Player player, GamerBuilds builds, Role role, SkillManager skillManager) {
+    private final RoleManager roleManager;
+
+    public BuildMenu(Player player, GamerBuilds builds, Role role, SkillManager skillManager, RoleManager roleManager) {
         super(player, 45, Component.text(role.getName() + " Builds"));
         this.builds = builds;
         this.role = role;
         this.skillManager = skillManager;
+        this.roleManager = roleManager;
         refresh();
     }
 
     @Override
     public void refresh() {
-        addButton(new BackButton(0, new ItemStack(Material.ARROW), new ClassSelectionMenu(player, builds, skillManager)));
+        addButton(new BackButton(0, new ItemStack(Material.ARROW), new ClassSelectionMenu(player, builds, skillManager, roleManager)));
         addButton(new Button(9, new ItemStack(role.getHelmet()), Component.text(role.getName() + " Helmet", role.getColor(), TextDecoration.BOLD)));
         addButton(new Button(18, new ItemStack(role.getChestplate()), Component.text(role.getName() + " Chestplate", role.getColor(), TextDecoration.BOLD)));
         addButton(new Button(27, new ItemStack(role.getLeggings()), Component.text(role.getName() + " Leggings", role.getColor(), TextDecoration.BOLD)));
