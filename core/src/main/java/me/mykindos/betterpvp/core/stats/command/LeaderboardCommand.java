@@ -8,7 +8,7 @@ import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.menu.MenuManager;
 import me.mykindos.betterpvp.core.stats.Leaderboard;
 import me.mykindos.betterpvp.core.stats.menu.LeaderboardMenu;
-import me.mykindos.betterpvp.core.stats.repository.LeaderboardRepository;
+import me.mykindos.betterpvp.core.stats.repository.LeaderboardManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -22,10 +22,10 @@ import java.util.Optional;
 @Slf4j
 public class LeaderboardCommand extends Command {
 
-    private final LeaderboardRepository leaderboards;
+    private final LeaderboardManager leaderboards;
 
     @Inject
-    public LeaderboardCommand(LeaderboardRepository leaderboards) {
+    public LeaderboardCommand(LeaderboardManager leaderboards) {
         this.leaderboards = leaderboards;
         aliases.add("lb");
     }
@@ -49,7 +49,7 @@ public class LeaderboardCommand extends Command {
 
         final String name = String.join(" ", args);
         final Optional<Leaderboard<?, ?>> leaderboardOpt = leaderboards.getObject(name);
-        if (leaderboardOpt.isEmpty()) {
+        if (leaderboardOpt.isEmpty() || !leaderboardOpt.get().isEnabled()) {
             UtilMessage.message(player, "Leaderboard", "Leaderboard not found [<alt2>%s</alt2>].", name);
             return;
         }
@@ -61,7 +61,7 @@ public class LeaderboardCommand extends Command {
     @Override
     public List<String> processTabComplete(CommandSender sender, String[] args) {
         if (args.length == 1) {
-            return new ArrayList<>(leaderboards.getObjects().keySet());
+                return new ArrayList<>(leaderboards.getEnabled().keySet());
         }
         return Collections.emptyList();
     }

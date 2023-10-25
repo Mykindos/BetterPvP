@@ -1,36 +1,31 @@
-package me.mykindos.betterpvp.core.combat.stats;
+package me.mykindos.betterpvp.core.combat.stats.impl;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.combat.stats.model.CombatStatsRepository;
+import me.mykindos.betterpvp.core.combat.stats.model.ICombatDataAttachment;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
-import me.mykindos.betterpvp.core.stats.repository.StatsRepository;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 @Slf4j
-public class CombatStatsRepository extends StatsRepository<CombatData> {
-
-    private final List<AttachmentLoader> attachmentLoaders = new ArrayList<>();
+@Singleton
+public class GlobalCombatStatsRepository extends CombatStatsRepository<GlobalCombatData> {
 
     @Inject
-    protected CombatStatsRepository(Core plugin) {
+    protected GlobalCombatStatsRepository(Core plugin) {
         super(plugin);
     }
 
-    public void addAttachmentLoader(AttachmentLoader attachmentLoader) {
-        this.attachmentLoaders.add(attachmentLoader);
-    }
-
     @Override
-    public CompletableFuture<CombatData> fetchDataAsync(UUID player) {
+    public CompletableFuture<GlobalCombatData> fetchDataAsync(UUID player) {
         return CompletableFuture.supplyAsync(() -> {
-            final CombatData data = new CombatData(player);
+            final GlobalCombatData data = new GlobalCombatData(player);
             final UuidStatementValue uuid = new UuidStatementValue(player);
             Statement statement = new Statement("CALL GetCombatData(?)", uuid);
             database.executeProcedure(statement, -1, result -> {
@@ -41,6 +36,14 @@ public class CombatStatsRepository extends StatsRepository<CombatData> {
                         data.setAssists(result.getInt("Assists"));
                         data.setKillStreak(result.getInt("KillStreak"));
                         data.setHighestKillStreak(result.getInt("HighestKillStreak"));
+
+                        // We care if the rating is null because that means they have not played a game yet,
+                        // so it falls back to the default value of rating in CombatData
+                        // Contrary to the other stats, which are initialized to 0
+                        int rating = result.getInt("Rating");
+                        if (!result.wasNull()) {
+                            data.setRating(rating);
+                        }
                     }
 
                     attachmentLoaders.forEach(loader -> {

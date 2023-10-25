@@ -41,7 +41,7 @@ public abstract class StatsRepository<T extends PlayerData> {
             saveQueue.forEach((uuid, data) -> data.prepareUpdates(uuid, database, plugin.getDatabasePrefix()));
             // Save extra
             postSaveAll();
-            log.info("Saving {} players.", saveQueue.size());
+            log.info("[{}] Saving {} players.", getClass().getSimpleName(), saveQueue.size());
             // Clear the save queue
             saveQueue.clear();
         });

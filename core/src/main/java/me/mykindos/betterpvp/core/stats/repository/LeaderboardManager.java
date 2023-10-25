@@ -2,23 +2,14 @@ package me.mykindos.betterpvp.core.stats.repository;
 
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
-import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.stats.Leaderboard;
-import me.mykindos.betterpvp.core.stats.event.LeaderboardInitializeEvent;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Singleton
-@BPvPListener
-public final class LeaderboardRepository extends Manager<Leaderboard<?, ?>> implements Listener {
-
-    @EventHandler
-    public void onLeaderboardInitialize(LeaderboardInitializeEvent event) {
-        addObject(event.getLeaderboard().getName(), event.getLeaderboard());
-    }
+public final class LeaderboardManager extends Manager<Leaderboard<?, ?>> {
 
     @Override
     public Optional<Leaderboard<?, ?>> getObject(String identifier) {
@@ -26,5 +17,11 @@ public final class LeaderboardRepository extends Manager<Leaderboard<?, ?>> impl
                 .filter(e -> e.getKey().equalsIgnoreCase(identifier))
                 .findFirst()
                 .map(Map.Entry::getValue);
+    }
+
+    public Map<String, ? extends Leaderboard<?, ?>> getEnabled() {
+        return getObjects().entrySet().stream()
+                .filter(e -> e.getValue().isEnabled())
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 }

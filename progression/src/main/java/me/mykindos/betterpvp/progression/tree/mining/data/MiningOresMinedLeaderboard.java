@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.stats.Leaderboard;
+import me.mykindos.betterpvp.core.stats.Viewable;
 import me.mykindos.betterpvp.core.stats.sort.SortType;
 import me.mykindos.betterpvp.core.stats.sort.TemporalSort;
 import me.mykindos.betterpvp.progression.Progression;
@@ -23,13 +24,13 @@ import java.util.UUID;
 
 @Slf4j
 @Singleton
-public class MiningOresMinedLeaderboard extends Leaderboard<UUID, Long> {
+public class MiningOresMinedLeaderboard extends Leaderboard<UUID, Long> implements Viewable {
 
     private final MiningRepository repository;
 
     @Inject
     public MiningOresMinedLeaderboard(Progression progression, MiningRepository repository) {
-        super(progression, progression.getDatabasePrefix());
+        super(progression);
         this.repository = repository;
     }
 
@@ -39,7 +40,7 @@ public class MiningOresMinedLeaderboard extends Leaderboard<UUID, Long> {
     }
 
     @Override
-    protected Comparator<Long> getSorter() {
+    protected Comparator<Long> getSorter(SortType sortType) {
         return Comparator.comparing(Long::intValue).reversed();
     }
 

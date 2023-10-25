@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.database.query.values.DoubleStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
 import me.mykindos.betterpvp.core.stats.Leaderboard;
+import me.mykindos.betterpvp.core.stats.Viewable;
 import me.mykindos.betterpvp.core.stats.sort.SortType;
 import me.mykindos.betterpvp.core.stats.sort.TemporalSort;
 import me.mykindos.betterpvp.progression.Progression;
@@ -24,11 +25,11 @@ import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
 @Singleton
-public class FishingWeightLeaderboard extends Leaderboard<UUID, Long> {
+public class FishingWeightLeaderboard extends Leaderboard<UUID, Long> implements Viewable {
 
     @Inject
     public FishingWeightLeaderboard(Progression progression) {
-        super(progression, progression.getDatabasePrefix());
+        super(progression);
     }
 
     @Override
@@ -37,7 +38,7 @@ public class FishingWeightLeaderboard extends Leaderboard<UUID, Long> {
     }
 
     @Override
-    protected Comparator<Long> getSorter() {
+    protected Comparator<Long> getSorter(SortType sortType) {
         return Comparator.comparing(Long::intValue).reversed();
     }
 

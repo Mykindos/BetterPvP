@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.combat.stats;
+package me.mykindos.betterpvp.core.combat.stats.model;
 
 import me.mykindos.betterpvp.core.database.Database;
 import org.jetbrains.annotations.NotNull;
@@ -9,7 +9,7 @@ import java.util.UUID;
  * Loads attachments for {@link CombatData} objects.
  */
 @FunctionalInterface
-public interface AttachmentLoader {
+public interface IAttachmentLoader {
 
     /**
      * Loads an attachment for the given {@link CombatData} object.

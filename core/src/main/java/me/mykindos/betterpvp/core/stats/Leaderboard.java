@@ -2,17 +2,18 @@ package me.mykindos.betterpvp.core.stats;
 
 import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
-import me.mykindos.betterpvp.core.stats.event.LeaderboardInitializeEvent;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardEntry;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardEntryComparator;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardEntryKey;
+import me.mykindos.betterpvp.core.stats.repository.LeaderboardManager;
 import me.mykindos.betterpvp.core.stats.sort.SortType;
 import me.mykindos.betterpvp.core.stats.sort.TemporalSort;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
@@ -20,15 +21,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
@@ -42,17 +35,21 @@ import java.util.concurrent.TimeUnit;
  * @param <T> The type of object to be sorted in this leaderboard.
  */
 @Slf4j
-public abstract class Leaderboard<E, T extends Comparable<T>> {
+public abstract class Leaderboard<E, T> {
 
     private final ConcurrentHashMap<SortType, TreeSet<LeaderboardEntry<E, T>>> topTen;
     private final AsyncLoadingCache<LeaderboardEntryKey<E>, T> entryCache;
     private final Database database;
     private final String tablePrefix;
 
-    protected Leaderboard(BPvPPlugin plugin, String tablePrefix) {
+    @Getter
+    @Setter
+    private boolean enabled = true;
+
+    protected Leaderboard(BPvPPlugin plugin) {
         Validate.isTrue(acceptedSortTypes().length > 0, "Leaderboard must accept at least one sort type.");
         this.database = plugin.getInjector().getInstance(Database.class);
-        this.tablePrefix = tablePrefix;
+        this.tablePrefix = plugin.getDatabasePrefix();
         this.topTen = new ConcurrentHashMap<>();
         this.entryCache = Caffeine.newBuilder()
                 .expireAfterWrite(10, TimeUnit.MINUTES)
@@ -60,13 +57,15 @@ public abstract class Leaderboard<E, T extends Comparable<T>> {
 
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(this::forceUpdate, 0L, 10L, TimeUnit.MINUTES);
 
-        UtilServer.callEvent(new LeaderboardInitializeEvent(this));
+        final LeaderboardManager manager = plugin.getInjector().getInstance(LeaderboardManager.class);
+        manager.addObject(getName(), this);
     }
 
     public void forceUpdate() {
         for (SortType sortType : acceptedSortTypes()) {
             CompletableFuture.supplyAsync(() -> fetchAll(sortType, database, tablePrefix)).thenApply(fetch -> {
-                TreeSet<LeaderboardEntry<E, T>> set = new TreeSet<>(new LeaderboardEntryComparator<>());
+                final LeaderboardEntryComparator<E, T> comparator = new LeaderboardEntryComparator<>(getSorter(sortType));
+                TreeSet<LeaderboardEntry<E, T>> set = new TreeSet<>(comparator);
                 set.addAll(fetch.entrySet().stream().map(entry -> LeaderboardEntry.of(entry.getKey(), entry.getValue())).toList());
                 return set;
             }).exceptionally(ex -> {
@@ -89,7 +88,7 @@ public abstract class Leaderboard<E, T extends Comparable<T>> {
     /**
      * @return The comparator to sort the leaderboard by.
      */
-    protected abstract Comparator<T> getSorter();
+    protected abstract Comparator<T> getSorter(SortType sortType);
 
     /**
      * @return The types of sorting this leaderboard accepts.
@@ -118,7 +117,7 @@ public abstract class Leaderboard<E, T extends Comparable<T>> {
      *        If the element was not added to a leaderboard, it will not be present in the map.
      *        If the element was already in the same position, it will not be present in the map.
      */
-    public final CompletableFuture<Map<SortType, Integer>> add(@NotNull E entryName, @NotNull T add) {
+    public CompletableFuture<Map<SortType, Integer>> add(@NotNull E entryName, @NotNull T add) {
         return CompletableFuture.supplyAsync(() -> {
             Map<SortType, Integer> types = new HashMap<>();
             for (SortType type : acceptedSortTypes()) {
@@ -178,7 +177,7 @@ public abstract class Leaderboard<E, T extends Comparable<T>> {
      *         If the element was not added to a leaderboard, it will not be present in the map.
      *         If the element was already in the same position, it will not be present in the map.
      */
-    public final Map<SortType, Integer> compute(@NotNull E entryName, @NotNull T element) {
+    public Map<SortType, Integer> compute(@NotNull E entryName, @NotNull T element) {
         Map<SortType, Integer> types = new HashMap<>();
         for (SortType type : acceptedSortTypes()) {
             final TreeSet<LeaderboardEntry<E, T>> set = topTen.get(type);
@@ -237,8 +236,8 @@ public abstract class Leaderboard<E, T extends Comparable<T>> {
     protected abstract Map<E, T> fetchAll(@NotNull SortType sortType, @NotNull Database database, @NotNull String tablePrefix);
 
     public void attemptAnnounce(Player player, Map<SortType, Integer> newPositions) {
-        if (newPositions.isEmpty()) {
-            return;
+        if (newPositions.isEmpty() || !isEnabled()) {
+            return; // No new positions or leaderboard is disabled
         }
 
         final Map.Entry<TemporalSort, Integer> highestEntry = newPositions.entrySet().stream()
