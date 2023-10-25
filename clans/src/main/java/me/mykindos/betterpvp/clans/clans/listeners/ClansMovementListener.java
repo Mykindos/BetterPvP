@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
 import me.mykindos.betterpvp.core.client.Rank;
+import me.mykindos.betterpvp.core.components.clans.data.ClanTerritory;
 import me.mykindos.betterpvp.core.framework.delayedactions.events.ClanHomeTeleportEvent;
 import me.mykindos.betterpvp.core.framework.delayedactions.events.ClanStuckTeleportEvent;
 import me.mykindos.betterpvp.core.framework.events.scoreboard.ScoreboardUpdateEvent;
@@ -13,10 +14,13 @@ import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import me.mykindos.betterpvp.core.world.events.SpawnTeleportEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -27,11 +31,13 @@ import java.util.Optional;
 public class ClansMovementListener extends ClanListener {
 
     private final Clans clans;
+    private final ClanManager clanManager;
 
     @Inject
     public ClansMovementListener(Clans clans, ClanManager clanManager, GamerManager gamerManager) {
         super(clanManager, gamerManager);
         this.clans = clans;
+        this.clanManager = clanManager;
     }
 
     @EventHandler
@@ -109,26 +115,76 @@ public class ClansMovementListener extends ClanListener {
     public void onClanHomeTeleport(ClanHomeTeleportEvent event) {
         if (event.isCancelled()) return;
 
-        clanManager.getClanByLocation(event.getPlayer().getLocation()).ifPresentOrElse(clan -> {
-            if (clan.isAdmin()) {
-                if (clan.isSafe() && clan.getName().contains("Spawn") && event.getPlayer().getLocation().getY() > 110) {
-                    return;
-                }
+        Player player = event.getPlayer();
+
+        if (!clanManager.canTeleport(player)) {
+            UtilMessage.message(player, "Clans", "You cannot teleport while combat tagged.");
+            event.setCancelled(true);
+            return;
+        }
+
+        clanManager.getClanByLocation(player.getLocation()).ifPresentOrElse(clan -> {
+            if (clan.isAdmin() && clan.isSafe()) {
+                event.setDelayInSeconds(0);
+                return;
             }
 
-            UtilMessage.message(event.getPlayer(), "Clans", "You can only teleport to your clan home from spawn or the wilderness.");
-            event.setCancelled(true);
-        }, () -> {
-            event.setDelayInSeconds(30);
-        });
+            Optional<Clan> playerClanOptional = clanManager.getClanByPlayer(player);
+            if (playerClanOptional.isPresent()) {
+                Clan playerClan = playerClanOptional.get();
 
+                if (clan.equals(playerClan)) {
+                    boolean hasEnemies = false;
+
+                    for (ClanTerritory territory : playerClan.getTerritory()) {
+                        Chunk chunk = UtilWorld.stringToChunk(territory.getChunk());
+                        if (chunk == null) continue;
+
+                        for (Entity entity : chunk.getEntities()) {
+                            if (entity instanceof Player target && !entity.equals(player) && clanManager.canHurt(player, target)) {
+                                hasEnemies = true;
+                                break;
+                            }
+                        }
+
+                        if (hasEnemies) break;
+                    }
+
+                    if (hasEnemies) {
+                        event.setDelayInSeconds(20);
+                    } else {
+                        event.setDelayInSeconds(0);
+                    }
+                    return;
+                }
+
+                if (clanManager.getRelation(playerClan, clan) == ClanRelation.ENEMY) {
+                    event.setDelayInSeconds(120);
+                } else {
+                    event.setDelayInSeconds(60);
+                }
+
+            } else {
+                event.setDelayInSeconds(20);
+            }
+
+        }, () -> {
+            event.setDelayInSeconds(20);
+        });
     }
+
 
     @EventHandler
     public void onClanStuckTeleport(ClanStuckTeleportEvent event) {
         if (event.isCancelled()) return;
 
         Player player = event.getPlayer();
+
+        if (!clanManager.canTeleport(player)) {
+            UtilMessage.message(player, "Clans", "You cannot teleport while combat tagged.");
+            event.setCancelled(true);
+            return;
+        }
 
         Location nearestWilderness = clanManager.closestWilderness(player);
 
@@ -146,13 +202,12 @@ public class ClansMovementListener extends ClanListener {
             return;
         }
 
-
         ClanRelation relation = clanManager.getRelation(clanManager.getClanByPlayer(player).orElse(null), territoryOptional.get());
 
         if (relation == ClanRelation.ENEMY) {
-            event.setDelayInSeconds(3 * 5);
+            event.setDelayInSeconds(120);
         } else {
-            event.setDelayInSeconds(2 * 5);
+            event.setDelayInSeconds(60);
         }
     }
 
