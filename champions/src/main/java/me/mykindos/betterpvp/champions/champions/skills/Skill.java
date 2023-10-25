@@ -12,11 +12,14 @@ import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
 import me.mykindos.betterpvp.core.components.champions.ISkill;
+import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 @Singleton
 @Slf4j
@@ -27,6 +30,8 @@ public abstract class Skill implements ISkill {
     protected final ChampionsManager championsManager;
 
     private boolean enabled;
+
+    private Set<Role> ClassTypes = new HashSet<>();
     private int maxLevel;
     protected int cooldown;
     protected int energy;
@@ -165,4 +170,13 @@ public abstract class Skill implements ISkill {
         };
     }
 
+    @Override
+    public Set<Role> getClassType() {
+        return ClassTypes;
+    }
+
+    @Override
+    public void addClass (Role role) {
+        ClassTypes.add(role);
+    }
 }

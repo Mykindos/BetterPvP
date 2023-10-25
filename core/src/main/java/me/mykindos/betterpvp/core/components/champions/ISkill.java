@@ -3,13 +3,15 @@ package me.mykindos.betterpvp.core.components.champions;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
+import java.util.Set;
+
 public interface ISkill {
 
     String getName();
 
     String[] getDescription(int level);
 
-    Role[] getClassType();
+    Set<Role> getClassType();
 
     void addClass(Role role);
 

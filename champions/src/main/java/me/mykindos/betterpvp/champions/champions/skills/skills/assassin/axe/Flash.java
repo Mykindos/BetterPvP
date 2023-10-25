@@ -124,7 +124,7 @@ public class Flash extends Skill implements InteractSkill, Listener {
     }
 
     private void notifyCharges(Player player, int charges) {
-        UtilMessage.simpleMessage(player, getClassType().getName(), "Flash Charges: <alt2>" + charges);
+        UtilMessage.simpleMessage(player, "Class", "Flash Charges: <alt2>" + charges);
     }
 
     @Override
@@ -133,7 +133,7 @@ public class Flash extends Skill implements InteractSkill, Listener {
             return true;
         }
 
-        UtilMessage.simpleMessage(player, getClassType().getName(), "You don't have any <alt>" + getName() + "</alt> charges.");
+        UtilMessage.simpleMessage(player, "Class", "You don't have any <alt>" + getName() + "</alt> charges.");
         return false;
     }
 
