@@ -4,13 +4,16 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
+import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.reflections.Reflections;
 
-import java.util.Objects;
+import java.lang.reflect.Modifier;
+import java.util.*;
 
 @Data
 public class Role {
@@ -24,6 +27,13 @@ public class Role {
     private Double maxHealth;
     private Double arrowDamage;
 
+    private Set<ISkill> swordSkills = new HashSet<>(9);
+    private Set<ISkill> axeSkills = new HashSet<>(9);
+    private Set<ISkill> passiveA = new HashSet<>(9);
+    private Set<ISkill> passiveB = new HashSet<>(9);
+    private Set<ISkill> global = new HashSet<>(9);
+    private Set<ISkill> bow = new HashSet<>(9);
+
     private boolean dealKnockback;
     private boolean takeKnockback;
     private boolean takeFallDamage;
@@ -35,6 +45,55 @@ public class Role {
     private float damagePitch;
 
     private Material[] armor = new Material[4];
+
+    public void loadSkills(ExtendedYamlConfiguration config, Reflections reflections, BPvPPlugin plugin) {
+        String path = "class." + key + ".skills.";
+        List<String> swordList = config.getOrSaveStringList(path + "sword", List.of("HiltSmash", "FleshHook"));
+        List<String> axeList = config.getOrSaveStringList(path + "axe", List.of("BullsCharge", "SeismicSlam"));
+        List<String> passiveAList = config.getOrSaveStringList(path + "passiveA", List.of("Bloodlust", "Cleave"));
+        List<String> passiveBList = config.getOrSaveStringList(path + "passiveB", List.of("Deflection", "Stampede"));
+        List<String> globalList = config.getOrSaveStringList(path + "global", List.of("BreakFall", "FastRecovery", "Swim"));
+        List<String> bowList = config.getOrSaveStringList(path + "bow", List.of());
+        Set<Class<? extends ISkill>> skillClasses = reflections.getSubTypesOf(ISkill.class);
+        skillClasses.removeIf(clazz -> clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers()) || clazz.isEnum());
+        skillClasses.removeIf(clazz -> clazz.isAnnotationPresent(Deprecated.class));
+
+        for (var clazz : skillClasses) {
+            ISkill skill = plugin.getInjector().getInstance(clazz);
+            if (skill.getType() == SkillType.SWORD && swordList.contains(skill.getName())) {
+                swordSkills.add(skill);
+                skill.addClass(this);
+                continue;
+            }
+            if (skill.getType() == SkillType.AXE && axeList.contains(clazz.getName())) {
+                axeSkills.add(skill);
+                skill.addClass(this);
+                continue;
+            }
+            if (skill.getType() == SkillType.PASSIVE_A && passiveAList.contains(clazz.getName())) {
+                passiveA.add(skill);
+                skill.addClass(this);
+                continue;
+            }
+            if (skill.getType() == SkillType.PASSIVE_B && passiveBList.contains(clazz.getName())) {
+                passiveB.add(skill);
+                skill.addClass(this);
+                continue;
+            }
+            if (skill.getType() == SkillType.GLOBAL && globalList.contains(clazz.getName())) {
+                global.add(skill);
+                skill.addClass(this);
+                continue;
+            }
+            if (skill.getType() == SkillType.BOW && bowList.contains(clazz.getName())) {
+                bow.add(skill);
+                skill.addClass(this);
+                continue;
+            }
+        }
+
+
+    }
 
     public void loadConfig(ExtendedYamlConfiguration config) {
         String path = "class." + key;

@@ -9,7 +9,9 @@ public interface ISkill {
 
     String[] getDescription(int level);
 
-    Role getClassType();
+    Role[] getClassType();
+
+    void addClass(Role role);
 
     SkillType getType();
 

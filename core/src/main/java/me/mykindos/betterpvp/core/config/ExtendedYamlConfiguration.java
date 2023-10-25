@@ -69,4 +69,15 @@ public class ExtendedYamlConfiguration extends YamlConfiguration {
         return getObject(path, type);
     }
 
+    @SuppressWarnings("unchecked")
+    @Nullable
+    public List<String> getOrSaveStringList(@NotNull String path, List<String> defaultValue) {
+        if (!isSet(path)) {
+            set(path, defaultValue);
+            return defaultValue;
+        } else {
+            return getStringList(path);
+        }
+    }
+
 }
