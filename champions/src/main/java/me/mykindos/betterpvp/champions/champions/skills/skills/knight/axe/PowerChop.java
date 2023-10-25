@@ -93,7 +93,7 @@ public class PowerChop extends PrepareSkill implements CooldownSkill {
         charge.entrySet().removeIf(entry -> {
             if (UtilTime.elapsed(entry.getValue(), (long) timeToHit * 1000)) {
                 Player player = entry.getKey();
-                UtilMessage.simpleMessage(player, getClassType().getName(), "You failed to use <green>%s<gray>.", getName());
+                UtilMessage.simpleMessage(player, "Champions", "You failed to use <green>%s<gray>.", getName());
                 player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
                 return true;
             }

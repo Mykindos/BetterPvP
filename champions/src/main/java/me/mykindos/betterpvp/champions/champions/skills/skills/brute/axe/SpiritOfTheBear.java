@@ -75,7 +75,7 @@ public class SpiritOfTheBear extends Skill implements InteractSkill, CooldownSki
         for (Player target : UtilPlayer.getNearbyAllies(player, player.getLocation(), (radius + level))) {
             target.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 100, 1));
             championsManager.getEffects().addEffect(target, EffectType.RESISTANCE, (long) (duration * 1000));
-            UtilMessage.message(target, getClassType().getName(), "You received the spirit of the bear!");
+            UtilMessage.message(target, "Champions", "You received the spirit of the bear!");
         }
     }
 

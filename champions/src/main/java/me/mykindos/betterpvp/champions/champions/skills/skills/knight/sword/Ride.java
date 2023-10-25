@@ -150,7 +150,7 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
         if (data != null) {
             Horse horse = data.getHorse();
             if (!horse.isDead()) {
-                UtilMessage.message(player, getClassType().getName(), "You have already summoned a horse.");
+                UtilMessage.message(player, "Champions", "You have already summoned a horse.");
                 return false;
             }
         }
@@ -174,7 +174,7 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
         data.setWasKilled(true);
         damagee.remove();
         horseData.remove(owner);
-        UtilMessage.message(owner, getClassType().getName(), "Your horse has been killed.");
+        UtilMessage.message(owner, "Champions", "Your horse has been killed.");
     }
 
     @EventHandler
@@ -183,7 +183,7 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
             HorseData data = horseData.get(player);
             if (data != null && data.getHorse().equals(horse)) {
                 if (!data.wasKilled()) {
-                    UtilMessage.message(player, getClassType().getName(), "Your horse has disappeared.");
+                    UtilMessage.message(player, "Champions", "Your horse has disappeared.");
                 }
                 horse.remove();
                 horseData.remove(player);

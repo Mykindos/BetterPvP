@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.reflections.Reflections;
 
 import java.util.Objects;
 
@@ -58,11 +59,15 @@ public class RoleManager extends Manager<Role> {
         if (customRoleSection == null) {
             customRoleSection = config.createSection(path);
         }
+        Reflections roleScan = new Reflections(Champions.class.getPackageName());
         for (String key : customRoleSection.getKeys(false)) {
             final ConfigurationSection section = customRoleSection.getConfigurationSection(key);
             final Role loaded = new Role(section.getName());
             loaded.loadConfig(config);
-            repository.getRoles().add(loaded);
+            if (loaded.isEnabled()) {
+                loaded.loadSkills(config, roleScan, champions);
+                repository.getRoles().add(loaded);
+            }
         }
     }
 

@@ -69,7 +69,7 @@ public class SilencingArrow extends PrepareArrowSkill {
         if (!(target instanceof Player damagee)) return;
         championsManager.getEffects().addEffect(damagee, EffectType.SILENCE, (long) ((baseDuration + level) * 1000L));
         if (championsManager.getEffects().hasEffect(damagee, EffectType.IMMUNETOEFFECTS)) {
-            UtilMessage.simpleMessage(damager, getClassType().getName(), "<alt>" + damagee.getName() + "</alt> is immune to your silence!");
+            UtilMessage.simpleMessage(damager, "Champions", "<alt>" + damagee.getName() + "</alt> is immune to your silence!");
         }
     }
 

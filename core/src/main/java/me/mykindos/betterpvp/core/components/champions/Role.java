@@ -20,6 +20,8 @@ public class Role {
     @Getter(AccessLevel.NONE)
     private final String key;
 
+    private boolean enabled;
+
     private String prefix;
 
     private TextColor color;
@@ -97,6 +99,8 @@ public class Role {
 
     public void loadConfig(ExtendedYamlConfiguration config) {
         String path = "class." + key;
+        enabled = config.getOrSaveBoolean(path + "enabled", true);
+
         prefix = config.getOrSaveString(path + "prefix", key.substring(0, 1));
 
         int R = config.getOrSaveInt(path + "color.R", 0);

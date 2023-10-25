@@ -71,7 +71,7 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
         double proposedHealth = player.getHealth() - (20 - (20 * healthReduction));
 
         if (proposedHealth <= 0.5) {
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You do not have enough health to use <green>%s %d<gray>", getName(), level);
+            UtilMessage.simpleMessage(player, "Champions", "You do not have enough health to use <green>%s %d<gray>", getName(), level);
             return false;
         }
 

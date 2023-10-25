@@ -133,12 +133,12 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
 
 
     public void doTakedown(Player player, Player target) {
-        UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <alt>" + target.getName() + "</alt> with <alt>" + getName());
+        UtilMessage.simpleMessage(player, "Champions", "You hit <alt>" + target.getName() + "</alt> with <alt>" + getName());
 
         UtilDamage.doCustomDamage(new CustomDamageEvent(target, player, null, DamageCause.CUSTOM, damage, false, "Takedown"));
 
 
-        UtilMessage.simpleMessage(target, getClassType().getName(), "<alt>" + player.getName() + "</alt> hit you with <alt>" + getName());
+        UtilMessage.simpleMessage(target, "Champions", "<alt>" + player.getName() + "</alt> hit you with <alt>" + getName());
         UtilDamage.doCustomDamage(new CustomDamageEvent(player, target, null, DamageCause.CUSTOM, damage, false, "Takedown Recoil"));
 
         PotionEffect pot = new PotionEffect(PotionEffectType.SLOW, (int) (1 + (getLevel(player) * 0.5)) * 20, 2);
@@ -150,7 +150,7 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
     public boolean canUse(Player p) {
 
         if (UtilBlock.isGrounded(p)) {
-            UtilMessage.simpleMessage(p, getClassType().getName(), "You cannot use <alt>" + getName() + "</alt> while grounded.");
+            UtilMessage.simpleMessage(p, "Champions", "You cannot use <alt>" + getName() + "</alt> while grounded.");
             return false;
         }
 

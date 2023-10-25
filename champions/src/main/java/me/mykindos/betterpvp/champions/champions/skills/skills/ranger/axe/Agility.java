@@ -103,7 +103,7 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
         if (active.contains(damagee.getUniqueId())) {
             event.setDamage(event.getDamage() * (1 - damageReduction));
             event.setKnockback(false);
-            UtilMessage.message(damager, getClassType().getName(), damagee.getName() + " is using " + getName());
+            UtilMessage.message(damager, "Champions", damagee.getName() + " is using " + getName());
             damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 0.5F, 2.0F);
         }
 

@@ -126,11 +126,11 @@ public class Void extends ActiveToggleSkill implements EnergySkill {
     public void toggle(Player player, int level) {
         if (active.contains(player.getUniqueId())) {
             active.remove(player.getUniqueId());
-            UtilMessage.simpleMessage(player, getClassType().getName(), "Void: <red>Off");
+            UtilMessage.simpleMessage(player, "Champions", "Void: <red>Off");
         } else {
             active.add(player.getUniqueId());
             if (championsManager.getEnergy().use(player, "Void", 5, false)) {
-                UtilMessage.simpleMessage(player, getClassType().getName(), "Void: <green>On");
+                UtilMessage.simpleMessage(player, "Champions", "Void: <green>On");
             }
         }
     }

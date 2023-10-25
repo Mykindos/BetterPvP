@@ -173,6 +173,6 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill {
     }
 
     private void sendState(Player player, boolean state) {
-        UtilMessage.simpleMessage(player, getClassType().getName(), "Immolate: %s", state ? "<green>On" : "<red>Off");
+        UtilMessage.simpleMessage(player, "Champions", "Immolate: %s", state ? "<green>On" : "<red>Off");
     }
 }

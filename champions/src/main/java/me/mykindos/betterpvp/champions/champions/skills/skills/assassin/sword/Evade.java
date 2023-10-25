@@ -124,10 +124,10 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
             handRaisedTime.remove(player.getUniqueId());
         }
 
-        UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s<gray>.", getName());
+        UtilMessage.simpleMessage(player, "Champions", "You used <green>%s<gray>.", getName());
 
         if (ent instanceof Player temp) {
-            UtilMessage.simpleMessage(temp, getClassType().getName(), "<yellow>%s<gray> used evade!", player.getName());
+            UtilMessage.simpleMessage(temp, "Champions", "<yellow>%s<gray> used evade!", player.getName());
         }
 
         active.remove(player.getUniqueId());
@@ -170,7 +170,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
                     if (!player.isHandRaised()) {
                         handRaisedTime.remove(player.getUniqueId());
                         it.remove();
-                        UtilMessage.message(player, getClassType().getName(), "Your Evade failed.");
+                        UtilMessage.message(player, "Champions", "Your Evade failed.");
                         player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
                     } else if (!handRaisedTime.containsKey(player.getUniqueId())) {
                         it.remove();
@@ -184,7 +184,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
                         it.remove();
                     } else if (UtilTime.elapsed(handRaisedTime.get(player.getUniqueId()), (long) duration * 1000)) {
                         handRaisedTime.remove(player.getUniqueId());
-                        UtilMessage.message(player, getClassType().getName(), "Your Evade failed.");
+                        UtilMessage.message(player, "Champions", "Your Evade failed.");
                         player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
                         it.remove();
                     }

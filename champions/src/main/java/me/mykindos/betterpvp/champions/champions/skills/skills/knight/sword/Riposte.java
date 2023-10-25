@@ -100,9 +100,9 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
             double newHealth = (healing + (level - 1));
             UtilPlayer.health(player, newHealth);
 
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s<gray>.", getName());
+            UtilMessage.simpleMessage(player, "Champions", "You used <green>%s<gray>.", getName());
             if (ent instanceof Player target) {
-                UtilMessage.simpleMessage(target, getClassType().getName(), "<yellow>%s<gray> used riposte!", player.getName());
+                UtilMessage.simpleMessage(target, "Champions", "<yellow>%s<gray> used riposte!", player.getName());
             }
 
             active.remove(player.getUniqueId());
@@ -180,7 +180,7 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
 
     private void failRiposte(Player player) {
         handRaisedTime.remove(player.getUniqueId());
-        UtilMessage.message(player, getClassType().getName(), "Your Riposte failed.");
+        UtilMessage.message(player, "Champions", "Your Riposte failed.");
         player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
     }
 
@@ -200,7 +200,7 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
             }
 
             if (UtilTime.elapsed(riposteData.getBoostedAttackTime(), (long) (bonusDamageDuration * 1000))) {
-                UtilMessage.message(player, getClassType().getName(), "You lost your boosted attack.");
+                UtilMessage.message(player, "Champions", "You lost your boosted attack.");
                 player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
                 boostedIterator.remove();
             }

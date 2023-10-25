@@ -81,14 +81,14 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener {
                 if (playerUseSkillEvent.isCancelled()) return;
                 if (UtilMath.offset(player, ent) <= 3.0) {
                     if (ent instanceof Player damagee) {
-                        UtilMessage.simpleMessage(damagee, getClassType().getName(), "<yellow>%s<gray> hit you with <green>%s<gray>.",
+                        UtilMessage.simpleMessage(damagee, "Champions", "<yellow>%s<gray> hit you with <green>%s<gray>.",
                                 player.getName(), getName() + " " + level);
 
                         championsManager.getEffects().addEffect(damagee, EffectType.SHOCK, (level * 1000L) / 2);
                         championsManager.getEffects().addEffect(damagee, EffectType.SILENCE, (((level * 1000L) / 2)));
                     }
 
-                    UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <yellow>%s<gray> with <green>%s<gray>.",
+                    UtilMessage.simpleMessage(player, "Champions", "You hit <yellow>%s<gray> with <green>%s<gray>.",
                             ent.getName(), getName() + " " + level);
 
                     UtilDamage.doCustomDamage(new CustomDamageEvent(ent, player, null, DamageCause.ENTITY_ATTACK, 3 + level, false, getName()));
@@ -96,7 +96,7 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener {
 
 
                 } else {
-                    UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s", getName());
+                    UtilMessage.simpleMessage(player, "Champions", "You failed <green>%s", getName());
                     player.getWorld().playSound(player.getLocation(), Sound.BLOCK_ANVIL_LAND, 1F, 0.1F);
                 }
             }

@@ -30,6 +30,7 @@ repositories {
 }
 
 dependencies {
+    implementation(project(mapOf("path" to ":core")))
     paperweight.paperDevBundle("1.20.2-R0.1-SNAPSHOT")
 
     implementation("com.google.inject:guice:5.1.0")

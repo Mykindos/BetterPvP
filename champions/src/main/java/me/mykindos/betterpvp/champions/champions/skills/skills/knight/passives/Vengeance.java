@@ -93,7 +93,7 @@ public class Vengeance extends Skill implements PassiveSkill, Listener {
             double damageIncrease = Math.min(4, (((numHits - 1) * ((level + 1) * 0.25))));
             if (damageIncrease > 0) {
                 event.setDamage(event.getDamage() + damageIncrease);
-                UtilMessage.simpleMessage(player, getClassType().getName(), "%s: <yellow>+%2.2f<gray> Bonus Damage", getName(), damageIncrease);
+                UtilMessage.simpleMessage(player, "Champions", "%s: <yellow>+%2.2f<gray> Bonus Damage", getName(), damageIncrease);
             }
 
             if (playerTasks.containsKey(player)) {

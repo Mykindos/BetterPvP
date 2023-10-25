@@ -64,7 +64,7 @@ public abstract class Skill implements ISkill {
     protected <T> T getConfig(String name, Object defaultValue, Class<T> type) {
         String path;
         if (getClassType() != null) {
-            path = "skills." + getClassType().name().toLowerCase() + "." + getName().toLowerCase().replace(" ", "") + "." + name;
+            path = "skills." + getDefaultClassString() + "." + getName().toLowerCase().replace(" ", "") + "." + name;
         } else {
             path = "skills.global." + getName().toLowerCase().replace(" ", "") + "." + name;
         }

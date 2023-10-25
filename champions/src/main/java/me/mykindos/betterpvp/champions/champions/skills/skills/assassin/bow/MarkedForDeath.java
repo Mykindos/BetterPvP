@@ -51,8 +51,8 @@ public class MarkedForDeath extends PrepareArrowSkill {
     }
 
     @Override
-    public Role getClassType() {
-        return Role.ASSASSIN;
+    public String getDefaultClassString() {
+        return "Assassin";
     }
 
     @Override
@@ -65,7 +65,7 @@ public class MarkedForDeath extends PrepareArrowSkill {
         if (!(target instanceof Player damagee)) return;
 
         championsManager.getEffects().addEffect(damagee, EffectType.VULNERABILITY, 1, (long) ((baseDuration + level) * 1000L));
-        UtilMessage.simpleMessage(damagee, getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s</alt>.", damager.getName(), getName());
+        UtilMessage.simpleMessage(damagee, "Champions", "<alt2>%s</alt2> hit you with <alt>%s</alt>.", damager.getName(), getName());
     }
 
     @Override

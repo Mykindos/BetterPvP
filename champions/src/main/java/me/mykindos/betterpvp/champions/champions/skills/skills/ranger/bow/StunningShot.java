@@ -64,7 +64,7 @@ public class StunningShot extends PrepareArrowSkill {
     @Override
     public void onHit(Player damager, LivingEntity target, int level) {
         if(!(target instanceof Player player)) return;
-        UtilMessage.message(player, getClassType().getName(), "You were hit by a " + getName());
+        UtilMessage.message(player, "Champions", "You were hit by a " + getName());
         championsManager.getEffects().addEffect(player, EffectType.STUN, (long) (level * 0.30) * 1000);
     }
 

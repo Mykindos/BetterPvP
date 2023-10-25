@@ -211,7 +211,7 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
         if (hasSkill(player) && charging.containsKey(player)) {
             charging.remove(player);
             // Cues
-            UtilMessage.simpleMessage(player, getClassType().getName(), "<alt>%s</alt> was interrupted.", getName());
+            UtilMessage.simpleMessage(player, "Champions", "<alt>%s</alt> was interrupted.", getName());
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WOLF_WHINE, 0.6f, 1.2f);
         }
     }
@@ -280,7 +280,7 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
         }
 
         // Cues
-        UtilMessage.message(player, getClassType().getName(), "You fired <alt>%s %s</alt>.", getName(), level);
+        UtilMessage.message(player, "Champions", "You fired <alt>%s %s</alt>.", getName(), level);
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 0.5f + player.getExp(), 1.75f - charge);
     }
 

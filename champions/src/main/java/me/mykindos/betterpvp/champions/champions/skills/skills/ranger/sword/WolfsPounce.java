@@ -112,7 +112,7 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
     @Override
     public boolean canUse(Player p) {
         if (!UtilBlock.isGrounded(p)) {
-            UtilMessage.simpleMessage(p, getClassType().getName(), "You cannot use <alt>" + getName() + "</alt> in the air.");
+            UtilMessage.simpleMessage(p, "Champions", "You cannot use <alt>" + getName() + "</alt> in the air.");
             return false;
         }
         return super.canUse(p);
@@ -194,8 +194,8 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
         damagee.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) slowDuration * 20, 1));
 
         // Cues
-        UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit <alt2>%s</alt2> with <alt>%s %s</alt>.", damagee.getName(), getName(), level);
-        UtilMessage.simpleMessage(damagee, getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s %s</alt>.", damager.getName(), getName(), level);
+        UtilMessage.simpleMessage(damager, "Champions", "You hit <alt2>%s</alt2> with <alt>%s %s</alt>.", damagee.getName(), getName(), level);
+        UtilMessage.simpleMessage(damagee, "Champions", "<alt2>%s</alt2> hit you with <alt>%s %s</alt>.", damager.getName(), getName(), level);
         damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_WOLF_AMBIENT, 0.5f, 0.5f);
     }
 
@@ -224,7 +224,7 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
         if (hasSkill(player) && charging.containsKey(player)) {
             charging.remove(player);
             // Cues
-            UtilMessage.simpleMessage(player, getClassType().getName(), "<alt>%s</alt> was interrupted.", getName());
+            UtilMessage.simpleMessage(player, "Champions", "<alt>%s</alt> was interrupted.", getName());
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WOLF_WHINE, 0.6f, 1.2f);
         }
     }
@@ -278,7 +278,7 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
 
                     if (!UtilBlock.isGrounded(player)) {
                         if (UtilTime.elapsed(charge.getLastMessage(), 250)) {
-                            UtilMessage.simpleMessage(player, getClassType().getName(), "You cannot use <alt>" + getName() + "</alt> in the air.");
+                            UtilMessage.simpleMessage(player, "Champions", "You cannot use <alt>" + getName() + "</alt> in the air.");
                             charge.setLastMessage(System.currentTimeMillis());
                         }
                         continue;

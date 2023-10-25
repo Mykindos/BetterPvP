@@ -102,8 +102,8 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
                 damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1.5F, 0.5F);
 
                 if (event.getDamagee() instanceof Player damaged) {
-                    UtilMessage.simpleMessage(damaged, getClassType().getName(), "<yellow>" + damager.getName() + "</yellow> hit you with <green>" + getName() + "</green>.");
-                    UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit <yellow>" + damaged.getName() + "</yellow> with <green>" + getName() + "</green>.");
+                    UtilMessage.simpleMessage(damaged, "Champions", "<yellow>" + damager.getName() + "</yellow> hit you with <green>" + getName() + "</green>.");
+                    UtilMessage.simpleMessage(damager, "Champions", "You hit <yellow>" + damaged.getName() + "</yellow> with <green>" + getName() + "</green>.");
           
                     running.remove(damager.getUniqueId());
                     return;

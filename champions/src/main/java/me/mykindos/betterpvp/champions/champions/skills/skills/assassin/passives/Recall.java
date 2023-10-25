@@ -126,13 +126,13 @@ public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listene
     public boolean canUse(Player player) {
         RecallData recallData = data.get(player);
         if (recallData != null) {
-            if(recallData.locations.size() > 0) {
+            if (recallData.locations.size() > 0) {
                 if (!player.getWorld().getName().equalsIgnoreCase(recallData.getLocation().getWorld().getName())) {
-                    UtilMessage.message(player, getClassType().getName(), "You can not recall into a different world");
+                    UtilMessage.message(player, "Champions", "You can not recall into a different world");
                     return false;
                 }
-            }else{
-                UtilMessage.message(player, getClassType().getName(), "You have nowhere to recall to.");
+            } else {
+                UtilMessage.message(player, "Champions", "You have nowhere to recall to.");
             }
         }
 

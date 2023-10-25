@@ -169,7 +169,7 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
     }
 
     private void sendState(Player player, boolean state) {
-        UtilMessage.simpleMessage(player, getClassType().getName(), "Life Bonds: %s", state ? "<green>On" : "<red>Off");
+        UtilMessage.simpleMessage(player, "Champions", "Life Bonds: %s", state ? "<green>On" : "<red>Off");
     }
 
     @Override

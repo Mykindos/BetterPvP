@@ -21,6 +21,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.ToggleSkill;
 import me.mykindos.betterpvp.core.components.champions.ISkill;
+import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseInteractSkillEvent;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEvent;
@@ -240,11 +241,11 @@ public class SkillListener implements Listener {
 
     private void sendSkillUsed(Player player, ISkill skill, int level) {
         if (skill instanceof PrepareSkill) {
-            UtilMessage.simpleMessage(player, skill.getClassType().getName(), "You prepared <green>%s %d<gray>.", skill.getName(), level);
+            UtilMessage.simpleMessage(player, "Champions", "You prepared <green>%s %d<gray>.", skill.getName(), level);
 
         } else {
             if (!(skill instanceof ChannelSkill)) {
-                UtilMessage.simpleMessage(player, skill.getClassType().getName(), "You used <green>%s %d<gray>.", skill.getName(), level);
+                UtilMessage.simpleMessage(player, "Champions", "You used <green>%s %d<gray>.", skill.getName(), level);
             }
         }
     }
@@ -255,7 +256,7 @@ public class SkillListener implements Listener {
         ISkill skill = event.getSkill();
 
         if (!skill.isEnabled()) {
-            UtilMessage.simpleMessage(player, skill.getClassType().getName(), "<alt>%s</alt> has been disabled by the server.", skill.getName());
+            UtilMessage.simpleMessage(player, "Champions", "<alt>%s</alt> has been disabled by the server.", skill.getName());
             event.setCancelled(true);
 
         }
@@ -271,7 +272,7 @@ public class SkillListener implements Listener {
         if (interactSkill.canUseSlowed()) return;
 
         if (player.hasPotionEffect(PotionEffectType.SLOW)) {
-            UtilMessage.simpleMessage(player, event.getSkill().getClassType().getName(),
+            UtilMessage.simpleMessage(player, "Champions",
                     "You cannot use <green>%s<gray> while slowed.", event.getSkill().getName());
             event.setCancelled(true);
         }
@@ -287,7 +288,7 @@ public class SkillListener implements Listener {
         if (interactSkill.canUseLevitating()) return;
 
         if (player.hasPotionEffect(PotionEffectType.LEVITATION)) {
-            UtilMessage.simpleMessage(player, event.getSkill().getClassType().getName(),
+            UtilMessage.simpleMessage(player, "Champions",
                     "You cannot use <green>%s<gray> while levitating.", event.getSkill().getName());
             event.setCancelled(true);
         }
@@ -301,7 +302,7 @@ public class SkillListener implements Listener {
         ISkill skill = event.getSkill();
 
         if (UtilBlock.isInLiquid(player)) {
-            UtilMessage.simpleMessage(player, skill.getClassType().getName(), "You cannot use <green>%s<gray> in water.", skill.getName());
+            UtilMessage.simpleMessage(player, "Champions", "You cannot use <green>%s<gray> in water.", skill.getName());
             event.setCancelled(true);
         }
     }
@@ -313,7 +314,7 @@ public class SkillListener implements Listener {
         ISkill skill = event.getSkill();
         if (skill.ignoreNegativeEffects()) return;
         if (effectManager.hasEffect(player, EffectType.SILENCE)) {
-            UtilMessage.simpleMessage(player, skill.getClassType().getName(), "You cannot use <green>%s<gray> while silenced.", skill.getName());
+            UtilMessage.simpleMessage(player, "Champions", "You cannot use <green>%s<gray> while silenced.", skill.getName());
             player.playSound(player.getLocation(), Sound.ENTITY_BAT_HURT, 1.0f, 1.0f);
             event.setCancelled(true);
         }
@@ -380,7 +381,7 @@ public class SkillListener implements Listener {
         ISkill skill = event.getSkill();
         if (skill.ignoreNegativeEffects()) return;
         if (effectManager.hasEffect(player, EffectType.STUN)) {
-            UtilMessage.simpleMessage(player, skill.getClassType().getName(), "You cannot use <green>%s<gray> while stunned.", skill.getName());
+            UtilMessage.simpleMessage(player, "Champions", "You cannot use <green>%s<gray> while stunned.", skill.getName());
         }
     }
 

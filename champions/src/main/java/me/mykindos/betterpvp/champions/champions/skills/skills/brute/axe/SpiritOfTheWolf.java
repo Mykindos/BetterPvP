@@ -72,7 +72,7 @@ public class SpiritOfTheWolf extends Skill implements InteractSkill, CooldownSki
 
         for (Player target : UtilPlayer.getNearbyAllies(player, player.getLocation(), (radius + level))) {
             target.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) (duration * 20), 1));
-            UtilMessage.message(target, getClassType().getName(), "You received the spirit of the wolf!");
+            UtilMessage.message(target, "Champions", "You received the spirit of the wolf!");
         }
     }
 

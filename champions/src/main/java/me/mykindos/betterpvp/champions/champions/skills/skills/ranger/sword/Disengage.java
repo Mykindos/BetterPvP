@@ -84,7 +84,7 @@ public class Disengage extends PrepareSkill implements CooldownSkill {
             UtilVelocity.velocity(damagee, vec, 3D, true, 0.0D, 0.4D, 1.5D, true);
             championsManager.getEffects().addEffect(damagee, EffectType.NOFALL, 3000);
             ent.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) ((baseSlowDuration + level) * 20), 3));
-            UtilMessage.message(damagee, getClassType().getName(), "You successfully disengaged");
+            UtilMessage.message(damagee, "Champions", "You successfully disengaged");
             disengages.remove(damagee);
         }
 

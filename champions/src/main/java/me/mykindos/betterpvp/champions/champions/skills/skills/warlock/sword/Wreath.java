@@ -206,7 +206,7 @@ public class Wreath extends PrepareSkill implements CooldownSkill {
         if (actives.containsKey(player)) {
             int stacks = actives.get(player);
             if (stacks > 0) {
-                UtilMessage.simpleMessage(player, getClassType().getName(), "<green>%s<gray> is already active with <green>%d<gray> stacks remaining",
+                UtilMessage.simpleMessage(player, "Champions", "<green>%s<gray> is already active with <green>%d<gray> stacks remaining",
                         getName(), stacks);
                 return false;
             }

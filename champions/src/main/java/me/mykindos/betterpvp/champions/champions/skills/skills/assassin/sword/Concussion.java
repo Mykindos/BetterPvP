@@ -96,7 +96,7 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener 
     @Override
     public boolean canUse(Player player) {
         if (active.contains(player.getUniqueId())) {
-            UtilMessage.simpleMessage(player, getClassType().getName(), "<alt>" + getName() + "</alt> is already active.");
+            UtilMessage.simpleMessage(player, "Champions", "<alt>" + getName() + "</alt> is already active.");
             return false;
         }
 

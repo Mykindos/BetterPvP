@@ -156,10 +156,10 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill {
     public void toggle(Player player, int level) {
         if (active.contains(player.getUniqueId())) {
             active.remove(player.getUniqueId());
-            UtilMessage.message(player, getClassType().getName(), "Arctic Armour: <red>Off");
+            UtilMessage.message(player, "Champions", "Arctic Armour: <red>Off");
         } else {
             active.add(player.getUniqueId());
-            UtilMessage.message(player, getClassType().getName(), "Arctic Armour: <green>On");
+            UtilMessage.message(player, "Champions", "Arctic Armour: <green>On");
         }
     }
 

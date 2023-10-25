@@ -73,10 +73,7 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
         };
     }
 
-    @Override
-    public Role getClassType() {
-        return Role.ASSASSIN;
-    }
+
 
     @Override
     public SkillType getType() {
@@ -129,9 +126,9 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
             if (!championsManager.getCooldowns().hasCooldown(player, "Deblink") || force) {
 
                 if (!force) {
-                    UtilMessage.simpleMessage(player, getClassType().getName(), "You used <alt>Deblink " + getLevel(player) + "</alt>.");
+                    UtilMessage.simpleMessage(player, "Champions", "You used <alt>Deblink " + getLevel(player) + "</alt>.");
                 } else {
-                    UtilMessage.simpleMessage(player, getClassType().getName(), "The target location was invalid, Blink cooldown has been reduced.");
+                    UtilMessage.simpleMessage(player, "Champions", "The target location was invalid, Blink cooldown has been reduced.");
                     championsManager.getCooldowns().removeCooldown(player, "Blink", true);
                     championsManager.getCooldowns().use(player, "Blink", 2, true);
                 }
@@ -157,12 +154,12 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
 
 
         if (player.hasPotionEffect(PotionEffectType.SLOW)) {
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You cannot use " + getName() + " while Slowed.");
+            UtilMessage.simpleMessage(player, "Champions", "You cannot use " + getName() + " while Slowed.");
             return false;
         }
 
         if (championsManager.getEffects().hasEffect(player, EffectType.STUN)) {
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You cannot use <alt>%s</alt> while stunned.", getName());
+            UtilMessage.simpleMessage(player, "Champions", "You cannot use <alt>%s</alt> while stunned.", getName());
             return false;
         }
 

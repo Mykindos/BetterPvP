@@ -105,7 +105,7 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
             if (player == null) return true;
 
             if (entry.getValue().getEndTime() - System.currentTimeMillis() <= 0) {
-                UtilMessage.message(player, getClassType().getName(), "Your blood barrier has expired.");
+                UtilMessage.message(player,"Champions", "Your blood barrier has expired.");
                 return true;
             }
 
@@ -142,7 +142,7 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
         double proposedHealth = player.getHealth() - (UtilPlayer.getMaxHealth(player) - (UtilPlayer.getMaxHealth(player) * healthReduction));
 
         if (proposedHealth <= 0.5) {
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You do not have enough health to use <green>%s %d<gray>", getName(), level);
+            UtilMessage.simpleMessage(player, "Champions", "You do not have enough health to use <green>%s %d<gray>", getName(), level);
             return false;
         }
 

@@ -31,7 +31,7 @@ public abstract class PrepareSkill extends Skill implements InteractSkill, Liste
     @Override
     public boolean canUse(Player player) {
         if (active.contains(player.getUniqueId())) {
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You have already prepared <alt>%s</alt>.", getName());
+            UtilMessage.simpleMessage(player, "Champions", "You have already prepared <alt>%s</alt>.", getName());
             return false;
         }
 

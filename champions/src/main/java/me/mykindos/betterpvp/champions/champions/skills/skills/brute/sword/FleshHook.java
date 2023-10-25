@@ -104,7 +104,7 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
                     if (UtilTime.elapsed(data.getLastCharge(), 400L)) {
                         if (data.getCharge() < data.getMaxCharge()) {
                             data.addCharge();
-                            UtilMessage.simpleMessage(player, getClassType().getName(), getName() + ": <alt2>+ " + data.getCharge() + "% Strength");
+                            UtilMessage.simpleMessage(player, "Champions", getName() + ": <alt2>+ " + data.getCharge() + "% Strength");
                             player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.4F, 1.0F + 0.05F * data.getCharge());
                         }
                     }
@@ -131,7 +131,7 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
                         }
 
 
-                        UtilMessage.simpleMessage(player, getClassType().getName(), "You used <alt>" + getName() + "</alt>.");
+                        UtilMessage.simpleMessage(player, "Champions", "You used <alt>" + getName() + "</alt>.");
                         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_IRON_GOLEM_ATTACK, 2.0F, 0.8F);
 
 

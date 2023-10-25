@@ -94,7 +94,7 @@ public class Deflection extends Skill implements PassiveSkill {
                             int charge = charges.get(cur);
                             if (charge < level) {
                                 charge = Math.min(level, charge + 1);
-                                UtilMessage.simpleMessage(cur, getClassType().getName(), "Deflection charge: <yellow>%d", charge);
+                                UtilMessage.simpleMessage(cur, "Champions", "Deflection charge: <yellow>%d", charge);
                                 charges.put(cur, charge);
                             }
                         }

@@ -80,7 +80,7 @@ public class Bloodlust extends Skill implements PassiveSkill {
                 }
                 championsManager.getEffects().addEffect(target, EffectType.STRENGTH, tempStr, (long) ((duration + level) * 1000L));
                 target.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) ((duration + level) * 20), tempStr));
-                UtilMessage.simpleMessage(target, getClassType().getName(), "You entered bloodlust at level: <alt2>" + tempStr + "</alt2>.");
+                UtilMessage.simpleMessage(target, "Champions", "You entered bloodlust at level: <alt2>" + tempStr + "</alt2>.");
                 target.getWorld().playSound(target.getLocation(), Sound.ENTITY_ZOMBIFIED_PIGLIN_ANGRY, 2.0F, 0.6F);
             }
 
@@ -100,7 +100,7 @@ public class Bloodlust extends Skill implements PassiveSkill {
         if (System.currentTimeMillis() > time.get(player)) {
             int tempStr = str.get(player);
             str.remove(player);
-            UtilMessage.simpleMessage(player, getClassType().getName(), "Your bloodlust has ended at level: <alt2>" + tempStr + "</alt2>.");
+            UtilMessage.simpleMessage(player, "Champions", "Your bloodlust has ended at level: <alt2>" + tempStr + "</alt2>.");
             time.remove(player);
         }
 

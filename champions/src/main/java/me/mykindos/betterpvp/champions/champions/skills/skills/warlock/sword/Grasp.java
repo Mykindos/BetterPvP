@@ -223,7 +223,7 @@ public class Grasp extends Skill implements InteractSkill, CooldownSkill, Listen
         int level = getLevel(player);
         Block block = player.getTargetBlock(null, (20 + (level * 10) / 2));
         if (block.getLocation().distance(player.getLocation()) < 3) {
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You cannot use <alt>" + getName() + "</alt> this close.");
+            UtilMessage.simpleMessage(player, "Champions", "You cannot use <alt>" + getName() + "</alt> this close.");
             return false;
         }
 

@@ -13,6 +13,10 @@ public interface ISkill {
 
     Set<Role> getClassType();
 
+    default String getDefaultClassString() {
+        return null;
+    }
+
     void addClass(Role role);
 
     SkillType getType();

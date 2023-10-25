@@ -81,8 +81,8 @@ public class Sever extends PrepareSkill implements CooldownSkill, Listener {
 
         int level = getLevel(player);
         runSever(player, damagee, level);
-        UtilMessage.simpleMessage(player, getClassType().getName(), "You severed <alt>" + damagee.getName() + "</alt>.");
-        UtilMessage.simpleMessage(damagee, getClassType().getName(), "You have been severed by <alt>" + player.getName() + "</alt>.");
+        UtilMessage.simpleMessage(player, "Champions", "You severed <alt>" + damagee.getName() + "</alt>.");
+        UtilMessage.simpleMessage(damagee, "Champions", "You have been severed by <alt>" + player.getName() + "</alt>.");
         active.remove(player.getUniqueId());
 
         championsManager.getCooldowns().removeCooldown(player, getName(), true);
