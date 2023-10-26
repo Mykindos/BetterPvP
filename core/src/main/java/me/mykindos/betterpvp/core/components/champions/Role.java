@@ -142,8 +142,8 @@ public class Role {
             throw new IllegalArgumentException("Invalid sound key: " + soundKey, e);
         }
 
-        damageVolume = config.getOrSaveObject(path + "soundvolume", 1.0F, Float.class);
-        damagePitch = config.getOrSaveObject(path + "soundpitch", 0.7F, Float.class);
+        damageVolume = Float.parseFloat(config.getOrSaveString(path + "soundvolume", "1.0"));
+        damagePitch = Float.parseFloat(config.getOrSaveString(path + "soundpitch", "0.7"));
 
         String[] armorTypes = {"helmet", "chestplate", "leggings", "boots"};
         for (int i = 0; i < armorTypes.length; i++) {

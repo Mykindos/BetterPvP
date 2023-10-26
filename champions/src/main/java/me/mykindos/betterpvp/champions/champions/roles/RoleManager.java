@@ -75,8 +75,6 @@ public class RoleManager extends Manager<Role> {
         }
         champions.saveConfig();
 
-
-
         //Reflections roleScan = new Reflections(Champions.class.getPackageName());
         for (String key : customRoleSection.getKeys(false)) {
             //final ConfigurationSection section = customRoleSection.getConfigurationSection(key);

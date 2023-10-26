@@ -229,7 +229,7 @@ public class RoleListener implements Listener {
         Optional<Role> roleOptional = roleManager.getObject(damagee.getUniqueId().toString());
         if (roleOptional.isPresent()) {
             Role role = roleOptional.get();
-            damagee.getWorld().playSound(damagee.getLocation(), role.getDamageSound(), role.getDamageVolume(), role.getDamagePitch());
+            damagee.getWorld().playSound(damagee.getLocation(), role.getDamageSound(), (float) role.getDamageVolume(), (float) role.getDamagePitch());
             /*switch (role) {
                     case KNIGHT ->
                             damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_BLAZE_HURT, 1.0F, 0.7F);
