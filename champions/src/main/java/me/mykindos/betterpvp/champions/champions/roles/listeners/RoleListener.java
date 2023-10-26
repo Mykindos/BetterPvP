@@ -315,8 +315,10 @@ public class RoleListener implements Listener {
     public void checkRoleBuffs() {
         for (Player player : Bukkit.getOnlinePlayers()) {
             Role role = roleManager.getRole(player);
-                if (role.getRoleBuff() != null) {
-                    player.addPotionEffect(role.getRoleBuff());
+                if (role != null) {
+                    if (role.getRoleBuff() != null) {
+                        player.addPotionEffect(role.getRoleBuff());
+                    }
                 }
             }
         }

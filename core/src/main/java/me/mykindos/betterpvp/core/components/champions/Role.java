@@ -3,11 +3,13 @@ package me.mykindos.betterpvp.core.components.champions;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.reflections.Reflections;
@@ -16,6 +18,7 @@ import java.lang.reflect.Modifier;
 import java.util.*;
 
 @Data
+@Slf4j
 public class Role {
     @Getter(AccessLevel.NONE)
     private final String key;
@@ -98,14 +101,17 @@ public class Role {
     }
 
     public void loadConfig(ExtendedYamlConfiguration config) {
-        String path = "class." + key;
+        log.error("key" + key);
+        String path = "class." + key + ".";
+        log.error("path" + path);
         enabled = config.getOrSaveBoolean(path + "enabled", true);
-
+        log.error("enabled" + enabled);
         prefix = config.getOrSaveString(path + "prefix", key.substring(0, 1));
 
-        int R = config.getOrSaveInt(path + "color.R", 0);
-        int G = config.getOrSaveInt(path + "color.G", 0);
-        int B = config.getOrSaveInt(path+ "color.B", 0);
+        int R = config.getOrSaveInt(path + "ColorR", 0);
+        log.error("R" + R);
+        int G = config.getOrSaveInt(path + "ColorG", 0);
+        int B = config.getOrSaveInt(path+ "ColorB", 0);
 
         color = TextColor.color(R, G, B);
 
@@ -116,8 +122,8 @@ public class Role {
         takeKnockback = config.getOrSaveBoolean(path + "takeKnockback", true);
         takeFallDamage = config.getOrSaveBoolean(path + "takeFallDamage", true);
 
-        String buffKey = config.getOrSaveString(path + "buff.name", "NONE");
-        int buffPower = config.getOrSaveInt(path + "buff.name", 0);
+        String buffKey = config.getOrSaveString(path + "buffname", "NONE");
+        int buffPower = config.getOrSaveInt(path + "buffstrength", 0);
         if (!buffKey.equals("NONE")) {
             try {
                 this.roleBuff = new PotionEffect(Objects.requireNonNull(PotionEffectType.getByName(buffKey)), -1, buffPower);
@@ -126,7 +132,7 @@ public class Role {
             }
         }
 
-        String soundKey = config.getOrSaveString(path + "sound.damageSound", "ENTITY_BLAZE_HURT");
+        String soundKey = config.getOrSaveString(path + "damageSound", "ENTITY_BLAZE_HURT");
         if (soundKey == null) {
             throw new IllegalArgumentException("Sound key cannot be null!");
         }
@@ -136,23 +142,22 @@ public class Role {
             throw new IllegalArgumentException("Invalid sound key: " + soundKey, e);
         }
 
-        damageVolume = config.getOrSaveObject(path + "sound.volume", 1.0F, Float.class);
-        damagePitch = config.getOrSaveObject(path + "sound.pitch", 0.7F, Float.class);
+        damageVolume = config.getOrSaveObject(path + "soundvolume", 1.0F, Float.class);
+        damagePitch = config.getOrSaveObject(path + "soundpitch", 0.7F, Float.class);
 
         String[] armorTypes = {"helmet", "chestplate", "leggings", "boots"};
         for (int i = 0; i < armorTypes.length; i++) {
             final String type = armorTypes[i];
-            final String materialKey = config.getOrSaveString(path, "LEATHER_" + type.toUpperCase());
+            final String materialKey = config.getOrSaveString(path + type, "LEATHER_" + type.toUpperCase());
             if (materialKey == null) {
                 throw new IllegalArgumentException(type.toUpperCase() + " material key cannot be null!");
             }
             try {
                 this.armor[i] = Material.valueOf(materialKey.toUpperCase());
             } catch (IllegalArgumentException e) {
-                //throw new IllegalArgumentException("Invalid material key: " + materialKey, e);
+                throw new IllegalArgumentException("Invalid material key: " + materialKey, e);
             }
         }
-
     }
 
     public boolean hasSkill (SkillType type, String name) {

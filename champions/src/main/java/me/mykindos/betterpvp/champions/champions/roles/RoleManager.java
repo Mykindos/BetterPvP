@@ -12,6 +12,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.reflections.Reflections;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -72,12 +73,16 @@ public class RoleManager extends Manager<Role> {
             log.error(customRoleSection.getCurrentPath());
             log.error(config.getCurrentPath());
         }
+        champions.saveConfig();
 
-        Reflections roleScan = new Reflections(Champions.class.getPackageName());
+
+
+        //Reflections roleScan = new Reflections(Champions.class.getPackageName());
         for (String key : customRoleSection.getKeys(false)) {
-            final ConfigurationSection section = customRoleSection.getConfigurationSection(key);
-            final Role loaded = new Role(section.getName());
+            //final ConfigurationSection section = customRoleSection.getConfigurationSection(key);
+            final Role loaded = new Role(key);
             loaded.loadConfig(config);
+            champions.saveConfig();
             if (loaded.isEnabled()) {
                 //loaded.loadSkills(config, roleScan, champions);
                 repository.getRoles().add(loaded);
