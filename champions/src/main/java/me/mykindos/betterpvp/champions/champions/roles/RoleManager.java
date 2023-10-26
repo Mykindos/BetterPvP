@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.champions.Champions;
+import me.mykindos.betterpvp.core.components.champions.ISkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
@@ -13,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.reflections.Reflections;
 
 import java.io.IOException;
+import java.lang.reflect.Modifier;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -75,14 +77,18 @@ public class RoleManager extends Manager<Role> {
         }
         champions.saveConfig();
 
-        //Reflections roleScan = new Reflections(Champions.class.getPackageName());
+        Reflections roleScan = new Reflections(Champions.class.getPackageName());
+        Set<Class<? extends ISkill>> skillClasses = roleScan.getSubTypesOf(ISkill.class);
+        skillClasses.removeIf(clazz -> clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers()) || clazz.isEnum());
+        skillClasses.removeIf(clazz -> clazz.isAnnotationPresent(Deprecated.class));
+
         for (String key : customRoleSection.getKeys(false)) {
             //final ConfigurationSection section = customRoleSection.getConfigurationSection(key);
             final Role loaded = new Role(key);
             loaded.loadConfig(config);
             champions.saveConfig();
             if (loaded.isEnabled()) {
-                //loaded.loadSkills(config, roleScan, champions);
+                loaded.loadSkills(config, skillClasses, champions);
                 repository.getRoles().add(loaded);
             }
         }

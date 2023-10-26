@@ -51,17 +51,15 @@ public class Role {
 
     private Material[] armor = new Material[4];
 
-    public void loadSkills(ExtendedYamlConfiguration config, Reflections reflections, BPvPPlugin plugin) {
-        String path = "class." + key + ".skills.";
+    public void loadSkills(ExtendedYamlConfiguration config, Set<Class<?extends ISkill>> skillClasses, BPvPPlugin plugin) {
+        String path = "class." + key + ".skills";
         List<String> swordList = config.getOrSaveStringList(path + "sword", List.of("HiltSmash", "FleshHook"));
         List<String> axeList = config.getOrSaveStringList(path + "axe", List.of("BullsCharge", "SeismicSlam"));
         List<String> passiveAList = config.getOrSaveStringList(path + "passiveA", List.of("Bloodlust", "Cleave"));
         List<String> passiveBList = config.getOrSaveStringList(path + "passiveB", List.of("Deflection", "Stampede"));
         List<String> globalList = config.getOrSaveStringList(path + "global", List.of("BreakFall", "FastRecovery", "Swim"));
         List<String> bowList = config.getOrSaveStringList(path + "bow", List.of());
-        Set<Class<? extends ISkill>> skillClasses = reflections.getSubTypesOf(ISkill.class);
-        skillClasses.removeIf(clazz -> clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers()) || clazz.isEnum());
-        skillClasses.removeIf(clazz -> clazz.isAnnotationPresent(Deprecated.class));
+        plugin.saveConfig();
 
         for (var clazz : skillClasses) {
             ISkill skill = plugin.getInjector().getInstance(clazz);
