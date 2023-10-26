@@ -352,10 +352,13 @@ public class ClansExplosionListener extends ClanListener {
         COPPERWAXEDWEATHERED(Material.WAXED_WEATHERED_CHISELED_COPPER, Material.WAXED_WEATHERED_COPPER_BLOCK, Material.WAXED_WEATHERED_COPPER_GRATE),
         COPPERWAXEDOXIDIZED(Material.WAXED_OXIDIZED_CHISELED_COPPER, Material.WAXED_OXIDIZED_COPPER_BLOCK, Material.WAXED_OXIDIZED_COPPER_GRATE),
 
+        TUFFBRICKS(Material.TUFF_BRICKS, Material.TUFF),
+
         PRISMARINE(Material.PRISMARINE_BRICKS, Material.PRISMARINE),
         */
         MUDBRICKS(Material.MUD_BRICKS, Material.MUD),
         DEEPSLATEBRICKS(Material.DEEPSLATE_BRICKS, Material.DEEPSLATE);
+
 
 
         private final List<Material> tiers;
