@@ -1,8 +1,8 @@
 package me.mykindos.betterpvp.core.combat.stats.model;
 
 import lombok.extern.slf4j.Slf4j;
-import me.mykindos.betterpvp.core.combat.log.DamageLog;
-import me.mykindos.betterpvp.core.combat.log.DamageLogManager;
+import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
+import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.stats.Leaderboard;
 import me.mykindos.betterpvp.core.stats.SearchOptions;

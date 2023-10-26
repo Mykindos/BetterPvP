@@ -6,7 +6,7 @@ import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.champions.stats.impl.ChampionsCombatLeaderboard;
 import me.mykindos.betterpvp.champions.stats.repository.ChampionsCombatData;
 import me.mykindos.betterpvp.champions.stats.repository.ChampionsStatsRepository;
-import me.mykindos.betterpvp.core.combat.log.DamageLogManager;
+import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
 import me.mykindos.betterpvp.core.combat.stats.model.CombatStatsListener;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.listener.BPvPListener;

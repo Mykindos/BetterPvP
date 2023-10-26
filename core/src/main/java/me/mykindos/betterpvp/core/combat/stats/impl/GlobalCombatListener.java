@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.core.combat.stats.impl;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.core.combat.log.DamageLogManager;
+import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
 import me.mykindos.betterpvp.core.combat.stats.model.CombatStatsListener;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.stats.repository.StatsRepository;
@@ -16,13 +16,10 @@ public class GlobalCombatListener extends CombatStatsListener<GlobalCombatData> 
 
     private final GlobalCombatStatsRepository repository;
 
-    private final GlobalCombatLeaderboard leaderboard;
-
     @Inject
     protected GlobalCombatListener(DamageLogManager logManager, GlobalCombatStatsRepository repository, GlobalCombatLeaderboard leaderboard) {
         super(logManager, leaderboard);
         this.repository = repository;
-        this.leaderboard = leaderboard;
     }
 
     @Override
