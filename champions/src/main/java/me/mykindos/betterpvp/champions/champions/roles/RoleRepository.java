@@ -28,7 +28,8 @@ public class RoleRepository {
     @Getter
     private final Set<Role> roles = new HashSet<Role>();
 
-    public RoleRepository(Database database, Champions champions) {
+    @Inject
+    public RoleRepository(Database database) {
         this.database = database;
     }
 

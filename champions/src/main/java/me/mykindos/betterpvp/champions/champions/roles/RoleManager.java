@@ -28,7 +28,6 @@ public class RoleManager extends Manager<Role> {
     public RoleManager(RoleRepository repository, Champions champions) {
         this.repository = repository;
         this.champions = champions;
-        loadRoles();
     }
 
     /**
@@ -61,7 +60,7 @@ public class RoleManager extends Manager<Role> {
         return objects.containsKey(player.getUniqueId().toString());
     }
 
-    private void loadRoles() {
+    public void loadRoles() {
         ExtendedYamlConfiguration config = champions.getConfig();
         String path = "class";
         ConfigurationSection customRoleSection = config.getConfigurationSection(path);

@@ -5,6 +5,7 @@ import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.Setter;
+import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.champions.champions.skills.SkillManager;
 import me.mykindos.betterpvp.champions.champions.skills.injector.SkillInjectorModule;
 import me.mykindos.betterpvp.champions.commands.ChampionsCommandLoader;
@@ -75,6 +76,9 @@ public class Champions extends BPvPPlugin {
 
             var skillManager = injector.getInstance(SkillManager.class);
             skillManager.loadSkills();
+
+            var roleManager = injector.getInstance(RoleManager.class);
+            roleManager.loadRoles();
 
             var itemHandler = injector.getInstance(ItemHandler.class);
             itemHandler.loadItemData("Champions");
