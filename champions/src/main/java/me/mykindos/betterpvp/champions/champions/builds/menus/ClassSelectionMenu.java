@@ -24,7 +24,7 @@ public class ClassSelectionMenu extends Menu {
         final Iterator<Role> iterator = roleManager.getRoles().iterator();
         for (int slot : slots) {
             final Role role = iterator.next();
-            addButton(new ClassSelectionButton(builds, role, skillManager, slot, new ItemStack(role.getChestplate())));
+            addButton(new ClassSelectionButton(builds, role, skillManager, roleManager, slot, new ItemStack(role.getChestplate())));
         }
 
         fillEmpty(Menu.BACKGROUND);

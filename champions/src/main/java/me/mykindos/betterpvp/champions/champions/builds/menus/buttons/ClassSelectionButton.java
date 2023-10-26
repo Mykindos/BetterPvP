@@ -24,11 +24,12 @@ public class ClassSelectionButton extends Button {
     private final RoleManager roleManager;
 
 
-    public ClassSelectionButton(GamerBuilds builds, Role role, SkillManager skillManager, int slot, ItemStack item) {
+    public ClassSelectionButton(GamerBuilds builds, Role role, SkillManager skillManager, RoleManager roleManager, int slot, ItemStack item) {
         super(slot, item, Component.text(role.getName(), role.getColor(), TextDecoration.BOLD));
         this.builds = builds;
         this.role = role;
         this.skillManager = skillManager;
+        this.roleManager = roleManager;
     }
 
     @Override

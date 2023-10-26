@@ -61,22 +61,10 @@ public class Backstab extends Skill implements PassiveSkill, Listener {
 
             event.setDamage(event.getDamage() * (1.2 + (level * 0.1)));
             daamger.getWorld().playEffect(event.getDamagee().getLocation().add(0, 1, 0), Effect.STEP_SOUND, Material.REDSTONE_BLOCK);
-
-            if (event.getDamagee() instanceof Player damagee) {
-                Optional<Role> roleOptional = championsManager.getRoles().getObject(damagee.getUniqueId());
-                roleOptional.ifPresent(role -> {
-                    if (role == Role.ASSASSIN) {
-                        event.setDamage(event.getDamage() * 0.8);
-                    }
-                });
-
             }
 
             event.setReason("Backstab");
         }
-
-
-    }
 
     @Override
     public SkillType getType() {

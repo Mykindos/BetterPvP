@@ -82,7 +82,7 @@ public class ExcessiveForce extends Skill implements InteractSkill, CooldownSkil
                 continue;
             }
 
-            if(!championsManager.getRoles().hasRole(next.getKey(), Role.ASSASSIN)){
+            if (!championsManager.getRoles().getRole(next.getKey()).hasSkill(getType(), getName())) {
                 it.remove();
             }
 

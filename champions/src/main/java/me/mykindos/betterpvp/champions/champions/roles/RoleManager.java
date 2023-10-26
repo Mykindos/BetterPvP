@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.reflections.Reflections;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 
@@ -42,6 +43,10 @@ public class RoleManager extends Manager<Role> {
 
     public Role getRole(Player player) {
         return objects.getOrDefault(player.getUniqueId().toString(), null);
+    }
+
+    public Optional<Role> getRole(String name) {
+        return repository.getRoles().stream().filter(o -> o.getName().equalsIgnoreCase(name)).findFirst();
     }
 
     public Set<Role> getRoles() {

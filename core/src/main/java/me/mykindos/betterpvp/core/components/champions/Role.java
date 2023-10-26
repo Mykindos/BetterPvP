@@ -155,6 +155,33 @@ public class Role {
 
     }
 
+    public boolean hasSkill (SkillType type, String name) {
+        switch (type) {
+            case SWORD -> {
+                return swordSkills.stream().anyMatch(o -> o.getName().equalsIgnoreCase(name));
+            }
+            case AXE -> {
+                return axeSkills.stream().anyMatch(o -> o.getName().equalsIgnoreCase(name));
+            }
+            case PASSIVE_A -> {
+                return passiveA.stream().anyMatch(o -> o.getName().equalsIgnoreCase(name));
+            }
+
+            case PASSIVE_B -> {
+                return passiveB.stream().anyMatch(o -> o.getName().equalsIgnoreCase(name));
+            }
+
+            case GLOBAL-> {
+                return global.stream().anyMatch(o -> o.getName().equalsIgnoreCase(name));
+            }
+
+            case BOW -> {
+                return bow.stream().anyMatch(o -> o.getName().equalsIgnoreCase(name));
+            }
+        }
+        return false;
+    }
+
     public String getName() {
         return key;
     }

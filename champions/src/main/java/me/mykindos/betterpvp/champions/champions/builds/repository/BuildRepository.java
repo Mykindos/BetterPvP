@@ -4,8 +4,10 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
+import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.SkillManager;
+import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.database.Database;
@@ -19,6 +21,7 @@ import javax.sql.rowset.CachedRowSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Singleton
 public class BuildRepository implements IRepository<RoleBuild> {
@@ -30,10 +33,13 @@ public class BuildRepository implements IRepository<RoleBuild> {
     private final Database database;
     private final SkillManager skillManager;
 
+    private final RoleManager roleManager;
+
     @Inject
-    public BuildRepository(Database database, SkillManager skillManager) {
+    public BuildRepository(Database database, SkillManager skillManager, RoleManager roleManager) {
         this.database = database;
         this.skillManager = skillManager;
+        this.roleManager = roleManager;
     }
 
     @Override
@@ -50,7 +56,9 @@ public class BuildRepository implements IRepository<RoleBuild> {
                 String uuid = result.getString(1);
                 String role = result.getString(2);
                 int id = result.getInt(3);
-                RoleBuild build = new RoleBuild(uuid, Role.valueOf(role.toUpperCase()), id);
+                Optional<Role> roleOptional = roleManager.getRole(role);
+                if (roleOptional.isEmpty()) continue;
+                RoleBuild build = new RoleBuild(uuid, roleOptional.get(), id);
 
                 String sword = result.getString(4);
                 setSkill(build, SkillType.SWORD, sword);
@@ -148,53 +156,19 @@ public class BuildRepository implements IRepository<RoleBuild> {
         String uuid = gamerBuilds.getUuid();
 
         List<RoleBuild> builds = new ArrayList<>();
-        for (int d = 1; d < 5; d++) {
 
-            RoleBuild assassin = new RoleBuild(uuid, Role.valueOf("ASSASSIN"), d);
+        for (Role role : roleManager.getRoles()) {
+            for (int d = 1; d < 5; d++) {
+                RoleBuild newClass = new RoleBuild(uuid, role, d);
 
-            assassin.setSkill(SkillType.SWORD, skillManager.getObjects().get("Sever"), 3);
-            assassin.setSkill(SkillType.AXE, skillManager.getObjects().get("Leap"), 5);
-            assassin.setSkill(SkillType.PASSIVE_A, skillManager.getObjects().get("Backstab"), 1);
-            assassin.setSkill(SkillType.PASSIVE_B, skillManager.getObjects().get("Smoke Bomb"), 3);
-            assassin.takePoints(12);
+                newClass.setSkill(SkillType.SWORD, (Skill) role.getSwordSkills().stream().findFirst().orElseThrow(), 3);
+                newClass.setSkill(SkillType.AXE, (Skill) role.getAxeSkills().stream().findFirst().orElseThrow(), 5);
+                newClass.setSkill(SkillType.PASSIVE_A, (Skill)role.getPassiveA().stream().findFirst().orElseThrow(), 1);
+                newClass.setSkill(SkillType.PASSIVE_B, (Skill) role.getPassiveB().stream().findFirst().orElseThrow(), 3);
+                newClass.takePoints(12);
 
-            RoleBuild brute = new RoleBuild(uuid, Role.valueOf("BRUTE"), d);
-            brute.setSkill(SkillType.SWORD, skillManager.getObjects().get("Takedown"), 5);
-            brute.setSkill(SkillType.AXE, skillManager.getObjects().get("Seismic Slam"), 3);
-            brute.setSkill(SkillType.PASSIVE_A, skillManager.getObjects().get("Colossus"), 1);
-            brute.setSkill(SkillType.PASSIVE_B, skillManager.getObjects().get("Stampede"), 3);
-            brute.takePoints(12);
-
-            RoleBuild ranger = new RoleBuild(uuid, Role.valueOf("RANGER"), d);
-            ranger.setSkill(SkillType.SWORD, skillManager.getObjects().get("Disengage"), 3);
-            ranger.setSkill(SkillType.BOW, skillManager.getObjects().get("Incendiary Shot"), 5);
-            ranger.setSkill(SkillType.PASSIVE_A, skillManager.getObjects().get("Longshot"), 3);
-            ranger.setSkill(SkillType.PASSIVE_B, skillManager.getObjects().get("Sharpshooter"), 1);
-            ranger.takePoints(12);
-
-            RoleBuild mage = new RoleBuild(uuid, Role.valueOf("MAGE"), d);
-            mage.setSkill(SkillType.SWORD, skillManager.getObjects().get("Inferno"), 5);
-            mage.setSkill(SkillType.AXE, skillManager.getObjects().get("Molten Blast"), 3);
-            mage.setSkill(SkillType.PASSIVE_A, skillManager.getObjects().get("Holy Light"), 2);
-            mage.setSkill(SkillType.PASSIVE_B, skillManager.getObjects().get("Immolate"), 2);
-            mage.takePoints(12);
-
-            RoleBuild knight = new RoleBuild(uuid, Role.valueOf("KNIGHT"), d);
-            knight.setSkill(SkillType.SWORD, skillManager.getObjects().get("Riposte"), 3);
-            knight.setSkill(SkillType.AXE, skillManager.getObjects().get("Bulls Charge"), 5);
-            knight.setSkill(SkillType.PASSIVE_A, skillManager.getObjects().get("Fury"), 3);
-            knight.setSkill(SkillType.PASSIVE_B, skillManager.getObjects().get("Swordsmanship"), 1);
-            knight.takePoints(12);
-
-            RoleBuild warlock = new RoleBuild(uuid, Role.valueOf("WARLOCK"), d);
-            warlock.setSkill(SkillType.SWORD, skillManager.getObjects().get("Leech"), 4);
-            warlock.setSkill(SkillType.AXE, skillManager.getObjects().get("Bloodshed"), 5);
-            warlock.setSkill(SkillType.PASSIVE_A, skillManager.getObjects().get("Frailty"), 1);
-            warlock.setSkill(SkillType.PASSIVE_B, skillManager.getObjects().get("Soul Harvest"), 2);
-            warlock.takePoints(12);
-
-            builds.addAll(List.of(knight, ranger, brute, mage, assassin, warlock));
-
+                builds.add(newClass);
+            }
         }
 
         builds.forEach(build -> {

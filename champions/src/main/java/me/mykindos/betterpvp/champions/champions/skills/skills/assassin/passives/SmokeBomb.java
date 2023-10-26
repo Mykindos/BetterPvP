@@ -76,7 +76,7 @@ public class SmokeBomb extends Skill implements ToggleSkill, CooldownSkill, List
             if (roleOptional.isPresent()) {
                 Role role = roleOptional.get();
 
-                if (role == Role.ASSASSIN) {
+                if (role.hasSkill(getType(), getName())) {
                     if (next.getValue() > 0) {
                         for (int i = 0; i < 5; i++) {
                             Particle.SMOKE_LARGE.builder().location(next.getKey().getLocation()).receivers(30).extra(0).spawn();
