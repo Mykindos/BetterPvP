@@ -16,6 +16,7 @@ import org.reflections.Reflections;
 
 import java.lang.reflect.Modifier;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Data
 @Slf4j
@@ -53,49 +54,69 @@ public class Role {
 
     public void loadSkills(ExtendedYamlConfiguration config, Set<Class<?extends ISkill>> skillClasses, BPvPPlugin plugin) {
         String path = "class." + key + ".skills";
+
         List<String> swordList = config.getOrSaveStringList(path + "sword", List.of("HiltSmash", "FleshHook"));
+        assert swordList != null;
+        swordList = swordList.stream().map(o -> o.toUpperCase().replace(" ", "")).collect(Collectors.toList());
+
         List<String> axeList = config.getOrSaveStringList(path + "axe", List.of("BullsCharge", "SeismicSlam"));
+        assert axeList != null;
+        axeList = axeList.stream().map(o -> o.toUpperCase().replace(" ", "")).collect(Collectors.toList());
+
         List<String> passiveAList = config.getOrSaveStringList(path + "passiveA", List.of("Bloodlust", "Cleave"));
+        assert passiveAList != null;
+        passiveAList = passiveAList.stream().map(o -> o.toUpperCase().replace(" ", "")).collect(Collectors.toList());
+
         List<String> passiveBList = config.getOrSaveStringList(path + "passiveB", List.of("Deflection", "Stampede"));
+        assert passiveBList != null;
+        passiveBList = passiveBList.stream().map(o -> o.toUpperCase().replace(" ", "")).collect(Collectors.toList());
+
         List<String> globalList = config.getOrSaveStringList(path + "global", List.of("BreakFall", "FastRecovery", "Swim"));
+        assert globalList != null;
+        globalList = globalList.stream().map(o -> o.toUpperCase().replace(" ", "")).collect(Collectors.toList());
+
         List<String> bowList = config.getOrSaveStringList(path + "bow", List.of());
+        assert bowList != null;
+        bowList = bowList.stream().map(o -> o.toUpperCase().replace(" ", "")).collect(Collectors.toList());
+
         plugin.saveConfig();
 
         for (var clazz : skillClasses) {
             ISkill skill = plugin.getInjector().getInstance(clazz);
-            if (skill.getType() == SkillType.SWORD && swordList.contains(skill.getName())) {
+            log.info(skill.getName().toUpperCase());
+            String skillName = skill.getName().toUpperCase().replace(" ", "");
+            if (skill.getType() == SkillType.SWORD && swordList.contains(skillName)) {
                 swordSkills.add(skill);
+                log.error("Loading sword skill " + skill.getName());
                 skill.addClass(this);
                 continue;
             }
-            if (skill.getType() == SkillType.AXE && axeList.contains(clazz.getName())) {
+            if (skill.getType() == SkillType.AXE && axeList.contains(skillName)) {
                 axeSkills.add(skill);
                 skill.addClass(this);
                 continue;
             }
-            if (skill.getType() == SkillType.PASSIVE_A && passiveAList.contains(clazz.getName())) {
+            if (skill.getType() == SkillType.PASSIVE_A && passiveAList.contains(skillName)) {
                 passiveA.add(skill);
                 skill.addClass(this);
                 continue;
             }
-            if (skill.getType() == SkillType.PASSIVE_B && passiveBList.contains(clazz.getName())) {
+            if (skill.getType() == SkillType.PASSIVE_B && passiveBList.contains(skillName)) {
                 passiveB.add(skill);
                 skill.addClass(this);
                 continue;
             }
-            if (skill.getType() == SkillType.GLOBAL && globalList.contains(clazz.getName())) {
+            if (skill.getType() == SkillType.GLOBAL && globalList.contains(skillName)) {
                 global.add(skill);
                 skill.addClass(this);
                 continue;
             }
-            if (skill.getType() == SkillType.BOW && bowList.contains(clazz.getName())) {
+            if (skill.getType() == SkillType.BOW && bowList.contains(skillName)) {
                 bow.add(skill);
                 skill.addClass(this);
                 continue;
             }
         }
-
-
     }
 
     public void loadConfig(ExtendedYamlConfiguration config) {
