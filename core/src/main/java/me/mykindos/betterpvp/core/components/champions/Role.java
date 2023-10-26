@@ -149,7 +149,7 @@ public class Role {
             try {
                 this.armor[i] = Material.valueOf(materialKey.toUpperCase());
             } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("Invalid material key: " + materialKey, e);
+                //throw new IllegalArgumentException("Invalid material key: " + materialKey, e);
             }
         }
 

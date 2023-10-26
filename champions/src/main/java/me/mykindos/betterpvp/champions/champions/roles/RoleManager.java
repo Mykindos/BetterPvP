@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.champions.roles;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
@@ -11,11 +12,12 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.reflections.Reflections;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-
+@Slf4j
 @Singleton
 public class RoleManager extends Manager<Role> {
 
@@ -66,14 +68,18 @@ public class RoleManager extends Manager<Role> {
         ConfigurationSection customRoleSection = config.getConfigurationSection(path);
         if (customRoleSection == null) {
             customRoleSection = config.createSection(path);
+        } else {
+            log.error(customRoleSection.getCurrentPath());
+            log.error(config.getCurrentPath());
         }
+
         Reflections roleScan = new Reflections(Champions.class.getPackageName());
         for (String key : customRoleSection.getKeys(false)) {
             final ConfigurationSection section = customRoleSection.getConfigurationSection(key);
             final Role loaded = new Role(section.getName());
             loaded.loadConfig(config);
             if (loaded.isEnabled()) {
-                loaded.loadSkills(config, roleScan, champions);
+                //loaded.loadSkills(config, roleScan, champions);
                 repository.getRoles().add(loaded);
             }
         }
