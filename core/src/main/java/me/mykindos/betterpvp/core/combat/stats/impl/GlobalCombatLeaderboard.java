@@ -11,8 +11,11 @@ import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
 import me.mykindos.betterpvp.core.stats.Leaderboard;
-import me.mykindos.betterpvp.core.stats.Viewable;
+import me.mykindos.betterpvp.core.stats.SearchOptions;
 import me.mykindos.betterpvp.core.stats.sort.SortType;
+import me.mykindos.betterpvp.core.stats.sort.Sorted;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.SQLException;
@@ -22,7 +25,7 @@ import java.util.function.Function;
 
 @Singleton
 @Slf4j
-public class GlobalCombatLeaderboard extends Leaderboard<UUID, CombatData> implements Viewable {
+public class GlobalCombatLeaderboard extends Leaderboard<UUID, CombatData> implements Sorted {
 
     private static final Map<SortType, Statement> TOP_SORT_STATEMENTS = ImmutableMap.of(
             CombatSort.RATING, new Statement("CALL GetTopRating(?)", new IntegerStatementValue(10)),
@@ -42,13 +45,14 @@ public class GlobalCombatLeaderboard extends Leaderboard<UUID, CombatData> imple
     }
 
     @Override
-    public String getName() {
+    public final String getName() {
         return "Combat";
     }
 
     @Override
-    protected Comparator<CombatData> getSorter(SortType sortType) {
-        return Comparator.comparing((Function<CombatData, Float>) (data -> switch ((CombatSort) sortType) {
+    protected final Comparator<CombatData> getSorter(SearchOptions searchOptions) {
+        final CombatSort sort = (CombatSort) Objects.requireNonNull(searchOptions.getSort());
+        return Comparator.comparing((Function<CombatData, Float>) (data -> switch (sort) {
             case RATING -> (float) data.getRating();
             case KILLS -> (float) data.getKills();
             case DEATHS -> (float) data.getDeaths();
@@ -58,35 +62,52 @@ public class GlobalCombatLeaderboard extends Leaderboard<UUID, CombatData> imple
         })).reversed();
     }
 
+    @NotNull
     @Override
-    public SortType[] acceptedSortTypes() {
+    public final SortType[] acceptedSortTypes() {
         return CombatSort.values();
     }
 
     @Override
-    public CompletableFuture<Map<SortType, Integer>> add(@NotNull UUID entryName, @NotNull CombatData add) {
+    public final Map<String, Component> getDescription(SearchOptions searchOptions, CombatData value) {
+        final List<CombatSort> types = new ArrayList<>(Arrays.stream(CombatSort.values()).toList());
+        final CombatSort selected = (CombatSort) Objects.requireNonNull(searchOptions.getSort());
+        final LinkedHashMap<String, Component> map = new LinkedHashMap<>(); // Preserve order
+        types.remove(selected);
+        types.add(0, selected);
+        for (CombatSort sort : types) {
+            final String text = sort.getValue(value);
+            final NamedTextColor color = sort == selected ? NamedTextColor.GREEN : NamedTextColor.GRAY;
+            map.put(sort.getName(), Component.text(text, color));
+        }
+        return map;
+    }
+
+    @Override
+    public final CompletableFuture<Map<SearchOptions, Integer>> add(@NotNull UUID entryName, @NotNull CombatData add) {
         throw new UnsupportedOperationException("Cannot add combat data, only compute/replace");
     }
 
     @Override
-    protected CombatData join(CombatData value, CombatData add) {
+    protected final CombatData join(CombatData value, CombatData add) {
         throw new UnsupportedOperationException("Cannot join combat data, only compute/replace");
     }
 
     @Override
-    protected CombatData fetch(SortType sortType, @NotNull Database database, @NotNull String tablePrefix, @NotNull UUID entry) {
+    protected CombatData fetch(@NotNull SearchOptions options, @NotNull Database database, @NotNull String tablePrefix, @NotNull UUID entry) {
         // We can join this because fetch is run on a separate thread
         return repository.getDataAsync(entry).join();
     }
 
     @Override
-    protected Map<UUID, CombatData> fetchAll(@NotNull SortType sortType, @NotNull Database database, @NotNull String tablePrefix) {
+    protected Map<UUID, CombatData> fetchAll(@NotNull SearchOptions options, @NotNull Database database, @NotNull String tablePrefix) {
         Map<UUID, CombatData> map = new HashMap<>();
+        final SortType sortType = Objects.requireNonNull(options.getSort());
         Statement stmt = TOP_SORT_STATEMENTS.get(sortType);
         database.executeProcedure(stmt, -1, result -> {
             try {
                 while (result.next()) {
-                    final UUID gamer = UUID.fromString(result.getString("Gamer"));
+                    final UUID gamer = UUID.fromString(result.getString(1));
                     // We can join this because fetchAll is run on a separate thread
                     final GlobalCombatData data = repository.getDataAsync(gamer).join();
                     map.put(gamer, data);

@@ -31,16 +31,16 @@ public class GlobalCombatStatsRepository extends CombatStatsRepository<GlobalCom
             database.executeProcedure(statement, -1, result -> {
                 try {
                     if (result.next()) {
-                        data.setKills(result.getInt("Kills"));
-                        data.setDeaths(result.getInt("Deaths"));
-                        data.setAssists(result.getInt("Assists"));
-                        data.setKillStreak(result.getInt("KillStreak"));
-                        data.setHighestKillStreak(result.getInt("HighestKillStreak"));
+                        data.setKills(result.getInt(1));
+                        data.setDeaths(result.getInt(2));
+                        data.setAssists(result.getInt(3));
+                        data.setKillStreak(result.getInt(5));
+                        data.setHighestKillStreak(result.getInt(6));
 
                         // We care if the rating is null because that means they have not played a game yet,
                         // so it falls back to the default value of rating in CombatData
                         // Contrary to the other stats, which are initialized to 0
-                        int rating = result.getInt("Rating");
+                        int rating = result.getInt(4);
                         if (!result.wasNull()) {
                             data.setRating(rating);
                         }

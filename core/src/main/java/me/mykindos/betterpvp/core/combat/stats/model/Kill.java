@@ -1,19 +1,21 @@
 package me.mykindos.betterpvp.core.combat.stats.model;
 
-import lombok.Value;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-@Value
+@RequiredArgsConstructor
+@Getter
 public class Kill {
 
-    UUID id = UUID.randomUUID();
-    UUID killer;
-    UUID victim;
-    int ratingDelta;
-    List<Contribution> contributions;
-    Instant timestamp = Instant.now();
+    private final UUID id = UUID.randomUUID();
+    private final UUID killer;
+    private final UUID victim;
+    private final int ratingDelta;
+    private final List<Contribution> contributions;
+    private final Instant timestamp = Instant.now();
 
 }

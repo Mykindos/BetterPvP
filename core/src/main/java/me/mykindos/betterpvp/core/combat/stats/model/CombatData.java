@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.stats.repository.PlayerData;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
@@ -13,6 +14,7 @@ import org.checkerframework.common.value.qual.IntRange;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -89,6 +91,15 @@ public abstract class CombatData extends PlayerData {
         // Save
         pendingKills.add(kill);
         return kill;
+    }
+
+    protected Kill generateKill(UUID killer, UUID victim, int ratingDelta, List<Contribution> contributions) {
+        return new Kill(killer, victim, ratingDelta, contributions);
+    }
+
+    @Override
+    protected void prepareUpdates(@NotNull UUID uuid, @NotNull Database database, String databasePrefix) {
+
     }
 
     public final float getKillDeathRatio() {

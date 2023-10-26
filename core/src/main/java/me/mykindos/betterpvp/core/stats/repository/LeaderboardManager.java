@@ -19,9 +19,16 @@ public final class LeaderboardManager extends Manager<Leaderboard<?, ?>> {
                 .map(Map.Entry::getValue);
     }
 
-    public Map<String, ? extends Leaderboard<?, ?>> getEnabled() {
+    public Optional<Leaderboard<?, ?>> getViewableByName(String name) {
+        return objects.entrySet().stream()
+                .filter(e -> e.getValue().isViewable() && e.getKey().equalsIgnoreCase(name))
+                .findFirst()
+                .map(Map.Entry::getValue);
+    }
+
+    public Map<String, ? extends Leaderboard<?, ?>> getViewable() {
         return getObjects().entrySet().stream()
-                .filter(e -> e.getValue().isEnabled())
+                .filter(e -> e.getValue().isViewable())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 }

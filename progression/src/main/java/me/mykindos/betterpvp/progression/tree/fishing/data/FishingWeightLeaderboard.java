@@ -10,22 +10,20 @@ import me.mykindos.betterpvp.core.database.query.values.DoubleStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
 import me.mykindos.betterpvp.core.stats.Leaderboard;
-import me.mykindos.betterpvp.core.stats.Viewable;
+import me.mykindos.betterpvp.core.stats.SearchOptions;
 import me.mykindos.betterpvp.core.stats.sort.SortType;
+import me.mykindos.betterpvp.core.stats.sort.Sorted;
 import me.mykindos.betterpvp.core.stats.sort.TemporalSort;
 import me.mykindos.betterpvp.progression.Progression;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.SQLException;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
 @Singleton
-public class FishingWeightLeaderboard extends Leaderboard<UUID, Long> implements Viewable {
+public class FishingWeightLeaderboard extends Leaderboard<UUID, Long> implements Sorted {
 
     @Inject
     public FishingWeightLeaderboard(Progression progression) {
@@ -38,12 +36,12 @@ public class FishingWeightLeaderboard extends Leaderboard<UUID, Long> implements
     }
 
     @Override
-    protected Comparator<Long> getSorter(SortType sortType) {
+    protected Comparator<Long> getSorter(SearchOptions searchOptions) {
         return Comparator.comparing(Long::intValue).reversed();
     }
 
     @Override
-    public SortType[] acceptedSortTypes() {
+    public SortType [] acceptedSortTypes() {
         return TemporalSort.values();
     }
 
@@ -53,12 +51,12 @@ public class FishingWeightLeaderboard extends Leaderboard<UUID, Long> implements
     }
 
     @Override
-    protected Long fetch(SortType sortType, @NotNull Database database, @NotNull String tablePrefix, @NotNull UUID entry) {
+    protected Long fetch(@NotNull SearchOptions options, @NotNull Database database, @NotNull String tablePrefix, @NotNull UUID entry) {
         AtomicLong weight = new AtomicLong();
-        final TemporalSort type = (TemporalSort) sortType;
+        final TemporalSort type = (TemporalSort) Objects.requireNonNull(options.getSort());
         Statement statement = new Statement("CALL GetGamerFishingWeight(?, ?)",
                 new UuidStatementValue(entry),
-               new DoubleStatementValue(type.getDays())); // Top 10
+                new DoubleStatementValue(type.getDays())); // Top 10
         database.executeProcedure(statement, -1, result -> {
             try {
                 if (result.next()) {
@@ -74,10 +72,10 @@ public class FishingWeightLeaderboard extends Leaderboard<UUID, Long> implements
 
     @SneakyThrows
     @Override
-    protected Map<UUID, Long> fetchAll(@NotNull SortType sortType, @NotNull Database database, @NotNull String tablePrefix) {
+    protected Map<UUID, Long> fetchAll(@NotNull SearchOptions options, @NotNull Database database, @NotNull String tablePrefix) {
         Map<UUID, Long> leaderboard = new HashMap<>();
 
-        final TemporalSort type = (TemporalSort) sortType;
+        final TemporalSort type = (TemporalSort) Objects.requireNonNull(options.getSort());
         Statement statement = new Statement("CALL GetTopFishingByWeight(?, ?)",
                 new DoubleStatementValue(type.getDays()),
                 new IntegerStatementValue(10)); // Top 10

@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
-public abstract class StatsRepository<T extends PlayerData> {
+public abstract class StatsRepository<T extends StatHolder> {
 
     protected final ConcurrentHashMap<UUID, T> saveQueue = new ConcurrentHashMap<>();
     protected final AsyncLoadingCache<UUID, T> dataCache;

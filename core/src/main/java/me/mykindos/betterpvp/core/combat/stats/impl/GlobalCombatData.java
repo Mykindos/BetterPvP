@@ -34,7 +34,7 @@ public class GlobalCombatData extends CombatData {
             final UUID killId = kill.getId();
             final List<Contribution> contributions = kill.getContributions();
 
-            final Contribution killerContribution = contributions.get(0);
+            final Contribution killerContribution = contributions.stream().filter(contribution -> contribution.getContributor().equals(kill.getKiller())).findFirst().orElseThrow();
             Statement killStatement = new Statement(killStmt,
                     new UuidStatementValue(killId),
                     new UuidStatementValue(kill.getKiller()),
@@ -58,7 +58,7 @@ public class GlobalCombatData extends CombatData {
         }
 
         // Save attachments
-        attachments.forEach(attachment -> attachment.prepareUpdates(this, new ArrayList<>(pendingKills), database, databasePrefix));
+        attachments.forEach(attachment -> attachment.prepareUpdates(this, database, databasePrefix));
 
         // Save self-rating (this saves independently for each player)
         String ratingStmt = "INSERT INTO " + databasePrefix + "ratings (Gamer, Rating) VALUES (?, ?) ON DUPLICATE KEY UPDATE Rating = VALUES(Rating);";

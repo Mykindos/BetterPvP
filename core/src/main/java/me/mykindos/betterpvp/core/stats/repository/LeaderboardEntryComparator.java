@@ -12,7 +12,7 @@ public class LeaderboardEntryComparator<E, T> implements Comparator<LeaderboardE
     @Override
     public int compare(LeaderboardEntry<E, T> entry1, LeaderboardEntry<E, T> entry2) {
         // Compare the value fields first
-        int valueComparison = comparator.compare(entry2.getValue(), entry1.getValue());
+        int valueComparison = comparator.compare(entry1.getValue(), entry2.getValue());
 
         // If the values are equal, compare the key fields
         if (valueComparison == 0) {

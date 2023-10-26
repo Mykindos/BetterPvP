@@ -6,12 +6,17 @@ import me.mykindos.betterpvp.core.menu.Button;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.interfaces.IRefreshingMenu;
 import me.mykindos.betterpvp.core.stats.Leaderboard;
+import me.mykindos.betterpvp.core.stats.SearchOptions;
+import me.mykindos.betterpvp.core.stats.filter.FilterType;
+import me.mykindos.betterpvp.core.stats.filter.Filtered;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardEntry;
 import me.mykindos.betterpvp.core.stats.sort.SortType;
+import me.mykindos.betterpvp.core.stats.sort.Sorted;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
@@ -24,20 +29,18 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
-import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 @Slf4j
-public class LeaderboardMenu extends Menu implements IRefreshingMenu {
+public class LeaderboardMenu<E, T> extends Menu implements IRefreshingMenu {
 
     private static final int POSITION_INDEX = UtilMessage.DIVIDER.content().length() / 2 - 6;
-    private final Leaderboard<?, ?> leaderboard;
+    private final Leaderboard<E, T> leaderboard;
     private int sortTypeIndex;
+    private int filterIndex;
 
-    public LeaderboardMenu(Player player, Leaderboard<?, ?> leaderboard) {
+    public LeaderboardMenu(Player player, Leaderboard<E, T> leaderboard) {
         super(player, 54, Component.text(leaderboard.getName()));
         this.leaderboard = leaderboard;
         this.sortTypeIndex = 0;
@@ -46,39 +49,77 @@ public class LeaderboardMenu extends Menu implements IRefreshingMenu {
 
     @Override
     public void refresh() {
-        // Sort button
-        List<Component> sortTypeLore = new ArrayList<>();
-        final SortType[] sortTypes = leaderboard.acceptedSortTypes();
-        SortType selectedSortType = sortTypes[sortTypeIndex];
-        for (SortType type : sortTypes) {
-            String name = type.getName();
-            NamedTextColor color = NamedTextColor.GRAY;
-            final boolean isSelected = selectedSortType == type;
-            if (isSelected) {
-                name += " \u00AB";
-                color = NamedTextColor.GREEN;
+        SearchOptions.SearchOptionsBuilder optionsBuilder = SearchOptions.builder();
+        if (leaderboard instanceof Sorted sorted) {
+            // Sort button
+            List<Component> sortTypeLore = new ArrayList<>();
+            final SortType[] sortTypes = sorted.acceptedSortTypes();
+            SortType selectedSortType = sortTypes[sortTypeIndex];
+            optionsBuilder.sort(selectedSortType);
+            for (SortType type : sortTypes) {
+                String name = type.getName();
+                NamedTextColor color = NamedTextColor.GRAY;
+                final boolean isSelected = selectedSortType == type;
+                if (isSelected) {
+                    name += " \u00AB";
+                    color = NamedTextColor.GREEN;
+                }
+                sortTypeLore.add(Component.text(name, color));
             }
-            sortTypeLore.add(Component.text(name, color));
+
+            final TextComponent sortTypeName = Component.text("Sort By", NamedTextColor.WHITE, TextDecoration.BOLD);
+            addButton(new Button(0, new ItemStack(Material.ARMOR_STAND), sortTypeName, sortTypeLore) {
+                @Override
+                public void onClick(Player player, Gamer gamer, ClickType clickType) {
+                    sortTypeIndex = sortTypeIndex + 1 >= sortTypes.length ? 0 : sortTypeIndex + 1;
+                    LeaderboardMenu.this.refresh();
+                    player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 2f, 2f);
+                }
+
+                @Override
+                public double getClickCooldown() {
+                    return 0.5;
+                }
+            });
         }
 
-        final TextComponent sortTypeName = Component.text("Sort", NamedTextColor.WHITE, TextDecoration.BOLD);
-        addButton(new Button(0, new ItemStack(Material.ARMOR_STAND), sortTypeName, sortTypeLore) {
-            @Override
-            public void onClick(Player player, Gamer gamer, ClickType clickType) {
-                sortTypeIndex = sortTypeIndex + 1 >= leaderboard.acceptedSortTypes().length ? 0 : sortTypeIndex + 1;
-                LeaderboardMenu.this.refresh();
-                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 2f, 2f);
+        if (leaderboard instanceof Filtered filtered) {
+            // Filter button
+            List<Component> filterLore = new ArrayList<>();
+            final FilterType[] filterTypes = filtered.acceptedFilters();
+            FilterType selectedFilterType = filterTypes[filterIndex];
+            optionsBuilder.filter(selectedFilterType);
+            for (FilterType type : filterTypes) {
+                String name = type.getName();
+                NamedTextColor color = NamedTextColor.GRAY;
+                final boolean isSelected = selectedFilterType == type;
+                if (isSelected) {
+                    name += " \u00AB";
+                    color = NamedTextColor.GREEN;
+                }
+                filterLore.add(Component.text(name, color));
             }
 
-            @Override
-            public double getClickCooldown() {
-                return 0.5;
-            }
-        });
+            final TextComponent filterTypeName = Component.text("Filter By", NamedTextColor.WHITE, TextDecoration.BOLD);
+            addButton(new Button(0, new ItemStack(Material.LECTERN), filterTypeName, filterLore) {
+                @Override
+                public void onClick(Player player, Gamer gamer, ClickType clickType) {
+                    filterIndex = filterIndex + 1 >= filterTypes.length ? 0 : filterIndex + 1;
+                    LeaderboardMenu.this.refresh();
+                    player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 2f, 2f);
+                }
+
+                @Override
+                public double getClickCooldown() {
+                    return 0.5;
+                }
+            });
+        }
 
         // Standings
+        final SearchOptions options = optionsBuilder.build();
         int position = 0;
-        final ArrayList<? extends LeaderboardEntry<?, ?>> entries = new ArrayList<>(leaderboard.getTopTen(selectedSortType));
+        final ArrayList<? extends LeaderboardEntry<E, T>> entries = new ArrayList<>(leaderboard.getTopTen(options));
         for (int i = 0; i < 10; i++) {
             position++;
             final TextColor color = getPositionColor(position);
@@ -95,9 +136,9 @@ public class LeaderboardMenu extends Menu implements IRefreshingMenu {
                 continue;
             }
 
-            final LeaderboardEntry<?, ?> entry = entries.get(i);
-            final Object key = entry.getKey();
-            final Object value = entry.getValue();
+            final LeaderboardEntry<E, T> entry = entries.get(i);
+            final E key = entry.getKey();
+            final T value = entry.getValue();
 
             ItemStack itemStack = new ItemStack(Material.PLAYER_HEAD);
             final SkullMeta meta = (SkullMeta) itemStack.getItemMeta();
@@ -113,12 +154,8 @@ public class LeaderboardMenu extends Menu implements IRefreshingMenu {
 
             itemStack.setItemMeta(meta);
 
-            if (value instanceof Number number) {
-                addButton(getEntry(slot, title, itemStack, keyRender, NumberFormat.getInstance().format(number)));
-            } else {
-                addButton(getEntry(slot, title, itemStack, keyRender, value.toString()));
-            }
-
+            final Map<String, Component> description = leaderboard.getDescription(options, value);
+            addButton(getEntry(slot, title, itemStack, keyRender, description));
         }
 
         // Podium spots
@@ -134,8 +171,8 @@ public class LeaderboardMenu extends Menu implements IRefreshingMenu {
 
         // Own data
         try {
-            final Leaderboard<UUID, ?> lb = (Leaderboard<UUID, ?>) leaderboard;
-            final CompletableFuture<?> entryData = lb.getEntryData(selectedSortType, player.getUniqueId());
+            final Leaderboard<UUID, T> lb = (Leaderboard<UUID, T>) leaderboard;
+            final CompletableFuture<T> entryData = lb.getEntryData(options, player.getUniqueId());
             final Button button = new Button(49,
                     new ItemStack(Material.PAPER),
                     Component.text("Retrieving your data...", NamedTextColor.GRAY));
@@ -146,11 +183,12 @@ public class LeaderboardMenu extends Menu implements IRefreshingMenu {
                     return;
                 }
 
+                final Map<String, Component> description = leaderboard.getDescription(options, data);
                 final Button replacement = getEntry(49,
                         Component.text("Your Data", NamedTextColor.WHITE, TextDecoration.BOLD),
                         button.getItemStack(),
                         player.getName(),
-                        data.toString());
+                        description);
                 button.setItemStack(replacement.getItemStack());
                 LeaderboardMenu.this.refreshButton(button);
             }).exceptionally(throwable -> {
@@ -189,16 +227,25 @@ public class LeaderboardMenu extends Menu implements IRefreshingMenu {
         return new Button(slot, itemStack);
     }
 
-    private Button getEntry(int slot, Component title, ItemStack itemStack, String key, String data) {
+    private Button getEntry(int slot, Component title, ItemStack itemStack, String key, Map<String, Component> description) {
         final ItemMeta meta = itemStack.getItemMeta();
         meta.displayName(title.decoration(TextDecoration.ITALIC, false));
-        meta.lore(List.of(
+        final List<Component> lore = new ArrayList<>(List.of(
                 UtilMessage.DIVIDER,
                 Component.empty(),
                 UtilMessage.deserialize("<white>Holder: <gray>%s", key).decoration(TextDecoration.ITALIC, false),
-                UtilMessage.deserialize("<white>%s: <gray>%s", leaderboard.getName(), data).decoration(TextDecoration.ITALIC, false),
                 Component.empty(),
                 UtilMessage.DIVIDER));
+
+        // After "holder"
+        int index = 3;
+        for (Map.Entry<String, Component> entry : description.entrySet()) {
+            final TextComponent keyText = Component.text(entry.getKey() + ": ").color(NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false);
+            final Component valueText = entry.getValue().decoration(TextDecoration.ITALIC, false).applyFallbackStyle(Style.style(NamedTextColor.GRAY));
+            lore.add(index, keyText.append(valueText));
+            index++;
+        }
+        meta.lore(lore);
         itemStack.setItemMeta(meta);
         return new Button(slot, itemStack);
     }

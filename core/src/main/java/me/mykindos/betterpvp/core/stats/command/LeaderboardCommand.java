@@ -28,6 +28,7 @@ public class LeaderboardCommand extends Command {
     public LeaderboardCommand(LeaderboardManager leaderboards) {
         this.leaderboards = leaderboards;
         aliases.add("lb");
+        aliases.add("top");
     }
 
     @Override
@@ -48,20 +49,20 @@ public class LeaderboardCommand extends Command {
         }
 
         final String name = String.join(" ", args);
-        final Optional<Leaderboard<?, ?>> leaderboardOpt = leaderboards.getObject(name);
-        if (leaderboardOpt.isEmpty() || !leaderboardOpt.get().isEnabled()) {
+        final Optional<Leaderboard<?, ?>> leaderboardOpt = leaderboards.getViewableByName(name);
+        if (leaderboardOpt.isEmpty() || !leaderboardOpt.get().isViewable()) {
             UtilMessage.message(player, "Leaderboard", "Leaderboard not found [<alt2>%s</alt2>].", name);
             return;
         }
 
         final Leaderboard<?, ?> leaderboard = leaderboardOpt.get();
-        MenuManager.openMenu(player, new LeaderboardMenu(player, leaderboard));
+        MenuManager.openMenu(player, new LeaderboardMenu<>(player, leaderboard));
     }
 
     @Override
     public List<String> processTabComplete(CommandSender sender, String[] args) {
         if (args.length == 1) {
-                return new ArrayList<>(leaderboards.getEnabled().keySet());
+                return new ArrayList<>(leaderboards.getViewable().keySet());
         }
         return Collections.emptyList();
     }

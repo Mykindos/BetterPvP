@@ -2,27 +2,27 @@ package me.mykindos.betterpvp.core.stats.repository;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import me.mykindos.betterpvp.core.stats.sort.SortType;
+import me.mykindos.betterpvp.core.stats.SearchOptions;
 import org.jetbrains.annotations.NotNull;
 
 @Data
 @AllArgsConstructor
 public class LeaderboardEntryKey<T> {
 
-    private final @NotNull SortType sortType;
+    private final @NotNull SearchOptions options;
     private final @NotNull T value;
 
-    public static <T> LeaderboardEntryKey<T> of(@NotNull SortType sortType, @NotNull T key) {
-        return new LeaderboardEntryKey<>(sortType, key);
+    public static <T> LeaderboardEntryKey<T> of(@NotNull SearchOptions options, @NotNull T key) {
+        return new LeaderboardEntryKey<>(options, key);
     }
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof LeaderboardEntryKey && ((LeaderboardEntryKey<?>) obj).value.equals(value) && ((LeaderboardEntryKey<?>) obj).sortType.equals(sortType);
+        return obj instanceof LeaderboardEntryKey && ((LeaderboardEntryKey<?>) obj).value.equals(value) && ((LeaderboardEntryKey<?>) obj).options.equals(options);
     }
 
     @Override
     public int hashCode() {
-        return value.hashCode() + sortType.hashCode();
+        return value.hashCode() + options.hashCode();
     }
 }

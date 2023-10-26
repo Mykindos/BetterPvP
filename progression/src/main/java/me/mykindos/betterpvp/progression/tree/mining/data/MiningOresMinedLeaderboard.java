@@ -9,9 +9,7 @@ import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.stats.Leaderboard;
-import me.mykindos.betterpvp.core.stats.Viewable;
-import me.mykindos.betterpvp.core.stats.sort.SortType;
-import me.mykindos.betterpvp.core.stats.sort.TemporalSort;
+import me.mykindos.betterpvp.core.stats.SearchOptions;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.tree.mining.repository.MiningRepository;
 import org.jetbrains.annotations.NotNull;
@@ -24,7 +22,7 @@ import java.util.UUID;
 
 @Slf4j
 @Singleton
-public class MiningOresMinedLeaderboard extends Leaderboard<UUID, Long> implements Viewable {
+public class MiningOresMinedLeaderboard extends Leaderboard<UUID, Long> {
 
     private final MiningRepository repository;
 
@@ -40,13 +38,8 @@ public class MiningOresMinedLeaderboard extends Leaderboard<UUID, Long> implemen
     }
 
     @Override
-    protected Comparator<Long> getSorter(SortType sortType) {
+    protected Comparator<Long> getSorter(SearchOptions searchOptions) {
         return Comparator.comparing(Long::intValue).reversed();
-    }
-
-    @Override
-    public SortType[] acceptedSortTypes() {
-        return new SortType[]{TemporalSort.SEASONAL};
     }
 
     @Override
@@ -55,23 +48,13 @@ public class MiningOresMinedLeaderboard extends Leaderboard<UUID, Long> implemen
     }
 
     @Override
-    protected Long fetch(SortType sortType, @NotNull Database database, @NotNull String tablePrefix, @NotNull UUID entry) {
-        if (sortType != TemporalSort.SEASONAL) {
-            log.error("Attempted to fetch leaderboard data for " + entry + " with invalid sort type " + sortType);
-            return 0L;
-        }
-
+    protected Long fetch(@NotNull SearchOptions options, @NotNull Database database, @NotNull String tablePrefix, @NotNull UUID entry) {
         return repository.fetchDataAsync(entry).join().getOresMined();
     }
 
-    @SneakyThrows
     @Override
-    protected Map<UUID, Long> fetchAll(@NotNull SortType sortType, @NotNull Database database, @NotNull String tablePrefix) {
-        if (sortType != TemporalSort.SEASONAL) {
-            log.error("Attempted to fetch leaderboard data for all with invalid sort type " + sortType);
-            return new HashMap<>();
-        }
-
+    @SneakyThrows
+    protected Map<UUID, Long> fetchAll(@NotNull SearchOptions options, @NotNull Database database, @NotNull String tablePrefix) {
         Map<UUID, Long> leaderboard = new HashMap<>();
         Statement statement = new Statement("CALL GetTopMiningByOre(?, ?, ?)",
                 new IntegerStatementValue(10),
@@ -91,4 +74,5 @@ public class MiningOresMinedLeaderboard extends Leaderboard<UUID, Long> implemen
 
         return leaderboard;
     }
+
 }
