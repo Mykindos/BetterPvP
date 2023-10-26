@@ -62,11 +62,6 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill {
         };
     }
 
-    @Override
-    public Set<Role> getClassTypes() {
-        return Role.MAGE;
-    }
-
     @EventHandler
     public void Combust(EntityCombustEvent e) {
         if (e.getEntity() instanceof Player player) {

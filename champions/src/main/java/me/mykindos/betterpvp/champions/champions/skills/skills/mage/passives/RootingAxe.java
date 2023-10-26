@@ -55,11 +55,6 @@ public class RootingAxe extends Skill implements PassiveSkill, CooldownSkill {
         };
     }
 
-    @Override
-    public Set<Role> getClassTypes() {
-        return Role.MAGE;
-    }
-
     @EventHandler
     public void onDamage(CustomDamageEvent event) {
         if (!(event.getDamager() instanceof Player damager)) return;

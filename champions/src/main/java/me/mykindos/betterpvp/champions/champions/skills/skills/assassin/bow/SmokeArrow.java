@@ -55,11 +55,6 @@ public class SmokeArrow extends PrepareArrowSkill {
     }
 
     @Override
-    public Set<Role> getClassTypes() {
-        return Role.ASSASSIN;
-    }
-
-    @Override
     public SkillType getType() {
         return SkillType.BOW;
     }

@@ -74,11 +74,6 @@ public class Wreath extends PrepareSkill implements CooldownSkill {
     }
 
     @Override
-    public Set<Role> getClassTypes() {
-        return Role.WARLOCK;
-    }
-
-    @Override
     public SkillType getType() {
         return SkillType.SWORD;
     }

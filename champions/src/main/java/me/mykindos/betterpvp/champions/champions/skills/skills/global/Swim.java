@@ -47,11 +47,6 @@ public class Swim extends Skill implements PassiveSkill, EnergySkill {
     }
 
     @Override
-    public Set<Role> getClassTypes() {
-        return null;
-    }
-
-    @Override
     public SkillType getType() {
 
         return SkillType.GLOBAL;

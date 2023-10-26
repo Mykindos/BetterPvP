@@ -69,7 +69,7 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
             Vector vec = player.getLocation().getDirection();
             vec.setY(0);
             UtilVelocity.velocity(player, vec, 0.9D, false, 0.0D, 0.8D, 2.0D, true);
-            UtilMessage.message(player, getClassTypes().getName(), "You used <alt>Wall Kick</alt>.");
+            UtilMessage.message(player, "Champions", "You used <alt>Wall Kick</alt>.");
         }
 
         player.getWorld().spawnEntity(player.getLocation(), EntityType.LLAMA_SPIT);
@@ -164,11 +164,6 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
     @Override
     public double getCooldown(int level) {
         return cooldown - ((level - 1) * 0.5);
-    }
-
-    @Override
-    public Set<Role> getClassTypes() {
-        return Role.ASSASSIN;
     }
 
     @Override

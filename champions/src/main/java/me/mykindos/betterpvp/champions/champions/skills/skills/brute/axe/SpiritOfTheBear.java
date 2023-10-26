@@ -52,11 +52,6 @@ public class SpiritOfTheBear extends Skill implements InteractSkill, CooldownSki
     }
 
     @Override
-    public Set<Role> getClassTypes() {
-        return Role.BRUTE;
-    }
-
-    @Override
     public SkillType getType() {
 
         return SkillType.AXE;

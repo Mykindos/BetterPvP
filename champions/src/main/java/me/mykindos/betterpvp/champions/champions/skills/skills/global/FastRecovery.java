@@ -44,11 +44,6 @@ public class FastRecovery extends Skill implements PassiveSkill {
         };
     }
 
-    @Override
-    public Set<Role> getClassTypes() {
-        return null;
-    }
-
     @EventHandler
     public void onEnergyRegen(RegenerateEnergyEvent event) {
         Player player = event.getPlayer();

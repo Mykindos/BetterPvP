@@ -57,11 +57,6 @@ public class Deflection extends Skill implements PassiveSkill {
     }
 
     @Override
-    public Set<Role> getClassTypes() {
-        return Role.KNIGHT;
-    }
-
-    @Override
     public SkillType getType() {
         return SkillType.PASSIVE_B;
     }

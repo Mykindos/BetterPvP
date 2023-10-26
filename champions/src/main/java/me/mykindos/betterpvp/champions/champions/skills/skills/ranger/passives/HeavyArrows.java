@@ -57,11 +57,6 @@ public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill {
         };
     }
 
-    @Override
-    public Set<Role> getClassTypes() {
-        return Role.RANGER;
-    }
-
     @UpdateEvent
     public void update() {
         Iterator<Arrow> it = arrows.iterator();

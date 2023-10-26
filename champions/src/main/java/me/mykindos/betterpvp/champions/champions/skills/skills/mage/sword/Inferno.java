@@ -68,11 +68,6 @@ public class Inferno extends ChannelSkill implements InteractSkill, EnergySkill 
     }
 
     @Override
-    public Set<Role> getClassTypes() {
-        return Role.MAGE;
-    }
-
-    @Override
     public SkillType getType() {
         return SkillType.SWORD;
     }

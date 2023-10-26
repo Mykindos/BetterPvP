@@ -43,11 +43,6 @@ public class HolyLight extends Skill implements PassiveSkill {
     }
 
     @Override
-    public Set<Role> getClassTypes() {
-        return Role.MAGE;
-    }
-
-    @Override
     public SkillType getType() {
         return SkillType.PASSIVE_A;
     }

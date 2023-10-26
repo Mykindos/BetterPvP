@@ -71,12 +71,6 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
         };
     }
 
-    @Override
-    public Set<Role> getClassTypes() {
-        return Role.WARLOCK;
-    }
-
-
     @EventHandler
     public void removeOnDeath(PlayerDeathEvent event) {
         shieldDataMap.remove(event.getEntity().getUniqueId());

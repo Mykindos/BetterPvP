@@ -66,11 +66,6 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill {
         };
     }
 
-    @Override
-    public Set<Role> getClassTypes() {
-        return Role.MAGE;
-    }
-
     @UpdateEvent(delay = 1000)
     public void audio() {
         for (UUID uuid : active) {

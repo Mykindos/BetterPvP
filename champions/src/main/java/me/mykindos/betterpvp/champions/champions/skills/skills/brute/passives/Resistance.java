@@ -39,11 +39,6 @@ public class Resistance extends Skill implements PassiveSkill {
         };
     }
 
-    @Override
-    public Set<Role> getClassTypes() {
-        return Role.BRUTE;
-    }
-
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onDamage(CustomDamageEvent event) {
         if (event.getDamagee() instanceof Player damagee) {

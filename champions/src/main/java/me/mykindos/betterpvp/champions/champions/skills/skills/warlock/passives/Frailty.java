@@ -51,11 +51,6 @@ public class Frailty extends Skill implements PassiveSkill {
         };
     }
 
-    @Override
-    public Set<Role> getClassTypes() {
-        return Role.WARLOCK;
-    }
-
     @EventHandler
     public void onEquip(SkillEquipEvent event) {
         if (event.getSkill().equals(this)) {

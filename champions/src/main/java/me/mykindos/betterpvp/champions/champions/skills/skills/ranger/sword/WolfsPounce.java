@@ -125,11 +125,6 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
     }
 
     @Override
-    public Set<Role> getClassTypes() {
-        return Role.RANGER;
-    }
-
-    @Override
     public SkillType getType() {
         return SkillType.SWORD;
     }

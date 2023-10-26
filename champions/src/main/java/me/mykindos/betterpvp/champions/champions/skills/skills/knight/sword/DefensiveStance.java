@@ -65,15 +65,9 @@ public class DefensiveStance extends ChannelSkill implements InteractSkill, Ener
     }
 
     @Override
-    public Set<Role> getClassTypes() {
-        return Role.KNIGHT;
-    }
-
-    @Override
     public SkillType getType() {
         return SkillType.SWORD;
     }
-
 
     @EventHandler
     public void onDamage(CustomDamageEvent event) {

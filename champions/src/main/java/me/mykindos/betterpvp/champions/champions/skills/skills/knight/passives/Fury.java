@@ -40,11 +40,6 @@ public class Fury extends Skill implements PassiveSkill, Listener {
     }
 
     @Override
-    public Set<Role> getClassTypes() {
-        return Role.KNIGHT;
-    }
-
-    @Override
     public SkillType getType() {
         return SkillType.PASSIVE_A;
     }

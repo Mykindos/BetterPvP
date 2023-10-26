@@ -79,11 +79,6 @@ public class Boulder extends Skill implements Listener, InteractSkill, CooldownS
     }
 
     @Override
-    public Set<Role> getClassTypes() {
-        return Role.MAGE;
-    }
-
-    @Override
     public SkillType getType() {
         return SkillType.AXE;
     }

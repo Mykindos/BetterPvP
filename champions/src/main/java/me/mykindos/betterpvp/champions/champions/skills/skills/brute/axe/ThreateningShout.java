@@ -49,10 +49,6 @@ public class ThreateningShout extends Skill implements InteractSkill, CooldownSk
         };
     }
 
-    @Override
-    public Set<Role> getClassTypes() {
-        return Role.BRUTE;
-    }
 
     @Override
     public SkillType getType() {

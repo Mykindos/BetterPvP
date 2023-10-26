@@ -60,12 +60,6 @@ public class Longshot extends Skill implements PassiveSkill {
                 "Cannot be used in own territory"};
     }
 
-    @Override
-    public Set<Role> getClassTypes() {
-        return Role.RANGER;
-    }
-
-
     @UpdateEvent
     public void update() {
         Iterator<Arrow> it = arrows.keySet().iterator();

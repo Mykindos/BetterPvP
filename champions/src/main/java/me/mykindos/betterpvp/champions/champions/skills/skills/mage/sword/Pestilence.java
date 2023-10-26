@@ -173,11 +173,6 @@ public class Pestilence extends PrepareSkill implements CooldownSkill {
     }
 
     @Override
-    public Set<Role> getClassTypes() {
-        return Role.MAGE;
-    }
-
-    @Override
     public SkillType getType() {
 
         return SkillType.SWORD;

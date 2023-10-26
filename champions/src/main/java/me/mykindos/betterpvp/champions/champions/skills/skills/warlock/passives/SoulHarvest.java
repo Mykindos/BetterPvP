@@ -55,11 +55,6 @@ public class SoulHarvest extends Skill implements PassiveSkill {
     }
 
     @Override
-    public Set<Role> getClassTypes() {
-        return Role.WARLOCK;
-    }
-
-    @Override
     public SkillType getType() {
         return SkillType.PASSIVE_B;
     }

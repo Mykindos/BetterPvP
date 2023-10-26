@@ -53,11 +53,6 @@ public class StrengthInNumbers extends Skill implements InteractSkill, CooldownS
     }
 
     @Override
-    public Set<Role> getClassTypes() {
-        return Role.BRUTE;
-    }
-
-    @Override
     public SkillType getType() {
 
         return SkillType.AXE;

@@ -68,12 +68,6 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
         };
     }
 
-    @Override
-    public Set<Role> getClassTypes() {
-        return Role.WARLOCK;
-    }
-
-
     @EventHandler
     public void onDamage(CustomDamageEvent event) {
         if (isInTorment(event.getDamagee())) {

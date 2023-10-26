@@ -44,11 +44,6 @@ public class Overwhelm extends Skill implements PassiveSkill {
     }
 
     @Override
-    public Set<Role> getClassTypes() {
-        return Role.BRUTE;
-    }
-
-    @Override
     public SkillType getType() {
         return SkillType.PASSIVE_B;
     }

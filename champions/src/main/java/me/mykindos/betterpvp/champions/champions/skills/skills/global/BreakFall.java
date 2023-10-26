@@ -41,11 +41,6 @@ public class BreakFall extends Skill implements PassiveSkill {
     }
 
     @Override
-    public Set<Role> getClassTypes() {
-        return null;
-    }
-
-    @Override
     public SkillType getType() {
 
         return SkillType.GLOBAL;

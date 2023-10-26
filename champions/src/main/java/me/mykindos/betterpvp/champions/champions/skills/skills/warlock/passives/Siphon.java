@@ -51,11 +51,6 @@ public class Siphon extends Skill implements PassiveSkill {
         };
     }
 
-    @Override
-    public Set<Role> getClassTypes() {
-        return Role.WARLOCK;
-    }
-
     @UpdateEvent(delay = 2000)
     public void onUpdate() {
         for (Player player : Bukkit.getOnlinePlayers()) {

@@ -105,13 +105,6 @@ public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listene
         }
     }
 
-
-    @Override
-    public Set<Role> getClassTypes() {
-        return Role.ASSASSIN;
-    }
-
-
     @Override
     public SkillType getType() {
 

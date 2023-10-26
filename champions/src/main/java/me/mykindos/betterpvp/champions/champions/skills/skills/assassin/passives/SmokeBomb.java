@@ -160,11 +160,6 @@ public class SmokeBomb extends Skill implements ToggleSkill, CooldownSkill, List
     }
 
     @Override
-    public Set<Role> getClassTypes() {
-        return Role.ASSASSIN;
-    }
-
-    @Override
     public SkillType getType() {
         return SkillType.PASSIVE_B;
     }

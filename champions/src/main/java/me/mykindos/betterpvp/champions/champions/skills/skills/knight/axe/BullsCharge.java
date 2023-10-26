@@ -132,11 +132,6 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
     }
 
     @Override
-    public Set<Role> getClassTypes() {
-        return Role.KNIGHT;
-    }
-
-    @Override
     public SkillType getType() {
         return SkillType.AXE;
     }

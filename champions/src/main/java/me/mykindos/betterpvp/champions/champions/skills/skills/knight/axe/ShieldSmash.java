@@ -69,11 +69,6 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
     }
 
     @Override
-    public Set<Role> getClassTypes() {
-        return Role.KNIGHT;
-    }
-
-    @Override
     public SkillType getType() {
         return SkillType.AXE;
     }

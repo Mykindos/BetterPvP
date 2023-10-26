@@ -119,11 +119,6 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
     }
 
     @Override
-    public Set<Role> getClassTypes() {
-        return Role.MAGE;
-    }
-
-    @Override
     public float getEnergy(int level) {
         return energy;
     }

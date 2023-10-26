@@ -43,10 +43,6 @@ public class Entangle extends Skill implements PassiveSkill {
         };
     }
 
-    @Override
-    public Set<Role> getClassTypes() {
-        return Role.RANGER;
-    }
 
     @Override
     public SkillType getType() {

@@ -72,11 +72,6 @@ public class Swarm extends ChannelSkill implements InteractSkill, EnergySkill, L
     }
 
     @Override
-    public Set<Role> getClassTypes() {
-        return Role.MAGE;
-    }
-
-    @Override
     public SkillType getType() {
         return SkillType.SWORD;
     }

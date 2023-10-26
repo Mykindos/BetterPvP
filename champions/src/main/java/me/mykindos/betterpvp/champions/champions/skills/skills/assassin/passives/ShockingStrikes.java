@@ -45,11 +45,6 @@ public class ShockingStrikes extends Skill implements PassiveSkill, Listener {
     }
 
     @Override
-    public Set<Role> getClassTypes() {
-        return Role.ASSASSIN;
-    }
-
-    @Override
     public SkillType getType() {
         return SkillType.PASSIVE_A;
     }

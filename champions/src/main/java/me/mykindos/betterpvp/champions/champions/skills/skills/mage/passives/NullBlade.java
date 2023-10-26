@@ -40,11 +40,6 @@ public class NullBlade extends Skill implements PassiveSkill, EnergySkill {
         };
     }
 
-    @Override
-    public Set<Role> getClassTypes() {
-        return Role.MAGE;
-    }
-
     @EventHandler
     public void onDamage(CustomDamageEvent event) {
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;

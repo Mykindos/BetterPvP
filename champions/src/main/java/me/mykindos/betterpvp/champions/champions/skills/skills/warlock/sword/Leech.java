@@ -72,12 +72,6 @@ public class Leech extends PrepareSkill implements CooldownSkill {
         };
     }
 
-    @Override
-    public Set<Role> getClassTypes() {
-        return Role.WARLOCK;
-    }
-
-
     @EventHandler
     public void onDamage(CustomDamageEvent event) {
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;

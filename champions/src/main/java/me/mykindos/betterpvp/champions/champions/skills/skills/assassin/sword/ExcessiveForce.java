@@ -90,11 +90,6 @@ public class ExcessiveForce extends Skill implements InteractSkill, CooldownSkil
     }
 
     @Override
-    public Set<Role> getClassTypes() {
-        return Role.ASSASSIN;
-    }
-
-    @Override
     public SkillType getType() {
         return SkillType.SWORD;
     }

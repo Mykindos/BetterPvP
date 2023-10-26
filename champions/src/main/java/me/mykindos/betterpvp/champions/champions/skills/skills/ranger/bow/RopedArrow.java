@@ -99,11 +99,6 @@ public class RopedArrow extends PrepareArrowSkill {
     }
 
     @Override
-    public Set<Role> getClassTypes() {
-        return Role.RANGER;
-    }
-
-    @Override
     public SkillType getType() {
         return SkillType.BOW;
     }

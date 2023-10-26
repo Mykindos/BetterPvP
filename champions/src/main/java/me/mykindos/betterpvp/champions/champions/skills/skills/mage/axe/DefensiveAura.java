@@ -51,11 +51,6 @@ public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill
     }
 
     @Override
-    public Set<Role> getClassTypes() {
-        return Role.MAGE;
-    }
-
-    @Override
     public SkillType getType() {
 
         return SkillType.AXE;

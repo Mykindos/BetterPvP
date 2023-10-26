@@ -85,11 +85,6 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
         };
     }
 
-    @Override
-    public Set<Role> getClassTypes() {
-        return Role.BRUTE;
-    }
-
     @UpdateEvent
     public void onUpdate() {
         Iterator<UUID> iterator = active.iterator();

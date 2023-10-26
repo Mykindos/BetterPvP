@@ -51,11 +51,6 @@ public class Bloodshed extends Skill implements InteractSkill, CooldownSkill, Li
     }
 
     @Override
-    public Set<Role> getClassTypes() {
-        return Role.WARLOCK;
-    }
-
-    @Override
     public SkillType getType() {
         return SkillType.AXE;
     }

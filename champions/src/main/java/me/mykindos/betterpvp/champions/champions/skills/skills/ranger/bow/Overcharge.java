@@ -76,12 +76,6 @@ public class Overcharge extends Skill implements InteractSkill, Listener {
         };
     }
 
-    @Override
-    public Set<Role> getClassTypes() {
-        return Role.RANGER;
-    }
-
-
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         charging.remove(event.getPlayer().getUniqueId());

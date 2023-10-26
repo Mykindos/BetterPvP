@@ -193,11 +193,6 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
     }
 
     @Override
-    public Set<Role> getClassTypes() {
-        return Role.KNIGHT;
-    }
-
-    @Override
     public SkillType getType() {
         return SkillType.SWORD;
     }

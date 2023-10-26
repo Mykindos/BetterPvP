@@ -53,11 +53,6 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener 
     }
 
     @Override
-    public Set<Role> getClassTypes() {
-        return Role.ASSASSIN;
-    }
-
-    @Override
     public SkillType getType() {
         return SkillType.SWORD;
     }

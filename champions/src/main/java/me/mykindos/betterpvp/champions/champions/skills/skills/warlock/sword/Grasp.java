@@ -71,12 +71,6 @@ public class Grasp extends Skill implements InteractSkill, CooldownSkill, Listen
         };
     }
 
-    @Override
-    public Set<Role> getClassTypes() {
-        return Role.WARLOCK;
-    }
-
-
     private void createArmourStand(Player player, Location loc, int level) {
         CustomArmourStand as = new CustomArmourStand(((CraftWorld) loc.getWorld()).getHandle());
         ArmorStand test = (ArmorStand) as.spawn(loc);

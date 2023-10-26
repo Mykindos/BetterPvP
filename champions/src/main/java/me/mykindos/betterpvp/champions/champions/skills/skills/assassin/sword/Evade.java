@@ -79,11 +79,6 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
     }
 
     @Override
-    public Set<Role> getClassTypes() {
-        return Role.ASSASSIN;
-    }
-
-    @Override
     public SkillType getType() {
 
         return SkillType.SWORD;

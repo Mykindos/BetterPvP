@@ -59,11 +59,6 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener {
     }
 
     @Override
-    public Set<Role> getClassTypes() {
-        return Role.KNIGHT;
-    }
-
-    @Override
     public SkillType getType() {
         return SkillType.SWORD;
     }

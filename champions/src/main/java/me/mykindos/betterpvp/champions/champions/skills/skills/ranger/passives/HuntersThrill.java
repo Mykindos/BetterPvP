@@ -50,11 +50,6 @@ public class HuntersThrill extends Skill implements PassiveSkill {
         };
     }
 
-    @Override
-    public Set<Role> getClassTypes() {
-        return Role.RANGER;
-    }
-
     @EventHandler
     public void onArrowHit(CustomDamageEvent event) {
         if(!(event.getProjectile() instanceof Arrow)) return;

@@ -71,11 +71,6 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
     }
 
     @Override
-    public Set<Role> getClassTypes() {
-        return Role.KNIGHT;
-    }
-
-    @Override
     public SkillType getType() {
         return SkillType.SWORD;
     }

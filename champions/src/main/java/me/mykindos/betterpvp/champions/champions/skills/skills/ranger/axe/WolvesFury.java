@@ -57,11 +57,6 @@ public class WolvesFury extends Skill implements InteractSkill, CooldownSkill, L
     }
 
     @Override
-    public Set<Role> getClassTypes() {
-        return Role.RANGER;
-    }
-
-    @Override
     public SkillType getType() {
 
         return SkillType.AXE;

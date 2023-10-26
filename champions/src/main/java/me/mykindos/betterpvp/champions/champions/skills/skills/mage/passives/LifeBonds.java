@@ -148,11 +148,6 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
     }
 
     @Override
-    public Set<Role> getClassTypes() {
-        return Role.MAGE;
-    }
-
-    @Override
     public SkillType getType() {
 
         return SkillType.PASSIVE_B;

@@ -63,11 +63,6 @@ public class PowerChop extends PrepareSkill implements CooldownSkill {
     }
 
     @Override
-    public Set<Role> getClassTypes() {
-        return Role.KNIGHT;
-    }
-
-    @Override
     public SkillType getType() {
         return SkillType.AXE;
     }

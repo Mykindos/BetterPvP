@@ -57,11 +57,6 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
     }
 
     @Override
-    public Set<Role> getClassTypes() {
-        return Role.WARLOCK;
-    }
-
-    @Override
     public SkillType getType() {
         return SkillType.AXE;
     }

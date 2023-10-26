@@ -45,12 +45,6 @@ public class CripplingBlow extends Skill implements PassiveSkill {
         };
     }
 
-    @Override
-    public Set<Role> getClassTypes() {
-        return Role.BRUTE;
-    }
-
-
     @EventHandler
     public void onDamage(CustomDamageEvent event) {
         if(!(event.getDamager() instanceof Player player)) return;

@@ -69,12 +69,6 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
         };
     }
 
-    @Override
-    public Set<Role> getClassTypes() {
-        return Role.BRUTE;
-    }
-
-
     @UpdateEvent
     public void updateFleshHook() {
         ListIterator<ChargeData> iterator = charges.listIterator();
