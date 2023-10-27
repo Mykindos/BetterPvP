@@ -40,7 +40,7 @@ public abstract class StatsRepository<T extends StatHolder> {
             // Save repo-specific data
             saveQueue.forEach((uuid, data) -> data.prepareUpdates(uuid, database, plugin.getDatabasePrefix()));
             // Save extra
-            postSaveAll();
+            postSaveAll(async);
             log.info("[{}] Saving {} players.", getClass().getSimpleName(), saveQueue.size());
             // Clear the save queue
             saveQueue.clear();
@@ -50,7 +50,7 @@ public abstract class StatsRepository<T extends StatHolder> {
     /**
      * Called after all data is saved, before the save queue is cleared.
      */
-    protected void postSaveAll() {
+    protected void postSaveAll(boolean async) {
         // Override this if you need to execute any additional queries post-save
     }
 

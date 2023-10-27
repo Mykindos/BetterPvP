@@ -83,10 +83,7 @@ public abstract class CombatData extends PlayerData {
         }
 
         // Allow modules to modify the kill
-        final Kill kill = new Kill(killer.getHolder(),
-                getHolder(),
-                ratingDelta,
-                new ArrayList<>(contributions.values()));
+        final Kill kill = generateKill(killer.getHolder(), getHolder(), ratingDelta, new ArrayList<>(contributions.values()));
 
         // Save
         pendingKills.add(kill);

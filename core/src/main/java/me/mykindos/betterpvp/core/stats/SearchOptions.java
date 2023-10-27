@@ -18,7 +18,7 @@ public class SearchOptions {
 
     public static SearchOptions EMPTY = SearchOptions.builder().build();
 
-    public <E> boolean accepts(E entryName) {
-        return (sort == null || sort.accepts(entryName)) && (filter == null || filter.accepts(entryName));
+    public <E> boolean accepts(E value) {
+        return (sort == null || sort.accepts(value)) && (filter == null || filter.accepts(value));
     }
 }

@@ -30,6 +30,7 @@ public class MiningOresMinedLeaderboard extends Leaderboard<UUID, Long> {
     public MiningOresMinedLeaderboard(Progression progression, MiningRepository repository) {
         super(progression);
         this.repository = repository;
+        init();
     }
 
     @Override
@@ -38,7 +39,7 @@ public class MiningOresMinedLeaderboard extends Leaderboard<UUID, Long> {
     }
 
     @Override
-    protected Comparator<Long> getSorter(SearchOptions searchOptions) {
+    public Comparator<Long> getSorter(SearchOptions searchOptions) {
         return Comparator.comparing(Long::intValue).reversed();
     }
 

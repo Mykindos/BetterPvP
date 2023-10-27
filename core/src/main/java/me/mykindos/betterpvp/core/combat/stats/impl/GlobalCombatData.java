@@ -61,7 +61,7 @@ public class GlobalCombatData extends CombatData {
         attachments.forEach(attachment -> attachment.prepareUpdates(this, database, databasePrefix));
 
         // Save self-rating (this saves independently for each player)
-        String ratingStmt = "INSERT INTO " + databasePrefix + "ratings (Gamer, Rating) VALUES (?, ?) ON DUPLICATE KEY UPDATE Rating = VALUES(Rating);";
+        String ratingStmt = "INSERT INTO " + databasePrefix + "combat_stats (Gamer, Rating) VALUES (?, ?) ON DUPLICATE KEY UPDATE Rating = VALUES(Rating);";
         Statement victimRating = new Statement(ratingStmt,
                 new UuidStatementValue(getHolder()),
                 new IntegerStatementValue(getRating()));

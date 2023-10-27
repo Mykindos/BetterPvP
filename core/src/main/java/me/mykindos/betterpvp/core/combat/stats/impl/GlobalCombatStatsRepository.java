@@ -8,8 +8,11 @@ import me.mykindos.betterpvp.core.combat.stats.model.CombatStatsRepository;
 import me.mykindos.betterpvp.core.combat.stats.model.ICombatDataAttachment;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
+import me.mykindos.betterpvp.core.stats.repository.StatsRepository;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -17,9 +20,20 @@ import java.util.concurrent.CompletableFuture;
 @Singleton
 public class GlobalCombatStatsRepository extends CombatStatsRepository<GlobalCombatData> {
 
+    private final List<StatsRepository<?>> dependentRepositories = new ArrayList<>();
+
     @Inject
     protected GlobalCombatStatsRepository(Core plugin) {
         super(plugin);
+    }
+
+    public void addDependentRepository(StatsRepository<?> repository) {
+        this.dependentRepositories.add(repository);
+    }
+
+    @Override
+    protected void postSaveAll(boolean async) {
+        dependentRepositories.forEach(repo -> repo.saveAll(async));
     }
 
     @Override

@@ -28,6 +28,7 @@ public class FishingWeightLeaderboard extends Leaderboard<UUID, Long> implements
     @Inject
     public FishingWeightLeaderboard(Progression progression) {
         super(progression);
+        init();
     }
 
     @Override
@@ -36,7 +37,7 @@ public class FishingWeightLeaderboard extends Leaderboard<UUID, Long> implements
     }
 
     @Override
-    protected Comparator<Long> getSorter(SearchOptions searchOptions) {
+    public Comparator<Long> getSorter(SearchOptions searchOptions) {
         return Comparator.comparing(Long::intValue).reversed();
     }
 

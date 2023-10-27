@@ -47,38 +47,40 @@ public abstract class Leaderboard<E, T> {
     private final Database database;
     private final String tablePrefix;
     private final Collection<SearchOptions> validSearchOptions = new ArrayList<>();
+    private final BPvPPlugin plugin;
 
     @Getter
     @Setter
     private boolean viewable = true;
 
     protected Leaderboard(BPvPPlugin plugin) {
+        this.plugin = plugin;
         this.database = plugin.getInjector().getInstance(Database.class);
         this.tablePrefix = plugin.getDatabasePrefix();
         this.topTen = new ConcurrentHashMap<>();
         this.entryCache = Caffeine.newBuilder()
                 .expireAfterWrite(10, TimeUnit.MINUTES)
                 .buildAsync((key, executor) -> CompletableFuture.supplyAsync(() -> fetch(key.getOptions(), database, tablePrefix, key.getValue())));
+    }
 
+    protected void init() {
         // Populate search options
-        if (this instanceof Filtered filtered) {
-            // Empty sorts, only filters
-            for (FilterType filterType : filtered.acceptedFilters()) {
-                validSearchOptions.add(SearchOptions.builder().filter(filterType).build());
-            }
-        }
-        if (this instanceof Sorted sorted) {
-            // Empty filters, only sorts
-            for (SortType sortType : sorted.acceptedSortTypes()) {
-                validSearchOptions.add(SearchOptions.builder().sort(sortType).build());
-            }
-        }
         if (this instanceof Filtered filtered && this instanceof Sorted sorted) {
             // Both sorts and filters
             for (SortType sortType : sorted.acceptedSortTypes()) {
                 for (FilterType filterType : filtered.acceptedFilters()) {
                     validSearchOptions.add(SearchOptions.builder().sort(sortType).filter(filterType).build());
                 }
+            }
+        } else if (this instanceof Filtered filtered) {
+            // Empty sorts, only filters
+            for (FilterType filterType : filtered.acceptedFilters()) {
+                validSearchOptions.add(SearchOptions.builder().filter(filterType).build());
+            }
+        } else if (this instanceof Sorted sorted) {
+            // Empty filters, only sorts
+            for (SortType sortType : sorted.acceptedSortTypes()) {
+                validSearchOptions.add(SearchOptions.builder().sort(sortType).build());
             }
         }
 
@@ -125,7 +127,7 @@ public abstract class Leaderboard<E, T> {
     /**
      * @return The comparator to sort the leaderboard by.
      */
-    protected abstract Comparator<T> getSorter(SearchOptions searchOptions);
+    public abstract Comparator<T> getSorter(SearchOptions searchOptions);
 
     /**
      * Gets the description of the given value for a leaderboard menu.
@@ -224,7 +226,7 @@ public abstract class Leaderboard<E, T> {
     public Map<SearchOptions, Integer> compute(@NotNull E entryName, @NotNull T element) {
         Map<SearchOptions, Integer> types = new HashMap<>();
         for (SearchOptions options : validSearchOptions) {
-            if (!options.accepts(entryName)) {
+            if (!options.accepts(element)) {
                 continue;
             }
 
@@ -239,7 +241,7 @@ public abstract class Leaderboard<E, T> {
             set.removeIf(existing -> existing.getKey().equals(entry.getKey())); // Remove entry if cloned
             set.add(entry);
             if (set.size() > 10) {
-                set.pollLast(); // Remove last entry to keep the same size, only if we updated the size
+                set.pollLast(); // Remove the last entry to keep the same size, only if we updated the size
             }
 
             // Only return this type if the entry was added

@@ -14,14 +14,14 @@ public final class LeaderboardManager extends Manager<Leaderboard<?, ?>> {
     @Override
     public Optional<Leaderboard<?, ?>> getObject(String identifier) {
         return objects.entrySet().stream()
-                .filter(e -> e.getKey().equalsIgnoreCase(identifier))
+                .filter(entry -> entry.getKey().equalsIgnoreCase(identifier))
                 .findFirst()
                 .map(Map.Entry::getValue);
     }
 
     public Optional<Leaderboard<?, ?>> getViewableByName(String name) {
         return objects.entrySet().stream()
-                .filter(e -> e.getValue().isViewable() && e.getKey().equalsIgnoreCase(name))
+                .filter(e -> e.getValue().isViewable() && e.getValue().getName().equalsIgnoreCase(name))
                 .findFirst()
                 .map(Map.Entry::getValue);
     }
@@ -29,6 +29,6 @@ public final class LeaderboardManager extends Manager<Leaderboard<?, ?>> {
     public Map<String, ? extends Leaderboard<?, ?>> getViewable() {
         return getObjects().entrySet().stream()
                 .filter(e -> e.getValue().isViewable())
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                .collect(Collectors.toMap(entry -> entry.getValue().getName(), Map.Entry::getValue));
     }
 }

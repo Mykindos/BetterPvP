@@ -25,7 +25,7 @@ import java.util.function.Function;
 
 @Singleton
 @Slf4j
-public class GlobalCombatLeaderboard extends Leaderboard<UUID, CombatData> implements Sorted {
+public final class GlobalCombatLeaderboard extends Leaderboard<UUID, CombatData> implements Sorted {
 
     private static final Map<SortType, Statement> TOP_SORT_STATEMENTS = ImmutableMap.of(
             CombatSort.RATING, new Statement("CALL GetTopRating(?)", new IntegerStatementValue(10)),
@@ -39,18 +39,19 @@ public class GlobalCombatLeaderboard extends Leaderboard<UUID, CombatData> imple
     private final GlobalCombatStatsRepository repository;
 
     @Inject
-    protected GlobalCombatLeaderboard(Core core, GlobalCombatStatsRepository repository) {
+    public GlobalCombatLeaderboard(Core core, GlobalCombatStatsRepository repository) {
         super(core);
         this.repository = repository;
+        init();
     }
 
     @Override
-    public final String getName() {
+    public String getName() {
         return "Combat";
     }
 
     @Override
-    protected final Comparator<CombatData> getSorter(SearchOptions searchOptions) {
+    public Comparator<CombatData> getSorter(SearchOptions searchOptions) {
         final CombatSort sort = (CombatSort) Objects.requireNonNull(searchOptions.getSort());
         return Comparator.comparing((Function<CombatData, Float>) (data -> switch (sort) {
             case RATING -> (float) data.getRating();
@@ -64,12 +65,12 @@ public class GlobalCombatLeaderboard extends Leaderboard<UUID, CombatData> imple
 
     @NotNull
     @Override
-    public final SortType[] acceptedSortTypes() {
+    public SortType[] acceptedSortTypes() {
         return CombatSort.values();
     }
 
     @Override
-    public final Map<String, Component> getDescription(SearchOptions searchOptions, CombatData value) {
+    public Map<String, Component> getDescription(SearchOptions searchOptions, CombatData value) {
         final List<CombatSort> types = new ArrayList<>(Arrays.stream(CombatSort.values()).toList());
         final CombatSort selected = (CombatSort) Objects.requireNonNull(searchOptions.getSort());
         final LinkedHashMap<String, Component> map = new LinkedHashMap<>(); // Preserve order
@@ -109,7 +110,7 @@ public class GlobalCombatLeaderboard extends Leaderboard<UUID, CombatData> imple
                 while (result.next()) {
                     final UUID gamer = UUID.fromString(result.getString(1));
                     // We can join this because fetchAll is run on a separate thread
-                    final GlobalCombatData data = repository.getDataAsync(gamer).join();
+                    final CombatData data = repository.getDataAsync(gamer).join();
                     map.put(gamer, data);
                 }
             } catch (SQLException e) {

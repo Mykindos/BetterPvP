@@ -78,7 +78,7 @@ public class LeaderboardMenu<E, T> extends Menu implements IRefreshingMenu {
 
                 @Override
                 public double getClickCooldown() {
-                    return 0.5;
+                    return 0.2;
                 }
             });
         }
@@ -101,7 +101,7 @@ public class LeaderboardMenu<E, T> extends Menu implements IRefreshingMenu {
             }
 
             final TextComponent filterTypeName = Component.text("Filter By", NamedTextColor.WHITE, TextDecoration.BOLD);
-            addButton(new Button(0, new ItemStack(Material.LECTERN), filterTypeName, filterLore) {
+            addButton(new Button(9, new ItemStack(Material.LECTERN), filterTypeName, filterLore) {
                 @Override
                 public void onClick(Player player, Gamer gamer, ClickType clickType) {
                     filterIndex = filterIndex + 1 >= filterTypes.length ? 0 : filterIndex + 1;
@@ -111,7 +111,7 @@ public class LeaderboardMenu<E, T> extends Menu implements IRefreshingMenu {
 
                 @Override
                 public double getClickCooldown() {
-                    return 0.5;
+                    return 0.2;
                 }
             });
         }

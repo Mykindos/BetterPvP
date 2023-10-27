@@ -29,6 +29,10 @@ public class ChampionsCombatData extends CombatData {
         this.role = role;
     }
 
+    public @Nullable Role getRole() {
+        return role;
+    }
+
     @Override
     protected ChampionsKill generateKill(UUID killer, UUID victim, int ratingDelta, List<Contribution> contributions) {
         final Role killerRole = roleManager.getObject(killer).orElse(null);
@@ -55,15 +59,15 @@ public class ChampionsCombatData extends CombatData {
 
             Statement killStatement = new Statement(killStmt,
                     new UuidStatementValue(killId),
-                    new StringStatementValue(championsKill.getKillerRole().toString()),
-                    new StringStatementValue(championsKill.getVictimRole().toString()));
+                    new StringStatementValue(championsKill.getKillerRole() == null ? "" : championsKill.getKillerRole().toString()),
+                    new StringStatementValue(championsKill.getVictimRole() == null ? "" : championsKill.getVictimRole().toString()));
             killStatements.add(killStatement);
 
             contributions.entrySet().removeIf(entry -> entry.getKey().getContributor() == kill.getKiller());
             contributions.forEach((contribution, cRole) -> {
                 Statement assistStatement = new Statement(assistStmt,
                         new UuidStatementValue(contribution.getId()),
-                        new StringStatementValue(cRole.toString()));
+                        new StringStatementValue(cRole == null ? "" : cRole.toString()));
                 contributionStatements.add(assistStatement);
             });
         }
@@ -72,10 +76,10 @@ public class ChampionsCombatData extends CombatData {
         attachments.forEach(attachment -> attachment.prepareUpdates(this, database, databasePrefix));
 
         // Save self-rating (this saves independently for each player)
-        String ratingStmt = "INSERT INTO " + databasePrefix + "ratings (Gamer, Class, Rating) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE Rating = VALUES(Rating);";
+        String ratingStmt = "INSERT INTO " + databasePrefix + "combat_stats (Gamer, Class, Rating) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE Rating = VALUES(Rating);";
         Statement victimRating = new Statement(ratingStmt,
                 new UuidStatementValue(getHolder()),
-                new StringStatementValue(role == null ? null : role.toString()),
+                new StringStatementValue(role == null ? "" : role.toString()),
                 new IntegerStatementValue(getRating()));
 
         database.executeBatch(killStatements, false);
