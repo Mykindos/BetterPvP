@@ -202,7 +202,7 @@ public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listene
 
     @Override
     public void loadSkillConfig(){
-        markerTiming = getConfig("markerTiming", 0.5, Double.class);
+        markerTiming = getConfig("markerTiming", 0.25, Double.class);
         percentHealthRecovered = getConfig("percentHealthRecovered", 0.5, Double.class);
     }
 }
