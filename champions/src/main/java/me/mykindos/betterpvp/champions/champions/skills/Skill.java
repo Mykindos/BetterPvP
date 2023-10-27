@@ -133,9 +133,7 @@ public abstract class Skill implements ISkill {
         Optional<Role> roleOptional = championsManager.getRoles().getObject(gamerBuilds.getUuid());
         if (roleOptional.isPresent()) {
             Role role = roleOptional.get();
-            log.warn(getClassType().toString());
-            if (getClassType().contains(role) || getClassType() == null) {
-                log.error(role.getName());
+            if (role.getSkills().stream().anyMatch(o -> o.getName().equalsIgnoreCase(getName()))) {
                 RoleBuild roleBuild = gamerBuilds.getActiveBuilds().get(role.getName());
                 BuildSkill buildSkill = roleBuild.getBuildSkill(getType());
                 if (buildSkill != null && buildSkill.getSkill() != null) {
