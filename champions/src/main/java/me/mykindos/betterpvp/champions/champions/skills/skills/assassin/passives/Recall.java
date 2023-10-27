@@ -189,10 +189,10 @@ public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listene
         Particle.DustOptions dustOptions = new Particle.DustOptions(org.bukkit.Color.fromRGB(148, 0, 211), 0.5F);
 
         for (double length = 0; length < distance; length += 0.1) {
-            double yOffset = Math.sin(length) * 1;
+            double yOffset = Math.sin(length) * 0.3;
 
-            double randomX = (random.nextDouble() - 0.5) * 1;
-            double randomZ = (random.nextDouble() - 0.5) * 1;
+            double randomX = (random.nextDouble() - 0.5) * 0.1;
+            double randomZ = (random.nextDouble() - 0.5) * 0.1;
 
             world.spawnParticle(Particle.SPELL_WITCH, location.clone().add(randomX, yOffset, randomZ), 1);
             location.add(vector);
