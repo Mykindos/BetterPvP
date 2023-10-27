@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.listeners;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
 import me.mykindos.betterpvp.champions.champions.builds.BuildSkill;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
@@ -53,6 +54,7 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 
+@Slf4j
 @Singleton
 @BPvPListener
 public class SkillListener implements Listener {
@@ -207,6 +209,7 @@ public class SkillListener implements Listener {
         Optional<Role> roleOptional = roleManager.getObject(player.getUniqueId().toString());
         if (roleOptional.isPresent()) {
             Role role = roleOptional.get();
+            log.info(role.getName() + " " + skillType);
 
             Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(player.getUniqueId().toString());
             if (gamerBuildsOptional.isPresent()) {
@@ -214,6 +217,8 @@ public class SkillListener implements Listener {
 
                 RoleBuild build = builds.getActiveBuilds().get(role.getName());
                 if (build == null) return;
+                log.info(" " + build.getId());
+                log.info(" " + build.getActiveSkills().toString());
 
                 Optional<Skill> skillOptional = build.getActiveSkills().stream()
                         .filter(skill -> skill instanceof InteractSkill && skill.getType() == skillType).findFirst();
