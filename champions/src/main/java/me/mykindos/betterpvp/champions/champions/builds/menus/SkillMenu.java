@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.champions.champions.builds.menus;
 
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.champions.champions.builds.BuildSkill;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
@@ -25,6 +26,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 public class SkillMenu extends Menu implements IRefreshingMenu {
 
     /**
@@ -66,9 +68,11 @@ public class SkillMenu extends Menu implements IRefreshingMenu {
         addDefaultButtons();
 
         for (Skill skill : skillManager.getSkillsForRole(role)) {
+            log.warn(skill.getName());
             if (skill == null) continue;
             if (skill.getType() == null) continue;
             if (!skill.isEnabled()) continue;
+            log.info("skill " + skill.getName());
             if (skill.getType() == SkillType.SWORD) {
                 slotNumber = swordSlotNumber;
                 swordSlotNumber++;
