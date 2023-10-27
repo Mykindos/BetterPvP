@@ -76,7 +76,7 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 30
-      extraHealthRecovered: 2.0
+      percentHealthRecovered: 0.5
       markerTiming: 0.5
     evade:
       enabled: true

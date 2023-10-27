@@ -35,7 +35,7 @@ import java.util.*;
 public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listener {
 
     public WeakHashMap<Player, RecallData> data = new WeakHashMap<>();
-    public double extraHealthRecovered;
+    public double percentHealthRecovered;
     public double currHealth;
     public double markerTiming;
     @Inject
@@ -55,10 +55,8 @@ public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listene
         return new String[]{
                 "Drop your Sword / Axe to activate",
                 "",
-                "Teleports you back in time <val>" + (2 + (level)) + "</val> seconds,",
-                "and returns your health to its original value",
-                "",
-                "If your health was lower before, you will gain <val>" + (extraHealthRecovered + (level * 0.5)) + "</val> health instead",
+                "Teleports you back in time <val>" + (2 + (level)) + "</val> seconds, increasing",
+                "your health by <stat>" + (percentHealthRecovered * 100) + "%</stat> of the health you had",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -160,7 +158,7 @@ public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listene
         }
         player.teleport(recallLocation);
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 2.0F, 2.0F);
-        UtilEntity.setHealth(player, Math.min(20, Math.max(currHealth + (extraHealthRecovered + (level * 0.5)), recallData.getHealth())));
+        UtilEntity.setHealth(player, currHealth + (currHealth * percentHealthRecovered));
         UtilServer.callEvent(new EffectClearEvent(player));
 
         //sequentially go through all the markers, drawing lines between them
@@ -205,6 +203,6 @@ public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listene
     @Override
     public void loadSkillConfig(){
         markerTiming = getConfig("markerTiming", 0.5, Double.class);
-        extraHealthRecovered = getConfig("extraHealthRecovered", 2.0, Double.class);
+        percentHealthRecovered = getConfig("percentHealthRecovered", 0.5, Double.class);
     }
 }
