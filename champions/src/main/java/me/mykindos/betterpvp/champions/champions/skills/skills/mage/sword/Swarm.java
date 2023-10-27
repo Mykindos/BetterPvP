@@ -70,7 +70,10 @@ public class Swarm extends ChannelSkill implements InteractSkill, EnergySkill, L
                 "Energy: <val>" + getEnergy(level)
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "mage";
+    }
     @Override
     public SkillType getType() {
         return SkillType.SWORD;

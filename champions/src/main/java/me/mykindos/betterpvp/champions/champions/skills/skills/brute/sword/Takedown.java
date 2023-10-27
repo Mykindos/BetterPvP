@@ -68,7 +68,10 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
                 "Cooldown: <val>" + getCooldown(level)
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "brute";
+    }
     @Override
     public SkillType getType() {
 

@@ -69,7 +69,10 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
                 "Cooldown: <val>" + getCooldown(level)
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "knight";
+    }
     @Override
     public SkillType getType() {
         return SkillType.SWORD;

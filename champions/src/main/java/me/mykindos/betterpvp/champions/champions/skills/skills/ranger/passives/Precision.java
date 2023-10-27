@@ -39,7 +39,10 @@ public class Precision extends Skill implements PassiveSkill {
                 "Your arrows deal <val>" + (level * 0.5) + "</val> bonus damage on hit"
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "ranger";
+    }
     @Override
     public SkillType getType() {
 

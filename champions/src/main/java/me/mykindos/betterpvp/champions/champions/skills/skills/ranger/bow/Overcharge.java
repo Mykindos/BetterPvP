@@ -75,7 +75,10 @@ public class Overcharge extends Skill implements InteractSkill, Listener {
                 "Maximum Damage: <val>" + (2 + level)
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "ranger";
+    }
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         charging.remove(event.getPlayer().getUniqueId());

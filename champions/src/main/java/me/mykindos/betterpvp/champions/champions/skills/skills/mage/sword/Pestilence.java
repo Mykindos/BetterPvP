@@ -69,7 +69,10 @@ public class Pestilence extends PrepareSkill implements CooldownSkill {
                 "Cooldown: <val>" + getCooldown(level)
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "mage";
+    }
     @Override
     public Action[] getActions() {
         return SkillActions.RIGHT_CLICK;

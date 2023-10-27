@@ -34,7 +34,10 @@ public class SilencingStrikes extends Skill implements PassiveSkill, Listener {
     public SilencingStrikes(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "assassin";
+    }
     private int hitsNeeded;
     private double timeSpan;
 

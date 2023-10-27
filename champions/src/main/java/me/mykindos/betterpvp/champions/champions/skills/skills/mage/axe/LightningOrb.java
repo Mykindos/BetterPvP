@@ -64,7 +64,10 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
                 "Cooldown: <val>" + getCooldown(level)
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "mage";
+    }
     @Override
     public SkillType getType() {
         return SkillType.AXE;

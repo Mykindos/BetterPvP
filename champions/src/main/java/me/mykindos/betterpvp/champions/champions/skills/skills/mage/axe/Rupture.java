@@ -77,7 +77,10 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
                 "Cooldown: <val>" + getCooldown(level)
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "mage";
+    }
     @Override
     public SkillType getType() {
         return SkillType.AXE;

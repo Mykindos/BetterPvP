@@ -61,7 +61,10 @@ public class PowerChop extends PrepareSkill implements CooldownSkill {
                 "Cooldown: <val>" + getCooldown(level)
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "knight";
+    }
     @Override
     public SkillType getType() {
         return SkillType.AXE;

@@ -54,7 +54,10 @@ public class Vengeance extends Skill implements PassiveSkill, Listener {
                 "you can deal a maximum of <val>" + (level + 1) + "</val> extra damage"
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "knight";
+    }
     @Override
     public SkillType getType() {
         return SkillType.PASSIVE_A;

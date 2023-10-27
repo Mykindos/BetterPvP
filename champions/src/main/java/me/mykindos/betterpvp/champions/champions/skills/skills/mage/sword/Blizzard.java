@@ -61,7 +61,10 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergySkill
                 "Energy: <val>" + getEnergy(level)
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "mage";
+    }
     @Override
     public SkillType getType() {
 

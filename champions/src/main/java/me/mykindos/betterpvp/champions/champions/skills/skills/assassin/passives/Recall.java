@@ -43,7 +43,10 @@ public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listene
         super(champions, championsManager);
     }
 
-
+    @Override
+    public String getDefaultClassString() {
+        return "assassin";
+    }
     @Override
     public String getName() {
         return "Recall";

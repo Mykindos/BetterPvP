@@ -38,7 +38,10 @@ public class Resistance extends Skill implements PassiveSkill {
                 "but you deal <val>" + (level * 15) + "%</val> less damage as well"
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "brute";
+    }
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onDamage(CustomDamageEvent event) {
         if (event.getDamagee() instanceof Player damagee) {

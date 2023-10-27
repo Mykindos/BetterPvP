@@ -50,7 +50,6 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
         super(champions, championsManager);
     }
 
-
     @Override
     public String getName() {
         return "Blink";
@@ -73,7 +72,10 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
         };
     }
 
-
+    @Override
+    public String getDefaultClassString() {
+        return "assassin";
+    }
 
     @Override
     public SkillType getType() {

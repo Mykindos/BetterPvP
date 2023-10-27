@@ -100,7 +100,10 @@ public class Flash extends Skill implements InteractSkill, Listener {
         baseRechargeSeconds = getConfig("baseRechargeSeconds", 4.0, Double.class);
         teleportDistance = getConfig("teleportDistance", 5.0, Double.class);
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "assassin";
+    }
     @Override
     public SkillType getType() {
         return SkillType.AXE;

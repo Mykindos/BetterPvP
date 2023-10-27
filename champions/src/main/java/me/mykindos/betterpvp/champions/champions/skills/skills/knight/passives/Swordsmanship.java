@@ -59,7 +59,10 @@ public class Swordsmanship extends Skill implements PassiveSkill {
                 "This only applies to swords"
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "knight";
+    }
     @Override
     public SkillType getType() {
         return SkillType.PASSIVE_B;

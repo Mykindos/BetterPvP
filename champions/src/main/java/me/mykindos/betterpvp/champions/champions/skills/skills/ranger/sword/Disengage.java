@@ -59,7 +59,10 @@ public class Disengage extends PrepareSkill implements CooldownSkill {
                 "",
                 "Cooldown: <val>" + getCooldown(level)};
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "ranger";
+    }
     @Override
     public SkillType getType() {
 

@@ -55,7 +55,10 @@ public class BattleTaunt extends ChannelSkill implements InteractSkill, Cooldown
                 "",
                 "Energy / Second: <val>" + getEnergy(level)};
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "brute";
+    }
     @Override
     public SkillType getType() {
         return SkillType.SWORD;

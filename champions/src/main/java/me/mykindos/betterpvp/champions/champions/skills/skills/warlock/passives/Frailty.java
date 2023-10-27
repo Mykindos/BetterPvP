@@ -50,7 +50,10 @@ public class Frailty extends Skill implements PassiveSkill {
                 "take <val>" + (20 + ((level - 1) * 5)) + "%" + "</val> more damage from your melee attacks"
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "warlock";
+    }
     @EventHandler
     public void onEquip(SkillEquipEvent event) {
         if (event.getSkill().equals(this)) {

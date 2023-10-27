@@ -66,7 +66,10 @@ public class Inferno extends ChannelSkill implements InteractSkill, EnergySkill 
                 "Energy / Second: <val>" + getEnergy(level)
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "mage";
+    }
     @Override
     public SkillType getType() {
         return SkillType.SWORD;

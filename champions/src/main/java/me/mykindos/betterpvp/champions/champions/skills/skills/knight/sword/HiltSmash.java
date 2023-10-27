@@ -57,7 +57,10 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener {
                 "Cooldown: <val>" + getCooldown(level)
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "knight";
+    }
     @Override
     public SkillType getType() {
         return SkillType.SWORD;

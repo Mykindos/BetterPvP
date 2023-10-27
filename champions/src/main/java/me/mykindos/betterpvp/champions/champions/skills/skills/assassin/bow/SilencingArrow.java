@@ -30,6 +30,10 @@ public class SilencingArrow extends PrepareArrowSkill {
     public SilencingArrow(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
+    @Override
+    public String getDefaultClassString() {
+        return "assassin";
+    }
 
     @Override
     public String getName() {

@@ -82,7 +82,10 @@ public class RopedArrow extends PrepareArrowSkill {
                 "Cooldown: <val>" + getCooldown(level) + "</val>"
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "ranger";
+    }
     @Override
     public void invalidatePlayer(Player player) {
         strength.remove(player);

@@ -49,7 +49,10 @@ public class Bloodshed extends Skill implements InteractSkill, CooldownSkill, Li
                 "Cooldown: <val>" + getCooldown(level)
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "warlock";
+    }
     @Override
     public SkillType getType() {
         return SkillType.AXE;

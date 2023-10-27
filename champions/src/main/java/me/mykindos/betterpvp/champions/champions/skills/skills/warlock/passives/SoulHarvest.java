@@ -53,7 +53,10 @@ public class SoulHarvest extends Skill implements PassiveSkill {
                 "Buff duration: <val>" + ((40 + (level * 20)) / 20) + "</val> seconds"
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "warlock";
+    }
     @Override
     public SkillType getType() {
         return SkillType.PASSIVE_B;

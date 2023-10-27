@@ -28,7 +28,10 @@ public class ShockingStrikes extends Skill implements PassiveSkill, Listener {
     public ShockingStrikes(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "assassin";
+    }
     @Override
     public String getName() {
         return "Shocking Strikes";

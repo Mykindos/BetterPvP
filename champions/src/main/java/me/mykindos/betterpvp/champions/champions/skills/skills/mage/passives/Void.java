@@ -56,7 +56,10 @@ public class Void extends ActiveToggleSkill implements EnergySkill {
                 "Energy / Second: <val>" + getEnergy(level)
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "mage";
+    }
     @UpdateEvent(delay = 1000)
     public void audio() {
         for (UUID uuid : active) {

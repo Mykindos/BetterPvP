@@ -42,7 +42,10 @@ public class Colossus extends Skill implements PassiveSkill {
                 "You take <val>" + ((reductionPerLevel * 100) * level) + "%</val> reduced knockback"
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "brute";
+    }
     @Override
     public SkillType getType() {
 

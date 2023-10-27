@@ -70,7 +70,10 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
                 "Cooldown: <val>" + getCooldown(level)
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "warlock";
+    }
     @EventHandler
     public void removeOnDeath(PlayerDeathEvent event) {
         shieldDataMap.remove(event.getEntity().getUniqueId());

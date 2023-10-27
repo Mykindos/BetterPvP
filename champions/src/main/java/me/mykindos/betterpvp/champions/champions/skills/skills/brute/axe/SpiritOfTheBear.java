@@ -50,7 +50,10 @@ public class SpiritOfTheBear extends Skill implements InteractSkill, CooldownSki
                 "Cooldown: <val>" + getCooldown(level)
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "brute";
+    }
     @Override
     public SkillType getType() {
 

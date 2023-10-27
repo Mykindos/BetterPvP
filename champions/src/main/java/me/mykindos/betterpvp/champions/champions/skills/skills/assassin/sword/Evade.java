@@ -84,7 +84,10 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
         return SkillType.SWORD;
     }
 
-
+    @Override
+    public String getDefaultClassString() {
+        return "assassin";
+    }
     @EventHandler
     public void onEvade(CustomDamageEvent event) {
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;

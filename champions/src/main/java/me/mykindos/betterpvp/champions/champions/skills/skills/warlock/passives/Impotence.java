@@ -46,7 +46,10 @@ public class Impotence extends Skill implements PassiveSkill {
                 "3 nearby enemies = <stat>" + (calculateReduction(3) * 100) + "%</stat>"
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "warlock";
+    }
     @Override
     public SkillType getType() {
         return SkillType.PASSIVE_A;

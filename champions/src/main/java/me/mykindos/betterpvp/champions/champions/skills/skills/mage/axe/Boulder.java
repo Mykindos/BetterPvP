@@ -60,7 +60,10 @@ public class Boulder extends Skill implements Listener, InteractSkill, CooldownS
                 "Recharge: <val>" + getCooldown(level)
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "mage";
+    }
     private double getRadius(int level) {
         return baseRadius + 0.5 * (level - 1);
     }

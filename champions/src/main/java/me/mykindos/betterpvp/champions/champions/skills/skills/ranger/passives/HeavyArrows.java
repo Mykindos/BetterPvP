@@ -56,7 +56,10 @@ public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill {
                 "Energy used per shot: <val>"+ (energy - ((level - 1) * 2))
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "ranger";
+    }
     @UpdateEvent
     public void update() {
         Iterator<Arrow> it = arrows.iterator();

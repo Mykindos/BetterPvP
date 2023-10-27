@@ -52,7 +52,10 @@ public class Sever extends PrepareSkill implements CooldownSkill, Listener {
                 "Cooldown: <val>" + getCooldown(level)
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "assassin";
+    }
     @Override
     public SkillType getType() {
         return SkillType.SWORD;

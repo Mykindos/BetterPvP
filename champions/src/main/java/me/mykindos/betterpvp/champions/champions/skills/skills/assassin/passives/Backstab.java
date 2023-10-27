@@ -65,7 +65,10 @@ public class Backstab extends Skill implements PassiveSkill, Listener {
 
             event.setReason("Backstab");
         }
-
+    @Override
+    public String getDefaultClassString() {
+        return "assassin";
+    }
     @Override
     public SkillType getType() {
         return SkillType.PASSIVE_A;

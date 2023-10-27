@@ -46,7 +46,10 @@ public class StunningShot extends PrepareArrowSkill {
                 "Cooldown: <val>" + getCooldown(level)
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "ranger";
+    }
     @Override
     public SkillType getType() {
 

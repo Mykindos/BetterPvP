@@ -55,6 +55,11 @@ public class ToxicArrow extends PrepareArrowSkill {
     }
 
     @Override
+    public String getDefaultClassString() {
+        return "assassin";
+    }
+
+    @Override
     public double getCooldown(int level) {
 
         return cooldown - ((level - 1));

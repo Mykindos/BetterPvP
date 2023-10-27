@@ -49,7 +49,10 @@ public class LevitatingShot extends PrepareArrowSkill {
                 "Cooldown: <val>" + getCooldown(level)
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "ranger";
+    }
     @Override
     public SkillType getType() {
 

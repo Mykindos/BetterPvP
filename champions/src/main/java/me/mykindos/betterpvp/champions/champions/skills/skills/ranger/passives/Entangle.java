@@ -43,7 +43,10 @@ public class Entangle extends Skill implements PassiveSkill {
         };
     }
 
-
+    @Override
+    public String getDefaultClassString() {
+        return "ranger";
+    }
     @Override
     public SkillType getType() {
         return SkillType.PASSIVE_A;

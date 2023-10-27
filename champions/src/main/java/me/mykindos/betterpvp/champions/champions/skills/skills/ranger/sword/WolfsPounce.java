@@ -92,7 +92,10 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
                 "Cooldown: <val>" + getCooldown(level)
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "ranger";
+    }
     @Override
     public void trackPlayer(Player player) {
         // Action bar

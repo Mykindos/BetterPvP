@@ -48,7 +48,10 @@ public class VitalitySpores extends Skill implements PassiveSkill {
                 "",
                 "You will keep the buff until you take damage"};
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "ranger";
+    }
     @UpdateEvent(delay = 500)
     public void onUpdate() {
         for (Player player : Bukkit.getOnlinePlayers()) {

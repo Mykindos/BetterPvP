@@ -71,7 +71,10 @@ public class Leech extends PrepareSkill implements CooldownSkill {
                 "Cooldown: <val>" + getCooldown(level)
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "warlock";
+    }
     @EventHandler
     public void onDamage(CustomDamageEvent event) {
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;

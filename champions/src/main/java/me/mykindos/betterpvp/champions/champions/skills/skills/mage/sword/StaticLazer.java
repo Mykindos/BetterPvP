@@ -101,7 +101,10 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
                 "Energy: <val>" + getEnergyPerSecond(level)
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "mage";
+    }
     private float getEnergyPerSecond(int level) {
         return (float) energyPerSecond;
     }

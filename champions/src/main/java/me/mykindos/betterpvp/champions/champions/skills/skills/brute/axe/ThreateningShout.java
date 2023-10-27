@@ -49,7 +49,10 @@ public class ThreateningShout extends Skill implements InteractSkill, CooldownSk
         };
     }
 
-
+    @Override
+    public String getDefaultClassString() {
+        return "brute";
+    }
     @Override
     public SkillType getType() {
 

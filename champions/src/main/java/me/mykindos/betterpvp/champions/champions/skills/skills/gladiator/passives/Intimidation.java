@@ -53,7 +53,10 @@ public class Intimidation extends Skill implements PassiveSkill {
                 "blocks will get <effect>Slowness 1",
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "brute";
+    }
     @Override
     public void trackPlayer(Player player) {
         trackedEnemies.put(player, new HashSet<>());

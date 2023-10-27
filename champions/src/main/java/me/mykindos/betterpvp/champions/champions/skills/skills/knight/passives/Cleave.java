@@ -47,7 +47,10 @@ public class Cleave extends Skill implements PassiveSkill, Listener {
                 "Distance: <val>" + (baseDistance + level),
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "knight";
+    }
     @Override
     public SkillType getType() {
         return SkillType.PASSIVE_A;

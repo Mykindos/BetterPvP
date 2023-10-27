@@ -41,7 +41,10 @@ public class HolyLight extends Skill implements PassiveSkill {
                 "yourself and all allies within",
                 "<val>" + (8 + level) + "</val> blocks <effect>Regeneration I</effect>"};
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "mage";
+    }
     @Override
     public SkillType getType() {
         return SkillType.PASSIVE_A;

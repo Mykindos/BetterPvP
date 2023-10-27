@@ -50,7 +50,10 @@ public class Siphon extends Skill implements PassiveSkill {
                 "Energy siphoned per second: <stat>" + energySiphoned
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "warlock";
+    }
     @UpdateEvent(delay = 2000)
     public void onUpdate() {
         for (Player player : Bukkit.getOnlinePlayers()) {

@@ -55,7 +55,10 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
                 "Cooldown: <val>" + getCooldown(level)
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "warlock";
+    }
     @Override
     public SkillType getType() {
         return SkillType.AXE;

@@ -52,7 +52,10 @@ public class Fortitude extends Skill implements PassiveSkill, Listener {
                 "rate of <stat>" + heal + "</stat> health per second"
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "knight";
+    }
     @Override
     public SkillType getType() {
         return SkillType.PASSIVE_B;

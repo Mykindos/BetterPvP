@@ -68,7 +68,10 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
                 "Cooldown: <val>" + getCooldown(level)
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "knight";
+    }
     public void activate(Player player, int level) {
 
         player.getWorld().playSound(player.getLocation(), Sound.ITEM_GOAT_HORN_SOUND_0, 2.0f, 1f);

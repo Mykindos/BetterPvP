@@ -76,7 +76,10 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BAT_TAKEOFF, 2.0F, 1.2F);
     }
 
-
+    @Override
+    public String getDefaultClassString() {
+        return "assassin";
+    }
     public boolean wallKick(Player player) {
 
         if (championsManager.getCooldowns().use(player, "Wall Kick", 0.25, false)) {

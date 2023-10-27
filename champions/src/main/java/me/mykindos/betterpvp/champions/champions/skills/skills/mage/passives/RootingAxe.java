@@ -54,7 +54,10 @@ public class RootingAxe extends Skill implements PassiveSkill, CooldownSkill {
                 "Internal Cooldown: <val>" + getCooldown(level)
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "mage";
+    }
     @EventHandler
     public void onDamage(CustomDamageEvent event) {
         if (!(event.getDamager() instanceof Player damager)) return;

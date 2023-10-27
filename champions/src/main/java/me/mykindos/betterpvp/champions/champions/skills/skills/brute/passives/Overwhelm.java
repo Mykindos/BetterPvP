@@ -42,7 +42,10 @@ public class Overwhelm extends Skill implements PassiveSkill {
                 "You can deal a maximum of <val>" + String.format("%.1f", (0.0 + (level * 0.5))) + "</val> bonus damage"
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "brute";
+    }
     @Override
     public SkillType getType() {
         return SkillType.PASSIVE_B;

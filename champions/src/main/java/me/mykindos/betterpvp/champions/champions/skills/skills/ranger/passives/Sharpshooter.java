@@ -51,7 +51,10 @@ public class Sharpshooter extends Skill implements PassiveSkill {
                 "your arrow damage will reset"
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "ranger";
+    }
     @EventHandler
     public void onArrowHit(CustomDamageEvent event) {
         if(!(event.getProjectile() instanceof Arrow)) return;

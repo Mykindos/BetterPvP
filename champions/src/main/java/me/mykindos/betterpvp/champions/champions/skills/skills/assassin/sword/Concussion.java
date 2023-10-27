@@ -39,7 +39,10 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener 
     public String getName() {
         return "Concussion";
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "assassin";
+    }
     @Override
     public String[] getDescription(int level) {
 

@@ -84,6 +84,10 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
                 "Cooldown: <val>" + getCooldown(level)
         };
     }
+    @Override
+    public String getDefaultClassString() {
+        return "brute";
+    }
 
     @UpdateEvent
     public void onUpdate() {

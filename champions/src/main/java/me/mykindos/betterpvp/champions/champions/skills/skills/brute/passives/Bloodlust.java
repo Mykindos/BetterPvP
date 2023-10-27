@@ -59,6 +59,11 @@ public class Bloodlust extends Skill implements PassiveSkill {
                 "boosting the level of <effect>Speed</effect> and <effect>Strength</effect>"};
     }
 
+    @Override
+    public String getDefaultClassString() {
+        return "brute";
+    }
+
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
 

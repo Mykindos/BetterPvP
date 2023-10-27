@@ -47,7 +47,10 @@ public class LevelField extends Skill implements PassiveSkill, Listener {
                 "Minimum extra damage: <val>"+ (60 - ((level - 1) * 15)),
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "knight";
+    }
     @Override
     public SkillType getType() {
         return SkillType.PASSIVE_A;

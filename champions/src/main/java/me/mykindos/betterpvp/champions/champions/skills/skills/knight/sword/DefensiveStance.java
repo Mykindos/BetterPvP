@@ -63,7 +63,10 @@ public class DefensiveStance extends ChannelSkill implements InteractSkill, Ener
                 "",
                 "Energy / Second: <val>" + getEnergy(level)};
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "knight";
+    }
     @Override
     public SkillType getType() {
         return SkillType.SWORD;

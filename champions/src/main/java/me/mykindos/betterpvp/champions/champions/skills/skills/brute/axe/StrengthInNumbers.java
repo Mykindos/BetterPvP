@@ -51,6 +51,10 @@ public class StrengthInNumbers extends Skill implements InteractSkill, CooldownS
 
         };
     }
+    @Override
+    public String getDefaultClassString() {
+        return "brute";
+    }
 
     @Override
     public SkillType getType() {

@@ -57,7 +57,10 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
 
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "mage";
+    }
     @Override
     public void toggle(Player player, int level) {
         if (active.contains(player.getUniqueId())) {

@@ -39,7 +39,10 @@ public class NullBlade extends Skill implements PassiveSkill, EnergySkill {
                 "opponents with every attack"
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "mage";
+    }
     @EventHandler
     public void onDamage(CustomDamageEvent event) {
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;

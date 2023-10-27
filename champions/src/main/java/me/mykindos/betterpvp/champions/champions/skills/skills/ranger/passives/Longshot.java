@@ -59,7 +59,10 @@ public class Longshot extends Skill implements PassiveSkill {
                 "",
                 "Cannot be used in own territory"};
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "ranger";
+    }
     @UpdateEvent
     public void update() {
         Iterator<Arrow> it = arrows.keySet().iterator();

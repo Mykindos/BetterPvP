@@ -29,7 +29,6 @@ public class MarkedForDeath extends PrepareArrowSkill {
         super(champions, championsManager);
     }
 
-
     @Override
     public String getName() {
         return "Marked for Death";

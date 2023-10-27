@@ -38,7 +38,10 @@ public class Fury extends Skill implements PassiveSkill, Listener {
                 "Your attacks deal a bonus <val>" + (level * 0.5) + "</val> damage"
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "knight";
+    }
     @Override
     public SkillType getType() {
         return SkillType.PASSIVE_A;

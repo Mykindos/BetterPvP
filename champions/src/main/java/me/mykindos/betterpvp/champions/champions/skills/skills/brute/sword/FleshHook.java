@@ -151,7 +151,6 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
         }
     }
 
-
     @Override
     public SkillType getType() {
 
@@ -168,6 +167,11 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
     public void activate(Player player, int level) {
         charges.add(new ChargeData(player.getUniqueId(), 25, 100));
         delay.put(player, System.currentTimeMillis());
+    }
+
+    @Override
+    public String getDefaultClassString() {
+        return "brute";
     }
 
     @Override

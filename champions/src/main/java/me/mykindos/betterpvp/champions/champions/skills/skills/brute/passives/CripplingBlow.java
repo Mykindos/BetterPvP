@@ -44,7 +44,10 @@ public class CripplingBlow extends Skill implements PassiveSkill {
                 "and receive <effect>Slowness I</effect> for <val>" + (slowDuration + (level * 0.5)) + "</val> seconds"
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "brute";
+    }
     @EventHandler
     public void onDamage(CustomDamageEvent event) {
         if(!(event.getDamager() instanceof Player player)) return;

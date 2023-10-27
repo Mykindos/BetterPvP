@@ -83,7 +83,10 @@ public class ComboAttack extends Skill implements PassiveSkill, Listener {
         }
     }
 
-
+    @Override
+    public String getDefaultClassString() {
+        return "assassin";
+    }
     @UpdateEvent(delay = 500)
     public void onUpdate() {
 

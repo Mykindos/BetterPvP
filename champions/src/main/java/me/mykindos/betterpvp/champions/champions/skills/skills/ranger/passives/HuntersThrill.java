@@ -49,7 +49,10 @@ public class HuntersThrill extends Skill implements PassiveSkill {
                 "maximum of <effect>Speed IV</effect>",
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "ranger";
+    }
     @EventHandler
     public void onArrowHit(CustomDamageEvent event) {
         if(!(event.getProjectile() instanceof Arrow)) return;

@@ -45,7 +45,10 @@ public class Thorns extends Skill implements PassiveSkill, Listener {
                 "they hit you using a melee attack"
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "knight";
+    }
     @Override
     public SkillType getType() {
         return SkillType.PASSIVE_A;

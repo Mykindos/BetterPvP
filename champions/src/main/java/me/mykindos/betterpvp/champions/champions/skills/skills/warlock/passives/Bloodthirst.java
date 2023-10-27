@@ -44,7 +44,10 @@ public class Bloodthirst extends Skill implements PassiveSkill {
                 "you receive <effect>Speed I</effect>"
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "warlock";
+    }
     @UpdateEvent(delay = 1000)
     public void onUpdate() {
         for (Player player : Bukkit.getOnlinePlayers()) {

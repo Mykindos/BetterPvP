@@ -72,7 +72,10 @@ public class Wreath extends PrepareSkill implements CooldownSkill {
                 "Cooldown: <val>" + getCooldown(level)
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "warlock";
+    }
     @Override
     public SkillType getType() {
         return SkillType.SWORD;

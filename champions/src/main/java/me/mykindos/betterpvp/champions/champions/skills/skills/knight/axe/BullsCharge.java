@@ -62,7 +62,10 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
                 "Cooldown: <val>" + getCooldown(level)
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "knight";
+    }
     @Override
     public void activate(Player player, int level) {
         player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 60, 2));

@@ -55,7 +55,10 @@ public class Deflection extends Skill implements PassiveSkill {
                 "reduced by the number of deflection charges",
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "knight";
+    }
     @Override
     public SkillType getType() {
         return SkillType.PASSIVE_B;

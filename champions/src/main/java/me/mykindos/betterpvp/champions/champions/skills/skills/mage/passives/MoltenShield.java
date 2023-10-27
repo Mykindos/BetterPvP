@@ -40,7 +40,10 @@ public class MoltenShield extends Skill implements PassiveSkill {
                 "You are immune to lava and fire damage"
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "mage";
+    }
     @Override
     public SkillType getType() {
         return SkillType.PASSIVE_A;

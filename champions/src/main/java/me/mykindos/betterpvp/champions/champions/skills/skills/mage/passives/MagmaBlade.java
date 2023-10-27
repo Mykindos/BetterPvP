@@ -40,7 +40,10 @@ public class MagmaBlade extends Skill implements PassiveSkill {
                 "dealing an additional <val>" + (level) + "</val> damage",
                 "to players who are on fire"};
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "mage";
+    }
     @Override
     public SkillType getType() {
         return SkillType.PASSIVE_A;

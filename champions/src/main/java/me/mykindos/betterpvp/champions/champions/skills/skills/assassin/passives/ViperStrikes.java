@@ -28,7 +28,10 @@ public class ViperStrikes extends Skill implements PassiveSkill, Listener {
     public ViperStrikes(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "assassin";
+    }
     @Override
     public String getName() {
         return "Viper Strikes";

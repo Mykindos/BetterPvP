@@ -55,6 +55,11 @@ public class SmokeArrow extends PrepareArrowSkill {
     }
 
     @Override
+    public String getDefaultClassString() {
+        return "assassin";
+    }
+
+    @Override
     public SkillType getType() {
         return SkillType.BOW;
     }

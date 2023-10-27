@@ -55,7 +55,10 @@ public class WolvesFury extends Skill implements InteractSkill, CooldownSkill, L
                 "Cooldown: <val>" + getCooldown(level)
         };
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "ranger";
+    }
     @Override
     public SkillType getType() {
 

@@ -57,7 +57,10 @@ public class Stampede extends Skill implements PassiveSkill {
                 "Attacking during stampede deals",
                 "<stat>" + damage + "</stat> bonus damage per speed level"};
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "brute";
+    }
     @Override
     public SkillType getType() {
 
