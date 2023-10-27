@@ -33,6 +33,8 @@ public class Role {
     private Double maxHealth;
     private Double arrowDamage;
 
+    Set<ISkill> skills = new HashSet<>();
+
     private Set<ISkill> swordSkills = new HashSet<>(9);
     private Set<ISkill> axeSkills = new HashSet<>(9);
     private Set<ISkill> passiveA = new HashSet<>(9);
@@ -83,38 +85,55 @@ public class Role {
 
         for (var clazz : skillClasses) {
             ISkill skill = plugin.getInjector().getInstance(clazz);
-            log.info(skill.getName().toUpperCase());
             String skillName = skill.getName().toUpperCase().replace(" ", "");
-            if (skill.getType() == SkillType.SWORD && swordList.contains(skillName)) {
-                swordSkills.add(skill);
-                log.error("Loading sword skill " + skill.getName());
-                skill.addClass(this);
-                continue;
+            boolean added = false;
+            switch (skill.getType()) {
+                case SWORD -> {
+                    if (swordList.contains(skillName)) {
+                        swordSkills.add(skill);
+                        added = true;
+                    }
+                }
+
+                case AXE -> {
+                    if (axeList.contains(skillName)) {
+                        axeSkills.add(skill);
+                        added = true;
+                    }
+                }
+
+                case PASSIVE_A -> {
+                    if (passiveAList.contains(skillName)) {
+                        passiveA.add(skill);
+                        added = true;
+                    }
+                }
+
+                case PASSIVE_B -> {
+                    if (passiveBList.contains(skillName)) {
+                        passiveB.add(skill);
+                        added = true;
+                    }
+                }
+
+                case GLOBAL -> {
+                    if (globalList.contains(skillName)) {
+                        global.add(skill);
+                        added = true;
+                    }
+                }
+
+                case BOW -> {
+                    if (bowList.contains(skillName)) {
+                        bow.add(skill);
+                        added = true;
+                    }
+                }
             }
-            if (skill.getType() == SkillType.AXE && axeList.contains(skillName)) {
-                axeSkills.add(skill);
+
+            if (added) {
+                skills.add(skill);
                 skill.addClass(this);
-                continue;
-            }
-            if (skill.getType() == SkillType.PASSIVE_A && passiveAList.contains(skillName)) {
-                passiveA.add(skill);
-                skill.addClass(this);
-                continue;
-            }
-            if (skill.getType() == SkillType.PASSIVE_B && passiveBList.contains(skillName)) {
-                passiveB.add(skill);
-                skill.addClass(this);
-                continue;
-            }
-            if (skill.getType() == SkillType.GLOBAL && globalList.contains(skillName)) {
-                global.add(skill);
-                skill.addClass(this);
-                continue;
-            }
-            if (skill.getType() == SkillType.BOW && bowList.contains(skillName)) {
-                bow.add(skill);
-                skill.addClass(this);
-                continue;
             }
         }
     }

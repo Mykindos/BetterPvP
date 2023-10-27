@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.champions.champions.builds.menus.buttons.SkillButton;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.SkillManager;
+import me.mykindos.betterpvp.core.components.champions.ISkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.menu.Button;
@@ -67,38 +68,37 @@ public class SkillMenu extends Menu implements IRefreshingMenu {
 
         addDefaultButtons();
 
-        for (Skill skill : skillManager.getSkillsForRole(role)) {
-            log.warn(skill.getName());
-            if (skill == null) continue;
-            if (skill.getType() == null) continue;
-            if (!skill.isEnabled()) continue;
-            log.info("skill " + skill.getName());
-            if (skill.getType() == SkillType.SWORD) {
-                slotNumber = swordSlotNumber;
-                swordSlotNumber++;
-            } else if (skill.getType() == SkillType.AXE) {
-                slotNumber = axeSlotNumber;
-                axeSlotNumber++;
-            } else if (skill.getType() == SkillType.BOW) {
-                slotNumber = bowSlotNumber;
-                bowSlotNumber++;
-            } else if (skill.getType() == SkillType.PASSIVE_A) {
-                slotNumber = passiveASlotNumber;
-                passiveASlotNumber++;
-            } else if (skill.getType() == SkillType.PASSIVE_B) {
-                slotNumber = passiveBSlotNumber;
-                passiveBSlotNumber++;
-            } else if (skill.getType() == SkillType.GLOBAL) {
-                slotNumber = globalSlotNumber;
-                globalSlotNumber++;
-            }
+        for (ISkill iSkill : role.getSkills()) {
+            if (iSkill instanceof Skill skill) {
+                if (skill.getType() == null) continue;
+                if (!skill.isEnabled()) continue;
+                if (skill.getType() == SkillType.SWORD) {
+                    slotNumber = swordSlotNumber;
+                    swordSlotNumber++;
+                } else if (skill.getType() == SkillType.AXE) {
+                    slotNumber = axeSlotNumber;
+                    axeSlotNumber++;
+                } else if (skill.getType() == SkillType.BOW) {
+                    slotNumber = bowSlotNumber;
+                    bowSlotNumber++;
+                } else if (skill.getType() == SkillType.PASSIVE_A) {
+                    slotNumber = passiveASlotNumber;
+                    passiveASlotNumber++;
+                } else if (skill.getType() == SkillType.PASSIVE_B) {
+                    slotNumber = passiveBSlotNumber;
+                    passiveBSlotNumber++;
+                } else if (skill.getType() == SkillType.GLOBAL) {
+                    slotNumber = globalSlotNumber;
+                    globalSlotNumber++;
+                }
 
 
-            BuildSkill buildSkill = roleBuild.getBuildSkill(skill.getType());
-            if (buildSkill != null) {
-                addButton(buildButton(skill, slotNumber, buildSkill.getLevel()));
-            } else {
-                addButton(buildButton(skill, slotNumber, 1));
+                BuildSkill buildSkill = roleBuild.getBuildSkill(skill.getType());
+                if (buildSkill != null) {
+                    addButton(buildButton(skill, slotNumber, buildSkill.getLevel()));
+                } else {
+                    addButton(buildButton(skill, slotNumber, 1));
+                }
             }
         }
 
