@@ -51,7 +51,7 @@ public class MarkedForDeath extends PrepareArrowSkill {
 
     @Override
     public String getDefaultClassString() {
-        return "Assassin";
+        return "assassin";
     }
 
     @Override
