@@ -100,11 +100,7 @@ public class ChampionsCommand extends Command implements IConsoleCommand {
             roleManager.reloadRoles();
 
             for (Player player : Bukkit.getOnlinePlayers()) {
-                buildManager.getObjects().clear();
-                GamerBuilds builds = new GamerBuilds(player.getUniqueId().toString());
-                buildManager.getBuildRepository().loadBuilds(builds);
-                buildManager.getBuildRepository().loadDefaultBuilds(builds);
-                buildManager.addObject(player.getUniqueId().toString(), builds);
+                buildManager.loadBuildsForPlayer(player.getUniqueId().toString());
             }
 
             UtilMessage.message(sender, "Champions", "Successfully reloaded champions");

@@ -16,4 +16,12 @@ public class BuildManager extends Manager<GamerBuilds> {
     public BuildManager(BuildRepository buildRepository) {
         this.buildRepository = buildRepository;
     }
+
+    public void loadBuildsForPlayer(String UUID) {
+        getObjects().clear();
+        GamerBuilds builds = new GamerBuilds(UUID);
+        getBuildRepository().loadBuilds(builds);
+        getBuildRepository().loadDefaultBuilds(builds);
+        addObject(UUID, builds);
+    }
 }
