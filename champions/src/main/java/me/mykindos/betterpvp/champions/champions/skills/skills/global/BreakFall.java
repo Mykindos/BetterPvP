@@ -39,7 +39,10 @@ public class BreakFall extends Skill implements PassiveSkill {
                 "",
                 "Fall damage is reduced by <val>" + (damageReduction + level)};
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "global";
+    }
     @Override
     public SkillType getType() {
 

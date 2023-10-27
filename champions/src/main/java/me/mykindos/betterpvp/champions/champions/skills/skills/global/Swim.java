@@ -45,7 +45,10 @@ public class Swim extends Skill implements PassiveSkill, EnergySkill {
                 "",
                 "Energy: <val>" + getEnergy(level)};
     }
-
+    @Override
+    public String getDefaultClassString() {
+        return "global";
+    }
     @Override
     public SkillType getType() {
 
