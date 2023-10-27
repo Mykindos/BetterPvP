@@ -56,10 +56,9 @@ public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listene
                 "Drop your Sword / Axe to activate",
                 "",
                 "Teleports you back in time <val>" + (2 + (level)) + "</val> seconds,",
-                "setting your health to what it was at that time",
-                "and increasing it by an additional <val>" + (extraHealthRecovered + (level * 0.5)) + "</val> health",
+                "and returns your health to its original value",
                 "",
-                "If your health was lower before, it will only apply the extra health",
+                "If your health was lower before, you will gain <val>" + (extraHealthRecovered + (level * 0.5)) + "</val> health instead",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -161,7 +160,7 @@ public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listene
         }
         player.teleport(recallLocation);
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 2.0F, 2.0F);
-        UtilEntity.setHealth(player, Math.min(20, Math.max(currHealth + (extraHealthRecovered + (level * 0.5)), recallData.getHealth() + (extraHealthRecovered + (level * 0.5)))));
+        UtilEntity.setHealth(player, Math.min(20, Math.max(currHealth + (extraHealthRecovered + (level * 0.5)), recallData.getHealth())));
         UtilServer.callEvent(new EffectClearEvent(player));
 
         //sequentially go through all the markers, drawing lines between them
