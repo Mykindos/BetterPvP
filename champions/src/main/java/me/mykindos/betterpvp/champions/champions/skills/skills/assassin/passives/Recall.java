@@ -57,7 +57,7 @@ public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listene
                 "",
                 "Teleports you back in time <val>" + (2 + (level)) + "</val> seconds,",
                 "setting your health to what it was at that time",
-                "and increasing it by an additional <stat>" + (extraHealthRecovered + level) + "</stat> health",
+                "and increasing it by an additional <val>" + (extraHealthRecovered + level) + "</val> health",
                 "",
                 "If your health was lower before, it will only apply the extra health",
                 "",
