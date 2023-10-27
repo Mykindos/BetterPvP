@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.builds.repository;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Singleton
 public class BuildRepository implements IRepository<RoleBuild> {
 
@@ -151,23 +153,24 @@ public class BuildRepository implements IRepository<RoleBuild> {
 
     public void loadDefaultBuilds(GamerBuilds gamerBuilds) {
 
-        if (!gamerBuilds.getBuilds().isEmpty()) return;
-
         String uuid = gamerBuilds.getUuid();
 
         List<RoleBuild> builds = new ArrayList<>();
 
         for (Role role : roleManager.getRoles()) {
-            for (int d = 1; d < 5; d++) {
-                RoleBuild newClass = new RoleBuild(uuid, role, d);
+            //load any new kits
+            if (gamerBuilds.getBuild(role, 1).isEmpty()) {
+                for (int d = 1; d < 5; d++) {
+                    RoleBuild newClass = new RoleBuild(uuid, role, d);
 
-                newClass.setSkill(SkillType.SWORD, (Skill) role.getSwordSkills().stream().findFirst().orElseThrow(), 3);
-                newClass.setSkill(SkillType.AXE, (Skill) role.getAxeSkills().stream().findFirst().orElseThrow(), 5);
-                newClass.setSkill(SkillType.PASSIVE_A, (Skill)role.getPassiveA().stream().findFirst().orElseThrow(), 1);
-                newClass.setSkill(SkillType.PASSIVE_B, (Skill) role.getPassiveB().stream().findFirst().orElseThrow(), 3);
-                newClass.takePoints(12);
+                    newClass.setSkill(SkillType.SWORD, (Skill) role.getSwordSkills().stream().findFirst().orElseThrow(), 3);
+                    newClass.setSkill(SkillType.AXE, (Skill) role.getAxeSkills().stream().findFirst().orElseThrow(), 5);
+                    newClass.setSkill(SkillType.PASSIVE_A, (Skill) role.getPassiveA().stream().findFirst().orElseThrow(), 1);
+                    newClass.setSkill(SkillType.PASSIVE_B, (Skill) role.getPassiveB().stream().findFirst().orElseThrow(), 3);
+                    newClass.takePoints(12);
 
-                builds.add(newClass);
+                    builds.add(newClass);
+                }
             }
         }
 
