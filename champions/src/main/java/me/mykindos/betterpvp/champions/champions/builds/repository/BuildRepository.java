@@ -62,23 +62,53 @@ public class BuildRepository implements IRepository<RoleBuild> {
                 if (roleOptional.isEmpty()) continue;
                 RoleBuild build = new RoleBuild(uuid, roleOptional.get(), id);
 
+                Role roleClass = roleOptional.get();
                 String sword = result.getString(4);
-                setSkill(build, SkillType.SWORD, sword);
+                if (roleClass.hasSkill(SkillType.SWORD, sword.split(",")[0])) {
+                    setSkill(build, SkillType.SWORD, sword);
+                } else {
+                    setSkill(build, SkillType.SWORD, null);
+                }
+
 
                 String axe = result.getString(5);
-                setSkill(build, SkillType.AXE, axe);
+                if (roleClass.hasSkill(SkillType.AXE, axe.split(",")[0])) {
+                    setSkill(build, SkillType.AXE, axe);
+                } else {
+                    setSkill(build, SkillType.AXE, null);
+                }
+
 
                 String bow = result.getString(6);
-                setSkill(build, SkillType.BOW, bow);
+                if (roleClass.hasSkill(SkillType.BOW, bow.split(",")[0])) {
+                    setSkill(build, SkillType.BOW, sword);
+                } else {
+                    setSkill(build, SkillType.BOW, null);
+                }
 
                 String passiveA = result.getString(7);
-                setSkill(build, SkillType.PASSIVE_A, passiveA);
+                if (roleClass.hasSkill(SkillType.PASSIVE_A, passiveA.split(",")[0])) {
+                    setSkill(build, SkillType.PASSIVE_A, sword);
+                } else {
+                    setSkill(build, SkillType.PASSIVE_A, null);
+                }
+
 
                 String passiveB = result.getString(8);
-                setSkill(build, SkillType.PASSIVE_B, passiveB);
+                if (roleClass.hasSkill(SkillType.PASSIVE_B, passiveB.split(",")[0])) {
+                    setSkill(build, SkillType.PASSIVE_B, sword);
+                } else {
+                    setSkill(build, SkillType.PASSIVE_B, null);
+                }
+
 
                 String global = result.getString(9);
-                setSkill(build, SkillType.GLOBAL, global);
+                if (roleClass.hasSkill(SkillType.GLOBAL, global.split(",")[0])) {
+                    setSkill(build, SkillType.GLOBAL, sword);
+                } else {
+                    setSkill(build, SkillType.GLOBAL, null);
+                }
+
 
                 boolean active = result.getBoolean(10);
                 build.setActive(active);
@@ -107,8 +137,6 @@ public class BuildRepository implements IRepository<RoleBuild> {
             int level = Integer.parseInt(split[1]);
             build.setSkill(type, skill, level);
             build.takePoints(level);
-
-
         }
     }
 
@@ -186,5 +214,4 @@ public class BuildRepository implements IRepository<RoleBuild> {
             }
         });
     }
-
 }

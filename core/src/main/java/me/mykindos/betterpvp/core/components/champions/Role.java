@@ -222,6 +222,38 @@ public class Role {
         return false;
     }
 
+    public ISkill getDefaultSkill(SkillType type) {
+        switch(type) {
+            case SWORD -> {
+                return swordSkills.stream().findFirst().orElse(null);
+            }
+
+            case AXE -> {
+                return axeSkills.stream().findFirst().orElse(null);
+            }
+
+            case PASSIVE_A -> {
+                return passiveA.stream().findFirst().orElse(null);
+            }
+
+            case PASSIVE_B -> {
+                return passiveB.stream().findFirst().orElse(null);
+            }
+
+            case GLOBAL -> {
+                return global.stream().findFirst().orElse(null);
+            }
+
+            case BOW -> {
+                return bow.stream().findFirst().orElse(null);
+            }
+
+            default -> {
+                return null;
+            }
+        }
+    }
+
     public String getName() {
         return key;
     }
