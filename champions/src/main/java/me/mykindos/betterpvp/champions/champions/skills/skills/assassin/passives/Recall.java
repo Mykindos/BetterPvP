@@ -38,6 +38,8 @@ public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listene
     public double percentHealthRecovered;
     public double currHealth;
     public double markerTiming;
+
+    public double duration;
     @Inject
     public Recall(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -55,7 +57,7 @@ public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listene
         return new String[]{
                 "Drop your Sword / Axe to activate",
                 "",
-                "Teleports you back in time <val>" + (2 + (level)) + "</val> seconds, increasing",
+                "Teleports you back in time <val>" + (duration + (level)) + "</val> seconds, increasing",
                 "your health by <stat>" + (percentHealthRecovered * 100) + "%</stat> of the health you had",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
@@ -84,7 +86,7 @@ public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listene
                 Iterator<RecallData.LocationMarker> iterator = recallData.getLocationMarkers().iterator();
                 while (iterator.hasNext()) {
                     RecallData.LocationMarker marker = iterator.next();
-                    if (UtilTime.elapsed(marker.getTimestamp(), (long) ((2 + level) * 1000))) {
+                    if (UtilTime.elapsed(marker.getTimestamp(), (long) ((duration + level) * 1000))) {
                         iterator.remove();
                     }
                 }
@@ -204,5 +206,6 @@ public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listene
     public void loadSkillConfig(){
         markerTiming = getConfig("markerTiming", 0.25, Double.class);
         percentHealthRecovered = getConfig("percentHealthRecovered", 0.5, Double.class);
+        duration = getConfig("duration", 1.5, Double.class);
     }
 }
