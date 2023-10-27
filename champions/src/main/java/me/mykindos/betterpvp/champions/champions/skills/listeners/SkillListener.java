@@ -120,9 +120,9 @@ public class SkillListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onFinishUseSkill(PlayerUseSkillEvent event) {
         if (event.isCancelled()) return;
-
         Player player = event.getPlayer();
         ISkill skill = event.getSkill();
+        log.info("finish use skill " + skill.getName());
         int level = event.getLevel();
 
         if (skill instanceof InteractSkill interactSkill) {
