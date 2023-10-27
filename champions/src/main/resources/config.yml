@@ -78,6 +78,7 @@ skills:
       cooldown: 30
       percentHealthRecovered: 0.25
       markerTiming: 0.5
+      duration: 1.5
     evade:
       enabled: true
       maxlevel: 5
