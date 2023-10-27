@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.brute.sword;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
@@ -37,6 +38,7 @@ import org.bukkit.util.Vector;
 
 import java.util.*;
 
+@Slf4j
 @Singleton
 @BPvPListener
 public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSkill {
@@ -73,20 +75,25 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
     public void updateFleshHook() {
         ListIterator<ChargeData> iterator = charges.listIterator();
         while (iterator.hasNext()) {
+            log.warn("1");
             ChargeData data = iterator.next();
             Player player = Bukkit.getPlayer(data.getUuid());
+            log.warn("2");
             if (player != null) {
                 int level = getLevel(player);
                 if (level <= 0) {
+                    log.warn("3");
                     iterator.remove();
                     continue;
                 }
                 if (delay.containsKey(player)) {
                     if (!UtilTime.elapsed(delay.get(player), 250)) {
+                        log.warn("3");
                         continue;
                     }
                 }
                 if (player.isHandRaised()) {
+                    log.warn("5");
 
                     if (!UtilPlayer.isHoldingItem(player, SkillWeapons.SWORDS)) {
                         iterator.remove();
@@ -165,6 +172,7 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
 
     @Override
     public void activate(Player player, int level) {
+        log.error(player.getName() + level);
         charges.add(new ChargeData(player.getUniqueId(), 25, 100));
         delay.put(player, System.currentTimeMillis());
     }
