@@ -84,6 +84,7 @@ public class SkillListener implements Listener {
         int level = event.getLevel();
 
         if (!skill.canUse(player)) {
+            log.info("Cannot use " + skill.getName());
             event.setCancelled(true);
             return;
         }
@@ -226,6 +227,7 @@ public class SkillListener implements Listener {
                 if (skillOptional.isPresent()) {
                     Skill skill = skillOptional.get();
 
+                    log.info(skill.getName());
                     if (skill instanceof InteractSkill interactSkill) {
                         if (!Arrays.asList(interactSkill.getActions()).contains(event.getAction())) {
                             return;
@@ -233,7 +235,7 @@ public class SkillListener implements Listener {
                     }
 
                     int level = getLevel(player, build.getBuildSkill(skillType));
-
+                    log.info("calling " + skill.getName());
                     UtilServer.callEvent(new PlayerUseInteractSkillEvent(player, skill, level));
 
                 }
