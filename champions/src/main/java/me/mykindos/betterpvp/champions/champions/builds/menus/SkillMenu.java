@@ -50,7 +50,6 @@ public class SkillMenu extends Menu implements IRefreshingMenu {
         super(player, 54, Component.text("Edit Build"));
         this.role = role;
         this.skillManager = skillManager;
-
         roleBuild = builds.getBuilds().stream().filter(build -> build.getRole() == role && build.getId() == buildNumber)
                 .findFirst().orElseThrow();
         refresh();

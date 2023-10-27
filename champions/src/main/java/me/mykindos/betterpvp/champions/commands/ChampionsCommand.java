@@ -3,6 +3,9 @@ package me.mykindos.betterpvp.champions.commands;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
+import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
+import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
+import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.champions.champions.skills.SkillManager;
 import me.mykindos.betterpvp.champions.listeners.ChampionsListenerLoader;
 import me.mykindos.betterpvp.core.client.Client;
@@ -12,6 +15,7 @@ import me.mykindos.betterpvp.core.command.IConsoleCommand;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -63,6 +67,12 @@ public class ChampionsCommand extends Command implements IConsoleCommand {
         @Inject
         private ItemHandler itemHandler;
 
+        @Inject
+        RoleManager roleManager;
+
+        @Inject
+        BuildManager buildManager;
+
         @Override
         public String getName() {
             return "reload";
@@ -87,6 +97,15 @@ public class ChampionsCommand extends Command implements IConsoleCommand {
             skillManager.reloadSkills();
 
             itemHandler.loadItemData("Champions");
+            roleManager.reloadRoles();
+
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                buildManager.getObjects().clear();
+                GamerBuilds builds = new GamerBuilds(player.getUniqueId().toString());
+                buildManager.getBuildRepository().loadBuilds(builds);
+                buildManager.getBuildRepository().loadDefaultBuilds(builds);
+                buildManager.addObject(player.getUniqueId().toString(), builds);
+            }
 
             UtilMessage.message(sender, "Champions", "Successfully reloaded champions");
         }
