@@ -144,9 +144,9 @@ public class Role {
         enabled = config.getOrSaveBoolean(path + "enabled", true);
         prefix = config.getOrSaveString(path + "prefix", key.substring(0, 1));
 
-        int R = config.getOrSaveInt(path + "ColorR", 0);
-        int G = config.getOrSaveInt(path + "ColorG", 0);
-        int B = config.getOrSaveInt(path+ "ColorB", 0);
+        int R = config.getOrSaveInt(path + "ColorR", 255);
+        int G = config.getOrSaveInt(path + "ColorG", 255);
+        int B = config.getOrSaveInt(path+ "ColorB", 255);
 
         color = TextColor.color(R, G, B);
 
