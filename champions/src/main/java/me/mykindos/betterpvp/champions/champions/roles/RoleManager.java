@@ -71,9 +71,6 @@ public class RoleManager extends Manager<Role> {
         ConfigurationSection customRoleSection = config.getConfigurationSection(path);
         if (customRoleSection == null) {
             customRoleSection = config.createSection(path);
-        } else {
-            log.error(customRoleSection.getCurrentPath());
-            log.error(config.getCurrentPath());
         }
         champions.saveConfig();
 

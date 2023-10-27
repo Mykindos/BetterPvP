@@ -139,15 +139,12 @@ public class Role {
     }
 
     public void loadConfig(ExtendedYamlConfiguration config) {
-        log.error("key" + key);
         String path = "class." + key + ".";
-        log.error("path" + path);
+
         enabled = config.getOrSaveBoolean(path + "enabled", true);
-        log.error("enabled" + enabled);
         prefix = config.getOrSaveString(path + "prefix", key.substring(0, 1));
 
         int R = config.getOrSaveInt(path + "ColorR", 0);
-        log.error("R" + R);
         int G = config.getOrSaveInt(path + "ColorG", 0);
         int B = config.getOrSaveInt(path+ "ColorB", 0);
 
