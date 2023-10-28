@@ -185,8 +185,6 @@ public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listene
         Location location = from.clone();
         Random random = new Random();
 
-        Particle.DustOptions dustOptions = new Particle.DustOptions(org.bukkit.Color.fromRGB(148, 0, 211), 0.5F);
-
         for (double length = 0; length < distance; length += 0.1) {
             double yOffset = Math.sin(length) * 0.3;
 
@@ -196,10 +194,6 @@ public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listene
             world.spawnParticle(Particle.SPELL_WITCH, location.clone().add(randomX, yOffset, randomZ), 1);
             location.add(vector);
         }
-    }
-
-    private String formatLocation(Location location) {
-        return "(" + location.getX() + ", " + location.getY() + ", " + location.getZ() + ")";
     }
 
     @Override
