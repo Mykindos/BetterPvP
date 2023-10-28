@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.builds.menus.buttons;
 
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.menus.SkillMenu;
 import me.mykindos.betterpvp.champions.champions.skills.SkillManager;
@@ -15,6 +16,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 
+@Slf4j
 public class EditBuildButton extends Button {
 
     private final GamerBuilds builds;
@@ -32,6 +34,7 @@ public class EditBuildButton extends Button {
 
     @Override
     public void onClick(Player player, Gamer gamer, ClickType clickType) {
+        log.info("Clicking " + buildNumber);
         MenuManager.openMenu(player, new SkillMenu(player, builds, role, buildNumber, skillManager));
         player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1.0F, 2.0F);
     }
