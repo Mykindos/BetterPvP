@@ -40,13 +40,13 @@ public abstract class CombatData extends PlayerData {
     @Getter(AccessLevel.NONE)
     protected final ConcurrentHashMultiset<ICombatDataAttachment> attachments = ConcurrentHashMultiset.create();
 
-    private final UUID holder;
-    private @IntRange(from = 0) int rating = 1_500; // Default is 1500 rating
-    private @IntRange(from = 0) int kills;
-    private @IntRange(from = 0) int assists;
-    private @IntRange(from = 0) int deaths;
-    private @IntRange(from = 0) int killStreak;
-    private @IntRange(from = 0) int highestKillStreak;
+    protected final UUID holder;
+    protected @IntRange(from = 0) int rating = 1_500; // Default is 1500 rating
+    protected @IntRange(from = 0) int kills;
+    protected @IntRange(from = 0) int assists;
+    protected @IntRange(from = 0) int deaths;
+    protected @IntRange(from = 0) int killStreak;
+    protected @IntRange(from = 0) int highestKillStreak;
 
     public final <T> T getAttachment(Class<T> clazz) {
         return (T) attachments.stream().filter(attachment -> attachment.getClass().equals(clazz)).findFirst().orElseThrow();
@@ -56,7 +56,7 @@ public abstract class CombatData extends PlayerData {
         attachments.add(attachment);
     }
 
-    public final Kill killed(@NotNull CombatData killer, @NotNull Map<CombatData, Contribution> contributions) {
+    public final Kill killed(UUID killId, @NotNull CombatData killer, @NotNull Map<CombatData, Contribution> contributions) {
         Preconditions.checkArgument(contributions.containsKey(killer), "Must have at least one contributor");
         final int ratingDelta = getRatingDelta(killer, this);
 
@@ -83,15 +83,19 @@ public abstract class CombatData extends PlayerData {
         }
 
         // Allow modules to modify the kill
-        final Kill kill = generateKill(killer.getHolder(), getHolder(), ratingDelta, new ArrayList<>(contributions.values()));
+        final Kill kill = generateKill(killId,
+                killer.getHolder(),
+                getHolder(),
+                ratingDelta,
+                new ArrayList<>(contributions.values()));
 
         // Save
         pendingKills.add(kill);
         return kill;
     }
 
-    protected Kill generateKill(UUID killer, UUID victim, int ratingDelta, List<Contribution> contributions) {
-        return new Kill(killer, victim, ratingDelta, contributions);
+    protected Kill generateKill(UUID killId, UUID killer, UUID victim, int ratingDelta, List<Contribution> contributions) {
+        return new Kill(killId, killer, victim, ratingDelta, contributions);
     }
 
     @Override
@@ -109,14 +113,14 @@ public abstract class CombatData extends PlayerData {
     @Override
     public Component[] getDescription() {
         return new Component[] {
-                UtilMessage.deserialize("Rating: <alt2>%,d", rating),
+                UtilMessage.deserialize("Rating: <alt>%,d", rating),
                 Component.empty(),
-                UtilMessage.deserialize("Kills: <alt>%,d", kills),
-                UtilMessage.deserialize("Assists: <alt>%,d", assists),
-                UtilMessage.deserialize("Deaths: <alt>%,d", deaths),
-                UtilMessage.deserialize("KDR: <alt>%,.2f", getKillDeathRatio()),
-                UtilMessage.deserialize("Killstreak: <alt>%,d", killStreak),
-                UtilMessage.deserialize("Highest Killstreak: <alt>%,d", highestKillStreak),
+                UtilMessage.deserialize("Kills: <alt2>%,d", kills),
+                UtilMessage.deserialize("Assists: <alt2>%,d", assists),
+                UtilMessage.deserialize("Deaths: <alt2>%,d", deaths),
+                UtilMessage.deserialize("KDR: <alt2>%,.2f", getKillDeathRatio()),
+                UtilMessage.deserialize("Killstreak: <alt2>%,d", killStreak),
+                UtilMessage.deserialize("Highest Killstreak: <alt2>%,d", highestKillStreak),
         };
     }
 

@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
 import me.mykindos.betterpvp.core.combat.stats.model.CombatStatsListener;
+import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.stats.repository.StatsRepository;
 import org.bukkit.entity.Player;
@@ -22,8 +23,8 @@ public class GlobalCombatListener extends CombatStatsListener<GlobalCombatData> 
         this.repository = repository;
     }
 
-    @Override
-    protected void onSave() {
+    @UpdateEvent(delay = 60_000 * 5) // save async every 5 minutes
+    public void onUpdate() {
         repository.saveAll(true);
     }
 

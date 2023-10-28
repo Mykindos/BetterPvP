@@ -11,7 +11,7 @@ import java.util.UUID;
 @Getter
 public class Kill {
 
-    private final UUID id = UUID.randomUUID();
+    private final UUID id;
     private final UUID killer;
     private final UUID victim;
     private final int ratingDelta;

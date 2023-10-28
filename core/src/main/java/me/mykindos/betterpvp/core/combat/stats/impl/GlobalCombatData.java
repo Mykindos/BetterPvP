@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.combat.stats.impl;
 
 import me.mykindos.betterpvp.core.combat.stats.model.CombatData;
 import me.mykindos.betterpvp.core.combat.stats.model.Contribution;
+import me.mykindos.betterpvp.core.combat.stats.model.ICombatDataAttachment;
 import me.mykindos.betterpvp.core.combat.stats.model.Kill;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
@@ -58,8 +59,9 @@ public class GlobalCombatData extends CombatData {
         }
 
         // Save attachments
-        attachments.forEach(attachment -> attachment.prepareUpdates(this, database, databasePrefix));
-
+        for (ICombatDataAttachment attachment : attachments) {
+            attachment.prepareUpdates(this, database, databasePrefix);
+        }
         // Save self-rating (this saves independently for each player)
         String ratingStmt = "INSERT INTO " + databasePrefix + "combat_stats (Gamer, Rating, Killstreak, HighestKillstreak) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE Rating = VALUES(Rating), Killstreak = VALUES(Killstreak), HighestKillstreak = VALUES(HighestKillstreak)";
         Statement victimRating = new Statement(ratingStmt,

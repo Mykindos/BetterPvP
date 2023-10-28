@@ -16,8 +16,8 @@ public class ChampionsKill extends Kill {
     private final Role victimRole;
     private final Map<Contribution, Role> contributionRoles;
 
-    public ChampionsKill(UUID killer, UUID victim, int ratingDelta, List<Contribution> contributions, Role killerRole, Role victimRole, Map<Contribution, Role> contributionRoles) {
-        super(killer, victim, ratingDelta, contributions);
+    public ChampionsKill(UUID killId, UUID killer, UUID victim, int ratingDelta, List<Contribution> contributions, Role killerRole, Role victimRole, Map<Contribution, Role> contributionRoles) {
+        super(killId, killer, victim, ratingDelta, contributions);
         this.killerRole = killerRole;
         this.victimRole = victimRole;
         this.contributionRoles = contributionRoles;

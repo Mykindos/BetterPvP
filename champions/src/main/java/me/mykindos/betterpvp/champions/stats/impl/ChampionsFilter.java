@@ -28,13 +28,13 @@ public enum ChampionsFilter implements FilterType {
 
     public static ChampionsFilter fromRole(Role role) {
         return Arrays.stream(values())
-                .filter(filter -> filter.role == role)
+                .filter(filter -> filter.role == role && filter != GLOBAL)
                 .findFirst()
                 .orElse(NONE);
     }
 
     @Override
     public boolean accepts(Object entry) {
-        return entry instanceof ChampionsCombatData data && data.getRole() == role;
+        return this != GLOBAL && entry instanceof ChampionsCombatData data && data.getRole() == role;
     }
 }

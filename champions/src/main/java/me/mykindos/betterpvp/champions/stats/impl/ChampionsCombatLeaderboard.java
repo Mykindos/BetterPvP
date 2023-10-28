@@ -48,6 +48,28 @@ public final class ChampionsCombatLeaderboard extends Leaderboard<UUID, CombatDa
         return "Combat";
     }
 
+    @Override
+    public SortedSet<LeaderboardEntry<UUID, CombatData>> getTopTen(SearchOptions options) {
+        final ChampionsFilter filter = (ChampionsFilter) Objects.requireNonNull(options.getFilter());
+        if (filter == ChampionsFilter.GLOBAL) {
+            final CombatSort sortType = (CombatSort) Objects.requireNonNull(options.getSort());
+            final SearchOptions globalOptions = SearchOptions.builder().sort(sortType).build();
+            return globalLeaderboard.getTopTen(globalOptions);
+        }
+        return super.getTopTen(options);
+    }
+
+    @Override
+    public CompletableFuture<CombatData> getEntryData(SearchOptions searchOptions, UUID entry) {
+        final ChampionsFilter filter = (ChampionsFilter) Objects.requireNonNull(searchOptions.getFilter());
+        if (filter == ChampionsFilter.GLOBAL) {
+            final CombatSort sortType = (CombatSort) Objects.requireNonNull(searchOptions.getSort());
+            final SearchOptions globalOptions = SearchOptions.builder().sort(sortType).build();
+            return globalLeaderboard.getEntryData(globalOptions, entry);
+        }
+        return super.getEntryData(searchOptions, entry);
+    }
+
     @NotNull
     @Override
     public FilterType @NotNull [] acceptedFilters() {

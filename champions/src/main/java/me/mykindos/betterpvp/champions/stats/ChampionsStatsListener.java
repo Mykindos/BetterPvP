@@ -29,11 +29,6 @@ public class ChampionsStatsListener extends CombatStatsListener<ChampionsCombatD
     }
 
     @Override
-    protected void onSave() {
-        repository.saveAll(true);
-    }
-
-    @Override
     protected ChampionsStatsRepository getAssignedRepository(Player player) {
         return repository;
     }

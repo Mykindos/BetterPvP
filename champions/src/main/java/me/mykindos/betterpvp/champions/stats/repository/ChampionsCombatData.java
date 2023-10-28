@@ -4,6 +4,7 @@ import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.champions.stats.ChampionsKill;
 import me.mykindos.betterpvp.core.combat.stats.model.CombatData;
 import me.mykindos.betterpvp.core.combat.stats.model.Contribution;
+import me.mykindos.betterpvp.core.combat.stats.model.ICombatDataAttachment;
 import me.mykindos.betterpvp.core.combat.stats.model.Kill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.database.Database;
@@ -32,7 +33,7 @@ public class ChampionsCombatData extends CombatData {
     }
 
     @Override
-    protected ChampionsKill generateKill(UUID killer, UUID victim, int ratingDelta, List<Contribution> contributions) {
+    protected ChampionsKill generateKill(UUID killId, UUID killer, UUID victim, int ratingDelta, List<Contribution> contributions) {
         final Role killerRole = roleManager.getObject(killer).orElse(null);
         final Role victimRole = roleManager.getObject(victim).orElse(null);
         final Map<Contribution, Role> contributorRoles = new HashMap<>();
@@ -40,7 +41,7 @@ public class ChampionsCombatData extends CombatData {
             final Role contributorRole = roleManager.getObject(contribution.getContributor()).orElse(null);
             contributorRoles.put(contribution, contributorRole);
         });
-        return new ChampionsKill(killer, victim, ratingDelta, contributions, killerRole, victimRole, contributorRoles);
+        return new ChampionsKill(killId, killer, victim, ratingDelta, contributions, killerRole, victimRole, contributorRoles);
     }
 
     @Override
@@ -73,7 +74,9 @@ public class ChampionsCombatData extends CombatData {
         }
 
         // Save attachments
-        attachments.forEach(attachment -> attachment.prepareUpdates(this, database, databasePrefix));
+        for (ICombatDataAttachment attachment : attachments) {
+            attachment.prepareUpdates(this, database, databasePrefix);
+        }
 
         // Save self-rating (this saves independently for each player)
         String ratingStmt = "INSERT INTO " + databasePrefix + "combat_stats (Gamer, Class, Rating, Killstreak, HighestKillstreak) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE Rating = VALUES(Rating), Killstreak = VALUES(Killstreak), HighestKillstreak = VALUES(HighestKillstreak);";

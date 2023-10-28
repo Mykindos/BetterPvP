@@ -1,7 +1,6 @@
 package me.mykindos.betterpvp.core.stats.menu;
 
 import lombok.extern.slf4j.Slf4j;
-import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.menu.Button;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.interfaces.IRefreshingMenu;
@@ -22,14 +21,16 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 @Slf4j
@@ -37,83 +38,43 @@ public class LeaderboardMenu<E, T> extends Menu implements IRefreshingMenu {
 
     private static final int POSITION_INDEX = UtilMessage.DIVIDER.content().length() / 2 - 6;
     private final Leaderboard<E, T> leaderboard;
-    private int sortTypeIndex;
-    private int filterIndex;
+    private final @Nullable CycleButton<SortType> sortButton;
+    private final @Nullable CycleButton<FilterType> filterButton;
 
     public LeaderboardMenu(Player player, Leaderboard<E, T> leaderboard) {
         super(player, 54, Component.text(leaderboard.getName()));
         this.leaderboard = leaderboard;
-        this.sortTypeIndex = 0;
+
+        int buttonIndex = 0;
+        if (leaderboard instanceof Sorted sorted) {
+            final TextComponent sortTypeName = Component.text("Sort By", NamedTextColor.WHITE, TextDecoration.BOLD);
+            sortButton = new CycleButton<>(0, sorted.acceptedSortTypes(), new ItemStack(Material.ARMOR_STAND), sortTypeName, this);
+            buttonIndex += 9;
+        } else {
+            sortButton = null;
+        }
+
+        if (leaderboard instanceof Filtered filtered) {
+            final TextComponent filterTypeName = Component.text("Filter By", NamedTextColor.WHITE, TextDecoration.BOLD);
+            filterButton = new CycleButton<>(buttonIndex, filtered.acceptedFilters(), new ItemStack(Material.LECTERN), filterTypeName, this);
+        } else {
+            filterButton = null;
+        }
+
         refresh();
     }
 
     @Override
     public void refresh() {
         SearchOptions.SearchOptionsBuilder optionsBuilder = SearchOptions.builder();
-        if (leaderboard instanceof Sorted sorted) {
-            // Sort button
-            List<Component> sortTypeLore = new ArrayList<>();
-            final SortType[] sortTypes = sorted.acceptedSortTypes();
-            SortType selectedSortType = sortTypes[sortTypeIndex];
-            optionsBuilder.sort(selectedSortType);
-            for (SortType type : sortTypes) {
-                String name = type.getName();
-                NamedTextColor color = NamedTextColor.GRAY;
-                final boolean isSelected = selectedSortType == type;
-                if (isSelected) {
-                    name += " \u00AB";
-                    color = NamedTextColor.GREEN;
-                }
-                sortTypeLore.add(Component.text(name, color));
-            }
-
-            final TextComponent sortTypeName = Component.text("Sort By", NamedTextColor.WHITE, TextDecoration.BOLD);
-            addButton(new Button(0, new ItemStack(Material.ARMOR_STAND), sortTypeName, sortTypeLore) {
-                @Override
-                public void onClick(Player player, Gamer gamer, ClickType clickType) {
-                    sortTypeIndex = sortTypeIndex + 1 >= sortTypes.length ? 0 : sortTypeIndex + 1;
-                    LeaderboardMenu.this.refresh();
-                    player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 2f, 2f);
-                }
-
-                @Override
-                public double getClickCooldown() {
-                    return 0.2;
-                }
-            });
+        if (sortButton != null) {
+            addButton(sortButton);
+            optionsBuilder.sort(sortButton.getCurrent());
         }
 
-        if (leaderboard instanceof Filtered filtered) {
-            // Filter button
-            List<Component> filterLore = new ArrayList<>();
-            final FilterType[] filterTypes = filtered.acceptedFilters();
-            FilterType selectedFilterType = filterTypes[filterIndex];
-            optionsBuilder.filter(selectedFilterType);
-            for (FilterType type : filterTypes) {
-                String name = type.getName();
-                NamedTextColor color = NamedTextColor.GRAY;
-                final boolean isSelected = selectedFilterType == type;
-                if (isSelected) {
-                    name += " \u00AB";
-                    color = NamedTextColor.GREEN;
-                }
-                filterLore.add(Component.text(name, color));
-            }
-
-            final TextComponent filterTypeName = Component.text("Filter By", NamedTextColor.WHITE, TextDecoration.BOLD);
-            addButton(new Button(9, new ItemStack(Material.LECTERN), filterTypeName, filterLore) {
-                @Override
-                public void onClick(Player player, Gamer gamer, ClickType clickType) {
-                    filterIndex = filterIndex + 1 >= filterTypes.length ? 0 : filterIndex + 1;
-                    LeaderboardMenu.this.refresh();
-                    player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 2f, 2f);
-                }
-
-                @Override
-                public double getClickCooldown() {
-                    return 0.2;
-                }
-            });
+        if (filterButton != null) {
+            addButton(filterButton);
+            optionsBuilder.filter(filterButton.getCurrent());
         }
 
         // Standings

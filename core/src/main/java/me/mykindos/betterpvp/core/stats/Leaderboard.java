@@ -147,7 +147,7 @@ public abstract class Leaderboard<E, T> {
     /**
      * @return The top entries in the leaderboard of type T.
      */
-    public final SortedSet<LeaderboardEntry<E, T>> getTopTen(SearchOptions options) {
+    public SortedSet<LeaderboardEntry<E, T>> getTopTen(SearchOptions options) {
         validate(options);
         return Collections.unmodifiableSortedSet(topTen.get(options));
     }
@@ -259,7 +259,7 @@ public abstract class Leaderboard<E, T> {
      * @param entry The entry to get the data for.
      * @return The data in this leaderboard for the given entry.
      */
-    public final CompletableFuture<T> getEntryData(SearchOptions searchOptions, E entry) {
+    public CompletableFuture<T> getEntryData(SearchOptions searchOptions, E entry) {
         validate(searchOptions);
         return topTen.get(searchOptions).stream()
                 .filter(e -> e.getKey().equals(entry))
