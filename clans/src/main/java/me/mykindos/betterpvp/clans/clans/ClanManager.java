@@ -64,6 +64,14 @@ public class ClanManager extends Manager<Clan> {
     private int additionalClaims;
 
     @Inject
+    @Config(path = "clans.pillage.enabled", defaultValue = "true")
+    private boolean pillageEnabled;
+
+    @Inject
+    @Config(path = "clans.dominance.enabled", defaultValue = "true")
+    private boolean dominanceEnabled;
+
+    @Inject
     public ClanManager(ClanRepository repository, GamerManager gamerManager, PillageHandler pillageHandler) {
         this.repository = repository;
         this.gamerManager = gamerManager;
@@ -366,6 +374,7 @@ public class ClanManager extends Manager<Clan> {
     }
 
     public void applyDominance(IClan killed, IClan killer) {
+        if (!dominanceEnabled) return;
         if (killed == null || killer == null) return;
         if (killed.equals(killer)) return;
         if (!killed.isEnemy(killer)) return;
@@ -377,6 +386,11 @@ public class ClanManager extends Manager<Clan> {
         int killedSize = killed.getSquadCount();
 
         double dominance = getDominanceForKill(killedSize, killerSize);
+
+        if (!pillageEnabled && (killerEnemy.getDominance() + dominance) >= 100) {
+            //pillaging is disabled, so stop a pillage from happening
+            return;
+        }
 
         // If the killed players clan has no dominance on the killer players clan, then give dominance to the killer
         if (killedEnemy.getDominance() == 0) {

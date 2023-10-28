@@ -21,6 +21,9 @@ public class InsuranceListener extends ClanListener {
     @Config(path = "clans.insurance.durationInHours", defaultValue = "24")
     private int expiryTime;
 
+    @Inject
+    @Config(path = "clans.insurance.enabled", defaultValue = "true")
+    private boolean enabled;
     private final Set<Material> nonRestorables = Set.of(Material.IRON_BLOCK, Material.DIAMOND_BLOCK, Material.NETHERITE_BLOCK,
             Material.GOLD_BLOCK, Material.EMERALD_BLOCK, Material.ENCHANTING_TABLE, Material.BEEHIVE,
             Material.TNT, Material.REDSTONE_BLOCK, Material.WATER, Material.LAVA, Material.ICE
@@ -33,6 +36,7 @@ public class InsuranceListener extends ClanListener {
 
     @UpdateEvent(delay = 38400, isAsync = true)
     public void cleanClanInsurance() {
+        if (!enabled) return;
         long expiryTimeMs = (long) expiryTime * 60 * 60 * 1000;
         clanManager.getObjects().values().forEach(clan -> {
             clan.getInsurance().removeIf(insurance -> UtilTime.elapsed(insurance.getTime(), expiryTimeMs));
@@ -43,6 +47,7 @@ public class InsuranceListener extends ClanListener {
 
     @UpdateEvent(delay = 1)
     public void processInsuranceQueue() {
+        if (!enabled) return;
         if (clanManager.getInsuranceQueue().isEmpty()) return;
 
         for (int i = 0; i < 3; i++) {
