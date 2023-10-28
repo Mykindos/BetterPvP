@@ -53,6 +53,7 @@ public class SkillMenu extends Menu implements IRefreshingMenu {
         roleBuild = builds.getBuilds().stream().filter(build -> build.getRole() == role && build.getId() == buildNumber)
                 .findFirst().orElseThrow();
         refresh();
+        log.info("loading skill menu for " + buildNumber);
     }
 
     @Override
@@ -64,6 +65,8 @@ public class SkillMenu extends Menu implements IRefreshingMenu {
         int passiveASlotNumber = 28;
         int passiveBSlotNumber = 37;
         int globalSlotNumber = 46;
+
+        log.info("Loading skills for build " + roleBuild.getId());
 
         addDefaultButtons();
 

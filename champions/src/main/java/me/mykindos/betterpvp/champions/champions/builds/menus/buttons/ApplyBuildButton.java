@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.builds.menus.buttons;
 
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.ApplyBuildEvent;
@@ -15,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Optional;
 
+@Slf4j
 public class ApplyBuildButton extends Button {
 
     private final GamerBuilds builds;
@@ -33,9 +35,11 @@ public class ApplyBuildButton extends Button {
         Optional<RoleBuild> roleBuildOptional = builds.getBuild(role, buildNumber);
         roleBuildOptional.ifPresent(build -> {
             RoleBuild activeBuild = builds.getActiveBuilds().get(role.getName());
+
             activeBuild.setActive(false);
 
             build.setActive(true);
+            log.info("Changing active build from " + activeBuild.getId() + " to " + build.getId());
             builds.getActiveBuilds().put(role.getName(), build);
 
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1.0F, 2.0F);
