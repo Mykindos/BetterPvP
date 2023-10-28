@@ -123,7 +123,6 @@ public class BuildRepository implements IRepository<RoleBuild> {
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
-
     }
 
     private void setSkill(RoleBuild build, SkillType type, String value) {
@@ -180,6 +179,17 @@ public class BuildRepository implements IRepository<RoleBuild> {
                 new BooleanStatementValue(build.isActive())));
     }
 
+    public RoleBuild getDefaultBuild(String UUID, Role role, int id) {
+        RoleBuild build = new RoleBuild(UUID, role, id);
+
+        build.setSkill(SkillType.SWORD, (Skill) role.getSwordSkills().stream().findFirst().orElseThrow(), 3);
+        build.setSkill(SkillType.AXE, (Skill) role.getAxeSkills().stream().findFirst().orElseThrow(), 5);
+        build.setSkill(SkillType.PASSIVE_A, (Skill) role.getPassiveA().stream().findFirst().orElseThrow(), 1);
+        build.setSkill(SkillType.PASSIVE_B, (Skill) role.getPassiveB().stream().findFirst().orElseThrow(), 3);
+        build.takePoints(12);
+        return build;
+    }
+
     public void loadDefaultBuilds(GamerBuilds gamerBuilds) {
 
         String uuid = gamerBuilds.getUuid();
@@ -190,15 +200,7 @@ public class BuildRepository implements IRepository<RoleBuild> {
             //load any new kits
             if (gamerBuilds.getBuild(role, 1).isEmpty()) {
                 for (int d = 1; d < 5; d++) {
-                    RoleBuild newClass = new RoleBuild(uuid, role, d);
-
-                    newClass.setSkill(SkillType.SWORD, (Skill) role.getSwordSkills().stream().findFirst().orElseThrow(), 3);
-                    newClass.setSkill(SkillType.AXE, (Skill) role.getAxeSkills().stream().findFirst().orElseThrow(), 5);
-                    newClass.setSkill(SkillType.PASSIVE_A, (Skill) role.getPassiveA().stream().findFirst().orElseThrow(), 1);
-                    newClass.setSkill(SkillType.PASSIVE_B, (Skill) role.getPassiveB().stream().findFirst().orElseThrow(), 3);
-                    newClass.takePoints(12);
-
-                    builds.add(newClass);
+                    builds.add(getDefaultBuild(uuid, role, d));
                 }
             }
         }
@@ -214,5 +216,14 @@ public class BuildRepository implements IRepository<RoleBuild> {
                 gamerBuilds.getActiveBuilds().put(build.getRole().getName(), build);
             }
         });
+    }
+
+    public void loadActiveBuilds(GamerBuilds gamerBuilds) {
+        //make sure there is an active build, if not, set it
+        for (Role role : roleManager.getRoles()) {
+            if (gamerBuilds.getActiveBuilds().get(role.getName()) == null) {
+                gamerBuilds.getActiveBuilds().put(role.getName(), gamerBuilds.getBuilds().get(1));
+            }
+        }
     }
 }

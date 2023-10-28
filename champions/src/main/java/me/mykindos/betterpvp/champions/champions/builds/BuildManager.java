@@ -22,6 +22,7 @@ public class BuildManager extends Manager<GamerBuilds> {
         GamerBuilds builds = new GamerBuilds(UUID);
         getBuildRepository().loadBuilds(builds);
         getBuildRepository().loadDefaultBuilds(builds);
+        getBuildRepository().loadActiveBuilds(builds);
         addObject(UUID, builds);
     }
 }
