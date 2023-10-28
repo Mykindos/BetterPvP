@@ -24,6 +24,8 @@ import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import org.bukkit.Effect;
 import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -135,46 +137,21 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
                     championsManager.getCooldowns().use(player, "Blink", 2, true);
                 }
 
-                Block lastSmoke = player.getLocation().getBlock();
-
-                double curRange = 0.0D;
                 Location target = this.loc.remove(player);
-
                 float currentYaw = player.getLocation().getYaw();
                 float currentPitch = player.getLocation().getPitch();
 
-                boolean done = false;
-                while (!done) {
-                    Vector vec = UtilVelocity.getTrajectory(player.getLocation(),
-                            new Location(player.getWorld(), target.getX(), target.getY(), target.getZ()));
-
-                    Location newTarget = player.getLocation().add(vec.multiply(curRange));
-
-
-                    curRange += 0.2D;
-
-
-                    lastSmoke.getWorld().playEffect(lastSmoke.getLocation(), Effect.SMOKE, 4);
-                    lastSmoke = newTarget.getBlock();
-
-                    if (UtilMath.offset(newTarget, target) < 0.4D) {
-                        done = true;
-                    }
-                    if (curRange > 24.0D) {
-                        done = true;
-                    }
-                }
+                drawBlinkLine(player.getLocation(), target);
 
                 target.setYaw(currentYaw);
                 target.setPitch(currentPitch);
 
                 player.teleport(target);
-
-                player.getWorld().playEffect(player.getLocation(), Effect.BLAZE_SHOOT, 0, 15);
+                player.getWorld().playEffect(player.getLocation(), Effect.BLAZE_SHOOT, 0);
             }
         }, 1);
-
     }
+
 
     @Override
     public boolean canUse(Player player) {
@@ -210,7 +187,6 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
 
     @Override
     public void activate(Player player, int level) {
-
         // Run this later as teleporting during the InteractEvent was causing it to trigger twice
         UtilServer.runTaskLater(champions, () -> {
             Vector direction = player.getLocation().getDirection();
@@ -223,16 +199,16 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
                 Block testBlock = testLocation.getBlock();
                 if (!UtilBlock.isWall(testBlock)) {
                     targetLocation = testLocation;
-                    player.getWorld().playEffect(targetLocation, Effect.SMOKE, 4);
 
                     if (!UtilPlayer.getNearbyPlayers(player, targetLocation, 0.5D, EntityProperty.ENEMY).isEmpty()) {
                         break;
                     }
                 } else {
-
                     break;
                 }
             }
+
+            drawBlinkLine(player.getLocation(), targetLocation);
 
             blinkTime.put(player, System.currentTimeMillis());
             loc.put(player, player.getLocation());
@@ -244,8 +220,19 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
             championsManager.getCooldowns().use(player, "Deblink", 0.25, false);
             player.getWorld().playEffect(player.getLocation(), Effect.BLAZE_SHOOT, 0);
         }, 1);
+    }
 
 
+    private void drawBlinkLine(Location from, Location to) {
+        World world = from.getWorld();
+        double distance = from.distance(to);
+        Vector vector = to.toVector().subtract(from.toVector()).normalize().multiply(0.1);
+        Location location = from.clone();
+
+        for (double length = 0; length < distance; length += 0.1) {
+            world.spawnParticle(Particle.SMOKE_LARGE, location, 0, 0, 0, 0, 0);
+            location.add(vector);
+        }
     }
 
     @Override
