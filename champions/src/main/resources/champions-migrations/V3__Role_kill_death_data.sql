@@ -11,17 +11,13 @@ create table if not exists champions_kills
 (
     KillId      varchar(36) not null primary key,
     KillerClass varchar(20) default '',
-    VictimClass varchar(20) default '',
-    constraint killId_pk
-        foreign key (KillId) references kills (Id)
+    VictimClass varchar(20) default ''
 );
 
 create table if not exists champions_kill_contributions
 (
     ContributionId   varchar(36) not null primary key,
-    ContributorClass varchar(20) default '',
-    constraint contributionId_pk
-        foreign key (ContributionId) references kill_contributions (Id)
+    ContributorClass varchar(20) default ''
 );
 
 create table if not exists champions_combat_stats

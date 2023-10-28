@@ -8,15 +8,13 @@ import me.mykindos.betterpvp.core.combat.stats.model.Kill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
-import me.mykindos.betterpvp.core.database.query.values.*;
+import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
+import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
+import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.*;
 
 public class ChampionsCombatData extends CombatData {
 
@@ -37,9 +35,11 @@ public class ChampionsCombatData extends CombatData {
     protected ChampionsKill generateKill(UUID killer, UUID victim, int ratingDelta, List<Contribution> contributions) {
         final Role killerRole = roleManager.getObject(killer).orElse(null);
         final Role victimRole = roleManager.getObject(victim).orElse(null);
-        final Map<Contribution, Role> contributorRoles = contributions.stream().collect(Collectors.toMap(
-                contribution -> contribution, contribution -> roleManager.getObject(contribution.getContributor()).orElse(null)
-        ));
+        final Map<Contribution, Role> contributorRoles = new HashMap<>();
+        contributions.forEach(contribution -> {
+            final Role contributorRole = roleManager.getObject(contribution.getContributor()).orElse(null);
+            contributorRoles.put(contribution, contributorRole);
+        });
         return new ChampionsKill(killer, victim, ratingDelta, contributions, killerRole, victimRole, contributorRoles);
     }
 
@@ -76,11 +76,13 @@ public class ChampionsCombatData extends CombatData {
         attachments.forEach(attachment -> attachment.prepareUpdates(this, database, databasePrefix));
 
         // Save self-rating (this saves independently for each player)
-        String ratingStmt = "INSERT INTO " + databasePrefix + "combat_stats (Gamer, Class, Rating) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE Rating = VALUES(Rating);";
+        String ratingStmt = "INSERT INTO " + databasePrefix + "combat_stats (Gamer, Class, Rating, Killstreak, HighestKillstreak) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE Rating = VALUES(Rating), Killstreak = VALUES(Killstreak), HighestKillstreak = VALUES(HighestKillstreak);";
         Statement victimRating = new Statement(ratingStmt,
                 new UuidStatementValue(getHolder()),
                 new StringStatementValue(role == null ? "" : role.toString()),
-                new IntegerStatementValue(getRating()));
+                new IntegerStatementValue(getRating()),
+                new IntegerStatementValue(getKillStreak()),
+                new IntegerStatementValue(getHighestKillStreak()));
 
         database.executeBatch(killStatements, false);
         database.executeBatch(contributionStatements, false);
