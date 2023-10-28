@@ -16,7 +16,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 
-@Slf4j
 public class EditBuildButton extends Button {
 
     private final GamerBuilds builds;
@@ -34,7 +33,6 @@ public class EditBuildButton extends Button {
 
     @Override
     public void onClick(Player player, Gamer gamer, ClickType clickType) {
-        log.info("Clicking " + buildNumber);
         MenuManager.openMenu(player, new SkillMenu(player, builds, role, buildNumber, skillManager));
         player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1.0F, 2.0F);
     }

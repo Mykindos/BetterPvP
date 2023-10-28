@@ -18,7 +18,6 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Optional;
 
-@Slf4j
 public class DeleteBuildButton extends Button {
 
     private final GamerBuilds builds;
@@ -34,7 +33,6 @@ public class DeleteBuildButton extends Button {
 
     @Override
     public void onClick(Player player, Gamer gamer, ClickType clickType) {
-        log.info("delete " + buildNumber);
         Optional<RoleBuild> roleBuildOptional = builds.getBuild(role, buildNumber);
         roleBuildOptional.ifPresent(build -> {
             build.deleteBuild();
