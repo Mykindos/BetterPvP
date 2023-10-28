@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
+import me.mykindos.betterpvp.champions.champions.builds.event.LoadBuildsEvent;
 import me.mykindos.betterpvp.champions.champions.builds.menus.ClassSelectionMenu;
 import me.mykindos.betterpvp.champions.champions.builds.menus.SkillMenu;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.ApplyBuildEvent;
@@ -46,6 +47,9 @@ public class BuildListener implements Listener {
             buildManager.getBuildRepository().loadBuilds(builds);
             buildManager.getBuildRepository().loadDefaultBuilds(builds);
             buildManager.addObject(event.getClient().getUuid(), builds);
+            UtilServer.runTask(champions, () -> {
+                UtilServer.callEvent(new LoadBuildsEvent(event.getPlayer(), builds));
+            });
         });
     }
 
