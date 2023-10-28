@@ -118,20 +118,17 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
             public void run() {
 
                 if ((!UtilBlock.airFoliage(loc.getBlock())) && UtilBlock.solid(loc.getBlock())) {
-
                     loc.add(0.0D, 1.0D, 0.0D);
                     if ((!UtilBlock.airFoliage(loc.getBlock())) && UtilBlock.solid(loc.getBlock())) {
                         cancel();
                         return;
                     }
-
                 }
 
                 if (loc.getBlock().getType().name().contains("DOOR")) {
                     cancel();
                     return;
                 }
-
 
                 if ((loc.clone().add(0.0D, -1.0D, 0.0D).getBlock().getType() == Material.AIR)) {
                     Block halfBlock = loc.clone().add(0, -0.5, 0).getBlock();
@@ -145,17 +142,21 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
                     Location tempLoc = new Location(player.getWorld(), loc.getX() + UtilMath.randDouble(-1.5D, 1.5D), loc.getY() + UtilMath.randDouble(0.3D, 0.8D) - 0.75,
                             loc.getZ() + UtilMath.randDouble(-1.5D, 1.5D));
 
+                    Block nearestSolidBlock = getNearestSolidBlock(loc);
+                    if (nearestSolidBlock == null) {
+                        cancel();
+                        return;
+                    }
+
                     CustomArmourStand as = new CustomArmourStand(((CraftWorld) loc.getWorld()).getHandle());
                     ArmorStand armourStand = (ArmorStand) as.spawn(tempLoc);
-                    armourStand.getEquipment().setHelmet(new ItemStack(Material.PACKED_ICE));
+                    armourStand.getEquipment().setHelmet(new ItemStack(nearestSolidBlock.getType()));
                     armourStand.setGravity(false);
                     armourStand.setVisible(false);
                     armourStand.setSmall(true);
                     armourStand.setHeadPose(new EulerAngle(UtilMath.randomInt(360), UtilMath.randomInt(360), UtilMath.randomInt(360)));
 
-
-                    player.getWorld().playEffect(loc, Effect.STEP_SOUND, Material.PACKED_ICE);
-
+                    player.getWorld().playEffect(loc, Effect.STEP_SOUND, nearestSolidBlock.getType());
 
                     stands.put(armourStand, System.currentTimeMillis() + 4000);
 
@@ -169,27 +170,29 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
 
                             cooldownJump.get(player).add(ent);
                         }
-
                     }
-
                 }
-
             }
-
         }.runTaskTimer(champions, 0, 2);
 
         new BukkitRunnable() {
-
             @Override
             public void run() {
                 runnable.cancel();
                 cooldownJump.get(player).clear();
-
             }
-
         }.runTaskLater(champions, 40);
     }
 
+    private Block getNearestSolidBlock(Location location) {
+        for (int y = 0; y < location.getY(); y++) {
+            Block block = location.clone().subtract(0, y, 0).getBlock();
+            if (!UtilBlock.airFoliage(block) && UtilBlock.solid(block)) {
+                return block;
+            }
+        }
+        return null;
+    }
     @Override
     public Action[] getActions() {
         return SkillActions.RIGHT_CLICK;
