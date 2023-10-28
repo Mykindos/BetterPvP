@@ -62,14 +62,15 @@ public class BuildRepository implements IRepository<RoleBuild> {
                 if (roleOptional.isEmpty()) continue;
                 RoleBuild build = new RoleBuild(uuid, roleOptional.get(), id);
 
+
                 Role roleClass = roleOptional.get();
                 String sword = result.getString(4);
-                if (roleClass.hasSkill(SkillType.SWORD, sword.split(",")[0])) {
+                String[] swordSplit = sword.split(",");
+                if (roleClass.hasSkill(SkillType.SWORD, swordSplit[0])) {
                     setSkill(build, SkillType.SWORD, sword);
                 } else {
                     setSkill(build, SkillType.SWORD, null);
                 }
-
 
                 String axe = result.getString(5);
                 if (roleClass.hasSkill(SkillType.AXE, axe.split(",")[0])) {
@@ -77,7 +78,6 @@ public class BuildRepository implements IRepository<RoleBuild> {
                 } else {
                     setSkill(build, SkillType.AXE, null);
                 }
-
 
                 String bow = result.getString(6);
                 if (roleClass.hasSkill(SkillType.BOW, bow.split(",")[0])) {
@@ -135,6 +135,7 @@ public class BuildRepository implements IRepository<RoleBuild> {
             if (!skill.isEnabled()) return;
 
             int level = Integer.parseInt(split[1]);
+            if (level > skill.getMaxLevel()) level = skill.getMaxLevel();
             build.setSkill(type, skill, level);
             build.takePoints(level);
         }

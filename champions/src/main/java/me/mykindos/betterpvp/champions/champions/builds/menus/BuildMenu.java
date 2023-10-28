@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.builds.menus;
 
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.champions.champions.builds.menus.buttons.ApplyBuildButton;
@@ -21,6 +22,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
+@Slf4j
 public class BuildMenu extends Menu implements IRefreshingMenu {
 
     private final GamerBuilds builds;
@@ -28,6 +30,7 @@ public class BuildMenu extends Menu implements IRefreshingMenu {
     private final SkillManager skillManager;
 
     private final RoleManager roleManager;
+
 
     public BuildMenu(Player player, GamerBuilds builds, Role role, SkillManager skillManager, RoleManager roleManager) {
         super(player, 45, Component.text(role.getName() + " Builds"));
@@ -49,6 +52,11 @@ public class BuildMenu extends Menu implements IRefreshingMenu {
         int slot = 11;
         for (int i = 1; i < 5; i++) {
             RoleBuild activeBuild = builds.getActiveBuilds().get(role.getName());
+            if (activeBuild == null) {
+                activeBuild = builds.getBuild(role, i).orElseThrow();
+                log.warn("setting active build for " + role.getName());
+                builds.getActiveBuilds().put(role.getName(), activeBuild);
+            }
             final boolean selected = activeBuild.getId() == i;
             Component buildName = Component.text("Build " + i, NamedTextColor.GRAY);
             if (selected) {
