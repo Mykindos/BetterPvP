@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.champions.champions.builds.menus.buttons;
 
-import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.DeleteBuildEvent;
