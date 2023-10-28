@@ -102,7 +102,7 @@ public abstract class Skill implements ISkill {
     public void loadSkillConfig() {
     }
 
-    protected boolean hasSkill(Player player) {
+    public boolean hasSkill(Player player) {
         Optional<GamerBuilds> gamerBuildsOptional = championsManager.getBuilds().getObject(player.getUniqueId());
         return gamerBuildsOptional.filter(this::hasSkill).isPresent();
     }

@@ -20,7 +20,7 @@ public interface CooldownSkill extends ISkill {
 
     default boolean shouldDisplayActionBar(Gamer gamer) {
         final Player found = gamer.getPlayer();
-        if (found == null) {
+        if (found == null || !hasSkill(found)) {
             return false;
         }
 
