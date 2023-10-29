@@ -74,6 +74,20 @@ public class UtilPlayer {
         return fetchNearbyEntityEvent.getEntities();
     }
 
+    public static List<Player> getNearbyPlayers(Location location, double radius, List<Player> players) {
+        List<Player> nearbyPlayers = new ArrayList<>();
+        for (Player player : players) {
+            if (player.getWorld().equals(location.getWorld()) && player.getLocation().distance(location) <= radius) {
+                nearbyPlayers.add(player);
+            }
+        }
+        return nearbyPlayers;
+    }
+
+    public static List<Player> getNearbyPlayers(Entity entity, double radius) {
+        return getNearbyPlayers(entity.getLocation(), radius, entity.getWorld().getPlayers());
+    }
+
     public static int getPing(Player player) {
         return player.getPing();
     }

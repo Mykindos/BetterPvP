@@ -12,9 +12,15 @@ import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LargeFireball;
@@ -26,6 +32,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -107,8 +114,26 @@ public class MoltenBlast extends Skill implements InteractSkill, CooldownSkill, 
         if (event.getEntity() instanceof LargeFireball largeFireball) {
             fireballs.remove(largeFireball);
             largeFireball.getWorld().playSound(largeFireball.getLocation(), Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 2.0f, 1.0f);
+
+            Location impactLocation = largeFireball.getLocation();
+
+            if (largeFireball.getShooter() instanceof Player player) {
+                UtilMessage.message(player, getClassType().getName(), "fireball is being detected and has a player instance");
+                UtilMessage.message(player, getClassType().getName(), "Fireball location: "+largeFireball.getLocation());
+
+                List<Player> nearbyPlayers = UtilPlayer.getNearbyPlayers(impactLocation, 4.0, impactLocation.getWorld().getPlayers());
+
+                for (Player nearbyPlayer : nearbyPlayers) {
+                    UtilMessage.message(player, getClassType().getName(), "There is a player in the list");
+                    Location playerLocation = nearbyPlayer.getLocation();
+
+                    Vector direction = playerLocation.toVector().subtract(impactLocation.toVector()).normalize();
+                    UtilVelocity.velocity(nearbyPlayer, direction, 3, false, 0.0, 1.0, 3.0, true);
+                }
+            }
         }
     }
+
 
 
     @EventHandler
