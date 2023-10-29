@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
+import me.mykindos.betterpvp.progression.tree.fishing.event.PlayerCaughtFishEvent;
 import me.mykindos.betterpvp.progression.tree.fishing.model.FishingLoot;
 import me.mykindos.betterpvp.progression.tree.fishing.model.FishingLootType;
 import org.bukkit.Material;
@@ -44,7 +45,7 @@ public class TreasureType implements FishingLootType {
             }
 
             @Override
-            public void processCatch(PlayerFishEvent event) {
+            public void processCatch(PlayerCaughtFishEvent event) {
                 final int count = RANDOM.ints(minAmount, maxAmount + 1)
                         .findFirst()
                         .orElse(minAmount);
