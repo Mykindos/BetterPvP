@@ -25,6 +25,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -35,6 +36,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 
 import java.util.Optional;
+import java.util.function.Function;
 
 @BPvPListener
 public class RoleListener implements Listener {
@@ -266,21 +268,20 @@ public class RoleListener implements Listener {
         });
     }
 
-    @EventHandler(priority = EventPriority.LOW)
+    @EventHandler(priority = EventPriority.NORMAL)
     public void onDeath(CustomDeathEvent event) {
-        if (event.getKilled() instanceof Player killed) {
-            roleManager.getObject(killed.getUniqueId()).ifPresent(role -> {
-                event.setCustomDeathMessage(event.getCustomDeathMessage()
-                        .replace(killed.getName(), "<green>" + role.getPrefix() + ".<yellow>" + killed.getName()));
-            });
-        }
-
-        if (event.getKiller() instanceof Player killer) {
-            roleManager.getObject(killer.getUniqueId()).ifPresent(role -> {
-                event.setCustomDeathMessage(event.getCustomDeathMessage()
-                        .replace(killer.getName(), "<green>" + role.getPrefix() + ".<yellow>" + killer.getName()));
-            });
-        }
+        final Function<LivingEntity, Component> def = event.getNameFormat();
+        event.setNameFormat(entity -> {
+            Component name = def.apply(entity);
+            if (entity instanceof Player player) {
+                final Optional<Role> role = roleManager.getObject(player.getUniqueId());
+                if (role.isPresent()) {
+                    final String prefix = role.get().getPrefix();
+                    name = Component.text(prefix + ". ", NamedTextColor.GREEN).append(name);
+                }
+            }
+            return name;
+        });
     }
 
 }

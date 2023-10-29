@@ -62,7 +62,7 @@ public class Cleave extends Skill implements PassiveSkill, Listener {
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
         if (!(event.getDamager() instanceof Player damager)) return;
         if (!UtilPlayer.isHoldingItem(damager, SkillWeapons.AXES)) return;
-        if (event.getReason().equals(getName())) return; // Don't get stuck in an endless damage loop
+        if (event.hasReason(getName())) return; // Don't get stuck in an endless damage loop
 
         int level = getLevel(damager);
         if (level > 0) {

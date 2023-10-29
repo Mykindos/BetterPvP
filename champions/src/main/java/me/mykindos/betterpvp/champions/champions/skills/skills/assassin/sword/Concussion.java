@@ -84,7 +84,7 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener 
         if (level <= 0) return;
 
         if (active.contains(damager.getUniqueId())) {
-            e.setReason("Concussion");
+            e.addReason("Concussion");
             damagee.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, (int) (level * durationPerLevel) * 20, 0));
             UtilMessage.simpleMessage(damager, getName(), "You gave <alt>" + damagee.getName() + "</alt> a concussion.");
             UtilMessage.simpleMessage(damagee, getName(), "<alt>" + damager.getName() + "</alt> gave you a concussion.");

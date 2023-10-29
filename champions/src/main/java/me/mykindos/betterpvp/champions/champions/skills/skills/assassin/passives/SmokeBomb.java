@@ -108,10 +108,8 @@ public class SmokeBomb extends Skill implements ToggleSkill, CooldownSkill, List
     public void onDamage(CustomDamageEvent event) {
         if (event.getDamager() instanceof Player player) {
             if (smoked.containsKey(player)) {
-                if (event.getReason() != null) {
-                    if (event.getReason().equalsIgnoreCase("Sever")) {
-                        return;
-                    }
+                if (event.hasReason("Sever")) {
+                    return;
                 }
 
                 reappear(player);

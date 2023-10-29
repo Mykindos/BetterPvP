@@ -70,7 +70,7 @@ public class ViperStrikes extends Skill implements PassiveSkill, Listener {
 
         final int ticks = (int) (getSeconds(level) * 20);
         damagee.addPotionEffect(PotionEffectType.POISON.createEffect(ticks, 0));
-        event.setReason(getName());
+        event.addReason(getName());
     }
 
 }
