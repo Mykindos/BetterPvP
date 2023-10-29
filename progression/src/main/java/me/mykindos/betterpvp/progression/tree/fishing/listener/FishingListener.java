@@ -5,6 +5,7 @@ import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.gamer.Gamer;
@@ -15,6 +16,7 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.display.TitleComponent;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.tree.fishing.Fishing;
+import me.mykindos.betterpvp.progression.tree.fishing.event.PlayerCaughtFishEvent;
 import me.mykindos.betterpvp.progression.tree.fishing.event.PlayerStartFishingEvent;
 import me.mykindos.betterpvp.progression.tree.fishing.event.PlayerStopFishingEvent;
 import me.mykindos.betterpvp.progression.tree.fishing.event.PlayerThrowBaitEvent;
@@ -203,7 +205,11 @@ public class FishingListener implements Listener {
                 Particle.VILLAGER_ANGRY.builder().location(hookLocation).receivers(60, true).spawn();
             }
             case CAUGHT_FISH -> {
-                // they reeled in the caught fish
+                final FishingLoot loot = fish.get(player);
+                getRandomLoot();
+                UtilServer.callEvent(new PlayerCaughtFishEvent(event.getPlayer(), loot, event.getHook(), event.getCaught()));
+
+                /*// they reeled in the caught fish
                 final FishingLoot caught = fish.get(player);
 
                 final Item entity = (Item) Objects.requireNonNull(event.getCaught());
@@ -231,7 +237,7 @@ public class FishingListener implements Listener {
 
                 FishingRodType rod = canMainReel ? main.get() : off.get();
                 UtilServer.callEvent(new PlayerStopFishingEvent(player, rod, caught, PlayerStopFishingEvent.FishingResult.CATCH, event));
-
+            */
                 // todo announce if they got on leaderboard and play firework sound
             }
         }
@@ -302,8 +308,9 @@ public class FishingListener implements Listener {
                 }
 
                 @Override
-                public void processCatch(PlayerFishEvent event) {
+                public void processCatch(PlayerCaughtFishEvent event) {
                     UtilMessage.message(event.getPlayer(), "Fishing", "<red>No fish registered! Please report this to an admin!");
+                    gamerManager.sendMessageToRank("Progression", UtilMessage.deserialize("<yellow>%s</yellow> <red>caught a FishingLootType null fish. Is the config correct? Please report this internally.", event.getPlayer()), Rank.HELPER);
                 }
             };
         }
