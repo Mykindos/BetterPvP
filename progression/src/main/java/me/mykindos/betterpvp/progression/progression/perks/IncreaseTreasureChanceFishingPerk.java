@@ -62,7 +62,7 @@ public class IncreaseTreasureChanceFishingPerk implements Listener, ProgressionP
                 fishing.getLootTypes().getElements().stream().anyMatch(o -> (o instanceof TreasureType));
     }
 
-    @EventHandler (priority = EventPriority.LOW)
+    @EventHandler (priority = EventPriority.HIGH)
     public void onCatch(PlayerCaughtFishEvent event) {
         //if we are already fishing up a treasure, don't change anything
         if ((event.getLoot().getType() instanceof TreasureType)) return;
@@ -72,7 +72,9 @@ public class IncreaseTreasureChanceFishingPerk implements Listener, ProgressionP
                 fishing.getLevel(player).whenComplete((level, throwable1) -> {
                     //cannot increase chance over the max level
                     if (level > maxLevel) level = maxLevel;
-                    double levelIncrease = (int) (1 + (1000 - minLevel) * increasePerLevel);
+                    //make leveling more intuitive
+                    level = level - minLevel;
+                    double levelIncrease = (int) (1 + level * increasePerLevel);
                     WeighedList<FishingLootType> lootTypes = new WeighedList<>();
                     //regenerate the WeighedList, increasing the frequency of TreasureTypes
                     for (FishingLootType type : fishing.getLootTypes()) {
