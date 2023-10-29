@@ -71,7 +71,7 @@ public class Backstab extends Skill implements PassiveSkill, Listener {
 
             }
 
-            event.setReason("Backstab");
+            event.addReason("Backstab");
         }
 
 

@@ -4,15 +4,19 @@ import com.google.inject.Inject;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
-import me.mykindos.betterpvp.core.combat.death.events.CustomDeathEvent;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
+import me.mykindos.betterpvp.core.combat.death.events.CustomDeathEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import net.kyori.adventure.text.Component;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
+
+import java.util.function.Function;
 
 @BPvPListener
 public class ClansDeathListener implements Listener {
@@ -26,23 +30,21 @@ public class ClansDeathListener implements Listener {
         this.damageLogManager = damageLogManager;
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.LOW)
     public void onDeath(CustomDeathEvent event) {
-        Player receiver = event.getReceiver();
+        final Player receiver = event.getReceiver();
         Clan receiverClan = clanManager.getClanByPlayer(receiver).orElse(null);
-        if (event.getKilled() instanceof Player killed) {
-            Clan killedClan = clanManager.getClanByPlayer(killed).orElse(null);
-            ClanRelation relation = clanManager.getRelation(receiverClan, killedClan);
-            event.setCustomDeathMessage(event.getCustomDeathMessage().replace(killed.getName(),
-                    relation.getPrimaryMiniColor() + killed.getName()));
-        }
 
-        if (event.getKiller() instanceof Player killer) {
-            Clan killerClan = clanManager.getClanByPlayer(killer).orElse(null);
-            ClanRelation relation = clanManager.getRelation(receiverClan, killerClan);
-            event.setCustomDeathMessage(event.getCustomDeathMessage().replace(killer.getName(),
-                    relation.getPrimaryMiniColor() + killer.getName()));
-        }
+        final Function<LivingEntity, Component> def = event.getNameFormat();
+        event.setNameFormat(entity -> {
+            Component name = def.apply(entity);
+            if (entity instanceof Player player) {
+                Clan playerClan = clanManager.getClanByPlayer(player).orElse(null);
+                ClanRelation relation = clanManager.getRelation(receiverClan, playerClan);
+                name = name.color(relation.getPrimary());
+            }
+            return name;
+        });
     }
 
     @EventHandler

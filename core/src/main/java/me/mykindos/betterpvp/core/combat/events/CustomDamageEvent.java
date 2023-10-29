@@ -9,6 +9,9 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class CustomDamageEvent extends CustomCancellableEvent {
@@ -24,7 +27,7 @@ public class CustomDamageEvent extends CustomCancellableEvent {
     private long damageDelay = 200;
     private LightningStrike lightning;
     private boolean ignoreArmour;
-    private String reason = "";
+    private Set<String> reason = new HashSet<>();
 
     private boolean doVanillaEvent;
 
@@ -59,7 +62,7 @@ public class CustomDamageEvent extends CustomCancellableEvent {
      */
     public CustomDamageEvent(LivingEntity damagee, LivingEntity damager, Projectile proj, DamageCause cause, double damage, boolean knockback, String reason) {
         this(damagee, damager, proj, cause, damage, knockback);
-        this.reason = reason;
+        this.reason.add(reason);
     }
 
     /**
@@ -82,6 +85,21 @@ public class CustomDamageEvent extends CustomCancellableEvent {
 
     }
 
+    public void addReason(String reason) {
+        this.reason.add(reason);
+    }
+
+    public String[] getReason() {
+        return reason.toArray(String[]::new);
+    }
+
+    public boolean hasReason(String reason) {
+        return this.reason.stream().anyMatch(s -> s.equalsIgnoreCase(reason));
+    }
+
+    public boolean hasReason() {
+        return !reason.isEmpty();
+    }
 
     /**
      * Sets the damage of the event
