@@ -14,7 +14,7 @@ public class DamageLog {
 
     private final EntityDamageEvent.DamageCause damageCause;
     private final double damage;
-    private final String reason;
+    private final String[] reason;
     private final long expiry = System.currentTimeMillis() + 10000;
 
 

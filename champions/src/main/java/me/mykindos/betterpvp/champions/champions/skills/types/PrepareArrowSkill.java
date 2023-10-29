@@ -39,7 +39,7 @@ public abstract class PrepareArrowSkill extends PrepareSkill implements Cooldown
 
             onHit(damager, event.getDamagee(), level);
             arrows.remove(arrow);
-            event.setReason(getName());
+            event.addReason(getName());
 
         }
 

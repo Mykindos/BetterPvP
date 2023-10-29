@@ -81,7 +81,7 @@ public class WolvesFury extends Skill implements InteractSkill, CooldownSkill, L
         int level = getLevel(damager);
         if(level > 0) {
             e.setKnockback(false);
-            e.setReason(getName());
+            e.addReason(getName());
         }
 
     }
