@@ -324,7 +324,7 @@ public class RoleListener implements Listener {
             }
         }
 
-    @EventHandler(priority = EventPriority.LOW)
+    @EventHandler(priority = EventPriority.HIGH)
     public void onDamageReduction(CustomDamageReductionEvent event) {
         CustomDamageEvent damageEvent = event.getCustomDamageEvent();
         if (damageEvent.isIgnoreArmour()) return;

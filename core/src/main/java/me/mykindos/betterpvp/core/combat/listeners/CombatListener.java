@@ -141,7 +141,7 @@ public class CombatListener implements Listener {
 
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.LOW)
     private void onCustomDamageReduction(CustomDamageReductionEvent event) {
         event.setDamage(armourManager.getDamageReduced(event.getCustomDamageEvent().getDamage(), event.getCustomDamageEvent().getDamagee()));
     }
