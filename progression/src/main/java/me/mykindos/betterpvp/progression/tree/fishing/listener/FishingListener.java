@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.tree.fishing.Fishing;
 import me.mykindos.betterpvp.progression.tree.fishing.event.PlayerStartFishingEvent;
 import me.mykindos.betterpvp.progression.tree.fishing.event.PlayerStopFishingEvent;
+import me.mykindos.betterpvp.progression.tree.fishing.event.PlayerThrowBaitEvent;
 import me.mykindos.betterpvp.progression.tree.fishing.fish.Fish;
 import me.mykindos.betterpvp.progression.tree.fishing.model.Bait;
 import me.mykindos.betterpvp.progression.tree.fishing.model.BaitType;
@@ -271,12 +272,18 @@ public class FishingListener implements Listener {
 
         event.setCancelled(true);
         event.getItem().subtract();
+
         final BaitType baitType = typeOpt.get();
+        final Bait bait = baitType.generateBait();
+        UtilServer.callEvent(new PlayerThrowBaitEvent(event.getPlayer(), bait));
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onBait (PlayerThrowBaitEvent event) {
         final Vector velocity = event.getPlayer().getLocation().getDirection().normalize().multiply(new Vector(1.5, 2.0, 1.5));
         final Location location = event.getPlayer().getEyeLocation();
-        final Bait bait = baitType.generateBait();
-        bait.spawn(progression, location, velocity);
-        activeBaits.put(event.getPlayer(), bait);
+        event.getBait().spawn(progression, location, velocity);
+        activeBaits.put(event.getPlayer(), event.getBait());
     }
 
     private void splash(Location hookLocation) {
