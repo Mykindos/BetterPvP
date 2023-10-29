@@ -30,6 +30,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityShootBowEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -50,6 +51,11 @@ public class RoleListener implements Listener {
         this.gamerManager = gamerManager;
         this.buildManager = buildManager;
         this.cooldownManager = cooldownManager;
+    }
+
+    @EventHandler
+    public void onLeave(PlayerQuitEvent event) {
+        roleManager.removeObject(event.getPlayer().getUniqueId().toString());
     }
 
     @EventHandler(priority = EventPriority.LOWEST)

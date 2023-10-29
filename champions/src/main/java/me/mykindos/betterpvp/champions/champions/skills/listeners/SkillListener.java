@@ -6,20 +6,14 @@ import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
 import me.mykindos.betterpvp.champions.champions.builds.BuildSkill;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
+import me.mykindos.betterpvp.champions.champions.builds.event.LoadBuildsEvent;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillDequipEvent;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillEquipEvent;
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.champions.champions.roles.events.RoleChangeEvent;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
-import me.mykindos.betterpvp.champions.champions.skills.types.ActiveToggleSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.PrepareSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.ToggleSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.*;
 import me.mykindos.betterpvp.core.components.champions.ISkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -45,7 +39,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.potion.PotionEffectType;
 
@@ -330,21 +323,18 @@ public class SkillListener implements Listener {
         event.getSkill().invalidatePlayer(event.getPlayer());
     }
 
-    @EventHandler
-    public void onJoin(PlayerJoinEvent event) {
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onLoadBuilds(LoadBuildsEvent event) {
         final Player player = event.getPlayer();
 
         Role role = roleManager.getObject(player.getUniqueId().toString()).orElse(null);
-        Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(player.getUniqueId().toString());
-        if (gamerBuildsOptional.isPresent()) {
-            GamerBuilds builds = gamerBuildsOptional.get();
+        GamerBuilds builds = event.getGamerBuilds();
 
-            // Track new skills
-            String name = role == null ? null : role.getName();
-            RoleBuild build = builds.getActiveBuilds().get(name);
-            if (build != null) {
-                build.getActiveSkills().forEach(skill -> skill.invalidatePlayer(player));
-            }
+        // Track new skills
+        String name = role == null ? null : role.getName();
+        RoleBuild build = builds.getActiveBuilds().get(name);
+        if (build != null) {
+            build.getActiveSkills().forEach(skill -> skill.trackPlayer(player));
         }
     }
 
