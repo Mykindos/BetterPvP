@@ -21,6 +21,8 @@ import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.JoinConfiguration;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -276,8 +278,8 @@ public class RoleListener implements Listener {
             if (entity instanceof Player player) {
                 final Optional<Role> role = roleManager.getObject(player.getUniqueId());
                 if (role.isPresent()) {
-                    final String prefix = role.get().getPrefix();
-                    name = Component.text(prefix + ". ", NamedTextColor.GREEN).append(name);
+                    final TextComponent prefix = Component.text(role.get().getPrefix() + ".", NamedTextColor.GREEN);
+                    name = Component.join(JoinConfiguration.separator(Component.space()), prefix, name);
                 }
             }
             return name;
