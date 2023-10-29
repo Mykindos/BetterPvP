@@ -66,12 +66,13 @@ public class IncreaseFishWeightFishingPerk implements Listener, ProgressionPerk 
             fishing.hasPerk(player, getClass()).whenComplete((hasPerk, throwable) -> {
                 if (hasPerk) {
                     fishing.getLevel(player).whenComplete((level, throwable1) -> {
-                        //cannot increase chance over the max level
+                        //cannot increase weight over the max level
                         if (level > maxLevel) level = maxLevel;
-                        double levelIncrease = (int) (1 + (1000 - minLevel) * increasePerLevel);
+                        //make leveling more intuitive
+                        level = level - minLevel;
+                        double levelIncrease = (int) (1 + level * increasePerLevel);
                         int weight = (int) (fish.getWeight() * levelIncrease);
                         if (weight > fish.getType().getMaxWeight()) weight = fish.getType().getMaxWeight();
-                        Bukkit.broadcast(UtilMessage.deserialize("Increasing weight from %s to %s", fish.getWeight(), weight));
                         //make a new fish
                         event.setLoot(new Fish(fish.getType(), weight));
                     }).exceptionally(throwable1 -> {

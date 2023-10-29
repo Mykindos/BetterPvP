@@ -54,17 +54,18 @@ public class LongerBaitFishingPerk implements Listener, ProgressionPerk {
 
     @Override
     public boolean canUse(Player player, ProgressionData<?> data) {
-        return minLevel <= data.getLevel() && data.getLevel() <= maxLevel;
+        return minLevel <= data.getLevel();
     }
 
-    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBait(PlayerThrowBaitEvent event) {
         Player player = event.getPlayer();
         fishing.hasPerk(player, getClass()).whenComplete((hasPerk, throwable) -> {
             if (hasPerk) {
                 fishing.getLevel(player).whenComplete((level, throwable1) -> {
-                    //cannot increase chance over the max level
                     if (level > maxLevel) level = maxLevel;
+                    //make leveling more intuitive
+                    level = level - minLevel;
                     Bait bait = event.getBait();
                     long multiplier = (long) (1 + (level * increasePerLevel));
                     bait.setDurationTicks((bait.getDurationTicks() * multiplier));
