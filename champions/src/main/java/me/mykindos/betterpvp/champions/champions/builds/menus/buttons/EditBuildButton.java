@@ -30,12 +30,10 @@ public class EditBuildButton extends Button {
         this.role = role;
         this.buildNumber = buildNumber;
         this.skillManager = skillManager;
-        log.info("edit buildNumber " + buildNumber);
     }
 
     @Override
     public void onClick(Player player, Gamer gamer, ClickType clickType) {
-        log.info("click edit buildNumber " + buildNumber);
         MenuManager.openMenu(player, new SkillMenu(player, builds, role, buildNumber, skillManager));
         player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1.0F, 2.0F);
     }

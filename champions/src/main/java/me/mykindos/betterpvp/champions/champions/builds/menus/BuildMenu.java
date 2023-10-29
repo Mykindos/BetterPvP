@@ -62,7 +62,6 @@ public class BuildMenu extends Menu implements IRefreshingMenu {
             if (selected) {
                 buildName = Component.text("\u00BB Build " + i + " \u00AB", NamedTextColor.GREEN);
             }
-            log.info("" + i);
             addButton(new ApplyBuildButton(builds, role, i, slot, getApplyBuildItem(i, selected), buildName));
             addButton(new EditBuildButton(builds, role, i, skillManager, slot + 9));
             addButton(new DeleteBuildButton(builds, role, i, slot + 18));

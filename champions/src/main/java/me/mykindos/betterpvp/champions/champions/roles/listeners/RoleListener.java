@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.champions.champions.roles.events.RoleChangeEvent;
 import me.mykindos.betterpvp.core.combat.death.events.CustomDeathEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageDurabilityEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.CustomDamageReductionEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
@@ -322,4 +323,16 @@ public class RoleListener implements Listener {
                 }
             }
         }
+
+    @EventHandler(priority = EventPriority.LOW)
+    public void onDamageReduction(CustomDamageReductionEvent event) {
+        CustomDamageEvent damageEvent = event.getCustomDamageEvent();
+        if (damageEvent.isIgnoreArmour()) return;
+        if (damageEvent.getDamagee() instanceof Player damagee) {
+            Role role = roleManager.getRole(damagee);
+            if (role == null) return;
+            event.setDamage(damageEvent.getRawDamage() * role.getDamageMultiplier());
+        }
+    }
+
     }

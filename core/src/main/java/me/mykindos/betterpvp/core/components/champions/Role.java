@@ -254,6 +254,10 @@ public class Role {
         }
     }
 
+    public double getDamageMultiplier() {
+        return 20/maxHealth;
+    }
+
     public String getName() {
         return key;
     }
