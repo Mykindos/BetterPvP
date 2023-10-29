@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.champions.champions.roles.listeners;
 
 import com.google.inject.Inject;
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
@@ -39,6 +40,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.util.Optional;
 
+@Slf4j
 @BPvPListener
 public class RoleListener implements Listener {
 
@@ -334,5 +336,4 @@ public class RoleListener implements Listener {
             event.setDamage(damageEvent.getRawDamage() * role.getDamageMultiplier());
         }
     }
-
-    }
+}

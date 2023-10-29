@@ -117,10 +117,10 @@ public class CombatListener implements Listener {
                     }
                 }
 
+                event.setRawDamage(event.getDamage());
                 CustomDamageReductionEvent customDamageReductionEvent = UtilServer.callEvent(new CustomDamageReductionEvent(event, event.getDamage()));
                 //customDamageReductionEvent.setDamage(armourManager.getDamageReduced(event.getDamage(), event.getDamagee()));
 
-                event.setRawDamage(event.getDamage());
                 event.setDamage(event.isIgnoreArmour() ? event.getDamage() : customDamageReductionEvent.getDamage());
 
                 for (CustomDamageAdapter adapter : customDamageAdapters) {
@@ -169,7 +169,6 @@ public class CombatListener implements Listener {
             } else {
                 event.getDamagee().setHealth(event.getDamagee().getHealth() - event.getDamage());
             }
-
         }
     }
 
