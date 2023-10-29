@@ -18,7 +18,6 @@ public class UtilWorld {
         return chunk.getWorld().getName() + "/ " + chunk.getX() + "/ " + chunk.getZ();
     }
 
-
     public static Chunk stringToChunk(String string) {
         try {
             String[] tokens = string.split("/ ");
@@ -34,7 +33,7 @@ public class UtilWorld {
     }
 
     public static Location stringToLocation(String string) {
-        if (string == null || string.length() == 0) {
+        if (string == null || string.isEmpty()) {
             return null;
         }
 
