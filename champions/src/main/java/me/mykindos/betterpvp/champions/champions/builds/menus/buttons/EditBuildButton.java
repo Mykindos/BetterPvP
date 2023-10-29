@@ -23,7 +23,7 @@ public class EditBuildButton extends Button {
     private final SkillManager skillManager;
 
     public EditBuildButton(GamerBuilds builds, Role role, int buildNumber, SkillManager skillManager, int slot) {
-        super(slot, new ItemStack(Material.ANVIL), Component.text("Edit Build", NamedTextColor.GRAY));
+        super(slot, new ItemStack(Material.ANVIL), Component.text("Edit Build " + buildNumber, NamedTextColor.GRAY));
         this.builds = builds;
         this.role = role;
         this.buildNumber = buildNumber;

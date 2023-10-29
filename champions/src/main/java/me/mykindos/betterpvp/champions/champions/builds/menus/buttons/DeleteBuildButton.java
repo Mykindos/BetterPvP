@@ -24,7 +24,7 @@ public class DeleteBuildButton extends Button {
     private final int buildNumber;
 
     public DeleteBuildButton(GamerBuilds builds, Role role, int buildNumber, int slot) {
-        super(slot, new ItemStack(Material.RED_CONCRETE), Component.text("Delete" , NamedTextColor.RED));
+        super(slot, new ItemStack(Material.RED_CONCRETE), Component.text("Delete Build " + buildNumber , NamedTextColor.RED));
         this.builds = builds;
         this.role = role;
         this.buildNumber = buildNumber;
