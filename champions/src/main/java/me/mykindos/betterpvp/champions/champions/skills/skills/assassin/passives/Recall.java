@@ -160,7 +160,7 @@ public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listene
         }
         player.teleport(recallLocation);
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 2.0F, 2.0F);
-        UtilEntity.setHealth(player, currHealth + (currHealth * percentHealthRecovered));
+        UtilEntity.setHealth(player, currHealth + (recallData.getHealth() * percentHealthRecovered));
         UtilServer.callEvent(new EffectClearEvent(player));
 
         //sequentially go through all the markers, drawing lines between them
