@@ -39,7 +39,7 @@ public class DoorListener implements Listener {
 
         if (block.getType() == Material.IRON_DOOR || block.getType() == Material.IRON_TRAPDOOR) {
 
-            if (!clanManager.hasAccess(event.getPlayer(), event.getPlayer().getLocation())) {
+            if (!clanManager.hasAccess(event.getPlayer(), block.getLocation())) {
                 if (cooldownManager.use(event.getPlayer(), "Door", 250, false)) {
                     block.getWorld().playEffect(block.getLocation(), Effect.ZOMBIE_CHEW_WOODEN_DOOR, 0);
                 }

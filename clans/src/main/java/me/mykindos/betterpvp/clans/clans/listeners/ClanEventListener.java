@@ -191,7 +191,7 @@ public class ClanEventListener extends ClanListener {
         clan.getAlliances().clear();
 
         clanManager.getRepository().delete(clan);
-        clanManager.getObjects().remove(clan.getName());
+        clanManager.getObjects().remove(clan.getName().toLowerCase());
 
     }
 
