@@ -38,6 +38,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.util.Vector;
 
@@ -191,7 +192,7 @@ public class FishingListener implements Listener {
             }
             case REEL_IN -> {
                 // They reeled in before
-                UtilServer.callEvent(new PlayerStopFishingEvent(player, null, fish.getIfPresent(player), PlayerStopFishingEvent.FishingResult.EARLY_REEL));
+                UtilServer.callEvent(new PlayerStopFishingEvent(player, null, fish.getIfPresent(player), PlayerStopFishingEvent.FishingResult.EARLY_REEL, event));
                 fish.invalidate(player);
             }
             case FAILED_ATTEMPT -> {
@@ -217,7 +218,7 @@ public class FishingListener implements Listener {
                 boolean canOffReel = off.map(rod -> rod.canReel(caught)).orElse(false);
                 if (!canMainReel && !canOffReel) {
                     FishingRodType rod = main.orElse(off.orElse(null));
-                    UtilServer.callEvent(new PlayerStopFishingEvent(player, rod, caught, PlayerStopFishingEvent.FishingResult.BAD_ROD));
+                    UtilServer.callEvent(new PlayerStopFishingEvent(player, rod, caught, PlayerStopFishingEvent.FishingResult.BAD_ROD, event));
                     UtilMessage.message(event.getPlayer(), "Fishing", "<red>Your rod couldn't reel this <dark_red>%s</dark_red>!", caught.getType().getName());
                     entity.remove();
                     return; // Cancel if neither of the rods in your hand can reel
@@ -228,7 +229,7 @@ public class FishingListener implements Listener {
                 player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 5f, 0F);
 
                 FishingRodType rod = canMainReel ? main.get() : off.get();
-                UtilServer.callEvent(new PlayerStopFishingEvent(player, rod, caught, PlayerStopFishingEvent.FishingResult.CATCH));
+                UtilServer.callEvent(new PlayerStopFishingEvent(player, rod, caught, PlayerStopFishingEvent.FishingResult.CATCH, event));
 
                 // todo announce if they got on leaderboard and play firework sound
             }

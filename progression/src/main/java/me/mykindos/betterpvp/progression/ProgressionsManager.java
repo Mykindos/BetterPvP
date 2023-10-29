@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.progression;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import me.mykindos.betterpvp.progression.model.ProgressionPerk;
 import me.mykindos.betterpvp.progression.model.ProgressionTree;
 import org.reflections.Reflections;
 
@@ -47,6 +48,21 @@ public class ProgressionsManager {
 
     public void loadTrees() {
         trees.forEach(tree -> tree.loadConfig(progression.getConfig()));
+    }
+
+    public void loadPerks() {
+        Reflections reflections = new Reflections(getClass().getPackageName());
+        final Set<Class<? extends ProgressionPerk>> perkClasses = reflections.getSubTypesOf(ProgressionPerk.class);
+        for (Class<? extends ProgressionPerk> clazz : perkClasses) {
+            if (clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers())) continue;
+            final ProgressionPerk perk = progression.getInjector().getInstance(clazz);
+            progression.getInjector().injectMembers(perk);
+            final Class<? extends ProgressionTree>[] trees = perk.acceptedTrees();
+            for (Class<? extends ProgressionTree> tree : trees) {
+                fromClass(tree).addPerk(perk);
+            }
+        }
+        log.info("Loaded " + perkClasses.size() + " general progression perks");
     }
 
 }
