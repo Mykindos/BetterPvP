@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
+import me.mykindos.betterpvp.core.utilities.model.ConfigAccessor;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.model.stats.ProgressionStatsRepository;
 import me.mykindos.betterpvp.progression.tree.mining.Mining;
@@ -26,7 +27,7 @@ import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @Singleton
-public class MiningRepository extends ProgressionStatsRepository<Mining, MiningData> {
+public class MiningRepository extends ProgressionStatsRepository<Mining, MiningData> implements ConfigAccessor {
 
     private final Map<Material, Long> experiencePerBlock = new EnumMap<>(Material.class);
     private final Set<Material> leaderboardBlocks = new HashSet<>();

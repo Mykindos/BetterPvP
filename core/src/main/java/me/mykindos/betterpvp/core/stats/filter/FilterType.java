@@ -1,12 +1,12 @@
-package me.mykindos.betterpvp.core.stats.sort;
+package me.mykindos.betterpvp.core.stats.filter;
 
 import me.mykindos.betterpvp.core.stats.Leaderboard;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Defines parameters to sort the search of a {@link Leaderboard}
+ * Defines parameters to reduce the search of a {@link Leaderboard}
  */
-public interface SortType {
+public interface FilterType {
 
     @NotNull String getName();
 

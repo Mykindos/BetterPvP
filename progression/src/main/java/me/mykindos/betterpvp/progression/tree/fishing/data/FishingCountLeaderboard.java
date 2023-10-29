@@ -10,25 +10,25 @@ import me.mykindos.betterpvp.core.database.query.values.DoubleStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
 import me.mykindos.betterpvp.core.stats.Leaderboard;
+import me.mykindos.betterpvp.core.stats.SearchOptions;
 import me.mykindos.betterpvp.core.stats.sort.SortType;
+import me.mykindos.betterpvp.core.stats.sort.Sorted;
 import me.mykindos.betterpvp.core.stats.sort.TemporalSort;
 import me.mykindos.betterpvp.progression.Progression;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.SQLException;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
 @Singleton
-public class FishingCountLeaderboard extends Leaderboard<UUID, Long> {
+public class FishingCountLeaderboard extends Leaderboard<UUID, Long> implements Sorted {
 
     @Inject
     public FishingCountLeaderboard(Progression progression) {
-        super(progression, progression.getDatabasePrefix());
+        super(progression);
+        init();
     }
 
     @Override
@@ -37,12 +37,12 @@ public class FishingCountLeaderboard extends Leaderboard<UUID, Long> {
     }
 
     @Override
-    protected Comparator<Long> getSorter() {
+    public Comparator<Long> getSorter(SearchOptions searchOptions) {
         return Comparator.comparing(Long::intValue).reversed();
     }
 
     @Override
-    public SortType[] acceptedSortTypes() {
+    public SortType [] acceptedSortTypes() {
         return TemporalSort.values();
     }
 
@@ -52,9 +52,10 @@ public class FishingCountLeaderboard extends Leaderboard<UUID, Long> {
     }
 
     @Override
-    protected Long fetch(SortType sortType, @NotNull Database database, @NotNull String tablePrefix, @NotNull UUID entry) {
+    @SneakyThrows
+    protected Long fetch(@NotNull SearchOptions options, @NotNull Database database, @NotNull String tablePrefix, @NotNull UUID entry) {
         AtomicLong count = new AtomicLong();
-        final TemporalSort type = (TemporalSort) sortType;
+        final TemporalSort type = (TemporalSort) Objects.requireNonNull(options.getSort());
         Statement statement = new Statement("CALL GetGamerFishingCount(?, ?)",
                 new UuidStatementValue(entry),
                 new DoubleStatementValue(type.getDays())); // Top 10
@@ -73,10 +74,10 @@ public class FishingCountLeaderboard extends Leaderboard<UUID, Long> {
 
     @SneakyThrows
     @Override
-    protected Map<UUID, Long> fetchAll(@NotNull SortType sortType, @NotNull Database database, @NotNull String tablePrefix) {
+    protected Map<UUID, Long> fetchAll(@NotNull SearchOptions options, @NotNull Database database, @NotNull String tablePrefix) {
         Map<UUID, Long> leaderboard = new HashMap<>();
 
-        final TemporalSort type = (TemporalSort) sortType;
+        final TemporalSort type = (TemporalSort) Objects.requireNonNull(options.getSort());
         Statement statement = new Statement("CALL GetTopFishingByCount(?, ?)",
                 new DoubleStatementValue(type.getDays()),
                 new IntegerStatementValue(10)); // Top 10
@@ -92,6 +93,5 @@ public class FishingCountLeaderboard extends Leaderboard<UUID, Long> {
             }
         });
 
-        return leaderboard;
-    }
+        return leaderboard;    }
 }

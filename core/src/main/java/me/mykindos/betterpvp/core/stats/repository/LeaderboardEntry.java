@@ -33,4 +33,9 @@ public class LeaderboardEntry<E, T> {
     public int hashCode() {
         return key.hashCode();
     }
+
+    @Override
+    public String toString() {
+        return key.toString() + ": " + value.toString();
+    }
 }
