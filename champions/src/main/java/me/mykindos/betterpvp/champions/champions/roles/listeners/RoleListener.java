@@ -279,7 +279,7 @@ public class RoleListener implements Listener {
                 final Optional<Role> role = roleManager.getObject(player.getUniqueId());
                 if (role.isPresent()) {
                     final TextComponent prefix = Component.text(role.get().getPrefix() + ".", NamedTextColor.GREEN);
-                    name = Component.join(JoinConfiguration.separator(Component.space()), prefix, name);
+                    name = Component.join(JoinConfiguration.noSeparators(), prefix, name);
                 }
             }
             return name;
