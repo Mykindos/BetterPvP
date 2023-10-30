@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.clans.clans.listeners.ClanListener;
 import me.mykindos.betterpvp.clans.fields.event.FieldsInteractableUseEvent;
 import me.mykindos.betterpvp.clans.fields.model.FieldsBlock;
 import me.mykindos.betterpvp.clans.fields.model.FieldsInteractable;
+import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.events.ClientAdministrateEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.gamer.Gamer;
@@ -16,6 +17,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -63,6 +65,8 @@ public class FieldsListener extends ClanListener {
 
         fields.addBlocks(toSave);
         UtilMessage.message(event.getPlayer(), "Fields", "Saved <alt2>%s</alt2> interactables change(s) to the database.", toSave.size());
+        Component message = UtilMessage.deserialize("<yellow>%s</yellow> saved <green>%s</green> interactables changes(s) to the database.", event.getPlayer().getName(), toSave.size());
+        gamerManager.sendMessageToRank("Fields", message, Rank.HELPER);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -142,6 +146,8 @@ public class FieldsListener extends ClanListener {
         // If they're admin, and they placed an interactable, then save it
         profiles.computeIfAbsent(player, p -> {
             UtilMessage.message(player, "Fields", "<red>You are now editing interactables in Fields. <u>Your changes will be saved when you stop administrating.</u></red>");
+            Component message = UtilMessage.deserialize("<yellow>%s</yellow> is now editing interactables in Fields", player.getName());
+            gamerManager.sendMessageToRank("Fields", message, Rank.HELPER);
             return new HashMap<>();
         }).put(block, blockType);
     }
