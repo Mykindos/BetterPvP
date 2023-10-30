@@ -10,7 +10,7 @@ import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.model.ProgressionPerk;
 import me.mykindos.betterpvp.progression.model.ProgressionTree;
 import me.mykindos.betterpvp.progression.model.stats.ProgressionData;
-import me.mykindos.betterpvp.progression.progression.perks.DropMultiplier;
+import me.mykindos.betterpvp.progression.progression.perks.ChanceHandler;
 import me.mykindos.betterpvp.progression.tree.fishing.Fishing;
 import me.mykindos.betterpvp.progression.tree.fishing.event.PlayerStopFishingEvent;
 import me.mykindos.betterpvp.progression.tree.fishing.fish.Fish;
@@ -23,7 +23,7 @@ import org.bukkit.event.Listener;
 @BPvPListener
 @Singleton
 @Slf4j
-public class DropMultiplierFishingPerk implements Listener, ProgressionPerk, DropMultiplier {
+public class DropMultiplierFishingPerk implements Listener, ProgressionPerk, ChanceHandler {
 
     @Config(path = "fishing.perks.drop-multiplier.minLevel", defaultValue = "0")
     @Inject
@@ -71,7 +71,7 @@ public class DropMultiplierFishingPerk implements Listener, ProgressionPerk, Dro
                     fishing.getLevel(player).whenComplete((level, throwable1) -> {
                         //cannot increase chance over the max level
                         if (level > maxLevel) level = maxLevel;
-                        int extraDrops = getExtraDrops((level - minLevel) * increasePerLevel);
+                        int extraDrops = getChance((level - minLevel) * increasePerLevel);
                         Location playerLocation = player.getLocation();
                         for (int i = 0; i < extraDrops; i++) {
                             playerLocation.getWorld().dropItemNaturally(playerLocation, loot.getFishBucket());
