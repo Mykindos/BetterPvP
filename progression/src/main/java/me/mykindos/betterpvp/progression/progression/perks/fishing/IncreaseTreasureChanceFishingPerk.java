@@ -58,8 +58,9 @@ public class IncreaseTreasureChanceFishingPerk implements Listener, ProgressionP
 
     @Override
     public boolean canUse(Player player, ProgressionData<?> data) {
-        return minLevel <= data.getLevel() &&
-                fishing.getLootTypes().getElements().stream().anyMatch(o -> (o instanceof TreasureType));
+        return false;
+        //return minLevel <= data.getLevel() &&
+        //        fishing.getLootTypes().getElements().stream().anyMatch(o -> (o instanceof TreasureType));
     }
 
     @EventHandler (priority = EventPriority.HIGH)
