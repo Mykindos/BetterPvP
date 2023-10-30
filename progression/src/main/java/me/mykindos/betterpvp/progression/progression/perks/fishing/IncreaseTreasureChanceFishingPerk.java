@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.progression.progression.perks;
+package me.mykindos.betterpvp.progression.progression.perks.fishing;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
