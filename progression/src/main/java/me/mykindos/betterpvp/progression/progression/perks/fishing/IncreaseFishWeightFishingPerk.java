@@ -1,19 +1,19 @@
-package me.mykindos.betterpvp.progression.progression.perks;
-
+package me.mykindos.betterpvp.progression.progression.perks.fishing;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.model.ProgressionPerk;
 import me.mykindos.betterpvp.progression.model.ProgressionTree;
 import me.mykindos.betterpvp.progression.model.stats.ProgressionData;
 import me.mykindos.betterpvp.progression.tree.fishing.Fishing;
-import me.mykindos.betterpvp.progression.tree.fishing.event.PlayerStopFishingEvent;
+import me.mykindos.betterpvp.progression.tree.fishing.event.PlayerCaughtFishEvent;
 import me.mykindos.betterpvp.progression.tree.fishing.fish.Fish;
-import org.bukkit.Location;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -22,17 +22,16 @@ import org.bukkit.event.Listener;
 @BPvPListener
 @Singleton
 @Slf4j
-public class DropMultiplierFishingPerk implements Listener, ProgressionPerk, DropMultiplier {
-
-    @Config(path = "fishing.perks.drop-multiplier.minLevel", defaultValue = "0")
+public class IncreaseFishWeightFishingPerk implements Listener, ProgressionPerk {
+    @Config(path = "fishing.perks.fish-weight.minLevel", defaultValue = "0")
     @Inject
     private int minLevel;
 
-    @Config(path = "fishing.perks.drop-multiplier.maxLevel", defaultValue = "1000")
+    @Config(path = "fishing.perks.fish-weight.maxLevel", defaultValue = "1000")
     @Inject
     private int maxLevel;
 
-    @Config(path = "fishing.perks.drop-multiplier.increasePerLevel", defaultValue = "0.25")
+    @Config(path = "fishing.perks.fish-weight.increasePerLevel", defaultValue = "0.0005")
     @Inject
     private double increasePerLevel;
 
@@ -45,12 +44,12 @@ public class DropMultiplierFishingPerk implements Listener, ProgressionPerk, Dro
 
     @Override
     public String getName() {
-        return "Drop Multiplier Fishing";
+        return "Increase Fish Weight Fishing";
     }
 
     @Override
     public Class<? extends ProgressionTree>[] acceptedTrees() {
-        return new Class[] {
+        return new Class[]{
                 Fishing.class
         };
     }
@@ -60,23 +59,24 @@ public class DropMultiplierFishingPerk implements Listener, ProgressionPerk, Dro
         return minLevel <= data.getLevel();
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
-    public void onCatch(PlayerStopFishingEvent event) {
-        if (event.getReason() != PlayerStopFishingEvent.FishingResult.CATCH) return;
-        if (event.getLoot() instanceof Fish loot) {
+    @EventHandler (priority = EventPriority.NORMAL)
+    public void onCatch(PlayerCaughtFishEvent event) {
+        if ((event.getLoot() instanceof Fish fish)) {
             Player player = event.getPlayer();
             fishing.hasPerk(player, getClass()).whenComplete((hasPerk, throwable) -> {
                 if (hasPerk) {
                     fishing.getLevel(player).whenComplete((level, throwable1) -> {
-                        //cannot increase chance over the max level
+                        //cannot increase weight over the max level
                         if (level > maxLevel) level = maxLevel;
-                        int extraDrops = getExtraDrops((level - minLevel) * increasePerLevel);
-                        Location playerLocation = player.getLocation();
-                        for (int i = 0; i < extraDrops; i++) {
-                            playerLocation.getWorld().dropItemNaturally(playerLocation, loot.getFishBucket());
-                        }
+                        //make leveling more intuitive
+                        level = level - minLevel;
+                        double levelIncrease = (int) (1 + level * increasePerLevel);
+                        int weight = (int) (fish.getWeight() * levelIncrease);
+                        if (weight > fish.getType().getMaxWeight()) weight = fish.getType().getMaxWeight();
+                        //make a new fish
+                        event.setLoot(new Fish(fish.getType(), weight));
                     }).exceptionally(throwable1 -> {
-                        log.error("Failed to check if player " + event.getPlayer().getName() + " has a level ", throwable);
+                        log.error("Failed to check if player " + event.getPlayer().getName() + " has a level ", throwable1);
                         return null;
                     });
                 }
@@ -85,8 +85,5 @@ public class DropMultiplierFishingPerk implements Listener, ProgressionPerk, Dro
                 return null;
             });
         }
-
-
-
     }
 }
