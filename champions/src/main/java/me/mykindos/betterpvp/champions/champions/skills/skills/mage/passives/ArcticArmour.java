@@ -22,6 +22,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.Levelled;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -58,7 +59,6 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill {
 
     @Override
     public String[] getDescription(int level) {
-
         return new String[]{
                 "Drop your Sword / Axe to toggle",
                 "",
@@ -110,7 +110,6 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill {
                     iterator.remove();
                 } else if (!championsManager.getEnergy().use(player, getName(), getEnergy(level) / 2, true)) {
                     iterator.remove();
-
                 } else if (championsManager.getEffects().hasEffect(player, EffectType.SILENCE)) {
                     iterator.remove();
                 } else {
@@ -120,6 +119,11 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill {
 
                     player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20, resistanceStrength));
                     championsManager.getEffects().addEffect(player, EffectType.RESISTANCE, resistanceStrength + 1, 1000);
+                    // Apply ice effect
+                    convertWaterToIce(player, getDuration(level), distance);
+
+                    player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20, 0));
+                    championsManager.getEffects().addEffect(player, EffectType.RESISTANCE, 1, 1000);
 
                     for (var data : UtilPlayer.getNearbyPlayers(player, distance)) {
                         Player target = data.getKey();
@@ -154,17 +158,30 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill {
 
     }
 
+    private void convertWaterToIce(Player player, double duration, int radius) {
+        HashMap<Block, Double> blocks = UtilBlock.getInRadius(player.getLocation(), radius);
+        for (Block block : blocks.keySet()) {
+            if (block.getLocation().getY() <= player.getLocation().getY()) {
+                if (block.getType() == Material.WATER) {
+                    // Check if it's a water source block
+                    if (block.getBlockData() instanceof Levelled water) {
+                        if (water.getLevel() == 0) {
+                            blockHandler.addRestoreBlock(block, Material.ICE, (long) duration * 1000);
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     @Override
     public SkillType getType() {
-
         return SkillType.PASSIVE_B;
     }
 
 
     @Override
     public float getEnergy(int level) {
-
         return (float) (energy - ((level - 1) * energyDecreasePerLevel));
     }
 
