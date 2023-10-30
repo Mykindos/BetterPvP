@@ -34,7 +34,7 @@ public class IncreaseFishWeightFishingPerk implements Listener, ProgressionPerk,
     @Inject
     private double increasePerLevel;
 
-    @Config(path = "fishing.perks.fish-weight.increaseWeight", defaultValue = "0.20");
+    @Config(path = "fishing.perks.fish-weight.increaseWeight", defaultValue = "0.20")
     @Inject
     private double increaseWeight;
 
