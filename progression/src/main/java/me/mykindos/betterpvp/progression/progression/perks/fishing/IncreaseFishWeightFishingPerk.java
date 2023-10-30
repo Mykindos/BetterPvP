@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.model.ProgressionPerk;
 import me.mykindos.betterpvp.progression.model.ProgressionTree;
@@ -13,6 +14,7 @@ import me.mykindos.betterpvp.progression.progression.perks.ChanceHandler;
 import me.mykindos.betterpvp.progression.tree.fishing.Fishing;
 import me.mykindos.betterpvp.progression.tree.fishing.event.PlayerCaughtFishEvent;
 import me.mykindos.betterpvp.progression.tree.fishing.fish.Fish;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -74,10 +76,16 @@ public class IncreaseFishWeightFishingPerk implements Listener, ProgressionPerk,
                         //make leveling more intuitive
                         level = level - minLevel;
                         double chanceMultiplier = getChance(level * increasePerLevel);
-                        int weight = (int) (fish.getWeight() * chanceMultiplier * increaseWeight);
-                        if (weight > fish.getType().getMaxWeight()) weight = fish.getType().getMaxWeight();
-                        //make a new fish
-                        event.setLoot(new Fish(fish.getType(), weight));
+                        if (chanceMultiplier == 0) {
+                            return;
+                        }
+                        int weight = (int) (fish.getWeight() + (fish.getWeight() * chanceMultiplier * increaseWeight));
+                        //make a new fish if weight is > than old weight
+                        if (!(weight < fish.getWeight())) {
+                            event.setLoot(new Fish(fish.getType(), weight));
+                        }
+
+                        Bukkit.broadcast(UtilMessage.deserialize("Increasing weight from %s to %s", fish.getWeight(), weight));
                     }).exceptionally(throwable1 -> {
                         log.error("Failed to check if player " + event.getPlayer().getName() + " has a level ", throwable1);
                         return null;
