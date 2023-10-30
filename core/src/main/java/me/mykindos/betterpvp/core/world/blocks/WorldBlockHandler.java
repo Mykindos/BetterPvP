@@ -35,20 +35,20 @@ public class WorldBlockHandler {
 
     public void addRestoreBlock(Block block, Material newMaterial, long expiry) {
         Optional<RestoreBlock> restoreBlockOptional = getRestoreBlock(block);
-        if(restoreBlockOptional.isPresent()) {
+        if (restoreBlockOptional.isPresent()) {
             RestoreBlock restoreBlock = restoreBlockOptional.get();
             restoreBlock.setExpire(System.currentTimeMillis() + expiry);
-        }else{
+        } else {
             restoreBlocks.add(new RestoreBlock(block, newMaterial, expiry));
         }
     }
 
     public boolean isRestoreBlock(Block block) {
-        return restoreBlocks.stream().anyMatch(restoreBlock -> restoreBlock.getBlock().getLocation().equals(block.getLocation()));
+        return restoreBlocks.stream().anyMatch(restoreBlock -> restoreBlock.getBlock().equals(block));
     }
 
     public Optional<RestoreBlock> getRestoreBlock(Block block) {
-        return restoreBlocks.stream().filter(restoreBlock -> restoreBlock.getBlock().getLocation().equals(block.getLocation())).findFirst();
+        return restoreBlocks.stream().filter(restoreBlock -> restoreBlock.getBlock().equals(block)).findFirst();
     }
 
     public void outlineChunk(Chunk chunk) {
