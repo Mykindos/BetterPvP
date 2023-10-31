@@ -4,8 +4,10 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.insurance.Insurance;
 import me.mykindos.betterpvp.clans.clans.insurance.InsuranceType;
+import me.mykindos.betterpvp.clans.clans.leaderboard.ClanLeaderboard;
 import me.mykindos.betterpvp.clans.clans.pillage.Pillage;
 import me.mykindos.betterpvp.clans.clans.pillage.PillageHandler;
 import me.mykindos.betterpvp.clans.clans.pillage.events.PillageStartEvent;
@@ -20,11 +22,7 @@ import me.mykindos.betterpvp.core.framework.events.scoreboard.ScoreboardUpdateEv
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
-import me.mykindos.betterpvp.core.utilities.UtilTime;
-import me.mykindos.betterpvp.core.utilities.UtilWorld;
+import me.mykindos.betterpvp.core.utilities.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -34,14 +32,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 @Slf4j
@@ -50,9 +41,13 @@ public class ClanManager extends Manager<Clan> {
 
     @Getter
     private final ClanRepository repository;
+
     private final GamerManager gamerManager;
     @Getter
     private final PillageHandler pillageHandler;
+
+    @Getter
+    private final ClanLeaderboard leaderboard;
 
     private Map<Integer, Double> dominanceScale;
 
@@ -72,15 +67,15 @@ public class ClanManager extends Manager<Clan> {
     private boolean dominanceEnabled;
 
     @Inject
-    public ClanManager(ClanRepository repository, GamerManager gamerManager, PillageHandler pillageHandler) {
+    public ClanManager(Clans clans, ClanRepository repository, GamerManager gamerManager, PillageHandler pillageHandler) {
         this.repository = repository;
         this.gamerManager = gamerManager;
         this.pillageHandler = pillageHandler;
         this.dominanceScale = new HashMap<>();
         this.insuranceQueue = new ConcurrentLinkedQueue<>();
+        this.leaderboard = new ClanLeaderboard(clans, this);
 
         dominanceScale = repository.getDominanceScale();
-
     }
 
     public Optional<Clan> getClanById(UUID id) {
@@ -509,6 +504,7 @@ public class ClanManager extends Manager<Clan> {
         });
 
         log.info("Loaded {} clans", objects.size());
+        leaderboard.forceUpdate();
     }
 
     public boolean isInSafeZone(Player player) {
