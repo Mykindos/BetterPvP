@@ -195,7 +195,7 @@ public class FishingListener implements Listener {
             }
             case REEL_IN -> {
                 // They reeled in before
-                UtilServer.callEvent(new PlayerStopFishingEvent(player, null, fish.getIfPresent(player), PlayerStopFishingEvent.FishingResult.EARLY_REEL, event));
+                UtilServer.callEvent(new PlayerStopFishingEvent(player, null, fish.getIfPresent(player), PlayerStopFishingEvent.FishingResult.EARLY_REEL));
                 fish.invalidate(player);
             }
             case FAILED_ATTEMPT -> {
