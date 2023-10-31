@@ -77,7 +77,6 @@ public class IncreaseFishWeightFishingPerk implements Listener, ProgressionPerk,
                         //make leveling more intuitive
                         level = level - minLevel;
                         double chanceMultiplier = getChance(level * increasePerLevel);
-                        Bukkit.broadcast(Component.text(chanceMultiplier));
                         if (chanceMultiplier == 0) {
                             return;
                         }
@@ -86,8 +85,6 @@ public class IncreaseFishWeightFishingPerk implements Listener, ProgressionPerk,
                         if (!(weight < fish.getWeight())) {
                             event.setLoot(new Fish(fish.getType(), weight));
                         }
-
-                        Bukkit.broadcast(UtilMessage.deserialize("Increasing weight from %s to %s", fish.getWeight(), weight));
                     }).exceptionally(throwable1 -> {
                         log.error("Failed to check if player " + event.getPlayer().getName() + " has a level ", throwable1);
                         return null;
