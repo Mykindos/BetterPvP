@@ -1,5 +1,5 @@
 author: Moonsworth LLC Development Team, Mykindos
-main: me.mykindos.betterpvp.lunar.LunarClientAPI
+main: me.mykindos.betterpvp.lunar.Lunar
 name: Lunar
 load: STARTUP
 version: '1.0'
