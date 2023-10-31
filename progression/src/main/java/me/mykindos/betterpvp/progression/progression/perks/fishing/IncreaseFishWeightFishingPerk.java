@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.progression.progression.perks.ChanceHandler;
 import me.mykindos.betterpvp.progression.tree.fishing.Fishing;
 import me.mykindos.betterpvp.progression.tree.fishing.event.PlayerCaughtFishEvent;
 import me.mykindos.betterpvp.progression.tree.fishing.fish.Fish;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -76,6 +77,7 @@ public class IncreaseFishWeightFishingPerk implements Listener, ProgressionPerk,
                         //make leveling more intuitive
                         level = level - minLevel;
                         double chanceMultiplier = getChance(level * increasePerLevel);
+                        Bukkit.broadcast(Component.text(chanceMultiplier));
                         if (chanceMultiplier == 0) {
                             return;
                         }

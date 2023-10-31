@@ -243,6 +243,41 @@ public class FishingListener implements Listener {
         }
     }
 
+    @EventHandler(priority = EventPriority.MONITOR)
+    void onCatch (PlayerCaughtFishEvent event) {
+        //this is the final step
+        Player player = event.getPlayer();
+        FishHook hook = event.getHook();
+        final Item entity = (Item) Objects.requireNonNull(event.getCaught());
+        final FishingLoot caught = event.getLoot();
+        fish.invalidate(player);
+
+        splash(hook.getLocation());
+
+        final PlayerInventory inventory = player.getInventory();
+        final Optional<FishingRodType> main = fishing.getRodType(inventory.getItemInMainHand());
+        final Optional<FishingRodType> off = fishing.getRodType(inventory.getItemInOffHand());
+
+        boolean canMainReel = main.map(rod -> rod.canReel(caught)).orElse(false);
+        boolean canOffReel = off.map(rod -> rod.canReel(caught)).orElse(false);
+        if (!canMainReel && !canOffReel) {
+            FishingRodType rod = main.orElse(off.orElse(null));
+            UtilServer.callEvent(new PlayerStopFishingEvent(player, rod, caught, PlayerStopFishingEvent.FishingResult.BAD_ROD));
+            UtilMessage.message(event.getPlayer(), "Fishing", "<red>Your rod couldn't reel this <dark_red>%s</dark_red>!", caught.getType().getName());
+            entity.remove();
+            return; // Cancel if neither of the rods in your hand can reel
+        }
+
+        entity.setCanMobPickup(false);
+        caught.processCatch(event);
+        player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 5f, 0F);
+
+        FishingRodType rod = canMainReel ? main.get() : off.get();
+        UtilServer.callEvent(new PlayerStopFishingEvent(player, rod, caught, PlayerStopFishingEvent.FishingResult.CATCH));
+
+        // todo announce if they got on leaderboard and play firework sound
+    }
+
     @EventHandler
     public void onBucket(PlayerInteractEvent event) {
         if (!event.getAction().isRightClick()) {
