@@ -9,7 +9,7 @@ import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.DoubleStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
-import me.mykindos.betterpvp.core.stats.Leaderboard;
+import me.mykindos.betterpvp.core.stats.PlayerLeaderboard;
 import me.mykindos.betterpvp.core.stats.SearchOptions;
 import me.mykindos.betterpvp.core.stats.sort.SortType;
 import me.mykindos.betterpvp.core.stats.sort.Sorted;
@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
 @Singleton
-public class FishingWeightLeaderboard extends Leaderboard<UUID, Long> implements Sorted {
+public class FishingWeightLeaderboard extends PlayerLeaderboard<Long> implements Sorted {
 
     @Inject
     public FishingWeightLeaderboard(Progression progression) {

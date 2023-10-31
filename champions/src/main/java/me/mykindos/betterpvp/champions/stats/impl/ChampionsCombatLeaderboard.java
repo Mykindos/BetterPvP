@@ -13,7 +13,7 @@ import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
-import me.mykindos.betterpvp.core.stats.Leaderboard;
+import me.mykindos.betterpvp.core.stats.PlayerLeaderboard;
 import me.mykindos.betterpvp.core.stats.SearchOptions;
 import me.mykindos.betterpvp.core.stats.filter.FilterType;
 import me.mykindos.betterpvp.core.stats.filter.Filtered;
@@ -29,7 +29,7 @@ import java.util.concurrent.CompletableFuture;
 
 @Singleton
 @Slf4j
-public final class ChampionsCombatLeaderboard extends Leaderboard<UUID, CombatData> implements Sorted, Filtered {
+public final class ChampionsCombatLeaderboard extends PlayerLeaderboard<CombatData> implements Sorted, Filtered {
 
     private final ChampionsStatsRepository repository;
     private final GlobalCombatLeaderboard globalLeaderboard;
@@ -92,8 +92,8 @@ public final class ChampionsCombatLeaderboard extends Leaderboard<UUID, CombatDa
     }
 
     @Override
-    public Map<String, Component> getDescription(SearchOptions searchOptions, CombatData value) {
-        return globalLeaderboard.getDescription(searchOptions, value);
+    public Map<String, Component> describe(SearchOptions searchOptions, CombatData value) {
+        return globalLeaderboard.describe(searchOptions, value);
     }
 
     @Override

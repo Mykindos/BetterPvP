@@ -7,7 +7,7 @@ public enum ClanProperty {
 
     TIME_CREATED(true),
     LAST_LOGIN(true),
-    LEVEL(true),
+    EXPERIENCE(true),
     POINTS(true),
     ENERGY(true),
     NO_DOMINANCE_COOLDOWN(true),

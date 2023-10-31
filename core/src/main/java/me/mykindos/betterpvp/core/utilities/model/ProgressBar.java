@@ -7,8 +7,9 @@ import net.kyori.adventure.text.format.NamedTextColor;
 
 public class ProgressBar {
 
-    public static String SYMBOL = "\u258A";
+    public static char DEFAULT_SYMBOL = '\u258A';
 
+    private String symbol = String.valueOf(DEFAULT_SYMBOL);
     private final float progress; // Scales from 0 to 1.0
     private final int barLength;
     private boolean inverted = false;
@@ -26,6 +27,11 @@ public class ProgressBar {
         return this;
     }
 
+    public ProgressBar withCharacter(char character) {
+        symbol = String.valueOf(character);
+        return this;
+    }
+
     public TextComponent build() {
         int progressCount = (int) (progress * barLength);
         if (inverted) {
@@ -35,10 +41,10 @@ public class ProgressBar {
 
         TextComponent component = Component.empty();
         if (progressCount > 0) {
-            component = component.append(Component.text(SYMBOL.repeat(progressCount), NamedTextColor.GREEN));
+            component = component.append(Component.text(symbol.repeat(progressCount), NamedTextColor.GREEN));
         }
         if (remainingCount > 0) {
-            component = component.append(Component.text(SYMBOL.repeat(remainingCount), NamedTextColor.RED));
+            component = component.append(Component.text(symbol.repeat(remainingCount), NamedTextColor.RED));
         }
 
         return component;
