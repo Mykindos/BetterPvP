@@ -31,11 +31,6 @@ public class ClanCommandButton extends Button {
         lore.add(Component.text("",NamedTextColor.GRAY).decoration(TextDecoration.ITALIC,false));
         lore.add(Component.text("Left click to show more",NamedTextColor.GRAY).decoration(TextDecoration.ITALIC,false));
 
-
-
-
-
-
         this.itemStack = UtilItem.removeAttributes(UtilItem.setItemNameAndLore(itemStack, name, lore)).clone();
     }
 

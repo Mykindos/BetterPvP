@@ -8,7 +8,7 @@ import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
-import me.mykindos.betterpvp.core.stats.Leaderboard;
+import me.mykindos.betterpvp.core.stats.PlayerLeaderboard;
 import me.mykindos.betterpvp.core.stats.SearchOptions;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.tree.mining.repository.MiningRepository;
@@ -22,7 +22,7 @@ import java.util.UUID;
 
 @Slf4j
 @Singleton
-public class MiningOresMinedLeaderboard extends Leaderboard<UUID, Long> {
+public class MiningOresMinedLeaderboard extends PlayerLeaderboard<Long> {
 
     private final MiningRepository repository;
 
