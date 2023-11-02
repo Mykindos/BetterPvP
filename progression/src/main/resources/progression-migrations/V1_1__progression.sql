@@ -85,7 +85,7 @@ BEGIN
     SET @sql_query = CONCAT('
         SELECT SUM(AmountMined)
         FROM ', tablePrefix,'mining
-        WHERE Gamer = ', gamerName, ' AND Material IN (', blocks, ');'
+        WHERE Gamer = ''', gamerName, ''' AND Material IN (', blocks, ');'
         );
 
     PREPARE stmt FROM @sql_query;
