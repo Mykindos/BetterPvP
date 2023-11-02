@@ -119,7 +119,12 @@ public class MoltenBlast extends Skill implements InteractSkill, CooldownSkill, 
                 UtilMessage.message(player, getClassType().getName(), "fireball is being detected and has a player instance");
                 UtilMessage.message(player, getClassType().getName(), "Fireball location: "+largeFireball.getLocation());
 
-                List<KeyValue<Player, EntityProperty>> nearbyPlayers = UtilPlayer.getNearbyPlayers(player, impactLocation, 4.0, EntityProperty.ALL);
+                double radius = 4.0;
+
+                List<KeyValue<Player, EntityProperty>> nearbyPlayers = UtilPlayer.getNearbyPlayers(player, impactLocation, radius, EntityProperty.ALL);
+                if (player.getLocation().distanceSquared(impactLocation) <= radius * radius) {
+                    nearbyPlayers.add(new KeyValue<>(player, EntityProperty.FRIENDLY));
+                }
 
                 for (KeyValue<Player, EntityProperty> nearbyPlayer : nearbyPlayers) {
                     UtilMessage.message(player, getClassType().getName(), "There is a player in the list");
