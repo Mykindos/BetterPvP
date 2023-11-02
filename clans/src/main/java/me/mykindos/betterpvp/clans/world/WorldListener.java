@@ -21,6 +21,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Container;
+import org.bukkit.block.PistonMoveReaction;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -32,11 +33,7 @@ import org.bukkit.entity.Warden;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockBurnEvent;
-import org.bukkit.event.block.BlockIgniteEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.block.BlockSpreadEvent;
+import org.bukkit.event.block.*;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -267,6 +264,22 @@ public class WorldListener implements Listener {
             }
         });
 
+    }
+
+    @EventHandler
+    public void pistonSlimeExtend(BlockPistonExtendEvent event) {
+        if (event.isCancelled()) return;
+        if (event.getBlocks().stream().anyMatch(UtilBlock::isStickyBlock)) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void pistonSlimeRetract(BlockPistonRetractEvent event) {
+        if (event.isCancelled()) return;
+        if (event.getBlocks().stream().anyMatch(UtilBlock::isStickyBlock)) {
+            event.setCancelled(true);
+        }
     }
 
     /**

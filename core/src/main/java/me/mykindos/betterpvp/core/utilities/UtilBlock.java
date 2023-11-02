@@ -323,6 +323,19 @@ public class UtilBlock {
         return interactable || mat.name().contains("STAIR") || mat.name().contains("FENCE") || mat.name().contains("WIRE");
     }
 
+    /**
+     *
+     * @param block Block ID to check
+     * @return True if it is a Slime or Honey block
+     */
+    public static boolean isStickyBlock(Block block) {
+        return isStickyBlock(block.getType());
+    }
+
+    public static boolean isStickyBlock(Material material) {
+        return material == Material.SLIME_BLOCK || material == Material.HONEY_BLOCK;
+    }
+
     public static boolean isInLiquid(Entity ent) {
 
         return ent.isInWater() || ent.isInLava() || ent.isInBubbleColumn();
