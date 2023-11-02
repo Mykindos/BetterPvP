@@ -81,12 +81,12 @@ DROP PROCEDURE IF EXISTS GetCombatData;
 CREATE PROCEDURE GetCombatData(player varchar(36))
 BEGIN
     SELECT
-        IFNULL(kills_count, 0) AS Kills,
-        IFNULL(deaths_count, 0) AS Deaths,
-        IFNULL(assists_count, 0) AS Assists,
-        cs.Rating AS Rating,
-        cs.Killstreak AS Killstreak,
-        cs.HighestKillstreak AS HighestKillstreak
+        IFNULL(SUM(kills_count), 0) AS Kills,
+        IFNULL(SUM(deaths_count), 0) AS Deaths,
+        IFNULL(SUM(assists_count), 0) AS Assists,
+        MAX(cs.Rating) AS Rating,
+        MAX(cs.Killstreak) AS Killstreak,
+        MAX(cs.HighestKillstreak) AS HighestKillstreak
     FROM combat_stats AS cs
              LEFT JOIN (
         SELECT Killer, COUNT(*) AS kills_count
