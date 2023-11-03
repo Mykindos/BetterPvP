@@ -81,14 +81,14 @@ public class BuildRepository implements IRepository<RoleBuild> {
 
                 String bow = result.getString(6);
                 if (roleClass.hasSkill(SkillType.BOW, bow.split(",")[0])) {
-                    setSkill(build, SkillType.BOW, sword);
+                    setSkill(build, SkillType.BOW, bow);
                 } else {
                     setSkill(build, SkillType.BOW, null);
                 }
 
                 String passiveA = result.getString(7);
                 if (roleClass.hasSkill(SkillType.PASSIVE_A, passiveA.split(",")[0])) {
-                    setSkill(build, SkillType.PASSIVE_A, sword);
+                    setSkill(build, SkillType.PASSIVE_A, passiveA);
                 } else {
                     setSkill(build, SkillType.PASSIVE_A, null);
                 }
@@ -96,7 +96,7 @@ public class BuildRepository implements IRepository<RoleBuild> {
 
                 String passiveB = result.getString(8);
                 if (roleClass.hasSkill(SkillType.PASSIVE_B, passiveB.split(",")[0])) {
-                    setSkill(build, SkillType.PASSIVE_B, sword);
+                    setSkill(build, SkillType.PASSIVE_B, passiveB);
                 } else {
                     setSkill(build, SkillType.PASSIVE_B, null);
                 }
@@ -181,11 +181,14 @@ public class BuildRepository implements IRepository<RoleBuild> {
 
     public RoleBuild getDefaultBuild(String UUID, Role role, int id) {
         RoleBuild build = new RoleBuild(UUID, role, id);
-
-        build.setSkill(SkillType.SWORD, (Skill) role.getSwordSkills().stream().findFirst().orElseThrow(), 3);
-        build.setSkill(SkillType.AXE, (Skill) role.getAxeSkills().stream().findFirst().orElseThrow(), 5);
-        build.setSkill(SkillType.PASSIVE_A, (Skill) role.getPassiveA().stream().findFirst().orElseThrow(), 1);
-        build.setSkill(SkillType.PASSIVE_B, (Skill) role.getPassiveB().stream().findFirst().orElseThrow(), 3);
+        Skill sword = (Skill) role.getSwordSkills().stream().findFirst().orElseThrow();
+        Skill axe = (Skill) role.getAxeSkills().stream().findFirst().orElseThrow();
+        Skill passiveA = (Skill) role.getPassiveA().stream().findFirst().orElseThrow();
+        Skill passiveB = (Skill) role.getPassiveB().stream().findFirst().orElseThrow();
+        build.setSkill(SkillType.SWORD, sword, 3);
+        build.setSkill(SkillType.AXE, axe, 5);
+        build.setSkill(SkillType.PASSIVE_A, passiveA, 1);
+        build.setSkill(SkillType.PASSIVE_B, passiveB, 3);
         build.takePoints(12);
         return build;
     }
@@ -221,9 +224,7 @@ public class BuildRepository implements IRepository<RoleBuild> {
     public void loadActiveBuilds(GamerBuilds gamerBuilds) {
         //make sure there is an active build, if not, set it
         for (Role role : roleManager.getRoles()) {
-            if (gamerBuilds.getActiveBuilds().get(role.getName()) == null) {
-                gamerBuilds.getActiveBuilds().put(role.getName(), gamerBuilds.getBuilds().get(1));
-            }
+            gamerBuilds.getActiveBuilds().computeIfAbsent(role.getName(), k -> gamerBuilds.getBuilds().get(1));
         }
     }
 }
