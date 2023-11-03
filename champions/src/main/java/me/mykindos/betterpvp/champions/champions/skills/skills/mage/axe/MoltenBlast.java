@@ -32,6 +32,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
 import java.util.*;
@@ -45,6 +46,8 @@ public class MoltenBlast extends Skill implements InteractSkill, CooldownSkill, 
     public final List<LargeFireball> fireballs = new ArrayList<>();
 
     private double damage;
+
+    private final Map<LargeFireball, Long> fireballLaunchTimes = new HashMap<>();
 
     @Inject
     public MoltenBlast(Champions champions, ChampionsManager championsManager) {
@@ -103,8 +106,32 @@ public class MoltenBlast extends Skill implements InteractSkill, CooldownSkill, 
     public void onProjectileHit(ProjectileHitEvent event) {
         if (event.getEntity() instanceof LargeFireball largeFireball) {
             fireballs.remove(largeFireball);
+            fireballLaunchTimes.remove(largeFireball);
 
+            long endTime = System.currentTimeMillis();
+            Long startTime = fireballLaunchTimes.get(largeFireball);
+            if (startTime != null) {
+                long duration = endTime - startTime;
+                if (largeFireball.getShooter() instanceof Player player) {
+                    double travelTime = predictTravelTime(player, speed);
+                    UtilMessage.message(player, getClassType().getName(),
+                            "The fireball existed for " + (duration / 1000.0) + " seconds.");
+                    UtilMessage.message(player, getClassType().getName(),
+                            "Predicted travel time was " + travelTime + " seconds.");
+                }
+            }
         }
+    }
+
+    private double predictTravelTime(Player player, double fireballSpeed) {
+        Location startLocation = player.getEyeLocation();
+        Vector direction = startLocation.getDirection();
+        RayTraceResult rayTraceResult = startLocation.getWorld().rayTraceBlocks(startLocation, direction, 100); // Max distance of 100 blocks
+        if (rayTraceResult != null && rayTraceResult.getHitBlock() != null) {
+            double distance = startLocation.distance(rayTraceResult.getHitPosition().toLocation(startLocation.getWorld()));
+            return distance / fireballSpeed;
+        }
+        return 0;
     }
 
     @EventHandler
@@ -182,14 +209,13 @@ public class MoltenBlast extends Skill implements InteractSkill, CooldownSkill, 
     }
 
 
-    @Override
     public void activate(Player player, int level) {
         LargeFireball fireball = player.launchProjectile(LargeFireball.class, player.getLocation().getDirection().multiply(speed));
         fireball.setYield(2.0F);
         fireball.setIsIncendiary(false);
 
         fireballs.add(fireball);
-
+        fireballLaunchTimes.put(fireball, System.currentTimeMillis());
     }
 
     @Override
