@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.champions.crafting.imbuements;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
@@ -15,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Singleton
-@Slf4j
 public class ImbuementRepository implements IRepository<Imbuement> {
 
     @Inject
@@ -33,8 +31,8 @@ public class ImbuementRepository implements IRepository<Imbuement> {
     public List<Imbuement> getAll() {
         List<Imbuement> imbuementValues = new ArrayList<>();
         String query = "SELECT * FROM " + databasePrefix + "imbuement_data;";
-
-        try (CachedRowSet result = database.executeQuery(new Statement(query))) {
+        CachedRowSet result = database.executeQuery(new Statement(query));
+        try {
             while (result.next()) {
                 String name = result.getString(1);
                 String key = result.getString(2);
@@ -50,7 +48,7 @@ public class ImbuementRepository implements IRepository<Imbuement> {
                 imbuementValues.add(imbuement);
             }
         } catch (SQLException ex) {
-            log.error("Failed to load imbuements", ex);
+            ex.printStackTrace();
         }
 
         return imbuementValues;

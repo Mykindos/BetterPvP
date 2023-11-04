@@ -55,7 +55,8 @@ public abstract class ProgressionStatsRepository<T extends ProgressionTree, K ex
         return loaded.thenApplyAsync(data -> {
             String expStmt = "SELECT " + tableName + " FROM " + plugin.getDatabasePrefix() + "exp WHERE gamer = ?;";
             final Statement query = new Statement(expStmt, new StringStatementValue(player.toString()));
-            try (CachedRowSet result = database.executeQuery(query)) {
+            final CachedRowSet result = database.executeQuery(query);
+            try {
                 if (result.next()) {
                     data.setExperience(result.getLong(tableName));
                 }
