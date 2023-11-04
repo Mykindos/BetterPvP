@@ -85,8 +85,8 @@ public class WorldListener implements Listener {
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 
             Optional<Gamer> gamerOptional = gamerManager.getObject(event.getPlayer().getUniqueId());
-            if(gamerOptional.isPresent()) {
-                if(gamerOptional.get().getClient().isAdministrating()){
+            if (gamerOptional.isPresent()) {
+                if (gamerOptional.get().getClient().isAdministrating()) {
                     return;
                 }
             }
@@ -111,7 +111,6 @@ public class WorldListener implements Listener {
         ItemStack replacement = new ItemStack(Material.IRON_INGOT, event.getPlayer().getInventory().getItemInMainHand().getAmount() * 3);
         event.getPlayer().getInventory().setItemInMainHand(replacement);
     }
-
 
 
     /*
@@ -149,7 +148,6 @@ public class WorldListener implements Listener {
     }
 
 
-
     @EventHandler
     public void onBlockBurn(BlockBurnEvent event) {
         event.setCancelled(true);
@@ -185,9 +183,16 @@ public class WorldListener implements Listener {
                     || event.getInventory().getType() == InventoryType.SHULKER_BOX
                     || event.getInventory().getType() == InventoryType.STONECUTTER
                     || event.getInventory().getType() == InventoryType.SMITHING
-                    || event.getInventory().getType() == InventoryType.BEACON) {
-                UtilMessage.simpleMessage(player, "Game", "<alt2>" + UtilFormat.cleanString(event.getInventory().getType().toString()) + "</alt2> is disabled.");
-                event.setCancelled(true);
+                    || event.getInventory().getType() == InventoryType.BEACON
+                    || event.getInventory().getType() == InventoryType.ENDER_CHEST) {
+
+                gamerManager.getObject(player.getUniqueId()).ifPresent(gamer -> {
+                    if (!gamer.getClient().isAdministrating()) {
+                        UtilMessage.simpleMessage(player, "Game", "<alt2>" + UtilFormat.cleanString(event.getInventory().getType().toString()) + "</alt2> is disabled.");
+                        event.setCancelled(true);
+                    }
+                });
+
             }
 
             if (event.getInventory().getType() == InventoryType.ENCHANTING) {
@@ -426,7 +431,7 @@ public class WorldListener implements Listener {
      * Updates the names of items that are picked up from the ground (sets there name to be yellow from wh ite)
      * Other than enchanted armour
      */
-    @EventHandler (priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onPickup(EntityPickupItemEvent event) {
         if (event.getEntity() instanceof Player) {
             itemHandler.updateNames(event.getItem().getItemStack());
@@ -510,7 +515,7 @@ public class WorldListener implements Listener {
 
     @EventHandler
     public void onDamageWarden(CustomDamageEvent event) {
-        if(event.getDamagee() instanceof Warden) {
+        if (event.getDamagee() instanceof Warden) {
             event.setKnockback(false);
         }
     }
