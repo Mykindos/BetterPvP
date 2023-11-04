@@ -34,7 +34,7 @@ dependencies {
 
     implementation("com.google.inject:guice:5.1.0")
     implementation("org.reflections:reflections:0.10.2")
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.13.3")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.13.4.1")
 
     compileOnly(project(":core"))
     compileOnly("io.papermc.paper:paper-api:1.20.2-R0.1-SNAPSHOT")
