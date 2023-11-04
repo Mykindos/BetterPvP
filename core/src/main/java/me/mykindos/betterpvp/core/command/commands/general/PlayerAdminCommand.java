@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.command.commands.admin;
+package me.mykindos.betterpvp.core.command.commands.general;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
