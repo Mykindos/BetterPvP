@@ -60,7 +60,7 @@ public class GamerRepository implements IRepository<Gamer> {
 
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            log.error("Failed to load gamers", ex);
         }
 
         log.info("Loaded " + gamers.size() + " gamers");
@@ -85,7 +85,7 @@ public class GamerRepository implements IRepository<Gamer> {
                 gamer.putProperty(value, property, true);
             }
         } catch (SQLException | ClassNotFoundException ex) {
-            ex.printStackTrace();
+            log.error("Failed to load gamer properties for {}", gamer.getUuid(), ex);
         }
     }
 
