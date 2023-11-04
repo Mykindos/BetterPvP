@@ -38,6 +38,8 @@ skills:
     silencingstrikes:
       enabled: true
       maxlevel: 3
+      hitsNeeded: 3
+      timeSpan: 0.8
     comboattack:
       enabled: true
       maxlevel: 3
