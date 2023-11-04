@@ -74,11 +74,10 @@ public class FishingRepository extends ProgressionStatsRepository<Fishing, Fishi
                 String stmt = "SELECT COUNT(*), SUM(Weight) FROM " + plugin.getDatabasePrefix() + "fishing WHERE gamer = ?;";
                 final Statement query = new Statement(stmt, new StringStatementValue(player.toString()));
                 final FishingData data = new FishingData();
-                try (CachedRowSet result = database.executeQuery(query)) {
-                    if (result.next()) {
-                        data.setFishCaught(result.getInt(1));
-                        data.setWeightCaught(result.getInt(2));
-                    }
+                final CachedRowSet result = database.executeQuery(query);
+                if (result.next()) {
+                    data.setFishCaught(result.getInt(1));
+                    data.setWeightCaught(result.getInt(2));
                 }
                 return data;
             } catch (SQLException e) {

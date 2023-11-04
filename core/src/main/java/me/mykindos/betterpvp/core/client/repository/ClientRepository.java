@@ -39,8 +39,8 @@ public class ClientRepository implements IRepository<Client> {
     public List<Client> getAll() {
         List<Client> clients = new ArrayList<>();
         String query = "SELECT * FROM clients;";
-
-        try (CachedRowSet result = database.executeQuery(new Statement(query))) {
+        CachedRowSet result = database.executeQuery(new Statement(query));
+        try {
             while (result.next()) {
                 String uuid = result.getString(2);
                 String name = result.getString(3);
@@ -101,7 +101,7 @@ public class ClientRepository implements IRepository<Client> {
         queuedStatUpdates.put(client.getUuid() + property, statement);
     }
 
-    public void processStatUpdates(boolean async) {
+    public void processStatUpdates(boolean async){
         ConcurrentHashMap<String, Statement> statements = new ConcurrentHashMap<>(queuedStatUpdates);
         queuedStatUpdates.clear();
 

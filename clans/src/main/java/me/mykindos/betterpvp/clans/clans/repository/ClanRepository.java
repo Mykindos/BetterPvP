@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.clans.clans.repository;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanProperty;
@@ -49,11 +50,13 @@ public class ClanRepository implements IRepository<Clan> {
     @Config(path = "clans.database.prefix", defaultValue = "clans_")
     private String databasePrefix;
 
+    private final Clans clans;
     private final Database database;
     private final ConcurrentHashMap<String, Statement> queuedPropertyUpdates;
 
     @Inject
-    public ClanRepository(Database database) {
+    public ClanRepository(Clans clans, Database database) {
+        this.clans = clans;
         this.database = database;
         this.queuedPropertyUpdates = new ConcurrentHashMap<>();
     }
@@ -62,8 +65,8 @@ public class ClanRepository implements IRepository<Clan> {
     public List<Clan> getAll() {
         List<Clan> clanList = new ArrayList<>();
         String query = "SELECT * FROM " + databasePrefix + "clans;";
-
-        try (CachedRowSet result = database.executeQuery(new Statement(query))) {
+        CachedRowSet result = database.executeQuery(new Statement(query));
+        try {
             while (result.next()) {
                 UUID clanId = UUID.fromString(result.getString(1));
                 String name = result.getString(2);
@@ -78,7 +81,7 @@ public class ClanRepository implements IRepository<Clan> {
                 clan.setAdmin(admin);
                 clan.setSafe(safe);
 
-                if (banner != null && !banner.isEmpty()) {
+                if(banner != null && !banner.equals("")) {
                     clan.setBanner(ItemStack.deserializeBytes(Base64.getDecoder().decode(banner)));
                 }
 
@@ -89,7 +92,7 @@ public class ClanRepository implements IRepository<Clan> {
 
             }
         } catch (SQLException ex) {
-            log.error("Error loading clans", ex);
+            ex.printStackTrace();
         }
 
 
@@ -99,8 +102,8 @@ public class ClanRepository implements IRepository<Clan> {
     private void loadProperties(Clan clan) {
         String query = "SELECT properties.Property, Value, Type FROM " + databasePrefix + "clan_properties properties INNER JOIN "
                 + "property_map map on properties.Property = map.Property WHERE Clan = ?";
-
-        try (CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId())))) {
+        CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId())));
+        try {
             while (result.next()) {
                 String value = result.getString(1);
                 String type = result.getString(3);
@@ -115,7 +118,7 @@ public class ClanRepository implements IRepository<Clan> {
                 clan.putProperty(value, property, true);
             }
         } catch (SQLException | ClassNotFoundException ex) {
-            log.error("Error loading properties for clan: {}", clan.getId(), ex);
+            ex.printStackTrace();
         }
 
         clan.getProperties().registerListener(clan);
@@ -214,14 +217,14 @@ public class ClanRepository implements IRepository<Clan> {
     public List<ClanTerritory> getTerritory(Clan clan) {
         List<ClanTerritory> territory = new ArrayList<>();
         String query = "SELECT * FROM " + databasePrefix + "clan_territory WHERE Clan = ?;";
-
-        try (CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId())))) {
+        CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId())));
+        try {
             while (result.next()) {
                 String chunk = result.getString(3);
                 territory.add(new ClanTerritory(chunk));
             }
         } catch (SQLException ex) {
-            log.error("Error loading clan territory for clan: {}", clan.getId(), ex);
+            ex.printStackTrace();
         }
 
         return territory;
@@ -246,15 +249,15 @@ public class ClanRepository implements IRepository<Clan> {
     public List<ClanMember> getMembers(Clan clan) {
         List<ClanMember> members = new ArrayList<>();
         String query = "SELECT * FROM " + databasePrefix + "clan_members WHERE Clan = ?;";
-
-        try (CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId())))) {
+        CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId())));
+        try {
             while (result.next()) {
                 String uuid = result.getString(3);
                 ClanMember.MemberRank rank = ClanMember.MemberRank.valueOf(result.getString(4));
                 members.add(new ClanMember(uuid, rank));
             }
         } catch (SQLException ex) {
-            log.error("Error loading clan members for clan: {}", clan.getId(), ex);
+            ex.printStackTrace();
         }
 
         return members;
@@ -289,8 +292,8 @@ public class ClanRepository implements IRepository<Clan> {
     public List<ClanAlliance> getAlliances(ClanManager clanManager, Clan clan) {
         List<ClanAlliance> alliances = new ArrayList<>();
         String query = "SELECT * FROM " + databasePrefix + "clan_alliances WHERE Clan = ?;";
-
-        try (CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId())))) {
+        CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId())));
+        try {
             while (result.next()) {
                 var otherClan = clanManager.getClanById(UUID.fromString(result.getString(3)));
                 if (otherClan.isPresent()) {
@@ -301,7 +304,7 @@ public class ClanRepository implements IRepository<Clan> {
                 }
             }
         } catch (SQLException ex) {
-            log.error("Error loading clan alliances for clan: {}", clan.getId(), ex);
+            ex.printStackTrace();
         }
 
         return alliances;
@@ -343,8 +346,8 @@ public class ClanRepository implements IRepository<Clan> {
     public List<ClanEnemy> getEnemies(ClanManager clanManager, Clan clan) {
         List<ClanEnemy> enemies = new ArrayList<>();
         String query = "SELECT * FROM " + databasePrefix + "clan_enemies WHERE Clan = ?;";
-
-        try (CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId())))) {
+        CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId())));
+        try {
             while (result.next()) {
                 var otherClan = clanManager.getClanById(UUID.fromString(result.getString(3)));
                 if (otherClan.isPresent()) {
@@ -353,7 +356,7 @@ public class ClanRepository implements IRepository<Clan> {
                 }
             }
         } catch (SQLException ex) {
-            log.error("Error loading clan enemies for clan: {}", clan.getId(), ex);
+            ex.printStackTrace();
         }
 
         return enemies;
@@ -363,13 +366,13 @@ public class ClanRepository implements IRepository<Clan> {
     public Map<Integer, Double> getDominanceScale() {
         HashMap<Integer, Double> dominanceScale = new HashMap<>();
         String query = "SELECT * FROM " + databasePrefix + "dominance_scale;";
-
-        try (CachedRowSet result = database.executeQuery(new Statement(query))) {
+        CachedRowSet result = database.executeQuery(new Statement(query));
+        try {
             if (result.next()) {
                 dominanceScale.put(result.getInt(1), result.getDouble(2));
             }
         } catch (SQLException ex) {
-            log.error("Error loading dominance scale", ex);
+            ex.printStackTrace();
         }
 
         return dominanceScale;
@@ -402,8 +405,8 @@ public class ClanRepository implements IRepository<Clan> {
         World world = Bukkit.getWorld("world");
         List<Insurance> insurance = Collections.synchronizedList(new ArrayList<>());
         String query = "SELECT * FROM " + databasePrefix + "insurance WHERE Clan = ? ORDER BY Time ASC";
-
-        try (CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId())))) {
+        CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId())));
+        try {
             while (result.next()) {
                 InsuranceType insuranceType = InsuranceType.valueOf(result.getString(2));
                 Material material = Material.valueOf(result.getString(3));
@@ -417,7 +420,7 @@ public class ClanRepository implements IRepository<Clan> {
                 insurance.add(new Insurance(time, material, blockData, insuranceType, blockLocation));
             }
         } catch (SQLException ex) {
-            log.error("Error loading insurance for clan: {}", clan.getId(), ex);
+            ex.printStackTrace();
         }
 
         return insurance;
