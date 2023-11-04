@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.builds.repository;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Singleton
+@Slf4j
 public class BuildRepository implements IRepository<RoleBuild> {
 
     @Inject
@@ -45,8 +47,8 @@ public class BuildRepository implements IRepository<RoleBuild> {
 
     public void loadBuilds(GamerBuilds builds) {
         String query = "SELECT * FROM " + tablePrefix + "builds WHERE Gamer = ?";
-        CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(builds.getUuid())));
-        try {
+
+        try (CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(builds.getUuid())))) {
             while (result.next()) {
                 String uuid = result.getString(1);
                 String role = result.getString(2);
