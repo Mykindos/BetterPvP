@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.clans.fields.repository;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.clans.Clans;
@@ -29,9 +30,10 @@ import java.util.Set;
 @Slf4j
 public class FieldsRepository implements IRepository<FieldsBlockEntry> {
 
+    @Getter
     private final Set<FieldsInteractable> types = new HashSet<>();
-    private Database database;
-    private Clans clans;
+    private final Database database;
+    private final Clans clans;
 
     @Inject
     public FieldsRepository(Clans clans, Database database) {
@@ -55,16 +57,12 @@ public class FieldsRepository implements IRepository<FieldsBlockEntry> {
         types.forEach(type -> clans.getInjector().injectMembers(type));
     }
 
-    public Set<FieldsInteractable> getTypes() {
-        return types;
-    }
-
     @Override
     public List<FieldsBlockEntry> getAll() {
         List<FieldsBlockEntry> ores = new ArrayList<>();
         String query = "SELECT * FROM " + clans.getDatabasePrefix() + "fields_ores";
-        ResultSet result = database.executeQuery(new Statement(query));
-        try {
+
+        try (ResultSet result = database.executeQuery(new Statement(query))) {
             while (result.next()) {
                 final String world = result.getString("world");
                 final int x = result.getInt("x");
@@ -79,7 +77,7 @@ public class FieldsRepository implements IRepository<FieldsBlockEntry> {
                 ores.add(new FieldsBlockEntry(type, world, x, y, z));
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            log.error("Error loading fields ores", ex);
         }
 
         return ores;
