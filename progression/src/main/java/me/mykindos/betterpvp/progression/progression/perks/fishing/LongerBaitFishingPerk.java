@@ -67,8 +67,8 @@ public class LongerBaitFishingPerk implements Listener, ProgressionPerk {
                     //make leveling more intuitive
                     level = level - minLevel;
                     Bait bait = event.getBait();
-                    long multiplier = (long) (1 + (level * increasePerLevel));
-                    bait.setDurationTicks((bait.getDurationTicks() * multiplier));
+                    double multiplier = (1f + (level * increasePerLevel / 100));
+                    bait.setDurationTicks((long) (bait.getDurationTicks() * multiplier));
                 }).exceptionally(throwable1 -> {
                     log.error("Failed to check if player " + event.getPlayer().getName() + " has a level ", throwable);
                     return null;
