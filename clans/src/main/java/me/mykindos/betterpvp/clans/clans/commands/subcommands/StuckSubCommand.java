@@ -2,13 +2,13 @@ package me.mykindos.betterpvp.clans.clans.commands.subcommands;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
 import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.SubCommand;
+import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.framework.delayedactions.events.ClanStuckTeleportEvent;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -25,13 +25,12 @@ import java.util.Optional;
 @SubCommand(ClanCommand.class)
 public class StuckSubCommand extends ClanSubCommand {
 
-    private final Clans clans;
+    private final CooldownManager cooldownManager;
 
-    private long lastRun = System.currentTimeMillis();
     @Inject
-    public StuckSubCommand(Clans clans, ClanManager clanManager, GamerManager gamerManager) {
+    public StuckSubCommand(ClanManager clanManager, GamerManager gamerManager, CooldownManager cooldownManager) {
         super(clanManager, gamerManager);
-        this.clans = clans;
+        this.cooldownManager = cooldownManager;
     }
 
     @Override
@@ -46,13 +45,11 @@ public class StuckSubCommand extends ClanSubCommand {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        if (!UtilTime.elapsed(lastRun, 1 * 1000)) {
+        if(!cooldownManager.use(player, getName(), 1000, false, true)){
             UtilMessage.message(player, "Clans", "Try again in a second");
             return;
         }
-
-        lastRun = System.currentTimeMillis();
-
+        
         Optional<Clan> territoryOptional = clanManager.getClanByLocation(player.getLocation());
 
             if (territoryOptional.isEmpty()) {

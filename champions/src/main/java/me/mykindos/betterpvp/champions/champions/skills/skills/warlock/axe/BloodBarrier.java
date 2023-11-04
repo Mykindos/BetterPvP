@@ -182,7 +182,7 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
 
         private final long endTime;
 
-        public int count = 3;
+        public int count;
 
         public ShieldData(long length, int count) {
             this.endTime = System.currentTimeMillis() + length;

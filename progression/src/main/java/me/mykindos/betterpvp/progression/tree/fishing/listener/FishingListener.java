@@ -181,7 +181,7 @@ public class FishingListener implements Listener {
                 final FishHook hook = event.getHook();
                 // Set defaults
                 hook.setWaitTime((int) (minWaitTime * 20), (int) (maxWaitTime * 20));
-                hook.setLureTime(1 * 20, 2 * 20);
+                hook.setLureTime(20, 40);
                 hook.setSkyInfluenced(false);
                 hook.setRainInfluenced(false);
                 activeHooks.put(hook, false);

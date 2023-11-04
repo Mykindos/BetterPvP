@@ -57,7 +57,7 @@ public class Database {
             preparedStatement.executeUpdate();
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            log.error("Error executing update: {}", statement.getQuery(), ex);
         }
     }
 
@@ -96,11 +96,11 @@ public class Database {
                 callback.accept(preparedStatement.getGeneratedKeys());
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            log.error("Error executing batch", ex);
             try {
                 connection.rollback();
             } catch (SQLException rollbackException) {
-                ex.printStackTrace();
+                log.error("Failed to rollback batch", rollbackException);
             }
         } finally {
             try {
@@ -131,7 +131,7 @@ public class Database {
             rowset.populate(preparedStatement.executeQuery());
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            log.error("Error executing query: {}", statement.getQuery(), ex);
         }
 
         return rowset;
@@ -157,7 +157,7 @@ public class Database {
             consumer.accept(result);
             result.close();
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            log.info("Error executing procedure: {}", statement.getQuery(), ex);
         }
     }
 

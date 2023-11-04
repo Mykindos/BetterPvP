@@ -51,7 +51,7 @@ public class ShopItemRepository {
                     shopItems.put(shopKeeper, new ArrayList<>());
                 }
 
-                ShopItem shopItem = null;
+                ShopItem shopItem;
 
                 String dynamicPricingQuery = "SELECT * FROM " + databasePrefix + "shopitems_dynamic_pricing WHERE shopItemId = ?";
                 CachedRowSet dynamicPricingResult = database.executeQuery(new Statement(dynamicPricingQuery, new IntegerStatementValue(id)));
