@@ -13,14 +13,12 @@ public class PlayerStopFishingEvent extends ProgressionFishingEvent {
     private final @Nullable FishingRodType rodType;
     private final FishingLoot loot;
     private final FishingResult reason;
-    private final PlayerFishEvent playerFishEvent;
 
-    public PlayerStopFishingEvent(Player player, @Nullable FishingRodType rodType, FishingLoot loot, FishingResult reason, PlayerFishEvent playerFishEvent) {
+    public PlayerStopFishingEvent(Player player, @Nullable FishingRodType rodType, FishingLoot loot, FishingResult reason) {
         super(player);
         this.rodType = rodType;
         this.loot = loot;
         this.reason = reason;
-        this.playerFishEvent = playerFishEvent;
     }
 
     public enum FishingResult {
