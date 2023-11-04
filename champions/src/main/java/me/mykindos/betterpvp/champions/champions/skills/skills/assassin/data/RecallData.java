@@ -35,16 +35,6 @@ public class RecallData {
         }
     }
 
-    public double getOldHealth(double secondsAgo) {
-        for (TempData data : locations) {
-            if (data.getTimestamp() <= System.currentTimeMillis() - (secondsAgo * 1000)) {
-                return data.getHealth();
-            }
-        }
-        return -1;
-    }
-
-
     public Location getLocation() {
         return locations.get(0).getLocation();
     }
