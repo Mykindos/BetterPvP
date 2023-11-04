@@ -1,4 +1,4 @@
-Repository containing all of BetterPvP's plugins for 1.20.1.
+Repository containing all of BetterPvP's plugins for 1.20.2.
 
 ## Dependencies:
 - Java 17
