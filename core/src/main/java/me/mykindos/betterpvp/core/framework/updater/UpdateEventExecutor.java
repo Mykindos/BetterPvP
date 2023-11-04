@@ -46,8 +46,8 @@ public class UpdateEventExecutor {
 
             updateMethods.put(listener, methodMap);
 
-
         }
+
     }
 
     private void executeUpdateEvents() {
@@ -59,12 +59,12 @@ public class UpdateEventExecutor {
                 var event = method.getValue();
 
                 Long lastRun = lastRunTimers.get(event.delay());
-                if(lastRun != null){
-                    if(lastRun < System.currentTimeMillis()) {
+                if (lastRun != null) {
+                    if (lastRun < System.currentTimeMillis()) {
                         callUpdater(event, method.getKey(), entry.getKey());
                         updateTimers.put(event.delay(), System.currentTimeMillis() + event.delay());
                     }
-                }else{
+                } else {
                     lastRunTimers.put(event.delay(), System.currentTimeMillis() + event.delay());
                 }
 

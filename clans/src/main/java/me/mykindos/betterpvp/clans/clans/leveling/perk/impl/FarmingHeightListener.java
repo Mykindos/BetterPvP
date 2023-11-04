@@ -27,10 +27,6 @@ public class FarmingHeightListener implements Listener {
         this.manager = manager;
     }
 
-    @EventHandler
-    public void onTest() {
-    }
-
     private void registerPerk(ClanPerkManager manager, int level, int minReq) {
         ClanPerk perk = new ClanPerk() {
             @Override
