@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.clans.clans.map.nms;
 
+import lombok.extern.slf4j.Slf4j;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
@@ -9,6 +10,7 @@ import org.bukkit.craftbukkit.v1_20_R2.util.CraftMagicNumbers;
 import java.lang.reflect.Field;
 import java.util.function.Function;
 
+@Slf4j
 public class UtilMapMaterial {
 
     private static Field PROPERTIES_FUNCTION;
@@ -23,7 +25,7 @@ public class UtilMapMaterial {
             PROPERTIES_FUNCTION = BlockBehaviour.Properties.class.getDeclaredField("a");
             PROPERTIES_FUNCTION.setAccessible(true);
         } catch (NoSuchFieldException ex) {
-            ex.printStackTrace();
+            log.error("Failed to access NMS field", ex);
         }
     }
 

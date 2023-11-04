@@ -67,7 +67,7 @@ public class DeathListener implements Listener {
         final Component killedName = event.getKilledName().applyFallbackStyle(NamedTextColor.YELLOW);
         if (event.getKiller() == null) {
             if (reasons.length == 0) {
-                message = killedName.append(Component.text(" was killed.", NamedTextColor.GRAY));
+                message = killedName.append(Component.text(" was killed", NamedTextColor.GRAY));
             } else {
                 message = killedName.append(Component.text(" was killed by ", NamedTextColor.GRAY)).append(reason);
             }

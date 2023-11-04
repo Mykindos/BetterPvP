@@ -85,7 +85,7 @@ public class Siphon extends Skill implements PassiveSkill {
                             v.multiply(0.9);
                             position.add(v);
                         }
-                    }.runTaskTimer(champions, 0l, 2);
+                    }.runTaskTimer(champions, 0L, 2);
                 }
             }
 

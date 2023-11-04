@@ -3,16 +3,7 @@ package me.mykindos.betterpvp.clans.clans.menus;
 
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
-import me.mykindos.betterpvp.clans.clans.menus.buttons.AlliesButton;
-import me.mykindos.betterpvp.clans.clans.menus.buttons.ClanButton;
-import me.mykindos.betterpvp.clans.clans.menus.buttons.ClanCommandButton;
-import me.mykindos.betterpvp.clans.clans.menus.buttons.ClanUpgradesButton;
-import me.mykindos.betterpvp.clans.clans.menus.buttons.ClanVaultButton;
-import me.mykindos.betterpvp.clans.clans.menus.buttons.EnemiesButton;
-import me.mykindos.betterpvp.clans.clans.menus.buttons.EnemyButton;
-import me.mykindos.betterpvp.clans.clans.menus.buttons.EnergyButton;
-import me.mykindos.betterpvp.clans.clans.menus.buttons.LeaveClanButton;
-import me.mykindos.betterpvp.clans.clans.menus.buttons.TerritoryButton;
+import me.mykindos.betterpvp.clans.clans.menus.buttons.*;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.gamer.Gamer;
@@ -53,6 +44,7 @@ public class ClanMenu extends Menu {
 
     public void fillPage() {
 
+        addButton(new ClanProgressionButton(4, clan));
         addButton(new TerritoryButton(17, player, clan));
         addButton(new EnergyButton(26, player, clan));
         addButton(new AlliesButton(8, playerClan, clan));

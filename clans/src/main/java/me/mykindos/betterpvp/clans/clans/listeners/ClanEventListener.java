@@ -9,7 +9,6 @@ import me.mykindos.betterpvp.clans.clans.data.ClanDefaultValues;
 import me.mykindos.betterpvp.clans.clans.events.ChunkClaimEvent;
 import me.mykindos.betterpvp.clans.clans.events.ChunkUnclaimEvent;
 import me.mykindos.betterpvp.clans.clans.events.ClanAllianceEvent;
-import me.mykindos.betterpvp.clans.clans.events.ClanBuyEnergyEvent;
 import me.mykindos.betterpvp.clans.clans.events.ClanCreateEvent;
 import me.mykindos.betterpvp.clans.clans.events.ClanDisbandEvent;
 import me.mykindos.betterpvp.clans.clans.events.ClanEnemyEvent;
@@ -36,17 +35,12 @@ import me.mykindos.betterpvp.core.components.clans.events.ClanEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.events.scoreboard.ScoreboardUpdateEvent;
 import me.mykindos.betterpvp.core.framework.inviting.InviteHandler;
-import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.gamer.exceptions.NoSuchGamerException;
-import me.mykindos.betterpvp.core.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
-import me.mykindos.betterpvp.core.utilities.UtilLocation;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import me.mykindos.betterpvp.core.utilities.UtilSound;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
 import net.kyori.adventure.text.Component;
@@ -55,12 +49,10 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 
-import java.text.NumberFormat;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -141,15 +133,16 @@ public class ClanEventListener extends ClanListener {
 
         clanManager.addObject(clan.getName().toLowerCase(), clan);
         clanManager.getRepository().save(clan);
+        clanManager.getLeaderboard().forceUpdate();
 
         var defaultValues = clans.getInjector().getInstance(ClanDefaultValues.class);
         clan.saveProperty(ClanProperty.TIME_CREATED, System.currentTimeMillis());
         clan.saveProperty(ClanProperty.LAST_LOGIN, System.currentTimeMillis());
-        clan.saveProperty(ClanProperty.LEVEL, defaultValues.getDefaultLevel());
         clan.saveProperty(ClanProperty.POINTS, defaultValues.getDefaultPoints());
         clan.saveProperty(ClanProperty.ENERGY, defaultValues.getDefaultEnergy());
         clan.saveProperty(ClanProperty.NO_DOMINANCE_COOLDOWN, (System.currentTimeMillis() + (3_600_000L * 24)));
         clan.saveProperty(ClanProperty.LAST_TNTED, 0L);
+        clan.saveProperty(ClanProperty.EXPERIENCE, 0L);
         clan.saveProperty(ClanProperty.BALANCE, 0);
 
         UtilMessage.simpleMessage(event.getPlayer(), "Clans", "Successfully created clan <aqua>%s", clan.getName());
@@ -192,6 +185,7 @@ public class ClanEventListener extends ClanListener {
 
         clanManager.getRepository().delete(clan);
         clanManager.getObjects().remove(clan.getName().toLowerCase());
+        clanManager.getLeaderboard().forceUpdate();
 
     }
 

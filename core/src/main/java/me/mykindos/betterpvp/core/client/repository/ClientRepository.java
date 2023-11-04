@@ -51,7 +51,7 @@ public class ClientRepository implements IRepository<Client> {
                 clients.add(client);
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            log.error("Error loading clients", ex);
         }
 
         log.info("Loaded " + clients.size() + " clients");
@@ -76,7 +76,7 @@ public class ClientRepository implements IRepository<Client> {
                 client.putProperty(value, property, true);
             }
         } catch (SQLException | ClassNotFoundException ex) {
-            ex.printStackTrace();
+            log.error("Error loading client properties for " + client.getName(), ex);
         }
     }
 

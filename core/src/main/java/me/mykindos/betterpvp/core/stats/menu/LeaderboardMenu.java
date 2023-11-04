@@ -1,9 +1,11 @@
 package me.mykindos.betterpvp.core.stats.menu;
 
 import lombok.extern.slf4j.Slf4j;
+import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.menu.Button;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.interfaces.IRefreshingMenu;
+import me.mykindos.betterpvp.core.stats.Description;
 import me.mykindos.betterpvp.core.stats.Leaderboard;
 import me.mykindos.betterpvp.core.stats.SearchOptions;
 import me.mykindos.betterpvp.core.stats.filter.FilterType;
@@ -18,20 +20,20 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 @Slf4j
 public class LeaderboardMenu<E, T> extends Menu implements IRefreshingMenu {
@@ -97,26 +99,10 @@ public class LeaderboardMenu<E, T> extends Menu implements IRefreshingMenu {
                 continue;
             }
 
+
             final LeaderboardEntry<E, T> entry = entries.get(i);
-            final E key = entry.getKey();
-            final T value = entry.getValue();
-
-            ItemStack itemStack = new ItemStack(Material.PLAYER_HEAD);
-            final SkullMeta meta = (SkullMeta) itemStack.getItemMeta();
-            String keyRender = key.toString();
-            if (key instanceof UUID uuid) {
-                final OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
-                meta.setPlayerProfile(player.getPlayerProfile());
-                keyRender = player.getName();
-            } else if (key instanceof OfflinePlayer entryPlayer) {
-                meta.setPlayerProfile(entryPlayer.getPlayerProfile());
-                keyRender = entryPlayer.getName();
-            }
-
-            itemStack.setItemMeta(meta);
-
-            final Map<String, Component> description = leaderboard.getDescription(options, value);
-            addButton(getEntry(slot, title, itemStack, keyRender, description));
+            final Description description = leaderboard.getDescription(options, entry);
+            addButton(getEntry(slot, title, description));
         }
 
         // Podium spots
@@ -131,37 +117,31 @@ public class LeaderboardMenu<E, T> extends Menu implements IRefreshingMenu {
                 Component.text("Top #3", getPositionColor(3), TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false)));
 
         // Own data
-        try {
-            final Leaderboard<UUID, T> lb = (Leaderboard<UUID, T>) leaderboard;
-            final CompletableFuture<T> entryData = lb.getEntryData(options, player.getUniqueId());
-            final Button button = new Button(49,
-                    new ItemStack(Material.PAPER),
-                    Component.text("Retrieving your data...", NamedTextColor.GRAY));
+        final CompletableFuture<Optional<LeaderboardEntry<E, T>>> entryData = leaderboard.getPlayerData(player.getUniqueId(), options);
+        final Button button = new Button(49,
+                new ItemStack(Material.PAPER),
+                Component.text("Retrieving your data...", NamedTextColor.GRAY));
 
-            entryData.whenComplete((data, throwable) -> {
-                if (throwable != null) {
-                    button.setItemStack(getFailedItem(button.getItemStack()));
-                    return;
-                }
+        entryData.thenAccept(dataOpt -> {
+            if (dataOpt.isEmpty()) {
+                button.setItemStack(Menu.BACKGROUND);
+                return;
+            }
 
-                final Map<String, Component> description = leaderboard.getDescription(options, data);
-                final Button replacement = getEntry(49,
-                        Component.text("Your Data", NamedTextColor.WHITE, TextDecoration.BOLD),
-                        button.getItemStack(),
-                        player.getName(),
-                        description);
-                button.setItemStack(replacement.getItemStack());
-                LeaderboardMenu.this.refreshButton(button);
-            }).exceptionally(throwable -> {
-                log.error("Failed to retrieve leaderboard data for " + player.getName(), throwable);
-                button.setItemStack(getFailedItem(button.getItemStack()));
-                return null;
-            });
+            final LeaderboardEntry<E, T> data = dataOpt.get();
+            final Description description = leaderboard.getDescription(options, data);
+            final Button replacement = getEntry(49,
+                    Component.text("Your Data", NamedTextColor.WHITE, TextDecoration.BOLD),
+                    description);
+            button.setItemStack(replacement.getItemStack());
+            LeaderboardMenu.this.refreshButton(button);
+        }).exceptionally(throwable -> {
+            log.error("Failed to retrieve leaderboard data for " + player.getName(), throwable);
+            button.setItemStack(getFailedItem(button.getItemStack()));
+            return null;
+        });
 
-            addButton(button);
-        } catch (ClassCastException ignored) {
-            // Not a leaderboard with UUID keys aka players
-        }
+        addButton(button);
 
         // Fill empty
         fillEmpty(Menu.BACKGROUND);
@@ -188,19 +168,19 @@ public class LeaderboardMenu<E, T> extends Menu implements IRefreshingMenu {
         return new Button(slot, itemStack);
     }
 
-    private Button getEntry(int slot, Component title, ItemStack itemStack, String key, Map<String, Component> description) {
+    private Button getEntry(int slot, Component title, Description description) {
+        final ItemStack itemStack = description.getIcon();
         final ItemMeta meta = itemStack.getItemMeta();
         meta.displayName(title.decoration(TextDecoration.ITALIC, false));
         final List<Component> lore = new ArrayList<>(List.of(
                 UtilMessage.DIVIDER,
                 Component.empty(),
-                UtilMessage.deserialize("<white>Holder: <gray>%s", key).decoration(TextDecoration.ITALIC, false),
                 Component.empty(),
                 UtilMessage.DIVIDER));
 
         // After "holder"
-        int index = 3;
-        for (Map.Entry<String, Component> entry : description.entrySet()) {
+        int index = 2;
+        for (Map.Entry<String, Component> entry : description.getLines().entrySet()) {
             final TextComponent keyText = Component.text(entry.getKey() + ": ").color(NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false);
             final Component valueText = entry.getValue().decoration(TextDecoration.ITALIC, false).applyFallbackStyle(Style.style(NamedTextColor.GRAY));
             lore.add(index, keyText.append(valueText));
@@ -208,7 +188,17 @@ public class LeaderboardMenu<E, T> extends Menu implements IRefreshingMenu {
         }
         meta.lore(lore);
         itemStack.setItemMeta(meta);
-        return new Button(slot, itemStack);
+        return new Button(slot, itemStack) {
+            @Override
+            public void onClick(Player player, Gamer gamer, ClickType clickType) {
+                final Consumer<Player> clickFunction = description.getClickFunction();
+                if (clickFunction == null) {
+                    return;
+                }
+                clickFunction.accept(player);
+                player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1, 1);
+            }
+        };
     }
 
     private TextColor getPositionColor(int positionIndex) {

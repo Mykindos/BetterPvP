@@ -473,7 +473,6 @@ public class CombatListener implements Listener {
 
                 }
 
-                damagee.updateInventory();
             }
         }
 
@@ -496,7 +495,6 @@ public class CombatListener implements Listener {
                         damager.playSound(damager.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
                     }
 
-                    damager.updateInventory();
                 }
 
 

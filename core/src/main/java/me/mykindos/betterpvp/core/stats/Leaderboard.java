@@ -19,13 +19,11 @@ import me.mykindos.betterpvp.core.stats.sort.Sorted;
 import me.mykindos.betterpvp.core.stats.sort.TemporalSort;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.text.NumberFormat;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -135,14 +133,18 @@ public abstract class Leaderboard<E, T> {
      * @param value The value to get the description for.
      * @return The description of the given value.
      */
-    public Map<String, Component> getDescription(SearchOptions searchOptions, T value) {
+    public Description getDescription(SearchOptions searchOptions, LeaderboardEntry<E, T> value) {
         validate(searchOptions);
-        if (value instanceof Number number) {
-            return Map.of(getName(), Component.text(NumberFormat.getInstance().format(number)));
-        } else {
-            return Map.of(getName(), Component.text(value.toString()));
-        }
+        return describe(searchOptions, value);
     }
+
+    /**
+     * Gets the description of the given value for a leaderboard menu.
+     * @param searchOptions The options to get the description for.
+     * @param value The value to get the description for.
+     * @return The description of the given value.
+     */
+    protected abstract Description describe(SearchOptions searchOptions, LeaderboardEntry<E, T> value);
 
     /**
      * @return The top entries in the leaderboard of type T.
@@ -268,6 +270,38 @@ public abstract class Leaderboard<E, T> {
                 .map(CompletableFuture::completedFuture)
                 .orElseGet(() -> entryCache.get(LeaderboardEntryKey.of(searchOptions, entry)));
     }
+
+    /**
+     * Gets the data in this leaderboard that can correspond to the given player.
+     * @param player The player to get the data for.
+     * @param options The options to load the data for.
+     * @return The data in this leaderboard that can correspond to the given player.
+     */
+    public final CompletableFuture<Optional<LeaderboardEntry<E, T>>> getPlayerData(@NotNull UUID player, @NotNull SearchOptions options) {
+        // Fetch the player data
+        CompletableFuture<Optional<LeaderboardEntry<E, T>>> future = CompletableFuture.supplyAsync(() -> Optional.ofNullable(fetchPlayerData(player, options, database, tablePrefix))).exceptionally(ex -> {
+            if (!(ex instanceof UnsupportedOperationException)) {
+                log.error("Failed to fetch leaderboard data for " + player + "!", ex);
+            }
+            return Optional.empty();
+        });
+
+        // Cache the data we just got
+        future.thenAccept(data -> {
+            if (data.isPresent()) {
+                final LeaderboardEntry<E, T> entry = data.get();
+                entryCache.put(LeaderboardEntryKey.of(options, entry.getKey()), CompletableFuture.completedFuture(entry.getValue()));
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Gets the data in this leaderboard that can correspond to the given player.
+     * @param player The player to get the data for.
+     * @return The data in this leaderboard that can correspond to the given player.
+     */
+    protected abstract LeaderboardEntry<E, T> fetchPlayerData(@NotNull UUID player, @NotNull SearchOptions options, @NotNull Database database, @NotNull String tablePrefix) throws UnsupportedOperationException;
 
     /**
      * Loads the data for the given entry.
