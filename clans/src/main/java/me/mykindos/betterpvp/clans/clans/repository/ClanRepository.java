@@ -3,7 +3,6 @@ package me.mykindos.betterpvp.clans.clans.repository;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanProperty;
@@ -50,13 +49,12 @@ public class ClanRepository implements IRepository<Clan> {
     @Config(path = "clans.database.prefix", defaultValue = "clans_")
     private String databasePrefix;
 
-    private final Clans clans;
+
     private final Database database;
     private final ConcurrentHashMap<String, Statement> queuedPropertyUpdates;
 
     @Inject
-    public ClanRepository(Clans clans, Database database) {
-        this.clans = clans;
+    public ClanRepository( Database database) {
         this.database = database;
         this.queuedPropertyUpdates = new ConcurrentHashMap<>();
     }
@@ -81,7 +79,7 @@ public class ClanRepository implements IRepository<Clan> {
                 clan.setAdmin(admin);
                 clan.setSafe(safe);
 
-                if(banner != null && !banner.equals("")) {
+                if(banner != null && !banner.isEmpty()) {
                     clan.setBanner(ItemStack.deserializeBytes(Base64.getDecoder().decode(banner)));
                 }
 
@@ -92,7 +90,7 @@ public class ClanRepository implements IRepository<Clan> {
 
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            log.error("Failed to load clans", ex);
         }
 
 
@@ -118,7 +116,7 @@ public class ClanRepository implements IRepository<Clan> {
                 clan.putProperty(value, property, true);
             }
         } catch (SQLException | ClassNotFoundException ex) {
-            ex.printStackTrace();
+            log.error("Failed to load clan properties for {}", clan.getId(), ex);
         }
 
         clan.getProperties().registerListener(clan);
@@ -224,7 +222,7 @@ public class ClanRepository implements IRepository<Clan> {
                 territory.add(new ClanTerritory(chunk));
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            log.error("Failed to load clan territory for {}", clan.getId(), ex);
         }
 
         return territory;
@@ -257,7 +255,7 @@ public class ClanRepository implements IRepository<Clan> {
                 members.add(new ClanMember(uuid, rank));
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            log.error("Failed to load clan members for {}", clan.getId(), ex);
         }
 
         return members;
@@ -304,7 +302,7 @@ public class ClanRepository implements IRepository<Clan> {
                 }
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            log.error("Failed to load clan alliances for {}", clan.getId(), ex);
         }
 
         return alliances;
@@ -356,7 +354,7 @@ public class ClanRepository implements IRepository<Clan> {
                 }
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            log.error("Failed to load clan enemies for {}", clan.getId(), ex);
         }
 
         return enemies;
@@ -372,7 +370,7 @@ public class ClanRepository implements IRepository<Clan> {
                 dominanceScale.put(result.getInt(1), result.getDouble(2));
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            log.error("Failed to load dominance scale", ex);
         }
 
         return dominanceScale;
@@ -420,7 +418,7 @@ public class ClanRepository implements IRepository<Clan> {
                 insurance.add(new Insurance(time, material, blockData, insuranceType, blockLocation));
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            log.error("Failed to load insurance for {}", clan.getId(), ex);
         }
 
         return insurance;

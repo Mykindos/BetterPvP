@@ -17,13 +17,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
-public class DiscordWebhook
-{
+public class DiscordWebhook {
 
     private final String webhookUrl;
 
-    public DiscordWebhook(String webhookUrl)
-    {
+    public DiscordWebhook(String webhookUrl) {
         this.webhookUrl = webhookUrl;
     }
 
@@ -32,8 +30,7 @@ public class DiscordWebhook
      *
      * @param message The message to send
      */
-    public void send(DiscordMessage message)
-    {
+    public void send(DiscordMessage message) {
 
         new Thread(() ->
         {
@@ -47,12 +44,14 @@ public class DiscordWebhook
                     .addHeader("Content-Type", "application/json")
                     .build();
 
-            try
-            {
-                httpClient.newCall(request).execute();
-            }
-            catch (IOException e)
-            {
+            try (var response = httpClient.newCall(request).execute()) {
+                if (!response.isSuccessful()) {
+                    if (response.body() != null) {
+                        log.warn("Failed to submit message to discord webhook: " + response.body().string());
+                    }
+                }
+
+            } catch (IOException e) {
                 log.warn("Failed to submit message to discord webhook", e);
             }
 
@@ -61,8 +60,7 @@ public class DiscordWebhook
     }
 
 
-    private JsonObject toJson(DiscordMessage discordMessage)
-    {
+    private JsonObject toJson(DiscordMessage discordMessage) {
         Gson gson = new Gson();
         JsonObject json = new JsonObject();
 
@@ -71,20 +69,17 @@ public class DiscordWebhook
         json.addProperty("avatar_url", discordMessage.getAvatarUrl());
         json.addProperty("tts", discordMessage.isTextToSpeech());
 
-        if (!discordMessage.getEmbeds().isEmpty())
-        {
+        if (!discordMessage.getEmbeds().isEmpty()) {
             List<JsonObject> embedObjects = new ArrayList<>();
 
-            for (var embed : discordMessage.getEmbeds())
-            {
+            for (var embed : discordMessage.getEmbeds()) {
                 JsonObject jsonEmbed = new JsonObject();
 
                 jsonEmbed.addProperty("title", embed.getTitle());
                 jsonEmbed.addProperty("description", embed.getDescription());
                 jsonEmbed.addProperty("url", embed.getUrl());
 
-                if (embed.getColor() != null)
-                {
+                if (embed.getColor() != null) {
                     Color color = embed.getColor();
                     int rgb = color.getRed();
                     rgb = (rgb << 8) + color.getGreen();
@@ -99,8 +94,7 @@ public class DiscordWebhook
                 EmbedAuthor author = embed.getAuthor();
                 List<EmbedField> fields = embed.getFields();
 
-                if (footer != null)
-                {
+                if (footer != null) {
                     JsonObject jsonFooter = new JsonObject();
 
                     jsonFooter.addProperty("text", footer.getText());
@@ -108,24 +102,21 @@ public class DiscordWebhook
                     jsonEmbed.add("footer", jsonFooter);
                 }
 
-                if (image != null)
-                {
+                if (image != null) {
                     JsonObject jsonImage = new JsonObject();
 
                     jsonImage.addProperty("url", image);
                     jsonEmbed.add("image", jsonImage);
                 }
 
-                if (thumbnail != null)
-                {
+                if (thumbnail != null) {
                     JsonObject jsonThumbnail = new JsonObject();
 
                     jsonThumbnail.addProperty("url", thumbnail);
                     jsonEmbed.add("thumbnail", jsonThumbnail);
                 }
 
-                if (author != null)
-                {
+                if (author != null) {
                     JsonObject jsonAuthor = new JsonObject();
 
                     jsonAuthor.addProperty("name", author.getName());
@@ -135,8 +126,7 @@ public class DiscordWebhook
                 }
 
                 List<JsonObject> jsonFields = new ArrayList<>();
-                for (EmbedField field : fields)
-                {
+                for (EmbedField field : fields) {
                     JsonObject jsonField = new JsonObject();
 
                     jsonField.addProperty("name", field.getName());

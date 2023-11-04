@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.combat.damage;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Singleton
+@Slf4j
 public class ItemDamageRepository implements IRepository<ItemDamageValue> {
 
     @Inject
@@ -39,7 +41,7 @@ public class ItemDamageRepository implements IRepository<ItemDamageValue> {
                 itemDamageValues.add(new ItemDamageValue(item, damage));
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            log.error("Failed to load damage values", ex);
         }
 
         return itemDamageValues;
