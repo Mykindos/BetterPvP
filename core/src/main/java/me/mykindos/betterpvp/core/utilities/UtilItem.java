@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.core.utilities;
 
+import me.mykindos.betterpvp.core.framework.BPvPPlugin;
+import me.mykindos.betterpvp.core.utilities.model.WeighedList;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -264,6 +266,26 @@ public class UtilItem {
             newComponents.add(component.decoration(TextDecoration.ITALIC, false));
         }
         return newComponents;
+    }
+
+    public static WeighedList<ItemStack> getDropTable(BPvPPlugin plugin, String configKey) {
+        WeighedList<ItemStack> droptable = new WeighedList<>();
+
+        var configSection = plugin.getConfig().getConfigurationSection(configKey);
+        if (configSection == null) return droptable;
+
+        configSection.getKeys(false).forEach(key -> {
+            Material item = Material.getMaterial(key);
+            int amount = configSection.getInt(key + ".amount", 1);
+            int modelId = configSection.getInt(key + ".model-id", 0);
+            int weight = configSection.getInt(key + ".weight");
+            int categoryWeight = configSection.getInt(key + ".category-weight");
+
+            ItemStack itemStack = UtilItem.createItemStack(item, amount, modelId);
+            droptable.add(categoryWeight, weight, itemStack);
+        });
+
+        return droptable;
     }
 
 }

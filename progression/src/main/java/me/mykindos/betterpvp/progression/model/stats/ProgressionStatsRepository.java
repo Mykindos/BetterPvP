@@ -21,15 +21,17 @@ import java.util.concurrent.CompletableFuture;
 public abstract class ProgressionStatsRepository<T extends ProgressionTree, K extends ProgressionData<T>> extends StatsRepository<K> {
 
     protected T tree;
+    protected final String tableName;
 
     protected ProgressionStatsRepository(Progression plugin, String tableName) {
-        super(plugin, tableName);
+        super(plugin);
+        this.tableName = tableName;
     }
 
     protected abstract Class<T> getTreeClass();
 
     @Override
-    protected void postSaveAll() {
+    protected void postSaveAll(boolean async) {
         String expStmt = "INSERT INTO " + plugin.getDatabasePrefix() + "exp (Gamer, " + tableName + ") VALUES (?, ?) ON DUPLICATE KEY UPDATE " + tableName + " = VALUES(" + tableName + ");";
         List<Statement> statements = new ArrayList<>();
         saveQueue.forEach((uuid, data) -> statements.add(new Statement(expStmt,

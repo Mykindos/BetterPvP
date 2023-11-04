@@ -63,7 +63,7 @@ public class Backstab extends Skill implements PassiveSkill, Listener {
             daamger.getWorld().playEffect(event.getDamagee().getLocation().add(0, 1, 0), Effect.STEP_SOUND, Material.REDSTONE_BLOCK);
             }
 
-            event.setReason("Backstab");
+            event.addReason("Backstab");
         }
     @Override
     public String getDefaultClassString() {

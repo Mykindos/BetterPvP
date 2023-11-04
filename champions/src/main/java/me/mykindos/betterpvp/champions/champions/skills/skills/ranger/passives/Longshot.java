@@ -107,7 +107,7 @@ public class Longshot extends Skill implements PassiveSkill {
         double damage = Math.min(baseDamage + getLevel(damager), length / 3.5);
 
         event.setDamage(event.getDamage() + (damage));
-        event.setReason(getName() + (length > deathMessageThreshold ? " <gray>from <green>" + (int) length + "<gray> blocks" : ""));
+        event.addReason(getName() + (length > deathMessageThreshold ? " (" + (int) length + " blocks)" : ""));
 
     }
 

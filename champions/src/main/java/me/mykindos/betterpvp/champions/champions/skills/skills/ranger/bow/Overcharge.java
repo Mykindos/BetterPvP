@@ -107,7 +107,7 @@ public class Overcharge extends Skill implements InteractSkill, Listener {
         if (!(event.getDamager() instanceof Player)) return;
         if (bonus.containsKey(arrow)) {
             event.setDamage(event.getDamage() + bonus.get(arrow));
-            event.setReason(getName());
+            event.addReason(getName());
         }
     }
 

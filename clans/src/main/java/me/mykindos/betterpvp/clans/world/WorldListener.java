@@ -35,6 +35,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
+import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
@@ -267,6 +269,22 @@ public class WorldListener implements Listener {
             }
         });
 
+    }
+
+    @EventHandler
+    public void pistonSlimeExtend(BlockPistonExtendEvent event) {
+        if (event.isCancelled()) return;
+        if (event.getBlocks().stream().anyMatch(UtilBlock::isStickyBlock)) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void pistonSlimeRetract(BlockPistonRetractEvent event) {
+        if (event.isCancelled()) return;
+        if (event.getBlocks().stream().anyMatch(UtilBlock::isStickyBlock)) {
+            event.setCancelled(true);
+        }
     }
 
     /**

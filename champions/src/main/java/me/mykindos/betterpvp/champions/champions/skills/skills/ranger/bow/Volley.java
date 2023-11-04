@@ -104,7 +104,7 @@ public class Volley extends PrepareArrowSkill {
 
 
         event.setDamage(8);
-        event.setReason(getName());
+        event.addReason(getName());
 
     }
 

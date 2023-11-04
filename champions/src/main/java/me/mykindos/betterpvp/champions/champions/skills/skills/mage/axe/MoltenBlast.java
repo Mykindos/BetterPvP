@@ -119,7 +119,7 @@ public class MoltenBlast extends Skill implements InteractSkill, CooldownSkill, 
 
                 event.setKnockback(true);
                 event.setDamage(damage);
-                event.setReason(getName());
+                event.addReason(getName());
                 UtilServer.runTaskLater(champions, () -> event.getDamagee().setFireTicks((int) (20 * (0 + (getLevel(player) * 0.5)))), 2);
 
             }

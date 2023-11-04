@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import me.mykindos.betterpvp.core.utilities.model.ConfigAccessor;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
@@ -18,18 +17,16 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
-public abstract class StatsRepository<T extends PlayerData> implements ConfigAccessor {
+public abstract class StatsRepository<T extends StatHolder> {
 
     protected final ConcurrentHashMap<UUID, T> saveQueue = new ConcurrentHashMap<>();
     protected final AsyncLoadingCache<UUID, T> dataCache;
     protected final Database database;
     protected final BPvPPlugin plugin;
-    protected final String tableName;
 
-    protected StatsRepository(BPvPPlugin plugin, String tableName) {
+    protected StatsRepository(BPvPPlugin plugin) {
         this.database = plugin.getInjector().getInstance(Database.class);
         this.plugin = plugin;
-        this.tableName = tableName;
         this.dataCache = Caffeine.newBuilder()
                 .expireAfterAccess(30, TimeUnit.MINUTES)
                 .buildAsync((AsyncCacheLoader<? super UUID, T>) ((key, executor) -> loadCompleteDataAsync(key)));
@@ -42,9 +39,9 @@ public abstract class StatsRepository<T extends PlayerData> implements ConfigAcc
         UtilServer.runTask(plugin, async, () -> {
             // Save repo-specific data
             saveQueue.forEach((uuid, data) -> data.prepareUpdates(uuid, database, plugin.getDatabasePrefix()));
-            // Save experience
-            log.info("Saving {} players.", saveQueue.size());
-            postSaveAll();
+            // Save extra
+            postSaveAll(async);
+            log.info("[{}] Saving {} players.", getClass().getSimpleName(), saveQueue.size());
             // Clear the save queue
             saveQueue.clear();
         });
@@ -53,7 +50,9 @@ public abstract class StatsRepository<T extends PlayerData> implements ConfigAcc
     /**
      * Called after all data is saved, before the save queue is cleared.
      */
-    protected abstract void postSaveAll();
+    protected void postSaveAll(boolean async) {
+        // Override this if you need to execute any additional queries post-save
+    }
 
     /**
      * Shuts down the repository.
@@ -123,8 +122,8 @@ public abstract class StatsRepository<T extends PlayerData> implements ConfigAcc
      * Fetches the data for the given player directly from the database.
      *
      * <b>NOTE: Use with caution. This is a direct database call. For common use call {@link StatsRepository#getDataAsync}</b>
-     * @param player
-     * @return
+     * @param player The player to get the data for.
+     * @return The {@link PlayerData} for the given player.
      */
     public abstract CompletableFuture<T> fetchDataAsync(UUID player);
 

@@ -60,7 +60,7 @@ public class Entangle extends Skill implements PassiveSkill {
 
         int level = getLevel(damager);
         if (level > 0) {
-            event.setReason(getName());
+            event.addReason(getName());
             event.getDamagee().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) ((baseDuration + (level * 0.5)) * 20), 1));
         }
     }

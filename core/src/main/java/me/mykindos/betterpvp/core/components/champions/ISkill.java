@@ -43,4 +43,6 @@ public interface ISkill {
 
     Material[] getItemsBySkillType();
 
+    boolean hasSkill(Player player);
+
 }

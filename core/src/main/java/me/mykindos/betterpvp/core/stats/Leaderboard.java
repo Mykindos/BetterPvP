@@ -2,33 +2,29 @@ package me.mykindos.betterpvp.core.stats;
 
 import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.google.common.base.Preconditions;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
-import me.mykindos.betterpvp.core.stats.event.LeaderboardInitializeEvent;
+import me.mykindos.betterpvp.core.stats.filter.FilterType;
+import me.mykindos.betterpvp.core.stats.filter.Filtered;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardEntry;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardEntryComparator;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardEntryKey;
+import me.mykindos.betterpvp.core.stats.repository.LeaderboardManager;
 import me.mykindos.betterpvp.core.stats.sort.SortType;
+import me.mykindos.betterpvp.core.stats.sort.Sorted;
 import me.mykindos.betterpvp.core.stats.sort.TemporalSort;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
-import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
@@ -42,46 +38,86 @@ import java.util.concurrent.TimeUnit;
  * @param <T> The type of object to be sorted in this leaderboard.
  */
 @Slf4j
-public abstract class Leaderboard<E, T extends Comparable<T>> {
+public abstract class Leaderboard<E, T> {
 
-    private final ConcurrentHashMap<SortType, TreeSet<LeaderboardEntry<E, T>>> topTen;
+    private final ConcurrentHashMap<SearchOptions, TreeSet<LeaderboardEntry<E, T>>> topTen;
     private final AsyncLoadingCache<LeaderboardEntryKey<E>, T> entryCache;
     private final Database database;
     private final String tablePrefix;
+    private final Collection<SearchOptions> validSearchOptions = new ArrayList<>();
+    private final BPvPPlugin plugin;
 
-    protected Leaderboard(BPvPPlugin plugin, String tablePrefix) {
-        Validate.isTrue(acceptedSortTypes().length > 0, "Leaderboard must accept at least one sort type.");
+    @Getter
+    @Setter
+    private boolean viewable = true;
+
+    protected Leaderboard(BPvPPlugin plugin) {
+        this.plugin = plugin;
         this.database = plugin.getInjector().getInstance(Database.class);
-        this.tablePrefix = tablePrefix;
+        this.tablePrefix = plugin.getDatabasePrefix();
         this.topTen = new ConcurrentHashMap<>();
         this.entryCache = Caffeine.newBuilder()
                 .expireAfterWrite(10, TimeUnit.MINUTES)
-                .buildAsync((key, executor) -> CompletableFuture.supplyAsync(() -> fetch(key.getSortType(), database, tablePrefix, key.getValue())));
+                .buildAsync((key, executor) -> CompletableFuture.supplyAsync(() -> fetch(key.getOptions(), database, tablePrefix, key.getValue())));
+    }
 
+    protected void init() {
+        // Populate search options
+        if (this instanceof Filtered filtered && this instanceof Sorted sorted) {
+            // Both sorts and filters
+            for (SortType sortType : sorted.acceptedSortTypes()) {
+                for (FilterType filterType : filtered.acceptedFilters()) {
+                    validSearchOptions.add(SearchOptions.builder().sort(sortType).filter(filterType).build());
+                }
+            }
+        } else if (this instanceof Filtered filtered) {
+            // Empty sorts, only filters
+            for (FilterType filterType : filtered.acceptedFilters()) {
+                validSearchOptions.add(SearchOptions.builder().filter(filterType).build());
+            }
+        } else if (this instanceof Sorted sorted) {
+            // Empty filters, only sorts
+            for (SortType sortType : sorted.acceptedSortTypes()) {
+                validSearchOptions.add(SearchOptions.builder().sort(sortType).build());
+            }
+        }
+
+        // If no sorts or filters, add empty
+        if (validSearchOptions.isEmpty()) {
+            validSearchOptions.add(SearchOptions.EMPTY);
+        }
+
+        // Schedule updates and register with manager
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(this::forceUpdate, 0L, 10L, TimeUnit.MINUTES);
-
-        UtilServer.callEvent(new LeaderboardInitializeEvent(this));
+        final LeaderboardManager manager = plugin.getInjector().getInstance(LeaderboardManager.class);
+        manager.addObject(UUID.randomUUID(), this);
     }
 
     public void forceUpdate() {
-        for (SortType sortType : acceptedSortTypes()) {
-            CompletableFuture.supplyAsync(() -> fetchAll(sortType, database, tablePrefix)).thenApply(fetch -> {
-                TreeSet<LeaderboardEntry<E, T>> set = new TreeSet<>(new LeaderboardEntryComparator<>());
+        for (SearchOptions options : validSearchOptions) {
+            CompletableFuture.supplyAsync(() -> fetchAll(options, database, tablePrefix)).thenApply(fetch -> {
+                final LeaderboardEntryComparator<E, T> comparator = new LeaderboardEntryComparator<>(getSorter(options));
+                TreeSet<LeaderboardEntry<E, T>> set = new TreeSet<>(comparator);
                 set.addAll(fetch.entrySet().stream().map(entry -> LeaderboardEntry.of(entry.getKey(), entry.getValue())).toList());
                 return set;
             }).exceptionally(ex -> {
-                log.error("Failed to fetch leaderboard data for " + sortType + "!", ex);
+                log.error("Failed to fetch leaderboard data for " + options + "!", ex);
                 ex.printStackTrace();
                 return null;
             }).whenComplete((set, ex) -> {
                 if (ex != null) {
-                    log.error("Failed to fetch leaderboard data for " + sortType + "!", ex);
+                    log.error("Failed to fetch leaderboard data for " + options + "!", ex);
                     ex.printStackTrace();
                     return;
                 }
-                topTen.put(sortType, set);
+                topTen.put(options, set);
             });
         }
+    }
+
+    private void validate(SearchOptions options) {
+        Preconditions.checkNotNull(options, "Search options cannot be null!");
+        Preconditions.checkArgument(validSearchOptions.contains(options), "Search options " + options + " are not valid for this leaderboard!");
     }
 
     public abstract String getName();
@@ -89,22 +125,33 @@ public abstract class Leaderboard<E, T extends Comparable<T>> {
     /**
      * @return The comparator to sort the leaderboard by.
      */
-    protected abstract Comparator<T> getSorter();
+    public abstract Comparator<T> getSorter(SearchOptions searchOptions);
 
     /**
-     * @return The types of sorting this leaderboard accepts.
+     * Gets the description of the given value for a leaderboard menu.
+     * @param searchOptions The options to get the description for.
+     * @param value The value to get the description for.
+     * @return The description of the given value.
      */
-    public abstract SortType[] acceptedSortTypes();
+    public Description getDescription(SearchOptions searchOptions, LeaderboardEntry<E, T> value) {
+        validate(searchOptions);
+        return describe(searchOptions, value);
+    }
+
+    /**
+     * Gets the description of the given value for a leaderboard menu.
+     * @param searchOptions The options to get the description for.
+     * @param value The value to get the description for.
+     * @return The description of the given value.
+     */
+    protected abstract Description describe(SearchOptions searchOptions, LeaderboardEntry<E, T> value);
 
     /**
      * @return The top entries in the leaderboard of type T.
      */
-    public final SortedSet<LeaderboardEntry<E, T>> getTopTen(SortType sortType) {
-        if (!Arrays.asList(acceptedSortTypes()).contains(sortType)) {
-            log.error("Sort type " + sortType + " is not accepted by this leaderboard.");
-            throw new IllegalArgumentException("Sort type " + sortType + " is not accepted by this leaderboard.");
-        }
-        return Collections.unmodifiableSortedSet(topTen.get(sortType));
+    public SortedSet<LeaderboardEntry<E, T>> getTopTen(SearchOptions options) {
+        validate(options);
+        return Collections.unmodifiableSortedSet(topTen.get(options));
     }
 
     /**
@@ -118,11 +165,11 @@ public abstract class Leaderboard<E, T extends Comparable<T>> {
      *        If the element was not added to a leaderboard, it will not be present in the map.
      *        If the element was already in the same position, it will not be present in the map.
      */
-    public final CompletableFuture<Map<SortType, Integer>> add(@NotNull E entryName, @NotNull T add) {
+    public CompletableFuture<Map<SearchOptions, Integer>> add(@NotNull E entryName, @NotNull T add) {
         return CompletableFuture.supplyAsync(() -> {
-            Map<SortType, Integer> types = new HashMap<>();
-            for (SortType type : acceptedSortTypes()) {
-                final TreeSet<LeaderboardEntry<E, T>> set = topTen.get(type);
+            Map<SearchOptions, Integer> types = new HashMap<>();
+            for (SearchOptions options : validSearchOptions) {
+                final TreeSet<LeaderboardEntry<E, T>> set = topTen.get(options);
                 if (set == null) {
                     continue;
                 }
@@ -134,7 +181,7 @@ public abstract class Leaderboard<E, T extends Comparable<T>> {
                 if (match.isPresent()) {
                     existingData = match.orElseThrow().getValue();
                 } else {
-                    existingData = entryCache.get(LeaderboardEntryKey.of(type, entryName)).join(); // Reason for this to be async
+                    existingData = entryCache.get(LeaderboardEntryKey.of(options, entryName)).join(); // Reason for this to be async
                 }
 
                 entry.setValue(join(existingData, add));
@@ -150,7 +197,7 @@ public abstract class Leaderboard<E, T extends Comparable<T>> {
 
                 int indexNow = newList.indexOf(entry) + 1;
                 if (set.contains(entry) && indexBefore != indexNow) {
-                    types.put(type, indexNow);
+                    types.put(options, indexNow);
                 }
             }
             return types;
@@ -178,10 +225,14 @@ public abstract class Leaderboard<E, T extends Comparable<T>> {
      *         If the element was not added to a leaderboard, it will not be present in the map.
      *         If the element was already in the same position, it will not be present in the map.
      */
-    public final Map<SortType, Integer> compute(@NotNull E entryName, @NotNull T element) {
-        Map<SortType, Integer> types = new HashMap<>();
-        for (SortType type : acceptedSortTypes()) {
-            final TreeSet<LeaderboardEntry<E, T>> set = topTen.get(type);
+    public Map<SearchOptions, Integer> compute(@NotNull E entryName, @NotNull T element) {
+        Map<SearchOptions, Integer> types = new HashMap<>();
+        for (SearchOptions options : validSearchOptions) {
+            if (!options.accepts(element)) {
+                continue;
+            }
+
+            final TreeSet<LeaderboardEntry<E, T>> set = topTen.get(options);
             if (set == null) {
                 continue;
             }
@@ -192,13 +243,13 @@ public abstract class Leaderboard<E, T extends Comparable<T>> {
             set.removeIf(existing -> existing.getKey().equals(entry.getKey())); // Remove entry if cloned
             set.add(entry);
             if (set.size() > 10) {
-                set.pollLast(); // Remove last entry to keep the same size, only if we updated the size
+                set.pollLast(); // Remove the last entry to keep the same size, only if we updated the size
             }
 
             // Only return this type if the entry was added
             int indexNow = new ArrayList<>(set).indexOf(entry) + 1;
             if (set.contains(entry) && indexBefore != indexNow) {
-                types.put(type, indexNow);
+                types.put(options, indexNow);
             }
         }
         return types;
@@ -206,57 +257,89 @@ public abstract class Leaderboard<E, T extends Comparable<T>> {
 
     /**
      * Gets the data in this leaderboard for the given entry.
+     * @param searchOptions The options to load the data for.
      * @param entry The entry to get the data for.
      * @return The data in this leaderboard for the given entry.
      */
-    public final CompletableFuture<T> getEntryData(SortType sortType, E entry) {
-        return topTen.get(sortType).stream()
+    public CompletableFuture<T> getEntryData(SearchOptions searchOptions, E entry) {
+        validate(searchOptions);
+        return topTen.get(searchOptions).stream()
                 .filter(e -> e.getKey().equals(entry))
                 .findFirst()
                 .map(LeaderboardEntry::getValue)
                 .map(CompletableFuture::completedFuture)
-                .orElseGet(() -> entryCache.get(LeaderboardEntryKey.of(sortType, entry)));
+                .orElseGet(() -> entryCache.get(LeaderboardEntryKey.of(searchOptions, entry)));
     }
 
     /**
+     * Gets the data in this leaderboard that can correspond to the given player.
+     * @param player The player to get the data for.
+     * @param options The options to load the data for.
+     * @return The data in this leaderboard that can correspond to the given player.
+     */
+    public final CompletableFuture<Optional<LeaderboardEntry<E, T>>> getPlayerData(@NotNull UUID player, @NotNull SearchOptions options) {
+        // Fetch the player data
+        CompletableFuture<Optional<LeaderboardEntry<E, T>>> future = CompletableFuture.supplyAsync(() -> Optional.ofNullable(fetchPlayerData(player, options, database, tablePrefix))).exceptionally(ex -> {
+            if (!(ex instanceof UnsupportedOperationException)) {
+                log.error("Failed to fetch leaderboard data for " + player + "!", ex);
+            }
+            return Optional.empty();
+        });
+
+        // Cache the data we just got
+        future.thenAccept(data -> {
+            if (data.isPresent()) {
+                final LeaderboardEntry<E, T> entry = data.get();
+                entryCache.put(LeaderboardEntryKey.of(options, entry.getKey()), CompletableFuture.completedFuture(entry.getValue()));
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Gets the data in this leaderboard that can correspond to the given player.
+     * @param player The player to get the data for.
+     * @return The data in this leaderboard that can correspond to the given player.
+     */
+    protected abstract LeaderboardEntry<E, T> fetchPlayerData(@NotNull UUID player, @NotNull SearchOptions options, @NotNull Database database, @NotNull String tablePrefix) throws UnsupportedOperationException;
+
+    /**
      * Loads the data for the given entry.
-     * @param sortType The type of sorting to use.
+     * @param options The options to load the data for.
      * @param database The database to fetch from.
      * @param tablePrefix The prefix of the table.
      * @param entry The entry to load the data for.
      * @return The data for the given entry.
      */
-    protected abstract T fetch(SortType sortType, @NotNull Database database, @NotNull String tablePrefix, @NotNull E entry);
+    protected abstract T fetch(@NotNull SearchOptions options, @NotNull Database database, @NotNull String tablePrefix, @NotNull E entry);
 
     /**
      * Fetches the top entries from the database.
-     * @param sortType The type of sorting to use.
-     * @param database The database to fetch from.
+     *
+     * @param options     The options to load the data for.
+     * @param database    The database to fetch from.
      * @param tablePrefix The prefix of the table.
      */
-    protected abstract Map<E, T> fetchAll(@NotNull SortType sortType, @NotNull Database database, @NotNull String tablePrefix);
+    protected abstract Map<E, T> fetchAll(@NotNull SearchOptions options, @NotNull Database database, @NotNull String tablePrefix);
 
-    public void attemptAnnounce(Player player, Map<SortType, Integer> newPositions) {
-        if (newPositions.isEmpty()) {
-            return;
+    public void attemptAnnounce(Player player, Map<SearchOptions, Integer> newPositions) {
+        if (newPositions.isEmpty() || !isViewable()) {
+            return; // No new positions or leaderboard is disabled
         }
 
-        final Map.Entry<TemporalSort, Integer> highestEntry = newPositions.entrySet().stream()
-                .map(entry -> Map.entry((TemporalSort) entry.getKey(), entry.getValue()))
-                .max(Map.Entry.comparingByKey(Comparator.comparing(TemporalSort::getDays)))
-                .orElseThrow();
+        final int highestEntry = newPositions.getOrDefault(SearchOptions.builder().sort(TemporalSort.SEASONAL).build(), 0);
+        if (highestEntry != 1) {
+            return; // We only announce for top 1 of season
+        }
 
-        if (highestEntry.getKey() == TemporalSort.SEASONAL && highestEntry.getValue() <= 3) {
-            final String playerName = player.getName();
-            UtilMessage.simpleBroadcast("Leaderboard", "<dark_green>%s <green>has reached <dark_green>#%d</dark_green> on the %s %s leaderboard!",
-                    playerName,
-                    highestEntry.getValue(),
-                    highestEntry.getKey().getName().toLowerCase(),
-                    this.getName());
+        final String playerName = player.getName();
+        UtilMessage.simpleBroadcast("Leaderboard", "<dark_green>%s <green>has reached <dark_green>#%d</dark_green> on the seasonal %s leaderboard!",
+                playerName,
+                highestEntry,
+                this.getName());
 
-            for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-                UtilSound.playSound(onlinePlayer, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 1.0F, 1.0F, true);
-            }
+        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+            UtilSound.playSound(onlinePlayer, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 1.0F, 1.0F, true);
         }
     }
 

@@ -54,6 +54,7 @@ public abstract class Menu {
     }
 
     public void addButton(Button button) {
+        buttons.stream().filter(b -> b.getSlot() == button.getSlot()).findFirst().ifPresent(buttons::remove);
         buttons.add(button);
         inventory.setItem(button.getSlot(), button.getItemStack());
     }

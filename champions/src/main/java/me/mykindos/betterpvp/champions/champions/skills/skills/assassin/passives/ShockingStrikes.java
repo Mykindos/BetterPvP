@@ -62,7 +62,7 @@ public class ShockingStrikes extends Skill implements PassiveSkill, Listener {
 
         championsManager.getEffects().addEffect(damagee, EffectType.SHOCK, level * 1000L);
         damagee.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 0));
-        event.setReason(getName());
+        event.addReason(getName());
 
     }
 

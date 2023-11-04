@@ -5,80 +5,84 @@ import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.menu.Button;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.interfaces.IRefreshingMenu;
+import me.mykindos.betterpvp.core.stats.Description;
 import me.mykindos.betterpvp.core.stats.Leaderboard;
+import me.mykindos.betterpvp.core.stats.SearchOptions;
+import me.mykindos.betterpvp.core.stats.filter.FilterType;
+import me.mykindos.betterpvp.core.stats.filter.Filtered;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardEntry;
 import me.mykindos.betterpvp.core.stats.sort.SortType;
+import me.mykindos.betterpvp.core.stats.sort.Sorted;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.SkullMeta;
+import org.jetbrains.annotations.Nullable;
 
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 @Slf4j
-public class LeaderboardMenu extends Menu implements IRefreshingMenu {
+public class LeaderboardMenu<E, T> extends Menu implements IRefreshingMenu {
 
     private static final int POSITION_INDEX = UtilMessage.DIVIDER.content().length() / 2 - 6;
-    private final Leaderboard<?, ?> leaderboard;
-    private int sortTypeIndex;
+    private final Leaderboard<E, T> leaderboard;
+    private final @Nullable CycleButton<SortType> sortButton;
+    private final @Nullable CycleButton<FilterType> filterButton;
 
-    public LeaderboardMenu(Player player, Leaderboard<?, ?> leaderboard) {
+    public LeaderboardMenu(Player player, Leaderboard<E, T> leaderboard) {
         super(player, 54, Component.text(leaderboard.getName()));
         this.leaderboard = leaderboard;
-        this.sortTypeIndex = 0;
+
+        int buttonIndex = 0;
+        if (leaderboard instanceof Sorted sorted) {
+            final TextComponent sortTypeName = Component.text("Sort By", NamedTextColor.WHITE, TextDecoration.BOLD);
+            sortButton = new CycleButton<>(0, sorted.acceptedSortTypes(), new ItemStack(Material.ARMOR_STAND), sortTypeName, this);
+            buttonIndex += 9;
+        } else {
+            sortButton = null;
+        }
+
+        if (leaderboard instanceof Filtered filtered) {
+            final TextComponent filterTypeName = Component.text("Filter By", NamedTextColor.WHITE, TextDecoration.BOLD);
+            filterButton = new CycleButton<>(buttonIndex, filtered.acceptedFilters(), new ItemStack(Material.LECTERN), filterTypeName, this);
+        } else {
+            filterButton = null;
+        }
+
         refresh();
     }
 
     @Override
     public void refresh() {
-        // Sort button
-        List<Component> sortTypeLore = new ArrayList<>();
-        final SortType[] sortTypes = leaderboard.acceptedSortTypes();
-        SortType selectedSortType = sortTypes[sortTypeIndex];
-        for (SortType type : sortTypes) {
-            String name = type.getName();
-            NamedTextColor color = NamedTextColor.GRAY;
-            final boolean isSelected = selectedSortType == type;
-            if (isSelected) {
-                name += " \u00AB";
-                color = NamedTextColor.GREEN;
-            }
-            sortTypeLore.add(Component.text(name, color));
+        SearchOptions.SearchOptionsBuilder optionsBuilder = SearchOptions.builder();
+        if (sortButton != null) {
+            addButton(sortButton);
+            optionsBuilder.sort(sortButton.getCurrent());
         }
 
-        final TextComponent sortTypeName = Component.text("Sort", NamedTextColor.WHITE, TextDecoration.BOLD);
-        addButton(new Button(0, new ItemStack(Material.ARMOR_STAND), sortTypeName, sortTypeLore) {
-            @Override
-            public void onClick(Player player, Gamer gamer, ClickType clickType) {
-                sortTypeIndex = sortTypeIndex + 1 >= leaderboard.acceptedSortTypes().length ? 0 : sortTypeIndex + 1;
-                LeaderboardMenu.this.refresh();
-                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 2f, 2f);
-            }
-
-            @Override
-            public double getClickCooldown() {
-                return 0.5;
-            }
-        });
+        if (filterButton != null) {
+            addButton(filterButton);
+            optionsBuilder.filter(filterButton.getCurrent());
+        }
 
         // Standings
+        final SearchOptions options = optionsBuilder.build();
         int position = 0;
-        final ArrayList<? extends LeaderboardEntry<?, ?>> entries = new ArrayList<>(leaderboard.getTopTen(selectedSortType));
+        final ArrayList<? extends LeaderboardEntry<E, T>> entries = new ArrayList<>(leaderboard.getTopTen(options));
         for (int i = 0; i < 10; i++) {
             position++;
             final TextColor color = getPositionColor(position);
@@ -95,30 +99,10 @@ public class LeaderboardMenu extends Menu implements IRefreshingMenu {
                 continue;
             }
 
-            final LeaderboardEntry<?, ?> entry = entries.get(i);
-            final Object key = entry.getKey();
-            final Object value = entry.getValue();
 
-            ItemStack itemStack = new ItemStack(Material.PLAYER_HEAD);
-            final SkullMeta meta = (SkullMeta) itemStack.getItemMeta();
-            String keyRender = key.toString();
-            if (key instanceof UUID uuid) {
-                final OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
-                meta.setPlayerProfile(player.getPlayerProfile());
-                keyRender = player.getName();
-            } else if (key instanceof OfflinePlayer entryPlayer) {
-                meta.setPlayerProfile(entryPlayer.getPlayerProfile());
-                keyRender = entryPlayer.getName();
-            }
-
-            itemStack.setItemMeta(meta);
-
-            if (value instanceof Number number) {
-                addButton(getEntry(slot, title, itemStack, keyRender, NumberFormat.getInstance().format(number)));
-            } else {
-                addButton(getEntry(slot, title, itemStack, keyRender, value.toString()));
-            }
-
+            final LeaderboardEntry<E, T> entry = entries.get(i);
+            final Description description = leaderboard.getDescription(options, entry);
+            addButton(getEntry(slot, title, description));
         }
 
         // Podium spots
@@ -133,36 +117,31 @@ public class LeaderboardMenu extends Menu implements IRefreshingMenu {
                 Component.text("Top #3", getPositionColor(3), TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false)));
 
         // Own data
-        try {
-            final Leaderboard<UUID, ?> lb = (Leaderboard<UUID, ?>) leaderboard;
-            final CompletableFuture<?> entryData = lb.getEntryData(selectedSortType, player.getUniqueId());
-            final Button button = new Button(49,
-                    new ItemStack(Material.PAPER),
-                    Component.text("Retrieving your data...", NamedTextColor.GRAY));
+        final CompletableFuture<Optional<LeaderboardEntry<E, T>>> entryData = leaderboard.getPlayerData(player.getUniqueId(), options);
+        final Button button = new Button(49,
+                new ItemStack(Material.PAPER),
+                Component.text("Retrieving your data...", NamedTextColor.GRAY));
 
-            entryData.whenComplete((data, throwable) -> {
-                if (throwable != null) {
-                    button.setItemStack(getFailedItem(button.getItemStack()));
-                    return;
-                }
+        entryData.thenAccept(dataOpt -> {
+            if (dataOpt.isEmpty()) {
+                button.setItemStack(Menu.BACKGROUND);
+                return;
+            }
 
-                final Button replacement = getEntry(49,
-                        Component.text("Your Data", NamedTextColor.WHITE, TextDecoration.BOLD),
-                        button.getItemStack(),
-                        player.getName(),
-                        data.toString());
-                button.setItemStack(replacement.getItemStack());
-                LeaderboardMenu.this.refreshButton(button);
-            }).exceptionally(throwable -> {
-                log.error("Failed to retrieve leaderboard data for " + player.getName(), throwable);
-                button.setItemStack(getFailedItem(button.getItemStack()));
-                return null;
-            });
+            final LeaderboardEntry<E, T> data = dataOpt.get();
+            final Description description = leaderboard.getDescription(options, data);
+            final Button replacement = getEntry(49,
+                    Component.text("Your Data", NamedTextColor.WHITE, TextDecoration.BOLD),
+                    description);
+            button.setItemStack(replacement.getItemStack());
+            LeaderboardMenu.this.refreshButton(button);
+        }).exceptionally(throwable -> {
+            log.error("Failed to retrieve leaderboard data for " + player.getName(), throwable);
+            button.setItemStack(getFailedItem(button.getItemStack()));
+            return null;
+        });
 
-            addButton(button);
-        } catch (ClassCastException ignored) {
-            // Not a leaderboard with UUID keys aka players
-        }
+        addButton(button);
 
         // Fill empty
         fillEmpty(Menu.BACKGROUND);
@@ -189,18 +168,37 @@ public class LeaderboardMenu extends Menu implements IRefreshingMenu {
         return new Button(slot, itemStack);
     }
 
-    private Button getEntry(int slot, Component title, ItemStack itemStack, String key, String data) {
+    private Button getEntry(int slot, Component title, Description description) {
+        final ItemStack itemStack = description.getIcon();
         final ItemMeta meta = itemStack.getItemMeta();
         meta.displayName(title.decoration(TextDecoration.ITALIC, false));
-        meta.lore(List.of(
+        final List<Component> lore = new ArrayList<>(List.of(
                 UtilMessage.DIVIDER,
                 Component.empty(),
-                UtilMessage.deserialize("<white>Holder: <gray>%s", key).decoration(TextDecoration.ITALIC, false),
-                UtilMessage.deserialize("<white>%s: <gray>%s", leaderboard.getName(), data).decoration(TextDecoration.ITALIC, false),
                 Component.empty(),
                 UtilMessage.DIVIDER));
+
+        // After "holder"
+        int index = 2;
+        for (Map.Entry<String, Component> entry : description.getLines().entrySet()) {
+            final TextComponent keyText = Component.text(entry.getKey() + ": ").color(NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false);
+            final Component valueText = entry.getValue().decoration(TextDecoration.ITALIC, false).applyFallbackStyle(Style.style(NamedTextColor.GRAY));
+            lore.add(index, keyText.append(valueText));
+            index++;
+        }
+        meta.lore(lore);
         itemStack.setItemMeta(meta);
-        return new Button(slot, itemStack);
+        return new Button(slot, itemStack) {
+            @Override
+            public void onClick(Player player, Gamer gamer, ClickType clickType) {
+                final Consumer<Player> clickFunction = description.getClickFunction();
+                if (clickFunction == null) {
+                    return;
+                }
+                clickFunction.accept(player);
+                player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1, 1);
+            }
+        };
     }
 
     private TextColor getPositionColor(int positionIndex) {

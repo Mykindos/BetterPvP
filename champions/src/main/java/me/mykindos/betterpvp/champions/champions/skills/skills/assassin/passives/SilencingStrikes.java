@@ -77,7 +77,7 @@ public class SilencingStrikes extends Skill implements PassiveSkill, Listener {
 
             silenceData.addCount();
             silenceData.setLastHit(System.currentTimeMillis());
-            event.setReason(getName());
+            event.addReason(getName());
             if (silenceData.getCount() == hitsNeeded) {
                 championsManager.getEffects().addEffect(damagee, EffectType.SILENCE, (long) ((level * 1000L) * 0.75));
                 //if (championsManager.getEffects().hasEffect(damagee, EffectType.IMMUNETOEFFECTS)) {

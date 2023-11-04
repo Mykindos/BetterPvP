@@ -78,7 +78,7 @@ public class ComboAttack extends Skill implements PassiveSkill, Listener {
             event.setDamage(event.getDamage() + repeat.get(damager));
             repeat.put(damager, Math.min((level * damageIncrement), repeat.get(damager) + damageIncrement));
             last.put(damager, System.currentTimeMillis());
-            event.setReason(getName());
+            event.addReason(getName());
 
         }
     }
