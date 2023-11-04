@@ -19,7 +19,13 @@ public class MiningListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onBreak (BlockBreakEvent event) {
+        log.info("called");
         UtilServer.callEvent(new ProgressionMiningEvent(event.getPlayer(), event.getBlock(), LongUnaryOperator.identity()));
+    }
+
+    @EventHandler
+    public void onMine(ProgressionMiningEvent event) {
+        log.info("handler");
     }
 
 }
