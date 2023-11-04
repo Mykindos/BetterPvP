@@ -1,27 +1,25 @@
 package me.mykindos.betterpvp.progression.tree.mining.listener;
 
-import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.progression.tree.mining.MiningService;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.progression.tree.mining.event.ProgressionMiningEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 
+import java.util.function.LongUnaryOperator;
+
 @BPvPListener
 @Slf4j
 @Singleton
-public class MiningStatsListener implements Listener {
+public class MiningListener implements Listener {
 
-    @Inject
-    private MiningService service;
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onBreak(ProgressionMiningEvent event) {
-        service.attemptMineOre(event.getPlayer(), event.getBlock(), event.getExperienceModifier());
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onBreak (BlockBreakEvent event) {
+        UtilServer.callEvent(new ProgressionMiningEvent(event.getPlayer(), event.getBlock(), LongUnaryOperator.identity()));
     }
 
 }
