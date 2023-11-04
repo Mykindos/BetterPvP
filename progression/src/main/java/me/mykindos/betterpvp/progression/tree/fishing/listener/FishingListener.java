@@ -21,11 +21,7 @@ import me.mykindos.betterpvp.progression.tree.fishing.event.PlayerStartFishingEv
 import me.mykindos.betterpvp.progression.tree.fishing.event.PlayerStopFishingEvent;
 import me.mykindos.betterpvp.progression.tree.fishing.event.PlayerThrowBaitEvent;
 import me.mykindos.betterpvp.progression.tree.fishing.fish.Fish;
-import me.mykindos.betterpvp.progression.tree.fishing.model.Bait;
-import me.mykindos.betterpvp.progression.tree.fishing.model.BaitType;
-import me.mykindos.betterpvp.progression.tree.fishing.model.FishingLoot;
-import me.mykindos.betterpvp.progression.tree.fishing.model.FishingLootType;
-import me.mykindos.betterpvp.progression.tree.fishing.model.FishingRodType;
+import me.mykindos.betterpvp.progression.tree.fishing.model.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -41,15 +37,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.util.Vector;
 
-import java.util.Iterator;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Random;
-import java.util.WeakHashMap;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -206,39 +197,7 @@ public class FishingListener implements Listener {
             }
             case CAUGHT_FISH -> {
                 final FishingLoot loot = fish.get(player);
-                getRandomLoot();
                 UtilServer.callEvent(new PlayerCaughtFishEvent(event.getPlayer(), loot, event.getHook(), event.getCaught()));
-
-                /*// they reeled in the caught fish
-                final FishingLoot caught = fish.get(player);
-
-                final Item entity = (Item) Objects.requireNonNull(event.getCaught());
-                fish.invalidate(player);
-                final FishHook hook = event.getHook();
-                splash(hook.getLocation());
-
-                final PlayerInventory inventory = player.getInventory();
-                final Optional<FishingRodType> main = fishing.getRodType(inventory.getItemInMainHand());
-                final Optional<FishingRodType> off = fishing.getRodType(inventory.getItemInOffHand());
-
-                boolean canMainReel = main.map(rod -> rod.canReel(caught)).orElse(false);
-                boolean canOffReel = off.map(rod -> rod.canReel(caught)).orElse(false);
-                if (!canMainReel && !canOffReel) {
-                    FishingRodType rod = main.orElse(off.orElse(null));
-                    UtilServer.callEvent(new PlayerStopFishingEvent(player, rod, caught, PlayerStopFishingEvent.FishingResult.BAD_ROD, event));
-                    UtilMessage.message(event.getPlayer(), "Fishing", "<red>Your rod couldn't reel this <dark_red>%s</dark_red>!", caught.getType().getName());
-                    entity.remove();
-                    return; // Cancel if neither of the rods in your hand can reel
-                }
-
-                entity.setCanMobPickup(false);
-                caught.processCatch(event);
-                player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 5f, 0F);
-
-                FishingRodType rod = canMainReel ? main.get() : off.get();
-                UtilServer.callEvent(new PlayerStopFishingEvent(player, rod, caught, PlayerStopFishingEvent.FishingResult.CATCH, event));
-            */
-                // todo announce if they got on leaderboard and play firework sound
             }
         }
     }
@@ -274,8 +233,6 @@ public class FishingListener implements Listener {
 
         FishingRodType rod = canMainReel ? main.get() : off.get();
         UtilServer.callEvent(new PlayerStopFishingEvent(player, rod, caught, PlayerStopFishingEvent.FishingResult.CATCH));
-
-        // todo announce if they got on leaderboard and play firework sound
     }
 
     @EventHandler

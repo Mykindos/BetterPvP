@@ -5,7 +5,6 @@ import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.model.ProgressionPerk;
 import me.mykindos.betterpvp.progression.model.ProgressionTree;
@@ -14,8 +13,6 @@ import me.mykindos.betterpvp.progression.progression.perks.ChanceHandler;
 import me.mykindos.betterpvp.progression.tree.fishing.Fishing;
 import me.mykindos.betterpvp.progression.tree.fishing.event.PlayerCaughtFishEvent;
 import me.mykindos.betterpvp.progression.tree.fishing.fish.Fish;
-import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -82,7 +79,7 @@ public class IncreaseFishWeightFishingPerk implements Listener, ProgressionPerk,
                         }
                         int weight = (int) (fish.getWeight() + (fish.getWeight() * chanceMultiplier * increaseWeight));
                         //make a new fish if weight is > than old weight
-                        if (!(weight < fish.getWeight())) {
+                        if (weight >= fish.getWeight()) {
                             event.setLoot(new Fish(fish.getType(), weight));
                         }
                     }).exceptionally(throwable1 -> {
