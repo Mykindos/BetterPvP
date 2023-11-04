@@ -190,7 +190,6 @@ public class UtilMath {
                     edge.add(l);
                 }
             }
-            return edge;
         } else {
             for (Location l : blocks) {
                 World w = l.getWorld();
@@ -207,8 +206,8 @@ public class UtilMath {
                     edge.add(l);
                 }
             }
-            return edge;
         }
+        return edge;
     }
 
     /**
