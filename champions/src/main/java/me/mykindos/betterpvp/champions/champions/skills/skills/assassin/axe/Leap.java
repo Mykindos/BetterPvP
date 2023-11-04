@@ -107,7 +107,7 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
                                         }
                                     }
                                 }
-                                Block forward = null;
+                                Block forward;
 
                                 if (Math.abs(vec.getX()) > Math.abs(vec.getZ())) {
                                     if (xPos) {
