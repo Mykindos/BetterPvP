@@ -45,7 +45,7 @@ public class InsuranceListener extends ClanListener {
         clanManager.getRepository().deleteExpiredInsurance(expiryTimeMs);
     }
 
-    @UpdateEvent(delay = 1)
+    @UpdateEvent
     public void processInsuranceQueue() {
         if (!enabled) return;
         if (clanManager.getInsuranceQueue().isEmpty()) return;
