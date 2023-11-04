@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.combat.armour;
 
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Singleton
+@Slf4j
 public class ArmourRepository implements IRepository<Armour> {
 
     @Inject
@@ -39,7 +41,7 @@ public class ArmourRepository implements IRepository<Armour> {
                 armour.add(new Armour(type, reduction));
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            log.error("Failed to load armour", ex);
         }
         return armour;
     }
