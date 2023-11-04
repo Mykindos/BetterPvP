@@ -48,7 +48,7 @@ public class BuildListener implements Listener {
     @EventHandler
     public void onClientJoin(ClientLoginEvent event) {
         UtilServer.runTaskAsync(champions, () -> {
-            buildManager.loadBuildsForPlayer(event.getClient().getUuid());
+            GamerBuilds builds = buildManager.loadBuildsForPlayer(event.getClient().getUuid());
             UtilServer.runTask(champions, () -> {
                 UtilServer.callEvent(new LoadBuildsEvent(event.getPlayer(), builds));
             });
