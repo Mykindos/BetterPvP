@@ -21,22 +21,23 @@ import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
-import org.bukkit.Bukkit;
-import org.bukkit.Effect;
-import org.bukkit.Material;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
-import java.util.WeakHashMap;
+import java.util.*;
 
 @Singleton
 @BPvPListener
 public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listener {
 
     public WeakHashMap<Player, RecallData> data = new WeakHashMap<>();
-    public double percentHealthRecovered;
+    public double extraHealthRecovered;
+    public double currHealth;
+    public double markerTiming;
     @Inject
     public Recall(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -54,8 +55,11 @@ public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listene
         return new String[]{
                 "Drop your Sword / Axe to activate",
                 "",
-                "Teleports you back in time <val>" + (1.5 + (level)) + "</val> seconds, increasing",
-                "your health by <stat>" + (percentHealthRecovered * 100) + "%</stat> of the health you had",
+                "Teleports you back in time <val>" + (2 + (level)) + "</val> seconds,",
+                "setting your health to what it was at that time",
+                "and increasing it by an additional <stat>" + extraHealthRecovered + "</stat> health",
+                "",
+                "If your health was lower before, it will only apply the extra health",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -69,22 +73,25 @@ public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listene
 
     @UpdateEvent(delay = 500)
     public void updateRecallData() {
-
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
             int level = getLevel(onlinePlayer);
             if (level > 0) {
-                if (data.containsKey(onlinePlayer)) {
-                    RecallData recallData = data.get(onlinePlayer);
-                    if (UtilTime.elapsed(recallData.getTime(), 1000)) {
-                        recallData.addLocation(onlinePlayer.getLocation(), onlinePlayer.getHealth(), (1.5 + (level)));
-                        recallData.setTime(System.currentTimeMillis());
+                RecallData recallData = data.computeIfAbsent(onlinePlayer, k -> new RecallData());
+
+                if (UtilTime.elapsed(recallData.getTime(), (long) (markerTiming * 1000))) {
+                    recallData.addLocation(onlinePlayer.getLocation(), onlinePlayer.getHealth(), (int) ((2 + level) * (1 / markerTiming)));
+                    recallData.addLocationMarker(onlinePlayer.getLocation());
+                    recallData.setTime(System.currentTimeMillis());
+                }
+
+                Iterator<RecallData.LocationMarker> iterator = recallData.getLocationMarkers().iterator();
+                while (iterator.hasNext()) {
+                    RecallData.LocationMarker marker = iterator.next();
+                    if (UtilTime.elapsed(marker.getTimestamp(), (long) ((2 + level) * 1000))) {
+                        iterator.remove();
                     }
-                } else {
-                    data.put(onlinePlayer, new RecallData());
-                    data.get(onlinePlayer).addLocation(onlinePlayer.getLocation(), onlinePlayer.getHealth(), (1.5 + (level)));
                 }
             }
-
         }
     }
 
@@ -140,22 +147,65 @@ public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listene
         return true;
     }
 
+
     @Override
     public void toggle(Player player, int level) {
-
         RecallData recallData = data.get(player);
+        List<RecallData.LocationMarker> locationMarkers = recallData.getLocationMarkers();
+
+        Location originalLocation = player.getLocation().add(0, 1.0, 0);
+        Location recallLocation = recallData.getLocation().add(0, 0, 0);
+        int maxMarkers = (int) ((2 + (level - 1)) / markerTiming);
+        while (locationMarkers.size() > maxMarkers) {
+            locationMarkers.remove(locationMarkers.size() - 1);
+        }
+        player.teleport(recallLocation);
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 2.0F, 2.0F);
-        player.teleport(recallData.getLocation());
-        UtilEntity.setHealth(player, player.getHealth() + (recallData.getHealth() * percentHealthRecovered));
-
-        player.getWorld().playEffect(data.get(player).getLocation(), Effect.STEP_SOUND, Material.EMERALD_BLOCK);
-
+        UtilEntity.setHealth(player, Math.min(20, Math.max(currHealth + extraHealthRecovered, recallData.getHealth() + extraHealthRecovered)));
         UtilServer.callEvent(new EffectClearEvent(player));
 
+        //sequentially go through all the markers, drawing lines between them
+        Location previousLocation = recallLocation;
+        for (RecallData.LocationMarker marker : locationMarkers) {
+            Location markerLocation = marker.getLocation().add(0, 1.0, 0);
+            drawParticleTrail(previousLocation, markerLocation, player);
+            previousLocation = markerLocation;
+        }
+
+        //draw a line from the final marker back to the original player location
+        if (!locationMarkers.isEmpty()) {
+            Location lastMarkerLocation = locationMarkers.get(locationMarkers.size() - 1).getLocation();
+            drawParticleTrail(lastMarkerLocation, originalLocation, player);
+        }
+    }
+
+    private void drawParticleTrail(Location from, Location to, Player player) {
+        World world = from.getWorld();
+        double distance = from.distance(to);
+        Vector vector = to.toVector().subtract(from.toVector()).normalize().multiply(0.1);
+        Location location = from.clone();
+        Random random = new Random();
+
+        Particle.DustOptions dustOptions = new Particle.DustOptions(org.bukkit.Color.fromRGB(148, 0, 211), 0.5F);
+
+        for (double length = 0; length < distance; length += 0.1) {
+            double yOffset = Math.sin(length) * 1;
+
+            double randomX = (random.nextDouble() - 0.5) * 1;
+            double randomZ = (random.nextDouble() - 0.5) * 1;
+
+            world.spawnParticle(Particle.SPELL_WITCH, location.clone().add(randomX, yOffset, randomZ), 1);
+            location.add(vector);
+        }
+    }
+
+    private String formatLocation(Location location) {
+        return "(" + location.getX() + ", " + location.getY() + ", " + location.getZ() + ")";
     }
 
     @Override
     public void loadSkillConfig(){
-        percentHealthRecovered = getConfig("percentHealthRecovered", 0.25, Double.class);
+        markerTiming = getConfig("markerTiming", 0.5, Double.class);
+        extraHealthRecovered = getConfig("extraHealthRecovered", 2.0, Double.class);
     }
 }
