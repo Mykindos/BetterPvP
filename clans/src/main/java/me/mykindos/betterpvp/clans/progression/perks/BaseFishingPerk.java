@@ -5,9 +5,10 @@ import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
-import me.mykindos.betterpvp.core.config.Config;
+import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.model.ConfigAccessor;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.model.ProgressionPerk;
 import me.mykindos.betterpvp.progression.model.ProgressionTree;
@@ -25,10 +26,8 @@ import java.util.Optional;
 
 @Singleton
 @Slf4j
-public class BaseFishingPerk implements Listener, ProgressionPerk {
+public class BaseFishingPerk implements Listener, ConfigAccessor, ProgressionPerk {
 
-    @Config(path = "fishing.base-fishing-perk.level", defaultValue = "500")
-    @Inject(optional = true)
     private int requiredLevel;
 
     @Inject(optional = true)
@@ -83,5 +82,10 @@ public class BaseFishingPerk implements Listener, ProgressionPerk {
             log.error("Failed to check if player " + player.getName() + " has perk " + getName(), throwable);
             return null;
         });
+    }
+
+    @Override
+    public void loadConfig(ExtendedYamlConfiguration config) {
+        this.requiredLevel = config.getOrSaveObject("fishing.base-fishing-perk.level", 500, Integer.class);
     }
 }

@@ -13,6 +13,8 @@ public class PlayerCaughtFishEvent extends ProgressionFishingEvent {
     private FishingLoot loot;
     final FishHook hook;
     final Entity caught;
+    @Setter
+    private boolean ignoresWeight;
 
     public PlayerCaughtFishEvent(Player player, FishingLoot loot, FishHook hook, Entity caught) {
         super(player);
