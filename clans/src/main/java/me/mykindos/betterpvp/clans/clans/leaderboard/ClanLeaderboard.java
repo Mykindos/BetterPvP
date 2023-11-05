@@ -101,7 +101,7 @@ public class ClanLeaderboard extends Leaderboard<UUID, Clan> implements Sorted {
     @Override
     protected Map<UUID, Clan> fetchAll(@NotNull SearchOptions options, @NotNull Database database, @NotNull String tablePrefix) {
         final ClanSort sort = (ClanSort) Objects.requireNonNull(options.getSort());
-        final Collection<Clan> pool = clanManager.getObjects().values();
+        final Collection<Clan> pool = new HashSet<>(clanManager.getObjects().values());
         pool.removeIf(Clan::isAdmin);
         return switch (sort) {
             case LEVEL -> pool.stream()

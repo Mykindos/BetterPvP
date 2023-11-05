@@ -5,8 +5,10 @@ import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
 
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 public final class Adapters {
@@ -20,18 +22,30 @@ public final class Adapters {
     public void loadAdapters(Collection<Class<?>> adapters) {
         final PluginManager pluginManager = Bukkit.getPluginManager();
         for (Class<?> clazz : adapters) {
-            PluginAdapter adapterAnnotation = clazz.getAnnotation(PluginAdapter.class);
-            final String pluginName = adapterAnnotation.value();
+            if (Modifier.isAbstract(clazz.getModifiers()) || Modifier.isInterface(clazz.getModifiers()) || !clazz.isAnnotationPresent(PluginAdapter.class)) {
+                continue;
+            }
 
-            Optional.ofNullable(pluginManager.getPlugin(pluginName)).ifPresentOrElse(dependencyPlugin -> {
-                try {
-                    final Object adapter = plugin.getInjector().getInstance(clazz);
-                    plugin.getInjector().injectMembers(adapter);
-                    log.info("Loaded adapter " + clazz.getSimpleName() + " for " + pluginName + "!");
-                } catch (Exception e) {
-                    log.error("Failed to load adapter " + clazz.getSimpleName() + " for " + pluginName + "!", e);
+            PluginAdapter[] adapterAnnotation = clazz.getAnnotationsByType(PluginAdapter.class);
+            if (adapterAnnotation.length == 0) {
+                log.warn("Adapter " + clazz.getSimpleName() + " does not have a PluginAdapter annotation!");
+                continue;
+            }
+
+            boolean pass = true;
+            for (PluginAdapter annotation : adapterAnnotation) {
+                if (pluginManager.getPlugin(annotation.value()) == null) {
+                    log.warn("Plugin " + annotation.value() + " not found! Adapter " + clazz.getSimpleName() + " will not be loaded.");
+                    pass = false;
                 }
-            }, () -> log.info("Plugin " + pluginName + " not found! Adapter " + clazz.getSimpleName() + " will not be loaded."));
+            }
+
+            if (pass) {
+                final String pluginName = Arrays.stream(adapterAnnotation).map(PluginAdapter::value).collect(Collectors.joining(", "));
+                final Object adapter = plugin.getInjector().getInstance(clazz);
+                plugin.getInjector().injectMembers(adapter);
+                log.info("Loaded adapter " + clazz.getSimpleName() + " for " + pluginName + "!");
+            }
         }
     }
 

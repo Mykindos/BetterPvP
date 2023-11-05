@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.gamer.properties.GamerPropertyUpdateEvent;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.display.ActionBar;
+import me.mykindos.betterpvp.core.utilities.model.display.PlayerList;
 import me.mykindos.betterpvp.core.utilities.model.display.TitleQueue;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -30,6 +31,7 @@ public class Gamer extends PropertyContainer implements Invitable, IMapListener 
     private final String uuid;
     private ActionBar actionBar = new ActionBar();
     private TitleQueue titleQueue = new TitleQueue();
+    private PlayerList playerList = new PlayerList();
 
     private long lastDamaged;
     private long lastTip;
