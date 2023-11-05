@@ -11,14 +11,18 @@ public class ListenerLoader extends Loader {
         super(plugin);
     }
 
+    public void load(Listener listener) {
+        plugin.getInjector().injectMembers(listener);
+        plugin.getListeners().add(listener);
+        Bukkit.getPluginManager().registerEvents(listener, plugin);
+        count++;
+    }
+
     @Override
     public void load(Class<?> clazz) {
         try {
             Listener listener = (Listener) plugin.getInjector().getInstance(clazz);
-            plugin.getInjector().injectMembers(listener);
-            plugin.getListeners().add(listener);
-            Bukkit.getPluginManager().registerEvents(listener, plugin);
-            count++;
+            load(listener);
         } catch (Exception ex) {
             ex.printStackTrace();
         }

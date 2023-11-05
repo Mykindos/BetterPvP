@@ -1,7 +1,6 @@
 package me.mykindos.betterpvp.core.client.listener;
 
 import com.google.inject.Inject;
-import lombok.SneakyThrows;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.ClientManager;
 import me.mykindos.betterpvp.core.client.Rank;
@@ -15,12 +14,9 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -36,22 +32,6 @@ public class ClientListener implements Listener {
     @Inject
     @Config(path = "pvp.enableOldPvP", defaultValue = "true")
     private boolean enableOldPvP;
-
-    @Inject
-    @Config(path = "tab.title", defaultValue = "Welcome to Mineplex Clans!")
-    private String tabTitle;
-
-    @Inject
-    @Config(path = "tab.website", defaultValue = "https://mineplex.com")
-    private String website;
-
-    @Inject
-    @Config(path = "tab.shop", defaultValue = "mineplex.com/shop")
-    private String shop;
-
-    @Inject
-    @Config(path = "tab.server", defaultValue = "Clans-1")
-    private String server;
 
     @Inject
     @Config(path = "server.unlimitedPlayers", defaultValue = "false")
@@ -117,9 +97,6 @@ public class ClientListener implements Listener {
                 }
             }
         }
-
-        updateTab(event.getPlayer());
-
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -143,25 +120,6 @@ public class ClientListener implements Listener {
         clientOptional.ifPresent(client -> {
             client.putProperty(ClientProperty.LUNAR, event.isRegistered());
         });
-    }
-
-
-    @UpdateEvent(delay = 5000)
-    public void updateTabAllPlayers() {
-        Bukkit.getOnlinePlayers().forEach(this::updateTab);
-    }
-
-    @SneakyThrows
-    public void updateTab(Player player) {
-        var header = Component.text("Mineplex ", NamedTextColor.GOLD)
-                .append(Component.text("Network ", NamedTextColor.WHITE))
-                .append(Component.text(server, NamedTextColor.GREEN));
-
-        var footer = Component.text("Visit ", NamedTextColor.WHITE)
-                .append(Component.text(shop, NamedTextColor.YELLOW))
-                .append(Component.text(" for cool perks!", NamedTextColor.WHITE));
-
-        player.sendPlayerListHeaderAndFooter(header, footer);
     }
 
     @EventHandler
