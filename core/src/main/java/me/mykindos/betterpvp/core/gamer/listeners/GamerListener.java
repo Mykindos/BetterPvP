@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.gamer.listeners;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.events.ClientLoginEvent;
 import me.mykindos.betterpvp.core.config.Config;
@@ -11,15 +12,24 @@ import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
+import me.mykindos.betterpvp.core.utilities.model.display.PlayerListType;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
+import java.util.Objects;
 import java.util.Optional;
 
 @BPvPListener
+@Singleton
 public class GamerListener implements Listener {
+
+    private final PermanentComponent header;
+    private final PermanentComponent footer;
 
     @Inject
     @Config(path="gamer.default.coins", defaultValue = "5000")
@@ -29,6 +39,14 @@ public class GamerListener implements Listener {
     @Config(path="gamer.default.fragments", defaultValue = "0")
     private int defaultFragments;
 
+    @Inject
+    @Config(path = "tab.shop", defaultValue = "mineplex.com/shop")
+    private String shop;
+
+    @Inject
+    @Config(path = "tab.server", defaultValue = "Clans-1")
+    private String server;
+
     private final Core core;
     private final GamerManager gamerManager;
 
@@ -36,6 +54,14 @@ public class GamerListener implements Listener {
     public GamerListener(Core core, GamerManager gamerManager){
         this.core = core;
         this.gamerManager = gamerManager;
+
+        this.header = new PermanentComponent(gamer -> Component.text("Mineplex ", NamedTextColor.GOLD)
+                .append(Component.text("Network ", NamedTextColor.WHITE))
+                .append(Component.text(Objects.requireNonNull(server, ""), NamedTextColor.GREEN)));
+
+        this.footer = new PermanentComponent(gamer -> Component.text("Visit ", NamedTextColor.WHITE)
+                .append(Component.text(Objects.requireNonNull(shop, ""), NamedTextColor.YELLOW))
+                .append(Component.text(" for cool perks!", NamedTextColor.WHITE)));
     }
 
     @UpdateEvent (isAsync = true)
@@ -44,14 +70,13 @@ public class GamerListener implements Listener {
             gamerManager.getObject(player.getUniqueId()).ifPresent(gamer -> {
                 gamer.getActionBar().show(gamer);
                 gamer.getTitleQueue().show(gamer);
+                gamer.getPlayerList().show(gamer);
             });
         }
     }
 
-
     @EventHandler
     public void onClientLogin(ClientLoginEvent event) {
-
         Optional<Gamer> gamerOptional = gamerManager.getObject(event.getClient().getUuid());
         Gamer gamer;
         if(gamerOptional.isEmpty()){
@@ -61,15 +86,18 @@ public class GamerListener implements Listener {
             gamerManager.getGamerRepository().save(gamer);
 
             // TODO new player protection
-        }else{
+        } else {
             gamer = gamerOptional.get();
-
         }
+
         checkUnsetProperties(gamer);
 
         Bukkit.getOnlinePlayers().forEach(player ->
                 UtilServer.runTaskLater(core, () -> UtilServer.callEvent(new ScoreboardUpdateEvent(player)), 1));
 
+        gamer.getPlayerList().clear();
+        gamer.getPlayerList().add(PlayerListType.FOOTER, footer);
+        gamer.getPlayerList().add(PlayerListType.HEADER, header);
     }
 
     private void checkUnsetProperties(Gamer gamer) {

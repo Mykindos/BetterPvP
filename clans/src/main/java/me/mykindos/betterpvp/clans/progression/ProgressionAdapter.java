@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.listener.ClansListenerLoader;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
+import me.mykindos.betterpvp.core.utilities.model.ConfigAccessor;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.ProgressionsManager;
 import me.mykindos.betterpvp.progression.model.ProgressionPerk;
@@ -47,6 +48,10 @@ public class ProgressionAdapter{
         for (Class<? extends Listener> clazz : listenerClasses) {
             if (clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers())) continue;
             final Listener listener = clans.getInjector().getInstance(clazz);
+            if (listener instanceof ConfigAccessor accessor) {
+                accessor.loadConfig(clans.getConfig());
+            }
+
             progression.getInjector().injectMembers(listener);
             listenerLoader.load(clazz);
         }
@@ -59,6 +64,10 @@ public class ProgressionAdapter{
         for (Class<? extends ProgressionPerk> clazz : perkClasses) {
             if (clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers())) continue;
             final ProgressionPerk perk = clans.getInjector().getInstance(clazz);
+            if (perk instanceof ConfigAccessor accessor) {
+                accessor.loadConfig(clans.getConfig());
+            }
+
             progression.getInjector().injectMembers(perk);
             clans.getInjector().injectMembers(perk);
             final Class<? extends ProgressionTree>[] trees = perk.acceptedTrees();
