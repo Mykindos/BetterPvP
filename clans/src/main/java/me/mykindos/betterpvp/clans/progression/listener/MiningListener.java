@@ -6,7 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.clans.fields.event.FieldsInteractableUseEvent;
 import me.mykindos.betterpvp.clans.fields.model.FieldsInteractable;
 import me.mykindos.betterpvp.clans.fields.model.FieldsOre;
-import me.mykindos.betterpvp.core.config.Config;
+import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
+import me.mykindos.betterpvp.core.utilities.model.ConfigAccessor;
 import me.mykindos.betterpvp.progression.tree.mining.Mining;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -15,11 +16,9 @@ import org.bukkit.event.Listener;
 
 @Slf4j
 @Singleton
-public class MiningListener implements Listener {
+public class MiningListener implements Listener, ConfigAccessor {
 
-    @Config(path = "fields.fieldsXpMultiplier", defaultValue = "5.0")
-    @Inject(optional = true)
-    private double xpMultiplier = 5;
+    private double xpMultiplier;
 
     @Inject(optional = true)
     private Mining mining;
@@ -36,4 +35,8 @@ public class MiningListener implements Listener {
         mining.getMiningService().attemptMineOre(player, block, experience -> (long) (experience * xpMultiplier));
     }
 
+    @Override
+    public void loadConfig(ExtendedYamlConfiguration config) {
+        this.xpMultiplier = config.getOrSaveObject("fields.fieldsXpMultiplier", 5d, Double.class);
+    }
 }

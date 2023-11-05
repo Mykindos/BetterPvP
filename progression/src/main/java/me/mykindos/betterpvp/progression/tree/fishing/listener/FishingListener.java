@@ -152,7 +152,7 @@ public class FishingListener implements Listener {
 
     private void startFishing(Player player, FishHook hook) {
         final FishingLoot loot = this.fish.get(player);// store a new fish in the cache for them
-        UtilServer.callEvent(new PlayerStartFishingEvent(player, loot));
+        UtilServer.callEvent(new PlayerStartFishingEvent(player, loot, hook));
 
         // Process baits
         activeBaits.values().stream()
@@ -204,7 +204,7 @@ public class FishingListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     void onCatch (PlayerCaughtFishEvent event) {
-        //this is the final step
+        // this is the final step
         Player player = event.getPlayer();
         FishHook hook = event.getHook();
         final Item entity = (Item) Objects.requireNonNull(event.getCaught());
@@ -219,7 +219,7 @@ public class FishingListener implements Listener {
 
         boolean canMainReel = main.map(rod -> rod.canReel(caught)).orElse(false);
         boolean canOffReel = off.map(rod -> rod.canReel(caught)).orElse(false);
-        if (!canMainReel && !canOffReel) {
+        if (!canMainReel && !canOffReel && !event.isIgnoresWeight()) {
             FishingRodType rod = main.orElse(off.orElse(null));
             UtilServer.callEvent(new PlayerStopFishingEvent(player, rod, caught, PlayerStopFishingEvent.FishingResult.BAD_ROD));
             UtilMessage.message(event.getPlayer(), "Fishing", "<red>Your rod couldn't reel this <dark_red>%s</dark_red>!", caught.getType().getName());

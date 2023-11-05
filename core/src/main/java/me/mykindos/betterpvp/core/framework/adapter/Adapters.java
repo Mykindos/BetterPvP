@@ -3,10 +3,11 @@ package me.mykindos.betterpvp.core.framework.adapter;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import org.bukkit.Bukkit;
-import org.bukkit.plugin.PluginManager;
 
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 public final class Adapters {
@@ -17,21 +18,37 @@ public final class Adapters {
         this.plugin = plugin;
     }
 
-    public void loadAdapters(Collection<Class<?>> adapters) {
-        final PluginManager pluginManager = Bukkit.getPluginManager();
-        for (Class<?> clazz : adapters) {
-            PluginAdapter adapterAnnotation = clazz.getAnnotation(PluginAdapter.class);
-            final String pluginName = adapterAnnotation.value();
+    public boolean canLoad(Class<?> clazz) {
+        if (Modifier.isAbstract(clazz.getModifiers()) || Modifier.isInterface(clazz.getModifiers())) {
+            return false;
+        }
 
-            Optional.ofNullable(pluginManager.getPlugin(pluginName)).ifPresentOrElse(dependencyPlugin -> {
-                try {
-                    final Object adapter = plugin.getInjector().getInstance(clazz);
-                    plugin.getInjector().injectMembers(adapter);
-                    log.info("Loaded adapter " + clazz.getSimpleName() + " for " + pluginName + "!");
-                } catch (Exception e) {
-                    log.error("Failed to load adapter " + clazz.getSimpleName() + " for " + pluginName + "!", e);
-                }
-            }, () -> log.info("Plugin " + pluginName + " not found! Adapter " + clazz.getSimpleName() + " will not be loaded."));
+        PluginAdapter[] adapterAnnotation = clazz.getAnnotationsByType(PluginAdapter.class);
+        for (PluginAdapter annotation : adapterAnnotation) {
+            if (Bukkit.getPluginManager().getPlugin(annotation.value()) == null) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public void loadAdapters(Collection<Class<?>> adapters) {
+        for (Class<?> clazz : adapters) {
+            if (!canLoad(clazz)) {
+                log.warn("Could not load adapter " + clazz.getSimpleName() + "! Dependencies not found!");
+                continue;
+            }
+
+            final PluginAdapter[] adapterAnnotation = clazz.getAnnotationsByType(PluginAdapter.class);
+            if (adapterAnnotation.length == 0) {
+                continue;
+            }
+
+            final String pluginName = Arrays.stream(adapterAnnotation).map(PluginAdapter::value).collect(Collectors.joining(", "));
+            final Object adapter = plugin.getInjector().getInstance(clazz);
+            plugin.getInjector().injectMembers(adapter);
+            log.info("Loaded adapter " + clazz.getSimpleName() + " for " + pluginName + "!");
         }
     }
 
