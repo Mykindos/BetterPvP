@@ -95,6 +95,7 @@ public class GamerListener implements Listener {
         Bukkit.getOnlinePlayers().forEach(player ->
                 UtilServer.runTaskLater(core, () -> UtilServer.callEvent(new ScoreboardUpdateEvent(player)), 1));
 
+        gamer.getPlayerList().clear();
         gamer.getPlayerList().add(PlayerListType.FOOTER, footer);
         gamer.getPlayerList().add(PlayerListType.HEADER, header);
     }
