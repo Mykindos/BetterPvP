@@ -1,81 +1,30 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.data;
 
-import lombok.Data;
+import me.mykindos.betterpvp.champions.champions.skills.skills.assassin.passives.Recall;
 import org.bukkit.Location;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedList;
 
 public class RecallData {
-    public List<TempData> locations = new ArrayList<>();
-    private List<LocationMarker> locationMarkers = new ArrayList<>();
 
-    private long time;
+    private final LinkedList<Location> markers = new LinkedList<>();
+    private final Recall recall;
+    private final int level;
 
-    public RecallData() {
-        this.time = System.currentTimeMillis();
+    public RecallData(Recall recall, int level) {
+        this.recall = recall;
+        this.level = level;
     }
 
-
-    public double getHealth() {
-        return locations.get(0).getHealth();
-    }
-
-    public void addLocationMarker(Location location) {
-        locationMarkers.add(new LocationMarker(location));
-    }
-    public List<LocationMarker> getLocationMarkers() {
-        return locationMarkers;
-    }
-    public void addLocation(Location location, double health, double max) {
-        TempData loc = new TempData(location, health);
-        locations.add(loc);
-        if (locations.size() > max) {
-            locations.remove(0);
+    public void push(Location location) {
+        markers.addFirst(location);
+        if (markers.size() > recall.getDuration(level) / (Recall.MARKER_MILLIS / 1000d)) {
+            markers.removeLast();
         }
     }
 
-    public Location getLocation() {
-        return locations.get(0).getLocation();
+    public LinkedList<Location> getMarkers() {
+        return markers;
     }
 
-
-    public long getTime() {
-        return time;
-    }
-
-    public void setTime(long time) {
-        this.time = time;
-    }
-
-    @Data
-    private static class TempData {
-        private final Location location;
-        private final double health;
-        private final long timestamp;
-
-        public TempData(Location location, double health) {
-            this.location = location;
-            this.health = health;
-            this.timestamp = System.currentTimeMillis();
-        }
-    }
-
-    public static class LocationMarker {
-        private final Location location;
-        private final long timestamp;
-
-        public LocationMarker(Location location) {
-            this.location = location;
-            this.timestamp = System.currentTimeMillis();
-        }
-
-        public Location getLocation() {
-            return location;
-        }
-
-        public long getTimestamp() {
-            return timestamp;
-        }
-    }
 }
