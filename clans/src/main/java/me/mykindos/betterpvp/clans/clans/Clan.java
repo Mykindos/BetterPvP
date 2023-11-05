@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.clans.clans;
 
+import com.google.common.base.Preconditions;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.clans.clans.events.ClanPropertyUpdateEvent;
@@ -36,6 +37,14 @@ import java.util.UUID;
 @Data
 public class Clan extends PropertyContainer implements IClan, Invitable, IMapListener {
 
+    public static long getExperienceForLevel(long level) {
+        return (long) Math.pow(level, 2) - 1;
+    }
+
+    public static long getLevelFromExperience(long experience) {
+        return (long) Math.sqrt(experience + 1d);
+    }
+
     private final UUID id;
     private String name;
     private Location home;
@@ -66,10 +75,6 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
 
     public int getPoints() {
         return (int) getProperty(ClanProperty.POINTS).orElse(0);
-    }
-
-    public int getLevel() {
-        return (int) getProperty(ClanProperty.LEVEL).orElse(1);
     }
 
     /**
@@ -167,6 +172,23 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
         }
 
         return count;
+    }
+
+    public long getExperience() {
+        return (long) getProperty(ClanProperty.EXPERIENCE).orElse(0L);
+    }
+
+    public void grantExperience(long experience) {
+        Preconditions.checkArgument(experience > 0, "Experience must be greater than 0");
+        saveProperty(ClanProperty.EXPERIENCE.name(), getExperience() + experience, false);
+    }
+
+    public void setExperience(long experience) {
+        saveProperty(ClanProperty.EXPERIENCE.name(), experience, false);
+    }
+
+    public long getLevel() {
+        return getLevelFromExperience(getExperience());
     }
 
     /**

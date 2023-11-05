@@ -117,31 +117,31 @@ CREATE PROCEDURE GetChampionsData(player varchar(36))
 BEGIN
     SELECT
         cs.Class AS Class,
-        IFNULL(kills_count, 0) AS Kills,
-        IFNULL(deaths_count, 0) AS Deaths,
-        IFNULL(assists_count, 0) AS Assists,
-        cs.Rating AS Rating,
-        cs.Killstreak AS Killstreak,
-        cs.HighestKillstreak AS HighestKillstreak
+        IFNULL(SUM(kills_count), 0) AS Kills,
+        IFNULL(SUM(deaths_count), 0) AS Deaths,
+        IFNULL(SUM(assists_count), 0) AS Assists,
+        MAX(cs.Rating) AS Rating,
+        MAX(cs.Killstreak) AS Killstreak,
+        MAX(cs.HighestKillstreak) AS HighestKillstreak
     FROM champions_combat_stats AS cs
              LEFT JOIN (
-        SELECT KillerClass, COUNT(*) AS kills_count
+        SELECT ck.KillerClass, COUNT(KillId) AS kills_count
         FROM kills
-                 LEFT JOIN (SELECT KillId, KillerClass FROM champions_kills) AS ck ON ck.KillId = Id
+                 LEFT JOIN champions_kills AS ck ON ck.KillId = Id
         WHERE Killer = player
-        GROUP BY KillerClass
+        GROUP BY ck.KillerClass
     ) AS k ON cs.Class = k.KillerClass
              LEFT JOIN (
-        SELECT VictimClass, COUNT(*) AS deaths_count
+        SELECT VictimClass, COUNT(KillId) AS deaths_count
         FROM kills
-                 LEFT JOIN (SELECT KillId, VictimClass FROM champions_kills) AS ck ON ck.KillId = Id
+                 LEFT JOIN champions_kills AS ck ON ck.KillId = Id
         WHERE Victim = player
         GROUP BY VictimClass
     ) AS d ON cs.Class = d.VictimClass
              LEFT JOIN (
-        SELECT ContributorClass, COUNT(*) AS assists_count
+        SELECT ContributorClass, COUNT(KillId) AS assists_count
         FROM kill_contributions
-                 LEFT JOIN (SELECT ContributionId, ContributorClass FROM champions_kill_contributions) AS ckc ON ckc.ContributionId = Id
+                 LEFT JOIN champions_kill_contributions AS ckc ON ckc.ContributionId = Id
         WHERE Contributor = player
         GROUP BY ContributorClass
     ) AS ac ON cs.Class = ac.ContributorClass

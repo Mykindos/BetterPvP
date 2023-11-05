@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.data;
 
 import lombok.Data;
+import lombok.Getter;
 import org.bukkit.Location;
 
 import java.util.ArrayList;
@@ -8,6 +9,7 @@ import java.util.List;
 
 public class RecallData {
     public List<TempData> locations = new ArrayList<>();
+    @Getter
     private long time;
 
     public RecallData() {
@@ -32,10 +34,6 @@ public class RecallData {
         return locations.get(0).getLocation();
     }
 
-
-    public long getTime() {
-        return time;
-    }
 
     public void setTime(long time) {
         this.time = time;

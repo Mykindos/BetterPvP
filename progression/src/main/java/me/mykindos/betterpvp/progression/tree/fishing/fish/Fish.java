@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.progression.tree.fishing.fish;
 import lombok.Value;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.progression.tree.fishing.event.PlayerCaughtFishEvent;
 import me.mykindos.betterpvp.progression.tree.fishing.model.FishingLoot;
 import me.mykindos.betterpvp.progression.utility.ProgressionNamespacedKeys;
 import net.kyori.adventure.text.Component;
@@ -84,7 +85,7 @@ public class Fish implements FishingLoot {
     }
 
     @Override
-    public void processCatch(PlayerFishEvent event) {
+    public void processCatch(PlayerCaughtFishEvent event) {
         ItemStack item = getFishBucket();
         final Item entity = (Item) event.getCaught();
         Objects.requireNonNull(entity).setItemStack(item);

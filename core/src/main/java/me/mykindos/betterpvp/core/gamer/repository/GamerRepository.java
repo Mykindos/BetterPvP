@@ -60,7 +60,7 @@ public class GamerRepository implements IRepository<Gamer> {
 
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            log.error("Failed to load gamers", ex);
         }
 
         log.info("Loaded " + gamers.size() + " gamers");
@@ -69,7 +69,7 @@ public class GamerRepository implements IRepository<Gamer> {
 
     private void loadProperties(Gamer gamer) {
         String query = "SELECT properties.Property, Value, Type FROM " + databasePrefix + "gamer_properties properties INNER JOIN "
-                 + "property_map map on properties.Property = map.Property WHERE Gamer = ?";
+                + "property_map map on properties.Property = map.Property WHERE Gamer = ?";
         CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(gamer.getUuid())));
         try {
             while (result.next()) {
@@ -85,7 +85,7 @@ public class GamerRepository implements IRepository<Gamer> {
                 gamer.putProperty(value, property, true);
             }
         } catch (SQLException | ClassNotFoundException ex) {
-            ex.printStackTrace();
+            log.error("Failed to load gamer properties for {}", gamer.getUuid(), ex);
         }
     }
 
@@ -112,7 +112,7 @@ public class GamerRepository implements IRepository<Gamer> {
         queuedStatUpdates.put(gamer.getUuid() + property, statement);
     }
 
-    public void processStatUpdates(boolean async){
+    public void processStatUpdates(boolean async) {
         ConcurrentHashMap<String, Statement> statements = new ConcurrentHashMap<>(queuedStatUpdates);
         queuedStatUpdates.clear();
 

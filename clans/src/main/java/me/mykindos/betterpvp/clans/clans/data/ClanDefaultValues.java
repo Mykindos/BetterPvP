@@ -14,10 +14,6 @@ public class ClanDefaultValues {
     private int defaultEnergy;
 
     @Inject
-    @Config(path = "clans.clan.default.level", defaultValue = "1")
-    private int defaultLevel;
-
-    @Inject
     @Config(path = "clans.clan.default.points", defaultValue = "0")
     private int defaultPoints;
 

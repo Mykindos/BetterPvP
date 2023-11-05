@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
+import me.mykindos.betterpvp.progression.tree.fishing.event.PlayerCaughtFishEvent;
 import me.mykindos.betterpvp.progression.tree.fishing.model.FishingLoot;
 import me.mykindos.betterpvp.progression.tree.fishing.model.FishingLootType;
 import me.mykindos.betterpvp.progression.utility.ProgressionNamespacedKeys;
@@ -42,7 +43,7 @@ public class SwimmerType implements FishingLootType {
             }
 
             @Override
-            public void processCatch(PlayerFishEvent event) {
+            public void processCatch(PlayerCaughtFishEvent event) {
                 final Entity item = Objects.requireNonNull(event.getCaught());
                 final Location location = item.getLocation();
                 item.remove();

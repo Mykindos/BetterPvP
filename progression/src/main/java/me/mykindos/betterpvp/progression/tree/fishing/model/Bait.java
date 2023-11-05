@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.progression.tree.fishing.model;
 
 import lombok.Getter;
+import lombok.Setter;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilLocation;
@@ -35,7 +36,9 @@ public abstract class Bait {
     private final BaitType type;
     private ArmorStand referenceEntity;
     private ArmorStand floatingEntity;
-    private final long durationTicks;
+    @Setter
+    @Getter
+    private  long durationTicks;
     private final Set<WeakReference<FishHook>> hooks = new HashSet<>();
 
     /**
@@ -109,7 +112,7 @@ public abstract class Bait {
         this.floatingEntity = UtilEntity.createUtilityArmorStand(location);
         this.floatingEntity.getEquipment().setHelmet(skull, true);
 
-       new BukkitRunnable() {
+        new BukkitRunnable() {
             private final float frequency = 360.0f / 80L; // One full cycle every 80 ticks
             private final float amplitude = 0.3f; // The height difference for each cycle (-1 to 1)
             private final long fullRotationTicks = 120L; // How many ticks does it take to complete a full rotation
@@ -180,7 +183,7 @@ public abstract class Bait {
                                     3.0,
                                     true,
                                     block -> block.getType().equals(Material.WATER)
-                                    );
+                            );
 
                             if (particleLocation.isEmpty()) {
                                 continue; // We can't play particles if we can't find a surface water

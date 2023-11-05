@@ -10,7 +10,7 @@ import me.mykindos.betterpvp.core.combat.stats.model.CombatSort;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
-import me.mykindos.betterpvp.core.stats.Leaderboard;
+import me.mykindos.betterpvp.core.stats.PlayerLeaderboard;
 import me.mykindos.betterpvp.core.stats.SearchOptions;
 import me.mykindos.betterpvp.core.stats.sort.SortType;
 import me.mykindos.betterpvp.core.stats.sort.Sorted;
@@ -25,7 +25,7 @@ import java.util.function.Function;
 
 @Singleton
 @Slf4j
-public final class GlobalCombatLeaderboard extends Leaderboard<UUID, CombatData> implements Sorted {
+public final class GlobalCombatLeaderboard extends PlayerLeaderboard<CombatData> implements Sorted {
 
     private static final Map<SortType, Statement> TOP_SORT_STATEMENTS = ImmutableMap.of(
             CombatSort.RATING, new Statement("CALL GetTopRating(?)", new IntegerStatementValue(10)),
@@ -70,7 +70,7 @@ public final class GlobalCombatLeaderboard extends Leaderboard<UUID, CombatData>
     }
 
     @Override
-    public Map<String, Component> getDescription(SearchOptions searchOptions, CombatData value) {
+    public Map<String, Component> describe(SearchOptions searchOptions, CombatData value) {
         final List<CombatSort> types = new ArrayList<>(Arrays.stream(CombatSort.values()).toList());
         final CombatSort selected = (CombatSort) Objects.requireNonNull(searchOptions.getSort());
         final LinkedHashMap<String, Component> map = new LinkedHashMap<>(); // Preserve order

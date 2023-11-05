@@ -27,7 +27,7 @@ public class CycleButton<T> extends Button {
     public CycleButton(int slot, T[] pool, ItemStack item, Component name, Menu menu) {
         super(slot, item, name);
         Preconditions.checkArgument(menu instanceof IRefreshingMenu, "Menu must implement IRefreshingMenu");
-        Preconditions.checkArgument(pool.length > 1, "Pool must have at more than one element");
+        Preconditions.checkArgument(pool.length > 0, "Pool must have at least one element");
         this.pool = pool;
         this.index = 0;
         this.menu = ((IRefreshingMenu) menu);

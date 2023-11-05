@@ -38,6 +38,8 @@ skills:
     silencingstrikes:
       enabled: true
       maxlevel: 3
+      hitsNeeded: 3
+      timeSpan: 0.8
     comboattack:
       enabled: true
       maxlevel: 3
@@ -79,6 +81,8 @@ skills:
       maxlevel: 5
       cooldown: 15
       duration: 1.25
+      internalCD: 0.5
+      forcedDamageDelay: 400
   knight:
     shieldsmash:
       enabled: true
