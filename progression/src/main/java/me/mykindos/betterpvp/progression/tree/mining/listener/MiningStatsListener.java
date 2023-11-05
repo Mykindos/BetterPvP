@@ -5,7 +5,6 @@ import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.progression.tree.mining.MiningService;
-import me.mykindos.betterpvp.progression.tree.mining.event.ProgressionMiningEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -20,8 +19,8 @@ public class MiningStatsListener implements Listener {
     private MiningService service;
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onBreak(ProgressionMiningEvent event) {
-        service.attemptMineOre(event.getPlayer(), event.getBlock(), event.getExperienceModifier());
+    public void onBreak(BlockBreakEvent event) {
+        service.attemptMineOre(event.getPlayer(), event.getBlock());
     }
 
 }
