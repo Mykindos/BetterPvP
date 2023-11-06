@@ -125,7 +125,7 @@ public class HealingShot extends PrepareArrowSkill {
 
     @Override
     public void loadSkillConfig() {
-        baseDuration = getConfig("baseDuration", 6.0, Double.class);
+        baseDuration = getConfig("baseDuration", 4.0, Double.class);
         increaseDurationPerLevel = getConfig("increasePerLevel", 1.0, Double.class);
         cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 1.0, Double.class);
     }

@@ -427,7 +427,7 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 12
-      baseDuration: 6.0
+      baseDuration: 4.0
       increasePerLevel: 1.0
       cooldownDecreasePerLevel: 1.0
   warlock:
