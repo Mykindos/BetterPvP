@@ -21,6 +21,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
@@ -85,7 +86,7 @@ public class BaseFishingPerk implements Listener, ConfigAccessor, ProgressionPer
     }
 
     @Override
-    public void loadConfig(ExtendedYamlConfiguration config) {
+    public void loadConfig(@NotNull ExtendedYamlConfiguration config) {
         this.requiredLevel = config.getOrSaveObject("fishing.base-fishing-perk.level", 500, Integer.class);
     }
 }

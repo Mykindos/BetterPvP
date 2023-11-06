@@ -15,7 +15,11 @@ import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class ChampionsCombatData extends CombatData {
 

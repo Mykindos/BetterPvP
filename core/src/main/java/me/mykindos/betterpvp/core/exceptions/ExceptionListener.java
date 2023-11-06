@@ -1,7 +1,6 @@
 package me.mykindos.betterpvp.core.exceptions;
 
 import com.destroystokyo.paper.event.server.ServerExceptionEvent;
-import com.google.gson.JsonObject;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.discord.DiscordMessage;

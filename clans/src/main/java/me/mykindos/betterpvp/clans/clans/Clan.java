@@ -304,6 +304,11 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
     }
 
     @Override
+    public int hashCode() {
+        return getName().hashCode();
+    }
+
+    @Override
     public void saveProperty(String key, Object object, boolean updateScoreboard) {
         properties.put(key, object);
         if (updateScoreboard) {

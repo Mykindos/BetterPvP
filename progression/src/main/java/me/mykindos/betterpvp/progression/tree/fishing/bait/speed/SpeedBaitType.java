@@ -19,9 +19,9 @@ public class SpeedBaitType extends SimpleBaitType {
     }
 
     @Override
-    public void loadConfig(ExtendedYamlConfiguration config) {
+    public void loadConfig(@NotNull ExtendedYamlConfiguration config) {
         super.loadConfig(config);
-        this.multiplier = config.getOrSaveObject("fishing.bait." + key + ".multiplier", 1.0, Double.class);
+        this.multiplier = config.getOrSaveObject("fishing.bait." + key + ".multiplier", 1.0D, Double.class);
     }
 
     @Override

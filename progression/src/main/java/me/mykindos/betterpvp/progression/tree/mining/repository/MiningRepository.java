@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.progression.tree.mining.MiningService;
 import me.mykindos.betterpvp.progression.tree.mining.data.MiningData;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
+import org.jetbrains.annotations.NotNull;
 
 import java.sql.SQLException;
 import java.util.Collections;
@@ -78,7 +79,7 @@ public class MiningRepository extends ProgressionStatsRepository<Mining, MiningD
     }
 
     @Override
-    public void loadConfig(ExtendedYamlConfiguration config) {
+    public void loadConfig(@NotNull ExtendedYamlConfiguration config) {
         experiencePerBlock.clear();
         ConfigurationSection section = config.getConfigurationSection("mining.xpPerBlock");
         if (section == null) {
