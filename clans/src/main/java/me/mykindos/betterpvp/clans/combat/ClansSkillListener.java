@@ -47,7 +47,13 @@ public class ClansSkillListener implements Listener {
     @EventHandler
     public void onGetPlayerPropertyEvent(GetPlayerPropertyEvent event) {
         boolean canHurt = clanManager.canHurt(event.getOriginal(), event.getTarget());
-        event.setReturnProperty(canHurt ? EntityProperty.ENEMY : EntityProperty.FRIENDLY);
+        if (event.getCompareProperty() == EntityProperty.FRIENDLY) {
+            event.setReturnProperty(canHurt ? EntityProperty.ENEMY : EntityProperty.FRIENDLY);
+        }
+        else {
+            event.setReturnProperty(canHurt ? EntityProperty.FRIENDLY : EntityProperty.ENEMY);
+        }
+
     }
 
     @EventHandler
