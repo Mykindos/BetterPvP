@@ -125,6 +125,7 @@ public class LeaderboardMenu<E, T> extends Menu implements IRefreshingMenu {
         entryData.thenAccept(dataOpt -> {
             if (dataOpt.isEmpty()) {
                 button.setItemStack(Menu.BACKGROUND);
+                refreshButton(button);
                 return;
             }
 
