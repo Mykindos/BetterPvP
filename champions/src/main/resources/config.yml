@@ -76,6 +76,8 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 30
+      percentHealthRecovered: 0.25
+      duration: 2.5
     evade:
       enabled: true
       maxlevel: 5
