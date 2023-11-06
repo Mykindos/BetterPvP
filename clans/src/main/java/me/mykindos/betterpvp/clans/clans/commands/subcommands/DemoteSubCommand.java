@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.entity.Player;
 
+import java.util.Objects;
 import java.util.Optional;
 
 @Singleton
@@ -80,7 +81,7 @@ public class DemoteSubCommand extends ClanSubCommand {
             }
             else if (client.isAdministrating() && targetMember.getRank().getPrivilege() >= member.getRank().getPrivilege()) {
                 gamerManager.sendMessageToRank("Clans",
-                        UtilMessage.deserialize("<yellow>%s<gray> force demoted <yellow>%s", player.getName(), targetGamer.getPlayer().getName()),
+                        UtilMessage.deserialize("<yellow>%s<gray> force demoted <yellow>%s", player.getName(), Objects.requireNonNull(targetGamer.getPlayer()).getName()),
                         Rank.HELPER);
             }
 

@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.knight.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -60,7 +61,7 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
                 "Right click with a Sword to activate",
                 "",
                 "Mount a valiant steed which will ",
-                "last for <val>" + (lifespan + (level-1)) + "</val> seconds",
+                "last for <val>" + (lifespan + (level - 1)) + "</val> seconds",
                 "",
                 "If the horse takes any damage or you",
                 "dismount, it will disappear",
@@ -113,9 +114,16 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
     }
 
     private static class HorseData {
+
+        @Getter
         private final long lifespan;
+
+        @Getter
         private final Horse horse;
+
+        @Getter
         private final long spawnTime;
+
         private boolean wasKilled = false;  // Add this field
 
         public HorseData(Horse horse, long spawnTime, long lifespan) {
@@ -124,17 +132,6 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
             this.lifespan = lifespan; // Store lifespan
         }
 
-        public long getLifespan() {
-            return lifespan;
-        }
-
-        public Horse getHorse() {
-            return horse;
-        }
-
-        public long getSpawnTime() {
-            return spawnTime;
-        }
 
         public boolean wasKilled() {
             return wasKilled;

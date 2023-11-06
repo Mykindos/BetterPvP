@@ -21,6 +21,7 @@ import org.bukkit.util.Vector;
 
 import java.util.Objects;
 
+@SuppressWarnings("UnstableApiUsage")
 @BPvPListener
 @Singleton
 public class HitboxHandler implements Listener {

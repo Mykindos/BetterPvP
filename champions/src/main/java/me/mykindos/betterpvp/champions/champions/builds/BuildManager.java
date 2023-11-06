@@ -7,9 +7,9 @@ import me.mykindos.betterpvp.champions.champions.builds.repository.BuildReposito
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 
 @Singleton
+@Getter
 public class BuildManager extends Manager<GamerBuilds> {
 
-    @Getter
     private final BuildRepository buildRepository;
 
     @Inject

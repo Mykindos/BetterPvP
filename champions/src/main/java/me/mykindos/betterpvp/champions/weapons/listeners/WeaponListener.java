@@ -133,7 +133,7 @@ public class WeaponListener implements Listener {
             var lore = new ArrayList<>(weapon.getLore());
 
             var originalOwner = event.getItemMeta().getPersistentDataContainer().getOrDefault(ChampionsNamespacedKeys.ORIGINAL_OWNER, PersistentDataType.STRING, "");
-            if (!originalOwner.equals("")) {
+            if (!originalOwner.isEmpty()) {
                 lore.add(Component.text(""));
                 lore.add(Component.text("Original Owner: ", NamedTextColor.WHITE).append(Component.text(originalOwner, NamedTextColor.YELLOW)));
             }
