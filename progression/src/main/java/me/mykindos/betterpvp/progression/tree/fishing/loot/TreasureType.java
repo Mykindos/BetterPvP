@@ -9,7 +9,6 @@ import me.mykindos.betterpvp.progression.tree.fishing.model.FishingLoot;
 import me.mykindos.betterpvp.progression.tree.fishing.model.FishingLootType;
 import org.bukkit.Material;
 import org.bukkit.entity.Item;
-import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -59,7 +58,7 @@ public class TreasureType implements FishingLootType {
     }
 
     @Override
-    public void loadConfig(ExtendedYamlConfiguration config) {
+    public void loadConfig(@NotNull ExtendedYamlConfiguration config) {
         this.frequency = config.getOrSaveInt("fishing.loot." + key + ".frequency", 1);
         this.minAmount = config.getOrSaveInt("fishing.loot." + key + ".minAmount", 1);
         this.maxAmount = config.getOrSaveInt("fishing.loot." + key + ".maxAmount", 1);

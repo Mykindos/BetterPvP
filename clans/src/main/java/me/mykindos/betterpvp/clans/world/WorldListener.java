@@ -183,8 +183,7 @@ public class WorldListener implements Listener {
                     || event.getInventory().getType() == InventoryType.SHULKER_BOX
                     || event.getInventory().getType() == InventoryType.STONECUTTER
                     || event.getInventory().getType() == InventoryType.SMITHING
-                    || event.getInventory().getType() == InventoryType.BEACON
-                    || event.getInventory().getType() == InventoryType.ENDER_CHEST) {
+                    || event.getInventory().getType() == InventoryType.BEACON) {
 
                 gamerManager.getObject(player.getUniqueId()).ifPresent(gamer -> {
                     if (!gamer.getClient().isAdministrating()) {
@@ -195,7 +194,7 @@ public class WorldListener implements Listener {
 
             }
 
-            if (event.getInventory().getType() == InventoryType.ENCHANTING) {
+            if (event.getInventory().getType() == InventoryType.ENCHANTING || event.getInventory().getType() == InventoryType.ENDER_CHEST) {
                 event.setCancelled(true);
             }
         }

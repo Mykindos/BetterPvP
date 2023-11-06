@@ -46,7 +46,7 @@ public enum SimpleFishingRod implements FishingRodType {
     }
 
     @Override
-    public void loadConfig(ExtendedYamlConfiguration config) {
+    public void loadConfig(@NotNull ExtendedYamlConfiguration config) {
         final String key = this.name.toLowerCase();
         this.maxWeight = config.getOrSaveInt("fishing.rods." + key + ".maxWeight", maxWeight);
     }

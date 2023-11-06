@@ -32,10 +32,8 @@ public class UtilInventory {
                     if (stack.getType() == item) {
                         if (stack.getAmount() > toRemove) {
                             stack.setAmount(stack.getAmount() - toRemove);
-                            player.updateInventory();
                         } else {
-                            player.getInventory().setItem(i, (ItemStack) null);
-                            player.updateInventory();
+                            player.getInventory().setItem(i, null);
                         }
 
                         return true;
