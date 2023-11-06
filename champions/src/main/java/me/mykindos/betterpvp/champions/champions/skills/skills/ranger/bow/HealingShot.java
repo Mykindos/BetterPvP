@@ -6,11 +6,12 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
+import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -23,6 +24,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityShootBowEvent;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 @Singleton
@@ -74,13 +76,27 @@ public class HealingShot extends PrepareArrowSkill {
         active.add(player.getUniqueId());
     }
 
+    //Code from PrepareArrowSkill. For this skill, we need to use PreCustomDamageEvent as it effects targets we cannot damage
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPreDamageEvent(PreCustomDamageEvent event) {
+        CustomDamageEvent cde = event.getCustomDamageEvent();
+        if (!(cde.getProjectile() instanceof Arrow arrow)) return;
+        if (!(cde.getDamager() instanceof Player damager)) return;
+        if (!arrows.contains(arrow)) return;
+        int level = getLevel(damager);
+        if (level > 0) {
+            onHit(damager, cde.getDamagee(), level);
+            arrows.remove(arrow);
+            cde.addReason(getName());
+            event.setCancelled(true);
+        }
+    }
+
     @Override
     public void onHit(Player damager, LivingEntity target, int level) {
         if (target instanceof Player damagee) {
-            Bukkit.broadcast(Component.text(1));
             if (UtilPlayer.isPlayerFriendly(damager, damagee)) {
-                Bukkit.broadcast(Component.text(2));
-                damagee.addPotionEffect(PotionEffectType.REGENERATION.createEffect((int) (getDuration(level) / 20), 2 ));
+                damagee.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, (int) (getDuration(level) * 20), 2 ));
             }
         }
     }
@@ -112,8 +128,8 @@ public class HealingShot extends PrepareArrowSkill {
 
     @Override
     public void loadSkillConfig() {
-        baseDuration = getConfig("baseDuration", 6, Double.class);
-        increaseDurationPerLevel = getConfig("increasePerLevel", 1, Double.class);
-        cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 1, Double.class);
+        baseDuration = getConfig("baseDuration", 6.0, Double.class);
+        increaseDurationPerLevel = getConfig("increasePerLevel", 1.0, Double.class);
+        cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 1.0, Double.class);
     }
 }

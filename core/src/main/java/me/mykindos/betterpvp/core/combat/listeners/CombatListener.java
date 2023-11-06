@@ -20,6 +20,7 @@ import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -206,7 +207,8 @@ public class CombatListener implements Listener {
 
         if (cde.getDamager() != null) {
             if (cde.getDamager().equals(cde.getDamagee())) {
-                event.setCancelled(true);
+                //event.setCancelled(true);
+                cde.setDamage(0);
                 return;
             }
         }

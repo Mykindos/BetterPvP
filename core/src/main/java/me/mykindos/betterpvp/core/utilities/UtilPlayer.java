@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
 import me.mykindos.betterpvp.core.utilities.events.GetPlayerPropertyEvent;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -86,6 +87,7 @@ public class UtilPlayer {
             return true;
         }
         GetPlayerPropertyEvent getPlayerPropertyEvent = new GetPlayerPropertyEvent(original, target, compareProperty, defaultProperty);
+        UtilServer.callEvent(getPlayerPropertyEvent);
         return getPlayerPropertyEvent.getCompareProperty() == getPlayerPropertyEvent.getReturnProperty();
     }
 
