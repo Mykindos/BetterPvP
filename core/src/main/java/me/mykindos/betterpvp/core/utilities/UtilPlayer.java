@@ -7,9 +7,11 @@ import com.comphenix.protocol.wrappers.WrappedDataValue;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
+import me.mykindos.betterpvp.core.utilities.events.GetPlayerPropertyEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -24,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@Slf4j
 public class UtilPlayer {
 
     public static void setWarningEffect(Player player, int warningDelaySeconds) {
@@ -72,6 +75,18 @@ public class UtilPlayer {
         UtilServer.callEvent(fetchNearbyEntityEvent);
 
         return fetchNearbyEntityEvent.getEntities();
+    }
+
+    public static boolean isPlayerFriendly (Player original, Player target) {
+        return isPlayerRelation(original, target, EntityProperty.FRIENDLY, EntityProperty.ENEMY);
+    }
+
+    public static boolean isPlayerRelation(Player original, Player target, EntityProperty compareProperty, EntityProperty defaultProperty) {
+        if (compareProperty.equals(EntityProperty.ALL)) {
+            return true;
+        }
+        GetPlayerPropertyEvent getPlayerPropertyEvent = new GetPlayerPropertyEvent(original, target, compareProperty, defaultProperty);
+        return getPlayerPropertyEvent.getCompareProperty() == getPlayerPropertyEvent.getReturnProperty();
     }
 
     public static int getPing(Player player) {

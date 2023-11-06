@@ -9,7 +9,10 @@ import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -20,6 +23,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityShootBowEvent;
+import org.bukkit.potion.PotionEffectType;
 
 @Singleton
 @BPvPListener
@@ -72,7 +76,13 @@ public class HealingShot extends PrepareArrowSkill {
 
     @Override
     public void onHit(Player damager, LivingEntity target, int level) {
-        //intentionally left b
+        if (target instanceof Player damagee) {
+            Bukkit.broadcast(Component.text(1));
+            if (UtilPlayer.isPlayerFriendly(damager, damagee)) {
+                Bukkit.broadcast(Component.text(2));
+                damagee.addPotionEffect(PotionEffectType.REGENERATION.createEffect((int) (getDuration(level) / 20), 2 ));
+            }
+        }
     }
 
     @Override
@@ -80,9 +90,6 @@ public class HealingShot extends PrepareArrowSkill {
         arrows.add(arrow);
         arrow.setFireTicks(200);
     }
-
-    @EventHandler(priority = EventPriority.LOW)
-    public void on
 
     @Override
     public void displayTrail(Location location) {
