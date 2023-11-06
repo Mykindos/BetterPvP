@@ -79,7 +79,7 @@ public class DeathListener implements Listener {
                 ItemStack item = killer.getEquipment().getItemInMainHand();
                 if (reasons.length == 0 && item.getType() != Material.AIR) {
                     Component itemCmpt = Component.text(PlainTextComponentSerializer.plainText().serialize(item.displayName()).replaceAll("[\\[\\]]", ""), NamedTextColor.GREEN);
-                    reason = Component.text("a ", NamedTextColor.GRAY).append(itemCmpt);
+                    reason = Component.text("a ", NamedTextColor.GRAY).append(itemCmpt.hoverEvent(item));
                     with = true;
                 }
             }
