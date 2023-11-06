@@ -105,14 +105,8 @@ public class HealingShot extends PrepareArrowSkill {
     }
 
     @Override
-    public void processEntityShootBowEvent(EntityShootBowEvent event, Player player, int level, Arrow arrow) {
-        arrows.add(arrow);
-        arrow.setFireTicks(200);
-    }
-
-    @Override
     public void displayTrail(Location location) {
-        Particle.REDSTONE.builder().location(location).color(255, 0, 0).count(3).extra(0).receivers(60, true).spawn();
+        Particle.HEART.builder().location(location).count(3).extra(0).receivers(60, true).spawn();
     }
 
     @Override
