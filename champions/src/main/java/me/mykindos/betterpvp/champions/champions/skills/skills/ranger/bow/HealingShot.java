@@ -85,18 +85,21 @@ public class HealingShot extends PrepareArrowSkill {
         if (!arrows.contains(arrow)) return;
         int level = getLevel(damager);
         if (level > 0) {
-            onHit(damager, cde.getDamagee(), level);
+            onHit(damager, cde.getDamagee(), level, event);
             arrows.remove(arrow);
             cde.addReason(getName());
-            event.setCancelled(true);
         }
     }
 
-    @Override
     public void onHit(Player damager, LivingEntity target, int level) {
+        return;
+    }
+
+    public void onHit(Player damager, LivingEntity target, int level, PreCustomDamageEvent event) {
         if (target instanceof Player damagee) {
             if (UtilPlayer.isPlayerFriendly(damager, damagee)) {
                 damagee.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, (int) (getDuration(level) * 20), 2 ));
+                event.setCancelled(true);
             }
         }
     }
