@@ -13,6 +13,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.jetbrains.annotations.NotNull;
 
 @Slf4j
 @Singleton
@@ -36,7 +37,7 @@ public class MiningListener implements Listener, ConfigAccessor {
     }
 
     @Override
-    public void loadConfig(ExtendedYamlConfiguration config) {
+    public void loadConfig(@NotNull ExtendedYamlConfiguration config) {
         this.xpMultiplier = config.getOrSaveObject("fields.fieldsXpMultiplier", 5d, Double.class);
     }
 }

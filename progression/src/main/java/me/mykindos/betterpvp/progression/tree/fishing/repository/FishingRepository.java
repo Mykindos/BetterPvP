@@ -28,6 +28,7 @@ import me.mykindos.betterpvp.progression.tree.fishing.model.FishingLootType;
 import me.mykindos.betterpvp.progression.tree.fishing.model.FishingRodType;
 import me.mykindos.betterpvp.progression.tree.fishing.rod.SimpleFishingRod;
 import org.bukkit.configuration.ConfigurationSection;
+import org.jetbrains.annotations.NotNull;
 import org.reflections.Reflections;
 
 import javax.sql.rowset.CachedRowSet;
@@ -91,7 +92,7 @@ public class FishingRepository extends ProgressionStatsRepository<Fishing, Fishi
     }
 
     @Override
-    public void loadConfig(ExtendedYamlConfiguration config) {
+    public void loadConfig(@NotNull ExtendedYamlConfiguration config) {
         // Clear
         lootTypes.clear();
         rodTypes.clear();

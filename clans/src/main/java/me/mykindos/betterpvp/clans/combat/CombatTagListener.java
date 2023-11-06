@@ -20,7 +20,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 
 import java.time.Duration;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Random;
+import java.util.Set;
+import java.util.UUID;
 
 @BPvPListener
 public class CombatTagListener implements Listener {

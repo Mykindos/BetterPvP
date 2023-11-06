@@ -24,10 +24,6 @@ import java.util.Objects;
 
 public class UtilBlock {
 
-    public static HashSet<Material> blockAirFoliageSet = new HashSet<>();
-    public static HashSet<Material> blockPassSet = new HashSet<>();
-    public static HashSet<Material> blockUseSet = new HashSet<>();
-
     public static Collection<BoundingBox> getBoundingBoxes(final Block block) {
         return block.getCollisionShape().getBoundingBoxes().stream().map(boundingBox -> {
             final Vector min = boundingBox.getMin().add(block.getLocation().toVector());
@@ -403,12 +399,8 @@ public class UtilBlock {
         if (List.of(Material.DIRT_PATH, Material.FARMLAND, Material.RAIL).contains(block.getType())) return false;
 
         String name = block.getType().name();
-        if (name.contains("STAIRS") || name.contains("CAMPFIRE") || name.contains("SLAB") || name.contains("ICE")
-                || name.contains("WIRE") || name.contains("FENCE")) {
-            return false;
-        }
-
-        return true;
+        return !name.contains("STAIRS") && !name.contains("CAMPFIRE") && !name.contains("SLAB") && !name.contains("ICE")
+                && !name.contains("WIRE") && !name.contains("FENCE");
     }
 
     /**

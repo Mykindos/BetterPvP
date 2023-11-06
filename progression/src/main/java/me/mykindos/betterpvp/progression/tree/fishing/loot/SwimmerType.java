@@ -14,7 +14,6 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Skeleton;
 import org.bukkit.entity.Zombie;
 import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
@@ -68,7 +67,7 @@ public class SwimmerType implements FishingLootType {
     }
 
     @Override
-    public void loadConfig(ExtendedYamlConfiguration config) {
+    public void loadConfig(@NotNull ExtendedYamlConfiguration config) {
         this.frequency = config.getOrSaveInt("fishing.loot." + key + ".frequency", 1);
         final String type = config.getOrSaveString("fishing.loot." + key + ".entity", "PIG");
         if (type == null) {

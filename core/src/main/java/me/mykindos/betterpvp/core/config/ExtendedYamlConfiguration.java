@@ -4,12 +4,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Level;
 
 public class ExtendedYamlConfiguration extends YamlConfiguration {
@@ -56,17 +56,18 @@ public class ExtendedYamlConfiguration extends YamlConfiguration {
     }
 
     @SuppressWarnings("unchecked")
-    @Nullable
-    public <T> T getOrSaveObject(@NotNull String path, Object defaultValue, Class<T> type) {
+    @NotNull
+    public <T> T getOrSaveObject(@NotNull String path, @NotNull Object defaultValue, Class<T> type) {
         if (!isSet(path)) {
             set(path, defaultValue);
         }
 
         if(type == List.class) {
-            return (T) getList(path);
+            return (T) Objects.requireNonNull(getList(path));
         }
 
-        return getObject(path, type);
+        var result = getObject(path, type);
+        return result == null ? (T) defaultValue : result;
     }
 
 }

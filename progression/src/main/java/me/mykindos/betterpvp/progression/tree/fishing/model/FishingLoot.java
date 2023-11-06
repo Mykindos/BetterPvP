@@ -1,7 +1,6 @@
 package me.mykindos.betterpvp.progression.tree.fishing.model;
 
 import me.mykindos.betterpvp.progression.tree.fishing.event.PlayerCaughtFishEvent;
-import org.bukkit.event.player.PlayerFishEvent;
 
 public interface FishingLoot {
 

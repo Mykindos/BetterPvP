@@ -4,7 +4,6 @@ import lombok.Getter;
 import me.mykindos.betterpvp.progression.tree.fishing.model.FishingLoot;
 import me.mykindos.betterpvp.progression.tree.fishing.model.FishingRodType;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerFishEvent;
 import org.jetbrains.annotations.Nullable;
 
 @Getter
