@@ -263,13 +263,13 @@ public class SkillListener implements Listener {
     }
 
     @EventHandler
-    public void onUseSkillWhileSlowed(PlayerUseInteractSkillEvent event) {
+    public void onUseSkillWhileSlowed(PlayerUseSkillEvent event) {
         if (event.isCancelled()) return;
 
+        ISkill skill = event.getSkill();
         Player player = event.getPlayer();
-        InteractSkill interactSkill = (InteractSkill) event.getSkill();
 
-        if (interactSkill.canUseSlowed()) return;
+        if (skill.canUseWhileSlowed()) return;
 
         if (player.hasPotionEffect(PotionEffectType.SLOW)) {
             UtilMessage.simpleMessage(player, event.getSkill().getClassType().getName(),
@@ -279,13 +279,12 @@ public class SkillListener implements Listener {
     }
 
     @EventHandler
-    public void onUseSkillWhileLevitating(PlayerUseInteractSkillEvent event) {
+    public void onUseSkillWhileLevitating(PlayerUseSkillEvent event) {
         if (event.isCancelled()) return;
-
+        ISkill skill = event.getSkill();
         Player player = event.getPlayer();
-        InteractSkill interactSkill = (InteractSkill) event.getSkill();
 
-        if (interactSkill.canUseLevitating()) return;
+        if (skill.canUseWhileLevitating()) return;
 
         if (player.hasPotionEffect(PotionEffectType.LEVITATION)) {
             UtilMessage.simpleMessage(player, event.getSkill().getClassType().getName(),
@@ -301,6 +300,8 @@ public class SkillListener implements Listener {
         Player player = event.getPlayer();
         ISkill skill = event.getSkill();
 
+        if (skill.canUseInLiquid()) return;
+
         if (UtilBlock.isInLiquid(player)) {
             UtilMessage.simpleMessage(player, skill.getClassType().getName(), "You cannot use <green>%s<gray> in water.", skill.getName());
             event.setCancelled(true);
@@ -313,6 +314,7 @@ public class SkillListener implements Listener {
         Player player = event.getPlayer();
         ISkill skill = event.getSkill();
         if (skill.ignoreNegativeEffects()) return;
+        if (skill.canUseWhileSilenced()) return;
         if (effectManager.hasEffect(player, EffectType.SILENCE)) {
             UtilMessage.simpleMessage(player, skill.getClassType().getName(), "You cannot use <green>%s<gray> while silenced.", skill.getName());
             player.playSound(player.getLocation(), Sound.ENTITY_BAT_HURT, 1.0f, 1.0f);
@@ -377,6 +379,7 @@ public class SkillListener implements Listener {
         Player player = event.getPlayer();
         ISkill skill = event.getSkill();
         if (skill.ignoreNegativeEffects()) return;
+        if (skill.canUseWhileStunned()) return;
         if (effectManager.hasEffect(player, EffectType.STUN)) {
             UtilMessage.simpleMessage(player, skill.getClassType().getName(), "You cannot use <green>%s<gray> while stunned.", skill.getName());
         }

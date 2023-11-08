@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
@@ -11,6 +12,7 @@ import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.components.champions.ISkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
@@ -32,6 +34,16 @@ public abstract class Skill implements ISkill {
     protected int cooldown;
     protected int energy;
 
+    private boolean canUseWhileSlowed;
+
+    private boolean canUseWhileStunned;
+
+    private boolean canUseWhileSilenced;
+
+    private boolean canUseWhileLevitating;
+
+    private boolean canUseInLiquid;
+
     @Inject
     public Skill(Champions champions, ChampionsManager championsManager) {
         this.champions = champions;
@@ -43,6 +55,32 @@ public abstract class Skill implements ISkill {
     public boolean isEnabled() {
         return enabled;
     }
+
+    @Override
+    public boolean canUseWhileSlowed() {
+        return canUseWhileSlowed;
+    }
+
+    @Override
+    public boolean canUseWhileStunned() {
+        return canUseWhileStunned;
+    }
+
+    @Override
+    public boolean canUseWhileSilenced() {
+        return canUseWhileSilenced;
+    }
+
+    @Override
+    public boolean canUseWhileLevitating() {
+        return canUseWhileLevitating;
+    }
+
+    @Override
+    public boolean canUseInLiquid() {
+        return canUseInLiquid;
+    }
+
 
     @Override
     public int getMaxLevel() {
@@ -79,6 +117,11 @@ public abstract class Skill implements ISkill {
         if (this instanceof EnergySkill) {
             energy = getConfig("energy", 0, Integer.class);
         }
+        canUseWhileSlowed = getConfig("canUseWhileSlowed", true, Boolean.class);
+        canUseWhileSilenced = getConfig("canUseWhileSilenced", false, Boolean.class);
+        canUseWhileStunned = getConfig("canUseWhileStunned", false, Boolean.class);
+        canUseWhileLevitating = getConfig("canUseWhileLevitating", false, Boolean.class);
+        canUseInLiquid = getConfig("canUseInLiquid", false, Boolean.class);
 
         loadSkillConfig();
     }
