@@ -38,6 +38,7 @@ public abstract class PlayerLeaderboard<T> extends Leaderboard<UUID, T> {
 
         ItemStack itemStack = new ItemStack(Material.PLAYER_HEAD);
         final SkullMeta meta = (SkullMeta) itemStack.getItemMeta();
+        meta.setPlayerProfile(player.getPlayerProfile());
         itemStack.setItemMeta(meta);
 
         return Description.builder()

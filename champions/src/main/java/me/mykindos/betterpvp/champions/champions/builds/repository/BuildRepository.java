@@ -89,7 +89,7 @@ public class BuildRepository implements IRepository<RoleBuild> {
 
     private void setSkill(RoleBuild build, SkillType type, String value) {
 
-        if (value != null && !value.equals("")) {
+        if (value != null && !value.isEmpty()) {
             String[] split = value.split(",");
             Skill skill = skillManager.getObjects().get(split[0]);
             if(skill == null) return;

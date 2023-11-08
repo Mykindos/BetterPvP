@@ -22,7 +22,11 @@ import me.mykindos.betterpvp.core.framework.events.scoreboard.ScoreboardUpdateEv
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
-import me.mykindos.betterpvp.core.utilities.*;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -32,7 +36,14 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 @Slf4j
@@ -297,7 +308,7 @@ public class ClanManager extends Manager<Clan> {
             for (ClanMember member : clan.getMembers()) {
                 Optional<Gamer> gamerOptional = gamerManager.getObject(member.getUuid());
                 gamerOptional.ifPresent(gamer -> {
-                    membersString.append(membersString.length() != 0 ? "<gray>, " : "").append("<yellow>")
+                    membersString.append(!membersString.isEmpty() ? "<gray>, " : "").append("<yellow>")
                             .append(member.getRoleIcon())
                             .append(UtilFormat.getOnlineStatus(member.getUuid()))
                             .append(UtilFormat.spoofNameForLunar(gamer.getClient().getName()));
@@ -310,7 +321,7 @@ public class ClanManager extends Manager<Clan> {
 
     public boolean canTeleport(Player player) {
         Optional<Gamer> gamerOptional = gamerManager.getObject(player.getUniqueId());
-        if (!gamerOptional.isPresent()) {
+        if (gamerOptional.isEmpty()) {
             return false;
         }
         Gamer gamer = gamerOptional.get();
@@ -347,10 +358,7 @@ public class ClanManager extends Manager<Clan> {
                 if (gamerOptional.isPresent()) {
                     Gamer gamer = gamerOptional.get();
                     // Allow skills if player is combat tagged
-                    if (!UtilTime.elapsed(gamer.getLastDamaged(), 15000)) {
-                        return true;
-
-                    }
+                    return !UtilTime.elapsed(gamer.getLastDamaged(), 15000);
                 }
 
                 return false;

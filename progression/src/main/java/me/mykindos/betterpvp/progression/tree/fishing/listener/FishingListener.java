@@ -21,7 +21,11 @@ import me.mykindos.betterpvp.progression.tree.fishing.event.PlayerStartFishingEv
 import me.mykindos.betterpvp.progression.tree.fishing.event.PlayerStopFishingEvent;
 import me.mykindos.betterpvp.progression.tree.fishing.event.PlayerThrowBaitEvent;
 import me.mykindos.betterpvp.progression.tree.fishing.fish.Fish;
-import me.mykindos.betterpvp.progression.tree.fishing.model.*;
+import me.mykindos.betterpvp.progression.tree.fishing.model.Bait;
+import me.mykindos.betterpvp.progression.tree.fishing.model.BaitType;
+import me.mykindos.betterpvp.progression.tree.fishing.model.FishingLoot;
+import me.mykindos.betterpvp.progression.tree.fishing.model.FishingLootType;
+import me.mykindos.betterpvp.progression.tree.fishing.model.FishingRodType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -40,7 +44,11 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.util.Vector;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Random;
+import java.util.WeakHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 

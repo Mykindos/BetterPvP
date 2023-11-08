@@ -156,8 +156,10 @@ public class MapHandler {
         });
     }
 
+    @SuppressWarnings("DataFlowIssue")
     public void saveMapData() {
         new BukkitRunnable() {
+
             @Override
             public void run() {
                 final long l = System.currentTimeMillis();
@@ -173,13 +175,15 @@ public class MapHandler {
                 try {
                     final File file = new File("world/data/map.json");
                     if (!file.exists()) {
-                        file.createNewFile();
+                        if(!file.createNewFile())  {
+                            log.error("Failed to create blank map file");
+                        }
                     }
 
                     ObjectMapper mapper = new ObjectMapper();
                     mapper.writeValue(file, minimapRenderer.getWorldCacheMap());
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    log.error("Failed to save map data", e);
                 }
                 log.info("Saved map data in {}", UtilTime.getTime(System.currentTimeMillis() - l, UtilTime.TimeUnit.SECONDS, 2));
             }

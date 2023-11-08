@@ -223,7 +223,6 @@ public class UtilItem {
                 player.getWorld().dropItem(player.getLocation(), stack);
             }
 
-            player.updateInventory();
         }
     }
 

@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.clans.tips;
 
-import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;

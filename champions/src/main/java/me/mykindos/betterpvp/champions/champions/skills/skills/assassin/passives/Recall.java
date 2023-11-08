@@ -1,161 +1,165 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.passives;
 
 
+import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
-import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillDequipEvent;
-import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillEquipEvent;
-import me.mykindos.betterpvp.champions.champions.roles.events.RoleChangeEvent;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.skills.assassin.data.RecallData;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.ToggleSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.effects.events.EffectClearEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilEntity;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
-import me.mykindos.betterpvp.core.utilities.UtilTime;
-import org.bukkit.Bukkit;
-import org.bukkit.Effect;
-import org.bukkit.Material;
+import me.mykindos.betterpvp.core.utilities.UtilPlayer;
+import me.mykindos.betterpvp.core.utilities.math.VectorLine;
+import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.ListIterator;
+import java.util.Map;
 import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
 public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listener {
 
-    public WeakHashMap<Player, RecallData> data = new WeakHashMap<>();
-    public double percentHealthRecovered;
+    public static final long MARKER_MILLIS = 200;
+
+    private final Map<Player, RecallData> data = new WeakHashMap<>();
+    private double percentHealthRecovered;
+    private double duration;
+
     @Inject
     public Recall(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
-
 
     @Override
     public String getName() {
         return "Recall";
     }
 
+    public double getDuration(int level) {
+        return duration + (level - 1);
+    }
+
     @Override
     public String[] getDescription(int level) {
-
-        return new String[]{
+        return new String[] {
                 "Drop your Sword / Axe to activate",
                 "",
-                "Teleports you back in time <val>" + (1.5 + (level)) + "</val> seconds, increasing",
+                "Teleports you back in time <val>" + getDuration(level) + "</val> seconds, increasing",
                 "your health by <stat>" + (percentHealthRecovered * 100) + "%</stat> of the health you had",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
     }
 
-    @EventHandler
-    public void onRoleChange(RoleChangeEvent e) {
-        data.remove(e.getPlayer());
+    @Override
+    public void trackPlayer(Player player) {
+        data.put(player, new RecallData(this, getLevel(player)));
     }
 
+    @Override
+    public void invalidatePlayer(Player player) {
+        data.remove(player);
+    }
 
-    @UpdateEvent(delay = 500)
+    @UpdateEvent(delay = MARKER_MILLIS)
     public void updateRecallData() {
+        final Iterator<Map.Entry<Player, RecallData>> iterator = data.entrySet().iterator();
 
-        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-            int level = getLevel(onlinePlayer);
-            if (level > 0) {
-                if (data.containsKey(onlinePlayer)) {
-                    RecallData recallData = data.get(onlinePlayer);
-                    if (UtilTime.elapsed(recallData.getTime(), 1000)) {
-                        recallData.addLocation(onlinePlayer.getLocation(), onlinePlayer.getHealth(), (1.5 + (level)));
-                        recallData.setTime(System.currentTimeMillis());
-                    }
-                } else {
-                    data.put(onlinePlayer, new RecallData());
-                    data.get(onlinePlayer).addLocation(onlinePlayer.getLocation(), onlinePlayer.getHealth(), (1.5 + (level)));
-                }
+        while (iterator.hasNext()) {
+            final Map.Entry<Player, RecallData> entry = iterator.next();
+            final Player player = entry.getKey();
+            final RecallData recallData = entry.getValue();
+            final int level = getLevel(player);
+            if (!player.isOnline() || level <= 0) {
+                iterator.remove();
+                continue;
             }
 
+            recallData.push(player.getLocation());
         }
     }
-
-    @EventHandler
-    public void onSkillDequip(SkillDequipEvent event) {
-        if (event.getSkill().equals(this)) {
-            data.remove(event.getPlayer());
-        }
-    }
-
-    @EventHandler
-    public void onEquip(SkillEquipEvent e) {
-        if (e.getSkill() == this) {
-            if (data.containsKey(e.getPlayer())) {
-                data.get(e.getPlayer()).locations.clear();
-            }
-        }
-    }
-
 
     @Override
     public Role getClassType() {
         return Role.ASSASSIN;
     }
 
-
     @Override
     public SkillType getType() {
-
         return SkillType.PASSIVE_B;
     }
 
     @Override
     public double getCooldown(int level) {
-
-        return cooldown - ((level - 1) * 2);
+        return cooldown - ((level - 1d) * 2);
     }
 
     @Override
     public boolean canUse(Player player) {
-        RecallData recallData = data.get(player);
-        if (recallData != null) {
-            if(recallData.locations.size() > 0) {
-                if (!player.getWorld().getName().equalsIgnoreCase(recallData.getLocation().getWorld().getName())) {
-                    UtilMessage.message(player, getClassType().getName(), "You can not recall into a different world");
-                    return false;
-                }
-            }else{
-                UtilMessage.message(player, getClassType().getName(), "You have nowhere to recall to.");
-            }
-        }
-
-        return true;
+        return data.get(player) != null;
     }
 
     @Override
     public void toggle(Player player, int level) {
-
         RecallData recallData = data.get(player);
+        Preconditions.checkNotNull(recallData, "Recall data is null for player " + player.getName());
+        final LinkedList<Location> markers = recallData.getMarkers();
+        markers.removeIf(location -> !location.getWorld().equals(player.getWorld()));
+
+        if (markers.isEmpty()) {
+            markers.add(player.getLocation()); // Teleport them to self if they have no markers
+        }
+
+        // Teleport Logic
+        Location teleportLocation = markers.getLast();
+        player.teleportAsync(teleportLocation);
+
+        // Heal Logic
+        double heal = UtilPlayer.getMaxHealth(player) * percentHealthRecovered;
+        UtilPlayer.health(player, heal);
+
+        // Cues
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 2.0F, 2.0F);
-        player.teleport(recallData.getLocation());
-        UtilEntity.setHealth(player, player.getHealth() + (recallData.getHealth() * percentHealthRecovered));
+        teleportLocation.getWorld().playSound(teleportLocation, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 2.0F, 2.0F);
 
-        player.getWorld().playEffect(data.get(player).getLocation(), Effect.STEP_SOUND, Material.EMERALD_BLOCK);
+        final ListIterator<Location> iterator = markers.listIterator();
+        Location particleLocation = iterator.next(); // Start location - we know it exists
+        while (iterator.hasNext()) {
+            final Location next = iterator.next();
 
-        UtilServer.callEvent(new EffectClearEvent(player));
+            final VectorLine line = VectorLine.withStepSize(particleLocation, next, 0.2);
+            for (Location location : line.toLocations()) {
+                Particle.SPELL_WITCH.builder()
+                        .offset(0, 0.3, 0)
+                        .location(location)
+                        .receivers(60, true)
+                        .extra(0)
+                        .count(3)
+                        .spawn();
+            }
 
+            particleLocation = next;
+        }
+
+        recallData.getMarkers().clear();
     }
 
     @Override
     public void loadSkillConfig(){
         percentHealthRecovered = getConfig("percentHealthRecovered", 0.25, Double.class);
+        duration = getConfig("duration", 2.5, Double.class);
     }
 }

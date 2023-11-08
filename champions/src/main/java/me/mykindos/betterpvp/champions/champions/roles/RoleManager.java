@@ -9,9 +9,9 @@ import org.bukkit.entity.Player;
 
 
 @Singleton
+@Getter
 public class RoleManager extends Manager<Role> {
 
-    @Getter
     private final RoleRepository repository;
 
     @Inject
