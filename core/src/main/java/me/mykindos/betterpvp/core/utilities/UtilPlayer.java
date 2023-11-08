@@ -11,8 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
-import me.mykindos.betterpvp.core.utilities.events.GetPlayerPropertyEvent;
-import net.kyori.adventure.text.Component;
+import me.mykindos.betterpvp.core.utilities.events.GetPlayerRelationshipEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -78,17 +77,9 @@ public class UtilPlayer {
         return fetchNearbyEntityEvent.getEntities();
     }
 
-    public static boolean isPlayerFriendly (Player original, Player target) {
-        return isPlayerRelation(original, target, EntityProperty.FRIENDLY, EntityProperty.ENEMY);
-    }
-
-    public static boolean isPlayerRelation(Player original, Player target, EntityProperty compareProperty, EntityProperty defaultProperty) {
-        if (compareProperty.equals(EntityProperty.ALL)) {
-            return true;
-        }
-        GetPlayerPropertyEvent getPlayerPropertyEvent = new GetPlayerPropertyEvent(original, target, compareProperty, defaultProperty);
-        UtilServer.callEvent(getPlayerPropertyEvent);
-        return getPlayerPropertyEvent.getCompareProperty() == getPlayerPropertyEvent.getReturnProperty();
+    public static boolean isPlayerFriendly (Player player, Player target) {
+        GetPlayerRelationshipEvent getPlayerRelationshipEvent = UtilServer.callEvent(new GetPlayerRelationshipEvent(player, target));
+        return getPlayerRelationshipEvent.getEntityProperty() == EntityProperty.FRIENDLY;
     }
 
     public static int getPing(Player player) {
