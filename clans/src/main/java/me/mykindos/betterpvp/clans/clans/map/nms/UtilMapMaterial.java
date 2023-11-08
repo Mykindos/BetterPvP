@@ -10,6 +10,7 @@ import org.bukkit.craftbukkit.v1_20_R2.util.CraftMagicNumbers;
 import java.lang.reflect.Field;
 import java.util.function.Function;
 
+@SuppressWarnings("JavaReflectionMemberAccess")
 @Slf4j
 public class UtilMapMaterial {
 

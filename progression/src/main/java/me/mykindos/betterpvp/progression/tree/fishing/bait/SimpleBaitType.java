@@ -23,7 +23,7 @@ public abstract class SimpleBaitType implements BaitType {
     @Override
     public void loadConfig(@NotNull ExtendedYamlConfiguration config) {
         this.texture = config.getOrSaveObject("fishing.bait." + key + ".texture", "https://google.com/", String.class);
-        this.radius = config.getOrSaveObject("fishing.bait. " + key + ".radius", 2.5D, Double.class);
+        this.radius = config.getOrSaveObject("fishing.bait." + key + ".radius", 2.5D, Double.class);
         this.expiration = config.getOrSaveObject("fishing.bait." + key + ".seconds", 10.0D, Double.class);
         this.name = config.getOrSaveObject("fishing.bait." + key + ".name", "Bait", String.class);
     }
