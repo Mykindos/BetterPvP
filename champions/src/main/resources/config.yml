@@ -423,6 +423,13 @@ skills:
       maxlevel: 5
       cooldown: 12
       baseSlowDuration: 2.0
+    healingshot:
+      enabled: true
+      maxlevel: 5
+      cooldown: 17
+      baseDuration: 4.0
+      increasePerLevel: 1.0
+      cooldownDecreasePerLevel: 3.0
   warlock:
     bloodbarrier:
       enabled: true
