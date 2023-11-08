@@ -77,7 +77,7 @@ public class HealingShot extends PrepareArrowSkill {
     }
 
     //Code from PrepareArrowSkill. For this skill, we need to use PreCustomDamageEvent as it effects targets we cannot damage
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
     public void onPreDamageEvent(PreCustomDamageEvent event) {
         CustomDamageEvent cde = event.getCustomDamageEvent();
         if (!(cde.getProjectile() instanceof Arrow arrow)) return;

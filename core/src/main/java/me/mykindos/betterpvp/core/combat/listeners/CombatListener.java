@@ -207,8 +207,7 @@ public class CombatListener implements Listener {
 
         if (cde.getDamager() != null) {
             if (cde.getDamager().equals(cde.getDamagee())) {
-                //event.setCancelled(true);
-                cde.setDamage(0);
+                event.setCancelled(true);
                 return;
             }
         }
