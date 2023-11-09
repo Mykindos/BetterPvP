@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -25,6 +26,10 @@ import org.bukkit.potion.PotionEffectType;
 public class SmokeArrow extends PrepareArrowSkill {
 
     private double baseDuration;
+
+    private double durationIncreasePerLevel;
+
+    private int slownessStrength;
 
     @Inject
     public SmokeArrow(Champions champions, ChampionsManager championsManager) {
@@ -42,14 +47,14 @@ public class SmokeArrow extends PrepareArrowSkill {
                 "Left click with a Bow to prepare",
                 "",
                 "Your next arrow will give <effect>Blindness</effect>",
-                "and <effect>Slowness II</effect> to the target for <val>" + getEffectDuration(level) + "</val> seconds.",
+                "and <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength + 1) + "</effect> to the target for <val>" + getEffectDuration(level) + "</val> seconds.",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
     }
 
     private double getEffectDuration(int level) {
-        return baseDuration + level;
+        return baseDuration + (level * durationIncreasePerLevel);
     }
 
     @Override
@@ -104,5 +109,7 @@ public class SmokeArrow extends PrepareArrowSkill {
     @Override
     public void loadSkillConfig() {
         baseDuration = getConfig("baseDuration", 3.0, Double.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
+        slownessStrength = getConfig("slownessStrength", 1, Integer.class);
     }
 }
