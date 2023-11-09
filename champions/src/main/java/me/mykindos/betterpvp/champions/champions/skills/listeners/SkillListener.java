@@ -382,6 +382,7 @@ public class SkillListener implements Listener {
         if (skill.canUseWhileStunned()) return;
         if (effectManager.hasEffect(player, EffectType.STUN)) {
             UtilMessage.simpleMessage(player, skill.getClassType().getName(), "You cannot use <green>%s<gray> while stunned.", skill.getName());
+            event.setCancelled(true);
         }
     }
 
