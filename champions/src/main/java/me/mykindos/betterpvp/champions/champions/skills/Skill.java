@@ -31,7 +31,8 @@ public abstract class Skill implements ISkill {
 
     private boolean enabled;
     private int maxLevel;
-    protected int cooldown;
+    protected double cooldown;
+    protected double cooldownDecreasePerLevel;
     protected int energy;
 
     private boolean canUseWhileSlowed;
@@ -111,7 +112,8 @@ public abstract class Skill implements ISkill {
         maxLevel = getConfig("maxlevel", 5, Integer.class);
 
         if (this instanceof CooldownSkill) {
-            cooldown = getConfig("cooldown", 0, Integer.class);
+            cooldown = getConfig("cooldown", 1.0, Integer.class);
+            cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 1.0, Double.class);
         }
 
         if (this instanceof EnergySkill) {

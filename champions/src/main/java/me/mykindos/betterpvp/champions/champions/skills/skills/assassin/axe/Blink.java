@@ -153,25 +153,11 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
 
     @Override
     public boolean canUse(Player player) {
-
-
-        if (player.hasPotionEffect(PotionEffectType.SLOW)) {
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You cannot use " + getName() + " while Slowed.");
-            return false;
-        }
-
-        if (championsManager.getEffects().hasEffect(player, EffectType.STUN)) {
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You cannot use <alt>%s</alt> while stunned.", getName());
-            return false;
-        }
-
         if ((loc.containsKey(player)) && (blinkTime.containsKey(player))
                 && (!UtilTime.elapsed(blinkTime.get(player), 4000L))) {
             deblink(player, false);
             return false;
         }
-
-
         return true;
     }
 
@@ -179,7 +165,7 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
     @Override
     public double getCooldown(int level) {
 
-        return cooldown - ((level - 1));
+        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
 
