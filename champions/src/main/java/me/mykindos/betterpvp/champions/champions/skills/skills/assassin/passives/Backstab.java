@@ -46,7 +46,7 @@ public class Backstab extends Skill implements PassiveSkill, Listener {
 
         return new String[]{
                 "Hitting an enemy from behind with a sword will",
-                "increase your damage by <val>" + (getDamageModifier(level) - 1) * 100 + "%"};
+                "increase your damage by <val>" + Math.floor((getDamageModifier(level) - 1) * 100) + "%"};
     }
 
     public double getDamageModifier(int level) {

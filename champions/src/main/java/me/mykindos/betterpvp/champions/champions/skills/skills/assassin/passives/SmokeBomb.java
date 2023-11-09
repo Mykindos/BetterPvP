@@ -41,6 +41,7 @@ import java.util.WeakHashMap;
 public class SmokeBomb extends Skill implements ToggleSkill, CooldownSkill, Listener {
 
     private double baseDuration;
+    private double durationIncreasePerLevel;
 
     private double blindDuration;
 
@@ -145,7 +146,7 @@ public class SmokeBomb extends Skill implements ToggleSkill, CooldownSkill, List
                 "Drop your Sword / Axe to activate",
                 "",
                 "Instantly <effect>Vanish</effect> before your foes",
-                "for a maximum of <val>" + (baseDuration + level) + "</val> seconds,",
+                "for a maximum of <val>" + getDuration(level) + "</val> seconds,",
                 "inflicting <effect>Blindness II</effect> to enemies",
                 "within <stat>" + blindRadius + "</stat> blocks for <stat>" + blindDuration + "</stat> seconds",
                 "",
@@ -172,11 +173,15 @@ public class SmokeBomb extends Skill implements ToggleSkill, CooldownSkill, List
         return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
+    public double getDuration(int level) {
+        return baseDuration + (level * durationIncreasePerLevel);
+    }
+
     @Override
     public void toggle(Player player, int level) {
         player.playSound(player.getLocation(), Sound.BLOCK_CONDUIT_AMBIENT, 2.0f, 1.f);
 
-        championsManager.getEffects().addEffect(player, EffectType.INVISIBILITY, (long) ((baseDuration + level) * 1000L));
+        championsManager.getEffects().addEffect(player, EffectType.INVISIBILITY, (long) (getDuration(level) * 1000L));
         smoked.put(player, (int) (baseDuration + level));
 
 
@@ -198,6 +203,7 @@ public class SmokeBomb extends Skill implements ToggleSkill, CooldownSkill, List
 
     public void loadSkillConfig() {
         baseDuration = getConfig("baseDuration", 3.0, Double.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
         blindDuration = getConfig("blindDuration", 1.75, Double.class);
         blindRadius = getConfig("blindRadius", 2.5, Double.class);
     }
