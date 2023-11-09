@@ -7,77 +7,182 @@ skills:
       enabled: true
       cooldown: 8
       maxlevel: 5
+      canUseWhileSlowed: false
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      cooldownDecreasePerLevel: 0.5
+      leapStrength: 1.3
+      wallKickStrength: 0.9
     sever:
       enabled: true
       cooldown: 20
       maxlevel: 3
       damagePerSecond: 2.0
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      cooldownDecreasePerLevel: 1.0
     shockingstrikes:
       enabled: true
       maxlevel: 3
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
     viperstrikes:
       enabled: true
       maxlevel: 3
       baseSeconds: 2.0
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
     backstab:
       enabled: true
       maxlevel: 5
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
     smokebomb:
       enabled: true
       cooldown: 50
       maxlevel: 5
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      baseDuration: 3.0
+      blindDuration: 1.75
+      blindRadius: 2.5
+      cooldownDecreasePerLevel: 1.0
     silencingarrow:
       enabled: true
       maxlevel: 5
       cooldown: 15
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      baseDuration: 3.0
+      cooldownDecreasePerLevel: 1.0
     smokearrow:
       enabled: true
       maxlevel: 4
       cooldown: 20
       baseDuration: 3.0
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      cooldownDecreasePerLevel: 1.0
     silencingstrikes:
       enabled: true
       maxlevel: 3
       hitsNeeded: 3
       timeSpan: 0.8
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
     comboattack:
       enabled: true
       maxlevel: 3
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      damageIncrement: 1.0
+      duration: 2.0
     concussion:
       enabled: true
       cooldown: 16
       maxlevel: 3
       durationPerLevel: 1.5
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      cooldownDecreasePerLevel: 1.0
     excessiveforce:
       enabled: true
       cooldown: 16
       maxlevel: 3
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      cooldownDecreasePerLevel: 1.0
     blink:
       enabled: true
       cooldown: 13
       maxlevel: 5
       maxTravelDistance: 16
+      canUseWhileSlowed: false
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      cooldownDecreasePerLevel: 1.0
     flash:
       enabled: true
       maxlevel: 5
       baseMaxCharges: 1
       baseRechargeSeconds: 4.0
       teleportDistance: 5.0
+      canUseWhileSlowed: false
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
     markedfordeath:
       enabled: true
       maxlevel: 5
       cooldown: 25
       baseDuration: 6.0
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      cooldownDecreasePerLevel: 1.0
     toxicarrow:
       enabled: true
       maxlevel: 5
       cooldown: 14
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      baseDuration: 6.0
+      cooldownDecreasePerLevel: 1.0
     recall:
       enabled: true
       maxlevel: 5
       cooldown: 30
       percentHealthRecovered: 0.25
       duration: 2.5
+      canUseWhileSlowed: false
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      cooldownDecreasePerLevel: 1.0
     evade:
       enabled: true
       maxlevel: 5
@@ -85,36 +190,83 @@ skills:
       duration: 1.25
       internalCD: 0.5
       forcedDamageDelay: 400
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      cooldownDecreasePerLevel: 1.0
   knight:
     shieldsmash:
       enabled: true
       maxlevel: 5
       cooldown: 15
       baseMultiplier: 1.6
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      cooldownDecreasePerLevel: 1.0
     ride:
       enabled: false
       cooldown: 30
       maxlevel: 5
       lifespan: 2.0
+      canUseWhileSlowed: false
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      cooldownDecreasePerLevel: 1.0
     bullscharge:
       enabled: true
       cooldown: 14
       maxlevel: 5
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      slowDuration: 3.0
+      cooldownDecreasePerLevel: 1.0
     fortitude:
       enabled: true
       maxlevel: 3
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      heal: 1.0
     vengeance:
       enabled: true
       maxlevel: 3
       damageIncrease: 0.25
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
     levelfield:
       enabled: true
       maxlevel: 3
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      radius: 10
     cleave:
       enabled: true
       maxlevel: 3
       baseDamage: 4.0
       baseDistance: 2.0
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
     riposte:
       enabled: true
       maxlevel: 3
@@ -123,42 +275,97 @@ skills:
       bonusDamage: 1.0
       healing: 1.0
       bonusDamageDuration: 2.0
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      cooldownDecreasePerLevel: 1.0
     holdposition:
       enabled: true
       maxlevel: 5
       cooldown: 25
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      cooldownDecreasePerLevel: 1.0
     swordsmanship:
       enabled: true
       maxlevel: 3
       timeBetweenCharges: 2.0
       timeOutOfCombat: 2.5
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
     fury:
       enabled: true
       maxlevel: 3
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
     thorns:
       enabled: true
       maxlevel: 3
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
     sacrifice:
       enabled: true
       maxlevel: 3
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
     defensivestance:
       enabled: true
       maxlevel: 5
       energy: 7
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      damage: 2.0
     powerchop:
       enabled: true
       maxlevel: 5
       cooldown: 14
       timeToHit: 1.0
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      cooldownDecreasePerLevel: 1.0
     deflection:
       enabled: true
       maxlevel: 3
       timeBetweenCharges: 2.0
       timeOutOfCombat: 2.0
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
     hiltsmash:
       enabled: true
       maxlevel: 5
       cooldown: 10
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      cooldownDecreasePerLevel: 1.0
   mage:
     staticlazer:
       enabled: true
@@ -169,10 +376,24 @@ skills:
       baseDamage: 2.0
       baseRange: 20.0
       energyPerSecond: 32.0
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      cooldownDecreasePerLevel: 1.0
     rupture:
       enabled: true
       cooldown: 12
       maxlevel: 5
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      damage: 8.0
+      slowDuration: 1.5
+      cooldownDecreasePerLevel: 1.0
     boulder:
       enabled: true
       cooldown: 25
@@ -180,16 +401,34 @@ skills:
       baseRadius: 4.0
       baseHeal: 2.0
       baseDamage: 3.0
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      cooldownDecreasePerLevel: 1.0
     inferno:
       enabled: true
       maxlevel: 5
       energy: 9
       fireTicks: 50
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
     moltenblast:
       enabled: true
       maxlevel: 5
       cooldown: 23
       speed: 2.0
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      damage: 6.0
+      cooldownDecreasePerLevel: 1.0
     glacialprison:
       enabled: true
       maxlevel: 5
@@ -197,6 +436,12 @@ skills:
       duration: 5.0
       sphereSize: 5
       speed: 1.5
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      cooldownDecreasePerLevel: 1.0
     lightningorb:
       enabled: true
       maxlevel: 5
@@ -206,140 +451,320 @@ skills:
       spreadDistance: 3.0
       shockDuration: 2.0
       maxTarget: 3
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      cooldownDecreasePerLevel: 1.0
     swarm:
       enabled: true
       maxlevel: 5
       energy: 12
       batLifespan: 2.0
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      batDamage: 1.0
     immolate:
       enabled: true
       maxlevel: 5
       energy: 11
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
     lifebonds:
       enabled: true
       maxlevel: 5
       energy: 9
       minRadius: 2.0
       duration: 2.0
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
     magmablade:
       enabled: true
       maxlevel: 3
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
     moltenshield:
       enabled: true
       maxlevel: 1
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
     defensiveaura:
       enabled: true
       maxlevel: 5
       cooldown: 30
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      duration: 10.0
+      cooldownDecreasePerLevel: 1.0
     blizzard:
       enabled: true
       maxlevel: 5
       energy: 9
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      slowDuration: 2.0
     void:
       enabled: true
       maxlevel: 5
       energy: 15
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      damageReduction: 5
+      energyReduction: 20
     nullblade:
       enabled: true
       maxlevel: 5
       energy: 7
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
     holylight:
       enabled: true
       maxlevel: 5
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
     cyclone:
       enabled: true
       maxlevel: 5
       cooldown: 16
       minimumDistance: 7
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      cooldownDecreasePerLevel: 1.0
     polymorph:
       enabled: true
       maxlevel: 3
       cooldown: 45
       duration: 8.0
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      cooldownDecreasePerLevel: 1.0
     arcticarmour:
       enabled: true
       maxlevel: 5
       energy: 6
       minRadius: 2
       duration: 2.0
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: true
     pestilence:
       enabled: true
       maxlevel: 3
       cooldown: 20
       duration: 5.0
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      enemyDamageReduction: 0.2
+      cooldownDecreasePerLevel: 1.0
     rootingaxe:
       enabled: true
       maxlevel: 3
       cooldown: 8
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      duration: 2.0
+      cooldownDecreasePerLevel: 1.0
   brute:
     battletaunt:
       enabled: true
       energy: 15
       maxlevel: 5
       cooldown: 0
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      cooldownDecreasePerLevel: 1.0
     intimidation:
       enabled: true
       maxlevel: 3
       baseRadius: 3.0
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
     seismicslam:
       enabled: true
       maxlevel: 5
       cooldown: 25
       radius: 5
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      cooldownDecreasePerLevel: 1.0
     cripplingblow:
       enabled: true
       maxlevel: 3
       slowDuration: 2.0
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
     fleshhook:
       enabled: true
       maxlevel: 5
       cooldown: 18
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      cooldownDecreasePerLevel: 1.0
     colossus:
       enabled: true
       maxlevel: 3
       reductionPerLevel: 0.25
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
     takedown:
       enabled: true
       maxlevel: 5
       cooldown: 25
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      damage: 10.0
+      cooldownDecreasePerLevel: 1.0
     stampede:
       enabled: true
       maxlevel: 5
       durationPerStack: 8.0
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      damageMultiplier: 2.0
     threateningshout:
       enabled: true
       maxlevel: 5
       cooldown: 20
       radius: 4
       duration: 3.0
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      cooldownDecreasePerLevel: 1.0
     bloodlust:
       enabled: true
       maxlevel: 5
       duration: 5.0
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      radius: 15
+      maxStacks: 3
     resistance:
       enabled: true
       maxlevel: 3
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
     overwhelm:
       enabled: true
       maxlevel: 3
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
     spiritofthewolf:
       enabled: true
       maxlevel: 5
       cooldown: 15
       radius: 5
       duration: 9.0
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      cooldownDecreasePerLevel: 1.0
     spiritofthebear:
       enabled: true
       maxlevel: 5
       cooldown: 20
       radius: 5
       duration: 5.0
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      cooldownDecreasePerLevel: 1.0
     strengthinnumbers:
       enabled: true
       maxlevel: 5
       cooldown: 20
       radius: 10
       duration: 2.0
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      cooldownDecreasePerLevel: 1.0
   ranger:
     wolfspounce:
       enabled: true
@@ -347,82 +772,184 @@ skills:
       cooldown: 8
       baseCharge: 40.0
       baseDamage: 2.0
+      canUseWhileSlowed: false
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      slowDuration: 3.0
+      cooldownDecreasePerLevel: 1.0
     stunningshot:
       enabled: true
       maxlevel: 5
       cooldown: 25
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      cooldownDecreasePerLevel: 1.0
     incendiaryshot:
       enabled: true
       maxlevel: 5
       cooldown: 14
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: true
+      canUseInLiquid: false
+      cooldownDecreasePerLevel: 1.0
     ropedarrow:
       enabled: true
       maxlevel: 5
       cooldown: 8
+      canUseWhileSlowed: false
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      cooldownDecreasePerLevel: 1.0
     levitatingshot:
       enabled: true
       maxlevel: 5
       cooldown: 14
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      cooldownDecreasePerLevel: 1.0
     pindown:
       enabled: true
       maxlevel: 5
       cooldown: 13
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      cooldownDecreasePerLevel: 1.0
     longshot:
       enabled: true
       maxlevel: 5
       baseDamage: 18.0
       deathMessageThreshold: 40.0
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
     heavyarrows:
       enabled: true
       maxlevel: 5
       energy: 20
       basePushBack: 1.0
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
     overcharge:
       enabled: true
       maxlevel: 5
       damageIncrement: 1
       durationIncrement: 0.4
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
     huntersthrill:
       enabled: true
       maxlevel: 5
       maxTimeBetweenShots: 8.0
       maxConsecutiveHits: 4
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
     precision:
       enabled: true
       maxlevel: 3
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
     entangle:
       enabled: true
       maxlevel: 3
       baseDuration: 2.0
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
     volley:
       enabled: true
       maxlevel: 5
       cooldown: 15
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      cooldownDecreasePerLevel: 1.0
     vitalityspores:
       enabled: true
       maxlevel: 5
       baseDuration: 7.0
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
     sharpshooter:
       enabled: true
       maxlevel: 3
       maxTimeBetweenShots: 5.0
       maxConsecutiveHits: 4
       numMisses: 2
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
     agility:
       enabled: true
       maxlevel: 5
       cooldown: 30
       baseDuration: 3.0
+      canUseWhileSlowed: false
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      damageReduction: 0.6
+      cooldownDecreasePerLevel: 1.0
     wolvesfury:
       enabled: true
       maxlevel: 5
       cooldown: 25
       baseDuration: 3.0
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      cooldownDecreasePerLevel: 1.0
     disengage:
       enabled: true
       maxlevel: 5
       cooldown: 12
       baseSlowDuration: 2.0
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      cooldownDecreasePerLevel: 1.0
     healingshot:
       enabled: true
       maxlevel: 5
@@ -430,6 +957,11 @@ skills:
       baseDuration: 4.0
       increasePerLevel: 1.0
       cooldownDecreasePerLevel: 3.0
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
   warlock:
     bloodbarrier:
       enabled: true
@@ -437,64 +969,159 @@ skills:
       cooldown: 30
       range: 8
       duration: 60.0
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      damageReduction: 0.3
+      numAttacksToReduce: 3
+      cooldownDecreasePerLevel: 1.0
     bloodshed:
       enabled: true
       maxlevel: 5
       cooldown: 12
       duration: 4.0
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      cooldownDecreasePerLevel: 1.0
     bloodthirst:
       enabled: true
       maxlevel: 5
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
     soulharvest:
       enabled: true
       maxlevel: 3
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
     impotence:
       enabled: true
       maxlevel: 3
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      radius: 3
+      maxEnemies: 3
     tormentedsoul:
       enabled: true
       maxlevel: 5
       cooldown: 30
       duration: 7.0
       radius: 5
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      damageIncrease: 0.33
+      cooldownDecreasePerLevel: 1.0
     cleanse:
       enabled: true
       maxlevel: 5
       cooldown: 15
       distance: 5
       duration: 2.0
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      cooldownDecreasePerLevel: 1.0
     grasp:
       enabled: true
       maxlevel: 5
       cooldown: 30
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      cooldownDecreasePerLevel: 1.0
     leech:
       enabled: true
       maxlevel: 5
       cooldown: 25
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      range: 7
+      leechedHealth: 1.0
+      maxRangeFromCaster: 21
+      cooldownDecreasePerLevel: 1.0
     wreath:
       enabled: true
       maxlevel: 5
       cooldown: 30
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      numAttacks: 3
+      slowDuration: 2.0
+      cooldownDecreasePerLevel: 1.0
     frailty:
       enabled: true
       maxlevel: 3
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
     siphon:
       enabled: true
       maxlevel: 5
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      radius: 4
+      energySiphoned: 1.0
   global:
     breakfall:
       enabled: true
       maxlevel: 3
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
+      damageReduction: 5.0
     fastrecovery:
       enabled: true
       maxlevel: 5
-      percentagePerLevel: 0.20
+      percentagePerLevel: 0.2
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
     swim:
       enabled: true
       maxlevel: 5
       energy: 10
       cooldown: 0.35
       internalCooldown: 0.35
+      canUseWhileSlowed: true
+      canUseWhileSilenced: false
+      canUseWhileStunned: false
+      canUseWhileLevitating: false
+      canUseInLiquid: false
 class:
   assassin:
     dealKnockback: false
@@ -515,3 +1142,37 @@ command:
   reload:
     enabled: true
     requiredRank: ADMIN
+  build:
+    enabled: true
+    requiredRank: ADMIN
+  combat:
+    enabled: true
+    requiredRank: ADMIN
+  skills:
+    enabled: true
+    requiredRank: ADMIN
+weapons:
+  tnt-cannon:
+    cooldown: 25.0
+    velocity: 2.5
+  alligators-tooth:
+    base-damage: 8.0
+    bonus-damage: 4.0
+    energy-per-tick: 1.0
+    initial-energy-cost: 10.0
+    strength: 1.0
+  throwing-web:
+    cooldown: 10.0
+    duration: 2.5
+    throwable-expiry: 10.0
+  wind-blade:
+    base-damage: 7.0
+    energy-per-tick: 1.0
+    initial-energy-cost: 10.0
+    strength: 0.7
+  energy-apple:
+    cooldown: 10.0
+    energy-regen: 0.5
+combat:
+  arrow-base-damage: 4.5
+  crit-arrows: true
