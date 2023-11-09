@@ -45,7 +45,7 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
     private int maxTravelDistance;
 
     @Inject
-    public Blink(Champions champions, ChampionsManager championsManager, Champions champions1) {
+    public Blink(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
 

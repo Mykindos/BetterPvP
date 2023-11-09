@@ -62,7 +62,12 @@ public class Flash extends Skill implements InteractSkill, Listener {
     });
 
     private int baseMaxCharges;
+
+    private int chargeIncreasePerLevel;
+
     private double baseRechargeSeconds;
+
+    private double rechargeReductionPerLevel;
     private double teleportDistance;
 
     @Inject
@@ -90,17 +95,19 @@ public class Flash extends Skill implements InteractSkill, Listener {
     }
 
     private int getMaxCharges(int level) {
-        return baseMaxCharges + (level - 1);
+        return baseMaxCharges + ((level - 1) * chargeIncreasePerLevel);
     }
 
     private double getRechargeSeconds(int level) {
-        return baseRechargeSeconds;
+        return baseRechargeSeconds - (level * rechargeReductionPerLevel);
     }
 
     @Override
     public void loadSkillConfig() {
         baseMaxCharges = getConfig("baseMaxCharges", 1, Integer.class);
+        chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 1, Integer.class);
         baseRechargeSeconds = getConfig("baseRechargeSeconds", 4.0, Double.class);
+        rechargeReductionPerLevel = getConfig("baseRechargeSeconds", 0.0, Double.class);
         teleportDistance = getConfig("teleportDistance", 5.0, Double.class);
     }
 
