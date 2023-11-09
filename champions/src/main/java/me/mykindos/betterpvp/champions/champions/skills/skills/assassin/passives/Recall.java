@@ -104,7 +104,7 @@ public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listene
 
     @Override
     public double getCooldown(int level) {
-        return cooldown - ((level - 1d) * 2);
+        return cooldown - ((level - 1d) * cooldownDecreasePerLevel);
     }
 
     @Override

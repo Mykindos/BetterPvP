@@ -34,6 +34,10 @@ skills:
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
+      assassinDecrease: 0.0
+      baseIncrease: 1.0
+      slownessDuration: 1.0
+      slownessStrength: 0
     viperstrikes:
       enabled: true
       maxlevel: 3
@@ -51,6 +55,9 @@ skills:
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
+      increasePerLevel: 0.1
+      assassinDecrease: 0.2
+      baseIncrease: 0.2
     smokebomb:
       enabled: true
       cooldown: 50
@@ -63,7 +70,7 @@ skills:
       baseDuration: 3.0
       blindDuration: 1.75
       blindRadius: 2.5
-      cooldownDecreasePerLevel: 1.0
+      cooldownDecreasePerLevel: 2.5
     silencingarrow:
       enabled: true
       maxlevel: 5
@@ -74,7 +81,7 @@ skills:
       canUseWhileLevitating: false
       canUseInLiquid: false
       baseDuration: 3.0
-      cooldownDecreasePerLevel: 1.0
+      cooldownDecreasePerLevel: 0.5
     smokearrow:
       enabled: true
       maxlevel: 4
@@ -85,7 +92,7 @@ skills:
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
-      cooldownDecreasePerLevel: 1.0
+      cooldownDecreasePerLevel: 2.0
     silencingstrikes:
       enabled: true
       maxlevel: 3
@@ -159,7 +166,7 @@ skills:
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
-      cooldownDecreasePerLevel: 1.0
+      cooldownDecreasePerLevel: 2.0
     toxicarrow:
       enabled: true
       maxlevel: 5
@@ -182,7 +189,7 @@ skills:
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
-      cooldownDecreasePerLevel: 1.0
+      cooldownDecreasePerLevel: 2.0
     evade:
       enabled: true
       maxlevel: 5

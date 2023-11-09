@@ -60,7 +60,7 @@ public class ToxicArrow extends PrepareArrowSkill {
     @Override
     public double getCooldown(int level) {
 
-        return cooldown - ((level - 1));
+        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
 

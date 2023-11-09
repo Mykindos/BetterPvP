@@ -64,7 +64,7 @@ public class SmokeArrow extends PrepareArrowSkill {
 
     @Override
     public double getCooldown(int level) {
-        return cooldown - (2 * level);
+        return cooldown - (level * cooldownDecreasePerLevel);
     }
 
     @Override

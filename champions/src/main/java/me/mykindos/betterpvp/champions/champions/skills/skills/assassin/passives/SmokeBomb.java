@@ -169,7 +169,7 @@ public class SmokeBomb extends Skill implements ToggleSkill, CooldownSkill, List
     @Override
     public double getCooldown(int level) {
 
-        return cooldown - ((level - 1) * 2.5);
+        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
     @Override

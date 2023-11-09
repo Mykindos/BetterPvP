@@ -61,7 +61,7 @@ public class SilencingArrow extends PrepareArrowSkill {
 
     @Override
     public double getCooldown(int level) {
-        return cooldown - ((level - 1) * 0.5);
+        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
 
