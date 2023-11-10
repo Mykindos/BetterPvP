@@ -45,7 +45,7 @@ public class SpiritOfTheWolf extends Skill implements InteractSkill, CooldownSki
                 "",
                 "Call upon the spirit of the wolf,",
                 "granting all allies within <val>" + (radius + (level)) + "</val> blocks",
-                "<effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect> for <stat>" + duration + "</stat> seconds.",
+                "<effect>Speed " + UtilFormat.getRomanNumeral(speedStrength + 1) + "</effect> for <stat>" + duration + "</stat> seconds.",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };

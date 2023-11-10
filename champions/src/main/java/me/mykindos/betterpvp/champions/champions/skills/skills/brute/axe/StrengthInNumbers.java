@@ -46,7 +46,7 @@ public class StrengthInNumbers extends Skill implements InteractSkill, CooldownS
                 "Right click with an Axe to activate",
                 "",
                 "Grant all allies within <stat>" + radius + "</stat> blocks",
-                "<effect>Strength</effect> " + UtilFormat.getRomanNumeral(strengthStrength) + " for <val>" + getDuration(level) + "</val> seconds",
+                "<effect>Strength " + UtilFormat.getRomanNumeral(strengthStrength) + "</effect> for <val>" + getDuration(level) + "</val> seconds",
                 "",
                 "This does not give you the buff",
                 "",
