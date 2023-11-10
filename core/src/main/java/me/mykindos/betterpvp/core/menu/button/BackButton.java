@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.core.menu.button;
 
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
@@ -12,20 +11,21 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.jetbrains.annotations.NotNull;
+import xyz.xenondevs.invui.gui.Gui;
 import xyz.xenondevs.invui.item.ItemProvider;
-import xyz.xenondevs.invui.item.impl.AbstractItem;
+import xyz.xenondevs.invui.item.impl.controlitem.ControlItem;
 
 @RequiredArgsConstructor
 @AllArgsConstructor
-public class BackButton extends AbstractItem {
+public class BackButton extends ControlItem<Gui> {
 
     private final Windowed previousMenu;
-    private ItemProvider fallback = Menu.BACKGROUND_ITEM;
+    private Runnable onBack;
 
     @Override
-    public ItemProvider getItemProvider() {
+    public ItemProvider getItemProvider(Gui gui) {
         if (previousMenu == null) {
-            return fallback;
+            return gui.getBackground();
         }
 
         return ItemView.builder()
@@ -38,6 +38,13 @@ public class BackButton extends AbstractItem {
 
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
+        if (previousMenu == null) {
+            return;
+        }
+
         previousMenu.show(player);
+        if (onBack != null) {
+            onBack.run();
+        }
     }
 }
