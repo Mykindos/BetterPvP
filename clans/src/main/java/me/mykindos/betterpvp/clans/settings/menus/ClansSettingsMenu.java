@@ -2,55 +2,69 @@ package me.mykindos.betterpvp.clans.settings.menus;
 
 import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.gamer.properties.GamerProperty;
-import me.mykindos.betterpvp.core.menu.interfaces.IRefreshingMenu;
-import me.mykindos.betterpvp.core.settings.menus.SettingSubMenu;
+import me.mykindos.betterpvp.core.settings.menus.SettingCategory;
 import me.mykindos.betterpvp.core.settings.menus.buttons.SettingsButton;
+import me.mykindos.betterpvp.core.utilities.model.description.Description;
+import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.ItemFlag;
+import org.jetbrains.annotations.NotNull;
+import xyz.xenondevs.invui.gui.AbstractGui;
 
-import java.util.Optional;
+public class ClansSettingsMenu extends AbstractGui implements SettingCategory {
 
-public class ClansSettingsMenu extends SettingSubMenu implements IRefreshingMenu {
+    public ClansSettingsMenu(Gamer gamer) {
+        super(9, 1);
 
-    private final Gamer gamer;
+        final Description sidebarDescription = Description.builder().icon(lang -> {
+            final boolean setting = (boolean) gamer.getProperty(GamerProperty.SIDEBAR_ENABLED).orElse(false);
+            final NamedTextColor color = setting ? NamedTextColor.GREEN : NamedTextColor.RED;
+            return ItemView.builder()
+                    .material(Material.IRON_BARS)
+                    .displayName(Component.text("Sidebar", color))
+                    .lore(Component.text("Whether to display the sidebar or not", NamedTextColor.GRAY))
+                    .frameLore(true)
+                    .build()
+                    .get();
+        }).build();
 
-    public ClansSettingsMenu(Player player, Gamer gamer) {
-        super(player, 9, Component.text("Clans Settings", NamedTextColor.BLACK).decorate(TextDecoration.BOLD));
-        this.gamer = gamer;
+        final Description clanMenuDescription = Description.builder().icon(lang -> {
+            final boolean setting = (boolean) gamer.getProperty(GamerProperty.CLAN_MENU_ENABLED).orElse(false);
+            final NamedTextColor color = setting ? NamedTextColor.GREEN : NamedTextColor.RED;
+            return ItemView.builder()
+                    .material(Material.BAMBOO_HANGING_SIGN)
+                    .displayName(Component.text("Clan Menu", color))
+                    .lore(Component.text("Whether to display a menu or chat message when doing /clan", NamedTextColor.GRAY))
+                    .frameLore(true)
+                    .build()
+                    .get();
+        }).build();
 
-        refresh();
+        addItems(
+                new SettingsButton(gamer, GamerProperty.SIDEBAR_ENABLED, sidebarDescription),
+                new SettingsButton(gamer, GamerProperty.CLAN_MENU_ENABLED, clanMenuDescription)
+        );
+    }
+
+    @NotNull
+    @Override
+    public Component getTitle() {
+        return Component.text("Clans Settings");
     }
 
     @Override
-    public void refresh() {
-
-        Optional<Boolean> sidebarSettingOptional = gamer.getProperty(GamerProperty.SIDEBAR_ENABLED);
-        sidebarSettingOptional.ifPresent(sidebarSetting -> {
-            addButton(new SettingsButton(gamer,
-                    GamerProperty.SIDEBAR_ENABLED,
-                    0,
-                    new ItemStack(Material.IRON_BARS),
-                    Component.text("Sidebar", sidebarSetting ? NamedTextColor.GREEN : NamedTextColor.RED),
-                    Component.text("Whether to display the sidebar or not", NamedTextColor.GRAY)));
-
-        });
-
-        Optional<Boolean> clanMenuSettingOptional = gamer.getProperty(GamerProperty.CLAN_MENU_ENABLED);
-        clanMenuSettingOptional.ifPresent(clanMenuSetting -> {
-            addButton(new SettingsButton(gamer,
-                    GamerProperty.CLAN_MENU_ENABLED,
-                    1,
-                    new ItemStack(Material.BAMBOO_HANGING_SIGN),
-                    Component.text("Clan Menu", clanMenuSetting ? NamedTextColor.GREEN : NamedTextColor.RED),
-                    Component.text("Whether to display a menu or chat message when doing /clan", NamedTextColor.GRAY)));
-
-        });
-
+    public Description getDescription() {
+        return Description.builder()
+                .icon(ItemView.builder()
+                        .material(Material.DIAMOND_HELMET)
+                        .displayName(Component.text("Clans Settings", NamedTextColor.GREEN, TextDecoration.BOLD))
+                        .lore(Component.text("View generic settings related to the clans gamemode", NamedTextColor.GRAY))
+                        .flag(ItemFlag.HIDE_ATTRIBUTES)
+                        .frameLore(true)
+                        .build())
+                .build();
     }
-
-
 }

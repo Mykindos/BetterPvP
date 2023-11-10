@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
+import me.mykindos.betterpvp.core.menu.impl.ConfirmationMenu;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.entity.Player;
@@ -72,13 +73,19 @@ public class PromoteSubCommand extends ClanSubCommand {
 
         Gamer targetGamer = targetGamerOptional.get();
         clan.getMemberByUUID(targetGamer.getUuid()).ifPresentOrElse(targetMember -> {
-            if(targetMember.getRank().getPrivilege() + 1 >= member.getRank().getPrivilege()){
-                if(member.getRank() == ClanMember.MemberRank.LEADER){
-                    UtilServer.callEvent(new MemberDemoteEvent(player, clan, member));
-                }else {
+            if (targetMember.getRank().getPrivilege() + 1 >= member.getRank().getPrivilege()){
+                if (member.getRank() == ClanMember.MemberRank.LEADER) {
+                    new ConfirmationMenu("Are you sure you want to promote this person to leader?", success -> {
+                        if (success) {
+                            UtilServer.callEvent(new MemberDemoteEvent(player, clan, member));
+                            UtilServer.callEvent(new MemberPromoteEvent(player, clan, targetMember));
+                        }
+                    }).show(player);
+                } else {
                     UtilMessage.message(player, "Clans", "You can only promote players with a lower rank.");
-                    return;
                 }
+
+                return;
             }
 
             UtilServer.callEvent(new MemberPromoteEvent(player, clan, targetMember));

@@ -1,59 +1,93 @@
 package me.mykindos.betterpvp.shops.shops.menus.buttons;
 
+import lombok.NonNull;
 import me.mykindos.betterpvp.core.components.shops.IShopItem;
 import me.mykindos.betterpvp.core.components.shops.ShopCurrency;
 import me.mykindos.betterpvp.core.components.shops.events.PlayerBuyItemEvent;
 import me.mykindos.betterpvp.core.components.shops.events.PlayerSellItemEvent;
 import me.mykindos.betterpvp.core.gamer.Gamer;
-import me.mykindos.betterpvp.core.menu.Button;
-import me.mykindos.betterpvp.core.menu.Menu;
+import me.mykindos.betterpvp.core.gamer.GamerManager;
+import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.menu.CooldownButton;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import me.mykindos.betterpvp.shops.shops.utilities.ShopsNamespacedKeys;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.NotNull;
+import xyz.xenondevs.invui.item.ItemProvider;
+import xyz.xenondevs.invui.item.impl.AbstractItem;
 
-public class ShopItemButton extends Button {
+import java.text.NumberFormat;
 
-    private final Menu parent;
+public class ShopItemButton extends AbstractItem implements CooldownButton {
+
     private final IShopItem shopItem;
-    private final ItemStack item;
+    private final GamerManager gamerManager;
+    private final ItemHandler itemHandler;
 
-    public ShopItemButton(Menu parent, int slot, IShopItem shopItem, ItemStack item) {
-        super(slot, item);
-        this.parent = parent;
+    public ShopItemButton(@NonNull IShopItem shopItem, ItemHandler handler, @NonNull GamerManager gamerManager) {
         this.shopItem = shopItem;
-        this.item = item;
+        this.gamerManager = gamerManager;
+        this.itemHandler = handler;
     }
 
     @Override
-    public void onClick(Player player, Gamer gamer, ClickType clickType) {
+    public ItemProvider getItemProvider() {
+        boolean canSell = shopItem.getSellPrice() > 0;
+        final ItemView.ItemViewBuilder builder = ItemView.builder()
+                .material(shopItem.getMaterial())
+                .amount(shopItem.getAmount())
+                .lore(Component.empty())
+                .lore(Component.text("Buy: ", NamedTextColor.GRAY).append(Component.text("$" + NumberFormat.getInstance().format(shopItem.getBuyPrice()), NamedTextColor.YELLOW)))
+                .lore(Component.text("Shift Left Click: ", NamedTextColor.GRAY).append(Component.text("Buy 64", NamedTextColor.YELLOW)));
 
+        if (canSell) {
+            builder.lore(Component.empty());
+            builder.lore(Component.text("Sell: ", NamedTextColor.GRAY).append(Component.text("$" + NumberFormat.getInstance().format(shopItem.getSellPrice()), NamedTextColor.YELLOW)));
+            builder.lore(Component.text("Shift Right Click: ", NamedTextColor.GRAY).append(Component.text("Sell 64", NamedTextColor.YELLOW)));
+        }
+
+        final ItemStack item = itemHandler.updateNames(builder.build().get());
+        return ItemView.of(item);
+    }
+
+    @Override
+    public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
+        final ItemStack item = getItemProvider().get();
         ItemMeta itemMeta = item.getItemMeta();
-        if (itemMeta == null) return;
+        if (itemMeta == null) {
+            return;
+        }
 
         ShopCurrency currency = ShopCurrency.COINS;
-        if (itemMeta.getPersistentDataContainer().has(ShopsNamespacedKeys.SHOP_CURRENCY)) {
-            String currencyData = itemMeta.getPersistentDataContainer().get(ShopsNamespacedKeys.SHOP_CURRENCY, PersistentDataType.STRING);
+        final PersistentDataContainer pdc = itemMeta.getPersistentDataContainer();
+        if (pdc.has(ShopsNamespacedKeys.SHOP_CURRENCY)) {
+            String currencyData = pdc.get(ShopsNamespacedKeys.SHOP_CURRENCY, PersistentDataType.STRING);
             if (currencyData != null) {
                 currency = ShopCurrency.valueOf(currencyData.toUpperCase());
             }
         }
 
+        final Gamer gamer = gamerManager.getObject(player.getUniqueId()).orElseThrow();
         if (clickType == ClickType.LEFT || clickType == ClickType.SHIFT_LEFT) {
             UtilServer.callEvent(new PlayerBuyItemEvent(player, gamer, shopItem, item, currency, clickType));
         } else if (clickType == ClickType.RIGHT || clickType == ClickType.SHIFT_RIGHT) {
             UtilServer.callEvent(new PlayerSellItemEvent(player, gamer, shopItem, item, currency, clickType));
         }
 
-        parent.construct();
+        notifyWindows();
     }
 
     @Override
-    public double getClickCooldown() {
-        return 0.15;
+    public double getCooldown() {
+        return 0.2;
     }
-
 }

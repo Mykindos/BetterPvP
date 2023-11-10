@@ -5,11 +5,11 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.clans.leveling.ClanPerk;
 import me.mykindos.betterpvp.clans.clans.leveling.ClanPerkManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.event.Listener;
-import org.bukkit.inventory.ItemStack;
 
 @BPvPListener
 @Singleton
@@ -46,8 +46,8 @@ public class FarmingHeightListener implements Listener {
             }
 
             @Override
-            public ItemStack getIcon() {
-                return new ItemStack(Material.WHEAT);
+            public ItemView getIcon() {
+                return ItemView.builder().material(Material.WHEAT).build();
             }
         };
 

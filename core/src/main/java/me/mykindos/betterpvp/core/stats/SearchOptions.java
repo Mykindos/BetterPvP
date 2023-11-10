@@ -2,12 +2,14 @@ package me.mykindos.betterpvp.core.stats;
 
 import lombok.Builder;
 import lombok.Value;
+import lombok.With;
 import me.mykindos.betterpvp.core.stats.filter.FilterType;
 import me.mykindos.betterpvp.core.stats.sort.SortType;
 import org.jetbrains.annotations.Nullable;
 
 @Value
-@Builder
+@Builder(toBuilder = true)
+@With
 public class SearchOptions {
 
     @Nullable
