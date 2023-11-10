@@ -133,7 +133,7 @@ skills:
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
-      cooldownDecreasePerLevel: 1.0
+      cooldownDecreasePerLevel: 2.0
     blink:
       enabled: true
       cooldown: 13
@@ -156,6 +156,7 @@ skills:
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
+      chargeIncreasePerLevel: 1
     markedfordeath:
       enabled: true
       maxlevel: 5
@@ -167,6 +168,8 @@ skills:
       canUseWhileLevitating: false
       canUseInLiquid: false
       cooldownDecreasePerLevel: 2.0
+      durationIncreasePerLevel: 1.0
+      vulnerabilityStrength: 1
     toxicarrow:
       enabled: true
       maxlevel: 5
