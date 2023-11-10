@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Sound;
@@ -23,6 +24,8 @@ public class SpiritOfTheWolf extends Skill implements InteractSkill, CooldownSki
 
     private int radius;
     private double duration;
+
+    private int speedStrength;
 
     @Inject
     public SpiritOfTheWolf(Champions champions, ChampionsManager championsManager) {
@@ -42,7 +45,7 @@ public class SpiritOfTheWolf extends Skill implements InteractSkill, CooldownSki
                 "",
                 "Call upon the spirit of the wolf,",
                 "granting all allies within <val>" + (radius + (level)) + "</val> blocks",
-                "<effect>Speed II</effect> for <stat>" + duration + "</stat> seconds.",
+                "<effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect> for <stat>" + duration + "</stat> seconds.",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -69,10 +72,10 @@ public class SpiritOfTheWolf extends Skill implements InteractSkill, CooldownSki
     @Override
     public void activate(Player player,int level) {
         player.getWorld().playSound(player.getLocation().add(0.0, -1.0, 0.0), Sound.ENTITY_WOLF_HOWL, 0.5F, 1.0F);
-        player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 140, 1));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) duration * 20, speedStrength));
 
         for (Player target : UtilPlayer.getNearbyAllies(player, player.getLocation(), (radius + level))) {
-            target.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) (duration * 20), 1));
+            target.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) (duration * 20), speedStrength));
             UtilMessage.message(target, getClassType().getName(), "You received the spirit of the wolf!");
         }
     }
@@ -86,5 +89,6 @@ public class SpiritOfTheWolf extends Skill implements InteractSkill, CooldownSki
     public void loadSkillConfig() {
         radius = getConfig("radius", 5, Integer.class);
         duration = getConfig("duration", 9.0, Double.class);
+        speedStrength = getConfig("speedStrength", 1, Integer.class);
     }
 }
