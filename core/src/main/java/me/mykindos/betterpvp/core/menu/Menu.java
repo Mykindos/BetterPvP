@@ -1,114 +1,76 @@
 package me.mykindos.betterpvp.core.menu;
 
-import lombok.Data;
+import lombok.experimental.UtilityClass;
+import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import xyz.xenondevs.invui.gui.structure.Structure;
+import xyz.xenondevs.invui.item.Item;
+import xyz.xenondevs.invui.item.ItemProvider;
+import xyz.xenondevs.invui.item.impl.SimpleItem;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
-@Data
-public abstract class Menu {
+@UtilityClass
+public class Menu {
 
-    protected static final ItemStack BACKGROUND = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
-    protected final Player player;
-    private final int size;
-    private final Component title;
-    private final List<Button> buttons;
-    private final Inventory inventory;
-    private final long openTime;
+    /**
+     * The {@link ItemProvider} for {@link ItemStack}s used as background items in menus.
+     */
+    public static final ItemProvider BACKGROUND_ITEM = ItemView.builder()
+            .material(Material.GRAY_STAINED_GLASS_PANE)
+            .displayName(Component.empty())
+            .build();
 
-    public Menu(Player player, int size, Component title, Button[] buttons) {
-        this.player = player;
-        this.size = size;
-        this.title = title;
-        this.buttons = Arrays.asList(buttons);
-        this.inventory = Bukkit.createInventory(player, size, title);
-        this.openTime = System.currentTimeMillis();
+    /**
+     * The default {@link Item} implementation for background items in menus.
+     */
+    public static final Item BACKGROUND_GUI_ITEM = new SimpleItem(BACKGROUND_ITEM, click -> SoundEffect.WRONG_ACTION.play(click.getPlayer()));
 
-        fillInventoryWithAir();
-        construct();
-
-    }
-
-    public Menu(Player player, int size, Component title) {
-        this.player = player;
-        this.size = size;
-        this.title = title;
-        this.buttons = new ArrayList<>();
-        this.inventory = Bukkit.createInventory(player, size, title);
-        this.openTime = System.currentTimeMillis();
-
-        fillInventoryWithAir();
-    }
-
-    public void construct(){
-        for (Button button : buttons) {
-            inventory.setItem(button.getSlot(), button.getItemStack());
-        }
-    }
-
-    public void addButton(Button button) {
-        buttons.stream().filter(b -> b.getSlot() == button.getSlot()).findFirst().ifPresent(buttons::remove);
-        buttons.add(button);
-        inventory.setItem(button.getSlot(), button.getItemStack());
-    }
-
-    public void refreshButton(Button button) {
-        if (buttons.contains(button)) {
-            inventory.setItem(button.getSlot(), button.getItemStack());
-        }
-    }
-
-    public boolean isButton(ItemStack item) {
-        if (item != null && item.getType() != Material.AIR) {
-            if (item.hasItemMeta() && item.getItemMeta().hasDisplayName()) {
-                for (Button button : this.getButtons()) {
-                    if (button.getItemStack().equals(item)) {
-                        return true;
-                    }
-                }
-
-            }
-        }
-        return false;
-    }
-
-    public Button getButton(ItemStack item) {
-        if (item != null && item.getType() != Material.AIR) {
-            if (item.hasItemMeta() && item.getItemMeta().hasDisplayName()) {
-                for (Button button : this.getButtons()) {
-                    if (button.getItemStack().equals(item)) {
-                        return button;
-                    }
-                }
-
-            }
-        }
-        return null;
+    static {
+        Structure.addGlobalIngredient('#', BACKGROUND_GUI_ITEM);
     }
 
     /**
-     * I dont remember why I do this but I don't want to find out
+     * Get a lore that fixes all lore lines to the same length, as to avoid
+     * each line from going off the screen.
+     *
+     * @param loreIn The single-line lore description
+     * @return An array of similar-length lore lines containing the lore description.
      */
-    private void fillInventoryWithAir(){
-        for (int i = 0; i < size; i++) {
-            inventory.setItem(i, new ItemStack(Material.AIR));
-        }
-    }
+    public static List<Component> getFixedLore(String loreIn) {
+        String lore = loreIn;
+        int lineLength = 30;
+        lore = lore.trim();
 
-    protected void fillEmpty(ItemStack itemStack) {
-        for (int i = 0; i < size; i++) {
-            final ItemStack item = inventory.getItem(i);
-            if (item == null || item.getType() == Material.AIR) {
-                inventory.setItem(i, itemStack);
+        String[] lines = new String[(int) Math.ceil((double) lore.length() / lineLength)];
+        int lineNumber = 0;
+
+        while (!lore.trim().isEmpty()) {
+            if (lines[lineNumber] == null) {
+                lines[lineNumber] = "";
+            }
+            int wordEnd = lore.contains(" ") ? lore.indexOf(" ") + 1 : lore.length();
+            String word = lore.substring(0, wordEnd);
+            lore = lore.substring(wordEnd);
+            lines[lineNumber] += word;
+            if (lines[lineNumber].length() > lineLength) {
+                lineNumber++;
             }
         }
+
+        // Clearing lines that are empty and making them all gray
+        return Arrays.stream(lines)
+                .filter(Objects::nonNull)
+                .filter(s -> !s.isEmpty())
+                .map(line -> Component.text(line.trim(), NamedTextColor.GRAY).asComponent())
+                .toList();
     }
+
 
 }

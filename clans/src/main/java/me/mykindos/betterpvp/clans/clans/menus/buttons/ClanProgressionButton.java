@@ -3,32 +3,30 @@ package me.mykindos.betterpvp.clans.clans.menus.buttons;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.menus.ClanMenu;
 import me.mykindos.betterpvp.clans.clans.menus.PerkMenu;
-import me.mykindos.betterpvp.core.gamer.Gamer;
-import me.mykindos.betterpvp.core.menu.Button;
-import me.mykindos.betterpvp.core.menu.MenuManager;
-import me.mykindos.betterpvp.core.utilities.UtilItem;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
+import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
+import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.jetbrains.annotations.NotNull;
+import xyz.xenondevs.invui.item.ItemProvider;
+import xyz.xenondevs.invui.item.impl.controlitem.ControlItem;
 
-import java.util.List;
+public class ClanProgressionButton extends ControlItem<ClanMenu> {
 
-public class ClanProgressionButton extends Button {
     private final Clan clan;
+    private final ItemProvider itemProvider;
 
-    public ClanProgressionButton(int slot, Clan clan) {
-        super(slot, new ItemStack(Material.CAMPFIRE));
+    public ClanProgressionButton(Clan clan) {
         this.clan = clan;
-        this.name = Component.text("Clan Level", NamedTextColor.BLUE).decoration(TextDecoration.ITALIC,false);
 
         final long currentLevel = clan.getLevel();
         final long currentBaseExperience = Clan.getExperienceForLevel(currentLevel);
@@ -48,27 +46,25 @@ public class ClanProgressionButton extends Button {
                 .appendSpace()
                 .append(Component.text(String.format("(%,d%%)", (int) (progress * 100)), TextColor.color(222, 222, 222)));
 
-        this.lore = List.of(
-                UtilMessage.DIVIDER,
-                Component.empty(),
-                progressBarFinal,
-                Component.empty(),
-                UtilMessage.deserialize("<gray>Level: <white>%s", currentLevel).decoration(TextDecoration.ITALIC, false),
-                UtilMessage.deserialize("<gray>Progress: <white>%,d/%,d XP", experienceHave, experienceNeeded).decoration(TextDecoration.ITALIC, false),
-                Component.empty(),
-                UtilMessage.DIVIDER,
-                Component.empty(),
-                UtilMessage.deserialize("<white><bold>Click to</bold> <yellow>View Perks").decoration(TextDecoration.ITALIC, false)
-        );
-
-        this.itemStack = UtilItem.removeAttributes(UtilItem.setItemNameAndLore(itemStack, name, lore)).clone();
+        this.itemProvider = ItemView.builder().material(Material.BEACON)
+                .displayName(Component.text("Clan Level", NamedTextColor.BLUE))
+                .lore(progressBarFinal)
+                .lore(Component.empty())
+                .lore(Component.text("Level: ", NamedTextColor.GRAY).append(Component.text(currentLevel, NamedTextColor.YELLOW)))
+                .lore(Component.text("Progress: ", NamedTextColor.GRAY).append(Component.text(String.format("%,d/%,d XP", experienceHave, experienceNeeded), NamedTextColor.YELLOW)))
+                .frameLore(true)
+                .action(ClickActions.ALL, Component.text("View Perks"))
+                .build();
     }
 
     @Override
-    public void onClick(Player player, Gamer gamer, ClickType clickType) {
-        if (clickType.isLeftClick()) {
-            MenuManager.openMenu(player, new PerkMenu(player, clan, new ClanMenu(player, clan, clan)));
-            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 2f, 2f);
-        }
+    public ItemProvider getItemProvider(ClanMenu gui) {
+        return itemProvider;
+    }
+
+    @Override
+    public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
+        new PerkMenu(clan, getGui()).show(player);
+        SoundEffect.HIGH_PITCH_PLING.play(player);
     }
 }

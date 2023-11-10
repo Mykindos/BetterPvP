@@ -1,11 +1,10 @@
 package me.mykindos.betterpvp.clans.clans.leveling.perk;
 
 import me.mykindos.betterpvp.clans.clans.leveling.ClanPerk;
-import me.mykindos.betterpvp.core.utilities.model.ItemView;
+import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
 
 public class DummyPerk implements ClanPerk {
     @Override
@@ -26,7 +25,7 @@ public class DummyPerk implements ClanPerk {
     }
 
     @Override
-    public ItemStack getIcon() {
-        return ItemView.builder().material(Material.STICK).build().toItemStack();
+    public ItemView getIcon() {
+        return ItemView.builder().material(Material.STICK).build();
     }
 }

@@ -1,6 +1,6 @@
 package me.mykindos.betterpvp.clans.fields.commands.subcommands;
 
-import com.google.common.collect.HashMultimap;
+import com.google.common.collect.SetMultimap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
@@ -40,7 +40,7 @@ public class FieldsInfoSubCommand extends Command {
     @Override
     public void execute(Player player, Client client, String... args) {
         final Set<FieldsInteractable> types = fields.getBlockTypes();
-        final HashMultimap<FieldsInteractable, FieldsBlock> blocks = fields.getBlocks();
+        final SetMultimap<FieldsInteractable, FieldsBlock> blocks = fields.getBlocks();
         final long activeOres = blocks.values().stream().filter(FieldsBlock::isActive).count();
         final long inactiveOres = blocks.values().size() - activeOres;
         final double modifier = fields.getSpeedBuff();

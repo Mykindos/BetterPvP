@@ -1,77 +1,61 @@
 package me.mykindos.betterpvp.champions.champions.builds.menus;
 
+import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
-import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.champions.champions.builds.menus.buttons.ApplyBuildButton;
 import me.mykindos.betterpvp.champions.champions.builds.menus.buttons.DeleteBuildButton;
 import me.mykindos.betterpvp.champions.champions.builds.menus.buttons.EditBuildButton;
 import me.mykindos.betterpvp.champions.champions.skills.SkillManager;
 import me.mykindos.betterpvp.core.components.champions.Role;
-import me.mykindos.betterpvp.core.menu.Button;
 import me.mykindos.betterpvp.core.menu.Menu;
-import me.mykindos.betterpvp.core.menu.buttons.BackButton;
-import me.mykindos.betterpvp.core.menu.interfaces.IRefreshingMenu;
-import me.mykindos.betterpvp.core.utilities.UtilItem;
+import me.mykindos.betterpvp.core.menu.Windowed;
+import me.mykindos.betterpvp.core.menu.button.BackButton;
+import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.ItemFlag;
 import org.jetbrains.annotations.NotNull;
+import xyz.xenondevs.invui.gui.AbstractGui;
+import xyz.xenondevs.invui.item.impl.SimpleItem;
 
-public class BuildMenu extends Menu implements IRefreshingMenu {
+public class BuildMenu extends AbstractGui implements Windowed {
 
-    private final GamerBuilds builds;
     private final Role role;
-    private final SkillManager skillManager;
 
-    public BuildMenu(Player player, GamerBuilds builds, Role role, SkillManager skillManager) {
-        super(player, 45, Component.text(role.getName() + " Builds"));
-        this.builds = builds;
+    public BuildMenu(GamerBuilds builds, Role role, BuildManager buildManager, SkillManager skillManager, Windowed previous) {
+        super(9, 5);
         this.role = role;
-        this.skillManager = skillManager;
-        refresh();
-    }
 
-    @Override
-    public void refresh() {
-        addButton(new BackButton(0, new ItemStack(Material.ARROW), new ClassSelectionMenu(player, builds, skillManager)));
-        addButton(new Button(9, new ItemStack(role.getHelmet()), Component.text(role.getName() + " Helmet", role.getColor(), TextDecoration.BOLD)));
-        addButton(new Button(18, new ItemStack(role.getChestplate()), Component.text(role.getName() + " Chestplate", role.getColor(), TextDecoration.BOLD)));
-        addButton(new Button(27, new ItemStack(role.getLeggings()), Component.text(role.getName() + " Leggings", role.getColor(), TextDecoration.BOLD)));
-        addButton(new Button(36, new ItemStack(role.getBoots()), Component.text(role.getName() + " Boots", role.getColor(), TextDecoration.BOLD)));
-
+        setItem(0, new BackButton(previous));
+        setItem(9, new SimpleItem(getItemView(role.getHelmet(), role, " Helmet")));
+        setItem(18, new SimpleItem(getItemView(role.getChestplate(), role, " Chestplate")));
+        setItem(27, new SimpleItem(getItemView(role.getLeggings(), role, " Leggings")));
+        setItem(36, new SimpleItem(getItemView(role.getBoots(), role, " Boots")));
         int slot = 11;
-        for (int i = 1; i < 5; i++) {
-            RoleBuild activeBuild = builds.getActiveBuilds().get(role.getName());
-            final boolean selected = activeBuild.getId() == i;
-            Component buildName = Component.text("Build " + i, NamedTextColor.GRAY);
-            if (selected) {
-                buildName = Component.text("\u00BB Build " + i + " \u00AB", NamedTextColor.GREEN);
-            }
-            addButton(new ApplyBuildButton(builds, role, i, slot, getApplyBuildItem(i, selected), buildName));
-            addButton(new EditBuildButton(builds, role, i, skillManager, slot + 9));
-            addButton(new DeleteBuildButton(builds, role, i, slot + 18));
+        for (int build = 1; build < 5; build++) {
+
+            setItem(slot, new ApplyBuildButton(builds, role, build));
+            setItem(slot + 9, new EditBuildButton(builds, role, build, buildManager, skillManager, this));
+            setItem(slot + 18, new DeleteBuildButton(builds, role, build));
 
             slot += 2;
         }
 
-        fillEmpty(Menu.BACKGROUND);
+        setBackground(Menu.BACKGROUND_ITEM);
+    }
+
+    private static ItemView getItemView(Material material, Role role, String name) {
+        return ItemView.builder()
+                .material(material)
+                .displayName(Component.text(role.getName() + name, role.getColor(), TextDecoration.BOLD))
+                .flag(ItemFlag.HIDE_ATTRIBUTES)
+                .build();
     }
 
     @NotNull
-    private ItemStack getApplyBuildItem(int id, boolean addGlow) {
-
-        ItemStack itemStack;
-        switch (id) {
-            case 1 -> itemStack = new ItemStack(Material.RED_DYE, 1);
-            case 2 -> itemStack = new ItemStack(Material.ORANGE_DYE, 1);
-            case 3 -> itemStack = new ItemStack(Material.YELLOW_DYE, 1);
-            case 4 -> itemStack = new ItemStack(Material.LIME_DYE, 1);
-            default -> throw new IllegalStateException("Unexpected value: " + id);
-        }
-
-        return addGlow ? UtilItem.addGlow(itemStack) : itemStack;
+    @Override
+    public Component getTitle() {
+        return Component.text(role.getName() + " Builds");
     }
 }

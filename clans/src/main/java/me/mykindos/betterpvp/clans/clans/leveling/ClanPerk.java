@@ -1,8 +1,8 @@
 package me.mykindos.betterpvp.clans.clans.leveling;
 
 import me.mykindos.betterpvp.clans.clans.Clan;
+import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
-import org.bukkit.inventory.ItemStack;
 
 public interface ClanPerk {
 
@@ -28,7 +28,7 @@ public interface ClanPerk {
      * Get the icon of the perk
      * @return The icon of the perk in menus
      */
-    ItemStack getIcon();
+    ItemView getIcon();
 
     /**
      * Check if the clan has the perk

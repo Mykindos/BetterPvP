@@ -1,31 +1,40 @@
 package me.mykindos.betterpvp.champions.champions.builds.menus;
 
-import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
 import me.mykindos.betterpvp.champions.champions.builds.menus.buttons.ClassSelectionButton;
 import me.mykindos.betterpvp.champions.champions.skills.SkillManager;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.menu.Menu;
+import me.mykindos.betterpvp.core.menu.Windowed;
 import net.kyori.adventure.text.Component;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import xyz.xenondevs.invui.gui.AbstractGui;
 
 import java.util.Arrays;
 import java.util.Iterator;
 
-public class ClassSelectionMenu extends Menu {
-    public ClassSelectionMenu(Player player, GamerBuilds builds, SkillManager skillManager) {
-        super(player, 27, Component.text("Pick a Kit"));
-        load(builds, skillManager);
-    }
+@Singleton
+public class ClassSelectionMenu extends AbstractGui implements Windowed {
 
-    private void load(GamerBuilds builds, SkillManager skillManager) {
+    @Inject
+    public ClassSelectionMenu(BuildManager buildManager, SkillManager skillManager) {
+        super(9, 3);
+
         int[] slots = new int[] {10, 11, 12, 14, 15, 16};
         final Iterator<Role> iterator = Arrays.stream(Role.values()).iterator();
         for (int slot : slots) {
             final Role role = iterator.next();
-            addButton(new ClassSelectionButton(builds, role, skillManager, slot, new ItemStack(role.getChestplate())));
+            setItem(slot, new ClassSelectionButton(buildManager, skillManager, role, this));
         }
 
-        fillEmpty(Menu.BACKGROUND);
+        setBackground(Menu.BACKGROUND_ITEM);
+    }
+
+    @NotNull
+    @Override
+    public Component getTitle() {
+        return Component.text("Pick a Kit");
     }
 }

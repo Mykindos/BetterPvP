@@ -1,26 +1,26 @@
 package me.mykindos.betterpvp.champions.champions.commands.menu;
 
 import me.mykindos.betterpvp.core.components.champions.Role;
-import me.mykindos.betterpvp.core.gamer.Gamer;
-import me.mykindos.betterpvp.core.menu.Button;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
+import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import xyz.xenondevs.invui.item.impl.SimpleItem;
 
-public class KitButton extends Button {
+public class KitButton extends SimpleItem {
 
     private final Role role;
-    public KitButton(int slot, ItemStack item, String name, Role role) {
-        super(slot, item, Component.text(name, NamedTextColor.GREEN));
 
+    public KitButton(ItemView item, Role role) {
+        super(item);
         this.role = role;
     }
 
     @Override
-    public void onClick(Player player, Gamer gamer, ClickType clickType) {
+    public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
         player.getInventory().clear();
         player.getInventory().setHelmet(new ItemStack(role.getHelmet()));
         player.getInventory().setChestplate(new ItemStack(role.getChestplate()));
@@ -38,4 +38,5 @@ public class KitButton extends Button {
 
         player.closeInventory();
     }
+
 }

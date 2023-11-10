@@ -5,30 +5,20 @@ import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.menus.ClanMenu;
 import me.mykindos.betterpvp.core.database.Database;
-import me.mykindos.betterpvp.core.menu.MenuManager;
-import me.mykindos.betterpvp.core.stats.Description;
 import me.mykindos.betterpvp.core.stats.Leaderboard;
 import me.mykindos.betterpvp.core.stats.SearchOptions;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardEntry;
 import me.mykindos.betterpvp.core.stats.sort.SortType;
 import me.mykindos.betterpvp.core.stats.sort.Sorted;
+import me.mykindos.betterpvp.core.utilities.model.description.Description;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -68,10 +58,11 @@ public class ClanLeaderboard extends Leaderboard<UUID, Clan> implements Sorted {
         final ItemStack banner = clan.getBanner().clone();
         banner.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS, ItemFlag.HIDE_ATTRIBUTES);
         builder.icon(banner);
-        builder.line("Clan", Component.text(clan.getName()));
-        builder.clickFunction(player -> {
+        builder.property("Clan", Component.text(clan.getName()));
+        builder.clickFunction(click -> {
+            final Player player = click.getPlayer();
             final Clan selfClan = clanManager.getClanByPlayer(player).orElse(null);
-            MenuManager.openMenu(player, new ClanMenu(player, selfClan, clan));
+            new ClanMenu(player, selfClan, clan).show(player);
         });
 
         final List<ClanSort> types = new ArrayList<>(Arrays.stream(ClanSort.values()).toList());
@@ -84,7 +75,7 @@ public class ClanLeaderboard extends Leaderboard<UUID, Clan> implements Sorted {
             final NamedTextColor color = sort == selected ? NamedTextColor.GREEN : NamedTextColor.GRAY;
             map.put(sort.getName(), Component.text(text, color));
         }
-        return builder.lines(map).build();
+        return builder.properties(map).build();
     }
 
     @Override
