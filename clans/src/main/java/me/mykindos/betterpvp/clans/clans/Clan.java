@@ -18,11 +18,11 @@ import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.utilities.model.item.banner.BannerColor;
+import me.mykindos.betterpvp.core.utilities.model.item.banner.BannerWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -51,7 +51,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
     private boolean admin;
     private boolean safe;
     private boolean online;
-    private ItemStack banner = new ItemStack(Material.WHITE_BANNER);
+    private BannerWrapper banner = BannerWrapper.builder().baseColor(BannerColor.WHITE).build();
 
     private List<ClanMember> members = new ArrayList<>();
     private List<ClanAlliance> alliances = new ArrayList<>();

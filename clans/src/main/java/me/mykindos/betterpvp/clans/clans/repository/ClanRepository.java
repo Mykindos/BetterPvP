@@ -24,11 +24,16 @@ import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
 import me.mykindos.betterpvp.core.database.repository.IRepository;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
+import me.mykindos.betterpvp.core.utilities.model.item.banner.BannerColor;
+import me.mykindos.betterpvp.core.utilities.model.item.banner.BannerWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.banner.Pattern;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BannerMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import javax.sql.rowset.CachedRowSet;
 import java.sql.SQLException;
@@ -80,7 +85,12 @@ public class ClanRepository implements IRepository<Clan> {
                 clan.setSafe(safe);
 
                 if(banner != null && !banner.isEmpty()) {
-                    clan.setBanner(ItemStack.deserializeBytes(Base64.getDecoder().decode(banner)));
+                    final ItemStack bannerItem = ItemStack.deserializeBytes(Base64.getDecoder().decode(banner));
+                    final ItemMeta meta = bannerItem.getItemMeta();
+                    final BannerMeta bannerMeta = (BannerMeta) meta;
+                    final BannerColor color = BannerColor.fromType(bannerItem.getType());
+                    final List<Pattern> patterns = bannerMeta.getPatterns();
+                    clan.setBanner(BannerWrapper.builder().baseColor(color).patterns(patterns).build());
                 }
 
                 clan.putProperty(ClanProperty.TNT_PROTECTION, 0L);
@@ -190,7 +200,7 @@ public class ClanRepository implements IRepository<Clan> {
     public void updateClanBanner(Clan clan) {
         String query = "UPDATE " + databasePrefix + "clans SET Banner = ? WHERE id = ?;";
         database.executeUpdateAsync(new Statement(query,
-                new StringStatementValue(Base64.getEncoder().encodeToString(clan.getBanner().serializeAsBytes())),
+                new StringStatementValue(Base64.getEncoder().encodeToString(clan.getBanner().get().serializeAsBytes())),
                 new UuidStatementValue(clan.getId())));
     }
 

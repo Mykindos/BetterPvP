@@ -26,7 +26,7 @@ public class ViewClanButton extends SimpleItem {
     }
 
     public ViewClanButton(@NotNull Clan viewerClan, @NotNull Clan clan, @NotNull List<Component> extraLore) {
-        super(ItemView.of(clan.getBanner()).toBuilder()
+        super(ItemView.of(clan.getBanner().get()).toBuilder()
                 .displayName(Component.text(clan.getName(), NamedTextColor.GREEN))
                 .lore(new ArrayList<>(extraLore))
                 .lore(UtilMessage.deserialize("<gray><white>%,d</white>/<white>%,d</white> Online", clan.getOnlineMemberCount(), clan.getMembers().size()))
