@@ -147,7 +147,7 @@ public class SmokeBomb extends Skill implements ToggleSkill, CooldownSkill, List
                 "",
                 "Instantly <effect>Vanish</effect> before your foes",
                 "for a maximum of <val>" + getDuration(level) + "</val> seconds,",
-                "inflicting <effect>Blindness II</effect> to enemies",
+                "inflicting <effect>Blindness</effect> to enemies",
                 "within <stat>" + blindRadius + "</stat> blocks for <stat>" + blindDuration + "</stat> seconds",
                 "",
                 "Hitting an enemy or using abilities",
@@ -194,7 +194,7 @@ public class SmokeBomb extends Skill implements ToggleSkill, CooldownSkill, List
         Particle.EXPLOSION_HUGE.builder().location(player.getLocation()).receivers(30).spawn();
 
         for (Player target : UtilPlayer.getNearbyEnemies(player, player.getLocation(), blindRadius)) {
-            target.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, (int) (blindDuration * 20), 1));
+            target.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, (int) (blindDuration * 20), 0));
         }
 
         UtilServer.callEvent(new EffectClearEvent(player));

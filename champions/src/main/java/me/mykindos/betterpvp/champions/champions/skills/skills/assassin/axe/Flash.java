@@ -107,7 +107,7 @@ public class Flash extends Skill implements InteractSkill, Listener {
         baseMaxCharges = getConfig("baseMaxCharges", 1, Integer.class);
         chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 1, Integer.class);
         baseRechargeSeconds = getConfig("baseRechargeSeconds", 4.0, Double.class);
-        rechargeReductionPerLevel = getConfig("baseRechargeSeconds", 0.0, Double.class);
+        rechargeReductionPerLevel = getConfig("rechargeReductionPerLevel", 0.0, Double.class);
         teleportDistance = getConfig("teleportDistance", 5.0, Double.class);
     }
 
