@@ -523,4 +523,22 @@ public class ClanManager extends Manager<Clan> {
         }
         return false;
     }
+
+    public boolean isFields(Location location) {
+        Optional<Clan> clan = getClanByLocation(location);
+        return clan.filter(this::isFields).isPresent();
+    }
+
+    public boolean isFields(Clan clan) {
+        return (clan.getName().equalsIgnoreCase("Fields"));
+    }
+
+    public boolean isLake(Location location) {
+        Optional<Clan> clan = getClanByLocation(location);
+        return clan.filter(this::isLake).isPresent();
+    }
+
+    public boolean isLake(Clan clan) {
+        return (clan.getName().equalsIgnoreCase("Lake"));
+    }
 }
