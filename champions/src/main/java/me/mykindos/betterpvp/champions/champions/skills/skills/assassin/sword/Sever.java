@@ -29,6 +29,10 @@ public class Sever extends PrepareSkill implements CooldownSkill, Listener {
 
     private double damagePerSecond;
 
+    private double baseDuration;
+
+    private double durationIncreasePerLevel;
+
     @Inject
     public Sever(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -45,11 +49,15 @@ public class Sever extends PrepareSkill implements CooldownSkill, Listener {
         return new String[]{
                 "Right click with a Sword to prepare",
                 "",
-                "Your next hit applies a <val>" + (level) + "</val> second <effect>Bleed</effect>",
+                "Your next hit applies a <val>" + getDuration(level) + "</val> second <effect>Bleed</effect>",
                 "dealing <stat>1</stat> heart per second",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
+    }
+
+    public double getDuration(int level) {
+        return baseDuration + (level * durationIncreasePerLevel);
     }
 
     @Override
@@ -96,7 +104,7 @@ public class Sever extends PrepareSkill implements CooldownSkill, Listener {
 
             @Override
             public void run() {
-                if (count >= (level) || damagee == null || damager == null || damagee.getHealth() <= 0) {
+                if (count >= getDuration(level) || damagee == null || damager == null || damagee.getHealth() <= 0) {
                     this.cancel();
                 } else {
                     if (championsManager.getCooldowns().use(damagee, "Sever-Damage", 0.75, false)) {
@@ -114,7 +122,8 @@ public class Sever extends PrepareSkill implements CooldownSkill, Listener {
     @Override
     public void loadSkillConfig() {
         damagePerSecond = getConfig("damagePerSecond", 2.0, Double.class);
-
+        baseDuration = getConfig("baseDuration", 0.0, Double.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
     }
 
 
