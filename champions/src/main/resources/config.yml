@@ -644,13 +644,13 @@ skills:
       enabled: true
       energy: 15
       maxlevel: 5
-      cooldown: 0
+      cooldown: 0.5
       canUseWhileSlowed: true
       canUseWhileSilenced: false
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
-      cooldownDecreasePerLevel: 1.0
+      cooldownDecreasePerLevel: 0.0
     intimidation:
       enabled: true
       maxlevel: 3

@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.champions.champions.skills.skills.gladiator.passives;
+package me.mykindos.betterpvp.champions.champions.skills.skills.brute.passives;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilLocation;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
@@ -29,10 +30,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 @BPvPListener
 public class Intimidation extends Skill implements PassiveSkill {
 
-    private static final int DURATION_TICKS = 10;
-    private static final PotionEffect SLOWNESS = new PotionEffect(PotionEffectType.SLOW, DURATION_TICKS, 0, false, false);
+    private int radius;
+    private int slownessStrength;
 
-    private double baseRadius;
+
+
     private final AtomicInteger soundTicks = new AtomicInteger(0);
     private final WeakHashMap<Player, Set<Player>> trackedEnemies = new WeakHashMap<>();
 
@@ -50,7 +52,7 @@ public class Intimidation extends Skill implements PassiveSkill {
     public String[] getDescription(int level) {
         return new String[]{
                 "Every enemy facing away from you within <val>" + getRadius(level) + "</val>",
-                "blocks will get <effect>Slowness 1",
+                "blocks will get <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength + 1),
         };
     }
 
@@ -68,11 +70,11 @@ public class Intimidation extends Skill implements PassiveSkill {
         trackedEnemies.remove(player);
     }
 
-    public double getRadius(int level) {
-        return baseRadius + (level - 1);
+    public int getRadius(int level) {
+        return radius + (level - 1);
     }
 
-    @UpdateEvent
+
     public void onUpdate() {
         final boolean sounds = soundTicks.get() == 0;
         final Iterator<Player> iterator = trackedEnemies.keySet().iterator();
@@ -115,7 +117,7 @@ public class Intimidation extends Skill implements PassiveSkill {
                 if (sounds) {
                     UtilSound.playSound(enemy, Sound.ENTITY_WARDEN_HEARTBEAT, 1f, 1f, true);
                 }
-                enemy.addPotionEffect(SLOWNESS);
+                enemy.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 10, 0));
             } else if (trackedEnemies.get(player).remove(enemy)) {
                 UtilPlayer.clearWarningEffect(enemy); // Clear them if they are no longer in front
             }
@@ -134,6 +136,7 @@ public class Intimidation extends Skill implements PassiveSkill {
 
     @Override
     public void loadSkillConfig() {
-        baseRadius = getConfig("baseRadius", 3.0, Double.class);
+        radius = getConfig("radius", 3, Integer.class);
+        slownessStrength = getConfig("slownessStrength", 0, Integer.class);
     }
 }
