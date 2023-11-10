@@ -146,7 +146,7 @@ public class FieldsListener extends ClanListener {
         }).put(block, blockType);
     }
 
-    @UpdateEvent(delay = 100)
+    @UpdateEvent(delay = 5_000)
     public void respawnOres() {
         final double modifier = fields.getSpeedBuff();
         fields.getBlocks().entries()

@@ -148,8 +148,8 @@ public class Fields {
      *
      * @return An unmodifiable collection of blocks
      */
-    public HashMultimap<FieldsInteractable, FieldsBlock> getBlocks() {
-        return HashMultimap.create(blocks);
+    public SetMultimap<FieldsInteractable, FieldsBlock> getBlocks() {
+        return blocks;
     }
 
     public Optional<FieldsInteractable> getTypeFromBlock(Block block) {

@@ -6,12 +6,12 @@ import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
 import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
-import me.mykindos.betterpvp.clans.clans.events.ClanDisbandEvent;
 import me.mykindos.betterpvp.clans.clans.events.MemberLeaveClanEvent;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
+import me.mykindos.betterpvp.core.menu.impl.ConfirmationMenu;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
@@ -61,7 +61,7 @@ public class LeaveSubCommand extends ClanSubCommand {
                         UtilMessage.message(player, "Clans", "You must pass on <alt>Leadership</alt> before leaving.");
                         return;
                     } else if (clan.getMembers().size() == 1) {
-                        UtilServer.callEvent(new ClanDisbandEvent(player, clan));
+                        player.chat("/clan disband");
                         return;
                     }
                 }
@@ -74,7 +74,10 @@ public class LeaveSubCommand extends ClanSubCommand {
             return;
         }
 
-        UtilServer.callEvent(new MemberLeaveClanEvent(player, clan));
-
+        new ConfirmationMenu("Are you sure you want to leave your clan?", success -> {
+            if (success) {
+                UtilServer.callEvent(new MemberLeaveClanEvent(player, clan));
+            }
+        }).show(player);
     }
 }

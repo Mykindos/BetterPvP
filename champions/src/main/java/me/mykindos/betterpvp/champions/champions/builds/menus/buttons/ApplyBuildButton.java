@@ -2,45 +2,74 @@ package me.mykindos.betterpvp.champions.champions.builds.menus.buttons;
 
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
+import me.mykindos.betterpvp.champions.champions.builds.menus.BuildMenu;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.ApplyBuildEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
-import me.mykindos.betterpvp.core.gamer.Gamer;
-import me.mykindos.betterpvp.core.menu.Button;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Sound;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.jetbrains.annotations.NotNull;
+import xyz.xenondevs.invui.item.ItemProvider;
+import xyz.xenondevs.invui.item.impl.controlitem.ControlItem;
 
 import java.util.Optional;
 
-public class ApplyBuildButton extends Button {
+public class ApplyBuildButton extends ControlItem<BuildMenu> {
 
     private final GamerBuilds builds;
     private final Role role;
-    private final int buildNumber;
+    private final int build;
 
-    public ApplyBuildButton(GamerBuilds builds, Role role, int buildNumber, int slot, ItemStack item, Component name) {
-        super(slot, item, name);
+    public ApplyBuildButton(GamerBuilds builds, Role role, int build) {
         this.builds = builds;
         this.role = role;
-        this.buildNumber = buildNumber;
+        this.build = build;
     }
 
     @Override
-    public void onClick(Player player, Gamer gamer, ClickType clickType) {
-        Optional<RoleBuild> roleBuildOptional = builds.getBuild(role, buildNumber);
-        roleBuildOptional.ifPresent(build -> {
+    public ItemProvider getItemProvider(BuildMenu gui) {
+        Material type = switch (build) {
+            case 1 -> Material.RED_DYE;
+            case 2 -> Material.ORANGE_DYE;
+            case 3 -> Material.YELLOW_DYE;
+            case 4 -> Material.LIME_DYE;
+            default -> throw new IllegalStateException("Unexpected value: " + build);
+        };
+
+        boolean selected = builds.getActiveBuilds().get(role.getName()).getId() == build;
+        Component buildName = Component.text("Build " + build, NamedTextColor.GRAY);
+        if (selected) {
+            buildName = Component.text("\u00BB Build " + build + " \u00AB", NamedTextColor.GREEN);
+        }
+
+        if (selected) {
+            return ItemView.builder().displayName(buildName).material(type).glow(true).build();
+        }
+
+        return ItemView.builder().displayName(buildName).material(type).build();
+    }
+
+    @Override
+    public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
+        Optional<RoleBuild> roleBuildOptional = builds.getBuild(role, build);
+        roleBuildOptional.ifPresent(selected -> {
             RoleBuild activeBuild = builds.getActiveBuilds().get(role.getName());
             activeBuild.setActive(false);
 
-            build.setActive(true);
-            builds.getActiveBuilds().put(role.getName(), build);
+            selected.setActive(true);
+            builds.getActiveBuilds().put(role.getName(), selected);
 
-            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1.0F, 2.0F);
-            UtilServer.callEvent(new ApplyBuildEvent(player, builds, activeBuild, build));
-            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1.0F, 2.0F);
+            UtilServer.callEvent(new ApplyBuildEvent(player, builds, activeBuild, selected));
+            notifyWindows();
+            getGui().updateControlItems();
+
+            SoundEffect.HIGH_PITCH_PLING.play(player);
         });
     }
 }

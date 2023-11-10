@@ -11,13 +11,9 @@ import org.bukkit.profile.PlayerTextures;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Base64;
-import java.util.UUID;
 
 @Slf4j
 public class SkullBuilder {
-
-    // We use a static UUID so that the skull items will match and can stack
-    private static final UUID randomUUID = UUID.fromString("5a3dd181-90dd-4896-8985-3622c3caa9d9");
 
     private final ItemStack itemStack;
 

@@ -10,7 +10,6 @@ import me.mykindos.betterpvp.clans.clans.menus.ClanMenu;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
-import me.mykindos.betterpvp.core.menu.MenuManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.entity.Player;
 
@@ -55,11 +54,8 @@ public class InfoSubCommand extends ClanSubCommand {
         }
 
         Clan target = clanOptional.get();
-
-
         Clan playerClan = clanManager.getClanByPlayer(player).orElse(null);
-
-        MenuManager.openMenu(player, new ClanMenu(player, playerClan, target));
+        new ClanMenu(player, playerClan, target).show(player);
 
         //ClanRelation clanRelation = clanManager.getRelation(playerClan, target);
         //Component component = Component.text(target.getName() + " Information: ", clanRelation.getPrimary()).appendNewline()
