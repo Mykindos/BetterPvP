@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
-import me.mykindos.betterpvp.core.utilities.model.SkullBuilder;
+import me.mykindos.betterpvp.core.utilities.model.item.skull.SkullBuilder;
 import me.mykindos.betterpvp.progression.tree.fishing.model.BaitType;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
