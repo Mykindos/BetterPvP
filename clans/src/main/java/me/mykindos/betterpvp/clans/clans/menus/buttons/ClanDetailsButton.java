@@ -4,27 +4,40 @@ import lombok.Getter;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanProperty;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
+import me.mykindos.betterpvp.clans.clans.menus.BannerMenu;
+import me.mykindos.betterpvp.clans.clans.menus.ClanMenu;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.ItemFlag;
 import org.jetbrains.annotations.NotNull;
 import xyz.xenondevs.invui.item.ItemProvider;
-import xyz.xenondevs.invui.item.impl.AbstractItem;
+import xyz.xenondevs.invui.item.impl.controlitem.ControlItem;
 
 import java.util.Optional;
 
 @Getter
-public class ClanInformationButton extends AbstractItem {
+public class ClanDetailsButton extends ControlItem<ClanMenu> {
 
-    private final ItemProvider itemProvider;
+    private final Clan clan;
+    private final boolean admin;
+    private final ClanRelation viewerRelation;
 
-    public ClanInformationButton(Clan clan, ClanRelation viewerRelation) {
+    public ClanDetailsButton(boolean admin, Clan clan, ClanRelation viewerRelation) {
+        this.viewerRelation = viewerRelation;
+        this.clan = clan;
+        this.admin = admin;
+    }
+
+    @Override
+    public ItemProvider getItemProvider(ClanMenu gui) {
         final double netDominance = clan.getEnemies().stream().mapToDouble(ClanEnemy::getDominance).sum();
         String netDominanceText = String.format("%.1f%%", netDominance);
 
@@ -42,17 +55,27 @@ public class ClanInformationButton extends AbstractItem {
             tntProtectionCmpt = Component.text("No - Clan is online", NamedTextColor.RED);
         }
 
-        this.itemProvider = ItemView.of(clan.getBanner()).toBuilder()
+        final ItemView.ItemViewBuilder builder = ItemView.of(clan.getBanner().get()).toBuilder()
                 .frameLore(true)
+                .flag(ItemFlag.HIDE_ITEM_SPECIFICS)
                 .displayName(Component.text(clan.getName(), viewerRelation.getSecondary()))
                 .lore(Component.text("Net Dominance: ", NamedTextColor.GRAY).append(Component.text(netDominanceText, netDominance >= 0 ? NamedTextColor.GREEN : NamedTextColor.DARK_PURPLE)))
                 .lore(Component.text("TNT Protection: ", NamedTextColor.GRAY).append(tntProtectionCmpt))
-                .lore(UtilMessage.deserialize("<gray>Online: <white>%,d</white>/<white>%,d</white>", clan.getOnlineMemberCount(), clan.getMembers().size()))
-                .build();
+                .lore(UtilMessage.deserialize("<gray>Online: <white>%,d</white>/<white>%,d</white>", clan.getOnlineMemberCount(), clan.getMembers().size()));
+
+        if (admin) {
+            builder.action(ClickActions.ALL, Component.text("Edit Banner"));
+        }
+
+        return builder.build();
     }
 
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
-        // Ignored
+        if (!admin) {
+            return;
+        }
+
+        new BannerMenu(clan, getGui(), this::notifyWindows).show(player);
     }
 }

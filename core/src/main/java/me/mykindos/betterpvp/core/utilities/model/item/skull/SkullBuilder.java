@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.utilities.model;
+package me.mykindos.betterpvp.core.utilities.model.item.skull;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
 import lombok.extern.slf4j.Slf4j;
