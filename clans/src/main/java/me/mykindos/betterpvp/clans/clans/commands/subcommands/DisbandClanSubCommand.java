@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
+import me.mykindos.betterpvp.core.menu.impl.ConfirmationMenu;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
@@ -63,7 +64,11 @@ public class DisbandClanSubCommand extends ClanSubCommand {
                 return;
             }
 
-            Bukkit.getPluginManager().callEvent(new ClanDisbandEvent(player, clan));
+            new ConfirmationMenu("Are you sure you want to disband your clan?", success -> {
+                if (success) {
+                    Bukkit.getPluginManager().callEvent(new ClanDisbandEvent(player, clan));
+                }
+            }).show(player);
 
         } else {
             MDC.put("clanId", clan.getId() + "");

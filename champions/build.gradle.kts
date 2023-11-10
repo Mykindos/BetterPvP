@@ -27,6 +27,7 @@ repositories {
     maven { url = uri("https://repo.papermc.io/repository/maven-public/") }
     maven{ url = uri("https://repo.dmulloy2.net/repository/public/") }
     maven{ url = uri("https://repo.md-5.net/content/groups/public/") }
+    maven { url = uri("https://repo.xenondevs.xyz/releases") }
 }
 
 dependencies {
@@ -41,6 +42,7 @@ dependencies {
     compileOnly("org.projectlombok:lombok:1.18.26")
     compileOnly("com.comphenix.protocol:ProtocolLib:5.1.0")
     compileOnly("LibsDisguises:LibsDisguises:10.0.31")
+    compileOnly("xyz.xenondevs.invui:invui:1.23")
 
     annotationProcessor("org.projectlombok:lombok:1.18.26")
 

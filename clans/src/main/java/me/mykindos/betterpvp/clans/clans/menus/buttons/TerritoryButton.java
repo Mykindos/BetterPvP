@@ -1,57 +1,62 @@
 package me.mykindos.betterpvp.clans.clans.menus.buttons;
 
+import lombok.Getter;
 import me.mykindos.betterpvp.clans.clans.Clan;
-import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
-import me.mykindos.betterpvp.core.gamer.Gamer;
-import me.mykindos.betterpvp.core.menu.Button;
-import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.model.ItemView;
+import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
+import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemFlag;
+import org.jetbrains.annotations.NotNull;
+import xyz.xenondevs.invui.item.ItemProvider;
+import xyz.xenondevs.invui.item.impl.AbstractItem;
 
-import java.util.ArrayList;
+@Getter
+public class TerritoryButton extends AbstractItem {
 
-public class TerritoryButton extends Button {
+    private final boolean admin;
+    private final Clan clan;
 
-    private final boolean ownClan;
-    private final ClanMember.MemberRank rank; // to store the rank of the player in the clan
-
-    public TerritoryButton(int slot, Player player, Clan clan) {
-        super(slot, ItemView.builder().material(Material.PAPER).customModelData(3).fallbackMaterial(Material.CREEPER_BANNER_PATTERN).build().toItemStack());
-        ClanMember member = clan.getMemberByUUID(player.getUniqueId()).orElse(null);
-        this.ownClan = member != null;
-        this.rank = member != null ? member.getRank() : null;
-
-        this.itemStack.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS);
-        this.name = Component.text("Territory", NamedTextColor.DARK_GREEN).decoration(TextDecoration.ITALIC,false);
-        this.lore = new ArrayList<>();
-        lore.add(UtilMessage.deserialize("%d/%d claimed", clan.getTerritory().size(), Math.min(clan.getMembers().size() + 3, 9)));
-
-        if (ownClan && (rank == ClanMember.MemberRank.ADMIN || rank == ClanMember.MemberRank.LEADER)) {
-            lore.add(Component.text(""));
-            lore.add(Component.text("Left click to claim territory", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC,false));
-            lore.add(Component.text(""));
-            lore.add(Component.text("Right click to unclaim territory", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC,false));
-        }
-
-        this.itemStack = UtilItem.removeAttributes(UtilItem.setItemNameAndLore(itemStack, name, lore)).clone();
+    public TerritoryButton(boolean admin, Clan clan) {
+        this.admin = admin;
+        this.clan = clan;
     }
 
     @Override
-    public void onClick(Player player, Gamer gamer, ClickType clickType) {
-        if (!ownClan) return;
-        if (rank != ClanMember.MemberRank.ADMIN && rank != ClanMember.MemberRank.LEADER) return;
+    public ItemProvider getItemProvider() {
+        final ItemView.ItemViewBuilder builder = ItemView.builder()
+                .material(Material.CREEPER_BANNER_PATTERN)
+                .flag(ItemFlag.HIDE_ITEM_SPECIFICS)
+                .displayName(Component.text("Territory", NamedTextColor.DARK_GREEN))
+                .lore(UtilMessage.deserialize("<white>%d</white>/%d claimed", clan.getTerritory().size(), Math.min(clan.getMembers().size() + 3, 9)))
+                .frameLore(true);
 
-        if (clickType.isLeftClick()) {
-            player.chat("/clan claim");
-        } else if (clickType.isRightClick()) {
-            player.chat("/clan unclaim");
+        if (admin) {
+            builder.action(ClickActions.LEFT, Component.text("Claim Territory"));
+            builder.action(ClickActions.RIGHT, Component.text("Unclaim Territory"));
         }
+
+        return builder.build();
+    }
+
+    @Override
+    public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
+        if (!admin) {
+            return;
+        }
+
+        if (ClickActions.LEFT.accepts(clickType)) {
+            player.chat("/clan claim");
+            notifyWindows();
+        } else if (ClickActions.RIGHT.accepts(clickType)) {
+            player.chat("/clan unclaim");
+            notifyWindows();
+        }
+
     }
 }

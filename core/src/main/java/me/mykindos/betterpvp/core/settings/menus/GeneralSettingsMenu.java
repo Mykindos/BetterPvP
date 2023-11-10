@@ -1,44 +1,58 @@
 package me.mykindos.betterpvp.core.settings.menus;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.gamer.properties.GamerProperty;
-import me.mykindos.betterpvp.core.menu.interfaces.IRefreshingMenu;
 import me.mykindos.betterpvp.core.settings.menus.buttons.SettingsButton;
+import me.mykindos.betterpvp.core.utilities.model.description.Description;
+import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import xyz.xenondevs.invui.gui.AbstractGui;
 
-import java.util.Optional;
+@Singleton
+public class GeneralSettingsMenu extends AbstractGui implements SettingCategory {
 
-public class GeneralSettingsMenu extends SettingSubMenu implements IRefreshingMenu {
+    @Inject
+    public GeneralSettingsMenu(final Player player, final Gamer gamer) {
+        super(9, 1);
 
-    private final Gamer gamer;
+        final Description tipDescription = Description.builder().icon(lang -> {
+            final boolean tipSetting = (boolean) gamer.getProperty(GamerProperty.TIPS_ENABLED).orElse(false);
+            final NamedTextColor color = tipSetting ? NamedTextColor.GREEN : NamedTextColor.RED;
+            return ItemView.builder()
+                    .material(Material.WRITABLE_BOOK)
+                    .displayName(Component.text("Tips", color))
+                    .lore(Component.text("Whether to enable tips or not.", NamedTextColor.GRAY))
+                    .frameLore(true)
+                    .build()
+                    .get();
+        }).build();
 
-    public GeneralSettingsMenu(Player player, Gamer gamer) {
-        super(player, 9, Component.text("General Settings", NamedTextColor.BLACK).decorate(TextDecoration.BOLD));
-        this.gamer = gamer;
+        addItems(
+                new SettingsButton(gamer, GamerProperty.TIPS_ENABLED, tipDescription)
+        );
+    }
 
-        refresh();
+    @NotNull
+    @Override
+    public Component getTitle() {
+        return Component.text("General Settings");
     }
 
     @Override
-    public void refresh() {
-
-        Optional<Boolean> tipSettingOptional = gamer.getProperty(GamerProperty.TIPS_ENABLED);
-        tipSettingOptional.ifPresent(tipSetting -> {
-            addButton(new SettingsButton(gamer,
-                    GamerProperty.TIPS_ENABLED,
-                    0,
-                    new ItemStack(Material.WRITABLE_BOOK),
-                    Component.text("Tips", tipSetting ? NamedTextColor.GREEN : NamedTextColor.RED),
-                    Component.text("Whether to enable tips or not.", NamedTextColor.GRAY)));
-
-        });
-
+    public Description getDescription() {
+        return Description.builder()
+                .icon(ItemView.builder()
+                        .material(Material.REDSTONE_TORCH)
+                        .displayName(Component.text("General Settings", NamedTextColor.GREEN, TextDecoration.BOLD))
+                        .lore(Component.text("View your general settings", NamedTextColor.GRAY)).frameLore(true)
+                        .build())
+                .build();
     }
-
-
 }

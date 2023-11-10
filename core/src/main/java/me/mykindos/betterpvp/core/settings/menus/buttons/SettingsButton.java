@@ -2,40 +2,55 @@ package me.mykindos.betterpvp.core.settings.menus.buttons;
 
 import lombok.Getter;
 import me.mykindos.betterpvp.core.gamer.Gamer;
-import me.mykindos.betterpvp.core.menu.Button;
-import me.mykindos.betterpvp.core.utilities.UtilSound;
+import me.mykindos.betterpvp.core.menu.CooldownButton;
+import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import me.mykindos.betterpvp.core.utilities.model.description.Description;
+import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
+import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.jetbrains.annotations.NotNull;
+import xyz.xenondevs.invui.item.ItemProvider;
+import xyz.xenondevs.invui.item.impl.AbstractItem;
 
-public class SettingsButton extends Button {
+public class SettingsButton extends AbstractItem implements CooldownButton {
 
     @Getter
     protected final String setting;
-
+    @Getter
+    private final Description description;
     private final Gamer gamer;
 
-    public SettingsButton(Gamer gamer, Enum<?> setting, int slot, ItemStack item, Component name, Component... lore) {
-        super(slot, item, name, lore);
+    public SettingsButton(Gamer gamer, Enum<?> setting, Description description) {
         this.gamer = gamer;
+        this.description = description;
         this.setting = setting.name();
     }
 
     @Override
-    public void onClick(Player player, Gamer gamer, ClickType clickType) {
-        if(clickType == ClickType.LEFT) {
-            this.gamer.saveProperty(setting, true, true);
-        }else if(clickType == ClickType.RIGHT){
-            this.gamer.saveProperty(setting, false, true);
-        }
+    public ItemProvider getItemProvider() {
+        final boolean current = (boolean) this.gamer.getProperty(setting).orElse(false);
+        final String action = current ? "Disable" : "Enable";
 
-        UtilSound.playSound(player, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1, false);
+        ItemProvider icon = description.getIcon();
+        return ItemView.builder().with(icon.get())
+                    .action(ClickActions.ALL, Component.text(action))
+                    .build();
     }
 
     @Override
-    public double getClickCooldown() {
-        return 1;
+    public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
+        final boolean current = (boolean) this.gamer.getProperty(setting).orElse(false);
+        this.gamer.saveProperty(setting, !current, true);
+
+        notifyWindows();
+        SoundEffect.HIGH_PITCH_PLING.play(player);
+    }
+
+    @Override
+    public double getCooldown() {
+        return 0.2;
     }
 }

@@ -7,10 +7,10 @@ import me.mykindos.betterpvp.core.components.shops.ShopCurrency;
 import me.mykindos.betterpvp.core.components.shops.events.PlayerBuyItemEvent;
 import me.mykindos.betterpvp.core.components.shops.events.PlayerSellItemEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
+import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.menu.MenuManager;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -50,12 +50,14 @@ public class ShopListener implements Listener {
     private final ShopkeeperManager shopkeeperManager;
     private final ShopManager shopManager;
     private final ItemHandler itemHandler;
+    private final GamerManager gamerManager;
 
     @Inject
-    public ShopListener(ShopkeeperManager shopkeeperManager, ShopManager shopManager, ItemHandler itemHandler) {
+    public ShopListener(ShopkeeperManager shopkeeperManager, ShopManager shopManager, ItemHandler itemHandler, GamerManager gamerManager) {
         this.shopkeeperManager = shopkeeperManager;
         this.shopManager = shopManager;
         this.itemHandler = itemHandler;
+        this.gamerManager = gamerManager;
     }
 
     @EventHandler
@@ -69,9 +71,8 @@ public class ShopListener implements Listener {
             var shopkeeperItems = shopManager.getShopItems(shopkeeper.getShopkeeperName());
             if(shopkeeperItems == null || shopkeeperItems.isEmpty()) return;
 
-            var menu = new ShopMenu(event.getPlayer(), Component.text(shopkeeper.getShopkeeperName()),
-                    shopkeeperItems, itemHandler);
-            MenuManager.openMenu(event.getPlayer(), menu);
+            var menu = new ShopMenu(Component.text(shopkeeper.getShopkeeperName()), shopkeeperItems, itemHandler, gamerManager);
+            menu.show(event.getPlayer());
         });
     }
 

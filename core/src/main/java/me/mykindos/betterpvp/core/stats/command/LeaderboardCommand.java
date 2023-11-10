@@ -5,7 +5,6 @@ import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
-import me.mykindos.betterpvp.core.menu.MenuManager;
 import me.mykindos.betterpvp.core.stats.Leaderboard;
 import me.mykindos.betterpvp.core.stats.menu.LeaderboardMenu;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardManager;
@@ -56,7 +55,7 @@ public class LeaderboardCommand extends Command {
         }
 
         final Leaderboard<?, ?> leaderboard = leaderboardOpt.get();
-        MenuManager.openMenu(player, new LeaderboardMenu<>(player, leaderboard));
+        new LeaderboardMenu<>(player, leaderboard).show(player);
     }
 
     @Override
