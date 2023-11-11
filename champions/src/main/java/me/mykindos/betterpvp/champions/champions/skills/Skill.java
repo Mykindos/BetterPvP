@@ -112,7 +112,7 @@ public abstract class Skill implements ISkill {
         maxLevel = getConfig("maxlevel", 5, Integer.class);
 
         if (this instanceof CooldownSkill) {
-            cooldown = getConfig("cooldown", 1.0, Integer.class);
+            cooldown = getConfig("cooldown", 1.0, Double.class);
             cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 1.0, Double.class);
         }
 
