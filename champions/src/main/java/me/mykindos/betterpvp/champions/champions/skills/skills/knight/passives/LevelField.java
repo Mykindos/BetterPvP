@@ -70,6 +70,8 @@ public class LevelField extends Skill implements ToggleSkill, CooldownSkill, Lis
                 "Deal: <val>" + (level * damageDealtPerPlayer) + "</val> more damage",
                 "Take: <val>" + (level * damageTakenPerPlayer) + "</val> less damage",
                 "",
+                "Drop weapon to lock in values for the next 5 seconds",
+                "",
                 "Maximum number of enemies: <stat>"+ maxEnemies,
         };
     }
