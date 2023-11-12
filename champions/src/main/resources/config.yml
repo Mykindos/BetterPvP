@@ -238,6 +238,7 @@ skills:
       canUseWhileLevitating: false
       canUseInLiquid: false
       cooldownDecreasePerLevel: 1.0
+      multiplierIncreasePerLevel: 0.2
     ride:
       enabled: false
       cooldown: 30
@@ -260,6 +261,8 @@ skills:
       canUseInLiquid: false
       slowDuration: 3.0
       cooldownDecreasePerLevel: 1.0
+      speedDuration: 3.0
+      slownessStrength: 2
     fortitude:
       enabled: true
       maxlevel: 3
@@ -269,6 +272,9 @@ skills:
       canUseWhileLevitating: false
       canUseInLiquid: false
       heal: 1.0
+      healRate: 1.0
+      baseHeal: 3.0
+      healIncreasePerLevel: 3.0
     vengeance:
       enabled: true
       maxlevel: 3
@@ -279,7 +285,7 @@ skills:
       canUseWhileLevitating: false
       canUseInLiquid: false
     levelfield:
-      enabled: true
+      enabled: false
       maxlevel: 3
       canUseWhileSlowed: true
       canUseWhileSilenced: false
@@ -297,6 +303,7 @@ skills:
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
+      distanceIncreasePerLevel: 1.0
     riposte:
       enabled: true
       maxlevel: 3
@@ -310,7 +317,7 @@ skills:
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
-      cooldownDecreasePerLevel: 1.0
+      cooldownDecreasePerLevel: 1.5
     holdposition:
       enabled: true
       maxlevel: 5
@@ -321,6 +328,9 @@ skills:
       canUseWhileLevitating: false
       canUseInLiquid: false
       cooldownDecreasePerLevel: 2.0
+      baseDuration: 5.0
+      slowDuration: 0.5
+      slownessStrength: 3
     swordsmanship:
       enabled: true
       maxlevel: 3
@@ -339,6 +349,8 @@ skills:
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
+      baseBonusDamage: 0.0
+      bonusDamageIncreasePerLevel: 0.5
     thorns:
       enabled: true
       maxlevel: 3
@@ -376,6 +388,9 @@ skills:
       canUseWhileLevitating: false
       canUseInLiquid: false
       cooldownDecreasePerLevel: 1.5
+      baseBonusDamage: 2.0
+      bonusDamageIncreasePerLevel: 0.75
+      minBonusDamage: 0.75
     deflection:
       enabled: true
       maxlevel: 3
@@ -386,6 +401,7 @@ skills:
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
+      baseCharges: 0
     hiltsmash:
       enabled: true
       maxlevel: 5
@@ -544,7 +560,7 @@ skills:
       canUseWhileLevitating: false
       canUseInLiquid: false
       duration: 10.0
-      cooldownDecreasePerLevel: 1.0
+      cooldownDecreasePerLevel: 2.0
     blizzard:
       enabled: true
       maxlevel: 5
@@ -651,6 +667,7 @@ skills:
       canUseWhileLevitating: false
       canUseInLiquid: false
       cooldownDecreasePerLevel: 0.0
+      radius: 2
     intimidation:
       enabled: true
       maxlevel: 3
@@ -660,6 +677,8 @@ skills:
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
+      radius: 3
+      slownessStrength: 0
     seismicslam:
       enabled: true
       maxlevel: 5
@@ -712,6 +731,9 @@ skills:
       canUseInLiquid: false
       damage: 10.0
       cooldownDecreasePerLevel: 1.0
+      baseDuration: 1.0
+      durationIncreasePerLevel: 1.0
+      slownessStrength: 3
     stampede:
       enabled: true
       maxlevel: 5
@@ -1149,6 +1171,8 @@ skills:
       canUseWhileLevitating: false
       canUseInLiquid: false
       damageReduction: 5.0
+      baseDamageReduction: 5.0
+      damageReductionIncreasePerLevel: 1.0
     fastrecovery:
       enabled: true
       maxlevel: 5
