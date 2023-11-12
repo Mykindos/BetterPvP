@@ -144,7 +144,7 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
         orb.setVelocity(player.getLocation().getDirection());
         orb.setCanPlayerPickup(false);
         orb.setCanMobPickup(false);
-        ThrowableItem throwableItem = new ThrowableItem(orb, player, "Lightning Orb", 5000, true, true);
+        ThrowableItem throwableItem = new ThrowableItem(orb, player, "Lightning Orb", 10000, true, true);
         championsManager.getThrowables().addThrowable(throwableItem);
     }
 
@@ -162,7 +162,7 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
         shockDurationIncreasePerLevel = getConfig("shockDurationIncreasePerLevel", 0.0, Double.class);
 
         baseDamage = getConfig("baseDamage", 11.0, Double.class);
-        damageIncreasePerLevel = getConfig("baseDamage", 0.0, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
     }
 
     @Override

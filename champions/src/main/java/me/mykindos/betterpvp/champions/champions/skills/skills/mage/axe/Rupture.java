@@ -12,11 +12,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.customtypes.CustomArmourStand;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilBlock;
-import me.mykindos.betterpvp.core.utilities.UtilDamage;
-import me.mykindos.betterpvp.core.utilities.UtilEntity;
-import me.mykindos.betterpvp.core.utilities.UtilMath;
-import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import me.mykindos.betterpvp.core.utilities.*;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -48,9 +44,15 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
     private final WeakHashMap<Player, ArrayList<LivingEntity>> cooldownJump = new WeakHashMap<>();
     private final WeakHashMap<ArmorStand, Long> stands = new WeakHashMap<>();
 
-    private double damage;
+    private double baseDamage;
 
-    private double slowDuration;
+    private double damageIncreasePerLevel;
+
+    private double baseSlowDuration;
+
+    private double slowDurationIncreasePerLevel;
+
+    private int slowStrength;
 
     @Inject
     public Rupture(Champions champions, ChampionsManager championsManager) {
@@ -69,12 +71,20 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
                 "Right click with an Axe to activate",
                 "",
                 "Rupture the earth in the direction",
-                "you are facing, dealing <stat>" + damage + "</stat> damage,",
-                "knocking up and giving <effect>Slowness III</effect> to enemies",
-                "hit for <stat>" + slowDuration + "</stat> seconds",
+                "you are facing, dealing <stat>" + getDamage(level) + "</stat> damage,",
+                "knocking up and giving <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength + 1) + "</effect> to enemies",
+                "hit for <stat>" + getSlowDuration(level) + "</stat> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
+    }
+
+    public double getDamage(int level) {
+        return baseDamage + level * damageIncreasePerLevel;
+    }
+
+    public double getSlowDuration(int level) {
+        return baseSlowDuration + level * slowDurationIncreasePerLevel;
     }
 
     @Override
@@ -165,8 +175,8 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
                         if (!cooldownJump.get(player).contains(ent)) {
 
                             UtilVelocity.velocity(ent, 0.5, 1, 2.0, false);
-                            ent.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) slowDuration * 20, 2));
-                            UtilDamage.doCustomDamage(new CustomDamageEvent(ent, player, null, DamageCause.CUSTOM, damage, false, getName()));
+                            ent.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) getSlowDuration(level) * 20, slowStrength));
+                            UtilDamage.doCustomDamage(new CustomDamageEvent(ent, player, null, DamageCause.CUSTOM, getDamage(level), false, getName()));
 
                             cooldownJump.get(player).add(ent);
                         }
@@ -199,7 +209,10 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
     }
 
     public void loadSkillConfig() {
-        damage = getConfig("damage", 8.0, Double.class);
-        slowDuration = getConfig("slowDuration", 1.5, Double.class);
+        baseDamage = getConfig("baseDamage", 8.0, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
+        baseSlowDuration = getConfig("baseSlowDuration", 1.5, Double.class);
+        slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.0, Double.class);
+        slowStrength = getConfig("slowStrength", 2, Integer.class);
     }
 }
