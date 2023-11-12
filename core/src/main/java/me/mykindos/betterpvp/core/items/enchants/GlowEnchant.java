@@ -72,6 +72,14 @@ public class GlowEnchant extends Enchantment {
     public boolean isDiscoverable() {
         return false;
     }
+    @Override
+    public int getMinModifiedCost(int level) {
+        return 0;
+    }
+    @Override
+    public int getMaxModifiedCost(int level) {
+        return 0;
+    }
 
     @Override
     public @NotNull EnchantmentRarity getRarity() {
