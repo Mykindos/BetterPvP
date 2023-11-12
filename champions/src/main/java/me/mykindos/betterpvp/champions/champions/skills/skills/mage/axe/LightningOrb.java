@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Item;
@@ -36,9 +37,22 @@ import org.bukkit.potion.PotionEffectType;
 public class LightningOrb extends Skill implements InteractSkill, CooldownSkill, Listener {
 
     private int maxTargets;
-    private double spreadDistance;
-    private double slowDuration;
-    private double shockDuration;
+    private double baseSpreadDistance;
+
+    private double spreadDistanceIncreasePerLevel;
+
+    private double baseSlowDuration;
+
+    private double slowDurationIncreasePerLevel;
+
+    private int slowStrength;
+    private double baseShockDuration;
+
+    private double shockDurationIncreasePerLevel;
+
+    private double baseDamage;
+
+    private double damageIncreasePerLevel;
 
     @Inject
     public LightningOrb(Champions champions, ChampionsManager championsManager) {
@@ -55,12 +69,28 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
 
         return new String[]{
                 "Launch an electric orb that upon directly hitting a player",
-                "will strike up to <stat>" + maxTargets + "</stat> targets within <val>" + (spreadDistance + (level * 0.5)) + "</val> blocks",
-                "with lightning, <effect>Shocking</effect> them for <stat>" + shockDuration + "</stat> seconds and",
-                "giving them <effect>Slowness II</effect> for <stat>" + slowDuration + "</stat> seconds",
+                "will strike up to <stat>" + maxTargets + "</stat> targets within <val>" + getSpreadDistance(level) + "</val> blocks",
+                "with lightning, dealing <stat>" + getDamage(level) + "</stat> damage, <effect>Shocking</effect> them for <stat>" + getShockDuration(level) + "</stat> seconds, and",
+                "giving them <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength + 1) + "</effect> for <stat>" + getSlowDuration(level) + "</stat> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
+    }
+    
+    public double getSpreadDistance(int level) {
+        return baseSpreadDistance + level * spreadDistanceIncreasePerLevel;
+    }
+
+    public double getSlowDuration(int level) {
+        return baseSlowDuration + level * slowDurationIncreasePerLevel;
+    }
+
+    public double getShockDuration(int level) {
+        return baseShockDuration + level * shockDurationIncreasePerLevel;
+    }
+
+    public double getDamage(int level) {
+        return baseDamage + level * damageIncreasePerLevel;
     }
 
     @Override
@@ -76,7 +106,7 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
     @Override
     public double getCooldown(int level) {
 
-        return cooldown - ((level * 2));
+        return cooldown - level * cooldownDecreasePerLevel;
     }
 
 
@@ -88,20 +118,20 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
         int level = getLevel(thrower);
         if (level > 0) {
             int count = 0;
-            for (LivingEntity ent : UtilEntity.getNearbyEnemies(thrower, event.getThrowable().getItem().getLocation(), spreadDistance + (0.5 * level))) {
+            for (LivingEntity ent : UtilEntity.getNearbyEnemies(thrower, event.getThrowable().getItem().getLocation(), getSpreadDistance(level))) {
 
                 if (count >= maxTargets) continue;
                 event.getThrowable().getImmunes().add(ent);
                 if (ent instanceof Player target) {
-                    championsManager.getEffects().addEffect(target, EffectType.SHOCK, (long) shockDuration * 1000);
+                    championsManager.getEffects().addEffect(target, EffectType.SHOCK, (long) (getShockDuration(level) * 1000));
                 }
 
-                ent.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) slowDuration * 20, 1));
+                ent.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) (getSlowDuration(level) * 20), slowStrength));
 
-                thrower.getLocation().getWorld().spigot().strikeLightning(ent.getLocation(), true);
-                UtilDamage.doCustomDamage(new CustomDamageEvent(ent, event.getThrowable().getThrower(), null, DamageCause.CUSTOM, 11, false, getName()));
+                thrower.getLocation().getWorld().strikeLightning(ent.getLocation());
+                UtilDamage.doCustomDamage(new CustomDamageEvent(ent, event.getThrowable().getThrower(), null, DamageCause.CUSTOM, getDamage(level), false, getName()));
 
-                ent.getWorld().playSound(ent.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1.0F, 1.0F);
+                //ent.getWorld().playSound(ent.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1.0F, 1.0F);
                 count++;
             }
         }
@@ -112,6 +142,8 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
     public void activate(Player player, int level) {
         Item orb = player.getWorld().dropItem(player.getEyeLocation().add(player.getLocation().getDirection()), new ItemStack(Material.DIAMOND_BLOCK));
         orb.setVelocity(player.getLocation().getDirection());
+        orb.setCanPlayerPickup(false);
+        orb.setCanMobPickup(false);
         ThrowableItem throwableItem = new ThrowableItem(orb, player, "Lightning Orb", 5000, true, true);
         championsManager.getThrowables().addThrowable(throwableItem);
     }
@@ -119,9 +151,18 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
     @Override
     public void loadSkillConfig() {
         maxTargets = getConfig("maxTarget", 3, Integer.class);
-        spreadDistance = getConfig("spreadDistance", 3.0, Double.class);
-        slowDuration = getConfig("slowDuration", 4.0, Double.class);
-        shockDuration = getConfig("shockDuration", 2.0, Double.class);
+        baseSpreadDistance = getConfig("spreadDistance", 3.0, Double.class);
+        spreadDistanceIncreasePerLevel = getConfig("spreadDistanceIncreasePerLevel", 0.5, Double.class);
+
+        baseSlowDuration = getConfig("slowDuration", 4.0, Double.class);
+        slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.0, Double.class);
+        slowStrength = getConfig("slowStrength", 1, Integer.class);
+
+        baseShockDuration = getConfig("shockDuration", 2.0, Double.class);
+        shockDurationIncreasePerLevel = getConfig("shockDurationIncreasePerLevel", 0.0, Double.class);
+
+        baseDamage = getConfig("baseDamage", 11.0, Double.class);
+        damageIncreasePerLevel = getConfig("baseDamage", 0.0, Double.class);
     }
 
     @Override

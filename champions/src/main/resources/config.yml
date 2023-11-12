@@ -502,7 +502,7 @@ skills:
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
-      cooldownDecreasePerLevel: 1.0
+      cooldownDecreasePerLevel: 2.0
     swarm:
       enabled: true
       maxlevel: 5

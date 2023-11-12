@@ -39,7 +39,13 @@ public class MoltenBlast extends Skill implements InteractSkill, CooldownSkill, 
 
     public final List<LargeFireball> fireballs = new ArrayList<>();
 
-    private double damage;
+    private double baseDamage;
+
+    private double damageIncreasePerLevel;
+
+    private double baseFireDuration;
+
+    private double fireDurationIncreasePerLevel;
 
     @Inject
     public MoltenBlast(Champions champions, ChampionsManager championsManager) {
@@ -59,11 +65,19 @@ public class MoltenBlast extends Skill implements InteractSkill, CooldownSkill, 
                 "Right click with an Axe to activate",
                 "",
                 "Shoot a large fireball that deals",
-                "<stat>" + damage + "</stat> area of effect damage, and igniting any players hit",
-                "for <val>" + (level * 0.5) + "</val> seconds",
+                "<stat>" + getDamage(level) + "</stat> area of effect damage, and igniting any players hit",
+                "for <val>" + getFireDuration(level) + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
+    }
+
+    public double getDamage(int level) {
+        return baseDamage + level * damageIncreasePerLevel;
+    }
+
+    public double getFireDuration(int level) {
+        return baseFireDuration + level * fireDurationIncreasePerLevel;
     }
 
     @Override
@@ -112,16 +126,16 @@ public class MoltenBlast extends Skill implements InteractSkill, CooldownSkill, 
 
 
     @EventHandler
-    public void onaDamage(CustomDamageEvent event) {
+    public void onDamage(CustomDamageEvent event) {
 
         if (event.getProjectile() != null) {
             Projectile fireball = event.getProjectile();
             if (fireball instanceof LargeFireball && fireball.getShooter() instanceof Player player) {
-
+                int level = getLevel(player);
                 event.setKnockback(true);
-                event.setDamage(damage);
+                event.setDamage(getDamage(level));
                 event.addReason(getName());
-                UtilServer.runTaskLater(champions, () -> event.getDamagee().setFireTicks((int) (20 * (0 + (getLevel(player) * 0.5)))), 2);
+                UtilServer.runTaskLater(champions, () -> event.getDamagee().setFireTicks((int) (20 * getFireDuration(level))), 2);
 
             }
         }
@@ -148,7 +162,7 @@ public class MoltenBlast extends Skill implements InteractSkill, CooldownSkill, 
     @Override
     public double getCooldown(int level) {
 
-        return cooldown - ((level - 1) * 2);
+        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
 
@@ -165,7 +179,10 @@ public class MoltenBlast extends Skill implements InteractSkill, CooldownSkill, 
     @Override
     public void loadSkillConfig(){
         speed = getConfig("speed", 2.0, Double.class);
-        damage = getConfig("damage", 6.0, Double.class);
+        baseDamage = getConfig("baseDamage", 6.0, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
+        baseFireDuration = getConfig("baseFireDuration", 0.0, Double.class);
+        fireDurationIncreasePerLevel = getConfig("baseFireDuration", 0.5, Double.class);
     }
 
     @Override
