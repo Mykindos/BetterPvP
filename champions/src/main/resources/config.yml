@@ -542,6 +542,7 @@ skills:
       slowStrength: 1
       shockDurationIncreasePerLevel: 0.0
       baseDamage: 11.0
+      damageIncreasePerLevel: 0.0
     swarm:
       enabled: true
       maxlevel: 5
@@ -566,7 +567,6 @@ skills:
       enabled: true
       maxlevel: 5
       energy: 9
-      minRadius: 2.0
       duration: 2.0
       canUseWhileSlowed: true
       canUseWhileSilenced: false
@@ -623,8 +623,6 @@ skills:
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
-      damageReduction: 5
-      energyReduction: 20
     nullblade:
       enabled: true
       maxlevel: 5
@@ -668,8 +666,6 @@ skills:
       enabled: true
       maxlevel: 5
       energy: 6
-      minRadius: 2
-      duration: 2.0
       canUseWhileSlowed: true
       canUseWhileSilenced: false
       canUseWhileStunned: false
@@ -696,8 +692,7 @@ skills:
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
-      duration: 2.0
-      cooldownDecreasePerLevel: 1.0
+      cooldownDecreasePerLevel: 2.0
   brute:
     battletaunt:
       enabled: true
