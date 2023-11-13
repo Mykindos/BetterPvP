@@ -25,6 +25,10 @@ import org.bukkit.util.Vector;
 @BPvPListener
 public class Volley extends PrepareArrowSkill {
 
+    public int baseNumArrows;
+
+    private int numArrowsIncreasePerLevel;
+
     @Inject
     public Volley(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -48,6 +52,10 @@ public class Volley extends PrepareArrowSkill {
         };
     }
 
+    public int getNumArrows(int level) {
+        return baseNumArrows + level * numArrowsIncreasePerLevel;
+    }
+
     @Override
     public Role getClassType() {
         return Role.RANGER;
@@ -66,7 +74,7 @@ public class Volley extends PrepareArrowSkill {
         Location location = player.getLocation();
         Vector vector;
 
-        for (int i = 0; i < 10; i += 2) {
+        for (int i = 0; i < getNumArrows(level); i += 2) {
             Arrow n = player.launchProjectile(Arrow.class);
             n.setShooter(player);
             location.setYaw(location.getYaw() + i);
@@ -75,7 +83,7 @@ public class Volley extends PrepareArrowSkill {
             arrows.add(n);
         }
         location = player.getLocation();
-        for (int i = 0; i < 10; i += 2) {
+        for (int i = 0; i < getNumArrows(level); i += 2) {
             Arrow n = player.launchProjectile(Arrow.class);
             n.setShooter(player);
             location.setYaw(location.getYaw() - i);
@@ -112,7 +120,7 @@ public class Volley extends PrepareArrowSkill {
 
     @Override
     public double getCooldown(int level) {
-        return cooldown - ((level - 1) * 2);
+        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
     @Override
@@ -124,5 +132,11 @@ public class Volley extends PrepareArrowSkill {
     @Override
     public Action[] getActions() {
         return SkillActions.LEFT_CLICK;
+    }
+
+    @Override
+    public void loadSkillConfig() {
+        baseNumArrows = getConfig("baseNumArrows", 10, Integer.class);
+        numArrowsIncreasePerLevel = getConfig("numArrowsIncreasePerLevel", 0, Integer.class);
     }
 }

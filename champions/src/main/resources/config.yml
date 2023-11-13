@@ -468,6 +468,11 @@ skills:
       damage: 8.0
       slowDuration: 1.5
       cooldownDecreasePerLevel: 1.0
+      baseDamage: 8.0
+      damageIncreasePerLevel: 0.0
+      baseSlowDuration: 1.5
+      slowDurationIncreasePerLevel: 0.0
+      slowStrength: 2
     boulder:
       enabled: true
       cooldown: 25.0
@@ -493,6 +498,11 @@ skills:
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
+      baseFireDuration: 2.5
+      fireDurationIncreasePerLevel: 0.0
+      baseDamage: 1.0
+      damageIncreasePerLevel: 0.0
+      immuneTime: 0.45
     moltenblast:
       enabled: true
       maxlevel: 5
@@ -520,6 +530,8 @@ skills:
       canUseWhileLevitating: false
       canUseInLiquid: false
       cooldownDecreasePerLevel: 2.0
+      baseDuration: 5.0
+      durationIncreasePerLevel: 5.0
     lightningorb:
       enabled: true
       maxlevel: 5
@@ -561,6 +573,11 @@ skills:
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
+      baseFireTickDuration: 4.0
+      fireTickDurationIncreasePerLevel: 0.0
+      baseFireTrailDuration: 2.0
+      fireTrailDurationIncreasePerLevel: 0.0
+      speedStrength: 1
     lifebonds:
       enabled: true
       maxlevel: 5
@@ -571,6 +588,8 @@ skills:
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
+      baseRadius: 2.0
+      radiusIncreasePerLevel: 1.0
     magmablade:
       enabled: true
       maxlevel: 3
@@ -579,6 +598,8 @@ skills:
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
+      baseDamage: 0.0
+      damageIncreasePerLevel: 1.0
     moltenshield:
       enabled: true
       maxlevel: 1
@@ -611,6 +632,9 @@ skills:
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
+      baseSlowDuration: 2.0
+      slowDurationIncreasePerLevel: 0.0
+      slowStrength: 2
     void:
       enabled: true
       maxlevel: 5
@@ -620,6 +644,11 @@ skills:
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
+      baseDamageReduction: 5.0
+      damageReductionIncreasePerLevel: 0.0
+      baseEnergyReduction: 20
+      energyReductionDecreasePerLevel: 0
+      slownessStrength: 2
     nullblade:
       enabled: true
       maxlevel: 5
@@ -637,6 +666,11 @@ skills:
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
+      baseRadius: 8.0
+      radiusIncreasePerLevel: 1.0
+      baseDuration: 7.0
+      durationIncreasePerLevel: 0.0
+      regenerationStrength: 0
     cyclone:
       enabled: true
       maxlevel: 5
@@ -647,6 +681,8 @@ skills:
       canUseWhileLevitating: false
       canUseInLiquid: false
       cooldownDecreasePerLevel: 1.0
+      baseDistance: 7.0
+      distanceIncreasePerLevel: 1.0
     polymorph:
       enabled: true
       maxlevel: 3
@@ -667,6 +703,12 @@ skills:
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: true
+      baseRadius: 2
+      radiusIncreasePerLevel: 1
+      baseDuration: 2.0
+      durationIncreasePerLevel: 0.0
+      resistanceStrength: 0
+      slownessStrength: 0
     pestilence:
       enabled: true
       maxlevel: 3
@@ -677,6 +719,9 @@ skills:
       canUseWhileLevitating: false
       canUseInLiquid: false
       cooldownDecreasePerLevel: 3.0
+      duration: 5.0
+      enemyDamageReduction: 0.2
+      radius: 5.0
     rootingaxe:
       enabled: true
       maxlevel: 3
@@ -687,6 +732,8 @@ skills:
       canUseWhileLevitating: false
       canUseInLiquid: false
       cooldownDecreasePerLevel: 2.0
+      baseDuration: 2.0
+      durationIncreasePerLevel: 0.0
   brute:
     battletaunt:
       enabled: true
@@ -871,15 +918,19 @@ skills:
       enabled: true
       maxlevel: 4
       cooldown: 8.0
-      baseCharge: 40.0
-      baseDamage: 2.0
-      canUseWhileSlowed: false
+      cooldownDecreasePerLevel: 1.0
+      canUseWhileSlowed: true
       canUseWhileSilenced: false
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
+      baseCharge: 40.0
+      chargeIncreasePerLevel: 10.0
+      baseDamage: 2.0
+      damageIncreasePerLevel: 1.0
       slowDuration: 3.0
-      cooldownDecreasePerLevel: 1.0
+      slowDurationIncreasePerLevel: 0.0
+      slowStrength: 1
     stunningshot:
       enabled: true
       maxlevel: 5
@@ -890,6 +941,8 @@ skills:
       canUseWhileLevitating: false
       canUseInLiquid: false
       cooldownDecreasePerLevel: 1.0
+      baseDuration: 0.0
+      durationIncreasePerLevel: 0.3
     incendiaryshot:
       enabled: true
       maxlevel: 5
@@ -900,6 +953,8 @@ skills:
       canUseWhileLevitating: true
       canUseInLiquid: false
       cooldownDecreasePerLevel: 1.0
+      baseBurnDuration: 0.0
+      burnDurationIncreasePerLevel: 1.5
     ropedarrow:
       enabled: true
       maxlevel: 5
@@ -920,6 +975,9 @@ skills:
       canUseWhileLevitating: false
       canUseInLiquid: false
       cooldownDecreasePerLevel: 1.0
+      baseDuration: 3.5
+      durationIncreasePerLevel: 0.5
+      levitationStrength: 1
     pindown:
       enabled: true
       maxlevel: 5
@@ -929,17 +987,23 @@ skills:
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
-      cooldownDecreasePerLevel: 1.0
+      cooldownDecreasePerLevel: 1.5
+      baseDuration: 0.0
+      durationIncreasePerLevel: 1.5
+      slownessStrength: 3
     longshot:
       enabled: true
       maxlevel: 5
-      baseDamage: 18.0
       deathMessageThreshold: 40.0
       canUseWhileSlowed: true
       canUseWhileSilenced: false
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
+      baseMaxDamage: 14.0
+      maxDamageIncreasePerLevel: 1.0
+      baseDamage: 0.25
+      damageIncreasePerLevel: 0.0
     heavyarrows:
       enabled: true
       maxlevel: 5
@@ -953,13 +1017,16 @@ skills:
     overcharge:
       enabled: true
       maxlevel: 5
-      damageIncrement: 1
-      durationIncrement: 0.4
       canUseWhileSlowed: true
       canUseWhileSilenced: false
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
+      baseDamageIncrement: 1.0
+      damageIncrementPerLevel: 0.0
+      baseDurationIncrement: 0.4
+      baseMaxDamage: 2.0
+      maxDamageIncreasePerLevel: 1.0
     huntersthrill:
       enabled: true
       maxlevel: 5
@@ -970,6 +1037,7 @@ skills:
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
+      maxTimeBetweenShotsIncreasePerLevel: 1.0
     precision:
       enabled: true
       maxlevel: 3
@@ -978,6 +1046,8 @@ skills:
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
+      baseDamage: 0.0
+      damageIncreasePerLevel: 0.5
     entangle:
       enabled: true
       maxlevel: 3
@@ -987,6 +1057,8 @@ skills:
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
+      durationIncreasePerLevel: 0.5
+      slownessStrength: 1
     volley:
       enabled: true
       maxlevel: 5
@@ -996,7 +1068,9 @@ skills:
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
-      cooldownDecreasePerLevel: 1.0
+      cooldownDecreasePerLevel: 2.0
+      baseNumArrows: 10
+      numArrowsIncreasePerLevel: 0
     vitalityspores:
       enabled: true
       maxlevel: 5
@@ -1006,6 +1080,8 @@ skills:
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
+      durationDecreasePerLevel: 1.0
+      regenerationStrength: 0
     sharpshooter:
       enabled: true
       maxlevel: 3
@@ -1017,6 +1093,9 @@ skills:
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
+      maxTimeBetweenShotsIncreasePerLevel: 1.0
+      baseDamage: 0.0
+      damageIncreasePerLevel: 0.75
     agility:
       enabled: true
       maxlevel: 5
@@ -1027,8 +1106,9 @@ skills:
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
-      damageReduction: 0.6
       cooldownDecreasePerLevel: 1.0
+      durationIncreasePerLevel: 1.0
+      baseDamageReduction: 0.6
     wolvesfury:
       enabled: true
       maxlevel: 5
@@ -1039,7 +1119,9 @@ skills:
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
-      cooldownDecreasePerLevel: 1.0
+      cooldownDecreasePerLevel: 1.5
+      durationIncreasePerLevel: 1.0
+      strengthStrength: 1
     disengage:
       enabled: true
       maxlevel: 5
@@ -1050,7 +1132,11 @@ skills:
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
-      cooldownDecreasePerLevel: 1.0
+      cooldownDecreasePerLevel: 0.0
+      slowDurationIncreasePerLevel: 1.0
+      baseProcDuration: 1.0
+      procDurationincreasePerLevel: 0.0
+      slowStrength: 3
     healingshot:
       enabled: true
       maxlevel: 5

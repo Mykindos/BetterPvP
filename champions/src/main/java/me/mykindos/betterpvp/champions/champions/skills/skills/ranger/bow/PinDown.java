@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import org.bukkit.Effect;
 import org.bukkit.Location;
@@ -24,6 +25,12 @@ import org.bukkit.potion.PotionEffectType;
 @Singleton
 @BPvPListener
 public class PinDown extends PrepareArrowSkill {
+
+    private double baseDuration;
+
+    private double durationIncreasePerLevel;
+
+    private int slownessStrength;
 
     @Inject
     public PinDown(Champions champions, ChampionsManager championsManager) {
@@ -42,10 +49,14 @@ public class PinDown extends PrepareArrowSkill {
                 "Left click with a Bow to activate",
                 "",
                 "Quickly launch an arrow that gives enemies",
-                "<effect>Slowness IV</effect> for <val>" + (level * 1.5) + "</val> seconds",
+                "<effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength + 1) + "</effect> for <val>" + getDuration(level) + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
+    }
+
+    public double getDuration(int level) {
+        return baseDuration + durationIncreasePerLevel * level;
     }
 
     @Override
@@ -73,7 +84,7 @@ public class PinDown extends PrepareArrowSkill {
 
     @Override
     public void onHit(Player damager, LivingEntity target, int level) {
-        target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) ((level * 1.5) * 20), 3));
+        target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) (getDuration(level) * 20), slownessStrength));
     }
 
     @Override
@@ -89,7 +100,13 @@ public class PinDown extends PrepareArrowSkill {
     @Override
     public double getCooldown(int level) {
 
-        return cooldown - ((level - 1) * 1.5);
+        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
+    @Override
+    public void loadSkillConfig() {
+        baseDuration = getConfig("baseDuration", 0.0, Double.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.5, Double.class);
+        slownessStrength = getConfig("slownessStrength", 3, Integer.class);
+    }
 }

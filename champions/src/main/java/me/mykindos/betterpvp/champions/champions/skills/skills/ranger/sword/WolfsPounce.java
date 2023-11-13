@@ -17,13 +17,7 @@ import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEven
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilBlock;
-import me.mykindos.betterpvp.core.utilities.UtilDamage;
-import me.mykindos.betterpvp.core.utilities.UtilEntity;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
-import me.mykindos.betterpvp.core.utilities.UtilTime;
-import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import me.mykindos.betterpvp.core.utilities.*;
 import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
 import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
 import org.bukkit.Sound;
@@ -62,9 +56,18 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
     });
 
     private double baseCharge;
+
+    private double chargeIncreasePerLevel;
+
     private double baseDamage;
 
-    private double slowDuration;
+    private double damageIncreasePerLevel;
+
+    private double baseSlowDuration;
+    
+    private double slowDurationIncreasePerLevel;
+
+    private int slowStrength;
 
     @Inject
     public WolfsPounce(Champions champions, ChampionsManager championsManager) {
@@ -88,12 +91,16 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
                 "",
                 "Colliding with another player mid-air",
                 "will deal up to <val>" + getDamage(level) + "</val> damage and apply",
-                "<effect>Slowness II</effect> for <stat>" + slowDuration + "</stat> seconds",
+                "<effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect> for <stat>" + getSlowDuration(level) + "</stat> seconds",
                 "",
                 "Taking damage cancels charge",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
+    }
+
+    public double getSlowDuration(int level) {
+        return baseSlowDuration + level * slowDurationIncreasePerLevel;
     }
 
     @Override
@@ -120,11 +127,11 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
     }
 
     private double getDamage(int level) {
-        return baseDamage + (level - 1);
+        return baseDamage + (level - 1) * damageIncreasePerLevel;
     }
 
     private double getChargePerSecond(int level) {
-        return baseCharge + (10 * (level - 1)); // Increment of 10% per level
+        return baseCharge + (chargeIncreasePerLevel * (level - 1)); // Increment of 10% per level
     }
 
     @Override
@@ -139,7 +146,7 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
 
     @Override
     public double getCooldown(int level) {
-        return cooldown - (level - 1d);
+        return cooldown - (level - 1d) * cooldownDecreasePerLevel;
     }
 
     @Override
@@ -150,8 +157,13 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
     @Override
     public void loadSkillConfig() {
         baseCharge = getConfig("baseCharge", 40.0, Double.class);
+        chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 10.0, Double.class);
         baseDamage = getConfig("baseDamage", 2.0, Double.class);
-        slowDuration = getConfig("slowDuration", 3.0, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
+        baseSlowDuration = getConfig("slowDuration", 3.0, Double.class);
+        slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.0, Double.class);
+
+        slowStrength = getConfig("slowStrength", 1, Integer.class);
     }
 
     @Override
@@ -192,7 +204,7 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
 
         // Effects & Damage
         UtilDamage.doCustomDamage(new CustomDamageEvent(damagee, damager, null, EntityDamageEvent.DamageCause.CUSTOM, damage, true, getName()));
-        damagee.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) slowDuration * 20, 1));
+        damagee.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) baseSlowDuration * 20, 1));
 
         // Cues
         UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit <alt2>%s</alt2> with <alt>%s %s</alt>.", damagee.getName(), getName(), level);
@@ -323,7 +335,7 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
 
         public void tick() {
             // Divide over 100 to get multiplication factor since it's in 100% scale for display
-            final double chargeToGive = getChargePerSecond(level) / 100;
+            final double chargeToGive = getChargePerSecond(level)/100;
             this.charge = Math.min(1, this.charge + (chargeToGive / 20));
         }
 

@@ -191,7 +191,7 @@ public class RopedArrow extends PrepareArrowSkill {
 
     @Override
     public double getCooldown(int level) {
-        return (double) cooldown - (level - 1);
+        return (double) cooldown - (level - 1) * cooldownDecreasePerLevel;
     }
 
 }
