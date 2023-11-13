@@ -488,7 +488,6 @@ skills:
       enabled: true
       maxlevel: 5
       energy: 9
-      fireTicks: 50
       canUseWhileSlowed: true
       canUseWhileSilenced: false
       canUseWhileStunned: false
@@ -513,7 +512,6 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 25.0
-      duration: 5.0
       sphereSize: 5
       speed: 1.5
       canUseWhileSlowed: true
@@ -521,7 +519,7 @@ skills:
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
-      cooldownDecreasePerLevel: 1.0
+      cooldownDecreasePerLevel: 2.0
     lightningorb:
       enabled: true
       maxlevel: 5
@@ -613,7 +611,6 @@ skills:
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
-      slowDuration: 2.0
     void:
       enabled: true
       maxlevel: 5
@@ -644,7 +641,6 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 16.0
-      minimumDistance: 7
       canUseWhileSlowed: true
       canUseWhileSilenced: false
       canUseWhileStunned: false
@@ -675,14 +671,12 @@ skills:
       enabled: true
       maxlevel: 3
       cooldown: 20.0
-      duration: 5.0
       canUseWhileSlowed: true
       canUseWhileSilenced: false
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
-      enemyDamageReduction: 0.2
-      cooldownDecreasePerLevel: 1.0
+      cooldownDecreasePerLevel: 3.0
     rootingaxe:
       enabled: true
       maxlevel: 3

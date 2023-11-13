@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Bukkit;
@@ -35,7 +36,12 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergySkill
 
     private final WeakHashMap<Snowball, Player> snow = new WeakHashMap<>();
 
-    private double slowDuration;
+    private double baseSlowDuration;
+
+    private double slowDurationIncreasePerLevel;
+
+    private int slowStrength;
+
     @Inject
     public Blizzard(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -54,11 +60,15 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergySkill
                 "Hold right click with a Sword to channel.",
                 "",
                 "While channeling, release a blizzard",
-                "that gives <effect>Slowness III</effect> to anyone hit ",
-                "for <stat>" + slowDuration + "</stat> seconds",
+                "that gives <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength + 1) + "</effect> to anyone hit ",
+                "for <stat>" + getSlowDuration(level) + "</stat> seconds",
                 "",
                 "Energy: <val>" + getEnergy(level)
         };
+    }
+
+    public double getSlowDuration(int level) {
+        return baseSlowDuration + level * slowDurationIncreasePerLevel;
     }
 
     @Override
@@ -90,8 +100,10 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergySkill
                     damagee.removePotionEffect(PotionEffectType.SLOW);
                 }
 
+                int level = getLevel((Player) event.getDamager());
+
                 damagee.setVelocity(event.getProjectile().getVelocity().multiply(0.1).add(new Vector(0, 0.25, 0)));
-                damagee.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) slowDuration * 20, 2));
+                damagee.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) getSlowDuration(level), slowStrength));
 
                 event.cancel("Snowball");
                 snow.remove(snowball);
@@ -138,6 +150,8 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergySkill
     }
 
     public void loadSkillConfig() {
-        slowDuration = getConfig("slowDuration", 2.0, Double.class);
+        baseSlowDuration = getConfig("baseSlowDuration", 2.0, Double.class);
+        slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.0, Double.class);
+        slowStrength = getConfig("slowStrength", 2, Integer.class);
     }
 }
