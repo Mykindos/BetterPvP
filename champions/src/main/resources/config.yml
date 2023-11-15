@@ -1154,8 +1154,6 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 30.0
-      range: 8
-      duration: 60.0
       canUseWhileSlowed: true
       canUseWhileSilenced: false
       canUseWhileStunned: false
@@ -1163,7 +1161,7 @@ skills:
       canUseInLiquid: false
       damageReduction: 0.3
       numAttacksToReduce: 3
-      cooldownDecreasePerLevel: 1.0
+      cooldownDecreasePerLevel: 2.0
     bloodshed:
       enabled: true
       maxlevel: 5
@@ -1218,12 +1216,10 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 15.0
-      distance: 5
-      duration: 2.0
       canUseWhileSlowed: true
-      canUseWhileSilenced: false
-      canUseWhileStunned: false
-      canUseWhileLevitating: false
+      canUseWhileSilenced: true
+      canUseWhileStunned: true
+      canUseWhileLevitating: true
       canUseInLiquid: false
       cooldownDecreasePerLevel: 1.0
     grasp:
