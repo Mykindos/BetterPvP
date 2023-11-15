@@ -1195,6 +1195,9 @@ skills:
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
+      baseHealthPercent: 0.25
+      healthPercentIncreasePerLevel: 0.05
+      speedStrength: 0
     soulharvest:
       enabled: true
       maxlevel: 3
@@ -1203,6 +1206,10 @@ skills:
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
+      baseBuffDuration: 2.0
+      buffDurationIncreasePerLevel: 1.0
+      speedStrength: 1
+      regenerationStrength: 1
     impotence:
       enabled: true
       maxlevel: 3
@@ -1212,6 +1219,11 @@ skills:
       canUseWhileLevitating: false
       canUseInLiquid: false
       maxEnemies: 3
+      baseRadius: 3.0
+      radiusIncreasePerLevel: 1.0
+      baseDecrease: 0.15
+      baseDecreasePerPlayer: 0.05
+      decreaseIncreasePerLevel: 0.0
     tormentedsoul:
       enabled: true
       maxlevel: 5
@@ -1256,7 +1268,11 @@ skills:
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
-      cooldownDecreasePerLevel: 1.0
+      cooldownDecreasePerLevel: 1.5
+      baseDistance: 10.0
+      distanceIncreasePerLevel: 5.0
+      baseDamage: 0.0
+      damageIncreasePerLevel: 1.0
     leech:
       enabled: true
       maxlevel: 5
@@ -1266,10 +1282,12 @@ skills:
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
-      range: 7
-      leechedHealth: 1.0
-      maxRangeFromCaster: 21
-      cooldownDecreasePerLevel: 1.0
+      cooldownDecreasePerLevel: 2.0
+      baseRange: 7.0
+      rangeIncreasePerLevel: 0.0
+      baseLeechedHealth: 1.0
+      leachedHealthIncreasePerLevel: 0.0
+      baseMaxRangeFromCaster: 21.0
     wreath:
       enabled: true
       maxlevel: 5
@@ -1279,9 +1297,14 @@ skills:
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
-      numAttacks: 3
-      slowDuration: 2.0
-      cooldownDecreasePerLevel: 1.0
+      cooldownDecreasePerLevel: 2.0
+      baseNumAttacks: 3
+      numAttacksIncreasePerLevel: 0
+      baseSlowDuration: 2.0
+      slowDurationIncreasePerLevel: 0.0
+      baseDamage: 2.0
+      damageIncreasePerLevel: 0.66
+      slowStrength: 1
     frailty:
       enabled: true
       maxlevel: 3
@@ -1290,6 +1313,10 @@ skills:
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
+      baseHealthPercent: 0.3
+      healthPercentIncreasePerLevel: 0.1
+      baseDamagePercent: 0.15
+      damagePercentIncreasePerLevel: 0.05
     siphon:
       enabled: true
       maxlevel: 5
@@ -1298,6 +1325,11 @@ skills:
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
+      baseRadius: 3.0
+      radiusIncreasePerLevel: 1.0
+      baseEnergySiphoned: 1.0
+      energySiphonedIncreasePerLevel: 0.0
+      speedStrength: 1
   global:
     breakfall:
       enabled: true
