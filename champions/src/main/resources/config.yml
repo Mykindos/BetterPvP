@@ -1162,6 +1162,15 @@ skills:
       damageReduction: 0.3
       numAttacksToReduce: 3
       cooldownDecreasePerLevel: 2.0
+      baseRange: 8.0
+      rangeIncreasePerLevel: 1.0
+      baseHealthReduction: 0.5
+      healthReductionDecreasePerLevel: 0.05
+      baseDuration: 60.0
+      durationIncreasePerLevel: 0.0
+      damageReductionPerLevel: 0.0
+      baseNumAttacksToReduce: 3
+      numAttacksToReducePerLevel: 0
     bloodshed:
       enabled: true
       maxlevel: 5
@@ -1173,6 +1182,11 @@ skills:
       canUseWhileLevitating: false
       canUseInLiquid: false
       cooldownDecreasePerLevel: 1.0
+      baseHealthReduction: 0.5
+      healthReductionDecreasePerLevel: 0.05
+      baseDuration: 6.0
+      durationIncreasePerLevel: 0.5
+      speedStrength: 2
     bloodthirst:
       enabled: true
       maxlevel: 5
@@ -1197,7 +1211,6 @@ skills:
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
-      radius: 3
       maxEnemies: 3
     tormentedsoul:
       enabled: true
@@ -1211,7 +1224,13 @@ skills:
       canUseWhileLevitating: false
       canUseInLiquid: false
       damageIncrease: 0.33
-      cooldownDecreasePerLevel: 1.0
+      cooldownDecreasePerLevel: 2.0
+      baseDuration: 7.0
+      durationIncreasePerLevel: 0.0
+      baseRange: 5.0
+      rangeIncreasePerLevel: 0.5
+      baseDamageIncrease: 0.33
+      damageIncreasePerLevel: 0.0
     cleanse:
       enabled: true
       maxlevel: 5
@@ -1222,6 +1241,12 @@ skills:
       canUseWhileLevitating: true
       canUseInLiquid: false
       cooldownDecreasePerLevel: 1.0
+      baseHealthReduction: 0.5
+      healthReductionDecreasePerLevel: 0.05
+      baseRange: 5.0
+      rangeIncreasePerLevel: 1.0
+      baseDuration: 2.0
+      durationIncreasePerLevel: 0.5
     grasp:
       enabled: true
       maxlevel: 5
@@ -1273,8 +1298,6 @@ skills:
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
-      radius: 4
-      energySiphoned: 1.0
   global:
     breakfall:
       enabled: true

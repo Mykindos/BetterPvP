@@ -19,7 +19,14 @@ import org.bukkit.event.EventPriority;
 @BPvPListener
 public class Impotence extends Skill implements PassiveSkill {
 
-    private int radius;
+    private double baseRadius;
+    private double radiusIncreasePerLevel;
+
+    private double baseDecrease;
+
+    private double baseDecreasePerPlayer;
+
+    private double decreaseIncreasePerLevel;
     private int maxEnemies;
     @Inject
     public Impotence(Champions champions, ChampionsManager championsManager) {
@@ -34,15 +41,19 @@ public class Impotence extends Skill implements PassiveSkill {
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "For each enemy within <val>" + (radius + level) + "</val> blocks you take",
+                "For each enemy within <val>" + getRadius(level) + "</val> blocks you take",
                 "reduced damage from all sources, at a",
                 "maximum of <stat>" + maxEnemies + "</stat> players",
                 "",
                 "Damage Reduction:",
-                "1 nearby enemy = <stat>" + (calculateReduction(1) * 100)  + "%</stat>",
-                "2 nearby enemies = <stat>" + (calculateReduction(2) * 100) + "%</stat>",
-                "3 nearby enemies = <stat>" + (calculateReduction(3) * 100) + "%</stat>"
+                "1 nearby enemy = <stat>" + (calculateReduction(level, 1) * 100)  + "%</stat>",
+                "2 nearby enemies = <stat>" + (calculateReduction(level, 2) * 100) + "%</stat>",
+                "3 nearby enemies = <stat>" + (calculateReduction(level, 3) * 100) + "%</stat>"
         };
+    }
+
+    private double getRadius(int level) {
+        return baseRadius + level * radiusIncreasePerLevel;
     }
 
     @Override
@@ -61,19 +72,24 @@ public class Impotence extends Skill implements PassiveSkill {
 
         int level = getLevel(player);
         if (level > 0) {
-            int nearby = UtilPlayer.getNearbyEnemies(player, player.getLocation(), radius + level).size();
-            event.setDamage(event.getDamage() * (1 - calculateReduction(nearby)));
+            int nearby = UtilPlayer.getNearbyEnemies(player, player.getLocation(), getRadius(level)).size();
+            event.setDamage(event.getDamage() * (1 - calculateReduction(level, nearby)));
         }
     }
 
-    private double calculateReduction(int nearby) {
-        double rawDecrease = 15 + (Math.min(nearby, maxEnemies) * 5);
-        return rawDecrease * 0.01;
+    private double calculateReduction(int level, int nearby) {
+        return (baseDecrease + level * decreaseIncreasePerLevel) + (Math.min(nearby, maxEnemies) * baseDecreasePerPlayer);
     }
 
     @Override
     public void loadSkillConfig() {
-        radius = getConfig("radius", 3, Integer.class);
+        baseRadius = getConfig("baseRadius", 3.0, Double.class);
+        radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 1.0, Double.class);
+
+        baseDecrease = getConfig("baseDecrease", 0.15, Double.class);
+        baseDecreasePerPlayer = getConfig("baseDecreasePerPlayer", 0.05, Double.class);
+        decreaseIncreasePerLevel = getConfig("decreaseIncreasePerLevel", 0.0, Double.class);
+
         maxEnemies = getConfig("maxEnemies", 3, Integer.class);
     }
 }

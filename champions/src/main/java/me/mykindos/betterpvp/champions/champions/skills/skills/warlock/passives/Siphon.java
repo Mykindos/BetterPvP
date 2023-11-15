@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.warlock.passives
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import io.papermc.paper.configuration.type.fallback.FallbackValue;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -10,6 +11,7 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
@@ -26,9 +28,15 @@ import org.bukkit.util.Vector;
 @BPvPListener
 public class Siphon extends Skill implements PassiveSkill {
 
-    private int radius;
+    private double baseRadius;
 
-    private double energySiphoned;
+    private double radiusIncreasePerLevel;
+
+    private double baseEnergySiphoned;
+
+    private double energySiphonedIncreasePerLevel;
+
+    private int speedStrength;
     @Inject
     public Siphon(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -42,11 +50,19 @@ public class Siphon extends Skill implements PassiveSkill {
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Siphon energy from all enemies within <val>" + (radius + level) + "</val> blocks, granting",
-                "you <effect>Speed I</effect> and sometimes a small amount of health",
+                "Siphon energy from all enemies within <val>" + getRadius(level) + "</val> blocks, granting",
+                "you <effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect> and sometimes a small amount of health",
                 "",
-                "Energy siphoned per second: <stat>" + energySiphoned
+                "Energy siphoned per second: <stat>" + getEnergySiphoned(level)
         };
+    }
+
+    public double getRadius(int level) {
+        return baseRadius + level * radiusIncreasePerLevel;
+    }
+
+    public double getEnergySiphoned(int level) {
+        return baseEnergySiphoned + level * energySiphonedIncreasePerLevel;
     }
 
     @Override
@@ -59,8 +75,8 @@ public class Siphon extends Skill implements PassiveSkill {
         for (Player player : Bukkit.getOnlinePlayers()) {
             int level = getLevel(player);
             if(level > 0) {
-                for(Player target : UtilPlayer.getNearbyEnemies(player, player.getLocation(), radius + level)) {
-                    championsManager.getEnergy().degenerateEnergy(target, ((float) energySiphoned)/10.0f);
+                for(Player target : UtilPlayer.getNearbyEnemies(player, player.getLocation(), getRadius(level))) {
+                    championsManager.getEnergy().degenerateEnergy(target, ((float) getEnergySiphoned(level))/10.0f);
                     new BukkitRunnable() {
                         private final Location position = target.getLocation().add(0, 1, 0);
 
@@ -76,7 +92,7 @@ public class Siphon extends Skill implements PassiveSkill {
                                 if (UtilMath.randomInt(10) == 1) {
                                     UtilPlayer.health(player, 1);
                                 }
-                                player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 50, 0));
+                                player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 50, speedStrength));
                                 this.cancel();
                                 return;
                             }
@@ -100,7 +116,11 @@ public class Siphon extends Skill implements PassiveSkill {
 
     @Override
     public void loadSkillConfig() {
-        radius = getConfig("radius", 4, Integer.class);
-        energySiphoned = getConfig("energySiphoned", 1.0, Double.class);
+        baseRadius = getConfig("baseRadius", 3.0, Double.class);
+        radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 1.0, Double.class);
+        baseEnergySiphoned = getConfig("baseEnergySiphoned", 1.0, Double.class);
+        energySiphonedIncreasePerLevel = getConfig("energySiphonedIncreasePerLevel", 0.0, Double.class);
+
+        speedStrength = getConfig("speedStrength", 1, Integer.class);
     }
 }
