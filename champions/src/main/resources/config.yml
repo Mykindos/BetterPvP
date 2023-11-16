@@ -537,10 +537,6 @@ skills:
       maxlevel: 5
       cooldown: 23.0
       maxTargets: 3
-      slowDuration: 4.0
-      spreadDistance: 3.0
-      shockDuration: 2.0
-      maxTarget: 3
       canUseWhileSlowed: true
       canUseWhileSilenced: false
       canUseWhileStunned: false
@@ -553,6 +549,9 @@ skills:
       shockDurationIncreasePerLevel: 0.0
       baseDamage: 11.0
       damageIncreasePerLevel: 0.0
+      spreadDistance: 3.0
+      slowDuration: 4.0
+      baseShockDuration: 2.0
     swarm:
       enabled: true
       maxlevel: 5
@@ -693,7 +692,7 @@ skills:
       canUseWhileStunned: false
       canUseWhileLevitating: false
       canUseInLiquid: false
-      cooldownDecreasePerLevel: 1.0
+      cooldownDecreasePerLevel: 7.0
     arcticarmour:
       enabled: true
       maxlevel: 5
@@ -719,9 +718,9 @@ skills:
       canUseWhileLevitating: false
       canUseInLiquid: false
       cooldownDecreasePerLevel: 3.0
-      duration: 5.0
       enemyDamageReduction: 0.2
       radius: 5.0
+      infectionDuration: 5.0
     rootingaxe:
       enabled: true
       maxlevel: 3

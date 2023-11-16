@@ -140,7 +140,7 @@ public class Polymorph extends PrepareSkill implements CooldownSkill {
     @Override
     public double getCooldown(int level) {
 
-        return cooldown - ((level - 1) * 7);
+        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
 

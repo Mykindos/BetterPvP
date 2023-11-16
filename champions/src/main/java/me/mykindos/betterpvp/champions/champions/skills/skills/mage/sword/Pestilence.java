@@ -192,7 +192,7 @@ public class Pestilence extends PrepareSkill implements CooldownSkill {
 
     @Override
     public void loadSkillConfig() {
-        infectionDuration = getConfig("duration", 5.0, Double.class);
+        infectionDuration = getConfig("infectionDuration", 5.0, Double.class);
         enemyDamageReduction = getConfig("enemyDamageReduction", 0.20, Double.class);
         radius = getConfig("radius", 5.0, Double.class);
     }

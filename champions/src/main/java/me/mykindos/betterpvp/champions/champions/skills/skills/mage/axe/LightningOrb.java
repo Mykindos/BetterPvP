@@ -150,7 +150,7 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
 
     @Override
     public void loadSkillConfig() {
-        maxTargets = getConfig("maxTarget", 3, Integer.class);
+        maxTargets = getConfig("maxTargets", 3, Integer.class);
         baseSpreadDistance = getConfig("spreadDistance", 3.0, Double.class);
         spreadDistanceIncreasePerLevel = getConfig("spreadDistanceIncreasePerLevel", 0.5, Double.class);
 
@@ -158,7 +158,7 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
         slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.0, Double.class);
         slowStrength = getConfig("slowStrength", 1, Integer.class);
 
-        baseShockDuration = getConfig("shockDuration", 2.0, Double.class);
+        baseShockDuration = getConfig("baseShockDuration", 2.0, Double.class);
         shockDurationIncreasePerLevel = getConfig("shockDurationIncreasePerLevel", 0.0, Double.class);
 
         baseDamage = getConfig("baseDamage", 11.0, Double.class);
