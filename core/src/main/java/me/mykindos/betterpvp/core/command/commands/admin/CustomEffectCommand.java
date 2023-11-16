@@ -3,11 +3,14 @@ package me.mykindos.betterpvp.core.command.commands.admin;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -42,6 +45,9 @@ public class CustomEffectCommand extends Command {
         @Inject
         private EffectManager effectManager;
 
+        @Inject
+        private GamerManager gamerManager;
+
         @Override
         public String getName() {
             return "give";
@@ -62,6 +68,7 @@ public class CustomEffectCommand extends Command {
             Player target = Bukkit.getPlayer(args[0]);
             if (target == null) {
                 UtilMessage.message(player, "Core", UtilMessage.deserialize("<yellow>%s</yellow> is not a valid target (does not exist)", args[0]));
+                return;
             }
 
             EffectType effect;
@@ -93,6 +100,8 @@ public class CustomEffectCommand extends Command {
 
             }
             effectManager.addEffect(player, effect, strength, duration * 1000L);
+            Component message = UtilMessage.deserialize("<yellow>%s</yellow> applied <white>%s %s</white> to <yellow>%s</yellow> for <green>%s</green> seconds", player.getName(), effect.name(), strength, target.getName(), duration);
+            gamerManager.sendMessageToRank("Effect", message, Rank.HELPER);
         }
 
         @Override
@@ -107,6 +116,9 @@ public class CustomEffectCommand extends Command {
 
         @Inject
         private EffectManager effectManager;
+
+        @Inject
+        private GamerManager gamerManager;
 
         @Override
         public String getName() {
@@ -128,10 +140,13 @@ public class CustomEffectCommand extends Command {
             Player target = Bukkit.getPlayer(args[0]);
             if (target == null) {
                 UtilMessage.message(player, "Core", UtilMessage.deserialize("<yellow>%s</yellow> is not a valid target (does not exist)", args[0]));
+                return;
             }
 
             if (args.length < 2) {
-                effectManager.removeAllEffects(player);
+                effectManager.removeAllEffects(target);
+                Component message = UtilMessage.deserialize("<yellow>%s</yellow> removed all effects from <yellow>%s</yellow>", player.getName(), target.getName());
+                gamerManager.sendMessageToRank("Effect", message, Rank.HELPER);
                 return;
             }
             EffectType effect;
@@ -141,7 +156,10 @@ public class CustomEffectCommand extends Command {
                 UtilMessage.message(player, "Core", UtilMessage.deserialize("<yellow>%s</yellow> is not a valid effect", args[1]));
                 return;
             }
-            effectManager.removeEffect(player, effect);
+
+            effectManager.removeEffect(target, effect);
+            Component message = UtilMessage.deserialize("<yellow>%s</yellow> removed <white>%s</white> from <yellow>%s</yellow>", player.getName(), effect.name(), target.getName());
+            gamerManager.sendMessageToRank("Effect", message, Rank.HELPER);
         }
 
         @Override
@@ -149,6 +167,4 @@ public class CustomEffectCommand extends Command {
             return arg == 1 ? ArgumentType.PLAYER.name() : ArgumentType.NONE.name();
         }
     }
-
-
 }
