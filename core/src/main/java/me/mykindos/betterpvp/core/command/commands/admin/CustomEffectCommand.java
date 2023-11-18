@@ -12,7 +12,12 @@ import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @Singleton
 public class CustomEffectCommand extends Command {
@@ -35,18 +40,15 @@ public class CustomEffectCommand extends Command {
 
     @Override
     public String getArgumentType(int arg) {
-        return arg == 1 ? ArgumentType.SUBCOMMAND.name() : ArgumentType.NONE.name();
+        if (arg == 1) {
+            return ArgumentType.SUBCOMMAND.name();
+        }
+        return ArgumentType.NONE.name();
     }
 
     @Singleton
     @SubCommand(CustomEffectCommand.class)
-    private static class CustomEffectGiveSubCommand extends Command {
-
-        @Inject
-        private EffectManager effectManager;
-
-        @Inject
-        private GamerManager gamerManager;
+    private static class CustomEffectGiveSubCommand extends CustomEffectSubCommand {
 
         @Override
         public String getName() {
@@ -106,20 +108,19 @@ public class CustomEffectCommand extends Command {
 
         @Override
         public String getArgumentType(int arg) {
-            return arg == 1 ? ArgumentType.PLAYER.name() : ArgumentType.NONE.name();
+            if (arg == 1) {
+                return ArgumentType.PLAYER.name();
+            }
+            if (arg == 2) {
+                return "EFFECT";
+            }
+            return ArgumentType.NONE.name();
         }
     }
 
     @Singleton
     @SubCommand(CustomEffectCommand.class)
-    private static class CustomEffectClearSubCommand extends Command {
-
-        @Inject
-        private EffectManager effectManager;
-
-        @Inject
-        private GamerManager gamerManager;
-
+    private static class CustomEffectClearSubCommand extends CustomEffectSubCommand {
         @Override
         public String getName() {
             return "clear";
@@ -164,7 +165,13 @@ public class CustomEffectCommand extends Command {
 
         @Override
         public String getArgumentType(int arg) {
-            return arg == 1 ? ArgumentType.PLAYER.name() : ArgumentType.NONE.name();
+            if (arg == 1) {
+                return ArgumentType.PLAYER.name();
+            }
+            if (arg == 2) {
+                return "EFFECT";
+            }
+            return ArgumentType.NONE.name();
         }
     }
 }
