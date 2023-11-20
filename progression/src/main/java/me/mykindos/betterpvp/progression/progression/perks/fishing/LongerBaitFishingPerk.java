@@ -21,6 +21,9 @@ import org.bukkit.event.Listener;
 @Singleton
 @Slf4j
 public class LongerBaitFishingPerk implements Listener, ProgressionPerk {
+    @Config(path = "fishing.perks.longer-bait.enabled", defaultValue = "true")
+    @Inject
+    private boolean enabled;
 
     @Config(path = "fishing.perks.longer-bait.minLevel", defaultValue = "0")
     @Inject
@@ -59,6 +62,8 @@ public class LongerBaitFishingPerk implements Listener, ProgressionPerk {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBait(PlayerThrowBaitEvent event) {
+        if (!enabled) return;
+        if(!fishing.isEnabled()) return;
         Player player = event.getPlayer();
         fishing.hasPerk(player, getClass()).whenComplete((hasPerk, throwable) -> {
             if (hasPerk) {

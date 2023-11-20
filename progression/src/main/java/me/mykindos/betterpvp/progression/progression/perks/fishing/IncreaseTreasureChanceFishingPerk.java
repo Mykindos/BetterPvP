@@ -24,6 +24,10 @@ import org.bukkit.event.Listener;
 @Singleton
 @Slf4j
 public class IncreaseTreasureChanceFishingPerk implements Listener, ProgressionPerk {
+    @Config(path = "fishing.perks.treasure-chance.enabled", defaultValue = "true")
+    @Inject
+    private boolean enabled;
+
     @Config(path = "fishing.perks.treasure-chance.minLevel", defaultValue = "750")
     @Inject
     private int minLevel;
@@ -63,6 +67,8 @@ public class IncreaseTreasureChanceFishingPerk implements Listener, ProgressionP
 
     @EventHandler (priority = EventPriority.HIGH)
     public void onCatch(PlayerCaughtFishEvent event) {
+        if (!enabled) return;
+        if(!fishing.isEnabled()) return;
         // Only reroll for swimmers
         if (!(event.getLoot().getType() instanceof SwimmerType)) return;
 

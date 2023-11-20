@@ -29,8 +29,9 @@ public class Mining extends ProgressionTree {
 
     @Override
     public void loadConfig(@NotNull ExtendedYamlConfiguration config) {
+        enabled = config.getOrSaveBoolean("mining.enabled", true);
+        miningService.setEnabled(enabled);
         statsRepository.loadConfig(config);
         leaderboard.forceUpdate(); // Force update because mining service reloads tracked blocks
     }
-
 }

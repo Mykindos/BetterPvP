@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.progression.tree.mining.Mining;
 import me.mykindos.betterpvp.progression.tree.mining.MiningService;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;

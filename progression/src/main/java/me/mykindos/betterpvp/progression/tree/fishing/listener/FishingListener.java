@@ -90,6 +90,7 @@ public class FishingListener implements Listener {
     // Title display
     @UpdateEvent(delay = 500)
     public void waitCue() {
+        if (!fishing.isEnabled()) return;
         final Iterator<Player> iterator = fish.asMap().keySet().iterator();
         Component component = Component.text()
                 .append(Component.text(".", animatedDot == 1 ? NamedTextColor.WHITE : NamedTextColor.GRAY))
@@ -134,6 +135,7 @@ public class FishingListener implements Listener {
     // Fishing determination
     @UpdateEvent
     public void updateFishingStatus() {
+        if (!fishing.isEnabled()) return;
         // Clear baits
         activeBaits.asMap().keySet().removeIf(player -> player == null || !player.isOnline());
         activeBaits.values().removeIf(Bait::hasExpired);
@@ -175,6 +177,7 @@ public class FishingListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onFish(PlayerFishEvent event) {
+        if (!fishing.isEnabled()) return;
         final Player player = event.getPlayer();
         event.setExpToDrop(0); // Remove their xp
         switch (event.getState()) {
@@ -212,6 +215,7 @@ public class FishingListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     void onCatch (PlayerCaughtFishEvent event) {
+        if (!fishing.isEnabled()) return;
         // this is the final step
         Player player = event.getPlayer();
         FishHook hook = event.getHook();
@@ -263,6 +267,7 @@ public class FishingListener implements Listener {
 
     @EventHandler
     public void onBaitThrow(PlayerInteractEvent event) {
+        if (!fishing.isEnabled()) return;
         if (event.getHand() != EquipmentSlot.HAND || event.getItem() == null) {
             return; // Return if they don't interact with the main hand, or they don't have an item on it
         }
@@ -286,6 +291,7 @@ public class FishingListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onBait (PlayerThrowBaitEvent event) {
+        if (!fishing.isEnabled()) return;
         final Vector velocity = event.getPlayer().getLocation().getDirection().normalize().multiply(new Vector(1.5, 2.0, 1.5));
         final Location location = event.getPlayer().getEyeLocation();
         event.getBait().spawn(progression, location, velocity);
