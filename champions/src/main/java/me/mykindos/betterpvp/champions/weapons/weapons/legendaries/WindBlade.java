@@ -84,8 +84,9 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
 
     @UpdateEvent
     public void doWindBlade() {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            if (!active.contains(player.getUniqueId())) continue;
+        for (var uuid : active) {
+            Player player = Bukkit.getPlayer(uuid);
+            if (player == null) continue;
 
             if (player.getInventory().getItemInMainHand().getType() != Material.MUSIC_DISC_MELLOHI) {
                 active.remove(player.getUniqueId());
@@ -117,6 +118,7 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
             player.getWorld().spawnEntity(player.getLocation(), EntityType.LLAMA_SPIT);
             player.getWorld().playSound(player.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 0.5F, 1.5F);
         }
+
     }
 
     @EventHandler(priority = EventPriority.LOW)
