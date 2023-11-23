@@ -133,7 +133,6 @@ public class Polymorph extends PrepareSkill implements CooldownSkill {
 
     @Override
     public SkillType getType() {
-
         return SkillType.AXE;
     }
 
