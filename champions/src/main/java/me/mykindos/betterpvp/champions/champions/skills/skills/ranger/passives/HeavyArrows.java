@@ -109,7 +109,7 @@ public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill {
 
     @Override
     public float getEnergy(int level) {
-        return energy - ((level - 1) * 2);
+        return (float) (energy - ((level - 1) * cooldownDecreasePerLevel));
     }
 
     @Override

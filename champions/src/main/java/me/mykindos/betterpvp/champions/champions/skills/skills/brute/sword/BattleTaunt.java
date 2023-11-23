@@ -120,7 +120,7 @@ public class BattleTaunt extends ChannelSkill implements InteractSkill, Cooldown
     @Override
     public float getEnergy(int level) {
 
-        return energy - ((level - 1));
+        return (float) (energy - ((level - 1) * energyDecreasePerLevel));
     }
 
     @Override

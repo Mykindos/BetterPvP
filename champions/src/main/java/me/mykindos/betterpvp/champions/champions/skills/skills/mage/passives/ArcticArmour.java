@@ -165,7 +165,7 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill {
     @Override
     public float getEnergy(int level) {
 
-        return (float) (energy - ((level - 1) * 0.5));
+        return (float) (energy - ((level - 1) * energyDecreasePerLevel));
     }
 
     @Override

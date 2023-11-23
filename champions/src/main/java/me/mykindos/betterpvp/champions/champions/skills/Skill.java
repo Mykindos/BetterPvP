@@ -35,7 +35,7 @@ public abstract class Skill implements ISkill {
     protected double cooldown;
     protected double cooldownDecreasePerLevel;
     protected int energy;
-    protected double energyDecreasePerLevel;
+    protected Double energyDecreasePerLevel;
 
     private boolean canUseWhileSlowed;
 

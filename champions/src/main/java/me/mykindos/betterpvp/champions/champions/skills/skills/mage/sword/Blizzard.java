@@ -86,7 +86,7 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergySkill
     @Override
     public float getEnergy(int level) {
 
-        return energy - ((level - 1));
+        return (float) (energy - ((level - 1) * energyDecreasePerLevel));
     }
 
 

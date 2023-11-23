@@ -167,7 +167,7 @@ public class DefensiveStance extends ChannelSkill implements InteractSkill, Ener
     @Override
     public float getEnergy(int level) {
 
-        return (float) energy - ((level - 1));
+        return (float) (energy - ((level - 1) * energyDecreasePerLevel));
     }
 
     @Override

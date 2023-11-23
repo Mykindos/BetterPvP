@@ -172,7 +172,7 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
     @Override
     public float getEnergy(int level) {
 
-        return (float) energy - ((level - 1));
+        return (float) (energy - ((level - 1) * energyDecreasePerLevel));
     }
 
     private void sendState(Player player, boolean state) {
