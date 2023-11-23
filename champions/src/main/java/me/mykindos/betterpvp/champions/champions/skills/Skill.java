@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.components.champions.ISkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
+import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -34,6 +35,7 @@ public abstract class Skill implements ISkill {
     protected double cooldown;
     protected double cooldownDecreasePerLevel;
     protected int energy;
+    protected double energyDecreasePerLevel;
 
     private boolean canUseWhileSlowed;
 
@@ -96,15 +98,35 @@ public abstract class Skill implements ISkill {
         }
     }
 
-    protected <T> T getConfig(String name, Object defaultValue, Class<T> type) {
+    private String getPath(String name) {
         String path;
         if (getClassType() != null) {
             path = "skills." + getClassType().name().toLowerCase() + "." + getName().toLowerCase().replace(" ", "") + "." + name;
         } else {
             path = "skills.global." + getName().toLowerCase().replace(" ", "") + "." + name;
         }
-        return champions.getConfig().getOrSaveObject(path, defaultValue, type);
+        return path;
     }
+
+    protected <T> T getConfig(String name, Object defaultValue, Class<T> type) {
+        return champions.getConfig().getOrSaveObject(getPath(name), defaultValue, type);
+    }
+
+    /**
+     * @param name name of the value
+     * @param defaultValue default value
+     * @param type The type of default value
+     * @param <T> The type of default value
+     * @return returns the config value if exists, or the default value if it does not. Does not save value in the config
+     */
+    protected <T> T getNonDefaultConfig(String name, Object defaultValue, Class<T> type) {
+        ExtendedYamlConfiguration config = champions.getConfig();
+        if (config.isSet(getPath(name))) {
+            return config.getObject(getPath(name), type);
+        }
+        return (type.cast(defaultValue));
+    }
+
 
     @Override
     public final void loadConfig() {
@@ -118,12 +140,14 @@ public abstract class Skill implements ISkill {
 
         if (this instanceof EnergySkill) {
             energy = getConfig("energy", 0, Integer.class);
+            energyDecreasePerLevel = getConfig("energyDecreasePerLevel", 1.0, Double.class);
         }
-        canUseWhileSlowed = getConfig("canUseWhileSlowed", true, Boolean.class);
-        canUseWhileSilenced = getConfig("canUseWhileSilenced", false, Boolean.class);
-        canUseWhileStunned = getConfig("canUseWhileStunned", false, Boolean.class);
-        canUseWhileLevitating = getConfig("canUseWhileLevitating", false, Boolean.class);
-        canUseInLiquid = getConfig("canUseInLiquid", false, Boolean.class);
+
+        canUseWhileSlowed = getNonDefaultConfig("canUseWhileSlowed", true, Boolean.class);
+        canUseWhileSilenced = getNonDefaultConfig("canUseWhileSilenced", false, Boolean.class);
+        canUseWhileStunned = getNonDefaultConfig("canUseWhileStunned", false, Boolean.class);
+        canUseWhileLevitating = getNonDefaultConfig("canUseWhileLevitating", false, Boolean.class);
+        canUseInLiquid = getNonDefaultConfig("canUseInLiquid", false, Boolean.class);
 
         loadSkillConfig();
     }
