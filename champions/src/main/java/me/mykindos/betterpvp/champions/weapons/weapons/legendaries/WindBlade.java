@@ -84,40 +84,37 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
 
     @UpdateEvent
     public void doWindBlade() {
-        for (var uuid : active) {
+        active.removeIf(uuid -> {
             Player player = Bukkit.getPlayer(uuid);
-            if (player == null) continue;
+            if (player == null) return true;
 
             if (player.getInventory().getItemInMainHand().getType() != Material.MUSIC_DISC_MELLOHI) {
-                active.remove(player.getUniqueId());
-                continue;
+                return true;
             }
 
             if (!player.isHandRaised()) {
-                active.remove(player.getUniqueId());
-                continue;
+                return true;
             }
 
             var checkUsageEvent = UtilServer.callEvent(new PlayerUseItemEvent(player, this, true));
             if (checkUsageEvent.isCancelled()) {
                 UtilMessage.simpleMessage(player, "Restriction", "You cannot use this weapon here.");
-                continue;
+                return true;
             }
 
             if (!canUse(player)) {
-                active.remove(player.getUniqueId());
-                continue;
+                return true;
             }
 
             if (!energyHandler.use(player, "Wind Blade", energyPerTick, true)) {
-                active.remove(player.getUniqueId());
-                continue;
+                return true;
             }
 
             UtilVelocity.velocity(player, velocityStrength, 0.11, 1.0, true);
             player.getWorld().spawnEntity(player.getLocation(), EntityType.LLAMA_SPIT);
             player.getWorld().playSound(player.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 0.5F, 1.5F);
-        }
+            return false;
+        });
 
     }
 
