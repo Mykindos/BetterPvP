@@ -119,12 +119,8 @@ public abstract class Skill implements ISkill {
      * @param <T> The type of default value
      * @return returns the config value if exists, or the default value if it does not. Does not save value in the config
      */
-    protected <T> T getNonDefaultConfig(String name, Object defaultValue, Class<T> type) {
-        ExtendedYamlConfiguration config = champions.getConfig();
-        if (config.isSet(getPath(name))) {
-            return config.getObject(getPath(name), type);
-        }
-        return (type.cast(defaultValue));
+    protected <T> T getConfigObject(String name, T defaultValue, Class<T> type) {
+        return champions.getConfig().getObject(getPath(name), type, defaultValue);
     }
 
 
@@ -143,11 +139,11 @@ public abstract class Skill implements ISkill {
             energyDecreasePerLevel = getConfig("energyDecreasePerLevel", 1.0, Double.class);
         }
 
-        canUseWhileSlowed = getNonDefaultConfig("canUseWhileSlowed", true, Boolean.class);
-        canUseWhileSilenced = getNonDefaultConfig("canUseWhileSilenced", false, Boolean.class);
-        canUseWhileStunned = getNonDefaultConfig("canUseWhileStunned", false, Boolean.class);
-        canUseWhileLevitating = getNonDefaultConfig("canUseWhileLevitating", false, Boolean.class);
-        canUseInLiquid = getNonDefaultConfig("canUseInLiquid", false, Boolean.class);
+        canUseWhileSlowed = getConfigObject("canUseWhileSlowed", true, Boolean.class);
+        canUseWhileSilenced = getConfigObject("canUseWhileSilenced", false, Boolean.class);
+        canUseWhileStunned = getConfigObject("canUseWhileStunned", false, Boolean.class);
+        canUseWhileLevitating = getConfigObject("canUseWhileLevitating", false, Boolean.class);
+        canUseInLiquid = getConfigObject("canUseInLiquid", false, Boolean.class);
 
         loadSkillConfig();
     }
