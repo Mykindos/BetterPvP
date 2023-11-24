@@ -1,17 +1,33 @@
 package me.mykindos.betterpvp.core.config.implementations;
 
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 
 import javax.inject.Provider;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 
+@Slf4j
 public class ConfigProvider<T> implements Provider<T> {
 
     private final BPvPPlugin plugin;
     private final String configPath;
     private final String defaultValue;
-    private Class<T> type;
+    private final Class<T> type;
+
+    private static final Map<Class<?>, Function<String, ?>> parsers = new HashMap<>();
+
+    static {
+        parsers.put(int.class, Integer::parseInt);
+        parsers.put(double.class, Double::parseDouble);
+        parsers.put(boolean.class, Boolean::parseBoolean);
+        parsers.put(float.class, Float::parseFloat);
+        parsers.put(long.class, Long::parseLong);
+        parsers.put(List.class, s -> Arrays.asList(s.split(",")));
+    }
 
     public ConfigProvider(BPvPPlugin plugin, String configPath, String defaultValue, Class<T> type) {
         this.plugin = plugin;
@@ -20,28 +36,15 @@ public class ConfigProvider<T> implements Provider<T> {
         this.defaultValue = defaultValue;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public T get() {
-
         Object castedDefault = defaultValue;
-        if(type == int.class) {
-            castedDefault = Integer.parseInt(defaultValue);
-            type = (Class<T>) Integer.class;
-        }else if(type == double.class){
-            castedDefault = Double.parseDouble(defaultValue);
-            type = (Class<T>) Double.class;
-        }else if(type == boolean.class) {
-            castedDefault = Boolean.parseBoolean(defaultValue);
-            type = (Class<T>) Boolean.class;
-        }else if(type == float.class) {
-            castedDefault = Float.parseFloat(defaultValue);
-            type = (Class<T>) Float.class;
-        }else if(type == long.class) {
-            castedDefault = Long.parseLong(defaultValue);
-            type = (Class<T>) Long.class;
-        }else if(type == List.class) {
-            castedDefault = Arrays.asList(defaultValue.split(","));
+        if (parsers.containsKey(type)) {
+            try {
+                castedDefault = parsers.get(type).apply(defaultValue);
+            } catch (Exception ex) {
+                log.error("Failed to parse default value for {} ({})", configPath, type.getSimpleName(), ex);
+            }
         }
 
         T value = plugin.getConfig().getOrSaveObject(configPath, castedDefault, type);
@@ -49,4 +52,5 @@ public class ConfigProvider<T> implements Provider<T> {
 
         return value;
     }
+
 }

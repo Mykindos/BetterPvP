@@ -29,14 +29,19 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
 @BPvPListener
 public class Pestilence extends PrepareSkill implements CooldownSkill {
 
-    private final HashMap<UUID, PestilenceData> pestilenceData = new HashMap<>();
+    private final ConcurrentHashMap<UUID, PestilenceData> pestilenceData = new ConcurrentHashMap<>();
 
     private double infectionDuration;
     private double enemyDamageReduction;
@@ -79,27 +84,29 @@ public class Pestilence extends PrepareSkill implements CooldownSkill {
 
     @UpdateEvent(delay = 500)
     public void spread() {
-        pestilenceData.entrySet().removeIf(entry -> Bukkit.getPlayer(entry.getKey()) == null);
-
-        pestilenceData.forEach((key, value) -> {
-            Player player = Bukkit.getPlayer(key);
+        Iterator<Map.Entry<UUID, PestilenceData>> iterator = pestilenceData.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<UUID, PestilenceData> entry = iterator.next();
+            Player player = Bukkit.getPlayer(entry.getKey());
             if (player == null) {
-                value.getOldInfected().clear();
-                value.getCurrentlyInfected().clear();
-                return;
-            }
+                entry.getValue().getOldInfected().clear();
+                entry.getValue().getCurrentlyInfected().clear();
+                iterator.remove();
+            } else {
+                List<LivingEntity> newInfections = new ArrayList<>();
+                for (LivingEntity entity : entry.getValue().getCurrentlyInfected().keySet()) {
+                    for (LivingEntity target : UtilEntity.getNearbyEnemies(player, entity.getLocation(), radius)) {
+                        if (entry.getValue().getCurrentlyInfected().containsKey(target)) continue;
+                        if (entry.getValue().getOldInfected().containsKey(target)) continue;
 
-            for (LivingEntity entity : value.getCurrentlyInfected().keySet()) {
-                for (LivingEntity target : UtilEntity.getNearbyEnemies(player, entity.getLocation(), radius)) {
-                    if (value.getCurrentlyInfected().containsKey(target)) continue;
-                    if (value.getOldInfected().containsKey(target)) continue;
-
-                    value.addInfection(target, (long) infectionDuration * 1000);
+                        newInfections.add(target);
+                    }
+                }
+                for (LivingEntity target : newInfections) {
+                    entry.getValue().addInfection(target, (long) infectionDuration * 1000);
                 }
             }
-
-        });
-
+        }
     }
 
     @UpdateEvent(delay = 500)
@@ -200,8 +207,8 @@ public class Pestilence extends PrepareSkill implements CooldownSkill {
     @Data
     private static class PestilenceData {
 
-        private final HashMap<LivingEntity, DamageData> oldInfected = new HashMap<>();
-        private final HashMap<LivingEntity, DamageData> currentlyInfected = new HashMap<>();
+        private final ConcurrentHashMap<LivingEntity, DamageData> oldInfected = new ConcurrentHashMap<>();
+        private final ConcurrentHashMap<LivingEntity, DamageData> currentlyInfected = new ConcurrentHashMap<>();
 
         public void addInfection(LivingEntity entity, long length) {
             entity.addPotionEffect(new PotionEffect(PotionEffectType.POISON, (int) ((length / 1000) * 20), 0));
