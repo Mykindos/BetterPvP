@@ -8,9 +8,9 @@ import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
 import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
 import me.mykindos.betterpvp.clans.clans.menus.BannerMenu;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.entity.Player;
 
@@ -21,8 +21,8 @@ import java.util.List;
 public class BannerSubCommand extends ClanSubCommand {
 
     @Inject
-    public BannerSubCommand(ClanManager clanManager, GamerManager gamerManager) {
-        super(clanManager, gamerManager);
+    public BannerSubCommand(ClanManager clanManager, ClientManager clientManager) {
+        super(clanManager, clientManager);
         aliases.addAll(List.of("banner", "setclanbanner"));
     }
 

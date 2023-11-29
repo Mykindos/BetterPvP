@@ -1,15 +1,16 @@
-package me.mykindos.betterpvp.core.gamer.listeners;
+package me.mykindos.betterpvp.core.client.gamer.repository;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.Core;
-import me.mykindos.betterpvp.core.client.events.ClientLoginEvent;
+import me.mykindos.betterpvp.core.client.events.AsyncClientLoadEvent;
+import me.mykindos.betterpvp.core.client.events.AsyncClientPreLoadEvent;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.events.scoreboard.ScoreboardUpdateEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
-import me.mykindos.betterpvp.core.gamer.Gamer;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
-import me.mykindos.betterpvp.core.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
@@ -17,8 +18,8 @@ import me.mykindos.betterpvp.core.utilities.model.display.PlayerListType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 import java.util.Objects;
@@ -48,12 +49,12 @@ public class GamerListener implements Listener {
     private String server;
 
     private final Core core;
-    private final GamerManager gamerManager;
+    private final ClientManager manager;
 
     @Inject
-    public GamerListener(Core core, GamerManager gamerManager){
+    public GamerListener(Core core, ClientManager manager) {
         this.core = core;
-        this.gamerManager = gamerManager;
+        this.manager = manager;
 
         this.header = new PermanentComponent(gamer -> Component.text("Mineplex ", NamedTextColor.GOLD)
                 .append(Component.text("Network ", NamedTextColor.WHITE))
@@ -66,38 +67,32 @@ public class GamerListener implements Listener {
 
     @UpdateEvent (isAsync = true)
     public void onUpdate() {
-        for(Player player : Bukkit.getOnlinePlayers()){
-            gamerManager.getObject(player.getUniqueId()).ifPresent(gamer -> {
-                gamer.getActionBar().show(gamer);
-                gamer.getTitleQueue().show(gamer);
-                gamer.getPlayerList().show(gamer);
-            });
-        }
+        this.manager.getOnline().forEach(client -> {
+            final Gamer gamer = client.getGamer();
+            gamer.getActionBar().show(gamer);
+            gamer.getTitleQueue().show(gamer);
+            gamer.getPlayerList().show(gamer);
+        });
     }
 
     @EventHandler
-    public void onClientLogin(ClientLoginEvent event) {
-        Optional<Gamer> gamerOptional = gamerManager.getObject(event.getClient().getUuid());
-        Gamer gamer;
-        if(gamerOptional.isEmpty()){
-            gamer = new Gamer(event.getClient(), event.getClient().getUuid());
+    public void onPreClientLoad(AsyncClientPreLoadEvent event) {
+        this.manager.loadGamerProperties(event.getClient());
+    }
 
-            gamerManager.addObject(event.getClient().getUuid(), gamer);
-            gamerManager.getGamerRepository().save(gamer);
+    @EventHandler (priority =  EventPriority.MONITOR)
+    public void onClientLoad(AsyncClientLoadEvent event) {
+        this.manager.loadOnline(event.getClient().getUniqueId(), event.getClient().getName(), client -> {
+            final Gamer gamer = client.getGamer();
+            checkUnsetProperties(gamer);
 
-            // TODO new player protection
-        } else {
-            gamer = gamerOptional.get();
-        }
+            Bukkit.getOnlinePlayers().forEach(player ->
+                    UtilServer.runTaskLater(core, () -> UtilServer.callEvent(new ScoreboardUpdateEvent(player)), 1));
 
-        checkUnsetProperties(gamer);
-
-        Bukkit.getOnlinePlayers().forEach(player ->
-                UtilServer.runTaskLater(core, () -> UtilServer.callEvent(new ScoreboardUpdateEvent(player)), 1));
-
-        gamer.getPlayerList().clear();
-        gamer.getPlayerList().add(PlayerListType.FOOTER, footer);
-        gamer.getPlayerList().add(PlayerListType.HEADER, header);
+            gamer.getPlayerList().clear();
+            gamer.getPlayerList().add(PlayerListType.FOOTER, footer);
+            gamer.getPlayerList().add(PlayerListType.HEADER, header);
+        }, null);
     }
 
     private void checkUnsetProperties(Gamer gamer) {
@@ -109,16 +104,6 @@ public class GamerListener implements Listener {
         Optional<Integer> fragmentsOptional = gamer.getProperty(GamerProperty.FRAGMENTS);
         if(fragmentsOptional.isEmpty()){
             gamer.saveProperty(GamerProperty.FRAGMENTS, defaultFragments);
-        }
-
-        Optional<Boolean> sidebarOptional = gamer.getProperty(GamerProperty.SIDEBAR_ENABLED);
-        if(sidebarOptional.isEmpty()){
-            gamer.saveProperty(GamerProperty.SIDEBAR_ENABLED, true);
-        }
-
-        Optional<Boolean> tipsOptional = gamer.getProperty(GamerProperty.TIPS_ENABLED);
-        if(tipsOptional.isEmpty()){
-            gamer.saveProperty(GamerProperty.TIPS_ENABLED, true);
         }
 
         Optional<Boolean> clanMenuOptional = gamer.getProperty(GamerProperty.CLAN_MENU_ENABLED);

@@ -8,8 +8,8 @@ import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
 import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
@@ -19,8 +19,8 @@ import org.bukkit.entity.Player;
 public class SetExpSubCommand extends ClanSubCommand {
 
     @Inject
-    public SetExpSubCommand(ClanManager clanManager, GamerManager gamerManager) {
-        super(clanManager, gamerManager);
+    public SetExpSubCommand(ClanManager clanManager, ClientManager clientManager) {
+        super(clanManager, clientManager);
     }
 
     @Override
@@ -83,7 +83,7 @@ public class SetExpSubCommand extends ClanSubCommand {
                 prevLevel,
                 newExperience,
                 newLevel);
-        gamerManager.sendMessageToRank("Clans", alert, Rank.HELPER);
+        clientManager.sendMessageToRank("Clans", alert, Rank.HELPER);
     }
 
     @Override

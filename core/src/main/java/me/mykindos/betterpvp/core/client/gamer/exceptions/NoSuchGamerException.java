@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.gamer.exceptions;
+package me.mykindos.betterpvp.core.client.gamer.exceptions;
 
 import java.util.UUID;
 

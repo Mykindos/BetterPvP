@@ -13,7 +13,7 @@ import java.util.Map;
 
 @Singleton
 @Slf4j
-public class MySQLDatabaseConnection implements IDatabaseConnection {
+public class MariaDBDatabaseConnection implements IDatabaseConnection {
 
     @Inject
     @Config(path = "core.database.ip", defaultValue = "127.0.0.1")
@@ -68,7 +68,7 @@ public class MySQLDatabaseConnection implements IDatabaseConnection {
                     .load();
             flyway.migrate();
         } catch (Exception ex) {
-            log.error("Please correctly configure the MySQL database connection in the core plugin config.", ex);
+            log.error("Please correctly configure the MariaDB database connection in the core plugin config.", ex);
         }
 
     }

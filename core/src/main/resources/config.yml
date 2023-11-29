@@ -4,7 +4,15 @@ core:
     password:
     ip:
     username:
-    prefix: ''
+  redis:
+    database:
+    password:
+    host:
+    port:
+  tips:
+    timeBetweenTips: 150.0
+  exceptions:
+    discord-webhook: ''
 pvp:
   enableOldPvP: true
 gamer:

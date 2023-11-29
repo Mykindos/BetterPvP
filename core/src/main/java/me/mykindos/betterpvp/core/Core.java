@@ -6,7 +6,7 @@ import com.google.inject.Injector;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import me.mykindos.betterpvp.core.client.ClientManager;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.stats.impl.GlobalCombatStatsRepository;
 import me.mykindos.betterpvp.core.command.loader.CoreCommandLoader;
 import me.mykindos.betterpvp.core.config.Config;
@@ -15,7 +15,6 @@ import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.injector.DatabaseInjectorModule;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.injector.CoreInjectorModule;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.loader.CoreListenerLoader;
@@ -44,7 +43,6 @@ public class Core extends BPvPPlugin {
     private Database database;
 
     private ClientManager clientManager;
-    private GamerManager gamerManager;
 
     @Inject
     private UpdateEventExecutor updateEventExecutor;
@@ -58,6 +56,7 @@ public class Core extends BPvPPlugin {
     @Config(path = "core.password", defaultValue = "")
     public String password;
 
+    @Override
     public void onEnable() {
         saveDefaultConfig();
 
@@ -78,10 +77,6 @@ public class Core extends BPvPPlugin {
         coreCommandLoader.loadCommands(PACKAGE);
 
         clientManager = injector.getInstance(ClientManager.class);
-        clientManager.loadFromList(clientManager.getRepository().getAll());
-
-        gamerManager = injector.getInstance(GamerManager.class);
-        gamerManager.loadFromList(gamerManager.getGamerRepository().getAll());
 
         var itemHandler = injector.getInstance(ItemHandler.class);
         itemHandler.loadItemData("Core");
@@ -94,8 +89,7 @@ public class Core extends BPvPPlugin {
 
     @Override
     public void onDisable() {
-        clientManager.getRepository().processStatUpdates(false);
-        gamerManager.getGamerRepository().processStatUpdates(false);
+        clientManager.processStatUpdates(false);
         injector.getInstance(GlobalCombatStatsRepository.class).shutdown();
 
         if (hasListener(listenerKey)) {

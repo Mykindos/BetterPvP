@@ -62,17 +62,6 @@ create table if not exists property_map
         primary key (Property, Type)
 );
 
-create table if not exists ${tablePrefix}gamers
-(
-    id   int auto_increment,
-    UUID varchar(255) not null,
-    constraint gamers_pk
-    primary key (id)
-);
-
-create unique index ${tablePrefix}gamers_UUID_uindex
-    on ${tablePrefix}gamers (UUID);
-
 create table if not exists ${tablePrefix}gamer_properties
 (
     Gamer    varchar(255) not null,

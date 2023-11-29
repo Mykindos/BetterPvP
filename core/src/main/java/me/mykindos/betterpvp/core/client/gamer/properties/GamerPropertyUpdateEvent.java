@@ -1,7 +1,7 @@
-package me.mykindos.betterpvp.core.gamer.properties;
+package me.mykindos.betterpvp.core.client.gamer.properties;
 
 import lombok.Getter;
-import me.mykindos.betterpvp.core.gamer.Gamer;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.properties.PropertyUpdateEvent;
 
 @Getter

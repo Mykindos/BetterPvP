@@ -8,8 +8,8 @@ import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
 import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -20,8 +20,8 @@ import org.bukkit.entity.Player;
 public class SetEnergySubCommand extends ClanSubCommand {
 
     @Inject
-    public SetEnergySubCommand(ClanManager clanManager, GamerManager gamerManager) {
-        super(clanManager, gamerManager);
+    public SetEnergySubCommand(ClanManager clanManager, ClientManager clientManager) {
+        super(clanManager, clientManager);
     }
 
     @Override
@@ -67,7 +67,7 @@ public class SetEnergySubCommand extends ClanSubCommand {
                 .append(Component.text(" Previous: ", NamedTextColor.GRAY)).append(Component.text(oldEnergy, NamedTextColor.YELLOW));
 
         UtilMessage.message(player, "Clans", component);
-        gamerManager.sendMessageToRank("Clans", UtilMessage.deserialize("<yellow>%s<gray> set the energy of <yellow>%s<gray> to <green>%s <white>(<yellow>%s<white>)",
+        clientManager.sendMessageToRank("Clans", UtilMessage.deserialize("<yellow>%s<gray> set the energy of <yellow>%s<gray> to <green>%s <white>(<yellow>%s<white>)",
                 player.getName(), playerClan.getName(), playerClan.getEnergy(), playerClan.getEnergyTimeRemaining()), Rank.HELPER);
     }
 

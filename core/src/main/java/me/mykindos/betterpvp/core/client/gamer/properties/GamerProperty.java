@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.gamer.properties;
+package me.mykindos.betterpvp.core.client.gamer.properties;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,15 +9,11 @@ import lombok.Getter;
 public enum GamerProperty {
 
     // Misc
-    SIDEBAR_ENABLED,
     CLAN_MENU_ENABLED,
-
-    TIPS_ENABLED,
 
     // Chat modes
     CLAN_CHAT,
     ALLY_CHAT,
-    STAFF_CHAT,
 
     // Currency
     BALANCE,
@@ -30,8 +26,5 @@ public enum GamerProperty {
     // Damage
     DAMAGE_DEALT,
     DAMAGE_TAKEN,
-
-    COOLDOWN_DISPLAY;
-
 
 }

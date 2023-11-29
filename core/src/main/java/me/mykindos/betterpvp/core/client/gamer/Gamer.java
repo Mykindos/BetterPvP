@@ -1,15 +1,16 @@
-package me.mykindos.betterpvp.core.gamer;
+package me.mykindos.betterpvp.core.client.gamer;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
+import me.mykindos.betterpvp.core.client.gamer.properties.GamerPropertyUpdateEvent;
 import me.mykindos.betterpvp.core.framework.customtypes.IMapListener;
 import me.mykindos.betterpvp.core.framework.events.scoreboard.ScoreboardUpdateEvent;
 import me.mykindos.betterpvp.core.framework.inviting.Invitable;
-import me.mykindos.betterpvp.core.gamer.properties.GamerProperty;
-import me.mykindos.betterpvp.core.gamer.properties.GamerPropertyUpdateEvent;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.model.Unique;
 import me.mykindos.betterpvp.core.utilities.model.display.ActionBar;
 import me.mykindos.betterpvp.core.utilities.model.display.PlayerList;
 import me.mykindos.betterpvp.core.utilities.model.display.TitleQueue;
@@ -25,9 +26,9 @@ import java.util.UUID;
  */
 @Getter
 @Setter
-public class Gamer extends PropertyContainer implements Invitable, IMapListener {
+@EqualsAndHashCode(callSuper = false, of = {"uuid"})
+public class Gamer extends PropertyContainer implements Invitable, Unique, IMapListener {
 
-    private final Client client;
     private final String uuid;
     private ActionBar actionBar = new ActionBar();
     private TitleQueue titleQueue = new TitleQueue();
@@ -37,8 +38,7 @@ public class Gamer extends PropertyContainer implements Invitable, IMapListener 
     private long lastTip;
     private String lastAdminMessenger;
 
-    public Gamer(Client client, String uuid){
-        this.client = client;
+    public Gamer(String uuid) {
         this.uuid = uuid;
         properties.registerListener(this);
     }
@@ -78,5 +78,10 @@ public class Gamer extends PropertyContainer implements Invitable, IMapListener 
 
     public void setLastTipNow() {
         setLastTip(System.currentTimeMillis());
+    }
+
+    @Override
+    public UUID getUniqueId() {
+        return UUID.fromString(uuid);
     }
 }
