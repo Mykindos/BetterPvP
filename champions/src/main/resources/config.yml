@@ -445,6 +445,12 @@ skills:
     bloodthirst:
       enabled: true
       maxlevel: 5
+    bloodcompass:
+      enabled: true
+      maxlevel: 3
+      numArrows: 1
+      revealDistance: 10.0
+      pointDistance: 64.0
     soulharvest:
       enabled: true
       maxlevel: 3
