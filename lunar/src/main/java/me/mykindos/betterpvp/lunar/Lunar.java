@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.lunar;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
+import com.lunarclient.apollo.event.EventBus;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.Core;
@@ -15,6 +16,7 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
 import me.mykindos.betterpvp.lunar.commands.loader.LunarCommandLoader;
 import me.mykindos.betterpvp.lunar.injector.LunarInjectorModule;
 import me.mykindos.betterpvp.lunar.listener.LunarListenerLoader;
+import me.mykindos.betterpvp.lunar.listener.impl.LunarClientLoginListener;
 import org.bukkit.Bukkit;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
@@ -65,6 +67,8 @@ public final class Lunar extends BPvPPlugin {
             var shopsCommandLoader = injector.getInstance(LunarCommandLoader.class);
             shopsCommandLoader.loadCommands(PACKAGE);
 
+            final LunarClientLoginListener loginListener = injector.getInstance(LunarClientLoginListener.class);
+            EventBus.getBus().register(loginListener);
 
             updateEventExecutor.loadPlugin(this);
         }

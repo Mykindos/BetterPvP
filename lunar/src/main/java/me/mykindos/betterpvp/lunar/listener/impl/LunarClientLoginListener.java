@@ -1,34 +1,64 @@
 package me.mykindos.betterpvp.lunar.listener.impl;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.lunarclient.apollo.Apollo;
+import com.lunarclient.apollo.event.ApolloListener;
+import com.lunarclient.apollo.event.Listen;
+import com.lunarclient.apollo.event.player.ApolloRegisterPlayerEvent;
+import com.lunarclient.apollo.event.player.ApolloUnregisterPlayerEvent;
+import com.lunarclient.apollo.module.notification.Notification;
+import com.lunarclient.apollo.module.notification.NotificationModule;
+import com.lunarclient.apollo.module.staffmod.StaffModModule;
+import com.lunarclient.apollo.player.ApolloPlayer;
+import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.ClientManager;
+import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.framework.events.lunar.LunarClientEvent;
-import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.lunar.Lunar;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.plugin.java.JavaPlugin;
+
+import java.time.Duration;
+import java.util.Objects;
 
 @Singleton
-@BPvPListener
-public class LunarClientLoginListener implements Listener {
+public class LunarClientLoginListener implements ApolloListener {
 
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onJoin(PlayerJoinEvent event) {
-        final Player player = event.getPlayer();
-        if (Apollo.getPlayerManager().hasSupport(player.getUniqueId())) {
-            UtilServer.callEvent(new LunarClientEvent(player, true));
-        }
+    @Inject
+    private ClientManager clientManager;
+
+    @Listen
+    public void onApolloRegister(ApolloRegisterPlayerEvent event) {
+        final ApolloPlayer apolloPlayer = event.getPlayer();
+        final Player player = Objects.requireNonNull(Bukkit.getPlayer(apolloPlayer.getUniqueId()));
+        UtilServer.callEvent(new LunarClientEvent(player, true));
+
+        // Notify them that they are using Lunar Client
+        final Notification notification = Notification.builder()
+                .title("Lunar Client Support")
+                .description("You are using Lunar Client! Enhanced features are now available.")
+                .resourceLocation("")
+                .displayTime(Duration.ofSeconds(10L))
+                .build();
+
+        UtilServer.runTaskLater(JavaPlugin.getPlugin(Lunar.class), () -> {
+            final NotificationModule module = Apollo.getModuleManager().getModule(NotificationModule.class);
+            module.displayNotification(apolloPlayer, notification);
+
+            // Enable staff module if admin
+            final Client client = clientManager.getObject(player.getUniqueId()).orElseThrow();
+            if (client.hasRank(Rank.ADMIN)) {
+                Apollo.getModuleManager().getModule(StaffModModule.class).enableAllStaffMods(apolloPlayer);
+            }
+        }, 1);
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onQuit(PlayerQuitEvent event) {
-        final Player player = event.getPlayer();
-        if (Apollo.getPlayerManager().hasSupport(player.getUniqueId())) {
-            UtilServer.callEvent(new LunarClientEvent(player, false));
-        }
+    @Listen
+    public void onApolloUnregister(ApolloUnregisterPlayerEvent event) {
+        final Player player = Bukkit.getPlayer(event.getPlayer().getUniqueId());
+        UtilServer.callEvent(new LunarClientEvent(player, false));
     }
 }
