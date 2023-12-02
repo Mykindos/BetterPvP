@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.core.tips;
 
-import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.Setter;

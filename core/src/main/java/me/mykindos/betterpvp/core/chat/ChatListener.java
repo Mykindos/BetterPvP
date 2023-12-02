@@ -139,7 +139,7 @@ public class ChatListener implements Listener {
     }
 
     private void logChatToDiscord(Player player, Component message) {
-        if(!discordChatWebhook.equals("")){
+        if(!discordChatWebhook.isEmpty()){
             DiscordWebhook webhook = new DiscordWebhook(discordChatWebhook);
             webhook.send(DiscordMessage.builder()
                     .username(player.getName())

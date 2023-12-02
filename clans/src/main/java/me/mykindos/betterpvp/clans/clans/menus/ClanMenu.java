@@ -2,181 +2,111 @@ package me.mykindos.betterpvp.clans.clans.menus;
 
 
 import me.mykindos.betterpvp.clans.clans.Clan;
-import me.mykindos.betterpvp.clans.clans.ClanRelation;
 import me.mykindos.betterpvp.clans.clans.menus.buttons.*;
-import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
-import me.mykindos.betterpvp.core.gamer.Gamer;
-import me.mykindos.betterpvp.core.menu.Button;
 import me.mykindos.betterpvp.core.menu.Menu;
+import me.mykindos.betterpvp.core.menu.Windowed;
+import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.ClickType;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.SkullMeta;
+import org.jetbrains.annotations.NotNull;
+import xyz.xenondevs.invui.gui.AbstractGui;
+import xyz.xenondevs.invui.item.impl.SimpleItem;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
-public class ClanMenu extends Menu {
+public class ClanMenu extends AbstractGui implements Windowed {
 
-    private final Player player;
-    private final Clan playerClan;
+    private static final int[] MEMBER_SLOTS = { 19, 20, 21, 22, 23, 24, 25, 26 };
+    private static final SimpleItem EMPTY_MEMBER_SLOT = new SimpleItem(ItemView.builder()
+            .material(Material.RED_STAINED_GLASS_PANE)
+            .displayName(Component.empty())
+            .lore(Component.text("EMPTY SLOT!", NamedTextColor.RED))
+            .lore(Component.empty())
+            .build());
+
+    private final Player viewer;
+    private final Clan viewerClan;
     private final Clan clan;
 
-    public ClanMenu(Player player, Clan playerClan, Clan clan) {
-        super(player, 54, Component.text("Clan Menu"));
-        this.playerClan = playerClan;
+    public ClanMenu(Player viewer, Clan viewerClan, Clan clan) {
+        super(9, 5);
+        this.viewerClan = viewerClan;
         this.clan = clan;
-        this.player = player;
+        this.viewer = viewer;
 
-        fillPage();
-        construct();
+        populate();
     }
 
-    public void fillPage() {
+    public void populate() {
+        boolean ownClan = viewerClan != null && viewerClan.getId().equals(clan.getId());
+        boolean admin = ownClan && viewerClan.getMemberByUUID(viewer.getUniqueId()).map(member -> member.getRank().hasRank(ClanMember.MemberRank.ADMIN)).orElse(false);
+        boolean leader = ownClan && viewerClan.getMemberByUUID(viewer.getUniqueId()).map(member -> member.getRank().hasRank(ClanMember.MemberRank.LEADER)).orElse(false);
 
-        addButton(new ClanProgressionButton(4, clan));
-        addButton(new TerritoryButton(17, player, clan));
-        addButton(new EnergyButton(26, player, clan));
-        addButton(new AlliesButton(8, playerClan, clan));
-        addButton(new ClanButton(22, clan, player, clan.getRelation(playerClan)));
+        // Top row global buttons
+        setItem(0, new ViewEnemiesButton(clan, this, viewerClan));
+        setItem(2, new ClanProgressionButton(clan));
+        setItem(4, new TerritoryButton(admin, clan));
+        setItem(6, new EnergyButton(ownClan, clan, this));
+        setItem(8, new ViewAlliancesButton(clan, this, viewerClan));
 
-        List<ClanMember> members = clan.getMembers();
-        loadPlayerHeads(members);
+        // Middle row - member and clan information
+        setItem(18, new ClanDetailsButton(admin, clan, clan.getRelation(viewerClan)));
+        addMemberButtons(ownClan);
 
-        // Only add the below buttons if it is the player's clan
-        if (clan.getMemberByUUID(player.getUniqueId()).isPresent()) {
-            addButton(new EnemiesButton(0, playerClan, clan));
-            addButton(new LeaveClanButton(49, clan, player));
-            addButton(new ClanCommandButton(35));
-            addButton(new ClanVaultButton(44, clan));
-            addButton(new ClanUpgradesButton(53,clan));
-            List<ClanEnemy> topEnemies = getTopEnemiesByDominance();
-            for (int i = 0; i < topEnemies.size(); i++) {
-                ClanEnemy enemy = topEnemies.get(i);
-                int slot = 9 * (i + 1);
-                addButton(new EnemyButton(slot, playerClan, enemy));
-            }
+        // Bottom row buttons (only viewable by clan members)
+        if (ownClan) {
+            setItem(38, new ClanHomeButton(admin));
+            setItem(40, new LeaveClanButton(leader));
+            setItem(42, new ClanVaultButton(clan));
         }
 
+        setBackground(Menu.BACKGROUND_ITEM);
     }
 
-    private void loadPlayerHeads(List<ClanMember> members) {
-        members.sort((m1, m2) -> Integer.compare(m2.getRank().getPrivilege(), m1.getRank().getPrivilege()));
-        ClanMember viewingMember = clan.getMemberByUUID(player.getUniqueId()).orElse(null);
+    private void addMemberButtons(boolean detailed) {
+        Optional<ClanMember.MemberRank> optRank = Optional.empty();
+        if (viewerClan != null) {
+            optRank = viewerClan.getMemberByUUID(viewer.getUniqueId()).map(ClanMember::getRank);
+        }
+        final boolean admin = optRank.isPresent() && optRank.map(rank -> rank.hasRank(ClanMember.MemberRank.ADMIN)).orElse(false);
+        final Map<ClanMember, OfflinePlayer> members = clan.getMembers().stream().collect(Collectors.toMap(
+                Function.identity(), member -> Bukkit.getOfflinePlayer(UUID.fromString(member.getUuid()))));
 
-        int[] slots = {13, 14, 23, 32, 31, 30, 21, 12};
-        for (int i = 0; i < members.size() && i < slots.length; i++) {
-            ClanMember member = members.get(i);
-            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(UUID.fromString(member.getUuid()));
-            if (offlinePlayer.getName() == null) continue;
+        final ArrayList<ClanMember> sorted = new ArrayList<>(members.keySet());
+        sorted.sort((m1, m2) -> {
+            final OfflinePlayer p1 = members.get(m1);
+            final OfflinePlayer p2 = members.get(m2);
+            if (p1.isOnline() != p2.isOnline()) {
+                return Boolean.compare(p2.isOnline(), p1.isOnline());
+            }
 
-            ItemStack playerHead;
-            NamedTextColor displayNameColor;
+            return Integer.compare(m2.getRank().getPrivilege(), m1.getRank().getPrivilege());
+        });
 
-            if (offlinePlayer.isOnline()) {
-                playerHead = new ItemStack(Material.PLAYER_HEAD);
-                displayNameColor = clan.getRelation(playerClan).getPrimary();
+        final Iterator<ClanMember> iterator = sorted.iterator();
+        for (final int slot : MEMBER_SLOTS) {
+            if (!iterator.hasNext()) {
+                setItem(slot, EMPTY_MEMBER_SLOT);
             } else {
-                playerHead = new ItemStack(Material.SKELETON_SKULL);
-                displayNameColor = NamedTextColor.GRAY;
+                final ClanMember member = iterator.next();
+                final OfflinePlayer player = members.get(member);
+                final boolean canEdit = admin && member.getRank().getPrivilege() < optRank.orElseThrow().getPrivilege();
+
+                setItem(slot, new ClanMemberButton(clan, member, player, detailed, canEdit));
             }
-
-            SkullMeta skullMeta = (SkullMeta) playerHead.getItemMeta();
-            skullMeta.setOwningPlayer(offlinePlayer);
-            skullMeta.displayName(Component.text(offlinePlayer.getName(),displayNameColor));
-            playerHead.setItemMeta(skullMeta);
-
-            List<Component> lore = new ArrayList<>();
-
-            TextColor rankColor = switch (member.getRank()) {
-                case RECRUIT -> NamedTextColor.DARK_GRAY;
-                case MEMBER -> NamedTextColor.GOLD;
-                case ADMIN -> NamedTextColor.RED;
-                case LEADER -> NamedTextColor.DARK_RED;
-            };
-            lore.add(Component.text(member.getRank().getName(), rankColor));
-            lore.add(Component.text("K/D/A: " + 0, NamedTextColor.GRAY));
-            lore.add(Component.text("Playtime: " + 0, NamedTextColor.GRAY));
-            if (viewingMember != null) {
-                boolean isAdmin = viewingMember.getRank() == ClanMember.MemberRank.ADMIN;
-                boolean isLeader = viewingMember.getRank() == ClanMember.MemberRank.LEADER;
-
-                if (isLeader && !member.getUuid().equals(viewingMember.getUuid())) {
-                    lore.add(Component.text(""));
-                    lore.add(Component.text("Left click to promote", NamedTextColor.DARK_GRAY));
-                    lore.add(Component.text("Right click to demote", NamedTextColor.DARK_GRAY));
-                    lore.add(Component.text("Shift left click to kick", NamedTextColor.DARK_GRAY));
-                } else if (isAdmin && !member.getUuid().equals(viewingMember.getUuid()) && (member.getRank() == ClanMember.MemberRank.RECRUIT || member.getRank() == ClanMember.MemberRank.MEMBER)) {
-                    lore.add(Component.text(""));
-                    lore.add(Component.text("Left click to promote", NamedTextColor.DARK_GRAY));
-                    lore.add(Component.text("Right click to demote", NamedTextColor.DARK_GRAY));
-                    lore.add(Component.text("Shift left click to kick", NamedTextColor.DARK_GRAY));
-                }
-            }
-
-            ItemMeta itemMeta = playerHead.getItemMeta();
-            itemMeta.lore(lore);
-            playerHead.setItemMeta(itemMeta);
-
-            Component displayName = Component.text(offlinePlayer.getName(), displayNameColor);
-
-            Button memberButton = new Button(slots[i], playerHead, displayName, lore) {
-                @Override
-                public void onClick(Player player, Gamer gamer, ClickType clickType) {
-                    ClanMember viewingMember = clan.getMemberByUUID(player.getUniqueId()).orElse(null);
-
-                    if (viewingMember == null) return;  // Exit if the clicking player isn't a clan member.
-
-                    if (clickType.isLeftClick()) {
-                        // No promotion logic for leaders since they can't promote anyone.
-                        if (viewingMember.getRank() == ClanMember.MemberRank.ADMIN && !member.getUuid().equals(viewingMember.getUuid()) && (member.getRank() == ClanMember.MemberRank.RECRUIT || member.getRank() == ClanMember.MemberRank.MEMBER)) {
-                            // Promote member logic (Recruits to Members only)
-                        }
-                    } else if (clickType.isRightClick()) {
-                        if (viewingMember.getRank() == ClanMember.MemberRank.LEADER && !member.getUuid().equals(viewingMember.getUuid()) && member.getRank() != ClanMember.MemberRank.LEADER) {
-                            // Demote member logic (Can demote any rank other than leader)
-                        } else if (viewingMember.getRank() == ClanMember.MemberRank.ADMIN && !member.getUuid().equals(viewingMember.getUuid()) && member.getRank() != ClanMember.MemberRank.LEADER && member.getRank() != ClanMember.MemberRank.ADMIN) {
-                            // Demote member logic for admins (Can demote Recruits and Members only)
-                        }
-                    } else if (clickType.isShiftClick()) {
-                        // Kick member logic, you can expand on the conditions here.
-                    }
-                }
-            };
-            addButton(memberButton);
         }
     }
 
-    public ClanRelation getRelation(UUID uuid){
-
-        if(clan.getMembers().stream().anyMatch(member -> member.getUuid().equals(uuid.toString()))){
-            return ClanRelation.SELF;
-        }else if(clan.getAlliances().stream().anyMatch(ally -> ally.getClan().getMembers().stream().anyMatch(member -> member.getUuid().equals(uuid.toString())))) {
-            return ClanRelation.ALLY;
-        }else if(clan.getEnemies().stream().anyMatch(enemy -> enemy.getClan().getMembers().stream().anyMatch(member -> member.getUuid().equals(uuid.toString())))) {
-            return ClanRelation.ENEMY;
-        }
-
-        return ClanRelation.NEUTRAL;
+    @NotNull
+    @Override
+    public Component getTitle() {
+        return Component.text("View " + clan.getName());
     }
-
-
-    private List<ClanEnemy> getTopEnemiesByDominance() {
-        List<ClanEnemy> enemies = clan.getEnemies();
-        enemies.sort(Comparator.comparingDouble((ClanEnemy e) -> Math.abs(e.getDominance())).reversed());
-
-        return enemies.subList(0, Math.min(5, enemies.size()));
-    }
-
-
 }

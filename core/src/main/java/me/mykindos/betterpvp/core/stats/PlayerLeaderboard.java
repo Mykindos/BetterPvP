@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.stats;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardEntry;
+import me.mykindos.betterpvp.core.utilities.model.description.Description;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -38,11 +39,12 @@ public abstract class PlayerLeaderboard<T> extends Leaderboard<UUID, T> {
 
         ItemStack itemStack = new ItemStack(Material.PLAYER_HEAD);
         final SkullMeta meta = (SkullMeta) itemStack.getItemMeta();
+        meta.setPlayerProfile(player.getPlayerProfile());
         itemStack.setItemMeta(meta);
 
         return Description.builder()
                 .icon(itemStack)
-                .lines(result)
+                .properties(result)
                 .build();
     }
 

@@ -11,8 +11,6 @@ import me.mykindos.betterpvp.core.framework.annotations.WithReflection;
 import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.gamer.properties.GamerProperty;
-import me.mykindos.betterpvp.core.menu.Menu;
-import me.mykindos.betterpvp.core.menu.MenuManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
@@ -98,8 +96,7 @@ public class ClanCommand extends Command {
     }
 
     private void openClanMenu(Player player, Clan playerClan, Clan clan) {
-        Menu clanMenu = new ClanMenu(player, playerClan, clan);
-        MenuManager.openMenu(player, clanMenu);
+        new ClanMenu(player, playerClan, clan).show(player);
     }
 
     public void displayChat(Player player, Clan clan) {

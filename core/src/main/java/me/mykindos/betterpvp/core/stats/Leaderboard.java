@@ -19,12 +19,22 @@ import me.mykindos.betterpvp.core.stats.sort.Sorted;
 import me.mykindos.betterpvp.core.stats.sort.TemporalSort;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
+import me.mykindos.betterpvp.core.utilities.model.description.Description;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
@@ -102,12 +112,10 @@ public abstract class Leaderboard<E, T> {
                 return set;
             }).exceptionally(ex -> {
                 log.error("Failed to fetch leaderboard data for " + options + "!", ex);
-                ex.printStackTrace();
                 return null;
             }).whenComplete((set, ex) -> {
                 if (ex != null) {
                     log.error("Failed to fetch leaderboard data for " + options + "!", ex);
-                    ex.printStackTrace();
                     return;
                 }
                 topTen.put(options, set);
@@ -203,7 +211,6 @@ public abstract class Leaderboard<E, T> {
             return types;
         }).exceptionally(ex -> {
             log.error("Failed to add " + entryName + " to leaderboard!", ex);
-            ex.printStackTrace();
             return null;
         });
     }

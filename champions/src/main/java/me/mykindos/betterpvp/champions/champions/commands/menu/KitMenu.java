@@ -1,25 +1,43 @@
 package me.mykindos.betterpvp.champions.champions.commands.menu;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.components.champions.Role;
-import me.mykindos.betterpvp.core.menu.Menu;
+import me.mykindos.betterpvp.core.menu.Windowed;
+import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemFlag;
+import org.jetbrains.annotations.NotNull;
+import xyz.xenondevs.invui.gui.AbstractGui;
 
-public class KitMenu extends Menu {
+@Singleton
+public class KitMenu extends AbstractGui implements Windowed {
 
-    public KitMenu(Player player) {
-        super(player, 36, Component.text("Select a kit", NamedTextColor.RED));
+    @Inject
+    public KitMenu() {
+        super(9, 4);
 
         int[] start = new int[]{0, 1, 3, 5, 7, 8};
         int count = 0;
         for (Role role : Role.values()) {
-            addButton(new KitButton(start[count], new ItemStack(role.getHelmet()).clone(), role.getName(), role));
-            addButton(new KitButton(start[count] + 9, new ItemStack(role.getChestplate()).clone(), role.getName(), role));
-            addButton(new KitButton(start[count] + 18, new ItemStack(role.getLeggings()).clone(), role.getName(), role));
-            addButton(new KitButton(start[count] + 27, new ItemStack(role.getBoots()).clone(), role.getName(), role));
+            Component name = Component.text(role.getName(), NamedTextColor.GREEN);
+            setItem(start[count], new KitButton(getItem(role.getHelmet(), name), role));
+            setItem(start[count] + 9, new KitButton(getItem(role.getChestplate(), name), role));
+            setItem(start[count] + 18, new KitButton(getItem(role.getLeggings(), name), role));
+            setItem(start[count] + 27, new KitButton(getItem(role.getBoots(), name), role));
             count++;
         }
+    }
+
+    private static ItemView getItem(Material role, Component name) {
+        return ItemView.builder().material(role).flag(ItemFlag.HIDE_ATTRIBUTES).displayName(name).build();
+    }
+
+    @NotNull
+    @Override
+    public Component getTitle() {
+        return Component.text("Select a kit");
     }
 }

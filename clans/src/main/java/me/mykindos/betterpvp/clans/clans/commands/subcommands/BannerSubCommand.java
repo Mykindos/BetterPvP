@@ -6,24 +6,19 @@ import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
 import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
+import me.mykindos.betterpvp.clans.clans.menus.BannerMenu;
 import me.mykindos.betterpvp.core.client.Client;
-import me.mykindos.betterpvp.core.client.ClientManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.gamer.GamerManager;
-import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
 @Singleton
 @SubCommand(ClanCommand.class)
 public class BannerSubCommand extends ClanSubCommand {
-
-    @Inject
-    private ClientManager clientManager;
 
     @Inject
     public BannerSubCommand(ClanManager clanManager, GamerManager gamerManager) {
@@ -56,16 +51,7 @@ public class BannerSubCommand extends ClanSubCommand {
             return;
         }
 
-        ItemStack heldItem = UtilItem.removeEnchants(player.getInventory().getItemInMainHand());
-        if (!heldItem.getType().toString().endsWith("_BANNER")){
-            UtilMessage.message(player, "Banner", "You must be holding a banner to set it as the clan banner!");
-            return;
-        }
-
-        clan.setBanner(heldItem);
-        clanManager.getRepository().updateClanBanner(clan);
-        player.getInventory().removeItem(heldItem);
-        UtilMessage.message(player, "Banner", "Clan banner has been set!");
+        new BannerMenu(clan, null).show(player);
     }
 
     @Override

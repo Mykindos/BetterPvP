@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
+import me.mykindos.betterpvp.core.utilities.events.GetPlayerRelationshipEvent;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -39,6 +40,12 @@ public class ClansSkillListener implements Listener {
             UtilMessage.message(event.getPlayer(), "Restriction", "You cannot use this skill here.");
             event.setCancelled(true);
         }
+    }
+
+    @EventHandler
+    public void onGetPlayerPropertyEvent(GetPlayerRelationshipEvent event) {
+        boolean canHurt = clanManager.canHurt(event.getPlayer(), event.getTarget());
+        event.setEntityProperty(canHurt ? EntityProperty.ENEMY : EntityProperty.FRIENDLY);
     }
 
     @EventHandler

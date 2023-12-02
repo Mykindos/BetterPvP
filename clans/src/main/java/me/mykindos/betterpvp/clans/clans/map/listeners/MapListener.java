@@ -114,7 +114,7 @@ public class MapListener implements Listener {
 
         if (event.getCurrentItem().getType() == Material.FILLED_MAP) {
             final Inventory topInventory = event.getWhoClicked().getOpenInventory().getTopInventory();
-            if (topInventory != null && topInventory.getType() != InventoryType.CRAFTING) {
+            if (topInventory.getType() != InventoryType.CRAFTING) {
                 event.setCancelled(true);
             }
             if (event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {

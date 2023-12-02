@@ -9,11 +9,10 @@ import me.mykindos.betterpvp.champions.crafting.imbuements.ImbuementRepository;
 import java.util.List;
 
 @Singleton
+@Getter
 public class CraftingManager {
 
-
-    @Getter
-    private List<Imbuement> imbuements;
+    private final List<Imbuement> imbuements;
 
     @Inject
     public CraftingManager(ImbuementRepository imbuementRepository) {

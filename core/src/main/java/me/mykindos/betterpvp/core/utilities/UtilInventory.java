@@ -26,20 +26,17 @@ public class UtilInventory {
     public static boolean remove(Player player, Material item, int toRemove) {
         if (contains(player, item, toRemove)) {
             for (int i = 0; i < player.getInventory().getSize(); ++i) {
-                if (player.getInventory().getItem(i) != null) {
-                    ItemStack stack = player.getInventory().getItem(i);
-                    if (stack == null) continue;
-                    if (stack.getType() == item) {
-                        if (stack.getAmount() > toRemove) {
-                            stack.setAmount(stack.getAmount() - toRemove);
-                            player.updateInventory();
-                        } else {
-                            player.getInventory().setItem(i, (ItemStack) null);
-                            player.updateInventory();
-                        }
-
-                        return true;
+                ItemStack stack = player.getInventory().getItem(i);
+                if (stack == null) continue;
+                if (stack.getType() == item) {
+                    if (stack.getAmount() > toRemove) {
+                        stack.setAmount(stack.getAmount() - toRemove);
+                    } else {
+                        player.getInventory().setItem(i, null);
                     }
+
+                    return true;
+
                 }
             }
 

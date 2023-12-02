@@ -1,48 +1,49 @@
 package me.mykindos.betterpvp.clans.clans.menus.buttons;
 
-import me.mykindos.betterpvp.clans.clans.Clan;
-import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
-import me.mykindos.betterpvp.core.gamer.Gamer;
-import me.mykindos.betterpvp.core.menu.Button;
-import me.mykindos.betterpvp.core.utilities.UtilItem;
-import me.mykindos.betterpvp.core.utilities.model.ItemView;
+import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
+import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.jetbrains.annotations.NotNull;
+import xyz.xenondevs.invui.item.ItemProvider;
+import xyz.xenondevs.invui.item.impl.AbstractItem;
 
-import java.util.ArrayList;
+public class LeaveClanButton extends AbstractItem {
 
-public class LeaveClanButton extends Button {
+    private final boolean leader;
 
-    private final ClanMember.MemberRank rank; // to store the rank of the player in the clan
-
-    public LeaveClanButton(int slot, Clan clan, Player player) {
-        super(slot, ItemView.builder().material(Material.PAPER).customModelData(5).fallbackMaterial(Material.RED_CONCRETE).build().toItemStack());
-
-        ClanMember member = clan.getMemberByUUID(player.getUniqueId()).orElse(null);
-        this.rank = member != null ? member.getRank() : null;
-
-        this.name = Component.text("Leave Clan", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false);
-        this.lore = new ArrayList<>();
-        lore.add(Component.text("Left click to leave your clan", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
-
-        if (rank == ClanMember.MemberRank.LEADER) {
-            lore.add(Component.text("Shift Left click to disband your clan", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
-        }
-
-        this.itemStack = UtilItem.removeAttributes(UtilItem.setItemNameAndLore(itemStack, name, lore)).clone();
+    public LeaveClanButton(boolean leader) {
+        this.leader = leader;
     }
 
     @Override
-    public void onClick(Player player, Gamer gamer, ClickType clickType) {
-        if (clickType.isLeftClick()) {
+    public ItemProvider getItemProvider() {
+        final ItemView.ItemViewBuilder provider = ItemView.builder()
+                .material(Material.PAPER)
+                .customModelData(10003)
+                .fallbackMaterial(Material.RED_CONCRETE)
+                .displayName(Component.text("Leave", NamedTextColor.RED))
+                .action(ClickActions.ALL, Component.text("Leave Clan"));
+        if (leader) {
+            provider.action(ClickActions.SHIFT, Component.text("Disband Clan"));
+        }
+        return provider.build();
+    }
+
+    @Override
+    public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
+        if (leader && ClickActions.SHIFT.accepts(clickType)) {
+            player.closeInventory();
+            player.chat("/clan disband");
+        } else if (ClickActions.LEFT.accepts(clickType)) {
+            player.closeInventory();
             player.chat("/clan leave");
-        } else if (clickType.isShiftClick() && rank == ClanMember.MemberRank.LEADER) {
-            player.chat("/c disband");
         }
     }
+
 }
 

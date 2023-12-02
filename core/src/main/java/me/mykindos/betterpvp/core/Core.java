@@ -22,6 +22,7 @@ import me.mykindos.betterpvp.core.listener.loader.CoreListenerLoader;
 import net.kyori.adventure.key.Key;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
+import xyz.xenondevs.invui.InvUI;
 
 import java.lang.reflect.Field;
 import java.util.Set;
@@ -87,6 +88,8 @@ public class Core extends BPvPPlugin {
 
         updateEventExecutor.loadPlugin(this);
         updateEventExecutor.initialize();
+
+        InvUI.getInstance().setPlugin(this);
     }
 
     @Override
