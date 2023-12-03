@@ -70,9 +70,12 @@ public class BloodCompass extends Skill implements PassiveSkill {
         if (player == null) return;
 
         nearestEnemies.forEach((uuid, enemy) -> {
-            if (player.getLocation().distance(enemy.getLocation()) <= revealDistance) {
-                UtilPlayer.setGlowing(player, enemy, true);            }
-            drawArrow(player, enemy);
+            double distanceToEnemy = player.getLocation().distance(enemy.getLocation());
+            if (distanceToEnemy <= revealDistance) {
+                UtilPlayer.setGlowing(player, enemy, true);
+            } else {
+                drawArrow(player, enemy);
+            }
         });
     }
 
