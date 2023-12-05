@@ -24,7 +24,7 @@ public class ClientDeserializer implements JsonDeserializer<Client> {
         final String name = object.get("name").getAsString();
         final Rank rank = Objects.requireNonNull(Rank.getRank(object.get("rank").getAsInt()));
         final boolean administrating = object.get("administrating").getAsBoolean();
-        final JsonObject properties = object.get("properties").getAsJsonObject();
+        final JsonArray properties = object.get("properties").getAsJsonArray();
 
         final Gamer gamer = new Gamer(uuid);
         final Client client = new Client(gamer, uuid, name, rank);
@@ -35,9 +35,8 @@ public class ClientDeserializer implements JsonDeserializer<Client> {
     }
 
     @SneakyThrows
-    private void setProperties(Client client, JsonObject properties) {
-        final JsonArray array = properties.getAsJsonArray();
-        for (JsonElement element : array) {
+    private void setProperties(Client client, JsonArray properties) {
+        for (JsonElement element : properties) {
             final JsonObject object = element.getAsJsonObject();
             final String type = object.get("type").getAsString();
             final String name = object.get("name").getAsString();

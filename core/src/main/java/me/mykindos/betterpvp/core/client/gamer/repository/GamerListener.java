@@ -21,6 +21,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -82,17 +83,19 @@ public class GamerListener implements Listener {
 
     @EventHandler (priority =  EventPriority.MONITOR)
     public void onClientLoad(AsyncClientLoadEvent event) {
-        this.manager.loadOnline(event.getClient().getUniqueId(), event.getClient().getName(), client -> {
-            final Gamer gamer = client.getGamer();
-            checkUnsetProperties(gamer);
+        final Gamer gamer = event.getClient().getGamer();
+        checkUnsetProperties(gamer);
+    }
 
-            Bukkit.getOnlinePlayers().forEach(player ->
-                    UtilServer.runTaskLater(core, () -> UtilServer.callEvent(new ScoreboardUpdateEvent(player)), 1));
+    @EventHandler
+    public void onJoin(PlayerJoinEvent event) {
+        final Gamer gamer = this.manager.search().online(event.getPlayer()).getGamer();
+        Bukkit.getOnlinePlayers().forEach(player ->
+                UtilServer.runTaskLater(core, () -> UtilServer.callEvent(new ScoreboardUpdateEvent(player)), 1));
 
-            gamer.getPlayerList().clear();
-            gamer.getPlayerList().add(PlayerListType.FOOTER, footer);
-            gamer.getPlayerList().add(PlayerListType.HEADER, header);
-        }, null);
+        gamer.getPlayerList().clear();
+        gamer.getPlayerList().add(PlayerListType.FOOTER, footer);
+        gamer.getPlayerList().add(PlayerListType.HEADER, header);
     }
 
     private void checkUnsetProperties(Gamer gamer) {

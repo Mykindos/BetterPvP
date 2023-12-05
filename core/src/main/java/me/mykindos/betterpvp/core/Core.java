@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
 import me.mykindos.betterpvp.core.injector.CoreInjectorModule;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.loader.CoreListenerLoader;
+import me.mykindos.betterpvp.core.redis.Redis;
 import net.kyori.adventure.key.Key;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
@@ -42,15 +43,13 @@ public class Core extends BPvPPlugin {
     @Inject
     private Database database;
 
+    @Inject
+    private Redis redis;
+
     private ClientManager clientManager;
 
     @Inject
     private UpdateEventExecutor updateEventExecutor;
-
-    @Inject
-    @Config(path = "core.database.prefix")
-    @Getter
-    private String databasePrefix;
 
     @Inject
     @Config(path = "core.password", defaultValue = "")
@@ -68,7 +67,8 @@ public class Core extends BPvPPlugin {
                 new ConfigInjectorModule(this, fields));
         injector.injectMembers(this);
 
-        database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:core-migrations", "");
+        database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:core-migrations", "core");
+        redis.credentials(this.getConfig());
 
         var coreListenerLoader = injector.getInstance(CoreListenerLoader.class);
         coreListenerLoader.registerListeners(PACKAGE);

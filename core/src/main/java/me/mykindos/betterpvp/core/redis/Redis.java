@@ -1,8 +1,6 @@
 package me.mykindos.betterpvp.core.redis;
 
-import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.core.Core;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import redis.clients.jedis.JedisPool;
@@ -13,14 +11,9 @@ import java.time.Duration;
 @Singleton
 public class Redis {
 
-    private JedisAgent wrapper;
+    private JedisPool pool;
 
-    @Inject
-    public Redis(Core core) {
-        this.init(core.getConfig());
-    }
-
-    public void init(final RedisCredentials redisCredentials) {
+    public void credentials(final RedisCredentials redisCredentials) {
         final JedisPoolConfig poolConfig = new JedisPoolConfig();
         poolConfig.setMaxTotal(128);
         poolConfig.setMaxIdle(128);
@@ -33,7 +26,7 @@ public class Redis {
         poolConfig.setNumTestsPerEvictionRun(3);
         poolConfig.setBlockWhenExhausted(true);
 
-        final JedisPool pool = new JedisPool(
+        this.pool = new JedisPool(
                 poolConfig,
                 redisCredentials.getHost(),
                 redisCredentials.getPort(),
@@ -41,10 +34,9 @@ public class Redis {
                 redisCredentials.getPassword(),
                 redisCredentials.getDatabase()
         );
-        this.wrapper = new JedisAgent(pool);
     }
 
-    public void init(final FileConfiguration fileConfiguration) {
+    public void credentials(final FileConfiguration fileConfiguration) {
         final ConfigurationSection section = fileConfiguration.getConfigurationSection("core.redis");
         if (section == null) {
             throw new IllegalArgumentException("The configuration file provided does not contain database details!");
@@ -57,11 +49,11 @@ public class Redis {
                 section.getInt("port")
         );
 
-        this.init(redisInfo);
+        this.credentials(redisInfo);
     }
 
-    public JedisAgent getAgent() {
-        return this.wrapper;
+    public RedisAgent createAgent() {
+        return new RedisAgent(pool);
     }
 
 }

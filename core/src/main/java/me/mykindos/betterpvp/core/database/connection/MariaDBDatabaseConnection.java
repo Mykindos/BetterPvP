@@ -9,7 +9,6 @@ import javax.inject.Inject;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Map;
 
 @Singleton
 @Slf4j
@@ -53,16 +52,15 @@ public class MariaDBDatabaseConnection implements IDatabaseConnection {
     }
 
     @Override
-    public void runDatabaseMigrations(ClassLoader classLoader, String location, String prefix) {
+    public void runDatabaseMigrations(ClassLoader classLoader, String location, String name) {
 
         var url = "jdbc:mysql://" + sqlServer + "/" + sqlDatabaseName;
 
         try {
             var flyway = Flyway.configure(classLoader)
-                    .table(prefix + "schema_history")
+                    .table(name + "_schema_history")
                     .dataSource(url, sqlUsername, sqlPassword)
                     .locations(location)
-                    .placeholders(Map.of("tablePrefix", prefix))
                     .baselineOnMigrate(true)
                     .validateOnMigrate(false)
                     .load();

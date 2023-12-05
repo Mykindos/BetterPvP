@@ -50,6 +50,7 @@ public class ClientManager extends PlayerManager<Client> {
         super(plugin);
         this.sql = sql;
         this.redis = redis;
+        this.redis.getObserver().register(this::receiveUpdate);
 
         this.store = Caffeine.newBuilder()
                 .scheduler(Scheduler.systemScheduler())
@@ -105,6 +106,7 @@ public class ClientManager extends PlayerManager<Client> {
 
     @Override
     protected void unload(final Client client) {
+        this.redis.save(client);
         this.store.invalidate(client);
     }
 
@@ -223,6 +225,27 @@ public class ClientManager extends PlayerManager<Client> {
             this.redis.save(client);
             this.sql.save(client);
         });
+    }
+
+    /**
+     * Called whenever this server instance has been notified that a client has been updated
+     * elsewhere.
+     * For example, when a client is updated on another server, this server will
+     * receive a message from redis that the client has been updated.
+     * @param uuid The UUID of the client that was updated.
+     */
+    protected void receiveUpdate(UUID uuid) {
+        // Attempt to get a loaded client with the same UUID.
+        final Optional<Client> client = this.getStoredUser(stored -> stored.getUniqueId().equals(uuid));
+        if (client.isEmpty()) {
+            // No client loaded with the same UUID, meaning we don't need to update anything
+            // as the updates will be applied when the client is loaded.
+            return;
+        }
+
+        // Otherwise, update
+        final Client stored = client.get();
+        this.redis.getClient(uuid).ifPresent(stored::copy);
     }
 }
 

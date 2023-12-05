@@ -1,4 +1,4 @@
-create table if not exists ${tablePrefix}builds
+create table if not exists champions_builds
 (
     Gamer    varchar(255) not null,
     Role     varchar(255) not null,
@@ -12,8 +12,8 @@ create table if not exists ${tablePrefix}builds
     Active   tinyint      null
 );
 
-alter table  ${tablePrefix}builds
-    add constraint  ${tablePrefix}builds_pk
+alter table  champions_builds
+    add constraint  champions_builds_pk
         primary key (Gamer, Role, ID);
 
 # noinspection SqlResolve

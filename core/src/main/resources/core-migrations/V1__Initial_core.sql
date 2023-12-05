@@ -1,4 +1,4 @@
-create table if not exists ${tablePrefix}clients
+create table if not exists clients
 (
     id   int auto_increment,
     UUID varchar(255) not null,
@@ -8,45 +8,45 @@ create table if not exists ${tablePrefix}clients
         primary key (id)
 );
 
-create unique index ${tablePrefix}clients_UUID_uindex
-    on ${tablePrefix}clients (UUID);
+create unique index clients_UUID_uindex
+    on clients (UUID);
 
-INSERT IGNORE INTO ${tablePrefix}clients (UUID, Name, `Rank`) VALUES ('e1f5d06b-685b-46a0-b22c-176d6aefffff', 'Mykindos', 'DEVELOPER');
+INSERT IGNORE INTO clients (UUID, Name, `Rank`) VALUES ('e1f5d06b-685b-46a0-b22c-176d6aefffff', 'Mykindos', 'DEVELOPER');
 
-create table if not exists ${tablePrefix}armour
+create table if not exists armour
 (
     Item      varchar(255) not null,
     Reduction double       null,
-    constraint ${tablePrefix}armour_pk
+    constraint armour_pk
         primary key (Item)
 );
 
-INSERT IGNORE INTO ${tablePrefix}armour (Item, Reduction) VALUES ('CHAINMAIL_BOOTS', 8);
-INSERT IGNORE INTO ${tablePrefix}armour (Item, Reduction) VALUES ('CHAINMAIL_CHESTPLATE', 20);
-INSERT IGNORE INTO ${tablePrefix}armour (Item, Reduction) VALUES ('CHAINMAIL_HELMET', 8);
-INSERT IGNORE INTO ${tablePrefix}armour (Item, Reduction) VALUES ('CHAINMAIL_LEGGINGS', 16);
-INSERT IGNORE INTO ${tablePrefix}armour (Item, Reduction) VALUES ('DIAMOND_BOOTS', 12);
-INSERT IGNORE INTO ${tablePrefix}armour (Item, Reduction) VALUES ('DIAMOND_CHESTPLATE', 21);
-INSERT IGNORE INTO ${tablePrefix}armour (Item, Reduction) VALUES ('DIAMOND_HELMET', 12);
-INSERT IGNORE INTO ${tablePrefix}armour (Item, Reduction) VALUES ('DIAMOND_LEGGINGS', 16);
-INSERT IGNORE INTO ${tablePrefix}armour (Item, Reduction) VALUES ('GOLDEN_BOOTS', 9);
-INSERT IGNORE INTO ${tablePrefix}armour (Item, Reduction) VALUES ('GOLDEN_CHESTPLATE', 20);
-INSERT IGNORE INTO ${tablePrefix}armour (Item, Reduction) VALUES ('GOLDEN_HELMET', 8);
-INSERT IGNORE INTO ${tablePrefix}armour (Item, Reduction) VALUES ('GOLDEN_LEGGINGS', 16);
-INSERT IGNORE INTO ${tablePrefix}armour (Item, Reduction) VALUES ('IRON_BOOTS', 8);
-INSERT IGNORE INTO ${tablePrefix}armour (Item, Reduction) VALUES ('IRON_CHESTPLATE', 24);
-INSERT IGNORE INTO ${tablePrefix}armour (Item, Reduction) VALUES ('IRON_HELMET', 7);
-INSERT IGNORE INTO ${tablePrefix}armour (Item, Reduction) VALUES ('IRON_LEGGINGS', 22);
-INSERT IGNORE INTO ${tablePrefix}armour (Item, Reduction) VALUES ('LEATHER_BOOTS', 6);
-INSERT IGNORE INTO ${tablePrefix}armour (Item, Reduction) VALUES ('LEATHER_CHESTPLATE', 13);
-INSERT IGNORE INTO ${tablePrefix}armour (Item, Reduction) VALUES ('LEATHER_HELMET', 7);
-INSERT IGNORE INTO ${tablePrefix}armour (Item, Reduction) VALUES ('LEATHER_LEGGINGS', 10);
-INSERT IGNORE INTO ${tablePrefix}armour (Item, Reduction) VALUES ('NETHERITE_BOOTS', 8);
-INSERT IGNORE INTO ${tablePrefix}armour (Item, Reduction) VALUES ('NETHERITE_CHESTPLATE', 22);
-INSERT IGNORE INTO ${tablePrefix}armour (Item, Reduction) VALUES ('NETHERITE_HELMET', 10);
-INSERT IGNORE INTO ${tablePrefix}armour (Item, Reduction) VALUES ('NETHERITE_LEGGINGS', 18);
+INSERT IGNORE INTO armour (Item, Reduction) VALUES ('CHAINMAIL_BOOTS', 8);
+INSERT IGNORE INTO armour (Item, Reduction) VALUES ('CHAINMAIL_CHESTPLATE', 20);
+INSERT IGNORE INTO armour (Item, Reduction) VALUES ('CHAINMAIL_HELMET', 8);
+INSERT IGNORE INTO armour (Item, Reduction) VALUES ('CHAINMAIL_LEGGINGS', 16);
+INSERT IGNORE INTO armour (Item, Reduction) VALUES ('DIAMOND_BOOTS', 12);
+INSERT IGNORE INTO armour (Item, Reduction) VALUES ('DIAMOND_CHESTPLATE', 21);
+INSERT IGNORE INTO armour (Item, Reduction) VALUES ('DIAMOND_HELMET', 12);
+INSERT IGNORE INTO armour (Item, Reduction) VALUES ('DIAMOND_LEGGINGS', 16);
+INSERT IGNORE INTO armour (Item, Reduction) VALUES ('GOLDEN_BOOTS', 9);
+INSERT IGNORE INTO armour (Item, Reduction) VALUES ('GOLDEN_CHESTPLATE', 20);
+INSERT IGNORE INTO armour (Item, Reduction) VALUES ('GOLDEN_HELMET', 8);
+INSERT IGNORE INTO armour (Item, Reduction) VALUES ('GOLDEN_LEGGINGS', 16);
+INSERT IGNORE INTO armour (Item, Reduction) VALUES ('IRON_BOOTS', 8);
+INSERT IGNORE INTO armour (Item, Reduction) VALUES ('IRON_CHESTPLATE', 24);
+INSERT IGNORE INTO armour (Item, Reduction) VALUES ('IRON_HELMET', 7);
+INSERT IGNORE INTO armour (Item, Reduction) VALUES ('IRON_LEGGINGS', 22);
+INSERT IGNORE INTO armour (Item, Reduction) VALUES ('LEATHER_BOOTS', 6);
+INSERT IGNORE INTO armour (Item, Reduction) VALUES ('LEATHER_CHESTPLATE', 13);
+INSERT IGNORE INTO armour (Item, Reduction) VALUES ('LEATHER_HELMET', 7);
+INSERT IGNORE INTO armour (Item, Reduction) VALUES ('LEATHER_LEGGINGS', 10);
+INSERT IGNORE INTO armour (Item, Reduction) VALUES ('NETHERITE_BOOTS', 8);
+INSERT IGNORE INTO armour (Item, Reduction) VALUES ('NETHERITE_CHESTPLATE', 22);
+INSERT IGNORE INTO armour (Item, Reduction) VALUES ('NETHERITE_HELMET', 10);
+INSERT IGNORE INTO armour (Item, Reduction) VALUES ('NETHERITE_LEGGINGS', 18);
 
-create table if not exists ${tablePrefix}client_properties
+create table if not exists client_properties
 (
     Client   varchar(255) not null,
     Property varchar(255) not null,
@@ -62,7 +62,7 @@ create table if not exists property_map
         primary key (Property, Type)
 );
 
-create table if not exists ${tablePrefix}gamer_properties
+create table if not exists gamer_properties
 (
     Gamer    varchar(255) not null,
     Property varchar(255) not null,

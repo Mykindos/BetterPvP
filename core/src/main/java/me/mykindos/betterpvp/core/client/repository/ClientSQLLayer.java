@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
-import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
@@ -22,10 +21,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 @Singleton
 public class ClientSQLLayer {
-
-    @Inject
-    @Config(path = "core.database.prefix")
-    private String databasePrefix;
 
     private final Database database;
 
@@ -99,7 +94,7 @@ public class ClientSQLLayer {
     public void loadGamerProperties(Client client) {
         // Gamer
         Gamer gamer = client.getGamer();
-        String query2 = "SELECT properties.Property, Value, Type FROM " + databasePrefix + "gamer_properties properties INNER JOIN "
+        String query2 = "SELECT properties.Property, Value, Type FROM gamer_properties properties INNER JOIN "
                 + "property_map map on properties.Property = map.Property WHERE Gamer = ?";
         CachedRowSet result2 = database.executeQuery(new Statement(query2, new StringStatementValue(gamer.getUuid())));
         try {
@@ -122,7 +117,7 @@ public class ClientSQLLayer {
 
     private void loadClientProperties(Client client) {
         // Client
-        String query = "SELECT properties.Property, Value, Type FROM " + databasePrefix + "client_properties properties INNER JOIN "
+        String query = "SELECT properties.Property, Value, Type FROM client_properties properties INNER JOIN "
                 + "property_map map on properties.Property = map.Property WHERE Client = ?";
         CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(client.getUuid())));
         try {
@@ -159,7 +154,7 @@ public class ClientSQLLayer {
 
     public void saveProperty(Client client, String property, Object value) {
         // Client
-        String savePropertyQuery = "INSERT INTO " + databasePrefix + "client_properties (Client, Property, Value) VALUES (?, ?, ?)"
+        String savePropertyQuery = "INSERT INTO client_properties (Client, Property, Value) VALUES (?, ?, ?)"
                 + " ON DUPLICATE KEY UPDATE Value = ?";
         Statement statement = new Statement(savePropertyQuery,
                 new StringStatementValue(client.getUuid()),
@@ -171,7 +166,7 @@ public class ClientSQLLayer {
 
     public void saveGamerProperty(Gamer gamer, String property, Object value) {
         // Gamer
-        String savePropertyQuery = "INSERT INTO " + databasePrefix + "gamer_properties (Gamer, Property, Value) VALUES (?, ?, ?)"
+        String savePropertyQuery = "INSERT INTO gamer_properties (Gamer, Property, Value) VALUES (?, ?, ?)"
                 + " ON DUPLICATE KEY UPDATE Value = ?";
 
         Statement statement = new Statement(savePropertyQuery,

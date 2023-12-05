@@ -3,7 +3,6 @@ package me.mykindos.betterpvp.champions.crafting.imbuements;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.repository.IRepository;
@@ -18,10 +17,6 @@ import java.util.List;
 @Slf4j
 public class ImbuementRepository implements IRepository<Imbuement> {
 
-    @Inject
-    @Config(path = "champions.database.prefix", defaultValue = "champions_")
-    private String databasePrefix;
-
     private final Database database;
 
     @Inject
@@ -32,7 +27,7 @@ public class ImbuementRepository implements IRepository<Imbuement> {
 
     public List<Imbuement> getAll() {
         List<Imbuement> imbuementValues = new ArrayList<>();
-        String query = "SELECT * FROM " + databasePrefix + "imbuement_data;";
+        String query = "SELECT * FROM champions_imbuement_data;";
         CachedRowSet result = database.executeQuery(new Statement(query));
         try {
             while (result.next()) {

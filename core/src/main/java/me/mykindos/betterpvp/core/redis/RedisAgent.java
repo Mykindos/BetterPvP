@@ -7,20 +7,19 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class JedisAgent {
+public class RedisAgent {
 
     private final JedisPool jedisPool;
 
-    JedisAgent(final JedisPool jedisPool) {
+    RedisAgent(final JedisPool jedisPool) {
         this.jedisPool = jedisPool;
     }
 
-    public void useResource(final BiConsumer<Jedis, JedisAgent> consumer) {
+    public void useResource(final BiConsumer<Jedis, RedisAgent> consumer) {
         try (final Jedis jedis = this.jedisPool.getResource()) {
             consumer.accept(jedis, this);
         }
     }
-
 
     public void useResource(final Consumer<Jedis> consumer) {
         try (final Jedis jedis = this.jedisPool.getResource()) {

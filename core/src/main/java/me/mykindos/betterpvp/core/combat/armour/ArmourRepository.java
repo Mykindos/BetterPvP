@@ -1,7 +1,6 @@
 package me.mykindos.betterpvp.core.combat.armour;
 
 import lombok.extern.slf4j.Slf4j;
-import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.repository.IRepository;
@@ -17,10 +16,6 @@ import java.util.List;
 @Slf4j
 public class ArmourRepository implements IRepository<Armour> {
 
-    @Inject
-    @Config(path = "core.database.prefix")
-    private String databasePrefix;
-
     private final Database database;
 
     @Inject
@@ -32,7 +27,7 @@ public class ArmourRepository implements IRepository<Armour> {
     @Override
     public List<Armour> getAll() {
         List<Armour> armour = new ArrayList<>();
-        String query = "SELECT * FROM " + databasePrefix + "armour";
+        String query = "SELECT * FROM armour";
         CachedRowSet result = database.executeQuery(new Statement(query));
         try {
             while (result.next()) {

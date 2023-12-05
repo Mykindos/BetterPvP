@@ -3,7 +3,6 @@ package me.mykindos.betterpvp.core.items;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
@@ -22,9 +21,6 @@ import java.util.List;
 @Slf4j
 public class ItemRepository implements IRepository<BPVPItem> {
 
-    @Inject
-    @Config(path = "core.database.prefix")
-    private String databasePrefix;
     private Database database;
 
     @Inject
@@ -39,7 +35,7 @@ public class ItemRepository implements IRepository<BPVPItem> {
 
     public List<BPVPItem> getItemsForModule(String module) {
         List<BPVPItem> items = new ArrayList<>();
-        String query = "SELECT * FROM " + databasePrefix + "items WHERE Module = ?";
+        String query = "SELECT * FROM items WHERE Module = ?";
         CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(module)));
         try {
             while (result.next()) {
@@ -67,7 +63,7 @@ public class ItemRepository implements IRepository<BPVPItem> {
 
     private List<Component> getLoreForItem(int id) {
         List<Component> lore = new ArrayList<>();
-        String query = "SELECT * FROM " + databasePrefix + "itemlore WHERE Item = " + id + " ORDER BY Priority ASC";
+        String query = "SELECT * FROM itemlore WHERE Item = " + id + " ORDER BY Priority ASC";
         CachedRowSet result = database.executeQuery(new Statement(query));
 
         try {

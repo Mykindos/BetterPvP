@@ -38,7 +38,7 @@ public abstract class StatsRepository<T extends StatHolder> {
     public final void saveAll(boolean async) {
         UtilServer.runTask(plugin, async, () -> {
             // Save repo-specific data
-            saveQueue.forEach((uuid, data) -> data.prepareUpdates(uuid, database, plugin.getDatabasePrefix()));
+            saveQueue.forEach((uuid, data) -> data.prepareUpdates(uuid, database));
             // Save extra
             postSaveAll(async);
             log.info("[{}] Saving {} players.", getClass().getSimpleName(), saveQueue.size());

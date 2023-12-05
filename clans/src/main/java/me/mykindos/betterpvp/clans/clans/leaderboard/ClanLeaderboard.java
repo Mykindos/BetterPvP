@@ -99,18 +99,18 @@ public class ClanLeaderboard extends Leaderboard<UUID, Clan> implements Sorted {
     }
 
     @Override
-    protected LeaderboardEntry<UUID, Clan> fetchPlayerData(@NotNull UUID player, @NotNull SearchOptions options, @NotNull Database database, @NotNull String tablePrefix) throws UnsupportedOperationException {
+    protected LeaderboardEntry<UUID, Clan> fetchPlayerData(@NotNull UUID player, @NotNull SearchOptions options, @NotNull Database database) throws UnsupportedOperationException {
         final Optional<Clan> clan = clanManager.getClanByPlayer(player);
         return clan.map(value -> LeaderboardEntry.of(value.getId(), value)).orElse(null);
     }
 
     @Override
-    protected Clan fetch(@NotNull SearchOptions options, @NotNull Database database, @NotNull String tablePrefix, @NotNull UUID entry) {
+    protected Clan fetch(@NotNull SearchOptions options, @NotNull Database database, @NotNull UUID entry) {
         return clanManager.getClanById(entry).orElseThrow();
     }
 
     @Override
-    protected Map<UUID, Clan> fetchAll(@NotNull SearchOptions options, @NotNull Database database, @NotNull String tablePrefix) {
+    protected Map<UUID, Clan> fetchAll(@NotNull SearchOptions options, @NotNull Database database) {
         final ClanSort sort = (ClanSort) Objects.requireNonNull(options.getSort());
         final Collection<Clan> pool = new HashSet<>(clanManager.getObjects().values());
         pool.removeIf(Clan::isAdmin);

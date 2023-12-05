@@ -72,7 +72,7 @@ public class FishingRepository extends ProgressionStatsRepository<Fishing, Fishi
     public CompletableFuture<FishingData> fetchDataAsync(UUID player) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                String stmt = "SELECT COUNT(*), SUM(Weight) FROM " + plugin.getDatabasePrefix() + "fishing WHERE gamer = ?;";
+                String stmt = "SELECT COUNT(*), SUM(Weight) FROM progression_fishing WHERE gamer = ?;";
                 final Statement query = new Statement(stmt, new StringStatementValue(player.toString()));
                 final FishingData data = new FishingData();
                 final CachedRowSet result = database.executeQuery(query);

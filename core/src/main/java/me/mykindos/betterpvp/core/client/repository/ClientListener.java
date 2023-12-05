@@ -50,9 +50,6 @@ public class ClientListener implements Listener {
     public boolean unlimitedPlayers;
 
     @Inject
-    private ClientManager clientManager;
-
-    @Inject
     private ClientManager repository;
 
     private boolean serverLoaded;
@@ -140,7 +137,7 @@ public class ClientListener implements Listener {
         }
 
         if (event.getResult() == PlayerLoginEvent.Result.KICK_FULL || event.getResult() == PlayerLoginEvent.Result.KICK_WHITELIST) {
-            final Client client = clientManager.search().online(event.getPlayer());
+            final Client client = repository.search().online(event.getPlayer());
             if (client.hasRank(Rank.TRIAL_MOD)) {
                 event.allow();
             }
@@ -165,7 +162,7 @@ public class ClientListener implements Listener {
 
     @EventHandler (priority = EventPriority.MONITOR)
     public void onLunarEvent(LunarClientEvent event) {
-        Client client = clientManager.search().online(event.getPlayer());
+        Client client = repository.search().online(event.getPlayer());
         client.putProperty(ClientProperty.LUNAR, event.isRegistered());
     }
 

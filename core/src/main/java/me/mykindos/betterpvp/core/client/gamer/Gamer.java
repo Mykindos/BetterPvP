@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.client.gamer;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerPropertyUpdateEvent;
 import me.mykindos.betterpvp.core.framework.customtypes.IMapListener;
@@ -16,6 +17,7 @@ import me.mykindos.betterpvp.core.utilities.model.display.PlayerList;
 import me.mykindos.betterpvp.core.utilities.model.display.TitleQueue;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
@@ -73,7 +75,7 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
 
     @Override
     public void onMapValueChanged(String key, Object value) {
-        UtilServer.callEvent(new GamerPropertyUpdateEvent( this, key, value));
+        UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> UtilServer.callEvent(new GamerPropertyUpdateEvent( this, key, value)));
     }
 
     public void setLastTipNow() {

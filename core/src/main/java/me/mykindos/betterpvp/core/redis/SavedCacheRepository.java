@@ -18,12 +18,13 @@ public abstract class SavedCacheRepository<T extends CacheObject> {
 
     @Getter
     protected final String name;
-    protected final JedisAgent jedisAgent;
+    @Getter
+    protected final RedisAgent agent;
     protected final TypeToken<T> type;
 
-    protected SavedCacheRepository(final JedisAgent agent, final String name) {
+    protected SavedCacheRepository(final RedisAgent agent, final String name) {
         this.type = new TypeToken<>(getClass()) {};
-        this.jedisAgent = agent;
+        this.agent = agent;
         this.name = name;
     }
 
@@ -44,7 +45,7 @@ public abstract class SavedCacheRepository<T extends CacheObject> {
     }
 
     protected void add(final T object, final long expirySeconds) {
-        this.jedisAgent.useResource(jedis -> {
+        this.agent.useResource(jedis -> {
             final String json = this.serialize(object);
 
             final Transaction pipeline = jedis.multi();
@@ -64,7 +65,7 @@ public abstract class SavedCacheRepository<T extends CacheObject> {
     }
 
     protected void removeMulti(final String... dataKeys) {
-        this.jedisAgent.useResource(jedis -> {
+        this.agent.useResource(jedis -> {
             final Transaction transaction = jedis.multi();
             for (final String storeKey : dataKeys) {
                 transaction.del(storeKey);
@@ -75,7 +76,7 @@ public abstract class SavedCacheRepository<T extends CacheObject> {
     }
 
     protected void flush() {
-        this.jedisAgent.useResource(jedis -> {
+        this.agent.useResource(jedis -> {
             final String currentTime = String.valueOf(this.getCurrentSecond());
             final List<String> dead = jedis.zrangeByScore(this.getStoreKey(), "-inf", currentTime).stream().map(key -> {
                 final String[] split = key.split(":");
@@ -86,14 +87,14 @@ public abstract class SavedCacheRepository<T extends CacheObject> {
     }
 
     protected List<T> collect() {
-        return this.jedisAgent.withResource(jedis -> this.get(this.getAlive().stream().map(key -> {
+        return this.agent.withResource(jedis -> this.get(this.getAlive().stream().map(key -> {
             final String[] split = key.split(":");
             return split[split.length - 1];
         }).toList()));
     }
 
     protected List<T> get(final List<String> dataKeys) {
-        return this.jedisAgent.withResource(jedis -> {
+        return this.agent.withResource(jedis -> {
             final ArrayList<T> result = new ArrayList<>();
             final Pipeline pipeline = jedis.pipelined();
             final List<Response<String>> responses = new ArrayList<>();
@@ -121,7 +122,7 @@ public abstract class SavedCacheRepository<T extends CacheObject> {
     }
 
     protected Optional<T> get(final String dataKey) {
-        return this.jedisAgent.withResource(jedis -> {
+        return this.agent.withResource(jedis -> {
             if (!this.exists(dataKey)) {
                 return Optional.empty();
             }
@@ -134,12 +135,12 @@ public abstract class SavedCacheRepository<T extends CacheObject> {
 
     protected List<String> getAlive() {
         this.flush();
-        return this.jedisAgent.withResource(
+        return this.agent.withResource(
                 jedis -> jedis.zrangeByScore(this.getStoreKey(), "(" + this.getCurrentSecond(), "+inf"));
     }
 
     protected boolean exists(final String dataKey) {
-        return this.jedisAgent.withResource(jedis -> jedis.exists(this.getStoreKey(dataKey)));
+        return this.agent.withResource(jedis -> jedis.exists(this.getStoreKey(dataKey)));
     }
 
     protected long getCurrentSecond() {

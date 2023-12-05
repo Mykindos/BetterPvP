@@ -1,4 +1,4 @@
-create table if not exists ${tablePrefix}items
+create table if not exists items
 (
     id       int auto_increment
         primary key,
@@ -12,7 +12,7 @@ create table if not exists ${tablePrefix}items
         unique (Material, Module)
 );
 
-create table if not exists ${tablePrefix}itemlore
+create table if not exists itemlore
 (
     Item     int           not null,
     Priority int default 0 not null,
@@ -20,5 +20,5 @@ create table if not exists ${tablePrefix}itemlore
     constraint itemlore_item_priority_uk
         unique (Item, Priority),
     constraint itemlore___fk
-        foreign key (Item) references ${tablePrefix}items (id)
+        foreign key (Item) references items (id)
 );
