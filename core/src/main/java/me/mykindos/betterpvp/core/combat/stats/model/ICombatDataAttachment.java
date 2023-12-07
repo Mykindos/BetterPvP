@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public interface ICombatDataAttachment {
 
-    void prepareUpdates(@NotNull CombatData data, @NotNull Database database, String databasePrefix);
+    void prepareUpdates(@NotNull CombatData data, @NotNull Database database);
 
     void onKill(@NotNull CombatData data, Kill kill);
 

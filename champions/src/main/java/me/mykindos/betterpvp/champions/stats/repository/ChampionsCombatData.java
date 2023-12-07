@@ -49,11 +49,11 @@ public class ChampionsCombatData extends CombatData {
     }
 
     @Override
-    protected void prepareUpdates(@NotNull UUID uuid, @NotNull Database database, String databasePrefix) {
+    protected void prepareUpdates(@NotNull UUID uuid, @NotNull Database database) {
         List<Statement> killStatements = new ArrayList<>();
         List<Statement> contributionStatements = new ArrayList<>();
-        final String killStmt = "INSERT INTO " + databasePrefix + "kills (KillId, KillerClass, VictimClass) VALUES (?, ?, ?);";
-        final String assistStmt = "INSERT INTO " + databasePrefix + "kill_contributions (ContributionId, ContributorClass) VALUES (?, ?);";
+        final String killStmt = "INSERT INTO champions_kills (KillId, KillerClass, VictimClass) VALUES (?, ?, ?);";
+        final String assistStmt = "INSERT INTO champions_kill_contributions (ContributionId, ContributorClass) VALUES (?, ?);";
 
         // Add kills - This is done first because it if it breaks it will stop the rating update
         // Kills are only saved by the victim
@@ -79,11 +79,11 @@ public class ChampionsCombatData extends CombatData {
 
         // Save attachments
         for (ICombatDataAttachment attachment : attachments) {
-            attachment.prepareUpdates(this, database, databasePrefix);
+            attachment.prepareUpdates(this, database);
         }
 
         // Save self-rating (this saves independently for each player)
-        String ratingStmt = "INSERT INTO " + databasePrefix + "combat_stats (Gamer, Class, Rating, Killstreak, HighestKillstreak) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE Rating = VALUES(Rating), Killstreak = VALUES(Killstreak), HighestKillstreak = VALUES(HighestKillstreak);";
+        String ratingStmt = "INSERT INTO champions_combat_stats (Gamer, Class, Rating, Killstreak, HighestKillstreak) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE Rating = VALUES(Rating), Killstreak = VALUES(Killstreak), HighestKillstreak = VALUES(HighestKillstreak);";
         Statement victimRating = new Statement(ratingStmt,
                 new UuidStatementValue(getHolder()),
                 new StringStatementValue(role == null ? "" : role.toString()),

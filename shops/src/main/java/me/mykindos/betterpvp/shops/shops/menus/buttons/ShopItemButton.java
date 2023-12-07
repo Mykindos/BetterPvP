@@ -1,12 +1,12 @@
 package me.mykindos.betterpvp.shops.shops.menus.buttons;
 
 import lombok.NonNull;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.components.shops.IShopItem;
 import me.mykindos.betterpvp.core.components.shops.ShopCurrency;
 import me.mykindos.betterpvp.core.components.shops.events.PlayerBuyItemEvent;
 import me.mykindos.betterpvp.core.components.shops.events.PlayerSellItemEvent;
-import me.mykindos.betterpvp.core.gamer.Gamer;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.menu.CooldownButton;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -30,12 +30,12 @@ import java.text.NumberFormat;
 public class ShopItemButton extends AbstractItem implements CooldownButton {
 
     private final IShopItem shopItem;
-    private final GamerManager gamerManager;
+    private final ClientManager clientManager;
     private final ItemHandler itemHandler;
 
-    public ShopItemButton(@NonNull IShopItem shopItem, ItemHandler handler, @NonNull GamerManager gamerManager) {
+    public ShopItemButton(@NonNull IShopItem shopItem, ItemHandler handler, @NonNull ClientManager clientManager) {
         this.shopItem = shopItem;
-        this.gamerManager = gamerManager;
+        this.clientManager = clientManager;
         this.itemHandler = handler;
     }
 
@@ -76,7 +76,7 @@ public class ShopItemButton extends AbstractItem implements CooldownButton {
             }
         }
 
-        final Gamer gamer = gamerManager.getObject(player.getUniqueId()).orElseThrow();
+        final Gamer gamer = clientManager.search().online(player).getGamer();
         if (clickType == ClickType.LEFT || clickType == ClickType.SHIFT_LEFT) {
             UtilServer.callEvent(new PlayerBuyItemEvent(player, gamer, shopItem, item, currency, clickType));
         } else if (clickType == ClickType.RIGHT || clickType == ClickType.SHIFT_RIGHT) {

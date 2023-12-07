@@ -43,11 +43,6 @@ public class Clans extends BPvPPlugin {
     @Inject
     private UpdateEventExecutor updateEventExecutor;
 
-    @Inject
-    @Config(path = "clans.database.prefix", defaultValue = "clans_")
-    @Getter
-    private String databasePrefix;
-
     private ClanManager clanManager;
 
     @Override
@@ -64,7 +59,7 @@ public class Clans extends BPvPPlugin {
                     new ConfigInjectorModule(this, fields));
             injector.injectMembers(this);
 
-            database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:clans-migrations", databasePrefix);
+            database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:clans-migrations", "clans");
 
             Bukkit.getPluginManager().callEvent(new ModuleLoadedEvent("Clans"));
 

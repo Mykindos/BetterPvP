@@ -2,13 +2,13 @@ package me.mykindos.betterpvp.shops.shops.listeners;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.shops.ShopCurrency;
 import me.mykindos.betterpvp.core.components.shops.events.PlayerBuyItemEvent;
 import me.mykindos.betterpvp.core.components.shops.events.PlayerSellItemEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
-import me.mykindos.betterpvp.core.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
@@ -50,14 +50,14 @@ public class ShopListener implements Listener {
     private final ShopkeeperManager shopkeeperManager;
     private final ShopManager shopManager;
     private final ItemHandler itemHandler;
-    private final GamerManager gamerManager;
+    private final ClientManager clientManager;
 
     @Inject
-    public ShopListener(ShopkeeperManager shopkeeperManager, ShopManager shopManager, ItemHandler itemHandler, GamerManager gamerManager) {
+    public ShopListener(ShopkeeperManager shopkeeperManager, ShopManager shopManager, ItemHandler itemHandler, ClientManager clientManager) {
         this.shopkeeperManager = shopkeeperManager;
         this.shopManager = shopManager;
         this.itemHandler = itemHandler;
-        this.gamerManager = gamerManager;
+        this.clientManager = clientManager;
     }
 
     @EventHandler
@@ -71,7 +71,7 @@ public class ShopListener implements Listener {
             var shopkeeperItems = shopManager.getShopItems(shopkeeper.getShopkeeperName());
             if(shopkeeperItems == null || shopkeeperItems.isEmpty()) return;
 
-            var menu = new ShopMenu(Component.text(shopkeeper.getShopkeeperName()), shopkeeperItems, itemHandler, gamerManager);
+            var menu = new ShopMenu(Component.text(shopkeeper.getShopkeeperName()), shopkeeperItems, itemHandler, clientManager);
             menu.show(event.getPlayer());
         });
     }

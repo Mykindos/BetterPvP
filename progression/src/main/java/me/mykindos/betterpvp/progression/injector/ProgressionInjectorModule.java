@@ -9,7 +9,6 @@ public class ProgressionInjectorModule extends AbstractModule {
 
     public ProgressionInjectorModule(Progression plugin) {
         this.plugin = plugin;
-
     }
 
     @Override

@@ -2,8 +2,8 @@ package me.mykindos.betterpvp.core.tips;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.framework.events.CustomCancellableEvent;
-import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.utilities.model.WeighedList;
 import org.bukkit.entity.Player;
 

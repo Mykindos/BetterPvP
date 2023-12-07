@@ -3,11 +3,11 @@ package me.mykindos.betterpvp.clans.clans.listeners;
 import com.google.inject.Inject;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.combatlog.events.PlayerCombatLogEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
-import me.mykindos.betterpvp.core.gamer.Gamer;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
@@ -24,12 +24,12 @@ import java.util.Optional;
 public class ClansCombatListener implements Listener {
 
     private final ClanManager clanManager;
-    private final GamerManager gamerManager;
+    private final ClientManager clientManager;
 
     @Inject
-    public ClansCombatListener(ClanManager clanManager, GamerManager gamerManager) {
+    public ClansCombatListener(ClanManager clanManager, ClientManager clientManager) {
         this.clanManager = clanManager;
-        this.gamerManager = gamerManager;
+        this.clientManager = clientManager;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -70,12 +70,10 @@ public class ClansCombatListener implements Listener {
             Clan locationClan = locationClanOptional.get();
             if (locationClan.isAdmin() && locationClan.isSafe()) {
                 if (damagee instanceof Player player) {
-                    Optional<Gamer> gamerOptional = gamerManager.getObject(player.getUniqueId());
-                    gamerOptional.ifPresent(gamer -> {
-                        if (UtilTime.elapsed(gamer.getLastDamaged(), 15000)) {
-                            event.setCancelled(true);
-                        }
-                    });
+                    Gamer gamer = clientManager.search().online(player).getGamer();
+                    if (UtilTime.elapsed(gamer.getLastDamaged(), 15000)) {
+                        event.setCancelled(true);
+                    }
                 } else {
                     event.setCancelled(true);
                 }

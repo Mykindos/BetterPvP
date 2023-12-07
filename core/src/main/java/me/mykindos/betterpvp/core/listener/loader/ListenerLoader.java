@@ -11,11 +11,15 @@ public class ListenerLoader extends Loader {
         super(plugin);
     }
 
-    public void load(Listener listener) {
-        plugin.getInjector().injectMembers(listener);
+    public void register(Listener listener) {
         plugin.getListeners().add(listener);
         Bukkit.getPluginManager().registerEvents(listener, plugin);
         count++;
+    }
+
+    public void load(Listener listener) {
+        plugin.getInjector().injectMembers(listener);
+        register(listener);
     }
 
     @Override

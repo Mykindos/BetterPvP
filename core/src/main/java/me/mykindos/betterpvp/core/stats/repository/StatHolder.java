@@ -7,6 +7,6 @@ import java.util.UUID;
 
 public abstract class StatHolder {
 
-    protected abstract void prepareUpdates(@NotNull UUID uuid, @NotNull Database database, String databasePrefix);
+    protected abstract void prepareUpdates(@NotNull UUID uuid, @NotNull Database database);
 
 }

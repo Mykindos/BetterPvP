@@ -2,11 +2,11 @@ package me.mykindos.betterpvp.clans.world;
 
 import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
+import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.framework.ModuleLoadedEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
-import me.mykindos.betterpvp.core.gamer.Gamer;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
@@ -61,18 +61,17 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 
 @Slf4j
 @BPvPListener
 public class WorldListener implements Listener {
 
-    private final GamerManager gamerManager;
+    private final ClientManager clientManager;
     private final ItemHandler itemHandler;
 
     @Inject
-    public WorldListener(GamerManager gamerManager, ItemHandler itemHandler) {
-        this.gamerManager = gamerManager;
+    public WorldListener(ClientManager clientManager, ItemHandler itemHandler) {
+        this.clientManager = clientManager;
         this.itemHandler = itemHandler;
     }
 
@@ -84,11 +83,9 @@ public class WorldListener implements Listener {
     public void blockFlint(PlayerInteractEvent event) {
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 
-            Optional<Gamer> gamerOptional = gamerManager.getObject(event.getPlayer().getUniqueId());
-            if (gamerOptional.isPresent()) {
-                if (gamerOptional.get().getClient().isAdministrating()) {
-                    return;
-                }
+            Client client = clientManager.search().online(event.getPlayer());
+            if (client.isAdministrating()) {
+                return;
             }
 
             if (event.getPlayer().getInventory().getItemInMainHand().getType() == Material.FLINT_AND_STEEL) {
@@ -185,13 +182,11 @@ public class WorldListener implements Listener {
                     || event.getInventory().getType() == InventoryType.SMITHING
                     || event.getInventory().getType() == InventoryType.BEACON) {
 
-                gamerManager.getObject(player.getUniqueId()).ifPresent(gamer -> {
-                    if (!gamer.getClient().isAdministrating()) {
-                        UtilMessage.simpleMessage(player, "Game", "<alt2>" + UtilFormat.cleanString(event.getInventory().getType().toString()) + "</alt2> is disabled.");
-                        event.setCancelled(true);
-                    }
-                });
-
+                final Client client = clientManager.search().online(player);
+                if (!client.isAdministrating()) {
+                    UtilMessage.simpleMessage(player, "Game", "<alt2>" + UtilFormat.cleanString(event.getInventory().getType().toString()) + "</alt2> is disabled.");
+                    event.setCancelled(true);
+                }
             }
 
             if (event.getInventory().getType() == InventoryType.ENCHANTING || event.getInventory().getType() == InventoryType.ENDER_CHEST) {
@@ -240,12 +235,10 @@ public class WorldListener implements Listener {
     @EventHandler
     public void onPlaceScaffold(BlockPlaceEvent event) {
         if (event.getBlock().getType() == Material.SCAFFOLDING) {
-            Optional<Gamer> gamerOptional = gamerManager.getObject(event.getPlayer().getUniqueId().toString());
-            gamerOptional.ifPresent(gamer -> {
-                if (!gamer.getClient().isAdministrating()) {
-                    event.setCancelled(true);
-                }
-            });
+            Client client = clientManager.search().online(event.getPlayer());
+            if (!client.isAdministrating()) {
+                event.setCancelled(true);
+            }
         }
     }
 
@@ -260,19 +253,16 @@ public class WorldListener implements Listener {
         Player player = event.getPlayer();
         Block block = event.getBlock();
 
-        Optional<Gamer> gamerOptional = gamerManager.getObject(player.getUniqueId().toString());
-        gamerOptional.ifPresent(gamer -> {
-            if (!gamer.getClient().isAdministrating()) {
-                // maybe load from config later
-                if (block.getType().name().contains("OBSIDIAN") || block.getType() == Material.BEDROCK || block.getType() == Material.WATER_BUCKET
-                        || block.getType() == Material.SPAWNER || block.getType() == Material.COBWEB
-                        || block.getType() == Material.BREWING_STAND || block.getType().name().contains("_BED")) {
-                    UtilMessage.simpleMessage(player, "Server", "You cannot place <alt2>" + WordUtils.capitalizeFully(block.getType().toString()) + "</alt2>.");
-                    event.setCancelled(true);
-                }
+        Client client = clientManager.search().online(player);
+        if (!client.isAdministrating()) {
+            // maybe load from config later
+            if (block.getType().name().contains("OBSIDIAN") || block.getType() == Material.BEDROCK || block.getType() == Material.WATER_BUCKET
+                    || block.getType() == Material.SPAWNER || block.getType() == Material.COBWEB
+                    || block.getType() == Material.BREWING_STAND || block.getType().name().contains("_BED")) {
+                UtilMessage.simpleMessage(player, "Server", "You cannot place <alt2>" + WordUtils.capitalizeFully(block.getType().toString()) + "</alt2>.");
+                event.setCancelled(true);
             }
-        });
-
+        }
     }
 
     @EventHandler

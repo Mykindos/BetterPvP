@@ -5,8 +5,8 @@ import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.papermc.paper.event.player.PlayerArmSwingEvent;
-import me.mykindos.betterpvp.core.gamer.Gamer;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
@@ -55,7 +55,7 @@ public class DisplayEditorManager implements Listener {
     }
 
     @Inject
-    private GamerManager gamerManager;
+    private ClientManager clientManager;
 
     private final WeakHashMap<Player, Display> selectedDisplays = new WeakHashMap<>();
     private final LoadingCache<Player, Object> selecting = Caffeine.newBuilder()
@@ -85,7 +85,7 @@ public class DisplayEditorManager implements Listener {
             UtilPlayer.setGlowing(player, previous, false);
         }
 
-        final Gamer gamer = gamerManager.getObject(player.getUniqueId()).orElseThrow();
+        final Gamer gamer = clientManager.search().online(player).getGamer();
         if (display == null) {
             gamer.getActionBar().remove(actionBar);
             return previous != null;

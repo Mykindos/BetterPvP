@@ -8,10 +8,9 @@ import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
 import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
 import me.mykindos.betterpvp.clans.clans.events.ClanKickMemberEvent;
 import me.mykindos.betterpvp.core.client.Client;
-import me.mykindos.betterpvp.core.client.ClientManager;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
@@ -27,8 +26,8 @@ public class KickSubCommand extends ClanSubCommand {
     private ClientManager clientManager;
 
     @Inject
-    public KickSubCommand(ClanManager clanManager, GamerManager gamerManager) {
-        super(clanManager, gamerManager);
+    public KickSubCommand(ClanManager clanManager, ClientManager clientManager) {
+        super(clanManager, clientManager);
     }
 
     @Override
@@ -55,10 +54,12 @@ public class KickSubCommand extends ClanSubCommand {
 
         Clan clan = clanManager.getClanByPlayer(player).orElseThrow();
 
-        Optional<Client> clientOptional = clientManager.getClientByName(args[0]);
-        if (clientOptional.isPresent()) {
-            Client target = clientOptional.get();
+        clientManager.search(player).offline(args[0], result -> {
+            if (result.isEmpty()) {
+                return;
+            }
 
+            Client target = result.get();
             ClanMember ourMember = clan.getMember(player.getUniqueId());
             if (!ourMember.hasRank(ClanMember.MemberRank.ADMIN)) {
                 UtilMessage.message(player, "Clans", "Only the Clan Leader and Admins can kick members.");
@@ -95,10 +96,9 @@ public class KickSubCommand extends ClanSubCommand {
                 UtilServer.callEvent(new ClanKickMemberEvent(player, clan, target));
 
             } else {
-                UtilMessage.simpleMessage(player, "Clans", "<alt2>" + target.getName() + "</alt2> is not in your clan");
+                UtilMessage.simpleMessage(player, "Clans", "<alt2>" + target.getName() + "</alt2> is not in your clan.");
             }
-
-        }
+        });
     }
 
     @Override

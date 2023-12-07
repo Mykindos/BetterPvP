@@ -8,15 +8,15 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
 import me.mykindos.betterpvp.clans.clans.events.TerritoryInteractEvent;
 import me.mykindos.betterpvp.clans.clans.insurance.InsuranceType;
-import me.mykindos.betterpvp.core.client.events.ClientLoginEvent;
+import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.energy.EnergyHandler;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
-import me.mykindos.betterpvp.core.gamer.Gamer;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
-import me.mykindos.betterpvp.core.gamer.exceptions.NoSuchGamerException;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
@@ -68,15 +68,15 @@ public class ClansWorldListener extends ClanListener {
     private final EnergyHandler energyHandler;
 
     @Inject
-    public ClansWorldListener(ClanManager clanManager, GamerManager gamerManager, Clans clans, EffectManager effectManager, EnergyHandler energyHandler) {
-        super(clanManager, gamerManager);
+    public ClansWorldListener(ClanManager clanManager, ClientManager clientManager, Clans clans, EffectManager effectManager, EnergyHandler energyHandler) {
+        super(clanManager, clientManager);
         this.clans = clans;
         this.effectManager = effectManager;
         this.energyHandler = energyHandler;
     }
 
     @EventHandler
-    public void onLogin(ClientLoginEvent event) {
+    public void onLogin(ClientJoinEvent event) {
         Optional<Clan> clanOptional = clanManager.getClanByClient(event.getClient());
         clanOptional.ifPresent(clan -> clan.setOnline(true));
     }
@@ -119,14 +119,14 @@ public class ClansWorldListener extends ClanListener {
         Player player = event.getPlayer();
         Block block = event.getBlock();
 
-        Gamer gamer = gamerManager.getObject(player.getUniqueId().toString()).orElseThrow(() -> new NoSuchGamerException(player.getName()));
+        final Client client = clientManager.search().online(player);
         Clan clan = clanManager.getClanByPlayer(player).orElse(null);
 
-        if (UtilBlock.isTutorial(block.getLocation())) {
+        if (client.isAdministrating()) {
             return;
         }
 
-        if (gamer.getClient().isAdministrating()) {
+        if (UtilBlock.isTutorial(block.getLocation())) {
             return;
         }
 
@@ -192,13 +192,13 @@ public class ClansWorldListener extends ClanListener {
     public void onBlockPlace(BlockPlaceEvent event) {
         if (event.isCancelled()) return;
         Player player = event.getPlayer();
-        Gamer gamer = gamerManager.getObject(player.getUniqueId().toString()).orElseThrow(() -> new NoSuchGamerException(player.getName()));
+        Client client = clientManager.search().online(player);
         Block block = event.getBlock();
 
         Clan clan = clanManager.getClanByPlayer(player).orElse(null);
         Optional<Clan> locationClanOptional = clanManager.getClanByLocation(block.getLocation());
 
-        if (gamer.getClient().isAdministrating()) {
+        if (client.isAdministrating()) {
             return;
         }
 
@@ -286,9 +286,8 @@ public class ClansWorldListener extends ClanListener {
 
         Material material = block.getType();
 
-        Gamer gamer = gamerManager.getObject(player.getUniqueId().toString()).orElseThrow(() -> new NoSuchGamerException(player.getName()));
-
-        if (gamer.getClient().isAdministrating()) return;
+        final Client client = clientManager.search().online(player);
+        if (client.isAdministrating()) return;
 
         Clan clan = clanManager.getClanByPlayer(player).orElse(null);
         Optional<Clan> locationClanOptional = clanManager.getClanByLocation(block.getLocation());
@@ -403,12 +402,10 @@ public class ClansWorldListener extends ClanListener {
         clanOptional.ifPresent(clan -> {
             if (!clan.isAdmin()) return;
             if (event.getRemover() instanceof Player player) {
-                Optional<Gamer> gamerOptional = gamerManager.getObject(player.getUniqueId().toString());
-                gamerOptional.ifPresent(gamer -> {
-                    if (!gamer.getClient().isAdministrating()) {
-                        event.setCancelled(true);
-                    }
-                });
+                final Client client = clientManager.search().online(player);
+                if (!client.isAdministrating()) {
+                    event.setCancelled(true);
+                }
             }
         });
     }
@@ -418,13 +415,10 @@ public class ClansWorldListener extends ClanListener {
      */
     @EventHandler
     public void armorStand(PlayerArmorStandManipulateEvent event) {
-
-        Optional<Gamer> gamerOptional = gamerManager.getObject(event.getPlayer().getUniqueId().toString());
-        gamerOptional.ifPresent(gamer -> {
-            if (!gamer.getClient().isAdministrating()) {
-                event.setCancelled(true);
-            }
-        });
+        Client client = clientManager.search().online(event.getPlayer());
+        if (!client.isAdministrating()) {
+            event.setCancelled(true);
+        }
     }
 
     /*
@@ -438,12 +432,10 @@ public class ClansWorldListener extends ClanListener {
             clanOptional.ifPresent(clan -> {
                 if (!clan.isAdmin()) return;
                 if (event.getDamager() instanceof Player player) {
-                    Optional<Gamer> gamerOptional = gamerManager.getObject(player.getUniqueId().toString());
-                    gamerOptional.ifPresent(gamer -> {
-                        if (!gamer.getClient().isAdministrating()) {
-                            event.setCancelled(true);
-                        }
-                    });
+                    Client client = clientManager.search().online(player);
+                    if (!client.isAdministrating()) {
+                        event.setCancelled(true);
+                    }
                 }
             });
 
@@ -464,13 +456,10 @@ public class ClansWorldListener extends ClanListener {
             Optional<Clan> clanOptional = clanManager.getClanByLocation(event.getClickedBlock().getLocation());
             clanOptional.ifPresent(clan -> {
                 if (!clan.isAdmin()) return;
-                Optional<Gamer> gamerOptional = gamerManager.getObject(event.getPlayer().getUniqueId().toString());
-                gamerOptional.ifPresent(gamer -> {
-                    if (!gamer.getClient().isAdministrating()) {
-                        event.setCancelled(true);
-                    }
-                });
-
+                Client client = clientManager.search().online(event.getPlayer());
+                if (!client.isAdministrating()) {
+                    event.setCancelled(true);
+                }
             });
 
         }
@@ -487,12 +476,10 @@ public class ClansWorldListener extends ClanListener {
             Optional<Clan> clanOptional = clanManager.getClanByLocation(event.getRightClicked().getLocation());
             clanOptional.ifPresent(clan -> {
                 if (clan.isAdmin()) {
-                    Optional<Gamer> gamerOptional = gamerManager.getObject(event.getPlayer().getUniqueId().toString());
-                    gamerOptional.ifPresent(gamer -> {
-                        if (!gamer.getClient().isAdministrating()) {
-                            event.setCancelled(true);
-                        }
-                    });
+                    Client client = clientManager.search().online(event.getPlayer());
+                    if (!client.isAdministrating()) {
+                        event.setCancelled(true);
+                    }
                 }
             });
 
@@ -559,10 +546,8 @@ public class ClansWorldListener extends ClanListener {
         if (event.isCancelled()) return;
 
         if (event.getBlock().getType() == Material.LAPIS_BLOCK) {
-            Optional<Gamer> gamerOptional = gamerManager.getObject(event.getPlayer().getUniqueId().toString());
-            if (gamerOptional.isEmpty()) return;
-            Gamer gamer = gamerOptional.get();
-            if (gamer.getClient().isAdministrating()) return;
+            Client client = clientManager.search().online(event.getPlayer());
+            if (client.isAdministrating()) return;
 
             Optional<Clan> locationClanOptional = clanManager.getClanByLocation(event.getBlock().getLocation());
             Optional<Clan> playerClanOptional = clanManager.getClanByPlayer(event.getPlayer());
@@ -659,11 +644,10 @@ public class ClansWorldListener extends ClanListener {
 
         clanManager.getClanByLocation(player.getLocation()).ifPresent(clan -> {
             if (clan.isSafe()) {
-                gamerManager.getObject(player.getUniqueId()).ifPresent(gamer -> {
-                    if (UtilTime.elapsed(gamer.getLastDamaged(), 15000)) {
-                        event.setCancelled(true);
-                    }
-                });
+                final Gamer gamer = clientManager.search().online(player).getGamer();
+                if (UtilTime.elapsed(gamer.getLastDamaged(), 15000)) {
+                    event.setCancelled(true);
+                }
             }
         });
     }
