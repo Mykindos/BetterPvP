@@ -1,15 +1,15 @@
 core:
   database:
     local:
-      databaseName:
-      password:
-      ip:
-      username:
+      databaseName: betterpvp
+      username: user
+      password: BetterPvP123!
+      ip: 127.0.0.1:4321
     global:
-      databaseName:
-      password:
-      ip:
-      username:
+      databaseName: betterpvp_global
+      username: user
+      password: BetterPvP123!
+      ip: 127.0.0.1:4321
   redis:
     database:
     password:
