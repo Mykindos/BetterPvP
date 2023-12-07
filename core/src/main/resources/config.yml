@@ -11,10 +11,10 @@ core:
       password: BetterPvP123!
       ip: 127.0.0.1:4321
   redis:
-    database:
-    password:
-    host:
-    port:
+    database: 0
+    password: BetterPvPAdmin123!
+    host: 127.0.0.1
+    port: 1234
   tips:
     timeBetweenTips: 150.0
   exceptions:
