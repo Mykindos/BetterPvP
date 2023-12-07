@@ -62,14 +62,6 @@ create table if not exists property_map
         primary key (Property, Type)
 );
 
-create table if not exists gamer_properties
-(
-    Gamer    varchar(255) not null,
-    Property varchar(255) not null,
-    Value    varchar(255) null,
-    primary key (Gamer, Property)
-);
-
 INSERT IGNORE INTO property_map VALUES ("CHAT_ENABLED", "boolean");
 INSERT IGNORE INTO property_map VALUES ("COINS", "int");
 INSERT IGNORE INTO property_map VALUES ("FRAGMENTS", "int");
@@ -84,3 +76,18 @@ INSERT IGNORE INTO property_map VALUES ("BLOCKS_BROKEN", "int");
 INSERT IGNORE INTO property_map VALUES ("DAMAGE_DEALT", "double");
 INSERT IGNORE INTO property_map VALUES ("DAMAGE_TAKEN", "double");
 INSERT IGNORE INTO property_map VALUES ("COOLDOWN_DISPLAY", "boolean");
+INSERT IGNORE INTO property_map VALUES ("ASSASSIN_EQUIPPED", "int");
+INSERT IGNORE INTO property_map VALUES ("KNIGHT_EQUIPPED", "int");
+INSERT IGNORE INTO property_map VALUES ("RANGER_EQUIPPED", "int");
+INSERT IGNORE INTO property_map VALUES ("WARLOCK_EQUIPPED", "int");
+INSERT IGNORE INTO property_map VALUES ("MAGE_EQUIPPED", "int");
+INSERT IGNORE INTO property_map VALUES ("BRUTE_EQUIPPED", "int");
+INSERT IGNORE INTO property_map VALUES ("SKILL_CHAT_PREVIEW", "boolean");
+INSERT IGNORE INTO property_map VALUES ("ENERGY", "int");
+INSERT IGNORE INTO property_map VALUES ("LEVEL", "int");
+INSERT IGNORE INTO property_map VALUES ("POINTS", "int");
+INSERT IGNORE INTO property_map VALUES ("BALANCE", "int");
+INSERT IGNORE INTO property_map VALUES ("LAST_LOGIN", "long");
+INSERT IGNORE INTO property_map VALUES ("NO_DOMINANCE_COOLDOWN", "long");
+INSERT IGNORE INTO property_map VALUES ("LAST_TNTED", "long");
+INSERT IGNORE INTO property_map VALUES ("TIME_CREATED", "long");

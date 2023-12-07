@@ -12,7 +12,7 @@ import me.mykindos.betterpvp.core.command.loader.CoreCommandLoader;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.config.ConfigInjectorModule;
 import me.mykindos.betterpvp.core.database.Database;
-import me.mykindos.betterpvp.core.database.injector.DatabaseInjectorModule;
+import me.mykindos.betterpvp.core.database.SharedDatabase;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
 import me.mykindos.betterpvp.core.injector.CoreInjectorModule;
@@ -44,6 +44,9 @@ public class Core extends BPvPPlugin {
     private Database database;
 
     @Inject
+    private SharedDatabase sharedDatabase;
+
+    @Inject
     private Redis redis;
 
     private ClientManager clientManager;
@@ -62,12 +65,11 @@ public class Core extends BPvPPlugin {
         Reflections reflections = new Reflections(PACKAGE, Scanners.FieldsAnnotated);
         Set<Field> fields = reflections.getFieldsAnnotatedWith(Config.class);
 
-        injector = Guice.createInjector(new CoreInjectorModule(this),
-                new DatabaseInjectorModule(),
-                new ConfigInjectorModule(this, fields));
+        injector = Guice.createInjector(new CoreInjectorModule(this), new ConfigInjectorModule(this, fields));
         injector.injectMembers(this);
 
-        database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:core-migrations", "core");
+        database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:core-migrations/local", "local");
+        sharedDatabase.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:core-migrations/global", "global");
         redis.credentials(this.getConfig());
 
         var coreListenerLoader = injector.getInstance(CoreListenerLoader.class);

@@ -1,9 +1,15 @@
 core:
   database:
-    databaseName:
-    password:
-    ip:
-    username:
+    local:
+      databaseName:
+      password:
+      ip:
+      username:
+    global:
+      databaseName:
+      password:
+      ip:
+      username:
   redis:
     database:
     password:

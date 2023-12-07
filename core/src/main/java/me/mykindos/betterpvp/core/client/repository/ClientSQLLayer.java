@@ -7,13 +7,14 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.database.Database;
+import me.mykindos.betterpvp.core.database.SharedDatabase;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
 
 import javax.sql.rowset.CachedRowSet;
 import java.sql.SQLException;
-import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,13 +24,19 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ClientSQLLayer {
 
     private final Database database;
+    private final SharedDatabase sharedDatabase;
+    private final Map<String, String> propertyMap;
 
     private final ConcurrentHashMap<String, Statement> queuedStatUpdates;
+    private final ConcurrentHashMap<String, Statement> queuedSharedStatUpdates;
 
     @Inject
-    public ClientSQLLayer(Database database) {
+    public ClientSQLLayer(Database database, SharedDatabase sharedDatabase) {
         this.database = database;
+        this.sharedDatabase = sharedDatabase;
         this.queuedStatUpdates = new ConcurrentHashMap<>();
+        this.queuedSharedStatUpdates = new ConcurrentHashMap<>();
+        this.propertyMap = this.getPropertyMap();
     }
 
     public Client create(UUID uuid, String name) {
@@ -53,7 +60,7 @@ public class ClientSQLLayer {
 
     public Optional<Client> getClient(UUID uuid) {
         String query = "SELECT * FROM clients WHERE UUID = ?;";
-        CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(uuid)));
+        CachedRowSet result = sharedDatabase.executeQuery(new Statement(query, new UuidStatementValue(uuid)));
         try {
             if (result.next()) {
                 String name = result.getString(3);
@@ -73,7 +80,7 @@ public class ClientSQLLayer {
 
     public Optional<Client> getClient(String name) {
         String query = "SELECT * FROM clients WHERE Name = ?;";
-        CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(name)));
+        CachedRowSet result = sharedDatabase.executeQuery(new Statement(query, new StringStatementValue(name)));
         try {
             if (result.next()) {
                 String uuid = result.getString(2);
@@ -94,21 +101,20 @@ public class ClientSQLLayer {
     public void loadGamerProperties(Client client) {
         // Gamer
         Gamer gamer = client.getGamer();
-        String query2 = "SELECT properties.Property, Value, Type FROM gamer_properties properties INNER JOIN "
-                + "property_map map on properties.Property = map.Property WHERE Gamer = ?";
+        String query2 = "SELECT Property, Value FROM gamer_properties WHERE Gamer = ?";
         CachedRowSet result2 = database.executeQuery(new Statement(query2, new StringStatementValue(gamer.getUuid())));
         try {
             while (result2.next()) {
-                String value = result2.getString(1);
-                String type = result2.getString(3);
-                Object property = switch (type) {
+                String property = result2.getString(1);
+                String type = propertyMap.get(property);
+                Object value = switch (type) {
                     case "int" -> result2.getInt(2);
                     case "boolean" -> Boolean.parseBoolean(result2.getString(2));
                     case "double" -> Double.parseDouble(result2.getString(2));
                     default -> Class.forName(type).cast(result2.getObject(2));
                 };
 
-                gamer.putProperty(value, property, true);
+                gamer.putProperty(property, value, true);
             }
         } catch (SQLException | ClassNotFoundException ex) {
             log.error("Failed to load gamer properties for {}", gamer.getUuid(), ex);
@@ -117,21 +123,20 @@ public class ClientSQLLayer {
 
     private void loadClientProperties(Client client) {
         // Client
-        String query = "SELECT properties.Property, Value, Type FROM client_properties properties INNER JOIN "
-                + "property_map map on properties.Property = map.Property WHERE Client = ?";
-        CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(client.getUuid())));
+        String query = "SELECT Property, Value FROM client_properties WHERE Client = ?";
+        CachedRowSet result = sharedDatabase.executeQuery(new Statement(query, new StringStatementValue(client.getUuid())));
         try {
             while (result.next()) {
-                String value = result.getString(1);
-                String type = result.getString(3);
-                Object property = switch (type) {
+                String property = result.getString(1);
+                String type = propertyMap.get(property);
+                Object value = switch (type) {
                     case "int" -> result.getInt(2);
                     case "boolean" -> Boolean.parseBoolean(result.getString(2));
                     case "double" -> Double.parseDouble(result.getString(2));
                     default -> Class.forName(type).cast(result.getObject(2));
                 };
 
-                client.putProperty(value, property, true);
+                client.putProperty(property, value, true);
             }
         } catch (SQLException | ClassNotFoundException ex) {
             log.error("Error loading client properties for " + client.getName(), ex);
@@ -141,7 +146,7 @@ public class ClientSQLLayer {
     public void save(Client object) {
         // Client
         String query = "INSERT INTO clients (UUID, Name) VALUES(?, ?) ON DUPLICATE KEY UPDATE `Rank` = ?;";
-        database.executeUpdateAsync(new Statement(query,
+        sharedDatabase.executeUpdateAsync(new Statement(query,
                 new StringStatementValue(object.getUuid()),
                 new StringStatementValue(object.getName()),
                 new StringStatementValue(object.getRank().name())
@@ -161,7 +166,7 @@ public class ClientSQLLayer {
                 new StringStatementValue(property),
                 new StringStatementValue(value.toString()),
                 new StringStatementValue(value.toString()));
-        queuedStatUpdates.put(client.getUuid() + property, statement);
+        queuedSharedStatUpdates.put(client.getUuid() + property, statement);
     }
 
     public void saveGamerProperty(Gamer gamer, String property, Object value) {
@@ -177,15 +182,32 @@ public class ClientSQLLayer {
         queuedStatUpdates.put(gamer.getUuid() + property, statement);
     }
 
-    public void processStatUpdates(boolean async){
-        // Client & Gamer
-        ConcurrentHashMap<String, Statement> statements = new ConcurrentHashMap<>(queuedStatUpdates);
-        queuedStatUpdates.clear();
+    public void processStatUpdates(boolean async) {
+        // Client
+        ConcurrentHashMap<String, Statement> statements = new ConcurrentHashMap<>(queuedSharedStatUpdates);
+        queuedSharedStatUpdates.clear();
+        sharedDatabase.executeBatch(statements.values().stream().toList(), async);
 
-        List<Statement> statementList = statements.values().stream().toList();
-        database.executeBatch(statementList, async);
+        // Gamer
+        statements = new ConcurrentHashMap<>(queuedStatUpdates);
+        queuedStatUpdates.clear();
+        database.executeBatch(statements.values().stream().toList(), async);
 
         log.info("Updated client and gamer stats with {} queries", statements.size());
     }
 
+    public Map<String, String> getPropertyMap() {
+        String query = "SELECT * FROM property_map;";
+        CachedRowSet result = sharedDatabase.executeQuery(new Statement(query));
+        Map<String, String> map = new ConcurrentHashMap<>();
+        try {
+            while (result.next()) {
+                map.put(result.getString(1), result.getString(2));
+            }
+        } catch (SQLException ex) {
+            log.error("Error loading property map", ex);
+        }
+
+        return map;
+    }
 }

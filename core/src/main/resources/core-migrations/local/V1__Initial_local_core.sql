@@ -22,3 +22,12 @@ create table if not exists itemlore
     constraint itemlore___fk
         foreign key (Item) references items (id)
 );
+
+
+create table if not exists gamer_properties
+(
+    Gamer    varchar(255) not null,
+    Property varchar(255) not null,
+    Value    varchar(255) null,
+    primary key (Gamer, Property)
+);

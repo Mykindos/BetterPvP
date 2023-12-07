@@ -6,10 +6,9 @@ services:
     image: mariadb
     container_name: mariadb
     environment:
-      MYSQL_DATABASE: betterpvp
       MYSQL_USER: user
       MYSQL_PASSWORD: BetterPvP123!
-      MYSQL_ROOT_PASSWORD: 0gcNvy5k # Random
+      MYSQL_ROOT_PASSWORD: BetterPvPAdmin123! # Random
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
@@ -18,6 +17,6 @@ services:
   redis:
     image: redis
     container_name: redis
-    command: redis-server --requirepass 0gcNvy5k
+    command: redis-server --requirepass BetterPvPAdmin123!
     ports:
       - "1234:6379"

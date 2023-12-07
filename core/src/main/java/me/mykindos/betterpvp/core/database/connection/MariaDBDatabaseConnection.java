@@ -2,10 +2,9 @@ package me.mykindos.betterpvp.core.database.connection;
 
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import me.mykindos.betterpvp.core.config.Config;
+import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import org.flywaydb.core.Flyway;
 
-import javax.inject.Inject;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -14,23 +13,25 @@ import java.sql.SQLException;
 @Slf4j
 public class MariaDBDatabaseConnection implements IDatabaseConnection {
 
-    @Inject
-    @Config(path = "core.database.ip", defaultValue = "127.0.0.1")
-    private String sqlServer;
-
-    @Inject
-    @Config(path = "core.database.username")
-    private String sqlUsername;
-
-    @Inject
-    @Config(path = "core.database.password")
-    private String sqlPassword;
-
-    @Inject
-    @Config(path = "core.database.databaseName")
-    private String sqlDatabaseName;
-
+    private final String sqlServer;
+    private final String sqlUsername;
+    private final String sqlPassword;
+    private final String sqlDatabaseName;
     private Connection connection;
+
+    public MariaDBDatabaseConnection(String sqlServer, String sqlUsername, String sqlPassword, String sqlDatabaseName) {
+        this.sqlServer = sqlServer;
+        this.sqlUsername = sqlUsername;
+        this.sqlPassword = sqlPassword;
+        this.sqlDatabaseName = sqlDatabaseName;
+    }
+
+    public MariaDBDatabaseConnection(ExtendedYamlConfiguration config) {
+        this.sqlServer = config.getString("core.database.local.ip", "127.0.0.1");
+        this.sqlUsername = config.getString("core.database.local.username");
+        this.sqlPassword = config.getString("core.database.local.password");
+        this.sqlDatabaseName = config.getString("core.database.local.databaseName");
+    }
 
     @Override
     public Connection getDatabaseConnection() {
