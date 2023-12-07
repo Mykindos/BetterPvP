@@ -7,9 +7,9 @@ import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
 import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.ICommand;
 import me.mykindos.betterpvp.core.command.SubCommand;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -26,8 +26,8 @@ public class ClanHelpSubCommand extends ClanSubCommand {
 
     private final ClanCommand clanCommand;
     @Inject
-    public ClanHelpSubCommand(ClanManager clanManager, GamerManager gamerManager, ClanCommand clanCommand) {
-        super(clanManager, gamerManager);
+    public ClanHelpSubCommand(ClanManager clanManager, ClientManager clientManager, ClanCommand clanCommand) {
+        super(clanManager, clientManager);
         aliases.addAll(List.of("?", "h"));
 
         this.clanCommand = clanCommand;

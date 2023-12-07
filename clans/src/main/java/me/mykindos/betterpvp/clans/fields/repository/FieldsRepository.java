@@ -60,7 +60,7 @@ public class FieldsRepository implements IRepository<FieldsBlockEntry> {
     @Override
     public List<FieldsBlockEntry> getAll() {
         List<FieldsBlockEntry> ores = new ArrayList<>();
-        String query = "SELECT * FROM " + clans.getDatabasePrefix() + "fields_ores";
+        String query = "SELECT * FROM clans_fields_ores";
         ResultSet result = database.executeQuery(new Statement(query));
         try {
             while (result.next()) {
@@ -84,7 +84,7 @@ public class FieldsRepository implements IRepository<FieldsBlockEntry> {
     }
 
     public void delete(String world, int x, int y, int z) {
-        String stmt = "DELETE FROM " + clans.getDatabasePrefix() + "fields_ores WHERE world = ? AND x = ? AND y = ? AND z = ?;";
+        String stmt = "DELETE FROM clans_fields_ores WHERE world = ? AND x = ? AND y = ? AND z = ?;";
         database.executeUpdate(new Statement(stmt,
                 new StringStatementValue(world),
                 new IntegerStatementValue(x),
@@ -99,7 +99,7 @@ public class FieldsRepository implements IRepository<FieldsBlockEntry> {
             return;
         }
 
-        String stmt = "INSERT INTO " + clans.getDatabasePrefix() + "fields_ores (world, x, y, z, type) VALUES (?, ?, ?, ?, ?);";
+        String stmt = "INSERT INTO clans_fields_ores (world, x, y, z, type) VALUES (?, ?, ?, ?, ?);";
         database.executeUpdate(new Statement(stmt,
                 new StringStatementValue(ore.getWorld()),
                 new IntegerStatementValue(ore.getX()),
@@ -110,7 +110,7 @@ public class FieldsRepository implements IRepository<FieldsBlockEntry> {
 
     @SneakyThrows
     public void saveBatch(@NotNull Collection<@NotNull FieldsBlockEntry> ores) {
-        String stmt = "INSERT INTO " + clans.getDatabasePrefix() + "fields_ores (world, x, y, z, type) VALUES (?, ?, ?, ?, ?);";
+        String stmt = "INSERT INTO clans_fields_ores (world, x, y, z, type) VALUES (?, ?, ?, ?, ?);";
         List<Statement> statements = new ArrayList<>();
         for (FieldsBlockEntry ore : ores) {
             if (ore.getType() == null) {

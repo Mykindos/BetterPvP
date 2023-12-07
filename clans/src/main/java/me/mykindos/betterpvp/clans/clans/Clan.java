@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.clans.clans.events.ClanPropertyUpdateEvent;
 import me.mykindos.betterpvp.clans.clans.insurance.Insurance;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.components.clans.IClan;
 import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
@@ -23,6 +24,7 @@ import me.mykindos.betterpvp.core.utilities.model.item.banner.BannerWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -321,7 +323,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
         try {
             ClanProperty property = ClanProperty.valueOf(key);
             if (property.isSaveProperty()) {
-                UtilServer.callEvent(new ClanPropertyUpdateEvent(this, key, value));
+                UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> UtilServer.callEvent(new ClanPropertyUpdateEvent(this, key, value)));
             }
         } catch (IllegalArgumentException ex) {
             log.error("Could not find a ClanProperty named {}", key, ex);

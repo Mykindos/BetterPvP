@@ -27,6 +27,8 @@ import me.mykindos.betterpvp.clans.clans.events.MemberLeaveClanEvent;
 import me.mykindos.betterpvp.clans.clans.events.MemberPromoteEvent;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
@@ -35,9 +37,6 @@ import me.mykindos.betterpvp.core.components.clans.events.ClanEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.events.scoreboard.ScoreboardUpdateEvent;
 import me.mykindos.betterpvp.core.framework.inviting.InviteHandler;
-import me.mykindos.betterpvp.core.gamer.Gamer;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
-import me.mykindos.betterpvp.core.gamer.exceptions.NoSuchGamerException;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -68,9 +67,9 @@ public class ClanEventListener extends ClanListener {
     private int maxClanMembers;
 
     @Inject
-    public ClanEventListener(Clans clans, ClanManager clanManager, GamerManager gamerManager, InviteHandler inviteHandler,
+    public ClanEventListener(Clans clans, ClanManager clanManager, ClientManager clientManager, InviteHandler inviteHandler,
                              WorldBlockHandler blockHandler) {
-        super(clanManager, gamerManager);
+        super(clanManager, clientManager);
         this.clans = clans;
         this.inviteHandler = inviteHandler;
         this.blockHandler = blockHandler;
@@ -147,7 +146,7 @@ public class ClanEventListener extends ClanListener {
 
         UtilMessage.simpleMessage(event.getPlayer(), "Clans", "Successfully created clan <aqua>%s", clan.getName());
         if (clan.isAdmin()) {
-            gamerManager.sendMessageToRank("Clans", UtilMessage.deserialize("<yellow>%s<gray> created admin clan <yellow>%s", event.getPlayer().getName(), clan.getName()), Rank.HELPER);
+            clientManager.sendMessageToRank("Clans", UtilMessage.deserialize("<yellow>%s<gray> created admin clan <yellow>%s", event.getPlayer().getName(), clan.getName()), Rank.HELPER);
         }
     }
 
@@ -209,9 +208,8 @@ public class ClanEventListener extends ClanListener {
                 .append(UtilMessage.deserialize(" or type '<alt2>/c join " + clan.getName() + "</alt2>' to accept!"));
         UtilMessage.simpleMessage(target, "Clans", inviteMessage);
 
-        Gamer targetGamer = gamerManager.getObject(target.getUniqueId().toString()).orElseThrow(() -> new NoSuchGamerException(target.getName()));
+        Gamer targetGamer = clientManager.search().online(target).getGamer();
         inviteHandler.createInvite(clan, targetGamer, "Invite", 20);
-
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -220,10 +218,11 @@ public class ClanEventListener extends ClanListener {
 
         Clan clan = event.getClan();
         Player player = event.getPlayer();
-        Gamer targetGamer = gamerManager.getObject(player.getUniqueId().toString()).orElseThrow(() -> new NoSuchGamerException(player.getName()));
+        Client client = clientManager.search().online(player);
+        final Gamer gamer = client.getGamer();
 
-        if (!targetGamer.getClient().isAdministrating()) {
-            if (!inviteHandler.isInvited(targetGamer, clan, "Invite")) {
+        if (!client.isAdministrating()) {
+            if (!inviteHandler.isInvited(gamer, clan, "Invite")) {
                 UtilMessage.simpleMessage(player, "Clans", "You are not invited to <alt2>Clan " + clan.getName() + "</alt2>.");
                 return;
             }
@@ -233,16 +232,17 @@ public class ClanEventListener extends ClanListener {
                 return;
             }
         } else {
-            gamerManager.sendMessageToRank("Clans", UtilMessage.deserialize("<yellow>%s<gray> force joined <yellow>%s", player.getName(), clan.getName()), Rank.HELPER);
+            clientManager.sendMessageToRank("Clans", UtilMessage.deserialize("<yellow>%s<gray> force joined <yellow>%s", player.getName(), clan.getName()), Rank.HELPER);
         }
 
         ClanMember member = new ClanMember(player.getUniqueId().toString(),
-                targetGamer.getClient().isAdministrating() ? ClanMember.MemberRank.LEADER : ClanMember.MemberRank.RECRUIT);
+                client.isAdministrating() ? ClanMember.MemberRank.LEADER : ClanMember.MemberRank.RECRUIT);
         clan.getMembers().add(member);
         clanManager.getRepository().saveClanMember(clan, member);
 
-        inviteHandler.removeInvite(clan, targetGamer, "Invite");
-        inviteHandler.removeInvite(targetGamer, clan, "Invite");
+
+        inviteHandler.removeInvite(clan, gamer, "Invite");
+        inviteHandler.removeInvite(gamer, clan, "Invite");
 
         clan.setOnline(true);
         clan.messageClan(String.format("<yellow>%s<gray> has joined your Clan.", player.getName()), player.getUniqueId(), true);
@@ -520,10 +520,8 @@ public class ClanEventListener extends ClanListener {
         member.setRank(ClanMember.MemberRank.getRankByPrivilege(Math.min(ClanMember.MemberRank.LEADER.getPrivilege(), member.getRank().getPrivilege() + 1)));
         clanManager.getRepository().updateClanMemberRank(clan, member);
 
-        Gamer memberGamer = gamerManager.getObject(member.getUuid()).orElseThrow(() -> new NoSuchGamerException(member.getUuid()));
-
-        UtilMessage.simpleMessage(player, "Clans", "You promoted <aqua>%s<gray> to <yellow>%s<gray>.",
-                memberGamer.getClient().getName(), member.getName());
+        Client client = clientManager.search().online(player);
+        UtilMessage.simpleMessage(player, "Clans", "You promoted <aqua>%s<gray> to <yellow>%s<gray>.", client.getName(), member.getName());
 
         Player memberPlayer = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
         if (memberPlayer != null) {
@@ -542,11 +540,9 @@ public class ClanEventListener extends ClanListener {
         member.setRank(ClanMember.MemberRank.getRankByPrivilege(Math.max(1, member.getRank().getPrivilege() - 1)));
         clanManager.getRepository().updateClanMemberRank(clan, member);
 
-        Gamer memberGamer = gamerManager.getObject(member.getUuid()).orElseThrow(() -> new NoSuchGamerException(member.getUuid()));
-
+        Client client = clientManager.search().online(player);
         if (!player.getUniqueId().toString().equalsIgnoreCase(member.getUuid())) {
-            UtilMessage.simpleMessage(player, "Clans", "You demoted <aqua>%s<gray> to <yellow>%s<gray>.",
-                    memberGamer.getClient().getName(), member.getName());
+            UtilMessage.simpleMessage(player, "Clans", "You demoted <aqua>%s<gray> to <yellow>%s<gray>.", client.getName(), member.getName());
         }
 
         Player memberPlayer = Bukkit.getPlayer(UUID.fromString(member.getUuid()));

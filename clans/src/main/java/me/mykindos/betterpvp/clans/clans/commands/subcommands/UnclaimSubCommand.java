@@ -9,17 +9,16 @@ import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
 import me.mykindos.betterpvp.clans.clans.events.ChunkUnclaimEvent;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.config.Config;
-import me.mykindos.betterpvp.core.gamer.Gamer;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.entity.Player;
 
-import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
 @Singleton
 @SubCommand(ClanCommand.class)
@@ -30,8 +29,8 @@ public class UnclaimSubCommand extends ClanSubCommand {
     private int additionalClaims;
 
     @Inject
-    public UnclaimSubCommand(ClanManager clanManager, GamerManager gamerManager) {
-        super(clanManager, gamerManager);
+    public UnclaimSubCommand(ClanManager clanManager, ClientManager clientManager) {
+        super(clanManager, clientManager);
     }
 
     @Override
@@ -75,13 +74,14 @@ public class UnclaimSubCommand extends ClanSubCommand {
             }
 
             for (ClanMember clanMember : locationClan.getMembers()) {
-                Optional<Gamer> gamerOptional = gamerManager.getObject(clanMember.getUuid());
-                if (gamerOptional.isPresent()) {
-                    if (gamerOptional.get().getClient().isAdministrating()) {
+                final Optional<Client> clientOpt = clientManager.search().online(UUID.fromString(clanMember.getUuid()));
+                if (clientOpt.isPresent()) {
+                    final Client online = clientOpt.get();
+                    if (online.isAdministrating()) {
                         UtilMessage.message(player, "Clans", "You may not unclaim territory from this Clan at this time.");
-                        gamerManager.sendMessageToRank("Clans",
+                        clientManager.sendMessageToRank("Clans",
                                 UtilMessage.deserialize("<yellow>%s<gray> prevented <yellow>%s<gray> from unclaiming <yellow>%s<gray>'s territory because they are in adminstrator mode",
-                                        Objects.requireNonNull(gamerOptional.get().getPlayer()).getName(), player.getName(), locationClan.getName()), Rank.HELPER);
+                                        online.getName(), player.getName(), locationClan.getName()), Rank.HELPER);
                         return;
                     }
                 }

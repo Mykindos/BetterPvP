@@ -1,4 +1,4 @@
-create table if not exists ${tablePrefix}clans
+create table if not exists clans
 (
     id        varchar(36) not null,
     Name      varchar(32) not null,
@@ -10,10 +10,10 @@ create table if not exists ${tablePrefix}clans
         primary key (id)
 );
 
-create unique index ${tablePrefix}clans_Name_uindex
-    on ${tablePrefix}clans (Name);
+create unique index clans_Name_uindex
+    on clans (Name);
 
-create table if not exists ${tablePrefix}clan_territory
+create table if not exists clan_territory
 (
     id        int         auto_increment not null,
     Clan      varchar(36) not null,
@@ -22,10 +22,10 @@ create table if not exists ${tablePrefix}clan_territory
         primary key (id)
 );
 
-create unique index ${tablePrefix}clans_territory_Clan_Chunk_uindex
-    on ${tablePrefix}clan_territory (Clan, Chunk);
+create unique index clans_territory_Clan_Chunk_uindex
+    on clan_territory (Clan, Chunk);
 
-create table if not exists ${tablePrefix}clan_members
+create table if not exists clan_members
 (
     id        int         auto_increment not null,
     Clan      varchar(36) not null,
@@ -35,10 +35,10 @@ create table if not exists ${tablePrefix}clan_members
         primary key (id)
 );
 
-create unique index ${tablePrefix}clans_members_Clan_Member_uindex
-    on ${tablePrefix}clan_members (Clan, Member);
+create unique index clan_members_Clan_Member_uindex
+    on clan_members (Clan, Member);
 
-create table if not exists ${tablePrefix}clan_alliances
+create table if not exists clan_alliances
 (
     id        int         auto_increment not null,
     Clan      varchar(36) not null,
@@ -48,10 +48,10 @@ create table if not exists ${tablePrefix}clan_alliances
         primary key (id)
 );
 
-create unique index ${tablePrefix}clans_alliances_Clan_AllyClan_uindex
-    on ${tablePrefix}clan_alliances (Clan, AllyClan);
+create unique index clan_alliances_Clan_AllyClan_uindex
+    on clan_alliances (Clan, AllyClan);
 
-create table if not exists ${tablePrefix}clan_enemies
+create table if not exists clan_enemies
 (
     id         int         auto_increment not null,
     Clan       varchar(36) not null,
@@ -61,28 +61,27 @@ create table if not exists ${tablePrefix}clan_enemies
         primary key (id)
 );
 
-create unique index ${tablePrefix}clans_enemies_Clan_EnemyClan_uindex
-    on ${tablePrefix}clan_enemies (Clan, EnemyClan);
+create unique index clan_enemies_Clan_EnemyClan_uindex
+    on clan_enemies (Clan, EnemyClan);
 
-
-create table if not exists ${tablePrefix}dominance_scale
+create table if not exists clans_dominance_scale
 (
     ClanSize  int    not null,
     Dominance double not null,
-    constraint ${tablePrefix}dominance_scale_pk
+    constraint clans_dominance_scale_pk
         primary key (ClanSize)
 );
 
-INSERT IGNORE INTO ${tablePrefix}dominance_scale VALUES (1, 3.5);
-INSERT IGNORE INTO ${tablePrefix}dominance_scale VALUES (2, 3.5);
-INSERT IGNORE INTO ${tablePrefix}dominance_scale VALUES (3, 4);
-INSERT IGNORE INTO ${tablePrefix}dominance_scale VALUES (4, 4);
-INSERT IGNORE INTO ${tablePrefix}dominance_scale VALUES (5, 4.5);
-INSERT IGNORE INTO ${tablePrefix}dominance_scale VALUES (6, 4.5);
-INSERT IGNORE INTO ${tablePrefix}dominance_scale VALUES (7, 5);
-INSERT IGNORE INTO ${tablePrefix}dominance_scale VALUES (8, 5);
+INSERT IGNORE INTO clans_dominance_scale VALUES (1, 3.5);
+INSERT IGNORE INTO clans_dominance_scale VALUES (2, 3.5);
+INSERT IGNORE INTO clans_dominance_scale VALUES (3, 4);
+INSERT IGNORE INTO clans_dominance_scale VALUES (4, 4);
+INSERT IGNORE INTO clans_dominance_scale VALUES (5, 4.5);
+INSERT IGNORE INTO clans_dominance_scale VALUES (6, 4.5);
+INSERT IGNORE INTO clans_dominance_scale VALUES (7, 5);
+INSERT IGNORE INTO clans_dominance_scale VALUES (8, 5);
 
-create table if not exists ${tablePrefix}insurance
+create table if not exists clan_insurance
 (
     Clan          varchar(36) not null,
     InsuranceType varchar(255)  not null,
@@ -94,19 +93,10 @@ create table if not exists ${tablePrefix}insurance
     Z             int           not null
 );
 
-create table if not exists ${tablePrefix}clan_properties
+create table if not exists clan_properties
 (
     Clan     varchar(36)  not null,
     Property varchar(255) not null,
     Value    varchar(255) null,
     primary key (Clan, Property)
 );
-
-INSERT IGNORE INTO property_map VALUES ("ENERGY", "int");
-INSERT IGNORE INTO property_map VALUES ("LEVEL", "int");
-INSERT IGNORE INTO property_map VALUES ("POINTS", "int");
-INSERT IGNORE INTO property_map VALUES ("BALANCE", "int");
-INSERT IGNORE INTO property_map VALUES ("LAST_LOGIN", "long");
-INSERT IGNORE INTO property_map VALUES ("NO_DOMINANCE_COOLDOWN", "long");
-INSERT IGNORE INTO property_map VALUES ("LAST_TNTED", "long");
-INSERT IGNORE INTO property_map VALUES ("TIME_CREATED", "long");

@@ -61,7 +61,7 @@ public class GlobalCombatStatsRepository extends CombatStatsRepository<GlobalCom
                     }
 
                     attachmentLoaders.forEach(loader -> {
-                        final ICombatDataAttachment attachment = loader.loadAttachment(player, data, database, plugin.getDatabasePrefix());
+                        final ICombatDataAttachment attachment = loader.loadAttachment(player, data, database);
                         data.attach(attachment);
                     });
                 } catch (SQLException e) {

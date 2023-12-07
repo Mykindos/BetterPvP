@@ -25,8 +25,8 @@ public abstract class PlayerLeaderboard<T> extends Leaderboard<UUID, T> {
     }
 
     @Override
-    protected LeaderboardEntry<UUID, T> fetchPlayerData(@NotNull UUID player, @NotNull SearchOptions options, @NotNull Database database, @NotNull String tablePrefix) throws UnsupportedOperationException {
-        return LeaderboardEntry.of(player, fetch(options, database, tablePrefix, player));
+    protected LeaderboardEntry<UUID, T> fetchPlayerData(@NotNull UUID player, @NotNull SearchOptions options, @NotNull Database database) throws UnsupportedOperationException {
+        return LeaderboardEntry.of(player, fetch(options, database, player));
     }
 
     @Override

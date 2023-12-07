@@ -6,9 +6,9 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
 import me.mykindos.betterpvp.core.chat.events.ChatReceivedEvent;
 import me.mykindos.betterpvp.core.chat.events.ChatSentEvent;
-import me.mykindos.betterpvp.core.gamer.Gamer;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
-import me.mykindos.betterpvp.core.gamer.properties.GamerProperty;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import net.kyori.adventure.text.Component;
@@ -23,8 +23,8 @@ import java.util.Optional;
 public class ClansChatListener extends ClanListener {
 
     @Inject
-    public ClansChatListener(ClanManager clanManager, GamerManager gamerManager) {
-        super(clanManager, gamerManager);
+    public ClansChatListener(ClanManager clanManager, ClientManager clientManager) {
+        super(clanManager, clientManager);
     }
 
     @EventHandler(priority = EventPriority.LOW)
@@ -54,13 +54,10 @@ public class ClansChatListener extends ClanListener {
     public void onChatSent(ChatSentEvent event) {
         if (event.isCancelled()) return;
 
-        Optional<Gamer> gamerOptional = gamerManager.getObject(event.getPlayer().getUniqueId().toString());
-        if (gamerOptional.isEmpty()) return;
-
         Optional<Clan> clanOptional = clanManager.getClanByPlayer(event.getPlayer());
         if (clanOptional.isEmpty()) return;
 
-        Gamer gamer = gamerOptional.get();
+        Gamer gamer = clientManager.search().online(event.getPlayer()).getGamer();
         Clan clan = clanOptional.get();
 
         Optional<Boolean> clanChatEnabledOptional = gamer.getProperty(GamerProperty.CLAN_CHAT);

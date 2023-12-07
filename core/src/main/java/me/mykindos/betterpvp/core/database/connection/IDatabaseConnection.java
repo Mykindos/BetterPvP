@@ -6,6 +6,6 @@ public interface IDatabaseConnection {
 
     Connection getDatabaseConnection();
 
-    void runDatabaseMigrations(ClassLoader classLoader, String location, String prefix);
+    void runDatabaseMigrations(ClassLoader classLoader, String location, String name);
 
 }
