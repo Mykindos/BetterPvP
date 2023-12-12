@@ -77,9 +77,13 @@ public class UtilPlayer {
         return fetchNearbyEntityEvent.getEntities();
     }
 
-    public static boolean isPlayerFriendly (Player player, Player target) {
+    public static boolean isPlayerFriendly(Player player, Player target) {
+        return getRelation(player, target) == EntityProperty.FRIENDLY;
+    }
+
+    public static EntityProperty getRelation(Player player, Player target) {
         GetPlayerRelationshipEvent getPlayerRelationshipEvent = UtilServer.callEvent(new GetPlayerRelationshipEvent(player, target));
-        return getPlayerRelationshipEvent.getEntityProperty() == EntityProperty.FRIENDLY;
+        return getPlayerRelationshipEvent.getEntityProperty();
     }
 
     public static int getPing(Player player) {
