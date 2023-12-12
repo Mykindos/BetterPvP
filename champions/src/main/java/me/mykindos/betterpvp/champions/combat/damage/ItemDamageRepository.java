@@ -3,7 +3,6 @@ package me.mykindos.betterpvp.champions.combat.damage;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.repository.IRepository;
@@ -18,10 +17,6 @@ import java.util.List;
 @Slf4j
 public class ItemDamageRepository implements IRepository<ItemDamageValue> {
 
-    @Inject
-    @Config(path = "champions.database.prefix", defaultValue = "champions_")
-    private String databasePrefix;
-
     private final Database database;
 
     @Inject
@@ -32,7 +27,7 @@ public class ItemDamageRepository implements IRepository<ItemDamageValue> {
     @Override
     public List<ItemDamageValue> getAll() {
         List<ItemDamageValue> itemDamageValues = new ArrayList<>();
-        String query = "SELECT * FROM " + databasePrefix + "damagevalues;";
+        String query = "SELECT * FROM champions_damagevalues;";
         CachedRowSet result = database.executeQuery(new Statement(query));
         try {
             while (result.next()) {

@@ -3,7 +3,6 @@ package me.mykindos.betterpvp.core.cooldowns;
 import com.google.inject.Inject;
 import me.mykindos.betterpvp.core.combat.death.events.CustomDeathEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -14,12 +13,10 @@ import org.bukkit.event.Listener;
 public class CooldownListener implements Listener {
 
     private final CooldownManager cooldownManager;
-    private final GamerManager gamerManager;
 
     @Inject
-    public CooldownListener(CooldownManager cooldownManager, GamerManager gamerManager) {
+    public CooldownListener(CooldownManager cooldownManager) {
         this.cooldownManager = cooldownManager;
-        this.gamerManager = gamerManager;
     }
 
     @UpdateEvent(delay = 100, isAsync = true)

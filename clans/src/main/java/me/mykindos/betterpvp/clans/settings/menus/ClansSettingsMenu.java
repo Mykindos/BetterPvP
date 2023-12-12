@@ -1,7 +1,9 @@
 package me.mykindos.betterpvp.clans.settings.menus;
 
-import me.mykindos.betterpvp.core.gamer.Gamer;
-import me.mykindos.betterpvp.core.gamer.properties.GamerProperty;
+import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
+import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.settings.menus.SettingCategory;
 import me.mykindos.betterpvp.core.settings.menus.buttons.SettingsButton;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
@@ -16,11 +18,12 @@ import xyz.xenondevs.invui.gui.AbstractGui;
 
 public class ClansSettingsMenu extends AbstractGui implements SettingCategory {
 
-    public ClansSettingsMenu(Gamer gamer) {
+    public ClansSettingsMenu(Client client) {
         super(9, 1);
+        final Gamer gamer = client.getGamer();
 
         final Description sidebarDescription = Description.builder().icon(lang -> {
-            final boolean setting = (boolean) gamer.getProperty(GamerProperty.SIDEBAR_ENABLED).orElse(false);
+            final boolean setting = (boolean) client.getProperty(ClientProperty.SIDEBAR_ENABLED).orElse(false);
             final NamedTextColor color = setting ? NamedTextColor.GREEN : NamedTextColor.RED;
             return ItemView.builder()
                     .material(Material.IRON_BARS)
@@ -44,7 +47,7 @@ public class ClansSettingsMenu extends AbstractGui implements SettingCategory {
         }).build();
 
         addItems(
-                new SettingsButton(gamer, GamerProperty.SIDEBAR_ENABLED, sidebarDescription),
+                new SettingsButton(client, ClientProperty.SIDEBAR_ENABLED, sidebarDescription),
                 new SettingsButton(gamer, GamerProperty.CLAN_MENU_ENABLED, clanMenuDescription)
         );
     }

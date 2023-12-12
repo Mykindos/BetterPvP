@@ -8,11 +8,10 @@ import me.mykindos.betterpvp.clans.fields.event.FieldsInteractableUseEvent;
 import me.mykindos.betterpvp.clans.fields.model.FieldsBlock;
 import me.mykindos.betterpvp.clans.fields.model.FieldsInteractable;
 import me.mykindos.betterpvp.core.client.Rank;
+import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.events.ClientAdministrateEvent;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
-import me.mykindos.betterpvp.core.gamer.Gamer;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
-import me.mykindos.betterpvp.core.gamer.exceptions.NoSuchGamerException;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -40,8 +39,8 @@ public class FieldsListener extends ClanListener {
     private Fields fields;
 
     @Inject
-    public FieldsListener(ClanManager clanManager, GamerManager gamerManager, Fields fields) {
-        super(clanManager, gamerManager);
+    public FieldsListener(ClanManager clanManager, ClientManager clientManager, Fields fields) {
+        super(clanManager, clientManager);
         this.fields = fields;
     }
 
@@ -66,7 +65,7 @@ public class FieldsListener extends ClanListener {
         fields.addBlocks(toSave);
         UtilMessage.message(event.getPlayer(), "Fields", "Saved <alt2>%s</alt2> interactables change(s) to the database.", toSave.size());
         Component message = UtilMessage.deserialize("<yellow>%s</yellow> saved <green>%s</green> interactables changes(s) to the database.", event.getPlayer().getName(), toSave.size());
-        gamerManager.sendMessageToRank("Fields", message, Rank.HELPER);
+        clientManager.sendMessageToRank("Fields", message, Rank.HELPER);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -119,8 +118,8 @@ public class FieldsListener extends ClanListener {
             return; // ignore if it's not fields
         }
 
-        Gamer gamer = gamerManager.getObject(player.getUniqueId().toString()).orElseThrow(() -> new NoSuchGamerException(player.getName()));
-        if (!gamer.getClient().isAdministrating()) {
+        Client client = clientManager.search().online(player);
+        if (!client.isAdministrating()) {
             return; // if they're not admin, skip
         }
 
@@ -147,7 +146,7 @@ public class FieldsListener extends ClanListener {
         profiles.computeIfAbsent(player, p -> {
             UtilMessage.message(player, "Fields", "<red>You are now editing interactables in Fields. <u>Your changes will be saved when you stop administrating.</u></red>");
             Component message = UtilMessage.deserialize("<yellow>%s</yellow> is now editing interactables in Fields", player.getName());
-            gamerManager.sendMessageToRank("Fields", message, Rank.HELPER);
+            clientManager.sendMessageToRank("Fields", message, Rank.HELPER);
             return new HashMap<>();
         }).put(block, blockType);
     }

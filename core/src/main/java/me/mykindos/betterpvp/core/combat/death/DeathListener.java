@@ -1,10 +1,10 @@
 package me.mykindos.betterpvp.core.combat.death;
 
 import com.google.inject.Inject;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
 import me.mykindos.betterpvp.core.combat.death.events.CustomDeathEvent;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -30,12 +30,12 @@ import java.util.Objects;
 public class DeathListener implements Listener {
 
     private final DamageLogManager damageLogManager;
-    private final GamerManager gamerManager;
+    private final ClientManager clientManager;
 
     @Inject
-    public DeathListener(DamageLogManager damageLogManager, GamerManager gamerManager) {
+    public DeathListener(DamageLogManager damageLogManager, ClientManager clientManager) {
         this.damageLogManager = damageLogManager;
-        this.gamerManager = gamerManager;
+        this.clientManager = clientManager;
     }
 
     @EventHandler
@@ -43,9 +43,7 @@ public class DeathListener implements Listener {
         event.deathMessage(null);
         DamageLog lastDamage = damageLogManager.getLastDamager(event.getPlayer());
 
-        gamerManager.getObject(event.getEntity().getUniqueId()).ifPresent(gamer -> {
-            gamer.setLastDamaged(0);
-        });
+        clientManager.search().online(event.getEntity()).getGamer().setLastDamaged(0);
 
         Bukkit.getOnlinePlayers().forEach(onlinePlayer -> {
             CustomDeathEvent customDeathEvent = new CustomDeathEvent(onlinePlayer, event.getPlayer());

@@ -3,12 +3,11 @@ package me.mykindos.betterpvp.core.client.commands;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.Client;
-import me.mykindos.betterpvp.core.client.ClientManager;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.events.ClientAdministrateEvent;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.SubCommand;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -16,7 +15,6 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Singleton
 public class ClientCommand extends Command {
@@ -40,7 +38,7 @@ public class ClientCommand extends Command {
     private static class AdminSubCommand extends Command {
 
         @Inject
-        private GamerManager gamerManager;
+        private ClientManager clientManager;
 
         @Override
         public String getName() {
@@ -56,11 +54,12 @@ public class ClientCommand extends Command {
         public void execute(Player player, Client client, String[] args) {
             client.setAdministrating(!client.isAdministrating());
             new ClientAdministrateEvent(client, player, client.isAdministrating()).callEvent();
+            this.clientManager.save(client);
 
             Component status = client.isAdministrating() ? Component.text("enabled", NamedTextColor.GREEN) : Component.text("disabled", NamedTextColor.RED);
             UtilMessage.simpleMessage(player, "Command", Component.text("Client admin: ").append(status));
             Component message = Component.text(player.getName(), NamedTextColor.YELLOW).append(Component.space()).append(status).append(Component.text(" client administration mode", NamedTextColor.GRAY));
-            gamerManager.sendMessageToRank("Core", message, Rank.HELPER);
+            clientManager.sendMessageToRank("Core", message, Rank.HELPER);
         }
 
         @Override
@@ -93,24 +92,12 @@ public class ClientCommand extends Command {
                 return;
             }
 
-            String name = args[0];
-
-            Optional<Client> clientOptional = clientManager.getClientByName(name);
-            clientOptional.ifPresentOrElse(target -> {
+            clientManager.search(player).offline(args[0], clientOpt -> clientOpt.ifPresentOrElse(target -> {
+                // Todo: prettify and populate
                 List<Component> result = new ArrayList<>();
                 result.add(UtilMessage.deserialize("<alt2>%s</alt2> Client Details", target.getName()));
-                //result.add(Component.text("IP Address: ", NamedTextColor.YELLOW).append(Component.text(target.getIP(), NamedTextColor.GRAY)));
-                //        + (client.hasRank(Rank.ADMIN) ? ChatColor.GRAY + target.getIP() : ChatColor.RED + "N/A"));
-                //event.getResult().add(ChatColor.YELLOW + "Previous Name: " + ChatColor.GRAY + target.getOldName());
-                //event.getResult().add(ChatColor.YELLOW + "IP Alias: " + ChatColor.GRAY + (client.hasRank(Rank.ADMIN, false)
-                //        ? ClientUtilities.getDetailedIPAlias(target, false) : ClientUtilities.getDetailedIPAlias(target, true)));
-                //event.getResult().add(ChatColor.YELLOW + "Rank: " + ChatColor.GRAY + UtilFormat.cleanString(target.getRank().toString()));
-                //event.getResult().add(ChatColor.YELLOW + "Discord Linked: " + ChatColor.GRAY + target.isDiscordLinked());
-                //event.getResult().add(ChatColor.YELLOW + "Punishments: " + ChatColor.GRAY + punishments);
-
                 result.forEach(message -> UtilMessage.message(player, message));
-
-            }, () -> UtilMessage.message(player, "Command", "Could not find a client with this name"));
+            }, () -> UtilMessage.message(player, "Command", "Could not find a client with this name")));
         }
 
         @Override
@@ -125,9 +112,6 @@ public class ClientCommand extends Command {
 
         @Inject
         private ClientManager clientManager;
-
-        @Inject
-        private GamerManager gamerManager;
 
         @Override
         public String getName() {
@@ -146,27 +130,28 @@ public class ClientCommand extends Command {
                 return;
             }
 
-            Optional<Client> clientOptional = clientManager.getClientByName(args[0]);
-            if (clientOptional.isPresent()) {
-                Client targetClient = clientOptional.get();
-                Rank targetRank = Rank.getRank(targetClient.getRank().getId() + 1);
-                if(targetRank != null) {
-                    if (client.getRank().getId() < targetRank.getId() || player.isOp()) {
-                        targetClient.setRank(targetRank);
+            clientManager.search(player).offline(args[0], result -> {
+                if (result.isPresent()) {
+                    Client targetClient = result.get();
+                    Rank targetRank = Rank.getRank(targetClient.getRank().getId() + 1);
+                    if (targetRank != null) {
+                        if (client.getRank().getId() < targetRank.getId() || player.isOp()) {
+                            targetClient.setRank(targetRank);
 
-                        final Component msg = UtilMessage.deserialize("<alt2>%s</alt2> has been promoted to ", targetClient.getName()).append(targetRank.getTag(true));
-                        UtilMessage.simpleMessage(player, "Client", msg);
-                        clientManager.getRepository().save(targetClient);
+                            final Component msg = UtilMessage.deserialize("<alt2>%s</alt2> has been promoted to ", targetClient.getName()).append(targetRank.getTag(true));
+                            UtilMessage.simpleMessage(player, "Client", msg);
+                            clientManager.save(targetClient);
 
-                        Component staffMessage = UtilMessage.deserialize("<yellow>%s</yellow> has promoted <yellow>%s</yellow> to ", player.getName(), targetClient.getName()).append(targetRank.getTag(true));
-                        gamerManager.sendMessageToRank("Client", staffMessage, Rank.HELPER);
+                            Component staffMessage = UtilMessage.deserialize("<yellow>%s</yellow> has promoted <yellow>%s</yellow> to ", player.getName(), targetClient.getName()).append(targetRank.getTag(true));
+                            clientManager.sendMessageToRank("Client", staffMessage, Rank.HELPER);
+                        } else {
+                            UtilMessage.message(player, "Client", "You cannot promote someone to your current rank or higher.");
+                        }
                     } else {
-                        UtilMessage.message(player, "Client", "You cannot promote someone to your current rank or higher.");
+                        UtilMessage.simpleMessage(player, "Client", "<alt2>%s</alt2> already has the highest rank.", targetClient.getName());
                     }
-                } else {
-                    UtilMessage.simpleMessage(player, "Client", "<alt2>%s</alt2> already has the highest rank.", targetClient.getName());
                 }
-            }
+            });
         }
     }
 
@@ -176,9 +161,6 @@ public class ClientCommand extends Command {
 
         @Inject
         private ClientManager clientManager;
-
-        @Inject
-        private GamerManager gamerManager;
 
         @Override
         public String getName() {
@@ -197,26 +179,28 @@ public class ClientCommand extends Command {
                 return;
             }
 
-            Optional<Client> clientOptional = clientManager.getClientByName(args[0]);
-            if (clientOptional.isPresent()) {
-                Client targetClient = clientOptional.get();
-                Rank targetRank = Rank.getRank(targetClient.getRank().getId() - 1);
-                if(targetRank != null) {
-                    if (client.getRank().getId() < targetRank.getId() || player.isOp()) {
-                        targetClient.setRank(targetRank);
+            clientManager.search(player).offline(args[0], result -> {
+                if (result.isPresent()) {
+                    Client targetClient = result.get();
+                    Rank targetRank = Rank.getRank(targetClient.getRank().getId() - 1);
+                    if(targetRank != null) {
+                        if (client.getRank().getId() < targetRank.getId() || player.isOp()) {
+                            targetClient.setRank(targetRank);
 
-                        final Component msg = UtilMessage.deserialize("<alt2>%s</alt2> has been demoted to ", targetClient.getName()).append(targetRank.getTag(true));
-                        UtilMessage.simpleMessage(player, "Client", msg);
-                        clientManager.getRepository().save(targetClient);
-                        Component staffMessage = UtilMessage.deserialize("<yellow>%s</yellow> has demoted <yellow>%s</yellow> to ", player.getName(), targetClient.getName()).append(targetRank.getTag(true));
-                        gamerManager.sendMessageToRank("Client", staffMessage, Rank.HELPER);
+                            final Component msg = UtilMessage.deserialize("<alt2>%s</alt2> has been demoted to ", targetClient.getName()).append(targetRank.getTag(true));
+                            UtilMessage.simpleMessage(player, "Client", msg);
+                            clientManager.save(targetClient);
+
+                            Component staffMessage = UtilMessage.deserialize("<yellow>%s</yellow> has demoted <yellow>%s</yellow> to ", player.getName(), targetClient.getName()).append(targetRank.getTag(true));
+                            clientManager.sendMessageToRank("Client", staffMessage, Rank.HELPER);
+                        } else {
+                            UtilMessage.message(player, "Client", "You cannot demote someone that is higher rank than you.");
+                        }
                     } else {
-                        UtilMessage.message(player, "Client", "You cannot demote someone that is higher rank than you.");
+                        UtilMessage.simpleMessage(player, "Client", "<alt2>%s</alt2> already has the lowest rank.", targetClient.getName());
                     }
-                } else {
-                    UtilMessage.simpleMessage(player, "Client", "<alt2>%s</alt2> already has the lowest rank.", targetClient.getName());
                 }
-            }
+            });
         }
     }
 }

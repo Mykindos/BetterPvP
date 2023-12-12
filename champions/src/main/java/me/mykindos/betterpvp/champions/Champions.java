@@ -40,13 +40,7 @@ public class Champions extends BPvPPlugin {
     @Inject
     private UpdateEventExecutor updateEventExecutor;
 
-    @Inject
-    @Config(path = "champions.database.prefix", defaultValue = "champions_")
-    @Getter
-    private String databasePrefix;
-
     private ChampionsListenerLoader championsListenerLoader;
-
 
     @Override
     public void onEnable() {
@@ -63,7 +57,7 @@ public class Champions extends BPvPPlugin {
                     new SkillInjectorModule(this));
             injector.injectMembers(this);
 
-            database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:champions-migrations", databasePrefix);
+            database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:champions-migrations", "champions");
 
             Bukkit.getPluginManager().callEvent(new ModuleLoadedEvent("Champions"));
 

@@ -40,11 +40,6 @@ public class Shops extends BPvPPlugin {
     @Inject
     private UpdateEventExecutor updateEventExecutor;
 
-    @Inject
-    @Config(path = "shops.database.prefix", defaultValue = "shops_")
-    @Getter
-    private String databasePrefix;
-
     @Override
     public void onEnable() {
         saveDefaultConfig();
@@ -59,7 +54,7 @@ public class Shops extends BPvPPlugin {
                     new ConfigInjectorModule(this, fields));
             injector.injectMembers(this);
 
-            database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:shops-migrations", databasePrefix);
+            database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:shops-migrations", "shops");
 
             Bukkit.getPluginManager().callEvent(new ModuleLoadedEvent("Shops"));
 

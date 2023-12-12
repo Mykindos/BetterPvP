@@ -1,4 +1,4 @@
-create table if not exists ${tablePrefix}fields_ores
+create table if not exists clans_fields_ores
 (
     world varchar(32) not null,
     x int not null,

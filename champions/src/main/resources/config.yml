@@ -1,6 +1,3 @@
-champions:
-  database:
-    prefix: champions_
 skills:
   assassin:
     leap:

@@ -4,10 +4,9 @@ import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
-import me.mykindos.betterpvp.core.gamer.Gamer;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -16,15 +15,16 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public abstract class ClanSubCommand extends Command {
 
     protected final ClanManager clanManager;
-    protected final GamerManager gamerManager;
+    protected final ClientManager clientManager;
 
-    public ClanSubCommand(ClanManager clanManager, GamerManager gamerManager) {
+    public ClanSubCommand(ClanManager clanManager, ClientManager clientManager) {
         this.clanManager = clanManager;
-        this.gamerManager = gamerManager;
+        this.clientManager = clientManager;
     }
 
     public String getUsage() {
@@ -41,14 +41,8 @@ public abstract class ClanSubCommand extends Command {
             }
         }
 
-        if (requiresServerAdmin()) {
-            Optional<Gamer> gamerOptional = gamerManager.getObject(player.getUniqueId());
-            if (gamerOptional.isPresent()) {
-                Gamer gamer = gamerOptional.get();
-                if (!gamer.getClient().hasRank(Rank.ADMIN)) {
-                    return;
-                }
-            }
+        if (requiresServerAdmin() && !client.hasRank(Rank.ADMIN)) {
+            return;
         }
 
         execute(player, client, args);
@@ -80,11 +74,12 @@ public abstract class ClanSubCommand extends Command {
                 if (sender instanceof Player player) {
                     Optional<Clan> clanOptional = clanManager.getClanByPlayer(player);
                     clanOptional.ifPresent(clan -> clan.getMembers().forEach(clanMember -> {
-                        Optional<Gamer> gamerOptional = gamerManager.getObject(clanMember.getUuid());
-                        gamerOptional.ifPresent(gamer -> {
-                            if (gamer.getClient().getName().toLowerCase().startsWith(lowercaseArg)) {
-                                tabCompletions.add(gamer.getClient().getName());
-                            }
+                        clientManager.search(player).offline(UUID.fromString(clanMember.getUuid()), clientOpt -> {
+                            clientOpt.ifPresent(client -> {
+                                if (client.getName().toLowerCase().startsWith(lowercaseArg)) {
+                                    tabCompletions.add(client.getName());
+                                }
+                            });
                         });
                     }));
                 }
@@ -126,10 +121,9 @@ public abstract class ClanSubCommand extends Command {
         if (sender instanceof Player player) {
 
             if (requiresServerAdmin()) {
-                Optional<Gamer> gamerOptional = gamerManager.getObject(player.getUniqueId());
-                if (gamerOptional.isPresent()) {
-                    Gamer gamer = gamerOptional.get();
-                    if (!gamer.getClient().hasRank(Rank.ADMIN)) return false;
+                Client client = clientManager.search().online(player);
+                if (!client.hasRank(Rank.ADMIN)) {
+                    return false;
                 }
             }
 

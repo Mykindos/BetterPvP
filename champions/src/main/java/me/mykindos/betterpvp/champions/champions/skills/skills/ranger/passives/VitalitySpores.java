@@ -6,11 +6,11 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
-import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
@@ -18,8 +18,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
-import java.util.Optional;
 
 @Singleton
 @BPvPListener
@@ -58,12 +56,10 @@ public class VitalitySpores extends Skill implements PassiveSkill {
         for (Player player : Bukkit.getOnlinePlayers()) {
             int level = getLevel(player);
             if (level > 0) {
-                Optional<Gamer> gamerOptional = championsManager.getGamers().getObject(player.getUniqueId());
-                gamerOptional.ifPresent(gamer -> {
-                    if (UtilTime.elapsed(gamer.getLastDamaged(), (long) ((baseDuration - level) * 1000L))) {
-                        player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 120, 0));
-                    }
-                });
+                Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
+                if (UtilTime.elapsed(gamer.getLastDamaged(), (long) ((baseDuration - level) * 1000L))) {
+                    player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 120, 0));
+                }
             }
         }
 

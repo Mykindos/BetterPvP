@@ -7,10 +7,10 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
 import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.framework.delayedactions.events.ClanStuckTeleportEvent;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
@@ -27,8 +27,8 @@ public class StuckSubCommand extends ClanSubCommand {
     private final CooldownManager cooldownManager;
 
     @Inject
-    public StuckSubCommand(ClanManager clanManager, GamerManager gamerManager, CooldownManager cooldownManager) {
-        super(clanManager, gamerManager);
+    public StuckSubCommand(ClanManager clanManager, ClientManager clientManager, CooldownManager cooldownManager) {
+        super(clanManager, clientManager);
         this.cooldownManager = cooldownManager;
     }
 

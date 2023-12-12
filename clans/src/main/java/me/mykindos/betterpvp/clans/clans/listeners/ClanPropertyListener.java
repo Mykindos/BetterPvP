@@ -2,8 +2,8 @@ package me.mykindos.betterpvp.clans.clans.listeners;
 
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.events.ClanPropertyUpdateEvent;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.event.EventHandler;
 
@@ -13,8 +13,8 @@ import javax.inject.Inject;
 public class ClanPropertyListener extends ClanListener{
 
     @Inject
-    public ClanPropertyListener(ClanManager clanManager, GamerManager gamerManager) {
-        super(clanManager, gamerManager);
+    public ClanPropertyListener(ClanManager clanManager, ClientManager clientManager) {
+        super(clanManager, clientManager);
     }
 
     @EventHandler
