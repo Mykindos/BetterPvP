@@ -8,10 +8,10 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.skills.assassin.data.FlashData;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
-import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilLocation;
@@ -34,7 +34,6 @@ import org.bukkit.util.Vector;
 
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Optional;
 import java.util.WeakHashMap;
 
 @Singleton
@@ -153,16 +152,16 @@ public class Flash extends Skill implements InteractSkill, Listener {
     public void invalidatePlayer(Player player) {
         charges.remove(player);
         // Action bar
-        final Optional<Gamer> gamerOpt = championsManager.getGamers().getObject(player.getUniqueId());
-        gamerOpt.ifPresent(gamer -> gamer.getActionBar().remove(actionBarComponent));
+        Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
+        gamer.getActionBar().remove(actionBarComponent);
     }
 
     @Override
     public void trackPlayer(Player player) {
         charges.computeIfAbsent(player, k -> new FlashData());
         // Action bar
-        final Optional<Gamer> gamerOpt = championsManager.getGamers().getObject(player.getUniqueId());
-        gamerOpt.ifPresent(gamer -> gamer.getActionBar().add(900, actionBarComponent));
+        Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
+        gamer.getActionBar().add(900, actionBarComponent);
     }
 
     @Override

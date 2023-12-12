@@ -2,8 +2,8 @@ package me.mykindos.betterpvp.clans.clans.listeners;
 
 import com.google.inject.Inject;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.config.Config;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 
 @BPvPListener
@@ -22,8 +22,8 @@ public class ClanBankListener extends ClanListener {
     private double interestRate;
 
     @Inject
-    public ClanBankListener(ClanManager clanManager, GamerManager gamerManager) {
-        super(clanManager, gamerManager);
+    public ClanBankListener(ClanManager clanManager, ClientManager clientManager) {
+        super(clanManager, clientManager);
     }
 
 }

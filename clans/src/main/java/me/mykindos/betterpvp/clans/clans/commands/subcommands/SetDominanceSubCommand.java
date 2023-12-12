@@ -8,9 +8,9 @@ import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
 import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.entity.Player;
 
@@ -21,8 +21,8 @@ import java.util.Optional;
 public class SetDominanceSubCommand extends ClanSubCommand {
 
     @Inject
-    public SetDominanceSubCommand(ClanManager clanManager, GamerManager gamerManager) {
-        super(clanManager, gamerManager);
+    public SetDominanceSubCommand(ClanManager clanManager, ClientManager clientManager) {
+        super(clanManager, clientManager);
     }
 
     @Override
@@ -90,7 +90,7 @@ public class SetDominanceSubCommand extends ClanSubCommand {
         targetClan.messageClan("<gray>Your dominance against <red>" + targetClan.getName()
                 + " <gray>has been set to <red>-" + dominance + "%", null, true);
 
-        gamerManager.sendMessageToRank("Clans",
+        clientManager.sendMessageToRank("Clans",
                 UtilMessage.deserialize("<yellow>%s<gray> set the dominance of <yellow>%s<gray> against <yellow>%s<gray> to <green>%s",
                         player.getName(), playerClan.getName(), targetClan.getName(), dominance), Rank.HELPER);
     }

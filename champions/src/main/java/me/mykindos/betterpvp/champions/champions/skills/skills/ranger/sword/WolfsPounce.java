@@ -10,12 +10,12 @@ import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
-import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.*;
 import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
@@ -32,7 +32,6 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
 import java.util.WeakHashMap;
 
 @Singleton
@@ -106,15 +105,15 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
     @Override
     public void trackPlayer(Player player) {
         // Action bar
-        final Optional<Gamer> gamerOpt = championsManager.getGamers().getObject(player.getUniqueId());
-        gamerOpt.ifPresent(gamer -> gamer.getActionBar().add(900, actionBarComponent));
+        Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
+        gamer.getActionBar().add(900, actionBarComponent);
     }
 
     @Override
     public void invalidatePlayer(Player player) {
         // Action bar
-        final Optional<Gamer> gamerOpt = championsManager.getGamers().getObject(player.getUniqueId());
-        gamerOpt.ifPresent(gamer -> gamer.getActionBar().remove(actionBarComponent));
+        Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
+        gamer.getActionBar().remove(actionBarComponent);
     }
 
     @Override

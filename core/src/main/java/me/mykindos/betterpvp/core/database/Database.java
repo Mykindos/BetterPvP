@@ -7,6 +7,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.database.connection.IDatabaseConnection;
+import me.mykindos.betterpvp.core.database.connection.MariaDBDatabaseConnection;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.StatementValue;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -34,7 +35,11 @@ public class Database {
     private final IDatabaseConnection connection;
 
     @Inject
-    public Database(Core core, IDatabaseConnection connection) {
+    public Database(Core core) {
+        this(core, new MariaDBDatabaseConnection(core.getConfig()));
+    }
+
+    protected Database(Core core, IDatabaseConnection connection) {
         this.core = core;
         this.connection = connection;
     }

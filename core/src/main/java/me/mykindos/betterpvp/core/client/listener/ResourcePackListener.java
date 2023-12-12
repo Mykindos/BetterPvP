@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.core.client.listener;
 
 import com.google.inject.Inject;
 import me.mykindos.betterpvp.core.Core;
-import me.mykindos.betterpvp.core.client.events.ClientLoginEvent;
+import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -38,7 +38,7 @@ public class ResourcePackListener implements Listener {
     }
 
     @EventHandler
-    public void onClientLogin(ClientLoginEvent event) {
+    public void onClientLogin(ClientJoinEvent event) {
 
         if(resourcePackEnabled) {
             UtilServer.runTaskLater(core, () -> {

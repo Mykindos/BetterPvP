@@ -6,11 +6,11 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
-import me.mykindos.betterpvp.core.gamer.Gamer;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
@@ -20,7 +20,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
-import java.util.Optional;
 import java.util.WeakHashMap;
 
 @Singleton
@@ -94,8 +93,7 @@ public class Deflection extends Skill implements PassiveSkill {
             int level = getLevel(cur);
             if (level > 0) {
                 if (charges.containsKey(cur)) {
-                    Optional<Gamer> gamerOptional = championsManager.getGamers().getObject(cur.getUniqueId().toString());
-                    gamerOptional.ifPresent(gamer -> {
+                    Gamer gamer = championsManager.getClientManager().search().online(cur).getGamer();
                         if (UtilTime.elapsed(gamer.getLastDamaged(), (long) timeOutOfCombat * 1000)) {
                             if (!championsManager.getCooldowns().use(cur, getName(), timeBetweenCharges, false)) return;
                             int charge = charges.get(cur);
@@ -105,11 +103,10 @@ public class Deflection extends Skill implements PassiveSkill {
                                 charges.put(cur, charge);
                             }
                         }
-                    });
+                    }
 
                 } else {
-                    charges.put(cur, 0);
-                }
+                charges.put(cur, 0);
             }
         }
 

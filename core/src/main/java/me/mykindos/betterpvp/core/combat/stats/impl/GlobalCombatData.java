@@ -23,11 +23,11 @@ public class GlobalCombatData extends CombatData {
     }
 
     @Override
-    protected void prepareUpdates(@NotNull UUID uuid, @NotNull Database database, String databasePrefix) {
+    protected void prepareUpdates(@NotNull UUID uuid, @NotNull Database database) {
         List<Statement> killStatements = new ArrayList<>();
         List<Statement> contributionStatements = new ArrayList<>();
-        final String killStmt = "INSERT INTO " + databasePrefix + "kills (Id, Killer, Victim, Contribution, Damage, RatingDelta, Timestamp) VALUES (?, ?, ?, ?, ?, ?, ?);";
-        final String assistStmt = "INSERT INTO " + databasePrefix + "kill_contributions (KillId, Id, Contributor, Contribution, Damage) VALUES (?, ?, ?, ?, ?);";
+        final String killStmt = "INSERT INTO kills (Id, Killer, Victim, Contribution, Damage, RatingDelta, Timestamp) VALUES (?, ?, ?, ?, ?, ?, ?);";
+        final String assistStmt = "INSERT INTO kill_contributions (KillId, Id, Contributor, Contribution, Damage) VALUES (?, ?, ?, ?, ?);";
 
         // Add kills - This is done first because it if it breaks it will stop the rating update
         // Kills are only saved by the victim
@@ -60,10 +60,10 @@ public class GlobalCombatData extends CombatData {
 
         // Save attachments
         for (ICombatDataAttachment attachment : attachments) {
-            attachment.prepareUpdates(this, database, databasePrefix);
+            attachment.prepareUpdates(this, database);
         }
         // Save self-rating (this saves independently for each player)
-        String ratingStmt = "INSERT INTO " + databasePrefix + "combat_stats (Gamer, Rating, Killstreak, HighestKillstreak) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE Rating = VALUES(Rating), Killstreak = VALUES(Killstreak), HighestKillstreak = VALUES(HighestKillstreak)";
+        String ratingStmt = "INSERT INTO combat_stats (Gamer, Rating, Killstreak, HighestKillstreak) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE Rating = VALUES(Rating), Killstreak = VALUES(Killstreak), HighestKillstreak = VALUES(HighestKillstreak)";
         Statement victimRating = new Statement(ratingStmt,
                 new UuidStatementValue(getHolder()),
                 new IntegerStatementValue(getRating()),

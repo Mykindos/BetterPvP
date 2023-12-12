@@ -6,15 +6,12 @@ import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.chat.events.ChatReceivedEvent;
 import me.mykindos.betterpvp.core.chat.events.ChatSentEvent;
 import me.mykindos.betterpvp.core.client.Client;
-import me.mykindos.betterpvp.core.client.ClientManager;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.properties.ClientProperty;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.discord.DiscordMessage;
 import me.mykindos.betterpvp.core.discord.DiscordWebhook;
-import me.mykindos.betterpvp.core.gamer.Gamer;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
-import me.mykindos.betterpvp.core.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import net.kyori.adventure.text.Component;
@@ -38,15 +35,8 @@ public class ChatListener implements Listener {
     @Config(path = "discord.chatWebhook", defaultValue = "")
     private String discordChatWebhook;
 
-    private final ClientManager clientManager;
-
-    private final GamerManager gamerManager;
-
     @Inject
-    public ChatListener(ClientManager clientManager, GamerManager gamerManager) {
-        this.clientManager = clientManager;
-        this.gamerManager = gamerManager;
-    }
+    private ClientManager clientManager;
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onAsyncChat(AsyncChatEvent event) {
@@ -72,24 +62,20 @@ public class ChatListener implements Listener {
     public void onChatSent(ChatSentEvent event) {
         if (event.isCancelled()) return;
 
-        Optional<Gamer> gamerOptional = gamerManager.getObject(event.getPlayer().getUniqueId().toString());
-        if (gamerOptional.isEmpty()) return;
-
-        Gamer gamer = gamerOptional.get();
-
+        Client client = clientManager.search().online(event.getPlayer());
         String playerName = UtilFormat.spoofNameForLunar(event.getPlayer().getName());
 
-        Optional<Boolean> staffChatEnabledOptional = gamer.getProperty(GamerProperty.STAFF_CHAT);
+        Optional<Boolean> staffChatEnabledOptional = client.getProperty(ClientProperty.STAFF_CHAT);
         staffChatEnabledOptional.ifPresent(staffChat -> {
             if (staffChat) {
                 event.cancel("Player has staff chat enabled");
 
-                Rank sendRank = gamer.getClient().getRank();
+                Rank sendRank = client.getRank();
                 Component senderComponent = sendRank.getPlayerNameMouseOver(playerName);
                 Component message = Component.text(" " + PlainTextComponentSerializer.plainText().serialize(event.getMessage()), NamedTextColor.LIGHT_PURPLE);
                 Component component = Component.empty().append(senderComponent).append(message);
 
-                gamerManager.sendMessageToRank("", component, Rank.HELPER);
+                clientManager.sendMessageToRank("", component, Rank.HELPER);
             }
         });
     }
@@ -99,23 +85,14 @@ public class ChatListener implements Listener {
         if (event.isCancelled()) return;
 
         Player player = event.getPlayer();
-        Optional<Client> clientOptional = clientManager.getObject(event.getPlayer().getUniqueId());
-        if(clientOptional.isPresent()) {
-
-            Client client = clientOptional.get();
-
-            for (Player onlinePlayer : event.getTargets()) {
-                ChatReceivedEvent chatReceived = new ChatReceivedEvent(player, client, onlinePlayer, event.getPrefix(), event.getMessage());
-                Bukkit.getPluginManager().callEvent(chatReceived);
-                if (chatReceived.isCancelled()) {
-                    log.info("ChatReceivedEvent cancelled for {} - {}", onlinePlayer.getName(), event.getCancelReason());
-                }
+        Client client = clientManager.search().online(event.getPlayer());
+        for (Player onlinePlayer : event.getTargets()) {
+            ChatReceivedEvent chatReceived = new ChatReceivedEvent(player, client, onlinePlayer, event.getPrefix(), event.getMessage());
+            Bukkit.getPluginManager().callEvent(chatReceived);
+            if (chatReceived.isCancelled()) {
+                log.info("ChatReceivedEvent cancelled for {} - {}", onlinePlayer.getName(), event.getCancelReason());
             }
-
-        }else{
-            log.error("ChatReceivedEvent could not be called as the sending client does not exist - {}", event.getPlayer().getName());
         }
-
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -123,13 +100,13 @@ public class ChatListener implements Listener {
         if (event.isCancelled()) return;
 
         Rank rank = event.getClient().getRank();
-        if(rank.isDisplayPrefix()) {
+        if (rank.isDisplayPrefix()) {
             Component rankPrefix = Component.text(rank.getName() + " ", rank.getColor(), TextDecoration.BOLD);
             event.setPrefix(rankPrefix.append(event.getPrefix().decoration(TextDecoration.BOLD, false)));
         }
 
         Optional<Boolean> lunarClientOptional = event.getClient().getProperty(ClientProperty.LUNAR);
-        if(lunarClientOptional.isPresent()) {
+        if (lunarClientOptional.isPresent()) {
             event.setPrefix(Component.text("* ", NamedTextColor.GREEN).append(event.getPrefix()));
         }
 

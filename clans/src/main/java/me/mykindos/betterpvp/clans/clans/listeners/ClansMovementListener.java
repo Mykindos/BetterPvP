@@ -5,12 +5,13 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
+import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.components.clans.data.ClanTerritory;
 import me.mykindos.betterpvp.core.framework.delayedactions.events.ClanHomeTeleportEvent;
 import me.mykindos.betterpvp.core.framework.delayedactions.events.ClanStuckTeleportEvent;
 import me.mykindos.betterpvp.core.framework.events.scoreboard.ScoreboardUpdateEvent;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -34,8 +35,8 @@ public class ClansMovementListener extends ClanListener {
     private final ClanManager clanManager;
 
     @Inject
-    public ClansMovementListener(Clans clans, ClanManager clanManager, GamerManager gamerManager) {
-        super(clanManager, gamerManager);
+    public ClansMovementListener(Clans clans, ClanManager clanManager, ClientManager clientManager) {
+        super(clanManager, clientManager);
         this.clans = clans;
         this.clanManager = clanManager;
     }
@@ -215,19 +216,17 @@ public class ClansMovementListener extends ClanListener {
     public void onSpawnTeleport(SpawnTeleportEvent event) {
         if (event.isCancelled()) return;
 
-        gamerManager.getObject(event.getPlayer().getUniqueId()).ifPresent(gamer -> {
-            if (gamer.getClient().hasRank(Rank.ADMIN)) {
-                return;
-            }
+        final Client client = clientManager.search().online(event.getPlayer());
+        if (client.hasRank(Rank.ADMIN)) {
+            return;
+        }
 
-            if (clanManager.getClanByLocation(event.getPlayer().getLocation()).isPresent()) {
-                UtilMessage.message(event.getPlayer(), "Spawn", "You can only teleport to spawn from the wilderness.");
-                event.setCancelled(true);
-            } else {
-                event.setDelayInSeconds(30);
-            }
-
-        });
+        if (clanManager.getClanByLocation(event.getPlayer().getLocation()).isPresent()) {
+            UtilMessage.message(event.getPlayer(), "Spawn", "You can only teleport to spawn from the wilderness.");
+            event.setCancelled(true);
+        } else {
+            event.setDelayInSeconds(30);
+        }
 
     }
 }

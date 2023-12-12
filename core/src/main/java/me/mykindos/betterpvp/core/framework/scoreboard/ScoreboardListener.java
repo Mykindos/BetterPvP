@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.core.framework.scoreboard;
 
 import com.google.inject.Inject;
 import me.mykindos.betterpvp.core.Core;
-import me.mykindos.betterpvp.core.client.events.ClientLoginEvent;
+import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
 import me.mykindos.betterpvp.core.framework.events.scoreboard.ScoreboardUpdateEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -23,7 +23,7 @@ public class ScoreboardListener implements Listener {
     }
 
     @EventHandler
-    public void onClientJoin(ClientLoginEvent event) {
+    public void onClientJoin(ClientJoinEvent event) {
         event.getPlayer().setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
     }
 

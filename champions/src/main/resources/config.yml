@@ -1,6 +1,3 @@
-champions:
-  database:
-    prefix: champions_
 skills:
   # canUseWhileSlowed, canUseWhileSilenced, canUseWhileLevitating, and canUseInLiquid are optional config options
   assassin:

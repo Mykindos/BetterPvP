@@ -14,13 +14,14 @@ import me.mykindos.betterpvp.clans.clans.map.MapHandler;
 import me.mykindos.betterpvp.clans.clans.map.data.ChunkData;
 import me.mykindos.betterpvp.clans.clans.map.data.MapSettings;
 import me.mykindos.betterpvp.clans.clans.map.nms.UtilMapMaterial;
+import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.components.clans.IClan;
 import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.components.clans.data.ClanTerritory;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
-import me.mykindos.betterpvp.core.gamer.Gamer;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.display.TimedComponent;
@@ -60,16 +61,16 @@ public class MapListener implements Listener {
     private final MapHandler mapHandler;
     private final ClanManager clanManager;
     private final CooldownManager cooldownManager;
-    private final GamerManager gamerManager;
+    private final ClientManager clientManager;
 
     @Inject
     public MapListener(Clans clans, MapHandler mapHandler, ClanManager clanManager,
-                       CooldownManager cooldownManager, GamerManager gamerManager) {
+                       CooldownManager cooldownManager, ClientManager clientManager) {
         this.clans = clans;
         this.mapHandler = mapHandler;
         this.clanManager = clanManager;
         this.cooldownManager = cooldownManager;
-        this.gamerManager = gamerManager;
+        this.clientManager = clientManager;
 
         mapHandler.loadMap();
     }
@@ -421,37 +422,32 @@ public class MapListener implements Listener {
             return;
         }
 
-        Optional<Gamer> gamerOptional = gamerManager.getObject(player.getUniqueId().toString());
-        if (gamerOptional.isPresent()) {
-            Gamer gamer = gamerOptional.get();
+        final Client client = clientManager.search().online(player);
+        final Gamer gamer = client.getGamer();
+        MapSettings.Scale scale;
+        if (event.getAction().name().contains("RIGHT")) {
+            MapSettings.Scale curScale = mapSettings.getScale();
 
-            MapSettings.Scale scale;
-            if (event.getAction().name().contains("RIGHT")) {
-                MapSettings.Scale curScale = mapSettings.getScale();
-
-                if (curScale == MapSettings.Scale.NORMAL && !gamer.getClient().isAdministrating()) {
-                    return;
-                } else if (curScale == MapSettings.Scale.FAR) {
-                    return;
-                }
-
-                scale = mapSettings.setScale(MapSettings.Scale.values()[curScale.ordinal() + 1]);
-                gamer.getActionBar().add(500, new TimedComponent(1.5, false, gmr -> createZoomBar(scale)));
-                mapSettings.setUpdate(true);
-            } else if (event.getAction().name().contains("LEFT")) {
-                MapSettings.Scale curScale = mapSettings.getScale();
-
-                if (curScale == MapSettings.Scale.CLOSEST) {
-                    return;
-                }
-
-                scale = mapSettings.setScale(MapSettings.Scale.values()[curScale.ordinal() - 1]);
-                gamer.getActionBar().add(500, new TimedComponent(1.5, false, gmr -> createZoomBar(scale)));
-                mapSettings.setUpdate(true);
+            if (curScale == MapSettings.Scale.NORMAL && !client.isAdministrating()) {
+                return;
+            } else if (curScale == MapSettings.Scale.FAR) {
+                return;
             }
 
-        }
+            scale = mapSettings.setScale(MapSettings.Scale.values()[curScale.ordinal() + 1]);
+            gamer.getActionBar().add(500, new TimedComponent(1.5, false, gmr -> createZoomBar(scale)));
+            mapSettings.setUpdate(true);
+        } else if (event.getAction().name().contains("LEFT")) {
+            MapSettings.Scale curScale = mapSettings.getScale();
 
+            if (curScale == MapSettings.Scale.CLOSEST) {
+                return;
+            }
+
+            scale = mapSettings.setScale(MapSettings.Scale.values()[curScale.ordinal() - 1]);
+            gamer.getActionBar().add(500, new TimedComponent(1.5, false, gmr -> createZoomBar(scale)));
+            mapSettings.setUpdate(true);
+        }
 
     }
 

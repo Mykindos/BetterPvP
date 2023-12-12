@@ -3,12 +3,13 @@ package me.mykindos.betterpvp.core.tips;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.Core;
-import me.mykindos.betterpvp.core.client.events.ClientLoginEvent;
+import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.client.properties.ClientProperty;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
-import me.mykindos.betterpvp.core.gamer.Gamer;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
-import me.mykindos.betterpvp.core.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -32,31 +33,31 @@ public class TipListener implements Listener {
 
     public final TipManager tipManager;
 
-    public final GamerManager gamerManager;
+    public final ClientManager clientManager;
 
     @Inject
-    public TipListener(Core core, GamerManager gamerManager, TipManager tipManager) {
+    public TipListener(Core core, ClientManager clientManager, TipManager tipManager) {
         super();
         this.core = core;
-        this.gamerManager = gamerManager;
+        this.clientManager = clientManager;
         this.tipManager = tipManager;
     }
 
     @EventHandler(priority = EventPriority.LOW)
-    public void onClientLogin(ClientLoginEvent event) {
-        gamerManager.getObject(event.getClient().getUuid()).ifPresent(Gamer::setLastTipNow);
+    public void onClientLogin(ClientJoinEvent event) {
+        event.getClient().getGamer().setLastTipNow();
     }
 
     @UpdateEvent(delay = 10 * 1000, isAsync = true)
     public void tipSender() {
         Bukkit.getOnlinePlayers().forEach(player -> {
-            gamerManager.getObject(player.getUniqueId()).ifPresent(gamer -> {
-                if ((boolean) gamer.getProperty(GamerProperty.TIPS_ENABLED).orElse(true)) {
-                    if (UtilTime.elapsed(gamer.getLastTip(), (long) timeBetweenTips * 60000)) {
-                        UtilServer.runTaskAsync(core, () -> UtilServer.callEvent(new TipEvent(player, gamer)));
-                    }
+            final Client client = clientManager.search().online(player);
+            final Gamer gamer = client.getGamer();
+            if ((boolean) client.getProperty(ClientProperty.TIPS_ENABLED).orElse(true)) {
+                if (UtilTime.elapsed(gamer.getLastTip(), (long) timeBetweenTips * 60000)) {
+                    UtilServer.runTaskAsync(core, () -> UtilServer.callEvent(new TipEvent(player, gamer)));
                 }
-            });
+            }
         });
     }
 

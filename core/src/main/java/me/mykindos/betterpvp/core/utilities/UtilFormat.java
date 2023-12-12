@@ -1,13 +1,17 @@
 package me.mykindos.betterpvp.core.utilities;
 
 import org.apache.commons.lang.WordUtils;
+import org.apache.commons.text.similarity.CosineSimilarity;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.DecimalFormat;
+import java.util.Arrays;
+import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class UtilFormat {
 
@@ -15,6 +19,20 @@ public class UtilFormat {
     public static final char COLOR_CHAR = '\u00A7';
     private static final Pattern STRIP_COLOR_PATTERN = Pattern.compile("(?i)" + String.valueOf(COLOR_CHAR) + "[0-9A-FK-ORX]");
 
+    /**
+     * Get whether two strings are similar to each other
+     *
+     * @param one The first string
+     * @param two The second string
+     * @return True if the strings are similar, false otherwise
+     */
+    public static boolean isSimilar(final String one, final String two) {
+        final Map<CharSequence, Integer> query =
+                Arrays.stream(one.split("")).collect(Collectors.toMap(c -> c, c -> 1, Integer::sum));
+        final Map<CharSequence, Integer> online =
+                Arrays.stream(two.split("")).collect(Collectors.toMap(c -> c, c -> 1, Integer::sum));
+        return new CosineSimilarity().cosineSimilarity(query, online) > 0.6;
+    }
 
     public static String formatNumber(int num) {
         return FORMATTER.format(num);

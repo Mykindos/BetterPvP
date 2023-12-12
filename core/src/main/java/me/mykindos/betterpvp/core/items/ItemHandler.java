@@ -11,7 +11,6 @@ import me.mykindos.betterpvp.core.items.enchants.GlowEnchant;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import me.mykindos.betterpvp.core.weapons.WeaponManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -33,7 +32,6 @@ import java.util.UUID;
 @Singleton
 public class ItemHandler {
 
-    private final WeaponManager weaponManager;
     private final ItemRepository itemRepository;
     private final HashMap<String, BPVPItem> itemMap = new HashMap<>();
     private final Enchantment glowEnchantment;
@@ -48,10 +46,8 @@ public class ItemHandler {
     private boolean hideEnchants;
 
     @Inject
-    public ItemHandler(Core core, WeaponManager weaponManager, ItemRepository itemRepository) {
-        this.weaponManager = weaponManager;
+    public ItemHandler(Core core, ItemRepository itemRepository) {
         this.itemRepository = itemRepository;
-
 
         glowEnchantment = new GlowEnchant(CoreNamespaceKeys.GLOW_ENCHANTMENT_KEY);
         registerEnchantment(glowEnchantment);

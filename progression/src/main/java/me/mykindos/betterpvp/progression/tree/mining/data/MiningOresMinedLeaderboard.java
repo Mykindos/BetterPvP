@@ -49,18 +49,17 @@ public class MiningOresMinedLeaderboard extends PlayerLeaderboard<Long> {
     }
 
     @Override
-    protected Long fetch(@NotNull SearchOptions options, @NotNull Database database, @NotNull String tablePrefix, @NotNull UUID entry) {
+    protected Long fetch(@NotNull SearchOptions options, @NotNull Database database, @NotNull UUID entry) {
         return repository.fetchDataAsync(entry).join().getOresMined();
     }
 
     @Override
     @SneakyThrows
-    protected Map<UUID, Long> fetchAll(@NotNull SearchOptions options, @NotNull Database database, @NotNull String tablePrefix) {
+    protected Map<UUID, Long> fetchAll(@NotNull SearchOptions options, @NotNull Database database) {
         Map<UUID, Long> leaderboard = new HashMap<>();
-        Statement statement = new Statement("CALL GetTopMiningByOre(?, ?, ?)",
+        Statement statement = new Statement("CALL GetTopMiningByOre(?, ?)",
                 new IntegerStatementValue(10),
-                new StringStatementValue(repository.getDbMaterialsList()),
-                new StringStatementValue(tablePrefix));
+                new StringStatementValue(repository.getDbMaterialsList()));
         database.executeProcedure(statement, -1, result -> {
             try {
                 while (result.next()) {

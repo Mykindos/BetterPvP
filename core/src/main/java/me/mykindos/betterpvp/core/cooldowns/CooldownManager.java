@@ -5,9 +5,9 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
-import me.mykindos.betterpvp.core.gamer.Gamer;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
 import me.mykindos.betterpvp.core.utilities.model.display.TimedComponent;
@@ -31,7 +31,7 @@ import java.util.function.Predicate;
 public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>> {
 
     @Inject
-    private GamerManager gamerManager;
+    private ClientManager clientManager;
 
     public boolean use(Player player, String ability, double duration, boolean inform) {
         return use(player, ability, duration, inform, true);
@@ -50,7 +50,7 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
     }
 
     public boolean use(Player player, String ability, double duration, boolean inform, boolean removeOnDeath, boolean cancellable, @Nullable Predicate<Gamer> actionBarCondition) {
-        final Gamer gamer = gamerManager.getObject(player.getUniqueId()).orElseThrow();
+        final Gamer gamer = clientManager.search().online(player).getGamer();
 
         // We add 1.5f to the duration in seconds, so they can see that it expired, and it doesn't instantly disappear
         final TimedComponent actionBarComponent = new TimedComponent(duration + 1.5, false, g -> {

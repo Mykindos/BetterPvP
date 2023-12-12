@@ -3,9 +3,8 @@ package me.mykindos.betterpvp.core.settings.commands;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
-import me.mykindos.betterpvp.core.gamer.Gamer;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.settings.menus.SettingsMenu;
 import org.bukkit.entity.Player;
 
@@ -13,7 +12,7 @@ import org.bukkit.entity.Player;
 public class SettingsCommand extends Command {
 
     @Inject
-    private GamerManager gamerManager;
+    private ClientManager clientManager;
 
     @Override
     public String getName() {
@@ -27,8 +26,7 @@ public class SettingsCommand extends Command {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        final Gamer gamer = gamerManager.getObject(player.getUniqueId()).orElseThrow();
-        new SettingsMenu(player, gamer).show(player);
+        new SettingsMenu(player, client).show(player);
     }
 
 

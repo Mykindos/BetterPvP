@@ -1,7 +1,3 @@
-progression:
-  database:
-    prefix: progression_
-
 mining:
   minLeaderboardBlockXp: 45
   xpPerBlock:
