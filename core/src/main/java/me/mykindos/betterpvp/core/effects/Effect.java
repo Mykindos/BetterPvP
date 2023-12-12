@@ -26,6 +26,6 @@ public class Effect {
     }
 
     public boolean hasExpired() {
-        return length - System.currentTimeMillis() <= 0;
+        return rawLength >= 0 && length - System.currentTimeMillis() <= 0;
     }
 }
