@@ -53,7 +53,6 @@ public abstract class Leaderboard<E, T> {
     private final ConcurrentHashMap<SearchOptions, TreeSet<LeaderboardEntry<E, T>>> topTen;
     private final AsyncLoadingCache<LeaderboardEntryKey<E>, T> entryCache;
     private final Database database;
-    private final String tablePrefix;
     private final Collection<SearchOptions> validSearchOptions = new ArrayList<>();
     private final BPvPPlugin plugin;
 
@@ -64,11 +63,10 @@ public abstract class Leaderboard<E, T> {
     protected Leaderboard(BPvPPlugin plugin) {
         this.plugin = plugin;
         this.database = plugin.getInjector().getInstance(Database.class);
-        this.tablePrefix = plugin.getDatabasePrefix();
         this.topTen = new ConcurrentHashMap<>();
         this.entryCache = Caffeine.newBuilder()
                 .expireAfterWrite(10, TimeUnit.MINUTES)
-                .buildAsync((key, executor) -> CompletableFuture.supplyAsync(() -> fetch(key.getOptions(), database, tablePrefix, key.getValue())));
+                .buildAsync((key, executor) -> CompletableFuture.supplyAsync(() -> fetch(key.getOptions(), database, key.getValue())));
     }
 
     protected void init() {
@@ -105,7 +103,7 @@ public abstract class Leaderboard<E, T> {
 
     public void forceUpdate() {
         for (SearchOptions options : validSearchOptions) {
-            CompletableFuture.supplyAsync(() -> fetchAll(options, database, tablePrefix)).thenApply(fetch -> {
+            CompletableFuture.supplyAsync(() -> fetchAll(options, database)).thenApply(fetch -> {
                 final LeaderboardEntryComparator<E, T> comparator = new LeaderboardEntryComparator<>(getSorter(options));
                 TreeSet<LeaderboardEntry<E, T>> set = new TreeSet<>(comparator);
                 set.addAll(fetch.entrySet().stream().map(entry -> LeaderboardEntry.of(entry.getKey(), entry.getValue())).toList());
@@ -286,7 +284,7 @@ public abstract class Leaderboard<E, T> {
      */
     public final CompletableFuture<Optional<LeaderboardEntry<E, T>>> getPlayerData(@NotNull UUID player, @NotNull SearchOptions options) {
         // Fetch the player data
-        CompletableFuture<Optional<LeaderboardEntry<E, T>>> future = CompletableFuture.supplyAsync(() -> Optional.ofNullable(fetchPlayerData(player, options, database, tablePrefix))).exceptionally(ex -> {
+        CompletableFuture<Optional<LeaderboardEntry<E, T>>> future = CompletableFuture.supplyAsync(() -> Optional.ofNullable(fetchPlayerData(player, options, database))).exceptionally(ex -> {
             if (!(ex instanceof UnsupportedOperationException)) {
                 log.error("Failed to fetch leaderboard data for " + player + "!", ex);
             }
@@ -305,29 +303,31 @@ public abstract class Leaderboard<E, T> {
 
     /**
      * Gets the data in this leaderboard that can correspond to the given player.
+     *
      * @param player The player to get the data for.
+     * @param options The options to load the data for.
+     * @param database The database to fetch from.
      * @return The data in this leaderboard that can correspond to the given player.
      */
-    protected abstract LeaderboardEntry<E, T> fetchPlayerData(@NotNull UUID player, @NotNull SearchOptions options, @NotNull Database database, @NotNull String tablePrefix) throws UnsupportedOperationException;
+    protected abstract LeaderboardEntry<E, T> fetchPlayerData(@NotNull UUID player, @NotNull SearchOptions options, @NotNull Database database) throws UnsupportedOperationException;
 
     /**
      * Loads the data for the given entry.
-     * @param options The options to load the data for.
+     *
+     * @param options  The options to load the data for.
      * @param database The database to fetch from.
-     * @param tablePrefix The prefix of the table.
-     * @param entry The entry to load the data for.
+     * @param entry    The entry to load the data for.
      * @return The data for the given entry.
      */
-    protected abstract T fetch(@NotNull SearchOptions options, @NotNull Database database, @NotNull String tablePrefix, @NotNull E entry);
+    protected abstract T fetch(@NotNull SearchOptions options, @NotNull Database database, @NotNull E entry);
 
     /**
      * Fetches the top entries from the database.
      *
-     * @param options     The options to load the data for.
-     * @param database    The database to fetch from.
-     * @param tablePrefix The prefix of the table.
+     * @param options  The options to load the data for.
+     * @param database The database to fetch from.
      */
-    protected abstract Map<E, T> fetchAll(@NotNull SearchOptions options, @NotNull Database database, @NotNull String tablePrefix);
+    protected abstract Map<E, T> fetchAll(@NotNull SearchOptions options, @NotNull Database database);
 
     public void attemptAnnounce(Player player, Map<SearchOptions, Integer> newPositions) {
         if (newPositions.isEmpty() || !isViewable()) {

@@ -7,9 +7,9 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
 import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.framework.delayedactions.events.ClanHomeTeleportEvent;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.entity.Player;
@@ -19,8 +19,8 @@ import org.bukkit.entity.Player;
 public class HomeSubCommand extends ClanSubCommand {
 
     @Inject
-    public HomeSubCommand(ClanManager clanManager, GamerManager gamerManager) {
-        super(clanManager, gamerManager);
+    public HomeSubCommand(ClanManager clanManager, ClientManager clientManager) {
+        super(clanManager, clientManager);
     }
 
     @Override

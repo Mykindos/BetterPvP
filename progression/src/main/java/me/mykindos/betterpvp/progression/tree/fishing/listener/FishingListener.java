@@ -5,11 +5,11 @@ import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
-import me.mykindos.betterpvp.core.gamer.Gamer;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -65,7 +65,7 @@ public class FishingListener implements Listener {
     private Fishing fishing;
 
     @Inject
-    private GamerManager gamerManager;
+    private ClientManager clientManager;
 
     @Inject
     @Config(path = "fishing.minWaitTime", defaultValue = "5.0")
@@ -128,7 +128,7 @@ public class FishingListener implements Listener {
             // Dots will have an animation where they will turn white, from gray, in a loop
             // The dots will be in the middle of the screen, and will be 3 dots in a row
             final TitleComponent title = TitleComponent.subtitle(0, 0.8, 0, false, gamer -> component);
-            gamerManager.getObject(player.getUniqueId()).ifPresent(gamer -> gamer.getTitleQueue().add(500, title));
+            clientManager.search().online(player).getGamer().getTitleQueue().add(500, title);
         }
     }
 
@@ -253,8 +253,8 @@ public class FishingListener implements Listener {
             return;
         }
 
-        final Optional<Gamer> gamer = gamerManager.getObject(event.getPlayer().getUniqueId());
-        if (gamer.isPresent() && gamer.get().getClient().isAdministrating()) {
+        final Client client = clientManager.search().online(event.getPlayer());
+        if (client.isAdministrating()) {
             return;
         }
 
@@ -316,7 +316,7 @@ public class FishingListener implements Listener {
                 @Override
                 public void processCatch(PlayerCaughtFishEvent event) {
                     UtilMessage.message(event.getPlayer(), "Fishing", "<red>No fish registered! Please report this to an admin!");
-                    gamerManager.sendMessageToRank("Progression", UtilMessage.deserialize("<yellow>%s</yellow> <red>caught a FishingLootType null fish. Is the config correct? Please report this internally.", event.getPlayer()), Rank.HELPER);
+                    clientManager.sendMessageToRank("Progression", UtilMessage.deserialize("<yellow>%s</yellow> <red>caught a FishingLootType null fish. Is the config correct? Please report this internally.", event.getPlayer()), Rank.HELPER);
                 }
             };
         }

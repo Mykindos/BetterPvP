@@ -11,8 +11,6 @@ public enum EffectType {
     SHOCK(true),
     STRENGTH(false),
     NOFALL(false),
-    SHARD_50(false),
-    SHARD_100(false),
     POISON(true),
     PROTECTION(false),
     PVPLOCK(false),
@@ -22,7 +20,8 @@ public enum EffectType {
     FRAILTY(true),
     TEXTURELOADING(false),
     IMMUNETOEFFECTS(false),
-    LEVITATION(true);
+    LEVITATION(true),
+    NO_JUMP(false);
 
     final boolean isNegative;
 

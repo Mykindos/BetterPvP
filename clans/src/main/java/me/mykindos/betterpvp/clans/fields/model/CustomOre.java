@@ -1,17 +1,17 @@
 package me.mykindos.betterpvp.clans.fields.model;
 
 import me.mykindos.betterpvp.clans.Clans;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 
 public abstract class CustomOre implements FieldsOre {
 
     protected final Clans clans;
-    protected final GamerManager gamerManager;
+    protected final ClientManager clientManager;
     private double respawnDelay = 0;
 
-    protected CustomOre(Clans clans, GamerManager gamerManager) {
+    protected CustomOre(Clans clans, ClientManager clientManager) {
         this.clans = clans;
-        this.gamerManager = gamerManager;
+        this.clientManager = clientManager;
     }
 
     @Override

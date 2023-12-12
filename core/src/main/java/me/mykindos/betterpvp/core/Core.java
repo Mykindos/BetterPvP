@@ -6,19 +6,19 @@ import com.google.inject.Injector;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import me.mykindos.betterpvp.core.client.ClientManager;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.stats.impl.GlobalCombatStatsRepository;
 import me.mykindos.betterpvp.core.command.loader.CoreCommandLoader;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.config.ConfigInjectorModule;
 import me.mykindos.betterpvp.core.database.Database;
-import me.mykindos.betterpvp.core.database.injector.DatabaseInjectorModule;
+import me.mykindos.betterpvp.core.database.SharedDatabase;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.injector.CoreInjectorModule;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.loader.CoreListenerLoader;
+import me.mykindos.betterpvp.core.redis.Redis;
 import net.kyori.adventure.key.Key;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
@@ -43,33 +43,34 @@ public class Core extends BPvPPlugin {
     @Inject
     private Database database;
 
+    @Inject
+    private SharedDatabase sharedDatabase;
+
+    @Inject
+    private Redis redis;
+
     private ClientManager clientManager;
-    private GamerManager gamerManager;
 
     @Inject
     private UpdateEventExecutor updateEventExecutor;
 
     @Inject
-    @Config(path = "core.database.prefix")
-    @Getter
-    private String databasePrefix;
-
-    @Inject
     @Config(path = "core.password", defaultValue = "")
     public String password;
 
+    @Override
     public void onEnable() {
         saveDefaultConfig();
 
         Reflections reflections = new Reflections(PACKAGE, Scanners.FieldsAnnotated);
         Set<Field> fields = reflections.getFieldsAnnotatedWith(Config.class);
 
-        injector = Guice.createInjector(new CoreInjectorModule(this),
-                new DatabaseInjectorModule(),
-                new ConfigInjectorModule(this, fields));
+        injector = Guice.createInjector(new CoreInjectorModule(this), new ConfigInjectorModule(this, fields));
         injector.injectMembers(this);
 
-        database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:core-migrations", "");
+        database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:core-migrations/local", "local");
+        sharedDatabase.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:core-migrations/global", "global");
+        redis.credentials(this.getConfig());
 
         var coreListenerLoader = injector.getInstance(CoreListenerLoader.class);
         coreListenerLoader.registerListeners(PACKAGE);
@@ -78,10 +79,6 @@ public class Core extends BPvPPlugin {
         coreCommandLoader.loadCommands(PACKAGE);
 
         clientManager = injector.getInstance(ClientManager.class);
-        clientManager.loadFromList(clientManager.getRepository().getAll());
-
-        gamerManager = injector.getInstance(GamerManager.class);
-        gamerManager.loadFromList(gamerManager.getGamerRepository().getAll());
 
         var itemHandler = injector.getInstance(ItemHandler.class);
         itemHandler.loadItemData("Core");
@@ -94,8 +91,7 @@ public class Core extends BPvPPlugin {
 
     @Override
     public void onDisable() {
-        clientManager.getRepository().processStatUpdates(false);
-        gamerManager.getGamerRepository().processStatUpdates(false);
+        clientManager.processStatUpdates(false);
         injector.getInstance(GlobalCombatStatsRepository.class).shutdown();
 
         if (hasListener(listenerKey)) {

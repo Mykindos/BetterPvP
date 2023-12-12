@@ -13,12 +13,12 @@ public interface IAttachmentLoader {
 
     /**
      * Loads an attachment for the given {@link CombatData} object.
-     * @param player The UUID of the player
-     * @param data The combat data
+     *
+     * @param player   The UUID of the player
+     * @param data     The combat data
      * @param database The database
-     * @param databasePrefix The database prefix
      * @return The attachment
      */
-    @NotNull ICombatDataAttachment loadAttachment(@NotNull UUID player, @NotNull CombatData data, @NotNull Database database, @NotNull String databasePrefix);
+    @NotNull ICombatDataAttachment loadAttachment(@NotNull UUID player, @NotNull CombatData data, @NotNull Database database);
 
 }

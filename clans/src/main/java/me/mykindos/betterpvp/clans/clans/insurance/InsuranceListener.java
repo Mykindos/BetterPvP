@@ -3,9 +3,9 @@ package me.mykindos.betterpvp.clans.clans.insurance;
 import com.google.inject.Inject;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.listeners.ClanListener;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
@@ -30,8 +30,8 @@ public class InsuranceListener extends ClanListener {
     );
 
     @Inject
-    public InsuranceListener(ClanManager clanManager, GamerManager gamerManager) {
-        super(clanManager, gamerManager);
+    public InsuranceListener(ClanManager clanManager, ClientManager clientManager) {
+        super(clanManager, clientManager);
     }
 
     @UpdateEvent(delay = 38400, isAsync = true)

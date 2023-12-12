@@ -3,8 +3,8 @@ package me.mykindos.betterpvp.core.command.listener;
 import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.client.Client;
-import me.mykindos.betterpvp.core.client.ClientManager;
 import me.mykindos.betterpvp.core.client.Rank;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.CommandManager;
 import me.mykindos.betterpvp.core.command.ICommand;
 import me.mykindos.betterpvp.core.command.SubCommand;
@@ -33,13 +33,7 @@ public class CommandListener implements Listener {
 
     @EventHandler
     public void onPlayerCommandPreProcess(PlayerCommandPreprocessEvent event) {
-        Optional<Client> clientOptional = clientManager.getObject(event.getPlayer().getUniqueId().toString());
-        if (clientOptional.isEmpty()) {
-            event.setCancelled(true);
-            return;
-        }
-
-        Client client = clientOptional.get();
+        Client client = clientManager.search().online(event.getPlayer());
         String commandName = event.getMessage().substring(1).toLowerCase();
 
         if (commandName.contains(" ")) {

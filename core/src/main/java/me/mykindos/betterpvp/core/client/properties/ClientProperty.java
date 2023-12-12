@@ -7,13 +7,11 @@ import lombok.Getter;
 @Getter
 public enum ClientProperty {
 
-    CHAT_ENABLED("CHAT_ENABLED"),
-    LUNAR("LUNAR");
+    SIDEBAR_ENABLED,
+    TIPS_ENABLED,
+    STAFF_CHAT,
+    COOLDOWN_DISPLAY,
+    CHAT_ENABLED,
+    LUNAR
 
-    private final String key;
-
-    @Override
-    public String toString(){
-        return key;
-    }
 }

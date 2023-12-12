@@ -58,10 +58,9 @@ public class MiningRepository extends ProgressionStatsRepository<Mining, MiningD
     public CompletableFuture<MiningData> fetchDataAsync(UUID player) {
         return CompletableFuture.supplyAsync(() -> {
             final MiningData data = new MiningData();
-            Statement statement = new Statement("CALL GetGamerOresMined(?, ?, ?)",
+            Statement statement = new Statement("CALL GetGamerOresMined(?, ?)",
                     new UuidStatementValue(player),
-                    new StringStatementValue(getDbMaterialsList()),
-                    new StringStatementValue(plugin.getDatabasePrefix()));
+                    new StringStatementValue(getDbMaterialsList()));
             database.executeProcedure(statement, -1, result -> {
                 try {
                     if (result.next()) {

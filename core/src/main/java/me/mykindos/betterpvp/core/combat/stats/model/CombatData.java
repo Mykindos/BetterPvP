@@ -99,7 +99,7 @@ public abstract class CombatData extends PlayerData {
     }
 
     @Override
-    protected void prepareUpdates(@NotNull UUID uuid, @NotNull Database database, String databasePrefix) {
+    protected void prepareUpdates(@NotNull UUID uuid, @NotNull Database database) {
 
     }
 

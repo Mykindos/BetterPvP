@@ -20,7 +20,7 @@ import java.util.Set;
 
 @PluginAdapter("Progression")
 @Slf4j
-public class ProgressionAdapter{
+public class ProgressionAdapter {
 
     private final Clans clans;
     private final Progression progression;
@@ -53,7 +53,7 @@ public class ProgressionAdapter{
             }
 
             progression.getInjector().injectMembers(listener);
-            listenerLoader.load(clazz);
+            listenerLoader.register(listener);
         }
         log.info("Loaded " + listenerClasses.size() + " clans progression listeners");
     }
@@ -69,7 +69,6 @@ public class ProgressionAdapter{
             }
 
             progression.getInjector().injectMembers(perk);
-            clans.getInjector().injectMembers(perk);
             final Class<? extends ProgressionTree>[] trees = perk.acceptedTrees();
             for (Class<? extends ProgressionTree> tree : trees) {
                 progressionsManager.fromClass(tree).addPerk(perk);

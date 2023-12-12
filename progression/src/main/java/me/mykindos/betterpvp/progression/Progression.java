@@ -37,11 +37,6 @@ public class Progression extends BPvPPlugin {
     @Inject
     private UpdateEventExecutor updateEventExecutor;
 
-    @Inject
-    @Config(path = "progression.database.prefix", defaultValue = "progression_")
-    @Getter
-    private String databasePrefix;
-
     @Getter
     private ProgressionsManager progressionsManager;
 
@@ -57,7 +52,7 @@ public class Progression extends BPvPPlugin {
             injector = core.getInjector().createChildInjector(new ProgressionInjectorModule(this), new ConfigInjectorModule(this, fields));
             injector.injectMembers(this);
 
-            database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:progression-migrations", databasePrefix);
+            database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:progression-migrations", "progression");
 
             Bukkit.getPluginManager().callEvent(new ModuleLoadedEvent("Progression"));
 

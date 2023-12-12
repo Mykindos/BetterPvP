@@ -1,7 +1,7 @@
 package me.mykindos.betterpvp.shops.shops.menus;
 
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.components.shops.IShopItem;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
@@ -16,12 +16,12 @@ public class ShopMenu extends AbstractGui implements Windowed {
 
     private final Component title;
 
-    public ShopMenu(Component title, List<IShopItem> shopItems, ItemHandler itemHandler, GamerManager gamerManager) {
+    public ShopMenu(Component title, List<IShopItem> shopItems, ItemHandler itemHandler, ClientManager clientManager) {
         super(9, 6);
         this.title = title;
 
         for (IShopItem shopItem : shopItems) {
-            setItem(shopItem.getSlot(), new ShopItemButton(shopItem, itemHandler, gamerManager));
+            setItem(shopItem.getSlot(), new ShopItemButton(shopItem, itemHandler, clientManager));
         }
 
         setBackground(Menu.BACKGROUND_ITEM);

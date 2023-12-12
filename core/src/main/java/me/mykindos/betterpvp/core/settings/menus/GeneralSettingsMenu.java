@@ -1,9 +1,9 @@
 package me.mykindos.betterpvp.core.settings.menus;
 
-import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.core.gamer.Gamer;
-import me.mykindos.betterpvp.core.gamer.properties.GamerProperty;
+import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.settings.menus.buttons.SettingsButton;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -18,12 +18,12 @@ import xyz.xenondevs.invui.gui.AbstractGui;
 @Singleton
 public class GeneralSettingsMenu extends AbstractGui implements SettingCategory {
 
-    @Inject
-    public GeneralSettingsMenu(final Player player, final Gamer gamer) {
+    public GeneralSettingsMenu(final Player player, final Client client) {
         super(9, 1);
+        final Gamer gamer = client.getGamer();
 
         final Description tipDescription = Description.builder().icon(lang -> {
-            final boolean tipSetting = (boolean) gamer.getProperty(GamerProperty.TIPS_ENABLED).orElse(false);
+            final boolean tipSetting = (boolean) client.getProperty(ClientProperty.TIPS_ENABLED).orElse(false);
             final NamedTextColor color = tipSetting ? NamedTextColor.GREEN : NamedTextColor.RED;
             return ItemView.builder()
                     .material(Material.WRITABLE_BOOK)
@@ -34,8 +34,21 @@ public class GeneralSettingsMenu extends AbstractGui implements SettingCategory 
                     .get();
         }).build();
 
+        final Description chatDescription = Description.builder().icon(lang -> {
+            final boolean chatSetting = (boolean) client.getProperty(ClientProperty.CHAT_ENABLED).orElse(false);
+            final NamedTextColor color = chatSetting ? NamedTextColor.GREEN : NamedTextColor.RED;
+            return ItemView.builder()
+                    .material(Material.WRITABLE_BOOK)
+                    .displayName(Component.text("Chat", color))
+                    .lore(Component.text("Whether to enable chat or not.", NamedTextColor.GRAY))
+                    .frameLore(true)
+                    .build()
+                    .get();
+        }).build();
+
         addItems(
-                new SettingsButton(gamer, GamerProperty.TIPS_ENABLED, tipDescription)
+                new SettingsButton(client, ClientProperty.TIPS_ENABLED, tipDescription),
+                new SettingsButton(client, ClientProperty.CHAT_ENABLED, chatDescription)
         );
     }
 

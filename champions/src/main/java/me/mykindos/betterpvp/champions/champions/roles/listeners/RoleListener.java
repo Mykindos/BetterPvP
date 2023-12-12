@@ -8,13 +8,14 @@ import me.mykindos.betterpvp.champions.champions.builds.menus.events.ApplyBuildE
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.DeleteBuildEvent;
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.champions.champions.roles.events.RoleChangeEvent;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.death.events.CustomDeathEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageDurabilityEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
@@ -45,14 +46,14 @@ import java.util.function.Function;
 public class RoleListener implements Listener {
 
     private final RoleManager roleManager;
-    private final GamerManager gamerManager;
+    private final ClientManager clientManager;
     private final BuildManager buildManager;
     private final CooldownManager cooldownManager;
 
     @Inject
-    public RoleListener(RoleManager roleManager, GamerManager gamerManager, BuildManager buildManager, CooldownManager cooldownManager) {
+    public RoleListener(RoleManager roleManager, ClientManager clientManager, BuildManager buildManager, CooldownManager cooldownManager) {
         this.roleManager = roleManager;
-        this.gamerManager = gamerManager;
+        this.clientManager = clientManager;
         this.buildManager = buildManager;
         this.cooldownManager = cooldownManager;
     }
@@ -75,11 +76,10 @@ public class RoleListener implements Listener {
             UtilMessage.simpleMessage(player, "Class", "You equipped <green>%s", role.getName());
             UtilMessage.message(player, equipMessage(player, role));
 
-            gamerManager.getObject(player.getUniqueId()).ifPresent(gamer -> {
-                String roleProperty = role.name() + "_EQUIPPED";
-                int timesEquipped = (int) gamer.getProperty(roleProperty).orElse(0) + 1;
-                gamer.saveProperty(roleProperty, timesEquipped);
-            });
+            final Gamer gamer = clientManager.search().online(player).getGamer();
+            String roleProperty = role.name() + "_EQUIPPED";
+            int timesEquipped = (int) gamer.getProperty(roleProperty).orElse(0) + 1;
+            gamer.saveProperty(roleProperty, timesEquipped);
         }
 
         for (PotionEffect effect : player.getActivePotionEffects()) {

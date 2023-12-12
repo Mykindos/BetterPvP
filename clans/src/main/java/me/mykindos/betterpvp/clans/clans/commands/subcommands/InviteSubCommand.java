@@ -8,10 +8,10 @@ import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
 import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
 import me.mykindos.betterpvp.clans.clans.events.ClanInviteMemberEvent;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.config.Config;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
@@ -28,8 +28,8 @@ public class InviteSubCommand extends ClanSubCommand {
     private int maxClanMembers;
 
     @Inject
-    public InviteSubCommand(ClanManager clanManager, GamerManager gamerManager) {
-        super(clanManager, gamerManager);
+    public InviteSubCommand(ClanManager clanManager, ClientManager clientManager) {
+        super(clanManager, clientManager);
     }
 
     @Override

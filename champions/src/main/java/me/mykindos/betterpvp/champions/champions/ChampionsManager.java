@@ -4,11 +4,11 @@ import lombok.Getter;
 import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.champions.champions.skills.SkillManager;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableHandler;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.energy.EnergyHandler;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -20,7 +20,7 @@ import javax.inject.Singleton;
 @Getter
 public class ChampionsManager {
 
-    private final GamerManager gamers;
+    private final ClientManager clientManager;
     private final SkillManager skills;
     private final RoleManager roles;
     private final BuildManager builds;
@@ -30,9 +30,9 @@ public class ChampionsManager {
     private final ThrowableHandler throwables;
 
     @Inject
-    public ChampionsManager(GamerManager gamers, SkillManager skills, RoleManager roles, BuildManager builds,
+    public ChampionsManager(ClientManager clientManager, SkillManager skills, RoleManager roles, BuildManager builds,
                             CooldownManager cooldowns, EffectManager effects, EnergyHandler energy, ThrowableHandler throwables) {
-        this.gamers = gamers;
+        this.clientManager = clientManager;
         this.skills = skills;
         this.roles = roles;
         this.builds = builds;

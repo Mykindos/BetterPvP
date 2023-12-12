@@ -1,7 +1,7 @@
 package me.mykindos.betterpvp.champions.champions.skills.types;
 
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.components.champions.ISkill;
-import me.mykindos.betterpvp.core.gamer.Gamer;
 import org.bukkit.entity.Player;
 
 import java.util.List;

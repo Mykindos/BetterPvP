@@ -4,9 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.config.Config;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.tree.fishing.Fishing;
 import me.mykindos.betterpvp.progression.tree.fishing.event.PlayerStopFishingEvent;
 import me.mykindos.betterpvp.progression.tree.fishing.fish.Fish;
@@ -22,13 +20,7 @@ import org.bukkit.event.Listener;
 public class FishingStatsListener implements Listener {
 
     @Inject
-    private Progression progression;
-
-    @Inject
     private Fishing fishing;
-
-    @Inject
-    private GamerManager gamerManager;
 
     @Inject
     @Config(path = "fishing.xpPerPound", defaultValue = "0.10")

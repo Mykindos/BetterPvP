@@ -6,9 +6,9 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.SkillManager;
 import me.mykindos.betterpvp.champions.properties.ChampionsProperty;
 import me.mykindos.betterpvp.core.chat.events.ChatReceivedEvent;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.config.Config;
-import me.mykindos.betterpvp.core.gamer.Gamer;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -31,12 +31,12 @@ public class SkillChatListener implements Listener {
     private boolean chatSkillPreview;
 
     private final SkillManager skillManager;
-    private final GamerManager gamerManager;
+    private final ClientManager clientManager;
 
     @Inject
-    public SkillChatListener(SkillManager skillManager, GamerManager gamerManager) {
+    public SkillChatListener(SkillManager skillManager, ClientManager clientManager) {
         this.skillManager = skillManager;
-        this.gamerManager = gamerManager;
+        this.clientManager = clientManager;
     }
 
     /**
@@ -49,14 +49,11 @@ public class SkillChatListener implements Listener {
         if (event.isCancelled()) return;
         if (!chatSkillPreview) return;
 
-        Optional<Gamer> gamerOptional = gamerManager.getObject(event.getTarget().getUniqueId());
-        if (gamerOptional.isPresent()) {
-            Gamer gamer = gamerOptional.get();
-            Optional<Boolean> skillChatPreviewOptional = gamer.getProperty(ChampionsProperty.SKILL_CHAT_PREVIEW);
-            if (skillChatPreviewOptional.isPresent()) {
-                boolean skillChatPreview = skillChatPreviewOptional.get();
-                if (!skillChatPreview) return;
-            }
+        Gamer gamer = clientManager.search().online(event.getTarget()).getGamer();
+        Optional<Boolean> skillChatPreviewOptional = gamer.getProperty(ChampionsProperty.SKILL_CHAT_PREVIEW);
+        if (skillChatPreviewOptional.isPresent()) {
+            boolean skillChatPreview = skillChatPreviewOptional.get();
+            if (!skillChatPreview) return;
         }
 
         String messageText = PlainTextComponentSerializer.plainText().serialize(event.getMessage());

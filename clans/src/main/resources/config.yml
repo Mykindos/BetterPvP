@@ -1,6 +1,4 @@
 clans:
-  database:
-    prefix: clans_
   claims:
     additional: 3
   tnt:

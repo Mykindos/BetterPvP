@@ -13,6 +13,8 @@ import me.mykindos.betterpvp.clans.clans.pillage.PillageHandler;
 import me.mykindos.betterpvp.clans.clans.pillage.events.PillageStartEvent;
 import me.mykindos.betterpvp.clans.clans.repository.ClanRepository;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.components.clans.IClan;
 import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
@@ -20,8 +22,6 @@ import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.events.scoreboard.ScoreboardUpdateEvent;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
-import me.mykindos.betterpvp.core.gamer.Gamer;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -53,7 +53,7 @@ public class ClanManager extends Manager<Clan> {
     @Getter
     private final ClanRepository repository;
 
-    private final GamerManager gamerManager;
+    private final ClientManager clientManager;
     @Getter
     private final PillageHandler pillageHandler;
 
@@ -78,9 +78,9 @@ public class ClanManager extends Manager<Clan> {
     private boolean dominanceEnabled;
 
     @Inject
-    public ClanManager(Clans clans, ClanRepository repository, GamerManager gamerManager, PillageHandler pillageHandler) {
+    public ClanManager(Clans clans, ClanRepository repository, ClientManager clientManager, PillageHandler pillageHandler) {
         this.repository = repository;
-        this.gamerManager = gamerManager;
+        this.clientManager = clientManager;
         this.pillageHandler = pillageHandler;
         this.dominanceScale = new HashMap<>();
         this.insuranceQueue = new ConcurrentLinkedQueue<>();
@@ -168,12 +168,9 @@ public class ClanManager extends Manager<Clan> {
         Optional<Clan> playerClanOptional = getClanByPlayer(player);
         Optional<Clan> locationClanOptional = getClanByLocation(location);
 
-        Optional<Gamer> gamerOptional = gamerManager.getObject(player.getUniqueId());
-        if (gamerOptional.isPresent()) {
-            Gamer gamer = gamerOptional.get();
-            if (gamer.getClient().isAdministrating()) {
-                return true;
-            }
+        Client client = clientManager.search().online(player);
+        if (client.isAdministrating()) {
+            return true;
         }
 
         if (locationClanOptional.isEmpty()) return true;
@@ -306,38 +303,28 @@ public class ClanManager extends Manager<Clan> {
         StringBuilder membersString = new StringBuilder();
         if (clan.getMembers() != null && !clan.getMembers().isEmpty()) {
             for (ClanMember member : clan.getMembers()) {
-                Optional<Gamer> gamerOptional = gamerManager.getObject(member.getUuid());
-                gamerOptional.ifPresent(gamer -> {
+                clientManager.search().offline(UUID.fromString(member.getUuid()), clientOpt -> clientOpt.ifPresent(client -> {
                     membersString.append(!membersString.isEmpty() ? "<gray>, " : "").append("<yellow>")
                             .append(member.getRoleIcon())
                             .append(UtilFormat.getOnlineStatus(member.getUuid()))
-                            .append(UtilFormat.spoofNameForLunar(gamer.getClient().getName()));
-                });
-
+                            .append(UtilFormat.spoofNameForLunar(client.getName()));
+                }));
             }
         }
         return membersString.toString();
     }
 
     public boolean canTeleport(Player player) {
-        Optional<Gamer> gamerOptional = gamerManager.getObject(player.getUniqueId());
-        if (gamerOptional.isEmpty()) {
-            return false;
-        }
-        Gamer gamer = gamerOptional.get();
+        Gamer gamer = clientManager.search().online(player).getGamer();
         return UtilTime.elapsed(gamer.getLastDamaged(), 15000);
     }
 
     public boolean canHurt(Player player, Player target) {
-
         Clan targetLocationClan = getClanByLocation(target.getLocation()).orElse(null);
         if (targetLocationClan != null && targetLocationClan.isSafe()) {
-            Optional<Gamer> gamerOptional = gamerManager.getObject(target.getUniqueId());
-            if (gamerOptional.isPresent()) {
-                Gamer gamer = gamerOptional.get();
-                if (UtilTime.elapsed(gamer.getLastDamaged(), 15000)) {
-                    return false;
-                }
+            Gamer gamer = clientManager.search().online(target).getGamer();
+            if (UtilTime.elapsed(gamer.getLastDamaged(), 15000)) {
+                return false;
             }
         }
 
@@ -354,14 +341,8 @@ public class ClanManager extends Manager<Clan> {
             Clan locationClan = locationClanOptional.get();
             if (locationClan.isAdmin() && locationClan.isSafe()) {
 
-                Optional<Gamer> gamerOptional = gamerManager.getObject(player.getUniqueId().toString());
-                if (gamerOptional.isPresent()) {
-                    Gamer gamer = gamerOptional.get();
-                    // Allow skills if player is combat tagged
-                    return !UtilTime.elapsed(gamer.getLastDamaged(), 15000);
-                }
-
-                return false;
+                Gamer gamer = clientManager.search().online(player).getGamer();
+                return !UtilTime.elapsed(gamer.getLastDamaged(), 15000);
             }
         }
 

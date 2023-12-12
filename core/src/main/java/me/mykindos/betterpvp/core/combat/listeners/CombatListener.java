@@ -1,6 +1,9 @@
 package me.mykindos.betterpvp.core.combat.listeners;
 
 import lombok.extern.slf4j.Slf4j;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.adapters.CustomDamageAdapter;
 import me.mykindos.betterpvp.core.combat.armour.ArmourManager;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
@@ -12,15 +15,12 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageReductionEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomKnockbackEvent;
 import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
-import me.mykindos.betterpvp.core.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -52,15 +52,15 @@ import java.util.List;
 public class CombatListener implements Listener {
 
     private final List<DamageData> damageDataList;
-    private final GamerManager gamerManager;
+    private final ClientManager clientManager;
     private final ArmourManager armourManager;
     private final DamageLogManager damageLogManager;
 
     private final List<CustomDamageAdapter> customDamageAdapters;
 
     @Inject
-    public CombatListener(GamerManager gamerManager, ArmourManager armourManager, DamageLogManager damageLogManager) {
-        this.gamerManager = gamerManager;
+    public CombatListener(ClientManager clientManager, ArmourManager armourManager, DamageLogManager damageLogManager) {
+        this.clientManager = clientManager;
         this.armourManager = armourManager;
         this.damageLogManager = damageLogManager;
         damageDataList = new ArrayList<>();
@@ -171,17 +171,15 @@ public class CombatListener implements Listener {
 
     private void processDamageData(CustomDamageEvent event) {
         if (event.getDamagee() instanceof Player damagee) {
-            gamerManager.getObject(damagee.getUniqueId()).ifPresent(gamer -> {
-                gamer.setLastDamaged(System.currentTimeMillis());
-                gamer.saveProperty(GamerProperty.DAMAGE_TAKEN, (double) gamer.getProperty(GamerProperty.DAMAGE_TAKEN).orElse(0D) + event.getDamage());
-            });
+            final Gamer gamer = clientManager.search().online(damagee).getGamer();
+            gamer.setLastDamaged(System.currentTimeMillis());
+            gamer.saveProperty(GamerProperty.DAMAGE_TAKEN, (double) gamer.getProperty(GamerProperty.DAMAGE_TAKEN).orElse(0D) + event.getDamage());
         }
 
         if (event.getDamager() instanceof Player damager) {
-            gamerManager.getObject(damager.getUniqueId()).ifPresent(gamer -> {
-                gamer.setLastDamaged(System.currentTimeMillis());
-                gamer.saveProperty(GamerProperty.DAMAGE_DEALT, (double) gamer.getProperty(GamerProperty.DAMAGE_DEALT).orElse(0D) + event.getDamage());
-            });
+            final Gamer gamer = clientManager.search().online(damager).getGamer();
+            gamer.setLastDamaged(System.currentTimeMillis());
+            gamer.saveProperty(GamerProperty.DAMAGE_DEALT, (double) gamer.getProperty(GamerProperty.DAMAGE_DEALT).orElse(0D) + event.getDamage());
         }
 
         DamageLog damageLog = new DamageLog(event.getDamager(), event.getCause(), event.getDamage(), event.getReason());

@@ -1,4 +1,4 @@
-create table if not exists ${tablePrefix}imbuement_data
+create table if not exists champions_imbuement_data
 (
     ImbuementName       varchar(255)  not null primary key,
     NamespaceKey        varchar(255)  not null,
@@ -10,19 +10,19 @@ create table if not exists ${tablePrefix}imbuement_data
     OnTools             tinyint       not null default 0
     );
 
-INSERT IGNORE INTO ${tablePrefix}imbuement_data (ImbuementName, NamespaceKey, AffixText, Material, Value, OnArmour, OnWeapons, OnTools) VALUES
+INSERT IGNORE INTO champions_imbuement_data (ImbuementName, NamespaceKey, AffixText, Material, Value, OnArmour, OnWeapons, OnTools) VALUES
     ('Haste', 'champions:imbuement-haste', '<green>15% <gray>cooldown reduction', 'SHAPER_ARMOR_TRIM_SMITHING_TEMPLATE', 15, 1, 1, 1);
 
-INSERT IGNORE INTO ${tablePrefix}imbuement_data (ImbuementName, NamespaceKey, AffixText, Material, Value, OnArmour, OnWeapons, OnTools) VALUES
+INSERT IGNORE INTO champions_imbuement_data (ImbuementName, NamespaceKey, AffixText, Material, Value, OnArmour, OnWeapons, OnTools) VALUES
     ('Vigor', 'champions:imbuement-vigor', '<green>10% <gray>increased damage', 'RAISER_ARMOR_TRIM_SMITHING_TEMPLATE', 10, 0, 1, 0);
 
-INSERT IGNORE INTO ${tablePrefix}imbuement_data (ImbuementName, NamespaceKey, AffixText, Material, Value, OnArmour, OnWeapons, OnTools) VALUES
+INSERT IGNORE INTO champions_imbuement_data (ImbuementName, NamespaceKey, AffixText, Material, Value, OnArmour, OnWeapons, OnTools) VALUES
     ('Fortification', 'champions:imbuement-fortification', '<green>10% <gray>damage reduction', 'WARD_ARMOR_TRIM_SMITHING_TEMPLATE', 10, 1, 0, 0);
 
-INSERT IGNORE INTO ${tablePrefix}imbuement_data (ImbuementName, NamespaceKey, AffixText, Material, Value, OnArmour, OnWeapons, OnTools) VALUES
+INSERT IGNORE INTO champions_imbuement_data (ImbuementName, NamespaceKey, AffixText, Material, Value, OnArmour, OnWeapons, OnTools) VALUES
     ('Insight', 'champions:imbuement-insight', '<green>10% <gray>energy cost reduction', 'WAYFINDER_ARMOR_TRIM_SMITHING_TEMPLATE', 10, 1, 1, 1);
 
-INSERT IGNORE INTO ${tablePrefix}imbuement_data (ImbuementName, NamespaceKey, AffixText, Material, Value, OnArmour, OnWeapons, OnTools) VALUES
+INSERT IGNORE INTO champions_imbuement_data (ImbuementName, NamespaceKey, AffixText, Material, Value, OnArmour, OnWeapons, OnTools) VALUES
     ('Fortune', 'champions:imbuement-fortune', '<green>10% <gray>chance to get double resources', 'DUNE_ARMOR_TRIM_SMITHING_TEMPLATE', 10, 0, 0, 1);
 
 -- Add runes to items & item lore
