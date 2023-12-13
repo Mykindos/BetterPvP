@@ -5,8 +5,10 @@ import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_20_R2.CraftWorld;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.LivingEntity;
@@ -62,6 +64,12 @@ public class UtilEntity {
         armorStand.setPersistent(false); // We don't want them to be saved in the world
         armorStand.setCollidable(false); // We don't want them to collide with anything
         return armorStand;
+    }
+
+    public static boolean isInWater (LivingEntity livingEntity) {
+        Location belowFeet = livingEntity.getLocation().subtract(0, -0.25, 0);
+        Block blockBelowFeet = livingEntity.getWorld().getBlockAt(belowFeet);
+        return (livingEntity.isInWater() || blockBelowFeet.getType() == Material.WATER);
     }
 
 }
