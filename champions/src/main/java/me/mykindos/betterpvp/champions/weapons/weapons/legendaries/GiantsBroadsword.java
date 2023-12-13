@@ -200,6 +200,10 @@ public class GiantsBroadsword extends ChannelWeapon implements InteractWeapon, L
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
         if (!(event.getDamager() instanceof Player damager)) return;
         if (isHoldingWeapon(damager)) {
+            if (this.active.contains(damager.getUniqueId())) {
+                event.setCancelled(true);
+                return;
+            }
             event.setDamage(baseDamage);
         }
     }
