@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -27,9 +28,15 @@ import java.util.UUID;
 @BPvPListener
 public class Void extends ActiveToggleSkill implements EnergySkill {
 
-    public int damageReduction;
+    public double baseDamageReduction;
 
-    public int energyReduction;
+    public double damageReductionIncreasePerLevel;
+
+    public int baseEnergyReduction;
+
+    public int energyReductionDecreasePerLevel;
+
+    public int slownessStrength;
     @Inject
     public Void(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -47,13 +54,21 @@ public class Void extends ActiveToggleSkill implements EnergySkill {
                 "Drop your Sword / Axe to toggle",
                 "",
                 "While in void form, you receive",
-                "<effect>Slownesss III</effect>, and take no Knockback",
+                "<effect>Slownesss " + UtilFormat.getRomanNumeral(slownessStrength + 1) + "</effect>, and take no Knockback",
                 "",
-                "Reduces incoming damage by <stat>" + damageReduction + "</stat>,",
-                "but burns <stat>" + energyReduction + "</stat> of your energy",
+                "Reduces incoming damage by <stat>" + getDamageReduction(level) + "</stat>,",
+                "but burns <stat>" + getEnergyReduction(level) + "</stat> of your energy",
                 "",
                 "Energy / Second: <val>" + getEnergy(level)
         };
+    }
+
+    public double getDamageReduction(int level) {
+        return baseDamageReduction + level * damageReductionIncreasePerLevel;
+    }
+
+    public double getEnergyReduction(int level) {
+        return baseEnergyReduction - level * energyReductionDecreasePerLevel;
     }
 
     @Override
@@ -82,7 +97,7 @@ public class Void extends ActiveToggleSkill implements EnergySkill {
             if (player != null) {
 
                 if (!player.hasPotionEffect(PotionEffectType.SLOW)) {
-                    player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 2));
+                    player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, slownessStrength));
                 }
 
                 int level = getLevel(player);
@@ -104,8 +119,8 @@ public class Void extends ActiveToggleSkill implements EnergySkill {
 
         int level = getLevel(damagee);
         if (level > 0) {
-            event.setDamage(event.getDamage() - damageReduction);
-            championsManager.getEnergy().degenerateEnergy(damagee, energyReduction * 0.01);
+            event.setDamage(event.getDamage() - getDamageReduction(level));
+            championsManager.getEnergy().degenerateEnergy(damagee, getEnergyReduction(level) * 0.01);
 
             event.setKnockback(false);
         }
@@ -120,7 +135,7 @@ public class Void extends ActiveToggleSkill implements EnergySkill {
     @Override
     public float getEnergy(int level) {
 
-        return (float) (energy - ((level - 1) * 0.5));
+        return (float) (energy - ((level - 1) * energyDecreasePerLevel));
     }
 
     @Override
@@ -137,7 +152,12 @@ public class Void extends ActiveToggleSkill implements EnergySkill {
     }
 
     public void loadSkillConfig() {
-        damageReduction = getConfig("damageReduction", 5, Integer.class);
-        energyReduction = getConfig("energyReduction", 20, Integer.class);
+        baseDamageReduction = getConfig("baseDamageReduction", 5.0, Double.class);
+        damageReductionIncreasePerLevel = getConfig("damageReductionIncreasePerLevel", 0.0, Double.class);
+
+        baseEnergyReduction = getConfig("baseEnergyReduction", 20, Integer.class);
+        energyReductionDecreasePerLevel = getConfig("energyReductionDecreasePerLevel", 0, Integer.class);
+
+        slownessStrength = getConfig("slownessStrength", 2, Integer.class);
     }
 }

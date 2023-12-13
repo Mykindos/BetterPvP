@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -23,7 +24,15 @@ import org.bukkit.potion.PotionEffectType;
 @BPvPListener
 public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill {
 
-    private double duration;
+    private double baseRadius;
+    
+    private double radiusIncreasePerLevel;
+
+    private double baseDuration;
+
+    private double durationIncreasePerLevel;
+
+    private int healthBoostStrength;
 
     @Inject
     public DefensiveAura(Champions champions, ChampionsManager championsManager) {
@@ -41,11 +50,19 @@ public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Gives you, and all allies within <val>" + (6 + level) + "</val> blocks",
-                "<effect>Health Boost I</effect> for <stat>" + duration + "</stat> seconds",
+                "Gives you, and all allies within <val>" + getRadius(level) + "</val> blocks",
+                "<effect>Health Boost " + UtilFormat.getRomanNumeral(healthBoostStrength + 1) + "</effect> for <stat>" + baseDuration + "</stat> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
+    }
+
+    public double getRadius(int level) {
+        return baseRadius + level * radiusIncreasePerLevel;
+    }
+
+    public double getDuration(int level) {
+        return baseDuration + durationIncreasePerLevel;
     }
 
     @Override
@@ -62,23 +79,22 @@ public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill
 
     @Override
     public double getCooldown(int level) {
-
-        return cooldown - ((level - 1) * 2);
+        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
 
     @Override
     public void activate(Player player, int level) {
-        player.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, (int) duration * 20, 0));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, (int) (getDuration(level) * 20), healthBoostStrength));
         AttributeInstance playerMaxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
         if (playerMaxHealth != null) {
-            player.setHealth(Math.min(player.getHealth() + 4, playerMaxHealth.getValue()));
-            for (Player target : UtilPlayer.getNearbyAllies(player, player.getLocation(), (6 + level))) {
+            player.setHealth(Math.min(player.getHealth() + 4 * (healthBoostStrength + 1), playerMaxHealth.getValue()));
+            for (Player target : UtilPlayer.getNearbyAllies(player, player.getLocation(), getRadius(level))) {
 
-                target.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, (int) duration * 20, 0));
+                target.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, (int) (getDuration(level) * 20), healthBoostStrength));
                 AttributeInstance targetMaxHealth = target.getAttribute(Attribute.GENERIC_MAX_HEALTH);
                 if (targetMaxHealth != null) {
-                    target.setHealth(Math.min(target.getHealth() + 4, targetMaxHealth.getValue()));
+                    target.setHealth(Math.min(target.getHealth() + 4 * (healthBoostStrength + 1), targetMaxHealth.getValue()));
                 }
             }
         }
@@ -86,7 +102,11 @@ public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill
 
     @Override
     public void loadSkillConfig() {
-        duration = getConfig("duration", 10.0, Double.class);
+        baseDuration = getConfig("baseDuration", 10.0, Double.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.0, Double.class);
+        baseRadius = getConfig("baseRadius", 6.0, Double.class);
+        radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 1.0, Double.class);
+        healthBoostStrength = getConfig("radiusIncreasePerLevel", 0, Integer.class);
     }
 
     @Override

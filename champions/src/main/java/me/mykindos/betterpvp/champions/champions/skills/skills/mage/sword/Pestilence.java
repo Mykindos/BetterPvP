@@ -46,6 +46,8 @@ public class Pestilence extends PrepareSkill implements CooldownSkill {
     private double infectionDuration;
     private double enemyDamageReduction;
 
+    private double radius;
+
     @Inject
     public Pestilence(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -93,7 +95,7 @@ public class Pestilence extends PrepareSkill implements CooldownSkill {
             } else {
                 List<LivingEntity> newInfections = new ArrayList<>();
                 for (LivingEntity entity : entry.getValue().getCurrentlyInfected().keySet()) {
-                    for (LivingEntity target : UtilEntity.getNearbyEnemies(player, entity.getLocation(), 5.0)) {
+                    for (LivingEntity target : UtilEntity.getNearbyEnemies(player, entity.getLocation(), radius)) {
                         if (entry.getValue().getCurrentlyInfected().containsKey(target)) continue;
                         if (entry.getValue().getOldInfected().containsKey(target)) continue;
 
@@ -192,13 +194,14 @@ public class Pestilence extends PrepareSkill implements CooldownSkill {
     @Override
     public double getCooldown(int level) {
 
-        return cooldown - ((level - 1) * 3);
+        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
     @Override
     public void loadSkillConfig() {
-        infectionDuration = getConfig("duration", 5.0, Double.class);
+        infectionDuration = getConfig("infectionDuration", 5.0, Double.class);
         enemyDamageReduction = getConfig("enemyDamageReduction", 0.20, Double.class);
+        radius = getConfig("radius", 5.0, Double.class);
     }
 
     @Data

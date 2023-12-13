@@ -45,7 +45,7 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
     private int maxTravelDistance;
 
     @Inject
-    public Blink(Champions champions, ChampionsManager championsManager, Champions champions1) {
+    public Blink(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
 
@@ -61,7 +61,7 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Instantly teleport forwards <stat>15</stat> Blocks",
+                "Instantly teleport forwards <stat>" + maxTravelDistance + "</stat> Blocks",
                 "",
                 "Using again within <stat>5</stat> seconds De-Blinks,",
                 "returning you to your original location",
@@ -153,25 +153,11 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
 
     @Override
     public boolean canUse(Player player) {
-
-
-        if (player.hasPotionEffect(PotionEffectType.SLOW)) {
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You cannot use " + getName() + " while Slowed.");
-            return false;
-        }
-
-        if (championsManager.getEffects().hasEffect(player, EffectType.STUN)) {
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You cannot use <alt>%s</alt> while stunned.", getName());
-            return false;
-        }
-
         if ((loc.containsKey(player)) && (blinkTime.containsKey(player))
                 && (!UtilTime.elapsed(blinkTime.get(player), 4000L))) {
             deblink(player, false);
             return false;
         }
-
-
         return true;
     }
 
@@ -179,7 +165,7 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
     @Override
     public double getCooldown(int level) {
 
-        return cooldown - ((level - 1));
+        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
 

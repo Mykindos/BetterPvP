@@ -21,7 +21,9 @@ import org.bukkit.event.block.Action;
 public class ThreateningShout extends Skill implements InteractSkill, CooldownSkill {
 
     private int radius;
-    private double duration;
+    private double baseDuration;
+
+    private double durationIncreasePerLevel;
 
     @Inject
     public ThreateningShout(Champions champions, ChampionsManager championsManager) {
@@ -41,10 +43,14 @@ public class ThreateningShout extends Skill implements InteractSkill, CooldownSk
                 "",
                 "Release a roar, which frightens all",
                 "enemies within <val>" + (radius + level) + "</val> blocks and grants",
-                "them <effect>Vulnerability</effect> for <val>" + (duration + level) +"</val> seconds",
+                "them <effect>Vulnerability</effect> for <val>" + getDuration(level) + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
+    }
+
+    public double getDuration(int level) {
+        return baseDuration + (level * durationIncreasePerLevel);
     }
 
     @Override
@@ -61,7 +67,7 @@ public class ThreateningShout extends Skill implements InteractSkill, CooldownSk
     @Override
     public double getCooldown(int level) {
 
-        return cooldown - ((level - 1));
+        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
 
@@ -69,7 +75,7 @@ public class ThreateningShout extends Skill implements InteractSkill, CooldownSk
     public void activate(Player player, int level) {
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 2.0F, 2.0F);
         for (Player target : UtilPlayer.getNearbyEnemies(player, player.getLocation(), radius + level)) {
-            championsManager.getEffects().addEffect(target, EffectType.VULNERABILITY, (long) ((duration + level) * 1000L));
+            championsManager.getEffects().addEffect(target, EffectType.VULNERABILITY, (long) (getDuration(level) * 1000L));
         }
 
     }
@@ -82,6 +88,7 @@ public class ThreateningShout extends Skill implements InteractSkill, CooldownSk
     @Override
     public void loadSkillConfig() {
         radius = getConfig("radius", 4, Integer.class);
-        duration = getConfig("duration", 3.0, Double.class);
+        baseDuration = getConfig("baseDuration", 3.0, Double.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 2.0, Double.class);
     }
 }

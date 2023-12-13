@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -22,7 +23,11 @@ import org.bukkit.potion.PotionEffectType;
 @BPvPListener
 public class CripplingBlow extends Skill implements PassiveSkill {
 
-    private double slowDuration;
+    private double baseDuration;
+
+    private double durationIncreasePerLevel;
+
+    private int slownessStrength;
 
     @Inject
     public CripplingBlow(Champions champions, ChampionsManager championsManager) {
@@ -39,8 +44,12 @@ public class CripplingBlow extends Skill implements PassiveSkill {
 
         return new String[]{
                 "Enemies you hit with an axe don't take knockback",
-                "and receive <effect>Slowness I</effect> for <val>" + (slowDuration + (level * 0.5)) + "</val> seconds"
+                "and receive <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength + 1) + "</effect> for <val>" + getDuration(level) + "</val> seconds"
         };
+    }
+
+    public double getDuration(int level) {
+        return baseDuration + level * durationIncreasePerLevel;
     }
 
     @Override
@@ -57,7 +66,7 @@ public class CripplingBlow extends Skill implements PassiveSkill {
         int level = getLevel(player);
         if(level > 0) {
             LivingEntity target = event.getDamagee();
-            target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) ((slowDuration + (level * 0.5)) * 20), 0));
+            target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) (getDuration(level) * 20), slownessStrength));
             event.addReason(getName());
             event.setKnockback(false);
         }
@@ -72,7 +81,9 @@ public class CripplingBlow extends Skill implements PassiveSkill {
 
     @Override
     public void loadSkillConfig(){
-        slowDuration = getConfig("slowDuration", 2.0, Double.class);
+        baseDuration = getConfig("baseDuration", 2.0, Double.class);
+        durationIncreasePerLevel = getConfig("baseDuration", 0.5, Double.class);
+        slownessStrength = getConfig("baseDuration", 0, Integer.class);
     }
 
 }

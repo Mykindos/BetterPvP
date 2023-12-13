@@ -32,8 +32,6 @@ public class HealingShot extends PrepareArrowSkill {
 
     double increaseDurationPerLevel;
 
-    double cooldownDecreasePerLevel;
-
     @Inject
     public HealingShot(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -113,7 +111,7 @@ public class HealingShot extends PrepareArrowSkill {
 
     @Override
     public double getCooldown(int level) {
-        return cooldown - ((level * cooldownDecreasePerLevel));
+        return cooldown - (level * cooldownDecreasePerLevel);
     }
 
     public double getDuration(int level) {
@@ -124,6 +122,5 @@ public class HealingShot extends PrepareArrowSkill {
     public void loadSkillConfig() {
         baseDuration = getConfig("baseDuration", 4.0, Double.class);
         increaseDurationPerLevel = getConfig("increasePerLevel", 1.0, Double.class);
-        cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 1.0, Double.class);
     }
 }

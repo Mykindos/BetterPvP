@@ -30,6 +30,10 @@ public class ExcessiveForce extends Skill implements InteractSkill, CooldownSkil
 
     private final WeakHashMap<Player, Long> active = new WeakHashMap<>();
 
+    private double baseDuration;
+
+    private double durationIncreasePerLevel;
+
     @Inject
     public ExcessiveForce(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -46,12 +50,16 @@ public class ExcessiveForce extends Skill implements InteractSkill, CooldownSkil
         return new String[]{
                 "Right click with a Sword to activate",
                 "",
-                "For the next <val>" + (3 + ((level - 1) * 0.5)) + "</val> seconds",
-                "your attacks deal knockback to enemies",
+                "For the next <val>" + getDuration(level) + "</val> seconds",
+                "your attacks deal standard knockback to enemies",
                 "",
                 "Does not ignore anti-knockback abilities",
                 "",
                 "Cooldown: <val>" + getCooldown(level)};
+    }
+
+    public double getDuration(int level) {
+        return baseDuration + (level - 1) * durationIncreasePerLevel;
     }
 
 
@@ -105,7 +113,13 @@ public class ExcessiveForce extends Skill implements InteractSkill, CooldownSkil
 
     @Override
     public double getCooldown(int level) {
-        return cooldown - (level * 2);
+        return cooldown - (level * cooldownDecreasePerLevel);
+    }
+
+    @Override
+    public void loadSkillConfig() {
+        baseDuration = getConfig("baseDuration", 3.0, Double.class);
+        durationIncreasePerLevel = getConfig("durationPerLevel", 0.5, Double.class);
     }
 
 
