@@ -352,6 +352,7 @@ public class CombatListener implements Listener {
         }
 
         double velocity = 0.2D + trajectory.length() * 0.8D;
+        trajectory.multiply(event.getMultiplier());
 
         UtilVelocity.velocity(event.getDamagee(),
                 trajectory, velocity, false, 0.0D, Math.abs(0.2D * knockback), 0.4D + (0.04D * knockback), true);
