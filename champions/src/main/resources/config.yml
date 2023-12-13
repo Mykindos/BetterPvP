@@ -891,6 +891,39 @@ class:
   assassin:
     dealKnockback: false
     receiveKnockback: true
+weapons:
+  throwing-web:
+    cooldown: 10.0
+    duration: 2.5
+    throwable-expiry: 10.0
+  wind-blade:
+    energy-per-tick: 1.0
+    initial-energy-cost: 10.0
+    base-damage: 7.0
+    strength: 0.7
+  tnt-cannon:
+    cooldown: 25.0
+    velocity: 2.5
+  energy-apple:
+    cooldown: 10.0
+    energy-regen: 0.5
+  alligators-tooth:
+    base-damage: 8.0
+    bonus-damage: 4.0
+    energy-per-tick: 1.0
+    initial-energy-cost: 10.0
+    strength: 1.0
+  knights-greatlance:
+    charge-cooldown: 5.0
+    base-damage: 8.0
+    max-charge-ticks: 60
+    charge-velocity: 1.5
+  magnetic-maul:
+    base-damage: 8.0
+    energy-per-tick: 3.0
+    initial-energy-cost: 10.0
+    pull-range: 10.0
+    pull-fov: 80.3
 chat:
   skill:
     preview: false
