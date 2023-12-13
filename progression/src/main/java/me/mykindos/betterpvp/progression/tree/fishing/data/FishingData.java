@@ -44,8 +44,8 @@ public final class FishingData extends ProgressionData<Fishing> {
     }
 
     @Override
-    protected void prepareUpdates(@NotNull UUID uuid, @NotNull Database database, String databasePrefix) {
-        final String stmt = "INSERT INTO " + databasePrefix + "fishing (Gamer, Type, Weight) VALUES (?, ?, ?);";
+    protected void prepareUpdates(@NotNull UUID uuid, @NotNull Database database) {
+        final String stmt = "INSERT INTO progression_fishing (Gamer, Type, Weight) VALUES (?, ?, ?);";
         List<Statement> statements = new ArrayList<>();
         for (Fish fish : catchesToSave) {
             Statement statement = new Statement(stmt,

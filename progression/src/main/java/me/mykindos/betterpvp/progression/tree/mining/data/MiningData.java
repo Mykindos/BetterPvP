@@ -39,8 +39,8 @@ public class MiningData extends ProgressionData<Mining> {
     }
 
     @Override
-    protected void prepareUpdates(@NotNull UUID uuid, @NotNull Database database, String databasePrefix) {
-        final String stmt = "INSERT INTO " + databasePrefix + "mining (Gamer,Material,AmountMined) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE AmountMined = AmountMined + VALUES(AmountMined);";
+    protected void prepareUpdates(@NotNull UUID uuid, @NotNull Database database) {
+        final String stmt = "INSERT INTO progression_mining (Gamer,Material,AmountMined) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE AmountMined = AmountMined + VALUES(AmountMined);";
         List<Statement> statements = new ArrayList<>();
         for (Map.Entry<Material, Integer> entry : oresToSave.entrySet()) {
             final Material type = entry.getKey();

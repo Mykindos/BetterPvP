@@ -1,8 +1,10 @@
 package me.mykindos.betterpvp.core.settings.menus.buttons;
 
 import lombok.Getter;
-import me.mykindos.betterpvp.core.gamer.Gamer;
+import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.menu.CooldownButton;
+import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
@@ -21,17 +23,23 @@ public class SettingsButton extends AbstractItem implements CooldownButton {
     protected final String setting;
     @Getter
     private final Description description;
-    private final Gamer gamer;
+    private final PropertyContainer container;
 
     public SettingsButton(Gamer gamer, Enum<?> setting, Description description) {
-        this.gamer = gamer;
+        this.container = gamer;
+        this.description = description;
+        this.setting = setting.name();
+    }
+
+    public SettingsButton(Client client, Enum<?> setting, Description description) {
+        this.container = client;
         this.description = description;
         this.setting = setting.name();
     }
 
     @Override
     public ItemProvider getItemProvider() {
-        final boolean current = (boolean) this.gamer.getProperty(setting).orElse(false);
+        final boolean current = (boolean) this.container.getProperty(setting).orElse(false);
         final String action = current ? "Disable" : "Enable";
 
         ItemProvider icon = description.getIcon();
@@ -42,8 +50,8 @@ public class SettingsButton extends AbstractItem implements CooldownButton {
 
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
-        final boolean current = (boolean) this.gamer.getProperty(setting).orElse(false);
-        this.gamer.saveProperty(setting, !current, true);
+        final boolean current = (boolean) this.container.getProperty(setting).orElse(false);
+        this.container.saveProperty(setting, !current, true);
 
         notifyWindows();
         SoundEffect.HIGH_PITCH_PLING.play(player);

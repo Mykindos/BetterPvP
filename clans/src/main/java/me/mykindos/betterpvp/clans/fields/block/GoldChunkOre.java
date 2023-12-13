@@ -4,10 +4,10 @@ import com.google.inject.Inject;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.fields.model.CustomOre;
 import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.config.Config;
-import me.mykindos.betterpvp.core.gamer.Gamer;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
-import me.mykindos.betterpvp.core.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
@@ -31,7 +31,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Random;
 
 /**
@@ -53,8 +52,8 @@ public class GoldChunkOre extends CustomOre implements Listener {
     private int maxCoins;
 
     @Inject
-    public GoldChunkOre(Clans clans, GamerManager gamerManager) {
-        super(clans, gamerManager);
+    public GoldChunkOre(Clans clans, ClientManager clientManager) {
+        super(clans, clientManager);
     }
 
     @Override
@@ -116,16 +115,11 @@ public class GoldChunkOre extends CustomOre implements Listener {
         }
 
         final int gold = Objects.requireNonNullElse(pdc.get(key, PersistentDataType.INTEGER), 0);
-        final Optional<Gamer> gamerOpt = gamerManager.getObject(player.getUniqueId());
-        if (gamerOpt.isEmpty()) {
-            event.setCancelled(true);
-            return; // Broken ?
-        }
+        Gamer gamer = clientManager.search().online(player).getGamer();
 
         // Success
         event.getItem().remove();
         event.setCancelled(true);
-        final Gamer gamer = gamerOpt.get();
         gamer.saveProperty(GamerProperty.BALANCE, gamer.getBalance() + gold);
 
         // Cues

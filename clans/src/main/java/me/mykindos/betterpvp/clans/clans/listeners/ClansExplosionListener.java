@@ -8,11 +8,11 @@ import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanProperty;
 import me.mykindos.betterpvp.clans.clans.insurance.InsuranceType;
+import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
-import me.mykindos.betterpvp.core.gamer.Gamer;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -87,8 +87,8 @@ public class ClansExplosionListener extends ClanListener {
     private final Clans clans;
 
     @Inject
-    public ClansExplosionListener(ClanManager clanManager, GamerManager gamerManager, WorldBlockHandler worldBlockHandler, Clans clans) {
-        super(clanManager, gamerManager);
+    public ClansExplosionListener(ClanManager clanManager, ClientManager clientManager, WorldBlockHandler worldBlockHandler, Clans clans) {
+        super(clanManager, clientManager);
         this.worldBlockHandler = worldBlockHandler;
         this.clans = clans;
     }
@@ -148,14 +148,12 @@ public class ClansExplosionListener extends ClanListener {
 
             if (playerClan.equals(locationClan)) {
                 if (System.currentTimeMillis() < playerClan.getLastTntedTime()) {
-                    gamerManager.getObject(event.getPlayer().getUniqueId().toString()).ifPresent(gamer -> {
-                        if (!gamer.getClient().isAdministrating()) {
-                            UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You cannot place blocks for <green>%s</green>.",
-                                    UtilTime.getTime(playerClan.getLastTntedTime() - System.currentTimeMillis(), UtilTime.TimeUnit.BEST, 1));
-                            event.setCancelled(true);
-                        }
-                    });
-
+                    final Client client = clientManager.search().online(event.getPlayer());
+                    if (!client.isAdministrating()) {
+                        UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You cannot place blocks for <green>%s</green>.",
+                                UtilTime.getTime(playerClan.getLastTntedTime() - System.currentTimeMillis(), UtilTime.TimeUnit.BEST, 1));
+                        event.setCancelled(true);
+                    }
                 }
             }
         }
@@ -172,12 +170,10 @@ public class ClansExplosionListener extends ClanListener {
             Optional<Clan> clanOptional = clanManager.getClanByLocation(block.getLocation());
             clanOptional.ifPresent(clan -> {
                 if (clan.isAdmin()) {
-                    Optional<Gamer> gamerOptional = gamerManager.getObject(event.getPlayer().getUniqueId().toString());
-                    gamerOptional.ifPresent(gamer -> {
-                        if (!gamer.getClient().isAdministrating()) {
-                            event.setCancelled(true);
-                        }
-                    });
+                    Client client = clientManager.search().online(event.getPlayer());
+                    if (!client.isAdministrating()) {
+                        event.setCancelled(true);
+                    }
                 }
             });
         }

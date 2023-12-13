@@ -14,7 +14,7 @@ public class SettingsListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOW)
     public void onMenuOpen(SettingsFetchEvent event) {
-        event.supply(new GeneralSettingsMenu(event.getPlayer(), event.getGamer()));
+        event.supply(new GeneralSettingsMenu(event.getPlayer(), event.getClient()));
     }
 
 }

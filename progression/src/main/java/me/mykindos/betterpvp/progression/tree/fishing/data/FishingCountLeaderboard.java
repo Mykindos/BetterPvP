@@ -57,7 +57,7 @@ public class FishingCountLeaderboard extends PlayerLeaderboard<Long> implements 
 
     @Override
     @SneakyThrows
-    protected Long fetch(@NotNull SearchOptions options, @NotNull Database database, @NotNull String tablePrefix, @NotNull UUID entry) {
+    protected Long fetch(@NotNull SearchOptions options, @NotNull Database database, @NotNull UUID entry) {
         AtomicLong count = new AtomicLong();
         final TemporalSort type = (TemporalSort) Objects.requireNonNull(options.getSort());
         Statement statement = new Statement("CALL GetGamerFishingCount(?, ?)",
@@ -78,7 +78,7 @@ public class FishingCountLeaderboard extends PlayerLeaderboard<Long> implements 
 
     @SneakyThrows
     @Override
-    protected Map<UUID, Long> fetchAll(@NotNull SearchOptions options, @NotNull Database database, @NotNull String tablePrefix) {
+    protected Map<UUID, Long> fetchAll(@NotNull SearchOptions options, @NotNull Database database) {
         Map<UUID, Long> leaderboard = new HashMap<>();
 
         final TemporalSort type = (TemporalSort) Objects.requireNonNull(options.getSort());

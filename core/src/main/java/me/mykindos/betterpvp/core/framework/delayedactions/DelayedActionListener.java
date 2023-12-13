@@ -2,10 +2,11 @@ package me.mykindos.betterpvp.core.framework.delayedactions;
 
 import com.google.inject.Inject;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.framework.delayedactions.events.PlayerDelayedActionEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -26,12 +27,12 @@ import java.util.WeakHashMap;
 public class DelayedActionListener implements Listener {
 
     private final Core core;
-    private final GamerManager gamerManager;
+    private final ClientManager clientManager;
 
     @Inject
-    public DelayedActionListener(Core core, GamerManager gamerManager) {
+    public DelayedActionListener(Core core, ClientManager clientManager) {
         this.core = core;
-        this.gamerManager = gamerManager;
+        this.clientManager = clientManager;
     }
 
     private final WeakHashMap<Player, DelayedAction> delayedActionMap = new WeakHashMap<>();
@@ -122,12 +123,10 @@ public class DelayedActionListener implements Listener {
     public void onCombatCancel(PlayerDelayedActionEvent event) {
         if (event.isCancelled()) return;
 
-        gamerManager.getObject(event.getPlayer().getUniqueId()).ifPresent(gamer -> {
-            if(!UtilTime.elapsed(gamer.getLastDamaged(), 15000)) {
-                event.setCancelled(true);
-                UtilMessage.message(event.getPlayer(), "Combat", "You cannot do this while in combat!");
-            }
-        });
-
+        final Gamer gamer = clientManager.search().online(event.getPlayer()).getGamer();
+        if(!UtilTime.elapsed(gamer.getLastDamaged(), 15000)) {
+            event.setCancelled(true);
+            UtilMessage.message(event.getPlayer(), "Combat", "You cannot do this while in combat!");
+        }
     }
 }

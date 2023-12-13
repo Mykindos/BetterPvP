@@ -32,7 +32,7 @@ public abstract class ProgressionStatsRepository<T extends ProgressionTree, K ex
 
     @Override
     protected void postSaveAll(boolean async) {
-        String expStmt = "INSERT INTO " + plugin.getDatabasePrefix() + "exp (Gamer, " + tableName + ") VALUES (?, ?) ON DUPLICATE KEY UPDATE " + tableName + " = VALUES(" + tableName + ");";
+        String expStmt = "INSERT INTO progression_exp (Gamer, " + tableName + ") VALUES (?, ?) ON DUPLICATE KEY UPDATE " + tableName + " = VALUES(" + tableName + ");";
         List<Statement> statements = new ArrayList<>();
         saveQueue.forEach((uuid, data) -> statements.add(new Statement(expStmt,
                 new StringStatementValue(uuid.toString()),
@@ -53,7 +53,7 @@ public abstract class ProgressionStatsRepository<T extends ProgressionTree, K ex
 
         // Otherwise, these people were just loaded from the database, so load their XP
         return loaded.thenApplyAsync(data -> {
-            String expStmt = "SELECT " + tableName + " FROM " + plugin.getDatabasePrefix() + "exp WHERE gamer = ?;";
+            String expStmt = "SELECT " + tableName + " FROM progression_exp WHERE gamer = ?;";
             final Statement query = new Statement(expStmt, new StringStatementValue(player.toString()));
             final CachedRowSet result = database.executeQuery(query);
             try {

@@ -7,10 +7,11 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.events.ClanBuyEnergyEvent;
 import me.mykindos.betterpvp.clans.clans.events.ClanDisbandEvent;
 import me.mykindos.betterpvp.clans.clans.events.EnergyCheckEvent;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
-import me.mykindos.betterpvp.core.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -37,8 +38,8 @@ public class ClanEnergyListener extends ClanListener {
     private double energyWarnLevel;
 
     @Inject
-    ClanEnergyListener(Clans clans, ClanManager clanManager, GamerManager gamerManager) {
-        super(clanManager, gamerManager);
+    ClanEnergyListener(Clans clans, ClanManager clanManager, ClientManager clientManager) {
+        super(clanManager, clientManager);
         this.clans = clans;
     }
 
@@ -73,27 +74,24 @@ public class ClanEnergyListener extends ClanListener {
     public void onBuyEnergy(ClanBuyEnergyEvent event) {
         if (event.isCancelled()) return;
 
-        gamerManager.getObject(event.getPlayer().getUniqueId()).ifPresent(gamer -> {
-            if (gamer.getBalance() < event.getCost()) {
-                UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You do not have enough money to buy this amount of energy.");
-                event.setCancelled(true);
-            }
-        });
-
+        final Gamer gamer = clientManager.search().online(event.getPlayer()).getGamer();
+        if (gamer.getBalance() < event.getCost()) {
+            UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You do not have enough money to buy this amount of energy.");
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onBuyEnergyFinal(ClanBuyEnergyEvent event) {
         if (event.isCancelled()) return;
 
-        gamerManager.getObject(event.getPlayer().getUniqueId()).ifPresent(gamer -> {
-            gamer.saveProperty(GamerProperty.BALANCE.name(), gamer.getBalance() - event.getCost(), true);
-            event.getClan().setEnergy(event.getClan().getEnergy() + event.getAmount());
+        final Gamer gamer = clientManager.search().online(event.getPlayer()).getGamer();
+        gamer.saveProperty(GamerProperty.BALANCE.name(), gamer.getBalance() - event.getCost(), true);
+        event.getClan().setEnergy(event.getClan().getEnergy() + event.getAmount());
 
-            UtilSound.playSound(event.getPlayer(), Sound.BLOCK_NOTE_BLOCK_PLING, 1.0F, 1.0F, false);
-            UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You bought <yellow>%s<gray> energy for <yellow>$%s<gray>.",
-                    NumberFormat.getInstance().format(event.getAmount()), NumberFormat.getInstance().format(event.getCost()));
-        });
+        UtilSound.playSound(event.getPlayer(), Sound.BLOCK_NOTE_BLOCK_PLING, 1.0F, 1.0F, false);
+        UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You bought <yellow>%s<gray> energy for <yellow>$%s<gray>.",
+                NumberFormat.getInstance().format(event.getAmount()), NumberFormat.getInstance().format(event.getCost()));
     }
 
     @UpdateEvent(delay = 60_000 * 5)

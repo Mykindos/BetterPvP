@@ -103,13 +103,13 @@ public final class GlobalCombatLeaderboard extends PlayerLeaderboard<CombatData>
     }
 
     @Override
-    protected CombatData fetch(@NotNull SearchOptions options, @NotNull Database database, @NotNull String tablePrefix, @NotNull UUID entry) {
+    protected CombatData fetch(@NotNull SearchOptions options, @NotNull Database database, @NotNull UUID entry) {
         // We can join this because fetch is run on a separate thread
         return repository.getDataAsync(entry).join();
     }
 
     @Override
-    protected Map<UUID, CombatData> fetchAll(@NotNull SearchOptions options, @NotNull Database database, @NotNull String tablePrefix) {
+    protected Map<UUID, CombatData> fetchAll(@NotNull SearchOptions options, @NotNull Database database) {
         Map<UUID, CombatData> map = new HashMap<>();
         final SortType sortType = Objects.requireNonNull(options.getSort());
         Statement stmt = TOP_SORT_STATEMENTS.get(sortType);

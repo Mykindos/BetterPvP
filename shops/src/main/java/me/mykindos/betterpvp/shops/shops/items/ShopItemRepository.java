@@ -4,7 +4,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.components.shops.IShopItem;
-import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
@@ -20,10 +19,6 @@ import java.util.List;
 @Slf4j
 public class ShopItemRepository {
 
-    @Inject
-    @Config(path = "shops.database.prefix", defaultValue = "shops_")
-    private String databasePrefix;
-
     private final Database database;
 
     @Inject
@@ -34,7 +29,7 @@ public class ShopItemRepository {
     public HashMap<String, List<IShopItem>> getAllShopItems() {
         var shopItems = new HashMap<String, List<IShopItem>>();
 
-        String query = "SELECT * FROM " + databasePrefix + "shopitems";
+        String query = "SELECT * FROM shopitems";
         CachedRowSet result = database.executeQuery(new Statement(query));
         try {
             while (result.next()) {
@@ -55,7 +50,7 @@ public class ShopItemRepository {
 
                 ShopItem shopItem;
 
-                String dynamicPricingQuery = "SELECT * FROM " + databasePrefix + "shopitems_dynamic_pricing WHERE shopItemId = ?";
+                String dynamicPricingQuery = "SELECT * FROM shopitems_dynamic_pricing WHERE shopItemId = ?";
                 CachedRowSet dynamicPricingResult = database.executeQuery(new Statement(dynamicPricingQuery, new IntegerStatementValue(id)));
                 if (dynamicPricingResult.next()) {
                     int minSellPrice = dynamicPricingResult.getInt(2);
@@ -74,7 +69,7 @@ public class ShopItemRepository {
                     shopItem = new NormalShopItem(id, shopKeeper, itemName, material, (byte) data, menuSlot, menuPage, amount, buyPrice, sellPrice);
                 }
 
-                String itemFlagQuery = "SELECT * FROM " + databasePrefix + "shopitems_flags WHERE shopItemId = ?";
+                String itemFlagQuery = "SELECT * FROM shopitems_flags WHERE shopItemId = ?";
                 CachedRowSet itemFlagResult = database.executeQuery(new Statement(itemFlagQuery, new IntegerStatementValue(id)));
                 while (itemFlagResult.next()) {
                     String key = itemFlagResult.getString(3);
@@ -94,7 +89,7 @@ public class ShopItemRepository {
 
     public void updateStock(List<DynamicShopItem> dynamicShopItems) {
         List<Statement> updateQueries = new ArrayList<>();
-        String query = "UPDATE " + databasePrefix + "shopitems_dynamic_pricing SET currentStock = ? WHERE shopItemId = ?";
+        String query = "UPDATE shopitems_dynamic_pricing SET currentStock = ? WHERE shopItemId = ?";
         dynamicShopItems.forEach(dynamicShopItem -> {
             updateQueries.add(new Statement(query, new IntegerStatementValue(dynamicShopItem.getCurrentStock()), new IntegerStatementValue(dynamicShopItem.getId())));
         });

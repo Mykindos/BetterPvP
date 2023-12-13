@@ -6,11 +6,11 @@ import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.menus.ClanMenu;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.framework.annotations.WithReflection;
-import me.mykindos.betterpvp.core.gamer.Gamer;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
-import me.mykindos.betterpvp.core.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
@@ -18,21 +18,21 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Singleton
 public class ClanCommand extends Command {
 
     private final ClanManager clanManager;
-    private final GamerManager gamerManager;
+    private final ClientManager clientManager;
 
     @WithReflection
     @Inject
-    public ClanCommand(ClanManager clanManager, GamerManager gamerManager) {
+    public ClanCommand(ClanManager clanManager, ClientManager clientManager) {
         this.clanManager = clanManager;
-        this.gamerManager = gamerManager;
+        this.clientManager = clientManager;
 
         aliases.addAll(List.of("c", "f", "faction"));
     }
@@ -56,18 +56,14 @@ public class ClanCommand extends Command {
         // If no arguments, show the clan of the current player
         if (args.length == 0) {
             if (playerClan != null) {
-                Optional<Gamer> gamerOptional = gamerManager.getObject(player.getUniqueId().toString());
-                if (gamerOptional.isPresent()) {
-                    Gamer gamer = gamerOptional.get();
-
-                    Optional<Boolean> clanMenuEnabled = gamer.getProperty(GamerProperty.CLAN_MENU_ENABLED);
-                    if (clanMenuEnabled.isPresent()) {
-                        if (clanMenuEnabled.get()) {
-                            openClanMenu(player, playerClan, playerClan);
-                            return;
-                        } else {
-                            displayChat(player, playerClan);
-                        }
+                final Gamer gamer = clientManager.search().online(player).getGamer();
+                Optional<Boolean> clanMenuEnabled = gamer.getProperty(GamerProperty.CLAN_MENU_ENABLED);
+                if (clanMenuEnabled.isPresent()) {
+                    if (clanMenuEnabled.get()) {
+                        openClanMenu(player, playerClan, playerClan);
+                        return;
+                    } else {
+                        displayChat(player, playerClan);
                     }
                 }
 
@@ -87,11 +83,15 @@ public class ClanCommand extends Command {
         }
 
         // If the clan was not found by name, try to get the clan by player name
-        Optional<Gamer> gamerOptional = gamerManager.getGamerByName(args[0]);
-        if (gamerOptional.isPresent()) {
-            clanManager.getClanByPlayer(UUID.fromString(gamerOptional.get().getUuid())).ifPresent(clan -> openClanMenu(player, playerClan, clan));
+        final Collection<Client> matches = clientManager.search(player).inform(false).advancedOnline(args[0]);
+        if (matches.size() == 1) {
+            final Client found = matches.iterator().next();
+            final Optional<Clan> foundClan = clanManager.getClanByPlayer(found.getUniqueId());
+            foundClan.ifPresentOrElse(clan -> openClanMenu(player, playerClan, clan), () -> {
+                UtilMessage.message(player, "Clans", "That player is not in a clan.");
+            });
         } else {
-            UtilMessage.message(player, "Clans", "Cannot find the specified clan or player");
+            UtilMessage.message(player, "Clans", "Cannot find the specified clan or player.");
         }
     }
 

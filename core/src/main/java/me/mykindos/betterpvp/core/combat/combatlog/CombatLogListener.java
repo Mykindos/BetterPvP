@@ -2,12 +2,14 @@ package me.mykindos.betterpvp.core.combat.combatlog;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.events.ClientQuitEvent;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.combatlog.events.PlayerCombatLogEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -29,16 +31,16 @@ import java.util.List;
 public class CombatLogListener implements Listener {
 
     private final CombatLogManager combatLogManager;
-    private final GamerManager gamerManager;
+    private final ClientManager clientManager;
 
     @Inject
     @Config(path = "combatlog.valuable-items", defaultValue = "TNT,MUSIC_DISC_PIGSTEP,MUSIC_DISC_WAIT,MUSIC_DISC_13")
     private List<String> valuableItems;
 
     @Inject
-    public CombatLogListener(CombatLogManager combatLogManager, GamerManager gamerManager) {
+    public CombatLogListener(CombatLogManager combatLogManager, ClientManager clientManager) {
         this.combatLogManager = combatLogManager;
-        this.gamerManager = gamerManager;
+        this.clientManager = clientManager;
     }
 
     @EventHandler
@@ -60,20 +62,18 @@ public class CombatLogListener implements Listener {
             return;
         }
 
-        gamerManager.getObject(event.getPlayer().getUniqueId()).ifPresent(gamer -> {
-            if (gamer.getClient().hasRank(Rank.ADMIN)) {
-                event.setSafe(true);
-            }
-        });
+        Client client = clientManager.search().online(event.getPlayer());
+        if (client.hasRank(Rank.ADMIN)) {
+            event.setSafe(true);
+        }
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onCombatLogInCombat(PlayerCombatLogEvent event) {
-        gamerManager.getObject(event.getPlayer().getUniqueId()).ifPresent(gamer -> {
-            if (!UtilTime.elapsed(gamer.getLastDamaged(), 15000)) {
-                event.setSafe(false);
-            }
-        });
+        Gamer gamer = clientManager.search().online(event.getPlayer()).getGamer();
+        if (!UtilTime.elapsed(gamer.getLastDamaged(), 15000)) {
+            event.setSafe(false);
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

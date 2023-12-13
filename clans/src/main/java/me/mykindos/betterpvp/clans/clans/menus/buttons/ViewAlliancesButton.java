@@ -15,7 +15,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.jetbrains.annotations.NotNull;
 import xyz.xenondevs.invui.item.Item;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -48,14 +47,6 @@ public class ViewAlliancesButton extends ViewClanCollectionButton {
                     .append(Component.text(alliance.isTrusted(), color)));
             return (Item) new ViewClanButton(viewerClan, alliedClan, lore);
         }).toList();
-        alliances = new ArrayList<>(alliances);
-        for (int i = 1; i < 100; i++) {
-            Material random = Material.values()[i];
-            alliances.add(ItemView.builder()
-                    .material(random)
-                    .displayName(Component.text(random.name()))
-                    .build().toSimpleItem());
-        }
 
         new ViewCollectionMenu(collectionName, alliances, parent).show(player);
     }

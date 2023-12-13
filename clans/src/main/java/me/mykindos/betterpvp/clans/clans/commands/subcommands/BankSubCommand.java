@@ -9,12 +9,11 @@ import me.mykindos.betterpvp.clans.clans.ClanProperty;
 import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
 import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
-import me.mykindos.betterpvp.core.gamer.Gamer;
-import me.mykindos.betterpvp.core.gamer.GamerManager;
-import me.mykindos.betterpvp.core.gamer.exceptions.NoSuchGamerException;
-import me.mykindos.betterpvp.core.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.entity.Player;
 
@@ -24,8 +23,8 @@ import org.bukkit.entity.Player;
 public class BankSubCommand extends ClanSubCommand {
 
     @Inject
-    public BankSubCommand(ClanManager clanManager, GamerManager gamerManager) {
-        super(clanManager, gamerManager);
+    public BankSubCommand(ClanManager clanManager, ClientManager clientManager) {
+        super(clanManager, clientManager);
     }
 
     @Override
@@ -72,8 +71,8 @@ public class BankSubCommand extends ClanSubCommand {
     private static class BankWithdrawSubCommand extends ClanSubCommand {
 
         @Inject
-        public BankWithdrawSubCommand(ClanManager clanManager, GamerManager gamerManager) {
-            super(clanManager, gamerManager);
+        public BankWithdrawSubCommand(ClanManager clanManager, ClientManager clientManager) {
+            super(clanManager, clientManager);
         }
 
         @Override
@@ -111,8 +110,7 @@ public class BankSubCommand extends ClanSubCommand {
                 return;
             }
 
-            Gamer gamer = gamerManager.getObject(player.getUniqueId()).orElseThrow(() -> new NoSuchGamerException(player.getUniqueId()));
-
+            Gamer gamer = client.getGamer();
             try {
                 int amountToWithdraw = Integer.parseInt(args[1]);
                 if(clan.getBalance() < amountToWithdraw) {
@@ -155,8 +153,8 @@ public class BankSubCommand extends ClanSubCommand {
     private static class BankDepositSubCommand extends ClanSubCommand {
 
         @Inject
-        public BankDepositSubCommand(ClanManager clanManager, GamerManager gamerManager) {
-            super(clanManager, gamerManager);
+        public BankDepositSubCommand(ClanManager clanManager, ClientManager clientManager) {
+            super(clanManager, clientManager);
         }
 
         @Override
@@ -183,9 +181,7 @@ public class BankSubCommand extends ClanSubCommand {
             }
 
             Clan clan = clanManager.getClanByPlayer(player).orElseThrow();
-
-            Gamer gamer = gamerManager.getObject(player.getUniqueId()).orElseThrow(() -> new NoSuchGamerException(player.getUniqueId()));
-
+            Gamer gamer = client.getGamer();
             try {
                 int amountToWithdraw = Integer.parseInt(args[1]);
                 if(gamer.getBalance() < amountToWithdraw) {

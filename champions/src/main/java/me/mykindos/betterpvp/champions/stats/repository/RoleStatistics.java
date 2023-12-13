@@ -33,7 +33,7 @@ public class RoleStatistics extends StatHolder {
     }
 
     @Override
-    protected void prepareUpdates(@NotNull UUID uuid, @NotNull Database database, String databasePrefix) {
-        combatData.values().forEach(data -> data.prepareUpdates(uuid, database, databasePrefix));
+    protected void prepareUpdates(@NotNull UUID uuid, @NotNull Database database) {
+        combatData.values().forEach(data -> data.prepareUpdates(uuid, database));
     }
 }
