@@ -18,7 +18,9 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 @BPvPListener
 public class BreakFall extends Skill implements PassiveSkill {
 
-    private double damageReduction;
+    private double baseDamageReduction;
+
+    private double damageReductionIncreasePerLevel;
     @Inject
     public BreakFall(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -35,7 +37,11 @@ public class BreakFall extends Skill implements PassiveSkill {
         return new String[]{
                 "You roll when you hit the ground",
                 "",
-                "Fall damage is reduced by <val>" + (damageReduction + level)};
+                "Fall damage is reduced by <val>" + getDamageReduction(level)};
+    }
+
+    public double getDamageReduction(int level) {
+        return baseDamageReduction + damageReductionIncreasePerLevel * level;
     }
 
     @Override
@@ -57,11 +63,12 @@ public class BreakFall extends Skill implements PassiveSkill {
 
         int level = getLevel(player);
         if(level > 0) {
-            e.setDamage(e.getDamage() - (damageReduction + level));
+            e.setDamage(e.getDamage() - getDamageReduction(level));
         }
 
     }
     public void loadSkillConfig(){
-        damageReduction = getConfig("damageReduction", 5.0, Double.class);
+        baseDamageReduction = getConfig("baseDamageReduction", 5.0, Double.class);
+        damageReductionIncreasePerLevel = getConfig("damageReductionIncreasePerLevel", 1.0, Double.class);
     }
 }

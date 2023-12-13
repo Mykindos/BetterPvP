@@ -30,7 +30,9 @@ public class Bloodlust extends Skill implements PassiveSkill {
     private final WeakHashMap<Player, Long> time = new WeakHashMap<>();
     private final WeakHashMap<Player, Integer> str = new WeakHashMap<>();
 
-    private double duration;
+    private double baseDuration;
+
+    private double durationIncreasePerLevel;
 
     private int radius;
 
@@ -52,10 +54,14 @@ public class Bloodlust extends Skill implements PassiveSkill {
         return new String[]{
                 "When an enemy dies within <stat>" + radius + "</stat> blocks,",
                 "you go into a Bloodlust, receiving",
-                "<effect>Speed I</effect> and <effect>Strength I</effect> for <val>" + (duration + level) + "</val> seconds.",
+                "<effect>Speed I</effect> and <effect>Strength I</effect> for <val>" + getDuration(level) + "</val> seconds.",
                 "",
-                "Bloodlust can stack up to <stat>" + maxStacks + "</stat> times,",
+                "Bloodlust can stack up to <stat>" + maxStacks + "</stat> times",
                 "boosting the level of <effect>Speed</effect> and <effect>Strength</effect>"};
+    }
+
+    public double getDuration(int level) {
+        return baseDuration + durationIncreasePerLevel * level;
     }
 
     @Override
@@ -75,12 +81,12 @@ public class Bloodlust extends Skill implements PassiveSkill {
                 }
                 tempStr = Math.min(tempStr, maxStacks);
                 str.put(target, tempStr);
-                time.put(target, (long) (System.currentTimeMillis() + duration * 1000));
+                time.put(target, (long) (System.currentTimeMillis() + getDuration(level) * 1000));
                 if (target.hasPotionEffect(PotionEffectType.SPEED)) {
                     target.removePotionEffect(PotionEffectType.SPEED);
                 }
-                championsManager.getEffects().addEffect(target, EffectType.STRENGTH, tempStr, (long) ((duration + level) * 1000L));
-                target.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) ((duration + level) * 20), tempStr));
+                championsManager.getEffects().addEffect(target, EffectType.STRENGTH, tempStr, (long) (getDuration(level) * 1000L));
+                target.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) (getDuration(level) * 20), tempStr));
                 UtilMessage.simpleMessage(target, getClassType().getName(), "You entered bloodlust at level: <alt2>" + tempStr + "</alt2>.");
                 target.getWorld().playSound(target.getLocation(), Sound.ENTITY_ZOMBIFIED_PIGLIN_ANGRY, 2.0F, 0.6F);
             }
@@ -115,7 +121,8 @@ public class Bloodlust extends Skill implements PassiveSkill {
 
     @Override
     public void loadSkillConfig(){
-        duration = getConfig("duration", 5.0, Double.class);
+        baseDuration = getConfig("baseDuration", 5.0, Double.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
         radius = getConfig("radius", 15, Integer.class);
         maxStacks = getConfig("maxStacks", 3, Integer.class);
     }

@@ -22,6 +22,10 @@ import org.bukkit.event.block.Action;
 @BPvPListener
 public class StunningShot extends PrepareArrowSkill {
 
+    private double baseDuration;
+
+    private double durationIncreasePerLevel;
+
     @Inject
     public StunningShot(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -39,10 +43,14 @@ public class StunningShot extends PrepareArrowSkill {
                 "Left click with a Bow to prepare",
                 "",
                 "Shoot an arrow that <effect>Stuns</effect>",
-                "anyone hit for <val>" + String.format("%.1f", (level * 0.30)) + "</val> seconds",
+                "anyone hit for <val>" + String.format("%.1f", getDuration(level)) + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
+    }
+
+    public double getDuration(int level) {
+        return baseDuration + durationIncreasePerLevel * level;
     }
 
     @Override
@@ -66,7 +74,7 @@ public class StunningShot extends PrepareArrowSkill {
     public void onHit(Player damager, LivingEntity target, int level) {
         if(!(target instanceof Player player)) return;
         UtilMessage.message(player, getClassType().getName(), "You were hit by a " + getName());
-        championsManager.getEffects().addEffect(player, EffectType.STUN, (long) (level * 0.30) * 1000);
+        championsManager.getEffects().addEffect(player, EffectType.STUN, (long) (getDuration(level) * 1000));
     }
 
     @Override
@@ -82,7 +90,12 @@ public class StunningShot extends PrepareArrowSkill {
     @Override
     public double getCooldown(int level) {
 
-        return cooldown - ((level - 1));
+        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
+    @Override
+    public void loadSkillConfig() {
+        baseDuration = getConfig("baseDuration", 0.0, Double.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.3, Double.class);
+    }
 }

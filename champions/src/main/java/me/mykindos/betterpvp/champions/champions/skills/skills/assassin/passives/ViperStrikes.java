@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -21,7 +22,11 @@ import javax.inject.Singleton;
 @BPvPListener
 public class ViperStrikes extends Skill implements PassiveSkill, Listener {
 
-    private double baseSeconds;
+    private double baseDuration;
+
+    private double durationIncreasePerLevel;
+
+    private int poisonStrength;
 
     @Inject
     public ViperStrikes(Champions champions, ChampionsManager championsManager) {
@@ -37,17 +42,19 @@ public class ViperStrikes extends Skill implements PassiveSkill, Listener {
     public String[] getDescription(int level) {
         return new String[]{
                 "Your attacks give enemies",
-                "<effect>Poison 1</effect> for <val>" + getSeconds(level) + "</val> seconds"
+                "<effect>Poison " + UtilFormat.getRomanNumeral(poisonStrength) + "</effect> for <val>" + getDuration(level) + "</val> seconds"
         };
     }
 
-    private double getSeconds(int level) {
-        return baseSeconds + (level - 1) * 2;
+    private double getDuration(int level) {
+        return baseDuration + (level - 1) * durationIncreasePerLevel;
     }
 
     @Override
     public void loadSkillConfig() {
-        baseSeconds = getConfig("baseSeconds", 2.0, Double.class);
+        baseDuration = getConfig("baseDuration", 2.0, Double.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 2.0, Double.class);
+        poisonStrength = getConfig("poisonStrength", 1, Integer.class);
     }
 
     @Override
@@ -68,7 +75,7 @@ public class ViperStrikes extends Skill implements PassiveSkill, Listener {
         int level = getLevel(damager);
         if (level <= 0) return;
 
-        final int ticks = (int) (getSeconds(level) * 20);
+        final int ticks = (int) (getDuration(level) * 20);
         damagee.addPotionEffect(PotionEffectType.POISON.createEffect(ticks, 0));
         event.addReason(getName());
     }

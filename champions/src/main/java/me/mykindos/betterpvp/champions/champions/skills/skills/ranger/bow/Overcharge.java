@@ -49,9 +49,17 @@ public class Overcharge extends Skill implements InteractSkill, Listener {
     private final List<Arrow> arrows = new ArrayList<>();
     private final Set<UUID> charging = new HashSet<>();
 
-    private int damageIncrement;
+    private double baseDamageIncrement;
+
+    private double damageIncrementPerLevel;
 
     private double durationIncrement;
+    
+    private double durationIncrementPerLevel;
+
+    private double baseMaxDamage;
+
+    private double maxDamageIncreasePerLevel;
 
     @Inject
     public Overcharge(Champions champions, ChampionsManager championsManager) {
@@ -70,10 +78,18 @@ public class Overcharge extends Skill implements InteractSkill, Listener {
                 "Hold right click with a Bow to use",
                 "",
                 "Draw back harder on your bow, giving",
-                "<stat>" + damageIncrement + "</stat> bonus damage per <stat>" + durationIncrement + "</stat> seconds",
+                "<stat>" + baseDamageIncrement + "</stat> bonus damage per <stat>" + durationIncrement + "</stat> seconds",
                 "",
-                "Maximum Damage: <val>" + (2 + level)
+                "Maximum Damage: <val>" + getMaxDamage(level)
         };
+    }
+
+    public double getDamageIncrement(int level) {
+        return baseDamageIncrement + level * damageIncrementPerLevel;
+    }
+
+    public double getMaxDamage(int level) {
+        return baseMaxDamage + level * maxDamageIncreasePerLevel;
     }
 
     @Override
@@ -174,7 +190,7 @@ public class Overcharge extends Skill implements InteractSkill, Listener {
     @Override
     public void activate(Player player, int level) {
         if (!data.containsKey(player)) {
-            data.put(player, new OverchargeData(player.getUniqueId(), damageIncrement, (2 + level)));
+            data.put(player, new OverchargeData(player.getUniqueId(), (int) getDamageIncrement(level), (int) getMaxDamage(level)));
             charging.add(player.getUniqueId());
         }
     }
@@ -216,7 +232,11 @@ public class Overcharge extends Skill implements InteractSkill, Listener {
 
     }
     public void loadSkillConfig() {
-        damageIncrement = getConfig("damageIncrement", 1, Integer.class);
-        durationIncrement = getConfig("durationIncrement", 0.4, Double.class);
+        baseDamageIncrement = getConfig("baseDamageIncrement", 1.0, Double.class);
+        damageIncrementPerLevel = getConfig("damageIncrementPerLevel", 0.0 , Double.class);
+        durationIncrement = getConfig("baseDurationIncrement", 0.4, Double.class);
+
+        baseMaxDamage = getConfig("baseMaxDamage", 2.0, Double.class);
+        maxDamageIncreasePerLevel = getConfig("maxDamageIncreasePerLevel", 1.0, Double.class);
     }
 }

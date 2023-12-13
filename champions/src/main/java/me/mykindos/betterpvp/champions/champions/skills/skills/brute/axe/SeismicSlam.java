@@ -61,6 +61,8 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
 
     private int radius;
 
+    private double damage;
+
     @Inject
     public SeismicSlam(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -80,6 +82,7 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
                 "",
                 "Jump and slam the ground, knocking",
                 "up all opponents within <stat>" + radius + "</stat> blocks",
+                "and dealing <stat>" + damage + "</stat> damage",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -169,7 +172,7 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
 
                     immune.get(player).add(ent);
                     UtilVelocity.velocity(ent, 0.3 * ((height.get(player) - ent.getLocation().getY()) * 0.1), 1, 3, true);
-                    UtilDamage.doCustomDamage(new CustomDamageEvent(ent, player, null, DamageCause.CUSTOM, 3.0, false, getName()));
+                    UtilDamage.doCustomDamage(new CustomDamageEvent(ent, player, null, DamageCause.CUSTOM, damage, false, getName()));
                 }
                 i++;
             }
@@ -199,7 +202,7 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
     @Override
     public double getCooldown(int level) {
 
-        return cooldown - ((level - 1) * 2);
+        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
     @Override
@@ -225,5 +228,6 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
     @Override
     public void loadSkillConfig(){
         radius = getConfig("radius", 5, Integer.class);
+        damage = getConfig("damage", 3.0, Double.class);
     }
 }

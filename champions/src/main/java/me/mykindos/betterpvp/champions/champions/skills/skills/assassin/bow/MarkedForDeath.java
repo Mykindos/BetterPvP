@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -24,6 +25,10 @@ public class MarkedForDeath extends PrepareArrowSkill {
 
 
     private double baseDuration;
+
+    private double durationIncreasePerLevel;
+
+    private int vulnerabilityStrength;
 
     @Inject
     public MarkedForDeath(Champions champions, ChampionsManager championsManager) {
@@ -42,9 +47,9 @@ public class MarkedForDeath extends PrepareArrowSkill {
         return new String[]{
                 "Left click with a Bow to prepare",
                 "",
-                "Your next arrow will give players <effect>Vulnerability I</effect>",
-                "for <val>" + (baseDuration + level) + "</val> seconds,",
-                "causing them to take <stat>25%</stat> additional damage",
+                "Your next arrow will give players <effect>Vulnerability "+ UtilFormat.getRomanNumeral(vulnerabilityStrength) + "</effect>",
+                "for <val>" + (baseDuration + (level * durationIncreasePerLevel)) + "</val> seconds,",
+                "causing them to take <stat>" + (vulnerabilityStrength * 25) + "%</stat> additional damage",
                 "from all targets.",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
@@ -65,7 +70,7 @@ public class MarkedForDeath extends PrepareArrowSkill {
     public void onHit(Player damager, LivingEntity target, int level) {
         if (!(target instanceof Player damagee)) return;
 
-        championsManager.getEffects().addEffect(damagee, EffectType.VULNERABILITY, 1, (long) ((baseDuration + level) * 1000L));
+        championsManager.getEffects().addEffect(damagee, EffectType.VULNERABILITY, vulnerabilityStrength, (long) ((baseDuration + (level * durationIncreasePerLevel) * 1000L)));
         UtilMessage.simpleMessage(damagee, getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s</alt>.", damager.getName(), getName());
     }
 
@@ -77,7 +82,7 @@ public class MarkedForDeath extends PrepareArrowSkill {
 
     @Override
     public double getCooldown(int level) {
-        return cooldown - ((level - 1) * 2);
+        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
     @Override
@@ -100,5 +105,7 @@ public class MarkedForDeath extends PrepareArrowSkill {
     @Override
     public void loadSkillConfig(){
         baseDuration = getConfig("baseDuration", 6.0, Double.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
+        vulnerabilityStrength = getConfig("vulnerabilityStrength", 1, Integer.class);
     }
 }

@@ -37,6 +37,14 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener {
 
     private WeakHashMap<Player, Boolean> rightClicked = new WeakHashMap<>();
 
+    private double baseDamage;
+
+    private double damageIncreasePerLevel;
+
+    private double baseDuration;
+
+    private double durationIncreasePerLevel;
+
     @Inject
     public HiltSmash(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -53,12 +61,20 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener {
                 "Right click with a Sword to activate",
                 "",
                 "Smash the hilt of your sword into",
-                "your opponent, dealing <val>" + (3 + (level)) + "</val> damage,",
-                "applying <effect>Shock</effect> for <val>" + (level / 2.0) + "</val> seconds,",
-                "and <effect>Silence</effect> the enemy for <val>" + (level / 2.0) + "</val> seconds",
+                "your opponent, dealing <val>" + getDamage(level) + "</val> damage,",
+                "applying <effect>Shock</effect> for <val>" + getDuration(level) + "</val> seconds,",
+                "and <effect>Silence</effect> the enemy for <val>" + getDuration(level) + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
+    }
+
+    public double getDamage(int level) {
+        return baseDamage + level * damageIncreasePerLevel;
+    }
+
+    public double getDuration(int level) {
+        return baseDuration + level * durationIncreasePerLevel;
     }
 
     @Override
@@ -115,8 +131,8 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener {
             if (UtilMath.offset(player, ent) <= 3.0) {
                 if (ent instanceof Player damagee) {
                     UtilMessage.simpleMessage(damagee, getClassType().getName(), "<yellow>%s<gray> hit you with <green>%s<gray>.", player.getName(), getName() + " " + level);
-                    championsManager.getEffects().addEffect(damagee, EffectType.SHOCK, (level * 1000L) / 2);
-                    championsManager.getEffects().addEffect(damagee, EffectType.SILENCE, (((level * 1000L) / 2)));
+                    championsManager.getEffects().addEffect(damagee, EffectType.SHOCK, (long) (getDuration(level) * 1000L));
+                    championsManager.getEffects().addEffect(damagee, EffectType.SILENCE, (long) (getDuration(level) * 1000L));
                 }
 
                 UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <yellow>%s<gray> with <green>%s<gray>.",
@@ -137,6 +153,14 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener {
 
     @Override
     public double getCooldown(int level) {
-        return cooldown;
+        return cooldown - level * cooldownDecreasePerLevel;
+    }
+
+    @Override
+    public void loadSkillConfig() {
+        baseDamage = getConfig("baseDamage", 3.0, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
+        baseDuration = getConfig("baseDuration", 0.0, Double.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
     }
 }
