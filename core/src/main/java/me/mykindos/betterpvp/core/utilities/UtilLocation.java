@@ -23,6 +23,8 @@ import java.util.stream.Collectors;
 
 public class UtilLocation {
 
+    public static final float DEFAULT_FOV = 73f;
+
     public static Set<Location> getBoundingBoxCorners(final World world, final BoundingBox boundingBox) {
         return new HashSet<>(Arrays.asList(
                 new Location(world, boundingBox.getMinX(), boundingBox.getMinY(), boundingBox.getMinZ()),
@@ -83,15 +85,26 @@ public class UtilLocation {
      * @return Whether the location is in front of the entity.
      */
     public static boolean isInFront(final LivingEntity entity, final Location other) {
+        return isInFront(entity, other, DEFAULT_FOV);
+    }
+
+    /**
+     * Check if a location is in front of an entity's screen, even if there's an obstacle between.
+     *
+     * @param entity The entity to check.
+     * @param other  The location to check.
+     * @param angle  The angle of the entity's field of view.
+     * @return Whether the location is in front of the entity.
+     */
+    public static boolean isInFront(final LivingEntity entity, final Location other, final float angle) {
         if (!entity.hasLineOfSight(other)) {
             return false;
         }
 
-        float fov = 73;
         final Vector direction = entity.getEyeLocation().getDirection(); // This is already normalized
         final Vector lineToLocation = other.subtract(entity.getEyeLocation()).toVector().normalize();
-        final double angle = Math.toDegrees(lineToLocation.angle(direction));
-        return Math.abs(angle) <= fov;
+        final double angle2 = Math.toDegrees(lineToLocation.angle(direction));
+        return Math.abs(angle2) <= angle;
     }
 
     /**

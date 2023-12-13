@@ -12,6 +12,7 @@ public class CustomKnockbackEvent extends CustomCancellableEvent {
     private LivingEntity damagee, damager;
     private double damage;
     private final CustomDamageEvent customDamageEvent;
+    private double multiplier = 1;
 
     private boolean canBypassMinimum = false;
 
