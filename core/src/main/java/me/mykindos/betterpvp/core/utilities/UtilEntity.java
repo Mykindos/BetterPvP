@@ -65,11 +65,4 @@ public class UtilEntity {
         armorStand.setCollidable(false); // We don't want them to collide with anything
         return armorStand;
     }
-
-    public static boolean isInWater (LivingEntity livingEntity) {
-        Location belowFeet = livingEntity.getLocation().subtract(0, -0.25, 0);
-        Block blockBelowFeet = livingEntity.getWorld().getBlockAt(belowFeet);
-        return (livingEntity.isInWater() || blockBelowFeet.getType() == Material.WATER);
-    }
-
 }

@@ -73,6 +73,12 @@ public class UtilBlock {
     public static boolean isInWater(Player p) {
 
         Block block = p.getLocation().getBlock();
+        Location belowFeet = p.getLocation().subtract(0, -0.25, 0);
+        Block blockBelowFeet = belowFeet.getBlock();
+        return isWater(block) || isWater(blockBelowFeet);
+    }
+
+    public static boolean isWater(Block block) {
         return block.getType() == Material.WATER
                 || block.getType() == Material.BUBBLE_COLUMN
                 || block.getType() == Material.SEAGRASS;
