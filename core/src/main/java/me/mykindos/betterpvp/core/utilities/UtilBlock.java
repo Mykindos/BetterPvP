@@ -73,7 +73,7 @@ public class UtilBlock {
     public static boolean isInWater(Player p) {
 
         Block block = p.getLocation().getBlock();
-        Location belowFeet = p.getLocation().subtract(0, -0.25, 0);
+        Location belowFeet = p.getLocation().subtract(0, 0.1, 0);
         Block blockBelowFeet = belowFeet.getBlock();
         return isWater(block) || isWater(blockBelowFeet);
     }
@@ -355,8 +355,11 @@ public class UtilBlock {
     }
 
     public static boolean isInLiquid(Entity ent) {
-
-        return ent.isInWater() || ent.isInLava() || ent.isInBubbleColumn();
+        if (ent instanceof Player player) {
+            return isInWater(player) || isInLava(player) || ent.isInBubbleColumn();
+        } else {
+            return ent.isInWater() || ent.isInLava() || ent.isInBubbleColumn();
+        }
     }
 
     public static boolean isWall(Block block) {

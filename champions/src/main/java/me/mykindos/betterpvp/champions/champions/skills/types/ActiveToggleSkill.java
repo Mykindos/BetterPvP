@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.effects.events.EffectReceiveEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
+import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -57,7 +58,7 @@ public abstract class ActiveToggleSkill extends Skill implements ToggleSkill, Li
 
     @EventHandler
     public void onEnterWater(PlayerMoveEvent event) {
-        if (UtilEntity.isInWater(event.getPlayer()) && !canUseInLiquid()) {
+        if (UtilBlock.isInWater(event.getPlayer()) && !canUseInLiquid()) {
             cancel(event.getPlayer());
         }
     }
