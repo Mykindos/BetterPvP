@@ -34,7 +34,12 @@ public abstract class Weapon implements IWeapon {
     @Override
     public boolean isHoldingWeapon(Player player) {
         ItemStack itemStack = player.getInventory().getItemInMainHand();
-        if (itemStack.getType() != material) return false;
+        return matches(itemStack);
+    }
+
+    @Override
+    public boolean matches(ItemStack itemStack) {
+        if (itemStack == null || itemStack.getType() != material) return false;
         if (model != 0) {
             ItemMeta itemMeta = itemStack.getItemMeta();
             if (itemMeta != null) {
@@ -43,8 +48,6 @@ public abstract class Weapon implements IWeapon {
                 }
             }
         }
-
         return true;
     }
-
 }

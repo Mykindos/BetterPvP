@@ -32,11 +32,16 @@ public class WeaponManager extends Manager<IWeapon> {
             champions.getInjector().injectMembers(weapon);
 
             addObject(weapon.getMaterial().name() + weapon.getModel(), weapon);
-
         }
 
         log.info("Loaded " + objects.size() + " weapons");
         champions.saveConfig();
+    }
+
+    public void reload() {
+        for (IWeapon weapon : getObjects().values()) {
+            champions.getInjector().injectMembers(weapon);
+        }
     }
 
     public Optional<IWeapon> getWeaponByItemStack(ItemStack itemStack) {
