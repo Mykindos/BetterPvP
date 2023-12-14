@@ -3,9 +3,16 @@ package me.mykindos.betterpvp.champions.champions.skills.types;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.effects.events.EffectReceiveEvent;
+import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
+import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.HashSet;
@@ -22,12 +29,38 @@ public abstract class ActiveToggleSkill extends Skill implements ToggleSkill, Li
 
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
-        active.remove(event.getEntity().getUniqueId());
+        cancel(event.getPlayer());
     }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
-        active.remove(event.getPlayer().getUniqueId());
+        cancel(event.getPlayer());
+    }
+
+    public void cancel(Player player) {
+        active.remove(player.getUniqueId());
+    }
+
+    @EventHandler
+    public void onCustomEffect(EffectReceiveEvent event) {
+        if ((event.getTarget() instanceof Player player)) {
+            if (!canUseWhileSilenced() && (event.getEffect().getEffectType() == EffectType.SILENCE)) {
+                cancel(player);
+            }
+            if (!canUseWhileLevitating() && (event.getEffect().getEffectType() == EffectType.LEVITATION)) {
+                cancel(player);
+            }
+            if (!canUseWhileStunned() && (event.getEffect().getEffectType() == EffectType.STUN)) {
+                cancel(player);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onEnterWater(PlayerMoveEvent event) {
+        if (UtilBlock.isInWater(event.getPlayer()) && !canUseInLiquid()) {
+            cancel(event.getPlayer());
+        }
     }
 
 }

@@ -98,6 +98,10 @@ public class SmokeBomb extends Skill implements ToggleSkill, CooldownSkill, List
 
     }
 
+    public void cancel(Player player) {
+        reappear(player);
+    }
+
     private void reappear(Player player) {
         championsManager.getEffects().removeEffect(player, EffectType.INVISIBILITY);
         UtilServer.callEvent(new EffectExpireEvent(player, new Effect(player.getUniqueId().toString(), EffectType.INVISIBILITY, 1, 0))); // Do this incase
