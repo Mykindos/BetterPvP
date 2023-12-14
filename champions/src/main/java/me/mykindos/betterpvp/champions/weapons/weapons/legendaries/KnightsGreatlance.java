@@ -46,6 +46,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
@@ -264,6 +265,14 @@ public class KnightsGreatlance extends Weapon implements InteractWeapon, Legenda
         }
 
         return Optional.ofNullable((LivingEntity) result.getHitEntity());
+    }
+
+    @EventHandler
+    public void onLeave(PlayerQuitEvent event) {
+        final LanceData remove = active.remove(event.getPlayer());
+        if (remove != null) {
+            deactivate(event.getPlayer(), remove);
+        }
     }
 
     @EventHandler(priority = EventPriority.LOW)
