@@ -74,7 +74,7 @@ public class Intimidation extends Skill implements PassiveSkill {
         return radius + (level - 1);
     }
 
-
+    @UpdateEvent
     public void onUpdate() {
         final boolean sounds = soundTicks.get() == 0;
         final Iterator<Player> iterator = trackedEnemies.keySet().iterator();
@@ -117,7 +117,7 @@ public class Intimidation extends Skill implements PassiveSkill {
                 if (sounds) {
                     UtilSound.playSound(enemy, Sound.ENTITY_WARDEN_HEARTBEAT, 1f, 1f, true);
                 }
-                enemy.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 10, 0));
+                enemy.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 10, slownessStrength));
             } else if (trackedEnemies.get(player).remove(enemy)) {
                 UtilPlayer.clearWarningEffect(enemy); // Clear them if they are no longer in front
             }
