@@ -785,6 +785,12 @@ skills:
       baseDecreasePerPlayer: 0.05
       decreaseIncreasePerLevel: 0.0
       radius: 3
+    bloodcompass:
+      enabled: true
+      maxlevel: 3
+      numArrows: 1
+      revealDistance: 10.0
+      pointDistance: 32.0
     tormentedsoul:
       enabled: true
       maxlevel: 5
