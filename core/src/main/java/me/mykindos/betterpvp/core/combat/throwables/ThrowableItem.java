@@ -17,6 +17,8 @@ public class ThrowableItem {
     private final List<LivingEntity> immune;
     private final boolean checkHead;
 
+    private int chargePercent;
+
     private boolean collideGround;
     private boolean removeOnCollision;
     private boolean singleCollision;
@@ -41,6 +43,14 @@ public class ThrowableItem {
         this.collideGround = false;
         item.setPickupDelay(Integer.MAX_VALUE);
         immune = new ArrayList<>();
+    }
+
+    public void setChargePercent(int chargePercent) {
+        this.chargePercent = chargePercent;
+    }
+
+    public int getChargePercent() {
+        return this.chargePercent;
     }
 
     public boolean isCheckingHead() {
