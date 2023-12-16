@@ -815,6 +815,15 @@ skills:
       durationIncreasePerLevel: 0.5
       distance: 5
       duration: 2.0
+    bloodcompass:
+      enabled: true
+      maxlevel: 3
+      numLines: 1
+      effectDuration: 5
+      maxDistance: 32.0
+      numPoints: 30
+      cooldown: 20.0
+      escapeRadius: 15.0
     grasp:
       enabled: true
       maxlevel: 5
