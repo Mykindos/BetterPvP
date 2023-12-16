@@ -823,7 +823,8 @@ skills:
       maxDistance: 32.0
       numPoints: 30
       cooldown: 20.0
-      escapeRadius: 15.0
+      escapeRadius: 5.0
+      damage: 7.0
     grasp:
       enabled: true
       maxlevel: 5
