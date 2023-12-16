@@ -512,6 +512,8 @@ skills:
       maxlevel: 5
       cooldown: 18.0
       cooldownDecreasePerLevel: 1.0
+      damage: 7.0
+      damageIncreasePerLevel: 2.0
     colossus:
       enabled: true
       maxlevel: 3
