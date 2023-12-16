@@ -15,8 +15,6 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -31,6 +29,7 @@ public class BloodCompass extends Skill implements ToggleSkill, CooldownSkill {
     public int effectDuration;
     public int numPoints;
     public double escapeRadius;
+    public double damage;
     private final List<List<Location>> markers = new ArrayList<>();
     private final Map<Integer, Player> lineToPlayerMap = new HashMap<>();
     private Map<Integer, Integer> currentPoints;
@@ -55,7 +54,8 @@ public class BloodCompass extends Skill implements ToggleSkill, CooldownSkill {
                 "Shoot out up to <val>" + (numLines + (level-1)) + "</val> tracking lines that will fly",
                 "towards the nearest enemies within <val>" + (maxDistance * level) +"</val> blocks",
                 "",
-                "Players hit with these blood lines will take <stat>7<stat> damage and recieve <effect>Glowing</effect> for <stat>" + effectDuration + "</stat> seconds",
+                "Players hit with these blood lines will recieve <effect>Glowing</effect> for <stat>" + effectDuration + "</stat> seconds",
+                "and take <val>" + damage + ((level-1) * 2) +"</val> damage",
         };
     }
 
@@ -67,7 +67,7 @@ public class BloodCompass extends Skill implements ToggleSkill, CooldownSkill {
         enemies = enemies.subList(0, Math.min(enemies.size(), numLines * level));
 
         if (enemies.isEmpty()) {
-            UtilMessage.message(player, getClassType().getName(), "Could not find any enemies within " + (maxDistance * level) + " blocks.");
+            UtilMessage.message(player, getClassType().getName(), "Blood Compass failed.");
         } else {
             int lineIndex = 0;
             for (Player enemy : enemies) {
@@ -194,7 +194,7 @@ public class BloodCompass extends Skill implements ToggleSkill, CooldownSkill {
                 if (target != null) {
                     UtilPlayer.setGlowing(player, target, true);
                     target.playSound(target.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1.0f, 1.0f);
-                    target.damage(7);
+                    target.damage(damage);
 
                     new BukkitRunnable() {
                         @Override
@@ -262,5 +262,6 @@ public class BloodCompass extends Skill implements ToggleSkill, CooldownSkill {
         effectDuration = getConfig("effectDuration", 5, Integer.class);
         numPoints = getConfig("numPoints", 30, Integer.class);
         escapeRadius = getConfig("escapeRadius", 5.0, Double.class);
+        damage = getConfig("damage", 7.0, Double.class);
     }
 }
