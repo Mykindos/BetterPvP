@@ -88,7 +88,7 @@ public class PowerChop extends PrepareSkill implements CooldownSkill {
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
         if (!(event.getDamager() instanceof Player player)) return;
         if (!charge.containsKey(player)) return;
-        if (!UtilPlayer.isHoldingItem(player, SkillWeapons.AXES)) return;
+        if (!isHolding(player)) return;
 
         int level = getLevel(player);
         if (level > 0) {

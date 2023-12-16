@@ -56,15 +56,15 @@ public class Backstab extends Skill implements PassiveSkill, Listener {
     @EventHandler
     public void onEntDamage(CustomDamageEvent event) {
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
-        if (!(event.getDamager() instanceof Player daamger)) return;
-        if (!UtilPlayer.isHoldingItem(daamger, SkillWeapons.SWORDS)) return;
+        if (!(event.getDamager() instanceof Player damager)) return;
+        if (!isHolding(damager)) return;
 
-        int level = getLevel(daamger);
+        int level = getLevel(damager);
         if (level <= 0) return;
 
-        if (UtilMath.getAngle(daamger.getLocation().getDirection(), event.getDamagee().getLocation().getDirection()) < 60) {
+        if (UtilMath.getAngle(damager.getLocation().getDirection(), event.getDamagee().getLocation().getDirection()) < 60) {
             event.setDamage(event.getDamage() * getDamageModifier(level));
-            daamger.getWorld().playEffect(event.getDamagee().getLocation().add(0, 1, 0), Effect.STEP_SOUND, Material.REDSTONE_BLOCK);
+            damager.getWorld().playEffect(event.getDamagee().getLocation().add(0, 1, 0), Effect.STEP_SOUND, Material.REDSTONE_BLOCK);
 
             if (event.getDamagee() instanceof Player damagee) {
                 Optional<Role> roleOptional = championsManager.getRoles().getObject(damagee.getUniqueId());

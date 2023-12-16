@@ -8,14 +8,17 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
-import me.mykindos.betterpvp.champions.combat.events.PlayerCheckShieldEvent;
+import me.mykindos.betterpvp.core.combat.click.events.RightClickEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.*;
+import me.mykindos.betterpvp.core.utilities.UtilDamage;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -144,12 +147,12 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
     }
 
     @EventHandler
-    public void onShieldCheck(PlayerCheckShieldEvent event) {
+    public void onShieldCheck(RightClickEvent event) {
         Player player = event.getPlayer();
-        if (hasSkill(player)) {
-            if (UtilItem.isAxe(event.getPlayer().getInventory().getItemInMainHand().getType())) {
-                event.setShouldHaveShield(true);
-                event.setCustomModelData(0);
+        if (hasSkill(player) && !this.championsManager.getCooldowns().hasCooldown(player, getName())) {
+            if (isHolding(event.getPlayer())) {
+                event.setUseShield(true);
+                event.setShieldModelData(RightClickEvent.DEFAULT_SHIELD);
             }
         }
     }

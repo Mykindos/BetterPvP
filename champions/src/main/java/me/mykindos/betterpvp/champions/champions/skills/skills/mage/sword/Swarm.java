@@ -7,10 +7,10 @@ import lombok.Data;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
-import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -19,7 +19,6 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import org.bukkit.Bukkit;
@@ -37,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.Map.Entry;
+import java.util.UUID;
 import java.util.WeakHashMap;
 
 @Singleton
@@ -107,29 +107,36 @@ public class Swarm extends ChannelSkill implements InteractSkill, EnergySkill, L
     @UpdateEvent
     public void checkChannelling() {
 
-        for (Player cur : Bukkit.getOnlinePlayers()) {
-            if (!active.contains(cur.getUniqueId())) continue;
+        final Iterator<UUID> iterator = active.iterator();
+        while (iterator.hasNext()) {
+            Player cur = Bukkit.getPlayer(iterator.next());
+            if (cur == null) {
+                iterator.remove();
+                continue;
+            }
 
-            if (cur.isHandRaised()) {
-                int level = getLevel(cur);
-                if (level <= 0) {
-                    active.remove(cur.getUniqueId());
-                } else if (!championsManager.getEnergy().use(cur, getName(), getEnergy(level) / 2, true)) {
-                    active.remove(cur.getUniqueId());
-                } else if (!UtilPlayer.isHoldingItem(cur, SkillWeapons.SWORDS)) {
-                    active.remove(cur.getUniqueId());
-                } else {
-                    if (batData.containsKey(cur)) {
+            Gamer gamer = championsManager.getClientManager().search().online(cur).getGamer();
+            if (!gamer.isHoldingRightClick()) {
+                iterator.remove();
+                continue;
+            }
 
-                        Bat bat = cur.getWorld().spawn(cur.getLocation().add(0, 0.5, 0), Bat.class);
-                        bat.setHealth(1);
-                        bat.setVelocity(cur.getLocation().getDirection().multiply(2));
-                        batData.get(cur).add(new BatData(bat, System.currentTimeMillis(), cur.getLocation()));
-
-                    }
-                }
+            int level = getLevel(cur);
+            if (level <= 0) {
+                iterator.remove();
+            } else if (!championsManager.getEnergy().use(cur, getName(), getEnergy(level) / 2, true)) {
+                iterator.remove();
+            } else if (!isHolding(cur)) {
+                iterator.remove();
             } else {
-                active.remove(cur.getUniqueId());
+                if (batData.containsKey(cur)) {
+
+                    Bat bat = cur.getWorld().spawn(cur.getLocation().add(0, 0.5, 0), Bat.class);
+                    bat.setHealth(1);
+                    bat.setVelocity(cur.getLocation().getDirection().multiply(2));
+                    batData.get(cur).add(new BatData(bat, System.currentTimeMillis(), cur.getLocation()));
+
+                }
             }
         }
 

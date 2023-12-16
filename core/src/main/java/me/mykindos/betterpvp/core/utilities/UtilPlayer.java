@@ -15,7 +15,6 @@ import me.mykindos.betterpvp.core.utilities.events.GetPlayerRelationshipEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.WorldBorder;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
@@ -23,7 +22,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -95,10 +93,6 @@ public class UtilPlayer {
             return player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR;
         }
         return false;
-    }
-
-    public static boolean isHoldingItem(Player player, Material[] items) {
-        return Arrays.stream(items).anyMatch(item -> item == player.getInventory().getItemInMainHand().getType());
     }
 
     /**

@@ -2,10 +2,11 @@ package me.mykindos.betterpvp.champions.weapons.weapons.legendaries;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.weapons.types.ChannelWeapon;
 import me.mykindos.betterpvp.champions.weapons.types.InteractWeapon;
 import me.mykindos.betterpvp.champions.weapons.types.LegendaryWeapon;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseItemEvent;
 import me.mykindos.betterpvp.core.config.Config;
@@ -26,7 +27,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
 
 import java.util.ArrayList;
@@ -52,14 +52,14 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
     @Config(path = "weapons.wind-blade.strength", defaultValue = "0.7")
     private double velocityStrength;
 
-
     private final EnergyHandler energyHandler;
+    private final ClientManager clientManager;
 
     @Inject
-    public WindBlade(EnergyHandler energyHandler) {
+    public WindBlade(EnergyHandler energyHandler, ClientManager clientManager) {
         super(Material.MUSIC_DISC_MELLOHI, 1, UtilMessage.deserialize("<orange>Wind Blade"));
         this.energyHandler = energyHandler;
-
+        this.clientManager = clientManager;
     }
 
     @Override
@@ -92,7 +92,8 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
                 return true;
             }
 
-            if (!player.isHandRaised()) {
+            final Gamer gamer = clientManager.search().online(player).getGamer();
+            if (!gamer.isHoldingRightClick()) {
                 return true;
             }
 
@@ -149,10 +150,5 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
     @Override
     public double getEnergy() {
         return initialEnergyCost;
-    }
-
-    @Override
-    public Action[] getActions() {
-        return SkillActions.RIGHT_CLICK;
     }
 }

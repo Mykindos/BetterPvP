@@ -45,7 +45,7 @@ public class RopedArrow extends PrepareArrowSkill {
         final Player player = gamer.getPlayer();
 
         // Only display charges in hotbar if holding the weapon
-        if (player == null || !strength.containsKey(player) || !UtilPlayer.isHoldingItem(player, getItemsBySkillType())) {
+        if (player == null || !strength.containsKey(player) || !isHolding(player)) {
             return null; // Skip if not online or not charging
         }
 

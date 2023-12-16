@@ -142,7 +142,7 @@ public class Pestilence extends PrepareSkill implements CooldownSkill {
     public void onApplyInfection(CustomDamageEvent event) {
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
         if (!(event.getDamager() instanceof Player damager)) return;
-        if (!UtilPlayer.isHoldingItem(damager, SkillWeapons.SWORDS)) return;
+        if (!isHolding(damager)) return;
         if (!active.contains(damager.getUniqueId())) return;
 
         int level = getLevel(damager);

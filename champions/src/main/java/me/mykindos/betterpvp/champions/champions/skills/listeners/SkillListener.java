@@ -13,7 +13,15 @@ import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.champions.champions.roles.events.RoleChangeEvent;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
-import me.mykindos.betterpvp.champions.champions.skills.types.*;
+import me.mykindos.betterpvp.champions.champions.skills.types.ActiveToggleSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.PrepareSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.ToggleSkill;
+import me.mykindos.betterpvp.core.combat.click.events.RightClickEvent;
 import me.mykindos.betterpvp.core.components.champions.ISkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -24,12 +32,12 @@ import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.energy.EnergyHandler;
+import me.mykindos.betterpvp.core.framework.adapter.Compatibility;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -40,6 +48,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.Arrays;
@@ -128,11 +137,13 @@ public class SkillListener implements Listener {
 
     @EventHandler
     public void onDrop(PlayerDropItemEvent event) {
+        if (Compatibility.SWORD_BLOCKING) {
+            return; // Return if sword blocking is enabled
+        }
 
         Player player = event.getPlayer();
-
-        Material droppedItem = event.getItemDrop().getItemStack().getType();
-        if (!Arrays.asList(SkillWeapons.AXES).contains(droppedItem) && !Arrays.asList(SkillWeapons.SWORDS).contains(droppedItem)) {
+        ItemStack droppedItem = event.getItemDrop().getItemStack();
+        if (!UtilItem.isAxe(droppedItem) && !UtilItem.isSword(droppedItem)) {
             return;
         }
 
@@ -164,6 +175,42 @@ public class SkillListener implements Listener {
 
     }
 
+    // Show shield for channel skills
+    @EventHandler
+    public void onRightClick(RightClickEvent event) {
+        Player player = event.getPlayer();
+        ItemStack mainHand = player.getInventory().getItemInMainHand();
+
+        SkillType skillType = SkillWeapons.getTypeFrom(mainHand);
+        if (skillType == null) {
+            return;
+        }
+
+        Optional<Role> roleOptional = roleManager.getObject(player.getUniqueId().toString());
+        if (roleOptional.isPresent()) {
+            Role role = roleOptional.get();
+
+            Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(player.getUniqueId().toString());
+            if (gamerBuildsOptional.isPresent()) {
+                GamerBuilds builds = gamerBuildsOptional.get();
+
+                RoleBuild build = builds.getActiveBuilds().get(role.getName());
+                if (build == null) return;
+
+                Optional<Skill> skillOptional = build.getActiveSkills().stream()
+                        .filter(skill -> skill instanceof InteractSkill && skill.getType() == skillType).findFirst();
+
+                if (skillOptional.isPresent()) {
+                    Skill skill = skillOptional.get();
+                    if (skill instanceof ChannelSkill) {
+                        event.setUseShield(true);
+                        event.setShieldModelData(RightClickEvent.INVISIBLE_SHIELD);
+                    }
+                }
+            }
+        }
+    }
+
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onSkillActivate(PlayerInteractEvent event) {
         if (event.getAction() == Action.PHYSICAL) return;
@@ -171,17 +218,16 @@ public class SkillListener implements Listener {
         if (cooldownManager.hasCooldown(event.getPlayer(), "DoorAccess")) return;
 
         Player player = event.getPlayer();
-        Material mainHand = player.getInventory().getItemInMainHand().getType();
+        ItemStack mainHand = player.getInventory().getItemInMainHand();
 
-        SkillType skillType = getSkillTypeByWeapon(mainHand);
-        if (skillType == null) return;
-
-        if (mainHand != Material.BOW & mainHand != Material.CROSSBOW) {
-            if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
-                return;
-            }
+        SkillType skillType = SkillWeapons.getTypeFrom(mainHand);
+        if (skillType == null) {
+            return;
         }
 
+        if (skillType != SkillType.BOW && (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK)) {
+            return;
+        }
 
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             Block block = event.getClickedBlock();
@@ -386,26 +432,11 @@ public class SkillListener implements Listener {
         int level = buildSkill.getLevel();
 
         SkillType skillType = buildSkill.getSkill().getType();
-        if (skillType == SkillType.AXE || skillType == SkillType.SWORD || skillType == SkillType.BOW) {
-            if (UtilPlayer.isHoldingItem(player, SkillWeapons.BOOSTERS)) {
-                level++;
-            }
+        if ((skillType == SkillType.AXE || skillType == SkillType.SWORD || skillType == SkillType.BOW)
+                && SkillWeapons.hasBooster(player)) {
+            level++;
         }
 
         return level;
     }
-
-    private SkillType getSkillTypeByWeapon(Material mainHand) {
-
-        if (Arrays.asList(SkillWeapons.SWORDS).contains(mainHand)) {
-            return SkillType.SWORD;
-        } else if (Arrays.asList(SkillWeapons.AXES).contains(mainHand)) {
-            return SkillType.AXE;
-        } else if (Arrays.asList(SkillWeapons.BOWS).contains(mainHand)) {
-            return SkillType.BOW;
-        }
-
-        return null;
-    }
-
 }

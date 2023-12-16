@@ -39,6 +39,7 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
     private long lastDamaged;
     private long lastTip;
     private String lastAdminMessenger;
+    private boolean isHoldingRightClick;
 
     public Gamer(String uuid) {
         this.uuid = uuid;

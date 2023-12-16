@@ -134,14 +134,55 @@ public class UtilItem {
         return item;
     }
 
+    public static ItemStack convertSword(ItemStack item) {
+        if (item.getType() != Material.SHIELD && UtilItem.isSword(item)) {
+            item.editMeta(meta -> meta.setCustomModelData(getShieldModel(item.getType())));
+            item.setType(Material.SHIELD);
+        }
+        return item;
+    }
+
+    public static int getShieldModel(Material swordType) {
+        return switch (swordType) {
+            case WOODEN_SWORD -> 2;
+            case GOLDEN_SWORD -> 3;
+            case STONE_SWORD -> 4;
+            case IRON_SWORD -> 5;
+            case DIAMOND_SWORD -> 6;
+            case NETHERITE_SWORD -> 7;
+            default -> 0;
+        };
+    }
+
+    public static Material getType(ItemStack itemStack) {
+        if (itemStack.getType() == Material.SHIELD) {
+            int model = itemStack.hasItemMeta() && itemStack.getItemMeta().hasCustomModelData() ? itemStack.getItemMeta().getCustomModelData() : 0;
+            return switch (model) {
+                case 2 -> Material.WOODEN_SWORD;
+                case 3 -> Material.GOLDEN_SWORD;
+                case 4 -> Material.STONE_SWORD;
+                case 5 -> Material.IRON_SWORD;
+                case 6 -> Material.DIAMOND_SWORD;
+                case 7 -> Material.NETHERITE_SWORD;
+                default -> Material.AIR;
+            };
+        }
+
+        return itemStack.getType();
+    }
+
     /**
      * Check if a Material is a type of sword
      *
-     * @param swordType Material to check
+     * @param item Material to check
      * @return Returns true if the Material is a type of sword
      */
-    public static boolean isSword(Material swordType) {
-        return swordType.name().contains("_SWORD");
+    public static boolean isSword(ItemStack item) {
+        return item.getType().name().contains("_SWORD");
+    }
+
+    public static boolean isSimilar(ItemStack item, ItemStack other) {
+        return (item.getType() == Material.AIR && other.getType() == Material.AIR) || (other.isSimilar(item));
     }
 
     /**
@@ -150,8 +191,8 @@ public class UtilItem {
      * @param axeType Material to check
      * @return Returns true if the Material is a type of axe
      */
-    public static boolean isAxe(Material axeType) {
-        return axeType.name().contains("_AXE");
+    public static boolean isAxe(ItemStack axeType) {
+        return axeType.getType().name().contains("_AXE");
     }
 
     /**
@@ -178,12 +219,12 @@ public class UtilItem {
         return hoeType.name().contains("_HOE");
     }
 
-    public static boolean isTool(Material material) {
-        return isPickaxe(material) || isHoe(material) || isShovel(material) || isAxe(material);
+    public static boolean isTool(ItemStack item) {
+        return isPickaxe(item.getType()) || isHoe(item.getType()) || isShovel(item.getType()) || isAxe(item);
     }
 
-    public static boolean isWeapon(Material material) {
-        return isSword(material) || isAxe(material) || isRanged(material);
+    public static boolean isWeapon(ItemStack itemStack) {
+        return isSword(itemStack) || isAxe(itemStack) || isRanged(itemStack);
     }
 
     public static boolean isArmour(Material material) {
@@ -197,22 +238,8 @@ public class UtilItem {
      * @param wep Material to check
      * @return Returns true if the Material is a type of ranged weapon
      */
-    public static boolean isRanged(Material wep) {
-        return (wep == Material.BOW || wep == Material.CROSSBOW);
-    }
-
-    /**
-     * Check if a Material is a gold tool
-     *
-     * @param item Material to check
-     * @return Returns true if the Material is a gold tool
-     */
-    public static boolean isGold(Material item) {
-        return (item == Material.GOLDEN_SWORD
-                || item == Material.GOLDEN_AXE
-                || item == Material.GOLDEN_PICKAXE
-                || item == Material.GOLDEN_SHOVEL
-                || item == Material.GOLDEN_HOE);
+    public static boolean isRanged(ItemStack wep) {
+        return (wep.getType() == Material.BOW || wep.getType() == Material.CROSSBOW);
     }
 
     public static void insert(Player player, ItemStack stack) {
@@ -222,7 +249,6 @@ public class UtilItem {
             } else {
                 player.getWorld().dropItem(player.getLocation(), stack);
             }
-
         }
     }
 

@@ -16,4 +16,9 @@ public class Compatibility {
      */
     public static boolean ITEMS_ADDER = Bukkit.getPluginManager().getPlugin("ItemsAdder") != null;
 
+    /**
+     * Whether the server is running ItemsAdder
+     */
+    public static boolean SWORD_BLOCKING = Bukkit.getPluginManager().getPlugin("SwordBlocking") != null;
+
 }
