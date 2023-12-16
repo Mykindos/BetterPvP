@@ -134,43 +134,6 @@ public class UtilItem {
         return item;
     }
 
-    public static ItemStack convertSword(ItemStack item) {
-        if (item.getType() != Material.SHIELD && UtilItem.isSword(item)) {
-            item.editMeta(meta -> meta.setCustomModelData(getShieldModel(item.getType())));
-            item.setType(Material.SHIELD);
-        }
-        return item;
-    }
-
-    public static int getShieldModel(Material swordType) {
-        return switch (swordType) {
-            case WOODEN_SWORD -> 2;
-            case GOLDEN_SWORD -> 3;
-            case STONE_SWORD -> 4;
-            case IRON_SWORD -> 5;
-            case DIAMOND_SWORD -> 6;
-            case NETHERITE_SWORD -> 7;
-            default -> 0;
-        };
-    }
-
-    public static Material getType(ItemStack itemStack) {
-        if (itemStack.getType() == Material.SHIELD) {
-            int model = itemStack.hasItemMeta() && itemStack.getItemMeta().hasCustomModelData() ? itemStack.getItemMeta().getCustomModelData() : 0;
-            return switch (model) {
-                case 2 -> Material.WOODEN_SWORD;
-                case 3 -> Material.GOLDEN_SWORD;
-                case 4 -> Material.STONE_SWORD;
-                case 5 -> Material.IRON_SWORD;
-                case 6 -> Material.DIAMOND_SWORD;
-                case 7 -> Material.NETHERITE_SWORD;
-                default -> Material.AIR;
-            };
-        }
-
-        return itemStack.getType();
-    }
-
     /**
      * Check if a Material is a type of sword
      *

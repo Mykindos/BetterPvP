@@ -137,10 +137,6 @@ public class SkillListener implements Listener {
 
     @EventHandler
     public void onDrop(PlayerDropItemEvent event) {
-        if (Compatibility.SWORD_BLOCKING) {
-            return; // Return if sword blocking is enabled
-        }
-
         Player player = event.getPlayer();
         ItemStack droppedItem = event.getItemDrop().getItemStack();
         if (!UtilItem.isAxe(droppedItem) && !UtilItem.isSword(droppedItem)) {
@@ -178,6 +174,10 @@ public class SkillListener implements Listener {
     // Show shield for channel skills
     @EventHandler
     public void onRightClick(RightClickEvent event) {
+        if (Compatibility.SWORD_BLOCKING) {
+            return; // Return if sword blocking is enabled
+        }
+
         Player player = event.getPlayer();
         ItemStack mainHand = player.getInventory().getItemInMainHand();
 

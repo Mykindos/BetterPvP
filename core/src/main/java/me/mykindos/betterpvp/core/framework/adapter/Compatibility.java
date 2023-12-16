@@ -17,8 +17,17 @@ public class Compatibility {
     public static boolean ITEMS_ADDER = Bukkit.getPluginManager().getPlugin("ItemsAdder") != null;
 
     /**
-     * Whether the server is running ItemsAdder
+     * Whether the server is running Sword Blocking mixin
      */
-    public static boolean SWORD_BLOCKING = Bukkit.getPluginManager().getPlugin("SwordBlocking") != null;
+    public static boolean SWORD_BLOCKING;
+
+    static {
+        try {
+            Class.forName("me.mykindos.betterpvp.blocking.BlockingPlugin");
+            SWORD_BLOCKING = true;
+        } catch (ClassNotFoundException e) {
+            SWORD_BLOCKING = false;
+        }
+    }
 
 }
