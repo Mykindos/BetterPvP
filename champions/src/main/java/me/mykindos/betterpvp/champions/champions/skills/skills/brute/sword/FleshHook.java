@@ -71,7 +71,7 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
                 "Hold right click with a Sword to channel",
                 "",
                 "Charge a hook that latches onto enemies, pulling them towards you",
-                "and dealing <val>" + (damage + (damageIncreasePerLevel * (level-1)))+"</val> damage",
+                "and dealing up to <val>" + (damage + (damageIncreasePerLevel * (level-1)))+"</val> damage",
                 "",
                 "Higher Charge time = faster hook",
                 "",
