@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
+import me.mykindos.betterpvp.champions.champions.skills.skills.mage.sword.StaticLazer;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
@@ -22,6 +23,8 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
+import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -44,9 +47,11 @@ import java.util.WeakHashMap;
 @Singleton
 @BPvPListener
 public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSkill {
-
     private final List<ChargeData> charges = new ArrayList<>();
     private final WeakHashMap<Player, Long> delay = new WeakHashMap<>();
+
+    public double damage;
+    public double damageIncreasePerLevel;
 
     @Inject
     public FleshHook(Champions champions, ChampionsManager championsManager) {
@@ -66,6 +71,7 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
                 "Hold right click with a Sword to channel",
                 "",
                 "Charge a hook that latches onto enemies, pulling them towards you",
+                "and dealing <val>" + (damage + (damageIncreasePerLevel * (level-1)))+"</val> damage",
                 "",
                 "Higher Charge time = faster hook",
                 "",
@@ -113,28 +119,18 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
                     if (UtilPlayer.isHoldingItem(player, SkillWeapons.SWORDS)) {
                         double base = 0.8D;
                         Location loc = player.getLocation();
-                        Location itemLocation = loc.clone();
 
-                        Location infront = player.getEyeLocation().add(player.getLocation().getDirection());
-                        for (int x = -20; x <= 20; x += 5) {
-                            Item item = player.getWorld().dropItem(infront, new ItemStack(Material.TRIPWIRE_HOOK));
-                            ThrowableItem throwable = new ThrowableItem(item, player, getName(), 10000L, true, true);
-                            throwable.setCollideGround(true);
-                            championsManager.getThrowables().addThrowable(throwable);
+                        Item item = player.getWorld().dropItem(player.getEyeLocation(), new ItemStack(Material.TRIPWIRE_HOOK));
+                        ThrowableItem throwable = new ThrowableItem(item, player, getName(), 10000L, true, true);
+                        throwable.setCollideGround(true);
+                        throwable.setChargePercent(data.getCharge());
+                        championsManager.getThrowables().addThrowable(throwable);
 
-                            itemLocation.setYaw(loc.getYaw() + x);
-                            Vector v = itemLocation.getDirection();
-
-                            UtilVelocity.velocity(item, v,
-                                    base + (data.getCharge() / 20f) * (0.25D * base), false, 0.0D, 0.2D, 20.0D, false);
-
-
-                        }
-
+                        Vector v = loc.getDirection();
+                        UtilVelocity.velocity(item, v, base + (data.getCharge() / 20f) * (0.25D * base), false, 0.0D, 0.2D, 20.0D, false);
 
                         UtilMessage.simpleMessage(player, getClassType().getName(), "You used <alt>" + getName() + "</alt>.");
                         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_IRON_GOLEM_ATTACK, 2.0F, 0.8F);
-
 
                         iterator.remove();
 
@@ -143,24 +139,26 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
                     }
                 }
             }
-
         }
     }
 
     @EventHandler
     public void onCollide(ThrowableHitEntityEvent event) {
         if (event.getThrowable().getName().equalsIgnoreCase(getName())) {
-            LivingEntity collide = event.getCollision();
+            LivingEntity target = event.getCollision();
 
-            UtilVelocity.velocity(collide, UtilVelocity.getTrajectory(collide.getLocation(), event.getThrowable().getThrower().getLocation()), 2.0D, false, 0.0D, 0.8D, 1.0D, true);
-            event.getThrowable().getItem().remove();
+            Player source = (Player) event.getThrowable().getThrower();
 
-            CustomDamageEvent ev = new CustomDamageEvent(collide, event.getThrowable().getThrower(), null, DamageCause.CUSTOM, 2, false, getName());
+            int chargePercent = event.getThrowable().getChargePercent();
+            double scaledDamage = (damage + (damageIncreasePerLevel * getLevel(source))) * (chargePercent / 100.0);
+
+            CustomDamageEvent ev = new CustomDamageEvent(target, source, null, DamageCause.CUSTOM, scaledDamage, false, getName());
             UtilDamage.doCustomDamage(ev);
 
+            UtilVelocity.velocity(target, UtilVelocity.getTrajectory(target.getLocation(), event.getThrowable().getThrower().getLocation()), 2.0D, false, 0.0D, 0.8D, 1.0D, true);
+            event.getThrowable().getItem().remove();
         }
     }
-
 
     @Override
     public SkillType getType() {
@@ -210,6 +208,11 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
                 lastCharge = System.currentTimeMillis();
             }
         }
+    }
 
+    @Override
+    public void loadSkillConfig() {
+        damage = getConfig("damage", 7.0, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 2.0, Double.class);
     }
 }
