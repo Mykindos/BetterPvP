@@ -46,6 +46,10 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
         properties.registerListener(this);
     }
 
+    public boolean isHoldingRightClick() {
+        return isHoldingRightClick;
+    }
+
     public @Nullable Player getPlayer() {
         return Bukkit.getPlayer(UUID.fromString(uuid));
     }

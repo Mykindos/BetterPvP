@@ -149,10 +149,12 @@ public class RightClickListener implements Listener {
 
     @EventHandler
     public void onClickOffhand(InventoryClickEvent event) {
+        // Prevent from touching the shield
         if (event.getClickedInventory() != null) {
             if (event.getCurrentItem() != null) {
                 if (isCosmeticShield(event.getCurrentItem())) {
                     event.setCancelled(true);
+                    return;
                 }
             }
         }

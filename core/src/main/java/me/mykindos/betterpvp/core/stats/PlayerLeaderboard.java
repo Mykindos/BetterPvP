@@ -34,7 +34,7 @@ public abstract class PlayerLeaderboard<T> extends Leaderboard<UUID, T> {
         final Map<String, Component> map = describe(searchOptions, value.getValue());
         final Map<String, Component> result = new LinkedHashMap<>();
         final OfflinePlayer player = Bukkit.getOfflinePlayer(value.getKey());
-        result.put("Player", Component.text(Objects.requireNonNull(player.getName())));
+        result.put("Player", Component.text(Objects.requireNonNullElse(player.getName(), "Unknown")));
         result.putAll(map);
 
         ItemStack itemStack = new ItemStack(Material.PLAYER_HEAD);
