@@ -26,7 +26,13 @@ public class Sharpshooter extends Skill implements PassiveSkill {
     private final WeakHashMap<Player, StackingHitData> data = new WeakHashMap<>();
     private final WeakHashMap<Player, Integer> misses = new WeakHashMap<>();
 
-    private double maxTimeBetweenShots;
+    private double baseDamage;
+
+    private double damageIncreasePerLevel;
+
+    private double baseMaxTimeBetweenShots;
+
+    private double maxTimeBetweenShotsIncreasePerLevel;
     private int maxConsecutiveHits;
     private int numMisses;
 
@@ -43,12 +49,20 @@ public class Sharpshooter extends Skill implements PassiveSkill {
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "You deal <val>" + (level * 0.75) + "</val> extra damage for",
+                "You deal <val>" + getDamage(level) + "</val> extra damage for",
                 "each consecutive hit up to a maximum of <stat>"+ maxConsecutiveHits +"</stat> hits",
                 "",
-                "After <stat>" + maxTimeBetweenShots + "</stat> seconds, or after missing <stat>"+numMisses+"</stat> times,",
+                "After <val>" + getMaxTimeBetweenShots(level) + "</val> seconds, or after missing <stat>" + numMisses + "</stat> times,",
                 "your arrow damage will reset"
         };
+    }
+
+    public double getDamage(int level) {
+        return baseDamage + damageIncreasePerLevel * level;
+    }
+
+    public double getMaxTimeBetweenShots(int level) {
+        return baseMaxTimeBetweenShots + level * maxTimeBetweenShotsIncreasePerLevel;
     }
 
     @Override
@@ -69,7 +83,7 @@ public class Sharpshooter extends Skill implements PassiveSkill {
 
             StackingHitData hitData = data.get(damager);
             hitData.addCharge();
-            event.setDamage(event.getDamage() + (Math.min(maxConsecutiveHits, hitData.getCharge()) * (level * 0.75)));
+            event.setDamage(event.getDamage() + (Math.min(maxConsecutiveHits, hitData.getCharge()) * getDamage(level)));
         }
     }
 
@@ -95,7 +109,7 @@ public class Sharpshooter extends Skill implements PassiveSkill {
     @UpdateEvent(delay=100)
     public void updateSharpshooterData() {
         data.entrySet().removeIf(entry -> {
-            if(System.currentTimeMillis() > entry.getValue().getLastHit() + ((maxTimeBetweenShots + getLevel(entry.getKey())) * 1000L)) {
+            if(System.currentTimeMillis() > entry.getValue().getLastHit() + (long) (getMaxTimeBetweenShots(getLevel(entry.getKey())) * 1000L)) {
                 misses.remove(entry.getKey());
                 return true;
             }
@@ -112,8 +126,11 @@ public class Sharpshooter extends Skill implements PassiveSkill {
 
     @Override
     public void loadSkillConfig(){
-        maxTimeBetweenShots = getConfig("maxTimeBetweenShots", 5.0, Double.class);
+        baseMaxTimeBetweenShots = getConfig("maxTimeBetweenShots", 5.0, Double.class);
+        maxTimeBetweenShotsIncreasePerLevel = getConfig("maxTimeBetweenShotsIncreasePerLevel", 1.0, Double.class);
         maxConsecutiveHits = getConfig("maxConsecutiveHits", 4, Integer.class);
+        baseDamage = getConfig("baseDamage", 0.0, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.75, Double.class);
         numMisses = getConfig("numMisses", 2, Integer.class);
     }
 

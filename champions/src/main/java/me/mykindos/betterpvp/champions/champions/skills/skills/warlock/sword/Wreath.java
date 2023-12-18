@@ -13,11 +13,7 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilBlock;
-import me.mykindos.betterpvp.core.utilities.UtilDamage;
-import me.mykindos.betterpvp.core.utilities.UtilEntity;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
+import me.mykindos.betterpvp.core.utilities.*;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -46,8 +42,18 @@ public class Wreath extends PrepareSkill implements CooldownSkill {
     private final WeakHashMap<Player, Integer> actives = new WeakHashMap<>();
     private final WeakHashMap<Player, Long> cooldowns = new WeakHashMap<>();
 
-    private int numAttacks;
-    private double slowDuration;
+    private int baseNumAttacks;
+
+    private int numAttacksIncreasePerLevel;
+    private double baseSlowDuration;
+
+    private double slowDurationIncreasePerLevel;
+
+    private double baseDamage;
+
+    private double damageIncreasePerLevel;
+
+    private int slowStrength;
 
     @Inject
     public Wreath(Champions champions, ChampionsManager championsManager) {
@@ -64,12 +70,24 @@ public class Wreath extends PrepareSkill implements CooldownSkill {
         return new String[]{
                 "Right click with a Sword to prepare",
                 "",
-                "Your next <stat>" + numAttacks + "</stat> attacks will release a barrage of",
-                "teeth that deal <val>" + String.format("%.2f", (2 + (level / 1.5))) + "</val> damage and apply <effect>Slowness II</effect>",
-                "to their target for <stat>" + slowDuration + "</stat> seconds",
+                "Your next <stat>" + getNumAttacks(level) + "</stat> attacks will release a barrage of",
+                "teeth that deal <val>" + String.format("%.2f", getDamage(level)) + "</val> damage and apply <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength + 1) + "</effect>",
+                "to their target for <stat>" + getSlowDuration(level) + "</stat> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
+    }
+
+    public int getNumAttacks(int level) {
+        return baseNumAttacks + level * numAttacksIncreasePerLevel;
+    }
+
+    public double getDamage(int level) {
+        return baseDamage + level * damageIncreasePerLevel;
+    }
+
+    public double getSlowDuration(int level) {
+        return baseSlowDuration + level * slowDurationIncreasePerLevel;
     }
 
     @Override
@@ -160,9 +178,9 @@ public class Wreath extends PrepareSkill implements CooldownSkill {
 
                     EvokerFangs fangs = (EvokerFangs) player.getWorld().spawnEntity(loc, EntityType.EVOKER_FANGS);
                     for (LivingEntity target : UtilEntity.getNearbyEnemies(player, fangs.getLocation(), 1.5)) {
-                        CustomDamageEvent dmg = new CustomDamageEvent(target, player, null, EntityDamageEvent.DamageCause.CUSTOM, 2 + (level / 1.5), false, getName());
+                        CustomDamageEvent dmg = new CustomDamageEvent(target, player, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, getName());
                         UtilDamage.doCustomDamage(dmg);
-                        target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) (slowDuration * 20), 1));
+                        target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) (getSlowDuration(level) * 20), slowStrength));
                     }
 
                 }
@@ -187,12 +205,12 @@ public class Wreath extends PrepareSkill implements CooldownSkill {
 
     @Override
     public double getCooldown(int level) {
-        return cooldown - (level * 2);
+        return cooldown - (level * cooldownDecreasePerLevel);
     }
 
     @Override
     public void activate(Player player, int level) {
-        actives.put(player, 3);
+        actives.put(player, getNumAttacks(level));
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_RAVAGER_ATTACK, 2.0f, 1.8f);
     }
 
@@ -217,7 +235,15 @@ public class Wreath extends PrepareSkill implements CooldownSkill {
     }
     @Override
     public void loadSkillConfig(){
-        numAttacks = getConfig("numAttacks", 3, Integer.class);
-        slowDuration = getConfig("slowDuration", 2.0, Double.class);
+        baseNumAttacks = getConfig("baseNumAttacks", 3, Integer.class);
+        numAttacksIncreasePerLevel = getConfig("numAttacksIncreasePerLevel", 0, Integer.class);
+
+        baseSlowDuration = getConfig("baseSlowDuration", 2.0, Double.class);
+        slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.0, Double.class);
+
+        baseDamage = getConfig("baseDamage", 2.0, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.66, Double.class);
+
+        slowStrength = getConfig("slowStrength", 1, Integer.class);
     }
 }

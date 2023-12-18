@@ -32,9 +32,11 @@ public class LevelField extends Skill implements PassiveSkill, Listener {
         return "Level Field";
     }
 
+    //TODO fix/implement
     @Override
     public String[] getDescription(int level) {
         return new String[]{
+                "DESCRIPTION/SKILL IS OUTDATED",
                 "For every enemy within <stat>" + radius + "</stat> blocks,",
                 "You deal <val>" +  (10 + ((level - 1) * 5)) + ".0%</val> extra damage",
                 "",

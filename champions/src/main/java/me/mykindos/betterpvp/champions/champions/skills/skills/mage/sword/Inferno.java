@@ -41,7 +41,15 @@ public class Inferno extends ChannelSkill implements InteractSkill, EnergySkill 
 
     private final WeakHashMap<LivingEntity, Long> tempImmune = new WeakHashMap<>();
 
-    private int fireTicks;
+    private double baseFireDuration;
+
+    private double fireDurationIncreasePerLevel;
+
+    private double baseDamage;
+
+    private double damageIncreasePerLevel;
+
+    private double immuneTime;
 
     @Inject
     public Inferno(Champions champions, ChampionsManager championsManager) {
@@ -60,10 +68,18 @@ public class Inferno extends ChannelSkill implements InteractSkill, EnergySkill 
                 "Hold right click with a Sword to chennel",
                 "",
                 "You spray fire at high speed igniting",
-                "anything it hits for <stat>" + ((double)fireTicks/ (double)20) + "</stat> seconds",
+                "anything it hits for <stat>" + getFireDuration(level) + "</stat> seconds",
                 "",
                 "Energy / Second: <val>" + getEnergy(level)
         };
+    }
+
+    public double getFireDuration(int level) {
+        return baseFireDuration + level * fireDurationIncreasePerLevel;
+    }
+
+    public double getDamage(int level) {
+        return baseDamage + level * damageIncreasePerLevel;
     }
 
     @Override
@@ -84,14 +100,14 @@ public class Inferno extends ChannelSkill implements InteractSkill, EnergySkill 
                 return;
             }
             if (e.getThrowable().getThrower() instanceof Player damager) {
-
+                int level = getLevel(damager);
                 if (e.getCollision().getFireTicks() <= 0) {
 
-                    e.getCollision().setFireTicks(fireTicks);
+                    e.getCollision().setFireTicks((int) (getFireDuration(level) * 20));
                 }
                 if (!e.getThrowable().getImmunes().contains(e.getCollision())) {
                     if (tempImmune.containsKey(e.getCollision())) return;
-                    CustomDamageEvent cde = new CustomDamageEvent(e.getCollision(), damager, null, DamageCause.FIRE, 1, false, "Inferno");
+                    CustomDamageEvent cde = new CustomDamageEvent(e.getCollision(), damager, null, DamageCause.FIRE, getDamage(level), false, "Inferno");
                     cde.setDamageDelay(0);
                     UtilDamage.doCustomDamage(cde);
                     e.getThrowable().getImmunes().add(e.getCollision());
@@ -104,7 +120,7 @@ public class Inferno extends ChannelSkill implements InteractSkill, EnergySkill 
 
     @UpdateEvent(delay = 125)
     public void updateImmunes() {
-        tempImmune.entrySet().removeIf(entry -> UtilTime.elapsed(entry.getValue(), 450));
+        tempImmune.entrySet().removeIf(entry -> UtilTime.elapsed(entry.getValue(), (long) (immuneTime * 1000L)));
     }
 
     @UpdateEvent
@@ -122,8 +138,7 @@ public class Inferno extends ChannelSkill implements InteractSkill, EnergySkill 
                     active.remove(cur.getUniqueId());
                 } else {
                     Item fire = cur.getWorld().dropItem(cur.getEyeLocation(), new ItemStack(Material.BLAZE_POWDER));
-                    championsManager.getThrowables().addThrowable(fire, cur, getName(), 3000L);
-
+                    championsManager.getThrowables().addThrowable(fire, cur, getName(), 5000L);
 
                     fire.teleport(cur.getEyeLocation());
                     fire.setVelocity(cur.getLocation().getDirection().add(new Vector(UtilMath.randDouble(-0.2, 0.2), UtilMath.randDouble(-0.2, 0.3), UtilMath.randDouble(-0.2, 0.2))));
@@ -139,7 +154,7 @@ public class Inferno extends ChannelSkill implements InteractSkill, EnergySkill 
     @Override
     public float getEnergy(int level) {
 
-        return energy - ((level - 1));
+        return (float) (energy - ((level - 1) * energyDecreasePerLevel));
     }
 
 
@@ -150,7 +165,12 @@ public class Inferno extends ChannelSkill implements InteractSkill, EnergySkill 
 
     @Override
     public void loadSkillConfig(){
-        fireTicks = getConfig("fireTicks", 50, Integer.class);
+        baseFireDuration = getConfig("baseFireDuration", 2.5, Double.class);
+        fireDurationIncreasePerLevel = getConfig("fireDurationIncreasePerLevel", 0.0, Double.class);
+        baseDamage = getConfig("baseDamage", 1.0, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
+
+        immuneTime = getConfig("immuneTime", 0.45, Double.class);
     }
 
     @Override

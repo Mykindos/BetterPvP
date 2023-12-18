@@ -84,7 +84,7 @@ public class Swim extends Skill implements PassiveSkill, EnergySkill {
     @Override
     public float getEnergy(int level) {
 
-        return energy - ((level - 1) * 2);
+        return (float) (energy - ((level - 1) * energyDecreasePerLevel));
     }
 
     @Override

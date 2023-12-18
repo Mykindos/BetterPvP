@@ -33,7 +33,13 @@ public class Longshot extends Skill implements PassiveSkill {
 
     private final WeakHashMap<Arrow, Location> arrows = new WeakHashMap<>();
 
+    private double baseMaxDamage;
+
+    private double maxDamageIncreasePerLevel;
+
     private double baseDamage;
+
+    private double damageIncreasePerLevel;
     private double deathMessageThreshold;
 
     @Inject
@@ -51,12 +57,20 @@ public class Longshot extends Skill implements PassiveSkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Shoot an arrow that gains additional",
-                "damage the further it travels",
+                "Shoot an arrow that deals an extra <stat>" + getDamage(level),
+                "damage per block it travels",
                 "",
-                "Caps out at <val>" + (baseDamage + level) + "</val> damage",
+                "Caps out at <val>" + getMaxDamage(level) + "</val> damage",
                 "",
                 "Cannot be used in own territory"};
+    }
+
+    public double getMaxDamage(int level) {
+        return baseMaxDamage + level * maxDamageIncreasePerLevel;
+    }
+
+    public double getDamage(int level) {
+        return baseDamage + level* damageIncreasePerLevel;
     }
 
     @Override
@@ -105,8 +119,9 @@ public class Longshot extends Skill implements PassiveSkill {
         if(!arrows.containsKey(arrow)) return;
 
         Location loc = arrows.remove(arrow);
+        int level = getLevel(damager);
         double length = UtilMath.offset(loc, event.getDamagee().getLocation());
-        double damage = Math.min(baseDamage + getLevel(damager), length / 3.5);
+        double damage = Math.min(getMaxDamage(level), length * getDamage(level));
 
         event.setDamage(event.getDamage() + (damage));
         event.addReason(getName() + (length > deathMessageThreshold ? " (" + (int) length + " blocks)" : ""));
@@ -127,7 +142,11 @@ public class Longshot extends Skill implements PassiveSkill {
 
     @Override
     public void loadSkillConfig(){
-        baseDamage = getConfig("baseDamage", 14.0, Double.class);
+        baseMaxDamage = getConfig("baseMaxDamage", 14.0, Double.class);
+        maxDamageIncreasePerLevel = getConfig("maxDamageIncreasePerLevel", 1.0, Double.class);
+        baseDamage = getConfig("baseDamage", 0.25, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
+
         deathMessageThreshold = getConfig("deathMessageThreshold", 40.0, Double.class);
     }
 

@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -24,6 +25,10 @@ import org.bukkit.potion.PotionEffectType;
 public class VitalitySpores extends Skill implements PassiveSkill {
 
     private double baseDuration;
+
+    private double durationDecreasePerLevel;
+
+    private int regenerationStrength;
 
     @Inject
     public VitalitySpores(Champions champions, ChampionsManager championsManager) {
@@ -39,11 +44,15 @@ public class VitalitySpores extends Skill implements PassiveSkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "After <val>" + (baseDuration - level) + "</val> seconds of not taking damage,",
+                "After <val>" + getDuration(level) + "</val> seconds of not taking damage,",
                 "forest spores surround you, giving",
-                "you <effect>Regeneration I</effect> for <stat>6</stat> seconds",
+                "you <effect>Regeneration " + UtilFormat.getRomanNumeral(regenerationStrength + 1) + "</effect>",
                 "",
                 "You will keep the buff until you take damage"};
+    }
+
+    public double getDuration(int level) {
+        return baseDuration - level * durationDecreasePerLevel;
     }
 
     @Override
@@ -57,8 +66,8 @@ public class VitalitySpores extends Skill implements PassiveSkill {
             int level = getLevel(player);
             if (level > 0) {
                 Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
-                if (UtilTime.elapsed(gamer.getLastDamaged(), (long) ((baseDuration - level) * 1000L))) {
-                    player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 120, 0));
+                if (UtilTime.elapsed(gamer.getLastDamaged(), (long) (getDuration(level) * 1000L))) {
+                    player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20, regenerationStrength));
                 }
             }
         }
@@ -85,6 +94,9 @@ public class VitalitySpores extends Skill implements PassiveSkill {
     @Override
     public void loadSkillConfig(){
         baseDuration = getConfig("baseDuration", 7.0, Double.class);
+        durationDecreasePerLevel = getConfig("durationDecreasePerLevel", 1.0, Double.class);
+
+        regenerationStrength = getConfig("regenerationStrength", 0, Integer.class);
     }
 
 }

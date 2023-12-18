@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.components.champions;
 
+import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
@@ -18,6 +19,16 @@ public interface ISkill {
     }
 
     boolean isEnabled();
+
+    boolean canUseWhileSlowed();
+
+    boolean canUseWhileStunned();
+
+    boolean canUseWhileSilenced();
+
+    boolean canUseWhileLevitating();
+
+    boolean canUseInLiquid();
 
     default boolean canUse(Player player) {
         return true;

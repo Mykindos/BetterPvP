@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
@@ -9,13 +10,16 @@ import me.mykindos.betterpvp.champions.champions.builds.BuildSkill;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
-import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.*;
 import me.mykindos.betterpvp.core.components.champions.ISkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
+import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
+import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.effects.events.EffectReceiveEvent;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 
 import java.util.Optional;
 
@@ -29,8 +33,20 @@ public abstract class Skill implements ISkill {
 
     private boolean enabled;
     private int maxLevel;
-    protected int cooldown;
+    protected double cooldown;
+    protected double cooldownDecreasePerLevel;
     protected int energy;
+    protected Double energyDecreasePerLevel;
+
+    private boolean canUseWhileSlowed;
+
+    private boolean canUseWhileStunned;
+
+    private boolean canUseWhileSilenced;
+
+    private boolean canUseWhileLevitating;
+
+    private boolean canUseInLiquid;
 
     @Inject
     public Skill(Champions champions, ChampionsManager championsManager) {
@@ -45,6 +61,32 @@ public abstract class Skill implements ISkill {
     }
 
     @Override
+    public boolean canUseWhileSlowed() {
+        return canUseWhileSlowed;
+    }
+
+    @Override
+    public boolean canUseWhileStunned() {
+        return canUseWhileStunned;
+    }
+
+    @Override
+    public boolean canUseWhileSilenced() {
+        return canUseWhileSilenced;
+    }
+
+    @Override
+    public boolean canUseWhileLevitating() {
+        return canUseWhileLevitating;
+    }
+
+    @Override
+    public boolean canUseInLiquid() {
+        return canUseInLiquid;
+    }
+
+
+    @Override
     public int getMaxLevel() {
         return maxLevel;
     }
@@ -57,15 +99,31 @@ public abstract class Skill implements ISkill {
         }
     }
 
-    protected <T> T getConfig(String name, Object defaultValue, Class<T> type) {
+    private String getPath(String name) {
         String path;
         if (getClassType() != null) {
             path = "skills." + getClassType().name().toLowerCase() + "." + getName().toLowerCase().replace(" ", "") + "." + name;
         } else {
             path = "skills.global." + getName().toLowerCase().replace(" ", "") + "." + name;
         }
-        return champions.getConfig().getOrSaveObject(path, defaultValue, type);
+        return path;
     }
+
+    protected <T> T getConfig(String name, Object defaultValue, Class<T> type) {
+        return champions.getConfig().getOrSaveObject(getPath(name), defaultValue, type);
+    }
+
+    /**
+     * @param name name of the value
+     * @param defaultValue default value
+     * @param type The type of default value
+     * @param <T> The type of default value
+     * @return returns the config value if exists, or the default value if it does not. Does not save value in the config
+     */
+    protected <T> T getConfigObject(String name, T defaultValue, Class<T> type) {
+        return champions.getConfig().getObject(getPath(name), type, defaultValue);
+    }
+
 
     @Override
     public final void loadConfig() {
@@ -73,12 +131,20 @@ public abstract class Skill implements ISkill {
         maxLevel = getConfig("maxlevel", 5, Integer.class);
 
         if (this instanceof CooldownSkill) {
-            cooldown = getConfig("cooldown", 0, Integer.class);
+            cooldown = getConfig("cooldown", 1.0, Double.class);
+            cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 1.0, Double.class);
         }
 
         if (this instanceof EnergySkill) {
             energy = getConfig("energy", 0, Integer.class);
+            energyDecreasePerLevel = getConfig("energyDecreasePerLevel", 1.0, Double.class);
         }
+
+        canUseWhileSlowed = getConfigObject("canUseWhileSlowed", true, Boolean.class);
+        canUseWhileSilenced = getConfigObject("canUseWhileSilenced", false, Boolean.class);
+        canUseWhileStunned = getConfigObject("canUseWhileStunned", false, Boolean.class);
+        canUseWhileLevitating = getConfigObject("canUseWhileLevitating", false, Boolean.class);
+        canUseInLiquid = getConfigObject("canUseInLiquid", false, Boolean.class);
 
         loadSkillConfig();
     }

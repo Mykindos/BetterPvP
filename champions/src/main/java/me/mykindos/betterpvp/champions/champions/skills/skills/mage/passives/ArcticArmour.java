@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
@@ -35,8 +36,14 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill {
 
     private final WorldBlockHandler blockHandler;
 
-    private int minRadius;
-    private double duration;
+    private int baseRadius;
+    private int radiusIncreasePerLevel;
+    private double baseDuration;
+    private double durationIncreasePerLevel;
+
+    private int resistanceStrength;
+
+    private int slownessStrength;
 
     @Inject
     public ArcticArmour(Champions champions, ChampionsManager championsManager, WorldBlockHandler blockHandler) {
@@ -56,13 +63,21 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill {
                 "Drop your Sword / Axe to toggle",
                 "",
                 "Create a freezing area around",
-                "you in a <val>" + (minRadius + level) + "</val> Block radius",
+                "you in a <val>" + getRadius(level )+ "</val> Block radius",
                 "",
-                "Allies inside this area receive <effect>Protection I</effect>, and",
-                "enemies inside this area receive <effect>Slowness I</effect>",
+                "Allies inside this area receive <effect>Resistance " + UtilFormat.getRomanNumeral(resistanceStrength + 1) + "</effect>, and",
+                "enemies inside this area receive <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength + 1) + "</effect>",
                 "",
                 "Energy / Second: <val>" + getEnergy(level)
         };
+    }
+
+    public int getRadius(int level) {
+        return baseRadius + level * radiusIncreasePerLevel;
+    }
+
+    public double getDuration(int level) {
+        return baseDuration + level * durationIncreasePerLevel;
     }
 
     @Override
@@ -100,20 +115,20 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill {
                     iterator.remove();
                 } else {
 
-                    int distance = (minRadius + level);
+                    int distance = getRadius(level);
                     HashMap<Block, Double> blocks = UtilBlock.getInRadius(player.getLocation(), distance);
 
-                    player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20, 0));
-                    championsManager.getEffects().addEffect(player, EffectType.RESISTANCE, 1, 1000);
+                    player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20, resistanceStrength));
+                    championsManager.getEffects().addEffect(player, EffectType.RESISTANCE, resistanceStrength + 1, 1000);
 
                     for (var data : UtilPlayer.getNearbyPlayers(player, distance)) {
                         Player target = data.getKey();
                         boolean friendly = data.getValue() == EntityProperty.FRIENDLY;
                         if (friendly) {
-                            target.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20, 0));
-                            championsManager.getEffects().addEffect(target, EffectType.RESISTANCE, 1, 1000);
+                            target.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20, resistanceStrength));
+                            championsManager.getEffects().addEffect(target, EffectType.RESISTANCE, resistanceStrength + 1, 1000);
                         } else {
-                            target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 0));
+                            target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, slownessStrength));
                         }
                     }
 
@@ -124,7 +139,7 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill {
                                 if (relDown.getType() != Material.SNOW && relDown.getType() != Material.AIR
                                         && UtilBlock.shouldPlaceSnowOn(relDown)) {
                                     if (block.getType() == Material.AIR || block.getType() == Material.SNOW) {
-                                        blockHandler.addRestoreBlock(block, Material.SNOW, (long) duration * 1000);
+                                        blockHandler.addRestoreBlock(block, Material.SNOW, (long) getDuration(level) * 1000);
                                     }
 
                                 }
@@ -150,7 +165,7 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill {
     @Override
     public float getEnergy(int level) {
 
-        return (float) (energy - ((level - 1) * 0.5));
+        return (float) (energy - ((level - 1) * energyDecreasePerLevel));
     }
 
     @Override
@@ -166,7 +181,12 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill {
 
     @Override
     public void loadSkillConfig() {
-        minRadius = getConfig("minRadius", 2, Integer.class);
-        duration = getConfig("duration", 2.0, Double.class);
+        baseRadius = getConfig("baseRadius", 2, Integer.class);
+        radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 1, Integer.class);
+        baseDuration = getConfig("baseDuration", 2.0, Double.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.0, Double.class);
+
+        resistanceStrength = getConfig("resistanceStrength", 0, Integer.class);
+        slownessStrength = getConfig("slownessStrength", 0, Integer.class);
     }
 }

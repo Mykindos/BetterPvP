@@ -26,9 +26,16 @@ import org.bukkit.event.block.Action;
 @BPvPListener
 public class Cleanse extends Skill implements InteractSkill, CooldownSkill, Listener {
 
-    private int distance;
-    private double duration;
+    private double baseDuration;
 
+    private double durationIncreasePerLevel;
+    private double baseRange;
+
+    private double rangeIncreasePerLevel;
+
+    private double baseHealthReduction;
+
+    private double healthReductionDecreasePerLevel;
     @Inject
     public Cleanse(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -44,14 +51,26 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Sacrifice <val>" + UtilMath.round(100 - ((0.50 + (level * 0.05)) * 100), 2) + "%" + "</val> of your health to purge all negative",
-                "effects from yourself and allies within <val>" + (distance + level) + "</val> blocks",
+                "Sacrifice <val>" + UtilMath.round(getHealthReduction(level) * 100, 2) + "%" + "</val> of your health to purge all negative",
+                "effects from yourself and allies within <val>" + getRange(level) + "</val> blocks",
                 "",
                 "You and your allies also receive an immunity against negative",
-                "effects for <val>" + (duration + (level / 2)) + "</val> seconds",
+                "effects for <val>" + getDuration(level) + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
+    }
+
+    public double getHealthReduction(int level) {
+        return baseHealthReduction - level * healthReductionDecreasePerLevel;
+    }
+
+    public double getRange(int level) {
+        return baseRange + level * rangeIncreasePerLevel;
+    }
+
+    public double getDuration(int level) {
+        return baseDuration + level * durationIncreasePerLevel;
     }
 
     @Override
@@ -68,7 +87,7 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
     @Override
     public boolean canUse(Player player) {
         int level = getLevel(player);
-        double healthReduction = 0.50 + (level * 0.05);
+        double healthReduction = 1.0 - getHealthReduction(level);
         double proposedHealth = player.getHealth() - (20 - (20 * healthReduction));
 
         if (proposedHealth <= 0.5) {
@@ -82,23 +101,24 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
 
     @Override
     public double getCooldown(int level) {
-        return cooldown - level;
+        return cooldown - level * cooldownDecreasePerLevel;
     }
 
     @Override
     public void activate(Player player, int level) {
-        double healthReduction = 0.50 + (level * 0.05);
+        double healthReduction = 1.0 - getHealthReduction(level);
         double proposedHealth = player.getHealth() - (20 - (20 * healthReduction));
 
         player.setHealth(Math.max(0.5, proposedHealth));
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_EVOKER_PREPARE_WOLOLO, 1.0f, 0.9f);
-        championsManager.getEffects().addEffect(player, EffectType.IMMUNETOEFFECTS, (long) ((duration + (level / 2)) * 1000L));
+        championsManager.getEffects().addEffect(player, EffectType.IMMUNETOEFFECTS, (long) (getDuration(level) * 1000L));
 
-        for (Player ally : UtilPlayer.getNearbyAllies(player, player.getLocation(), (distance + level))) {
-            championsManager.getEffects().addEffect(ally, EffectType.IMMUNETOEFFECTS, (long) ((duration + (level / 2)) * 1000L));
+        for (Player ally : UtilPlayer.getNearbyAllies(player, player.getLocation(), getRange(level))) {
+            championsManager.getEffects().addEffect(ally, EffectType.IMMUNETOEFFECTS, (long) (getDuration(level) * 1000L));
             UtilMessage.simpleMessage(ally, "Cleanse", "You were cleansed of negative by <alt>" + player.getName());
-
+            UtilServer.callEvent(new EffectClearEvent(ally));
         }
+
 
         UtilServer.callEvent(new EffectClearEvent(player));
     }
@@ -115,7 +135,12 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
 
     @Override
     public void loadSkillConfig() {
-        distance = getConfig("distance", 5, Integer.class);
-        duration = getConfig("duration", 2.0, Double.class);
+        baseHealthReduction = getConfig("baseHealthReduction", 0.5, Double.class);
+        healthReductionDecreasePerLevel = getConfig("healthReductionDecreasePerLevel", 0.05, Double.class);
+        baseRange = getConfig("baseRange", 5.0, Double.class);
+        rangeIncreasePerLevel = getConfig("rangeIncreasePerLevel", 1.0, Double.class);
+
+        baseDuration = getConfig("baseDuration", 2.0, Double.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
     }
 }

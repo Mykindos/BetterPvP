@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -22,6 +23,12 @@ import org.bukkit.potion.PotionEffectType;
 @Singleton
 @BPvPListener
 public class LevitatingShot extends PrepareArrowSkill {
+
+    private double baseDuration;
+
+    private double durationIncreasePerLevel;
+
+    private int levitationStrength;
 
     @Inject
     public LevitatingShot(Champions champions, ChampionsManager championsManager) {
@@ -40,12 +47,16 @@ public class LevitatingShot extends PrepareArrowSkill {
                 "Left click with a Bow to prepare",
                 "",
                 "Your next arrow is tipped with mysterious magic causing",
-                "the target to receive <effect>Levitation II</effect> for <val>" + (3.5 + (level * .5)) + "</val> seconds",
+                "the target to receive <effect>Levitation " + UtilFormat.getRomanNumeral(levitationStrength + 1) + "</effect> for <val>" + getDuration(level) + "</val> seconds",
                 "",
                 "Players with levitation are unable to use abilities",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
+    }
+
+    public double getDuration(int level) {
+        return baseDuration + level * durationIncreasePerLevel;
     }
 
     @Override
@@ -68,9 +79,9 @@ public class LevitatingShot extends PrepareArrowSkill {
     @Override
     public void onHit(Player damager, LivingEntity target, int level) {
         if (target instanceof Player player) {
-            championsManager.getEffects().addEffect(player, EffectType.LEVITATION, 1, (int) (2.5 + (level * 0.5)) * 1000);
+            championsManager.getEffects().addEffect(player, EffectType.LEVITATION, levitationStrength + 1, (int) (getDuration(level) * 1000));
         } else {
-            target.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, (int) (2.5 + (level * 0.5)) * 20, 1));
+            target.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, (int) (getDuration(level) * 1000), levitationStrength));
         }
     }
 
@@ -87,7 +98,13 @@ public class LevitatingShot extends PrepareArrowSkill {
     @Override
     public double getCooldown(int level) {
 
-        return cooldown - ((level - 1));
+        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
+    @Override
+    public void loadSkillConfig() {
+        baseDuration = getConfig("baseDuration", 3.5, Double.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
 
+        levitationStrength = getConfig("levitationStrength", 1, Integer.class);
+    }
 }

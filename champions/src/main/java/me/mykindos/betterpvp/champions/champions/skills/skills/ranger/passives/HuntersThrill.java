@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -26,8 +27,17 @@ public class HuntersThrill extends Skill implements PassiveSkill {
 
     private final WeakHashMap<Player, StackingHitData> data = new WeakHashMap<>();
 
-    private double maxTimeBetweenShots;
+    private double baseMaxTimeBetweenShots;
+
+    private double maxTimeBetweenShotsIncreasePerLevel;
+
+    private double baseDuration;
+
+    private double durationIncreasePerLevel;
+
     private int maxConsecutiveHits;
+
+
 
     @Inject
     public HuntersThrill(Champions champions, ChampionsManager championsManager) {
@@ -42,11 +52,19 @@ public class HuntersThrill extends Skill implements PassiveSkill {
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "For each consecutive hit within <val>" + (maxTimeBetweenShots + level),
+                "For each consecutive hit within <val>" + (baseMaxTimeBetweenShots + level),
                 "seconds of each other, you gain",
                 "increased movement speed up to a",
-                "maximum of <effect>Speed IV</effect>",
+                "maximum of <effect>Speed " + UtilFormat.getRomanNumeral(maxConsecutiveHits + 1) + "</effect>",
         };
+    }
+
+    public double getMaxTimeBetweenShots(int level) {
+        return baseMaxTimeBetweenShots + level * maxTimeBetweenShotsIncreasePerLevel;
+    }
+
+    public double getDuration(int level) {
+        return baseDuration + level * durationIncreasePerLevel;
     }
 
     @Override
@@ -68,7 +86,7 @@ public class HuntersThrill extends Skill implements PassiveSkill {
             StackingHitData hitData = data.get(damager);
             hitData.addCharge();
             damager.removePotionEffect(PotionEffectType.SPEED);
-            damager.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 120, Math.min(maxConsecutiveHits, hitData.getCharge()) - 1));
+            damager.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) (getDuration(getLevel(damager)) * 20), Math.min(maxConsecutiveHits, hitData.getCharge()) - 1));
         }
 
     }
@@ -76,7 +94,7 @@ public class HuntersThrill extends Skill implements PassiveSkill {
 
     @UpdateEvent(delay=100)
     public void updateHuntersThrillData() {
-        data.entrySet().removeIf(entry -> System.currentTimeMillis() > entry.getValue().getLastHit() + ((maxTimeBetweenShots + getLevel(entry.getKey())) * 1000L));
+        data.entrySet().removeIf(entry -> System.currentTimeMillis() > entry.getValue().getLastHit() + (long) ((getMaxTimeBetweenShots(getLevel(entry.getKey()))) * 1000L));
     }
 
     @Override
@@ -87,7 +105,12 @@ public class HuntersThrill extends Skill implements PassiveSkill {
 
     @Override
     public void loadSkillConfig(){
-        maxTimeBetweenShots = getConfig("maxTimeBetweenShots", 8.0, Double.class);
+        baseMaxTimeBetweenShots = getConfig("maxTimeBetweenShots", 8.0, Double.class);
+        maxTimeBetweenShotsIncreasePerLevel = getConfig("maxTimeBetweenShotsIncreasePerLevel", 1.0, Double.class);
+        baseDuration = getConfig("maxTimeBetweenShotsIncreasePerLevel", 6.0, Double.class);
+        durationIncreasePerLevel = getConfig("maxTimeBetweenShotsIncreasePerLevel", 0.0, Double.class);
+
+
         maxConsecutiveHits = getConfig("maxConsecutiveHits", 4, Integer.class);
     }
 

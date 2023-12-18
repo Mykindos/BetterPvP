@@ -30,6 +30,8 @@ public class Deflection extends Skill implements PassiveSkill {
     private double timeBetweenCharges;
     private double timeOutOfCombat;
 
+    private int baseCharges;
+
     private final WeakHashMap<Player, Integer> charges = new WeakHashMap<>();
 
     @Inject
@@ -52,6 +54,10 @@ public class Deflection extends Skill implements PassiveSkill {
                 "When attacked, the damage you take is",
                 "reduced by the number of deflection charges",
         };
+    }
+
+    public int getMaxCharges(int level) {
+        return baseCharges + level;
     }
 
     @Override
@@ -88,19 +94,19 @@ public class Deflection extends Skill implements PassiveSkill {
             if (level > 0) {
                 if (charges.containsKey(cur)) {
                     Gamer gamer = championsManager.getClientManager().search().online(cur).getGamer();
-                    if (UtilTime.elapsed(gamer.getLastDamaged(), (long) timeOutOfCombat * 1000)) {
-                        if (!championsManager.getCooldowns().use(cur, getName(), timeBetweenCharges, false)) return;
-                        int charge = charges.get(cur);
-                        if (charge < level) {
-                            charge = Math.min(level, charge + 1);
-                            UtilMessage.simpleMessage(cur, getClassType().getName(), "Deflection charge: <yellow>%d", charge);
-                            charges.put(cur, charge);
+                        if (UtilTime.elapsed(gamer.getLastDamaged(), (long) timeOutOfCombat * 1000)) {
+                            if (!championsManager.getCooldowns().use(cur, getName(), timeBetweenCharges, false)) return;
+                            int charge = charges.get(cur);
+                            if (charge < getMaxCharges(level)) {
+                                charge = Math.min(getMaxCharges(level), charge + 1);
+                                UtilMessage.simpleMessage(cur, getClassType().getName(), "Deflection charge: <yellow>%d", charge);
+                                charges.put(cur, charge);
+                            }
                         }
                     }
 
                 } else {
-                    charges.put(cur, 0);
-                }
+                charges.put(cur, 0);
             }
         }
 
@@ -110,6 +116,7 @@ public class Deflection extends Skill implements PassiveSkill {
     public void loadSkillConfig() {
         timeBetweenCharges = getConfig("timeBetweenCharges", 2.0, Double.class);
         timeOutOfCombat = getConfig("timeOutOfCombat", 2.0, Double.class);
+        baseCharges = getConfig("baseCharges", 0, Integer.class);
     }
 
 }

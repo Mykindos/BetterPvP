@@ -26,6 +26,11 @@ public class Thorns extends Skill implements PassiveSkill, Listener {
 
     private final WeakHashMap<LivingEntity, Long> cd = new WeakHashMap<>();
 
+    private double internalCooldown;
+
+    private double baseDamage;
+    private double damageIncreasePerLevel;
+
     @Inject
     public Thorns(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -40,9 +45,13 @@ public class Thorns extends Skill implements PassiveSkill, Listener {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Enemies take <val>" + level + "</val> damage when",
+                "Enemies take <val>" + getDamage(level) + "</val> damage when",
                 "they hit you using a melee attack"
         };
+    }
+
+    public double getDamage(int level) {
+        return baseDamage + level * damageIncreasePerLevel;
     }
 
     @Override
@@ -67,16 +76,19 @@ public class Thorns extends Skill implements PassiveSkill, Listener {
             LivingEntity damager = event.getDamager();
             if (!cd.containsKey(damager)) {
                 cd.put(damager, System.currentTimeMillis());
-            }else{
-                if(UtilTime.elapsed(cd.get(damager), 2000)){
-                    UtilDamage.doCustomDamage(new CustomDamageEvent(damager, p, null, DamageCause.CUSTOM, level * 0.80, false, getName()));
+            } else {
+                if(UtilTime.elapsed(cd.get(damager), (long) (internalCooldown * 1000L))){
+                    UtilDamage.doCustomDamage(new CustomDamageEvent(damager, p, null, DamageCause.CUSTOM, getDamage(level), false, getName()));
                     cd.put(damager, System.currentTimeMillis());
                 }
             }
         }
-
-
-
-        }
-
     }
+
+    @Override
+    public void loadSkillConfig() {
+        internalCooldown = getConfig("internalCooldown", 2.0, Double.class);
+        baseDamage = getConfig("baseDamage", 0.0, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.8, Double.class);
+    }
+}

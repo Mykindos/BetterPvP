@@ -15,11 +15,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilDamage;
-import me.mykindos.betterpvp.core.utilities.UtilEntity;
-import me.mykindos.betterpvp.core.utilities.UtilItem;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import me.mykindos.betterpvp.core.utilities.*;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -43,6 +39,8 @@ import java.util.List;
 public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, Listener {
 
     private double baseMultiplier;
+
+    private double multiplierIncreasePerLevel;
 
     @Inject
     public ShieldSmash(Champions champions, ChampionsManager championsManager) {
@@ -90,12 +88,12 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
     }
 
     private double getKnockbackMultiplier(int level) {
-        return baseMultiplier + ((level - 1) * 0.2);
+        return baseMultiplier + ((level - 1) * multiplierIncreasePerLevel);
     }
 
     @Override
     public double getCooldown(int level) {
-        return cooldown - (level - 1d);
+        return cooldown - (level - 1d) * cooldownDecreasePerLevel;
     }
 
 
@@ -149,7 +147,7 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
     public void onShieldCheck(PlayerCheckShieldEvent event) {
         Player player = event.getPlayer();
         if (hasSkill(player)) {
-            if(UtilItem.isAxe(event.getPlayer().getInventory().getItemInMainHand().getType())) {
+            if (UtilItem.isAxe(event.getPlayer().getInventory().getItemInMainHand().getType())) {
                 event.setShouldHaveShield(true);
                 event.setCustomModelData(0);
             }
@@ -164,5 +162,6 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
     @Override
     public void loadSkillConfig() {
         baseMultiplier = getConfig("baseMultiplier", 1.6, Double.class);
+        multiplierIncreasePerLevel = getConfig("multiplierIncreasePerLevel", 0.2, Double.class);
     }
 }
