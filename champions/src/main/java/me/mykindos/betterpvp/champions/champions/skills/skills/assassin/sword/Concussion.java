@@ -27,7 +27,9 @@ import javax.inject.Singleton;
 @BPvPListener
 public class Concussion extends PrepareSkill implements CooldownSkill, Listener {
 
-    private double durationPerLevel;
+    private double baseDuration;
+
+    private double durationIncreasePerLevel;
 
     @Inject
     public Concussion(Champions champions, ChampionsManager championsManager) {
@@ -45,10 +47,14 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener 
         return new String[]{
                 "Right click with a Sword to prepare",
                 "",
-                "Your next hit will <effect>Blind</effect> the target for <val>" + (durationPerLevel * level) + "</val> seconds",
+                "Your next hit will <effect>Blind</effect> the target for <val>" + (durationIncreasePerLevel * level) + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
+    }
+
+    public double getDuration(int level) {
+        return baseDuration + (durationIncreasePerLevel * level);
     }
 
     @Override
@@ -85,7 +91,7 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener 
 
         if (active.contains(damager.getUniqueId())) {
             e.addReason("Concussion");
-            damagee.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, (int) (level * durationPerLevel) * 20, 0));
+            damagee.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, (int) getDuration(level) * 20, 0));
             UtilMessage.simpleMessage(damager, getName(), "You gave <alt>" + damagee.getName() + "</alt> a concussion.");
             UtilMessage.simpleMessage(damagee, getName(), "<alt>" + damager.getName() + "</alt> gave you a concussion.");
             active.remove(damager.getUniqueId());
@@ -117,6 +123,7 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener 
 
     @Override
     public void loadSkillConfig() {
-        durationPerLevel = getConfig("durationPerLevel", 1.5, Double.class);
+        baseDuration = getConfig("baseDuration", 0.0, Double.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.5, Double.class);
     }
 }

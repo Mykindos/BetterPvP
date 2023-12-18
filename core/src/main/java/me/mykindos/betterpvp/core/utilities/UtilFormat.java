@@ -75,4 +75,23 @@ public class UtilFormat {
 
         return STRIP_COLOR_PATTERN.matcher(input).replaceAll("");
     }
+
+    public static String getRomanNumeral(int number) {
+        if (1 <= number && number <= 3) {
+            return "I".repeat(number);
+        }
+        if (number == 4) {
+            return "IV";
+        }
+        if (5 <= number && number <= 8) {
+            return "V" + "I".repeat(number - 5);
+        }
+        if (number == 9) {
+            return "IX";
+        }
+        if (number == 10) {
+            return "X";
+        }
+        return String.valueOf(number);
+    }
 }

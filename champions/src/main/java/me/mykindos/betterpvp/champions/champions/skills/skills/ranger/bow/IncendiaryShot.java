@@ -23,6 +23,10 @@ import org.bukkit.event.entity.EntityShootBowEvent;
 @BPvPListener
 public class IncendiaryShot extends PrepareArrowSkill {
 
+    private double baseBurnDuration;
+
+    private double burnDurationIncreasePerLevel;
+
     @Inject
     public IncendiaryShot(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -40,10 +44,14 @@ public class IncendiaryShot extends PrepareArrowSkill {
                 "Left click with a Bow to prepare",
                 "",
                 "Shoot an ignited arrow that <effect>Burns</effect>",
-                "anyone hit for <val>" + (level * 1.5) + "</val> seconds",
+                "anyone hit for <val>" + getBurnDuration(level) + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
+    }
+
+    public double getBurnDuration(int level) {
+        return baseBurnDuration + level * burnDurationIncreasePerLevel;
     }
 
     @Override
@@ -65,7 +73,7 @@ public class IncendiaryShot extends PrepareArrowSkill {
 
     @Override
     public void onHit(Player damager, LivingEntity target, int level) {
-        UtilServer.runTaskLater(champions, () -> target.setFireTicks(level * 30), 2);
+        UtilServer.runTaskLater(champions, () -> target.setFireTicks((int) (getBurnDuration(level) * 20)), 2);
     }
 
     @Override
@@ -87,7 +95,14 @@ public class IncendiaryShot extends PrepareArrowSkill {
     @Override
     public double getCooldown(int level) {
 
-        return cooldown - ((level - 1));
+        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
+    }
+
+    @Override
+    public void loadSkillConfig() {
+        baseBurnDuration = getConfig("baseBurnDuration", 0.0, Double.class);
+        burnDurationIncreasePerLevel = getConfig("burnDurationIncreasePerLevel", 1.5, Double.class);
+
     }
 
 }

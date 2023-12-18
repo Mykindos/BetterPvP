@@ -36,10 +36,15 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
 
     private final List<Torment> tormentList = new ArrayList<>();
 
-    private int radius;
-    private double duration;
+    private double baseDuration;
 
-    private double damageIncrease;
+    private double durationIncreasePerLevel;
+    private double baseRange;
+
+    private double rangeIncreasePerLevel;
+
+    private double baseDamageIncrease;
+    private double damageIncreasePerLevel;
 
     @Inject
     public TormentedSoil(Champions champions, ChampionsManager championsManager) {
@@ -58,13 +63,25 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
                 "Right click with an Axe to activate",
                 "",
                 "Corrupt the earth around you, creating a ring that",
-                "debuffs enemies within it for <stat>" + duration + "</stat> seconds.",
-                "Players within the ring take <stat>" + (damageIncrease * 100) + "%</stat> more damage.",
+                "debuffs enemies within it for <stat>" + getDuration(level) + "</stat> seconds.",
+                "Players within the ring take <stat>" + (getDamageIncrease(level) * 100) + "%</stat> more damage.",
                 "",
-                "Range: <val>" + (radius + (level / 2.0)) + "</val> blocks.",
+                "Range: <val>" + getRange(level) + "</val> blocks.",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
+    }
+
+    public double getRange(int level) {
+        return baseRange + level * rangeIncreasePerLevel;
+    }
+
+    public double getDamageIncrease(int level) {
+        return baseDamageIncrease + level * damageIncreasePerLevel;
+    }
+
+    public double getDuration(int level) {
+        return baseDuration + level * durationIncreasePerLevel;
     }
 
     @Override
@@ -75,26 +92,18 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
 
     @EventHandler
     public void onDamage(CustomDamageEvent event) {
-        if (isInTorment(event.getDamagee())) {
-            event.setDamage(event.getDamage() * (1 + damageIncrease));
-        }
-    }
-
-    private boolean isInTorment(LivingEntity entity) {
         for (Torment torment : tormentList) {
-            if (!torment.getLocation().getWorld().equals(entity.getLocation().getWorld())) {
-                return false;
+            if (!torment.getLocation().getWorld().equals(event.getDamagee().getLocation().getWorld())) {
+                return;
             }
-            for (LivingEntity target : UtilEntity.getNearbyEnemies(torment.getCaster(), torment.getLocation(), (radius + (torment.getLevel() / 2f)))) {
-                if (target.equals(entity)) {
-                    return true;
+            for (LivingEntity target : UtilEntity.getNearbyEnemies(torment.getCaster(), torment.getLocation(), getRange(torment.getLevel()))) {
+                if (target.equals(event.getDamagee())) {
+                    event.setDamage(event.getDamage() * (1 + getDamageIncrease(torment.getLevel())));
+                    return;
                 }
             }
-
         }
-        return false;
     }
-
 
     @UpdateEvent(delay = 500)
     public void onUpdate() {
@@ -102,12 +111,12 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
         while (it.hasNext()) {
             Torment torment = it.next();
 
-            if (UtilTime.elapsed(torment.getCastTime(), (long) (duration * 1000)) || torment.getCaster() == null) {
+            if (UtilTime.elapsed(torment.getCastTime(), (long) (getDuration(torment.getLevel()) * 1000)) || torment.getCaster() == null) {
                 it.remove();
                 continue;
             }
 
-            int size = (radius + (torment.getLevel() / 2));
+            double size = getRange(torment.getLevel());
             int particles = 50;
             Location loc = torment.getLocation().clone();
             for (int i = 0; i < particles; i++) {
@@ -142,7 +151,7 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
 
     @Override
     public double getCooldown(int level) {
-        return cooldown - (level * 2);
+        return cooldown - (level * cooldownDecreasePerLevel);
     }
 
 
@@ -168,9 +177,12 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
 
     @Override
     public void loadSkillConfig() {
-        duration = getConfig("duration", 7.0, Double.class);
-        radius = getConfig("radius", 5, Integer.class);
-        damageIncrease = getConfig("damageIncrease", 0.33, Double.class);
+        baseDuration = getConfig("baseDuration", 7.0, Double.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.0, Double.class);
+        baseRange = getConfig("baseRange", 5.0, Double.class);
+        rangeIncreasePerLevel = getConfig("rangeIncreasePerLevel", 0.5, Double.class);
+        baseDamageIncrease = getConfig("baseDamageIncrease", 0.33, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
     }
 
     @Data
