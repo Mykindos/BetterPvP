@@ -12,18 +12,15 @@ import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.util.List;
 import java.util.Optional;
 
 @Singleton
 public class SkillsCommand extends Command {
     @Inject
-    @Config(path = "command/skills/seeOtherPlayerSkillsRank", defaultValue = "TRIAL_MOD" )
+    @Config(path = "command.skills.seeOtherPlayerSkillsRank", defaultValue = "TRIAL_MOD" )
     private String seeOtherPlayerSkillsRankString;
 
 
@@ -34,7 +31,7 @@ public class SkillsCommand extends Command {
     public SkillsCommand(RoleManager roleManager, BuildManager buildManager) {
         this.roleManager = roleManager;
         this.buildManager = buildManager;
-        this.aliases.addAll(List.of("skill"));
+        this.aliases.add("skill");
     }
 
     @Override
