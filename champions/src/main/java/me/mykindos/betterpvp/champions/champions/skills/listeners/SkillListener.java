@@ -30,13 +30,14 @@ import me.mykindos.betterpvp.core.components.champions.events.PlayerUseToggleSki
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectType;
-import me.mykindos.betterpvp.core.effects.events.EffectReceiveEvent;
 import me.mykindos.betterpvp.core.energy.EnergyHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
@@ -176,6 +177,7 @@ public class SkillListener implements Listener {
     public void onSkillActivate(PlayerInteractEvent event) {
         if (event.getAction() == Action.PHYSICAL) return;
         if (event.getHand() == EquipmentSlot.OFF_HAND) return;
+        if (cooldownManager.hasCooldown(event.getPlayer(), "DoorAccess")) return;
 
         Player player = event.getPlayer();
         Material mainHand = player.getInventory().getItemInMainHand().getType();
@@ -189,9 +191,9 @@ public class SkillListener implements Listener {
             }
         }
 
-        if (UtilBlock.usable(event.getClickedBlock())) return;
 
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+            Bukkit.broadcast(Component.text(3));
             Block block = event.getClickedBlock();
             if (block != null) {
                 if (block.getType().name().contains("SPONGE")) {
@@ -200,10 +202,13 @@ public class SkillListener implements Listener {
                         return;
                     }
                 } else if (block.getType().name().contains("DOOR")) {
+                    cooldownManager.use(event.getPlayer(), "DoorAccess", 0.01, false);
                     return;
                 }
             }
         }
+
+        if (UtilBlock.usable(event.getClickedBlock())) return;
 
         Optional<Role> roleOptional = roleManager.getObject(player.getUniqueId().toString());
         if (roleOptional.isPresent()) {
@@ -229,7 +234,6 @@ public class SkillListener implements Listener {
                     }
 
                     int level = getLevel(player, build.getBuildSkill(skillType));
-
                     UtilServer.callEvent(new PlayerUseInteractSkillEvent(player, skill, level));
 
                 }
