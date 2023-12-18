@@ -89,6 +89,7 @@ public class Fishing extends ProgressionTree {
 
     @Override
     public void loadConfig(@NotNull ExtendedYamlConfiguration config) {
+        enabled = config.getOrSaveBoolean("fishing.enabled", true);
         statsRepository.loadConfig(config);
     }
 }
