@@ -816,15 +816,16 @@ skills:
       distance: 5
       duration: 2.0
     bloodcompass:
-      enabled: true
+            enabled: true
       maxlevel: 3
       numLines: 1
       effectDuration: 5
-      maxDistance: 32.0
+      maxDistance: 64.0
       numPoints: 30
       cooldown: 20.0
-      escapeRadius: 5.0
+      escapeRadius: 7.0
       damage: 7.0
+      damageIncreasePerLevel: 2.0
     grasp:
       enabled: true
       maxlevel: 5
