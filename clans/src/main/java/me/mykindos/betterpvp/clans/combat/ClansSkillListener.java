@@ -44,7 +44,7 @@ public class ClansSkillListener implements Listener {
 
     @EventHandler
     public void onGetPlayerPropertyEvent(GetPlayerRelationshipEvent event) {
-        boolean canHurt = clanManager.canHurt(event.getPlayer(), event.getTarget());
+        boolean canHurt = clanManager.isAlly(event.getPlayer(), event.getTarget());
         event.setEntityProperty(canHurt ? EntityProperty.ENEMY : EntityProperty.FRIENDLY);
     }
 
@@ -53,9 +53,9 @@ public class ClansSkillListener implements Listener {
         if (!(event.getSource() instanceof Player player)) return;
         event.getEntities().forEach(entity -> {
             if (!(entity.getKey() instanceof Player target)) return;
-            boolean canHurt = clanManager.canHurt(player, target);
+            boolean isAlly = clanManager.isAlly(player, target);
 
-            entity.setValue(canHurt ? EntityProperty.ENEMY : EntityProperty.FRIENDLY);
+            entity.setValue(isAlly ? EntityProperty.ENEMY : EntityProperty.FRIENDLY);
         });
 
         event.getEntities().removeIf(entity -> {
