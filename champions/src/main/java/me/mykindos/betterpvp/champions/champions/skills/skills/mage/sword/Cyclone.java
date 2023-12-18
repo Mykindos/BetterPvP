@@ -12,11 +12,13 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.util.Vector;
+import org.bukkit.Particle;
 
 @Singleton
 public class Cyclone extends Skill implements InteractSkill, CooldownSkill {
@@ -88,7 +90,28 @@ public class Cyclone extends Skill implements InteractSkill, CooldownSkill {
             }
         }
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1F, 0.6F);
+        createCyclone(player, level);
+    }
 
+    private void createCyclone(Player player, int level) {
+        Location center = player.getLocation();
+        double radius = getDistance(level);
+        int points = 100;
+        double height = center.getY() + 1.0;
+
+        for (int i = 0; i < points; i++) {
+            double angle = 2 * Math.PI * i / points;
+
+            for (int j = 0; j < 4; j++) {
+                double startAngle = j * Math.PI / 2;
+
+                double x = center.getX() + radius * Math.cos(angle + startAngle) * ((double) i / points);
+                double z = center.getZ() + radius * Math.sin(angle + startAngle) * ((double) i / points);
+
+                Location particleLocation = new Location(center.getWorld(), x, height, z);
+                center.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, particleLocation, 1, 0, 0, 0, 0);
+            }
+        }
     }
 
     @Override
