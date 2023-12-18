@@ -33,6 +33,14 @@ public class Frailty extends Skill implements PassiveSkill {
 
     private final Set<UUID> active = new HashSet<>();
 
+    private double baseHealthPercent;
+
+    private double healthPercentIncreasePerLevel;
+
+    private double baseDamagePercent;
+
+    private double damagePercentIncreasePerLevel;
+
     @Inject
     public Frailty(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -46,9 +54,17 @@ public class Frailty extends Skill implements PassiveSkill {
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Nearby enemies that fall below <val>" + (40 + ((level - 1) * 10)) + "%" + "</val> health",
-                "take <val>" + (20 + ((level - 1) * 5)) + "%" + "</val> more damage from your melee attacks"
+                "Nearby enemies that fall below <val>" + getHealthPercent(level) * 100 + "%" + "</val> health",
+                "take <val>" + getDamagePercent(level) * 100 + "%" + "</val> more damage from your melee attacks"
         };
+    }
+
+    public double getHealthPercent(int level) {
+        return baseHealthPercent + level * healthPercentIncreasePerLevel;
+    }
+
+    public double getDamagePercent (int level) {
+        return baseDamagePercent + level * damagePercentIncreasePerLevel;
     }
 
     @Override
@@ -99,7 +115,7 @@ public class Frailty extends Skill implements PassiveSkill {
                 int level = getLevel(player);
                 if (level <= 0) return;
                 for (Player target : UtilPlayer.getNearbyEnemies(player, player.getLocation(), 5)) {
-                    if (target.getHealth() / UtilPlayer.getMaxHealth(target) * 100 < (40 + ((level - 1) * 10))) {
+                    if (UtilPlayer.getHealthPercentage(target) < getHealthPercent(level)) {
                         target.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 30, 0));
                     }
                 }
@@ -120,8 +136,8 @@ public class Frailty extends Skill implements PassiveSkill {
                 }
             }
 
-            if (event.getDamagee().getHealth() / UtilPlayer.getMaxHealth(event.getDamagee()) * 100 < (40 + (level - 1) * 10)) {
-                event.setDamage(event.getDamage() * 1.20 + ((level - 1) * 0.05));
+            if (UtilPlayer.getHealthPercentage(event.getDamagee()) < getHealthPercent(level)) {
+                event.setDamage(event.getDamage() * (1 + getDamagePercent(level)));
             }
         }
 
@@ -132,5 +148,12 @@ public class Frailty extends Skill implements PassiveSkill {
         return SkillType.PASSIVE_A;
     }
 
+    public void loadSkillConfig() {
+        baseHealthPercent = getConfig("baseHealthPercent", 0.30, Double.class);
+        healthPercentIncreasePerLevel = getConfig("healthPercentIncreasePerLevel", 0.10, Double.class);
+
+        baseDamagePercent = getConfig("baseDamagePercent", 0.15, Double.class);
+        damagePercentIncreasePerLevel = getConfig("damagePercentIncreasePerLevel", 0.05, Double.class);
+    }
 
 }

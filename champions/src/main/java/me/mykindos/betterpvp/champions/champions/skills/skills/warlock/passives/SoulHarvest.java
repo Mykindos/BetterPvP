@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -30,6 +31,14 @@ public class SoulHarvest extends Skill implements PassiveSkill {
 
     private final List<SoulData> souls = new ArrayList<>();
 
+    private double baseBuffDuration;
+
+    private double buffDurationIncreasePerLevel;
+
+    private int speedStrength;
+
+    private int regenerationStrength;
+
     @Inject
     public SoulHarvest(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -44,13 +53,17 @@ public class SoulHarvest extends Skill implements PassiveSkill {
     public String[] getDescription(int level) {
         return new String[]{
                 "When enemies die, they will drop a soul",
-                "which is only visible to Warlocks",
+                "which is only visible to " + getClassType().getName(),
                 "",
                 "Collected souls give bursts of",
-                "<effect>Speed II</effect> and <effect>Regeneration II</effect>",
+                "<effect>Speed " + UtilFormat.getRomanNumeral(speedStrength + 1) + "</effect> and <effect>Regeneration " + UtilFormat.getRomanNumeral(regenerationStrength + 1) + "</effect>",
                 "",
-                "Buff duration: <val>" + ((40 + (level * 20)) / 20) + "</val> seconds"
+                "Buff duration: <val>" + getBuffDuration(level) + "</val> seconds"
         };
+    }
+
+    private double getBuffDuration(int level) {
+        return baseBuffDuration + level * buffDurationIncreasePerLevel;
     }
 
     @Override
@@ -102,9 +115,18 @@ public class SoulHarvest extends Skill implements PassiveSkill {
 
     }
 
+    @Override
+    public void loadSkillConfig() {
+        baseBuffDuration = getConfig("baseBuffDuration", 2.0, Double.class);
+        buffDurationIncreasePerLevel = getConfig("buffDurationIncreasePerLevel", 1.0, Double.class);
+
+        speedStrength = getConfig("speedStrength", 1, Integer.class);
+        regenerationStrength = getConfig("regenerationStrength", 1, Integer.class);
+    }
+
     private void giveEffect(Player player, int level) {
-        player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 40 + (level * 20), 1));
-        player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 40 + (level * 20), 1));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) (getBuffDuration(level) * 20), speedStrength));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, (int) (getBuffDuration(level) * 20), regenerationStrength));
     }
 
     @Data
@@ -113,7 +135,5 @@ public class SoulHarvest extends Skill implements PassiveSkill {
         private final UUID uuid;
         private final Location location;
         private final long expiry;
-
-
     }
 }

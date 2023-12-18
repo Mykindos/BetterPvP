@@ -31,6 +31,12 @@ public class PowerChop extends PrepareSkill implements CooldownSkill {
 
     private double timeToHit;
 
+    private double minBonusDamage;
+
+    private double baseBonusDamage;
+
+    private double bonusDamageIncreasePerLevel;
+
     private final WeakHashMap<Player, Long> charge = new WeakHashMap<>();
 
     @Inject
@@ -52,13 +58,17 @@ public class PowerChop extends PrepareSkill implements CooldownSkill {
                 "",
 
                 "Your next axe attack will",
-                "deal <val>" + (Math.max(1, (level + 2))) + "</val> bonus damage.",
+                "deal <val>" + getBonusDamage(level) + "</val> bonus damage.",
                 "",
                 "The attack must be made within",
                 "<stat>" + timeToHit + "</stat> seconds of being used",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
+    }
+
+    public double getBonusDamage(int level) {
+        return (Math.max(minBonusDamage, baseBonusDamage + level * bonusDamageIncreasePerLevel));
     }
 
     @Override
@@ -82,7 +92,7 @@ public class PowerChop extends PrepareSkill implements CooldownSkill {
 
         int level = getLevel(player);
         if (level > 0) {
-            event.setDamage(event.getDamage() + ((Math.max(0.75, (level + 2)) * 0.75)));
+            event.setDamage(event.getDamage() + getBonusDamage(level));
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_IRON_GOLEM_HURT, 1.0F, 1.0F);
             event.addReason(getName());
             charge.remove(player);
@@ -106,7 +116,7 @@ public class PowerChop extends PrepareSkill implements CooldownSkill {
 
     @Override
     public double getCooldown(int level) {
-        return cooldown - ((level - 1) * 1.5);
+        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
     @Override
@@ -118,6 +128,9 @@ public class PowerChop extends PrepareSkill implements CooldownSkill {
     @Override
     public void loadSkillConfig() {
         timeToHit = getConfig("timeToHit", 1.0, Double.class);
+        baseBonusDamage = getConfig("baseBonusDamage", 2.0, Double.class);
+        bonusDamageIncreasePerLevel = getConfig("bonusDamageIncreasePerLevel", 0.75, Double.class);
+        minBonusDamage = getConfig("minBonusDamage", 0.75, Double.class);
     }
 
     @Override

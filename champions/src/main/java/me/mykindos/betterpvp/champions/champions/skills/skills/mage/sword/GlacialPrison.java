@@ -32,7 +32,8 @@ public class GlacialPrison extends Skill implements InteractSkill, CooldownSkill
     private final WorldBlockHandler blockHandler;
 
     private int sphereSize;
-    private double duration;
+    private double baseDuration;
+    private double durationIncreasePerLevel;
     private double speed;
 
     @Inject
@@ -53,10 +54,14 @@ public class GlacialPrison extends Skill implements InteractSkill, CooldownSkill
                 "Right click with a Sword to activate",
                 "",
                 "Launches an icy orb, trapping any players within <stat>" + sphereSize  + "</stat>",
-                "blocks of it in a prison of ice for <stat>" + duration + "</stat> seconds",
+                "blocks of it in a prison of ice for <stat>" + getDuration(level) + "</stat> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
+    }
+
+    private double getDuration(int level) {
+        return baseDuration + level * durationIncreasePerLevel;
     }
 
     @Override
@@ -73,7 +78,7 @@ public class GlacialPrison extends Skill implements InteractSkill, CooldownSkill
     @Override
     public double getCooldown(int level) {
 
-        return cooldown - ((level - 1) * 2);
+        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
     @EventHandler
@@ -91,7 +96,8 @@ public class GlacialPrison extends Skill implements InteractSkill, CooldownSkill
 
             if (loc.getBlock().getType().name().contains("REDSTONE")) continue;
             if (loc.getBlock().getType() == Material.AIR || UtilBlock.airFoliage(loc.getBlock())) {
-                blockHandler.addRestoreBlock(loc.getBlock(), Material.ICE, (long) (duration * 1000));
+                int level = getLevel((Player) event.getThrowable().getThrower());
+                blockHandler.addRestoreBlock(loc.getBlock(), Material.ICE, (long) (getDuration(level) * 1000));
 
                 loc.getBlock().setType(Material.ICE);
             }
@@ -103,7 +109,7 @@ public class GlacialPrison extends Skill implements InteractSkill, CooldownSkill
     public void activate(Player player, int level) {
         Item item = player.getWorld().dropItem(player.getEyeLocation(), new ItemStack(Material.ICE));
         item.setVelocity(player.getLocation().getDirection().multiply(speed));
-        ThrowableItem throwableItem = new ThrowableItem(item, player, getName(), 5000, true, true);
+        ThrowableItem throwableItem = new ThrowableItem(item, player, getName(), 10000, true, true);
         throwableItem.setCollideGround(true);
         championsManager.getThrowables().addThrowable(throwableItem);
     }
@@ -111,7 +117,8 @@ public class GlacialPrison extends Skill implements InteractSkill, CooldownSkill
     @Override
     public void loadSkillConfig(){
         sphereSize = getConfig("sphereSize", 5, Integer.class);
-        duration = getConfig("duration", 5.0, Double.class);
+        baseDuration = getConfig("baseDuration", 5.0, Double.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 5.0, Double.class);
         speed = getConfig("speed", 1.5, Double.class);
     }
 

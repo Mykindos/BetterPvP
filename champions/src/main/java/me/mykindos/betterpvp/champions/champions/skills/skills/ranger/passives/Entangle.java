@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -22,6 +23,10 @@ import org.bukkit.potion.PotionEffectType;
 public class Entangle extends Skill implements PassiveSkill {
 
     private double baseDuration;
+
+    private double durationIncreasePerLevel;
+
+    private int slownessStrength;
 
     @Inject
     public Entangle(Champions champions, ChampionsManager championsManager) {
@@ -36,9 +41,13 @@ public class Entangle extends Skill implements PassiveSkill {
     @Override
     public String[] getDescription(int level) {
         return new String[] {
-                "Your arrows apply <effect>Slowness II</effect> to any",
-                "damageable target for <val>" + (baseDuration + (level * 0.5)) + "</val> seconds"
+                "Your arrows apply <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength + 1) + "</effect> to any",
+                "damageable target for <val>" + (getDuration(level)) + "</val> seconds"
         };
+    }
+
+    public double getDuration(int level) {
+        return baseDuration + level * durationIncreasePerLevel;
     }
 
     @Override
@@ -60,13 +69,15 @@ public class Entangle extends Skill implements PassiveSkill {
         int level = getLevel(damager);
         if (level > 0) {
             event.addReason(getName());
-            event.getDamagee().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) ((baseDuration + (level * 0.5)) * 20), 1));
+            event.getDamagee().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) ((getDuration(level)) * 20), slownessStrength));
         }
     }
 
     @Override
     public void loadSkillConfig(){
         baseDuration = getConfig("baseDuration", 2.0, Double.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
+        slownessStrength = getConfig("slownessStrength", 1, Integer.class);
     }
 
 }

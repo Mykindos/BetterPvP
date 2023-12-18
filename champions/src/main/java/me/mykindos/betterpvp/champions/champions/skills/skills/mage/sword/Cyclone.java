@@ -21,7 +21,9 @@ import org.bukkit.util.Vector;
 @Singleton
 public class Cyclone extends Skill implements InteractSkill, CooldownSkill {
 
-    private int minimumDistance;
+    private double baseDistance;
+
+    private double distanceIncreasePerLevel;
 
     @Inject
     public Cyclone(Champions champions, ChampionsManager championsManager) {
@@ -40,10 +42,14 @@ public class Cyclone extends Skill implements InteractSkill, CooldownSkill {
                 "Right click with a Sword to activate",
                 "",
                 "Pulls all enemies within",
-                "<val>" + (minimumDistance + level) + "</val> blocks towards you",
+                "<val>" + getDistance(level) + "</val> blocks towards you",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
+    }
+
+    public double getDistance(int level) {
+        return baseDistance + level * distanceIncreasePerLevel;
     }
 
     @Override
@@ -60,7 +66,7 @@ public class Cyclone extends Skill implements InteractSkill, CooldownSkill {
     @Override
     public double getCooldown(int level) {
 
-        return cooldown - ((level - 1));
+        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
 
@@ -70,7 +76,7 @@ public class Cyclone extends Skill implements InteractSkill, CooldownSkill {
         vector.setY(vector.getY() + 2);
 
 
-        for (LivingEntity target : UtilEntity.getNearbyEnemies(player, player.getLocation(), minimumDistance + level)) {
+        for (LivingEntity target : UtilEntity.getNearbyEnemies(player, player.getLocation(), getDistance(level))) {
             if (!target.getName().equalsIgnoreCase(player.getName())) {
                 if (player.hasLineOfSight(target)) {
 
@@ -92,6 +98,7 @@ public class Cyclone extends Skill implements InteractSkill, CooldownSkill {
 
     @Override
     public void loadSkillConfig(){
-        minimumDistance = getConfig("minimumDistance", 7, Integer.class);
+        baseDistance = getConfig("baseDistance", 7.0, Double.class);
+        distanceIncreasePerLevel = getConfig("distanceIncreasePerLevel", 1.0, Double.class);
     }
 }

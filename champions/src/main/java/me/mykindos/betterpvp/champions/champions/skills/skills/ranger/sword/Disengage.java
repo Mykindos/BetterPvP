@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import org.bukkit.entity.LivingEntity;
@@ -34,6 +35,14 @@ public class Disengage extends PrepareSkill implements CooldownSkill {
 
     private double baseSlowDuration;
 
+    private double slowDurationIncreasePerLevel;
+
+    private double baseProcDuration;
+
+    private double procDurationincreasePerLevel;
+
+    private int slowStrength;
+
     @Inject
     public Disengage(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -51,12 +60,20 @@ public class Disengage extends PrepareSkill implements CooldownSkill {
         return new String[]{
                 "Right click with a Sword to prepare",
                 "",
-                "If you are attacked within <stat>1</stat> second",
+                "If you are attacked within <stat>" + getProcDuration(level) + "</stat> second",
                 "you successfully disengage, leaping backwards",
-                "and giving your attacker <effect>Slowness IV</effect> for",
-                "<val>" + (baseSlowDuration + level) + "</val> seconds",
+                "and giving your attacker <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength + 1) + "</effect> for",
+                "<val>" + getSlowDuration(level) + "</val> seconds",
                 "",
-                "Cooldown: <val>" + getCooldown(level)};
+                "Cooldown: <stat>" + getCooldown(level)};
+    }
+
+    public double getSlowDuration(int level) {
+        return baseSlowDuration + level * slowDurationIncreasePerLevel;
+    }
+
+    public double getProcDuration(int level) {
+        return baseProcDuration + level * procDurationincreasePerLevel;
     }
 
     @Override
@@ -84,7 +101,7 @@ public class Disengage extends PrepareSkill implements CooldownSkill {
             event.setDamage(0);
             UtilVelocity.velocity(damagee, vec, 3D, true, 0.0D, 0.4D, 1.5D, true);
             championsManager.getEffects().addEffect(damagee, EffectType.NOFALL, 3000);
-            ent.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) ((baseSlowDuration + level) * 20), 3));
+            ent.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) (getSlowDuration(level) * 20), slowStrength));
             UtilMessage.message(damagee, getClassType().getName(), "You successfully disengaged");
             disengages.remove(damagee);
         }
@@ -99,13 +116,12 @@ public class Disengage extends PrepareSkill implements CooldownSkill {
     @Override
     public double getCooldown(int level) {
 
-        return cooldown;
+        return cooldown - level * cooldownDecreasePerLevel;
     }
 
     @Override
     public void activate(Player player, int level) {
-        disengages.put(player, System.currentTimeMillis() + 1000L);
-
+        disengages.put(player, System.currentTimeMillis() + (long) (getProcDuration(level) * 1000));
     }
 
     @Override
@@ -116,5 +132,11 @@ public class Disengage extends PrepareSkill implements CooldownSkill {
     @Override
     public void loadSkillConfig(){
         baseSlowDuration = getConfig("baseSlowDuration", 2.0, Double.class);
+        slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 1.0, Double.class);
+
+        baseProcDuration = getConfig("baseProcDuration", 1.0, Double.class);
+        procDurationincreasePerLevel =  getConfig("procDurationincreasePerLevel", 0.0, Double.class);
+
+        slowStrength = getConfig("slowStrength", 3, Integer.class);
     }
 }

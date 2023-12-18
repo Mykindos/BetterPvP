@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -33,6 +34,15 @@ import java.util.UUID;
 @BPvPListener
 public class Immolate extends ActiveToggleSkill implements EnergySkill {
 
+    private double baseFireTickDuration;
+
+    private double fireTickDurationIncreasePerLevel;
+
+    private double baseFireTrailDuration;
+
+    private double fireTrailDurationIncreasePerLevel;
+
+    private int speedStrength;
 
     @Inject
     public Immolate(Champions champions, ChampionsManager championsManager) {
@@ -51,14 +61,22 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill {
                 "Drop your Sword / Axe to toggle",
                 "",
                 "Ignite yourself in flaming fury, gaining",
-                "<effect>Speed II</effect> and <effect>Fire Resistance</effect>",
+                "<effect>Speed " + UtilFormat.getRomanNumeral(speedStrength + 1) + "</effect> and <effect>Fire Resistance</effect>",
                 "",
                 "You leave a trail of fire, which",
-                "burns players that go near it",
+                "burns players that go near it for <stat>" + getFireTickDuration(level) + "</stat> seconds",
                 "",
                 "Energy / Second: <val>" + getEnergy(level)
 
         };
+    }
+
+    public double getFireTickDuration(int level) {
+        return baseFireTickDuration + level * fireTickDurationIncreasePerLevel;
+    }
+
+    public double getFireTrailDuration(int level) {
+        return baseFireTrailDuration + level * fireTrailDurationIncreasePerLevel;
     }
 
     @Override
@@ -95,7 +113,8 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill {
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
                 Item fire = player.getWorld().dropItem(player.getLocation().add(0.0D, 0.5D, 0.0D), new ItemStack(Material.BLAZE_POWDER));
-                ThrowableItem throwableItem = new ThrowableItem(fire, player, getName(), 2000L);
+                int level = getLevel(player);
+                ThrowableItem throwableItem = new ThrowableItem(fire, player, getName(), (long) (getFireTrailDuration(level) * 1000L));
                 championsManager.getThrowables().addThrowable(throwableItem);
 
                 fire.setVelocity(new Vector((Math.random() - 0.5D) / 3.0D, Math.random() / 3.0D, (Math.random() - 0.5D) / 3.0D));
@@ -112,7 +131,8 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill {
         if (e.getCollision().getFireTicks() > 0) return;
 
         //LogManager.addLog(e.getCollision(), damager, "Immolate", 0);
-        e.getCollision().setFireTicks(80);
+        int level = getLevel(damager);
+        e.getCollision().setFireTicks((int) (getFireTickDuration(level) * 20));
     }
 
 
@@ -135,7 +155,7 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill {
                     iterator.remove();
                     sendState(player, false);
                 } else {
-                    player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 25, 1));
+                    player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 25, speedStrength));
                     player.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 25, 0));
                 }
             } else {
@@ -148,15 +168,13 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill {
 
     @Override
     public SkillType getType() {
-
         return SkillType.PASSIVE_B;
     }
 
 
     @Override
     public float getEnergy(int level) {
-
-        return (float) energy - ((level - 1));
+        return (float) (energy - ((level - 1) * energyDecreasePerLevel));
     }
 
     @Override
@@ -175,5 +193,16 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill {
 
     private void sendState(Player player, boolean state) {
         UtilMessage.simpleMessage(player, getClassType().getName(), "Immolate: %s", state ? "<green>On" : "<red>Off");
+    }
+
+    @Override
+    public void loadSkillConfig() {
+        baseFireTickDuration = getConfig("baseFireTickDuration", 4.0, Double.class);
+        fireTickDurationIncreasePerLevel = getConfig("fireTickDurationIncreasePerLevel", 0.0, Double.class);
+
+        baseFireTrailDuration = getConfig("baseFireTrailDuration", 2.0, Double.class);
+        fireTrailDurationIncreasePerLevel = getConfig("fireTrailDurationIncreasePerLevel", 0.0, Double.class);
+
+        speedStrength = getConfig("speedStrength", 1, Integer.class);
     }
 }

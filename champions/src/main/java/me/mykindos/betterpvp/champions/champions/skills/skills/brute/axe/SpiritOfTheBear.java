@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Sound;
@@ -24,6 +25,8 @@ public class SpiritOfTheBear extends Skill implements InteractSkill, CooldownSki
 
     private int radius;
     private double duration;
+
+    private int resistanceStrength;
 
     @Inject
     public SpiritOfTheBear(Champions champions, ChampionsManager championsManager) {
@@ -43,7 +46,7 @@ public class SpiritOfTheBear extends Skill implements InteractSkill, CooldownSki
                 "",
                 "Call upon the spirit of the bear,",
                 "granting all allies within <val>" + (radius + (level)) + "</val> blocks",
-                "<effect>Resistance II</effect> for <stat>" + duration + "</stat> seconds.",
+                "<effect>Resistance " + UtilFormat.getRomanNumeral(resistanceStrength + 1) + "</effect> for <stat>" + duration + "</stat> seconds.",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -63,18 +66,18 @@ public class SpiritOfTheBear extends Skill implements InteractSkill, CooldownSki
     @Override
     public double getCooldown(int level) {
 
-        return cooldown - ((level - 1) * 2);
+        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
 
     @Override
     public void activate(Player player, int level) {
         player.getWorld().playSound(player.getLocation().add(0.0, -1.0, 0.0), Sound.ENTITY_ENDER_DRAGON_GROWL, 1.8F, 2.5F);
-        player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 100, 1));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, (int) duration * 20, resistanceStrength));
         championsManager.getEffects().addEffect(player, EffectType.RESISTANCE, (long) (duration * 1000));
 
         for (Player target : UtilPlayer.getNearbyAllies(player, player.getLocation(), (radius + level))) {
-            target.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 100, 1));
+            target.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, (int) duration * 20, resistanceStrength));
             championsManager.getEffects().addEffect(target, EffectType.RESISTANCE, (long) (duration * 1000));
             UtilMessage.message(target, getClassType().getName(), "You received the spirit of the bear!");
         }
@@ -89,6 +92,7 @@ public class SpiritOfTheBear extends Skill implements InteractSkill, CooldownSki
     public void loadSkillConfig() {
         radius = getConfig("radius", 5, Integer.class);
         duration = getConfig("duration", 5.0, Double.class);
+        resistanceStrength = getConfig("resistanceStrength", 1, Integer.class);
     }
 
 }
