@@ -816,7 +816,7 @@ skills:
       distance: 5
       duration: 2.0
     bloodcompass:
-            enabled: true
+      enabled: true
       maxlevel: 3
       numLines: 1
       effectDuration: 5
