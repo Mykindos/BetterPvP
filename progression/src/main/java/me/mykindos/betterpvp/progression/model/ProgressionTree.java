@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.progression.model;
 
+import lombok.Getter;
 import me.mykindos.betterpvp.core.utilities.model.ConfigAccessor;
 import me.mykindos.betterpvp.progression.model.stats.ProgressionData;
 import me.mykindos.betterpvp.progression.model.stats.ProgressionStatsRepository;
@@ -14,6 +15,9 @@ import java.util.concurrent.CompletableFuture;
  * Represents a progression tree, with skills, buffs, and ways of gaining experience.
  */
 public abstract class ProgressionTree implements ConfigAccessor {
+
+    @Getter
+    protected boolean enabled;
 
     private final Set<ProgressionPerk> perks = new HashSet<>();
 
@@ -52,4 +56,5 @@ public abstract class ProgressionTree implements ConfigAccessor {
     public final CompletableFuture<Boolean> hasPerk(Player player, Class<?> perk) {
         return getPerks(player).thenApply(owned -> owned.stream().anyMatch(perk::isInstance));
     }
+
 }

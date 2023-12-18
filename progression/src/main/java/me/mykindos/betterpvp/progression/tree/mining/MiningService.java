@@ -2,6 +2,8 @@ package me.mykindos.betterpvp.progression.tree.mining;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
@@ -18,6 +20,10 @@ import java.util.function.LongUnaryOperator;
 @Singleton
 public class MiningService {
 
+    @Setter
+    @Getter
+    private boolean enabled;
+
     @Inject
     private MiningRepository repository;
 
@@ -33,6 +39,7 @@ public class MiningService {
     }
 
     public void attemptMineOre(Player player, Block block, LongUnaryOperator experienceModifier) {
+        if (!enabled) return;
         long experience = getExperience(block.getType());
         if (experience <= 0) {
             return; // Cancel if they don't get experience from this block

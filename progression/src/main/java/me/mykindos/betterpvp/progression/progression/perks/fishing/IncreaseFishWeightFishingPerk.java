@@ -22,6 +22,10 @@ import org.bukkit.event.Listener;
 @Singleton
 @Slf4j
 public class IncreaseFishWeightFishingPerk implements Listener, ProgressionPerk, ChanceHandler {
+    @Config(path = "fishing.perks.fish-weight.enabled", defaultValue = "true")
+    @Inject
+    private boolean enabled;
+
     @Config(path = "fishing.perks.fish-weight.minLevel", defaultValue = "0")
     @Inject
     private int minLevel;
@@ -64,6 +68,8 @@ public class IncreaseFishWeightFishingPerk implements Listener, ProgressionPerk,
 
     @EventHandler (priority = EventPriority.NORMAL)
     public void onCatch(PlayerCaughtFishEvent event) {
+        if (!enabled) return;
+        if(!fishing.isEnabled()) return;
         if ((event.getLoot() instanceof Fish fish)) {
             Player player = event.getPlayer();
             fishing.hasPerk(player, getClass()).whenComplete((hasPerk, throwable) -> {
