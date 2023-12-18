@@ -14,11 +14,16 @@ import me.mykindos.betterpvp.core.database.query.values.BooleanStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.database.repository.IRepository;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 import javax.sql.rowset.CachedRowSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static java.util.UUID.fromString;
 
 @Singleton
 public class BuildRepository implements IRepository<RoleBuild> {
@@ -85,16 +90,21 @@ public class BuildRepository implements IRepository<RoleBuild> {
 
         if (value != null && !value.isEmpty()) {
             String[] split = value.split(",");
-            Skill skill = skillManager.getObjects().get(split[0]);
-            if(skill == null) return;
-            if (!skill.isEnabled()) return;
-
-            int level = Integer.parseInt(split[1]);
-            build.setSkill(type, skill, level);
-            build.takePoints(level);
-
-
+            setSkill(build, type, split[0], Integer.parseInt(split[1]));
         }
+    }
+
+    private void setSkill(RoleBuild build, SkillType type, String skillName, int level) {
+        Skill skill = skillManager.getObjects().get(skillName);
+        if (skill == null) return;
+        if (!skill.isEnabled()) {
+            Player player = Bukkit.getPlayer(fromString(build.getUuid()));
+            if (player == null) return;
+            UtilMessage.message(player, "Champions", UtilMessage.deserialize("<green>%s</green> has been disabled on this server, refunding <green>%s</green> skill point(s) and removing from <yellow>%s</yellow> build <green>%s</green>", skill.getName(), level, build.getRole().toString(), build.getId()));
+            return;
+        }
+        build.setSkill(type, skill, level);
+        build.takePoints(level);
     }
 
     @Override
@@ -146,47 +156,41 @@ public class BuildRepository implements IRepository<RoleBuild> {
         for (int d = 1; d < 5; d++) {
 
             RoleBuild assassin = new RoleBuild(uuid, Role.valueOf("ASSASSIN"), d);
-
-            assassin.setSkill(SkillType.SWORD, skillManager.getObjects().get("Sever"), 3);
-            assassin.setSkill(SkillType.AXE, skillManager.getObjects().get("Leap"), 5);
-            assassin.setSkill(SkillType.PASSIVE_A, skillManager.getObjects().get("Backstab"), 1);
-            assassin.setSkill(SkillType.PASSIVE_B, skillManager.getObjects().get("Smoke Bomb"), 3);
-            assassin.takePoints(12);
+            setSkill(assassin, SkillType.SWORD, "Sever", 3);
+            setSkill(assassin, SkillType.AXE, "Leap", 5);
+            setSkill(assassin, SkillType.PASSIVE_A, "Backstab", 1);
+            setSkill(assassin, SkillType.PASSIVE_B, "Smoke Bomb", 3);
 
             RoleBuild brute = new RoleBuild(uuid, Role.valueOf("BRUTE"), d);
-            brute.setSkill(SkillType.SWORD, skillManager.getObjects().get("Takedown"), 5);
-            brute.setSkill(SkillType.AXE, skillManager.getObjects().get("Seismic Slam"), 3);
-            brute.setSkill(SkillType.PASSIVE_A, skillManager.getObjects().get("Colossus"), 1);
-            brute.setSkill(SkillType.PASSIVE_B, skillManager.getObjects().get("Stampede"), 3);
-            brute.takePoints(12);
+            setSkill(brute, SkillType.SWORD, "Takedown", 5);
+            setSkill(brute, SkillType.AXE, "Seismic Slam", 3);
+            setSkill(brute, SkillType.PASSIVE_A, "Colossus", 1);
+            setSkill(brute, SkillType.PASSIVE_B, "Stampede", 3);
+
 
             RoleBuild ranger = new RoleBuild(uuid, Role.valueOf("RANGER"), d);
-            ranger.setSkill(SkillType.SWORD, skillManager.getObjects().get("Disengage"), 3);
-            ranger.setSkill(SkillType.BOW, skillManager.getObjects().get("Incendiary Shot"), 5);
-            ranger.setSkill(SkillType.PASSIVE_A, skillManager.getObjects().get("Longshot"), 3);
-            ranger.setSkill(SkillType.PASSIVE_B, skillManager.getObjects().get("Sharpshooter"), 1);
-            ranger.takePoints(12);
+            setSkill(ranger, SkillType.SWORD, "Disengage", 3);
+            setSkill(ranger, SkillType.BOW, "Incendiary Shot", 5);
+            setSkill(ranger, SkillType.PASSIVE_A, "Longshot", 3);
+            setSkill(ranger, SkillType.PASSIVE_B, "Sharpshooter", 1);
 
             RoleBuild mage = new RoleBuild(uuid, Role.valueOf("MAGE"), d);
-            mage.setSkill(SkillType.SWORD, skillManager.getObjects().get("Inferno"), 5);
-            mage.setSkill(SkillType.AXE, skillManager.getObjects().get("Molten Blast"), 3);
-            mage.setSkill(SkillType.PASSIVE_A, skillManager.getObjects().get("Holy Light"), 2);
-            mage.setSkill(SkillType.PASSIVE_B, skillManager.getObjects().get("Immolate"), 2);
-            mage.takePoints(12);
+            setSkill(mage, SkillType.SWORD, "Inferno", 5);
+            setSkill(mage, SkillType.AXE, "Molten Blast", 3);
+            setSkill(mage, SkillType.PASSIVE_A, "Holy Light", 2);
+            setSkill(mage, SkillType.PASSIVE_B, "Immolate", 2);
 
             RoleBuild knight = new RoleBuild(uuid, Role.valueOf("KNIGHT"), d);
-            knight.setSkill(SkillType.SWORD, skillManager.getObjects().get("Riposte"), 3);
-            knight.setSkill(SkillType.AXE, skillManager.getObjects().get("Bulls Charge"), 5);
-            knight.setSkill(SkillType.PASSIVE_A, skillManager.getObjects().get("Fury"), 3);
-            knight.setSkill(SkillType.PASSIVE_B, skillManager.getObjects().get("Swordsmanship"), 1);
-            knight.takePoints(12);
+            setSkill(knight, SkillType.SWORD, "Riposte", 3);
+            setSkill(knight, SkillType.AXE, "Bulls Charge", 5);
+            setSkill(knight, SkillType.PASSIVE_A, "Fury", 3);
+            setSkill(knight, SkillType.PASSIVE_B, "Swordsmanship", 1);
 
             RoleBuild warlock = new RoleBuild(uuid, Role.valueOf("WARLOCK"), d);
-            warlock.setSkill(SkillType.SWORD, skillManager.getObjects().get("Leech"), 4);
-            warlock.setSkill(SkillType.AXE, skillManager.getObjects().get("Bloodshed"), 5);
-            warlock.setSkill(SkillType.PASSIVE_A, skillManager.getObjects().get("Frailty"), 1);
-            warlock.setSkill(SkillType.PASSIVE_B, skillManager.getObjects().get("Soul Harvest"), 2);
-            warlock.takePoints(12);
+            setSkill(warlock, SkillType.SWORD, "Leech", 4);
+            setSkill(warlock, SkillType.AXE, "Bloodshed", 5);
+            setSkill(warlock, SkillType.PASSIVE_A, "Frailty", 1);
+            setSkill(warlock, SkillType.PASSIVE_B, "Soul Harvest", 2);
 
             builds.addAll(List.of(knight, ranger, brute, mage, assassin, warlock));
 
