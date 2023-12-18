@@ -7,17 +7,22 @@ import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.components.champions.Role;
+import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.Optional;
 
 @Singleton
 public class SkillsCommand extends Command {
+    @Inject
+    @Config(path = "command.skills.seeOtherPlayerSkillsRank", defaultValue = "TRIAL_MOD" )
+    private String seeOtherPlayerSkillsRankString;
+
 
     private final RoleManager roleManager;
     private final BuildManager buildManager;
@@ -26,6 +31,7 @@ public class SkillsCommand extends Command {
     public SkillsCommand(RoleManager roleManager, BuildManager buildManager) {
         this.roleManager = roleManager;
         this.buildManager = buildManager;
+        this.aliases.add("skill");
     }
 
     @Override
@@ -40,6 +46,32 @@ public class SkillsCommand extends Command {
 
     @Override
     public void execute(Player player, Client client, String... args) {
+        if (args.length > 0 && client.hasRank(Rank.valueOf(seeOtherPlayerSkillsRankString.toUpperCase()))) {
+            Player target = Bukkit.getPlayer(args[0]);
+            if (target == null) {
+                UtilMessage.message(player, "Skills", UtilMessage.deserialize("<yellow>%s</yellow> is not a valid player", args[0]));
+                return;
+            }
+            Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(target.getUniqueId().toString());
+            if (gamerBuildsOptional.isEmpty()) {
+                UtilMessage.message(player, "Skills", UtilMessage.deserialize("<yellow>%s</yellow> does not have any builds", target.getName()));
+                return;
+            }
+            Optional<Role> roleOptional = roleManager.getObject(target.getUniqueId());
+            if (roleOptional.isEmpty()) {
+                UtilMessage.message(player, "Skills", UtilMessage.deserialize("<yellow>%s</yellow> does not have a set equipped", target.getName()));;
+                return;
+            }
+            GamerBuilds builds = gamerBuildsOptional.get();
+            Role role = roleOptional.get();
+            RoleBuild build = builds.getActiveBuilds().get(role.getName());
+            if (build != null) {
+                UtilMessage.message(player, "Skills", UtilMessage.deserialize("<yellow>%s</yellow>'s Build:", target.getName()).appendNewline().append(build.getBuildComponent()));
+                return;
+            }
+
+        }
+
         Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(player.getUniqueId().toString());
         if (gamerBuildsOptional.isPresent()) {
             GamerBuilds builds = gamerBuildsOptional.get();
@@ -53,22 +85,13 @@ public class SkillsCommand extends Command {
             Role role = roleOptional.get();
             RoleBuild build = builds.getActiveBuilds().get(role.getName());
             if (build != null) {
-
-                String sword = build.getSwordSkill() == null ? "" : build.getSwordSkill().getString();
-                String axe = build.getAxeSkill() == null ? "" : build.getAxeSkill().getString();
-                String bow = build.getBow() == null ? "" : build.getBow().getString();
-                String passivea = build.getPassiveA() == null ? "" : build.getPassiveA().getString();
-                String passiveb = build.getPassiveB() == null ? "" : build.getPassiveB().getString();
-                String global = build.getGlobal() == null ? "" : build.getGlobal().getString();
-
-                UtilMessage.message(player, Component.text("Sword: ", NamedTextColor.GREEN).append(Component.text(sword, NamedTextColor.WHITE)).appendNewline()
-                        .append(Component.text("Axe: ", NamedTextColor.GREEN).append(Component.text(axe, NamedTextColor.WHITE))).appendNewline()
-                        .append(Component.text("Bow: ", NamedTextColor.GREEN).append(Component.text(bow, NamedTextColor.WHITE))).appendNewline()
-                        .append(Component.text("Passive A: ", NamedTextColor.GREEN).append(Component.text(passivea, NamedTextColor.WHITE))).appendNewline()
-                        .append(Component.text("Passive B: ", NamedTextColor.GREEN).append(Component.text(passiveb, NamedTextColor.WHITE))).appendNewline()
-                        .append(Component.text("Global: ", NamedTextColor.GREEN).append(Component.text(global, NamedTextColor.WHITE))));
-
+                UtilMessage.message(player, build.getBuildComponent());
             }
         }
+    }
+
+    @Override
+    public String getArgumentType(int argCount) {
+        return argCount == 1 ? ArgumentType.PLAYER.name() : ArgumentType.NONE.name();
     }
 }
