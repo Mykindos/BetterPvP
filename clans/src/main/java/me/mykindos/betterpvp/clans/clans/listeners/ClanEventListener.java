@@ -5,13 +5,13 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanProperty;
-import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
 import me.mykindos.betterpvp.clans.clans.data.ClanDefaultValues;
 import me.mykindos.betterpvp.clans.clans.events.*;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.command.CommandManager;
 import me.mykindos.betterpvp.core.command.ICommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
@@ -46,7 +46,7 @@ public class ClanEventListener extends ClanListener {
     private final WorldBlockHandler blockHandler;
     private final Clans clans;
 
-    private final ClanCommand clanCommand;
+    private final CommandManager commandManager;
 
     @Inject
     @Config(path = "clans.members.max", defaultValue = "6")
@@ -54,12 +54,12 @@ public class ClanEventListener extends ClanListener {
 
     @Inject
     public ClanEventListener(Clans clans, ClanManager clanManager, ClientManager clientManager, InviteHandler inviteHandler,
-                             WorldBlockHandler blockHandler, ClanCommand clanCommand) {
+                             WorldBlockHandler blockHandler, CommandManager commandManager) {
         super(clanManager, clientManager);
         this.clans = clans;
         this.inviteHandler = inviteHandler;
         this.blockHandler = blockHandler;
-        this.clanCommand = clanCommand;
+        this.commandManager = commandManager;
     }
 
     @EventHandler
@@ -114,6 +114,7 @@ public class ClanEventListener extends ClanListener {
     public void onClanCreate(ClanCreateEvent event) {
 
         Clan clan = event.getClan();
+        ICommand clanCommand = commandManager.getCommand("clan").orElseThrow();
 
         for (ICommand subCommand : clanCommand.getSubCommands()) {
 
