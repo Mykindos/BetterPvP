@@ -5,30 +5,14 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanProperty;
+import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
 import me.mykindos.betterpvp.clans.clans.data.ClanDefaultValues;
-import me.mykindos.betterpvp.clans.clans.events.ChunkClaimEvent;
-import me.mykindos.betterpvp.clans.clans.events.ChunkUnclaimEvent;
-import me.mykindos.betterpvp.clans.clans.events.ClanAllianceEvent;
-import me.mykindos.betterpvp.clans.clans.events.ClanCreateEvent;
-import me.mykindos.betterpvp.clans.clans.events.ClanDisbandEvent;
-import me.mykindos.betterpvp.clans.clans.events.ClanEnemyEvent;
-import me.mykindos.betterpvp.clans.clans.events.ClanInviteMemberEvent;
-import me.mykindos.betterpvp.clans.clans.events.ClanKickMemberEvent;
-import me.mykindos.betterpvp.clans.clans.events.ClanNeutralEvent;
-import me.mykindos.betterpvp.clans.clans.events.ClanRequestAllianceEvent;
-import me.mykindos.betterpvp.clans.clans.events.ClanRequestNeutralEvent;
-import me.mykindos.betterpvp.clans.clans.events.ClanRequestTrustEvent;
-import me.mykindos.betterpvp.clans.clans.events.ClanSetHomeEvent;
-import me.mykindos.betterpvp.clans.clans.events.ClanTrustEvent;
-import me.mykindos.betterpvp.clans.clans.events.ClanUntrustEvent;
-import me.mykindos.betterpvp.clans.clans.events.MemberDemoteEvent;
-import me.mykindos.betterpvp.clans.clans.events.MemberJoinClanEvent;
-import me.mykindos.betterpvp.clans.clans.events.MemberLeaveClanEvent;
-import me.mykindos.betterpvp.clans.clans.events.MemberPromoteEvent;
+import me.mykindos.betterpvp.clans.clans.events.*;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.command.ICommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
@@ -62,17 +46,20 @@ public class ClanEventListener extends ClanListener {
     private final WorldBlockHandler blockHandler;
     private final Clans clans;
 
+    private final ClanCommand clanCommand;
+
     @Inject
     @Config(path = "clans.members.max", defaultValue = "6")
     private int maxClanMembers;
 
     @Inject
     public ClanEventListener(Clans clans, ClanManager clanManager, ClientManager clientManager, InviteHandler inviteHandler,
-                             WorldBlockHandler blockHandler) {
+                             WorldBlockHandler blockHandler, ClanCommand clanCommand) {
         super(clanManager, clientManager);
         this.clans = clans;
         this.inviteHandler = inviteHandler;
         this.blockHandler = blockHandler;
+        this.clanCommand = clanCommand;
     }
 
     @EventHandler
@@ -127,6 +114,14 @@ public class ClanEventListener extends ClanListener {
     public void onClanCreate(ClanCreateEvent event) {
 
         Clan clan = event.getClan();
+
+        for (ICommand subCommand : clanCommand.getSubCommands()) {
+
+            if (subCommand.getName().equalsIgnoreCase(clan.getName()) || subCommand.getAliases().stream().anyMatch(o -> o.equalsIgnoreCase(clan.getName()))) {
+                UtilMessage.message(event.getPlayer(), "Command", "Clan name cannot be a clan's subcommand name or alias");
+                return;
+            }
+        }
 
         clan.getMembers().add(new ClanMember(event.getPlayer().getUniqueId().toString(), ClanMember.MemberRank.LEADER));
 
