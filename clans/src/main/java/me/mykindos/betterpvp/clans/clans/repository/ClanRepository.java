@@ -8,12 +8,15 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanProperty;
 import me.mykindos.betterpvp.clans.clans.insurance.Insurance;
 import me.mykindos.betterpvp.clans.clans.insurance.InsuranceType;
+import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.components.clans.IClan;
 import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.components.clans.data.ClanTerritory;
 import me.mykindos.betterpvp.core.database.Database;
+import me.mykindos.betterpvp.core.database.mappers.PropertyMapper;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.BooleanStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.DoubleStatementValue;
@@ -50,11 +53,14 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ClanRepository implements IRepository<Clan> {
 
     private final Database database;
+    private final PropertyMapper propertyMapper;
+
     private final ConcurrentHashMap<String, Statement> queuedPropertyUpdates;
 
     @Inject
-    public ClanRepository( Database database) {
+    public ClanRepository(Database database, PropertyMapper propertyMapper) {
         this.database = database;
+        this.propertyMapper = propertyMapper;
         this.queuedPropertyUpdates = new ConcurrentHashMap<>();
     }
 
@@ -102,23 +108,10 @@ public class ClanRepository implements IRepository<Clan> {
     }
 
     private void loadProperties(Clan clan) {
-        String query = "SELECT properties.Property, Value, Type FROM clan_properties properties INNER JOIN "
-                + "property_map map on properties.Property = map.Property WHERE Clan = ?";
+        String query = "SELECT Property, Value FROM clan_properties WHERE Clan = ?";
         CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId())));
         try {
-            while (result.next()) {
-                String value = result.getString(1);
-                String type = result.getString(3);
-                Object property = switch (type) {
-                    case "int" -> result.getInt(2);
-                    case "boolean" -> Boolean.parseBoolean(result.getString(2));
-                    case "double" -> Double.parseDouble(result.getString(2));
-                    case "long" -> Long.parseLong(result.getString(2));
-                    default -> Class.forName(type).cast(result.getObject(2));
-                };
-
-                clan.putProperty(value, property, true);
-            }
+           propertyMapper.parseProperties(result, clan);
         } catch (SQLException | ClassNotFoundException ex) {
             log.error("Failed to load clan properties for {}", clan.getId(), ex);
         }
