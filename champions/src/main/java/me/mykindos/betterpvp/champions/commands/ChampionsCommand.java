@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.commands;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
+import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
 import me.mykindos.betterpvp.champions.champions.skills.SkillManager;
 import me.mykindos.betterpvp.champions.listeners.ChampionsListenerLoader;
 import me.mykindos.betterpvp.champions.weapons.WeaponManager;
@@ -67,6 +68,9 @@ public class ChampionsCommand extends Command implements IConsoleCommand {
         @Inject
         private WeaponManager weaponManager;
 
+        @Inject
+        private BuildManager buildManager;
+
         @Override
         public String getName() {
             return "reload";
@@ -90,6 +94,7 @@ public class ChampionsCommand extends Command implements IConsoleCommand {
             listenerLoader.reload(champions.getClass().getPackageName());
             skillManager.reloadSkills();
             weaponManager.reload();
+            buildManager.reloadBuilds();
 
             itemHandler.loadItemData("Champions");
 
