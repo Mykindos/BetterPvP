@@ -31,6 +31,8 @@ public class BloodCompass extends Skill implements ToggleSkill, CooldownSkill {
     public double escapeRadius;
     public double damage;
     public double damageIncreasePerLevel;
+    public double escapeRadiusIncreasePerLevel;
+    public double maxDistanceIncreasePerLevel;
     private final List<List<Location>> markers = new ArrayList<>();
     private final Map<Integer, Player> lineToPlayerMap = new HashMap<>();
     private Map<Integer, Integer> currentPoints;
@@ -74,9 +76,9 @@ public class BloodCompass extends Skill implements ToggleSkill, CooldownSkill {
     private void findEnemies(Player player, int level) {
         markers.clear();
         lineToPlayerMap.clear();
-        List<Player> enemies = UtilPlayer.getNearbyEnemies(player, player.getLocation(), (maxDistance));
+        List<Player> enemies = UtilPlayer.getNearbyEnemies(player, player.getLocation(), (maxDistance + maxDistanceIncreasePerLevel));
         enemies.sort(Comparator.comparingDouble(p -> p.getLocation().distance(player.getLocation())));
-        enemies = enemies.subList(0, Math.min(enemies.size(), numLines * level));
+        enemies = enemies.subList(0, Math.min(enemies.size(), getFinalNumLines(level)));
 
         if (enemies.isEmpty()) {
             UtilMessage.message(player, getClassType().getName(), "Blood Compass failed.");
@@ -111,7 +113,7 @@ public class BloodCompass extends Skill implements ToggleSkill, CooldownSkill {
                 }
 
                 if (pathIsClear) {
-                    drawCircle(target.getLocation(), escapeRadius);
+                    drawCircle(target.getLocation(), (escapeRadius + escapeRadiusIncreasePerLevel));
                 }
             }
         }
@@ -166,7 +168,7 @@ public class BloodCompass extends Skill implements ToggleSkill, CooldownSkill {
             if (target != null && target.isOnline()) {
                 Location originalTargetLocation = points.get(points.size() - 1);
 
-                if (currentPointIndex == points.size() - 2 && target.getLocation().distance(originalTargetLocation) <= escapeRadius) {
+                if (currentPointIndex == points.size() - 2 && target.getLocation().distance(originalTargetLocation) <= (escapeRadius + escapeRadiusIncreasePerLevel)) {
                     points.set(points.size() - 1, target.getLocation());
                 }
 
@@ -316,5 +318,7 @@ public class BloodCompass extends Skill implements ToggleSkill, CooldownSkill {
         escapeRadius = getConfig("escapeRadius", 7.0, Double.class);
         damage = getConfig("damage", 7.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 2.0, Double.class);
+        maxDistanceIncreasePerLevel = getConfig("maxDistanceIncreasePerLevel",0.0, Double.class);
+        escapeRadiusIncreasePerLevel = getConfig("escapeRadiusIncreasePerLevel",0.0, Double.class);
     }
 }
