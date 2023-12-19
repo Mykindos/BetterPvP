@@ -826,6 +826,8 @@ skills:
       escapeRadius: 7.0
       damage: 7.0
       damageIncreasePerLevel: 2.0
+      escapeRadiusIncreasePerLevel: 0.0
+      maxDistanceIncreasePerLevel: 0.0
     grasp:
       enabled: true
       maxlevel: 5
