@@ -52,6 +52,9 @@ public class BuildRepository implements IRepository<RoleBuild> {
                 int id = result.getInt(3);
                 RoleBuild build = new RoleBuild(uuid, Role.valueOf(role.toUpperCase()), id);
 
+                boolean active = result.getBoolean(10);
+                build.setActive(active);
+
                 String sword = result.getString(4);
                 setSkill(build, SkillType.SWORD, sword);
 
@@ -69,9 +72,6 @@ public class BuildRepository implements IRepository<RoleBuild> {
 
                 String global = result.getString(9);
                 setSkill(build, SkillType.GLOBAL, global);
-
-                boolean active = result.getBoolean(10);
-                build.setActive(active);
 
                 if (active) {
                     builds.getActiveBuilds().put(role, build);
@@ -98,6 +98,7 @@ public class BuildRepository implements IRepository<RoleBuild> {
         Skill skill = skillManager.getObjects().get(skillName);
         if (skill == null) return;
         if (!skill.isEnabled()) {
+            if (!build.isActive()) return;
             Player player = Bukkit.getPlayer(fromString(build.getUuid()));
             if (player == null) return;
             UtilMessage.message(player, "Champions", UtilMessage.deserialize("<green>%s</green> has been disabled on this server, refunding <green>%s</green> skill point(s) and removing from <yellow>%s</yellow> build <green>%s</green>", skill.getName(), level, build.getRole().toString(), build.getId()));
