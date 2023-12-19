@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.framework.annotations.WithReflection;
 import me.mykindos.betterpvp.core.utilities.UtilLocation;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 @Singleton
@@ -30,8 +31,9 @@ public class TeleportPositionCommand extends Command {
     public void execute(Player player, Client client, String... args) {
         double x = 0, y = 0, z = 0;
         if (args.length == 3) {
-            player.teleport(UtilLocation.getTeleportLocation(player.getLocation(), args));
-            UtilMessage.message(player, UtilMessage.deserialize("You teleported to (<green>%s</green>, <green>%s</green>, <green>%s</green>)", x, y, z));
+            Location location = UtilLocation.getTeleportLocation(player.getLocation(), args);
+            player.teleport(location);
+            UtilMessage.message(player, "Teleport", UtilMessage.deserialize("You teleported to (<green>%s</green>, <green>%s</green>, <green>%s</green>)", location.getX(), location.getY(), location.getZ()));
         } else {
             UtilMessage.message(player, "Teleport", "Correct usage: /tppos x y z");
         }
