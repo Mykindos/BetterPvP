@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.clans.fields.event.FieldsInteractableUseEvent;
 import me.mykindos.betterpvp.clans.fields.model.FieldsInteractable;
 import me.mykindos.betterpvp.clans.fields.model.FieldsOre;
+import me.mykindos.betterpvp.clans.progression.ProgressionAdapter;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.utilities.model.ConfigAccessor;
 import me.mykindos.betterpvp.progression.tree.mining.Mining;
@@ -20,9 +21,12 @@ import org.jetbrains.annotations.NotNull;
 public class MiningListener implements Listener, ConfigAccessor {
 
     private double xpMultiplier;
+    private final Mining mining;
 
-    @Inject(optional = true)
-    private Mining mining;
+    @Inject
+    public MiningListener(ProgressionAdapter adapter) {
+        this.mining = adapter.getProgression().getInjector().getInstance(Mining.class);
+    }
 
     @EventHandler
     public void onFieldsOreMine(FieldsInteractableUseEvent event) {
