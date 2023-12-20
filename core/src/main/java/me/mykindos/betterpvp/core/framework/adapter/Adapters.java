@@ -53,10 +53,13 @@ public final class Adapters {
             // Attempt to call the onLoad method
             try {
                 clazz.getMethod(adapterAnnotation[0].loadMethodName()).invoke(adapter);
-            } catch (IllegalAccessException | InvocationTargetException e) {
+            } catch (IllegalAccessException e) {
                 log.warn("Could not invoke load method for adapter " + clazz.getSimpleName() + " for " + pluginName + "!");
             } catch (NoSuchMethodException ignored) {
                 // Ignored because this is not required
+            } catch (InvocationTargetException e) {
+                log.error("Could not invoke load method for adapter " + clazz.getSimpleName() + " for " + pluginName + "!", e);
+                continue;
             }
 
             log.info("Loaded adapter " + clazz.getSimpleName() + " for " + pluginName + "!");

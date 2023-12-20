@@ -126,6 +126,15 @@ command:
     reload:
       enabled: true
       requiredRank: ADMIN
+fishing:
+  base-fishing-perk:
+    level: 10
+    enabled: true
+mining:
+  faster-ores-perk:
+    level: 10
+    enabled: true
+    speed-multiplier: 2.0
 fields:
   blocks:
     goldchunk:
