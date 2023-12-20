@@ -21,7 +21,6 @@ public class RecipeHandler {
             if (recipe instanceof Keyed keyedRecipe) {
                 Key key = keyedRecipe.key();
                 if (!key.namespace().equalsIgnoreCase(namespace)) continue;
-
                 if (!config.getBoolean(path + key.namespace() + '.' + key.value(), true)) {
                     Bukkit.removeRecipe((NamespacedKey) key);
                     log.error("Disabling recipe: " + key.asString());
