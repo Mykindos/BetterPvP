@@ -275,4 +275,47 @@ public class UtilLocation {
         return Optional.of(result);
     }
 
+    /**
+     *
+     * @param initialLocation the location that any relative coordinates refers to
+     * @param coordinates A list of a 3 strings, with x, y, z coordinates  Accepts `~` notation in the front. Acceptable inputs: ["0", "0", "0"], gives the location 0, 0, 0 and ["~", "~1", "~0"], which gives the location initialLocation.x, initalLocation.y + 1, initialLocation.z.
+     * @return the Location calculated
+     */
+    public static Location getTeleportLocation (Location initialLocation, String[] coordinates) {
+        double x = 0, y = 0, z = 0;
+        Location location = initialLocation.getWorld().getSpawnLocation();
+        if (coordinates.length == 3) {
+            if (coordinates[0].startsWith("~")) {
+                coordinates[0] = coordinates[0].substring(1);
+                x = initialLocation.getX();
+            }
+            try {
+                x += Double.parseDouble(coordinates[0]);
+            } catch (NumberFormatException e) {
+                x += 0;
+            }
+            if (coordinates[1].startsWith("~")) {
+                coordinates[1] = coordinates[1].substring(1);
+                y = initialLocation.getY();
+            }
+            try {
+                y += Double.parseDouble(coordinates[1]);
+            } catch (NumberFormatException e) {
+                y += 0;
+            }
+
+            if (coordinates[2].startsWith("~")) {
+                coordinates[2] = coordinates[2].substring(1);
+                z = initialLocation.getZ();
+            }
+            try {
+                z += Double.parseDouble(coordinates[2]);
+            } catch (NumberFormatException e) {
+                z += 0;
+            }
+            location.set(x, y, z);
+        }
+        return location;
+    }
+
 }
