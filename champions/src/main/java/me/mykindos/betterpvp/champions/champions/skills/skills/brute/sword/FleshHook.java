@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.brute.sword;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
@@ -33,6 +34,7 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
@@ -46,12 +48,16 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
+@Slf4j
 public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSkill {
     private final List<ChargeData> charges = new ArrayList<>();
     private final WeakHashMap<Player, Long> delay = new WeakHashMap<>();
+    private final WeakHashMap<Player, ChargeData> playerChargeMap = new WeakHashMap<>();
+
 
     public double damage;
     public double damageIncreasePerLevel;
+    public double cooldownDecreasePerLevel;
 
     @Inject
     public FleshHook(Champions champions, ChampionsManager championsManager) {
@@ -71,7 +77,7 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
                 "Hold right click with a Sword to channel",
                 "",
                 "Charge a hook that latches onto enemies, pulling them towards you",
-                "and dealing up to <val>" + (damage + (damageIncreasePerLevel * (level-1)))+"</val> damage",
+                "and dealing <val>" + getFinalDamage(level) + "</val> damage",
                 "",
                 "Higher Charge time = faster hook",
                 "",
@@ -79,11 +85,14 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
         };
     }
 
+    public double getFinalDamage(int level){
+        return (damage + (damageIncreasePerLevel * (level-1)));
+    }
+
     @Override
     public Role getClassType() {
         return Role.BRUTE;
     }
-
 
     @UpdateEvent
     public void updateFleshHook() {
@@ -111,6 +120,7 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
                     if (UtilTime.elapsed(data.getLastCharge(), 400L)) {
                         if (data.getCharge() < data.getMaxCharge()) {
                             data.addCharge();
+                            playerChargeMap.put(player, data);
                             UtilMessage.simpleMessage(player, getClassType().getName(), getName() + ": <alt2>+ " + data.getCharge() + "% Strength");
                             player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.4F, 1.0F + 0.05F * data.getCharge());
                         }
@@ -123,7 +133,6 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
                         Item item = player.getWorld().dropItem(player.getEyeLocation(), new ItemStack(Material.TRIPWIRE_HOOK));
                         ThrowableItem throwable = new ThrowableItem(item, player, getName(), 10000L, true, true);
                         throwable.setCollideGround(true);
-                        throwable.setChargePercent(data.getCharge());
                         championsManager.getThrowables().addThrowable(throwable);
 
                         Vector v = loc.getDirection();
@@ -148,9 +157,11 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
             LivingEntity target = event.getCollision();
 
             Player source = (Player) event.getThrowable().getThrower();
+            int level = getLevel(source);
 
-            int chargePercent = event.getThrowable().getChargePercent();
-            double scaledDamage = (damage + (damageIncreasePerLevel * getLevel(source))) * (chargePercent / 100.0);
+            ChargeData chargeData = playerChargeMap.get(source);
+            int chargePercent = (chargeData != null) ? chargeData.getCharge() : 0;
+            double scaledDamage = getFinalDamage(level) * (chargePercent / 100.0);
 
             CustomDamageEvent ev = new CustomDamageEvent(target, source, null, DamageCause.CUSTOM, scaledDamage, false, getName());
             UtilDamage.doCustomDamage(ev);
@@ -169,13 +180,16 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
     @Override
     public double getCooldown(int level) {
 
-        return cooldown - ((level - 1) * 2);
+        return (cooldown - (cooldownDecreasePerLevel * (level - 1)));
     }
 
     @Override
     public void activate(Player player, int level) {
-        charges.add(new ChargeData(player.getUniqueId(), 25, 100));
+        ChargeData chargeData = new ChargeData(player.getUniqueId(), 25, 100);
+        charges.add(chargeData);
         delay.put(player, System.currentTimeMillis());
+
+        playerChargeMap.put(player, chargeData);
     }
 
     @Override
@@ -214,5 +228,6 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
     public void loadSkillConfig() {
         damage = getConfig("damage", 7.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 2.0, Double.class);
+        cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 2.0, Double.class);
     }
 }
