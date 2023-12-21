@@ -121,7 +121,7 @@ public class CombatListener implements Listener {
                 CustomDamageReductionEvent customDamageReductionEvent = UtilServer.callEvent(new CustomDamageReductionEvent(event, event.getDamage()));
                 customDamageReductionEvent.setDamage(armourManager.getDamageReduced(event.getDamage(), event.getDamagee()));
 
-                event.setRawDamage(event.getDamage());
+
                 event.setDamage(event.isIgnoreArmour() ? event.getDamage() : customDamageReductionEvent.getDamage());
 
                 for (CustomDamageAdapter adapter : customDamageAdapters) {
