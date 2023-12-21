@@ -158,12 +158,12 @@ public class FieldsListener extends ClanListener {
                 .forEach(entry -> {
                     final FieldsBlock interactable = entry.getValue();
                     final FieldsInteractable type = entry.getKey();
-                    if (!UtilTime.elapsed(interactable.getLastUsed(), (long) (type.getRespawnDelay() * 1_000 / modifier))) {
-                        return;
-                    }
-
                     if (interactable.isActive()) {
                         return; // The block is already the interactable, ignore
+                    }
+
+                    if (!UtilTime.elapsed(interactable.getLastUsed(), (long) (type.getRespawnDelay() * 1_000 / modifier))) {
+                        return;
                     }
 
                     final Block block = interactable.getLocation().getBlock();

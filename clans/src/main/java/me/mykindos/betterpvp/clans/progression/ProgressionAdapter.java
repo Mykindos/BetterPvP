@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.clans.progression;
 
 import com.google.inject.Inject;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.listener.ClansListenerLoader;
@@ -22,8 +23,9 @@ import java.util.Set;
 @Slf4j
 public class ProgressionAdapter {
 
-    private final Clans clans;
+    @Getter
     private final Progression progression;
+    private final Clans clans;
     private final ProgressionsManager progressionsManager;
     private final ClansListenerLoader listenerLoader;
 
@@ -33,8 +35,6 @@ public class ProgressionAdapter {
         this.listenerLoader = listenerLoader;
         this.progression = Objects.requireNonNull((Progression) Bukkit.getPluginManager().getPlugin("Progression"));
         this.progressionsManager = progression.getProgressionsManager();
-
-        load();
     }
 
     public void load() {
@@ -52,8 +52,7 @@ public class ProgressionAdapter {
                 accessor.loadConfig(clans.getConfig());
             }
 
-            progression.getInjector().injectMembers(listener);
-            listenerLoader.register(listener);
+            listenerLoader.load(clazz);
         }
         log.info("Loaded " + listenerClasses.size() + " clans progression listeners");
     }
@@ -68,7 +67,7 @@ public class ProgressionAdapter {
                 accessor.loadConfig(clans.getConfig());
             }
 
-            progression.getInjector().injectMembers(perk);
+            clans.getInjector().injectMembers(perk);
             final Class<? extends ProgressionTree>[] trees = perk.acceptedTrees();
             for (Class<? extends ProgressionTree> tree : trees) {
                 progressionsManager.fromClass(tree).addPerk(perk);
