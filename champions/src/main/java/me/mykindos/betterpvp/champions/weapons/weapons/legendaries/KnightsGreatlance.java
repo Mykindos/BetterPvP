@@ -99,7 +99,7 @@ public class KnightsGreatlance extends Weapon implements InteractWeapon, Legenda
         this.cooldownManager = cooldownManager;
         this.clientManager = clientManager;
         this.effectManager = effectManager;
-        newShapedRecipe("*I*", "*I*", "*I*");
+        setShapedRecipe("*I*", "*I*", "*I*");
         shapedRecipe.setIngredient('*', Material.AIR);
         shapedRecipe.setIngredient('I', Material.STICK);
         Bukkit.addRecipe(shapedRecipe);

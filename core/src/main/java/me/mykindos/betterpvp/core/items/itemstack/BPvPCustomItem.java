@@ -11,8 +11,6 @@ import org.bukkit.inventory.ShapelessRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-
 @Getter
 public abstract class BPvPCustomItem {
     protected ShapedRecipe shapedRecipe;
@@ -62,29 +60,45 @@ public abstract class BPvPCustomItem {
 
     /**
      *
-     * @param shape a shape function accepted by ShapedRecipe
+     * @param shape a shape array of strings accepted by ShapedRecipe
      * @see ShapedRecipe#shape(String...)
-     * @return The ShapedRecipe, which can be safely discarded
      */
-    protected void newShapedRecipe(String... shape) {
-        this.shapedRecipe = new ShapedRecipe(new NamespacedKey(namespacedKey.namespace(), namespacedKey.value() + "_shaped"), getItemStack());
+    protected void setShapedRecipe(String... shape) {
+        setShapedRecipe(1, shape);
+    }
+
+    /**
+     *
+     * @param count number of items to return as apart of the recipe
+     * @param shape a shape array of strings accepted by ShapedRecipe
+     * @see ShapedRecipe#shape(String...)
+     */
+    protected void setShapedRecipe(int count, String... shape) {
+        this.shapedRecipe = getShapedRecipe(count, "shaped", shape);
+    }
+
+    //todo expose/implement some way to have more than 1 shaped recipe for an item
+    private ShapedRecipe getShapedRecipe(int count, String key_suffix, String... shape) {
+        ShapedRecipe shapedRecipe = new ShapedRecipe(new NamespacedKey(namespacedKey.namespace(), namespacedKey.value() + key_suffix), getItemStack(count));
         shapedRecipe.shape(shape);
+        return shapedRecipe;
     }
 
-    protected void setShapedRecipe(ShapedRecipe shapedRecipe) {
-        Bukkit.addRecipe(shapedRecipe);
-        this.shapedRecipe = shapedRecipe;
+    protected void setShapelessRecipe(ItemStack... ingredients) {
+        setShapelessRecipe(1, ingredients);
     }
 
+    protected void setShapelessRecipe(int count, ItemStack... ingredients) {
+        this.shapelessRecipe = getShapelessRecipe(count, "shapeless", ingredients);
+        Bukkit.addRecipe(shapelessRecipe);
+    }
 
-
-    protected ShapelessRecipe setShapelessRecipe(List<ItemStack> ingredients) {
-        ShapelessRecipe shapelessRecipe = new ShapelessRecipe(new NamespacedKey(namespacedKey.namespace(), namespacedKey.value() + "_shapeless"), getItemStack());
+    //todo expose/implement some way to have more than 1 shapeless recipe for an item
+    private ShapelessRecipe getShapelessRecipe(int count, String key_suffix, ItemStack... ingredients) {
+        ShapelessRecipe shapelessRecipe = new ShapelessRecipe(new NamespacedKey(namespacedKey.namespace(), namespacedKey.value() + key_suffix), getItemStack(count));
         for (ItemStack ingredient : ingredients) {
             shapelessRecipe.addIngredient(ingredient);
         }
-        Bukkit.addRecipe(shapelessRecipe);
-        this.shapelessRecipe = shapelessRecipe;
         return shapelessRecipe;
     }
 

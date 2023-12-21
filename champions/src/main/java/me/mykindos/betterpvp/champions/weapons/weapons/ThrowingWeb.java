@@ -56,7 +56,7 @@ public class ThrowingWeb extends Weapon implements Listener, InteractWeapon, Coo
 
         this.championsManager = championsManager;
         this.blockHandler = blockHandler;
-        newShapedRecipe("*S*", "SSS", "*S*");
+        setShapedRecipe("*S*", "SSS", "*S*");
         shapedRecipe.setIngredient('*', Material.AIR);
         shapedRecipe.setIngredient('S', Material.STRING);
         Bukkit.addRecipe(shapedRecipe);
