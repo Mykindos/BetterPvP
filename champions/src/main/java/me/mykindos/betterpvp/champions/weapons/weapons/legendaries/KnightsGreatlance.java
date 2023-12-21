@@ -7,8 +7,6 @@ import com.google.inject.Singleton;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
-import me.mykindos.betterpvp.champions.combat.events.PlayerCheckShieldEvent;
 import me.mykindos.betterpvp.champions.weapons.Weapon;
 import me.mykindos.betterpvp.champions.weapons.types.InteractWeapon;
 import me.mykindos.betterpvp.champions.weapons.types.LegendaryWeapon;
@@ -44,7 +42,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.util.RayTraceResult;
@@ -148,10 +145,8 @@ public class KnightsGreatlance extends Weapon implements InteractWeapon, Legenda
             final Map.Entry<Player, LanceData> cur = iterator.next();
             final Player player = cur.getKey();
             final LanceData data = cur.getValue();
-            final Gamer gamer = data.getGamer();
             if (player == null) {
                 iterator.remove();
-                deactivate(player, data);
                 continue;
             }
 
@@ -161,7 +156,8 @@ public class KnightsGreatlance extends Weapon implements InteractWeapon, Legenda
                 continue;
             }
 
-            if (!player.isHandRaised()) {
+            final Gamer gamer = data.getGamer();
+            if (!gamer.isHoldingRightClick()) {
                 iterator.remove();
                 deactivate(player, data);
                 continue;
@@ -172,6 +168,11 @@ public class KnightsGreatlance extends Weapon implements InteractWeapon, Legenda
                 UtilMessage.simpleMessage(player, "Restriction", "You cannot use this weapon here.");
                 iterator.remove();
                 deactivate(player, data);
+                continue;
+            }
+
+            if (!UtilBlock.isGrounded(player)) {
+                data.setTicksCharged(0); // Reset charge
                 continue;
             }
 
@@ -289,24 +290,9 @@ public class KnightsGreatlance extends Weapon implements InteractWeapon, Legenda
         if (UtilBlock.isInLiquid(player)) {
             UtilMessage.simpleMessage(player, "Knight's Greatlance", "You cannot use this weapon while in water!");
             return false;
-        } else if (!UtilBlock.isGrounded(player)) {
-            return false;
         }
         final Cooldown cooldown = this.cooldownManager.getAbilityRecharge(player, ATTACK_NAME);
         return cooldown == null || cooldown.getRemaining() <= 0;
-    }
-
-    @Override
-    public Action[] getActions() {
-        return SkillActions.RIGHT_CLICK;
-    }
-
-    @EventHandler
-    public void onShieldCheck(PlayerCheckShieldEvent event) {
-        if (event.getPlayer().getInventory().getItemInMainHand().getType() == getMaterial()) {
-            event.setShouldHaveShield(true);
-            event.setCustomModelData(1);
-        }
     }
 
     @Getter

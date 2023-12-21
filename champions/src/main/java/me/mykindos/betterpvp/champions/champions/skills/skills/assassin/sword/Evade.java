@@ -5,10 +5,10 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
-import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomEntityVelocityEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -19,7 +19,6 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import org.bukkit.Bukkit;
@@ -152,7 +151,8 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
         while (it.hasNext()) {
             Player player = Bukkit.getPlayer(it.next());
             if (player != null) {
-                if (player.isHandRaised()) {
+                Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
+                if (gamer.isHoldingRightClick()) {
                     player.getWorld().playEffect(player.getLocation(), Effect.STEP_SOUND, 7);
                 }
             } else {
@@ -168,16 +168,17 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
         while (it.hasNext()) {
             Player player = Bukkit.getPlayer(it.next());
             if (player != null) {
+                Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
                 int level = getLevel(player);
                 if (level > 0) {
-                    if (!player.isHandRaised()) {
+                    if (!gamer.isHoldingRightClick()) {
                         handRaisedTime.remove(player.getUniqueId());
                         it.remove();
                         UtilMessage.message(player, getClassType().getName(), "Your Evade failed.");
                         player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
                     } else if (!handRaisedTime.containsKey(player.getUniqueId())) {
                         it.remove();
-                    } else if (!UtilPlayer.isHoldingItem(player, SkillWeapons.SWORDS)) {
+                    } else if (!isHolding(player)) {
                         it.remove();
                     } else if (UtilBlock.isInLiquid(player)) {
                         it.remove();

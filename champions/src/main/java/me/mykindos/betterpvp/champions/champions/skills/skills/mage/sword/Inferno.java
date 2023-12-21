@@ -6,10 +6,10 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
-import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.throwables.events.ThrowableHitEntityEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -18,7 +18,6 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -33,6 +32,8 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
+import java.util.Iterator;
+import java.util.UUID;
 import java.util.WeakHashMap;
 
 @Singleton
@@ -125,27 +126,34 @@ public class Inferno extends ChannelSkill implements InteractSkill, EnergySkill 
 
     @UpdateEvent
     public void Update() {
-        for (Player cur : Bukkit.getOnlinePlayers()) {
-            if (!active.contains(cur.getUniqueId())) continue;
+        final Iterator<UUID> iterator = active.iterator();
+        while (iterator.hasNext()) {
+            Player cur = Bukkit.getPlayer(iterator.next());
+            if (cur == null) {
+                iterator.remove();
+                continue;
+            }
 
-            if (cur.isHandRaised()) {
-                int level = getLevel(cur);
-                if (level <= 0) {
-                    active.remove(cur.getUniqueId());
-                } else if (!UtilPlayer.isHoldingItem(cur, SkillWeapons.SWORDS)) {
-                    active.remove(cur.getUniqueId());
-                } else if (!championsManager.getEnergy().use(cur, getName(), getEnergy(level) / 2, true)) {
-                    active.remove(cur.getUniqueId());
-                } else {
-                    Item fire = cur.getWorld().dropItem(cur.getEyeLocation(), new ItemStack(Material.BLAZE_POWDER));
-                    championsManager.getThrowables().addThrowable(fire, cur, getName(), 5000L);
+            Gamer gamer = championsManager.getClientManager().search().online(cur).getGamer();
+            if (!gamer.isHoldingRightClick()) {
+                iterator.remove();
+                continue;
+            }
 
-                    fire.teleport(cur.getEyeLocation());
-                    fire.setVelocity(cur.getLocation().getDirection().add(new Vector(UtilMath.randDouble(-0.2, 0.2), UtilMath.randDouble(-0.2, 0.3), UtilMath.randDouble(-0.2, 0.2))));
-                    cur.getWorld().playSound(cur.getLocation(), Sound.ENTITY_GHAST_SHOOT, 0.1F, 1.0F);
-                }
+            int level = getLevel(cur);
+            if (level <= 0) {
+                iterator.remove();
+            } else if (!isHolding(cur)) {
+                iterator.remove();
+            } else if (!championsManager.getEnergy().use(cur, getName(), getEnergy(level) / 2, true)) {
+                iterator.remove();
             } else {
-                active.remove(cur.getUniqueId());
+                Item fire = cur.getWorld().dropItem(cur.getEyeLocation(), new ItemStack(Material.BLAZE_POWDER));
+                championsManager.getThrowables().addThrowable(fire, cur, getName(), 5000L);
+
+                fire.teleport(cur.getEyeLocation());
+                fire.setVelocity(cur.getLocation().getDirection().add(new Vector(UtilMath.randDouble(-0.2, 0.2), UtilMath.randDouble(-0.2, 0.3), UtilMath.randDouble(-0.2, 0.2))));
+                cur.getWorld().playSound(cur.getLocation(), Sound.ENTITY_GHAST_SHOOT, 0.1F, 1.0F);
             }
         }
 

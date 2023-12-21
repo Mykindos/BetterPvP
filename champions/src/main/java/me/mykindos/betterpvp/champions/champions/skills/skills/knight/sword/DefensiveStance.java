@@ -6,17 +6,16 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
-import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import org.bukkit.Bukkit;
@@ -28,6 +27,8 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.util.Vector;
 
+import java.util.Iterator;
+import java.util.UUID;
 import java.util.WeakHashMap;
 
 @Singleton
@@ -106,7 +107,8 @@ public class DefensiveStance extends ChannelSkill implements InteractSkill, Ener
 
         if (!(event.getDamagee() instanceof Player player)) return;
         if (!active.contains(player.getUniqueId())) return;
-        if (!player.isHandRaised()) return;
+        Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
+        if (!gamer.isHoldingRightClick()) return;
 
         int level = getLevel(player);
         if (level > 0) {
@@ -135,32 +137,36 @@ public class DefensiveStance extends ChannelSkill implements InteractSkill, Ener
 
     @UpdateEvent
     public void useEnergy() {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            if (!active.contains(player.getUniqueId())) continue;
+        final Iterator<UUID> iterator = active.iterator();
+        while (iterator.hasNext()) {
+            Player player = Bukkit.getPlayer(iterator.next());
+            if (player == null) {
+                iterator.remove();
+                continue;
+            }
 
-            if (player.isHandRaised()) {
+            Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
+            if (!gamer.isHoldingRightClick()) {
                 int level = getLevel(player);
                 if (level <= 0) {
-                    active.remove(player.getUniqueId());
+                    iterator.remove();
                 } else if (!championsManager.getEnergy().use(player, getName(), getEnergy(level) / 2, true)) {
-                    active.remove(player.getUniqueId());
-                } else if (!UtilPlayer.isHoldingItem(player, SkillWeapons.SWORDS)) {
-                    active.remove(player.getUniqueId());
+                    iterator.remove();
+                } else if (!isHolding(player)) {
+                    iterator.remove();
                 } else {
                     player.getWorld().playEffect(player.getLocation(), Effect.STEP_SOUND, 20);
                 }
-
             } else {
                 if (gap.containsKey(player)) {
                     if (UtilTime.elapsed(gap.get(player), 250)) {
-                        active.remove(player.getUniqueId());
+                        iterator.remove();
                         gap.remove(player);
                     }
                 }
             }
-
-
         }
+
     }
 
 

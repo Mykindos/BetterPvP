@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.champions.champions.skills.skills.knight.data.Ripos
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -116,7 +117,8 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
         if (!(event.getDamagee() instanceof Player player)) return;
         if (!active.contains(player.getUniqueId())) return;
         if (event.getDamager() == null) return;
-        if (!player.isHandRaised()) return;
+        Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
+        if (!gamer.isHoldingRightClick()) return;
         LivingEntity ent = event.getDamager();
 
         int level = getLevel(player);
@@ -167,7 +169,8 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
         while (it.hasNext()) {
             Player player = Bukkit.getPlayer(it.next());
             if (player != null) {
-                if (player.isHandRaised()) {
+                Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
+                if (gamer.isHoldingRightClick()) {
                     player.getWorld().playEffect(player.getLocation(), Effect.STEP_SOUND, Material.IRON_BLOCK);
                 }
             } else {
@@ -183,14 +186,15 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
         while (it.hasNext()) {
             Player player = Bukkit.getPlayer(it.next());
             if (player != null) {
-                if (player.isHandRaised() && !handRaisedTime.containsKey(player.getUniqueId())) {
+                Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
+                if (gamer.isHoldingRightClick() && !handRaisedTime.containsKey(player.getUniqueId())) {
                     handRaisedTime.put(player.getUniqueId(), System.currentTimeMillis());
                     continue;
                 }
 
                 if (riposteData.containsKey(player.getUniqueId())) continue;
 
-                if (!player.isHandRaised() && handRaisedTime.containsKey(player.getUniqueId())) {
+                if (!gamer.isHoldingRightClick() && handRaisedTime.containsKey(player.getUniqueId())) {
                     failRiposte(player);
                     it.remove();
                     continue;
@@ -198,7 +202,7 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
 
                 int level = getLevel(player);
 
-                if (player.isHandRaised() && UtilTime.elapsed(handRaisedTime.getOrDefault(player.getUniqueId(), 0L), (long) getDuration(level) * 1000L)) {
+                if (gamer.isHoldingRightClick() && UtilTime.elapsed(handRaisedTime.getOrDefault(player.getUniqueId(), 0L), (long) getDuration(level) * 1000L)) {
                     failRiposte(player);
                     it.remove();
                 }

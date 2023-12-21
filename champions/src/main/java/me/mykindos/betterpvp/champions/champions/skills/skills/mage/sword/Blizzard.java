@@ -5,10 +5,10 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
-import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -16,7 +16,6 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
@@ -28,6 +27,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
+import java.util.Iterator;
+import java.util.UUID;
 import java.util.WeakHashMap;
 
 @Singleton
@@ -115,26 +116,33 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergySkill
 
     @UpdateEvent
     public void onUpdate() {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            if (active.contains(player.getUniqueId())) {
-                if (player.isHandRaised()) {
-                    int level = getLevel(player);
-                    if (level <= 0) {
-                        active.remove(player.getUniqueId());
-                    } else if (!championsManager.getEnergy().use(player, getName(), getEnergy(level) / 4, true)) {
-                        active.remove(player.getUniqueId());
-                    } else if (!UtilPlayer.isHoldingItem(player, SkillWeapons.SWORDS)) {
-                        active.remove(player.getUniqueId());
-                    } else {
-                        Snowball s = player.launchProjectile(Snowball.class);
-                        s.getLocation().add(0, 1, 0);
-                        s.setVelocity(player.getLocation().getDirection().add(new Vector(UtilMath.randDouble(-0.3, 0.3), UtilMath.randDouble(-0.2, 0.4), UtilMath.randDouble(-0.3, 0.3))));
-                        player.getWorld().playSound(player.getLocation(), Sound.BLOCK_SNOW_STEP, 1f, 0.4f);
-                        snow.put(s, player);
-                    }
-                } else {
-                    active.remove(player.getUniqueId());
-                }
+        final Iterator<UUID> iterator = active.iterator();
+        while (iterator.hasNext()) {
+            Player player = Bukkit.getPlayer(iterator.next());
+            if (player == null) {
+                iterator.remove();
+                continue;
+            }
+
+            Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
+            if (!gamer.isHoldingRightClick()) {
+                iterator.remove();
+                continue;
+            }
+
+            int level = getLevel(player);
+            if (level <= 0) {
+                iterator.remove();
+            } else if (!championsManager.getEnergy().use(player, getName(), getEnergy(level) / 4, true)) {
+                iterator.remove();
+            } else if (!isHolding(player)) {
+                iterator.remove();
+            } else {
+                Snowball s = player.launchProjectile(Snowball.class);
+                s.getLocation().add(0, 1, 0);
+                s.setVelocity(player.getLocation().getDirection().add(new Vector(UtilMath.randDouble(-0.3, 0.3), UtilMath.randDouble(-0.2, 0.4), UtilMath.randDouble(-0.3, 0.3))));
+                player.getWorld().playSound(player.getLocation(), Sound.BLOCK_SNOW_STEP, 1f, 0.4f);
+                snow.put(s, player);
             }
         }
     }

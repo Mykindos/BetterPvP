@@ -114,7 +114,7 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener {
     }
 
     private void onInteract(Player player, LivingEntity ent) {
-        if (!UtilPlayer.isHoldingItem(player, SkillWeapons.SWORDS)) return;
+        if (!isHolding(player)) return;
 
         int level = getLevel(player);
         if (level <= 0) {

@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.champions.weapons.weapons;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.weapons.Weapon;
 import me.mykindos.betterpvp.champions.weapons.types.CooldownWeapon;
 import me.mykindos.betterpvp.champions.weapons.types.InteractWeapon;
@@ -15,7 +14,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
 
 @Singleton
 public class EnergyApple extends Weapon implements InteractWeapon, CooldownWeapon {
@@ -34,11 +32,6 @@ public class EnergyApple extends Weapon implements InteractWeapon, CooldownWeapo
     public EnergyApple(EnergyHandler energyHandler) {
         super(Material.APPLE, Component.text("Energy Apple", NamedTextColor.LIGHT_PURPLE));
         this.energyHandler = energyHandler;
-    }
-
-    @Override
-    public Action[] getActions() {
-        return SkillActions.RIGHT_CLICK;
     }
 
     @Override

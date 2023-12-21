@@ -82,7 +82,7 @@ public class Sever extends PrepareSkill implements CooldownSkill, Listener {
         if (!(event.getDamagee() instanceof Player damagee)) return;
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
         if (!active.contains(player.getUniqueId())) return;
-        if (!UtilPlayer.isHoldingItem(player, getItemsBySkillType())) return;
+        if (!isHolding(player)) return;
 
         // TODO
         //Weapon w = WeaponManager.getWeapon(player.getInventory().getItemInMainHand());

@@ -8,17 +8,19 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
-import me.mykindos.betterpvp.champions.combat.events.PlayerCheckShieldEvent;
+import me.mykindos.betterpvp.core.combat.click.events.RightClickEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.*;
+import me.mykindos.betterpvp.core.utilities.UtilDamage;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
@@ -27,7 +29,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
@@ -102,11 +103,6 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
         final Location bashLocation = player.getLocation().add(0, 0.8, 0);
         bashLocation.add(player.getLocation().getDirection().setY(0).normalize().multiply(1.5));
 
-        if (player.getInventory().getItemInOffHand().getType() != Material.SHIELD) {
-            var shield = new ItemStack(Material.SHIELD);
-            player.getInventory().setItemInOffHand(shield);
-        }
-
         // Visual Cues
         Collection<Player> receivers = player.getWorld().getNearbyPlayers(player.getLocation(), 60);
         Particle.CLOUD.builder().extra(0.05f).count(6).location(bashLocation).receivers(receivers).spawn();
@@ -144,12 +140,12 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
     }
 
     @EventHandler
-    public void onShieldCheck(PlayerCheckShieldEvent event) {
+    public void onShieldCheck(RightClickEvent event) {
         Player player = event.getPlayer();
-        if (hasSkill(player)) {
-            if (UtilItem.isAxe(event.getPlayer().getInventory().getItemInMainHand().getType())) {
-                event.setShouldHaveShield(true);
-                event.setCustomModelData(0);
+        if (hasSkill(player) && !this.championsManager.getCooldowns().hasCooldown(player, getName())) {
+            if (isHolding(event.getPlayer())) {
+                event.setUseShield(true);
+                event.setShieldModelData(RightClickEvent.DEFAULT_SHIELD);
             }
         }
     }
