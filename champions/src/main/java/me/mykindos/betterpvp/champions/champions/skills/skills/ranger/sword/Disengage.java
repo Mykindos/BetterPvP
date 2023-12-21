@@ -8,7 +8,7 @@ import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.PrepareSkill;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -127,7 +127,8 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
         while (it.hasNext()) {
             Player player = Bukkit.getPlayer(it.next());
             if (player != null) {
-                if (player.isHandRaised()) {
+                Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
+                if (gamer.isHoldingRightClick()) {
                     player.getWorld().playEffect(player.getLocation(), Effect.STEP_SOUND, Material.IRON_BLOCK);
                 }
             } else {
@@ -143,7 +144,13 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
             UUID playerId = it.next();
             Player player = Bukkit.getPlayer(playerId);
 
-            if (player == null || !player.isHandRaised()) {
+            if (player == null) {
+                resetPlayerState(it, playerId, player);
+                continue;
+            }
+
+            Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
+            if (!gamer.isHoldingRightClick()) {
                 resetPlayerState(it, playerId, player);
                 continue;
             }
