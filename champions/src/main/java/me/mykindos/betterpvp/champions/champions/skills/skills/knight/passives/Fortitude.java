@@ -73,12 +73,11 @@ public class Fortitude extends Skill implements PassiveSkill, Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onHit(CustomDamageEvent event) {
-        if (!(event.getDamagee() instanceof Player p)) return;
-        int level = getLevel(p);
+        if (!(event.getDamagee() instanceof Player player)) return;
+        int level = getLevel(player);
         if (level > 0) {
-            //Student TODO: what is the divided by 2 for?
-            health.put(p, Math.min(getMaxHeal(level), event.getDamage() / 2));
-            last.put(p, System.currentTimeMillis());
+            health.put(player, Math.min(getMaxHeal(level), event.getDamage()));
+            last.put(player, System.currentTimeMillis());
         }
     }
 
@@ -93,7 +92,7 @@ public class Fortitude extends Skill implements PassiveSkill, Listener {
                 if (health.get(cur) <= 0) {
                     remove.add(cur);
                 }
-                UtilPlayer.health(cur, healIncreasePerLevel);
+                UtilPlayer.health(cur, healRate);
             }
         }
 
@@ -105,6 +104,6 @@ public class Fortitude extends Skill implements PassiveSkill, Listener {
     public void loadSkillConfig() {
         healRate = getConfig("healRate", 1.0, Double.class);
         baseHeal = getConfig("baseHeal", 3.0, Double.class);
-        healIncreasePerLevel = getConfig("healIncreasePerLevel", 3.0, Double.class);
+        healIncreasePerLevel = getConfig("healIncreasePerLevel", 1.0, Double.class);
     }
 }
