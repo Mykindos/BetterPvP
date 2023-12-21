@@ -19,4 +19,11 @@ public @interface PluginAdapter {
      */
     String value();
 
+    /**
+     * The name of the method that should be called when the plugin is loaded. This method
+     * should be public and have no parameters.
+     * @return The name of the method that should be called when the plugin is loaded.
+     */
+    String loadMethodName() default "load";
+
 }
