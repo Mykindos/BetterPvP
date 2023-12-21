@@ -21,7 +21,6 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
@@ -30,7 +29,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
@@ -104,11 +102,6 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
     public void activate(Player player, int level) {
         final Location bashLocation = player.getLocation().add(0, 0.8, 0);
         bashLocation.add(player.getLocation().getDirection().setY(0).normalize().multiply(1.5));
-
-        if (player.getInventory().getItemInOffHand().getType() != Material.SHIELD) {
-            var shield = new ItemStack(Material.SHIELD);
-            player.getInventory().setItemInOffHand(shield);
-        }
 
         // Visual Cues
         Collection<Player> receivers = player.getWorld().getNearbyPlayers(player.getLocation(), 60);
