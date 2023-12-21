@@ -16,5 +16,6 @@ include(":progression")
 if (File("./private/").exists()) {
     include(":private:events")
     include(":private:dungeons")
+    include(":private:blocking-mixins")
     include(":private:blocking")
 }

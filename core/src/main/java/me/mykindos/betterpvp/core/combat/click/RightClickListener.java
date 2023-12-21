@@ -78,7 +78,7 @@ public class RightClickListener implements Listener {
 
             // If the click took longer than 250ms, remove it from the cache
             // Unless they're blocking with a shield, meaning they are still holding right click
-            if (!player.isBlocking() && System.currentTimeMillis() - context.getTime() > 250) {
+            if (!player.isBlocking() && System.currentTimeMillis() - context.getTime() > 260) {
                 iterator.remove();
                 context.getGamer().setHoldingRightClick(false);
                 final RightClickEndEvent releaseEvent = new RightClickEndEvent(context.getGamer().getPlayer());
@@ -113,7 +113,7 @@ public class RightClickListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onRightClick(PlayerInteractEvent event) {
         if (!event.getAction().isRightClick()
-                || (event.hasBlock() && event.getClickedBlock().getType().isInteractable())
+                || (event.getClickedBlock() != null && event.getClickedBlock().getType().isInteractable())
                 || event.getAction() == Action.PHYSICAL
                 || event.getHand() != EquipmentSlot.HAND) {
             return; // Return if they are not right-clicking or if they are right-clicking a usable block
@@ -128,8 +128,8 @@ public class RightClickListener implements Listener {
         gamer.setHoldingRightClick(true);
         final RightClickEvent clickEvent = new RightClickEvent(player, false, 0, false, event.getHand());
         final RightClickContext context = new RightClickContext(gamer, clickEvent, item);
-        if (rightClickCache.containsKey(player)) {
-            final RightClickContext previous = rightClickCache.remove(player);// Remove the old one to update the time
+        final RightClickContext previous = rightClickCache.remove(player);
+        if (previous != null) {
             clickEvent.setHoldClick(true);
             clickEvent.setUseShield(previous.getEvent().isUseShield());
             clickEvent.setShieldModelData(previous.getEvent().getShieldModelData());

@@ -24,7 +24,7 @@ public class Compatibility {
     static {
         try {
             Class.forName("me.mykindos.betterpvp.blocking.BlockingPlugin");
-            SWORD_BLOCKING = true;
+            SWORD_BLOCKING = Bukkit.getPluginManager().getPlugin("SwordBlocking") != null;
         } catch (ClassNotFoundException e) {
             SWORD_BLOCKING = false;
         }
