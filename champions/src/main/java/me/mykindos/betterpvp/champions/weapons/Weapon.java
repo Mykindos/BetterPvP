@@ -1,7 +1,6 @@
 package me.mykindos.betterpvp.champions.weapons;
 
 import com.google.inject.Singleton;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.components.champions.weapons.IWeapon;
 import me.mykindos.betterpvp.core.items.itemstack.BPvPCustomItem;
@@ -42,7 +41,7 @@ public abstract class Weapon extends BPvPCustomItem implements IWeapon {
     @Override
     public boolean matches(ItemStack itemStack) {
         if (itemStack == null || itemStack.getType() != material) return false;
-        if (model != 0) {
+        if (getModel() != 0) {
             ItemMeta itemMeta = itemStack.getItemMeta();
             if (itemMeta != null) {
                 if (itemMeta.hasCustomModelData()) {

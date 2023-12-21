@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
@@ -51,10 +52,14 @@ public class ThrowingWeb extends Weapon implements Listener, InteractWeapon, Coo
 
     @Inject
     public ThrowingWeb(ChampionsManager championsManager, WorldBlockHandler blockHandler) {
-        super(Material.COBWEB, Component.text("Throwing Web", NamedTextColor.LIGHT_PURPLE));
+        super(Material.COBWEB, Component.text("Throwing Web", NamedTextColor.LIGHT_PURPLE), "throwing_web");
 
         this.championsManager = championsManager;
         this.blockHandler = blockHandler;
+        newShapedRecipe("*S*", "SSS", "*S*");
+        shapedRecipe.setIngredient('*', Material.AIR);
+        shapedRecipe.setIngredient('S', Material.STRING);
+        Bukkit.addRecipe(shapedRecipe);
     }
 
     @Override

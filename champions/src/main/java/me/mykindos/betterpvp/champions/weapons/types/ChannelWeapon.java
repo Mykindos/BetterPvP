@@ -19,16 +19,16 @@ public abstract class ChannelWeapon extends Weapon implements IWeapon, Listener 
 
     protected final Set<UUID> active = new HashSet<>();
 
-    public ChannelWeapon(Material material, Component name, List<Component> lore) {
-        super(material, name, 0, lore);
+    public ChannelWeapon(Material material, Component name, String key, List<Component> lore) {
+        super(material, name, key, 0, lore);
     }
 
-    public ChannelWeapon(Material material, Component name) {
-        super(material, name);
+    public ChannelWeapon(Material material, Component name, String key) {
+        super(material, name, key);
     }
 
-    public ChannelWeapon(Material material, int modelData, Component name) {
-        super(material, modelData, name);
+    public ChannelWeapon(Material material, int modelData, Component name, String key) {
+        super(material, modelData, name, key);
     }
 
     public abstract double getEnergy();

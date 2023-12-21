@@ -36,7 +36,7 @@ public class TNTCannon extends Weapon implements Listener, InteractWeapon, Coold
 
     @Inject
     public TNTCannon(ChampionsManager championsManager, WorldBlockHandler blockHandler) {
-        super(Material.CARROT_ON_A_STICK, 1, Component.text("TNT Cannon", NamedTextColor.LIGHT_PURPLE));
+        super(Material.CARROT_ON_A_STICK, 1, Component.text("TNT Cannon", NamedTextColor.LIGHT_PURPLE), "tnt_cannon");
 
     }
 

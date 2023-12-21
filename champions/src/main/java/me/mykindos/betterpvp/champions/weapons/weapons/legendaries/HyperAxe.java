@@ -18,7 +18,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 public class HyperAxe extends Weapon implements LegendaryWeapon, Listener {
 
     public HyperAxe() {
-        super(Material.MUSIC_DISC_BLOCKS, 1, UtilMessage.deserialize("<orange>Hyper Axe"));
+        super(Material.MUSIC_DISC_BLOCKS, 1, UtilMessage.deserialize("<orange>Hyper Axe"), "hyper_axe");
     }
 
     @EventHandler(priority = EventPriority.LOW)

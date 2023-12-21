@@ -14,7 +14,7 @@ import org.bukkit.event.player.PlayerItemDamageEvent;
 @BPvPListener
 public class WingsOfZanzul extends Weapon implements LegendaryWeapon, Listener {
     public WingsOfZanzul() {
-        super(Material.ELYTRA, 1, UtilMessage.deserialize("<orange>Wings of Zanzul"));
+        super(Material.ELYTRA, 1, UtilMessage.deserialize("<orange>Wings of Zanzul"), "wings_of_zanzul");
     }
 
     @EventHandler

@@ -1,8 +1,6 @@
 package me.mykindos.betterpvp.core.items.itemstack;
 
 import lombok.Getter;
-import me.mykindos.betterpvp.core.framework.BPvPPlugin;
-import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -17,17 +15,15 @@ import java.util.List;
 
 @Getter
 public abstract class BPvPCustomItem {
-    private ShapedRecipe shapedRecipe;
-    private ShapelessRecipe shapelessRecipe;
+    protected ShapedRecipe shapedRecipe;
+    protected ShapelessRecipe shapelessRecipe;
 
-    private final int model;
-    private final Material material;
+    protected final int model;
+    protected final Material material;
 
-    Component name;
+    protected Component name;
 
-    private final NamespacedKey namespacedKey;
-
-    BPvPPlugin plugin;
+    protected final NamespacedKey namespacedKey;
 
     protected BPvPCustomItem(NamespacedKey namespacedKey, Component name, Material material, int model) {
         this.namespacedKey = namespacedKey;
@@ -42,7 +38,9 @@ public abstract class BPvPCustomItem {
 
     public ItemStack getItemStack(int count) {
         ItemStack item = new ItemStack(material);
-        item.getItemMeta().setCustomModelData(model);
+        ItemMeta itemMeta = item.getItemMeta();
+        itemMeta.setCustomModelData(model);
+        item.setItemMeta(itemMeta);
         return item;
     }
     public @NotNull Component getName() {
@@ -66,19 +64,19 @@ public abstract class BPvPCustomItem {
      *
      * @param shape a shape function accepted by ShapedRecipe
      * @see ShapedRecipe#shape(String...)
-     * @param ingredients a KeyValue<\Character, ItemStack>, which is a list of characters used in shape and their respective ItemStack
      * @return The ShapedRecipe, which can be safely discarded
      */
-    protected ShapedRecipe setShapedRecipe(String[] shape, KeyValue<Character, ItemStack>[] ingredients) {
-        ShapedRecipe shapedRecipe = new ShapedRecipe(new NamespacedKey(namespacedKey.namespace(), namespacedKey.value() + "_shaped"), getItemStack());
+    protected void newShapedRecipe(String... shape) {
+        this.shapedRecipe = new ShapedRecipe(new NamespacedKey(namespacedKey.namespace(), namespacedKey.value() + "_shaped"), getItemStack());
         shapedRecipe.shape(shape);
-        for (KeyValue<Character, ItemStack> ingredient : ingredients) {
-            shapedRecipe.setIngredient(ingredient.getKey(), ingredient.getValue());
-        }
+    }
+
+    protected void setShapedRecipe(ShapedRecipe shapedRecipe) {
         Bukkit.addRecipe(shapedRecipe);
         this.shapedRecipe = shapedRecipe;
-        return shapedRecipe;
     }
+
+
 
     protected ShapelessRecipe setShapelessRecipe(List<ItemStack> ingredients) {
         ShapelessRecipe shapelessRecipe = new ShapelessRecipe(new NamespacedKey(namespacedKey.namespace(), namespacedKey.value() + "_shapeless"), getItemStack());
