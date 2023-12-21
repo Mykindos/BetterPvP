@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
-import me.mykindos.betterpvp.core.config.Config;
+import me.mykindos.betterpvp.clans.progression.ProgressionAdapter;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -29,18 +29,19 @@ import java.util.Optional;
 @Singleton
 @Slf4j
 public class BaseFishingPerk implements Listener, ConfigAccessor, ProgressionPerk {
+
     private boolean enabled;
-
     private int requiredLevel;
+    private final ClanManager manager;
+    private final Progression progression;
+    private final Fishing fishing;
 
-    @Inject(optional = true)
-    private ClanManager manager;
-
-    @Inject(optional = true)
-    private Progression progression;
-
-    @Inject(optional = true)
-    private Fishing fishing;
+    @Inject
+    public BaseFishingPerk(final ClanManager clanManager, final ProgressionAdapter adapter) {
+        this.manager = clanManager;
+        this.progression = adapter.getProgression().getInjector().getInstance(Progression.class);
+        this.fishing = adapter.getProgression().getInjector().getInstance(Fishing.class);
+    }
 
     @Override
     public String getName() {

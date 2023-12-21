@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import org.bukkit.Bukkit;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Collection;
@@ -48,6 +49,19 @@ public final class Adapters {
             final String pluginName = Arrays.stream(adapterAnnotation).map(PluginAdapter::value).collect(Collectors.joining(", "));
             final Object adapter = plugin.getInjector().getInstance(clazz);
             plugin.getInjector().injectMembers(adapter);
+
+            // Attempt to call the onLoad method
+            try {
+                clazz.getMethod(adapterAnnotation[0].loadMethodName()).invoke(adapter);
+            } catch (IllegalAccessException e) {
+                log.warn("Could not invoke load method for adapter " + clazz.getSimpleName() + " for " + pluginName + "!");
+            } catch (NoSuchMethodException ignored) {
+                // Ignored because this is not required
+            } catch (InvocationTargetException e) {
+                log.error("Could not invoke load method for adapter " + clazz.getSimpleName() + " for " + pluginName + "!", e);
+                continue;
+            }
+
             log.info("Loaded adapter " + clazz.getSimpleName() + " for " + pluginName + "!");
         }
     }
