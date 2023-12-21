@@ -58,8 +58,4 @@ public class TNTCannon extends Weapon implements Listener, InteractWeapon, Coold
         return cooldown;
     }
 
-    @Override
-    public Action[] getActions() {
-        return new Action[]{Action.RIGHT_CLICK_AIR};
-    }
 }

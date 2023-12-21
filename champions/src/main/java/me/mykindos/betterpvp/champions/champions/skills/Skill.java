@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.champions.champions.skills;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
@@ -10,23 +9,17 @@ import me.mykindos.betterpvp.champions.champions.builds.BuildSkill;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
-import me.mykindos.betterpvp.champions.champions.skills.types.*;
+import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
 import me.mykindos.betterpvp.core.components.champions.ISkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
-import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
-import me.mykindos.betterpvp.core.effects.EffectType;
-import me.mykindos.betterpvp.core.effects.events.EffectReceiveEvent;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 
 import java.util.Optional;
 
 @Singleton
 @Slf4j
 public abstract class Skill implements ISkill {
-
 
     protected final Champions champions;
     protected final ChampionsManager championsManager;
@@ -212,24 +205,15 @@ public abstract class Skill implements ISkill {
     protected int getLevel(Player player) {
         Optional<BuildSkill> skillOptional = getSkill(player);
         int level = skillOptional.map(BuildSkill::getLevel).orElse(0);
-        if (level > 0) {
-            if (UtilPlayer.isHoldingItem(player, getItemsBySkillType())) {
-                if (UtilPlayer.isHoldingItem(player, SkillWeapons.BOOSTERS)) {
-                    level++;
-                }
-            }
+        if (level > 0 && SkillWeapons.isHolding(player, getType()) && SkillWeapons.hasBooster(player)) {
+            level++;
         }
 
         return level;
     }
 
-    public Material[] getItemsBySkillType() {
-        return switch (getType()) {
-            case SWORD -> SkillWeapons.SWORDS;
-            case AXE -> SkillWeapons.AXES;
-            case BOW -> SkillWeapons.BOWS;
-            default -> new Material[]{};
-        };
+    @Override
+    public boolean isHolding(Player player) {
+        return SkillWeapons.isHolding(player, getType());
     }
-
 }

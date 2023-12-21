@@ -6,10 +6,10 @@ import lombok.Data;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
-import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableItem;
 import me.mykindos.betterpvp.core.combat.throwables.events.ThrowableHitEntityEvent;
@@ -19,7 +19,6 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import org.bukkit.Bukkit;
@@ -96,9 +95,11 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
                         continue;
                     }
                 }
-                if (player.isHandRaised()) {
 
-                    if (!UtilPlayer.isHoldingItem(player, SkillWeapons.SWORDS)) {
+                Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
+                if (gamer.isHoldingRightClick()) {
+
+                    if (!isHolding(player)) {
                         iterator.remove();
                     }
 
@@ -110,7 +111,7 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
                         }
                     }
                 } else {
-                    if (UtilPlayer.isHoldingItem(player, SkillWeapons.SWORDS)) {
+                    if (isHolding(player)) {
                         double base = 0.8D;
                         Location loc = player.getLocation();
                         Location itemLocation = loc.clone();

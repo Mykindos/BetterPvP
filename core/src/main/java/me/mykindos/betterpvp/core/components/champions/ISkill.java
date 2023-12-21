@@ -1,7 +1,5 @@
 package me.mykindos.betterpvp.core.components.champions;
 
-import lombok.Getter;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 public interface ISkill {
@@ -44,8 +42,8 @@ public interface ISkill {
         return false;
     }
 
-    Material[] getItemsBySkillType();
-
     boolean hasSkill(Player player);
+
+    boolean isHolding(Player player);
 
 }

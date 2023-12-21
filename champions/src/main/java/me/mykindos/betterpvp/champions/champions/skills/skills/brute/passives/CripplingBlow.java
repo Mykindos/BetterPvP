@@ -60,8 +60,8 @@ public class CripplingBlow extends Skill implements PassiveSkill {
 
     @EventHandler
     public void onDamage(CustomDamageEvent event) {
-        if(!(event.getDamager() instanceof Player player)) return;
-        if(!UtilPlayer.isHoldingItem(player, SkillWeapons.AXES)) return;
+        if (!(event.getDamager() instanceof Player player)) return;
+        if (!isHolding(player)) return;
 
         int level = getLevel(player);
         if(level > 0) {

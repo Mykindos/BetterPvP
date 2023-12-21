@@ -1,10 +1,9 @@
 package me.mykindos.betterpvp.champions.champions.skills.types;
 
+import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.components.champions.ISkill;
 import org.bukkit.entity.Player;
-
-import java.util.List;
 
 public interface CooldownSkill extends ISkill {
 
@@ -24,7 +23,7 @@ public interface CooldownSkill extends ISkill {
             return false;
         }
 
-        return List.of(getItemsBySkillType()).contains(found.getInventory().getItemInMainHand().getType());
+        return SkillWeapons.getTypeFrom(found.getInventory().getItemInMainHand()) == getType();
     }
 
 }

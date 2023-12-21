@@ -6,7 +6,6 @@ import lombok.Data;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
-import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
@@ -22,7 +21,6 @@ import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
 import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
@@ -60,7 +58,7 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
     // Action bar
     private final PermanentComponent actionBarComponent = new PermanentComponent(gamer -> {
         final Player player = gamer.getPlayer();
-        if (player == null || !charging.containsKey(player) || !UtilPlayer.isHoldingItem(player, getItemsBySkillType())) {
+        if (player == null || !charging.containsKey(player) || !isHolding(player)) {
             return null; // Skip if not online or not charging
         }
 
@@ -224,7 +222,7 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
                 true,
                 true,
                 isCancellable(),
-                gmr -> gmr.getPlayer() != null && UtilPlayer.isHoldingItem(gmr.getPlayer(), getItemsBySkillType()));
+                gmr -> gmr.getPlayer() != null && isHolding(gmr.getPlayer()));
 
         final float range = getRange(level);
         final Vector direction = player.getEyeLocation().getDirection();
@@ -301,11 +299,12 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
                 }
 
                 // Check if they still are blocking and charge
-                if (player.isHandRaised() && championsManager.getEnergy().use(player, getName(), getEnergyPerSecond(level) / 20, true)) {
+                Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
+                if (gamer.isHoldingRightClick() && championsManager.getEnergy().use(player, getName(), getEnergyPerSecond(level) / 20, true)) {
                     championsManager.getCooldowns().removeCooldown(player, getName(), true);
 
                     // Check for sword hold status
-                    if (!UtilPlayer.isHoldingItem(player, SkillWeapons.SWORDS)) {
+                    if (!isHolding(player)) {
                         iterator.remove(); // Otherwise, remove
                     }
 
@@ -315,7 +314,7 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
                     continue;
                 }
 
-                if (UtilPlayer.isHoldingItem(player, SkillWeapons.SWORDS)) {
+                if (isHolding(player)) {
                     shoot(player, (float) charge.getCharge(), level);
                     charging.remove(player);
                 }

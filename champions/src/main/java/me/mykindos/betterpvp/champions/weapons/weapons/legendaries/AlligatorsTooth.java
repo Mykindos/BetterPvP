@@ -2,10 +2,11 @@ package me.mykindos.betterpvp.champions.weapons.weapons.legendaries;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.weapons.types.ChannelWeapon;
 import me.mykindos.betterpvp.champions.weapons.types.InteractWeapon;
 import me.mykindos.betterpvp.champions.weapons.types.LegendaryWeapon;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseItemEvent;
 import me.mykindos.betterpvp.core.config.Config;
@@ -23,8 +24,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
+
+import java.util.Iterator;
+import java.util.UUID;
 
 @Singleton
 @BPvPListener
@@ -51,11 +54,13 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
     private double velocityStrength;
 
     private final EnergyHandler energyHandler;
+    private final ClientManager clientManager;
 
     @Inject
-    public AlligatorsTooth(EnergyHandler energyHandler) {
+    public AlligatorsTooth(EnergyHandler energyHandler, ClientManager clientManager) {
         super(Material.MUSIC_DISC_MALL, 1,UtilMessage.deserialize("<orange>Alligators Tooth"));
         this.energyHandler = energyHandler;
+        this.clientManager = clientManager;
     }
 
     @Override
@@ -65,16 +70,17 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
 
     @UpdateEvent
     public void doAlligatorsTooth() {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            if (!active.contains(player.getUniqueId())) continue;
-
-            if (player.getInventory().getItemInMainHand().getType() != getMaterial()) {
-                active.remove(player.getUniqueId());
+        final Iterator<UUID> iterator = active.iterator();
+        while (iterator.hasNext()) {
+            final Player player = Bukkit.getPlayer(iterator.next());
+            if (player == null || !player.isOnline()) {
+                iterator.remove();
                 continue;
             }
 
-            if (!player.isHandRaised()) {
-                active.remove(player.getUniqueId());
+            final Gamer gamer = clientManager.search().online(player).getGamer();
+            if (!gamer.isHoldingRightClick() || player.getInventory().getItemInMainHand().getType() != getMaterial()) {
+                iterator.remove();
                 continue;
             }
 
@@ -85,12 +91,12 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
             }
 
             if (!canUse(player)) {
-                active.remove(player.getUniqueId());
+                iterator.remove();
                 continue;
             }
 
             if (!energyHandler.use(player, "Alligators Tooth", energyPerTick, true)) {
-                active.remove(player.getUniqueId());
+                iterator.remove();
                 continue;
             }
 
@@ -128,8 +134,4 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
         return initialEnergyCost;
     }
 
-    @Override
-    public Action[] getActions() {
-        return SkillActions.RIGHT_CLICK;
-    }
 }
