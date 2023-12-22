@@ -1,6 +1,6 @@
 -- Class armours
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, Durability, ModelData, Glow, HasUUID) VALUES
-    ('LEATHER_HELMET', 'champions', 'assassin_helmet', '<yellow>Assassin Helmet', 500 0, 0, 0);
+    ('LEATHER_HELMET', 'champions', 'assassin_helmet', '<yellow>Assassin Helmet', 500, 0, 0, 0);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, Durability, ModelData, Glow, HasUUID) VALUES
     ('LEATHER_CHESTPLATE', 'champions', 'assassin_vest', '<yellow>Assassin Vest', 500, 0, 0, 0);
@@ -143,12 +143,12 @@ INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, Durability, ModelD
     ('STONE_AXE', 'champions', 'basic_axe', '<yellow>Basic Axe', 500, 0, 0, 0);
 
 INSERT IGNORE INTO itemlore
-    VALUES ((SELECT id FROM items WHERE Material = 'STONE_AXE' AND Module = 'champions'), 0, '<gray>Damage: <green>5');
+    VALUES ((SELECT id FROM items WHERE Material = 'STONE_AXE' AND Namespace = 'champions'), 0, '<gray>Damage: <green>5');
 
 -- Tools
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, Durability, ModelData, Glow, HasUUID) VALUES
-    ('WOODEN_PICKAXE', 'champions', 'wooden_pickaxe' '<yellow>Wooden Pickaxe', 500, 0, 0, 0), ('STONE_PICKAXE', 'champions', 'stone_pickaxe', '<yellow>Stone Pickaxe', 500, 0, 0, 0),
+    ('WOODEN_PICKAXE', 'champions', 'wooden_pickaxe', '<yellow>Wooden Pickaxe', 500, 0, 0, 0), ('STONE_PICKAXE', 'champions', 'stone_pickaxe', '<yellow>Stone Pickaxe', 500, 0, 0, 0),
     ('IRON_PICKAXE', 'champions', 'iron_pickaxe', '<yellow>Iron Pickaxe', 500, 0, 0, 0), ('GOLDEN_PICKAXE', 'champions', 'gold_pickaxe', '<yellow>Gold Pickaxe', 500, 0, 0, 0),
     ('DIAMOND_PICKAXE', 'champions', 'diamond_pickaxe', '<yellow>Diamond Pickaxe', 500, 0, 0, 0), ('NETHERITE_PICKAXE', 'champions', 'netherite_pickaxe', '<yellow>Netherite Pickaxe', 500, 0, 0, 0);
 
@@ -170,7 +170,7 @@ INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, Durability, ModelD
     ('COBWEB', 'champions', 'throwing_web', '<light_purple>Throwing Web', 500, 0, 0, 0);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, Durability, ModelData, Glow, HasUUID) VALUES
-    ('APPLE', 'champions', 'APPLE', 'energy_apple', '<light_purple>Energy Apple', 500, 0, 0, 0);
+    ('APPLE', 'champions', 'energy_apple', '<light_purple>Energy Apple', 500, 0, 0, 0);
 
 -- Legendaries
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, Durability, ModelData, Glow, HasUUID) VALUES

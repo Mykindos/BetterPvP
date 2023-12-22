@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.items;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
@@ -33,6 +34,8 @@ import java.util.UUID;
 public class ItemHandler {
 
     private final ItemRepository itemRepository;
+
+    @Getter
     private final HashMap<String, BPVPItem> itemMap = new HashMap<>();
     private final Enchantment glowEnchantment;
 
@@ -55,7 +58,7 @@ public class ItemHandler {
 
     public void loadItemData(String module) {
         List<BPVPItem> items = itemRepository.getItemsForModule(module);
-        items.forEach(item -> itemMap.put(item.getMaterial().name() + item.getCustomModelData(), item));
+        items.forEach(item -> itemMap.put(item.getIdentifier(), item));
     }
 
     /**

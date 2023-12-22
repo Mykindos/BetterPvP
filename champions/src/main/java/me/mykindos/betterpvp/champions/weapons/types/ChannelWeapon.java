@@ -4,7 +4,6 @@ import me.mykindos.betterpvp.champions.combat.events.PlayerCheckShieldEvent;
 import me.mykindos.betterpvp.champions.weapons.Weapon;
 import me.mykindos.betterpvp.core.components.champions.weapons.IWeapon;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -19,16 +18,12 @@ public abstract class ChannelWeapon extends Weapon implements IWeapon, Listener 
 
     protected final Set<UUID> active = new HashSet<>();
 
-    public ChannelWeapon(Material material, Component name, String key, List<Component> lore) {
-        super(material, name, key, 0, lore);
+    public ChannelWeapon(String key) {
+        super(key);
     }
 
-    public ChannelWeapon(Material material, Component name, String key) {
-        super(material, name, key);
-    }
-
-    public ChannelWeapon(Material material, int modelData, Component name, String key) {
-        super(material, modelData, name, key);
+    public ChannelWeapon(String key, List<Component> lore) {
+        super(key, lore);
     }
 
     public abstract double getEnergy();

@@ -95,14 +95,14 @@ public class KnightsGreatlance extends Weapon implements InteractWeapon, Legenda
 
     @Inject
     public KnightsGreatlance(final CooldownManager cooldownManager, final ClientManager clientManager, final EffectManager effectManager) {
-        super(Material.MUSIC_DISC_WAIT, 1, UtilMessage.deserialize("<orange>Knight's Greatlance"), "knights_greatlance");
+        super("knights_greatlance");
         this.cooldownManager = cooldownManager;
         this.clientManager = clientManager;
         this.effectManager = effectManager;
         setShapedRecipe("*I*", "*I*", "*I*");
-        shapedRecipe.setIngredient('*', Material.AIR);
-        shapedRecipe.setIngredient('I', Material.STICK);
-        Bukkit.addRecipe(shapedRecipe);
+        shapedRecipes[0].setIngredient('*', Material.AIR);
+        shapedRecipes[0].setIngredient('I', Material.STICK);
+        Bukkit.addRecipe(shapedRecipes[0]);
     }
 
     @Override

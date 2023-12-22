@@ -33,19 +33,20 @@ public class ItemRepository implements IRepository<BPVPItem> {
         return null;
     }
 
-    public List<BPVPItem> getItemsForModule(String module) {
+    public List<BPVPItem> getItemsForModule(String namespace) {
         List<BPVPItem> items = new ArrayList<>();
-        String query = "SELECT * FROM items WHERE Module = ?";
-        CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(module)));
+        String query = "SELECT * FROM items WHERE Namespace = ?";
+        CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(namespace)));
         try {
             while (result.next()) {
                 int id = result.getInt(1);
                 Material material = Material.getMaterial(result.getString(2));
-                String key = result.getString(4).toLowerCase().replace(' ', '_');
-                Component name = UtilMessage.deserialize(result.getString(4)).decoration(TextDecoration.ITALIC, false);
-                int customModelData = result.getInt(5);
-                boolean glowing = result.getBoolean(6);
-                boolean uuid = result.getBoolean(7);
+                String key = result.getString(4);
+                Component name = UtilMessage.deserialize(result.getString(5)).decoration(TextDecoration.ITALIC, false);
+                int durability = result.getInt(6);
+                int customModelData = result.getInt(7);
+                boolean glowing = result.getBoolean(8);
+                boolean uuid = result.getBoolean(9);
 
                 List<Component> lore = getLoreForItem(id);
 
@@ -54,7 +55,7 @@ public class ItemRepository implements IRepository<BPVPItem> {
                     continue;
                 }
 
-                items.add(new BPVPItem(module.toLowerCase(), key, material, name, lore, customModelData, glowing, uuid));
+                items.add(new BPVPItem(namespace, key, material, name, lore, durability, customModelData, glowing, uuid));
             }
         } catch (Exception ex) {
             ex.printStackTrace();

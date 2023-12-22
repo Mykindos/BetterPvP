@@ -7,11 +7,11 @@ create table if not exists items
     Keyname    varchar(255) not null,
     Name       varchar(255) not null,
     ModelData  int          not null default 0,
-    Durability int
+    Durability int          not null,
     Glow       tinyint      not null,
     hasUUID    tinyint      not null default 0,
     constraint items_uk
-        unique (Material, Module)
+        unique (Material, Namespace)
 );
 
 create table if not exists itemlore

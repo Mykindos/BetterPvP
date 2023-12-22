@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.components.champions.weapons.IWeapon;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
+import me.mykindos.betterpvp.core.items.ItemHandler;
 import org.bukkit.inventory.ItemStack;
 import org.reflections.Reflections;
 
@@ -18,10 +19,12 @@ import java.util.Set;
 public class WeaponManager extends Manager<IWeapon> {
 
     private final Champions champions;
+    private final ItemHandler itemHandler;
 
     @Inject
-    public WeaponManager(Champions champions) {
+    public WeaponManager(Champions champions, ItemHandler itemHandler) {
         this.champions = champions;
+        this.itemHandler = itemHandler;
 
         Reflections reflections = new Reflections(getClass().getPackageName());
         Set<Class<? extends Weapon>> classes = reflections.getSubTypesOf(Weapon.class);
@@ -30,8 +33,8 @@ public class WeaponManager extends Manager<IWeapon> {
             if(clazz.isAnnotationPresent(Deprecated.class)) continue;
             Weapon weapon = champions.getInjector().getInstance(clazz);
             champions.getInjector().injectMembers(weapon);
-
-            addObject(weapon.getMaterial().name() + weapon.getModel(), weapon);
+            weapon.loadWeapon(itemHandler.getItemMap().get(weapon.getIdentifier()));
+            addObject(weapon.getIdentifier(), weapon);
         }
 
         log.info("Loaded " + objects.size() + " weapons");

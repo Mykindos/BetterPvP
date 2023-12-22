@@ -73,7 +73,7 @@ public class MagneticMaul extends ChannelWeapon implements InteractWeapon, Legen
 
     @Inject
     public MagneticMaul(EnergyHandler energyHandler) {
-        super(Material.MUSIC_DISC_FAR, 1, UtilMessage.deserialize("<orange>Magnetic Maul"), "magnetic_maul");
+        super("magnetic_maul");
         this.energyHandler = energyHandler;
     }
 

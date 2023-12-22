@@ -1,6 +1,9 @@
 package me.mykindos.betterpvp.core.items.itemstack;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -14,22 +17,27 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 @Getter
+@Setter
+@ToString
+@EqualsAndHashCode
 public abstract class BPvPCustomItem {
     private String namespace;
     private String key;
-    private final Material material;
-    private final Component name;
-    private final List<Component> lore;
+    private NamespacedKey namespacedKey;
+    private Material material;
+    private Component name;
+    private List<Component> lore;
     private int customModelData;
 
     //not sure if I need to save recipes
-    private ShapedRecipe[] shapedRecipes = new ShapedRecipe[1];
+    protected ShapedRecipe[] shapedRecipes = new ShapedRecipe[1];
     private ShapelessRecipe[] shapelessRecipes = new ShapelessRecipe[1];
     //todo add all recipes
 
     protected BPvPCustomItem(String namespace, String key, Material material, Component name, List<Component> lore, int customModelData) {
         this.namespace = namespace;
         this.key = key;
+        this.namespacedKey = new NamespacedKey(namespace, key);
         this.material = material;
         this.name = name;
         this.lore = lore;
@@ -47,10 +55,20 @@ public abstract class BPvPCustomItem {
         item.setItemMeta(itemMeta);
         return item;
     }
+
+    public String getIdentifier() {
+        return this.namespacedKey.asString();
+    }
+
     public @NotNull Component getName() {
         return this.name;
     }
 
+    /**
+     *
+     * @param itemStack the item stack to compare to
+     * @return true if the itemstack is an instance of this item
+     */
     public boolean matches(ItemStack itemStack) {
         if (itemStack == null || itemStack.getType() != material) return false;
         if (customModelData != 0) {
