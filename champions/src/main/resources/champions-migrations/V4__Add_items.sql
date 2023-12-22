@@ -148,48 +148,48 @@ INSERT IGNORE INTO itemlore
 -- Tools
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, Durability, ModelData, Glow, HasUUID) VALUES
-    ('WOODEN_PICKAXE', 'champions', 'wooden_pickaxe' '<yellow>Wooden Pickaxe', 500, 0, 0, 0), ('STONE_PICKAXE', 'champions', '<yellow>Stone Pickaxe', 500, 0, 0, 0),
-    ('IRON_PICKAXE', 'champions', '<yellow>Iron Pickaxe', 500, 0, 0, 0), ('GOLDEN_PICKAXE', 'champions', '<yellow>Gold Pickaxe', 500, 0, 0, 0),
-    ('DIAMOND_PICKAXE', 'champions', '<yellow>Diamond Pickaxe', 500, 0, 0, 0), ('NETHERITE_PICKAXE', 'champions', '<yellow>Netherite Pickaxe', 500, 0, 0, 0);
+    ('WOODEN_PICKAXE', 'champions', 'wooden_pickaxe' '<yellow>Wooden Pickaxe', 500, 0, 0, 0), ('STONE_PICKAXE', 'champions', 'stone_pickaxe', '<yellow>Stone Pickaxe', 500, 0, 0, 0),
+    ('IRON_PICKAXE', 'champions', 'iron_pickaxe', '<yellow>Iron Pickaxe', 500, 0, 0, 0), ('GOLDEN_PICKAXE', 'champions', 'gold_pickaxe', '<yellow>Gold Pickaxe', 500, 0, 0, 0),
+    ('DIAMOND_PICKAXE', 'champions', 'diamond_pickaxe', '<yellow>Diamond Pickaxe', 500, 0, 0, 0), ('NETHERITE_PICKAXE', 'champions', 'netherite_pickaxe', '<yellow>Netherite Pickaxe', 500, 0, 0, 0);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, Durability, ModelData, Glow, HasUUID) VALUES
-    ('WOODEN_AXE', 'champions', '<yellow>Wooden Axe', 500, 0, 0, 0), ('STONE_AXE', 'champions', '<yellow>Stone Axe', 500, 0, 0, 0);
+    ('WOODEN_AXE', 'champions', 'wooden_axe', '<yellow>Wooden Axe', 500, 0, 0, 0), ('STONE_AXE', 'champions', 'stone_axe', '<yellow>Stone Axe', 500, 0, 0, 0);
     
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, Durability, ModelData, Glow, HasUUID) VALUES
-    ('WOODEN_HOE', 'champions', '<yellow>Wooden Hoe', 500, 0, 0, 0), ('STONE_HOE', 'champions', '<yellow>Stone Hoe', 500, 0, 0, 0),
-    ('IRON_HOE', 'champions', '<yellow>Iron Hoe', 500, 0, 0, 0), ('GOLDEN_HOE', 'champions', '<yellow>Gold Hoe', 500, 0, 0, 0),
-    ('DIAMOND_HOE', 'champions', '<yellow>Diamond Hoe', 500, 0, 0, 0), ('NETHERITE_HOE', 'champions', '<yellow>Netherite Hoe', 500, 0, 0, 0);
+    ('WOODEN_HOE', 'champions', 'wooden_hoe', '<yellow>Wooden Hoe', 500, 0, 0, 0), ('STONE_HOE', 'champions', 'stone_hoe', '<yellow>Stone Hoe', 500, 0, 0, 0),
+    ('IRON_HOE', 'champions', 'iron_hoe', '<yellow>Iron Hoe', 500, 0, 0, 0), ('GOLDEN_HOE', 'champions', 'gold_hoe', '<yellow>Gold Hoe', 500, 0, 0, 0),
+    ('DIAMOND_HOE', 'champions', 'diamond_hoe', '<yellow>Diamond Hoe', 500, 0, 0, 0), ('NETHERITE_HOE', 'champions', 'netherite_hoe', '<yellow>Netherite Hoe', 500, 0, 0, 0);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, Durability, ModelData, Glow, HasUUID) VALUES
-    ('WOODEN_SHOVEL', 'champions', '<yellow>Wooden Shovel', 500, 0, 0, 0), ('STONE_SHOVEL', 'champions', '<yellow>Stone Shovel', 500, 0, 0, 0),
-    ('IRON_SHOVEL', 'champions', '<yellow>Iron Shovel', 500, 0, 0, 0), ('GOLDEN_SHOVEL', 'champions', '<yellow>Gold Shovel', 500, 0, 0, 0),
-    ('DIAMOND_SHOVEL', 'champions', '<yellow>Diamond Shovel', 500, 0, 0, 0), ('NETHERITE_SHOVEL', 'champions', '<yellow>Netherite Shovel', 500, 0, 0, 0);
+    ('WOODEN_SHOVEL', 'champions', 'wooden_shovel', '<yellow>Wooden Shovel', 500, 0, 0, 0), ('STONE_SHOVEL', 'champions', 'stone_shovel', '<yellow>Stone Shovel', 500, 0, 0, 0),
+    ('IRON_SHOVEL', 'champions', 'iron_shovel', '<yellow>Iron Shovel', 500, 0, 0, 0), ('GOLDEN_SHOVEL', 'champions', 'gold_shovel', '<yellow>Gold Shovel', 500, 0, 0, 0),
+    ('DIAMOND_SHOVEL', 'champions', 'diamond_shovel', '<yellow>Diamond Shovel', 500, 0, 0, 0), ('NETHERITE_SHOVEL', 'champions', 'netherite_shovel', '<yellow>Netherite Shovel', 500, 0, 0, 0);
 
 -- Custom weapons
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, Durability, ModelData, Glow, HasUUID) VALUES
-    ('COBWEB', 'champions', '<light_purple>Throwing Web', 500, 0, 0, 0);
+    ('COBWEB', 'champions', 'throwing_web', '<light_purple>Throwing Web', 500, 0, 0, 0);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, Durability, ModelData, Glow, HasUUID) VALUES
-    ('APPLE', 'champions', '<light_purple>Energy Apple', 500, 0, 0, 0);
+    ('APPLE', 'champions', 'APPLE', 'energy_apple', '<light_purple>Energy Apple', 500, 0, 0, 0);
 
 -- Legendaries
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, Durability, ModelData, Glow, HasUUID) VALUES
-    ('MUSIC_DISC_MELLOHI', 'champions', '<orange>Wind Blade', 500, 1, 0, 1);
+    ('MUSIC_DISC_MELLOHI', 'champions', 'wind_blade', '<orange>Wind Blade', 500, 1, 0, 1);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, Durability, ModelData, Glow, HasUUID) VALUES
-    ('MUSIC_DISC_MALL', 'champions', '<orange>Alligators Tooth', 500, 1, 0, 1);
+    ('MUSIC_DISC_MALL', 'champions', 'alligators_tooth', '<orange>Alligator\'s Tooth', 500, 1, 0, 1);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, Durability, ModelData, Glow, HasUUID) VALUES
-    ('MUSIC_DISC_BLOCKS', 'champions', '<orange>Hyper Axe', 500, 1, 0, 1);
+    ('MUSIC_DISC_BLOCKS', 'champions', 'hyper_axe', '<orange>Hyper Axe', 500, 1, 0, 1);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, Durability, ModelData, Glow, HasUUID) VALUES
-    ('MUSIC_DISC_WAIT', 'champions', '<orange>Knight\'s Greatlance', 500, 1, 0, 1);
+    ('MUSIC_DISC_WAIT', 'champions', 'knights_greatlance', '<orange>Knight\'s Greatlance', 500, 1, 0, 1);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, Durability, ModelData, Glow, HasUUID) VALUES
-    ('MUSIC_DISC_FAR', 'champions', '<orange>Magnetic Maul', 500, 1, 0, 1);
+    ('MUSIC_DISC_FAR', 'champions', 'magnetic_maul', '<orange>Magnetic Maul', 500, 1, 0, 1);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, Durability, ModelData, Glow, HasUUID) VALUES
-    ('MUSIC_DISC_CAT', 'champions', '<orange>Giant\'s Broadsword', 500, 1, 0, 1);
+    ('MUSIC_DISC_CAT', 'champions', 'giants_broadsword', '<orange>Giant\'s Broadsword', 500, 1, 0, 1);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, Durability, ModelData, Glow, HasUUID) VALUES
-    ('ELYTRA', 'champions', '<orange>Wings of Zanzul', 500, 1, 0, 1);
+    ('ELYTRA', 'champions', 'wings_of_zanzul', '<orange>Wings of Zanzul', 500, 1, 0, 1);
