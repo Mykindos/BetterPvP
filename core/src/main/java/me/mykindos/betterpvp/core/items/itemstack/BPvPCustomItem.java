@@ -11,23 +11,29 @@ import org.bukkit.inventory.ShapelessRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 @Getter
 public abstract class BPvPCustomItem {
-    protected ShapedRecipe shapedRecipe;
-    protected ShapelessRecipe shapelessRecipe;
+    private String namespace;
+    private String key;
+    private final Material material;
+    private final Component name;
+    private final List<Component> lore;
+    private int customModelData;
 
-    protected final int model;
-    protected final Material material;
+    //not sure if I need to save recipes
+    private ShapedRecipe[] shapedRecipes = new ShapedRecipe[1];
+    private ShapelessRecipe[] shapelessRecipes = new ShapelessRecipe[1];
+    //todo add all recipes
 
-    protected Component name;
-
-    protected final NamespacedKey namespacedKey;
-
-    protected BPvPCustomItem(NamespacedKey namespacedKey, Component name, Material material, int model) {
-        this.namespacedKey = namespacedKey;
+    protected BPvPCustomItem(String namespace, String key, Material material, Component name, List<Component> lore, int customModelData) {
+        this.namespace = namespace;
+        this.key = key;
         this.material = material;
         this.name = name;
-        this.model = model;
+        this.lore = lore;
+        this.customModelData = customModelData;
     }
 
     public ItemStack getItemStack() {
@@ -37,7 +43,7 @@ public abstract class BPvPCustomItem {
     public ItemStack getItemStack(int count) {
         ItemStack item = new ItemStack(material);
         ItemMeta itemMeta = item.getItemMeta();
-        itemMeta.setCustomModelData(model);
+        itemMeta.setCustomModelData(customModelData);
         item.setItemMeta(itemMeta);
         return item;
     }
@@ -47,11 +53,11 @@ public abstract class BPvPCustomItem {
 
     public boolean matches(ItemStack itemStack) {
         if (itemStack == null || itemStack.getType() != material) return false;
-        if (model != 0) {
+        if (customModelData != 0) {
             ItemMeta itemMeta = itemStack.getItemMeta();
             if (itemMeta != null) {
                 if (itemMeta.hasCustomModelData()) {
-                    return itemMeta.getCustomModelData() == model;
+                    return itemMeta.getCustomModelData() == customModelData;
                 }
             }
         }
@@ -74,12 +80,12 @@ public abstract class BPvPCustomItem {
      * @see ShapedRecipe#shape(String...)
      */
     protected void setShapedRecipe(int count, String... shape) {
-        this.shapedRecipe = getShapedRecipe(count, "shaped", shape);
+        this.shapedRecipes[0] = getShapedRecipe(count, "shaped", shape);
     }
 
     //todo expose/implement some way to have more than 1 shaped recipe for an item
     private ShapedRecipe getShapedRecipe(int count, String key_suffix, String... shape) {
-        ShapedRecipe shapedRecipe = new ShapedRecipe(new NamespacedKey(namespacedKey.namespace(), namespacedKey.value() + key_suffix), getItemStack(count));
+        ShapedRecipe shapedRecipe = new ShapedRecipe(new NamespacedKey(namespace, key + key_suffix), getItemStack(count));
         shapedRecipe.shape(shape);
         return shapedRecipe;
     }
@@ -89,13 +95,13 @@ public abstract class BPvPCustomItem {
     }
 
     protected void setShapelessRecipe(int count, ItemStack... ingredients) {
-        this.shapelessRecipe = getShapelessRecipe(count, "shapeless", ingredients);
-        Bukkit.addRecipe(shapelessRecipe);
+        this.shapelessRecipes[0] = getShapelessRecipe(count, "shapeless", ingredients);
+        Bukkit.addRecipe(shapelessRecipes[0]);
     }
 
     //todo expose/implement some way to have more than 1 shapeless recipe for an item
     private ShapelessRecipe getShapelessRecipe(int count, String key_suffix, ItemStack... ingredients) {
-        ShapelessRecipe shapelessRecipe = new ShapelessRecipe(new NamespacedKey(namespacedKey.namespace(), namespacedKey.value() + key_suffix), getItemStack(count));
+        ShapelessRecipe shapelessRecipe = new ShapelessRecipe(new NamespacedKey(namespace, key + key_suffix), getItemStack(count));
         for (ItemStack ingredient : ingredients) {
             shapelessRecipe.addIngredient(ingredient);
         }

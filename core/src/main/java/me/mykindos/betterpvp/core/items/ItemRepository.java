@@ -41,6 +41,7 @@ public class ItemRepository implements IRepository<BPVPItem> {
             while (result.next()) {
                 int id = result.getInt(1);
                 Material material = Material.getMaterial(result.getString(2));
+                String key = result.getString(4).toLowerCase().replace(' ', '_');
                 Component name = UtilMessage.deserialize(result.getString(4)).decoration(TextDecoration.ITALIC, false);
                 int customModelData = result.getInt(5);
                 boolean glowing = result.getBoolean(6);
@@ -53,7 +54,7 @@ public class ItemRepository implements IRepository<BPVPItem> {
                     continue;
                 }
 
-                items.add(new BPVPItem(material, name, lore, customModelData, glowing, uuid));
+                items.add(new BPVPItem(module.toLowerCase(), key, material, name, lore, customModelData, glowing, uuid));
             }
         } catch (Exception ex) {
             ex.printStackTrace();

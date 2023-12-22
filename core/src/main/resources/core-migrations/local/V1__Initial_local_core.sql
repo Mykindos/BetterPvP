@@ -2,12 +2,14 @@ create table if not exists items
 (
     id       int auto_increment
         primary key,
-    Material  varchar(255) not null,
-    Module    varchar(255) not null,
-    Name      varchar(255) not null,
-    ModelData int          not null default 0,
-    Glow      tinyint      not null,
-    hasUUID   tinyint      not null default 0,
+    Material   varchar(255) not null,
+    Namespace  varchar(255) not null,
+    Keyname    varchar(255) not null,
+    Name       varchar(255) not null,
+    ModelData  int          not null default 0,
+    Durability int
+    Glow       tinyint      not null,
+    hasUUID    tinyint      not null default 0,
     constraint items_uk
         unique (Material, Module)
 );
