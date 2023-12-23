@@ -30,7 +30,7 @@ INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, H
 SELECT id INTO @itemId FROM items WHERE Material = 'SHAPER_ARMOR_TRIM_SMITHING_TEMPLATE';
 INSERT IGNORE INTO itemlore VALUES (@itemId, 0, '<gray>Can be applied to any equippable item'), (@itemId, 1, ''), (@itemId, 2, '<blue>Affix'), (@itemId, 3, '<green>15% <gray>cooldown reduction');
 
-INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES ('RAISER_ARMOR_TRIM_SMITHING_TEMPLATE', 'champions', 'imbuement_vigor' '<yellow>Rune of Vigor', 0, 0, 0);
+INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES ('RAISER_ARMOR_TRIM_SMITHING_TEMPLATE', 'champions', 'imbuement_vigor', '<yellow>Rune of Vigor', 0, 0, 0);
 SELECT id INTO @itemId FROM items WHERE Material = 'RAISER_ARMOR_TRIM_SMITHING_TEMPLATE';
 INSERT IGNORE INTO itemlore VALUES (@itemId, 0, '<gray>Can only be applied to weapons'), (@itemId, 1, ''), (@itemId, 2, '<blue>Affix'), (@itemId, 3, '<green>20% <gray>increased damage');
 

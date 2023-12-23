@@ -17,7 +17,9 @@ create table if not exists itemdurability
 (
     Item       int           not null,
     Durability int           not null,
-    constraint itemdurability___fk,
+    constraint itemdurability_item_uk
+        unique (Item),
+    constraint itemdurability___fk
         foreign key (Item) references items (id)
 );
 

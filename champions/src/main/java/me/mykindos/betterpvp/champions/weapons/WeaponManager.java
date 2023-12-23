@@ -33,6 +33,8 @@ public class WeaponManager extends Manager<IWeapon> {
             if(clazz.isAnnotationPresent(Deprecated.class)) continue;
             Weapon weapon = champions.getInjector().getInstance(clazz);
             champions.getInjector().injectMembers(weapon);
+            log.error(String.valueOf(itemHandler.getItemMap()));
+            log.error(weapon.getIdentifier() + String.valueOf(itemHandler.getItemMap().get(weapon.getIdentifier())));
             weapon.loadWeapon(itemHandler.getItemMap().get(weapon.getIdentifier()));
             addObject(weapon.getIdentifier(), weapon);
         }
