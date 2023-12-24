@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.components.champions.weapons.IWeapon;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
+import me.mykindos.betterpvp.core.items.BPVPItem;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import org.bukkit.inventory.ItemStack;
 import org.reflections.Reflections;
@@ -25,20 +26,25 @@ public class WeaponManager extends Manager<IWeapon> {
     public WeaponManager(Champions champions, ItemHandler itemHandler) {
         this.champions = champions;
         this.itemHandler = itemHandler;
+    }
 
+    public void load() {
         Reflections reflections = new Reflections(getClass().getPackageName());
         Set<Class<? extends Weapon>> classes = reflections.getSubTypesOf(Weapon.class);
         for (var clazz : classes) {
-            if(clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers())) continue;
-            if(clazz.isAnnotationPresent(Deprecated.class)) continue;
+            if (clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers())) continue;
+            if (clazz.isAnnotationPresent(Deprecated.class)) continue;
             Weapon weapon = champions.getInjector().getInstance(clazz);
             champions.getInjector().injectMembers(weapon);
-            log.error(String.valueOf(itemHandler.getItemMap()));
-            log.error(weapon.getIdentifier() + String.valueOf(itemHandler.getItemMap().get(weapon.getIdentifier())));
-            weapon.loadWeapon(itemHandler.getItemMap().get(weapon.getIdentifier()));
+            BPVPItem item = itemHandler.getItem(weapon.getIdentifier());
+            if (item == null) {
+                log.error(weapon.getIdentifier() + " does not exist in itemRepository");
+                continue;
+            }
+            weapon.loadWeapon(item);
+
             addObject(weapon.getIdentifier(), weapon);
         }
-
         log.info("Loaded " + objects.size() + " weapons");
         champions.saveConfig();
     }
@@ -50,8 +56,10 @@ public class WeaponManager extends Manager<IWeapon> {
     }
 
     public Optional<IWeapon> getWeaponByItemStack(ItemStack itemStack) {
-        var meta = itemStack.getItemMeta();
-        return getObject(itemStack.getType().name() + (meta.hasCustomModelData() ? meta.getCustomModelData() : 0));
+        for (IWeapon weapon : objects.values()) {
+            if (weapon.matches(itemStack)) return Optional.of(weapon);
+        }
+        return Optional.empty();
     }
 
 }

@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.core.items;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
@@ -24,18 +23,13 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Singleton
 public class ItemHandler {
 
     private final ItemRepository itemRepository;
 
-    @Getter
     private final HashMap<String, BPVPItem> itemMap = new HashMap<>();
     private final Enchantment glowEnchantment;
 
@@ -116,6 +110,10 @@ public class ItemHandler {
         itemStack.setItemMeta(itemMeta);
 
         return itemStack;
+    }
+
+    public BPVPItem getItem(String identifier) {
+        return itemMap.get(identifier);
     }
 
     private void registerEnchantment(Enchantment enchantment) {
