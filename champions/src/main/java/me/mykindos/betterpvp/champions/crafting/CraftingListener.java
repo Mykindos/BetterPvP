@@ -63,14 +63,14 @@ public class CraftingListener implements Listener {
             return;
         }
 
-        if (UtilItem.isWeapon(firstItem.getType()) && !imbuement.isCanImbueWeapons()) {
-            if(!UtilItem.isAxe(firstItem.getType()) && !imbuement.isCanImbueTools()) {
+        if (UtilItem.isWeapon(firstItem) && !imbuement.isCanImbueWeapons()) {
+            if(!UtilItem.isAxe(firstItem) && !imbuement.isCanImbueTools()) {
                 return;
             }
         }
 
-        if (UtilItem.isTool(firstItem.getType()) && !imbuement.isCanImbueTools()) {
-            if(!UtilItem.isAxe(firstItem.getType()) && !imbuement.isCanImbueWeapons()) {
+        if (UtilItem.isTool(firstItem) && !imbuement.isCanImbueTools()) {
+            if(!UtilItem.isAxe(firstItem) && !imbuement.isCanImbueWeapons()) {
                 return;
             }
         }

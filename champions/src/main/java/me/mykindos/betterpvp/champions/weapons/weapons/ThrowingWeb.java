@@ -24,7 +24,7 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 
@@ -82,6 +82,13 @@ public class ThrowingWeb extends Weapon implements Listener, InteractWeapon, Coo
     }
 
     @EventHandler
+    public void onInteract(PlayerInteractEvent event) {
+        if (event.getAction().isLeftClick() && matches(event.getItem())) {
+            activate(event.getPlayer()); // also activate on left click
+        }
+    }
+
+    @EventHandler
     public void onGroundCollide(ThrowableHitGroundEvent event) {
         if (event.getThrowable().getName().equalsIgnoreCase("Throwing Web")) {
 
@@ -129,8 +136,4 @@ public class ThrowingWeb extends Weapon implements Listener, InteractWeapon, Coo
         return cooldown;
     }
 
-    @Override
-    public Action[] getActions() {
-        return new Action[]{Action.LEFT_CLICK_AIR};
-    }
 }

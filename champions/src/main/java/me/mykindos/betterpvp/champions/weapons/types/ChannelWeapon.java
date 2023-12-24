@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.champions.weapons.types;
 
-import me.mykindos.betterpvp.champions.combat.events.PlayerCheckShieldEvent;
 import me.mykindos.betterpvp.champions.weapons.Weapon;
 import me.mykindos.betterpvp.core.components.champions.weapons.IWeapon;
 import net.kyori.adventure.text.Component;
@@ -36,14 +35,6 @@ public abstract class ChannelWeapon extends Weapon implements IWeapon, Listener 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         active.remove(event.getPlayer().getUniqueId());
-    }
-
-    @EventHandler
-    public void onShieldCheck(PlayerCheckShieldEvent event) {
-        if(event.getPlayer().getInventory().getItemInMainHand().getType() == getMaterial()) {
-            event.setShouldHaveShield(true);
-            event.setCustomModelData(1);
-        }
     }
 
 }

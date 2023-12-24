@@ -8,6 +8,8 @@ import me.mykindos.betterpvp.champions.weapons.types.ChannelWeapon;
 import me.mykindos.betterpvp.champions.weapons.types.CooldownWeapon;
 import me.mykindos.betterpvp.champions.weapons.types.InteractWeapon;
 import me.mykindos.betterpvp.champions.weapons.types.LegendaryWeapon;
+import me.mykindos.betterpvp.core.combat.click.events.RightClickEndEvent;
+import me.mykindos.betterpvp.core.combat.click.events.RightClickEvent;
 import me.mykindos.betterpvp.core.combat.combatlog.events.PlayerCombatLogEvent;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseItemEvent;
 import me.mykindos.betterpvp.core.components.champions.weapons.IWeapon;
@@ -28,17 +30,17 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityPickupItemEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 @Singleton
 @BPvPListener
@@ -48,6 +50,7 @@ public class WeaponListener implements Listener {
     private final ItemHandler itemHandler;
     private final CooldownManager cooldownManager;
     private final EnergyHandler energyHandler;
+    private final Map<UUID, IWeapon> clicked = new HashMap<>();
 
     @Inject
     public WeaponListener(WeaponManager weaponManager, ItemHandler itemHandler, CooldownManager cooldownManager, EnergyHandler energyHandler) {
@@ -57,10 +60,16 @@ public class WeaponListener implements Listener {
         this.energyHandler = energyHandler;
     }
 
+    @EventHandler
+    public void onRelease(RightClickEndEvent event) {
+        clicked.remove(event.getPlayer().getUniqueId());
+    }
+
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onWeaponActivate(PlayerInteractEvent event) {
-        if (event.getAction() == Action.PHYSICAL) return;
-        if (event.getHand() == EquipmentSlot.OFF_HAND) return;
+    public void onWeaponActivate(RightClickEvent event) {
+        if (event.getHand() == EquipmentSlot.OFF_HAND) {
+            return; // Only main hand and right click
+        }
 
         Player player = event.getPlayer();
         ItemStack item = player.getInventory().getItemInMainHand();
@@ -71,11 +80,13 @@ public class WeaponListener implements Listener {
         Optional<IWeapon> weaponOptional = weaponManager.getWeaponByItemStack(item);
         if (weaponOptional.isEmpty()) return;
 
-
         IWeapon weapon = weaponOptional.get();
+        if (clicked.get(event.getPlayer().getUniqueId()) == weapon) {
+            return; // Skip if the last weapon activated in this click was this weapon
+        }
 
+        clicked.put(player.getUniqueId(), weapon); // Log this weapon as clicked
         if (weapon instanceof InteractWeapon interactWeapon) {
-            if (Arrays.stream(interactWeapon.getActions()).noneMatch(action -> action == event.getAction())) return;
             if (!interactWeapon.canUse(player)) {
                 return;
             }
@@ -87,9 +98,7 @@ public class WeaponListener implements Listener {
             return;
         }
 
-
         String name = PlainTextComponentSerializer.plainText().serialize(weapon.getName());
-
         if (weapon instanceof CooldownWeapon cooldownWeapon) {
             if (!cooldownManager.use(player, name, cooldownWeapon.getCooldown(),
                     cooldownWeapon.showCooldownFinished(), true, false, x -> weapon.isHoldingWeapon(player))) {
@@ -103,11 +112,15 @@ public class WeaponListener implements Listener {
                     return;
                 }
             }
-
         }
 
         if (weapon instanceof InteractWeapon interactWeapon) {
             interactWeapon.activate(player);
+
+            if (interactWeapon.useShield(player)) {
+                event.setUseShield(true);
+                event.setShieldModelData(RightClickEvent.INVISIBLE_SHIELD);
+            }
         }
 
     }

@@ -1,16 +1,40 @@
 package me.mykindos.betterpvp.champions.champions.skills.data;
 
-import org.bukkit.Material;
+import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.utilities.UtilItem;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 public class SkillWeapons {
 
-    public static final Material[] SWORDS = {Material.IRON_SWORD, Material.GOLDEN_SWORD, Material.DIAMOND_SWORD, Material.NETHERITE_SWORD};
+    public static boolean isHolding(Player player, SkillType skillType) {
+        final ItemStack item = player.getInventory().getItemInMainHand();
+        return switch (skillType) {
+            case SWORD -> UtilItem.isSword(item);
+            case AXE -> UtilItem.isAxe(item);
+            case BOW -> UtilItem.isRanged(item);
+            default -> true; // Passives
+        };
+    }
 
-    public static final Material[] BOWS = {Material.BOW, Material.CROSSBOW};
+    public static boolean hasBooster(Player player) {
+        final ItemStack item = player.getInventory().getItemInMainHand();
+        return switch (item.getType()) {
+            case GOLDEN_AXE, GOLDEN_SWORD, NETHERITE_SWORD, NETHERITE_AXE, CROSSBOW -> true;
+            default -> false;
+        };
+    }
 
-    public static final Material[] AXES = {Material.IRON_AXE, Material.GOLDEN_AXE, Material.DIAMOND_AXE, Material.NETHERITE_AXE};
+    public static SkillType getTypeFrom(ItemStack item) {
+        if (UtilItem.isSword(item)) {
+            return SkillType.SWORD;
+        } else if (UtilItem.isAxe(item)) {
+            return SkillType.AXE;
+        } else if (UtilItem.isRanged(item)) {
+            return SkillType.BOW;
+        }
 
-    public static final Material[] BOOSTERS = {Material.GOLDEN_AXE, Material.GOLDEN_SWORD, Material.NETHERITE_SWORD,
-            Material.NETHERITE_AXE, Material.CROSSBOW};
+        return null;
+    }
 
 }
