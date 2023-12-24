@@ -30,7 +30,7 @@ public abstract class Weapon extends BPvPCustomItem implements IWeapon {
         setMaterial(item.getMaterial());
         setName(item.getName());
         setLore(item.getLore());
-        setCustomModelData(getCustomModelData());
+        setCustomModelData(item.getCustomModelData());
     }
 
     @Override

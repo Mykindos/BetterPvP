@@ -98,7 +98,7 @@ public abstract class BPvPCustomItem {
      * @see ShapedRecipe#shape(String...)
      */
     protected void setShapedRecipe(int count, String... shape) {
-        this.shapedRecipes[0] = getShapedRecipe(count, "shaped", shape);
+        this.shapedRecipes[0] = getShapedRecipe(count, "_shaped", shape);
     }
 
     //todo expose/implement some way to have more than 1 shaped recipe for an item
@@ -113,7 +113,7 @@ public abstract class BPvPCustomItem {
     }
 
     protected void setShapelessRecipe(int count, ItemStack... ingredients) {
-        this.shapelessRecipes[0] = getShapelessRecipe(count, "shapeless", ingredients);
+        this.shapelessRecipes[0] = getShapelessRecipe(count, "_shapeless", ingredients);
         Bukkit.addRecipe(shapelessRecipes[0]);
     }
 

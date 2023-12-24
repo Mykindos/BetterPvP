@@ -78,7 +78,7 @@ public class ItemHandler {
             itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         }
 
-        BPVPItem item = itemMap.get(material.name() + modelData);
+        BPVPItem item = getItem(itemStack);
         if (item != null) {
             var nameUpdateEvent = UtilServer.callEvent(new ItemUpdateNameEvent(itemStack, itemMeta, item.getName()));
             itemMeta.displayName(nameUpdateEvent.getItemName().decoration(TextDecoration.ITALIC, false));
@@ -114,6 +114,13 @@ public class ItemHandler {
 
     public BPVPItem getItem(String identifier) {
         return itemMap.get(identifier);
+    }
+
+    public BPVPItem getItem(ItemStack itemStack) {
+        for (BPVPItem item : itemMap.values()) {
+            if (item.matches(itemStack)) return item;
+        }
+        return null;
     }
 
     private void registerEnchantment(Enchantment enchantment) {

@@ -14,6 +14,7 @@ import java.util.Iterator;
 @Slf4j
 public class RecipeHandler {
     public void loadConfig(@NotNull ExtendedYamlConfiguration config, String namespace) {
+        Bukkit.resetRecipes();
         String path = "recipe.";
         Iterator<Recipe> recipeIterator = Bukkit.recipeIterator();
         while (recipeIterator.hasNext()) {
@@ -23,7 +24,7 @@ public class RecipeHandler {
                 if (!key.namespace().equalsIgnoreCase(namespace)) continue;
                 if (!config.getBoolean(path + key.namespace() + '.' + key.value(), true)) {
                     Bukkit.removeRecipe((NamespacedKey) key);
-                    log.error("Disabling recipe: " + key.asString());
+                    log.info("Disabling recipe: " + key.asString());
                 }
             }
         }

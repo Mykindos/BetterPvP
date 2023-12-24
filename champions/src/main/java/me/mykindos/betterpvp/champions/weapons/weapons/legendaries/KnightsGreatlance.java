@@ -22,6 +22,7 @@ import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
+import me.mykindos.betterpvp.core.items.BPVPItem;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
@@ -99,10 +100,6 @@ public class KnightsGreatlance extends Weapon implements InteractWeapon, Legenda
         this.cooldownManager = cooldownManager;
         this.clientManager = clientManager;
         this.effectManager = effectManager;
-        setShapedRecipe("*I*", "*I*", "*I*");
-        shapedRecipes[0].setIngredient('*', Material.AIR);
-        shapedRecipes[0].setIngredient('I', Material.STICK);
-        Bukkit.addRecipe(shapedRecipes[0]);
     }
 
     @Override
@@ -119,6 +116,14 @@ public class KnightsGreatlance extends Weapon implements InteractWeapon, Legenda
         return lore;
     }
 
+    @Override
+    public void loadWeapon(BPVPItem item) {
+        super.loadWeapon(item);
+        setShapedRecipe("*I*", "*I*", "*I*");
+        shapedRecipes[0].setIngredient('*', Material.AIR);
+        shapedRecipes[0].setIngredient('I', Material.STICK);
+        Bukkit.addRecipe(shapedRecipes[0]);
+    }
 
     @Override
     public void activate(Player player) {

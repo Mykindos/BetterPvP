@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.combat.throwables.events.ThrowableHitEntityEve
 import me.mykindos.betterpvp.core.combat.throwables.events.ThrowableHitGroundEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
+import me.mykindos.betterpvp.core.items.BPVPItem;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
@@ -54,6 +55,12 @@ public class ThrowingWeb extends Weapon implements Listener, InteractWeapon, Coo
 
         this.championsManager = championsManager;
         this.blockHandler = blockHandler;
+
+    }
+
+    @Override
+    public void loadWeapon(BPVPItem item) {
+        super.loadWeapon(item);
         setShapedRecipe("*S*", "SSS", "*S*");
         shapedRecipes[0].setIngredient('*', Material.AIR);
         shapedRecipes[0].setIngredient('S', Material.STRING);
