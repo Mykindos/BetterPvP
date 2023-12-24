@@ -3,9 +3,11 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.brute.sword;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
@@ -21,6 +23,8 @@ import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
+import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -29,6 +33,7 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
@@ -42,10 +47,16 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
+@Slf4j
 public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSkill {
-
     private final List<ChargeData> charges = new ArrayList<>();
     private final WeakHashMap<Player, Long> delay = new WeakHashMap<>();
+    private final WeakHashMap<Player, ChargeData> playerChargeMap = new WeakHashMap<>();
+
+
+    public double damage;
+    public double damageIncreasePerLevel;
+    public double cooldownDecreasePerLevel;
 
     @Inject
     public FleshHook(Champions champions, ChampionsManager championsManager) {
@@ -65,6 +76,7 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
                 "Hold right click with a Sword to channel",
                 "",
                 "Charge a hook that latches onto enemies, pulling them towards you",
+                "and dealing <val>" + getFinalDamage(level) + "</val> damage",
                 "",
                 "Higher Charge time = faster hook",
                 "",
@@ -72,11 +84,14 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
         };
     }
 
+    public double getFinalDamage(int level){
+        return (damage + (damageIncreasePerLevel * (level-1)));
+    }
+
     @Override
     public Role getClassType() {
         return Role.BRUTE;
     }
-
 
     @UpdateEvent
     public void updateFleshHook() {
@@ -106,6 +121,7 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
                     if (UtilTime.elapsed(data.getLastCharge(), 400L)) {
                         if (data.getCharge() < data.getMaxCharge()) {
                             data.addCharge();
+                            playerChargeMap.put(player, data);
                             UtilMessage.simpleMessage(player, getClassType().getName(), getName() + ": <alt2>+ " + data.getCharge() + "% Strength");
                             player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.4F, 1.0F + 0.05F * data.getCharge());
                         }
@@ -114,28 +130,17 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
                     if (isHolding(player)) {
                         double base = 0.8D;
                         Location loc = player.getLocation();
-                        Location itemLocation = loc.clone();
 
-                        Location infront = player.getEyeLocation().add(player.getLocation().getDirection());
-                        for (int x = -20; x <= 20; x += 5) {
-                            Item item = player.getWorld().dropItem(infront, new ItemStack(Material.TRIPWIRE_HOOK));
-                            ThrowableItem throwable = new ThrowableItem(item, player, getName(), 10000L, true, true);
-                            throwable.setCollideGround(true);
-                            championsManager.getThrowables().addThrowable(throwable);
+                        Item item = player.getWorld().dropItem(player.getEyeLocation(), new ItemStack(Material.TRIPWIRE_HOOK));
+                        ThrowableItem throwable = new ThrowableItem(item, player, getName(), 10000L, true, true);
+                        throwable.setCollideGround(true);
+                        championsManager.getThrowables().addThrowable(throwable);
 
-                            itemLocation.setYaw(loc.getYaw() + x);
-                            Vector v = itemLocation.getDirection();
-
-                            UtilVelocity.velocity(item, v,
-                                    base + (data.getCharge() / 20f) * (0.25D * base), false, 0.0D, 0.2D, 20.0D, false);
-
-
-                        }
-
+                        Vector v = loc.getDirection();
+                        UtilVelocity.velocity(item, v, base + (data.getCharge() / 20f) * (0.25D * base), false, 0.0D, 0.2D, 20.0D, false);
 
                         UtilMessage.simpleMessage(player, getClassType().getName(), "You used <alt>" + getName() + "</alt>.");
                         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_IRON_GOLEM_ATTACK, 2.0F, 0.8F);
-
 
                         iterator.remove();
 
@@ -144,24 +149,28 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
                     }
                 }
             }
-
         }
     }
 
     @EventHandler
     public void onCollide(ThrowableHitEntityEvent event) {
         if (event.getThrowable().getName().equalsIgnoreCase(getName())) {
-            LivingEntity collide = event.getCollision();
+            LivingEntity target = event.getCollision();
 
-            UtilVelocity.velocity(collide, UtilVelocity.getTrajectory(collide.getLocation(), event.getThrowable().getThrower().getLocation()), 2.0D, false, 0.0D, 0.8D, 1.0D, true);
-            event.getThrowable().getItem().remove();
+            Player source = (Player) event.getThrowable().getThrower();
+            int level = getLevel(source);
 
-            CustomDamageEvent ev = new CustomDamageEvent(collide, event.getThrowable().getThrower(), null, DamageCause.CUSTOM, 2, false, getName());
+            ChargeData chargeData = playerChargeMap.get(source);
+            int chargePercent = (chargeData != null) ? chargeData.getCharge() : 0;
+            double scaledDamage = getFinalDamage(level) * (chargePercent / 100.0);
+
+            CustomDamageEvent ev = new CustomDamageEvent(target, source, null, DamageCause.CUSTOM, scaledDamage, false, getName());
             UtilDamage.doCustomDamage(ev);
 
+            UtilVelocity.velocity(target, UtilVelocity.getTrajectory(target.getLocation(), event.getThrowable().getThrower().getLocation()), 2.0D, false, 0.0D, 0.8D, 1.0D, true);
+            event.getThrowable().getItem().remove();
         }
     }
-
 
     @Override
     public SkillType getType() {
@@ -172,13 +181,16 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
     @Override
     public double getCooldown(int level) {
 
-        return cooldown - ((level - 1) * 2);
+        return (cooldown - (cooldownDecreasePerLevel * (level - 1)));
     }
 
     @Override
     public void activate(Player player, int level) {
-        charges.add(new ChargeData(player.getUniqueId(), 25, 100));
+        ChargeData chargeData = new ChargeData(player.getUniqueId(), 25, 100);
+        charges.add(chargeData);
         delay.put(player, System.currentTimeMillis());
+
+        playerChargeMap.put(player, chargeData);
     }
 
     @Override
@@ -211,6 +223,12 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
                 lastCharge = System.currentTimeMillis();
             }
         }
+    }
 
+    @Override
+    public void loadSkillConfig() {
+        damage = getConfig("damage", 7.0, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 2.0, Double.class);
+        cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 2.0, Double.class);
     }
 }
