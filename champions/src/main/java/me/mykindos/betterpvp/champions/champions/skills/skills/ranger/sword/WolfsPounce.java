@@ -6,7 +6,6 @@ import lombok.Data;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
-import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
@@ -17,7 +16,13 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.*;
+import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.UtilDamage;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
 import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
 import org.bukkit.Sound;
@@ -45,7 +50,7 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
     // Action bar
     private final PermanentComponent actionBarComponent = new PermanentComponent(gamer -> {
         final Player player = gamer.getPlayer();
-        if (player == null || !charging.containsKey(player) || !UtilPlayer.isHoldingItem(player, getItemsBySkillType())) {
+        if (player == null || !charging.containsKey(player) || !isHolding(player)) {
             return null; // Skip if not online or not charging
         }
 
@@ -194,7 +199,7 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
                 true,
                 true,
                 false,
-                gmr -> gmr.getPlayer() != null && UtilPlayer.isHoldingItem(gmr.getPlayer(), SkillWeapons.SWORDS));
+                gmr -> gmr.getPlayer() != null && isHolding(gmr.getPlayer()));
     }
 
     private void collide(Player damager, LivingEntity damagee, PounceData pounceData) {
@@ -270,6 +275,7 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
             Player player = iterator.next();
             ChargeData charge = charging.get(player);
             if (player != null) {
+                Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
                 int level = getLevel(player);
 
                 // Remove if they no longer have the skill
@@ -279,12 +285,12 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
                 }
 
                 // Check if they still are blocking and charge
-                if (player.isHandRaised()) {
+                if (gamer.isHoldingRightClick()) {
                     // Cancel cooldown to make it only start after we call #pounce
                     championsManager.getCooldowns().removeCooldown(player, getName(), true);
 
                     // Check for sword hold status
-                    if (!UtilPlayer.isHoldingItem(player, SkillWeapons.SWORDS)) {
+                    if (!isHolding(player)) {
                         iterator.remove(); // Otherwise, remove
                     }
 
@@ -303,7 +309,7 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
                     continue;
                 }
 
-                if (UtilPlayer.isHoldingItem(player, SkillWeapons.SWORDS)) {
+                if (isHolding(player)) {
                     // If they're not blocking and still holding their sword, pounce
                     pounce(player, charge.getCharge(), level);
                 }

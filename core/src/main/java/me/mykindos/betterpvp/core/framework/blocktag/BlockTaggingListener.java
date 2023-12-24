@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.framework.blocktag;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
@@ -38,6 +39,9 @@ public class BlockTaggingListener implements Listener {
 
     @Inject
     private Core core;
+
+    @Inject
+    private ClientManager clientManager;
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
@@ -121,6 +125,7 @@ public class BlockTaggingListener implements Listener {
 
     private void tagBlock(Block block, Player player) {
         if (player == null || player.getGameMode() == GameMode.CREATIVE) return;
+        if (clientManager.search().online(player).isAdministrating()) return;
         tagBlock(block, player.getUniqueId());
     }
 

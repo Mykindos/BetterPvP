@@ -16,7 +16,6 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilLocation;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.math.VectorLine;
 import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
 import net.kyori.adventure.text.Component;
@@ -47,7 +46,7 @@ public class Flash extends Skill implements InteractSkill, Listener {
         final Player player = gamer.getPlayer();
 
         // Only display charges in hotbar if holding the weapon
-        if (player == null || !charges.containsKey(player) || !UtilPlayer.isHoldingItem(player, getItemsBySkillType())) {
+        if (player == null || !charges.containsKey(player) || !isHolding(player)) {
             return null; // Skip if not online or not charging
         }
 

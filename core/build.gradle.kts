@@ -56,8 +56,8 @@ dependencies {
     implementation("org.apache.commons:commons-lang3:3.12.0")
     implementation("org.apache.commons:commons-text:1.10.0")
     implementation("com.squareup.okhttp3:okhttp:4.10.0")
-    implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
     implementation("xyz.xenondevs.invui:invui:1.23")
+    api("com.github.ben-manes.caffeine:caffeine:3.1.8")
     api("redis.clients:jedis:4.3.1")
 
     compileOnly("io.papermc.paper:paper-api:1.20.2-R0.1-SNAPSHOT")

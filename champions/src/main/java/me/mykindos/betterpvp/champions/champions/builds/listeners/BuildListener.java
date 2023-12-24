@@ -4,7 +4,6 @@ import com.google.inject.Inject;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
-import me.mykindos.betterpvp.champions.champions.builds.event.LoadBuildsEvent;
 import me.mykindos.betterpvp.champions.champions.builds.menus.ClassSelectionMenu;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.ApplyBuildEvent;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.DeleteBuildEvent;
@@ -41,13 +40,7 @@ public class BuildListener implements Listener {
     @EventHandler
     public void onClientJoin(ClientJoinEvent event) {
         UtilServer.runTaskAsync(champions, () -> {
-            GamerBuilds builds = new GamerBuilds(event.getClient().getUuid());
-            buildManager.getBuildRepository().loadBuilds(builds);
-            buildManager.getBuildRepository().loadDefaultBuilds(builds);
-            buildManager.addObject(event.getClient().getUuid(), builds);
-            UtilServer.runTask(champions, () -> {
-                UtilServer.callEvent(new LoadBuildsEvent(event.getPlayer(), builds));
-            });
+            buildManager.loadBuilds(event.getPlayer());
         });
     }
 

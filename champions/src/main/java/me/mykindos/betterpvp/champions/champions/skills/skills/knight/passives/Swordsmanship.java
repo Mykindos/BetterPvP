@@ -85,7 +85,7 @@ public class Swordsmanship extends Skill implements PassiveSkill {
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
         if (!(event.getDamager() instanceof Player player)) return;
         if (!charges.containsKey(player)) return;
-        if (!UtilPlayer.isHoldingItem(player, SkillWeapons.SWORDS)) return;
+        if (!isHolding(player)) return;
 
         int level = getLevel(player);
         if (level > 0) {

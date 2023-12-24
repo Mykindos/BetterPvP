@@ -68,7 +68,7 @@ public class RootingAxe extends Skill implements PassiveSkill, CooldownSkill {
     public void onDamage(CustomDamageEvent event) {
         if (!(event.getDamager() instanceof Player damager)) return;
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
-        if (!UtilPlayer.isHoldingItem(damager, SkillWeapons.AXES)) return;
+        if (!isHolding(damager)) return;
         if (event.getDamagee() instanceof Wither) return;
         if (!UtilBlock.isGrounded(event.getDamagee())) return;
 

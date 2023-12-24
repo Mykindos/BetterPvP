@@ -143,7 +143,7 @@ public class Overcharge extends Skill implements InteractSkill, Listener {
                     continue;
                 }
 
-                if (!UtilPlayer.isHoldingItem(player, SkillWeapons.BOWS)) {
+                if (!isHolding(player)) {
                     iterator.remove();
                     continue;
                 }

@@ -4,6 +4,8 @@ import lombok.Data;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 import java.util.ArrayList;
 
@@ -93,6 +95,26 @@ public class RoleBuild {
         bow = null;
         points = 12;
 
+    }
+
+    /**
+     * @return The component representation of a build
+     */
+    public Component getBuildComponent() {
+        String sword = getSwordSkill() == null ? "" : getSwordSkill().getString();
+        String axe = getAxeSkill() == null ? "" : getAxeSkill().getString();
+        String bow = getBow() == null ? "" : getBow().getString();
+        String passivea = getPassiveA() == null ? "" : getPassiveA().getString();
+        String passiveb = getPassiveB() == null ? "" : getPassiveB().getString();
+        String global = getGlobal() == null ? "" : getGlobal().getString();
+
+        Component component =  Component.text("Sword: ", NamedTextColor.GREEN).append(Component.text(sword, NamedTextColor.WHITE)).appendNewline()
+                .append(Component.text("Axe: ", NamedTextColor.GREEN).append(Component.text(axe, NamedTextColor.WHITE))).appendNewline()
+                .append(Component.text("Bow: ", NamedTextColor.GREEN).append(Component.text(bow, NamedTextColor.WHITE))).appendNewline()
+                .append(Component.text("Passive A: ", NamedTextColor.GREEN).append(Component.text(passivea, NamedTextColor.WHITE))).appendNewline()
+                .append(Component.text("Passive B: ", NamedTextColor.GREEN).append(Component.text(passiveb, NamedTextColor.WHITE))).appendNewline()
+                .append(Component.text("Global: ", NamedTextColor.GREEN).append(Component.text(global, NamedTextColor.WHITE)));
+        return component;
     }
 
 }

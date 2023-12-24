@@ -116,7 +116,7 @@ public class Wreath extends PrepareSkill implements CooldownSkill {
     public void onSwing(PlayerInteractEvent event) {
         if (event.getHand() != EquipmentSlot.HAND) return;
         if (!event.getAction().isLeftClick()) return;
-        if (!UtilPlayer.isHoldingItem(event.getPlayer(), SkillWeapons.SWORDS)) return;
+        if (!isHolding(event.getPlayer())) return;
         if (!actives.containsKey(event.getPlayer())) return;
 
         Player player = event.getPlayer();

@@ -23,6 +23,10 @@ import org.bukkit.event.block.BlockDropItemEvent;
 @Slf4j
 public class DropMultiplierMiningPerk implements Listener, ProgressionPerk, ChanceHandler {
 
+    @Config(path = "mining.perks.drop-multiplier.enabled", defaultValue = "true")
+    @Inject
+    private boolean enabled;
+
     @Config(path = "mining.perks.drop-multiplier.minLevel", defaultValue = "0")
     @Inject
     int minLevel;
@@ -61,6 +65,8 @@ public class DropMultiplierMiningPerk implements Listener, ProgressionPerk, Chan
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onBreak(BlockDropItemEvent event) {
+        if (!enabled) return;
+        if(!mining.isEnabled()) return;
         Player player = event.getPlayer();
         if (mining.getMiningService().getExperience(event.getBlockState().getType()) <= 0) return;
         mining.hasPerk(player, getClass()).whenComplete((hasPerk, throwable) -> {

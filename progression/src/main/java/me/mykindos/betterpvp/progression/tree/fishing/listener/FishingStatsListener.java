@@ -28,6 +28,7 @@ public class FishingStatsListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onCatch(PlayerStopFishingEvent event) {
+        if (!fishing.isEnabled()) return;
         if (!event.getReason().equals(PlayerStopFishingEvent.FishingResult.CATCH)) {
             return;
         }

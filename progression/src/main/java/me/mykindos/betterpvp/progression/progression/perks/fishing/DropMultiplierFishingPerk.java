@@ -25,6 +25,10 @@ import org.bukkit.event.Listener;
 @Slf4j
 public class DropMultiplierFishingPerk implements Listener, ProgressionPerk, ChanceHandler {
 
+    @Config(path = "fishing.perks.drop-multiplier.enabled", defaultValue = "true")
+    @Inject
+    private boolean enabled;
+
     @Config(path = "fishing.perks.drop-multiplier.minLevel", defaultValue = "0")
     @Inject
     private int minLevel;
@@ -63,6 +67,8 @@ public class DropMultiplierFishingPerk implements Listener, ProgressionPerk, Cha
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onCatch(PlayerStopFishingEvent event) {
+        if (!enabled) return;
+        if(!fishing.isEnabled()) return;
         if (event.getReason() != PlayerStopFishingEvent.FishingResult.CATCH) return;
         if (event.getLoot() instanceof Fish loot) {
             Player player = event.getPlayer();

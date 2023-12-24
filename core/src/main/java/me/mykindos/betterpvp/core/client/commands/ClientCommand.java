@@ -18,7 +18,6 @@ import java.util.List;
 
 @Singleton
 public class ClientCommand extends Command {
-
     @Override
     public String getName() {
         return "client";
@@ -59,6 +58,8 @@ public class ClientCommand extends Command {
 
             Component status = client.isAdministrating() ? Component.text("enabled", NamedTextColor.GREEN) : Component.text("disabled", NamedTextColor.RED);
             UtilMessage.simpleMessage(player, "Command", Component.text("Client admin: ").append(status));
+            Component message = Component.text(player.getName(), NamedTextColor.YELLOW).append(Component.space()).append(status).append(Component.text(" client administration mode", NamedTextColor.GRAY));
+            clientManager.sendMessageToRank("Core", message, Rank.HELPER);
         }
 
         @Override
@@ -140,10 +141,13 @@ public class ClientCommand extends Command {
                             final Component msg = UtilMessage.deserialize("<alt2>%s</alt2> has been promoted to ", targetClient.getName()).append(targetRank.getTag(true));
                             UtilMessage.simpleMessage(player, "Client", msg);
                             clientManager.save(targetClient);
-                        }else{
+
+                            Component staffMessage = UtilMessage.deserialize("<yellow>%s</yellow> has promoted <yellow>%s</yellow> to ", player.getName(), targetClient.getName()).append(targetRank.getTag(true));
+                            clientManager.sendMessageToRank("Client", staffMessage, Rank.HELPER);
+                        } else {
                             UtilMessage.message(player, "Client", "You cannot promote someone to your current rank or higher.");
                         }
-                    }else{
+                    } else {
                         UtilMessage.simpleMessage(player, "Client", "<alt2>%s</alt2> already has the highest rank.", targetClient.getName());
                     }
                 }
@@ -165,7 +169,7 @@ public class ClientCommand extends Command {
 
         @Override
         public String getDescription() {
-            return "Demote a client to a higher rank";
+            return "Demote a client to a lower rank";
         }
 
         @Override
@@ -186,10 +190,13 @@ public class ClientCommand extends Command {
                             final Component msg = UtilMessage.deserialize("<alt2>%s</alt2> has been demoted to ", targetClient.getName()).append(targetRank.getTag(true));
                             UtilMessage.simpleMessage(player, "Client", msg);
                             clientManager.save(targetClient);
-                        }else{
+
+                            Component staffMessage = UtilMessage.deserialize("<yellow>%s</yellow> has demoted <yellow>%s</yellow> to ", player.getName(), targetClient.getName()).append(targetRank.getTag(true));
+                            clientManager.sendMessageToRank("Client", staffMessage, Rank.HELPER);
+                        } else {
                             UtilMessage.message(player, "Client", "You cannot demote someone that is higher rank than you.");
                         }
-                    }else{
+                    } else {
                         UtilMessage.simpleMessage(player, "Client", "<alt2>%s</alt2> already has the lowest rank.", targetClient.getName());
                     }
                 }

@@ -164,10 +164,10 @@ skills:
     fortitude:
       enabled: true
       maxlevel: 3
-      heal: 1.0
       healRate: 1.0
       baseHeal: 3.0
-      healIncreasePerLevel: 3.0
+      healIncreasePerLevel: 1.0
+      healInterval: 0.5
     vengeance:
       enabled: true
       maxlevel: 3
@@ -724,8 +724,8 @@ skills:
       baseSlowDuration: 2.0
       cooldownDecreasePerLevel: 0.0
       slowDurationIncreasePerLevel: 1.0
-      baseProcDuration: 1.0
-      procDurationincreasePerLevel: 0.0
+      baseChannelDuration: 1.0
+      channelDurationincreasePerLevel: 0.0
       slowStrength: 3
     healingshot:
       enabled: true
@@ -817,6 +817,19 @@ skills:
       durationIncreasePerLevel: 0.5
       distance: 5
       duration: 2.0
+    bloodcompass:
+      enabled: true
+      maxlevel: 3
+      numLines: 1
+      effectDuration: 5
+      maxDistance: 64.0
+      numPoints: 30
+      cooldown: 20.0
+      escapeRadius: 7.0
+      damage: 7.0
+      damageIncreasePerLevel: 2.0
+      escapeRadiusIncreasePerLevel: 0.0
+      maxDistanceIncreasePerLevel: 0.0
     grasp:
       enabled: true
       maxlevel: 5
