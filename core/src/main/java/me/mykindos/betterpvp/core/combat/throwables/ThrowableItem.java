@@ -17,6 +17,8 @@ public class ThrowableItem {
     private final List<LivingEntity> immune;
     private final boolean checkHead;
 
+    private int chargePercent;
+
     private boolean collideGround;
     private boolean removeOnCollision;
     private boolean singleCollision;
