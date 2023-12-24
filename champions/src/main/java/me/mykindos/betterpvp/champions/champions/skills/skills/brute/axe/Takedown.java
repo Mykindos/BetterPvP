@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.champions.champions.skills.skills.brute.sword;
+package me.mykindos.betterpvp.champions.champions.skills.skills.brute.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -54,7 +54,7 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Right click with a Sword to activate",
+                "Right click with an Axe to activate",
                 "",
                 "Hurl yourself forwards",
                 "",
@@ -79,8 +79,7 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
 
     @Override
     public SkillType getType() {
-
-        return SkillType.SWORD;
+        return SkillType.AXE;
     }
 
     @Override
