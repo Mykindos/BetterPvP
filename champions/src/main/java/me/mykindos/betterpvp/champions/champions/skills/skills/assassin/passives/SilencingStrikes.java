@@ -89,10 +89,6 @@ public class SilencingStrikes extends Skill implements PassiveSkill, Listener {
             event.addReason(getName());
             if (silenceData.getCount() == hitsNeeded) {
                 championsManager.getEffects().addEffect(damagee, EffectType.SILENCE, (long) ((getDuration(level) * 1000L) * 0.75));
-                //if (championsManager.getEffects().hasEffect(damagee, EffectType.IMMUNETOEFFECTS)) {
-                //    UtilMessage.message(damager, getClassType().getName(), "%s is immune to your silence!",
-                //            ChatColor.GREEN + damagee.getName() + ChatColor.GRAY);
-                //}
                 data.remove(silenceData);
             }
         }
@@ -102,7 +98,7 @@ public class SilencingStrikes extends Skill implements PassiveSkill, Listener {
 
     @UpdateEvent
     public void onUpdate() {
-        data.removeIf(silenceData -> UtilTime.elapsed(silenceData.getLastHit(), (long) timeSpan * 1000));
+        data.removeIf(silenceData -> UtilTime.elapsed(silenceData.getLastHit(), (long) (timeSpan * 1000L)));
     }
 
     public SilencingStrikesData getSilencingStrikesData(Player damager, Player damagee) {
