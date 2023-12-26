@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 public class CustomGiveCommand extends Command {
 
@@ -43,13 +44,13 @@ public class CustomGiveCommand extends Command {
 
         BPVPItem item = itemHandler.getItem(args[1]);
         if (item == null) {
-            UtilMessage.message(player, UtilMessage.deserialize("<green>%s>/green> is not a valid item", args[1]));
+            UtilMessage.message(player, "command", UtilMessage.deserialize("<green>%s>/green> is not a valid item", args[1]));
             return;
         }
 
         int count = 1;
 
-        if (args.length > 3) {
+        /*if (args.length > 3) {
             try {
                 count = Integer.parseInt(args[2]);
                 if (count < 1) {
@@ -58,14 +59,15 @@ public class CustomGiveCommand extends Command {
             } catch (NumberFormatException e) {
                 UtilMessage.message(player, UtilMessage.deserialize("<green>%s>/green> is not a valid number. Accepts integers greater than 0", args[2]));
             }
-        }
+        }*/
 
-        target.getInventory().addItem(item.getItemStack(count));
+        ItemStack itemStack = itemHandler.updateNames(item.getItemStack(count));
+        target.getInventory().addItem(itemStack);
         //todo handle items that do not fit in inventory
     }
 
     public Component getUsage() {
-        return UtilMessage.deserialize("<yellow>Usage</yellow>: <green>customgive <player> <item> [amount]");
+        return UtilMessage.deserialize("<yellow>Usage</yellow>: <green>customgive <player> <item>");
     }
 
     @Override
