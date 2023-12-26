@@ -32,8 +32,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Data
@@ -135,30 +137,18 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
         return members.stream().filter(clanMember -> clanMember.getUuid().equalsIgnoreCase(uuid)).findFirst();
     }
 
-    public List<Player> getMembersAsPlayers() {
-        List<Player> players = new ArrayList<>();
-        for (ClanMember member : getMembers()) {
-            Player player = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
-            if (player != null) {
-                players.add(player);
-            }
-        }
 
-        return players;
-    }
 
     public void updateScoreboards() {
         getMembersAsPlayers().forEach(player -> UtilServer.callEvent(new ScoreboardUpdateEvent(player)));
     }
 
     public List<Player> getAdminsAsPlayers() {
-        List<Player> playerAdmins = getMembersAsPlayers();
-        playerAdmins.forEach(player -> {
-            if (!getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.ADMIN)) {
-                playerAdmins.remove(player);
-            }
-        });
-        return playerAdmins;
+        return getMembers().stream()
+                .filter(member -> member.getRank() == ClanMember.MemberRank.ADMIN)
+                .map(member -> Bukkit.getPlayer(UUID.fromString(member.getUuid())))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     /**
