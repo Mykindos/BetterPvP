@@ -4,7 +4,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
-import me.mykindos.betterpvp.core.command.ICommand;
 import me.mykindos.betterpvp.core.items.BPVPItem;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -61,7 +60,7 @@ public class CustomGiveCommand extends Command {
             }
         }
 
-        player.getInventory().addItem(item.getItemStack(count));
+        target.getInventory().addItem(item.getItemStack(count));
         //todo handle items that do not fit in inventory
     }
 
@@ -77,6 +76,6 @@ public class CustomGiveCommand extends Command {
         if (arg == 2) {
             return ArgumentType.CUSTOMITEM.name();
         }
-        return ICommand.ArgumentType.NONE.name();
+        return ArgumentType.NONE.name();
     }
 }
