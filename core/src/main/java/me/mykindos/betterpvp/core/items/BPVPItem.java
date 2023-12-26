@@ -15,9 +15,9 @@ import java.util.List;
 @Setter
 public class BPVPItem extends BPvPCustomItem {
 
-    private final int maxDurability;
-    private final boolean glowing;
-    private final boolean giveUUID;
+    private int maxDurability;
+    private boolean glowing;
+    private boolean giveUUID;
 
     public BPVPItem(String namespace, String key, Material material, Component name, List<Component> lore, int maxDurability, int customModelData, boolean glowing, boolean uuid) {
         super(namespace, key, material, name, lore, customModelData);

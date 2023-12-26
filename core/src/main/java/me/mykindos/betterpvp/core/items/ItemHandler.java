@@ -67,7 +67,6 @@ public class ItemHandler {
 
         Material material = itemStack.getType();
         ItemMeta itemMeta = itemStack.getItemMeta();
-        int modelData = itemMeta.hasCustomModelData() ? itemMeta.getCustomModelData() : 0;
 
         if (hideAttributes) {
             itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
@@ -112,6 +111,10 @@ public class ItemHandler {
         return itemStack;
     }
 
+    public Set<String> getItemIdentifiers() {
+        return itemMap.keySet();
+    }
+
     public BPVPItem getItem(String identifier) {
         return itemMap.get(identifier);
     }
@@ -121,6 +124,10 @@ public class ItemHandler {
             if (item.matches(itemStack)) return item;
         }
         return null;
+    }
+
+    public void replaceItem(String identifier, BPVPItem newItem) {
+        itemMap.replace(identifier, newItem);
     }
 
     private void registerEnchantment(Enchantment enchantment) {

@@ -42,7 +42,7 @@ public class WeaponManager extends Manager<IWeapon> {
                 continue;
             }
             weapon.loadWeapon(item);
-
+            itemHandler.replaceItem(weapon.getIdentifier(), weapon);
             addObject(weapon.getIdentifier(), weapon);
         }
         log.info("Loaded " + objects.size() + " weapons");
