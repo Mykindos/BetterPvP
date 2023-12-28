@@ -24,11 +24,12 @@ public class ItemListener implements Listener {
 
     @EventHandler
     public void onDamageItem(PlayerItemDamageEvent event) {
+        log.info(event.getItem().toString());
         if (event.isCancelled()) return;
         ItemStack itemStack = event.getItem();
         BPVPItem item = itemHandler.getItem(itemStack);
         if (item != null && item.getMaxDurability() >= 0) {
-            itemHandler.damageItem(event.getPlayer(), itemStack, item, event.getDamage());
+            item.damageItem(event.getPlayer(), itemStack, event.getDamage());
             event.setDamage(0);
             event.setCancelled(true);
         }

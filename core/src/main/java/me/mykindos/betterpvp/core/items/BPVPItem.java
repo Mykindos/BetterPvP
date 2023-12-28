@@ -5,6 +5,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -81,7 +82,6 @@ public class BPVPItem {
         ItemMeta itemMeta = itemStack.getItemMeta();
         PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
         itemMeta.displayName(getName());
-        itemMeta.lore(UtilItem.removeItalic(getLore()));
         if (isGiveUUID()) {
             if (!dataContainer.has(CoreNamespaceKeys.UUID_KEY)) {
                 dataContainer.set(CoreNamespaceKeys.UUID_KEY, PersistentDataType.STRING, UUID.randomUUID().toString());
@@ -90,11 +90,24 @@ public class BPVPItem {
         if (!dataContainer.has(CoreNamespaceKeys.CUSTOM_ITEM_KEY)) {
             dataContainer.set(CoreNamespaceKeys.CUSTOM_ITEM_KEY, PersistentDataType.STRING, getIdentifier());
         }
-        if (getMaxDurability() >= 0 && !dataContainer.has(CoreNamespaceKeys.DURABILITY_KEY)) {
-            dataContainer.set(CoreNamespaceKeys.DURABILITY_KEY, PersistentDataType.INTEGER, getMaxDurability());
+        if (getMaxDurability() >= 0) {
+            log.info("dura apply");
+            if (!dataContainer.has(CoreNamespaceKeys.DURABILITY_KEY)) {
+                dataContainer.set(CoreNamespaceKeys.DURABILITY_KEY, PersistentDataType.INTEGER, getMaxDurability());
+                log.info("add dura key");
+                applyLore(itemMeta, getMaxDurability());
+            } else {
+                int durability = dataContainer.get(CoreNamespaceKeys.DURABILITY_KEY, PersistentDataType.INTEGER);
+                log.info("add curr dura");
+                applyLore(itemMeta, durability);
+            }
+        } else {
+            log.info("standard apply");
+            applyLore(itemMeta);
         }
         itemStack.setItemMeta(itemMeta);
-
+        log.info("lore" + itemStack.lore());
+        log.warn("getLore " + getLore());
         return itemStack;
     }
 
@@ -193,10 +206,26 @@ public class BPVPItem {
         dataContainer.set(CoreNamespaceKeys.DURABILITY_KEY, PersistentDataType.INTEGER, newDurability);
         if (newDurability < 0) {
             player.getInventory().removeItem(itemStack);
-        } else if (itemMeta.hasLore()){
-
         }
+        applyLore(itemMeta, newDurability);
         itemStack.setItemMeta(itemMeta);
+
         return itemStack;
+    }
+
+    private ItemMeta applyLore(ItemMeta itemMeta) {
+        itemMeta.lore(UtilItem.removeItalic(getLore()));
+        log.error("LORE APPLY" + itemMeta.lore().toString());
+        return itemMeta;
+    }
+
+    private ItemMeta applyLore(ItemMeta itemMeta, int durability) {
+
+        List<Component> newLore = UtilItem.removeItalic(getLore());
+        newLore.add(0, UtilMessage.deserialize("<grey>Durability: %s</grey>", durability));
+        itemMeta.lore(newLore);
+        log.info("Dura Lore update: " + durability + " " + newLore);
+        log.warn( "lore" + itemMeta.lore());
+        return itemMeta;
     }
 }

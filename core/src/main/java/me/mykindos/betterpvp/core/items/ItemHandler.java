@@ -6,27 +6,23 @@ import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
-import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateLoreEvent;
-import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateNameEvent;
 import me.mykindos.betterpvp.core.items.enchants.GlowEnchant;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
-import me.mykindos.betterpvp.core.utilities.UtilItem;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Slf4j
 @Singleton
@@ -85,11 +81,11 @@ public class ItemHandler {
         if (item != null) {
             item.itemify(itemStack);
 
-            var nameUpdateEvent = UtilServer.callEvent(new ItemUpdateNameEvent(itemStack, itemMeta, item.getName()));
+            /*var nameUpdateEvent = UtilServer.callEvent(new ItemUpdateNameEvent(itemStack, itemMeta, item.getName()));
             itemMeta.displayName(nameUpdateEvent.getItemName().decoration(TextDecoration.ITALIC, false));
 
             var loreUpdateEvent = UtilServer.callEvent(new ItemUpdateLoreEvent(itemStack, itemMeta, new ArrayList<>(item.getLore())));
-            itemMeta.lore(UtilItem.removeItalic(loreUpdateEvent.getItemLore()));
+            itemMeta.lore(UtilItem.removeItalic(loreUpdateEvent.getItemLore()));*/
 
             PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
 
@@ -109,30 +105,6 @@ public class ItemHandler {
 
         itemStack.setItemMeta(itemMeta);
 
-        return itemStack;
-    }
-
-    public ItemStack damageItem (Player player, ItemStack itemStack, int damage) {
-        BPVPItem item = getItem(itemStack);
-        if (item == null) return itemStack;
-        return damageItem(player, itemStack, getItem(itemStack), damage);
-    }
-
-    public ItemStack damageItem (Player player, ItemStack itemStack, @NotNull BPVPItem item, int damage) {
-        if (item.getMaxDurability() < 0) return itemStack;
-        ItemMeta itemMeta = itemStack.getItemMeta();
-        PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
-        if (!dataContainer.has(CoreNamespaceKeys.DURABILITY_KEY)) {
-            log.warn("Itemstack of type: " + item.getIdentifier() + " is not initialized, but took damage. " +  itemStack.toString());
-            return itemStack;
-        }
-
-        int newDurability = dataContainer.get(CoreNamespaceKeys.DURABILITY_KEY, PersistentDataType.INTEGER) - damage;
-        dataContainer.set(CoreNamespaceKeys.DURABILITY_KEY, PersistentDataType.INTEGER, newDurability);
-        if (newDurability < 0) {
-            player.getInventory().removeItem(itemStack);
-        }
-        itemStack.setItemMeta(itemMeta);
         return itemStack;
     }
 
