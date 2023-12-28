@@ -48,13 +48,14 @@ public class ItemRepository implements IRepository<BPVPItem> {
                 boolean uuid = result.getBoolean(8);
 
                 List<Component> lore = getLoreForItem(id);
+                int maxDurability = getMaxDurabilityForItem(id);
 
                 if (material == null) {
                     log.info("Material is null for item {}", id);
                     continue;
                 }
 
-                items.add(new BPVPItem(namespace, key, material, name, lore, 0, customModelData, glowing, uuid));
+                items.add(new BPVPItem(namespace, key, material, name, lore, maxDurability, customModelData, glowing, uuid));
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -75,6 +76,20 @@ public class ItemRepository implements IRepository<BPVPItem> {
             ex.printStackTrace();
         }
         return lore;
+    }
+
+    private int getMaxDurabilityForItem(int id) {
+        String query = "SELECT * FROM itemdurability WHERE Item = " + id;
+        CachedRowSet result = database.executeQuery(new Statement(query));
+
+        try {
+            while (result.next()) {
+                return result.getInt(2);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return -1;
     }
 
     @Override

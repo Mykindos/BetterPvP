@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.items;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
@@ -16,15 +17,18 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 import java.util.*;
 
+@Slf4j
 @Singleton
 public class ItemHandler {
 
@@ -79,6 +83,8 @@ public class ItemHandler {
 
         BPVPItem item = getItem(itemStack);
         if (item != null) {
+            item.itemify(itemStack);
+
             var nameUpdateEvent = UtilServer.callEvent(new ItemUpdateNameEvent(itemStack, itemMeta, item.getName()));
             itemMeta.displayName(nameUpdateEvent.getItemName().decoration(TextDecoration.ITALIC, false));
 
@@ -86,11 +92,6 @@ public class ItemHandler {
             itemMeta.lore(UtilItem.removeItalic(loreUpdateEvent.getItemLore()));
 
             PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
-            if(item.isGiveUUID()) {
-                if (!dataContainer.has(CoreNamespaceKeys.UUID_KEY)) {
-                    dataContainer.set(CoreNamespaceKeys.UUID_KEY, PersistentDataType.STRING, UUID.randomUUID().toString());
-                }
-            }
 
             if (item.isGlowing() || dataContainer.has(CoreNamespaceKeys.GLOW_KEY)) {
                 itemMeta.addEnchant(glowEnchantment, 1, true);
@@ -111,6 +112,30 @@ public class ItemHandler {
         return itemStack;
     }
 
+    public ItemStack damageItem (Player player, ItemStack itemStack, int damage) {
+        BPVPItem item = getItem(itemStack);
+        if (item == null) return itemStack;
+        return damageItem(player, itemStack, getItem(itemStack), damage);
+    }
+
+    public ItemStack damageItem (Player player, ItemStack itemStack, @NotNull BPVPItem item, int damage) {
+        if (item.getMaxDurability() < 0) return itemStack;
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
+        if (!dataContainer.has(CoreNamespaceKeys.DURABILITY_KEY)) {
+            log.warn("Itemstack of type: " + item.getIdentifier() + " is not initialized, but took damage. " +  itemStack.toString());
+            return itemStack;
+        }
+
+        int newDurability = dataContainer.get(CoreNamespaceKeys.DURABILITY_KEY, PersistentDataType.INTEGER) - damage;
+        dataContainer.set(CoreNamespaceKeys.DURABILITY_KEY, PersistentDataType.INTEGER, newDurability);
+        if (newDurability < 0) {
+            player.getInventory().removeItem(itemStack);
+        }
+        itemStack.setItemMeta(itemMeta);
+        return itemStack;
+    }
+
     public Set<String> getItemIdentifiers() {
         return itemMap.keySet();
     }
@@ -120,6 +145,12 @@ public class ItemHandler {
     }
 
     public BPVPItem getItem(ItemStack itemStack) {
+        //try quick way
+        PersistentDataContainer dataContainer = itemStack.getItemMeta().getPersistentDataContainer();
+        if (dataContainer.has(CoreNamespaceKeys.CUSTOM_ITEM_KEY)) {
+            return getItem(dataContainer.get(CoreNamespaceKeys.CUSTOM_ITEM_KEY, PersistentDataType.STRING));
+        }
+        //do expensive lookup
         for (BPVPItem item : itemMap.values()) {
             if (item.matches(itemStack)) return item;
         }
