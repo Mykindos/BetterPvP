@@ -6,8 +6,8 @@ import me.mykindos.betterpvp.core.items.BPVPItem;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -22,8 +22,9 @@ public class ItemListener implements Listener {
         this.itemHandler = itemHandler;
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
     public void onDamageItem(PlayerItemDamageEvent event) {
+        log.info("itemdamaged");
         log.info(event.getItem().toString());
         if (event.isCancelled()) return;
         ItemStack itemStack = event.getItem();
@@ -33,9 +34,5 @@ public class ItemListener implements Listener {
             event.setDamage(0);
             event.setCancelled(true);
         }
-    }
-
-    public void onBreakBlockEvent(BlockBreakEvent event) {
-
     }
 }
