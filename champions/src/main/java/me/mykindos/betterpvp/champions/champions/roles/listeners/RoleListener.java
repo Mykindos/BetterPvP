@@ -11,14 +11,12 @@ import me.mykindos.betterpvp.champions.champions.roles.events.RoleChangeEvent;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.death.events.CustomDeathEvent;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageDurabilityEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
-import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
@@ -128,7 +126,7 @@ public class RoleListener implements Listener {
         equipRole(player, null);
     }
 
-    @EventHandler
+    /*@EventHandler
     public void reduceDurability(CustomDamageDurabilityEvent event) {
         if (event.getCustomDamageEvent().getDamagee() instanceof Player player) {
             roleManager.getObject(player.getUniqueId()).ifPresent(role -> {
@@ -153,7 +151,7 @@ public class RoleListener implements Listener {
                 }
             }
         }
-    }
+    }*/
 
     @EventHandler
     public void onApplyBuild(ApplyBuildEvent event) {

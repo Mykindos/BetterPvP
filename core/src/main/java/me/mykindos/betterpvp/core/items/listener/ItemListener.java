@@ -2,9 +2,11 @@ package me.mykindos.betterpvp.core.items.listener;
 
 import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
+import me.mykindos.betterpvp.core.combat.events.CustomDamageDurabilityEvent;
 import me.mykindos.betterpvp.core.items.BPVPItem;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -27,12 +29,37 @@ public class ItemListener implements Listener {
         log.info("itemdamaged");
         log.info(event.getItem().toString());
         if (event.isCancelled()) return;
-        ItemStack itemStack = event.getItem();
-        BPVPItem item = itemHandler.getItem(itemStack);
-        if (item != null && item.getMaxDurability() >= 0) {
-            item.damageItem(event.getPlayer(), itemStack, event.getDamage());
-            event.setDamage(0);
-            event.setCancelled(true);
+        event.setCancelled(damageCustomItem(event.getPlayer(), event.getItem(), event.getOriginalDamage()));
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onCustomDamageDurability(CustomDamageDurabilityEvent event) {
+        log.info("itemcustomdamaged");
+        if (event.isDamagerTakeDurability() && event.getCustomDamageEvent().getDamager() instanceof Player damager) {
+            if (damageCustomItem(damager, damager.getInventory().getItemInMainHand(), 1)) {
+                //durability was handled, cancel it
+                event.setDamagerTakeDurability(false);
+            }
+        }
+        if (event.isDamageeTakeDurability() && event.getCustomDamageEvent().getDamagee() instanceof Player damagee) {
+            for (ItemStack armour : damagee.getEquipment().getArmorContents()) {
+                if (armour == null) continue;
+                if (damageCustomItem(damagee, armour, 1)) {
+                    //durability was handled at least once, so cancel it (not perfect)
+                    event.setDamageeTakeDurability(false);
+                }
+            }
         }
     }
+
+    public boolean damageCustomItem(Player player, ItemStack itemStack, int damage) {
+        BPVPItem item = itemHandler.getItem(itemStack);
+        if (item != null && item.getMaxDurability() >= 0) {
+            item.damageItem(player, itemStack, damage);
+            return true;
+        }
+        return false;
+    }
+
+
 }
