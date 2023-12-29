@@ -10,13 +10,16 @@ import me.mykindos.betterpvp.core.framework.customtypes.IMapListener;
 import me.mykindos.betterpvp.core.framework.events.scoreboard.ScoreboardUpdateEvent;
 import me.mykindos.betterpvp.core.framework.inviting.Invitable;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
+import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.Unique;
 import me.mykindos.betterpvp.core.utilities.model.display.ActionBar;
 import me.mykindos.betterpvp.core.utilities.model.display.PlayerList;
 import me.mykindos.betterpvp.core.utilities.model.display.TitleQueue;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
 
@@ -46,7 +49,24 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
         properties.registerListener(this);
     }
 
+    public boolean canBlock() {
+        final Player player = getPlayer();
+        if (player != null) {
+            final ItemStack main = player.getInventory().getItemInMainHand();
+            final ItemStack off = player.getInventory().getItemInOffHand();
+            return UtilItem.isSword(main) || main.getType().equals(Material.SHIELD)
+                    || UtilItem.isSword(off) || off.getType().equals(Material.SHIELD);
+        }
+
+        return false;
+    }
+
     public boolean isHoldingRightClick() {
+        if (canBlock()) {
+            final Player player = getPlayer();
+            return player != null && (player.isBlocking() || player.isHandRaised());
+        }
+
         return isHoldingRightClick;
     }
 

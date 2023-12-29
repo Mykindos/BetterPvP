@@ -78,7 +78,7 @@ public class RightClickListener implements Listener {
 
             // If the click took longer than 250ms, remove it from the cache
             // Unless they're blocking with a shield, meaning they are still holding right click
-            if (!player.isBlocking() && System.currentTimeMillis() - context.getTime() > 260) {
+            if (!(gamer.canBlock() && (player.isBlocking() || player.isHandRaised())) && System.currentTimeMillis() - context.getTime() > 249) {
                 iterator.remove();
                 context.getGamer().setHoldingRightClick(false);
                 final RightClickEndEvent releaseEvent = new RightClickEndEvent(context.getGamer().getPlayer());
