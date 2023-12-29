@@ -42,6 +42,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
@@ -116,10 +117,10 @@ public class KnightsGreatlance extends Weapon implements InteractWeapon, Legenda
     @Override
     public void loadWeapon(BPVPItem item) {
         super.loadWeapon(item);
-        setShapedRecipe("*I*", "*I*", "*I*");
-        shapedRecipes[0].setIngredient('*', Material.AIR);
-        shapedRecipes[0].setIngredient('I', Material.STICK);
-        Bukkit.addRecipe(shapedRecipes[0]);
+        ShapedRecipe shapedRecipe = getShapedRecipe("*I*", "*I*", "*I*");
+        shapedRecipe.setIngredient('*', Material.AIR);
+        shapedRecipe.setIngredient('I', Material.STICK);
+        Bukkit.addRecipe(shapedRecipe);
     }
 
     @Override

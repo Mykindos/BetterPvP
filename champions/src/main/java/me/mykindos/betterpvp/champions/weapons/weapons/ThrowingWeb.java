@@ -26,6 +26,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.UUID;
@@ -61,10 +62,10 @@ public class ThrowingWeb extends Weapon implements Listener, InteractWeapon, Coo
     @Override
     public void loadWeapon(BPVPItem item) {
         super.loadWeapon(item);
-        setShapedRecipe("*S*", "SSS", "*S*");
-        shapedRecipes[0].setIngredient('*', Material.AIR);
-        shapedRecipes[0].setIngredient('S', Material.STRING);
-        Bukkit.addRecipe(shapedRecipes[0]);
+        ShapedRecipe shapedRecipe = getShapedRecipe("*S*", "SSS", "*S*");
+        shapedRecipe.setIngredient('*', Material.AIR);
+        shapedRecipe.setIngredient('S', Material.STRING);
+        Bukkit.addRecipe(shapedRecipe);
     }
 
     @Override

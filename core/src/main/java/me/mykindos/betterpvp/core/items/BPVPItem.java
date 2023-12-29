@@ -7,7 +7,6 @@ import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
@@ -42,11 +41,6 @@ public class BPVPItem {
     private int maxDurability;
     private boolean glowing;
     private boolean giveUUID;
-
-    //not sure if I need to save recipes
-    protected ShapedRecipe[] shapedRecipes = new ShapedRecipe[1];
-    private ShapelessRecipe[] shapelessRecipes = new ShapelessRecipe[1];
-    //todo add all recipes
 
     public BPVPItem(String namespace, String key, Material material, Component name, List<Component> lore, int maxDurability, int customModelData, boolean glowing, boolean uuid) {
         this.namespace = namespace;
@@ -169,44 +163,48 @@ public class BPVPItem {
         }
         return false;
     }
-
     /**
-     *
+     * Gets a single recipe with the default suffix "shaped"
+     * Should only be used if the item will only have 1 shaped recipe
      * @param shape a shape array of strings accepted by ShapedRecipe
-     * @see ShapedRecipe#shape(String...)
+     * @return a ShapedRecipe set to an instance of this item
      */
-    protected void setShapedRecipe(String... shape) {
-        setShapedRecipe(1, shape);
+    public ShapedRecipe getShapedRecipe(String... shape) {
+        return getShapedRecipe(1, shape);
     }
 
     /**
-     *
-     * @param count number of items to return as apart of the recipe
+     * Gets a single recipe with the default suffix "shaped", accepts multiple items
+     * Should only be used if the item will only have 1 shaped recipe
+     * @param count the number of items this recipe creates
      * @param shape a shape array of strings accepted by ShapedRecipe
-     * @see ShapedRecipe#shape(String...)
+     * @return a ShapedRecipe set to an instance of this item
      */
-    protected void setShapedRecipe(int count, String... shape) {
-        this.shapedRecipes[0] = getShapedRecipe(count, "_shaped", shape);
+    public ShapedRecipe getShapedRecipe(int count, String... shape) {
+        return getShapedRecipe(count, "shaped", shape);
     }
 
-    //todo expose/implement some way to have more than 1 shaped recipe for an item
-    private ShapedRecipe getShapedRecipe(int count, String key_suffix, String... shape) {
-        ShapedRecipe shapedRecipe = new ShapedRecipe(new NamespacedKey(namespace, key + key_suffix), getItemStack(count));
+    /**
+     * Create a shaped recipe, with a Namespacedkey key portion of 'key_' + key_suffix
+     * @param count the number of items this recipe creates
+     * @param key_suffix the suffix for this recipe key, default is "shaped"
+     * @param shape a shape array of strings accepted by ShapedRecipe
+     * @return a ShapedRecipe set to an instance of this item
+     */
+    public ShapedRecipe getShapedRecipe(int count, String key_suffix, String... shape) {
+        ShapedRecipe shapedRecipe = new ShapedRecipe(new NamespacedKey(namespace, key + "_" + key_suffix), getItemStack(count));
         shapedRecipe.shape(shape);
         return shapedRecipe;
     }
 
-    protected void setShapelessRecipe(ItemStack... ingredients) {
-        setShapelessRecipe(1, ingredients);
-    }
-
-    protected void setShapelessRecipe(int count, ItemStack... ingredients) {
-        this.shapelessRecipes[0] = getShapelessRecipe(count, "_shapeless", ingredients);
-        Bukkit.addRecipe(shapelessRecipes[0]);
-    }
-
-    //todo expose/implement some way to have more than 1 shapeless recipe for an item
-    private ShapelessRecipe getShapelessRecipe(int count, String key_suffix, ItemStack... ingredients) {
+    /**
+     * Create a shapeless recipe, with a Namespacedkey key portion of 'key_' + key_suffix
+     * @param count the number of items this recipe creates
+     * @param key_suffix the suffix for this recipe key, default is "shapeless"
+     * @param ingredients a list of ingredients
+     * @return a ShapelessRecipe set to an instance of this item
+     */
+    public ShapelessRecipe getShapelessRecipe(int count, String key_suffix, ItemStack... ingredients) {
         ShapelessRecipe shapelessRecipe = new ShapelessRecipe(new NamespacedKey(namespace, key + key_suffix), getItemStack(count));
         for (ItemStack ingredient : ingredients) {
             shapelessRecipe.addIngredient(ingredient);
@@ -214,7 +212,7 @@ public class BPVPItem {
         return shapelessRecipe;
     }
 
-    /**]
+    /**
      * Damage an item of this type
      * @param player the player damaging
      * @param itemStack the ItemStack to damage
