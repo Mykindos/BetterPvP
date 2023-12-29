@@ -6,10 +6,14 @@ import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
+import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateLoreEvent;
+import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateNameEvent;
 import me.mykindos.betterpvp.core.items.enchants.GlowEnchant;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
@@ -19,10 +23,7 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @Singleton
@@ -81,13 +82,18 @@ public class ItemHandler {
         if (item != null) {
             item.itemify(itemStack);
 
-            /*var nameUpdateEvent = UtilServer.callEvent(new ItemUpdateNameEvent(itemStack, itemMeta, item.getName()));
+            var nameUpdateEvent = UtilServer.callEvent(new ItemUpdateNameEvent(itemStack, itemMeta, item.getName()));
             itemMeta.displayName(nameUpdateEvent.getItemName().decoration(TextDecoration.ITALIC, false));
 
             var loreUpdateEvent = UtilServer.callEvent(new ItemUpdateLoreEvent(itemStack, itemMeta, new ArrayList<>(item.getLore())));
-            itemMeta.lore(UtilItem.removeItalic(loreUpdateEvent.getItemLore()));*/
 
             PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
+
+            if (dataContainer.has(CoreNamespaceKeys.DURABILITY_KEY)) {
+                item.applyLore(itemMeta, loreUpdateEvent.getItemLore(), dataContainer.get(CoreNamespaceKeys.DURABILITY_KEY, PersistentDataType.INTEGER));
+            } else {
+                item.applyLore(itemMeta, loreUpdateEvent.getItemLore());
+            }
 
             if (item.isGlowing() || dataContainer.has(CoreNamespaceKeys.GLOW_KEY)) {
                 itemMeta.addEnchant(glowEnchantment, 1, true);

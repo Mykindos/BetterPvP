@@ -26,7 +26,6 @@ public class ItemListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
     public void onDamageItem(PlayerItemDamageEvent event) {
-        log.info("itemdamaged");
         log.info(event.getItem().toString());
         if (event.isCancelled()) return;
         event.setCancelled(damageCustomItem(event.getPlayer(), event.getItem(), event.getOriginalDamage()));
@@ -34,7 +33,6 @@ public class ItemListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onCustomDamageDurability(CustomDamageDurabilityEvent event) {
-        log.info("itemcustomdamaged");
         if (event.isDamagerTakeDurability() && event.getCustomDamageEvent().getDamager() instanceof Player damager) {
             if (damageCustomItem(damager, damager.getInventory().getItemInMainHand(), 1)) {
                 //durability was handled, cancel it

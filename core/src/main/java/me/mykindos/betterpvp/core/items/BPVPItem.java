@@ -265,15 +265,22 @@ public class BPVPItem {
 
         return itemStack;
     }
+    public ItemMeta applyLore(ItemMeta itemMeta) {
+        return applyLore(itemMeta, getLore());
+    }
 
-    private ItemMeta applyLore(ItemMeta itemMeta) {
-        itemMeta.lore(UtilItem.removeItalic(getLore()));
+    public ItemMeta applyLore(ItemMeta itemMeta, List<Component> lore) {
+        itemMeta.lore(UtilItem.removeItalic(lore));
         return itemMeta;
     }
 
-    private ItemMeta applyLore(ItemMeta itemMeta, int durability) {
+    public ItemMeta applyLore(ItemMeta itemMeta, int durability) {
+        return applyLore(itemMeta, getLore(), durability);
+    }
 
-        List<Component> newLore = UtilItem.removeItalic(getLore());
+    public ItemMeta applyLore(ItemMeta itemMeta, List<Component> lore,  int durability) {
+
+        List<Component> newLore = UtilItem.removeItalic(lore);
         newLore.add(0, UtilMessage.deserialize("<grey>Durability: %s</grey>", durability));
         itemMeta.lore(newLore);
         return itemMeta;
