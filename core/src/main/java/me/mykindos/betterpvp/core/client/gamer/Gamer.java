@@ -54,8 +54,8 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
         if (player != null) {
             final ItemStack main = player.getInventory().getItemInMainHand();
             final ItemStack off = player.getInventory().getItemInOffHand();
-            return UtilItem.isSword(main) || main.getType().equals(Material.SHIELD)
-                    || UtilItem.isSword(off) || off.getType().equals(Material.SHIELD);
+            return UtilItem.isSword(main) || (main.getType().equals(Material.SHIELD) && !UtilItem.isCosmeticShield(main))
+                    || UtilItem.isSword(off) || (off.getType().equals(Material.SHIELD) && !UtilItem.isCosmeticShield(off));
         }
 
         return false;

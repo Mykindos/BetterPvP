@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.utilities;
 
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
+import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.utilities.model.WeighedList;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -11,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,6 +21,20 @@ import java.util.Map;
 
 public class UtilItem {
 
+    public static boolean isCosmeticShield(ItemStack item) {
+        return item.getType() == Material.SHIELD && item.hasItemMeta()
+                && item.getItemMeta().getPersistentDataContainer().has(CoreNamespaceKeys.UNDROPPABLE_KEY, PersistentDataType.BOOLEAN)
+                && Boolean.TRUE.equals(item.getItemMeta().getPersistentDataContainer().get(CoreNamespaceKeys.UNDROPPABLE_KEY, PersistentDataType.BOOLEAN));
+    }
+
+    public static ItemStack createCosmeticShield(int modelData) {
+        ItemStack shield = new ItemStack(Material.SHIELD);
+        final ItemMeta meta = shield.getItemMeta();
+        meta.setCustomModelData(modelData);
+        meta.getPersistentDataContainer().set(CoreNamespaceKeys.UNDROPPABLE_KEY, PersistentDataType.BOOLEAN, true);
+        shield.setItemMeta(meta);
+        return shield;
+    }
 
     /**
      * Updates an ItemStack, giving it a custom name and lore
