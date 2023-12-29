@@ -224,8 +224,10 @@ public class BPVPItem {
         ItemMeta itemMeta = itemStack.getItemMeta();
         PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
         if (!dataContainer.has(CoreNamespaceKeys.DURABILITY_KEY)) {
-            log.warn("Itemstack of type: " + getIdentifier() + " is not initialized, but took damage. " +  itemStack.toString());
-            return itemStack;
+            itemify(itemStack);
+            //need to re get the itemMeta, could also be done recursively
+            itemMeta = itemStack.getItemMeta();
+            dataContainer = itemMeta.getPersistentDataContainer();
         }
 
         int newDurability = dataContainer.get(CoreNamespaceKeys.DURABILITY_KEY, PersistentDataType.INTEGER) - damage;
