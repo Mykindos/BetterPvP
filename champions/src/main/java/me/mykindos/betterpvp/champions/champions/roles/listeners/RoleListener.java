@@ -126,33 +126,6 @@ public class RoleListener implements Listener {
         equipRole(player, null);
     }
 
-    /*@EventHandler
-    public void reduceDurability(CustomDamageDurabilityEvent event) {
-        if (event.getCustomDamageEvent().getDamagee() instanceof Player player) {
-            roleManager.getObject(player.getUniqueId()).ifPresent(role -> {
-                if (role != Role.WARLOCK) {
-                    double chance = (float) Role.WARLOCK.getChestplate().getMaxDurability() / (float) role.getChestplate().getMaxDurability();
-                    if (UtilMath.randDouble(0, chance) >= 1) {
-                        event.setDamageeTakeDurability(false);
-                    }
-                }
-            });
-
-        }
-    }
-
-    @EventHandler
-    public void onGoldSwordDamage(CustomDamageDurabilityEvent event) {
-        if (event.getCustomDamageEvent().getDamager() instanceof Player player) {
-            Material weapon = player.getInventory().getItemInMainHand().getType();
-            if (weapon == Material.GOLDEN_SWORD) {
-                if (UtilMath.randomInt(0, 10) <= 6) {
-                    event.setDamagerTakeDurability(false);
-                }
-            }
-        }
-    }*/
-
     @EventHandler
     public void onApplyBuild(ApplyBuildEvent event) {
         Player player = event.getPlayer();

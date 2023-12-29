@@ -50,17 +50,6 @@ public class CustomGiveCommand extends Command {
 
         int count = 1;
 
-        /*if (args.length > 3) {
-            try {
-                count = Integer.parseInt(args[2]);
-                if (count < 1) {
-                    throw new NumberFormatException("Number must be greater than or equal to 1");
-                }
-            } catch (NumberFormatException e) {
-                UtilMessage.message(player, UtilMessage.deserialize("<green>%s>/green> is not a valid number. Accepts integers greater than 0", args[2]));
-            }
-        }*/
-
         ItemStack itemStack = itemHandler.updateNames(item.getItemStack(count));
         target.getInventory().addItem(itemStack);
         //todo handle items that do not fit in inventory

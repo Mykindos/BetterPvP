@@ -219,7 +219,7 @@ public class BPVPItem {
      * @param damage the damage the ItemStack should take
      * @return the damaged ItemStack
      */
-    public ItemStack damageItem (Player player, ItemStack itemStack, int damage) {
+    public ItemStack damageItem(Player player, ItemStack itemStack, int damage) {
         if (getMaxDurability() < 0) return itemStack;
         ItemMeta itemMeta = itemStack.getItemMeta();
         PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
