@@ -19,6 +19,7 @@ import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.ModuleLoadedEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
 import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.recipes.RecipeHandler;
 import org.bukkit.Bukkit;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
@@ -76,6 +77,9 @@ public class Champions extends BPvPPlugin {
 
             var weaponManager = injector.getInstance(WeaponManager.class);
             weaponManager.load();
+
+            var recipeHandler = injector.getInstance(RecipeHandler.class);
+            recipeHandler.loadConfig(this.getConfig(), "champions");
 
             updateEventExecutor.loadPlugin(this);
         }

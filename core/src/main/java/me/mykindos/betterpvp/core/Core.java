@@ -82,7 +82,7 @@ public class Core extends BPvPPlugin {
         clientManager = injector.getInstance(ClientManager.class);
 
         var itemHandler = injector.getInstance(ItemHandler.class);
-        itemHandler.loadItemData("Core");
+        itemHandler.loadItemData("core");
 
         var recipeHandler = injector.getInstance(RecipeHandler.class);
         recipeHandler.loadConfig(this.getConfig(), "minecraft");

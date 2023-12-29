@@ -14,7 +14,6 @@ import java.util.Iterator;
 @Slf4j
 public class RecipeHandler {
     public void loadConfig(@NotNull ExtendedYamlConfiguration config, String namespace) {
-        Bukkit.resetRecipes();
         String path = "recipe.";
         Iterator<Recipe> recipeIterator = Bukkit.recipeIterator();
         while (recipeIterator.hasNext()) {
