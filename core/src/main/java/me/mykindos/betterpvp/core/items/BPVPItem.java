@@ -10,8 +10,10 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -91,23 +93,17 @@ public class BPVPItem {
             dataContainer.set(CoreNamespaceKeys.CUSTOM_ITEM_KEY, PersistentDataType.STRING, getIdentifier());
         }
         if (getMaxDurability() >= 0) {
-            log.info("dura apply");
             if (!dataContainer.has(CoreNamespaceKeys.DURABILITY_KEY)) {
                 dataContainer.set(CoreNamespaceKeys.DURABILITY_KEY, PersistentDataType.INTEGER, getMaxDurability());
-                log.info("add dura key");
                 applyLore(itemMeta, getMaxDurability());
             } else {
                 int durability = dataContainer.get(CoreNamespaceKeys.DURABILITY_KEY, PersistentDataType.INTEGER);
-                log.info("add curr dura");
                 applyLore(itemMeta, durability);
             }
         } else {
-            log.info("standard apply");
             applyLore(itemMeta);
         }
         itemStack.setItemMeta(itemMeta);
-        log.info("lore" + itemStack.lore());
-        log.warn("getLore " + getLore());
         return itemStack;
     }
 
@@ -140,6 +136,38 @@ public class BPVPItem {
             }
         }
         return true;
+    }
+
+    /**
+     *
+     * @param itemStack1
+     * @param itemStack2
+     * @return true if itemStack1 is most likely the same item as itemStack2, false otherwise
+     */
+    public boolean compareExactItem(ItemStack itemStack1,  ItemStack itemStack2) {
+        if (itemStack1 == itemStack2) {
+            return true;
+        }
+        if (itemStack1 == null || itemStack2 == null) {
+            return false;
+        }
+        if (matches(itemStack1) && matches(itemStack2)) {
+            ItemMeta itemMeta1 = itemStack1.getItemMeta();
+            ItemMeta itemMeta2 = itemStack2.getItemMeta();
+
+            PersistentDataContainer pdc1 = itemMeta1.getPersistentDataContainer();
+            PersistentDataContainer pdc2 = itemMeta2.getPersistentDataContainer();
+            if (isGiveUUID()) {
+               if (pdc1.has(CoreNamespaceKeys.UUID_KEY) && pdc2.has(CoreNamespaceKeys.UUID_KEY)) {
+                   return Objects.requireNonNull(pdc1.get(CoreNamespaceKeys.UUID_KEY, PersistentDataType.STRING)).equals(pdc2.get(CoreNamespaceKeys.UUID_KEY, PersistentDataType.STRING));
+               }
+            }
+
+            if (pdc1.has(CoreNamespaceKeys.DURABILITY_KEY) && pdc2.has(CoreNamespaceKeys.DURABILITY_KEY)) {
+                return Objects.requireNonNull(pdc1.get(CoreNamespaceKeys.DURABILITY_KEY, PersistentDataType.INTEGER)).equals(pdc2.get(CoreNamespaceKeys.DURABILITY_KEY, PersistentDataType.INTEGER));
+            }
+        }
+        return false;
     }
 
     /**
@@ -205,7 +233,34 @@ public class BPVPItem {
         int newDurability = dataContainer.get(CoreNamespaceKeys.DURABILITY_KEY, PersistentDataType.INTEGER) - damage;
         dataContainer.set(CoreNamespaceKeys.DURABILITY_KEY, PersistentDataType.INTEGER, newDurability);
         if (newDurability < 0) {
-            player.getInventory().removeItem(itemStack);
+            PlayerInventory inventory = player.getInventory();
+            if (UtilItem.isArmour(itemStack.getType())) {
+                if (compareExactItem(itemStack, inventory.getHelmet())) {
+                    inventory.setHelmet(null);
+                    player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
+                    return null;
+                }
+                if (compareExactItem(itemStack, inventory.getChestplate())) {
+                    inventory.setChestplate(null);
+                    player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
+                    return null;
+                }
+                if (compareExactItem(itemStack, inventory.getLeggings())) {
+                    inventory.setLeggings(null);
+                    player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
+                    return null;
+                }
+                if (compareExactItem(itemStack, inventory.getBoots())) {
+                    inventory.setBoots(null);
+                    player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
+                    return null;
+                }
+            }
+            if (UtilItem.isWeapon(itemStack) || UtilItem.isTool(itemStack)) {
+                inventory.setItemInMainHand(null);
+                player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
+                return null;
+            }
         }
         applyLore(itemMeta, newDurability);
         itemStack.setItemMeta(itemMeta);
@@ -215,7 +270,6 @@ public class BPVPItem {
 
     private ItemMeta applyLore(ItemMeta itemMeta) {
         itemMeta.lore(UtilItem.removeItalic(getLore()));
-        log.error("LORE APPLY" + itemMeta.lore().toString());
         return itemMeta;
     }
 
@@ -224,8 +278,6 @@ public class BPVPItem {
         List<Component> newLore = UtilItem.removeItalic(getLore());
         newLore.add(0, UtilMessage.deserialize("<grey>Durability: %s</grey>", durability));
         itemMeta.lore(newLore);
-        log.info("Dura Lore update: " + durability + " " + newLore);
-        log.warn( "lore" + itemMeta.lore());
         return itemMeta;
     }
 }

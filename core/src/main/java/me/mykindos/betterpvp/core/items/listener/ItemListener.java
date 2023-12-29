@@ -52,6 +52,13 @@ public class ItemListener implements Listener {
         }
     }
 
+    /**
+     *
+     * @param player the player that the ItemStack is on
+     * @param itemStack the itemStack to try and damage
+     * @param damage the amount of damage to apply
+     * @return true if the damage was processed (it was a custom item with durability), false if not
+     */
     public boolean damageCustomItem(Player player, ItemStack itemStack, int damage) {
         BPVPItem item = itemHandler.getItem(itemStack);
         if (item != null && item.getMaxDurability() >= 0) {
