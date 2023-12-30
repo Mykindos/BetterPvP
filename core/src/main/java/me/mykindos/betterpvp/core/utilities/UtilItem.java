@@ -7,11 +7,13 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
@@ -229,6 +231,25 @@ public class UtilItem {
                 player.getWorld().dropItem(player.getLocation(), stack);
             }
         }
+    }
+
+    /**
+     *
+     * @param itemMeta the itemMeta to check
+     * @param defaultDurability the default durability of the item
+     * @return the current durability of the item
+     */
+    public static int getOrSaveCustomDurability(ItemMeta itemMeta, int defaultDurability) {
+        return getOrSavePersistentData(itemMeta, CoreNamespaceKeys.DURABILITY_KEY, PersistentDataType.INTEGER, defaultDurability);
+    }
+
+    public static <T, Z> Z getOrSavePersistentData(ItemMeta itemMeta, NamespacedKey namespacedKey, PersistentDataType<T, Z> type, Z defaultValue) {
+        PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
+        if (!dataContainer.has(namespacedKey, type)) {
+            dataContainer.set(namespacedKey, type, defaultValue);
+            return defaultValue;
+        }
+        return dataContainer.getOrDefault(namespacedKey, type, defaultValue);
     }
 
     public static int indexOf(String matchingText, List<Component> components) {

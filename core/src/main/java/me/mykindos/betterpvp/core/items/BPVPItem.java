@@ -87,13 +87,8 @@ public class BPVPItem {
             dataContainer.set(CoreNamespaceKeys.CUSTOM_ITEM_KEY, PersistentDataType.STRING, getIdentifier());
         }
         if (getMaxDurability() >= 0) {
-            if (!dataContainer.has(CoreNamespaceKeys.DURABILITY_KEY)) {
-                dataContainer.set(CoreNamespaceKeys.DURABILITY_KEY, PersistentDataType.INTEGER, getMaxDurability());
-                applyLore(itemMeta, getMaxDurability());
-            } else {
-                int durability = dataContainer.get(CoreNamespaceKeys.DURABILITY_KEY, PersistentDataType.INTEGER);
-                applyLore(itemMeta, durability);
-            }
+            int durability = UtilItem.getOrSaveCustomDurability(itemMeta, getMaxDurability());
+            applyLore(itemMeta, durability);
         } else {
             applyLore(itemMeta);
         }
@@ -122,11 +117,8 @@ public class BPVPItem {
             return Objects.requireNonNull(dataContainer.get(CoreNamespaceKeys.CUSTOM_ITEM_KEY, PersistentDataType.STRING)).equalsIgnoreCase(getIdentifier());
         }
         if (customModelData != 0) {
-
-            if (itemMeta != null) {
-                if (itemMeta.hasCustomModelData()) {
-                    return itemMeta.getCustomModelData() == customModelData;
-                }
+            if (itemMeta.hasCustomModelData()) {
+                return itemMeta.getCustomModelData() == customModelData;
             }
         }
         return true;
@@ -230,7 +222,7 @@ public class BPVPItem {
             dataContainer = itemMeta.getPersistentDataContainer();
         }
 
-        int newDurability = dataContainer.get(CoreNamespaceKeys.DURABILITY_KEY, PersistentDataType.INTEGER) - damage;
+        int newDurability = dataContainer.getOrDefault(CoreNamespaceKeys.DURABILITY_KEY, PersistentDataType.INTEGER, getMaxDurability()) - damage;
         dataContainer.set(CoreNamespaceKeys.DURABILITY_KEY, PersistentDataType.INTEGER, newDurability);
         if (newDurability < 0) {
             PlayerInventory inventory = player.getInventory();

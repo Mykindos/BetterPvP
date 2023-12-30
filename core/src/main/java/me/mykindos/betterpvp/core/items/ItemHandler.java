@@ -90,7 +90,7 @@ public class ItemHandler {
             PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
 
             if (dataContainer.has(CoreNamespaceKeys.DURABILITY_KEY)) {
-                item.applyLore(itemMeta, loreUpdateEvent.getItemLore(), dataContainer.get(CoreNamespaceKeys.DURABILITY_KEY, PersistentDataType.INTEGER));
+                item.applyLore(itemMeta, loreUpdateEvent.getItemLore(), dataContainer.getOrDefault(CoreNamespaceKeys.DURABILITY_KEY, PersistentDataType.INTEGER, item.getMaxDurability()));
             } else {
                 item.applyLore(itemMeta, loreUpdateEvent.getItemLore());
             }
