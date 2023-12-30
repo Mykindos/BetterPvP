@@ -6,17 +6,21 @@ import lombok.Setter;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerPropertyUpdateEvent;
+import me.mykindos.betterpvp.core.framework.adapter.Compatibility;
 import me.mykindos.betterpvp.core.framework.customtypes.IMapListener;
 import me.mykindos.betterpvp.core.framework.events.scoreboard.ScoreboardUpdateEvent;
 import me.mykindos.betterpvp.core.framework.inviting.Invitable;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
+import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.Unique;
 import me.mykindos.betterpvp.core.utilities.model.display.ActionBar;
 import me.mykindos.betterpvp.core.utilities.model.display.PlayerList;
 import me.mykindos.betterpvp.core.utilities.model.display.TitleQueue;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,16 +42,55 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
 
     private long lastDamaged;
     private long lastTip;
+    private long lastBlock;
     private String lastAdminMessenger;
-    private boolean isHoldingRightClick;
 
     public Gamer(String uuid) {
         this.uuid = uuid;
-        properties.registerListener(this);
+        this.properties.registerListener(this);
+    }
+
+    public long timeSinceLastBlock() {
+        if (lastBlock == -1) {
+            return -1;
+        }
+
+        return System.currentTimeMillis() - lastBlock;
+    }
+
+    public boolean canBlock() {
+        final Player player = getPlayer();
+        if (player != null) {
+            final ItemStack main = player.getInventory().getItemInMainHand();
+            final ItemStack off = player.getInventory().getItemInOffHand();
+            final boolean sword = Compatibility.SWORD_BLOCKING && (UtilItem.isSword(main) || UtilItem.isSword(off));
+            final boolean shield = main.getType().equals(Material.SHIELD) || off.getType().equals(Material.SHIELD);
+            return sword || shield;
+        }
+
+        return false;
     }
 
     public boolean isHoldingRightClick() {
-        return isHoldingRightClick;
+        if (canBlock()) {
+            final Player player = getPlayer();
+            if (player == null) {
+                return false;
+            }
+
+            // If they're holding a cosmetic shield, give them a grace period for them to raise their hand
+            // Otherwise, this would return false
+            final ItemStack main = player.getInventory().getItemInMainHand();
+            final ItemStack off = player.getInventory().getItemInOffHand();
+            if (UtilItem.isCosmeticShield(main) || UtilItem.isCosmeticShield(off)) {
+                final int delay = player.getShieldBlockingDelay() * 50; // millis
+                return timeSinceLastBlock() < delay;
+            }
+
+            return player.isBlocking() || player.isHandRaised();
+        }
+
+        return lastBlock != -1;
     }
 
     public @Nullable Player getPlayer() {
