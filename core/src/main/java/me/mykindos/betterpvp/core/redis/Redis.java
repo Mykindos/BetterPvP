@@ -28,9 +28,7 @@ public class Redis {
                     poolConfig,
                     redisCredentials.getHost(),
                     redisCredentials.getPort(),
-                    0,
-                    null,
-                    redisCredentials.getDatabase()
+                    0
             );
         } else {
             // Passworded redis
@@ -39,8 +37,7 @@ public class Redis {
                     redisCredentials.getHost(),
                     redisCredentials.getPort(),
                     0,
-                    redisCredentials.getPassword(),
-                    redisCredentials.getDatabase()
+                    redisCredentials.getPassword()
             );
         }
 
@@ -77,7 +74,6 @@ public class Redis {
         final RedisCredentials redisInfo = new RedisCredentials(
                 section.getString("password"),
                 section.getString("host"),
-                section.getInt("database"),
                 section.getInt("port")
         );
 
