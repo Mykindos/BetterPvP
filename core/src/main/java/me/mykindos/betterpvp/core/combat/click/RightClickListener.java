@@ -7,7 +7,6 @@ import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.click.events.RightClickEndEvent;
 import me.mykindos.betterpvp.core.combat.click.events.RightClickEvent;
-import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
@@ -25,8 +24,6 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataType;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -69,8 +66,8 @@ public class RightClickListener implements Listener {
             final Gamer gamer = context.getGamer();
             if (!player.isOnline()) {
                 iterator.remove();
-                context.getGamer().setHoldingRightClick(false);
-                if (isCosmeticShield(player.getInventory().getItemInOffHand())) {
+                gamer.setLastBlock(-1);
+                if (UtilItem.isCosmeticShield(player.getInventory().getItemInOffHand())) {
                     player.getInventory().setItemInOffHand(null);
                 }
                 continue;
@@ -78,9 +75,9 @@ public class RightClickListener implements Listener {
 
             // If the click took longer than 250ms, remove it from the cache
             // Unless they're blocking with a shield, meaning they are still holding right click
-            if (!player.isBlocking() && System.currentTimeMillis() - context.getTime() > 260) {
+            if (!(gamer.canBlock() && (player.isBlocking() || player.isHandRaised())) && System.currentTimeMillis() - context.getTime() > 249) {
                 iterator.remove();
-                context.getGamer().setHoldingRightClick(false);
+                gamer.setLastBlock(-1);
                 final RightClickEndEvent releaseEvent = new RightClickEndEvent(context.getGamer().getPlayer());
                 UtilServer.callEvent(releaseEvent);
                 continue;
@@ -91,14 +88,14 @@ public class RightClickListener implements Listener {
             ItemStack holding = player.getInventory().getItem(context.getEvent().getHand());
             if (!UtilItem.isSimilar(holding, previouslyHolding)) {
                 iterator.remove();
-                context.getGamer().setHoldingRightClick(false);
+                gamer.setLastBlock(-1);
                 final RightClickEndEvent releaseEvent = new RightClickEndEvent(context.getGamer().getPlayer());
                 UtilServer.callEvent(releaseEvent);
                 continue;
             }
 
             // Otherwise, keep holding the item
-            gamer.setHoldingRightClick(true);
+            gamer.setLastBlock(System.currentTimeMillis());
             final RightClickEvent previousEvent = context.getEvent();
             final RightClickEvent event = new RightClickEvent(player,
                     previousEvent.isUseShield(),
@@ -125,7 +122,7 @@ public class RightClickListener implements Listener {
         // Call event
         final Player player = event.getPlayer();
         final Gamer gamer = clientManager.search().online(player).getGamer();
-        gamer.setHoldingRightClick(true);
+        gamer.setLastBlock(System.currentTimeMillis());
         final RightClickEvent clickEvent = new RightClickEvent(player, false, 0, false, event.getHand());
         final RightClickContext context = new RightClickContext(gamer, clickEvent, item);
         final RightClickContext previous = rightClickCache.remove(player);
@@ -141,7 +138,7 @@ public class RightClickListener implements Listener {
 
     @EventHandler
     public void onPickupShield(EntityPickupItemEvent event) {
-        if (isCosmeticShield(event.getItem().getItemStack())) {
+        if (UtilItem.isCosmeticShield(event.getItem().getItemStack())) {
             event.setCancelled(true);
             event.getItem().remove();
         }
@@ -152,7 +149,7 @@ public class RightClickListener implements Listener {
         // Prevent from touching the shield
         if (event.getClickedInventory() != null) {
             if (event.getCurrentItem() != null) {
-                if (isCosmeticShield(event.getCurrentItem())) {
+                if (UtilItem.isCosmeticShield(event.getCurrentItem())) {
                     event.setCancelled(true);
                     return;
                 }
@@ -163,7 +160,7 @@ public class RightClickListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onReleaseClick(RightClickEndEvent event) {
         Player player = event.getPlayer();
-        if (isCosmeticShield(player.getInventory().getItemInOffHand())) {
+        if (UtilItem.isCosmeticShield(player.getInventory().getItemInOffHand())) {
             player.getInventory().setItemInOffHand(null);
         }
     }
@@ -185,31 +182,20 @@ public class RightClickListener implements Listener {
             return;
         }
 
-        if (isCosmeticShield(offhand)) {
+        if (UtilItem.isCosmeticShield(offhand)) {
             return; // Don't replace if we are already holding a cosmetic shield
         }
 
         // Replace offhand with shield because we are blocking
-        ItemStack shield = new ItemStack(Material.SHIELD);
-        final ItemMeta meta = shield.getItemMeta();
-        meta.setCustomModelData(event.getShieldModelData());
-        meta.getPersistentDataContainer().set(CoreNamespaceKeys.UNDROPPABLE_KEY, PersistentDataType.BOOLEAN, true);
-        shield.setItemMeta(meta);
-        player.getInventory().setItemInOffHand(shield);
+        player.getInventory().setItemInOffHand(UtilItem.createCosmeticShield(event.getShieldModelData()));
     }
 
     @EventHandler
     public void onDropOffhand(PlayerDropItemEvent event) {
         final ItemStack item = event.getItemDrop().getItemStack();
-        if (isCosmeticShield(item)) {
+        if (UtilItem.isCosmeticShield(item)) {
             event.setCancelled(true);
         }
-    }
-
-    private boolean isCosmeticShield(ItemStack item) {
-        return item.getType() == Material.SHIELD && item.hasItemMeta()
-                && item.getItemMeta().getPersistentDataContainer().has(CoreNamespaceKeys.UNDROPPABLE_KEY, PersistentDataType.BOOLEAN)
-                && Boolean.TRUE.equals(item.getItemMeta().getPersistentDataContainer().get(CoreNamespaceKeys.UNDROPPABLE_KEY, PersistentDataType.BOOLEAN));
     }
 
 }
