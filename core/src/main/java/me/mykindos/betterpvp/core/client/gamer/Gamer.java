@@ -6,6 +6,7 @@ import lombok.Setter;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerPropertyUpdateEvent;
+import me.mykindos.betterpvp.core.framework.adapter.Compatibility;
 import me.mykindos.betterpvp.core.framework.customtypes.IMapListener;
 import me.mykindos.betterpvp.core.framework.events.scoreboard.ScoreboardUpdateEvent;
 import me.mykindos.betterpvp.core.framework.inviting.Invitable;
@@ -41,12 +42,20 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
 
     private long lastDamaged;
     private long lastTip;
+    private long lastBlock;
     private String lastAdminMessenger;
-    private boolean isHoldingRightClick;
 
     public Gamer(String uuid) {
         this.uuid = uuid;
-        properties.registerListener(this);
+        this.properties.registerListener(this);
+    }
+
+    public long timeSinceLastBlock() {
+        if (lastBlock == -1) {
+            return -1;
+        }
+
+        return System.currentTimeMillis() - lastBlock;
     }
 
     public boolean canBlock() {
@@ -54,8 +63,9 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
         if (player != null) {
             final ItemStack main = player.getInventory().getItemInMainHand();
             final ItemStack off = player.getInventory().getItemInOffHand();
-            return UtilItem.isSword(main) || (main.getType().equals(Material.SHIELD) && !UtilItem.isCosmeticShield(main))
-                    || UtilItem.isSword(off) || (off.getType().equals(Material.SHIELD) && !UtilItem.isCosmeticShield(off));
+            final boolean sword = Compatibility.SWORD_BLOCKING && (UtilItem.isSword(main) || UtilItem.isSword(off));
+            final boolean shield = main.getType().equals(Material.SHIELD) || off.getType().equals(Material.SHIELD);
+            return sword || shield;
         }
 
         return false;
@@ -64,10 +74,23 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
     public boolean isHoldingRightClick() {
         if (canBlock()) {
             final Player player = getPlayer();
-            return player != null && (player.isBlocking() || player.isHandRaised());
+            if (player == null) {
+                return false;
+            }
+
+            // If they're holding a cosmetic shield, give them a grace period for them to raise their hand
+            // Otherwise, this would return false
+            final ItemStack main = player.getInventory().getItemInMainHand();
+            final ItemStack off = player.getInventory().getItemInOffHand();
+            if (UtilItem.isCosmeticShield(main) || UtilItem.isCosmeticShield(off)) {
+                final int delay = player.getShieldBlockingDelay() * 50; // millis
+                return timeSinceLastBlock() < delay;
+            }
+
+            return player.isBlocking() || player.isHandRaised();
         }
 
-        return isHoldingRightClick;
+        return lastBlock != -1;
     }
 
     public @Nullable Player getPlayer() {

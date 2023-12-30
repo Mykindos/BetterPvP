@@ -66,7 +66,7 @@ public class RightClickListener implements Listener {
             final Gamer gamer = context.getGamer();
             if (!player.isOnline()) {
                 iterator.remove();
-                context.getGamer().setHoldingRightClick(false);
+                gamer.setLastBlock(-1);
                 if (UtilItem.isCosmeticShield(player.getInventory().getItemInOffHand())) {
                     player.getInventory().setItemInOffHand(null);
                 }
@@ -77,7 +77,7 @@ public class RightClickListener implements Listener {
             // Unless they're blocking with a shield, meaning they are still holding right click
             if (!(gamer.canBlock() && (player.isBlocking() || player.isHandRaised())) && System.currentTimeMillis() - context.getTime() > 249) {
                 iterator.remove();
-                context.getGamer().setHoldingRightClick(false);
+                gamer.setLastBlock(-1);
                 final RightClickEndEvent releaseEvent = new RightClickEndEvent(context.getGamer().getPlayer());
                 UtilServer.callEvent(releaseEvent);
                 continue;
@@ -88,14 +88,14 @@ public class RightClickListener implements Listener {
             ItemStack holding = player.getInventory().getItem(context.getEvent().getHand());
             if (!UtilItem.isSimilar(holding, previouslyHolding)) {
                 iterator.remove();
-                context.getGamer().setHoldingRightClick(false);
+                gamer.setLastBlock(-1);
                 final RightClickEndEvent releaseEvent = new RightClickEndEvent(context.getGamer().getPlayer());
                 UtilServer.callEvent(releaseEvent);
                 continue;
             }
 
             // Otherwise, keep holding the item
-            gamer.setHoldingRightClick(true);
+            gamer.setLastBlock(System.currentTimeMillis());
             final RightClickEvent previousEvent = context.getEvent();
             final RightClickEvent event = new RightClickEvent(player,
                     previousEvent.isUseShield(),
@@ -122,7 +122,7 @@ public class RightClickListener implements Listener {
         // Call event
         final Player player = event.getPlayer();
         final Gamer gamer = clientManager.search().online(player).getGamer();
-        gamer.setHoldingRightClick(true);
+        gamer.setLastBlock(System.currentTimeMillis());
         final RightClickEvent clickEvent = new RightClickEvent(player, false, 0, false, event.getHand());
         final RightClickContext context = new RightClickContext(gamer, clickEvent, item);
         final RightClickContext previous = rightClickCache.remove(player);
