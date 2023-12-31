@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.client.events.AsyncClientLoadEvent;
 import me.mykindos.betterpvp.core.client.events.AsyncClientPreLoadEvent;
 import me.mykindos.betterpvp.core.client.events.ClientUnloadEvent;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.redis.Redis;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.manager.PlayerManager;
@@ -42,15 +43,21 @@ public class ClientManager extends PlayerManager<Client> {
     public static final Object CACHE_DUMMY = new Object();
 
     private final LoadingCache<Client, Object> store; // supposedly thread-safe?
-    private final ClientSQLLayer sql;
-    private final ClientRedisLayer redis;
+    private final ClientSQLLayer sqlLayer;
+    private final ClientRedisLayer redisLayer;
+    private final Redis redis;
 
     @Inject
-    public ClientManager(Core plugin, ClientSQLLayer sql, ClientRedisLayer redis) {
+    public ClientManager(Core plugin, Redis redis) {
         super(plugin);
-        this.sql = sql;
+        this.sqlLayer = plugin.getInjector().getInstance(ClientSQLLayer.class);
         this.redis = redis;
-        this.redis.getObserver().register(this::receiveUpdate);
+        if (redis.isEnabled()) {
+            this.redisLayer = plugin.getInjector().getInstance(ClientRedisLayer.class);
+            this.redisLayer.getObserver().register(this::receiveUpdate);
+        } else {
+            this.redisLayer = null;
+        }
 
         this.store = Caffeine.newBuilder()
                 .scheduler(Scheduler.systemScheduler())
@@ -95,7 +102,9 @@ public class ClientManager extends PlayerManager<Client> {
         // Adding into storage because no existing client was present.
         Bukkit.getPluginManager().callEvent(new AsyncClientPreLoadEvent(client)); // Call event after a client is loaded
         this.store.get(client);
-        this.redis.save(client);
+        if (this.redis.isEnabled()) {
+            this.redisLayer.save(client);
+        }
 
         // Executing our success callback
         Bukkit.getPluginManager().callEvent(new AsyncClientLoadEvent(client)); // Call event after a client is loaded
@@ -106,7 +115,9 @@ public class ClientManager extends PlayerManager<Client> {
 
     @Override
     protected void unload(final Client client) {
-        this.redis.save(client);
+        if (this.redis.isEnabled()) {
+            this.redisLayer.save(client);
+        }
         this.store.invalidate(client);
     }
 
@@ -125,12 +136,17 @@ public class ClientManager extends PlayerManager<Client> {
         }
 
         // Attempting to load a brand-new client
-        Optional<Client> loaded = this.redis.getAndUpdate(uuid, name).or(() -> this.sql.getAndUpdate(uuid, name));
+        Optional<Client> loaded;
+        if (this.redis.isEnabled()) {
+            loaded = this.redisLayer.getAndUpdate(uuid, name).or(() -> this.sqlLayer.getAndUpdate(uuid, name));
+        } else {
+            loaded = this.sqlLayer.getAndUpdate(uuid, name);
+        }
 
         // If the client is empty, that means they don't exist in redis or the database.
         // Attempt to create a new client in the database.
         if (loaded.isEmpty()) {
-            loaded = Optional.of(this.sql.create(uuid, name));
+            loaded = Optional.of(this.sqlLayer.create(uuid, name));
         }
 
         // Attempt to store the client in the cache.
@@ -164,18 +180,32 @@ public class ClientManager extends PlayerManager<Client> {
 
     @Override
     protected void loadOffline(String name, Consumer<Optional<Client>> clientConsumer) {
-        this.loadOffline(client -> client.getName().equalsIgnoreCase(name),
-                () -> this.redis.getClient(name).or(() -> this.sql.getClient(name)),
-                clientConsumer
-        );
+        if (this.redis.isEnabled()) {
+            this.loadOffline(client -> client.getName().equalsIgnoreCase(name),
+                    () -> this.redisLayer.getClient(name).or(() -> this.sqlLayer.getClient(name)),
+                    clientConsumer
+            );
+        } else {
+            this.loadOffline(client -> client.getName().equalsIgnoreCase(name),
+                    () -> this.sqlLayer.getClient(name),
+                    clientConsumer
+            );
+        }
     }
 
     @Override
     protected void loadOffline(UUID uuid, Consumer<Optional<Client>> clientConsumer) {
-        this.loadOffline(client -> client.getUniqueId().equals(uuid),
-                () -> this.redis.getClient(uuid).or(() -> this.sql.getClient(uuid)),
-                clientConsumer
-        );
+        if (this.redis.isEnabled()) {
+            this.loadOffline(client -> client.getUniqueId().equals(uuid),
+                    () -> this.redisLayer.getClient(uuid).or(() -> this.sqlLayer.getClient(uuid)),
+                    clientConsumer
+            );
+        } else {
+            this.loadOffline(client -> client.getUniqueId().equals(uuid),
+                    () -> this.sqlLayer.getClient(uuid),
+                    clientConsumer
+            );
+        }
     }
 
     @Override
@@ -197,33 +227,37 @@ public class ClientManager extends PlayerManager<Client> {
 
     @Override
     public void processStatUpdates(boolean async) {
-        this.sql.processStatUpdates(async);
+        this.sqlLayer.processStatUpdates(async);
     }
 
     @Override
     public void saveProperty(Client client, String property, Object value) {
         CompletableFuture.runAsync(() -> {
-            this.redis.save(client);
-            this.sql.saveProperty(client, property, value);
+            if (this.redis.isEnabled()) {
+                this.redisLayer.save(client);
+            }
+            this.sqlLayer.saveProperty(client, property, value);
         });
     }
 
     public void saveGamerProperty(Gamer gamer, String property, Object value) {
         CompletableFuture.runAsync(() -> {
             // no need to save to redis because gamers are not persistent across servers
-            this.sql.saveGamerProperty(gamer, property, value);
+            this.sqlLayer.saveGamerProperty(gamer, property, value);
         });
     }
 
     public void loadGamerProperties(Client client) {
-        this.sql.loadGamerProperties(client);
+        this.sqlLayer.loadGamerProperties(client);
     }
 
     @Override
     public void save(Client client) {
         CompletableFuture.runAsync(() -> {
-            this.redis.save(client);
-            this.sql.save(client);
+            if (this.redis.isEnabled()) {
+                this.redisLayer.save(client);
+            }
+            this.sqlLayer.save(client);
         });
     }
 
@@ -235,6 +269,10 @@ public class ClientManager extends PlayerManager<Client> {
      * @param uuid The UUID of the client that was updated.
      */
     protected void receiveUpdate(UUID uuid) {
+        if (!this.redis.isEnabled()) {
+            throw new IllegalStateException("Redis is not enabled.");
+        }
+
         // Attempt to get a loaded client with the same UUID.
         final Optional<Client> client = this.getStoredUser(stored -> stored.getUniqueId().equals(uuid));
         if (client.isEmpty()) {
@@ -245,7 +283,7 @@ public class ClientManager extends PlayerManager<Client> {
 
         // Otherwise, update
         final Client stored = client.get();
-        this.redis.getClient(uuid).ifPresent(stored::copy);
+        this.redisLayer.getClient(uuid).ifPresent(stored::copy);
     }
 }
 
