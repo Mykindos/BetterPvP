@@ -15,6 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
@@ -255,6 +256,7 @@ public class BPVPItem {
             }
         }
         applyLore(itemMeta, newDurability);
+        setDurabilityDisplayPercentage(itemMeta);
         itemStack.setItemMeta(itemMeta);
 
         return itemStack;
@@ -278,5 +280,16 @@ public class BPVPItem {
         newLore.add(0, UtilMessage.deserialize("<grey>Durability: %s</grey>", durability));
         itemMeta.lore(newLore);
         return itemMeta;
+    }
+
+    private void setDurabilityDisplayPercentage(ItemMeta itemMeta) {
+        if (itemMeta instanceof Damageable damageableMeta) {
+            if (getMaxDurability() < 0) return;
+            int durability = UtilItem.getOrSaveCustomDurability(itemMeta, getMaxDurability());
+            if (durability < 0 ) durability = 0;
+            double durabilityPercent = (double) durability / getMaxDurability();
+            if (durabilityPercent > 1.0) durabilityPercent = 1.0;
+            damageableMeta.setDamage((int) ((getMaterial().getMaxDurability() * (1 - durabilityPercent))));
+        }
     }
 }
