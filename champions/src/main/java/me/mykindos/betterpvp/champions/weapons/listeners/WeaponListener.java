@@ -3,7 +3,6 @@ package me.mykindos.betterpvp.champions.weapons.listeners;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.utilities.ChampionsNamespacedKeys;
-import me.mykindos.betterpvp.champions.weapons.Weapon;
 import me.mykindos.betterpvp.champions.weapons.WeaponManager;
 import me.mykindos.betterpvp.champions.weapons.types.ChannelWeapon;
 import me.mykindos.betterpvp.champions.weapons.types.CooldownWeapon;
@@ -34,6 +33,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -64,13 +64,24 @@ public class WeaponListener implements Listener {
         this.energyHandler = energyHandler;
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onRelease(RightClickEndEvent event) {
         clicked.remove(event.getPlayer().getUniqueId());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onWeaponActivate(RightClickEvent event) {
+    public void onStart(RightClickEvent event) {
+        if (clicked.containsKey(event.getPlayer().getUniqueId())) {
+            final IWeapon weapon = clicked.get(event.getPlayer().getUniqueId());
+            if (weapon instanceof ChannelWeapon channelWeapon && channelWeapon.useShield(event.getPlayer())) {
+                event.setUseShield(true);
+                event.setShieldModelData(RightClickEvent.INVISIBLE_SHIELD);
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onWeaponActivate(PlayerInteractEvent event) {
         if (event.getHand() == EquipmentSlot.OFF_HAND) {
             return; // Only main hand and right click
         }
@@ -85,11 +96,6 @@ public class WeaponListener implements Listener {
         if (weaponOptional.isEmpty()) return;
 
         IWeapon weapon = weaponOptional.get();
-        if (clicked.get(event.getPlayer().getUniqueId()) == weapon) {
-            return; // Skip if the last weapon activated in this click was this weapon
-        }
-
-        clicked.put(player.getUniqueId(), weapon); // Log this weapon as clicked
         if (weapon instanceof InteractWeapon interactWeapon) {
             if (!interactWeapon.canUse(player)) {
                 return;
@@ -111,20 +117,21 @@ public class WeaponListener implements Listener {
         }
 
         if (weapon instanceof ChannelWeapon channelWeapon) {
+            if (clicked.get(event.getPlayer().getUniqueId()) == weapon) {
+                return; // Skip if we're currently holding click on this weapon
+            }
+
             if (channelWeapon.getEnergy() > 0) {
                 if (!energyHandler.use(player, name, channelWeapon.getEnergy(), true)) {
                     return;
                 }
             }
+
+            clicked.put(player.getUniqueId(), weapon); // Log this weapon as clicked
         }
 
         if (weapon instanceof InteractWeapon interactWeapon) {
             interactWeapon.activate(player);
-
-            if (interactWeapon.useShield(player)) {
-                event.setUseShield(true);
-                event.setShieldModelData(RightClickEvent.INVISIBLE_SHIELD);
-            }
         }
 
     }

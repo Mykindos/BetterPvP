@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.weapons.types;
 import me.mykindos.betterpvp.champions.weapons.Weapon;
 import me.mykindos.betterpvp.core.components.champions.weapons.IWeapon;
 import net.kyori.adventure.text.Component;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -26,6 +27,10 @@ public abstract class ChannelWeapon extends Weapon implements IWeapon, Listener 
     }
 
     public abstract double getEnergy();
+
+    public boolean useShield(Player player) {
+        return false;
+    }
 
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
