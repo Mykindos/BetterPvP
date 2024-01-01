@@ -78,6 +78,12 @@ public class ClientManager extends PlayerManager<Client> {
                 .build(key -> CACHE_DUMMY);
     }
 
+    public void shutdown() {
+        if (this.redis.isEnabled()) {
+            this.redisLayer.getObserver().shutdown();
+        }
+    }
+
     public void sendMessageToRank(String prefix, Component message, Rank rank) {
         List<Client> clients = this.getOnline().stream().filter(client -> client.hasRank(rank)).toList();
         clients.forEach(client -> {

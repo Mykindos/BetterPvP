@@ -26,7 +26,7 @@ public class ClientObserver extends JedisPubSub {
     @Inject
     public ClientObserver(Core core, Redis redis) {
         this.agent = redis.createAgent();
-        UtilServer.runTaskAsync(core, () -> redis.createAgent().useResource(jedis -> jedis.subscribe(this, CHANNEL)));
+        UtilServer.runTaskAsync(core, () -> agent.useResource(jedis -> jedis.subscribe(this, CHANNEL)));
     }
 
     public static String encode(UUID uuid) {
@@ -58,5 +58,9 @@ public class ClientObserver extends JedisPubSub {
 
     public void register(Consumer<UUID> listener) {
         this.listeners.add(listener);
+    }
+
+    public void shutdown() {
+        this.unsubscribe();
     }
 }

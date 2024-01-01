@@ -80,6 +80,12 @@ public class Redis {
         this.credentials(redisInfo);
     }
 
+    public void shutdown() {
+        if (pool != null) {
+            pool.close();
+        }
+    }
+
     public RedisAgent createAgent() {
         return new RedisAgent(pool);
     }
