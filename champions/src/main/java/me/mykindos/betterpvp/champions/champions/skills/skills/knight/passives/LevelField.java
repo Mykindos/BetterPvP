@@ -131,7 +131,7 @@ public class LevelField extends Skill implements ToggleSkill, CooldownSkill, Lis
 
     @Override
     public SkillType getType() {
-        return SkillType.PASSIVE_B;
+        return SkillType.PASSIVE_A;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
