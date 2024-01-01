@@ -216,8 +216,8 @@ public class BPVPItem {
      * @param damage    the damage the ItemStack should take
      * @return the damaged ItemStack
      */
-    public ItemStack damageItem(Player player, ItemStack itemStack, int damage) {
-        if (getMaxDurability() < 0) return itemStack;
+    public void damageItem(Player player, ItemStack itemStack, int damage) {
+        if (getMaxDurability() < 0) return;
         ItemMeta itemMeta = itemStack.getItemMeta();
         PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
         if (!dataContainer.has(CoreNamespaceKeys.DURABILITY_KEY)) {
@@ -235,35 +235,34 @@ public class BPVPItem {
                 if (compareExactItem(itemStack, inventory.getHelmet())) {
                     inventory.setHelmet(null);
                     player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
-                    return null;
+                    return;
                 }
                 if (compareExactItem(itemStack, inventory.getChestplate())) {
                     inventory.setChestplate(null);
                     player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
-                    return null;
+                    return;
                 }
                 if (compareExactItem(itemStack, inventory.getLeggings())) {
                     inventory.setLeggings(null);
                     player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
-                    return null;
+                    return;
                 }
                 if (compareExactItem(itemStack, inventory.getBoots())) {
                     inventory.setBoots(null);
                     player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
-                    return null;
+                    return;
                 }
             }
             if (UtilItem.isWeapon(itemStack) || UtilItem.isTool(itemStack)) {
                 inventory.setItemInMainHand(null);
                 player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
-                return null;
+                return;
             }
         }
         applyLore(itemMeta, newDurability);
         setDurabilityDisplayPercentage(itemMeta);
         itemStack.setItemMeta(itemMeta);
 
-        return itemStack;
     }
 
     public ItemMeta applyLore(ItemMeta itemMeta) {

@@ -24,7 +24,7 @@ public class ItemListener implements Listener {
         this.itemHandler = itemHandler;
     }
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onDamageItem(PlayerItemDamageEvent event) {
         if (event.isCancelled()) return;
         event.setCancelled(damageCustomItem(event.getPlayer(), event.getItem(), 1));

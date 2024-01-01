@@ -242,10 +242,25 @@ INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, H
     ('STONE_AXE', 'champions', 'basic_axe', '<yellow>Basic Axe', 0, 0, 0);
 
 INSERT IGNORE INTO itemdurability
-    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'knight_helmet'), 500);
+    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'basic_sword'), 500);
 
 INSERT IGNORE INTO itemlore
     VALUES ((SELECT id FROM items WHERE Material = 'STONE_AXE' AND Namespace = 'champions'), 0, '<gray>Damage: <green>5');
+
+INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
+    ('CROSSBOW', 'champions', 'crossbow', '<yellow>Crossbow', 0, 0, 0);
+
+INSERT IGNORE INTO itemdurability
+    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'crossbow'), 500);
+
+INSERT IGNORE INTO itemlore
+    VALUES ((SELECT id FROM items WHERE Material = 'CROSSBOW' AND Namespace = 'champions'), 0, '<gray>+1 Level to Bow Skills');
+
+INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
+    ('BOW', 'champions', 'bow', '<yellow>Bow', 0, 0, 0);
+
+INSERT IGNORE INTO itemdurability
+    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'bow'), 500);
 
 -- Tools
 
