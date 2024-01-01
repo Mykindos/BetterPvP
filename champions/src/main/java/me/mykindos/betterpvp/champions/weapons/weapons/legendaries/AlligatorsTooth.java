@@ -62,7 +62,7 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
 
     @Inject
     public AlligatorsTooth(EnergyHandler energyHandler, ClientManager clientManager) {
-        super(Material.MUSIC_DISC_MALL, 1, UtilMessage.deserialize("<orange>Alligators Tooth"));
+        super("alligators_tooth");
         this.energyHandler = energyHandler;
         this.clientManager = clientManager;
     }

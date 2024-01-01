@@ -20,6 +20,7 @@ import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
+import me.mykindos.betterpvp.core.items.BPVPItem;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
@@ -33,10 +34,7 @@ import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -44,6 +42,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
@@ -95,7 +94,7 @@ public class KnightsGreatlance extends Weapon implements InteractWeapon, Legenda
 
     @Inject
     public KnightsGreatlance(final CooldownManager cooldownManager, final ClientManager clientManager, final EffectManager effectManager) {
-        super(Material.MUSIC_DISC_WAIT, 1, UtilMessage.deserialize("<orange>Knight's Greatlance"));
+        super("knights_greatlance");
         this.cooldownManager = cooldownManager;
         this.clientManager = clientManager;
         this.effectManager = effectManager;
@@ -115,6 +114,14 @@ public class KnightsGreatlance extends Weapon implements InteractWeapon, Legenda
         return lore;
     }
 
+    @Override
+    public void loadWeapon(BPVPItem item) {
+        super.loadWeapon(item);
+        ShapedRecipe shapedRecipe = getShapedRecipe("*I*", "*I*", "*I*");
+        shapedRecipe.setIngredient('*', Material.AIR);
+        shapedRecipe.setIngredient('I', Material.STICK);
+        Bukkit.addRecipe(shapedRecipe);
+    }
 
     @Override
     public void activate(Player player) {

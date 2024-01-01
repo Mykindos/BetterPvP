@@ -11,14 +11,12 @@ import me.mykindos.betterpvp.champions.champions.roles.events.RoleChangeEvent;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.death.events.CustomDeathEvent;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageDurabilityEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
-import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
@@ -126,33 +124,6 @@ public class RoleListener implements Listener {
         }
 
         equipRole(player, null);
-    }
-
-    @EventHandler
-    public void reduceDurability(CustomDamageDurabilityEvent event) {
-        if (event.getCustomDamageEvent().getDamagee() instanceof Player player) {
-            roleManager.getObject(player.getUniqueId()).ifPresent(role -> {
-                if (role != Role.WARLOCK) {
-                    double chance = (float) Role.WARLOCK.getChestplate().getMaxDurability() / (float) role.getChestplate().getMaxDurability();
-                    if (UtilMath.randDouble(0, chance) >= 1) {
-                        event.setDamageeTakeDurability(false);
-                    }
-                }
-            });
-
-        }
-    }
-
-    @EventHandler
-    public void onGoldSwordDamage(CustomDamageDurabilityEvent event) {
-        if (event.getCustomDamageEvent().getDamager() instanceof Player player) {
-            Material weapon = player.getInventory().getItemInMainHand().getType();
-            if (weapon == Material.GOLDEN_SWORD) {
-                if (UtilMath.randomInt(0, 10) <= 6) {
-                    event.setDamagerTakeDurability(false);
-                }
-            }
-        }
     }
 
     @EventHandler

@@ -15,4 +15,8 @@ public class CoreNamespaceKeys {
 
     public static final NamespacedKey UNDROPPABLE_KEY = new NamespacedKey("core", "undroppable");
 
+    public static final NamespacedKey CUSTOM_ITEM_KEY = new NamespacedKey("core", "custom-item");
+
+    public static final NamespacedKey DURABILITY_KEY = new NamespacedKey("core", "durability");
+
 }

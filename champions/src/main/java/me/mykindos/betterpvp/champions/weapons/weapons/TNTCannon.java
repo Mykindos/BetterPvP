@@ -10,8 +10,6 @@ import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
@@ -36,7 +34,7 @@ public class TNTCannon extends Weapon implements Listener, InteractWeapon, Coold
 
     @Inject
     public TNTCannon(ChampionsManager championsManager, WorldBlockHandler blockHandler) {
-        super(Material.CARROT_ON_A_STICK, 1, Component.text("TNT Cannon", NamedTextColor.LIGHT_PURPLE));
+        super("tnt_cannon");
 
     }
 
