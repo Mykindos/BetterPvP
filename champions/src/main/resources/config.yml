@@ -986,6 +986,10 @@ weapons:
   energy-apple:
     cooldown: 10.0
     energy-regen: 0.5
+  mushroom-stew:
+    cooldown: 14.0
+    duration: 4.0
+    level: 2
 combat:
   arrow-base-damage: 4.5
   crit-arrows: true
