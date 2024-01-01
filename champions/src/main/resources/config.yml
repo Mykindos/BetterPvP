@@ -181,9 +181,14 @@ skills:
       damageIncreasePerLevel: 0.25
       baseMaxDamage: 1.0
     levelfield:
-      enabled: false
+      enabled: true
       maxlevel: 3
-      radius: 10
+      damagePerPlayer: 0.5
+      radius: 8.0
+      duration: 7
+      maxEnemies: 5
+      cooldown: 20.0
+      levelFieldUpdateTime: 1.0
     cleave:
       enabled: true
       maxlevel: 3
