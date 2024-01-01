@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.weapons.listeners;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.utilities.ChampionsNamespacedKeys;
+import me.mykindos.betterpvp.champions.weapons.Weapon;
 import me.mykindos.betterpvp.champions.weapons.WeaponManager;
 import me.mykindos.betterpvp.champions.weapons.types.ChannelWeapon;
 import me.mykindos.betterpvp.champions.weapons.types.CooldownWeapon;
@@ -15,9 +16,11 @@ import me.mykindos.betterpvp.core.components.champions.events.PlayerUseItemEvent
 import me.mykindos.betterpvp.core.components.champions.weapons.IWeapon;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.energy.EnergyHandler;
+import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateLoreEvent;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateNameEvent;
 import me.mykindos.betterpvp.core.framework.events.items.SpecialItemDropEvent;
+import me.mykindos.betterpvp.core.items.BPVPItem;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -31,6 +34,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -75,7 +79,7 @@ public class WeaponListener implements Listener {
         ItemStack item = player.getInventory().getItemInMainHand();
         ItemMeta itemMeta = item.getItemMeta();
         if (itemMeta == null) return;
-        if (!itemMeta.getPersistentDataContainer().has(ChampionsNamespacedKeys.IS_CUSTOM_WEAPON)) return;
+        if (!itemMeta.getPersistentDataContainer().has(CoreNamespaceKeys.CUSTOM_ITEM_KEY)) return;
 
         Optional<IWeapon> weaponOptional = weaponManager.getWeaponByItemStack(item);
         if (weaponOptional.isEmpty()) return;
@@ -130,8 +134,9 @@ public class WeaponListener implements Listener {
         Optional<IWeapon> weaponOptional = weaponManager.getWeaponByItemStack(event.getItemStack());
         if (weaponOptional.isPresent()) {
             IWeapon weapon = weaponOptional.get();
+            if(!(weapon instanceof BPVPItem item)) return;
 
-            event.getItemMeta().getPersistentDataContainer().set(ChampionsNamespacedKeys.IS_CUSTOM_WEAPON, PersistentDataType.STRING, "true");
+            event.getItemMeta().getPersistentDataContainer().set(CoreNamespaceKeys.CUSTOM_ITEM_KEY, PersistentDataType.STRING, item.getIdentifier());
             event.setItemName(weapon.getName());
         }
     }
@@ -141,8 +146,9 @@ public class WeaponListener implements Listener {
         Optional<IWeapon> weaponOptional = weaponManager.getWeaponByItemStack(event.getItemStack());
         if (weaponOptional.isPresent()) {
             IWeapon weapon = weaponOptional.get();
+            if(!(weapon instanceof BPVPItem item)) return;
 
-            event.getItemMeta().getPersistentDataContainer().set(ChampionsNamespacedKeys.IS_CUSTOM_WEAPON, PersistentDataType.STRING, "true");
+            event.getItemMeta().getPersistentDataContainer().set(CoreNamespaceKeys.CUSTOM_ITEM_KEY, PersistentDataType.STRING, item.getIdentifier());
             var lore = new ArrayList<>(weapon.getLore());
 
             var originalOwner = event.getItemMeta().getPersistentDataContainer().getOrDefault(ChampionsNamespacedKeys.ORIGINAL_OWNER, PersistentDataType.STRING, "");
@@ -204,4 +210,12 @@ public class WeaponListener implements Listener {
         }
     }
 
+    @EventHandler
+    public void onJoin(PlayerJoinEvent event) {
+        for (IWeapon weapon : weaponManager.getObjects().values()) {
+            if (weapon instanceof BPVPItem item) {
+                item.getRecipeKeys().forEach(key -> event.getPlayer().discoverRecipe(key));
+            }
+        }
+    }
 }

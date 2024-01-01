@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
@@ -18,10 +19,12 @@ import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.recipe.CraftingBookCategory;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -43,6 +46,7 @@ public class BPVPItem {
     private int maxDurability;
     private boolean glowing;
     private boolean giveUUID;
+    private List<NamespacedKey> recipeKeys;
 
     public BPVPItem(String namespace, String key, Material material, Component name, List<Component> lore, int maxDurability, int customModelData, boolean glowing, boolean uuid) {
         this.namespace = namespace;
@@ -55,6 +59,7 @@ public class BPVPItem {
         this.maxDurability = maxDurability;
         this.glowing = glowing;
         this.giveUUID = uuid;
+        recipeKeys = new ArrayList<>();
     }
 
 
@@ -167,6 +172,17 @@ public class BPVPItem {
     }
 
     /**
+     * Gets a single recipe with the default suffix "shaped"
+     * Should only be used if the item will only have 1 shaped recipe
+     *
+     * @param shape a shape array of strings accepted by ShapedRecipe
+     * @return a ShapedRecipe set to an instance of this item
+     */
+    public ShapedRecipe getShapedRecipe(int recipeNumber, String... shape) {
+        return getShapedRecipe(1, recipeNumber, shape);
+    }
+
+    /**
      * Gets a single recipe with the default suffix "shaped", accepts multiple items
      * Should only be used if the item will only have 1 shaped recipe
      *
@@ -174,8 +190,8 @@ public class BPVPItem {
      * @param shape a shape array of strings accepted by ShapedRecipe
      * @return a ShapedRecipe set to an instance of this item
      */
-    public ShapedRecipe getShapedRecipe(int count, String... shape) {
-        return getShapedRecipe(count, "shaped", shape);
+    public ShapedRecipe getShapedRecipe(int count, int recipeNumber, String... shape) {
+        return getShapedRecipe(count, "shaped" + recipeNumber, shape);
     }
 
     /**
@@ -206,6 +222,35 @@ public class BPVPItem {
             shapelessRecipe.addIngredient(ingredient);
         }
         return shapelessRecipe;
+    }
+
+    protected void createShapedRecipe(String[] layout, Material[] materials, CraftingBookCategory category) {
+
+        UtilItem.removeRecipe(getMaterial());
+
+        ShapedRecipe shapedRecipe = getShapedRecipe(layout);
+
+        // Get list of unique chars from String array
+        List<Character> chars = new ArrayList<>();
+        for (String s : layout) {
+            for (char c : s.toCharArray()) {
+                if(c == ' ') continue;
+                if (!chars.contains(c)) {
+                    chars.add(c);
+                }
+            }
+        }
+
+        // Add ingredients to recipe
+        for (int i = 0; i < chars.size(); i++) {
+            shapedRecipe.setIngredient(chars.get(i), materials[Math.min(i, materials.length - 1)]);
+        }
+
+        shapedRecipe.setCategory(category);
+
+        Bukkit.addRecipe(shapedRecipe);
+        recipeKeys.add(shapedRecipe.getKey());
+
     }
 
     /**

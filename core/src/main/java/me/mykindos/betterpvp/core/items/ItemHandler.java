@@ -123,6 +123,8 @@ public class ItemHandler {
     }
 
     public BPVPItem getItem(ItemStack itemStack) {
+        if(itemStack.getItemMeta() == null) return null;
+
         //try quick way
         PersistentDataContainer dataContainer = itemStack.getItemMeta().getPersistentDataContainer();
         if (dataContainer.has(CoreNamespaceKeys.CUSTOM_ITEM_KEY)) {

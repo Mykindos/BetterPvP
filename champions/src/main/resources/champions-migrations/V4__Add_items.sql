@@ -289,6 +289,13 @@ INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, H
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
     ('APPLE', 'champions', 'energy_apple', '<light_purple>Energy Apple', 0, 0, 0);
 
+INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
+    ('PUMPKIN_PIE', 'champions', 'mushroom_stew', '<light_purple>Mushroom Stew', 0, 0, 0);
+
+INSERT IGNORE INTO itemlore
+    VALUES (
+       (SELECT id FROM items WHERE Material = 'PUMPKIN_PIE' AND Namespace = 'champions'), 0, '<gray>Grants <white>Regeneration II <gray>for <yellow>4 seconds<gray>.');
+
 -- Legendaries
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
     ('MUSIC_DISC_MELLOHI', 'champions', 'wind_blade', '<orange>Wind Blade', 1, 0, 1);
@@ -300,13 +307,13 @@ INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, H
     ('MUSIC_DISC_BLOCKS', 'champions', 'hyper_axe', '<orange>Hyper Axe', 1, 0, 1);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
-    ('MUSIC_DISC_WAIT', 'champions', 'knights_greatlance', '<orange>Knight\'s Greatlance', 1, 0, 1);
+    ('MUSIC_DISC_WAIT", "champions", "knights_greatlance", "<orange>Knight"s Greatlance", 1, 0, 1);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
     ('MUSIC_DISC_FAR', 'champions', 'magnetic_maul', '<orange>Magnetic Maul', 1, 0, 1);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
-    ('MUSIC_DISC_CAT', 'champions', 'giants_broadsword', '<orange>Giant\'s Broadsword', 1, 0, 1);
+    ('MUSIC_DISC_CAT', 'champions', 'giants_broadsword', "<orange>Giant's Broadsword", 1, 0, 1);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
     ('ELYTRA', 'champions', 'wings_of_zanzul', '<orange>Wings of Zanzul', 1, 0, 1);

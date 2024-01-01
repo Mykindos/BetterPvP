@@ -117,10 +117,7 @@ public class KnightsGreatlance extends Weapon implements InteractWeapon, Legenda
     @Override
     public void loadWeapon(BPVPItem item) {
         super.loadWeapon(item);
-        ShapedRecipe shapedRecipe = getShapedRecipe("*I*", "*I*", "*I*");
-        shapedRecipe.setIngredient('*', Material.AIR);
-        shapedRecipe.setIngredient('I', Material.STICK);
-        Bukkit.addRecipe(shapedRecipe);
+
     }
 
     @Override
