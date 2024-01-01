@@ -1,8 +1,10 @@
 package me.mykindos.betterpvp.core.command;
 
+import com.google.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.client.Rank;
+import me.mykindos.betterpvp.core.items.ItemHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -20,6 +22,9 @@ public abstract class Command implements ICommand {
 
     @Setter
     private Rank requiredRank;
+
+    @Inject
+    ItemHandler itemHandler;
 
     protected List<String> aliases;
     protected List<ICommand> subCommands;
@@ -76,6 +81,7 @@ public abstract class Command implements ICommand {
             case "WORLD" -> tabCompletions.addAll(Bukkit.getWorlds().stream().map(World::getName)
                     .filter(name -> name.toLowerCase().startsWith(lowercaseArg)).toList());
             case "BOOLEAN" -> tabCompletions.addAll(List.of("true", "false"));
+            case "CUSTOMITEM" -> tabCompletions.addAll(itemHandler.getItemIdentifiers());
         }
 
         return tabCompletions;

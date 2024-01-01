@@ -15,6 +15,7 @@ public interface IWeapon {
     List<Component> getLore();
 
     boolean isHoldingWeapon(Player player);
+
     boolean matches(ItemStack itemStack);
 
 }

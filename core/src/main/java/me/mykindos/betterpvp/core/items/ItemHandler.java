@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.items;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
@@ -9,7 +10,6 @@ import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateLoreEvent;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateNameEvent;
 import me.mykindos.betterpvp.core.items.enchants.GlowEnchant;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
-import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -23,16 +23,14 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
+@Slf4j
 @Singleton
 public class ItemHandler {
 
     private final ItemRepository itemRepository;
+
     private final HashMap<String, BPVPItem> itemMap = new HashMap<>();
     private final Enchantment glowEnchantment;
 
@@ -55,7 +53,7 @@ public class ItemHandler {
 
     public void loadItemData(String module) {
         List<BPVPItem> items = itemRepository.getItemsForModule(module);
-        items.forEach(item -> itemMap.put(item.getMaterial().name() + item.getCustomModelData(), item));
+        items.forEach(item -> itemMap.put(item.getIdentifier(), item));
     }
 
     /**
@@ -70,7 +68,6 @@ public class ItemHandler {
 
         Material material = itemStack.getType();
         ItemMeta itemMeta = itemStack.getItemMeta();
-        int modelData = itemMeta.hasCustomModelData() ? itemMeta.getCustomModelData() : 0;
 
         if (hideAttributes) {
             itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
@@ -81,19 +78,21 @@ public class ItemHandler {
             itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         }
 
-        BPVPItem item = itemMap.get(material.name() + modelData);
+        BPVPItem item = getItem(itemStack);
         if (item != null) {
+            item.itemify(itemStack);
+
             var nameUpdateEvent = UtilServer.callEvent(new ItemUpdateNameEvent(itemStack, itemMeta, item.getName()));
             itemMeta.displayName(nameUpdateEvent.getItemName().decoration(TextDecoration.ITALIC, false));
 
             var loreUpdateEvent = UtilServer.callEvent(new ItemUpdateLoreEvent(itemStack, itemMeta, new ArrayList<>(item.getLore())));
-            itemMeta.lore(UtilItem.removeItalic(loreUpdateEvent.getItemLore()));
 
             PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
-            if(item.isGiveUUID()) {
-                if (!dataContainer.has(CoreNamespaceKeys.UUID_KEY)) {
-                    dataContainer.set(CoreNamespaceKeys.UUID_KEY, PersistentDataType.STRING, UUID.randomUUID().toString());
-                }
+
+            if (dataContainer.has(CoreNamespaceKeys.DURABILITY_KEY)) {
+                item.applyLore(itemMeta, loreUpdateEvent.getItemLore(), dataContainer.getOrDefault(CoreNamespaceKeys.DURABILITY_KEY, PersistentDataType.INTEGER, item.getMaxDurability()));
+            } else {
+                item.applyLore(itemMeta, loreUpdateEvent.getItemLore());
             }
 
             if (item.isGlowing() || dataContainer.has(CoreNamespaceKeys.GLOW_KEY)) {
@@ -113,6 +112,31 @@ public class ItemHandler {
         itemStack.setItemMeta(itemMeta);
 
         return itemStack;
+    }
+
+    public Set<String> getItemIdentifiers() {
+        return itemMap.keySet();
+    }
+
+    public BPVPItem getItem(String identifier) {
+        return itemMap.get(identifier);
+    }
+
+    public BPVPItem getItem(ItemStack itemStack) {
+        //try quick way
+        PersistentDataContainer dataContainer = itemStack.getItemMeta().getPersistentDataContainer();
+        if (dataContainer.has(CoreNamespaceKeys.CUSTOM_ITEM_KEY)) {
+            return getItem(dataContainer.get(CoreNamespaceKeys.CUSTOM_ITEM_KEY, PersistentDataType.STRING));
+        }
+        //do expensive lookup
+        for (BPVPItem item : itemMap.values()) {
+            if (item.matches(itemStack)) return item;
+        }
+        return null;
+    }
+
+    public void replaceItem(String identifier, BPVPItem newItem) {
+        itemMap.replace(identifier, newItem);
     }
 
     private void registerEnchantment(Enchantment enchantment) {

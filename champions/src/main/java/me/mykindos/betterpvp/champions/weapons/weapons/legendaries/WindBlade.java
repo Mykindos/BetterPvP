@@ -57,7 +57,7 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
 
     @Inject
     public WindBlade(EnergyHandler energyHandler, ClientManager clientManager) {
-        super(Material.MUSIC_DISC_MELLOHI, 1, UtilMessage.deserialize("<orange>Wind Blade"));
+        super("wind_blade");
         this.energyHandler = energyHandler;
         this.clientManager = clientManager;
     }

@@ -30,7 +30,7 @@ public class EnergyApple extends Weapon implements InteractWeapon, CooldownWeapo
 
     @Inject
     public EnergyApple(EnergyHandler energyHandler) {
-        super(Material.APPLE, Component.text("Energy Apple", NamedTextColor.LIGHT_PURPLE));
+        super("energy_apple");
         this.energyHandler = energyHandler;
     }
 
