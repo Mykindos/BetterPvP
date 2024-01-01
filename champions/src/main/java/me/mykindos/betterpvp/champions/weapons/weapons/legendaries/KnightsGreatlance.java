@@ -199,6 +199,12 @@ public class KnightsGreatlance extends ChannelWeapon implements InteractWeapon, 
                 continue;
             }
 
+            if (!energyHandler.use(player, "Knight's Greatlance", energyPerTick, true)) {
+                iterator.remove();
+                deactivate(player, data);
+                return;
+            }
+
             // Get all enemies that collide with the player from the last location to the new location
             final Location newLocation = getMidpoint(player);
             final Optional<LivingEntity> hit = trace(player, data.getLastLocation(), newLocation);
@@ -247,10 +253,6 @@ public class KnightsGreatlance extends ChannelWeapon implements InteractWeapon, 
             Vector direction = player.getLocation().getDirection().multiply(chargeVelocity);
             direction.setY(0); // Make them stick to the ground
             player.setVelocity(direction);
-
-            if (!energyHandler.use(player, "Knight's Greatlance", energyPerTick, true)) {
-                return;
-            }
 
             // Cues
             new ParticleBuilder(Particle.CRIT)
