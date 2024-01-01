@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
@@ -70,7 +71,6 @@ public class BPVPItem {
     }
 
     /**
-     *
      * @param itemStack the item stack to apply custom features,
      * @return the full custom itemstack
      */
@@ -106,7 +106,6 @@ public class BPVPItem {
     }
 
     /**
-     *
      * @param itemStack the item stack to compare to
      * @return true if the itemstack is an instance of this item
      */
@@ -126,12 +125,11 @@ public class BPVPItem {
     }
 
     /**
-     *
      * @param itemStack1
      * @param itemStack2
      * @return true if itemStack1 is most likely the same item as itemStack2, false otherwise
      */
-    public boolean compareExactItem(ItemStack itemStack1,  ItemStack itemStack2) {
+    public boolean compareExactItem(ItemStack itemStack1, ItemStack itemStack2) {
         if (itemStack1 == itemStack2) {
             return true;
         }
@@ -145,9 +143,9 @@ public class BPVPItem {
             PersistentDataContainer pdc1 = itemMeta1.getPersistentDataContainer();
             PersistentDataContainer pdc2 = itemMeta2.getPersistentDataContainer();
             if (isGiveUUID()) {
-               if (pdc1.has(CoreNamespaceKeys.UUID_KEY) && pdc2.has(CoreNamespaceKeys.UUID_KEY)) {
-                   return Objects.requireNonNull(pdc1.get(CoreNamespaceKeys.UUID_KEY, PersistentDataType.STRING)).equals(pdc2.get(CoreNamespaceKeys.UUID_KEY, PersistentDataType.STRING));
-               }
+                if (pdc1.has(CoreNamespaceKeys.UUID_KEY) && pdc2.has(CoreNamespaceKeys.UUID_KEY)) {
+                    return Objects.requireNonNull(pdc1.get(CoreNamespaceKeys.UUID_KEY, PersistentDataType.STRING)).equals(pdc2.get(CoreNamespaceKeys.UUID_KEY, PersistentDataType.STRING));
+                }
             }
 
             if (pdc1.has(CoreNamespaceKeys.DURABILITY_KEY) && pdc2.has(CoreNamespaceKeys.DURABILITY_KEY)) {
@@ -156,9 +154,11 @@ public class BPVPItem {
         }
         return false;
     }
+
     /**
      * Gets a single recipe with the default suffix "shaped"
      * Should only be used if the item will only have 1 shaped recipe
+     *
      * @param shape a shape array of strings accepted by ShapedRecipe
      * @return a ShapedRecipe set to an instance of this item
      */
@@ -169,6 +169,7 @@ public class BPVPItem {
     /**
      * Gets a single recipe with the default suffix "shaped", accepts multiple items
      * Should only be used if the item will only have 1 shaped recipe
+     *
      * @param count the number of items this recipe creates
      * @param shape a shape array of strings accepted by ShapedRecipe
      * @return a ShapedRecipe set to an instance of this item
@@ -179,9 +180,10 @@ public class BPVPItem {
 
     /**
      * Create a shaped recipe, with a Namespacedkey key portion of 'key_' + key_suffix
-     * @param count the number of items this recipe creates
+     *
+     * @param count      the number of items this recipe creates
      * @param key_suffix the suffix for this recipe key, default is "shaped"
-     * @param shape a shape array of strings accepted by ShapedRecipe
+     * @param shape      a shape array of strings accepted by ShapedRecipe
      * @return a ShapedRecipe set to an instance of this item
      */
     public ShapedRecipe getShapedRecipe(int count, String key_suffix, String... shape) {
@@ -192,8 +194,9 @@ public class BPVPItem {
 
     /**
      * Create a shapeless recipe, with a Namespacedkey key portion of 'key_' + key_suffix
-     * @param count the number of items this recipe creates
-     * @param key_suffix the suffix for this recipe key, default is "shapeless"
+     *
+     * @param count       the number of items this recipe creates
+     * @param key_suffix  the suffix for this recipe key, default is "shapeless"
      * @param ingredients a list of ingredients
      * @return a ShapelessRecipe set to an instance of this item
      */
@@ -207,9 +210,10 @@ public class BPVPItem {
 
     /**
      * Damage an item of this type
-     * @param player the player damaging
+     *
+     * @param player    the player damaging
      * @param itemStack the ItemStack to damage
-     * @param damage the damage the ItemStack should take
+     * @param damage    the damage the ItemStack should take
      * @return the damaged ItemStack
      */
     public ItemStack damageItem(Player player, ItemStack itemStack, int damage) {
@@ -225,7 +229,7 @@ public class BPVPItem {
 
         int newDurability = dataContainer.getOrDefault(CoreNamespaceKeys.DURABILITY_KEY, PersistentDataType.INTEGER, getMaxDurability()) - damage;
         dataContainer.set(CoreNamespaceKeys.DURABILITY_KEY, PersistentDataType.INTEGER, newDurability);
-        if (newDurability < 0) {
+        if (newDurability <= 0) {
             PlayerInventory inventory = player.getInventory();
             if (UtilItem.isArmour(itemStack.getType())) {
                 if (compareExactItem(itemStack, inventory.getHelmet())) {
@@ -261,6 +265,7 @@ public class BPVPItem {
 
         return itemStack;
     }
+
     public ItemMeta applyLore(ItemMeta itemMeta) {
         return applyLore(itemMeta, getLore());
     }
@@ -274,10 +279,10 @@ public class BPVPItem {
         return applyLore(itemMeta, getLore(), durability);
     }
 
-    public ItemMeta applyLore(ItemMeta itemMeta, List<Component> lore,  int durability) {
+    public ItemMeta applyLore(ItemMeta itemMeta, List<Component> lore, int durability) {
 
         List<Component> newLore = UtilItem.removeItalic(lore);
-        newLore.add(0, UtilMessage.deserialize("<grey>Durability: %s</grey>", durability));
+        newLore.add(0, UtilMessage.deserialize("<grey>Durability: %s</grey>", durability).decoration(TextDecoration.ITALIC, false));
         itemMeta.lore(newLore);
         return itemMeta;
     }
@@ -285,11 +290,19 @@ public class BPVPItem {
     private void setDurabilityDisplayPercentage(ItemMeta itemMeta) {
         if (itemMeta instanceof Damageable damageableMeta) {
             if (getMaxDurability() < 0) return;
-            int durability = UtilItem.getOrSaveCustomDurability(itemMeta, getMaxDurability());
-            if (durability < 0 ) durability = 0;
-            double durabilityPercent = (double) durability / getMaxDurability();
-            if (durabilityPercent > 1.0) durabilityPercent = 1.0;
-            damageableMeta.setDamage((int) ((getMaterial().getMaxDurability() * (1 - durabilityPercent))));
+            int durability = calculateDurability(itemMeta);
+            double durabilityPercent = calculateDurabilityPercent(durability);
+            damageableMeta.setDamage(Math.max(1, (int) ((getMaterial().getMaxDurability() * (1 - durabilityPercent)))));
         }
+    }
+
+    private int calculateDurability(ItemMeta itemMeta) {
+        int durability = UtilItem.getOrSaveCustomDurability(itemMeta, getMaxDurability());
+        return Math.max(durability, 0);
+    }
+
+    private double calculateDurabilityPercent(int durability) {
+        double durabilityPercent = (double) durability / getMaxDurability();
+        return Math.min(Math.max(durabilityPercent, 0.0), 1.0);
     }
 }
