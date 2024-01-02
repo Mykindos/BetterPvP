@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
 import me.mykindos.betterpvp.core.injector.CoreInjectorModule;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.loader.CoreListenerLoader;
+import me.mykindos.betterpvp.core.recipes.RecipeHandler;
 import me.mykindos.betterpvp.core.redis.Redis;
 import net.kyori.adventure.key.Key;
 import org.reflections.Reflections;
@@ -81,7 +82,12 @@ public class Core extends BPvPPlugin {
         clientManager = injector.getInstance(ClientManager.class);
 
         var itemHandler = injector.getInstance(ItemHandler.class);
-        itemHandler.loadItemData("Core");
+        itemHandler.loadItemData("core");
+
+        var recipeHandler = injector.getInstance(RecipeHandler.class);
+        recipeHandler.loadConfig(this.getConfig(), "minecraft");
+        recipeHandler.loadConfig(this.getConfig(), "core");
+        this.saveConfig();
 
         updateEventExecutor.loadPlugin(this);
         updateEventExecutor.initialize();
@@ -92,6 +98,8 @@ public class Core extends BPvPPlugin {
     @Override
     public void onDisable() {
         clientManager.processStatUpdates(false);
+        clientManager.shutdown();
+        redis.shutdown();
         injector.getInstance(GlobalCombatStatsRepository.class).shutdown();
 
         if (hasListener(listenerKey)) {

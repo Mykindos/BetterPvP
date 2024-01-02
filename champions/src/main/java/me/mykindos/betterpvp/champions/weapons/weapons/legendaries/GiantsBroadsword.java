@@ -68,7 +68,7 @@ public class GiantsBroadsword extends ChannelWeapon implements InteractWeapon, L
 
     @Inject
     public GiantsBroadsword(EnergyHandler energyHandler, ClientManager clientManager) {
-        super(Material.MUSIC_DISC_CAT, 1, UtilMessage.deserialize("<orange>Giant's Broadsword"));
+        super("giants_broadsword");
         this.energyHandler = energyHandler;
         this.clientManager = clientManager;
     }

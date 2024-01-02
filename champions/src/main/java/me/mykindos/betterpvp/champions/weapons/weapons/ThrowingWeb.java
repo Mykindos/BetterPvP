@@ -11,12 +11,12 @@ import me.mykindos.betterpvp.core.combat.throwables.events.ThrowableHitEntityEve
 import me.mykindos.betterpvp.core.combat.throwables.events.ThrowableHitGroundEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
+import me.mykindos.betterpvp.core.items.BPVPItem;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
@@ -26,6 +26,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.UUID;
@@ -51,10 +52,20 @@ public class ThrowingWeb extends Weapon implements Listener, InteractWeapon, Coo
 
     @Inject
     public ThrowingWeb(ChampionsManager championsManager, WorldBlockHandler blockHandler) {
-        super(Material.COBWEB, Component.text("Throwing Web", NamedTextColor.LIGHT_PURPLE));
+        super("throwing_web");
 
         this.championsManager = championsManager;
         this.blockHandler = blockHandler;
+
+    }
+
+    @Override
+    public void loadWeapon(BPVPItem item) {
+        super.loadWeapon(item);
+        ShapedRecipe shapedRecipe = getShapedRecipe("*S*", "SSS", "*S*");
+        shapedRecipe.setIngredient('*', Material.AIR);
+        shapedRecipe.setIngredient('S', Material.STRING);
+        Bukkit.addRecipe(shapedRecipe);
     }
 
     @Override

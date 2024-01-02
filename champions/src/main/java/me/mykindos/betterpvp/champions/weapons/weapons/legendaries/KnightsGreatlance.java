@@ -7,7 +7,7 @@ import com.google.inject.Singleton;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import me.mykindos.betterpvp.champions.weapons.Weapon;
+import me.mykindos.betterpvp.champions.weapons.types.ChannelWeapon;
 import me.mykindos.betterpvp.champions.weapons.types.InteractWeapon;
 import me.mykindos.betterpvp.champions.weapons.types.LegendaryWeapon;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
@@ -19,7 +19,9 @@ import me.mykindos.betterpvp.core.cooldowns.Cooldown;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.energy.EnergyHandler;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
+import me.mykindos.betterpvp.core.items.BPVPItem;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
@@ -34,7 +36,6 @@ import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
@@ -58,7 +59,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class KnightsGreatlance extends Weapon implements InteractWeapon, LegendaryWeapon, Listener {
+public class KnightsGreatlance extends ChannelWeapon implements InteractWeapon, LegendaryWeapon, Listener {
 
     private static final String ATTACK_NAME = "Knight's Greatlance Charge";
 
@@ -66,6 +67,14 @@ public class KnightsGreatlance extends Weapon implements InteractWeapon, Legenda
     private final CooldownManager cooldownManager;
     private final ClientManager clientManager;
     private final EffectManager effectManager;
+
+    @Inject
+    @Config(path = "weapons.knights-greatlance.energy-per-tick", defaultValue = "1.0")
+    private double energyPerTick;
+
+    @Inject
+    @Config(path = "weapons.knights-greatlance.initial-energy-cost", defaultValue = "10.0")
+    private double initialEnergyCost;
 
     @Inject
     @Config(path = "weapons.knights-greatlance.base-damage", defaultValue = "8.0")
@@ -83,6 +92,8 @@ public class KnightsGreatlance extends Weapon implements InteractWeapon, Legenda
     @Config(path = "weapons.knights-greatlance.charge-velocity", defaultValue = "1.5")
     private final double chargeVelocity = 1.5d;
 
+    private final EnergyHandler energyHandler;
+
     private final PermanentComponent actionBar = new PermanentComponent(gmr -> {
         if (!gmr.isOnline() || !active.containsKey(gmr.getPlayer())) {
             return null;
@@ -94,11 +105,12 @@ public class KnightsGreatlance extends Weapon implements InteractWeapon, Legenda
     });
 
     @Inject
-    public KnightsGreatlance(final CooldownManager cooldownManager, final ClientManager clientManager, final EffectManager effectManager) {
-        super(Material.MUSIC_DISC_WAIT, 1, UtilMessage.deserialize("<orange>Knight's Greatlance"));
+    public KnightsGreatlance(final CooldownManager cooldownManager, final ClientManager clientManager, final EffectManager effectManager, EnergyHandler energyHandler) {
+        super("knights_greatlance");
         this.cooldownManager = cooldownManager;
         this.clientManager = clientManager;
         this.effectManager = effectManager;
+        this.energyHandler = energyHandler;
     }
 
     @Override
@@ -115,6 +127,11 @@ public class KnightsGreatlance extends Weapon implements InteractWeapon, Legenda
         return lore;
     }
 
+    @Override
+    public void loadWeapon(BPVPItem item) {
+        super.loadWeapon(item);
+
+    }
 
     @Override
     public void activate(Player player) {
@@ -180,6 +197,12 @@ public class KnightsGreatlance extends Weapon implements InteractWeapon, Legenda
                 iterator.remove();
                 deactivate(player, data);
                 continue;
+            }
+
+            if (!energyHandler.use(player, "Knight's Greatlance", energyPerTick, true)) {
+                iterator.remove();
+                deactivate(player, data);
+                return;
             }
 
             // Get all enemies that collide with the player from the last location to the new location
@@ -293,6 +316,11 @@ public class KnightsGreatlance extends Weapon implements InteractWeapon, Legenda
         }
         final Cooldown cooldown = this.cooldownManager.getAbilityRecharge(player, ATTACK_NAME);
         return cooldown == null || cooldown.getRemaining() <= 0;
+    }
+
+    @Override
+    public double getEnergy() {
+        return initialEnergyCost;
     }
 
     @Getter

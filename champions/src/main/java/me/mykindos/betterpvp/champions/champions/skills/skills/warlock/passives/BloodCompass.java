@@ -33,12 +33,9 @@ public class BloodCompass extends Skill implements ToggleSkill, CooldownSkill {
     public double damageIncreasePerLevel;
     public double escapeRadiusIncreasePerLevel;
     public double maxDistanceIncreasePerLevel;
-    private final List<List<Location>> markers = new ArrayList<>();
-    private final Map<Integer, Player> lineToPlayerMap = new HashMap<>();
-    private Map<Integer, Integer> currentPoints;
-    private int taskId = -1;
-
-
+    private Map<Player, List<List<Location>>> playerMarkersMap = new HashMap<>();
+    private Map<Player, Map<Integer, Player>> playerLineToPlayerMap = new HashMap<>();
+    private Map<Player, Integer> playerTaskIdMap = new HashMap<>();
 
     @Inject
     public BloodCompass(Champions champions, ChampionsManager championsManager) {
@@ -74,81 +71,84 @@ public class BloodCompass extends Skill implements ToggleSkill, CooldownSkill {
     }
 
     private void findEnemies(Player player, int level) {
-        markers.clear();
-        lineToPlayerMap.clear();
         List<Player> enemies = UtilPlayer.getNearbyEnemies(player, player.getLocation(), (maxDistance + maxDistanceIncreasePerLevel));
         enemies.sort(Comparator.comparingDouble(p -> p.getLocation().distance(player.getLocation())));
         enemies = enemies.subList(0, Math.min(enemies.size(), getFinalNumLines(level)));
 
-        if (enemies.isEmpty()) {
-            UtilMessage.message(player, getClassType().getName(), "Blood Compass failed.");
-        } else {
+        List<List<Location>> markers = new ArrayList<>();
+        Map<Integer, Player> lineToPlayerMap = new HashMap<>();
+
+        if (!enemies.isEmpty()) {
             int lineIndex = 0;
             for (Player enemy : enemies) {
-                calculatePoints(player, enemy);
-                lineToPlayerMap.put(lineIndex++, enemy);
+                List<Location> points = calculatePoints(player, enemy); // calculatePoints now returns a List<Location>
+                if (!points.isEmpty()) {
+                    markers.add(points);
+                    lineToPlayerMap.put(lineIndex++, enemy);
+                }
             }
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 2.0f, 1.0f);
+        } else {
+            UtilMessage.message(player, getClassType().getName(), "Blood Compass failed.");
         }
+
+        playerMarkersMap.put(player, markers);
+        playerLineToPlayerMap.put(player, lineToPlayerMap);
     }
 
     @Override
     public void toggle(Player player, int level) {
-        resetDrawingState();
+        resetDrawingState(player);
         findEnemies(player, level);
+
+        List<List<Location>> markers = playerMarkersMap.get(player);
+        Map<Integer, Player> lineToPlayerMap = playerLineToPlayerMap.get(player);
 
         for (int lineIndex = 0; lineIndex < markers.size(); lineIndex++) {
             List<Location> points = markers.get(lineIndex);
             Player target = lineToPlayerMap.get(lineIndex);
-            boolean pathIsClear = true;
+            boolean pathIsClear = isPathClear(player, target, points);
 
-            if (target != null && target.isOnline()) {
-                for (int i = 1; i <= points.size(); i++) {
-                    Location endPoint = i < points.size() ? points.get(i) : target.getLocation().add(0, 1.8, 0);
-                    boolean segmentClear = isLineClear(points.get(i - 1), endPoint);
-                    if (!segmentClear) {
-                        pathIsClear = false;
-                        break;
-                    }
-                }
-
-                if (pathIsClear) {
-                    drawCircle(target.getLocation(), (escapeRadius + escapeRadiusIncreasePerLevel));
-                }
+            if (pathIsClear) {
+                drawCircle(target.getLocation(), (escapeRadius + escapeRadiusIncreasePerLevel));
             }
         }
 
         startDrawingLines(player);
     }
 
-    private void resetDrawingState() {
-        currentLine = 0;
-        currentPoint = 0;
-        markers.clear();
+    private void resetDrawingState(Player player) {
+        Integer taskId = playerTaskIdMap.get(player);
+        if (taskId != null && taskId != -1) {
+            Bukkit.getScheduler().cancelTask(taskId);
+        }
+        playerMarkersMap.put(player, new ArrayList<>());
+        playerLineToPlayerMap.put(player, new HashMap<>());
+        playerTaskIdMap.put(player, -1);
     }
 
-    private int currentLine = 0;
-    private int currentPoint = 0;
-
     private void startDrawingLines(Player player) {
-        if (taskId != -1) {
-            Bukkit.getScheduler().cancelTask(taskId);
-            taskId = -1;
+        Integer existingTaskId = playerTaskIdMap.get(player);
+        if (existingTaskId != null && existingTaskId != -1) {
+            Bukkit.getScheduler().cancelTask(existingTaskId);
         }
 
-        currentPoints = new HashMap<>();
+        List<List<Location>> markers = playerMarkersMap.get(player);
+        Map<Integer, Integer> currentPoints = new HashMap<>();
         for (int i = 0; i < markers.size(); i++) {
             currentPoints.put(i, 0);
         }
 
-        taskId = new BukkitRunnable() {
+        int taskId = new BukkitRunnable() {
             @Override
             public void run() {
-                if (!drawLineSegment(player)) {
+                if (!drawLineSegment(player, currentPoints)) {
                     this.cancel();
                 }
             }
         }.runTaskTimer(champions, 0L, 1L).getTaskId();
+
+        playerTaskIdMap.put(player, taskId);
     }
 
     /**
@@ -156,8 +156,10 @@ public class BloodCompass extends Skill implements ToggleSkill, CooldownSkill {
      * @return true if there are more segments to draw, false otherwise.
      */
 
-    private boolean drawLineSegment(Player player) {
+    private boolean drawLineSegment(Player player, Map<Integer, Integer> currentPoints) {
         boolean moreSegmentsToDraw = false;
+        List<List<Location>> markers = playerMarkersMap.get(player);
+        Map<Integer, Player> lineToPlayerMap = playerLineToPlayerMap.get(player);
 
         for (Map.Entry<Integer, Integer> entry : currentPoints.entrySet()) {
             int lineIndex = entry.getKey();
@@ -202,7 +204,18 @@ public class BloodCompass extends Skill implements ToggleSkill, CooldownSkill {
         return true;
     }
 
-    private void calculatePoints(Player player, Player enemy) {
+    private boolean isPathClear(Player player, Player enemy, List<Location> points) {
+        for (int i = 1; i < points.size(); i++) {
+            Location start = points.get(i - 1);
+            Location end = points.get(i);
+            if (!isLineClear(start, end)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private List<Location> calculatePoints(Player player, Player enemy) {
         List<Location> points = new ArrayList<>();
         Location start = player.getLocation().add(0, 1.8, 0);
         Location end = enemy.getLocation().add(0, 1.8, 0);
@@ -233,8 +246,7 @@ public class BloodCompass extends Skill implements ToggleSkill, CooldownSkill {
         if (!obstruction) {
             points.add(end);
         }
-
-        markers.add(points);
+        return points;
     }
 
 
@@ -306,7 +318,7 @@ public class BloodCompass extends Skill implements ToggleSkill, CooldownSkill {
 
     @Override
     public SkillType getType() {
-        return SkillType.PASSIVE_B;
+        return SkillType.PASSIVE_A;
     }
 
     @Override

@@ -39,13 +39,7 @@ import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
-import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntityPickupItemEvent;
-import org.bukkit.event.entity.EntityPortalEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.entity.SlimeSplitEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.BrewEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType;
@@ -417,7 +411,7 @@ public class WorldListener implements Listener {
     }
 
     /*
-     * Updates the names of items that are picked up from the ground (sets there name to be yellow from wh ite)
+     * Updates the names of items that are picked up from the ground (sets there name to be yellow from white)
      * Other than enchanted armour
      */
     @EventHandler(priority = EventPriority.MONITOR)
@@ -425,6 +419,11 @@ public class WorldListener implements Listener {
         if (event.getEntity() instanceof Player) {
             itemHandler.updateNames(event.getItem().getItemStack());
         }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onSpawnItem(ItemSpawnEvent event) {
+        itemHandler.updateNames(event.getEntity().getItemStack());
     }
 
     /*

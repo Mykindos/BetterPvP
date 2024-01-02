@@ -71,7 +71,8 @@ public interface ICommand {
         POSITION_Y,
         POSITION_Z,
         WORLD,
-        BOOLEAN
+        BOOLEAN,
+        CUSTOMITEM,
     }
 
 }
