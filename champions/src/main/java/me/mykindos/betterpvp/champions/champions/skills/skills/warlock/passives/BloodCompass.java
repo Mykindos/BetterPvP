@@ -33,9 +33,9 @@ public class BloodCompass extends Skill implements ToggleSkill, CooldownSkill {
     public double damageIncreasePerLevel;
     public double escapeRadiusIncreasePerLevel;
     public double maxDistanceIncreasePerLevel;
-    private Map<Player, List<List<Location>>> playerMarkersMap = new HashMap<>();
-    private Map<Player, Map<Integer, Player>> playerLineToPlayerMap = new HashMap<>();
-    private Map<Player, Integer> playerTaskIdMap = new HashMap<>();
+    private final Map<Player, List<List<Location>>> playerMarkersMap = new WeakHashMap<>();
+    private final Map<Player, WeakHashMap<Integer, Player>> playerLineToPlayerMap = new WeakHashMap<>();
+    private final Map<Player, Integer> playerTaskIdMap = new WeakHashMap<>();
 
     @Inject
     public BloodCompass(Champions champions, ChampionsManager championsManager) {
@@ -56,17 +56,17 @@ public class BloodCompass extends Skill implements ToggleSkill, CooldownSkill {
                 "towards the nearest enemies within <stat>" + maxDistance + "</stat> blocks",
                 "",
                 "Players hit with these blood lines will receive",
-                "<effect>Glowing</effect> for <stat>" + effectDuration + "</stat> seconds and take <val>" + getFinalDamage(level) +"</val> damage",
+                "<effect>Glowing</effect> for <stat>" + effectDuration + "</stat> seconds and take <val>" + getFinalDamage(level) + "</val> damage",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
     }
 
-    public double getFinalDamage(int level){
+    public double getFinalDamage(int level) {
         return (damage + ((level - 1)) * damageIncreasePerLevel);
     }
 
-    public int getFinalNumLines(int level){
+    public int getFinalNumLines(int level) {
         return (numLines + (level - 1));
     }
 
@@ -76,7 +76,7 @@ public class BloodCompass extends Skill implements ToggleSkill, CooldownSkill {
         enemies = enemies.subList(0, Math.min(enemies.size(), getFinalNumLines(level)));
 
         List<List<Location>> markers = new ArrayList<>();
-        Map<Integer, Player> lineToPlayerMap = new HashMap<>();
+        WeakHashMap<Integer, Player> lineToPlayerMap = new WeakHashMap<>();
 
         if (!enemies.isEmpty()) {
             int lineIndex = 0;
@@ -123,7 +123,7 @@ public class BloodCompass extends Skill implements ToggleSkill, CooldownSkill {
             Bukkit.getScheduler().cancelTask(taskId);
         }
         playerMarkersMap.put(player, new ArrayList<>());
-        playerLineToPlayerMap.put(player, new HashMap<>());
+        playerLineToPlayerMap.put(player, new WeakHashMap<>());
         playerTaskIdMap.put(player, -1);
     }
 
@@ -153,6 +153,7 @@ public class BloodCompass extends Skill implements ToggleSkill, CooldownSkill {
 
     /**
      * Draws a single line segment for each line and progresses to the next one.
+     *
      * @return true if there are more segments to draw, false otherwise.
      */
 
@@ -330,7 +331,7 @@ public class BloodCompass extends Skill implements ToggleSkill, CooldownSkill {
         escapeRadius = getConfig("escapeRadius", 7.0, Double.class);
         damage = getConfig("damage", 7.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 2.0, Double.class);
-        maxDistanceIncreasePerLevel = getConfig("maxDistanceIncreasePerLevel",0.0, Double.class);
-        escapeRadiusIncreasePerLevel = getConfig("escapeRadiusIncreasePerLevel",0.0, Double.class);
+        maxDistanceIncreasePerLevel = getConfig("maxDistanceIncreasePerLevel", 0.0, Double.class);
+        escapeRadiusIncreasePerLevel = getConfig("escapeRadiusIncreasePerLevel", 0.0, Double.class);
     }
 }
