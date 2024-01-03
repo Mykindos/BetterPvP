@@ -18,6 +18,7 @@ public class ConfigProvider<T> implements Provider<T> {
     private final String configPath;
     private final String defaultValue;
     private Class<T> type;
+    private final String configName;
 
     private static final Map<Class<?>, Function<String, ?>> parsers = new HashMap<>();
 
@@ -30,11 +31,12 @@ public class ConfigProvider<T> implements Provider<T> {
         parsers.put(List.class, s -> Arrays.asList(s.split(",")));
     }
 
-    public ConfigProvider(BPvPPlugin plugin, String configPath, String defaultValue, Class<T> type) {
+    public ConfigProvider(BPvPPlugin plugin, String configPath, String defaultValue, Class<T> type, String configName) {
         this.plugin = plugin;
         this.configPath = configPath;
         this.type = type;
         this.defaultValue = defaultValue;
+        this.configName = configName;
     }
 
     @SuppressWarnings("unchecked")
@@ -50,7 +52,7 @@ public class ConfigProvider<T> implements Provider<T> {
             }
         }
 
-        T value = plugin.getConfig().getOrSaveObject(configPath, castedDefault, type);
+        T value = plugin.getConfig(configName).getOrSaveObject(configPath, castedDefault, type);
         plugin.saveConfig();
 
         return value;

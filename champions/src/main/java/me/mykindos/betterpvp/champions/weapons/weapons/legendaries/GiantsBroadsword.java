@@ -47,19 +47,19 @@ public class GiantsBroadsword extends ChannelWeapon implements InteractWeapon, L
     private static final String ABILITY_NAME = "Shield";
 
     @Inject
-    @Config(path = "weapons.giants-broadsword.energy-per-tick", defaultValue = "1.5")
+    @Config(path = "weapons.giants-broadsword.energy-per-tick", defaultValue = "1.5", configName = "weapons/legendaries")
     private double energyPerTick;
 
     @Inject
-    @Config(path = "weapons.giants-broadsword.initial-energy-cost", defaultValue = "10.0")
+    @Config(path = "weapons.giants-broadsword.initial-energy-cost", defaultValue = "10.0", configName = "weapons/legendaries")
     private double initialEnergyCost;
 
     @Inject
-    @Config(path = "weapons.giants-broadsword.base-damage", defaultValue = "10.0")
+    @Config(path = "weapons.giants-broadsword.base-damage", defaultValue = "10.0", configName = "weapons/legendaries")
     private double baseDamage;
 
     @Inject
-    @Config(path = "weapons.giants-broadsword.regen-amplifier", defaultValue = "3")
+    @Config(path = "weapons.giants-broadsword.regen-amplifier", defaultValue = "3", configName = "weapons/legendaries")
     private int regenAmplifier;
 
     private final EnergyHandler energyHandler;

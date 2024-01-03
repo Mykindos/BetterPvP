@@ -69,28 +69,28 @@ public class KnightsGreatlance extends ChannelWeapon implements InteractWeapon, 
     private final EffectManager effectManager;
 
     @Inject
-    @Config(path = "weapons.knights-greatlance.energy-per-tick", defaultValue = "1.0")
+    @Config(path = "weapons.knights-greatlance.energy-per-tick", defaultValue = "1.0", configName = "weapons/legendaries")
     private double energyPerTick;
 
     @Inject
-    @Config(path = "weapons.knights-greatlance.initial-energy-cost", defaultValue = "10.0")
+    @Config(path = "weapons.knights-greatlance.initial-energy-cost", defaultValue = "10.0", configName = "weapons/legendaries")
     private double initialEnergyCost;
 
     @Inject
-    @Config(path = "weapons.knights-greatlance.base-damage", defaultValue = "8.0")
+    @Config(path = "weapons.knights-greatlance.base-damage", defaultValue = "8.0", configName = "weapons/legendaries")
     private double baseDamage;
 
     @Inject
-    @Config(path = "weapons.knights-greatlance.charge-cooldown", defaultValue = "5.0")
-    private double attackCooldown = 5;
+    @Config(path = "weapons.knights-greatlance.charge-cooldown", defaultValue = "5.0", configName = "weapons/legendaries")
+    private double attackCooldown;
 
     @Inject
-    @Config(path = "weapons.knights-greatlance.max-charge-ticks", defaultValue = "60")
-    private long maxChargeTicks = 20 * 3L;
+    @Config(path = "weapons.knights-greatlance.max-charge-ticks", defaultValue = "60", configName = "weapons/legendaries")
+    private int maxChargeTicks;
 
     @Inject
-    @Config(path = "weapons.knights-greatlance.charge-velocity", defaultValue = "1.5")
-    private final double chargeVelocity = 1.5d;
+    @Config(path = "weapons.knights-greatlance.charge-velocity", defaultValue = "1.5", configName = "weapons/legendaries")
+    private double chargeVelocity;
 
     private final EnergyHandler energyHandler;
 

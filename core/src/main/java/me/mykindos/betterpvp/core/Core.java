@@ -55,10 +55,6 @@ public class Core extends BPvPPlugin {
     @Inject
     private UpdateEventExecutor updateEventExecutor;
 
-    @Inject
-    @Config(path = "core.password", defaultValue = "")
-    public String password;
-
     @Override
     public void onEnable() {
         saveDefaultConfig();

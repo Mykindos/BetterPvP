@@ -3,18 +3,33 @@ package me.mykindos.betterpvp.core.framework;
 import com.google.common.base.Charsets;
 import com.google.inject.Injector;
 import lombok.Getter;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Objects;
+import java.util.stream.Stream;
 
+@Slf4j
 public abstract class BPvPPlugin extends JavaPlugin {
 
-    private final File configFile;
     private ExtendedYamlConfiguration config;
 
     /**
@@ -23,9 +38,11 @@ public abstract class BPvPPlugin extends JavaPlugin {
     @Getter
     private final ArrayList<Object> listeners;
 
+    private final HashMap<String, ExtendedYamlConfiguration> configs;
+
     public BPvPPlugin() {
         this.listeners = new ArrayList<>();
-        this.configFile = new File(getDataFolder(), "config.yml");
+        this.configs = new HashMap<>();
     }
 
     public abstract Injector getInjector();
@@ -33,27 +50,92 @@ public abstract class BPvPPlugin extends JavaPlugin {
     @Override
     @NotNull
     public ExtendedYamlConfiguration getConfig() {
-        if (config == null) {
-            reloadConfig();
+        return getConfig("config");
+    }
+
+    @SneakyThrows
+    @NotNull
+    public ExtendedYamlConfiguration getConfig(String configName) {
+        if (!configs.containsKey(configName)) {
+            File configFile = new File(getDataFolder(), configName + ".yml");
+            if (!configFile.exists()) {
+                saveResource(configName + ".yml", false);
+            }
+
+            configs.put(configName, ExtendedYamlConfiguration.loadConfiguration(configFile));
         }
-        return config;
+
+        return configs.get(configName);
     }
 
     @Override
     public void reloadConfig() {
-        config = ExtendedYamlConfiguration.loadConfiguration(configFile);
+        configs.forEach((key, value) -> {
+            File configFile = new File(getDataFolder(), key + ".yml");
+            ExtendedYamlConfiguration config = ExtendedYamlConfiguration.loadConfiguration(configFile);
 
-        final InputStream defConfigStream = getResource("config.yml");
-        if (defConfigStream == null) {
-            return;
-        }
+            final InputStream defConfigStream = getResource("config.yml");
+            if (defConfigStream == null) {
+                return;
+            }
 
-        config.setDefaults(ExtendedYamlConfiguration.loadConfiguration(new InputStreamReader(defConfigStream, Charsets.UTF_8)));
+            config.setDefaults(ExtendedYamlConfiguration.loadConfiguration(new InputStreamReader(defConfigStream, Charsets.UTF_8)));
+            configs.put(key, ExtendedYamlConfiguration.loadConfiguration(configFile));
+        });
+
+    }
+
+    @Override
+    public void saveConfig() {
+        configs.forEach((key, value) -> {
+            try {
+                value.save(new File(getDataFolder(), key + ".yml"));
+            } catch (IOException e) {
+                log.error("Failed to save config file {}", key, e);
+            }
+        });
     }
 
     @Override
     public void saveDefaultConfig() {
-        super.saveDefaultConfig();
+        try {
+            URI uri = Objects.requireNonNull(getClassLoader().getResource("configs")).toURI();
+            try (FileSystem fileSystem = FileSystems.newFileSystem(uri, Collections.emptyMap())) {
+                Path myPath = fileSystem.getPath("configs");
+                walkAndSaveFiles(myPath);
+            }
+        } catch (URISyntaxException | IOException e) {
+            log.error("Failed to save default config files", e);
+        }
+
+    }
+
+    private void walkAndSaveFiles(Path path) {
+        try (Stream<Path> paths = Files.walk(path)) {
+            paths.forEach(file -> {
+                if (Files.isRegularFile(file)) {
+
+                    Path filePath = file.subpath(path.getNameCount(), file.getNameCount());
+                    Path targetPath = Paths.get(getDataFolder().getAbsolutePath(), filePath.toString());
+
+                    try {
+                        Files.createDirectories(targetPath.getParent());
+                        if (!Files.exists(targetPath)) { // Check if the file already exists
+                            Files.copy(file, targetPath);
+                        }
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                }
+            });
+        } catch (IOException e) {
+            log.error("Failed to walk and save config files", e);
+        }
+    }
+
+    private void saveFile(File file, boolean replace) {
+
     }
 
 }

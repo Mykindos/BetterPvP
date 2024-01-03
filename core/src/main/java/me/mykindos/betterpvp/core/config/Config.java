@@ -16,4 +16,6 @@ public @interface Config {
 
     String defaultValue() default "";
 
+    String configName() default "config";
+
 }
