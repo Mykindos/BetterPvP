@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.framework.delayedactions;
 
 import com.google.inject.Inject;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -9,6 +10,7 @@ import me.mykindos.betterpvp.core.framework.delayedactions.events.PlayerDelayedA
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import net.kyori.adventure.text.Component;
@@ -53,9 +55,9 @@ public class DelayedActionListener implements Listener {
         delayedActionMap.put(player, action);
     }
 
-    @EventHandler (priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onDuplicateDelayedAction(PlayerDelayedActionEvent event) {
-        if(delayedActionMap.containsKey(event.getPlayer())) {
+        if (delayedActionMap.containsKey(event.getPlayer())) {
             event.cancel("Player already has an active delayedaction");
         }
     }
@@ -80,7 +82,7 @@ public class DelayedActionListener implements Listener {
                         UtilTime.convert((delayedAction.getTime() - System.currentTimeMillis()), UtilTime.TimeUnit.BEST, 1),
                         UtilTime.getTimeUnit2(delayedAction.getTime() - System.currentTimeMillis()).toLowerCase()
                 );
-                
+
                 var times = Title.Times.times(Duration.ofMillis(0), Duration.ofMillis(1000), Duration.ofMillis(1000));
                 player.showTitle(Title.title(remainingTime, Component.empty(), times));
             }
@@ -119,12 +121,17 @@ public class DelayedActionListener implements Listener {
         }
     }
 
-    @EventHandler (priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onCombatCancel(PlayerDelayedActionEvent event) {
         if (event.isCancelled()) return;
+        if (UtilPlayer.isCreativeOrSpectator(event.getPlayer())) return;
 
-        final Gamer gamer = clientManager.search().online(event.getPlayer()).getGamer();
-        if(!UtilTime.elapsed(gamer.getLastDamaged(), 15000)) {
+        final Client client = clientManager.search().online(event.getPlayer());
+        if (client.isAdministrating()) return;
+
+        Gamer gamer = client.getGamer();
+
+        if (!UtilTime.elapsed(gamer.getLastDamaged(), 15000)) {
             event.setCancelled(true);
             UtilMessage.message(event.getPlayer(), "Combat", "You cannot do this while in combat!");
         }
