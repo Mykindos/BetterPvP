@@ -134,8 +134,4 @@ public abstract class BPvPPlugin extends JavaPlugin {
         }
     }
 
-    private void saveFile(File file, boolean replace) {
-
-    }
-
 }
