@@ -295,10 +295,10 @@ public class UtilItem {
         return newComponents;
     }
 
-    public static WeighedList<ItemStack> getDropTable(BPvPPlugin plugin, String configKey) {
+    public static WeighedList<ItemStack> getDropTable(BPvPPlugin plugin, String config, String configKey) {
         WeighedList<ItemStack> droptable = new WeighedList<>();
 
-        var configSection = plugin.getConfig().getConfigurationSection(configKey);
+        var configSection = plugin.getConfig(config).getConfigurationSection(configKey);
         if (configSection == null) return droptable;
 
         configSection.getKeys(false).forEach(key -> {
@@ -313,6 +313,10 @@ public class UtilItem {
         });
 
         return droptable;
+    }
+
+    public static WeighedList<ItemStack> getDropTable(BPvPPlugin plugin, String configKey) {
+        return getDropTable(plugin, "config", configKey);
     }
 
     public static void removeRecipe(Material material) {
