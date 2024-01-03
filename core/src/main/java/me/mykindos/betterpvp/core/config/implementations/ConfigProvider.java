@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.config.implementations;
 
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
+import org.apache.commons.lang.ClassUtils;
 
 import javax.inject.Provider;
 import java.util.Arrays;
@@ -16,7 +17,7 @@ public class ConfigProvider<T> implements Provider<T> {
     private final BPvPPlugin plugin;
     private final String configPath;
     private final String defaultValue;
-    private final Class<T> type;
+    private Class<T> type;
 
     private static final Map<Class<?>, Function<String, ?>> parsers = new HashMap<>();
 
@@ -36,12 +37,14 @@ public class ConfigProvider<T> implements Provider<T> {
         this.defaultValue = defaultValue;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public T get() {
         Object castedDefault = defaultValue;
         if (parsers.containsKey(type)) {
             try {
                 castedDefault = parsers.get(type).apply(defaultValue);
+                type = (Class<T>) ClassUtils.primitiveToWrapper(type);
             } catch (Exception ex) {
                 log.error("Failed to parse default value for {} ({})", configPath, type.getSimpleName(), ex);
             }

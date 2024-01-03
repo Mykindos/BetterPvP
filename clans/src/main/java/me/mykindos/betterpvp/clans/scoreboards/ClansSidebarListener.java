@@ -120,7 +120,5 @@ public class ClansSidebarListener implements Listener {
         } else {
             sidebarObjective.getScore(ChatColor.GRAY.toString() + "Wilderness").setScore(5);
         }
-
-        // TODO world event
     }
 }
