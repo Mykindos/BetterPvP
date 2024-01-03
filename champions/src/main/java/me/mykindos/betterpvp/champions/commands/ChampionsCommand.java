@@ -96,7 +96,7 @@ public class ChampionsCommand extends Command implements IConsoleCommand {
             weaponManager.reload();
             buildManager.reloadBuilds();
 
-            itemHandler.loadItemData("Champions");
+            itemHandler.loadItemData("champions");
 
             UtilMessage.message(sender, "Champions", "Successfully reloaded champions");
         }

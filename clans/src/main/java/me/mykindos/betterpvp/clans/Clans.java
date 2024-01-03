@@ -76,7 +76,7 @@ public class Clans extends BPvPPlugin {
             clanManager.loadFromList(clanManager.getRepository().getAll());
 
             var itemHandler = injector.getInstance(ItemHandler.class);
-            itemHandler.loadItemData("Clans");
+            itemHandler.loadItemData("clans");
 
             var perkManager = injector.getInstance(ClanPerkManager.class);
             perkManager.scan();

@@ -30,8 +30,6 @@ import java.util.stream.Stream;
 @Slf4j
 public abstract class BPvPPlugin extends JavaPlugin {
 
-    private ExtendedYamlConfiguration config;
-
     /**
      * Store our own list of listeners as spigot does not register them unless they have an active EventHandler
      */
@@ -72,15 +70,17 @@ public abstract class BPvPPlugin extends JavaPlugin {
     public void reloadConfig() {
         configs.forEach((key, value) -> {
             File configFile = new File(getDataFolder(), key + ".yml");
+
             ExtendedYamlConfiguration config = ExtendedYamlConfiguration.loadConfiguration(configFile);
 
-            final InputStream defConfigStream = getResource("config.yml");
+            final InputStream defConfigStream = getResource("configs/" + key + ".yml");
             if (defConfigStream == null) {
                 return;
             }
 
             config.setDefaults(ExtendedYamlConfiguration.loadConfiguration(new InputStreamReader(defConfigStream, Charsets.UTF_8)));
-            configs.put(key, ExtendedYamlConfiguration.loadConfiguration(configFile));
+            configs.put(key, config);
+
         });
 
     }
@@ -119,6 +119,7 @@ public abstract class BPvPPlugin extends JavaPlugin {
                     Path targetPath = Paths.get(getDataFolder().getAbsolutePath(), filePath.toString());
 
                     try {
+
                         Files.createDirectories(targetPath.getParent());
                         if (!Files.exists(targetPath)) { // Check if the file already exists
                             Files.copy(file, targetPath);
