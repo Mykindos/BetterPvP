@@ -103,7 +103,7 @@ public abstract class Skill implements ISkill {
     }
 
     protected <T> T getConfig(String name, Object defaultValue, Class<T> type) {
-        return champions.getConfig().getOrSaveObject(getPath(name), defaultValue, type);
+        return champions.getConfig("skills/skills").getOrSaveObject(getPath(name), defaultValue, type);
     }
 
     /**
@@ -114,7 +114,7 @@ public abstract class Skill implements ISkill {
      * @return returns the config value if exists, or the default value if it does not. Does not save value in the config
      */
     protected <T> T getConfigObject(String name, T defaultValue, Class<T> type) {
-        return champions.getConfig().getObject(getPath(name), type, defaultValue);
+        return champions.getConfig("skills/skills").getObject(getPath(name), type, defaultValue);
     }
 
 

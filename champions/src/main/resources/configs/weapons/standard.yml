@@ -1,0 +1,15 @@
+weapons:
+  tnt-cannon:
+    cooldown: 25.0
+    velocity: 2.5
+  throwing-web:
+    cooldown: 10.0
+    duration: 2.5
+    throwable-expiry: 10.0
+  mushroom-stew:
+    cooldown: 14.0
+    duration: 4.0
+    level: 2
+  energy-apple:
+    cooldown: 10.0
+    energy-regen: 0.5

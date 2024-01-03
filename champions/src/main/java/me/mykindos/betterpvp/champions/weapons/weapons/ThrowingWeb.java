@@ -36,15 +36,15 @@ import java.util.UUID;
 public class ThrowingWeb extends Weapon implements Listener, InteractWeapon, CooldownWeapon {
 
     @Inject
-    @Config(path = "weapons.throwing-web.cooldown", defaultValue = "10.0")
+    @Config(path = "weapons.throwing-web.cooldown", defaultValue = "10.0", configName = "weapons/standard")
     private double cooldown;
 
     @Inject
-    @Config(path = "weapons.throwing-web.duration", defaultValue = "2.5")
+    @Config(path = "weapons.throwing-web.duration", defaultValue = "2.5", configName = "weapons/standard")
     private double duration;
 
     @Inject
-    @Config(path = "weapons.throwing-web.throwable-expiry", defaultValue = "10.0")
+    @Config(path = "weapons.throwing-web.throwable-expiry", defaultValue = "10.0", configName = "weapons/standard")
     private double throwableExpiry;
 
     private final ChampionsManager championsManager;

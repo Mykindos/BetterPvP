@@ -38,23 +38,23 @@ import java.util.UUID;
 public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, LegendaryWeapon, Listener {
 
     @Inject
-    @Config(path = "weapons.alligators-tooth.energy-per-tick", defaultValue = "1.0")
+    @Config(path = "weapons.alligators-tooth.energy-per-tick", defaultValue = "1.0", configName = "weapons/legendaries")
     private double energyPerTick;
 
     @Inject
-    @Config(path = "weapons.alligators-tooth.initial-energy-cost", defaultValue = "10.0")
+    @Config(path = "weapons.alligators-tooth.initial-energy-cost", defaultValue = "10.0", configName = "weapons/legendaries")
     private double initialEnergyCost;
 
     @Inject
-    @Config(path = "weapons.alligators-tooth.base-damage", defaultValue = "8.0")
+    @Config(path = "weapons.alligators-tooth.base-damage", defaultValue = "8.0", configName = "weapons/legendaries")
     private double baseDamage;
 
     @Inject
-    @Config(path = "weapons.alligators-tooth.bonus-damage", defaultValue = "4.0")
+    @Config(path = "weapons.alligators-tooth.bonus-damage", defaultValue = "4.0", configName = "weapons/legendaries")
     private double bonusDamage;
 
     @Inject
-    @Config(path = "weapons.alligators-tooth.strength", defaultValue = "1.0")
+    @Config(path = "weapons.alligators-tooth.strength", defaultValue = "1.0", configName = "weapons/legendaries")
     private double velocityStrength;
 
     private final EnergyHandler energyHandler;

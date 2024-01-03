@@ -6,7 +6,7 @@ import org.apache.commons.lang3.AnnotationUtils;
 import java.lang.annotation.Annotation;
 
 @SuppressWarnings({"ClassExplicitlyAnnotation", "EqualsWhichDoesntCheckParameterClass"})
-public record ConfigImpl(String path, String defaultValue) implements Config {
+public record ConfigImpl(String path, String defaultValue, String configName) implements Config {
 
     @Override
     public int hashCode() {

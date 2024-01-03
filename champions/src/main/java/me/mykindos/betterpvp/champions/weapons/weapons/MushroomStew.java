@@ -36,15 +36,15 @@ public class MushroomStew extends Weapon implements InteractWeapon, CooldownWeap
 
 
     @Inject
-    @Config(path = "weapons.mushroom-stew.cooldown", defaultValue = "14.0")
+    @Config(path = "weapons.mushroom-stew.cooldown", defaultValue = "14.0", configName = "weapons/standard")
     private double cooldown;
 
     @Inject
-    @Config(path = "weapons.mushroom-stew.duration", defaultValue = "4.0")
+    @Config(path = "weapons.mushroom-stew.duration", defaultValue = "4.0", configName = "weapons/standard")
     private double duration;
 
     @Inject
-    @Config(path = "weapons.mushroom-stew.level", defaultValue = "2")
+    @Config(path = "weapons.mushroom-stew.level", defaultValue = "2", configName = "weapons/standard")
     private int level;
 
     @Inject

@@ -25,11 +25,11 @@ import org.bukkit.event.block.Action;
 public class TNTCannon extends Weapon implements Listener, InteractWeapon, CooldownWeapon {
 
     @Inject
-    @Config(path = "weapons.tnt-cannon.cooldown", defaultValue = "25.0")
+    @Config(path = "weapons.tnt-cannon.cooldown", defaultValue = "25.0", configName = "weapons/standard")
     private double cooldown;
 
     @Inject
-    @Config(path = "weapons.tnt-cannon.velocity", defaultValue = "2.5")
+    @Config(path = "weapons.tnt-cannon.velocity", defaultValue = "2.5", configName = "weapons/standard")
     private double velocity;
 
     @Inject

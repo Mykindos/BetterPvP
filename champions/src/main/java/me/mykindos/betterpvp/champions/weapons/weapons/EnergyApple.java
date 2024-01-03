@@ -21,11 +21,11 @@ public class EnergyApple extends Weapon implements InteractWeapon, CooldownWeapo
     private final EnergyHandler energyHandler;
 
     @Inject
-    @Config(path = "weapons.energy-apple.cooldown", defaultValue = "10.0")
+    @Config(path = "weapons.energy-apple.cooldown", defaultValue = "10.0", configName = "weapons/standard")
     private double cooldown;
 
     @Inject
-    @Config(path = "weapons.energy-apple.energy-regen", defaultValue = "0.50")
+    @Config(path = "weapons.energy-apple.energy-regen", defaultValue = "0.50", configName = "weapons/standard")
     private double energyRegen;
 
     @Inject

@@ -50,23 +50,23 @@ public class MagneticMaul extends ChannelWeapon implements InteractWeapon, Legen
     private static final String ABILITY_NAME = "Magnetism";
 
     @Inject
-    @Config(path = "weapons.magnetic-maul.energy-per-tick", defaultValue = "1.0")
+    @Config(path = "weapons.magnetic-maul.energy-per-tick", defaultValue = "1.0", configName = "weapons/legendaries")
     private double energyPerTick;
 
     @Inject
-    @Config(path = "weapons.magnetic-maul.initial-energy-cost", defaultValue = "10.0")
+    @Config(path = "weapons.magnetic-maul.initial-energy-cost", defaultValue = "10.0", configName = "weapons/legendaries")
     private double initialEnergyCost;
 
     @Inject
-    @Config(path = "weapons.magnetic-maul.base-damage", defaultValue = "8.0")
+    @Config(path = "weapons.magnetic-maul.base-damage", defaultValue = "8.0", configName = "weapons/legendaries")
     private double baseDamage;
 
     @Inject
-    @Config(path = "weapons.magnetic-maul.pull-range", defaultValue = "10.0")
+    @Config(path = "weapons.magnetic-maul.pull-range", defaultValue = "10.0", configName = "weapons/legendaries")
     private double pullRange;
 
     @Inject
-    @Config(path = "weapons.magnetic-maul.pull-fov", defaultValue = "80.3 ")
+    @Config(path = "weapons.magnetic-maul.pull-fov", defaultValue = "80.3", configName = "weapons/legendaries")
     private double pullFov;
 
     private final EnergyHandler energyHandler;

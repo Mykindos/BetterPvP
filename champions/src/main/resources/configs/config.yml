@@ -1,0 +1,33 @@
+class:
+  assassin:
+    dealKnockback: false
+    receiveKnockback: true
+chat:
+  skill:
+    preview: false
+command:
+  kit:
+    enabled: true
+    requiredRank: ADMIN
+  champions:
+    reload:
+      enabled: true
+      requiredRank: ADMIN
+    enabled: true
+    requiredRank: ADMIN
+  reload:
+    enabled: true
+    requiredRank: ADMIN
+  build:
+    enabled: true
+    requiredRank: ADMIN
+  combat:
+    enabled: true
+    requiredRank: ADMIN
+  skills:
+    enabled: true
+    requiredRank: ADMIN
+    seeOtherPlayerSkillsRank: ADMIN
+combat:
+  arrow-base-damage: 4.5
+  crit-arrows: true
