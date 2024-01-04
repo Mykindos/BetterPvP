@@ -775,6 +775,12 @@ skills:
       baseHealthPercent: 0.25
       healthPercentIncreasePerLevel: 0.05
       speedStrength: 0
+    curse:
+      enabled: true
+      maxlevel: 3
+      internalCD: 3.0
+      curseDuration: 3
+      effectLevel: 1
     soulharvest:
       enabled: true
       maxlevel: 3
