@@ -46,7 +46,9 @@ public class Thorns extends Skill implements PassiveSkill, Listener {
 
         return new String[]{
                 "Enemies take <val>" + getDamage(level) + "</val> damage when",
-                "they hit you using a melee attack"
+                "they hit you using a melee attack",
+                "",
+                "Internal Cooldown: <stat>" + internalCooldown
         };
     }
 
