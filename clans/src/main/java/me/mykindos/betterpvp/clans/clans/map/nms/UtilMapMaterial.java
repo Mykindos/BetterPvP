@@ -5,7 +5,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MapColor;
-import org.bukkit.craftbukkit.v1_20_R2.util.CraftMagicNumbers;
+import org.bukkit.craftbukkit.v1_20_R3.util.CraftMagicNumbers;
 
 import java.lang.reflect.Field;
 import java.util.function.Function;
@@ -20,10 +20,10 @@ public class UtilMapMaterial {
     static {
         try {
 
-            BLOCKBEHAVIOUR_INFO = BlockBehaviour.class.getDeclaredField("aN");
+            BLOCKBEHAVIOUR_INFO = BlockBehaviour.class.getDeclaredField("aP");
             BLOCKBEHAVIOUR_INFO.setAccessible(true);
 
-            PROPERTIES_FUNCTION = BlockBehaviour.Properties.class.getDeclaredField("a");
+            PROPERTIES_FUNCTION = BlockBehaviour.Properties.class.getDeclaredField("b");
             PROPERTIES_FUNCTION.setAccessible(true);
         } catch (NoSuchFieldException ex) {
             log.error("Failed to access NMS field", ex);
