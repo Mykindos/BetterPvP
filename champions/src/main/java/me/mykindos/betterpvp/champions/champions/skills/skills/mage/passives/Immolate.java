@@ -78,7 +78,7 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill {
 
     @Override
     public Role getClassType() {
-        return Role.PALADIN;
+        return Role.MAGE;
     }
 
     @EventHandler
