@@ -40,7 +40,7 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill {
     private double fireTrailDurationIncreasePerLevel;
     private int speedStrength;
     private int strengthStrength;
-    private int energyDecreasePerLevel;
+    private double energyDecreasePerLevel;
     @Inject
     public Immolate(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -200,6 +200,6 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill {
         speedStrength = getConfig("speedStrength", 0, Integer.class);
         strengthStrength = getConfig("speedStrength", 1, Integer.class);
 
-        energyDecreasePerLevel = getConfig("energyDecreasePerLevel", 1, Integer.class);
+        energyDecreasePerLevel = getConfig("energyDecreasePerLevel", 1.0, Double.class);
     }
 }
