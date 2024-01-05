@@ -343,8 +343,7 @@ skills:
       speed: 1.5
       cooldownDecreasePerLevel: 2.0
       baseDuration: 5.0
-      durationIncreasePerLevel: 5.0
-      duration: 5.0
+      durationIncreasePerLevel: 0.5
     lightningorb:
       enabled: true
       maxlevel: 5
