@@ -118,7 +118,7 @@ public class GlacialPrison extends Skill implements InteractSkill, CooldownSkill
     public void loadSkillConfig(){
         sphereSize = getConfig("sphereSize", 5, Integer.class);
         baseDuration = getConfig("baseDuration", 5.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 5.0, Double.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
         speed = getConfig("speed", 1.5, Double.class);
     }
 
