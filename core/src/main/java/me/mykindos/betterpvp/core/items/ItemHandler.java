@@ -8,8 +8,8 @@ import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateLoreEvent;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateNameEvent;
-import me.mykindos.betterpvp.core.items.enchants.GlowEnchant;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -35,8 +35,6 @@ public class ItemHandler {
     private final ItemRepository itemRepository;
 
     private final HashMap<String, BPVPItem> itemMap = new HashMap<>();
-    private final Enchantment glowEnchantment;
-
 
     @Inject
     @Config(path = "items.hideAttributes", defaultValue = "true")
@@ -49,8 +47,6 @@ public class ItemHandler {
     @Inject
     public ItemHandler(Core core, ItemRepository itemRepository) {
         this.itemRepository = itemRepository;
-
-        glowEnchantment = new GlowEnchant();
     }
 
     public void loadItemData(String module) {
@@ -98,7 +94,7 @@ public class ItemHandler {
             }
 
             if (item.isGlowing() || dataContainer.has(CoreNamespaceKeys.GLOW_KEY)) {
-                itemMeta.addEnchant(glowEnchantment, 1, true);
+                UtilItem.addGlow(itemMeta);
             } else {
                 for (Map.Entry<Enchantment, Integer> entry : itemStack.getEnchantments().entrySet()) {
                     itemStack.removeEnchantment(entry.getKey());
@@ -112,7 +108,6 @@ public class ItemHandler {
         }
 
         itemStack.setItemMeta(itemMeta);
-
         return itemStack;
     }
 

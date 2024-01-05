@@ -138,20 +138,13 @@ public class UtilItem {
     /**
      * Add the 'enchanted' glowing effect to any ItemStack
      *
-     * @param item Item to update
+     * @param meta Item to update
      * @return Returns an ItemStack that is now glowing
      */
     @SuppressWarnings("deprecation")
-    public static ItemStack addGlow(ItemStack item) {
-        ItemMeta itemMeta = item.getItemMeta();
-        Enchantment enchantment = Enchantment.getByName("Glow");
-        if (enchantment != null) {
-            itemMeta.addEnchant(enchantment, 1, true);
-        }
-
-        item.setItemMeta(itemMeta);
-
-        return item;
+    public static void addGlow(ItemMeta meta) {
+        meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        meta.addEnchant(Enchantment.LUCK, 1, true);
     }
 
     /**
