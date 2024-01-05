@@ -32,6 +32,8 @@ subprojects {
         maven("https://repo.xenondevs.xyz/releases")
         maven("https://repo.dmulloy2.net/repository/public/")
         maven("https://repo.spongepowered.org/maven/")
+        maven("https://maven.aestrus.io/releases")
+
     }
 
     // Set java language version
