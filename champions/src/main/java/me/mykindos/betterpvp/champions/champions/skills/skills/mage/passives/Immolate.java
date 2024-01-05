@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.champions.champions.skills.skills.paladin.passives;
+package me.mykindos.betterpvp.champions.champions.skills.skills.mage.passives;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
