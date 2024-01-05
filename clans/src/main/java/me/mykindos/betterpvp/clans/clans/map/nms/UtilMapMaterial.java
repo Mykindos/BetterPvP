@@ -20,10 +20,10 @@ public class UtilMapMaterial {
     static {
         try {
 
-            BLOCKBEHAVIOUR_INFO = BlockBehaviour.class.getDeclaredField("aN");
+            BLOCKBEHAVIOUR_INFO = BlockBehaviour.class.getDeclaredField("aP");
             BLOCKBEHAVIOUR_INFO.setAccessible(true);
 
-            PROPERTIES_FUNCTION = BlockBehaviour.Properties.class.getDeclaredField("a");
+            PROPERTIES_FUNCTION = BlockBehaviour.Properties.class.getDeclaredField("b");
             PROPERTIES_FUNCTION.setAccessible(true);
         } catch (NoSuchFieldException ex) {
             log.error("Failed to access NMS field", ex);

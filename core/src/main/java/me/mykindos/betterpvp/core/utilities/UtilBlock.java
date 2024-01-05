@@ -116,19 +116,22 @@ public class UtilBlock {
         }
 
         // Fix for player ground-spoofing on their clients
-        final BoundingBox box = player.getBoundingBox();
-        Location corner1 = new Location(player.getWorld(), box.getMinX(), box.getMinY() - 0.1, box.getMinZ());
-        Location corner2 = new Location(player.getWorld(), box.getMaxX(), box.getMinY() - 0.1, box.getMaxZ());
-        final BoundingBox checkBox = new BoundingBox(corner1.getX(), corner1.getY(), corner1.getZ(), corner2.getX(), corner2.getY() + 0.001, corner2.getZ());
+        // Return true if the player bounding box hits a block
+        final BoundingBox boundingBox = player.getBoundingBox();
+        boundingBox.expand(-0.1);
+        boundingBox.shift(0, -0.2, 0);
 
-        // Check if any blocks inside the bounding box are solid
-        for (int x = (int) checkBox.getMinX(); x <= checkBox.getMaxX(); x++) {
-            for (int y = (int) checkBox.getMinY(); y <= checkBox.getMaxY(); y++) {
-                for (int z = (int) checkBox.getMinZ(); z <= checkBox.getMaxZ(); z++) {
-                    Block block = player.getWorld().getBlockAt(x, y, z);
-                    if (solid(block) && checkBox.overlaps(block.getBoundingBox())) {
-                        return true;
-                    }
+        final int minX = (int) boundingBox.getMinX();
+        final int minY = (int) boundingBox.getMinY();
+        final int minZ = (int) boundingBox.getMinZ();
+        final int maxX = (int) boundingBox.getMaxX();
+        final int maxZ = (int) boundingBox.getMaxZ();
+
+        for (int x = minX; x <= maxX; x++) {
+            for (int z = minZ; z <= maxZ; z++) {
+                final Block block = player.getWorld().getBlockAt(x, minY, z);
+                if (block.getType().isSolid()) {
+                    return true;
                 }
             }
         }
