@@ -8,8 +8,8 @@ import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateLoreEvent;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateNameEvent;
-import me.mykindos.betterpvp.core.items.enchants.GlowEnchant;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -22,8 +22,11 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Slf4j
 @Singleton
@@ -32,8 +35,6 @@ public class ItemHandler {
     private final ItemRepository itemRepository;
 
     private final HashMap<String, BPVPItem> itemMap = new HashMap<>();
-    private final Enchantment glowEnchantment;
-
 
     @Inject
     @Config(path = "items.hideAttributes", defaultValue = "true")
@@ -46,9 +47,6 @@ public class ItemHandler {
     @Inject
     public ItemHandler(Core core, ItemRepository itemRepository) {
         this.itemRepository = itemRepository;
-
-        glowEnchantment = new GlowEnchant(CoreNamespaceKeys.GLOW_ENCHANTMENT_KEY);
-        registerEnchantment(glowEnchantment);
     }
 
     public void loadItemData(String module) {
@@ -96,7 +94,7 @@ public class ItemHandler {
             }
 
             if (item.isGlowing() || dataContainer.has(CoreNamespaceKeys.GLOW_KEY)) {
-                itemMeta.addEnchant(glowEnchantment, 1, true);
+                UtilItem.addGlow(itemMeta);
             } else {
                 for (Map.Entry<Enchantment, Integer> entry : itemStack.getEnchantments().entrySet()) {
                     itemStack.removeEnchantment(entry.getKey());
@@ -110,7 +108,6 @@ public class ItemHandler {
         }
 
         itemStack.setItemMeta(itemMeta);
-
         return itemStack;
     }
 
@@ -134,21 +131,11 @@ public class ItemHandler {
         for (BPVPItem item : itemMap.values()) {
             if (item.matches(itemStack)) return item;
         }
+
         return null;
     }
 
     public void replaceItem(String identifier, BPVPItem newItem) {
         itemMap.replace(identifier, newItem);
-    }
-
-    private void registerEnchantment(Enchantment enchantment) {
-        try {
-            Field accept = Enchantment.class.getDeclaredField("acceptingNew");
-            accept.setAccessible(true);
-            accept.set(null, true);
-            Enchantment.registerEnchantment(enchantment);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
     }
 }

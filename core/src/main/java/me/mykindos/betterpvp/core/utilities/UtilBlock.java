@@ -4,6 +4,7 @@ import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
@@ -115,25 +116,26 @@ public class UtilBlock {
             return ent.isOnGround();
         }
 
-        // Fix for player ground-spoofing on their clients
-        final BoundingBox box = player.getBoundingBox();
-        Location corner1 = new Location(player.getWorld(), box.getMinX(), box.getMinY() - 0.1, box.getMinZ());
-        Location corner2 = new Location(player.getWorld(), box.getMaxX(), box.getMinY() - 0.1, box.getMaxZ());
-        final BoundingBox checkBox = new BoundingBox(corner1.getX(), corner1.getY(), corner1.getZ(), corner2.getX(), corner2.getY() + 0.001, corner2.getZ());
-
-        // Check if any blocks inside the bounding box are solid
-        for (int x = (int) checkBox.getMinX(); x <= checkBox.getMaxX(); x++) {
-            for (int y = (int) checkBox.getMinY(); y <= checkBox.getMaxY(); y++) {
-                for (int z = (int) checkBox.getMinZ(); z <= checkBox.getMaxZ(); z++) {
-                    Block block = player.getWorld().getBlockAt(x, y, z);
-                    if (solid(block) && checkBox.overlaps(block.getBoundingBox())) {
-                        return true;
-                    }
-                }
-            }
+        final World world = player.getWorld();
+        final BoundingBox reference = player.getBoundingBox();
+        final BoundingBox collisionBox = reference.clone().shift(0, -0.1, 0);
+        Block block = new Location(world, reference.getMinX(), reference.getMinY() - 0.1, reference.getMinZ()).getBlock();
+        if (solid(block) && doesBoundingBoxCollide(collisionBox, block)) {
+            return true;
         }
 
-        return false;
+        block = new Location(world, reference.getMinX(), reference.getMinY() - 0.1, reference.getMaxZ()).getBlock();
+        if (solid(block) && doesBoundingBoxCollide(collisionBox, block)) {
+            return true;
+        }
+
+        block = new Location(world, reference.getMaxX(), reference.getMinY() - 0.1, reference.getMinZ()).getBlock();
+        if (solid(block) && doesBoundingBoxCollide(collisionBox, block)) {
+            return true;
+        }
+
+        block = new Location(world, reference.getMaxX(), reference.getMinY() - 0.1, reference.getMaxZ()).getBlock();
+        return solid(block) && doesBoundingBoxCollide(collisionBox, block);
     }
 
     /**

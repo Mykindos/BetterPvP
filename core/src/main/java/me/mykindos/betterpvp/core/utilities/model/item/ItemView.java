@@ -140,7 +140,7 @@ public class ItemView implements ItemProvider {
         }
 
         if (glow) {
-            UtilItem.addGlow(itemStack);
+            UtilItem.addGlow(meta);
         }
 
         itemStack.setItemMeta(meta);
