@@ -31,6 +31,7 @@ public class UtilEntity {
         List<KeyValue<LivingEntity, EntityProperty>> livingEntities = new ArrayList<>();
         source.getWorld().getLivingEntities().stream()
                 .filter(livingEntity -> {
+                    if(!source.getWorld().getName().equalsIgnoreCase(livingEntity.getWorld().getName())) return false;
                     if (livingEntity.equals(source)) return false;
                     if (livingEntity.getLocation().distance(location) > radius) return false;
                     return !(livingEntity instanceof ArmorStand);
