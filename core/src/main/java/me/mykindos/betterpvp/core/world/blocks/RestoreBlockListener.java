@@ -40,17 +40,17 @@ public class RestoreBlockListener implements Listener {
 
     @EventHandler
     public void onPhysics(BlockFromToEvent event) {
-        if (!UtilBlock.isWater(event.getBlock()) && !UtilBlock.isWater(event.getToBlock())) {
+        final Block block = event.getBlock();
+        if (!UtilBlock.isWater(block) && !UtilBlock.isWater(event.getToBlock())) {
             return; // Not water
         }
 
-        final Block block = event.getBlock();
-        final boolean colliding = addCollidingRestoreBlock(event.getBlock(), block.getRelative(BlockFace.UP))
-                || addCollidingRestoreBlock(event.getBlock(), block.getRelative(BlockFace.DOWN))
-                || addCollidingRestoreBlock(event.getBlock(), block.getRelative(BlockFace.NORTH))
-                || addCollidingRestoreBlock(event.getBlock(), block.getRelative(BlockFace.SOUTH))
-                || addCollidingRestoreBlock(event.getBlock(), block.getRelative(BlockFace.EAST))
-                || addCollidingRestoreBlock(event.getBlock(), block.getRelative(BlockFace.WEST));
+        final boolean colliding = addCollidingRestoreBlock(block, block.getRelative(BlockFace.UP))
+                || addCollidingRestoreBlock(block, block.getRelative(BlockFace.DOWN))
+                || addCollidingRestoreBlock(block, block.getRelative(BlockFace.NORTH))
+                || addCollidingRestoreBlock(block, block.getRelative(BlockFace.SOUTH))
+                || addCollidingRestoreBlock(block, block.getRelative(BlockFace.EAST))
+                || addCollidingRestoreBlock(block, block.getRelative(BlockFace.WEST));
 
         if (colliding) {
             event.setCancelled(true);
