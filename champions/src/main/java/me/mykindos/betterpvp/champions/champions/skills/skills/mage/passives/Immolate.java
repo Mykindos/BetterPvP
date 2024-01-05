@@ -145,9 +145,9 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill {
                     iterator.remove();
                     sendState(player, false);
                 } else {
-                    player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 25, 0));
+                    player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 25, speedStrength));
                     player.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 25, 0));
-                    championsManager.getEffects().addEffect(player, EffectType.STRENGTH, 1, 1250L);
+                    championsManager.getEffects().addEffect(player, EffectType.STRENGTH, strengthStrength, 1250L);
                 }
             } else {
                 iterator.remove();
