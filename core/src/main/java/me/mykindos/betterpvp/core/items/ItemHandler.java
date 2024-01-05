@@ -22,8 +22,11 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Slf4j
 @Singleton
@@ -47,8 +50,7 @@ public class ItemHandler {
     public ItemHandler(Core core, ItemRepository itemRepository) {
         this.itemRepository = itemRepository;
 
-        glowEnchantment = new GlowEnchant(CoreNamespaceKeys.GLOW_ENCHANTMENT_KEY);
-        registerEnchantment(glowEnchantment);
+        glowEnchantment = new GlowEnchant();
     }
 
     public void loadItemData(String module) {
@@ -134,21 +136,11 @@ public class ItemHandler {
         for (BPVPItem item : itemMap.values()) {
             if (item.matches(itemStack)) return item;
         }
+
         return null;
     }
 
     public void replaceItem(String identifier, BPVPItem newItem) {
         itemMap.replace(identifier, newItem);
-    }
-
-    private void registerEnchantment(Enchantment enchantment) {
-        try {
-            Field accept = Enchantment.class.getDeclaredField("acceptingNew");
-            accept.setAccessible(true);
-            accept.set(null, true);
-            Enchantment.registerEnchantment(enchantment);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
     }
 }

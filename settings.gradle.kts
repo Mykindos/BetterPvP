@@ -34,7 +34,7 @@ dependencyResolutionManagement {
         create("libs") {
             // Versions
             version("kotlin", "1.8.20")
-            version("paper", "1.20.2-R0.1-SNAPSHOT")
+            version("paper", "1.20.4-R0.1-SNAPSHOT")
             version("paperweight", "1.5.11")
             version("invui", "1.23")
             version("jackson", "2.15.3")

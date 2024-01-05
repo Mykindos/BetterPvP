@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.items.enchants;
 
 import io.papermc.paper.enchantments.EnchantmentRarity;
+import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import net.kyori.adventure.text.Component;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
@@ -13,10 +14,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Set;
 
 public class GlowEnchant extends Enchantment {
-
-    public GlowEnchant(@NotNull NamespacedKey key) {
-        super(key);
-    }
 
     @Override
     public @NotNull String getName() {
@@ -99,5 +96,10 @@ public class GlowEnchant extends Enchantment {
     @Override
     public @NotNull String translationKey() {
         return "enchants.glow";
+    }
+
+    @Override
+    public @NotNull NamespacedKey getKey() {
+        return CoreNamespaceKeys.GLOW_ENCHANTMENT_KEY;
     }
 }
