@@ -94,7 +94,10 @@ public class HoldPosition extends Skill implements InteractSkill, CooldownSkill,
     public void activate(Player player, int level) {
         championsManager.getEffects().addEffect(player, EffectType.RESISTANCE, resistanceStrength - 1, (long) getDuration(level) * 1000);
         player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, (int) (getDuration(level) * 20), resistanceStrength));
-        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) getDuration(level), slownessStrength));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) getDuration(level) * 20, slownessStrength));
+        championsManager.getEffects().addEffect(player, EffectType.NO_JUMP, (long) getDuration(level) * 1000);
+        championsManager.getEffects().addEffect(player, EffectType.NO_SPRINT, (long) getDuration(level) * 1000);
+
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1F, 0.5F);
     }
 

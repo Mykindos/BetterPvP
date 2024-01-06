@@ -21,7 +21,8 @@ public enum EffectType {
     TEXTURELOADING(false),
     IMMUNETOEFFECTS(false),
     LEVITATION(true),
-    NO_JUMP(false);
+    NO_JUMP(false),
+    NO_SPRINT(false);
 
     final boolean isNegative;
 

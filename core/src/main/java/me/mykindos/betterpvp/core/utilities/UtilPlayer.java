@@ -65,6 +65,7 @@ public class UtilPlayer {
         player.getWorld().getPlayers().stream()
                 .filter(worldPlayer -> {
                     if (worldPlayer.equals(player)) return false;
+                    if (!worldPlayer.getWorld().getName().equalsIgnoreCase(location.getWorld().getName())) return false;
                     return !(worldPlayer.getLocation().distance(location) > radius);
                 })
                 .forEach(ent -> players.add(new KeyValue<>(ent, entityProperty)));
@@ -139,8 +140,8 @@ public class UtilPlayer {
 
         final List<WrappedDataValue> wrappedDataValueList = new ArrayList<>();
 
-        for(final WrappedWatchableObject entry : watcher.getWatchableObjects()) {
-            if(entry == null) continue;
+        for (final WrappedWatchableObject entry : watcher.getWatchableObjects()) {
+            if (entry == null) continue;
 
             final WrappedDataWatcher.WrappedDataWatcherObject watcherObject = entry.getWatcherObject();
             wrappedDataValueList.add(

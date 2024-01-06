@@ -163,8 +163,8 @@ public class BuildRepository implements IRepository<RoleBuild> {
             setSkill(assassin, SkillType.PASSIVE_B, "Smoke Bomb", 3);
 
             RoleBuild brute = new RoleBuild(uuid, Role.valueOf("BRUTE"), d);
-            setSkill(brute, SkillType.SWORD, "Takedown", 5);
-            setSkill(brute, SkillType.AXE, "Seismic Slam", 3);
+            setSkill(brute, SkillType.SWORD, "Flesh Hook", 3);
+            setSkill(brute, SkillType.AXE, "Seismic Slam", 5);
             setSkill(brute, SkillType.PASSIVE_A, "Colossus", 1);
             setSkill(brute, SkillType.PASSIVE_B, "Stampede", 3);
 
