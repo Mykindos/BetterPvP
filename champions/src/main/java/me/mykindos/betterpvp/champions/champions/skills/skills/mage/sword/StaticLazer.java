@@ -316,7 +316,7 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
 
                 if (isHolding(player)) {
                     shoot(player, (float) charge.getCharge(), level);
-                    charging.remove(player);
+                    iterator.remove();
                 }
             }
         }
