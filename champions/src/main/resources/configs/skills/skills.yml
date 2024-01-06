@@ -134,7 +134,6 @@ skills:
       maxlevel: 5
       cooldown: 15.0
       duration: 1.25
-      internalCD: 0.5
       forcedDamageDelay: 400
       cooldownDecreasePerLevel: 1.0
       internalCooldown: 0.5
