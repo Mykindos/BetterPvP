@@ -82,7 +82,7 @@ public class WeaponListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onWeaponActivate(PlayerInteractEvent event) {
-        if (event.getHand() == EquipmentSlot.OFF_HAND) {
+        if (event.getHand() == EquipmentSlot.OFF_HAND || !event.getAction().isRightClick()) {
             return; // Only main hand and right click
         }
 

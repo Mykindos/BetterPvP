@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -45,7 +46,7 @@ public class Thorns extends Skill implements PassiveSkill, Listener {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Enemies take <val>" + getDamage(level) + "</val> damage when",
+                "Enemies take <val>" + UtilFormat.formatNumber(getDamage(level)) + "</val> damage when",
                 "they hit you using a melee attack",
                 "",
                 "Internal Cooldown: <stat>" + internalCooldown

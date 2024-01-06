@@ -709,7 +709,8 @@ skills:
       cooldownDecreasePerLevel: 1.0
       durationIncreasePerLevel: 1.0
       baseDamageReduction: 0.6
-      damageReduction: 0.6
+      damageReductionIncreasePerLevel: 0.0
+      speedStrength: 1
     wolvesfury:
       enabled: true
       maxlevel: 5

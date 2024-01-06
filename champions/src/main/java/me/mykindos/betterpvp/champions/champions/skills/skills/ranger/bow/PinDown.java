@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -72,14 +73,17 @@ public class PinDown extends PrepareArrowSkill {
 
     @Override
     public void activate(Player player, int level) {
-        UtilInventory.remove(player, Material.ARROW, 1);
 
-        Arrow proj = player.launchProjectile(Arrow.class);
-        arrows.add(proj);
+        if (championsManager.getCooldowns().use(player, getName(), getCooldown(level), true, true, true, false)) {
+            UtilInventory.remove(player, Material.ARROW, 1);
 
-        proj.setVelocity(player.getLocation().getDirection().multiply(1.6D));
-        player.getWorld().playEffect(player.getLocation(), Effect.BOW_FIRE, 0);
-        player.getWorld().playEffect(player.getLocation(), Effect.BOW_FIRE, 0);
+            Arrow proj = player.launchProjectile(Arrow.class);
+            arrows.add(proj);
+
+            proj.setVelocity(player.getLocation().getDirection().multiply(1.6D));
+            player.getWorld().playEffect(player.getLocation(), Effect.BOW_FIRE, 0);
+            player.getWorld().playEffect(player.getLocation(), Effect.BOW_FIRE, 0);
+        }
     }
 
     @Override

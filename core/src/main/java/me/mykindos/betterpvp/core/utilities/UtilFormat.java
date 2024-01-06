@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 public class UtilFormat {
 
-    private static final DecimalFormat FORMATTER = new DecimalFormat("#,###");
+    private static final DecimalFormat FORMATTER = new DecimalFormat("#,##");
     public static final char COLOR_CHAR = '\u00A7';
     private static final Pattern STRIP_COLOR_PATTERN = Pattern.compile("(?i)" + String.valueOf(COLOR_CHAR) + "[0-9A-FK-ORX]");
 
@@ -35,6 +35,10 @@ public class UtilFormat {
     }
 
     public static String formatNumber(int num) {
+        return FORMATTER.format(num);
+    }
+
+    public static String formatNumber(double num) {
         return FORMATTER.format(num);
     }
 
