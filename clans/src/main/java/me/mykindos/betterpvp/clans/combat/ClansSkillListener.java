@@ -53,7 +53,7 @@ public class ClansSkillListener implements Listener {
         if (!(event.getSource() instanceof Player player)) return;
         event.getEntities().forEach(entity -> {
             if (!(entity.getKey() instanceof Player target)) return;
-            boolean isAlly = clanManager.isAlly(player, target);
+            boolean isAlly = clanManager.isAlly(player, target); // TODO investigate
 
             entity.setValue(isAlly ? EntityProperty.FRIENDLY : EntityProperty.ENEMY);
         });
@@ -61,6 +61,10 @@ public class ClansSkillListener implements Listener {
         event.getEntities().removeIf(entity -> {
             if (entity.getKey() instanceof Player target) {
                 if (target.getGameMode() == GameMode.CREATIVE || target.getGameMode() == GameMode.SPECTATOR) {
+                    return true;
+                }
+
+                if(!clanManager.canHurt(player, target)) {
                     return true;
                 }
 
