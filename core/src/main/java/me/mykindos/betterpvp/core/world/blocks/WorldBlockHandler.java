@@ -14,9 +14,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.Container;
 import org.bukkit.block.data.BlockData;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -24,31 +22,56 @@ import java.util.Optional;
 public class WorldBlockHandler {
 
     @Getter
-    private final List<RestoreBlock> restoreBlocks;
-    private final Core core;
-
+    private final Map<Block, RestoreBlock> restoreBlocks = new HashMap<>();
+    @Getter
+    private final Map<Runnable, Long> scheduledBlocks = new HashMap<>();
     @Inject
-    public WorldBlockHandler(Core core) {
-        this.core = core;
-        this.restoreBlocks = new ArrayList<>();
-    }
+    private Core core;
 
     public void addRestoreBlock(Block block, Material newMaterial, long expiry) {
+        addRestoreBlock(block, newMaterial, expiry, true);
+    }
+
+    /**
+     * Adds a block to be restored
+     * @param block Block to restore
+     * @param newMaterial Material to restore to
+     * @param expiry Time in milliseconds to restore
+     * @param force Whether to override an existing restore block's expiry or choose the higher value
+     */
+    public void addRestoreBlock(Block block, Material newMaterial, long expiry, boolean force) {
         Optional<RestoreBlock> restoreBlockOptional = getRestoreBlock(block);
-        if(restoreBlockOptional.isPresent()) {
+        if (restoreBlockOptional.isPresent()) {
+            final long newExpiry = System.currentTimeMillis() + expiry;
             RestoreBlock restoreBlock = restoreBlockOptional.get();
-            restoreBlock.setExpire(System.currentTimeMillis() + expiry);
-        }else{
-            restoreBlocks.add(new RestoreBlock(block, newMaterial, expiry));
+            restoreBlock.setExpire(force ? newExpiry : Math.max(restoreBlock.getExpire(), newExpiry));
+        } else {
+            restoreBlocks.put(block, new RestoreBlock(block, newMaterial, expiry));
         }
     }
 
+    public void scheduleRestoreBlock(Block block, Material newMaterial, long delay, long expiry) {
+        scheduleRestoreBlock(block, newMaterial, delay, expiry, true);
+    }
+
+    /**
+     * Adds a block to be restored after a delay
+     * @param block Block to restore
+     * @param newMaterial Material to restore to
+     * @param delay Delay in milliseconds
+     * @param expiry Time in milliseconds to restore
+     * @param force Whether to override an existing restore block's expiry or choose the higher value
+     */
+    public void scheduleRestoreBlock(Block block, Material newMaterial, long delay, long expiry, boolean force) {
+        this.scheduledBlocks.put(() -> addRestoreBlock(block, newMaterial, expiry, force), System.currentTimeMillis() + delay);
+    }
+
     public boolean isRestoreBlock(Block block) {
-        return restoreBlocks.stream().anyMatch(restoreBlock -> restoreBlock.getBlock().getLocation().equals(block.getLocation()));
+        return restoreBlocks.containsKey(block);
     }
 
     public Optional<RestoreBlock> getRestoreBlock(Block block) {
-        return restoreBlocks.stream().filter(restoreBlock -> restoreBlock.getBlock().getLocation().equals(block.getLocation())).findFirst();
+        return Optional.ofNullable(restoreBlocks.get(block));
     }
 
     public void outlineChunk(Chunk chunk) {
@@ -71,5 +94,4 @@ public class WorldBlockHandler {
         Bukkit.getOnlinePlayers().forEach(player -> player.sendMultiBlockChange(outline));
         UtilServer.runTaskLater(core, () -> Bukkit.getOnlinePlayers().forEach(player -> player.sendMultiBlockChange(original)), 60 * 20L);
     }
-
 }

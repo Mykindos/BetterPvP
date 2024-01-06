@@ -14,9 +14,12 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -208,6 +211,30 @@ public class UtilLocation {
         return reference.clone().add(direction);
     }
 
+    /**
+     * Get all surface blocks in a box within a certain radius of a {@link Location}.
+     *
+     * @param center The center location for the circle
+     * @param radius The radius of the circle
+     * @return A {@link Map} of blocks and their distance from the center
+     * @see #getClosestSurfaceBlock(Location, boolean)
+     */
+    public static List<Block> getBoxSurfaceBlocks(final Location center, final double radius, final double height) {
+        Preconditions.checkState(radius > 0, "Radius must be greater than 0");
+        final List<Block> blocks = new ArrayList<>();
+
+        // Loop through all blocks in the radius within the same y-level as the center and get the closest surface block
+        for (double x = -radius; x <= radius; x++) {
+            for (double z = -radius; z <= radius; z++) {
+                // Block at the same height as the center
+                final Location blockLocation = center.clone().add(x, 0, z);
+                // If there is a surface block, add it to the list
+                getClosestSurfaceBlock(blockLocation, height, false).map(Location::getBlock).ifPresent(blocks::add);
+            }
+        }
+        return blocks;
+    }
+
 
     /**
      * Get the closest surface block relative to a {@link Location}.
@@ -281,7 +308,7 @@ public class UtilLocation {
      * @param coordinates A list of a 3 strings, with x, y, z coordinates  Accepts `~` notation in the front. Acceptable inputs: ["0", "0", "0"], gives the location 0, 0, 0 and ["~", "~1", "~0"], which gives the location initialLocation.x, initalLocation.y + 1, initialLocation.z.
      * @return the Location calculated
      */
-    public static Location getTeleportLocation (Location initialLocation, String[] coordinates) {
+    public static Location getTeleportLocation(Location initialLocation, String[] coordinates) {
         double x = 0, y = 0, z = 0;
         Location location = initialLocation.getWorld().getSpawnLocation();
         if (coordinates.length == 3) {
