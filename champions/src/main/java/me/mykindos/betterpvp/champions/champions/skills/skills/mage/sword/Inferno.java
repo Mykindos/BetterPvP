@@ -125,7 +125,7 @@ public class Inferno extends ChannelSkill implements InteractSkill, EnergySkill 
     }
 
     @UpdateEvent
-    public void Update() {
+    public void update() {
         final Iterator<UUID> iterator = active.iterator();
         while (iterator.hasNext()) {
             Player cur = Bukkit.getPlayer(iterator.next());

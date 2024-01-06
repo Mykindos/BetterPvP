@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
@@ -33,7 +34,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class DefensiveStance extends ChannelSkill implements InteractSkill, EnergySkill {
+public class DefensiveStance extends ChannelSkill implements CooldownSkill, InteractSkill, EnergySkill {
 
     private final WeakHashMap<Player, Long> gap = new WeakHashMap<>();
 
@@ -44,6 +45,8 @@ public class DefensiveStance extends ChannelSkill implements InteractSkill, Ener
     private double baseDamageReduction;
 
     private double damageReductionPerLevel;
+
+    private double internalCooldown;
 
     private boolean blocksMelee;
 
@@ -145,26 +148,24 @@ public class DefensiveStance extends ChannelSkill implements InteractSkill, Ener
                 continue;
             }
 
+
             Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
             if (!gamer.isHoldingRightClick()) {
-                int level = getLevel(player);
-                if (level <= 0) {
-                    iterator.remove();
-                } else if (!championsManager.getEnergy().use(player, getName(), getEnergy(level) / 2, true)) {
-                    iterator.remove();
-                } else if (!isHolding(player)) {
-                    iterator.remove();
-                } else {
-                    player.getWorld().playEffect(player.getLocation(), Effect.STEP_SOUND, 20);
-                }
-            } else {
-                if (gap.containsKey(player)) {
-                    if (UtilTime.elapsed(gap.get(player), 250)) {
-                        iterator.remove();
-                        gap.remove(player);
-                    }
-                }
+                iterator.remove();
+                continue;
             }
+
+            int level = getLevel(player);
+            if (level <= 0) {
+                iterator.remove();
+            } else if (!championsManager.getEnergy().use(player, getName(), getEnergy(level) / 2, true)) {
+                iterator.remove();
+            } else if (!isHolding(player)) {
+                iterator.remove();
+            } else {
+                player.getWorld().playEffect(player.getLocation(), Effect.STEP_SOUND, 20);
+            }
+
         }
 
     }
@@ -177,12 +178,8 @@ public class DefensiveStance extends ChannelSkill implements InteractSkill, Ener
     }
 
     @Override
-    public void activate(Player p, int level) {
-        if (!active.contains(p.getUniqueId())) {
-            active.add(p.getUniqueId());
-            gap.put(p, System.currentTimeMillis());
-
-        }
+    public void activate(Player player, int level) {
+        active.add(player.getUniqueId());
     }
 
     @Override
@@ -191,12 +188,20 @@ public class DefensiveStance extends ChannelSkill implements InteractSkill, Ener
     }
 
     @Override
+    public double getCooldown(int level) {
+        return internalCooldown;
+    }
+
+    @Override
     public void loadSkillConfig() {
         baseDamage = getConfig("baseDamage", 2.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
         baseDamageReduction = getConfig("baseDamageReduction", 1.0, Double.class);
         damageReductionPerLevel = getConfig("damageReductionPerLevel", 0.0, Double.class);
+        internalCooldown = getConfig("internalCooldown", 0.5, Double.class);
         blocksMelee = getConfig("blocksMelee", true, Boolean.class);
         blocksArrow = getConfig("blocksArrow", false, Boolean.class);
     }
+
+
 }
