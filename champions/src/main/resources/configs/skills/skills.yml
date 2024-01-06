@@ -147,7 +147,7 @@ skills:
       cooldownDecreasePerLevel: 1.0
       multiplierIncreasePerLevel: 0.2
     ride:
-      enabled: false
+      enabled: true
       cooldown: 30.0
       maxlevel: 5
       lifespan: 2.0
