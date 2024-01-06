@@ -307,7 +307,7 @@ public class Leech extends PrepareSkill implements CooldownSkill {
         leachedHealthIncreasePerLevel = getConfig("leachedHealthIncreasePerLevel", 0.0, Double.class);
 
         baseMaxRangeFromCaster = getConfig("baseMaxRangeFromCaster", 21.0, Double.class);
-        maxRangeFromCasterIncreasePerLevel = getConfig("baseMaxRangeFromCaster", 0.0, Double.class);
+        maxRangeFromCasterIncreasePerLevel = getConfig("maxRangeFromCasterIncreasePerLevel", 0.0, Double.class);
     }
 
     @Data
