@@ -401,6 +401,7 @@ skills:
       durationIncreasePerLevel: 0.0
       baseRadius: 6.0
       radiusIncreasePerLevel: 1.0
+      internalCooldown: 0.5
     blizzard:
       enabled: true
       maxlevel: 5
