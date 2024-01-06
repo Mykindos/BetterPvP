@@ -251,6 +251,7 @@ skills:
       blocksMelee: true
       blocksArrow: false
       energyDecreasePerLevel: 1.0
+      internalCooldown: 1.0
     powerchop:
       enabled: true
       maxlevel: 5
@@ -401,7 +402,6 @@ skills:
       durationIncreasePerLevel: 0.0
       baseRadius: 6.0
       radiusIncreasePerLevel: 1.0
-      internalCooldown: 0.5
     blizzard:
       enabled: true
       maxlevel: 5
