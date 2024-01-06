@@ -377,7 +377,7 @@ public class CombatListener implements Listener {
         return damageDataList.stream().anyMatch(damageData -> {
             if (damageData.getUuid().equalsIgnoreCase(damagee.getUniqueId().toString())
                     && damageData.getCause() == cause) {
-                if (damager == null) {
+                if (damager == null || damageData.getDamager() == null) {
                     return true;
                 } else {
                     return damageData.getDamager().equalsIgnoreCase(damager.getUniqueId().toString());
