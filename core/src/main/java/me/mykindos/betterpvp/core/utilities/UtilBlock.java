@@ -82,7 +82,10 @@ public class UtilBlock {
     public static boolean isWater(Block block) {
         return block.getType() == Material.WATER
                 || block.getType() == Material.BUBBLE_COLUMN
-                || block.getType() == Material.SEAGRASS;
+                || block.getType() == Material.SEAGRASS
+                || block.getType() == Material.TALL_SEAGRASS
+                || block.getType() == Material.KELP
+                || block.getType() == Material.KELP_PLANT;
     }
 
     /**

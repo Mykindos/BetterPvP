@@ -1,9 +1,12 @@
 package me.mykindos.betterpvp.core.world.blocks;
 
 import lombok.Data;
+import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.plugin.java.JavaPlugin;
 
 
 @Data
@@ -27,6 +30,8 @@ public class RestoreBlock {
 
     public void restore() {
         block.setBlockData(blockData);
+        // Update nearby blocks
+        UtilServer.runTaskLater(JavaPlugin.getPlugin(Core.class), () -> block.getState().update(false, true), 1L);
     }
 
 }
