@@ -199,12 +199,9 @@ skills:
       enabled: true
       maxlevel: 3
       cooldown: 12.0
-      duration: 1.0
-      bonusDamage: 1.0
-      healing: 1.0
       bonusDamageDuration: 2.0
       cooldownDecreasePerLevel: 1.5
-      baseDuration: 0.75
+      baseDuration: 1.0
       durationIncreasePerLevel: 0.0
       baseBonusDamageDuration: 2.0
       bonusDamageDurationIncreasePerLevel: 0.0
@@ -329,7 +326,7 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 23.0
-      speed: 2.0
+      speed: 0.5
       damage: 6.0
       cooldownDecreasePerLevel: 2.0
       baseDamage: 6.0
