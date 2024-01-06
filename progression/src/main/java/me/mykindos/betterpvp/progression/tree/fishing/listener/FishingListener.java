@@ -69,11 +69,11 @@ public class FishingListener implements Listener {
 
     @Inject
     @Config(path = "fishing.minWaitTime", defaultValue = "5.0")
-    private double minWaitTime = 5;
+    private double minWaitTime;
 
     @Inject
     @Config(path = "fishing.maxWaitTime", defaultValue = "20.0")
-    private double maxWaitTime = 20;
+    private double maxWaitTime;
 
     private int animatedDot = 1;
     private int direction = 1;

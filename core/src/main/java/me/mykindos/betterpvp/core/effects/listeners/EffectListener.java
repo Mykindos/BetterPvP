@@ -25,6 +25,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.PlayerToggleSprintEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -301,5 +302,12 @@ public class EffectListener implements Listener {
         }
 
         target.setFireTicks(0);
+    }
+
+    @EventHandler
+    public void onSprint(PlayerToggleSprintEvent event) {
+        if(effectManager.hasEffect(event.getPlayer(), EffectType.NO_SPRINT)){
+            event.getPlayer().setSprinting(false);
+        }
     }
 }
