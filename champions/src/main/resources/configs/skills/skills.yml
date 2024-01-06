@@ -849,10 +849,8 @@ skills:
       rangeIncreasePerLevel: 0.0
       baseLeechedHealth: 1.0
       leachedHealthIncreasePerLevel: 0.0
-      baseMaxRangeFromCaster: 21.0
-      range: 7
       leechedHealth: 1.0
-      maxRangeFromCaster: 21
+      maxRangeFromCaster: 20
     wreath:
       enabled: true
       maxlevel: 5
