@@ -115,13 +115,23 @@ public class LeaderboardMenu<E, T> extends AbstractGui implements Windowed {
                     .lore(UtilMessage.DIVIDER)
                     .build();
 
+            final ItemView loading = ItemView.builder().material(Material.PAPER)
+                    .displayName(title)
+                    .lore(UtilMessage.DIVIDER)
+                    .lore(Component.empty())
+                    .lore(Component.text("           LOADING...", NamedTextColor.RED, TextDecoration.BOLD))
+                    .lore(Component.empty())
+                    .lore(UtilMessage.DIVIDER)
+                    .build();
+
             final int index = standing - 1;
             setItem(slot, new LeaderboardEntryButton<>(() -> {
                 if (index >= entries.size()) {
                     return null;
                 }
-                return entries.get(index);
-            }, failed, title));
+                final LeaderboardEntry<E, T> etLeaderboardEntry = entries.get(index);
+                return CompletableFuture.completedFuture(etLeaderboardEntry);
+            }, loading, failed, title));
         }
 
         // Podium indicators

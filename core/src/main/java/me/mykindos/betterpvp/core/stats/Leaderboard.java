@@ -139,7 +139,7 @@ public abstract class Leaderboard<E, T> {
      * @param value The value to get the description for.
      * @return The description of the given value.
      */
-    public Description getDescription(SearchOptions searchOptions, LeaderboardEntry<E, T> value) {
+    public CompletableFuture<Description> getDescription(SearchOptions searchOptions, LeaderboardEntry<E, T> value) {
         validate(searchOptions);
         return describe(searchOptions, value);
     }
@@ -150,7 +150,7 @@ public abstract class Leaderboard<E, T> {
      * @param value The value to get the description for.
      * @return The description of the given value.
      */
-    protected abstract Description describe(SearchOptions searchOptions, LeaderboardEntry<E, T> value);
+    protected abstract CompletableFuture<Description> describe(SearchOptions searchOptions, LeaderboardEntry<E, T> value);
 
     /**
      * @return The top entries in the leaderboard of type T.

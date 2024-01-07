@@ -43,10 +43,6 @@ public class LeaderboardEntryButton<E, T> extends ControlItem<LeaderboardMenu<E,
         this.failed = failed;
     }
 
-    public LeaderboardEntryButton(Supplier<LeaderboardEntry<E, T>> entrySupplier, ItemProvider failed, final Component title) {
-        this(() -> CompletableFuture.completedFuture(entrySupplier.get()), null, failed, title);
-    }
-
     public CompletableFuture<LeaderboardEntry<E, T>> getCurrentEntry() {
         return entrySupplier.get();
     }
@@ -70,7 +66,14 @@ public class LeaderboardEntryButton<E, T> extends ControlItem<LeaderboardMenu<E,
             return failed;
         }
 
-        final Description description = gui.getLeaderboard().getDescription(gui.getSearchOptions(), currentEntry);
+        final CompletableFuture<Description> descriptionFuture = gui.getLeaderboard().getDescription(gui.getSearchOptions(), currentEntry);
+        if (!descriptionFuture.isDone()) {
+            // Update the GUI when the description is loaded
+            descriptionFuture.thenAccept(desc -> notifyWindows());
+            return loading;
+        }
+
+        final Description description = descriptionFuture.get();
         final ItemStack itemStack = description.getIcon().get();
         final ItemMeta meta = itemStack.getItemMeta();
 
@@ -106,8 +109,12 @@ public class LeaderboardEntryButton<E, T> extends ControlItem<LeaderboardMenu<E,
         }
 
         final LeaderboardEntry<E, T> currentEntry = future.get();
-        final Description description = getGui().getLeaderboard().getDescription(getGui().getSearchOptions(), currentEntry);
-        final Consumer<Click> clickFunction = description.getClickFunction();
+        final CompletableFuture<Description> descriptionFuture = getGui().getLeaderboard().getDescription(getGui().getSearchOptions(), currentEntry);
+        if (!descriptionFuture.isDone()) {
+            return; // Do nothing if the description hasn't loaded
+        }
+
+        final Consumer<Click> clickFunction = descriptionFuture.get().getClickFunction();
         if (clickFunction == null) {
             return; // Otherwise, do nothing
         }

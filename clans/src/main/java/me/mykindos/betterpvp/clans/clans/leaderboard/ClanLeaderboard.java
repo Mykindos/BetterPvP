@@ -62,7 +62,7 @@ public class ClanLeaderboard extends Leaderboard<UUID, Clan> implements Sorted {
     }
 
     @Override
-    public Description describe(SearchOptions searchOptions, LeaderboardEntry<UUID, Clan> entry) {
+    public CompletableFuture<Description> describe(SearchOptions searchOptions, LeaderboardEntry<UUID, Clan> entry) {
         final Clan clan = entry.getValue();
         final Description.DescriptionBuilder builder = Description.builder();
         final ItemStack banner = clan.getBanner().get();
@@ -85,7 +85,7 @@ public class ClanLeaderboard extends Leaderboard<UUID, Clan> implements Sorted {
             final NamedTextColor color = sort == selected ? NamedTextColor.GREEN : NamedTextColor.GRAY;
             map.put(sort.getName(), Component.text(text, color));
         }
-        return builder.properties(map).build();
+        return CompletableFuture.completedFuture(builder.properties(map).build());
     }
 
     @Override
