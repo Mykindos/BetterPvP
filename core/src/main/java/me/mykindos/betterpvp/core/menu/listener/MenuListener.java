@@ -39,7 +39,11 @@ public class MenuListener implements Listener {
 
         final Player player = (Player) event.getWhoClicked();
         final int slot = event.getSlot();
-        final AbstractSingleWindow window = (AbstractSingleWindow) WindowManager.getInstance().getOpenWindow(player);
+        final Window open = WindowManager.getInstance().getOpenWindow(player);
+
+        if (!(open instanceof AbstractSingleWindow window) || event.getClickedInventory() == event.getView().getBottomInventory()) {
+            return;
+        }
 
         double cooldown = 0.05;
         final AbstractGui gui = window.getGui();
