@@ -504,6 +504,7 @@ skills:
       damage: 5.0
       cooldownDecreasePerLevel: 2.0
       damageIncreasePerLevel: 2.0
+      slamDelay: 500
     cripplingblow:
       enabled: true
       maxlevel: 3

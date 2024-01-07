@@ -55,6 +55,7 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
     private double damage;
     public double damageIncreasePerLevel;
     public double cooldownDecreasePerLevel;
+    public int slamDelay;
 
     @Inject
     public SeismicSlam(Champions champions, ChampionsManager championsManager) {
@@ -92,25 +93,27 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
     @UpdateEvent
     public void onUpdate() {
         Iterator<UUID> iterator = active.iterator();
+        List<UUID> toRemove = new ArrayList<>();
+
         while (iterator.hasNext()) {
             UUID uuid = iterator.next();
-
             Player player = Bukkit.getPlayer(uuid);
+
             if (player != null) {
-                // Get the block 0.25 blocks below the player
-                Block blockBelow = player.getLocation().subtract(0, 0.75, 0).getBlock();
+                long activationTime = height.getOrDefault(player, 0L);
+                boolean timeElapsed = UtilTime.elapsed(activationTime, slamDelay);
+                boolean isPlayerGrounded = UtilBlock.isGrounded(player) || player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType().isSolid();
 
-                if (player.isDead() || !UtilTime.elapsed(height.get(player), 500) || !UtilBlock.isGrounded(player) || !blockBelow.getType().isSolid()) {
-                    continue;
+                if (timeElapsed && isPlayerGrounded) {
+                    slam(player);
+                    toRemove.add(uuid);
                 }
-
-                slam(player);
-                iterator.remove();
-            } else {
-                iterator.remove();
             }
         }
+
+        toRemove.forEach(active::remove);
     }
+
 
 
     public void slam(final Player player) {
@@ -194,5 +197,6 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
         damage = getConfig("damage", 5.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 2.0, Double.class);
         cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 2.0, Double.class);
+        slamDelay = getConfig("slamDelay",500, Integer.class);
     }
 }
