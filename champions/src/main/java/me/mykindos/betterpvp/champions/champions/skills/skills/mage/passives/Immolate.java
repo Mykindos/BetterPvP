@@ -13,11 +13,12 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -35,15 +36,12 @@ import java.util.UUID;
 public class Immolate extends ActiveToggleSkill implements EnergySkill {
 
     private double baseFireTickDuration;
-
     private double fireTickDurationIncreasePerLevel;
-
     private double baseFireTrailDuration;
-
     private double fireTrailDurationIncreasePerLevel;
-
     private int speedStrength;
-
+    private int strengthStrength;
+    private double energyDecreasePerLevel;
     @Inject
     public Immolate(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -61,10 +59,10 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill {
                 "Drop your Sword / Axe to toggle",
                 "",
                 "Ignite yourself in flaming fury, gaining",
-                "<effect>Speed " + UtilFormat.getRomanNumeral(speedStrength + 1) + "</effect> and <effect>Fire Resistance</effect>",
+                "<effect>Speed "+ UtilFormat.getRomanNumeral(speedStrength + 1) + "</effect>, <effect>Strength " + UtilFormat.getRomanNumeral(strengthStrength) + " </effect> and <effect>Fire Resistance",
                 "",
                 "You leave a trail of fire, which",
-                "burns players that go near it for <stat>" + getFireTickDuration(level) + "</stat> seconds",
+                "ignites enemies for <stat>" + getFireTickDuration(level) + "</stat> seconds",
                 "",
                 "Energy / Second: <val>" + getEnergy(level)
 
@@ -96,8 +94,6 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill {
 
     @UpdateEvent(delay = 1000)
     public void audio() {
-
-
         for (UUID uuid : active) {
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
@@ -118,8 +114,6 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill {
                 championsManager.getThrowables().addThrowable(throwableItem);
 
                 fire.setVelocity(new Vector((Math.random() - 0.5D) / 3.0D, Math.random() / 3.0D, (Math.random() - 0.5D) / 3.0D));
-
-
             }
         }
     }
@@ -134,11 +128,8 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill {
         int level = getLevel(damager);
         e.getCollision().setFireTicks((int) (getFireTickDuration(level) * 20));
     }
-
-
     @UpdateEvent
     public void checkActive() {
-
         Iterator<UUID> iterator = active.iterator();
         while (iterator.hasNext()) {
             UUID uuid = iterator.next();
@@ -157,20 +148,31 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill {
                 } else {
                     player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 25, speedStrength));
                     player.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 25, 0));
+                    championsManager.getEffects().addEffect(player, EffectType.STRENGTH, strengthStrength, 1250L);
                 }
             } else {
                 iterator.remove();
             }
         }
-
     }
-
+    
+    @UpdateEvent(delay = 100)
+    public void createFireParticles() {
+        for (UUID uuid : active) {
+            Player player = Bukkit.getPlayer(uuid);
+            if (player != null) {
+                World world = player.getWorld();
+                Location location = player.getLocation();
+                int particleCount = 10;
+                world.spawnParticle(Particle.FLAME, location, particleCount, 0.5, 0.5, 0.5, 0.05);
+            }
+        }
+    }
 
     @Override
     public SkillType getType() {
         return SkillType.PASSIVE_B;
     }
-
 
     @Override
     public float getEnergy(int level) {
@@ -180,14 +182,18 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill {
     @Override
     public void toggle(Player player, int level) {
         if (active.contains(player.getUniqueId())) {
+
             active.remove(player.getUniqueId());
+
+            player.removePotionEffect(PotionEffectType.SPEED);
+            player.removePotionEffect(PotionEffectType.FIRE_RESISTANCE);
+            championsManager.getEffects().removeEffect(player, EffectType.STRENGTH);
             sendState(player, false);
         } else {
             if (championsManager.getEnergy().use(player, getName(), 10, false)) {
                 active.add(player.getUniqueId());
                 sendState(player, true);
             }
-
         }
     }
 
@@ -199,10 +205,10 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill {
     public void loadSkillConfig() {
         baseFireTickDuration = getConfig("baseFireTickDuration", 4.0, Double.class);
         fireTickDurationIncreasePerLevel = getConfig("fireTickDurationIncreasePerLevel", 0.0, Double.class);
-
         baseFireTrailDuration = getConfig("baseFireTrailDuration", 2.0, Double.class);
         fireTrailDurationIncreasePerLevel = getConfig("fireTrailDurationIncreasePerLevel", 0.0, Double.class);
-
-        speedStrength = getConfig("speedStrength", 1, Integer.class);
+        speedStrength = getConfig("speedStrength", 0, Integer.class);
+        strengthStrength = getConfig("speedStrength", 1, Integer.class);
+        energyDecreasePerLevel = getConfig("energyDecreasePerLevel", 1.0, Double.class);
     }
 }
