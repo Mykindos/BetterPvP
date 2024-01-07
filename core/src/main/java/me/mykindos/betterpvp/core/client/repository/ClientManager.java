@@ -1,7 +1,7 @@
 package me.mykindos.betterpvp.core.client.repository;
 
+import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.github.benmanes.caffeine.cache.Scheduler;
 import com.google.inject.Inject;
@@ -23,7 +23,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -40,9 +39,8 @@ import java.util.stream.Collectors;
 public class ClientManager extends PlayerManager<Client> {
 
     public static final long TIME_TO_LIVE = TimeUnit.MINUTES.toMillis(5);
-    public static final Object CACHE_DUMMY = new Object();
 
-    private final LoadingCache<Client, Object> store; // supposedly thread-safe?
+    private final Cache<UUID, Client> store; // supposedly thread-safe?
     private final ClientSQLLayer sqlLayer;
     private final ClientRedisLayer redisLayer;
     private final Redis redis;
@@ -62,20 +60,20 @@ public class ClientManager extends PlayerManager<Client> {
         this.store = Caffeine.newBuilder()
                 .scheduler(Scheduler.systemScheduler())
                 .expireAfter(new ClientExpiry())
-                .removalListener((final Client unloaded, final Object value, final RemovalCause cause) -> {
-                    if (unloaded == null) {
+                .removalListener((final UUID uuid, final Client client, final RemovalCause cause) -> {
+                    if (uuid == null || client == null) {
                         return;
                     }
 
-                    Bukkit.getScheduler().runTask(plugin, () -> UtilServer.callEvent(new ClientUnloadEvent(unloaded)));
-                    
+                    Bukkit.getScheduler().runTask(plugin, () -> UtilServer.callEvent(new ClientUnloadEvent(client)));
+
                     // Only announce the client was unloaded if it expired or was removed forcefully, not replaced.
                     // It won't be removed by size because we didn't set a maximum size.
                     if (cause == RemovalCause.EXPIRED || cause == RemovalCause.EXPLICIT || cause == RemovalCause.COLLECTED) {
-                        log.info(UNLOAD_ENTITY_FORMAT, unloaded.getName());
+                        log.info(UNLOAD_ENTITY_FORMAT, client.getName());
                     }
                 })
-                .build(key -> CACHE_DUMMY);
+                .build();
     }
 
     public void shutdown() {
@@ -107,7 +105,7 @@ public class ClientManager extends PlayerManager<Client> {
 
         // Adding into storage because no existing client was present.
         Bukkit.getPluginManager().callEvent(new AsyncClientPreLoadEvent(client)); // Call event after a client is loaded
-        this.store.get(client);
+        load(client);
         if (this.redis.isEnabled()) {
             this.redisLayer.save(client);
         }
@@ -120,11 +118,16 @@ public class ClientManager extends PlayerManager<Client> {
     }
 
     @Override
+    protected void load(Client entity) {
+        this.store.put(entity.getUniqueId(), entity);
+    }
+
+    @Override
     protected void unload(final Client client) {
         if (this.redis.isEnabled()) {
             this.redisLayer.save(client);
         }
-        this.store.invalidate(client);
+        this.store.invalidate(client.getUniqueId());
     }
 
     // Override to allow classes in the same package to access
@@ -135,7 +138,7 @@ public class ClientManager extends PlayerManager<Client> {
 
     @Override
     protected void loadOnline(final UUID uuid, final String name, final Consumer<Optional<Client>> callback) {
-        final Optional<Client> storedUser = this.getStoredUser(stored -> stored.getUniqueId().equals(uuid));
+        final Optional<Client> storedUser = this.getStoredExact(uuid);
         if (storedUser.isPresent()) {
             callback.accept(storedUser);
             return;
@@ -160,7 +163,7 @@ public class ClientManager extends PlayerManager<Client> {
         this.storeNewClient(loaded.get(), client -> callback.accept(Optional.of(client)), true);
     }
 
-    protected void loadOffline(final Predicate<Client> searchStorageFilter,
+    protected void loadOffline(final Supplier<Optional<Client>> searchStorageFilter,
                                final Supplier<Optional<Client>> loader,
                                final Consumer<Optional<Client>> callback) {
         // If the client is already loaded, then we will return that instead of loading it again.
@@ -169,7 +172,7 @@ public class ClientManager extends PlayerManager<Client> {
         // We don't do the same for loading online clients (like when joining) because we want to
         // make sure that the client is always up-to-date for online people. If an offline client
         // logs on during its expiry time, it'll be overwritten with the new data.
-        final Optional<Client> storedUser = this.getStoredUser(searchStorageFilter);
+        final Optional<Client> storedUser = searchStorageFilter.get();
         if (storedUser.isPresent()) {
             callback.accept(storedUser);
             return;
@@ -187,12 +190,12 @@ public class ClientManager extends PlayerManager<Client> {
     @Override
     protected void loadOffline(String name, Consumer<Optional<Client>> clientConsumer) {
         if (this.redis.isEnabled()) {
-            this.loadOffline(client -> client.getName().equalsIgnoreCase(name),
+            this.loadOffline(() -> getStoredUser(client -> client.getName().equalsIgnoreCase(name)),
                     () -> this.redisLayer.getClient(name).or(() -> this.sqlLayer.getClient(name)),
                     clientConsumer
             );
         } else {
-            this.loadOffline(client -> client.getName().equalsIgnoreCase(name),
+            this.loadOffline(() -> getStoredUser(client -> client.getName().equalsIgnoreCase(name)),
                     () -> this.sqlLayer.getClient(name),
                     clientConsumer
             );
@@ -202,33 +205,37 @@ public class ClientManager extends PlayerManager<Client> {
     @Override
     protected void loadOffline(UUID uuid, Consumer<Optional<Client>> clientConsumer) {
         if (this.redis.isEnabled()) {
-            this.loadOffline(client -> client.getUniqueId().equals(uuid),
+            this.loadOffline(() -> getStoredExact(uuid),
                     () -> this.redisLayer.getClient(uuid).or(() -> this.sqlLayer.getClient(uuid)),
                     clientConsumer
             );
         } else {
-            this.loadOffline(client -> client.getUniqueId().equals(uuid),
+            this.loadOffline(() -> getStoredExact(uuid),
                     () -> this.sqlLayer.getClient(uuid),
                     clientConsumer
             );
         }
     }
 
+    protected Optional<Client> getStoredExact(UUID uuid) {
+        return Optional.ofNullable(this.store.getIfPresent(uuid));
+    }
+
     @Override
     protected Optional<Client> getStoredUser(final Predicate<Client> predicate) {
-        final Optional<Client> found = this.store.asMap().keySet().stream().filter(predicate).findFirst();
-        found.ifPresent(this.store::refresh); // Refreshing the client's expiry time
+        final Optional<Client> found = this.store.asMap().values().stream().filter(predicate).findFirst();
+        found.ifPresent(this::load);
         return found;
     }
 
     @Override
     public Set<Client> getLoaded() {
-        return Collections.unmodifiableSet(this.store.asMap().keySet());
+        return Set.copyOf(this.store.asMap().values());
     }
 
     @Override
     public Set<Client> getOnline() {
-        return this.store.asMap().keySet().stream().filter(Client::isLoaded).collect(Collectors.toUnmodifiableSet());
+        return this.store.asMap().values().stream().filter(Client::isLoaded).collect(Collectors.toUnmodifiableSet());
     }
 
     @Override
@@ -280,7 +287,7 @@ public class ClientManager extends PlayerManager<Client> {
         }
 
         // Attempt to get a loaded client with the same UUID.
-        final Optional<Client> client = this.getStoredUser(stored -> stored.getUniqueId().equals(uuid));
+        final Optional<Client> client = this.getStoredExact(uuid);
         if (client.isEmpty()) {
             // No client loaded with the same UUID, meaning we don't need to update anything
             // as the updates will be applied when the client is loaded.

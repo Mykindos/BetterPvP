@@ -40,11 +40,19 @@ public abstract class PlayerManager<T extends Unique> {
      */
     protected abstract void unload(T entity);
 
+    /**
+     * Load an entity into storage.
+     * @param entity The entity to load.
+     */
+    protected abstract void load(T entity);
+
     protected abstract void loadOnline(UUID uuid, String name, Consumer<Optional<T>> callback);
 
     protected abstract void loadOffline(final String name, final Consumer<Optional<T>> entityConsumer);
 
     protected abstract void loadOffline(final UUID uuid, final Consumer<Optional<T>> entityConsumer);
+
+    protected abstract Optional<T> getStoredExact(UUID uuid);
 
     protected abstract Optional<T> getStoredUser(Predicate<T> predicate);
 
@@ -111,7 +119,7 @@ public abstract class PlayerManager<T extends Unique> {
 
     public SearchEngineHuman<T> search(final CommandSender human) {
         return new SearchEngineHuman<>(human,
-                uuid -> getStoredUser(entity -> entity.getUniqueId().equals(uuid)),
+                this::getStoredExact,
                 this::loadOffline,
                 this::loadOffline
         );
@@ -119,7 +127,7 @@ public abstract class PlayerManager<T extends Unique> {
 
     public SearchEngineBase<T> search() {
         return new SearchEngineBase<>(
-                uuid -> getStoredUser(entity -> entity.getUniqueId().equals(uuid)),
+                this::getStoredExact,
                 this::loadOffline,
                 this::loadOffline
         );

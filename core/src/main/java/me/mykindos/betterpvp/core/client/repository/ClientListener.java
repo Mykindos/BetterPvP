@@ -80,7 +80,7 @@ public class ClientListener implements Listener {
     @EventHandler (priority = EventPriority.MONITOR)
     public void onLeave(final PlayerQuitEvent event) {
         final Player player = event.getPlayer();
-        final Optional<Client> clientOpt = repository.getStoredUser(client -> client.getUniqueId().equals(player.getUniqueId()));
+        final Optional<Client> clientOpt = repository.getStoredExact(player.getUniqueId());
         clientOpt.ifPresent(client -> {
             final ClientQuitEvent quitEvent = new ClientQuitEvent(client, player);
             UtilServer.callEvent(quitEvent);
