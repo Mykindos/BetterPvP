@@ -81,7 +81,8 @@ public abstract class Command implements ICommand {
             case "WORLD" -> tabCompletions.addAll(Bukkit.getWorlds().stream().map(World::getName)
                     .filter(name -> name.toLowerCase().startsWith(lowercaseArg)).toList());
             case "BOOLEAN" -> tabCompletions.addAll(List.of("true", "false"));
-            case "CUSTOMITEM" -> tabCompletions.addAll(itemHandler.getItemIdentifiers());
+            case "CUSTOMITEM" -> tabCompletions.addAll(itemHandler.getItemIdentifiers().stream()
+                    .filter(name -> name.toLowerCase().contains(lowercaseArg)).toList());
         }
 
         return tabCompletions;
