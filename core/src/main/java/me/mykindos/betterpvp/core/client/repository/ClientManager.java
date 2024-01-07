@@ -69,7 +69,7 @@ public class ClientManager extends PlayerManager<Client> {
 
                     // Only announce the client was unloaded if it expired or was removed forcefully, not replaced.
                     // It won't be removed by size because we didn't set a maximum size.
-                    if (cause == RemovalCause.EXPIRED || cause == RemovalCause.EXPLICIT || cause == RemovalCause.COLLECTED) {
+                    if (client.isLoaded() && (cause == RemovalCause.EXPIRED || cause == RemovalCause.EXPLICIT || cause == RemovalCause.COLLECTED)) {
                         log.info(UNLOAD_ENTITY_FORMAT, client.getName());
                     }
                 })

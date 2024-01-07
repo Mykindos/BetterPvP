@@ -84,7 +84,7 @@ public class Client extends PropertyContainer implements IMapListener, CacheObje
         this.name = other.name;
         this.rank = other.rank;
         this.administrating = other.administrating;
-        this.online = other.online;
+        this.online = this.online || other.online;
         this.newClient = other.newClient;
         this.properties.getMap().clear();
         this.properties.getMap().putAll(other.properties.getMap());

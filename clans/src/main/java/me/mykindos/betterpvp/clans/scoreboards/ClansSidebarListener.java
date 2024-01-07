@@ -52,11 +52,19 @@ public class ClansSidebarListener implements Listener {
         Player player = event.getPlayer();
         Scoreboard scoreboard = player.getScoreboard();
 
-        if (isHub) {
+        if (isHub || !event.getPlayer().isOnline()) {
             return;
         }
 
-        final Client client = clientManager.search().online(event.getPlayer());
+        final Optional<Client> clientOpt = clientManager.search().online(event.getPlayer().getUniqueId());
+        if (clientOpt.isEmpty()) {
+            return;
+        }
+
+        final Client client = clientOpt.get();
+        if (!client.isLoaded()) {
+            return;
+        }
         Optional<Boolean> sideBarEnabled = client.getProperty(ClientProperty.SIDEBAR_ENABLED);
         if (sideBarEnabled.isPresent()) {
             if (!sideBarEnabled.get()) {
