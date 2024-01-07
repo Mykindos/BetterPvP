@@ -514,7 +514,7 @@ public class ClanManager extends Manager<Clan> {
         Optional<Clan> clanOptional = getClanByLocation(player.getLocation());
         if (clanOptional.isPresent()) {
             Clan clan = clanOptional.get();
-            return clan.isAdmin() && clan.isSafe();
+            return clan.isSafe();
         }
         return false;
     }

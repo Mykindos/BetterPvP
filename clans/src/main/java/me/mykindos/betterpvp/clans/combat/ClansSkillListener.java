@@ -64,10 +64,8 @@ public class ClansSkillListener implements Listener {
                     return true;
                 }
 
-                if(event.getEntityProperty() == EntityProperty.ENEMY) {
-                    if(clanManager.isInSafeZone(target)) {
-                        return true;
-                    }
+                if (clanManager.isInSafeZone(target)) {
+                    return true;
                 }
 
                 if (event.getEntityProperty() != EntityProperty.ALL) {
@@ -89,7 +87,7 @@ public class ClansSkillListener implements Listener {
             Clan playerClan = playerClanOptional.get();
             Clan locationClan = locationClanOptional.get();
 
-            if(playerClan.equals(locationClan) || playerClan.isAllied(locationClan)) {
+            if (playerClan.equals(locationClan) || playerClan.isAllied(locationClan)) {
                 event.cancel("Cannot use Longshot in own or allied territory");
             }
         }
@@ -97,7 +95,7 @@ public class ClansSkillListener implements Listener {
 
     @EventHandler
     public void disableSafezone(PlayerCanUseSkillEvent event) {
-        if(!clanManager.canCast(event.getPlayer())) {
+        if (!clanManager.canCast(event.getPlayer())) {
             UtilMessage.message(event.getPlayer(), "Restriction", "You cannot use this skill here.");
             event.setCancelled(true);
         }
@@ -105,7 +103,7 @@ public class ClansSkillListener implements Listener {
 
     @EventHandler
     public void disableSafezoneItems(PlayerUseItemEvent event) {
-        if(!clanManager.canCast(event.getPlayer()) && event.isDangerous()) {
+        if (!clanManager.canCast(event.getPlayer()) && event.isDangerous()) {
             event.setCancelled(true);
         }
     }
