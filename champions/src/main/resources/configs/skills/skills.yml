@@ -648,7 +648,7 @@ skills:
     heavyarrows:
       enabled: true
       maxlevel: 5
-      energy: 20
+      energy: 24
       basePushBack: 1.0
       energyDecreasePerLevel: 2.0
     overcharge:
