@@ -97,7 +97,10 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
 
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
-                if (player.isDead() || !UtilTime.elapsed(height.get(player), 4000) || !UtilBlock.isGrounded(player)) {
+                // Get the block 0.25 blocks below the player
+                Block blockBelow = player.getLocation().subtract(0, 0.75, 0).getBlock();
+
+                if (player.isDead() || !UtilTime.elapsed(height.get(player), 500) || !UtilBlock.isGrounded(player) || !blockBelow.getType().isSolid()) {
                     continue;
                 }
 
@@ -108,6 +111,7 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
             }
         }
     }
+
 
     public void slam(final Player player) {
         active.remove(player.getUniqueId());
