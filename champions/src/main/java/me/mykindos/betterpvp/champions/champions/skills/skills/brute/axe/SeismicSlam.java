@@ -20,11 +20,7 @@ import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
-import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
@@ -54,14 +50,11 @@ import java.util.WeakHashMap;
 public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, Listener {
 
     private final Set<UUID> active = new HashSet<>();
-    private final List<Entity> fallingBlocks = new ArrayList<>();
-    private final WeakHashMap<Player, Double> height = new WeakHashMap<>();
-    private final WeakHashMap<Player, List<LivingEntity>> immune = new WeakHashMap<>();
-    private final HashMap<Chunk, Long> lastSlam = new HashMap<>();
-
-    private int radius;
-
+    private final WeakHashMap<Player, Long> height = new WeakHashMap<>();
+    private double radius;
     private double damage;
+    public double damageIncreasePerLevel;
+    public double cooldownDecreasePerLevel;
 
     @Inject
     public SeismicSlam(Champions champions, ChampionsManager championsManager) {
@@ -76,16 +69,19 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
 
     @Override
     public String[] getDescription(int level) {
-
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Jump and slam the ground, knocking",
-                "up all opponents within <stat>" + radius + "</stat> blocks",
-                "and dealing <stat>" + damage + "</stat> damage",
+                "Leap up and slam into the ground, causing",
+                "players within <stat>" + radius + "</stat> blocks to fly",
+                "upwards and take <val>" + getSlamDamage(level) + "</val> damage",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getCooldown(level)
         };
+    }
+
+    public double getSlamDamage(int level){
+        return damage + ((level-1) * damageIncreasePerLevel);
     }
 
     @Override
@@ -101,96 +97,62 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
 
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
-                if (player.isDead()) {
-                    iterator.remove();
+                if (player.isDead() || !UtilTime.elapsed(height.get(player), 4000) || !UtilBlock.isGrounded(player)) {
                     continue;
                 }
-                if (UtilBlock.isGrounded(player) || player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() != Material.AIR) {
-                    slam(player);
 
-                    iterator.remove();
-                }
+                slam(player);
+                iterator.remove();
             } else {
                 iterator.remove();
             }
         }
     }
 
-    @EventHandler
-    public void onUnload(ChunkUnloadEvent event) {
-        if (lastSlam.containsKey(event.getChunk())) {
-            if (!UtilTime.elapsed(lastSlam.get(event.getChunk()), 60000)) {
-                for (Entity ent : event.getChunk().getEntities()) {
-                    if (ent instanceof FallingBlock) {
-
-                        ent.remove();
-                    }
-                }
-
-            }
-        }
-    }
-
     public void slam(final Player player) {
-        lastSlam.put(player.getLocation().getChunk(), System.currentTimeMillis());
-        new BukkitRunnable() {
-            int i = 0;
+        active.remove(player.getUniqueId());
 
-            final List<Player> hit = new ArrayList<>();
-            final List<Location> blocks = new ArrayList<>();
+        int level = getLevel(player);
+        List<LivingEntity> targets = UtilEntity.getNearbyEnemies(player, player.getLocation(), 5.5d + 0.5 * level);
+        double baseVelocity = 0.6;
+        double maxDistance = 5.5d + 0.5;
 
-            @Override
-            public void run() {
-                if (i == radius) {
-                    cancel();
-                }
-
-                final Location loc = player.getLocation();
-                loc.getWorld().playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 2.0F, 1.0F);
-
-                for (Block block : UtilBlock.getInRadius(player.getLocation().add(0, -1, 0), i, 3).keySet()) {
-                    if (!blocks.contains(block.getLocation())) {
-                        if ((block.getLocation().getBlockY() == loc.getBlockY() - 1) && !UtilBlock.airFoliage(block) && !UtilBlock.usable(block)
-                                && UtilBlock.airFoliage(block.getRelative(BlockFace.UP))) {
-
-                            FallingBlock fb = loc.getWorld().spawnFallingBlock(block.getLocation().clone().add(0.0D, 1.1, 0.0D), Bukkit.createBlockData(block.getType()));
-                            blocks.add(block.getLocation());
-                            lastSlam.put(block.getLocation().getChunk(), System.currentTimeMillis());
-                            fb.setVelocity(new Vector(0.0F, 0.3F, 0.0F));
-                            fb.setDropItem(false);
-                            fallingBlocks.add(fb);
-                        }
-                    }
-                }
-
-                for (LivingEntity ent : UtilEntity.getNearbyEnemies(player, player.getLocation(), radius)) {
-                    if (immune.get(player).contains(ent)) continue;
-                    if (ent instanceof Player target) {
-                        if (hit.contains(target)) continue;
-                        hit.add(target);
-                    }
-
-                    immune.get(player).add(ent);
-                    UtilVelocity.velocity(ent, 0.3 * ((height.get(player) - ent.getLocation().getY()) * 0.1), 1, 3, true);
-                    UtilDamage.doCustomDamage(new CustomDamageEvent(ent, player, null, DamageCause.CUSTOM, damage, false, getName()));
-                }
-                i++;
+        for (LivingEntity target : targets) {
+            if (target.equals(player)) {
+                continue;
             }
 
-        }.runTaskTimer(champions, 0, 2);
+            double distance = player.getLocation().distance(target.getLocation());
+            double distanceFactor = 1 - (distance / maxDistance);
+            distanceFactor = Math.max(0, Math.min(distanceFactor, 1));
 
+            double scaledVelocity = baseVelocity + (2 * distanceFactor);
+            Vector trajectory = UtilVelocity.getTrajectory2d(player.getLocation().toVector(), target.getLocation().toVector());
+            UtilVelocity.velocity(target, trajectory, scaledVelocity, true, 0, 0.2 + 1.0 * distanceFactor, 1.4, true);
+
+            double damage = calculateDamage(player, target);
+            UtilDamage.doCustomDamage(new CustomDamageEvent(target, player, null, DamageCause.CUSTOM, damage, false, getName()));
+        }
+
+        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 2f, 0.2f);
+        for (Block cur : UtilBlock.getInRadius(player.getLocation(), 4d).keySet()) {
+            if (UtilBlock.airFoliage(cur.getRelative(BlockFace.UP)) && !UtilBlock.airFoliage(cur)) {
+                cur.getWorld().playEffect(cur.getLocation(), Effect.STEP_SOUND, cur.getType().createBlockData());
+            }
+        }
     }
 
+    public double calculateDamage(Player player, LivingEntity target) {
+        int level = getLevel(player);
+        double minDamage = getSlamDamage(level) / 4;
+        double maxDistance = 5.5d + 0.5 * level;
 
-    @EventHandler
-    public void onBlockChangeState(EntityChangeBlockEvent event) {
-        if (fallingBlocks.contains(event.getEntity())) {
-            event.setCancelled(true);
-            fallingBlocks.remove(event.getEntity());
-            FallingBlock fb = (FallingBlock) event.getEntity();
-            fb.getWorld().playSound(fb.getLocation(), Sound.BLOCK_STONE_STEP, 1.0F, 1.0F);
-            event.getEntity().remove();
-        }
+        double distance = player.getLocation().distance(target.getLocation());
+        double distanceFactor = 1 - (distance / maxDistance);
+        distanceFactor = Math.max(0, Math.min(distanceFactor, 1));
+
+        double scaledDamage = minDamage + (getSlamDamage(level) - minDamage) * distanceFactor;
+        return scaledDamage;
     }
 
     @Override
@@ -207,17 +169,14 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
 
     @Override
     public void activate(Player player, int level) {
-        player.setVelocity(new Vector(0, 1.3, 0));
-        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1.5F, 0.2F);
+        Vector vec = player.getLocation().getDirection();
+        if (vec.getY() < 0) {
+            vec.setY(vec.getY() * -1);
+        }
+        UtilVelocity.velocity(player, vec, 0.6, false, 0, 0.8, 0.8, true);
 
-        UtilServer.runTaskLater(champions, () -> {
-            player.setVelocity(player.getLocation().getDirection().multiply(1).add(new Vector(0, -0.5, 0)));
-            championsManager.getEffects().addEffect(player, EffectType.NOFALL, 5000);
-            height.put(player, player.getLocation().getY());
-            active.add(player.getUniqueId());
-            immune.put(player, new ArrayList<>());
-        }, 15);
-
+        height.put(player, System.currentTimeMillis());
+        active.add(player.getUniqueId());
     }
 
     @Override
@@ -227,7 +186,9 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
 
     @Override
     public void loadSkillConfig(){
-        radius = getConfig("radius", 5, Integer.class);
-        damage = getConfig("damage", 3.0, Double.class);
+        radius = getConfig("radius", 5.0, Double.class);
+        damage = getConfig("damage", 5.0, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 2.0, Double.class);
+        cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 2.0, Double.class);
     }
 }

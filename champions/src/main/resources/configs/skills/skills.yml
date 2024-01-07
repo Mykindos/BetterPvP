@@ -499,10 +499,11 @@ skills:
     seismicslam:
       enabled: true
       maxlevel: 5
-      cooldown: 25.0
-      radius: 5
+      cooldown: 20.0
+      radius: 5.0
+      damage: 5.0
       cooldownDecreasePerLevel: 2.0
-      damage: 3.0
+      damageIncreasePerLevel: 2.0
     cripplingblow:
       enabled: true
       maxlevel: 3
