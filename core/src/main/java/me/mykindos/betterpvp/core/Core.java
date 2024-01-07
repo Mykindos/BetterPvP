@@ -35,7 +35,6 @@ import static io.papermc.paper.network.ChannelInitializeListenerHolder.removeLis
 public class Core extends BPvPPlugin {
 
     private final String PACKAGE = getClass().getPackageName();
-    private static final Key listenerKey = Key.key("unsafechat", "listener");
 
     @Getter
     @Setter
@@ -98,9 +97,6 @@ public class Core extends BPvPPlugin {
         redis.shutdown();
         injector.getInstance(GlobalCombatStatsRepository.class).shutdown();
 
-        if (hasListener(listenerKey)) {
-            removeListener(listenerKey);
-        }
     }
 
 }
