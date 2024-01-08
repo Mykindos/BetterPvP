@@ -91,7 +91,7 @@ public class LevelField extends Skill implements ToggleSkill, CooldownSkill, Lis
                     });
                 }
             }
-        }, 0L, (long)getLevelFieldUpdateTime()).getTaskId();
+        }, 0L, getLevelFieldUpdateTime()).getTaskId();
     }
 
     @Inject
@@ -131,7 +131,7 @@ public class LevelField extends Skill implements ToggleSkill, CooldownSkill, Lis
 
     @Override
     public SkillType getType() {
-        return SkillType.PASSIVE_A;
+        return SkillType.PASSIVE_B;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
