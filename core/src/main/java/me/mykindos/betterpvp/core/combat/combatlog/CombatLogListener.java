@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.core.combat.combatlog;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.events.ClientQuitEvent;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
@@ -45,8 +44,7 @@ public class CombatLogListener implements Listener {
 
     @EventHandler
     public void onClientQuit(ClientQuitEvent event) {
-
-        PlayerCombatLogEvent combatLogEvent = UtilServer.callEvent(new PlayerCombatLogEvent(event.getPlayer()));
+        PlayerCombatLogEvent combatLogEvent = UtilServer.callEvent(new PlayerCombatLogEvent(event.getClient(), event.getPlayer()));
 
         event.setQuitMessage(event.getQuitMessage().append(UtilMessage.deserialize(" <gray>(" + (combatLogEvent.isSafe() ? "<green>Safe" : "<red>Unsafe") + "<gray>)")));
         if (!combatLogEvent.isSafe()) {
@@ -62,8 +60,7 @@ public class CombatLogListener implements Listener {
             return;
         }
 
-        Client client = clientManager.search().online(event.getPlayer());
-        if (client.hasRank(Rank.ADMIN)) {
+        if (event.getClient().hasRank(Rank.ADMIN)) {
             event.setSafe(true);
         }
     }

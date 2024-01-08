@@ -1,8 +1,10 @@
 package me.mykindos.betterpvp.clans.clans.menus.buttons;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import me.mykindos.betterpvp.clans.clans.Clan;
+import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -22,7 +24,9 @@ import org.jetbrains.annotations.NotNull;
 import xyz.xenondevs.invui.item.ItemProvider;
 import xyz.xenondevs.invui.item.impl.AbstractItem;
 
-@AllArgsConstructor
+import java.util.Objects;
+
+@RequiredArgsConstructor
 public class ClanMemberButton extends AbstractItem {
 
     private final Clan clan;
@@ -30,10 +34,23 @@ public class ClanMemberButton extends AbstractItem {
     private final OfflinePlayer player;
     private final boolean detailed;
     private final boolean canEdit;
+    private final ClientManager clientManager;
+    private String name;
 
     @SneakyThrows
     @Override
     public ItemProvider getItemProvider() {
+        if (name == null) {
+            name = player.getName();
+            if (name == null) {
+                this.clientManager.search().offline(player.getUniqueId(), opt -> {
+                    name = opt.map(Client::getName).orElseThrow();
+                    notifyWindows();
+                });
+            }
+        }
+
+        final String name = Objects.requireNonNullElse(this.name, "Loading Player...");
         final ItemStack itemStack = new ItemStack(Material.PLAYER_HEAD);
         final SkullMeta meta = (SkullMeta) itemStack.getItemMeta();
         meta.setPlayerProfile(player.getPlayerProfile());
@@ -50,7 +67,7 @@ public class ClanMemberButton extends AbstractItem {
         if (!player.isOnline()) {
             return builder
                     .material(Material.SKELETON_SKULL)
-                    .displayName(Component.text(player.getName(), NamedTextColor.RED, TextDecoration.BOLD))
+                    .displayName(Component.text(name, NamedTextColor.RED, TextDecoration.BOLD))
                     .lore(Component.empty())
                     .lore(role)
                     .lore(Component.empty())
@@ -58,7 +75,7 @@ public class ClanMemberButton extends AbstractItem {
         }
 
         final Player online = player.getPlayer();
-        builder.displayName(Component.text(online.getName(), NamedTextColor.GREEN, TextDecoration.BOLD))
+        builder.displayName(Component.text(name, NamedTextColor.GREEN, TextDecoration.BOLD))
                 .lore(Component.empty())
                 .lore(role);
 
@@ -76,18 +93,18 @@ public class ClanMemberButton extends AbstractItem {
 
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
-        if (!canEdit) {
+        if (!canEdit && name != null) {
             return;
         }
 
         if (ClickActions.LEFT.accepts(clickType)) {
-            player.chat("/c promote " + this.player.getName());
+            player.chat("/c promote " + this.name);
             player.closeInventory();
         } else if (ClickActions.RIGHT.accepts(clickType)) {
-            player.chat("/c demote " + this.player.getName());
+            player.chat("/c demote " + this.name);
             player.closeInventory();
         } else if (ClickActions.SHIFT.accepts(clickType)) {
-            player.chat("/c kick " + this.player.getName());
+            player.chat("/c kick " + this.name);
             player.closeInventory();
         }
 

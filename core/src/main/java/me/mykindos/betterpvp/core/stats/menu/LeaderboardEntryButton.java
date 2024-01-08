@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.stats.menu;
 
 import lombok.SneakyThrows;
+import me.mykindos.betterpvp.core.menu.CooldownButton;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardEntry;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
@@ -29,38 +30,37 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class LeaderboardEntryButton<E, T> extends ControlItem<LeaderboardMenu<E, T>> {
+public class LeaderboardEntryButton<E, T> extends ControlItem<LeaderboardMenu<E, T>> implements CooldownButton {
 
     private final Supplier<CompletableFuture<LeaderboardEntry<E, T>>> entrySupplier;
     private final Component title;
     private final ItemProvider loading;
     private final ItemProvider failed;
+    private CompletableFuture<LeaderboardEntry<E, T>> future;
+    private CompletableFuture<Description> descriptionFuture;
 
     public LeaderboardEntryButton(Supplier<CompletableFuture<LeaderboardEntry<E, T>>> entrySupplier, ItemProvider loading, ItemProvider failed, final Component title) {
         this.entrySupplier = entrySupplier;
         this.title = title;
         this.loading = loading;
         this.failed = failed;
+        this.future = CompletableFuture.completedFuture(null);
+        this.descriptionFuture = CompletableFuture.completedFuture(null);
     }
 
-    public LeaderboardEntryButton(Supplier<LeaderboardEntry<E, T>> entrySupplier, ItemProvider failed, final Component title) {
-        this(() -> CompletableFuture.completedFuture(entrySupplier.get()), null, failed, title);
-    }
-
-    public CompletableFuture<LeaderboardEntry<E, T>> getCurrentEntry() {
-        return entrySupplier.get();
+    protected void fetch() {
+        future = entrySupplier.get();
+        future.thenAccept(entry -> {
+            descriptionFuture = getGui().getLeaderboard().getDescription(getGui().getSearchOptions(), entry);
+            descriptionFuture.thenRun(this::notifyWindows); // Notify again after the description is loaded
+        }).thenRun(this::notifyWindows); // Notify after the entry is loaded
     }
 
     @SneakyThrows
     @Override
     public ItemProvider getItemProvider(LeaderboardMenu<E, T> gui) {
-        final CompletableFuture<LeaderboardEntry<E, T>> future = getCurrentEntry();
-        if (future == null) {
-            // If the entry is null, then the position is empty
-            return failed;
-        } else if (!future.isDone()) {
-            // Update the GUI when the entry is loaded
-            future.thenAccept(entry -> notifyWindows());
+        if (!future.isDone() || !descriptionFuture.isDone()) {
+            // Update the GUI when the entry is completely loaded (including description)
             return loading;
         }
 
@@ -70,7 +70,7 @@ public class LeaderboardEntryButton<E, T> extends ControlItem<LeaderboardMenu<E,
             return failed;
         }
 
-        final Description description = gui.getLeaderboard().getDescription(gui.getSearchOptions(), currentEntry);
+        final Description description = descriptionFuture.get();
         final ItemStack itemStack = description.getIcon().get();
         final ItemMeta meta = itemStack.getItemMeta();
 
@@ -100,19 +100,27 @@ public class LeaderboardEntryButton<E, T> extends ControlItem<LeaderboardMenu<E,
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
         // Attempt to execute the click function for the current entry
-        final CompletableFuture<LeaderboardEntry<E, T>> future = getCurrentEntry();
         if (future == null || !future.isDone() || future.get() == null) {
             return; // Do nothing if we have no data, or it hasn't loaded.
         }
 
         final LeaderboardEntry<E, T> currentEntry = future.get();
-        final Description description = getGui().getLeaderboard().getDescription(getGui().getSearchOptions(), currentEntry);
-        final Consumer<Click> clickFunction = description.getClickFunction();
+        final CompletableFuture<Description> descriptionFuture = getGui().getLeaderboard().getDescription(getGui().getSearchOptions(), currentEntry);
+        if (!descriptionFuture.isDone()) {
+            return; // Do nothing if the description hasn't loaded
+        }
+
+        final Consumer<Click> clickFunction = descriptionFuture.get().getClickFunction();
         if (clickFunction == null) {
             return; // Otherwise, do nothing
         }
 
         clickFunction.accept(new Click(event));
         player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1f, 1f);
+    }
+
+    @Override
+    public double getCooldown() {
+        return 0.4;
     }
 }
