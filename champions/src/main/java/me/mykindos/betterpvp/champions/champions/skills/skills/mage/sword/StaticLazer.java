@@ -289,36 +289,32 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
         while (iterator.hasNext()) {
             Player player = iterator.next();
             LazerData charge = charging.get(player);
-            if (player != null) {
-                int level = getLevel(player);
-
-                // Remove if they no longer have the skill
-                if (level <= 0) {
-                    iterator.remove();
-                    continue;
-                }
-
-                // Check if they still are blocking and charge
-                Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
-                if (gamer.isHoldingRightClick() && championsManager.getEnergy().use(player, getName(), getEnergyPerSecond(level) / 20, true)) {
-                    championsManager.getCooldowns().removeCooldown(player, getName(), true);
-
-                    // Check for sword hold status
-                    if (!isHolding(player)) {
-                        iterator.remove(); // Otherwise, remove
-                    }
-
-                    charge.tick();
-                    // Cues
-                    showCharge(player, charge);
-                    continue;
-                }
-
-                if (isHolding(player)) {
-                    shoot(player, (float) charge.getCharge(), level);
-                    iterator.remove();
-                }
+            if (player == null || !player.isOnline()) {
+                iterator.remove();
+                continue;
             }
+
+            int level = getLevel(player);
+
+            // Remove if they no longer have the skill
+            if (level <= 0) {
+                iterator.remove();
+                continue;
+            }
+
+            // Check if they still are blocking and charge
+            Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
+            if (isHolding(player) && gamer.isHoldingRightClick() && championsManager.getEnergy().use(player, getName(), getEnergyPerSecond(level) / 20, true)) {
+                championsManager.getCooldowns().removeCooldown(player, getName(), true);
+
+                charge.tick();
+                // Cues
+                showCharge(player, charge);
+                continue;
+            }
+
+            shoot(player, (float) charge.getCharge(), level);
+            iterator.remove();
         }
     }
 
