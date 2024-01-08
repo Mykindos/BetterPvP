@@ -32,7 +32,7 @@ import java.util.Set;
 public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill {
 
     private final Set<Arrow> arrows = new HashSet<>();
-
+    public double energyDecreasePerLevel;
     public double basePushBack;
 
     @Inject
@@ -109,7 +109,7 @@ public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill {
 
     @Override
     public float getEnergy(int level) {
-        return (float) (energy - ((level - 1) * cooldownDecreasePerLevel));
+        return (float) (energy - ((level - 1) * energyDecreasePerLevel));
     }
 
     @Override
@@ -119,5 +119,6 @@ public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill {
 
     public void loadSkillConfig(){
         basePushBack = getConfig("basePushBack", 1.0, Double.class);
+        energyDecreasePerLevel = getConfig("energyDecreasePerLevel", 2.0, Double.class);
     }
 }
