@@ -20,7 +20,7 @@ skills:
     shockingstrikes:
       enabled: true
       maxlevel: 3
-      assassinDecrease: 0.0
+      baseDuration: 0.0
       baseIncrease: 1.0
       slownessDuration: 1.0
       slownessStrength: 0
