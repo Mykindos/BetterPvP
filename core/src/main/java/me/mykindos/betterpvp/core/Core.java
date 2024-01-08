@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
 import me.mykindos.betterpvp.core.injector.CoreInjectorModule;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.loader.CoreListenerLoader;
+import me.mykindos.betterpvp.core.logging.Logger;
 import me.mykindos.betterpvp.core.recipes.RecipeHandler;
 import me.mykindos.betterpvp.core.redis.Redis;
 import net.kyori.adventure.key.Key;
@@ -67,6 +68,8 @@ public class Core extends BPvPPlugin {
         database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:core-migrations/local", "local");
         sharedDatabase.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:core-migrations/global", "global");
         redis.credentials(this.getConfig());
+
+        injector.getInstance(Logger.class);
 
         var coreListenerLoader = injector.getInstance(CoreListenerLoader.class);
         coreListenerLoader.registerListeners(PACKAGE);
