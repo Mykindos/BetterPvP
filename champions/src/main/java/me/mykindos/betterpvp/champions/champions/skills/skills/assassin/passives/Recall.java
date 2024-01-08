@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.math.VectorLine;
 import org.bukkit.Location;
@@ -21,6 +22,8 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -31,13 +34,11 @@ import java.util.WeakHashMap;
 @Singleton
 @BPvPListener
 public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listener {
-
-    public static final long MARKER_MILLIS = 200;
-
     private final Map<Player, RecallData> data = new WeakHashMap<>();
-    private double percentHealthRecovered;
+    public static final long MARKER_MILLIS = 200;
+    private int regenerationTime;
+    private int regenerationStrength;
     private double duration;
-
     private double durationIncreasePerLevel;
 
     @Inject
@@ -59,8 +60,8 @@ public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listene
         return new String[] {
                 "Drop your Sword / Axe to activate",
                 "",
-                "Teleports you back in time <val>" + getDuration(level) + "</val> seconds, increasing",
-                "your health by <stat>" + (percentHealthRecovered * 100) + "%</stat> of the health you had",
+                "Teleport back in time <val>" + getDuration(level) + "</val> seconds and",
+                "gain <effect>Regeneration " + UtilFormat.getRomanNumeral(regenerationStrength + 1) + "</effect> for <stat>" + regenerationTime + "</stat> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -130,8 +131,7 @@ public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listene
         player.teleportAsync(teleportLocation);
 
         // Heal Logic
-        double heal = UtilPlayer.getMaxHealth(player) * percentHealthRecovered;
-        UtilPlayer.health(player, heal);
+        player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, (regenerationTime * 20), regenerationStrength));
 
         // Cues
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 2.0F, 2.0F);
@@ -161,8 +161,9 @@ public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listene
 
     @Override
     public void loadSkillConfig(){
-        percentHealthRecovered = getConfig("percentHealthRecovered", 0.25, Double.class);
         duration = getConfig("duration", 2.5, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
+        regenerationTime = getConfig("regenerationTime", 6, Integer.class);
+        regenerationStrength = getConfig("regenerationStrength", 2, Integer.class);
     }
 }
