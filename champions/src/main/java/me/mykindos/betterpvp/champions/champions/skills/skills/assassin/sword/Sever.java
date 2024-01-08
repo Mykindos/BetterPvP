@@ -119,11 +119,9 @@ public class Sever extends Skill implements CooldownSkill, Listener {
                 ent.getWorld().playSound(ent.getLocation(), Sound.ENTITY_SPIDER_HURT, 1.0F, 1.5F);
             } else {
                 UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s", getName());
-                player.getWorld().playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 1F, 2F);
             }
         } else {
             UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s", getName());
-            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 1F, 2F);
         }
         player.swingMainHand();
     }
