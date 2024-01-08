@@ -15,7 +15,7 @@ skills:
       maxlevel: 3
       damagePerSecond: 2.0
       cooldownDecreasePerLevel: 1.0
-      baseDuration: 0.0
+      baseDuration: 1.0
       durationIncreasePerLevel: 1.0
     shockingstrikes:
       enabled: true
