@@ -61,7 +61,7 @@ public class MagmaBlade extends Skill implements PassiveSkill {
     public void onDamage(CustomDamageEvent event) {
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
         if (!(event.getDamager() instanceof Player player)) return;
-        if (!isHolding(player)) return;
+        if (!SkillWeapons.isHolding(player, SkillType.SWORD)) return;
 
         int level = getLevel(player);
         if (level > 0) {
