@@ -43,7 +43,8 @@ public class JoinSubCommand extends ClanSubCommand {
     @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length == 0) {
-            UtilMessage.message(player, "Clans", "You must specify a clan to join");
+            UtilMessage.message(player, "Clans", "You must specify a clan to join.");
+            return;
         }
 
         Optional<Clan> clanOptional = clanManager.getClanByPlayer(player);

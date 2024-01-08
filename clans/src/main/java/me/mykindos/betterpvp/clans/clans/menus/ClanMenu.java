@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.clans.clans.menus;
 
 
+import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.menus.buttons.ClanDetailsButton;
 import me.mykindos.betterpvp.clans.clans.menus.buttons.ClanHomeButton;
@@ -12,6 +13,7 @@ import me.mykindos.betterpvp.clans.clans.menus.buttons.LeaveClanButton;
 import me.mykindos.betterpvp.clans.clans.menus.buttons.TerritoryButton;
 import me.mykindos.betterpvp.clans.clans.menus.buttons.ViewAlliancesButton;
 import me.mykindos.betterpvp.clans.clans.menus.buttons.ViewEnemiesButton;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
@@ -22,6 +24,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import xyz.xenondevs.invui.gui.AbstractGui;
 import xyz.xenondevs.invui.item.impl.SimpleItem;
@@ -47,12 +50,14 @@ public class ClanMenu extends AbstractGui implements Windowed {
     private final Player viewer;
     private final Clan viewerClan;
     private final Clan clan;
+    private final ClientManager clientManager;
 
     public ClanMenu(Player viewer, Clan viewerClan, Clan clan) {
         super(9, 5);
         this.viewerClan = viewerClan;
         this.clan = clan;
         this.viewer = viewer;
+        this.clientManager = JavaPlugin.getPlugin(Clans.class).getInjector().getInstance(ClientManager.class);
 
         populate();
     }
@@ -84,10 +89,7 @@ public class ClanMenu extends AbstractGui implements Windowed {
     }
 
     private void addMemberButtons(boolean detailed) {
-        Optional<ClanMember.MemberRank> optRank = Optional.empty();
-        if (viewerClan != null) {
-            optRank = viewerClan.getMemberByUUID(viewer.getUniqueId()).map(ClanMember::getRank);
-        }
+        final Optional<ClanMember.MemberRank> optRank = clan.getMemberByUUID(viewer.getUniqueId()).map(ClanMember::getRank);
         final boolean admin = optRank.isPresent() && optRank.map(rank -> rank.hasRank(ClanMember.MemberRank.ADMIN)).orElse(false);
         final Map<ClanMember, OfflinePlayer> members = clan.getMembers().stream().collect(Collectors.toMap(
                 Function.identity(), member -> Bukkit.getOfflinePlayer(UUID.fromString(member.getUuid()))));
@@ -112,7 +114,7 @@ public class ClanMenu extends AbstractGui implements Windowed {
                 final OfflinePlayer player = members.get(member);
                 final boolean canEdit = admin && member.getRank().getPrivilege() < optRank.orElseThrow().getPrivilege();
 
-                setItem(slot, new ClanMemberButton(clan, member, player, detailed, canEdit));
+                setItem(slot, new ClanMemberButton(clan, member, player, detailed, canEdit, clientManager));
             }
         }
     }

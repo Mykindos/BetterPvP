@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
@@ -63,9 +64,15 @@ public class ItemHandler {
      * @return An ItemStack with an updated name
      */
     public ItemStack updateNames(ItemStack itemStack) {
-
         Material material = itemStack.getType();
+        if (material == Material.AIR) {
+            return itemStack;
+        }
+
         ItemMeta itemMeta = itemStack.getItemMeta();
+        if (itemMeta == null) {
+            itemMeta = Bukkit.getItemFactory().getItemMeta(material);
+        }
 
         if (hideAttributes) {
             itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);

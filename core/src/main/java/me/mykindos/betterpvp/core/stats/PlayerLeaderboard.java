@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.core.stats;
 
+import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardEntry;
@@ -15,13 +17,16 @@ import org.jetbrains.annotations.NotNull;
 import java.text.NumberFormat;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public abstract class PlayerLeaderboard<T> extends Leaderboard<UUID, T> {
 
+    protected ClientManager clientManager;
+
     protected PlayerLeaderboard(BPvPPlugin plugin) {
         super(plugin);
+        this.clientManager = plugin.getInjector().getInstance(ClientManager.class);
     }
 
     @Override
@@ -30,22 +35,30 @@ public abstract class PlayerLeaderboard<T> extends Leaderboard<UUID, T> {
     }
 
     @Override
-    protected Description describe(SearchOptions searchOptions, LeaderboardEntry<UUID, T> value) {
-        final Map<String, Component> map = describe(searchOptions, value.getValue());
-        final Map<String, Component> result = new LinkedHashMap<>();
-        final OfflinePlayer player = Bukkit.getOfflinePlayer(value.getKey());
-        result.put("Player", Component.text(Objects.requireNonNullElse(player.getName(), "Unknown")));
-        result.putAll(map);
+    protected CompletableFuture<Description> describe(SearchOptions searchOptions, LeaderboardEntry<UUID, T> value) {
+        final CompletableFuture<Description> future = new CompletableFuture<>();
 
+        final OfflinePlayer player = Bukkit.getOfflinePlayer(value.getKey());
+        final Map<String, Component> map = describe(searchOptions, value.getValue());
         ItemStack itemStack = new ItemStack(Material.PLAYER_HEAD);
         final SkullMeta meta = (SkullMeta) itemStack.getItemMeta();
         meta.setPlayerProfile(player.getPlayerProfile());
         itemStack.setItemMeta(meta);
 
-        return Description.builder()
-                .icon(itemStack)
-                .properties(result)
-                .build();
+        // Update name when loaded
+        this.clientManager.search().offline(player.getUniqueId(), clientOpt -> {
+            final Map<String, Component> result = new LinkedHashMap<>();
+            result.put("Player", Component.text(clientOpt.map(Client::getName).orElse("Unknown")));
+            result.putAll(map);
+
+            final Description description = Description.builder()
+                    .icon(itemStack)
+                    .properties(result)
+                    .build();
+            future.complete(description);
+        });
+
+        return future;
     }
 
     protected Map<String, Component> describe(SearchOptions searchOptions, T value) {

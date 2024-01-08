@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.progression.ProgressionsManager;
@@ -11,7 +12,6 @@ import me.mykindos.betterpvp.progression.model.ProgressionTree;
 import me.mykindos.betterpvp.progression.model.stats.ProgressionData;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -26,6 +26,9 @@ public class StatsCommand extends Command {
 
     @Inject
     private ProgressionsManager progressionsManager;
+
+    @Inject
+    private ClientManager clientManager;
 
     @Override
     public String getName() {
@@ -54,17 +57,17 @@ public class StatsCommand extends Command {
         }
 
         final ProgressionTree tree = treeOpt.get();
-        OfflinePlayer target = player;
         if (args.length > 1) {
-            target = Bukkit.getOfflinePlayer(args[1]);
+            clientManager.search(player).advancedOffline(args[1], result -> {
+                run(player, result.iterator().next(), tree);
+            });
+        } else {
+            run(player, client, tree);
         }
+    }
 
-        if (!target.hasPlayedBefore()) {
-            UtilMessage.message(player, "Stats", "Player not found [<alt2>%s</alt2>].", args[1]);
-            return;
-        }
-
-        final CompletableFuture<? extends ProgressionData<?>> loaded = tree.getStatsRepository().getDataAsync(target);
+    private void run(Player player, Client target, ProgressionTree tree) {
+        final CompletableFuture<? extends ProgressionData<?>> loaded = tree.getStatsRepository().getDataAsync(target.getUniqueId());
         if (!loaded.isDone()) {
             UtilMessage.message(player, "Stats", "Retrieving player data...");
         }

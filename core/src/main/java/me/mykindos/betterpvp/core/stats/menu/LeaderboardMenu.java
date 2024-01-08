@@ -50,6 +50,7 @@ public class LeaderboardMenu<E, T> extends AbstractGui implements Windowed {
     private SearchOptions searchOptions;
     @Getter(AccessLevel.NONE)
     private List<LeaderboardEntry<E, T>> entries = new ArrayList<>();
+    private List<LeaderboardEntryButton<E, T>> buttons = new ArrayList<>();
     private final Player player;
 
     public LeaderboardMenu(Player player, Leaderboard<E, T> leaderboard) {
@@ -115,13 +116,24 @@ public class LeaderboardMenu<E, T> extends AbstractGui implements Windowed {
                     .lore(UtilMessage.DIVIDER)
                     .build();
 
+            final ItemView loading = ItemView.builder().material(Material.PAPER)
+                    .displayName(title)
+                    .lore(UtilMessage.DIVIDER)
+                    .lore(Component.empty())
+                    .lore(Component.text("           LOADING...", NamedTextColor.RED, TextDecoration.BOLD))
+                    .lore(Component.empty())
+                    .lore(UtilMessage.DIVIDER)
+                    .build();
+
             final int index = standing - 1;
-            setItem(slot, new LeaderboardEntryButton<>(() -> {
+            final LeaderboardEntryButton<E, T> button = new LeaderboardEntryButton<>(() -> {
                 if (index >= entries.size()) {
-                    return null;
+                    return CompletableFuture.completedFuture(null);
                 }
-                return entries.get(index);
-            }, failed, title));
+                return CompletableFuture.completedFuture(entries.get(index));
+            }, loading, failed, title);
+            this.buttons.add(button);
+            setItem(slot, button);
         }
 
         // Podium indicators
@@ -138,16 +150,19 @@ public class LeaderboardMenu<E, T> extends AbstractGui implements Windowed {
         final ItemView loading = ItemView.builder()
                 .material(Material.PAPER)
                 .displayName(Component.text("Retrieving your data...", NamedTextColor.GRAY)).build();
-        setItem(49, new LeaderboardEntryButton<>(() -> {
+        final LeaderboardEntryButton<E, T> button = new LeaderboardEntryButton<>(() -> {
             final CompletableFuture<Optional<LeaderboardEntry<E, T>>> data = leaderboard.getPlayerData(player.getUniqueId(), searchOptions);
             return data.thenApply(opt -> opt.orElse(null));
-        }, loading, Menu.BACKGROUND_ITEM, title));
+        }, loading, Menu.BACKGROUND_ITEM, title);
+        this.buttons.add(button);
+        setItem(49, button);
 
         setBackground(Menu.BACKGROUND_ITEM);
     }
 
     private void fetch() {
         this.entries = new ArrayList<>(leaderboard.getTopTen(searchOptions));
+        this.buttons.forEach(LeaderboardEntryButton::fetch);
         updateControlItems();
     }
 

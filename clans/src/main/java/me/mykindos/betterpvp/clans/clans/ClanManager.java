@@ -248,8 +248,8 @@ public class ClanManager extends Manager<Clan> {
         return Component.text(target.getName() + " Information").color(getRelation(clan, target).getPrimary()).append(Component.newline())
                 .append(Component.text(" Age: ").color(NamedTextColor.WHITE).append(UtilMessage.getMiniMessage("<yellow>%s\n", target.getAge())))
                 .append(Component.text(" Territory: ").color(NamedTextColor.WHITE).append(UtilMessage.getMiniMessage("<yellow>%s\n", territoryString)))
-                .append(Component.text(" Allies: ").color(NamedTextColor.WHITE).append(Component.text(getAllianceList(player, target)))).append(Component.newline())
-                .append(Component.text(" Enemies: ").color(NamedTextColor.WHITE).append(Component.text(getEnemyList(player, target)))).append(Component.newline())
+                .append(Component.text(" Allies: ").color(NamedTextColor.WHITE).append(UtilMessage.getMiniMessage(getAllianceList(player, target)))).append(Component.newline())
+                .append(Component.text(" Enemies: ").color(NamedTextColor.WHITE).append(UtilMessage.getMiniMessage(getEnemyList(player, target)))).append(Component.newline())
                 .append(Component.text(" Members: ").color(NamedTextColor.WHITE).append(UtilMessage.getMiniMessage("%s", getMembersList(target))));
     }
 
