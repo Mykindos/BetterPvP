@@ -126,7 +126,7 @@ public class Concussion extends Skill implements CooldownSkill, Listener {
                     UtilMessage.simpleMessage(damagee, getName(), "<alt>" + ent.getName() + "</alt> gave you a concussion.");
                 }
                 ent.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, (int) getDuration(level) * 20, 0));
-                player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 0.5f + player.getExp(), 1.75f - charge);
+                player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 2f, 1.0f);
             } else {
                 UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s", getName());
             }
