@@ -44,7 +44,7 @@ public class CustomGiveCommand extends Command {
 
         BPVPItem item = itemHandler.getItem(args[1]);
         if (item == null) {
-            UtilMessage.message(player, "command", UtilMessage.deserialize("<green>%s>/green> is not a valid item", args[1]));
+            UtilMessage.message(player, "command", UtilMessage.deserialize("<green>%s</green> is not a valid item", args[1]));
             return;
         }
 
