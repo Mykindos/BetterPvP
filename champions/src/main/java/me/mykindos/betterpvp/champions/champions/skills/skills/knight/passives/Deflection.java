@@ -20,6 +20,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
+import java.util.HashMap;
+import java.util.UUID;
 import java.util.WeakHashMap;
 
 @Singleton
@@ -32,7 +34,7 @@ public class Deflection extends Skill implements PassiveSkill {
 
     private int baseCharges;
 
-    private final WeakHashMap<Player, Integer> charges = new WeakHashMap<>();
+    private final HashMap<UUID, Integer> charges = new HashMap<>();
 
     @Inject
     public Deflection(Champions champions, ChampionsManager championsManager) {
@@ -76,13 +78,13 @@ public class Deflection extends Skill implements PassiveSkill {
         if (event.isCancelled()) return;
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
         if (!(event.getDamagee() instanceof Player player)) return;
-        if (!charges.containsKey(player)) return;
+        if (!charges.containsKey(player.getUniqueId())) return;
 
         int level = getLevel(player);
         if (level > 0) {
-            int charge = charges.get(player);
+            int charge = charges.remove(player.getUniqueId());
             event.setDamage(event.getDamage() - charge);
-            charges.remove(player);
+
         }
     }
 
@@ -91,22 +93,23 @@ public class Deflection extends Skill implements PassiveSkill {
 
         for (Player cur : Bukkit.getOnlinePlayers()) {
             int level = getLevel(cur);
-            if (level > 0) {
-                if (charges.containsKey(cur)) {
+            if (charges.containsKey(cur.getUniqueId())) {
+                if (level > 0) {
+
                     Gamer gamer = championsManager.getClientManager().search().online(cur).getGamer();
-                        if (UtilTime.elapsed(gamer.getLastDamaged(), (long) timeOutOfCombat * 1000)) {
-                            if (!championsManager.getCooldowns().use(cur, getName(), timeBetweenCharges, false)) return;
-                            int charge = charges.get(cur);
-                            if (charge < getMaxCharges(level)) {
-                                charge = Math.min(getMaxCharges(level), charge + 1);
-                                UtilMessage.simpleMessage(cur, getClassType().getName(), "Deflection charge: <yellow>%d", charge);
-                                charges.put(cur, charge);
-                            }
+                    if (UtilTime.elapsed(gamer.getLastDamaged(), (long) timeOutOfCombat * 1000)) {
+                        if (!championsManager.getCooldowns().use(cur, getName(), timeBetweenCharges, false)) return;
+                        int charge = charges.get(cur.getUniqueId());
+                        if (charge < getMaxCharges(level)) {
+                            charge = Math.min(getMaxCharges(level), charge + 1);
+                            UtilMessage.simpleMessage(cur, getClassType().getName(), "Deflection charge: <yellow>%d", charge);
+                            charges.put(cur.getUniqueId(), charge);
                         }
                     }
-
                 } else {
-                charges.put(cur, 0);
+                    charges.remove(cur.getUniqueId());
+                }
+
             }
         }
 
