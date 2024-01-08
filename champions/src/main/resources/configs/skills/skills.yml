@@ -500,7 +500,7 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 20.0
-      radius: 5.0
+      radius: 6.0
       damage: 5.0
       cooldownDecreasePerLevel: 2.0
       damageIncreasePerLevel: 2.0

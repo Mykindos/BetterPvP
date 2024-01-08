@@ -77,7 +77,7 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
                 "players within <stat>" + radius + "</stat> blocks to fly",
                 "upwards and take <val>" + getSlamDamage(level) + "</val> damage",
                 "",
-                "Cooldown: " + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level)
         };
     }
 
@@ -122,7 +122,7 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
         int level = getLevel(player);
         List<LivingEntity> targets = UtilEntity.getNearbyEnemies(player, player.getLocation(), 5.5d + 0.5 * level);
         double baseVelocity = 0.6;
-        double maxDistance = 5.5d + 0.5;
+        double maxDistance = radius;
 
         for (LivingEntity target : targets) {
             if (target.equals(player)) {
@@ -152,7 +152,7 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
     public double calculateDamage(Player player, LivingEntity target) {
         int level = getLevel(player);
         double minDamage = getSlamDamage(level) / 4;
-        double maxDistance = 5.5d + 0.5 * level;
+        double maxDistance = radius;
 
         double distance = player.getLocation().distance(target.getLocation());
         double distanceFactor = 1 - (distance / maxDistance);
@@ -193,7 +193,7 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
 
     @Override
     public void loadSkillConfig(){
-        radius = getConfig("radius", 5.0, Double.class);
+        radius = getConfig("radius", 6.0, Double.class);
         damage = getConfig("damage", 5.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 2.0, Double.class);
         cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 2.0, Double.class);
