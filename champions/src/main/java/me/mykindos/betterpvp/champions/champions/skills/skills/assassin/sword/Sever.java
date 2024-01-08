@@ -51,9 +51,9 @@ public class Sever extends Skill implements CooldownSkill, Listener {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Right click with a Sword to prepare",
+                "Right click with a Sword to activate",
                 "",
-                "Your next hit applies a <val>" + getDuration(level) + "</val> second <effect>Bleed</effect>",
+                "Inflict a <val>" + getDuration(level) + "</val> second <effect>Bleed</effect>",
                 "dealing <stat>1</stat> heart per second",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
