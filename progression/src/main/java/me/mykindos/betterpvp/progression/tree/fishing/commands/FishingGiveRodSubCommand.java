@@ -59,7 +59,8 @@ public class FishingGiveRodSubCommand extends Command {
     @Override
     public List<String> processTabComplete(CommandSender sender, String[] args) {
         if (args.length == 1) {
-            return fishing.getRodTypes().stream().map(rod -> rod.getName().toLowerCase()).toList();
+            return fishing.getRodTypes().stream().filter(fishingRodType -> fishingRodType.getName().toLowerCase().contains(args[0]))
+                    .map(rod -> rod.getName().toLowerCase()).toList();
         }
         return new ArrayList<>();
     }
