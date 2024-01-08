@@ -61,7 +61,7 @@ public class LeaderboardCommand extends Command {
     @Override
     public List<String> processTabComplete(CommandSender sender, String[] args) {
         if (args.length == 1) {
-                return new ArrayList<>(leaderboards.getViewable().keySet());
+                return new ArrayList<>(leaderboards.getViewable().keySet().stream().filter(name -> name.toLowerCase().startsWith(args[0].toLowerCase())).toList());
         }
         return Collections.emptyList();
     }

@@ -107,9 +107,10 @@ public class CombatCommand extends Command {
     @Override
     public List<String> processTabComplete(CommandSender sender, String[] args) {
         if (args.length == 1) {
-            return Arrays.stream(ChampionsFilter.values()).map(filter -> filter.name().toLowerCase()).toList();
+            return Arrays.stream(ChampionsFilter.values()).filter(championsFilter -> championsFilter.name().toLowerCase().contains(args[0].toLowerCase())).
+                    map(filter -> filter.name().toLowerCase()).toList();
         } else if (args.length == 2) {
-            return Bukkit.getOnlinePlayers().stream().map(Player::getName).toList();
+            return Bukkit.getOnlinePlayers().stream().map(Player::getName).filter(name -> name.toLowerCase().contains(args[1].toLowerCase())).toList();
         }
         return List.of();
     }
