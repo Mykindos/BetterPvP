@@ -273,8 +273,10 @@ public class BloodCompass extends Skill implements ToggleSkill, CooldownSkill {
                 Player target = world.getPlayers().stream().filter(p -> p.getLocation().equals(end)).findFirst().orElse(null);
                 if (target != null) {
                     UtilPlayer.setGlowing(player, target, true);
-                    target.playSound(target.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1.0f, 1.0f);
+                    player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1.0f, 1.0f);
                     target.damage(getFinalDamage(level));
+
+                    UtilMessage.message(player, getClassType().getName(), "You hit " + target.getName() + " with Blood Compass.");
 
                     new BukkitRunnable() {
                         @Override
