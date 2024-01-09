@@ -374,7 +374,7 @@ skills:
       baseFireTrailDuration: 2.0
       fireTrailDurationIncreasePerLevel: 0.0
       speedStrength: 0
-      strengthStrength: 1
+      strengthLevel: 1
       energyDecreasePerLevel: 1.0
     lifebonds:
       enabled: true
