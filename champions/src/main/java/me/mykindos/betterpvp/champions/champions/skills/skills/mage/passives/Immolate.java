@@ -59,7 +59,7 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill {
                 "Drop your Sword / Axe to toggle",
                 "",
                 "Ignite yourself in flaming fury, gaining",
-                "<effect>Speed "+ UtilFormat.getRomanNumeral(speedStrength + 1) + "</effect>, <effect>Strength " + UtilFormat.getRomanNumeral(strengthStrength) + " </effect> and <effect>Fire Resistance",
+                "<effect>Speed "+ UtilFormat.getRomanNumeral(speedStrength + 1) + "</effect>, <effect>Strength " + UtilFormat.getRomanNumeral(strengthLevel) + " </effect> and <effect>Fire Resistance",
                 "",
                 "You leave a trail of fire, which",
                 "ignites enemies for <stat>" + getFireTickDuration(level) + "</stat> seconds",
@@ -148,7 +148,7 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill {
                 } else {
                     player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 25, speedStrength));
                     player.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 25, 0));
-                    championsManager.getEffects().addEffect(player, EffectType.STRENGTH, strengthStrength, 1250L);
+                    championsManager.getEffects().addEffect(player, EffectType.STRENGTH, strengthLevel, 1250L);
                 }
             } else {
                 iterator.remove();
