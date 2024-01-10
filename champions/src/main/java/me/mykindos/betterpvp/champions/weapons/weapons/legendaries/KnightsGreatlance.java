@@ -1,7 +1,6 @@
 package me.mykindos.betterpvp.champions.weapons.weapons.legendaries;
 
 import com.destroystokyo.paper.ParticleBuilder;
-import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.AllArgsConstructor;
@@ -25,6 +24,7 @@ import me.mykindos.betterpvp.core.items.BPVPItem;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -207,7 +207,18 @@ public class KnightsGreatlance extends ChannelWeapon implements InteractWeapon, 
 
             // Get all enemies that collide with the player from the last location to the new location
             final Location newLocation = getMidpoint(player);
-            final Optional<LivingEntity> hit = trace(player, data.getLastLocation(), newLocation);
+            final Optional<LivingEntity> hit = UtilEntity.interpolateCollision(data.getLastLocation(), newLocation, 0.6f, entity -> {
+                if (!(entity instanceof LivingEntity) || entity.equals(player)) {
+                    return false;
+                }
+
+                if (!(entity instanceof Player other)) {
+                    return true;
+                }
+
+                return UtilPlayer.getRelation(player, other) != EntityProperty.FRIENDLY;
+            }).map(RayTraceResult::getHitEntity).map(LivingEntity.class::cast);
+
             final int charge = data.getTicksCharged();
             final double percentage = (float) charge / maxChargeTicks;
             if (hit.isPresent()) {
@@ -263,32 +274,6 @@ public class KnightsGreatlance extends ChannelWeapon implements InteractWeapon, 
                     .receivers(60)
                     .spawn();
         }
-    }
-
-    private Optional<LivingEntity> trace(@NotNull Player player, @NotNull Location lastLocation, @NotNull Location location) {
-        Preconditions.checkNotNull(player, "Player cannot be null");
-        Preconditions.checkNotNull(lastLocation, "Last location cannot be null");
-        Preconditions.checkNotNull(location, "Location cannot be null");
-        Preconditions.checkArgument(location.getWorld() == lastLocation.getWorld(), "Locations must be in the same world");
-
-        final Vector direction = location.getDirection();
-        final RayTraceResult result = lastLocation.getWorld().rayTraceEntities(lastLocation, direction, direction.length(), 0.6, entity -> {
-            if (!(entity instanceof LivingEntity) || entity.equals(player)) {
-                return false;
-            }
-
-            if (!(entity instanceof Player other)) {
-                return true;
-            }
-
-            return UtilPlayer.getRelation(player, other) != EntityProperty.FRIENDLY;
-        });
-
-        if (result == null) {
-            return Optional.empty();
-        }
-
-        return Optional.ofNullable((LivingEntity) result.getHitEntity());
     }
 
     @EventHandler

@@ -20,7 +20,6 @@ import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -144,7 +143,7 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
         orb.setVelocity(player.getLocation().getDirection());
         orb.setCanPlayerPickup(false);
         orb.setCanMobPickup(false);
-        ThrowableItem throwableItem = new ThrowableItem(orb, player, "Lightning Orb", 10000, true, true);
+        ThrowableItem throwableItem = new ThrowableItem(orb, player, "Lightning Orb", 10000, true);
         championsManager.getThrowables().addThrowable(throwableItem);
     }
 
