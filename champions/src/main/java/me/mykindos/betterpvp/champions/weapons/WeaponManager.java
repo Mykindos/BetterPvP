@@ -49,12 +49,6 @@ public class WeaponManager extends Manager<IWeapon> {
         champions.saveConfig();
     }
 
-    public void reload() {
-        for (IWeapon weapon : getObjects().values()) {
-            champions.getInjector().injectMembers(weapon);
-        }
-    }
-
     public Optional<IWeapon> getWeaponByItemStack(ItemStack itemStack) {
         for (IWeapon weapon : objects.values()) {
             if (weapon.matches(itemStack)) return Optional.of(weapon);

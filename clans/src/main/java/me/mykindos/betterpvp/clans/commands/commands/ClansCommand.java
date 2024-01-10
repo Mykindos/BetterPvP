@@ -7,12 +7,12 @@ import me.mykindos.betterpvp.clans.clans.map.MapHandler;
 import me.mykindos.betterpvp.clans.commands.ClansCommandLoader;
 import me.mykindos.betterpvp.clans.fields.Fields;
 import me.mykindos.betterpvp.clans.listener.ClansListenerLoader;
-import me.mykindos.betterpvp.clans.tips.ClansTipLoader;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.IConsoleCommand;
 import me.mykindos.betterpvp.core.command.SubCommand;
+import me.mykindos.betterpvp.core.tips.TipManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -59,7 +59,7 @@ public class ClansCommand extends Command implements IConsoleCommand {
         private ClansListenerLoader listenerLoader;
 
         @Inject
-        private ClansTipLoader clansTipLoader;
+        private TipManager tipManager;
 
         @Inject
         private Fields fields;
@@ -81,15 +81,12 @@ public class ClansCommand extends Command implements IConsoleCommand {
 
         @Override
         public void execute(CommandSender sender, String[] args) {
-            clans.reloadConfig();
+            clans.reload();
 
             commandLoader.reload(clans.getClass().getPackageName());
-            listenerLoader.reload(clans.getClass().getPackageName());
-            clansTipLoader.reload(clans.getClass().getPackageName());
+            tipManager.reloadTips();
 
             fields.reload(clans);
-            clans.getInjector().injectMembers(clans.getInjector().getInstance(MapHandler.class));
-
 
             UtilMessage.message(sender, "Clans", "Successfully reloaded clans");
         }

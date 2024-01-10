@@ -53,10 +53,6 @@ public class FieldsRepository implements IRepository<FieldsBlockEntry> {
         log.info("Loaded " + types.size() + " ore types");
     }
 
-    public void reload() {
-        types.forEach(type -> clans.getInjector().injectMembers(type));
-    }
-
     @Override
     public List<FieldsBlockEntry> getAll() {
         List<FieldsBlockEntry> ores = new ArrayList<>();

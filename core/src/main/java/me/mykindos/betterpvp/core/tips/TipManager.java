@@ -17,11 +17,8 @@ public class TipManager extends Manager<Tip> {
         log.info("Loaded Tip " + tip.getName());
     }
 
-    public void reloadTips(BPvPPlugin plugin) {
-        getObjects().values().forEach(tip -> {
-            tip.loadConfig();
-            plugin.getInjector().injectMembers(tip);
-        });
+    public void reloadTips() {
+        getObjects().values().forEach(Tip::loadConfig);
     }
 
     public Collection<? extends Tip> getTips() {

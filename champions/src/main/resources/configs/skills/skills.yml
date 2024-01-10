@@ -166,7 +166,7 @@ skills:
       healRate: 1.0
       baseHeal: 3.0
       healIncreasePerLevel: 1.0
-      healInterval: 0.5
+      healInterval: 1.5
     vengeance:
       enabled: true
       maxlevel: 3

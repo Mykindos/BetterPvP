@@ -115,10 +115,9 @@ public class ShopsCommand extends Command implements IConsoleCommand {
 
         @Override
         public void execute(CommandSender sender, String[] args) {
-            shops.reloadConfig();
+            shops.reload();
 
             commandLoader.reload(shops.getClass().getPackageName());
-            listenerLoader.reload(shops.getClass().getPackageName());
             shopkeeperManager.loadShopsFromConfig();
 
             UtilMessage.message(sender, "Clans", "Successfully reloaded shops");

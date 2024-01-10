@@ -88,14 +88,11 @@ public class ChampionsCommand extends Command implements IConsoleCommand {
 
         @Override
         public void execute(CommandSender sender, String[] args) {
-            champions.reloadConfig();
+            champions.reload();
 
             commandLoader.reload(champions.getClass().getPackageName());
-            listenerLoader.reload(champions.getClass().getPackageName());
             skillManager.reloadSkills();
-            weaponManager.reload();
             buildManager.reloadBuilds();
-
             itemHandler.loadItemData("champions");
 
             UtilMessage.message(sender, "Champions", "Successfully reloaded champions");

@@ -32,13 +32,5 @@ public class ListenerLoader extends Loader {
         }
     }
 
-    @Override
-    public void reload(String packageName) {
-        plugin.getListeners().forEach(listener -> {
-            if (!listener.getClass().getPackageName().contains(packageName)) return;
-            plugin.getInjector().injectMembers(listener);
-        });
-    }
-
 
 }

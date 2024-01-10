@@ -46,10 +46,7 @@ public class SkillManager extends Manager<Skill> {
     }
 
     public void reloadSkills(){
-        getObjects().values().forEach(skill -> {
-            champions.getInjector().injectMembers(skill);
-            skill.reload();
-        });
+        getObjects().values().forEach(Skill::reload);
     }
 
     public List<Skill> getSkillsForRole(Role role) {

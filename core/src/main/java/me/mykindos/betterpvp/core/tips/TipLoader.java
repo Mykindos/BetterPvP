@@ -23,8 +23,4 @@ public class TipLoader extends Loader {
         tipManager.registerTip(plugin, tip);
     }
 
-    @Override
-    public void reload(String packageName) {
-        tipManager.reloadTips(plugin);
-    }
 }

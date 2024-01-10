@@ -81,10 +81,9 @@ public class ProgressionCommand extends Command implements IConsoleCommand {
 
         @Override
         public void execute(CommandSender sender, String[] args) {
-            progression.reloadConfig();
+            progression.reload();
 
             commandLoader.reload(progression.getClass().getPackageName());
-            listenerLoader.reload(progression.getClass().getPackageName());
             progressionsManager.loadTrees();
 
             UtilMessage.message(sender, "Progression", "Successfully reloaded progression");

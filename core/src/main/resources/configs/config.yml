@@ -44,7 +44,7 @@ command:
     requiredRank: ADMIN
   list:
     enabled: true
-    requiredRank: ADMIN
+    requiredRank: PLAYER
   teleport:
     enabled: true
     requiredRank: ADMIN
@@ -110,16 +110,16 @@ command:
       requiredRank: ADMIN
   settings:
     enabled: true
-    requiredRank: ADMIN
+    requiredRank: PLAYER
   heal:
     enabled: true
     requiredRank: ADMIN
   balance:
     enabled: true
-    requiredRank: ADMIN
+    requiredRank: PLAYER
     pay:
       enabled: true
-      requiredRank: ADMIN
+      requiredRank: PLAYER
     give:
       enabled: true
       requiredRank: ADMIN
@@ -129,3 +129,5 @@ command:
   recipe:
     minecraft:
       tnt: false
+update-event:
+  allow-rollover: false
