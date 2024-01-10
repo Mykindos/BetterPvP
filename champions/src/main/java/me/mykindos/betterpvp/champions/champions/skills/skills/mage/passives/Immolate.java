@@ -208,7 +208,7 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill {
         baseFireTrailDuration = getConfig("baseFireTrailDuration", 2.0, Double.class);
         fireTrailDurationIncreasePerLevel = getConfig("fireTrailDurationIncreasePerLevel", 0.0, Double.class);
         speedStrength = getConfig("speedStrength", 0, Integer.class);
-        strengthLevel = getConfig("speedLevel", 1, Integer.class);
+        strengthLevel = getConfig("strengthLevel", 1, Integer.class);
         energyDecreasePerLevel = getConfig("energyDecreasePerLevel", 1.0, Double.class);
     }
 }
