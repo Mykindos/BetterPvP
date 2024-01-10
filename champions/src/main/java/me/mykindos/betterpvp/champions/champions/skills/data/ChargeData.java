@@ -35,7 +35,7 @@ public class ChargeData {
             return;
         }
 
-        player.playSound(player.getEyeLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.5f, 1f + (0.5f * charge));
+        player.playSound(player.getEyeLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.5f, 1f + charge);
         lastSound = System.currentTimeMillis();
     }
 }

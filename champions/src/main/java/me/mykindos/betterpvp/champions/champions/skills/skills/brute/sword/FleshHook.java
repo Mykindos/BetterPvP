@@ -258,7 +258,7 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
         // Cues
         UtilMessage.message(target, getClassType().getName(), "<alt2>" + player.getName() + "</alt2> pulled you with <alt>" + getName() + "</alt>.");
         UtilMessage.message(player, getClassType().getName(), "You hit <alt2>" + target.getName() + "</alt2> with <alt>" + getName() + "</alt>.");
-        new SoundEffect(Sound.BLOCK_NOTE_BLOCK_PLING, 2f, 1f).play(player);
+        new SoundEffect(Sound.ENTITY_ARROW_HIT_PLAYER, 2f, 2f).play(player);
 
         event.getThrowable().getItem().remove();
         charging.remove(player);
