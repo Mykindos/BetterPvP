@@ -33,11 +33,9 @@ public class FieldsRepository implements IRepository<FieldsBlockEntry> {
     @Getter
     private final Set<FieldsInteractable> types = new HashSet<>();
     private final Database database;
-    private final Clans clans;
 
     @Inject
     public FieldsRepository(Clans clans, Database database) {
-        this.clans = clans;
         this.database = database;
 
         Reflections reflections = new Reflections(Fields.class.getPackageName());
