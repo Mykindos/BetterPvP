@@ -2,9 +2,9 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.mage.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.Data;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
+import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
@@ -21,7 +21,6 @@ import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
 import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
 import org.bukkit.Color;
@@ -53,7 +52,7 @@ import java.util.WeakHashMap;
 public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySkill, CooldownSkill {
 
     // Percentage (0 -> 1)
-    private final WeakHashMap<Player, LazerData> charging = new WeakHashMap<>();
+    private final WeakHashMap<Player, ChargeData> charging = new WeakHashMap<>();
 
     // Action bar
     private final PermanentComponent actionBarComponent = new PermanentComponent(gamer -> {
@@ -62,8 +61,8 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
             return null; // Skip if not online or not charging
         }
 
-        final LazerData charge = charging.get(player);
-        ProgressBar progressBar = ProgressBar.withProgress((float) charge.getCharge());
+        final ChargeData charge = charging.get(player);
+        ProgressBar progressBar = ProgressBar.withProgress(charge.getCharge());
         return progressBar.build();
     });
 
@@ -114,7 +113,7 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
         return (float) baseDamage + 2 * (level - 1);
     }
 
-    private double getChargePerSecond(int level) {
+    private float getChargePerSecond(int level) {
         return (float) baseCharge + (10 * (level - 1)); // Increment of 10% per level
     }
 
@@ -172,17 +171,7 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
 
     @Override
     public void activate(Player player, int level) {
-        charging.put(player, new LazerData(level));
-    }
-
-    private void showCharge(Player player, LazerData charge) {
-        // Sound
-        if (!UtilTime.elapsed(charge.getLastSound(), 150)) {
-            return;
-        }
-
-        player.playSound(player.getEyeLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.5f, 0.5f + (0.5f * (float) charge.getCharge()));
-        charge.setLastSound(System.currentTimeMillis());
+        charging.put(player, new ChargeData(getChargePerSecond(level) / 100));
     }
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
@@ -288,15 +277,14 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
         Iterator<Player> iterator = charging.keySet().iterator();
         while (iterator.hasNext()) {
             Player player = iterator.next();
-            LazerData charge = charging.get(player);
+            ChargeData charge = charging.get(player);
             if (player == null || !player.isOnline()) {
                 iterator.remove();
                 continue;
             }
 
-            int level = getLevel(player);
-
             // Remove if they no longer have the skill
+            int level = getLevel(player);
             if (level <= 0) {
                 iterator.remove();
                 continue;
@@ -308,29 +296,13 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
                 championsManager.getCooldowns().removeCooldown(player, getName(), true);
 
                 charge.tick();
-                // Cues
-                showCharge(player, charge);
+                charge.tickSound(player);
                 continue;
             }
 
-            shoot(player, (float) charge.getCharge(), level);
+            shoot(player, charge.getCharge(), level);
             iterator.remove();
         }
     }
 
-    @Data
-    private class LazerData {
-
-        private long lastSound = 0;
-        private long lastMessage = 0;
-        private double charge = 0; // 0 -> 1
-        private final int level;
-
-        public void tick() {
-            // Divide over 100 to get multiplication factor since it's in 100% scale for display
-            final double chargeToGive = getChargePerSecond(level) / 100;
-            this.charge = Math.min(1, this.charge + (chargeToGive / 20));
-        }
-
-    }
 }
