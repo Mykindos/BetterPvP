@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
-import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
@@ -23,8 +22,6 @@ import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
-import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
-import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -33,7 +30,6 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
@@ -49,10 +45,10 @@ import java.util.WeakHashMap;
 @BPvPListener
 @Slf4j
 public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSkill {
+
     private final List<ChargeData> charges = new ArrayList<>();
     private final WeakHashMap<Player, Long> delay = new WeakHashMap<>();
     private final WeakHashMap<Player, ChargeData> playerChargeMap = new WeakHashMap<>();
-
 
     public double damage;
     public double damageIncreasePerLevel;
@@ -132,7 +128,7 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
                         Location loc = player.getLocation();
 
                         Item item = player.getWorld().dropItem(player.getEyeLocation(), new ItemStack(Material.TRIPWIRE_HOOK));
-                        ThrowableItem throwable = new ThrowableItem(item, player, getName(), 10000L, true, true);
+                        ThrowableItem throwable = new ThrowableItem(item, player, getName(), 10000L, true);
                         throwable.setCollideGround(true);
                         championsManager.getThrowables().addThrowable(throwable);
 

@@ -19,92 +19,25 @@ import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.ItemMergeEvent;
 import org.bukkit.event.inventory.InventoryPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.util.RayTraceResult;
+
+import java.util.List;
 
 @BPvPListener
 public class ThrowableListener implements Listener {
 
-    private final ThrowableHandler throwableHandler;
-
     @Inject
-    public ThrowableListener(ThrowableHandler throwableHandler) {
-        this.throwableHandler = throwableHandler;
-    }
+    private ThrowableHandler throwableHandler;
 
     @UpdateEvent(delay = 125)
     public void removeThrowables() {
         throwableHandler.getThrowables().removeIf(throwable -> {
-            if (throwable.getExpireTime() - System.currentTimeMillis() <= 0) {
+            if (throwable.getExpireTime() - System.currentTimeMillis() <= 0 || !throwable.getItem().isValid()) {
                 throwable.getItem().remove();
                 return true;
             }
             return false;
         });
-
-    }
-
-    @EventHandler
-    public void onPickup(EntityPickupItemEvent event) {
-        if (throwableHandler.getThrowable(event.getItem()).isPresent()) {
-            event.setCancelled(true);
-        }
-
-    }
-
-    @EventHandler
-    public void onHopperPickup(InventoryPickupItemEvent event) {
-        if (event.isCancelled()) {
-            return;
-        }
-
-        if (throwableHandler.getThrowable(event.getItem()).isPresent()) {
-            event.setCancelled(true);
-        }
-    }
-
-    @EventHandler
-    public void onMerge(ItemMergeEvent event) {
-        if (throwableHandler.getThrowable(event.getEntity()).isPresent()) {
-            event.setCancelled(true);
-        }
-    }
-
-    @UpdateEvent
-    public void collisionCheck() {
-        throwableHandler.getThrowables().forEach(throwable -> {
-            checkGroundCollision(throwable);
-            checkEntityCollision(throwable);
-        });
-    }
-
-    private void checkGroundCollision(ThrowableItem throwable) {
-        if (!throwable.isCollideGround()) return;
-        if (throwable.getItem() == null || throwable.getItem().isDead()) return;
-        if (UtilBlock.isGrounded(throwable.getItem())) {
-            UtilServer.callEvent(new ThrowableHitGroundEvent(throwable));
-        }
-    }
-
-    private void checkEntityCollision(ThrowableItem throwable) {
-        if (throwable.getItem() == null || throwable.getItem().isDead()) return;
-        Location location = throwable.getItem().getLocation().clone();
-        if (!doCollision(throwable, location, throwable.getCollisionRadius())) {
-            if (throwable.isCheckingHead()) {
-                doCollision(throwable, location.add(0, 1.5, 0), throwable.getCollisionRadius());
-            }
-        }
-    }
-
-    private boolean doCollision(ThrowableItem throwable, Location location, double distance) {
-        var targets = UtilEntity.getNearbyEnemies(throwable.getThrower(), location, distance);
-        for (LivingEntity entity : targets) {
-            if (throwable.getImmune().contains(entity)) continue;
-            UtilServer.callEvent(new ThrowableHitEntityEvent(throwable, entity));
-            if (throwable.isSingleCollision()) {
-                break;
-            }
-        }
-
-        return !targets.isEmpty();
     }
 
     @EventHandler
@@ -114,8 +47,73 @@ public class ThrowableListener implements Listener {
         }
     }
 
+    @UpdateEvent
+    public void collisionCheck() {
+        throwableHandler.getThrowables().forEach(throwable -> {
+            checkGroundCollision(throwable);
+            checkEntityCollision(throwable);
+            throwable.setLastLocation(throwable.getItem().getLocation());
+        });
+    }
+
+    @EventHandler
+    public void onPickup(EntityPickupItemEvent event) {
+        throwableHandler.getThrowable(event.getItem()).ifPresent(throwable -> event.setCancelled(true));
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onHopperPickup(InventoryPickupItemEvent event) {
+        throwableHandler.getThrowable(event.getItem()).ifPresent(throwable -> event.setCancelled(true));
+    }
+
+    @EventHandler
+    public void onMerge(ItemMergeEvent event) {
+        throwableHandler.getThrowable(event.getEntity()).ifPresent(throwable -> event.setCancelled(true));
+    }
+
     @EventHandler
     public void playerQuit(PlayerQuitEvent event) {
         throwableHandler.getThrowables().removeIf(throwableItem -> throwableItem.getThrower().equals(event.getPlayer()));
+    }
+
+    private void checkGroundCollision(ThrowableItem throwable) {
+        if (!throwable.isCollideGround() || throwable.getItem() == null || !throwable.getItem().isValid()
+                || !UtilBlock.isGrounded(throwable.getItem())) {
+            return;
+        }
+
+        UtilServer.callEvent(new ThrowableHitGroundEvent(throwable));
+    }
+
+    private void checkEntityCollision(ThrowableItem throwable) {
+        if (throwable.getItem() == null || !throwable.getItem().isValid()) return;
+        final Location location = throwable.getItem().getLocation().clone();
+        final Location lastLocation = throwable.getLastLocation().clone();
+        final double size = throwable.getCollisionRadius();
+
+        // Attempt collision by nearby entities
+        final List<LivingEntity> targets = UtilEntity.getNearbyEnemies(throwable.getThrower(), location, size);
+        for (LivingEntity entity : targets) {
+            if (throwable.getImmune().contains(entity)) continue;
+            UtilServer.callEvent(new ThrowableHitEntityEvent(throwable, entity));
+            if (throwable.isSingleCollision()) {
+                break;
+            }
+        }
+
+        if (!targets.isEmpty()) {
+            return; // We hit an entity, so we don't need to fall back to ray trace
+        }
+
+        // Ray trace if all else fails
+        UtilEntity.interpolateCollision(lastLocation, location, (float) size, entity -> {
+            if (!(entity instanceof LivingEntity living) || living.equals(throwable.getThrower())) {
+                return false;
+            }
+
+            return !throwable.getImmune().contains(living);
+        }).map(RayTraceResult::getHitEntity).map(LivingEntity.class::cast).ifPresent(entity -> {
+            UtilServer.callEvent(new ThrowableHitEntityEvent(throwable, entity));
+        });
     }
 }

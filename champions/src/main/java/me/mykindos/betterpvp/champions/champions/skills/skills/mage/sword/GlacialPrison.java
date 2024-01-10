@@ -109,7 +109,7 @@ public class GlacialPrison extends Skill implements InteractSkill, CooldownSkill
     public void activate(Player player, int level) {
         Item item = player.getWorld().dropItem(player.getEyeLocation(), new ItemStack(Material.ICE));
         item.setVelocity(player.getLocation().getDirection().multiply(speed));
-        ThrowableItem throwableItem = new ThrowableItem(item, player, getName(), 10000, true, true);
+        ThrowableItem throwableItem = new ThrowableItem(item, player, getName(), 10000, true);
         throwableItem.setCollideGround(true);
         championsManager.getThrowables().addThrowable(throwableItem);
     }
