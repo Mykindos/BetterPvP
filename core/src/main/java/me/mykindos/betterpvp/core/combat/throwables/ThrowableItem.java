@@ -11,7 +11,7 @@ import java.util.List;
 @Data
 public class ThrowableItem {
 
-    private final List<LivingEntity> immune = new ArrayList<>();
+    private final List<LivingEntity> immunes = new ArrayList<>();
     private final Item item;
     private final LivingEntity thrower;
     private final String name;

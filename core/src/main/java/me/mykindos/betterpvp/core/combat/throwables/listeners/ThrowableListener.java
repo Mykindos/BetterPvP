@@ -94,7 +94,7 @@ public class ThrowableListener implements Listener {
         // Attempt collision by nearby entities
         final List<LivingEntity> targets = UtilEntity.getNearbyEnemies(throwable.getThrower(), location, size);
         for (LivingEntity entity : targets) {
-            if (throwable.getImmune().contains(entity)) continue;
+            if (throwable.getImmunes().contains(entity)) continue;
             UtilServer.callEvent(new ThrowableHitEntityEvent(throwable, entity));
             if (throwable.isSingleCollision()) {
                 break;
@@ -111,7 +111,7 @@ public class ThrowableListener implements Listener {
                 return false;
             }
 
-            return !throwable.getImmune().contains(living);
+            return !throwable.getImmunes().contains(living);
         }).map(RayTraceResult::getHitEntity).map(LivingEntity.class::cast).ifPresent(entity -> {
             UtilServer.callEvent(new ThrowableHitEntityEvent(throwable, entity));
         });
