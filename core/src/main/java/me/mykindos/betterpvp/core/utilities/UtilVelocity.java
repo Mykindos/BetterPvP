@@ -19,7 +19,7 @@ public class UtilVelocity {
     }
 
     public static Vector getTrajectory2d(Vector from, Vector to) {
-        return to.subtract(from).setY(0).normalize();
+        return to.clone().subtract(from).setY(0).normalize();
     }
 
     public static void velocity(Entity ent, Vector vec, double str, boolean ySet, double yBase, double yAdd, double yMax, boolean groundBoost, boolean velocityEvent) {
@@ -30,7 +30,9 @@ public class UtilVelocity {
 
             vec.normalize();
             vec.multiply(str);
+
             vec.setY(vec.getY() + yAdd);
+
             if (vec.getY() > yMax) {
                 vec.setY(yMax);
             }

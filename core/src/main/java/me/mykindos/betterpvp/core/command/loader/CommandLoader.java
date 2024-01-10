@@ -79,7 +79,7 @@ public class CommandLoader extends Loader {
 
             count++;
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Failed to load command", ex);
         }
     }
 

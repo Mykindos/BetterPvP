@@ -1,10 +1,12 @@
 package me.mykindos.betterpvp.core.listener.loader;
 
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.Loader;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 
+@Slf4j
 public class ListenerLoader extends Loader {
 
     public ListenerLoader(BPvPPlugin plugin) {
@@ -28,7 +30,7 @@ public class ListenerLoader extends Loader {
             Listener listener = (Listener) plugin.getInjector().getInstance(clazz);
             load(listener);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Failed to load listener", ex);
         }
     }
 

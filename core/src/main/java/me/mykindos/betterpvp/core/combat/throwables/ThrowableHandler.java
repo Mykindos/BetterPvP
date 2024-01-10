@@ -9,10 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Getter
 @Singleton
 public class ThrowableHandler {
 
-    @Getter
     private final List<ThrowableItem> throwables = new ArrayList<>();
 
     public void addThrowable(Item item, LivingEntity entity, String name, long expire){
@@ -24,17 +24,15 @@ public class ThrowableHandler {
     }
 
     public void addThrowable(Item item, LivingEntity entity, String name, long expire, boolean checkHead, boolean removeOnCollision){
-        addThrowable(new ThrowableItem(item, entity, name, expire, checkHead, removeOnCollision));
+        addThrowable(new ThrowableItem(item, entity, name, expire, removeOnCollision));
     }
 
     public void addThrowable(ThrowableItem throwableItem){
         throwables.add(throwableItem);
     }
 
-
     public Optional<ThrowableItem> getThrowable(Item item) {
         return throwables.stream().filter(throwable -> throwable.getItem().equals(item)).findFirst();
-
     }
 
 }

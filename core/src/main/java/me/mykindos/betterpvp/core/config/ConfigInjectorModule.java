@@ -58,7 +58,7 @@ public class ConfigInjectorModule extends AbstractModule {
     }
 
     public void reload() {
-        ;
+
     }
 
 }

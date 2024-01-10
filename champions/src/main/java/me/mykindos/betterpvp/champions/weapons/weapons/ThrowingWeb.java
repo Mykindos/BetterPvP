@@ -74,7 +74,7 @@ public class ThrowingWeb extends Weapon implements Listener, InteractWeapon, Coo
         item.getItemStack().getItemMeta().getPersistentDataContainer().set(CoreNamespaceKeys.UUID_KEY, PersistentDataType.STRING, UUID.randomUUID().toString());
         item.setVelocity(player.getLocation().getDirection().multiply(1.8));
 
-        ThrowableItem throwableItem = new ThrowableItem(item, player, "Throwing Web", (long) (throwableExpiry * 1000L), true, true);
+        ThrowableItem throwableItem = new ThrowableItem(item, player, "Throwing Web", (long) (throwableExpiry * 1000L), true);
         throwableItem.setCollideGround(true);
         throwableItem.getImmunes().add(player);
         championsManager.getThrowables().addThrowable(throwableItem);
