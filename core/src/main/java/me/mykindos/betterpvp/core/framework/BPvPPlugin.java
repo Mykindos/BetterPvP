@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.framework;
 import com.google.common.base.Charsets;
 import com.google.inject.Injector;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
@@ -13,6 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Field;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.FileSystem;
@@ -24,7 +26,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -37,6 +41,7 @@ public abstract class BPvPPlugin extends JavaPlugin {
     private final ArrayList<Object> listeners;
 
     private final HashMap<String, ExtendedYamlConfiguration> configs;
+
 
     public BPvPPlugin() {
         this.listeners = new ArrayList<>();
@@ -133,6 +138,11 @@ public abstract class BPvPPlugin extends JavaPlugin {
         } catch (IOException e) {
             log.error("Failed to walk and save config files", e);
         }
+    }
+
+    public void reload() {
+        reloadConfig();
+        getInjector().getAllBindings().forEach((key, value) -> getInjector().injectMembers(value.getProvider().get()));
     }
 
 }

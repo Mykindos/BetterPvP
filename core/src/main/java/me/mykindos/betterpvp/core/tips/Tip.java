@@ -51,8 +51,7 @@ public abstract class Tip {
     }
 
     protected <T> T getConfig(String name, Object defaultValue, Class<T> type) {
-        String path;
-        path = "tips." + getName().toLowerCase().replace(" ", "") + "." + name;
+        String path  = "tips." + getName().toLowerCase().replace(" ", "") + "." + name;
         return this.plugin.getConfig().getOrSaveObject(path, defaultValue, type);
     }
 

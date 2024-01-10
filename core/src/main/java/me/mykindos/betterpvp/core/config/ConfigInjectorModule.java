@@ -22,6 +22,7 @@ public class ConfigInjectorModule extends AbstractModule {
         this.plugin = plugin;
         this.fields = fields;
         this.providers = new HashMap<>();
+
     }
 
     @Override
@@ -54,6 +55,10 @@ public class ConfigInjectorModule extends AbstractModule {
         }
 
         return (ConfigProvider<T>) provider;
+    }
+
+    public void reload() {
+        ;
     }
 
 }

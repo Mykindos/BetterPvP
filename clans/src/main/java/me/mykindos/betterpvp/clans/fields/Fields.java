@@ -79,7 +79,6 @@ public class Fields {
             playerCountSpeeds.put(playerCount, speed);
         }
 
-        repository.reload();
     }
 
     /**

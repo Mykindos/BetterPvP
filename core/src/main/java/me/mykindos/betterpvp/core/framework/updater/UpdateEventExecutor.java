@@ -4,8 +4,10 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import org.bukkit.Bukkit;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -17,8 +19,13 @@ public class UpdateEventExecutor {
 
     private final Core core;
 
-    public HashMap<Long, Long> lastRunTimers = new HashMap<>();
+    public HashMap<Long, Integer> lastRunTimers = new HashMap<>();
     public HashMap<Object, HashMap<Method, UpdateEvent>> updateMethods = new HashMap<>();
+
+    // Depending on server performance, an update event running every tick may skip an interval. This allows the event to rollover to the next interval.
+    @Config(path = "update-event.allow-rollover", defaultValue = "false")
+    @Inject
+    private boolean allowRollover;
 
     @Inject
     public UpdateEventExecutor(Core core) {
@@ -52,20 +59,29 @@ public class UpdateEventExecutor {
 
     private void executeUpdateEvents() {
 
-        var updateTimers = new HashMap<Long, Long>();
+        var updateTimers = new HashMap<Long, Integer>();
+        int currentTick = Bukkit.getCurrentTick();
 
         for (var entry : updateMethods.entrySet()) {
+
             for (var method : entry.getValue().entrySet()) {
                 var event = method.getValue();
-
-                Long lastRun = lastRunTimers.get(event.delay());
-                if (lastRun != null) {
-                    if (lastRun < System.currentTimeMillis()) {
+                int tickDelay = (int) event.delay() / 50;
+                Integer lastRunTick = lastRunTimers.get(event.delay());
+                if (lastRunTick != null) {
+                    if (lastRunTick <= currentTick) {
                         callUpdater(event, method.getKey(), entry.getKey());
-                        updateTimers.put(event.delay(), System.currentTimeMillis() + event.delay());
+
+                        if (allowRollover) {
+                            updateTimers.put(event.delay(), currentTick + tickDelay);
+                        } else {
+                            if (!updateTimers.containsKey(event.delay())) {
+                                updateTimers.put(event.delay(), currentTick + tickDelay);
+                            }
+                        }
                     }
                 } else {
-                    lastRunTimers.put(event.delay(), System.currentTimeMillis() + event.delay());
+                    lastRunTimers.put(event.delay(), currentTick + tickDelay);
                 }
 
             }

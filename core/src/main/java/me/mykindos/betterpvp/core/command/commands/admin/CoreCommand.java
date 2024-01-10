@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.command.IConsoleCommand;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.command.loader.CoreCommandLoader;
 import me.mykindos.betterpvp.core.listener.loader.CoreListenerLoader;
+import me.mykindos.betterpvp.core.tips.TipManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -55,6 +56,9 @@ public class CoreCommand extends Command implements IConsoleCommand {
         @Inject
         private CoreListenerLoader listenerLoader;
 
+        @Inject
+        private TipManager tipManager;
+
         @Override
         public String getName() {
             return "reload";
@@ -72,9 +76,9 @@ public class CoreCommand extends Command implements IConsoleCommand {
 
         @Override
         public void execute(CommandSender sender, String[] args) {
-            core.reloadConfig();
+            core.reload();
             commandLoader.reload(core.getClass().getPackageName());
-            listenerLoader.reload(core.getClass().getPackageName());
+            tipManager.reloadTips();
 
             UtilMessage.message(sender, "Core", "Successfully reloaded core");
         }

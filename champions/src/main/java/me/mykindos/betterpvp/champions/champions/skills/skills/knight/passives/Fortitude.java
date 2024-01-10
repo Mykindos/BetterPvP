@@ -112,6 +112,6 @@ public class Fortitude extends Skill implements PassiveSkill, Listener {
         healRate = getConfig("healRate", 1.0, Double.class);
         baseHeal = getConfig("baseHeal", 3.0, Double.class);
         healIncreasePerLevel = getConfig("healIncreasePerLevel", 1.0, Double.class);
-        healInterval = getConfig("healInterval", 0.5, Double.class);
+        healInterval = getConfig("healInterval", 1.5, Double.class);
     }
 }
