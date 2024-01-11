@@ -102,6 +102,7 @@ public class Void extends ActiveToggleSkill implements EnergySkill {
                 if (!player.hasPotionEffect(PotionEffectType.INVISIBILITY)) {
                     player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 20, 1, false, false, false));
                 }
+                championsManager.getEffects().addEffect(player, EffectType.NO_JUMP, 20);
 
                 int level = getLevel(player);
                 if (level <= 0) {
@@ -147,6 +148,7 @@ public class Void extends ActiveToggleSkill implements EnergySkill {
             active.remove(player.getUniqueId());
             player.removePotionEffect(PotionEffectType.INVISIBILITY);
             player.removePotionEffect(PotionEffectType.SLOW);
+            championsManager.getEffects().removeEffect(player, EffectType.NO_JUMP);
             UtilMessage.simpleMessage(player, getClassType().getName(), "Void: <red>Off");
         } else {
             active.add(player.getUniqueId());
