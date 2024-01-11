@@ -508,7 +508,6 @@ public class ClanEventListener extends ClanListener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onMemberPromote(MemberPromoteEvent event) {
         if (event.isCancelled()) return;
-
         Player player = event.getPlayer();
         Clan clan = event.getClan();
         ClanMember member = event.getClanMember();
@@ -516,8 +515,10 @@ public class ClanEventListener extends ClanListener {
         member.setRank(ClanMember.MemberRank.getRankByPrivilege(Math.min(ClanMember.MemberRank.LEADER.getPrivilege(), member.getRank().getPrivilege() + 1)));
         clanManager.getRepository().updateClanMemberRank(clan, member);
 
-        Client client = clientManager.search().online(player);
-        UtilMessage.simpleMessage(player, "Clans", "You promoted <aqua>%s<gray> to <yellow>%s<gray>.", client.getName(), member.getName());
+        clientManager.search().offline(UUID.fromString(member.getUuid()), result -> {
+            result.ifPresent(client -> UtilMessage.simpleMessage(player, "Clans", "You promoted <aqua>%s<gray> to <yellow>%s<gray>.", client.getName(), member.getRank().getName()));
+        });
+
 
         Player memberPlayer = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
         if (memberPlayer != null) {
@@ -536,10 +537,9 @@ public class ClanEventListener extends ClanListener {
         member.setRank(ClanMember.MemberRank.getRankByPrivilege(Math.max(1, member.getRank().getPrivilege() - 1)));
         clanManager.getRepository().updateClanMemberRank(clan, member);
 
-        Client client = clientManager.search().online(player);
-        if (!player.getUniqueId().toString().equalsIgnoreCase(member.getUuid())) {
-            UtilMessage.simpleMessage(player, "Clans", "You demoted <aqua>%s<gray> to <yellow>%s<gray>.", client.getName(), member.getName());
-        }
+        clientManager.search().offline(UUID.fromString(member.getUuid()), result -> {
+            result.ifPresent(client -> UtilMessage.simpleMessage(player, "Clans", "You demoted <aqua>%s<gray> to <yellow>%s<gray>.", client.getName(), member.getRank().getName()));
+        });
 
         Player memberPlayer = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
         if (memberPlayer != null) {
