@@ -516,7 +516,7 @@ public class ClanEventListener extends ClanListener {
         clanManager.getRepository().updateClanMemberRank(clan, member);
 
         clientManager.search().offline(UUID.fromString(member.getUuid()), result -> {
-            result.ifPresent(client -> UtilMessage.simpleMessage(player, "Clans", "You promoted <aqua>%s<gray> to <yellow>%s<gray>.", client.getName(), member.getRank()));
+            result.ifPresent(client -> UtilMessage.simpleMessage(player, "Clans", "You promoted <aqua>%s<gray> to <yellow>%s<gray>.", client.getName(), member.getRank().getName()));
         });
 
 
@@ -538,7 +538,7 @@ public class ClanEventListener extends ClanListener {
         clanManager.getRepository().updateClanMemberRank(clan, member);
 
         clientManager.search().offline(UUID.fromString(member.getUuid()), result -> {
-            result.ifPresent(client -> UtilMessage.simpleMessage(player, "Clans", "You demoted <aqua>%s<gray> to <yellow>%s<gray>.", client.getName(), member.getRank()));
+            result.ifPresent(client -> UtilMessage.simpleMessage(player, "Clans", "You demoted <aqua>%s<gray> to <yellow>%s<gray>.", client.getName(), member.getRank().getName()));
         });
 
         Player memberPlayer = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
