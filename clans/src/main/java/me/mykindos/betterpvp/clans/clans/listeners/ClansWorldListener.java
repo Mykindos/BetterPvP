@@ -56,8 +56,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 @BPvPListener
@@ -66,6 +65,39 @@ public class ClansWorldListener extends ClanListener {
     private final Clans clans;
     private final EffectManager effectManager;
     private final EnergyHandler energyHandler;
+    private static final Set<Material> vaultBlockTypes = new HashSet<>(Arrays.asList(
+            Material.DARK_PRISMARINE,
+            Material.PRISMARINE_BRICKS,
+            Material.PRISMARINE
+            //placeholders until below blocks become available
+
+            /*
+            Material.CHISELED_COPPER,
+            Material.COPPER_BLOCK,
+            Material.COPPER_GRATE,
+            Material.EXPOSED_CHISELED_COPPER,
+            Material.EXPOSED_COPPER_BLOCK,
+            Material.EXPOSED_COPPER_GRATE,
+            Material.WEATHERED_CHISELED_COPPER,
+            Material.WEATHERED_COPPER_BLOCK,
+            Material.WEATHERED_COPPER_GRATE,
+            Material.OXIDIZED_CHISELED_COPPER,
+            Material.OXIDIZED_COPPER_BLOCK,
+            Material.OXIDIZED_COPPER_GRATE,
+            Material.WAXED_CHISELED_COPPER,
+            Material.WAXED_COPPER_BLOCK,
+            Material.WAXED_COPPER_GRATE,
+            Material.WAXED_EXPOSED_CHISELED_COPPER,
+            Material.WAXED_EXPOSED_COPPER_BLOCK,
+            Material.WAXED_EXPOSED_COPPER_GRATE,
+            Material.WAXED_WEATHERED_CHISELED_COPPER,
+            Material.WAXED_WEATHERED_COPPER_BLOCK,
+            Material.WAXED_WEATHERED_COPPER_GRATE,
+            Material.WAXED_OXIDIZED_CHISELED_COPPER,
+            Material.WAXED_OXIDIZED_COPPER_BLOCK,
+            Material.WAXED_OXIDIZED_COPPER_GRATE
+             */
+    ));
 
     @Inject
     public ClansWorldListener(ClanManager clanManager, ClientManager clientManager, Clans clans, EffectManager effectManager, EnergyHandler energyHandler) {
@@ -112,6 +144,7 @@ public class ClansWorldListener extends ClanListener {
         }
     }
 
+
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onBlockBreak(BlockBreakEvent event) {
         if (event.isCancelled()) return;
@@ -119,14 +152,12 @@ public class ClansWorldListener extends ClanListener {
         Player player = event.getPlayer();
         Block block = event.getBlock();
 
+        boolean isVaultBlock = checkIfVaultBlock(block);
+
         final Client client = clientManager.search().online(player);
         Clan clan = clanManager.getClanByPlayer(player).orElse(null);
 
-        if (client.isAdministrating()) {
-            return;
-        }
-
-        if (UtilBlock.isTutorial(block.getLocation())) {
+        if (client.isAdministrating() || UtilBlock.isTutorial(block.getLocation())) {
             return;
         }
 
@@ -134,6 +165,12 @@ public class ClansWorldListener extends ClanListener {
         locationClanOptional.ifPresent(locationClan -> {
             if (!locationClan.equals(clan)) {
                 ClanRelation relation = clanManager.getRelation(clan, locationClan);
+
+                if (isVaultBlock && clanManager.getPillageHandler().isPillaging(clan, locationClan)) {
+                    player.sendMessage("Only explosions can break Vault blocks");
+                    event.setCancelled(true);
+                    return;
+                }
 
                 // TODO this stuff
 
@@ -168,7 +205,6 @@ public class ClansWorldListener extends ClanListener {
                             relation.getPrimaryMiniColor() + "Clan " + locationClan.getName()
                     );
                 }
-
             } else {
                 if (!clan.getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.MEMBER)) {
                     final TerritoryInteractEvent tie = new TerritoryInteractEvent(player, locationClan, block, Event.Result.DENY, TerritoryInteractEvent.InteractionType.BREAK);
@@ -185,7 +221,10 @@ public class ClansWorldListener extends ClanListener {
                 }
             }
         });
+    }
 
+    private boolean checkIfVaultBlock(Block block) {
+        return vaultBlockTypes.contains(block.getType());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
