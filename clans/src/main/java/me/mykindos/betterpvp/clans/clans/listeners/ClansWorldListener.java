@@ -144,18 +144,18 @@ public class ClansWorldListener extends ClanListener {
         }
     }
 
-    @UpdateEvent(delay = 1000)
     public void checkPlayerPillaging() {
         for (Player player : Bukkit.getServer().getOnlinePlayers()) {
             Clan playerClan = clanManager.getClanByPlayer(player).orElse(null);
             Block targetBlock = player.getTargetBlockExact(5); // mining distance
-            boolean isVaultBlock = checkIfVaultBlock(targetBlock);
+
+            boolean isVaultBlock = targetBlock != null && checkIfVaultBlock(targetBlock);
 
             if (playerClan != null) {
                 Optional<Clan> locationClanOptional = clanManager.getClanByLocation(player.getLocation());
 
                 if (locationClanOptional.isPresent() && clanManager.getPillageHandler().isPillaging(playerClan, locationClanOptional.get())) {
-                    if (targetBlock != null && isVaultBlock) {
+                    if (isVaultBlock) {
                         // player is pillaging, in another clan's territory, and looking at a vault block
                         if (player.getGameMode() != GameMode.ADVENTURE) {
                             player.setGameMode(GameMode.ADVENTURE);
