@@ -55,6 +55,9 @@ public class ClansExplosionListener extends ClanListener {
     );
 
     @Inject
+    private ClansWorldListener clansWorldListener;
+
+    @Inject
     @Config(path = "clans.tnt.enabled", defaultValue = "false")
     private boolean tntEnabled;
 
@@ -87,10 +90,11 @@ public class ClansExplosionListener extends ClanListener {
     private final Clans clans;
 
     @Inject
-    public ClansExplosionListener(ClanManager clanManager, ClientManager clientManager, WorldBlockHandler worldBlockHandler, Clans clans) {
+    public ClansExplosionListener(ClanManager clanManager, ClientManager clientManager, WorldBlockHandler worldBlockHandler, Clans clans, ClansWorldListener clansWorldListener) {
         super(clanManager, clientManager);
         this.worldBlockHandler = worldBlockHandler;
         this.clans = clans;
+        this.clansWorldListener = clansWorldListener;
     }
 
     @UpdateEvent(delay = 2000)
@@ -214,6 +218,19 @@ public class ClansExplosionListener extends ClanListener {
         // todo: allow changing yield
         final BlockExplodeEvent explodeEvent = new BlockExplodeEvent(event.getLocation().getBlock(), new ArrayList<>(blocks), 1.0f, null);
         UtilServer.callEvent(explodeEvent);
+
+        for (Block block : new ArrayList<>(event.blockList())) {
+            if (clansWorldListener.checkIfVaultBlock(block)) {
+                Optional<Clan> clanOptional = clanManager.getClanByLocation(block.getLocation());
+                if (clanOptional.isPresent()) {
+                    attackedClan = clanOptional.get();
+                    if (!clanManager.getPillageHandler().isPillaging(attackingClan, attackedClan)) {
+                        event.setCancelled(true);
+                        return;
+                    }
+                }
+            }
+        }
 
         for (Block block : event.blockList()) {
             if (protectedBlocks.contains(block.getType())) continue;
