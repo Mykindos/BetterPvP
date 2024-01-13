@@ -10,12 +10,14 @@ import me.mykindos.betterpvp.core.combat.throwables.ThrowableItem;
 import me.mykindos.betterpvp.core.combat.throwables.events.ThrowableHitEntityEvent;
 import me.mykindos.betterpvp.core.combat.throwables.events.ThrowableHitGroundEvent;
 import me.mykindos.betterpvp.core.config.Config;
+import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.items.BPVPItem;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -50,13 +52,16 @@ public class ThrowingWeb extends Weapon implements Listener, InteractWeapon, Coo
     private final ChampionsManager championsManager;
     private final WorldBlockHandler blockHandler;
 
+    private final CooldownManager cooldownManager;
+
     @Inject
-    public ThrowingWeb(ChampionsManager championsManager, WorldBlockHandler blockHandler) {
+    public ThrowingWeb(ChampionsManager championsManager, WorldBlockHandler blockHandler, CooldownManager cooldownManager) {
         super("throwing_web");
 
         this.championsManager = championsManager;
         this.blockHandler = blockHandler;
 
+        this.cooldownManager = cooldownManager;
     }
 
     @Override
@@ -85,7 +90,10 @@ public class ThrowingWeb extends Weapon implements Listener, InteractWeapon, Coo
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
         if (event.getAction().isLeftClick() && matches(event.getItem())) {
-            activate(event.getPlayer()); // also activate on left click
+            String name = PlainTextComponentSerializer.plainText().serialize(getName());
+            if (cooldownManager.use(event.getPlayer(), name, getCooldown(), showCooldownFinished(), true, false, x -> isHoldingWeapon(event.getPlayer()))) {
+                activate(event.getPlayer()); // also activate on left click
+            }
         }
     }
 
