@@ -415,15 +415,15 @@ skills:
     void:
       enabled: true
       maxlevel: 5
-      energy: 15
-      baseDamageReduction: 5.0
-      damageReductionIncreasePerLevel: 0.0
+      energy: 30
+      baseDamageReduction: 2.0
+      damageReductionIncreasePerLevel: 0.2
       baseEnergyReduction: 20
-      energyReductionDecreasePerLevel: 0
+      energyReductionDecreasePerLevel: 1
       slownessStrength: 2
       damageReduction: 5
       energyReduction: 20
-      energyDecreasePerLevel: 0.5
+      energyDecreasePerLevel: 2.0
     nullblade:
       enabled: true
       maxlevel: 5
