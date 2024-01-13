@@ -51,7 +51,7 @@ public class Intimidation extends Skill implements PassiveSkill {
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Every enemy facing away from you within <val>" + getRadius(level) + "</val>",
+                "Every enemy facing towards you within <val>" + getRadius(level) + "</val>",
                 "blocks will get <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength + 1),
         };
     }
