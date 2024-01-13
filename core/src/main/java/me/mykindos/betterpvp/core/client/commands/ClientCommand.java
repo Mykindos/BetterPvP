@@ -153,6 +153,11 @@ public class ClientCommand extends Command {
                 }
             });
         }
+
+        @Override
+        public String getArgumentType(int argCount) {
+            return argCount == 1 ? ArgumentType.PLAYER.name() : ArgumentType.NONE.name();
+        }
     }
 
     @Singleton
@@ -201,6 +206,10 @@ public class ClientCommand extends Command {
                     }
                 }
             });
+        }
+        @Override
+        public String getArgumentType(int argCount) {
+            return argCount == 1 ? ArgumentType.PLAYER.name() : ArgumentType.NONE.name();
         }
     }
 }
