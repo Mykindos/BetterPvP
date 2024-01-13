@@ -21,8 +21,7 @@ import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
-import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
+import me.mykindos.betterpvp.core.utilities.model.display.DisplayComponent;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Location;
@@ -51,20 +50,8 @@ import java.util.WeakHashMap;
 @BPvPListener
 public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySkill, CooldownSkill {
 
-    // Percentage (0 -> 1)
     private final WeakHashMap<Player, ChargeData> charging = new WeakHashMap<>();
-
-    // Action bar
-    private final PermanentComponent actionBarComponent = new PermanentComponent(gamer -> {
-        final Player player = gamer.getPlayer();
-        if (player == null || !charging.containsKey(player) || !isHolding(player)) {
-            return null; // Skip if not online or not charging
-        }
-
-        final ChargeData charge = charging.get(player);
-        ProgressBar progressBar = ProgressBar.withProgress(charge.getCharge());
-        return progressBar.build();
-    });
+    private final DisplayComponent actionBarComponent = ChargeData.getActionBar(this, charging);
 
     private double baseCharge;
     private double baseDamage;
@@ -75,7 +62,6 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
     public StaticLazer(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
-
 
     @Override
     public String getName() {

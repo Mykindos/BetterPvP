@@ -25,9 +25,8 @@ import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
-import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
-import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
+import me.mykindos.betterpvp.core.utilities.model.display.DisplayComponent;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -51,23 +50,13 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
 
     private final WeakHashMap<Player, ChargeData> charging = new WeakHashMap<>();
     private final WeakHashMap<Player, Hook> hooks = new WeakHashMap<>();
+    private final DisplayComponent actionBarComponent = ChargeData.getActionBar(this, charging);
 
     private double damage;
     private double damageIncreasePerLevel;
     private double cooldownDecreasePerLevel;
     private double velocitySrengthPerLevel;
     private double baseVelocityStrength;
-
-    private final PermanentComponent actionBarComponent = new PermanentComponent(gamer -> {
-        final Player player = gamer.getPlayer();
-        if (player == null || !charging.containsKey(player) || !isHolding(player)) {
-            return null; // Skip if not online or not charging
-        }
-
-        final ChargeData charge = charging.get(player);
-        ProgressBar progressBar = ProgressBar.withProgress(charge.getCharge());
-        return progressBar.build();
-    });
 
     @Inject
     public FleshHook(Champions champions, ChampionsManager championsManager) {

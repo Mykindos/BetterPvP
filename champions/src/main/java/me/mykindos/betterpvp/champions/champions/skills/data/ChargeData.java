@@ -2,9 +2,19 @@ package me.mykindos.betterpvp.champions.champions.skills.data;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.components.champions.ISkill;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
+import me.mykindos.betterpvp.core.utilities.model.display.DisplayComponent;
+import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+
+import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * Represents the charge data for a player using a charge skill
@@ -37,5 +47,42 @@ public class ChargeData {
 
         player.playSound(player.getEyeLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.5f, 1f + charge);
         lastSound = System.currentTimeMillis();
+    }
+
+    /**
+     * Get the action bar component for a {@link ChargeData}.
+     * <br>
+     * <b>Note: The result of this method should be saved to be reused instead of creating a new one for each player</b>
+     * @param showCondition Predicate to determine if the component should be shown
+     * @param supplier Supplier to get the {@link ChargeData} for a {@link Gamer}
+     * @return The action bar component
+     */
+    public static DisplayComponent getActionBar(Predicate<Gamer> showCondition, Function<Gamer, ChargeData> supplier) {
+        return new PermanentComponent(gamer -> {
+            final Player player = gamer.getPlayer();
+            if (player == null || !showCondition.test(gamer)) {
+                return null; // Skip if not online or not showing
+            }
+
+            final ChargeData charge = supplier.apply(gamer);
+            ProgressBar progressBar = ProgressBar.withProgress(charge.getCharge());
+            return progressBar.build();
+        });
+    }
+
+    /**
+     * Get the action bar display for a {@link ChannelSkill}. Only displays if the player is holding skill item
+     * and the player is in the charge map.
+     *
+     * @param skill The skill to get the action bar for
+     * @param chargeDataMap The map of players to charge data. This should be a reference to the map in the skill
+     *                      and not a copy of it.
+     * @see ChargeData#getActionBar(Predicate, Function)
+     */
+    public static DisplayComponent getActionBar(ISkill skill, Map<Player, ChargeData> chargeDataMap) {
+        return getActionBar(
+                gmr -> gmr.isOnline() && chargeDataMap.containsKey(gmr.getPlayer())  && skill.isHolding(gmr.getPlayer()),
+                gmr -> chargeDataMap.get(gmr.getPlayer())
+        );
     }
 }
