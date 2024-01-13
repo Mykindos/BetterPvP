@@ -93,7 +93,7 @@ public class CustomEffectCommand extends Command {
                 }
 
             }
-            effectManager.addEffect(player, effect, strength, duration * 1000L);
+            effectManager.addEffect(target, effect, strength, duration * 1000L);
             Component message = UtilMessage.deserialize("<yellow>%s</yellow> applied <white>%s %s</white> to <yellow>%s</yellow> for <green>%s</green> seconds", player.getName(), effect.name(), strength, target.getName(), duration);
             gamerManager.sendMessageToRank("Effect", message, Rank.HELPER);
         }
