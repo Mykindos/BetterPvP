@@ -14,7 +14,6 @@ import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -60,7 +59,8 @@ public class ListSubCommand extends ClanSubCommand {
         }
 
         List<Clan> clansList = new ArrayList<>(clanManager.getObjects().values());
-        Collections.sort(clansList, Comparator.comparing(Clan::getName));
+        Collections.sort(clansList, Comparator.comparing(Clan::getOnlineMemberCount));
+        Collections.reverse(clansList);
 
         Component component = UtilMessage.deserialize("<yellow>Clan List<gray>: ");
 
@@ -98,7 +98,7 @@ public class ListSubCommand extends ClanSubCommand {
         ClanRelation clanRelation = clanManager.getRelation(playerClan, clan);
 
         //possible logic error, unable to test with multiple people in a Clan and one offline
-        int onlineMembers = (int) clanMembers.stream().filter(member -> Bukkit.getPlayer(member.getUuid()) == null).count();
+        int onlineMembers = clan.getOnlineMemberCount();
 
         NamedTextColor color = clanRelation.getPrimary();
 
