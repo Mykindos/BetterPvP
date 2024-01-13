@@ -86,9 +86,9 @@ public class Flash extends Skill implements InteractSkill, Listener {
                 "Teleport <stat>" + teleportDistance + "</stat> blocks forward",
                 "in the direction you are facing",
                 "",
-                "Store up to <val>" + getMaxCharges(level) + "</val> charges",
+                "Store up to <stat>" + getMaxCharges(level) + "</stat> charges",
                 "",
-                "Gain a charge every: <stat>" + getRechargeSeconds(level) + "</stat> seconds"
+                "Gain a charge every: <val>" + getRechargeSeconds(level) + "</val> seconds"
         };
     }
 
@@ -104,7 +104,7 @@ public class Flash extends Skill implements InteractSkill, Listener {
     public void loadSkillConfig() {
         baseMaxCharges = getConfig("baseMaxCharges", 5, Integer.class);
         chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 0, Integer.class);
-        baseRechargeSeconds = getConfig("baseRechargeSeconds", 9.0, Double.class);
+        baseRechargeSeconds = getConfig("baseRechargeSeasdconds", 9.0, Double.class);
         rechargeReductionPerLevel = getConfig("rechargeReductionPerLevel", 1.0, Double.class);
         teleportDistance = getConfig("teleportDistance", 5.0, Double.class);
     }
