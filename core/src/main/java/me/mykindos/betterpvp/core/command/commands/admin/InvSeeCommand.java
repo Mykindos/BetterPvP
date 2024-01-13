@@ -40,4 +40,8 @@ public class InvSeeCommand extends Command {
         }
 
     }
+    @Override
+    public String getArgumentType(int argCount) {
+        return argCount == 1 ? ArgumentType.PLAYER.name() : ArgumentType.NONE.name();
+    }
 }
