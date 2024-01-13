@@ -110,8 +110,6 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
     @EventHandler
     public void onDamage(CustomDamageEvent event) {
         if (!(event.getDamagee() instanceof Player damagee)) return;
-        if (event.getDamager() == null) return;
-
         if (active.contains(damagee.getUniqueId())) {
             int level = getLevel(damagee);
             event.setDamage(event.getDamage() * (1 - getDamageReduction(level)));
