@@ -60,6 +60,7 @@ public class ListSubCommand extends ClanSubCommand {
 
         List<Clan> clansList = new ArrayList<>(clanManager.getObjects().values());
         Collections.sort(clansList, Comparator.comparing(Clan::getOnlineMemberCount));
+        Collections.reverse(clansList);
 
         Component component = UtilMessage.deserialize("<yellow>Clan List<gray>: ");
 
