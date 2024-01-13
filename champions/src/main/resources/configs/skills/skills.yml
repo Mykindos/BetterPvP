@@ -595,7 +595,7 @@ skills:
   ranger:
     wolfspounce:
       enabled: true
-      maxlevel: 4
+      maxlevel: 5
       cooldown: 8.0
       cooldownDecreasePerLevel: 1.0
       baseCharge: 40.0

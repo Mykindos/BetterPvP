@@ -214,6 +214,6 @@ public abstract class Skill implements ISkill {
 
     @Override
     public boolean isHolding(Player player) {
-        return SkillWeapons.isHolding(player, getType());
+        return hasSkill(player) && SkillWeapons.isHolding(player, getType());
     }
 }

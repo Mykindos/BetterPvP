@@ -12,6 +12,7 @@ import org.bukkit.craftbukkit.v1_20_R3.CraftWorld;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
@@ -20,9 +21,22 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
 public class UtilEntity {
+
+    public static final BiPredicate<Player, Entity> IS_ENEMY = (player, entity) -> {
+        if (!(entity instanceof LivingEntity) || entity.equals(player)) {
+            return false;
+        }
+
+        if (!(entity instanceof Player other)) {
+            return true;
+        }
+
+        return UtilPlayer.getRelation(player, other) != EntityProperty.FRIENDLY;
+    };
 
     public static Optional<RayTraceResult> interpolateCollision(@NotNull Location lastLocation, @NotNull Location destination, float raySize, @Nullable Predicate<Entity> entityFilter) {
         Preconditions.checkNotNull(lastLocation, "Last location cannot be null");

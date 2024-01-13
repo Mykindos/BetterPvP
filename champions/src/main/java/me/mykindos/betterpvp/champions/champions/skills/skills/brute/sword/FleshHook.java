@@ -129,6 +129,11 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
         charging.put(player, new ChargeData((float) (0.1 + (level - 1) * 0.05) * 5));
     }
 
+    @Override
+    public boolean shouldDisplayActionBar(Gamer gamer) {
+        return !charging.containsKey(gamer.getPlayer()) && isHolding(gamer.getPlayer());
+    }
+
     @UpdateEvent
     public void updateFleshHook() {
         final Iterator<Player> iterator = charging.keySet().iterator();
@@ -150,8 +155,6 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
             // Check if they still are blocking and charge
             Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
             if (isHolding(player) && gamer.isHoldingRightClick()) {
-                championsManager.getCooldowns().removeCooldown(player, getName(), true);
-
                 data.tick();
                 data.tickSound(player);
                 continue;
@@ -194,6 +197,8 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
     }
 
     private void shoot(Player player, ChargeData data, int level) {
+        UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s<gray>.", getName());
+
         final Item item = player.getWorld().dropItem(player.getEyeLocation(), new ItemStack(Material.TRIPWIRE_HOOK));
         final ThrowableItem throwable = new ThrowableItem(item, player, getName(), 10_000L, true);
         throwable.setCollideGround(true);
@@ -207,9 +212,15 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
                 20,
                 false);
 
-        championsManager.getCooldowns().removeCooldown(player, getName(), true);
-        championsManager.getCooldowns().use(player, getName(), getCooldown(level), showCooldownFinished());
         hooks.put(player, new Hook(throwable, data, level));
+        championsManager.getCooldowns().removeCooldown(player, getName(), true);
+        championsManager.getCooldowns().use(player,
+                getName(),
+                getCooldown(level),
+                showCooldownFinished(),
+                true,
+                isCancellable(),
+                this::shouldDisplayActionBar);
     }
 
     @EventHandler

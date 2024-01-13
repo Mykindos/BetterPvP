@@ -14,7 +14,6 @@ import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
@@ -33,7 +32,6 @@ import org.bukkit.entity.Firework;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -119,11 +117,6 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
     }
 
     @Override
-    public boolean shouldDisplayActionBar(Gamer gamer) {
-        return false;
-    }
-
-    @Override
     public SkillType getType() {
         return SkillType.SWORD;
     }
@@ -131,6 +124,11 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
     @Override
     public Action[] getActions() {
         return SkillActions.RIGHT_CLICK;
+    }
+
+    @Override
+    public boolean shouldDisplayActionBar(Gamer gamer) {
+        return !charging.containsKey(gamer.getPlayer()) && isHolding(gamer.getPlayer());
     }
 
     @Override
@@ -160,13 +158,6 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
         charging.put(player, new ChargeData(getChargePerSecond(level) / 100));
     }
 
-    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-    public void cancelCooldown(PlayerUseSkillEvent event) {
-        if (event.getSkill() == this && charging.containsKey(event.getPlayer())) {
-            event.setCancelled(true); // Cancel cooldown or ability use if they're charging to allow them to release
-        }
-    }
-
     @EventHandler
     public void onDamage(EntityDamageByEntityEvent event) {
         if (event.getDamager() instanceof Firework firework) {
@@ -179,7 +170,9 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
 
     @EventHandler
     public void onDamageReceived(CustomDamageEvent event) {
-        if (!(event.getDamagee() instanceof Player player)) return;
+        if (event.isCancelled() || !(event.getDamagee() instanceof Player player)) {
+            return;
+        }
 
         if (hasSkill(player) && charging.containsKey(player)) {
             charging.remove(player);
@@ -190,14 +183,17 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
     }
 
     private void shoot(Player player, float charge, int level) {
+        UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s<gray>.", getName());
+
         // Cooldown
+        championsManager.getCooldowns().removeCooldown(player, getName(), true);
         championsManager.getCooldowns().use(player,
                 getName(),
                 getCooldown(level),
                 true,
                 true,
                 isCancellable(),
-                gmr -> gmr.getPlayer() != null && isHolding(gmr.getPlayer()));
+                this::shouldDisplayActionBar);
 
         final float range = getRange(level);
         final Vector direction = player.getEyeLocation().getDirection();
@@ -279,8 +275,6 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
             // Check if they still are blocking and charge
             Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
             if (isHolding(player) && gamer.isHoldingRightClick() && championsManager.getEnergy().use(player, getName(), getEnergyPerSecond(level) / 20, true)) {
-                championsManager.getCooldowns().removeCooldown(player, getName(), true);
-
                 charge.tick();
                 charge.tickSound(player);
                 continue;

@@ -30,6 +30,7 @@ public class ChargeData {
     private long lastSound = 0;
     private long lastMessage = 0;
     private long soundInterval = 150; // In millis
+    private long messageInterval = 250; // In millis
 
     /**
      * Gain charge for this skill.
@@ -47,6 +48,14 @@ public class ChargeData {
 
         player.playSound(player.getEyeLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.5f, 1f + charge);
         lastSound = System.currentTimeMillis();
+    }
+
+    public void messageSent() {
+        lastMessage = System.currentTimeMillis();
+    }
+
+    public boolean canSendMessage() {
+        return UtilTime.elapsed(lastMessage, messageInterval);
     }
 
     /**
@@ -81,7 +90,25 @@ public class ChargeData {
      */
     public static DisplayComponent getActionBar(ISkill skill, Map<Player, ChargeData> chargeDataMap) {
         return getActionBar(
-                gmr -> gmr.isOnline() && chargeDataMap.containsKey(gmr.getPlayer())  && skill.isHolding(gmr.getPlayer()),
+                gmr -> gmr.isOnline() && chargeDataMap.containsKey(gmr.getPlayer()) && skill.isHolding(gmr.getPlayer()),
+                gmr -> chargeDataMap.get(gmr.getPlayer())
+        );
+    }
+
+    /**
+     * Get the action bar display for a {@link ChannelSkill}. Only displays if the player is holding skill item
+     * and the player is in the charge map.
+     *
+     * @param skill The skill to get the action bar for
+     * @param chargeDataMap The map of players to charge data. This should be a reference to the map in the skill
+     *                      and not a copy of it.
+     * @param additionalShowCondition Additional condition to determine if the component should be shown. The
+     *                                gamer is guaranteed to be online.
+     * @see ChargeData#getActionBar(Predicate, Function)
+     */
+    public static DisplayComponent getActionBar(ISkill skill, Map<Player, ChargeData> chargeDataMap, Predicate<Gamer> additionalShowCondition) {
+        return getActionBar(
+                gmr -> gmr.isOnline() && chargeDataMap.containsKey(gmr.getPlayer()) && skill.isHolding(gmr.getPlayer()) && additionalShowCondition.test(gmr),
                 gmr -> chargeDataMap.get(gmr.getPlayer())
         );
     }
