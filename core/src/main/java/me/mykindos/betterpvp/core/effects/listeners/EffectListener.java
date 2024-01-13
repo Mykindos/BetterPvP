@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.effects.events.EffectExpireEvent;
 import me.mykindos.betterpvp.core.effects.events.EffectReceiveEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
@@ -28,17 +29,19 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitTask;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+
+import static org.bukkit.Bukkit.getServer;
 
 @BPvPListener
 public class EffectListener implements Listener {
 
     private final Core core;
     private final EffectManager effectManager;
+    private final Map<UUID, Long> lastBleedTimes = new HashMap<>();
+
 
     @Inject
     public EffectListener(Core core, EffectManager effectManager) {
@@ -68,7 +71,7 @@ public class EffectListener implements Listener {
             if (effect.getEffectType() == EffectType.STRENGTH) {
                 target.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, (int) ((effect.getRawLength() / 1000d) * 20), effect.getLevel() - 1));
             } else if (effect.getEffectType() == EffectType.SILENCE) {
-                target.getWorld().playSound(target.getLocation(), Sound.ENTITY_BAT_AMBIENT, 2.0F, 1.0F);
+                target.getWorld().playSound(target.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 1F, 1.5F);
                 UtilMessage.simpleMessage(target, "Silence", "You have been silenced for <alt>%s</alt> seconds.", effect.getRawLength() / 1000d);
             } else if (effect.getEffectType() == EffectType.VULNERABILITY) {
                 target.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, (int) ((effect.getRawLength() / 1000d) * 20), 0));
@@ -78,11 +81,35 @@ public class EffectListener implements Listener {
                 target.addPotionEffect(new PotionEffect(PotionEffectType.POISON, (int) ((effect.getRawLength() / 1000d) * 20), effect.getLevel()));
             } else if (effect.getEffectType() == EffectType.NO_JUMP) {
                 target.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, (int) ((effect.getRawLength() / 1000d) * 20), 128, false, false, false));
+            } else if(effect.getEffectType() == EffectType.BLEED) {
+                target.addPotionEffect(new PotionEffect(PotionEffectType.BAD_OMEN, (int) ((effect.getRawLength() / 1000d) * 20), 0, false, false));
             }
-
             effects.add(effect);
         }
     }
+
+    @UpdateEvent
+    public void onTick() {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (player.hasPotionEffect(PotionEffectType.BAD_OMEN)) {
+                long currentTime = System.currentTimeMillis();
+                long lastBleedTime = lastBleedTimes.getOrDefault(player.getUniqueId(), 0L);
+                int marginOfError = 20;
+
+                if (currentTime - lastBleedTime >= 1000 - marginOfError) {
+                    // Apply 2 points (1 heart) of damage
+                    var cde = new CustomDamageEvent(player, null, null,
+                            EntityDamageEvent.DamageCause.CUSTOM, 2.0, false, "Bleed");
+                    cde.setIgnoreArmour(true);
+                    UtilDamage.doCustomDamage(cde);
+
+                    lastBleedTimes.put(player.getUniqueId(), currentTime);
+                }
+            }
+        }
+    }
+
+
 
     @EventHandler
     public void onFall(EntityDamageEvent event) {
