@@ -41,6 +41,7 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -212,6 +213,7 @@ public class SkillListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onSkillActivate(PlayerInteractEvent event) {
+        if (event.useItemInHand() == Event.Result.DENY) return;
         if (event.getAction() == Action.PHYSICAL) return;
         if (event.getHand() == EquipmentSlot.OFF_HAND) return;
         if (cooldownManager.hasCooldown(event.getPlayer(), "DoorAccess")) return;

@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.WeakHashMap;
 
 @BPvPListener
 @Singleton
@@ -37,11 +38,26 @@ public class RightClickListener implements Listener {
     private final ClientManager clientManager;
     private final Core core;
     private final Map<Player, RightClickContext> rightClickCache = new HashMap<>();
+    private final WeakHashMap<Player, Long> lastDrop = new WeakHashMap<>();
 
     @Inject
     public RightClickListener(ClientManager clientManager, Core core) {
         this.clientManager = clientManager;
         this.core = core;
+    }
+
+    // Fix for interact event triggering when dropping items
+    @EventHandler
+    public void onDrop(PlayerDropItemEvent event) {
+        lastDrop.put(event.getPlayer(), System.currentTimeMillis());
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onInteract(PlayerInteractEvent event) {
+        if (this.lastDrop.containsKey(event.getPlayer()) && System.currentTimeMillis() - this.lastDrop.get(event.getPlayer()) <= 20L) {
+            event.setCancelled(true);
+            this.lastDrop.remove(event.getPlayer());
+        }
     }
 
     @UpdateEvent

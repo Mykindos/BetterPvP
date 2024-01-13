@@ -29,6 +29,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -82,7 +83,7 @@ public class WeaponListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onWeaponActivate(PlayerInteractEvent event) {
-        if (event.getHand() == EquipmentSlot.OFF_HAND || !event.getAction().isRightClick()) {
+        if (event.getHand() == EquipmentSlot.OFF_HAND || !event.getAction().isRightClick() || event.useItemInHand() == Event.Result.DENY) {
             return; // Only main hand and right click
         }
 
