@@ -23,7 +23,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -100,9 +99,6 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
 
     @EventHandler
     public void endOnInteract(PlayerInteractEvent event) {
-        if (event.getHand() != EquipmentSlot.HAND) return;
-        if (!event.getAction().isRightClick()) return;
-
         Player player = event.getPlayer();
         if (active.contains(player.getUniqueId())) {
             active.remove(player.getUniqueId());
@@ -114,16 +110,19 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
     @EventHandler
     public void onDamage(CustomDamageEvent event) {
         if (!(event.getDamagee() instanceof Player damagee)) return;
-        if (!(event.getDamager() instanceof Player damager)) return;
+        if (event.getDamager() == null) return;
 
         if (active.contains(damagee.getUniqueId())) {
             int level = getLevel(damagee);
             event.setDamage(event.getDamage() * (1 - getDamageReduction(level)));
             event.setKnockback(false);
-            UtilMessage.message(damager, getClassType().getName(), damagee.getName() + " is using " + getName());
+            if (event.getDamager() instanceof Player damager) {
+                UtilMessage.message(damager, getClassType().getName(), damagee.getName() + " is using " + getName());
+            }
+
             damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 0.5F, 2.0F);
         }
-
+        if (!(event.getDamager() instanceof Player damager)) return;
         if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
             active.remove(damager.getUniqueId());
         }
