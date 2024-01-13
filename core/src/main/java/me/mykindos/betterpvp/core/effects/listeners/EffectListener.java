@@ -41,6 +41,8 @@ public class EffectListener implements Listener {
     private final Core core;
     private final EffectManager effectManager;
     private final Map<UUID, Long> lastBleedTimes = new HashMap<>();
+    private final Map<UUID, Long> bleedEntities = new HashMap<>();
+
 
 
     @Inject
@@ -77,37 +79,46 @@ public class EffectListener implements Listener {
                 target.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, (int) ((effect.getRawLength() / 1000d) * 20), 0));
             } else if (effect.getEffectType() == EffectType.LEVITATION) {
                 target.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, (int) ((effect.getRawLength() / 1000d) * 20), effect.getLevel()));
-            } else if(effect.getEffectType() == EffectType.POISON) {
+            } else if (effect.getEffectType() == EffectType.POISON) {
                 target.addPotionEffect(new PotionEffect(PotionEffectType.POISON, (int) ((effect.getRawLength() / 1000d) * 20), effect.getLevel()));
             } else if (effect.getEffectType() == EffectType.NO_JUMP) {
                 target.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, (int) ((effect.getRawLength() / 1000d) * 20), 128, false, false, false));
-            } else if(effect.getEffectType() == EffectType.BLEED) {
+            } else if (effect.getEffectType() == EffectType.BLEED) {
                 target.addPotionEffect(new PotionEffect(PotionEffectType.BAD_OMEN, (int) ((effect.getRawLength() / 1000d) * 20), 0, false, false));
+                bleedEntities.put(target.getUniqueId(), System.currentTimeMillis());
             }
             effects.add(effect);
         }
     }
 
     @UpdateEvent
-    public void onTick() {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            if (player.hasPotionEffect(PotionEffectType.BAD_OMEN)) {
-                long currentTime = System.currentTimeMillis();
-                long lastBleedTime = lastBleedTimes.getOrDefault(player.getUniqueId(), 0L);
-                int marginOfError = 20;
+    public void onBleed() {
+        bleedEntities.keySet().removeIf(uuid -> {
+            LivingEntity entity = (LivingEntity) Bukkit.getEntity(uuid);
 
-                if (currentTime - lastBleedTime >= 1000 - marginOfError) {
-                    // Apply 2 points (1 heart) of damage
-                    var cde = new CustomDamageEvent(player, null, null,
-                            EntityDamageEvent.DamageCause.CUSTOM, 2.0, false, "Bleed");
-                    cde.setIgnoreArmour(true);
-                    UtilDamage.doCustomDamage(cde);
-
-                    lastBleedTimes.put(player.getUniqueId(), currentTime);
+            if (entity == null || !entity.hasPotionEffect(PotionEffectType.BAD_OMEN)) {
+                if (entity != null) {
+                    entity.removePotionEffect(PotionEffectType.BAD_OMEN);
                 }
+                return true;
             }
-        }
+
+            long currentTime = System.currentTimeMillis();
+            long lastBleedTime = lastBleedTimes.getOrDefault(uuid, 0L);
+            int marginOfError = 20;
+
+            if (currentTime - lastBleedTime >= 1000 - marginOfError) {
+                // Apply damage to any LivingEntity (including players)
+                var cde = new CustomDamageEvent(entity, null, null, EntityDamageEvent.DamageCause.CUSTOM, 2.0, false, "Bleed");
+                cde.setIgnoreArmour(true);
+                UtilDamage.doCustomDamage(cde);
+                lastBleedTimes.put(uuid, currentTime);
+            }
+
+            return false;
+        });
     }
+
 
 
 
