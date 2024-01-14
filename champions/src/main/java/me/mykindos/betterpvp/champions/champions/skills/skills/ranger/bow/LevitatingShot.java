@@ -81,7 +81,7 @@ public class LevitatingShot extends PrepareArrowSkill {
         if (target instanceof Player player) {
             championsManager.getEffects().addEffect(player, EffectType.LEVITATION, levitationStrength + 1, (int) (getDuration(level) * 1000));
         } else {
-            target.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, (int) (getDuration(level) * 1000), levitationStrength));
+            target.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, (int) (getDuration(level) * 20), levitationStrength));
         }
     }
 
@@ -102,9 +102,9 @@ public class LevitatingShot extends PrepareArrowSkill {
     }
     @Override
     public void loadSkillConfig() {
-        baseDuration = getConfig("baseDuration", 3.5, Double.class);
+        baseDuration = getConfig("baseDuration", 1.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
 
-        levitationStrength = getConfig("levitationStrength", 1, Integer.class);
+        levitationStrength = getConfig("levitationStrength", 3, Integer.class);
     }
 }
