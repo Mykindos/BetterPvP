@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.champions.champions.skills.skills.mage.sword;
+package me.mykindos.betterpvp.champions.champions.skills.skills.brute.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -11,7 +11,9 @@ import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
@@ -21,14 +23,15 @@ import org.bukkit.util.Vector;
 import org.bukkit.Particle;
 
 @Singleton
-public class Cyclone extends Skill implements InteractSkill, CooldownSkill {
+public class WhirlwindSword extends Skill implements InteractSkill, CooldownSkill {
 
     private double baseDistance;
-
     private double distanceIncreasePerLevel;
+    private double baseDamage;
+    private double damageIncreasePerLevel;
 
     @Inject
-    public Cyclone(Champions champions, ChampionsManager championsManager) {
+    public WhirlwindSword(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
 
@@ -43,8 +46,8 @@ public class Cyclone extends Skill implements InteractSkill, CooldownSkill {
         return new String[]{
                 "Right click with a Sword to activate",
                 "",
-                "Pulls all enemies within",
-                "<val>" + getDistance(level) + "</val> blocks towards you",
+                "Pulls all enemies within <val>" + getDistance(level) + "</val> blocks towards you",
+                "and deals <val> " + getDamage(level) + "</val> damage",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -52,6 +55,10 @@ public class Cyclone extends Skill implements InteractSkill, CooldownSkill {
 
     public double getDistance(int level) {
         return baseDistance + level * distanceIncreasePerLevel;
+    }
+
+    public double getDamage(int level){
+        return baseDamage + level * damageIncreasePerLevel;
     }
 
     @Override
@@ -85,34 +92,42 @@ public class Cyclone extends Skill implements InteractSkill, CooldownSkill {
                     Vector velocity = UtilVelocity.getTrajectory(target, player);
                     // LogManager.addLog(target, player, "Cyclone", 0);
                     UtilVelocity.velocity(target, velocity, 1.2D, false, 0.0D, 0.5D, 4.0D, true);
+                    target.damage(getDamage(level));
+                    UtilMessage.simpleMessage(target, getName(), "<alt>" + player.getName() + "</alt> hit you with <alt>" + getName());
                 }
 
             }
         }
-        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1F, 0.6F);
-        createCyclone(player, level);
+        createWhirlwind(player, level);
     }
 
-    private void createCyclone(Player player, int level) {
+    private void createWhirlwind(Player player, int level) {
         Location center = player.getLocation();
-        double radius = getDistance(level);
-        int points = 100;
-        double height = center.getY() + 1.0;
+        double initialRadius = getDistance(level);
+        double spiralDuration = 10;
+        Bukkit.getServer().getScheduler().runTaskTimer(champions, new Runnable() {
+            double i = 0;
+            @Override
+            public void run() {
+                if (i >= Math.PI * 2) {
+                    Bukkit.getScheduler().cancelTasks(champions);
+                    return;
+                }
 
-        for (int i = 0; i < points; i++) {
-            double angle = 2 * Math.PI * i / points;
+                double radius = initialRadius * (1 - (i / (Math.PI * 2)));
+                double x = Math.sin(i) * radius;
+                double z = Math.cos(i) * radius;
 
-            for (int j = 0; j < 4; j++) {
-                double startAngle = j * Math.PI / 2;
-
-                double x = center.getX() + radius * Math.cos(angle + startAngle) * ((double) i / points);
-                double z = center.getZ() + radius * Math.sin(angle + startAngle) * ((double) i / points);
-
-                Location particleLocation = new Location(center.getWorld(), x, height, z);
+                Location particleLocation = center.clone().add(x, 1, z);
                 center.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, particleLocation, 1, 0, 0, 0, 0);
+
+                center.getWorld().playSound(center, Sound.BLOCK_WOOL_STEP, 2f, 1f);
+
+                i += (Math.PI * 2) / spiralDuration;
             }
-        }
+        }, 0, 1);
     }
+
 
     @Override
     public Action[] getActions() {
@@ -121,7 +136,9 @@ public class Cyclone extends Skill implements InteractSkill, CooldownSkill {
 
     @Override
     public void loadSkillConfig(){
-        baseDistance = getConfig("baseDistance", 7.0, Double.class);
+        baseDistance = getConfig("baseDistance", 4.0, Double.class);
         distanceIncreasePerLevel = getConfig("distanceIncreasePerLevel", 1.0, Double.class);
+        baseDamage = getConfig("damage", 3.0, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
     }
 }
