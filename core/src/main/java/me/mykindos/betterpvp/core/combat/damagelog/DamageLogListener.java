@@ -15,6 +15,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 
+import java.util.concurrent.ConcurrentLinkedDeque;
+
 @Singleton
 @BPvPListener
 public class DamageLogListener implements Listener {
@@ -34,8 +36,10 @@ public class DamageLogListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onDeath(PlayerDeathEvent event) {
         final long deathTime = System.currentTimeMillis();
+        final ConcurrentLinkedDeque<DamageLog> log = new ConcurrentLinkedDeque<>(
+                damageLogManager.getObject(event.getPlayer().getUniqueId()).orElseThrow());
         final ClickEvent clickEvent = ClickEvent.callback(
-                audience -> damageLogManager.showDeathSummary(deathTime, (Player) audience),
+                audience -> damageLogManager.showDeathSummary(deathTime, (Player) audience, log),
                 ClickCallback.Options.builder().uses(1).build()
         );
 
@@ -45,9 +49,10 @@ public class DamageLogListener implements Listener {
                 .appendSpace()
                 .append(Component.text("to view your death summary."))
                 .clickEvent(clickEvent);
-
         final Component hover = Component.text("What killed you?");
-
         UtilMessage.simpleMessage(event.getPlayer(), "Death", component, hover);
+
+        // Clear the damage logs for this player
+        damageLogManager.getObjects().remove(event.getPlayer().getUniqueId().toString());
     }
 }
