@@ -98,12 +98,12 @@ skills:
     flash:
       enabled: true
       maxlevel: 5
-      baseMaxCharges: 1
-      baseRechargeSeconds: 4.0
+      baseMaxCharges: 5
+      baseRechargeSeconds: 9.0
       teleportDistance: 5.0
       canUseWhileSlowed: false
-      chargeIncreasePerLevel: 1
-      rechargeReductionPerLevel: 0.0
+      chargeIncreasePerLevel: 0
+      rechargeReductionPerLevel: 1.0
     markedfordeath:
       enabled: true
       maxlevel: 5
