@@ -26,6 +26,8 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.Iterator;
+import java.util.Map;
 import java.util.UUID;
 import java.util.WeakHashMap;
 
@@ -100,6 +102,7 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
     public void endOnInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         if (active.containsKey(player.getUniqueId())) {
+            active.remove(player.getUniqueId());
             deactivate(player);
         }
     }
@@ -118,22 +121,27 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
         }
         if (!(event.getDamager() instanceof Player damager)) return;
         if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
+            active.remove(damager.getUniqueId());
             deactivate(damager);
         }
     }
 
     @UpdateEvent(delay = 250)
     public void onUpdate() {
-        active.forEach((uuid, aLong) -> {
-            Player player = Bukkit.getPlayer(uuid);
-            if (player == null) {
-                active.remove(uuid);
-            } else {
-                if (aLong - System.currentTimeMillis() <= 0) {
-                    deactivate(player);
-                }
-            }
-        });
+       Iterator<Map.Entry<UUID, Long>> iterator = active.entrySet().iterator();
+       while (iterator.hasNext()) {
+           Map.Entry<UUID, Long> entry = iterator.next();
+           Player player = Bukkit.getPlayer(entry.getKey());
+           if (player == null) {
+              iterator.remove();
+              continue;
+           } else {
+               if (entry.getValue() - System.currentTimeMillis() <= 0) {
+                   iterator.remove();
+                   deactivate(player);
+               }
+           }
+       }
     }
 
     @Override
@@ -146,9 +154,8 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
     }
 
     public void deactivate(Player player) {
-        active.remove(player.getUniqueId());
-        UtilMessage.message(player, "Champions", UtilMessage.deserialize("<green>%s</green> has ended.", getName()));
-        player.getWorld().playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.5F, 1.5F);
+        UtilMessage.message(player, "Champions", UtilMessage.deserialize("<green>%s %s</green> has ended.", getName(), getLevel(player)));
+        player.getWorld().playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.5F, 0.25F);
         player.removePotionEffect(PotionEffectType.SPEED);
     }
 
