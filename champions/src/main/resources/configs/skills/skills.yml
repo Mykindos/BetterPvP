@@ -98,12 +98,12 @@ skills:
     flash:
       enabled: true
       maxlevel: 5
-      baseMaxCharges: 1
-      baseRechargeSeconds: 4.0
+      baseMaxCharges: 5
+      baseRechargeSeconds: 9.0
       teleportDistance: 5.0
       canUseWhileSlowed: false
-      chargeIncreasePerLevel: 1
-      rechargeReductionPerLevel: 0.0
+      chargeIncreasePerLevel: 0
+      rechargeReductionPerLevel: 1.0
     markedfordeath:
       enabled: true
       maxlevel: 5
@@ -630,9 +630,9 @@ skills:
       maxlevel: 5
       cooldown: 14.0
       cooldownDecreasePerLevel: 1.0
-      baseDuration: 3.5
+      baseDuration: 1.0
       durationIncreasePerLevel: 0.5
-      levitationStrength: 1
+      levitationStrength: 3
     pindown:
       enabled: true
       maxlevel: 5

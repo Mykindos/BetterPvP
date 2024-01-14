@@ -46,9 +46,9 @@ public class Impotence extends Skill implements PassiveSkill {
                 "maximum of <stat>" + maxEnemies + "</stat> players",
                 "",
                 "Damage Reduction:",
-                "1 nearby enemy = <stat>" + (calculateReduction(level, 1) * 100)  + "%</stat>",
-                "2 nearby enemies = <stat>" + (calculateReduction(level, 2) * 100) + "%</stat>",
-                "3 nearby enemies = <stat>" + (calculateReduction(level, 3) * 100) + "%</stat>"
+                "1 nearby enemy = <stat>" + String.format("%.1f",(calculateReduction(level, 1) * 100))  + "%</stat>",
+                "2 nearby enemies = <stat>" + String.format("%.1f",(calculateReduction(level, 2) * 100)) + "%</stat>",
+                "3 nearby enemies = <stat>" + String.format("%.1f",(calculateReduction(level, 3) * 100)) + "%</stat>"
         };
     }
 
