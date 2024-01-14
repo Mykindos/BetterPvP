@@ -13,10 +13,7 @@ import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
-import org.bukkit.Effect;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
+import org.bukkit.*;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -90,7 +87,8 @@ public class PinDown extends PrepareArrowSkill {
     @Override
     public void onHit(Player damager, LivingEntity target, int level) {
         target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) (getDuration(level) * 20), slownessStrength));
-        championsManager.getEffects().addEffect(target, EffectType.NO_JUMP, (long) getDuration(level) * 20);
+        championsManager.getEffects().addEffect(target, EffectType.NO_JUMP, (long) getDuration(level) * 100);
+        Bukkit.broadcastMessage("[debug]");
 
     }
 
