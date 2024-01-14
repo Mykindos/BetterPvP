@@ -143,7 +143,8 @@ public class ClansWorldListener extends ClanListener {
             });
         }
     }
-
+    
+    @UpdateEvent(delay = 1000)
     public void checkPlayerPillaging() {
         for (Player player : Bukkit.getServer().getOnlinePlayers()) {
             Clan playerClan = clanManager.getClanByPlayer(player).orElse(null);
