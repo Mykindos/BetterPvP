@@ -5,7 +5,6 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
-import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -14,7 +13,6 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -94,7 +92,7 @@ public class PowerChop extends PrepareSkill implements CooldownSkill {
         if (level > 0) {
             event.setDamage(event.getDamage() + getBonusDamage(level));
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_IRON_GOLEM_HURT, 1.0F, 1.0F);
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You hit " + event.getDamagee().getName() + " with <alt>" + getName());
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <alt2>%s</alt2> with <alt>%s</alt>.", event.getDamagee().getName(), getName());
             event.addReason(getName());
             charge.remove(player);
         }
@@ -105,7 +103,7 @@ public class PowerChop extends PrepareSkill implements CooldownSkill {
         charge.entrySet().removeIf(entry -> {
             if (UtilTime.elapsed(entry.getValue(), (long) timeToHit * 1000)) {
                 Player player = entry.getKey();
-                UtilMessage.simpleMessage(player, getClassType().getName(), "You failed to use <green>%s<gray>.", getName());
+                UtilMessage.simpleMessage(player, getClassType().getName(), "You failed to use <alt>%s</alt>.", getName());
                 player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
                 return true;
             }
