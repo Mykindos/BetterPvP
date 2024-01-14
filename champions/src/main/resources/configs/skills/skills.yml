@@ -43,7 +43,7 @@ skills:
       maxlevel: 5
       baseDuration: 3.0
       blindDuration: 1.75
-      blindRadius: 2.5
+      blindRadius: 4.0
       cooldownDecreasePerLevel: 2.5
       durationIncreasePerLevel: 1.0
     silencingarrow:
