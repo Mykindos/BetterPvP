@@ -4,33 +4,43 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
+import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
-import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Effect;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.WeakHashMap;
+
 @Singleton
 @BPvPListener
-public class PinDown extends PrepareArrowSkill {
+public class PinDown extends Skill implements InteractSkill, CooldownSkill, Listener {
+
+    private final WeakHashMap<Arrow, Player> arrows = new WeakHashMap<>();
 
     private double baseDuration;
-
     private double durationIncreasePerLevel;
-
     private int slownessStrength;
 
     @Inject
@@ -45,8 +55,7 @@ public class PinDown extends PrepareArrowSkill {
 
     @Override
     public String[] getDescription(int level) {
-
-        return new String[]{
+        return new String[] {
                 "Left click with a Bow to activate",
                 "",
                 "Quickly launch an arrow that gives enemies",
@@ -67,34 +76,82 @@ public class PinDown extends PrepareArrowSkill {
 
     @Override
     public SkillType getType() {
-
         return SkillType.BOW;
     }
 
     @Override
-    public void activate(Player player, int level) {
-
-        if (championsManager.getCooldowns().use(player, getName(), getCooldown(level), true, true, true, false)) {
-            UtilInventory.remove(player, Material.ARROW, 1);
-
-            Arrow proj = player.launchProjectile(Arrow.class);
-            arrows.add(proj);
-
-            proj.setVelocity(player.getLocation().getDirection().multiply(1.6D));
-            player.getWorld().playEffect(player.getLocation(), Effect.BOW_FIRE, 0);
-            player.getWorld().playEffect(player.getLocation(), Effect.BOW_FIRE, 0);
+    public boolean canUse(Player player) {
+        if (!UtilInventory.contains(player, Material.ARROW, 1)) {
+            UtilMessage.message(player, getName(), "You need at least <alt2>1 Arrow</alt2> to use this skill.");
+            return false;
         }
+
+        return super.canUse(player);
     }
 
     @Override
-    public void onHit(Player damager, LivingEntity target, int level) {
+    public void activate(Player player, int level) {
+        UtilInventory.remove(player, Material.ARROW, 1);
+
+        Arrow proj = player.launchProjectile(Arrow.class);
+        proj.setShooter(player);
+        arrows.put(proj, player);
+
+        proj.setVelocity(player.getLocation().getDirection().multiply(1.6D));
+        player.getWorld().playEffect(player.getLocation(), Effect.BOW_FIRE, 0);
+        player.getWorld().playEffect(player.getLocation(), Effect.BOW_FIRE, 0);
+    }
+
+    @UpdateEvent
+    public void onTick() {
+        arrows.entrySet().removeIf(entry -> {
+            final Arrow arrow = entry.getKey();
+            final Player shooter = entry.getValue();
+            if (arrow.isDead() || arrow.isOnGround() || shooter == null || !shooter.isOnline()) {
+                return true;
+            }
+
+            if (arrow.getTicksLived() > 5 * 20) {
+                arrow.remove();
+                UtilMessage.message(shooter, getName(), "You missed <alt>%s</alt>.", getName());
+                return true;
+            }
+
+            Particle.REDSTONE.builder()
+                    .location(arrow.getLocation())
+                    .color(128, 0, 128)
+                    .count(3)
+                    .extra(0)
+                    .receivers(60)
+                    .spawn();
+            return false;
+        });
+    }
+
+    @EventHandler
+    public void onHit(ProjectileHitEvent event) {
+        final Projectile projectile = event.getEntity();
+        if (!(projectile instanceof Arrow arrow) || !arrows.containsKey(arrow)) {
+            return;
+        }
+
+        final Player shooter = arrows.get(arrow);
+        if (shooter == null || !shooter.isOnline()) {
+            return;
+        }
+
+        final Entity entity = event.getHitEntity();
+        if (!(entity instanceof LivingEntity target)) {
+            UtilMessage.message(shooter, getName(), "You missed <alt>%s</alt>.", getName());
+            return;
+        }
+
+        final int level = getLevel(shooter);
         target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) (getDuration(level) * 20), slownessStrength));
         championsManager.getEffects().addEffect(target, EffectType.NO_JUMP, (long) getDuration(level) * 1000);
-    }
-
-    @Override
-    public void displayTrail(Location location) {
-        Particle.REDSTONE.builder().location(location).color(128, 0, 128).count(3).extra(0).receivers(60, true).spawn();
+        UtilMessage.message(shooter, getName(), "You hit <alt2>%s</alt2> with <alt>%s %s</alt>.", target.getName(), getName(), level);
+        UtilMessage.message(target, getName(), "<alt2>%s</alt2> hit you with <alt>%s %s</alt>.", shooter.getName(), getName(), level);
+        arrows.remove(arrow);
     }
 
     @Override
@@ -104,7 +161,6 @@ public class PinDown extends PrepareArrowSkill {
 
     @Override
     public double getCooldown(int level) {
-
         return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
