@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
@@ -89,6 +90,8 @@ public class PinDown extends PrepareArrowSkill {
     @Override
     public void onHit(Player damager, LivingEntity target, int level) {
         target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) (getDuration(level) * 20), slownessStrength));
+        championsManager.getEffects().addEffect(target, EffectType.NO_JUMP, (long) getDuration(level) * 20);
+
     }
 
     @Override

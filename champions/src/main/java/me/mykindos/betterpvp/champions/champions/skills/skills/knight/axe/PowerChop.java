@@ -94,6 +94,7 @@ public class PowerChop extends PrepareSkill implements CooldownSkill {
         if (level > 0) {
             event.setDamage(event.getDamage() + getBonusDamage(level));
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_IRON_GOLEM_HURT, 1.0F, 1.0F);
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You hit " + event.getDamagee().getName() + " with ", getName());
             event.addReason(getName());
             charge.remove(player);
         }
