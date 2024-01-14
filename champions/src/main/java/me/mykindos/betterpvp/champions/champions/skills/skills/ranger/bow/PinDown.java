@@ -88,8 +88,6 @@ public class PinDown extends PrepareArrowSkill {
     public void onHit(Player damager, LivingEntity target, int level) {
         target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) (getDuration(level) * 20), slownessStrength));
         championsManager.getEffects().addEffect(target, EffectType.NO_JUMP, (long) getDuration(level) * 100);
-        Bukkit.broadcastMessage("[debug]");
-
     }
 
     @Override
