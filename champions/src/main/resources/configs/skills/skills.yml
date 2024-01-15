@@ -831,8 +831,8 @@ skills:
       effectDurationIncreasePerLevel: 1
       maxDistance: 64.0
       numPoints: 30
-      cooldown: 15.0
-      escapeRadius: 7.0
+      cooldown: 13.0
+      escapeRadius: 8.0
       escapeRadiusIncreasePerLevel: 0.0
       maxDistanceIncreasePerLevel: 0.0
       cooldownDecreasePerLevel: 1.0
