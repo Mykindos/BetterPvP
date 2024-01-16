@@ -50,7 +50,7 @@ public class Backstab extends Skill implements PassiveSkill, Listener {
     }
 
     public double getDamageModifier(int level) {
-        return baseIncrease + (level * increasePerLevel);
+        return baseIncrease + ((level-1) * increasePerLevel);
     }
 
     @EventHandler

@@ -63,7 +63,7 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Instantly teleport forwards <stat>" + getMaxTravelDistance(level) + "</stat> Blocks",
+                "Instantly teleport forwards <val>" + getMaxTravelDistance(level) + "</val> Blocks",
                 "",
                 "Using again within <stat>" + getDeblinkTime(level) + "</stat> seconds De-Blinks,",
                 "returning you to your original location",
@@ -79,7 +79,7 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
     }
 
     public int getMaxTravelDistance(int level){
-        return maxTravelDistance + level * distanceIncreasePerLevel;
+        return maxTravelDistance + ((level-1) * distanceIncreasePerLevel);
     }
 
     @Override
@@ -187,7 +187,7 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
             Vector direction = player.getLocation().getDirection();
             Location targetLocation = player.getLocation().add(0, 1, 0);
 
-            double maxDistance = maxTravelDistance;
+            double maxDistance = getMaxTravelDistance(level);
 
             for (double currentDistance = 0; currentDistance < maxDistance; currentDistance += 1) {
                 Location testLocation = targetLocation.clone().add(direction.clone());

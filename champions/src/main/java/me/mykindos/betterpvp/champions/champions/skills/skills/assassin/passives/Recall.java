@@ -65,7 +65,7 @@ public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listene
                 "Drop your Sword / Axe to activate",
                 "",
                 "Teleports you back in time <val>" + getDuration(level) + "</val> seconds, giving",
-                "you <effect> " + UtilFormat.getRomanNumeral(regenerationLevel + 1)  +"</effect> for <stat>" + getRegenerationTime(level) + "%</stat> seconds",
+                "you <effect> Regeneration" + UtilFormat.getRomanNumeral(regenerationLevel + 1)  +"</effect> for <stat>" + getRegenerationTime(level) + "</stat> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -139,7 +139,7 @@ public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listene
         player.teleportAsync(teleportLocation);
 
         // Heal Logic
-        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) (regenerationDuration * 20), regenerationLevel));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, (int) (regenerationDuration * 20), regenerationLevel));
 
         // Cues
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 2.0F, 2.0F);

@@ -91,7 +91,7 @@ skills:
       enabled: true
       cooldown: 13.0
       maxlevel: 5
-      maxTravelDistance: 16
+      maxTravelDistance: 9
       canUseWhileSlowed: false
       cooldownDecreasePerLevel: 1.0
       distanceIncreasePerLevel: 3
@@ -535,7 +535,7 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 25.0
-      damage: 10.0
+      damage: 5.0
       cooldownDecreasePerLevel: 1.0
       baseDuration: 1.0
       durationIncreasePerLevel: 1.0
@@ -849,7 +849,7 @@ skills:
     grasp:
       enabled: true
       maxlevel: 5
-      cooldown: 20.0
+      cooldown: 22.0
       cooldownDecreasePerLevel: 1.5
       baseDistance: 10.0
       distanceIncreasePerLevel: 5.0

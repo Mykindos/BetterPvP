@@ -70,7 +70,7 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
     }
 
     public double getDamage(int level){
-        return damage + level * damageIncreasePerLevel;
+        return damage + ((level-1) * damageIncreasePerLevel);
     }
 
     public double getRecoilDamage(int level){

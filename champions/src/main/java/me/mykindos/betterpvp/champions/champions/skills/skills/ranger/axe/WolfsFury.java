@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -53,11 +54,12 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
                 "Right click with an Axe to activate",
                 "",
                 "Summon the power of the wolf, gaining",
-                "<effect>Strength " + UtilFormat.getRomanNumeral(strengthStrength) + "</effect> for <val>" + getDuration(level) + "</val> seconds, and giving",
+                "<effect>Strength " + UtilFormat.getRomanNumeral(strengthStrength + 1) + "</effect> for <val>" + getDuration(level) + "</val> seconds, and giving",
                 "no knockback on your attacks",
                 "",
                 "If you miss <stat>" + maxMissedSwings + "</stat> consecutive attacks,",
                 "Wolfs Fury ends",
+                "",
                 "Cooldown: <val>" + getCooldown(level)
         };
     }
@@ -121,7 +123,7 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
                 if (missedSwings.get(player) >= maxMissedSwings) {
                     active.remove(player);
                     missedSwings.remove(player);
-                    player.sendMessage("Wolfs Fury ended early.");
+                    UtilMessage.message(player, getClassType().getName(), "<alt>" + getName() + "</alt> ended early");
                 }
             }
         }
@@ -129,7 +131,7 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
 
     @Override
     public void activate(Player player, int level) {
-        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WOLF_HOWL, 1.0f, 1.0f);
+        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WOLF_GROWL, 2f, 1.2f);
         active.put(player, (long) (System.currentTimeMillis() + (getDuration(level) * 1000L)));
         championsManager.getEffects().addEffect(player, EffectType.STRENGTH, 1, (long) (getDuration(level) * 1000L));
     }
