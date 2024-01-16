@@ -120,7 +120,7 @@ public class HoldPosition extends Skill implements InteractSkill, CooldownSkill,
                 spawnMobSpellParticles(player);
                 ticksRun++;
             }
-        }.runTaskTimer(champions, 0, 20);
+        }.runTaskTimer(champions, 0, 1);
     }
 
     private void spawnMobSpellParticles(Player player) {

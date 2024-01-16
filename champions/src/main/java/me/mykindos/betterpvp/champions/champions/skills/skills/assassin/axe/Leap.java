@@ -79,20 +79,11 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
 
 
     public boolean wallKick(Player player) {
-
         if (championsManager.getCooldowns().use(player, "Wall Kick", 0.25, false)) {
             Vector vec = player.getLocation().getDirection();
 
-            boolean xPos = true;
-            boolean zPos = true;
-
-            if (vec.getX() < 0.0D) {
-                xPos = false;
-            }
-            if (vec.getZ() < 0.0D) {
-                zPos = false;
-            }
-
+            boolean xPos = vec.getX() >= 0.0D;
+            boolean zPos = vec.getZ() >= 0.0D;
 
             for (int x = -1; x <= 1; x++) {
                 for (int z = -1; z <= 1; z++) {
@@ -104,54 +95,34 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
                             if (!UtilBlock.airFoliage(back)) {
 
                                 if (back.getLocation().getY() >= Math.floor(player.getLocation().getY() - 1.0)) {
-                                    if (UtilBlock.airFoliage(back.getRelative(BlockFace.UP).getType())) {
-                                            continue;
-                                    }
-                                }
-
-                                Block forward;
-
-                                if (Math.abs(vec.getX()) > Math.abs(vec.getZ())) {
-                                    if (xPos) {
-                                        forward = player.getLocation().getBlock().getRelative(1, 0, 0);
-                                    } else {
-                                        forward = player.getLocation().getBlock().getRelative(-1, 0, 0);
+                                    // Check for additional block above
+                                    if (!UtilBlock.airFoliage(back.getRelative(BlockFace.UP))) {
+                                        continue;
                                     }
 
-                                } else if (zPos) {
-                                    forward = player.getLocation().getBlock().getRelative(0, 0, 1);
-                                } else {
-                                    forward = player.getLocation().getBlock().getRelative(0, 0, -1);
-                                }
-
-                                if (UtilBlock.airFoliage(forward)) {
+                                    Block forward;
                                     if (Math.abs(vec.getX()) > Math.abs(vec.getZ())) {
-                                        if (xPos) {
-                                            forward = player.getLocation().getBlock().getRelative(1, 1, 0);
-                                        } else {
-                                            forward = player.getLocation().getBlock().getRelative(-1, 1, 0);
-                                        }
-                                    } else if (zPos) {
-                                        forward = player.getLocation().getBlock().getRelative(0, 1, 1);
+                                        forward = xPos ? player.getLocation().getBlock().getRelative(1, 0, 0)
+                                                : player.getLocation().getBlock().getRelative(-1, 0, 0);
                                     } else {
-                                        forward = player.getLocation().getBlock().getRelative(0, 1, -1);
+                                        forward = zPos ? player.getLocation().getBlock().getRelative(0, 0, 1)
+                                                : player.getLocation().getBlock().getRelative(0, 0, -1);
                                     }
 
                                     if (UtilBlock.airFoliage(forward)) {
-
-                                        doLeap(player, true);
-                                        return true;
+                                        forward = forward.getRelative(BlockFace.UP);
+                                        if (UtilBlock.airFoliage(forward)) {
+                                            doLeap(player, true);
+                                            return true;
+                                        }
                                     }
                                 }
                             }
                         }
                     }
                 }
-
             }
         }
-
-
         return false;
     }
 

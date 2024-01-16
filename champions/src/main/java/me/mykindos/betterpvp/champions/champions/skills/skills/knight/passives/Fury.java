@@ -36,8 +36,8 @@ public class Fury extends Skill implements PassiveSkill, Listener {
 
     @Override
     public String[] getDescription(int level) {
-        return new String[]{
-                "Your attacks deal a bonus <val>" + getBonusDamage(level) + "</val> damage"
+        return new String[] {
+                "Your attacks deal a bonus <val>" + String.format("%.1f", getBonusDamage(level)) + "</val> damage"
         };
     }
 
