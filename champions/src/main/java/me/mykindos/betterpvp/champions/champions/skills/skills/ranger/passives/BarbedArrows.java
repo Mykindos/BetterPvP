@@ -20,7 +20,7 @@ import org.bukkit.potion.PotionEffectType;
 
 @Singleton
 @BPvPListener
-public class Entangle extends Skill implements PassiveSkill {
+public class BarbedArrows extends Skill implements PassiveSkill {
 
     private double baseDuration;
 
@@ -29,13 +29,13 @@ public class Entangle extends Skill implements PassiveSkill {
     private int slownessStrength;
 
     @Inject
-    public Entangle(Champions champions, ChampionsManager championsManager) {
+    public BarbedArrows(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
 
     @Override
     public String getName() {
-        return "Entangle";
+        return "Barbed Arrows";
     }
 
     @Override
