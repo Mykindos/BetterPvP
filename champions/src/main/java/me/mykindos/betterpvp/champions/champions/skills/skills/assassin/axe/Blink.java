@@ -63,7 +63,7 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Instantly teleport forwards <val>" + getMaxTravelDistance(level) + "</val> Blocks",
+                "Instantly teleport forwards <stat>" + getMaxTravelDistance(level) + "</stat> Blocks",
                 "",
                 "Using again within <stat>" + getDeblinkTime(level) + "</stat> seconds De-Blinks,",
                 "returning you to your original location",

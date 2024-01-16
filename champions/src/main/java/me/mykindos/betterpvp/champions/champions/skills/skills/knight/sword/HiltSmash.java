@@ -62,7 +62,7 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener {
                 "",
                 "Smash the hilt of your sword into",
                 "your opponent, dealing <val>" + getDamage(level) + "</val> damage and",
-                "applying <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength + 1) + "</effect> for <val>" + getDuration(level) + "</val> seconds,",
+                "applying <effect>" + UtilFormat.getRomanNumeral(slowStrength + 1) + "</effect> for <val>" + getDuration(level) + "</val> seconds,",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -138,10 +138,8 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener {
             ent.getWorld().playSound(ent.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1.0F, 1.2F);
         } else {
             UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s", getName());
-            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_IRON_GOLEM_ATTACK, 2.0f, 1.3f);
         }
 
-        player.swingMainHand();
     }
 
     @Override

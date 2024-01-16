@@ -70,7 +70,7 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
     }
 
     public double getDamage(int level){
-        return damage + ((level-1) * damageIncreasePerLevel);
+        return damage + level * damageIncreasePerLevel;
     }
 
     public double getRecoilDamage(int level){
@@ -143,13 +143,10 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
 
 
     public void doTakedown(Player player, Player target) {
-
         int level = getLevel(player);
 
         UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <alt>" + target.getName() + "</alt> with <alt>" + getName());
-
         UtilDamage.doCustomDamage(new CustomDamageEvent(target, player, null, DamageCause.CUSTOM, damage, false, "Takedown"));
-
 
         UtilMessage.simpleMessage(target, getClassType().getName(), "<alt>" + player.getName() + "</alt> hit you with <alt>" + getName());
         UtilDamage.doCustomDamage(new CustomDamageEvent(player, target, null, DamageCause.CUSTOM, damage, false, "Takedown Recoil"));
