@@ -103,7 +103,7 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergySkill
                 int level = getLevel((Player) event.getDamager());
 
                 Vector direction = snowball.getVelocity().normalize().multiply(1);
-                double pushStrength = 0.5;
+                double pushStrength = 1.0;
                 Vector pushBackVelocity = direction.multiply(pushStrength).setY(0.25);
 
                 damagee.setVelocity(pushBackVelocity);
@@ -142,7 +142,7 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergySkill
             } else {
                 Snowball s = player.launchProjectile(Snowball.class);
                 s.getLocation().add(0, 1, 0);
-                s.setVelocity(player.getLocation().getDirection().add(new Vector(UtilMath.randDouble(-0.2, 0.2), UtilMath.randDouble(-0.2, 0.2), UtilMath.randDouble(-0.2, 0.2))));
+                s.setVelocity(player.getLocation().getDirection().add(new Vector(UtilMath.randDouble(-0.2, 0.2), UtilMath.randDouble(-0.2, 0.4), UtilMath.randDouble(-0.3, 0.3))));
                 player.getWorld().playSound(player.getLocation(), Sound.BLOCK_SNOW_STEP, 1f, 0.4f);
                 snow.put(s, player);
             }
