@@ -21,29 +21,29 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.player.PlayerInteractEvent;
 
 import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class WolvesFury extends Skill implements InteractSkill, CooldownSkill, Listener {
+public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Listener {
 
     private final WeakHashMap<Player, Long> active = new WeakHashMap<>();
-
+    private final WeakHashMap<Player, Integer> missedSwings = new WeakHashMap<>();
     private double baseDuration;
-
     private double durationIncreasePerLevel;
-
     private int strengthStrength;
+    private int maxMissedSwings;
 
     @Inject
-    public WolvesFury(Champions champions, ChampionsManager championsManager) {
+    public WolfsFury(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
 
     @Override
     public String getName() {
-        return "Wolves Fury";
+        return "Wolfs Fury";
     }
 
     @Override
@@ -56,6 +56,8 @@ public class WolvesFury extends Skill implements InteractSkill, CooldownSkill, L
                 "<effect>Strength " + UtilFormat.getRomanNumeral(strengthStrength) + "</effect> for <val>" + getDuration(level) + "</val> seconds, and giving",
                 "no knockback on your attacks",
                 "",
+                "If you miss <stat>" + maxMissedSwings + "</stat> consecutive attacks,",
+                "Wolfs Fury ends",
                 "Cooldown: <val>" + getCooldown(level)
         };
     }
@@ -92,12 +94,37 @@ public class WolvesFury extends Skill implements InteractSkill, CooldownSkill, L
             e.setKnockback(false);
             e.addReason(getName());
         }
+        missedSwings.put(damager, 0);
 
     }
 
     @UpdateEvent(delay = 500)
     public void onUpdate() {
-        active.entrySet().removeIf(entry -> entry.getValue() - System.currentTimeMillis() <= 0);
+        active.entrySet().removeIf(entry -> {
+            if (entry.getValue() - System.currentTimeMillis() <= 0) {
+                missedSwings.remove(entry.getKey());
+                return true;
+            }
+            return false;
+        });
+    }
+
+    @EventHandler
+    public void onMiss(PlayerInteractEvent event) {
+        Player player = event.getPlayer();
+
+        int level = getLevel(player);
+
+        if(level > 0) {
+            if (active.containsKey(player)) {
+                missedSwings.put(player, missedSwings.getOrDefault(player, 0) + 1);
+                if (missedSwings.get(player) >= maxMissedSwings) {
+                    active.remove(player);
+                    missedSwings.remove(player);
+                    player.sendMessage("Wolfs Fury ended early.");
+                }
+            }
+        }
     }
 
     @Override
@@ -116,7 +143,7 @@ public class WolvesFury extends Skill implements InteractSkill, CooldownSkill, L
     public void loadSkillConfig(){
         baseDuration = getConfig("baseDuration", 3.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
-
-        strengthStrength = getConfig("strengthStrength", 1, Integer.class);
+        maxMissedSwings = getConfig("maxMissedSwings", 2, Integer.class);
+        strengthStrength = getConfig("strengthStrength", 3, Integer.class);
     }
 }

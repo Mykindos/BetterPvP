@@ -343,7 +343,7 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 25.0
-      sphereSize: 5
+      sphereSize: 4
       speed: 1.5
       cooldownDecreasePerLevel: 2.0
       baseDuration: 5.0
@@ -670,13 +670,9 @@ skills:
     overcharge:
       enabled: true
       maxlevel: 5
-      baseDamageIncrement: 1.0
-      damageIncrementPerLevel: 0.0
-      baseDurationIncrement: 0.4
       baseMaxDamage: 2.0
       maxDamageIncreasePerLevel: 1.0
-      damageIncrement: 1
-      durationIncrement: 0.4
+      chargeSeconds: 3.0
     huntersthrill:
       enabled: true
       maxlevel: 5
@@ -704,10 +700,10 @@ skills:
       damage: 8.0
     vitalityspores:
       enabled: true
-      maxlevel: 5
-      baseDuration: 7.0
+      maxlevel: 3
+      baseDuration: 5.0
       durationDecreasePerLevel: 1.0
-      regenerationStrength: 0
+      regenerationStrength: 1
     sharpshooter:
       enabled: true
       maxlevel: 3
@@ -728,14 +724,15 @@ skills:
       baseDamageReduction: 0.6
       damageReductionIncreasePerLevel: 0.0
       speedStrength: 1
-    wolvesfury:
+    wolfsfury:
       enabled: true
       maxlevel: 5
       cooldown: 25.0
       baseDuration: 3.0
       cooldownDecreasePerLevel: 1.5
       durationIncreasePerLevel: 1.0
-      strengthStrength: 1
+      strengthStrength: 3
+      maxMissedSwings: 2
     disengage:
       enabled: true
       maxlevel: 5

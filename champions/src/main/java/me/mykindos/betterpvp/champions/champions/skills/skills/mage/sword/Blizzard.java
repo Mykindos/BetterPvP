@@ -60,9 +60,8 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergySkill
         return new String[]{
                 "Hold right click with a Sword to channel.",
                 "",
-                "While channeling, release a blizzard",
-                "that gives <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength + 1) + "</effect> to anyone hit ",
-                "for <stat>" + getSlowDuration(level) + "</stat> seconds",
+                "Release a blizzard that gives <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength + 1) + "</effect>",
+                "for <stat>" + getSlowDuration(level) + "</stat> seconds and pushes enemies back",
                 "",
                 "Energy: <val>" + getEnergy(level)
         };
@@ -103,15 +102,18 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergySkill
 
                 int level = getLevel((Player) event.getDamager());
 
-                damagee.setVelocity(event.getProjectile().getVelocity().multiply(0.1).add(new Vector(0, 0.25, 0)));
+                Vector direction = snowball.getVelocity().normalize().multiply(1);
+                double pushStrength = 1.0;
+                Vector pushBackVelocity = direction.multiply(pushStrength).setY(0.25);
+
+                damagee.setVelocity(pushBackVelocity);
+
                 damagee.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) getSlowDuration(level), slowStrength));
 
                 event.cancel("Snowball");
                 snow.remove(snowball);
             }
-
         }
-
     }
 
     @UpdateEvent
