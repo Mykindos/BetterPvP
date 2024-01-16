@@ -14,6 +14,8 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -21,6 +23,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.Random;
 
 @Singleton
 @BPvPListener
@@ -99,7 +104,34 @@ public class HoldPosition extends Skill implements InteractSkill, CooldownSkill,
         championsManager.getEffects().addEffect(player, EffectType.NO_SPRINT, (long) getDuration(level) * 1000);
         player.setSprinting(false);
 
-        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1F, 0.5F);
+        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_SCREAM, 1F, 1.5F);
+        
+        long durationTicks = (long) (getDuration(level) * 20);
+        new BukkitRunnable() {
+            long ticksRun = 0;
+
+            @Override
+            public void run() {
+                if (ticksRun > durationTicks) {
+                    this.cancel();
+                    return;
+                }
+
+                spawnMobSpellParticles(player);
+                ticksRun++;
+            }
+        }.runTaskTimer(champions, 0, 20);
+    }
+
+    private void spawnMobSpellParticles(Player player) {
+        Location loc = player.getLocation();
+        Random random = new Random();
+        for (int i = 0; i < 10; i++) {
+            double x = loc.getX() + (random.nextDouble() - 0.5) * 2;
+            double y = loc.getY() + random.nextDouble() * 2;
+            double z = loc.getZ() + (random.nextDouble() - 0.5) * 2;
+            player.getWorld().spawnParticle(Particle.SPELL_MOB, new Location(loc.getWorld(), x, y, z), 0, 0.5, 0.5, 0.5, 0.01);
+        }
     }
 
     @Override

@@ -68,7 +68,7 @@ public class Fury extends Skill implements PassiveSkill, Listener {
     }
     public void loadSkillConfig() {
         baseBonusDamage = getConfig("baseBonusDamage", 0.0, Double.class);
-        bonusDamageIncreasePerLevel = getConfig("bonusDamageIncreasePerLevel", 0.5, Double.class);
+        bonusDamageIncreasePerLevel = getConfig("bonusDamageIncreasePerLevel", 0.4, Double.class);
 
     }
 }

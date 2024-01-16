@@ -41,8 +41,10 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
 
     private final WeakHashMap<Player, Location> loc = new WeakHashMap<>();
     private final WeakHashMap<Player, Long> blinkTime = new WeakHashMap<>();
-
     private int maxTravelDistance;
+    private int distanceIncreasePerLevel;
+    private int deblinkTime;
+    private int deblinkTimeIncreasePerLevel;
 
     @Inject
     public Blink(Champions champions, ChampionsManager championsManager) {
@@ -61,15 +63,23 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Instantly teleport forwards <stat>" + maxTravelDistance + "</stat> Blocks",
+                "Instantly teleport forwards <stat>" + getMaxTravelDistance(level) + "</stat> Blocks",
                 "",
-                "Using again within <stat>5</stat> seconds De-Blinks,",
+                "Using again within <stat>" + getDeblinkTime(level) + "</stat> seconds De-Blinks,",
                 "returning you to your original location",
                 "",
                 "Cannot be used while <effect>Slowed</effect>",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
+    }
+
+    public int getDeblinkTime(int level){
+        return deblinkTime + level * deblinkTimeIncreasePerLevel;
+    }
+
+    public int getMaxTravelDistance(int level){
+        return maxTravelDistance + level * distanceIncreasePerLevel;
     }
 
     @Override
@@ -153,8 +163,9 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
 
     @Override
     public boolean canUse(Player player) {
+        int level = getLevel(player);
         if ((loc.containsKey(player)) && (blinkTime.containsKey(player))
-                && (!UtilTime.elapsed(blinkTime.get(player), 4000L))) {
+                && (!UtilTime.elapsed(blinkTime.get(player), getDeblinkTime(level) * 1000L))) {
             deblink(player, false);
             return false;
         }
@@ -221,7 +232,10 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
 
     @Override
     public void loadSkillConfig(){
-        maxTravelDistance = getConfig("maxTravelDistance", 16, Integer.class);
+        maxTravelDistance = getConfig("maxTravelDistance", 9, Integer.class);
+        distanceIncreasePerLevel = getConfig("distanceIncreasePerLevel", 3, Integer.class);
+        deblinkTime = getConfig("deblinkTime", 6, Integer.class);
+        deblinkTimeIncreasePerLevel = getConfig("deblinkTimeIncreasePerLevel", 0, Integer.class);
     }
 
     @Override

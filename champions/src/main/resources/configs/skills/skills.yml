@@ -33,10 +33,9 @@ skills:
       poisonStrength: 1
     backstab:
       enabled: true
-      maxlevel: 5
-      increasePerLevel: 0.1
-      assassinDecrease: 0.2
-      baseIncrease: 0.2
+      maxlevel: 3
+      increasePerLevel: 1.5
+      baseIncrease: 1.5
     smokebomb:
       enabled: true
       cooldown: 50.0
@@ -95,6 +94,9 @@ skills:
       maxTravelDistance: 16
       canUseWhileSlowed: false
       cooldownDecreasePerLevel: 1.0
+      distanceIncreasePerLevel: 3
+      deblinkTime: 6
+      deblinkTimeIncreasePerLevel: 0
     flash:
       enabled: true
       maxlevel: 5
@@ -124,11 +126,13 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 30.0
-      percentHealthRecovered: 0.25
       duration: 2.5
       canUseWhileSlowed: false
       cooldownDecreasePerLevel: 2.0
       durationIncreasePerLevel: 1.0
+      regenerationDuration: 5
+      regenerationLevel: 1
+      regenerationDurationIncreasePerLevel: 0
     evade:
       enabled: true
       maxlevel: 5
@@ -227,7 +231,7 @@ skills:
       enabled: true
       maxlevel: 3
       baseBonusDamage: 0.0
-      bonusDamageIncreasePerLevel: 0.5
+      bonusDamageIncreasePerLevel: 0.4
     thorns:
       enabled: true
       maxlevel: 3
@@ -276,6 +280,7 @@ skills:
       damageIncreasePerLevel: 1.0
       baseDuration: 0.0
       durationIncreasePerLevel: 0.5
+      slowStrength: 2
   mage:
     staticlazer:
       enabled: true
@@ -535,6 +540,9 @@ skills:
       baseDuration: 1.0
       durationIncreasePerLevel: 1.0
       slownessStrength: 3
+      recoilDamage: 1.5
+      recoilDamageIncreasePerLevel: 0.5
+      damageIncreasePerLevel: 1.0
     stampede:
       enabled: true
       maxlevel: 5
@@ -844,7 +852,7 @@ skills:
     grasp:
       enabled: true
       maxlevel: 5
-      cooldown: 30.0
+      cooldown: 20.0
       cooldownDecreasePerLevel: 1.5
       baseDistance: 10.0
       distanceIncreasePerLevel: 5.0
