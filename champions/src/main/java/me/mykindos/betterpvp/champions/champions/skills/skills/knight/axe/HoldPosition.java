@@ -126,11 +126,11 @@ public class HoldPosition extends Skill implements InteractSkill, CooldownSkill,
     private void spawnMobSpellParticles(Player player) {
         Location loc = player.getLocation();
         Random random = new Random();
-        for (int i = 0; i < 10; i++) {
-            double x = loc.getX() + (random.nextDouble() - 0.5) * 0.5;
-            double y = loc.getY() - 0.2;
-            double z = loc.getZ() + (random.nextDouble() - 0.5) * 0.5;
-            player.getWorld().spawnParticle(Particle.SPELL_MOB, new Location(loc.getWorld(), x, y, z), 0, 0.5, 0.5, 0.5, 0.01);
+        for (int i = 0; i < 5; i++) {
+            double x = loc.getX() + (random.nextDouble() - 0.5) * 0.9;
+            double y = loc.getY();
+            double z = loc.getZ() + (random.nextDouble() - 0.5) * 0.9;
+            player.getWorld().spawnParticle(Particle.SPELL_MOB, new Location(loc.getWorld(), x, y, z), 0, 0.5, 0.5, 0.5, 0);
         }
     }
 

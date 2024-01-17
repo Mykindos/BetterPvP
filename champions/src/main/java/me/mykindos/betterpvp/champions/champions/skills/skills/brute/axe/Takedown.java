@@ -57,7 +57,7 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
                 "Right click with an Axe to activate",
                 "",
                 "Hurl yourself forwards, dealing <stat>" + getDamage(level) + "</stat> damage,",
-                "taking <val>" + getRecoilDamage(level)+"</val> damage and applying <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength + 1) + "</effect>",
+                "taking <val>" + getRecoilDamage(level)+"</val> damage, and applying <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength + 1) + "</effect>",
                 "to yourself and the target for <val>" + getDuration(level) + "</val> seconds",
                 "",
                 "Cannot be used while grounded",
@@ -67,7 +67,7 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
     }
 
     public double getDamage(int level){
-        return damage + level * damageIncreasePerLevel;
+        return damage + (level * damageIncreasePerLevel);
     }
 
     public double getRecoilDamage(int level){
