@@ -103,7 +103,7 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergySkill
                 int level = getLevel((Player) event.getDamager());
 
                 Vector direction = snowball.getVelocity().normalize().multiply(1);
-                double pushStrength = 1.0;
+                double pushStrength = 0.3;
                 Vector pushBackVelocity = direction.multiply(pushStrength).setY(0.25);
 
                 damagee.setVelocity(pushBackVelocity);

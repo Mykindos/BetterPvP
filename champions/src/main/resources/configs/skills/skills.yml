@@ -130,7 +130,7 @@ skills:
       canUseWhileSlowed: false
       cooldownDecreasePerLevel: 2.0
       durationIncreasePerLevel: 1.0
-      regenerationDuration: 5
+      regenerationDuration: 6
       regenerationLevel: 1
       regenerationDurationIncreasePerLevel: 0
     evade:

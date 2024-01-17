@@ -94,11 +94,9 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
                             Block back = player.getLocation().getBlock().getRelative(x, 0, z);
                             if (!UtilBlock.airFoliage(back)) {
 
-                                if (back.getLocation().getY() >= Math.floor(player.getLocation().getY() - 1.0)) {
-                                    // Check for additional block above
-                                    if (!UtilBlock.airFoliage(back.getRelative(BlockFace.UP))) {
-                                        continue;
-                                    }
+                                Block upperBack = back.getRelative(BlockFace.UP);
+                                if (back.getLocation().getY() >= Math.floor(player.getLocation().getY() - 1.0) ||
+                                        !UtilBlock.airFoliage(upperBack)) {
 
                                     Block forward;
                                     if (Math.abs(vec.getX()) > Math.abs(vec.getZ())) {
@@ -125,6 +123,7 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
         }
         return false;
     }
+
 
     @Override
     public boolean canUse(Player player) {

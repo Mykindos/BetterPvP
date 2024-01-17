@@ -104,7 +104,7 @@ public class HoldPosition extends Skill implements InteractSkill, CooldownSkill,
         championsManager.getEffects().addEffect(player, EffectType.NO_SPRINT, (long) getDuration(level) * 1000);
         player.setSprinting(false);
 
-        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_SCREAM, 1F, 1.5F);
+        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1F, 0.5F);
         
         long durationTicks = (long) (getDuration(level) * 20);
         new BukkitRunnable() {
@@ -127,9 +127,9 @@ public class HoldPosition extends Skill implements InteractSkill, CooldownSkill,
         Location loc = player.getLocation();
         Random random = new Random();
         for (int i = 0; i < 10; i++) {
-            double x = loc.getX() + (random.nextDouble() - 0.5) * 2;
-            double y = loc.getY() + random.nextDouble() * 2;
-            double z = loc.getZ() + (random.nextDouble() - 0.5) * 2;
+            double x = loc.getX() + (random.nextDouble() - 0.5) * 0.5;
+            double y = loc.getY() - 0.2;
+            double z = loc.getZ() + (random.nextDouble() - 0.5) * 0.5;
             player.getWorld().spawnParticle(Particle.SPELL_MOB, new Location(loc.getWorld(), x, y, z), 0, 0.5, 0.5, 0.5, 0.01);
         }
     }
