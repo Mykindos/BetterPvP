@@ -21,8 +21,12 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 @BPvPListener
 public class DamageLogListener implements Listener {
 
+    private final DamageLogManager damageLogManager;
+
     @Inject
-    private DamageLogManager damageLogManager;
+    public DamageLogListener(DamageLogManager damageLogManager) {
+        this.damageLogManager = damageLogManager;
+    }
 
     @UpdateEvent(delay = 100, isAsync = true)
     public void processDamageLogs() {

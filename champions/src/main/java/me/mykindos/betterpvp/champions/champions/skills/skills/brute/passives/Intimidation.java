@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
@@ -57,12 +58,12 @@ public class Intimidation extends Skill implements PassiveSkill {
     }
 
     @Override
-    public void trackPlayer(Player player) {
+    public void trackPlayer(Player player, Gamer gamer) {
         trackedEnemies.put(player, new HashSet<>());
     }
 
     @Override
-    public void invalidatePlayer(Player player) {
+    public void invalidatePlayer(Player player, Gamer gamer) {
         if (!trackedEnemies.containsKey(player)) return;
         for (Player tracked : trackedEnemies.get(player)) {
             UtilPlayer.clearWarningEffect(tracked); // Clear them if they are no longer in front

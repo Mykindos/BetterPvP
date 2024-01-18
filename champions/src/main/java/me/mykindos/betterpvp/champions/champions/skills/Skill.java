@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.components.champions.ISkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import org.bukkit.entity.Player;
@@ -145,17 +146,21 @@ public abstract class Skill implements ISkill {
     /**
      * Called when a player, for any reason, equips this skill.
      * i.e: Logging in, changing classes, editing build.
+     *
      * @param player The player that equipped the skill
+     * @param gamer
      */
-    public void trackPlayer(Player player) {
+    public void trackPlayer(Player player, Gamer gamer) {
     }
 
     /**
      * Called when a player, for any reason, unequips this skill.
      * i.e: Logging out, changing classes, editing build.
+     *
      * @param player The player that unequipped the skill
+     * @param gamer
      */
-    public void invalidatePlayer(Player player) {
+    public void invalidatePlayer(Player player, Gamer gamer) {
     }
 
     public void loadSkillConfig() {

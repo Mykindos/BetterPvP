@@ -11,7 +11,6 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
 import net.kyori.adventure.text.Component;
@@ -83,17 +82,13 @@ public class RopedArrow extends PrepareArrowSkill {
     }
 
     @Override
-    public void invalidatePlayer(Player player) {
+    public void invalidatePlayer(Player player, Gamer gamer) {
         strength.remove(player);
-        // Action bar
-        Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
         gamer.getActionBar().remove(actionBarComponent);
     }
 
     @Override
-    public void trackPlayer(Player player) {
-        // Action bar
-        Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
+    public void trackPlayer(Player player, Gamer gamer) {
         gamer.getActionBar().add(900, actionBarComponent);
     }
 

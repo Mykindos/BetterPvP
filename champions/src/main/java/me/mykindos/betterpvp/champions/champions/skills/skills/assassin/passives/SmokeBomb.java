@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import org.bukkit.Bukkit;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -30,14 +31,16 @@ import org.bukkit.potion.PotionEffectType;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.WeakHashMap;
+import java.util.Map;
+import java.util.UUID;
 
 @Singleton
 @BPvPListener
 public class SmokeBomb extends Skill implements ToggleSkill, CooldownSkill, Listener {
 
-    private final WeakHashMap<Player, Long> smoked = new WeakHashMap<>();
+    private final Map<UUID, Long> smoked = new HashMap<>();
 
     private double baseDuration;
     private double durationIncreasePerLevel;
@@ -101,7 +104,7 @@ public class SmokeBomb extends Skill implements ToggleSkill, CooldownSkill, List
     public void toggle(Player player, int level) {
         // Effects
         championsManager.getEffects().addEffect(player, EffectType.INVISIBILITY, (long) (getDuration(level) * 1000L));
-        smoked.put(player, System.currentTimeMillis());
+        smoked.put(player.getUniqueId(), System.currentTimeMillis());
         for (Player target : UtilPlayer.getNearbyEnemies(player, player.getLocation(), blindRadius)) {
             target.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, (int) (blindDuration * 20), 0));
         }
@@ -132,19 +135,19 @@ public class SmokeBomb extends Skill implements ToggleSkill, CooldownSkill, List
     }
 
     private void interact(Player player) {
-        final long castTime = smoked.get(player);
+        final long castTime = smoked.get(player.getUniqueId());
         if (!UtilTime.elapsed(castTime, 25L)) {
             return;
         }
 
-        smoked.remove(player);
+        smoked.remove(player.getUniqueId());
         reappear(player);
     }
 
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        if (smoked.containsKey(player)) {
+        if (smoked.containsKey(player.getUniqueId())) {
             interact(player);
         }
     }
@@ -152,7 +155,7 @@ public class SmokeBomb extends Skill implements ToggleSkill, CooldownSkill, List
     @EventHandler
     public void onPickup(PlayerAttemptPickupItemEvent event) {
         Player player = event.getPlayer();
-        if (smoked.containsKey(player)) {
+        if (smoked.containsKey(player.getUniqueId())) {
             interact(player);
         }
     }
@@ -160,35 +163,35 @@ public class SmokeBomb extends Skill implements ToggleSkill, CooldownSkill, List
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
         Player player = event.getEntity();
-        if (smoked.containsKey(player)) {
+        if (smoked.containsKey(player.getUniqueId())) {
             interact(player);
         }
     }
 
     @EventHandler
     public void onDamage(CustomDamageEvent event) {
-        if (event.getDamager() instanceof Player player && smoked.containsKey(player)) {
-            smoked.remove(player);
+        if (event.getDamager() instanceof Player player && smoked.containsKey(player.getUniqueId())) {
+            smoked.remove(player.getUniqueId());
             reappear(player);
         }
-        if (event.getDamagee() instanceof Player player && smoked.containsKey(player)) {
-            smoked.remove(player);
+        if (event.getDamagee() instanceof Player player && smoked.containsKey(player.getUniqueId())) {
+            smoked.remove(player.getUniqueId());
             reappear(player);
         }
     }
 
     @UpdateEvent
     public void onUpdate() {
-        Iterator<Player> it = smoked.keySet().iterator();
+        Iterator<UUID> it = smoked.keySet().iterator();
         while (it.hasNext()) {
-            final Player player = it.next();
+            final Player player = Bukkit.getPlayer(it.next());
             if (player == null || !player.isValid() || player.isDead()) {
                 it.remove();
                 continue;
             }
 
             // Remove if expire
-            final long castTime = smoked.get(player);
+            final long castTime = smoked.get(player.getUniqueId());
             final int level = getLevel(player);
             if (level <= 0 || UtilTime.elapsed(castTime, (long) (getDuration(level) * 1000L))) {
                 reappear(player);

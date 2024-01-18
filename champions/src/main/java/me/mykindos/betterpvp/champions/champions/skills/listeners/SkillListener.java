@@ -21,6 +21,8 @@ import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.ToggleSkill;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.click.events.RightClickEvent;
 import me.mykindos.betterpvp.core.components.champions.ISkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -65,15 +67,17 @@ public class SkillListener implements Listener {
     private final CooldownManager cooldownManager;
     private final EnergyHandler energyHandler;
     private final EffectManager effectManager;
+    private final ClientManager clientManager;
 
     @Inject
     public SkillListener(BuildManager buildManager, RoleManager roleManager, CooldownManager cooldownManager,
-                         EnergyHandler energyHandler, EffectManager effectManager) {
+                         EnergyHandler energyHandler, EffectManager effectManager, ClientManager clientManager) {
         this.buildManager = buildManager;
         this.roleManager = roleManager;
         this.cooldownManager = cooldownManager;
         this.energyHandler = energyHandler;
         this.effectManager = effectManager;
+        this.clientManager = clientManager;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -366,12 +370,14 @@ public class SkillListener implements Listener {
 
     @EventHandler
     public void onSkillEquip(SkillEquipEvent event) {
-        event.getSkill().trackPlayer(event.getPlayer());
+        final Gamer gamer = this.clientManager.search().online(event.getPlayer()).getGamer();
+        event.getSkill().trackPlayer(event.getPlayer(), gamer);
     }
 
     @EventHandler
     public void onSkillDequip(SkillDequipEvent event) {
-        event.getSkill().invalidatePlayer(event.getPlayer());
+        final Gamer gamer = this.clientManager.search().online(event.getPlayer()).getGamer();
+        event.getSkill().invalidatePlayer(event.getPlayer(), gamer);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -385,7 +391,8 @@ public class SkillListener implements Listener {
         String name = role == null ? null : role.getName();
         RoleBuild build = builds.getActiveBuilds().get(name);
         if (build != null) {
-            build.getActiveSkills().forEach(skill -> skill.trackPlayer(player));
+            final Gamer gamer = this.clientManager.search().online(player).getGamer();
+            build.getActiveSkills().forEach(skill -> skill.trackPlayer(player, gamer));
         }
     }
 
@@ -398,19 +405,20 @@ public class SkillListener implements Listener {
         Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(player.getUniqueId().toString());
         if (gamerBuildsOptional.isPresent()) {
             GamerBuilds builds = gamerBuildsOptional.get();
+            final Gamer gamer = this.clientManager.search().online(player).getGamer();
 
             // Invalidate old skills
             String name = previousRole == null ? null : previousRole.getName();
             RoleBuild build = builds.getActiveBuilds().get(name);
             if (build != null) {
-                build.getActiveSkills().stream().filter(Objects::nonNull).forEach(skill -> skill.invalidatePlayer(player));
+                build.getActiveSkills().stream().filter(Objects::nonNull).forEach(skill -> skill.invalidatePlayer(player, gamer));
             }
 
             // Track with new skills
             name = newRole == null ? null : newRole.getName();
             build = builds.getActiveBuilds().get(name);
             if (build != null) {
-                build.getActiveSkills().stream().filter(Objects::nonNull).forEach(skill -> skill.trackPlayer(player));
+                build.getActiveSkills().stream().filter(Objects::nonNull).forEach(skill -> skill.trackPlayer(player, gamer));
             }
         }
     }

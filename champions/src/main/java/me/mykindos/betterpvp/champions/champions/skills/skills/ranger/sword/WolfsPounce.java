@@ -140,16 +140,12 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
     }
 
     @Override
-    public void trackPlayer(Player player) {
-        // Action bar
-        Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
+    public void trackPlayer(Player player, Gamer gamer) {
         gamer.getActionBar().add(900, actionBarComponent);
     }
 
     @Override
-    public void invalidatePlayer(Player player) {
-        // Action bar
-        Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
+    public void invalidatePlayer(Player player, Gamer gamer) {
         gamer.getActionBar().remove(actionBarComponent);
     }
 
