@@ -206,6 +206,19 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
         }
     }
 
+    @EventHandler
+    public void onDamageReceived(CustomDamageEvent event) {
+        if(event.isCancelled()) return;
+        if (!(event.getDamagee() instanceof Player player)) return;
+
+        if (hasSkill(player) && charging.containsKey(player)) {
+            charging.remove(player);
+            // Cues
+            UtilMessage.simpleMessage(player, getClassType().getName(), "<alt>%s</alt> was interrupted.", getName());
+            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WOLF_WHINE, 0.6f, 1.2f);
+        }
+    }
+
     @UpdateEvent
     public void checkCollide() {
         // Collision check
