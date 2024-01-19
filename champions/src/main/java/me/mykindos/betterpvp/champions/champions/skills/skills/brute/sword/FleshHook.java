@@ -25,9 +25,8 @@ import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
-import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
-import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
+import me.mykindos.betterpvp.core.utilities.model.display.DisplayComponent;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -51,23 +50,13 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
 
     private final WeakHashMap<Player, ChargeData> charging = new WeakHashMap<>();
     private final WeakHashMap<Player, Hook> hooks = new WeakHashMap<>();
+    private final DisplayComponent actionBarComponent = ChargeData.getActionBar(this, charging);
 
     private double damage;
     private double damageIncreasePerLevel;
     private double cooldownDecreasePerLevel;
     private double velocitySrengthPerLevel;
     private double baseVelocityStrength;
-
-    private final PermanentComponent actionBarComponent = new PermanentComponent(gamer -> {
-        final Player player = gamer.getPlayer();
-        if (player == null || !charging.containsKey(player) || !isHolding(player)) {
-            return null; // Skip if not online or not charging
-        }
-
-        final ChargeData charge = charging.get(player);
-        ProgressBar progressBar = ProgressBar.withProgress(charge.getCharge());
-        return progressBar.build();
-    });
 
     @Inject
     public FleshHook(Champions champions, ChampionsManager championsManager) {
@@ -94,16 +83,12 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
     }
 
     @Override
-    public void trackPlayer(Player player) {
-        // Action bar
-        Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
+    public void trackPlayer(Player player, Gamer gamer) {
         gamer.getActionBar().add(900, actionBarComponent);
     }
 
     @Override
-    public void invalidatePlayer(Player player) {
-        // Action bar
-        Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
+    public void invalidatePlayer(Player player, Gamer gamer) {
         gamer.getActionBar().remove(actionBarComponent);
     }
 
@@ -140,6 +125,11 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
         charging.put(player, new ChargeData((float) (0.1 + (level - 1) * 0.05) * 5));
     }
 
+    @Override
+    public boolean shouldDisplayActionBar(Gamer gamer) {
+        return !charging.containsKey(gamer.getPlayer()) && isHolding(gamer.getPlayer());
+    }
+
     @UpdateEvent
     public void updateFleshHook() {
         final Iterator<Player> iterator = charging.keySet().iterator();
@@ -161,8 +151,6 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
             // Check if they still are blocking and charge
             Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
             if (isHolding(player) && gamer.isHoldingRightClick()) {
-                championsManager.getCooldowns().removeCooldown(player, getName(), true);
-
                 data.tick();
                 data.tickSound(player);
                 continue;
@@ -205,6 +193,8 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
     }
 
     private void shoot(Player player, ChargeData data, int level) {
+        UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s<gray>.", getName());
+
         final Item item = player.getWorld().dropItem(player.getEyeLocation(), new ItemStack(Material.TRIPWIRE_HOOK));
         final ThrowableItem throwable = new ThrowableItem(item, player, getName(), 10_000L, true);
         throwable.setCollideGround(true);
@@ -218,9 +208,15 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
                 20,
                 false);
 
-        championsManager.getCooldowns().removeCooldown(player, getName(), true);
-        championsManager.getCooldowns().use(player, getName(), getCooldown(level), showCooldownFinished());
         hooks.put(player, new Hook(throwable, data, level));
+        championsManager.getCooldowns().removeCooldown(player, getName(), true);
+        championsManager.getCooldowns().use(player,
+                getName(),
+                getCooldown(level),
+                showCooldownFinished(),
+                true,
+                isCancellable(),
+                this::shouldDisplayActionBar);
     }
 
     @EventHandler

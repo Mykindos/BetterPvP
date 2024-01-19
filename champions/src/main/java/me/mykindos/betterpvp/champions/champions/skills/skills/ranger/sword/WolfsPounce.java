@@ -2,9 +2,11 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
+import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
@@ -13,7 +15,6 @@ import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
@@ -23,54 +24,40 @@ import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
-import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
-import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
+import me.mykindos.betterpvp.core.utilities.model.display.DisplayComponent;
+import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.RayTraceResult;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
 public class WolfsPounce extends ChannelSkill implements InteractSkill, CooldownSkill {
 
-    // Percentage (0 -> 1)
     private final WeakHashMap<Player, ChargeData> charging = new WeakHashMap<>();
-    private final WeakHashMap<Player, PounceData> pounceData = new WeakHashMap<>();
-
-    // Action bar
-    private final PermanentComponent actionBarComponent = new PermanentComponent(gamer -> {
-        final Player player = gamer.getPlayer();
-        if (player == null || !charging.containsKey(player) || !isHolding(player)) {
-            return null; // Skip if not online or not charging
-        }
-
-        final ChargeData charge = charging.get(player);
-        ProgressBar progressBar = ProgressBar.withProgress((float) charge.getCharge());
-        return progressBar.build();
-    });
+    private final WeakHashMap<Player, Pounce> pounces = new WeakHashMap<>();
+    private final DisplayComponent actionBarComponent = ChargeData.getActionBar(this,
+            charging,
+            gamer -> true);
 
     private double baseCharge;
-
     private double chargeIncreasePerLevel;
-
     private double baseDamage;
-
     private double damageIncreasePerLevel;
-
     private double baseSlowDuration;
-    
     private double slowDurationIncreasePerLevel;
-
     private int slowStrength;
 
     @Inject
@@ -107,29 +94,6 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
         return baseSlowDuration + level * slowDurationIncreasePerLevel;
     }
 
-    @Override
-    public void trackPlayer(Player player) {
-        // Action bar
-        Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
-        gamer.getActionBar().add(900, actionBarComponent);
-    }
-
-    @Override
-    public void invalidatePlayer(Player player) {
-        // Action bar
-        Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
-        gamer.getActionBar().remove(actionBarComponent);
-    }
-
-    @Override
-    public boolean canUse(Player p) {
-        if (!UtilBlock.isGrounded(p)) {
-            UtilMessage.simpleMessage(p, getClassType().getName(), "You cannot use <alt>" + getName() + "</alt> in the air.");
-            return false;
-        }
-        return super.canUse(p);
-    }
-
     private double getDamage(int level) {
         return baseDamage + (level - 1) * damageIncreasePerLevel;
     }
@@ -159,6 +123,11 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
     }
 
     @Override
+    public boolean shouldDisplayActionBar(Gamer gamer) {
+        return !charging.containsKey(gamer.getPlayer()) && isHolding(gamer.getPlayer());
+    }
+
+    @Override
     public void loadSkillConfig() {
         baseCharge = getConfig("baseCharge", 40.0, Double.class);
         chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 10.0, Double.class);
@@ -171,40 +140,47 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
     }
 
     @Override
-    public void activate(Player player, int level) {
-        final ChargeData chargeData = new ChargeData(level);
-        charging.put(player, chargeData);
+    public void trackPlayer(Player player, Gamer gamer) {
+        gamer.getActionBar().add(900, actionBarComponent);
     }
 
     @Override
-    public boolean shouldDisplayActionBar(Gamer gamer) {
-        return false;
+    public void invalidatePlayer(Player player, Gamer gamer) {
+        gamer.getActionBar().remove(actionBarComponent);
     }
 
-    private void pounce(Player player, double charge, int level) {
-        charging.remove(player); // Remove their charge
+    @Override
+    public void activate(Player player, int level) {
+        final ChargeData chargeData = new ChargeData((float) getChargePerSecond(level) / 100);
+        charging.put(player, chargeData);
+    }
+
+    private void pounce(Player player, ChargeData chargeData, int level) {
+        UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s<gray>.", getName());
 
         // Velocity
+        final double charge = chargeData.getCharge();
         final double strength = 0.4 + (1.4 * charge);
         UtilVelocity.velocity(player, strength, 0.2, 0.4 + (0.9 * charge), true);
 
         // Pounce log
-        pounceData.put(player, new PounceData(charge, level));
+        pounces.put(player, new Pounce(chargeData, level, player.getLocation(), -1));
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WOLF_AMBIENT, 1f, 0.8f + (1.2f * (float) charge));
 
-        // Cooldown & Action Bar disabling
+        // Cooldown
+        championsManager.getCooldowns().removeCooldown(player, getName(), true);
         championsManager.getCooldowns().use(player,
                 getName(),
                 getCooldown(level),
                 true,
                 true,
-                false,
-                gmr -> gmr.getPlayer() != null && isHolding(gmr.getPlayer()));
+                isCancellable(),
+                this::shouldDisplayActionBar);
     }
 
-    private void collide(Player damager, LivingEntity damagee, PounceData pounceData) {
-        final int level = pounceData.getLevel();
-        double damage = getDamage(level) * pounceData.getCharge();
+    private void collide(Player damager, LivingEntity damagee, Pounce pounce) {
+        final int level = pounce.getLevel();
+        double damage = getDamage(level) * pounce.getData().getCharge();
 
         // Effects & Damage
         UtilDamage.doCustomDamage(new CustomDamageEvent(damagee, damager, null, EntityDamageEvent.DamageCause.CUSTOM, damage, true, getName()));
@@ -216,30 +192,14 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
         damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_WOLF_AMBIENT, 0.5f, 0.5f);
     }
 
-    private void showCharge(Player player, ChargeData charge) {
-        // Sound
-        if (!UtilTime.elapsed(charge.getLastSound(), 150)) {
+    @EventHandler
+    public void onDamageReceived(CustomDamageEvent event) {
+        if (event.isCancelled() || !(event.getDamagee() instanceof Player player)) {
             return;
         }
 
-        player.playSound(player.getEyeLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.5f, 0.5f + (0.5f * (float) charge.getCharge()));
-        charge.setLastSound(System.currentTimeMillis());
-    }
-
-    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-    public void cancelCooldown(PlayerUseSkillEvent event) {
-        if (event.getSkill() == this && charging.containsKey(event.getPlayer())) {
-            event.setCancelled(true); // Cancel cooldown or ability use if they're charging to allow them to release
-        }
-    }
-
-    @EventHandler
-    public void onDamageReceived(CustomDamageEvent event) {
-        if(event.isCancelled()) return;
-        if (!(event.getDamagee() instanceof Player player)) return;
-
         if (hasSkill(player) && charging.containsKey(player)) {
-            charging.remove(player);
+            charging.get(player).setCharge(0);
             // Cues
             UtilMessage.simpleMessage(player, getClassType().getName(), "<alt>%s</alt> was interrupted.", getName());
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WOLF_WHINE, 0.6f, 1.2f);
@@ -248,22 +208,54 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
 
     @UpdateEvent
     public void checkCollide() {
-        pounceData.entrySet().removeIf(entry -> entry.getValue().hasExpired());
-
         // Collision check
-        final Iterator<Player> pounceGamers = pounceData.keySet().iterator();
-        while (pounceGamers.hasNext()) {
-            final Player player = pounceGamers.next();
-            final List<LivingEntity> enemies = UtilEntity.getNearbyEnemies(player, player.getLocation(), 2);
-            if (enemies.isEmpty()) {
-                continue; // skip if no collision
+        final Iterator<Player> iterator = pounces.keySet().iterator();
+        while (iterator.hasNext()) {
+            final Player player = iterator.next();
+            if (player == null || !player.isOnline()) {
+                iterator.remove();
+                continue;
             }
 
-            // collide with first
-            final PounceData data = pounceData.get(player);
-            final LivingEntity enemy = enemies.get(0);
-            pounceGamers.remove(); // Remove them because they collided
-            collide(player, enemy, data);
+            // Mark as grounded if they're on the ground
+            // If they're grounded for more than 250ms, remove them
+            final Pounce pounce = pounces.get(player);
+            if (pounce.getGroundTime() == -1 && UtilBlock.isGrounded(player)) {
+                pounce.setGroundTime(System.currentTimeMillis());
+            } else if (pounce.getGroundTime() != -1 && UtilTime.elapsed(pounce.getGroundTime(), 250)) {
+                iterator.remove();
+                continue;
+            }
+
+            // Passive particles while flying
+            final Location playerLoc = player.getLocation();
+            Particle.CRIT.builder()
+                    .count(3)
+                    .extra(0)
+                    .offset(0.6, 0.6, 0.6)
+                    .location(playerLoc)
+                    .receivers(60)
+                    .spawn();
+
+            // See if they collided with anyone
+            final Location midBody = playerLoc.clone().add(0, player.getHeight() / 2, 0);
+            final List<LivingEntity> enemies = UtilEntity.getNearbyEnemies(player, midBody, 1.5);
+            final Optional<LivingEntity> hit = enemies.stream().findFirst().or(() -> UtilEntity.interpolateCollision(
+                    pounce.getLastLocation(),
+                    playerLoc,
+                    0.6f,
+                    ent -> UtilEntity.IS_ENEMY.test(player, ent)
+            ).map(RayTraceResult::getHitEntity).map(LivingEntity.class::cast));
+
+            // If they didn't collide with anyone, continue
+            if (hit.isEmpty()) {
+                pounce.setLastLocation(playerLoc);
+                continue;
+            }
+
+            // Collide
+            iterator.remove();
+            collide(player, hit.get(), pounce);
         }
     }
 
@@ -274,75 +266,45 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
         while (iterator.hasNext()) {
             Player player = iterator.next();
             ChargeData charge = charging.get(player);
-            if (player != null) {
-                Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
-                int level = getLevel(player);
-
-                // Remove if they no longer have the skill
-                if (level <= 0) {
-                    iterator.remove();
-                    continue;
-                }
-
-                // Check if they still are blocking and charge
-                if (gamer.isHoldingRightClick()) {
-                    // Cancel cooldown to make it only start after we call #pounce
-                    championsManager.getCooldowns().removeCooldown(player, getName(), true);
-
-                    // Check for sword hold status
-                    if (!isHolding(player)) {
-                        iterator.remove(); // Otherwise, remove
-                    }
-
-                    if (!UtilBlock.isGrounded(player)) {
-                        if (UtilTime.elapsed(charge.getLastMessage(), 250)) {
-                            UtilMessage.simpleMessage(player, getClassType().getName(), "You cannot use <alt>" + getName() + "</alt> in the air.");
-                            charge.setLastMessage(System.currentTimeMillis());
-                        }
-                        continue;
-                    }
-
-                    charge.tick();
-
-                    // Cues
-                    showCharge(player, charge);
-                    continue;
-                }
-
-                if (isHolding(player)) {
-                    // If they're not blocking and still holding their sword, pounce
-                    pounce(player, charge.getCharge(), level);
-                }
+            if (player == null || !player.isOnline()) {
+                iterator.remove();
+                continue;
             }
+
+            // Remove if they no longer have the skill
+            Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
+            int level = getLevel(player);
+            if (level <= 0) {
+                iterator.remove();
+                continue;
+            }
+
+            // Check if they still are blocking and charge
+            if (isHolding(player) && gamer.isHoldingRightClick()) {
+                // Reset their charge if they're not on the ground
+                if (!UtilBlock.isGrounded(player)) {
+                    if (charge.canSendMessage()) {
+                        UtilMessage.simpleMessage(player, getClassType().getName(), "You cannot use <alt>" + getName() + "</alt> in the air.");
+                        charge.messageSent();
+                    }
+                    continue;
+                }
+
+                charge.tick();
+                charge.tickSound(player);
+                continue;
+            }
+
+            iterator.remove();
+            pounce(player, charge, level);
         }
     }
 
     @Data
-    private static class PounceData {
-
-        private final long pounceTime = System.currentTimeMillis();
-        private final double charge; // 0 -> 1
+    @AllArgsConstructor
+    private static class Pounce {
+        private final ChargeData data;
         private final int level;
-
-        public boolean hasExpired() {
-            return System.currentTimeMillis() - pounceTime > 1000;
-        }
-
-    }
-
-    @Data
-    private class ChargeData {
-
-        private long lastSound = 0;
-        private long lastMessage = 0;
-        private double charge = 0; // 0 -> 1
-        private final int level;
-
-        public void tick() {
-            // Divide over 100 to get multiplication factor since it's in 100% scale for display
-            final double chargeToGive = getChargePerSecond(level)/100;
-            this.charge = Math.min(1, this.charge + (chargeToGive / 20));
-        }
-
-    }
-}
+        private Location lastLocation;
+        private long groundTime;
+    }}

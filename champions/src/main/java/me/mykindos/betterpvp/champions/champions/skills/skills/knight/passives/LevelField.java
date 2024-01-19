@@ -215,8 +215,7 @@ public class LevelField extends Skill implements ToggleSkill, CooldownSkill, Lis
 
 
     @Override
-    public void invalidatePlayer(Player player) {
-        Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
+    public void invalidatePlayer(Player player, Gamer gamer) {
         gamer.getActionBar().remove(actionBarComponent);
         playersWithSkill.remove(player.getUniqueId());
 
@@ -227,8 +226,7 @@ public class LevelField extends Skill implements ToggleSkill, CooldownSkill, Lis
     }
 
     @Override
-    public void trackPlayer(Player player) {
-        Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
+    public void trackPlayer(Player player, Gamer gamer) {
         gamer.getActionBar().add(900, actionBarComponent);
         playersWithSkill.add(player.getUniqueId());
 

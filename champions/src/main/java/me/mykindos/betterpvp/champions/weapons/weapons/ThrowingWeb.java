@@ -24,6 +24,7 @@ import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -89,7 +90,7 @@ public class ThrowingWeb extends Weapon implements Listener, InteractWeapon, Coo
 
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
-        if (event.getAction().isLeftClick() && matches(event.getItem())) {
+        if (event.useItemInHand() != Event.Result.DENY && event.getAction().isLeftClick() && matches(event.getItem())) {
             String name = PlainTextComponentSerializer.plainText().serialize(getName());
             if (cooldownManager.use(event.getPlayer(), name, getCooldown(), showCooldownFinished(), true, false, x -> isHoldingWeapon(event.getPlayer()))) {
                 activate(event.getPlayer()); // also activate on left click

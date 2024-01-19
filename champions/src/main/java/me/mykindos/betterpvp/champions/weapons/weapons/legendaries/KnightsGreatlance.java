@@ -26,10 +26,8 @@ import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
-import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
@@ -207,17 +205,11 @@ public class KnightsGreatlance extends ChannelWeapon implements InteractWeapon, 
 
             // Get all enemies that collide with the player from the last location to the new location
             final Location newLocation = getMidpoint(player);
-            final Optional<LivingEntity> hit = UtilEntity.interpolateCollision(data.getLastLocation(), newLocation, 0.6f, entity -> {
-                if (!(entity instanceof LivingEntity) || entity.equals(player)) {
-                    return false;
-                }
-
-                if (!(entity instanceof Player other)) {
-                    return true;
-                }
-
-                return UtilPlayer.getRelation(player, other) != EntityProperty.FRIENDLY;
-            }).map(RayTraceResult::getHitEntity).map(LivingEntity.class::cast);
+            final Optional<LivingEntity> hit = UtilEntity.interpolateCollision(data.getLastLocation(),
+                    newLocation,
+                    0.6f,
+                    ent -> UtilEntity.IS_ENEMY.test(player, ent))
+                    .map(RayTraceResult::getHitEntity).map(LivingEntity.class::cast);
 
             final int charge = data.getTicksCharged();
             final double percentage = (float) charge / maxChargeTicks;
