@@ -247,6 +247,14 @@ public class UtilMessage {
         return deserialize(String.format(message, args)).decoration(TextDecoration.ITALIC, false);
     }
 
+    public static Component getMiniMessage(String prefix, String message, Object... args) {
+        return getPrefix(prefix).append(deserialize(String.format(message, args))).decoration(TextDecoration.ITALIC, false);
+    }
+
+    public static Component getMiniMessage(String prefix, String message) {
+        return getPrefix(prefix).append(deserialize(message)).decoration(TextDecoration.ITALIC, false);
+    }
+
     public static Component getMiniMessage(String message) {
         return deserialize(message).decoration(TextDecoration.ITALIC, false);
     }

@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.skills.assassin.data.RecallData;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.ToggleSkill;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
@@ -67,12 +68,12 @@ public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listene
     }
 
     @Override
-    public void trackPlayer(Player player) {
+    public void trackPlayer(Player player, Gamer gamer) {
         data.put(player, new RecallData(this, getLevel(player)));
     }
 
     @Override
-    public void invalidatePlayer(Player player) {
+    public void invalidatePlayer(Player player, Gamer gamer) {
         data.remove(player);
     }
 
