@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.utilities;
 
+import com.google.common.base.Preconditions;
 import org.apache.commons.lang.WordUtils;
 import org.apache.commons.text.similarity.CosineSimilarity;
 import org.bukkit.Bukkit;
@@ -37,7 +38,25 @@ public class UtilFormat {
     }
 
     public static String formatNumber(double num) {
-        return String.format("%,.2f", num);
+        return formatNumber(num, 2);
+    }
+
+    public static String formatNumber(double num, int decimalPlaces) {
+        return formatNumber(num, decimalPlaces, false);
+    }
+
+    public static String formatNumber(double num, int decimalPlaces, boolean trailiningZeroes) {
+        Preconditions.checkArgument(decimalPlaces >= 0, "decimalPlaces cannot be negative");
+
+        // Convert the rounded number to a string with specified decimal places
+        @SuppressWarnings("MalformedFormatString") String formattedNumber = String.format("%." + decimalPlaces + "f", num);
+
+        // Remove trailing zeros if forceDecimals is false
+        if (!trailiningZeroes) {
+            formattedNumber = formattedNumber.replaceAll("\\.?0*$", "");
+        }
+
+        return formattedNumber;
     }
 
     public static String cleanString(String string) {

@@ -39,7 +39,7 @@ public class SkillButton extends ControlItem<SkillMenu> {
     @Override
     public ItemProvider getItemProvider(SkillMenu gui) {
         BuildSkill buildSkill = roleBuild.getBuildSkill(skill.getType());
-        int level = buildSkill == null ? 0 : buildSkill.getLevel();
+        int level = buildSkill != null && buildSkill.getSkill() == skill ? buildSkill.getLevel() : 0;
         int displayLevel = Math.max(1, level);
 
         final ItemView.ItemViewBuilder builder = ItemView.builder();
