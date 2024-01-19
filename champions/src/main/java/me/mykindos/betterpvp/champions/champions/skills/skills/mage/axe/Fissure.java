@@ -18,11 +18,10 @@ import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import org.bukkit.*;
 import org.bukkit.block.BlockFace;
-import org.bukkit.entity.LargeFireball;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -54,6 +53,8 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
     private Map<Player, ArrayList<Block>> playerFissurePaths = new HashMap<>();
     private Map<Player, HashSet<Player>> playerHits = new HashMap<>();
     private Map<Player, List<Block>> playerCreatedBlocks = new HashMap<>();
+    private Map<Player, BukkitRunnable> fissureExpirationTasks = new HashMap<>();
+
 
     @Inject
     public Fissure(Champions champions, ChampionsManager championsManager) {
@@ -75,10 +76,10 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
                 "creating an impassable wall",
                 "",
                 "Players struck by wall will",
-                "receive <effect>Slowness"+ UtilFormat.getRomanNumeral(slownessLevel + 1) + "</effect> for <val>" + getSlowDuration(level) + "</val> seconds",
-                "and take <val>"+getDamage(level)+"</val> damage plus an",
+                "receive <effect>Slowness "+ UtilFormat.getRomanNumeral(slownessLevel + 1) + "</effect> for <val>" + getSlowDuration(level) + "</val> seconds",
+                "and take <val>" + getDamage(level) + "</val> damage plus an",
                 "additional <val>" + getExtraDamage(level) + "</val> damage for",
-                "every block fissure has travelled.",
+                "every block fissure has travelled",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -110,11 +111,6 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
         return SkillType.AXE;
     }
 
-    @UpdateEvent
-    public void onUpdate() {
-
-    }
-
     @Override
     public boolean canUse(Player player) {
         if (!UtilBlock.isGrounded(player)) {
@@ -125,42 +121,56 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
         return true;
     }
 
-    @Override
     public void activate(Player player, int level) {
+        removeFissure(player);
+
+        BukkitRunnable existingTask = fissureExpirationTasks.get(player);
+        if (existingTask != null) {
+            existingTask.cancel();
+        }
+
         playerFissurePaths.put(player, new ArrayList<>());
         playerHits.put(player, new HashSet<>());
         playerCreatedBlocks.put(player, new ArrayList<>());
 
-        System.out.println("activated and put player in maps");
-
         createFissure(player);
 
-        new BukkitRunnable() {
+        BukkitRunnable newTask = new BukkitRunnable() {
             @Override
             public void run() {
-                System.out.println("called remove fissure");
                 removeFissure(player);
+                fissureExpirationTasks.remove(player);
             }
-        }.runTaskLater(champions, (long) (fissureExpireDuration * 20));
+        };
+        newTask.runTaskLater(champions, (long) (fissureExpireDuration * 20));
+        fissureExpirationTasks.put(player, newTask);
     }
 
-    private void onPlayerCollision(Player target, int blocksTraveled, Player player) {
-        HashSet<Player> playersHit = playerHits.get(player);
-        if (playersHit != null && !playersHit.contains(target)) {
-            System.out.println("hit player not null that wasnt already hit");
-            playersHit.add(target);
+    private void onEntityCollision(Entity entity, int blocksTraveled, Player player) {
+        if (entity instanceof LivingEntity) {
+            LivingEntity ent = (LivingEntity) entity;
 
             int level = getLevel(player);
 
-            target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, effectDuration, slownessLevel));
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <alt2>" + target.getName() + "</alt2> with <alt>" + getName());
-            UtilMessage.simpleMessage(target, getClassType().getName(), "<alt2>" + player.getName() + "</alt2> hit you with <alt>" + getName());
+            double damage = getDamage(getLevel(player)) + getExtraDamage(blocksTraveled, getLevel(player));
+            ent.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, getSlowDuration(level) * 20, slownessLevel));
+            ent.damage(damage);
 
-            double damage = getDamage(level) + getExtraDamage(blocksTraveled, level);
-            target.damage(damage);
-            System.out.println("all effects applied");
+            if (ent instanceof Player) {
+                Player target = (Player) ent;
+                HashSet<Player> playersHit = playerHits.get(player);
+
+                if (playersHit != null) {
+                    playersHit.add(target);
+
+                    UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <alt2>" + target.getName() + "</alt2> with <alt>" + getName());
+                    UtilMessage.simpleMessage(target, getClassType().getName(), "<alt2>" + player.getName() + "</alt2> hit you with <alt>" + getName());
+                }
+            }
         }
     }
+
+
 
     public void createFissure(Player player) {
         ArrayList<Block> fissurePath = playerFissurePaths.get(player);
@@ -168,31 +178,35 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
         Vector direction = player.getLocation().getDirection();
         direction.setY(0);
         direction.normalize();
-        direction.multiply(0.1); // Adjust this value as necessary
+
+        Location startLocation = player.getLocation().add(direction);
 
         for (int i = 0; i < fissureDistance; i++) {
-            // Clone the player's location and adjust the Y-coordinate
-            Location locationToCheck = player.getLocation().clone().add(direction.clone().multiply(i));
-            locationToCheck.setY(locationToCheck.getY() - 1); // Adjust the Y-coordinate
+            Location locationToCheck = startLocation.clone().add(direction.clone().multiply(i));
 
-            Block currentBlock = locationToCheck.getBlock();
+            // Round the X and Z coordinates to ensure we're working with distinct block coordinates
+            int blockX = locationToCheck.getBlockX();
+            int blockZ = locationToCheck.getBlockZ();
+            locationToCheck.setX(blockX);
+            locationToCheck.setZ(blockZ);
 
-            System.out.println("Checking block at: " + locationToCheck.toString() + " - Solid: " + UtilBlock.solid(currentBlock));
+            int height = Math.min(3, i / 2 + 1);
 
-            if (!UtilBlock.solid(currentBlock)) {
-                System.out.println("Not a solid block at: " + locationToCheck.toString());
-                break;
-            }
+            for (int j = 0; j < height; j++) {
+                locationToCheck.setY(locationToCheck.getY() - 1);
+                Block currentBlock = locationToCheck.getBlock();
 
-            if (!fissurePath.contains(currentBlock)) {
-                fissurePath.add(currentBlock);
-                System.out.println("Added block to fissurePath at: " + currentBlock.getLocation().toString());
+                if (UtilBlock.solid(currentBlock)) {
+                    if (!fissurePath.contains(currentBlock)) {
+                        fissurePath.add(currentBlock);
+                    }
+                    break;
+                }
             }
         }
 
         new BukkitRunnable() {
             private int index = 0;
-
             @Override
             public void run() {
                 if (index >= fissurePath.size()) {
@@ -203,21 +217,17 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
                 Block currentBlock = fissurePath.get(index);
                 int blocksTraveled = index;
 
-                System.out.println("called createFissurePillar");
-
                 createFissurePillar(currentBlock, blocksTraveled, player);
 
                 index++;
             }
-
-        }.runTaskTimer(champions, 0L, 1L);
+        }.runTaskTimer(champions, 0L, 2L);
     }
+
 
     private void createFissurePillar(Block block, int blocksTraveled, Player player) {
         List<Block> createdBlocks = playerCreatedBlocks.get(player);
         HashSet<Player> playersHit = playerHits.get(player);
-
-        System.out.println("inside of createFissurePillar");
 
         if (block.getType() == Material.TNT || block.isLiquid()
                 || block.getType().toString().contains("BANNER")
@@ -227,46 +237,40 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
             return;
         }
 
-        System.out.println("got past invalid block checks");
-
         int height = Math.min(3, blocksTraveled / 2 + 1);
 
         for (int i = 0; i < height; i++) {
-            System.out.println("inside of height loop");
             Block up = block.getRelative(BlockFace.UP, i + 1);
 
-            if (!UtilBlock.airFoliage(up)) break;
+            if (!UtilBlock.airFoliage(up) && up.getType() != Material.AIR) {
+                continue;
+            }
 
             up.setType(block.getType());
             player.getWorld().playEffect(up.getLocation(), Effect.STEP_SOUND, block.getType());
-
             createdBlocks.add(up);
 
-            for (Player p : up.getWorld().getPlayers()) {
-                System.out.println("checking for player at the block");
-                if (up.getLocation().distance(p.getLocation()) < 1.5) {
-                    if (!playersHit.contains(p)) {
-                        System.out.println("added a non hit player to the hit players list and called method");
-                        playersHit.add(p);
-                        onPlayerCollision(p, blocksTraveled, player);
+            for (Entity entity : up.getWorld().getNearbyEntities(up.getLocation(), 1.5, 1.5, 1.5)) {
+                if (entity instanceof Player) {
+                    Player target = (Player) entity;
+                    if (!playersHit.contains(target)) {
+                        onEntityCollision(target, blocksTraveled, player);
                     }
+                } else {
+                    onEntityCollision(entity, blocksTraveled, player);
                 }
             }
         }
     }
 
-
     public void removeFissure(Player player) {
         List<Block> createdBlocks = playerCreatedBlocks.get(player);
         if (createdBlocks != null) {
             for (Block block : createdBlocks) {
-                System.out.println("replaced a fissure block with air");
                 block.setType(Material.AIR);
             }
             createdBlocks.clear();
         }
-
-        System.out.println("removed player from all maps");
 
         playerFissurePaths.remove(player);
         playerHits.remove(player);
