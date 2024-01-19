@@ -92,8 +92,5 @@ public class DropMultiplierFishingPerk implements Listener, ProgressionPerk, Cha
                 return null;
             });
         }
-
-
-
     }
 }
