@@ -429,6 +429,19 @@ skills:
       maxlevel: 5
       energy: 7
       energyDecreasePerLevel: 2.0
+    fissure:
+      enabled: true
+      maxLevel: 5
+      cooldown: 15.0
+      baseDamage: 1.6
+      damageIncreasePerLevel: 0.4
+      fissureDistance: 14
+      fissureExpireDuration: 10.0
+      baseExtraDamagePerBlock: 0.4
+      baseExtraDamagePerBlockIncreasePerLevel: 0.2
+      effectDuration: 1
+      slownessLevel: 1
+      effectDurationIncreasePerLevel: 1
     holylight:
       enabled: true
       maxlevel: 5
