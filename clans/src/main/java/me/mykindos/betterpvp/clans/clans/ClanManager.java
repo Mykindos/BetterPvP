@@ -525,6 +525,7 @@ public class ClanManager extends Manager<Clan> {
     }
 
     public boolean isFields(Clan clan) {
+        if (clan == null) return false;
         return (clan.getName().equalsIgnoreCase("Fields"));
     }
 
@@ -534,6 +535,7 @@ public class ClanManager extends Manager<Clan> {
     }
 
     public boolean isLake(Clan clan) {
+        if (clan == null) return false;
         return (clan.getName().equalsIgnoreCase("Lake"));
     }
 }
