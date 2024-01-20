@@ -18,6 +18,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -47,7 +48,7 @@ public class DamageReductionFishingPerk implements Listener, ProgressionPerk {
     @Inject
     private Fishing fishing;
 
-    private Set<UUID> active;
+    private Set<UUID> active = new HashSet<>();
 
 
     @Override
@@ -102,8 +103,7 @@ public class DamageReductionFishingPerk implements Listener, ProgressionPerk {
                         fishing.getLevel(player).whenComplete((level, throwable1) -> {
                             //cannot increase chance over the max level
                             if (level > maxLevel) level = maxLevel;
-                            level = 500;
-                            double damageReduction = Math.min(1 - ((level - minLevel) * decreasePerLevel), 0);
+                            double damageReduction = Math.max(1 - ((level - minLevel) * decreasePerLevel), 0);
                             event.setDamage(event.getDamage() * damageReduction);
                         }).exceptionally(throwable1 -> {
                             log.error("Failed to check if player " + player.getName() + " has a level ", throwable);
