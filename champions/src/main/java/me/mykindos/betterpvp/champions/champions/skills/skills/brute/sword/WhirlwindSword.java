@@ -92,7 +92,7 @@ public class WhirlwindSword extends Skill implements InteractSkill, CooldownSkil
                     Vector velocity = UtilVelocity.getTrajectory(target, player);
                     UtilVelocity.velocity(target, velocity, 1.0D, false, 0.0D, 0.25D, 4.0D, true);
                     target.damage(getDamage(level));
-                    UtilMessage.simpleMessage(target, getName(), "<alt>" + player.getName() + "</alt> hit you with <alt>" + getName());
+                    UtilMessage.simpleMessage(target, getClassType().getName(), "<alt>" + player.getName() + "</alt> hit you with <alt>" + getName());
                 }
 
             }
