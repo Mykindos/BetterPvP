@@ -109,11 +109,11 @@ public class BattleTaunt extends ChannelSkill implements InteractSkill, Cooldown
             if (target instanceof Player) {
 
                 if (UtilMath.offset(player.getLocation(), target.getLocation()) >= radius) {
-                    UtilVelocity.velocity(target, UtilVelocity.getTrajectory(target, player), 0.3D, false, 0.0D, 0.0D, 1.0D, true);
+                    UtilVelocity.velocity(target, UtilVelocity.getTrajectory(target, player), 0.3D, false, 0.0D, 0.0D, 1.0D, true, true);
                 }
 
             } else {
-                UtilVelocity.velocity(target, UtilVelocity.getTrajectory(target, player), 0.3D, false, 0.0D, 0.0D, 1.0D, true);
+                UtilVelocity.velocity(target, UtilVelocity.getTrajectory(target, player), 0.3D, false, 0.0D, 0.0D, 1.0D, true, true);
             }
         }
     }

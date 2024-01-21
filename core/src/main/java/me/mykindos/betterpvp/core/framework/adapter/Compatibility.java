@@ -17,6 +17,11 @@ public class Compatibility {
     public static boolean ITEMS_ADDER = Bukkit.getPluginManager().getPlugin("ItemsAdder") != null;
 
     /**
+     * Whether the server is running ModelEngine
+     */
+    public static boolean MODEL_ENGINE = Bukkit.getPluginManager().getPlugin("ModelEngine") != null;
+
+    /**
      * Whether the server is running Sword Blocking mixin
      */
     public static boolean SWORD_BLOCKING;

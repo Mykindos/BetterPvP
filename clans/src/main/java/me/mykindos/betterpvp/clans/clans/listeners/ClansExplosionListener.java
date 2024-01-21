@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanProperty;
 import me.mykindos.betterpvp.clans.clans.insurance.InsuranceType;
+import me.mykindos.betterpvp.clans.weapons.impl.cannon.event.CannonShootEvent;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
@@ -20,6 +21,7 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.Container;
@@ -179,6 +181,11 @@ public class ClansExplosionListener extends ClanListener {
         }
     }
 
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onCannon(CannonShootEvent event) {
+        clanManager.getClanByPlayer(event.getPlayer()).ifPresent(clan -> tntMap.put(event.getCannonball(), clan));
+    }
+
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onExplode(EntityExplodeEvent event) {
         if (event.isCancelled()) return;
@@ -187,7 +194,8 @@ public class ClansExplosionListener extends ClanListener {
         if (!tntMap.containsKey(event.getEntity())) return;
 
         if (event.getEntity().getType() != EntityType.PRIMED_TNT) return;
-        event.getEntity().getWorld().playSound(event.getEntity().getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2.0f, 1.0f);
+        event.getEntity().getWorld().playSound(event.getEntity().getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 3.0f, 1.0f);
+        Particle.EXPLOSION_HUGE.builder().count(1).location(event.getEntity().getLocation()).spawn();
         event.setYield(2.5f);
         final Set<Block> blocks = UtilBlock.getInRadius(event.getLocation(), event.getYield()).keySet();
         for (Block block : blocks) {
