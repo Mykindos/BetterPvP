@@ -83,7 +83,7 @@ public class DamageLogManager extends Manager<ConcurrentLinkedDeque<DamageLog>> 
     public void showDeathSummary(long now, Player player, final ConcurrentLinkedDeque<DamageLog> logQueue) {
         final TextComponent.Builder component = Component.empty().toBuilder();
         if (logQueue == null || logQueue.isEmpty()) {
-            component.appendNewline().append(Component.text("No damage logs found."));
+            component.append(Component.text("No damage logs found."));
         } else {
             component.append(Component.text("Death Summary:"));
 
