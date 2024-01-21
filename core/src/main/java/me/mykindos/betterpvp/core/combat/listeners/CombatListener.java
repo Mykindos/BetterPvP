@@ -9,29 +9,15 @@ import me.mykindos.betterpvp.core.combat.armour.ArmourManager;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
 import me.mykindos.betterpvp.core.combat.data.DamageData;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageDurabilityEvent;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageReductionEvent;
-import me.mykindos.betterpvp.core.combat.events.CustomKnockbackEvent;
-import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.*;
+import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilDamage;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
-import me.mykindos.betterpvp.core.utilities.UtilTime;
-import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import me.mykindos.betterpvp.core.utilities.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.EvokerFangs;
-import org.bukkit.entity.FishHook;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -41,6 +27,8 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
@@ -48,6 +36,7 @@ import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import static me.mykindos.betterpvp.core.utilities.UtilMessage.message;
 
@@ -111,6 +100,7 @@ public class CombatListener implements Listener {
         }
 
         if (event.isDoVanillaEvent()) {
+            log.warn("doing vanilla event");
             return;
         }
 
@@ -236,7 +226,7 @@ public class CombatListener implements Listener {
 
         if (cde.getDamager() != null) {
             if (cde.getDamager().equals(cde.getDamagee())) {
-                event.setCancelled(true);
+                //event.setCancelled(true);
                 return;
             }
         }
@@ -306,6 +296,12 @@ public class CombatListener implements Listener {
         }
 
         LivingEntity damager = getDamagerEntity(event);
+        if (event.getCause() == DamageCause.SUFFOCATION) {
+            PersistentDataContainer pdc = UtilBlock.getPersistentDataContainer(damagee.getEyeLocation().getBlock());
+            if (pdc.has(CoreNamespaceKeys.BLOCK_SUMMONER_KEY)) {
+                damager = Bukkit.getPlayer(UUID.fromString(pdc.getOrDefault(CoreNamespaceKeys.BLOCK_SUMMONER_KEY, PersistentDataType.STRING, "0")));
+            }
+        }
         Projectile proj = getProjectile(event);
 
         CustomDamageEvent cde = new CustomDamageEvent(damagee, damager, proj, event.getCause(), event.getDamage(), true);
@@ -331,13 +327,14 @@ public class CombatListener implements Listener {
             e.setDamageDelay(400);
         }
 
+        if (e.getCause() == DamageCause.SUFFOCATION) {
+            e.setDamageDelay(400);
+        }
         if (e.getDamagee().getLocation().getBlock().isLiquid()) {
             if (e.getCause() == DamageCause.FIRE || e.getCause() == DamageCause.FIRE_TICK) {
                 e.cancel("Already in lava / liquid");
             }
         }
-
-
     }
 
     @EventHandler
@@ -430,6 +427,8 @@ public class CombatListener implements Listener {
         if (!(projectile.getShooter() instanceof LivingEntity)) {
             return null;
         }
+
+
         return (LivingEntity) projectile.getShooter();
     }
 

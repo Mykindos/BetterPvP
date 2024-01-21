@@ -183,7 +183,7 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill {
 
             final long expiryOffset = (long) (100 * (inRadius.get(block) * radius));
             final long delay = (long) Math.pow((1 - inRadius.get(block)) * radius, 2);
-            blockHandler.scheduleRestoreBlock(block, Material.ICE, delay, ((long) duration * 1000) + expiryOffset, false);
+            blockHandler.scheduleRestoreBlock(player, block, Material.ICE, delay, ((long) duration * 1000) + expiryOffset, false);
 
             final double chance = Math.random();
             if (chance < 0.025) {
