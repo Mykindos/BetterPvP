@@ -9,3 +9,4 @@ softdepend:
   - ProtocolLib
   - Progression
   - LibsDisguises
+  - ModelEngine
