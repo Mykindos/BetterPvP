@@ -74,7 +74,7 @@ public class ClansCannonListener implements Listener {
         final Optional<Clan> clanByPlayer = clanManager.getClanByPlayer(event.getPlayer());
         if (clanByPlayer.isEmpty()) {
             event.cancel("No Clan");
-            UtilMessage.message(event.getPlayer(), "Clans", "You must be in a <alt2>clan</alt2> to place a </alt2>cannon</alt2>.");
+            UtilMessage.message(event.getPlayer(), "Clans", "You must be in a <alt2>Clan</alt2> to place a <alt2>cannon</alt2>.");
             return;
         }
 
