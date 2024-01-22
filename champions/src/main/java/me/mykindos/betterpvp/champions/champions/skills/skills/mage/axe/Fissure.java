@@ -219,6 +219,29 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
             int height = Math.min(3, i / 2 + 1);
             boolean blockFound = false;
 
+            if (lastBlock != null) {
+                // Check for Z direction
+                if (Math.abs(lastBlock.getZ() - (int) locationToCheck.getZ()) >= 2) {
+                    System.out.println("skipped a block in Z direction");
+                    System.out.println("firstLocation: " + locationToCheck);
+                    Vector adjustZ = new Vector(0, 0, direction.getZ() * (-1 * (Math.sqrt(2) - 1)));
+                    locationToCheck = locationToCheck.clone().add(adjustZ);
+                    System.out.println("adjustedLocation: " + locationToCheck);
+                    i--;
+                }
+
+                // Check for X direction
+                if (Math.abs(lastBlock.getX() - (int) locationToCheck.getX()) >= 2) {
+                    System.out.println("skipped a block in X direction");
+                    System.out.println("firstLocation: " + locationToCheck);
+                    Vector adjustX = new Vector(direction.getX() * (-1 * (Math.sqrt(2) - 1)), 0, 0);
+                    locationToCheck = locationToCheck.clone().add(adjustX);
+                    System.out.println("adjustedLocation: " + locationToCheck);
+                    i--;
+                }
+            }
+
+
             //loops through height + 1
             for (int j = 0; j < height + 1; j++) {
                 Block currentBlock = locationToCheck.getBlock();
@@ -246,6 +269,7 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
                 //if the block is solid and has air above it, it is a suitable block so add it
                 } else if (currentBlock.isSolid() && UtilBlock.airFoliage(locationAbove.getBlock())) {
                     fissurePath.add(currentBlock);
+                    System.out.println("placed a block at: " + currentBlock);
                     lastBlock = currentBlock;
                     blockFound = true;
                     break;
