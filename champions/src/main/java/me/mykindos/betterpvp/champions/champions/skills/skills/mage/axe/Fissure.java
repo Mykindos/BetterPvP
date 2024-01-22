@@ -162,56 +162,75 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
     public void createFissure(Player player) {
         ArrayList<Block> fissurePath = playerFissurePaths.get(player);
 
+        //creates the player vector and normalizes it to get the players direction, ignoring Y
         Vector direction = player.getLocation().getDirection();
         direction.setY(0);
         direction.normalize();
 
+        //Sets the startLocation to the block below the players feet and in the center of the block
         Location playerLocation = player.getLocation();
-        Location startLocation = playerLocation.add(direction).getBlock().getLocation().add(0.5, -1, 0.5);
-        startLocation.setDirection(direction);
+        Location startLocation = playerLocation.add(direction).getBlock().getLocation().add(0, -1, 0);
+        startLocation.setX((int)startLocation.getX());
+        startLocation.setZ((int)startLocation.getZ());
 
+        //tracks the id of the last block places and stores the total heigh change during the fissure
         int totalHeightChange = 0;
         Block lastBlock = null;
 
+        //determines an angle between 0 and 45 degrees to use in calculations
         double angle = Math.toDegrees(Math.atan2(direction.getZ(), direction.getX()));
         angle = Math.abs(angle % 90);
         if (angle > 45) {
             angle = 90 - angle;
         }
 
-        double cardinalFactor = 1.05;
-        double diagonalFactor = Math.sqrt(2) + 0.05;
+        //interpolates between sqrt(2) and 1
+        double cardinalFactor = 1.0;
+        double diagonalFactor = Math.sqrt(2);
         double scalingFactor = cardinalFactor + (diagonalFactor - cardinalFactor) * (angle / 45.0);
 
+        double previousDistanceChecked = 0;
+
+        //goes through fissureDistance blocks
         outerLoop:
         for (int i = 0; i < fissureDistance; i++) {
-            Location locationToCheck = startLocation.clone().add(direction.clone().multiply(i * scalingFactor));
-            //fix this
+            //determines the distance traveled per iteration and applies the totalHeightChange to the Y
+            double newDistChecked = previousDistanceChecked += scalingFactor;
+            System.out.println("Amount moved = " +scalingFactor);
+            Location locationToCheck = startLocation.clone().add(direction.clone().multiply(newDistChecked));
             locationToCheck.add(0, totalHeightChange, 0);
+            System.out.println("locationToCheck: " +locationToCheck);
 
+            //defines locations above the curr block and determines the height of the fissure
             Location locationAbove = locationToCheck.clone().add(0, 1, 0);
             int height = Math.min(3, i / 2 + 1);
             boolean blockFound = false;
 
+            //loops through height + 1
             for (int j = 0; j < height + 1; j++) {
                 Block currentBlock = locationToCheck.getBlock();
 
+                //continues if the block is the same as the last block passed
                 if (currentBlock.equals(lastBlock)) {
                     continue;
                 }
 
+                //continues if its not an allowed block
                 if (isForbiddenBlockType(currentBlock.getType()) || currentBlock.getType().name().toLowerCase().contains("door") || currentBlock.getType().name().toLowerCase().contains("slab")) {
                     continue;
                 }
 
+                //if the block is solid and has air above it, increment the y value of the whole fissure up 1
                 if (currentBlock.isSolid() && !UtilBlock.airFoliage(locationAbove.getBlock())) {
                     locationAbove.setY(locationToCheck.getY() + 2);
                     locationToCheck.add(0, 1, 0);
                     totalHeightChange++;
+                //if the block is not solid, increment the y value of the whole fissure down 1
                 } else if (!currentBlock.isSolid()) {
                     locationAbove.setY(locationToCheck.getY());
                     locationToCheck.add(0, -1, 0);
                     totalHeightChange--;
+                //if the block is solid and has air above it, it is a suitable block so add it
                 } else if (currentBlock.isSolid() && UtilBlock.airFoliage(locationAbove.getBlock())) {
                     fissurePath.add(currentBlock);
                     lastBlock = currentBlock;
@@ -219,7 +238,7 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
                     break;
                 }
             }
-
+            //if no block is found height + 1 up/down from the original point stop the entire fissure
             if (!blockFound) {
                 break outerLoop;
             }
