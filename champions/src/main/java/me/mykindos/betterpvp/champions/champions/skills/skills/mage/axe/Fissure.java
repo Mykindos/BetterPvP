@@ -18,9 +18,11 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.*;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.*;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.block.Block;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -42,7 +44,7 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
     private int slownessLevel;
     private Map<Player, ArrayList<Block>> playerFissurePaths = new HashMap<>();
     private Map<Player, HashSet<Player>> playerHits = new HashMap<>();
-    private Map<Player, List<Block>> playerCreatedBlocks = new HashMap<>();
+    private Map<Player, HashSet<Block>> playerCreatedBlocks = new HashMap<>();
     private Map<Player, BukkitRunnable> fissureExpirationTasks = new HashMap<>();
 
 
@@ -116,7 +118,7 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
 
         playerFissurePaths.put(player, new ArrayList<>());
         playerHits.put(player, new HashSet<>());
-        playerCreatedBlocks.put(player, new ArrayList<>());
+        playerCreatedBlocks.put(player, new HashSet<>());
 
         createFissure(player);
 
@@ -169,11 +171,21 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
 
         //Sets the startLocation to the block below the players feet and in the center of the block
         Location playerLocation = player.getLocation();
-        Location startLocation = playerLocation.add(direction).getBlock().getLocation().add(0, -1, 0);
+        Location startLocation = playerLocation.add(0, -1, 0);
+        System.out.println("startLocation: "+startLocation);
         startLocation.setX((int)startLocation.getX());
         startLocation.setZ((int)startLocation.getZ());
+        if(startLocation.getZ() >= 0){
+            startLocation = playerLocation.add(0, 0, 0.5);
+        } else if(startLocation.getZ() < 0) {
+            startLocation = playerLocation.add(0, 0, -0.5);
+        } if(startLocation.getX() >= 0) {
+            startLocation = playerLocation.add(0.5, 0, 0);
+        } else if(startLocation.getX() < 0){
+            startLocation = playerLocation.add(-0.5, 0, 0);
+        }
+        System.out.println("startLocation2: "+startLocation);
 
-        //tracks the id of the last block places and stores the total heigh change during the fissure
         int totalHeightChange = 0;
         Block lastBlock = null;
 
@@ -196,10 +208,11 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
         for (int i = 0; i < fissureDistance; i++) {
             //determines the distance traveled per iteration and applies the totalHeightChange to the Y
             double newDistChecked = previousDistanceChecked += scalingFactor;
+            System.out.println("angle: " + angle);
             System.out.println("Amount moved = " +scalingFactor);
             Location locationToCheck = startLocation.clone().add(direction.clone().multiply(newDistChecked));
-            locationToCheck.add(0, totalHeightChange, 0);
             System.out.println("locationToCheck: " +locationToCheck);
+            locationToCheck.add(0, totalHeightChange, 0);
 
             //defines locations above the curr block and determines the height of the fissure
             Location locationAbove = locationToCheck.clone().add(0, 1, 0);
@@ -266,7 +279,7 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
 
 
     private void createFissurePillar(Block block, int blocksTraveled, Player player) {
-        List<Block> createdBlocks = playerCreatedBlocks.get(player);
+        HashSet<Block> createdBlocks = playerCreatedBlocks.get(player);
         HashSet<Player> playersHit = playerHits.get(player);
         int height = Math.min(3, blocksTraveled / 2 + 1);
 
@@ -316,10 +329,12 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
     }
 
     public void removeFissure(Player player) {
-        List<Block> createdBlocks = playerCreatedBlocks.get(player);
+        HashSet<Block> createdBlocks = playerCreatedBlocks.get(player);
         if (createdBlocks != null) {
             for (Block block : createdBlocks) {
+                Material blockMaterial = block.getType();
                 block.setType(Material.AIR);
+                player.getWorld().playEffect(block.getLocation(), Effect.STEP_SOUND, blockMaterial);
             }
             createdBlocks.clear();
         }
@@ -336,6 +351,16 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
         );
 
         return forbiddenBlockTypes.contains(material);
+    }
+
+    @EventHandler
+    public void onFissureBlockBreak(BlockBreakEvent event) {
+        for (Map.Entry<Player, HashSet<Block>> entry : playerCreatedBlocks.entrySet()) {
+            if (entry.getValue().contains(event.getBlock())) {
+                event.setCancelled(true);
+                break;
+            }
+        }
     }
 
     @Override
