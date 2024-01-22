@@ -135,7 +135,6 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
         if (entity instanceof LivingEntity) {
             LivingEntity ent = (LivingEntity) entity;
 
-            // Skip if the entity is the caster
             if (ent.equals(player)) {
                 return;
             }
@@ -164,19 +163,30 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
         ArrayList<Block> fissurePath = playerFissurePaths.get(player);
 
         Vector direction = player.getLocation().getDirection();
-        direction.setY(0); // Set Y component to 0 to only affect X and Z
+        direction.setY(0);
         direction.normalize();
 
-        // Start from the block in front of the player
         Location playerLocation = player.getLocation();
-        Location startLocation = playerLocation.add(direction).getBlock().getLocation().add(0.5, -1, 0.5); // Center of the block in front of the player
+        Location startLocation = playerLocation.add(direction).getBlock().getLocation().add(0.5, -1, 0.5);
         startLocation.setDirection(direction);
 
         int totalHeightChange = 0;
+        Block lastBlock = null;
 
-        outerLoop: // Label for the outer loop
+        double angle = Math.toDegrees(Math.atan2(direction.getZ(), direction.getX()));
+        angle = Math.abs(angle % 90);
+        if (angle > 45) {
+            angle = 90 - angle;
+        }
+
+        double cardinalFactor = 1.05;
+        double diagonalFactor = Math.sqrt(2) + 0.05;
+        double scalingFactor = cardinalFactor + (diagonalFactor - cardinalFactor) * (angle / 45.0);
+
+        outerLoop:
         for (int i = 0; i < fissureDistance; i++) {
-            Location locationToCheck = startLocation.clone().add(direction.clone().multiply(i));
+            Location locationToCheck = startLocation.clone().add(direction.clone().multiply(i * scalingFactor));
+            //fix this
             locationToCheck.add(0, totalHeightChange, 0);
 
             Location locationAbove = locationToCheck.clone().add(0, 1, 0);
@@ -186,14 +196,12 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
             for (int j = 0; j < height + 1; j++) {
                 Block currentBlock = locationToCheck.getBlock();
 
-                String blockTypeName = currentBlock.getType().name().toLowerCase();
-
-                if (isForbiddenBlockType(currentBlock.getType())) {
+                if (currentBlock.equals(lastBlock)) {
                     continue;
                 }
 
-                if (blockTypeName.contains("door") || blockTypeName.contains("slab")) {
-                    continue; // Skip this block if it's a door or slab
+                if (isForbiddenBlockType(currentBlock.getType()) || currentBlock.getType().name().toLowerCase().contains("door") || currentBlock.getType().name().toLowerCase().contains("slab")) {
+                    continue;
                 }
 
                 if (currentBlock.isSolid() && !UtilBlock.airFoliage(locationAbove.getBlock())) {
@@ -205,16 +213,15 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
                     locationToCheck.add(0, -1, 0);
                     totalHeightChange--;
                 } else if (currentBlock.isSolid() && UtilBlock.airFoliage(locationAbove.getBlock())) {
-                    if (!fissurePath.contains(currentBlock)) {
-                        fissurePath.add(currentBlock);
-                        blockFound = true;
-                        break;
-                    }
+                    fissurePath.add(currentBlock);
+                    lastBlock = currentBlock;
+                    blockFound = true;
+                    break;
                 }
             }
 
-            if (!blockFound) { // If no suitable block is found within the height limit
-                break outerLoop; // Exit the outer loop, stopping the fissure creation
+            if (!blockFound) {
+                break outerLoop;
             }
         }
 
@@ -261,7 +268,6 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
                     return;
                 }
 
-                // Determine the block material for the current height
                 Material blockMaterial = block.getType();
                 if (currentHeight < height - 1) {
                     Block below = block.getRelative(BlockFace.DOWN, height - currentHeight - 1);
@@ -274,7 +280,6 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
                 player.getWorld().playEffect(up.getLocation(), Effect.STEP_SOUND, blockMaterial);
                 createdBlocks.add(up);
 
-                // Check for entity collisions
                 for (Entity entity : up.getWorld().getNearbyEntities(up.getLocation(), 1.5, 1.5, 1.5)) {
                     if (entity instanceof Player) {
                         Player target = (Player) entity;
@@ -288,7 +293,7 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
 
                 currentHeight++;
             }
-        }.runTaskTimer(champions, 0L, 1L); // Schedule to run every tick
+        }.runTaskTimer(champions, 0L, 1L);
     }
 
     public void removeFissure(Player player) {
@@ -306,7 +311,6 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
     }
 
     private boolean isForbiddenBlockType(Material material) {
-        // Add all the forbidden block types here
         Set<Material> forbiddenBlockTypes = EnumSet.of(
                 Material.TNT,
                 Material.ANVIL
