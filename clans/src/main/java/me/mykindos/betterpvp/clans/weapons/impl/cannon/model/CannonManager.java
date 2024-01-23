@@ -167,7 +167,6 @@ public class CannonManager extends Manager<Cannon> {
 
         // model engine
         final ActiveModel activeModel = ModelEngineAPI.createActiveModel("cannon");
-        activeModel.setScale(1.3d);
         activeModel.setHitboxScale(1.3D);
         activeModel.setShadowVisible(true);
         final IPriorityHandler animationHandler = (IPriorityHandler) activeModel.getAnimationHandler();
