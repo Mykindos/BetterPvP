@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.combat.events;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import me.mykindos.betterpvp.core.combat.data.SoundProvider;
 import me.mykindos.betterpvp.core.framework.events.CustomCancellableEvent;
 import org.bukkit.entity.LightningStrike;
 import org.bukkit.entity.LivingEntity;
@@ -28,6 +29,7 @@ public class CustomDamageEvent extends CustomCancellableEvent {
     private LightningStrike lightning;
     private boolean ignoreArmour;
     private Set<String> reason = new HashSet<>();
+    private @NotNull SoundProvider soundProvider = SoundProvider.DEFAULT;
 
     private boolean doVanillaEvent;
 
