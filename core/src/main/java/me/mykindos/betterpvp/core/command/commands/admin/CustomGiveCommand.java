@@ -50,13 +50,22 @@ public class CustomGiveCommand extends Command {
 
         int count = 1;
 
+        if (args.length > 2) {
+            try {
+                count = Integer.parseInt(args[2]);
+            } catch (NumberFormatException ignored) {
+
+            }
+        }
+
+
         ItemStack itemStack = itemHandler.updateNames(item.getItemStack(count));
         target.getInventory().addItem(itemStack);
         //todo handle items that do not fit in inventory
     }
 
     public Component getUsage() {
-        return UtilMessage.deserialize("<yellow>Usage</yellow>: <green>customgive <player> <item>");
+        return UtilMessage.deserialize("<yellow>Usage</yellow>: <green>customgive <player> <item> [amount]");
     }
 
     @Override
