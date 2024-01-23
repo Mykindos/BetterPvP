@@ -1,9 +1,8 @@
-package me.mykindos.betterpvp.core.client.listener;
+package me.mykindos.betterpvp.core.resourcepack;
 
 import com.google.inject.Inject;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
-import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
@@ -14,35 +13,23 @@ import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 @BPvPListener
 public class ResourcePackListener implements Listener {
 
-    @Inject
-    @Config(path = "resourcepack.url", defaultValue = "")
-    private String resourcePackUrl;
 
-    @Inject
-    @Config(path = "resourcepack.sha", defaultValue = "")
-    private String resourcePackSha;
-
-    @Inject
-    @Config(path = "resourcepack.force", defaultValue = "false")
-    private boolean forceResourcePack;
-
-    @Inject
-    @Config(path = "resourcepack.enabled", defaultValue = "false")
-    private boolean resourcePackEnabled;
+    private final ResourcePackHandler resourcePackHandler;
 
     private final Core core;
 
     @Inject
-    public ResourcePackListener(Core core) {
+    public ResourcePackListener(ResourcePackHandler resourcePackHandler, Core core) {
+        this.resourcePackHandler = resourcePackHandler;
         this.core = core;
     }
 
     @EventHandler
     public void onClientLogin(ClientJoinEvent event) {
 
-        if(resourcePackEnabled) {
+        if(resourcePackHandler.isResourcePackEnabled()) {
             UtilServer.runTaskLater(core, () -> {
-                event.getPlayer().setResourcePack(resourcePackUrl, resourcePackSha);
+                event.getPlayer().setResourcePack(resourcePackHandler.getResourcePackUrl(), resourcePackHandler.getResourcePackSha());
             }, 2L);
         }
 
@@ -51,9 +38,9 @@ public class ResourcePackListener implements Listener {
 
     @EventHandler
     public void onTexturepackStatus(PlayerResourcePackStatusEvent e) {
-        if(!resourcePackEnabled) return;
+        if(!resourcePackHandler.isResourcePackEnabled()) return;
 
-        if (forceResourcePack) {
+        if (resourcePackHandler.isForceResourcePack()) {
             if (e.getStatus() == PlayerResourcePackStatusEvent.Status.DECLINED) {
                 e.getPlayer().kick(Component.text("You must allow the resource pack"));
             } else if (e.getStatus() == PlayerResourcePackStatusEvent.Status.FAILED_DOWNLOAD) {

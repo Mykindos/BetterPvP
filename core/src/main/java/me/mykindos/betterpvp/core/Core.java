@@ -21,16 +21,12 @@ import me.mykindos.betterpvp.core.listener.loader.CoreListenerLoader;
 import me.mykindos.betterpvp.core.logging.Logger;
 import me.mykindos.betterpvp.core.recipes.RecipeHandler;
 import me.mykindos.betterpvp.core.redis.Redis;
-import net.kyori.adventure.key.Key;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 import xyz.xenondevs.invui.InvUI;
 
 import java.lang.reflect.Field;
 import java.util.Set;
-
-import static io.papermc.paper.network.ChannelInitializeListenerHolder.hasListener;
-import static io.papermc.paper.network.ChannelInitializeListenerHolder.removeListener;
 
 @Slf4j
 public class Core extends BPvPPlugin {
