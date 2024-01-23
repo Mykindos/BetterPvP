@@ -53,8 +53,6 @@ public class CannonballWeapon extends Weapon implements InteractWeapon {
 
         final Cannon cannon = cannonOpt.get();
         if (cannon.isLoaded()) {
-            UtilMessage.message(player, "Combat", "This cannon is already loaded!");
-            SoundEffect.LOW_PITCH_PLING.play(player);
             return;
         }
 

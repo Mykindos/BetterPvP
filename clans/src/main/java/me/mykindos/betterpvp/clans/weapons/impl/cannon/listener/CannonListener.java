@@ -314,18 +314,20 @@ public class CannonListener implements Listener {
     public void onInteract(final PlayerInteractAtEntityEvent event) {
         // Don't aim if they are clicking with a cannonball
         final Player player = event.getPlayer();
-        if (this.cannonballWeapon.matches(player.getInventory().getItemInMainHand())
-                || this.cannonballWeapon.matches(player.getInventory().getItemInOffHand())) {
-            return;
-        }
 
         this.cannonManager.of(event.getRightClicked()).ifPresent(cannon -> {
+            final boolean loaded = cannon.isLoaded();
+            if (!loaded && (this.cannonballWeapon.matches(player.getInventory().getItemInMainHand())
+                    || this.cannonballWeapon.matches(player.getInventory().getItemInOffHand()))) {
+                return; // Allow them to reload if they are holding a cannonball and the cannon is not loaded
+            }
+
             if (!UtilTime.elapsed(cannon.getLastFuseTime(), (long) (this.cannonManager.getFuseSeconds() * 1000L))) {
                 return; // Don't aim if the cannon is fused
             }
 
             if (player.isSneaking()) {
-                if (!cannon.isLoaded()) {
+                if (!loaded) {
                     UtilMessage.message(player, "Combat", "This cannon is not loaded! Place a <alt2>Cannonball</alt2> in it to shoot.");
                     SoundEffect.LOW_PITCH_PLING.play(player);
                     return;
