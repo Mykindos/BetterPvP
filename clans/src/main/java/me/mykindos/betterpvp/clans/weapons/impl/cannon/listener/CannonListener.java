@@ -367,6 +367,12 @@ public class CannonListener implements Listener {
                         .offset(1, 1, 1)
                         .receivers(60)
                         .spawn();
+
+                // Drop cannonball if loaded
+                if (cannon.isLoaded()) {
+                    final Location location = cannon.getLocation();
+                    location.getWorld().dropItemNaturally(location, this.cannonballWeapon.getItemStack());
+                }
             });
         } catch (IllegalStateException ignored) {
             // Ignore if the cannon has no healthbar, means they died
