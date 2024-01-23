@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
 @BPvPListener
@@ -35,5 +36,10 @@ public class ScoreboardListener implements Listener {
     @EventHandler
     public void onTeleport(PlayerTeleportEvent e) {
         UtilServer.runTaskLater(core, () -> UtilServer.callEvent(new ScoreboardUpdateEvent(e.getPlayer())), 10);
+    }
+
+    @EventHandler
+    public void onRespawn(PlayerRespawnEvent e) {
+        UtilServer.runTaskLater(core, () -> UtilServer.callEvent(new ScoreboardUpdateEvent(e.getPlayer())), 5L);
     }
 }
