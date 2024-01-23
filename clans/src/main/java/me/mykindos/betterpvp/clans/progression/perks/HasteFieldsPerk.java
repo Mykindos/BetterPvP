@@ -101,11 +101,12 @@ public class HasteFieldsPerk implements Listener, ConfigAccessor, ProgressionPer
                     removeHaste(player);
                     return;
                 }
-                if (manager.isFields(clan) || manager.isLake(clan)) {
+                if (!(manager.isFields(clan) || manager.isLake(clan))) {
                     removeHaste(player);
                     return;
                 }
                 mining.getLevel(player).whenComplete((level, throwable1) -> {
+                    level = 500;
                     for (int i = hasteLevels.size() - 1; i >= 0; i--) {
                         if (level >= hasteLevels.get(i)) {
                             addHaste(player, i);
@@ -130,13 +131,14 @@ public class HasteFieldsPerk implements Listener, ConfigAccessor, ProgressionPer
     }
 
     private void addHaste(Player player, int level) {
+        if (player.hasPotionEffect(PotionEffectType.FAST_DIGGING)) return;
         UtilServer.runTask(clans, () -> player.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, -1, level)));
         UtilMessage.message(player, "Mining", UtilMessage.deserialize("Your mining vigor has increased"));
     }
 
     @Override
     public void loadConfig(@NotNull ExtendedYamlConfiguration config) {
-        this.hasteLevels = config.getOrSaveObject("mining.haste-fields-perk.hasteLevels", List.of(200, 400, 600, 800, 1000), List.class);
+        this.hasteLevels = config.getOrSaveIntegerList("mining.haste-fields-perk.hasteLevels", List.of(200, 400, 600, 800, 1000));
         this.enabled = config.getOrSaveBoolean("mining.haste-fields-perk.enabled", true);
     }
 }
