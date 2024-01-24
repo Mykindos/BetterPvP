@@ -18,9 +18,7 @@ import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -118,6 +116,26 @@ public class Overcharge extends Skill implements InteractSkill, Listener {
             }
         }
 
+    }
+
+    @UpdateEvent
+    public void createRedDustParticles() {
+        bonus.forEach((arrow, bonusDamage) -> {
+            if (arrow.isValid() && !arrow.isDead() && !arrow.isOnGround() && bonus.get(arrow) > 0) {
+
+                double baseSize = 0.25;
+                double count = (bonus.get(arrow));
+
+                double finalSize = baseSize * count;
+
+                System.out.print((float)finalSize);
+
+                Particle.DustOptions redDust = new Particle.DustOptions(Color.fromRGB(255, 0, 0), (float)finalSize);
+                arrow.getWorld().spawnParticle(Particle.REDSTONE, arrow.getLocation(), 1, 0.1, 0.1, 0.1, 0, redDust);
+            }
+        });
+
+        bonus.keySet().removeIf(arrow -> !arrow.isValid() || arrow.isDead() || arrow.isOnGround());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

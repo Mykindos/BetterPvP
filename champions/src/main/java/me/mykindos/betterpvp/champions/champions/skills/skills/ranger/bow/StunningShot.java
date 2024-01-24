@@ -79,7 +79,7 @@ public class StunningShot extends PrepareArrowSkill {
 
     @Override
     public void displayTrail(Location location) {
-        location.getWorld().spawnParticle(Particle.TRIAL_SPAWNER_DETECTION, location, 2, 0.1, 0.1, 0.1, 0);
+        location.getWorld().spawnParticle(Particle.SCULK_CHARGE_POP, location, 1, 0.1, 0.1, 0.1, 0);
     }
 
     @Override

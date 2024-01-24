@@ -87,7 +87,7 @@ public class LevitatingShot extends PrepareArrowSkill {
 
     @Override
     public void displayTrail(Location location) {
-        location.getWorld().spawnParticle(Particle.SCULK_CHARGE_POP, location, 1, 0.1, 0.1, 0.1, 0);
+        location.getWorld().spawnParticle(Particle.ENCHANTMENT_TABLE, location, 3, 0.1, 0.1, 0.1, 0);
     }
 
     @Override

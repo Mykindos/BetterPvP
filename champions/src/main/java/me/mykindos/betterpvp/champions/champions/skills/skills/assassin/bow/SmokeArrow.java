@@ -95,7 +95,7 @@ public class SmokeArrow extends PrepareArrowSkill {
         target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, effectDuration, 1));
         target.getWorld().playSound(target.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
 
-        target.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, target.getLocation(), 1);
+        target.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, target.getLocation(), 1);
 
         UtilMessage.simpleMessage(target, getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s</alt>.", damager.getName(), getName());
         UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit <alt2>%s</alt2> with <alt>%s</alt>.", target.getName(), getName());

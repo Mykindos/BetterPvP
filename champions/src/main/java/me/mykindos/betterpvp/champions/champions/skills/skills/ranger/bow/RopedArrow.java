@@ -16,6 +16,7 @@ import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -176,7 +177,7 @@ public class RopedArrow extends PrepareArrowSkill {
 
     @Override
     public void displayTrail(Location location) {
-        Particle.REDSTONE.builder().location(location).color(165, 42, 42).count(3).extra(0).receivers(60, true).spawn();
+        location.getWorld().spawnParticle(Particle.GUST, location, 1, 0.1, 0.1, 0.1, 0);
     }
 
     @Override

@@ -555,6 +555,7 @@ skills:
       maxStacks: 3
       baseDuration: 5.0
       durationIncreasePerLevel: 1.0
+      health: 4.0
     resistance:
       enabled: true
       maxlevel: 3
@@ -700,7 +701,7 @@ skills:
       maxlevel: 3
       maxTimeBetweenShots: 5.0
       maxConsecutiveHits: 4
-      numMisses: 2
+      numMisses: 1
       maxTimeBetweenShotsIncreasePerLevel: 1.0
       baseDamage: 0.0
       damageIncreasePerLevel: 0.75
