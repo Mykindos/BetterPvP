@@ -690,6 +690,7 @@ skills:
       cooldownDecreasePerLevel: 2.0
       baseNumArrows: 10
       numArrowsIncreasePerLevel: 0
+      damage: 8.0
     vitalityspores:
       enabled: true
       maxlevel: 5
