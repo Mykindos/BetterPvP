@@ -103,8 +103,8 @@ public class WolvesFury extends Skill implements InteractSkill, CooldownSkill, L
     @Override
     public void activate(Player player, int level) {
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WOLF_HOWL, 1.0f, 1.0f);
-        active.put(player, (long) (System.currentTimeMillis() + ((baseDuration + level) * 1000L)));
-        championsManager.getEffects().addEffect(player, EffectType.STRENGTH, 1, (long) ((baseDuration + level) * 1000L));
+        active.put(player, (long) (System.currentTimeMillis() + (getDuration(level) * 1000L)));
+        championsManager.getEffects().addEffect(player, EffectType.STRENGTH, 1, (long) (getDuration(level) * 1000L));
     }
 
     @Override
