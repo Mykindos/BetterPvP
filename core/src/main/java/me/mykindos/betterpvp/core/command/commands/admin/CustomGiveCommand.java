@@ -38,13 +38,13 @@ public class CustomGiveCommand extends Command {
         Player target = Bukkit.getPlayer(args[0]);
 
         if (target == null) {
-            UtilMessage.message(player, "command", UtilMessage.deserialize("<yellow>%s</yellow> is not a valid player name.", args[0]));
+            UtilMessage.message(player, "Command", UtilMessage.deserialize("<yellow>%s</yellow> is not a valid player name.", args[0]));
             return;
         }
 
         BPVPItem item = itemHandler.getItem(args[1]);
         if (item == null) {
-            UtilMessage.message(player, "command", UtilMessage.deserialize("<green>%s</green> is not a valid item", args[1]));
+            UtilMessage.message(player, "Command", UtilMessage.deserialize("<green>%s</green> is not a valid item", args[1]));
             return;
         }
 
@@ -53,8 +53,13 @@ public class CustomGiveCommand extends Command {
         if (args.length > 2) {
             try {
                 count = Integer.parseInt(args[2]);
+                if (count < 1) {
+                    UtilMessage.message(player, "Command", UtilMessage.deserialize("<green>%s</green> is not a valid number (must be greater than 1)", count));
+                    return;
+                }
             } catch (NumberFormatException ignored) {
-
+                UtilMessage.message(player, "Command", UtilMessage.deserialize("<green>%s</green> is not a valid number", args[2]));
+                return;
             }
         }
 
