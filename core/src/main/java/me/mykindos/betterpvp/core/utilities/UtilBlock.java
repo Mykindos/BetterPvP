@@ -68,15 +68,12 @@ public class UtilBlock {
     /**
      * Check if a Player is in water
      *
-     * @param p The Player
+     * @param player The Player
      * @return Returns true if the Player is standing in water
      */
-    public static boolean isInWater(Player p) {
-
-        Block block = p.getLocation().getBlock();
-        Location belowFeet = p.getLocation().subtract(0, 0.1, 0);
-        Block blockBelowFeet = belowFeet.getBlock();
-        return isWater(block) || isWater(blockBelowFeet);
+    public static boolean isInWater(Player player) {
+        Block block = player.getLocation().getBlock();
+        return isWater(block)  || player.isSwimming();
     }
 
     public static boolean isWater(Block block) {
