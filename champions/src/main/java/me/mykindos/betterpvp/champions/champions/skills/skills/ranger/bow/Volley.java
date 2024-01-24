@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.bow;
 
+import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
@@ -102,7 +103,13 @@ public class Volley extends PrepareArrowSkill {
 
     @Override
     public void displayTrail(Location location) {
-        location.getWorld().spawnParticle(Particle.CRIT, location, 1, 0, 0, 0, 0);
+        new ParticleBuilder(Particle.CRIT)
+                .location(location)
+                .count(1)
+                .offset(0, 0, 0)
+                .extra(0)
+                .receivers(60)
+                .spawn();
     }
 
     @EventHandler
@@ -114,7 +121,6 @@ public class Volley extends PrepareArrowSkill {
 
         event.setDamage(8);
         event.addReason(getName());
-
     }
 
 

@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.bow;
 
+import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
@@ -103,8 +104,16 @@ public class ToxicArrow extends PrepareArrowSkill {
         double red = 0.4;
         double green = 1.0;
         double blue = 0.4;
-        location.getWorld().spawnParticle(Particle.SPELL_MOB, particleLocation, 0, red, green, blue, 1.0);
+
+        new ParticleBuilder(Particle.SPELL_MOB)
+                .location(particleLocation)
+                .count(0)
+                .offset(red, green, blue)
+                .extra(1.0)
+                .receivers(60)
+                .spawn();
     }
+
 
     public void loadSkillConfig(){
         baseDuration = getConfig("baseDuration", 6.0, Double.class);

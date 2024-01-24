@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.bow;
 
+import com.destroystokyo.paper.ParticleBuilder;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
@@ -79,7 +80,13 @@ public class SilencingArrow extends PrepareArrowSkill {
 
     @Override
     public void displayTrail(Location location) {
-        location.getWorld().spawnParticle(Particle.SPELL, location, 1, 0.1, 0.1, 0.1, 0);
+        new ParticleBuilder(Particle.SPELL)
+                .location(location)
+                .count(1)
+                .offset(0.1, 0.1, 0.1)
+                .extra(0)
+                .receivers(60)
+                .spawn();
     }
 
 

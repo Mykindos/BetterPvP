@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.bow;
 
+import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Data;
@@ -131,7 +132,14 @@ public class Overcharge extends Skill implements InteractSkill, Listener {
                 System.out.print((float)finalSize);
 
                 Particle.DustOptions redDust = new Particle.DustOptions(Color.fromRGB(255, 0, 0), (float)finalSize);
-                arrow.getWorld().spawnParticle(Particle.REDSTONE, arrow.getLocation(), 1, 0.1, 0.1, 0.1, 0, redDust);
+                new ParticleBuilder(Particle.REDSTONE)
+                        .location(arrow.getLocation())
+                        .count(1)
+                        .offset(0.1, 0.1, 0.1)
+                        .extra(0)
+                        .data(redDust)
+                        .receivers(60)
+                        .spawn();
             }
         });
 

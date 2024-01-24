@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.bow;
 
+import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
@@ -120,7 +121,13 @@ public class PinDown extends Skill implements InteractSkill, CooldownSkill, List
                 return true;
             }
 
-            arrow.getWorld().spawnParticle(Particle.CRIT, arrow.getLocation(), 1, 0, 0, 0, 0);
+            new ParticleBuilder(Particle.CRIT)
+                    .location(arrow.getLocation())
+                    .count(1)
+                    .offset(0, 0, 0)
+                    .extra(0)
+                    .receivers(60)
+                    .spawn();
 
             return false;
         });

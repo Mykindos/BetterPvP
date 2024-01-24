@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.bow;
 
+import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
@@ -79,7 +80,13 @@ public class StunningShot extends PrepareArrowSkill {
 
     @Override
     public void displayTrail(Location location) {
-        location.getWorld().spawnParticle(Particle.SCULK_CHARGE_POP, location, 1, 0.1, 0.1, 0.1, 0);
+        new ParticleBuilder(Particle.SCULK_CHARGE_POP)
+                .location(location)
+                .count(1)
+                .offset(0.1, 0.1, 0.1)
+                .extra(0)
+                .receivers(60)
+                .spawn();
     }
 
     @Override

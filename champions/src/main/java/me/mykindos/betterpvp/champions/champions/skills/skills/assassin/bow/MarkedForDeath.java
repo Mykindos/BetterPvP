@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.bow;
 
+import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
@@ -77,7 +78,13 @@ public class MarkedForDeath extends PrepareArrowSkill {
 
     @Override
     public void displayTrail(Location location) {
-        location.getWorld().spawnParticle(Particle.SPELL_MOB, location, 1, 0.1, 0.1, 0.1, 0);
+        new ParticleBuilder(Particle.SPELL_MOB)
+                .location(location)
+                .count(1)
+                .offset(0.1, 0.1, 0.1)
+                .extra(0)
+                .receivers(60)
+                .spawn();
     }
 
 
