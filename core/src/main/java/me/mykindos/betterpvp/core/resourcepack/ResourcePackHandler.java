@@ -7,14 +7,12 @@ import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.config.Config;
 
 import javax.inject.Singleton;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -107,6 +105,10 @@ public class ResourcePackHandler {
         } catch (NoSuchAlgorithmException | IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void reload() {
+        this.cachedSha = null;
     }
 
 }
