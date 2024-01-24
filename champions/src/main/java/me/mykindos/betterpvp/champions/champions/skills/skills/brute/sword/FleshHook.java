@@ -193,8 +193,6 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
     }
 
     private void shoot(Player player, ChargeData data, int level) {
-        UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s<gray>.", getName());
-
         final Item item = player.getWorld().dropItem(player.getEyeLocation(), new ItemStack(Material.TRIPWIRE_HOOK));
         final ThrowableItem throwable = new ThrowableItem(item, player, getName(), 10_000L, true);
         throwable.setCollideGround(true);
@@ -247,7 +245,7 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
         target.setFallDistance(0); // Reset their fall distance
 
         // Damage
-        final double damage = getDamage(level);
+        final double damage = getDamage(level) * hookData.getData().getCharge();
         CustomDamageEvent ev = new CustomDamageEvent(target, player, null, EntityDamageEvent.DamageCause.CUSTOM, damage, false, getName());
         UtilDamage.doCustomDamage(ev);
 
