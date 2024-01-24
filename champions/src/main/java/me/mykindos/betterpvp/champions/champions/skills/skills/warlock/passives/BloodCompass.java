@@ -15,6 +15,8 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -29,10 +31,11 @@ public class BloodCompass extends Skill implements ToggleSkill, CooldownSkill {
     public int effectDuration;
     public int numPoints;
     public double escapeRadius;
-    public double damage;
-    public double damageIncreasePerLevel;
     public double escapeRadiusIncreasePerLevel;
     public double maxDistanceIncreasePerLevel;
+    public int effectDurationIncreasePerLevel;
+
+    public double cooldownDecreasePerLevel;
     private final Map<Player, List<List<Location>>> playerMarkersMap = new WeakHashMap<>();
     private final Map<Player, WeakHashMap<Integer, Player>> playerLineToPlayerMap = new WeakHashMap<>();
     private final Map<Player, Integer> playerTaskIdMap = new WeakHashMap<>();
@@ -56,18 +59,18 @@ public class BloodCompass extends Skill implements ToggleSkill, CooldownSkill {
                 "towards the nearest enemies within <stat>" + maxDistance + "</stat> blocks",
                 "",
                 "Players hit with these blood lines will receive",
-                "<effect>Glowing</effect> for <stat>" + effectDuration + "</stat> seconds and take <val>" + getFinalDamage(level) + "</val> damage",
+                "<effect>Glowing</effect> and <effect>Darkness</effect> for <val>" + getEffectDuration(level) + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
     }
 
-    public double getFinalDamage(int level) {
-        return (damage + ((level - 1)) * damageIncreasePerLevel);
-    }
-
     public int getFinalNumLines(int level) {
         return (numLines + (level - 1));
+    }
+
+    public int getEffectDuration(int level){
+        return effectDuration + level * effectDurationIncreasePerLevel;
     }
 
     private void findEnemies(Player player, int level) {
@@ -81,7 +84,7 @@ public class BloodCompass extends Skill implements ToggleSkill, CooldownSkill {
         if (!enemies.isEmpty()) {
             int lineIndex = 0;
             for (Player enemy : enemies) {
-                List<Location> points = calculatePoints(player, enemy); // calculatePoints now returns a List<Location>
+                List<Location> points = calculatePoints(player, enemy);
                 if (!points.isEmpty()) {
                     markers.add(points);
                     lineToPlayerMap.put(lineIndex++, enemy);
@@ -107,11 +110,6 @@ public class BloodCompass extends Skill implements ToggleSkill, CooldownSkill {
         for (int lineIndex = 0; lineIndex < markers.size(); lineIndex++) {
             List<Location> points = markers.get(lineIndex);
             Player target = lineToPlayerMap.get(lineIndex);
-            boolean pathIsClear = isPathClear(player, target, points);
-
-            if (pathIsClear) {
-                drawCircle(target.getLocation(), (escapeRadius + escapeRadiusIncreasePerLevel));
-            }
         }
 
         startDrawingLines(player);
@@ -186,36 +184,6 @@ public class BloodCompass extends Skill implements ToggleSkill, CooldownSkill {
         return moreSegmentsToDraw;
     }
 
-    private boolean isLineClear(Location start, Location end) {
-        World world = start.getWorld();
-        if (!world.equals(end.getWorld())) {
-            return false;
-        }
-
-        int points = (int) (start.distance(end) * 5);
-
-        for (int i = 0; i <= points; i++) {
-            double fraction = (double) i / points;
-            Location point = start.clone().add(end.clone().subtract(start).multiply(fraction));
-
-            if (UtilBlock.solid(point.getBlock())) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private boolean isPathClear(Player player, Player enemy, List<Location> points) {
-        for (int i = 1; i < points.size(); i++) {
-            Location start = points.get(i - 1);
-            Location end = points.get(i);
-            if (!isLineClear(start, end)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     private List<Location> calculatePoints(Player player, Player enemy) {
         List<Location> points = new ArrayList<>();
         Location start = player.getLocation().add(0, 1.8, 0);
@@ -237,10 +205,6 @@ public class BloodCompass extends Skill implements ToggleSkill, CooldownSkill {
             Random random = new Random();
             point.add(random.nextDouble() - 0.5, random.nextDouble() - 0.5, random.nextDouble() - 0.5);
 
-            if (i > 1 && !isLineClear(points.get(points.size() - 1), point)) {
-                obstruction = true;
-                break;
-            }
             points.add(point);
         }
 
@@ -274,38 +238,18 @@ public class BloodCompass extends Skill implements ToggleSkill, CooldownSkill {
                 if (target != null) {
                     UtilPlayer.setGlowing(player, target, true);
                     player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1.0f, 1.0f);
-                    target.damage(getFinalDamage(level));
+                    target.addPotionEffect(new PotionEffect(PotionEffectType.DARKNESS, (20 * getEffectDuration(level)),0, false, false));
 
-                    UtilMessage.message(player, getClassType().getName(), "You hit " + target.getName() + " with Blood Compass.");
+                    UtilMessage.message(player, getClassType().getName(), "You hit <alt2>" + target.getName() + "</alt2> with <alt>Blood Compass");
 
                     new BukkitRunnable() {
                         @Override
                         public void run() {
                             UtilPlayer.setGlowing(player, target, false);
                         }
-                    }.runTaskLater(champions, 20L * effectDuration);
+                    }.runTaskLater(champions, 20L * getEffectDuration(level));
                 }
             }
-        }
-    }
-
-    private void drawCircle(Location center, double radius) {
-        World world = center.getWorld();
-        int particles = 50;
-
-        for (int i = 0; i < particles; i++) {
-            double angle = 2 * Math.PI * i / particles;
-            double x = Math.cos(angle) * radius;
-            double z = Math.sin(angle) * radius;
-
-            Location loc = center.clone().add(x, 0, z);
-
-            while (loc.getBlockY() > 0 && UtilBlock.airFoliage(loc.getBlock())) {
-                loc.subtract(0, 1, 0);
-            }
-            loc.add(0, 1.25, 0);
-
-            world.spawnParticle(Particle.REDSTONE, loc, 1, new Particle.DustOptions(Color.RED, 2.0f));
         }
     }
 
@@ -328,12 +272,12 @@ public class BloodCompass extends Skill implements ToggleSkill, CooldownSkill {
     public void loadSkillConfig() {
         numLines = getConfig("numLines", 1, Integer.class);
         maxDistance = getConfig("maxDistance", 64.0, Double.class);
-        effectDuration = getConfig("effectDuration", 5, Integer.class);
+        effectDuration = getConfig("effectDuration", 6, Integer.class);
         numPoints = getConfig("numPoints", 30, Integer.class);
-        escapeRadius = getConfig("escapeRadius", 7.0, Double.class);
-        damage = getConfig("damage", 7.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 2.0, Double.class);
+        escapeRadius = getConfig("escapeRadius", 8.0, Double.class);
+        effectDurationIncreasePerLevel = getConfig("effectDurationIncreasePerLevel", 1, Integer.class);
         maxDistanceIncreasePerLevel = getConfig("maxDistanceIncreasePerLevel", 0.0, Double.class);
         escapeRadiusIncreasePerLevel = getConfig("escapeRadiusIncreasePerLevel", 0.0, Double.class);
+        cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 1.0, Double.class);
     }
 }
