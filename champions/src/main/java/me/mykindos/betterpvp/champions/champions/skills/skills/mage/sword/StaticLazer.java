@@ -14,15 +14,13 @@ import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
-import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
+import me.mykindos.betterpvp.core.utilities.model.display.DisplayComponent;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Location;
@@ -34,7 +32,6 @@ import org.bukkit.entity.Firework;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -51,20 +48,8 @@ import java.util.WeakHashMap;
 @BPvPListener
 public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySkill, CooldownSkill {
 
-    // Percentage (0 -> 1)
     private final WeakHashMap<Player, ChargeData> charging = new WeakHashMap<>();
-
-    // Action bar
-    private final PermanentComponent actionBarComponent = new PermanentComponent(gamer -> {
-        final Player player = gamer.getPlayer();
-        if (player == null || !charging.containsKey(player) || !isHolding(player)) {
-            return null; // Skip if not online or not charging
-        }
-
-        final ChargeData charge = charging.get(player);
-        ProgressBar progressBar = ProgressBar.withProgress(charge.getCharge());
-        return progressBar.build();
-    });
+    private final DisplayComponent actionBarComponent = ChargeData.getActionBar(this, charging);
 
     private double baseCharge;
     private double baseDamage;
@@ -75,7 +60,6 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
     public StaticLazer(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
-
 
     @Override
     public String getName() {
@@ -133,11 +117,6 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
     }
 
     @Override
-    public boolean shouldDisplayActionBar(Gamer gamer) {
-        return false;
-    }
-
-    @Override
     public SkillType getType() {
         return SkillType.SWORD;
     }
@@ -145,6 +124,11 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
     @Override
     public Action[] getActions() {
         return SkillActions.RIGHT_CLICK;
+    }
+
+    @Override
+    public boolean shouldDisplayActionBar(Gamer gamer) {
+        return !charging.containsKey(gamer.getPlayer()) && isHolding(gamer.getPlayer());
     }
 
     @Override
@@ -156,29 +140,18 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
     }
 
     @Override
-    public void trackPlayer(Player player) {
-        // Action bar
-        Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
+    public void trackPlayer(Player player, Gamer gamer) {
         gamer.getActionBar().add(900, actionBarComponent);
     }
 
     @Override
-    public void invalidatePlayer(Player player) {
-        // Action bar
-        Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
+    public void invalidatePlayer(Player player, Gamer gamer) {
         gamer.getActionBar().remove(actionBarComponent);
     }
 
     @Override
     public void activate(Player player, int level) {
         charging.put(player, new ChargeData(getChargePerSecond(level) / 100));
-    }
-
-    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-    public void cancelCooldown(PlayerUseSkillEvent event) {
-        if (event.getSkill() == this && charging.containsKey(event.getPlayer())) {
-            event.setCancelled(true); // Cancel cooldown or ability use if they're charging to allow them to release
-        }
     }
 
     @EventHandler
@@ -193,7 +166,9 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
 
     @EventHandler
     public void onDamageReceived(CustomDamageEvent event) {
-        if (!(event.getDamagee() instanceof Player player)) return;
+        if (event.isCancelled() || !(event.getDamagee() instanceof Player player)) {
+            return;
+        }
 
         if (hasSkill(player) && charging.containsKey(player)) {
             charging.remove(player);
@@ -205,13 +180,14 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
 
     private void shoot(Player player, float charge, int level) {
         // Cooldown
+        championsManager.getCooldowns().removeCooldown(player, getName(), true);
         championsManager.getCooldowns().use(player,
                 getName(),
                 getCooldown(level),
                 true,
                 true,
                 isCancellable(),
-                gmr -> gmr.getPlayer() != null && isHolding(gmr.getPlayer()));
+                this::shouldDisplayActionBar);
 
         final float range = getRange(level);
         final Vector direction = player.getEyeLocation().getDirection();
@@ -293,8 +269,6 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
             // Check if they still are blocking and charge
             Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
             if (isHolding(player) && gamer.isHoldingRightClick() && championsManager.getEnergy().use(player, getName(), getEnergyPerSecond(level) / 20, true)) {
-                championsManager.getCooldowns().removeCooldown(player, getName(), true);
-
                 charge.tick();
                 charge.tickSound(player);
                 continue;

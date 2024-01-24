@@ -148,18 +148,14 @@ public class Flash extends Skill implements InteractSkill, Listener {
     }
 
     @Override
-    public void invalidatePlayer(Player player) {
+    public void invalidatePlayer(Player player, Gamer gamer) {
         charges.remove(player);
-        // Action bar
-        Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
         gamer.getActionBar().remove(actionBarComponent);
     }
 
     @Override
-    public void trackPlayer(Player player) {
+    public void trackPlayer(Player player, Gamer gamer) {
         charges.computeIfAbsent(player, k -> new FlashData());
-        // Action bar
-        Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
         gamer.getActionBar().add(900, actionBarComponent);
     }
 

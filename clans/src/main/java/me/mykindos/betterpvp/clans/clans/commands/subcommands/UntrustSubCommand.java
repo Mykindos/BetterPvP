@@ -28,7 +28,7 @@ public class UntrustSubCommand extends ClanSubCommand {
 
     @Override
     public String getName() {
-        return "Untrust";
+        return "untrust";
     }
 
     @Override

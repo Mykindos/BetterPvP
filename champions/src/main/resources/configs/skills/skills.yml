@@ -43,7 +43,7 @@ skills:
       maxlevel: 5
       baseDuration: 3.0
       blindDuration: 1.75
-      blindRadius: 2.5
+      blindRadius: 4.0
       cooldownDecreasePerLevel: 2.5
       durationIncreasePerLevel: 1.0
     silencingarrow:
@@ -322,7 +322,7 @@ skills:
       immuneTime: 0.45
       fireTicks: 50
       energyDecreasePerLevel: 1.0
-    moltenblast:
+    fireblast:
       enabled: true
       maxlevel: 5
       cooldown: 23.0
@@ -332,7 +332,7 @@ skills:
       baseDamage: 6.0
       damageIncreasePerLevel: 0.0
       baseFireDuration: 0.0
-    glacialprison:
+    iceprison:
       enabled: true
       maxlevel: 5
       cooldown: 25.0
@@ -595,7 +595,7 @@ skills:
   ranger:
     wolfspounce:
       enabled: true
-      maxlevel: 4
+      maxlevel: 5
       cooldown: 8.0
       cooldownDecreasePerLevel: 1.0
       baseCharge: 40.0
@@ -676,7 +676,7 @@ skills:
       maxlevel: 3
       baseDamage: 0.0
       damageIncreasePerLevel: 0.5
-    entangle:
+    barbedarrows:
       enabled: true
       maxlevel: 3
       baseDuration: 2.0
@@ -827,15 +827,15 @@ skills:
       enabled: true
       maxlevel: 3
       numLines: 1
-      effectDuration: 5
+      effectDuration: 6
+      effectDurationIncreasePerLevel: 1
       maxDistance: 64.0
       numPoints: 30
-      cooldown: 20.0
-      escapeRadius: 7.0
-      damage: 7.0
-      damageIncreasePerLevel: 2.0
+      cooldown: 13.0
+      escapeRadius: 8.0
       escapeRadiusIncreasePerLevel: 0.0
       maxDistanceIncreasePerLevel: 0.0
+      cooldownDecreasePerLevel: 1.0
     grasp:
       enabled: true
       maxlevel: 5

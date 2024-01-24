@@ -26,7 +26,6 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Arrow;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.EvokerFangs;
 import org.bukkit.entity.FishHook;
 import org.bukkit.entity.LivingEntity;
@@ -48,6 +47,8 @@ import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static me.mykindos.betterpvp.core.utilities.UtilMessage.message;
 
 @Slf4j
 @BPvPListener
@@ -141,7 +142,6 @@ public class CombatListener implements Listener {
                 CustomDamageReductionEvent customDamageReductionEvent = UtilServer.callEvent(new CustomDamageReductionEvent(event, event.getDamage()));
                 customDamageReductionEvent.setDamage(armourManager.getDamageReduced(event.getDamage(), event.getDamagee()));
 
-
                 event.setDamage(event.isIgnoreArmour() ? event.getDamage() : customDamageReductionEvent.getDamage());
 
                 for (CustomDamageAdapter adapter : customDamageAdapters) {
@@ -150,31 +150,41 @@ public class CombatListener implements Listener {
                     }
 
                     if (adapter.processCustomDamageAdapter(event)) {
-                        finalizeDamage(event);
+                        finalizeDamage(event, customDamageReductionEvent);
                         return;
                     }
                 }
 
                 playDamageEffect(event);
-                finalizeDamage(event);
+                finalizeDamage(event, customDamageReductionEvent);
             }
         }
 
     }
 
-    private void finalizeDamage(CustomDamageEvent event) {
+    private void finalizeDamage(CustomDamageEvent event, CustomDamageReductionEvent reductionEvent) {
         updateDurability(event);
 
         if (!event.getDamagee().isDead()) {
 
             if (event.getDamagee() instanceof Player player) {
                 if (player.getInventory().getItemInMainHand().getType() == Material.BOOK) {
-                    player.sendMessage("");
-                    player.sendMessage("Initial Damage: " + event.getRawDamage());
-                    player.sendMessage("Damage after reduction: " + event.getDamage());
-                    player.sendMessage("Delay: " + event.getDamageDelay());
-                    player.sendMessage("Cause: " + event.getCause().name());
+                    final String modified = reductionEvent.getInitialDamage() == event.getRawDamage()
+                            ? "<red>Unmodified" : "<orange>" + reductionEvent.getInitialDamage();
+                    final String reduced = event.isIgnoreArmour() ? "<red>Disabled"
+                            : reductionEvent.getInitialDamage() == reductionEvent.getDamage()
+                            ? "<red>Unmodified" : "<orange>" + reductionEvent.getDamage();
+                    final String knockback = event.isKnockback() ? "<green>Enabled" : "<red>Disabled";
 
+                    player.sendMessage("");
+                    message(player, "Combat", "Damage Breakdown:");
+                    message(player, "Combat", "Initial Raw Damage: <orange>" + event.getRawDamage());
+                    message(player, "Combat", "Modified Damage: " + modified);
+                    message(player, "Combat", "Reduced Damage: " + reduced);
+                    message(player, "Combat", "Knockback: " + knockback);
+                    message(player, "Combat", "Delay: <#ededed>" + event.getDamageDelay());
+                    message(player, "Combat", "Cause: <#ededed><i>" + event.getCause().name());
+                    player.sendMessage("");
                 }
             }
 
@@ -423,30 +433,19 @@ public class CombatListener implements Listener {
     }
 
     private void playDamageEffect(CustomDamageEvent event) {
-        event.getDamagee().playHurtAnimation(270);
+        final LivingEntity damagee = event.getDamagee();
+        damagee.playHurtAnimation(270);
         if (event.getProjectile() instanceof Arrow) {
             if (event.getDamager() instanceof Player player) {
-
                 player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.5f, 0.7f);
-                event.getDamager().getWorld().playSound(event.getDamagee().getLocation(), Sound.ENTITY_ARROW_HIT, 0.5f, 1.0f);
-
+                event.getDamager().getWorld().playSound(damagee.getLocation(), Sound.ENTITY_ARROW_HIT, 0.5f, 1.0f);
             }
-        } else {
-
-            event.getDamagee().getWorld().playSound(event.getDamagee().getLocation(),
-                    getDamageSound(event.getDamagee().getType()), 1.0F, 1.0F);
-
-        }
-    }
-
-    public Sound getDamageSound(EntityType entityType) {
-        try {
-            String entName = entityType.name().toUpperCase();
-            return Sound.valueOf("ENTITY_" + entName + "_HURT");
-        } catch (IllegalArgumentException ignore) {
         }
 
-        return Sound.ENTITY_PLAYER_HURT;
+        final net.kyori.adventure.sound.Sound sound = event.getSoundProvider().apply(event);
+        if (sound != null) {
+            damagee.getWorld().playSound(sound, damagee);
+        }
     }
 
     private void updateDurability(CustomDamageEvent event) {

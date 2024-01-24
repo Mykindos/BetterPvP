@@ -27,7 +27,7 @@ import org.bukkit.inventory.ItemStack;
 
 @Singleton
 @BPvPListener
-public class GlacialPrison extends Skill implements InteractSkill, CooldownSkill, Listener {
+public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Listener {
 
     private final WorldBlockHandler blockHandler;
 
@@ -37,14 +37,14 @@ public class GlacialPrison extends Skill implements InteractSkill, CooldownSkill
     private double speed;
 
     @Inject
-    public GlacialPrison(Champions champions, ChampionsManager championsManager, WorldBlockHandler blockHandler) {
+    public IcePrison(Champions champions, ChampionsManager championsManager, WorldBlockHandler blockHandler) {
         super(champions, championsManager);
         this.blockHandler = blockHandler;
     }
 
     @Override
     public String getName() {
-        return "Glacial Prison";
+        return "Ice Prison";
     }
 
     @Override

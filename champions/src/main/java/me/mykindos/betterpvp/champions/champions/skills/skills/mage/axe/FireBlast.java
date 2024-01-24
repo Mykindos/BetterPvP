@@ -33,7 +33,7 @@ import java.util.List;
 
 @Singleton
 @BPvPListener
-public class MoltenBlast extends Skill implements InteractSkill, CooldownSkill, Listener {
+public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Listener {
 
     private double speed;
 
@@ -48,14 +48,14 @@ public class MoltenBlast extends Skill implements InteractSkill, CooldownSkill, 
     private double fireDurationIncreasePerLevel;
 
     @Inject
-    public MoltenBlast(Champions champions, ChampionsManager championsManager) {
+    public FireBlast(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
 
 
     @Override
     public String getName() {
-        return "Molten Blast";
+        return "Fire Blast";
     }
 
     @Override
