@@ -79,7 +79,7 @@ public class StunningShot extends PrepareArrowSkill {
 
     @Override
     public void displayTrail(Location location) {
-        Particle.REDSTONE.builder().location(location).color(0, 255, 0).count(3).extra(0).receivers(60, true).spawn();
+        location.getWorld().spawnParticle(Particle.TRIAL_SPAWNER_DETECTION, location, 2, 0.1, 0.1, 0.1, 0);
     }
 
     @Override

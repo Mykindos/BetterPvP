@@ -84,7 +84,7 @@ public class IncendiaryShot extends PrepareArrowSkill {
 
     @Override
     public void displayTrail(Location location) {
-        Particle.REDSTONE.builder().location(location).color(255, 0, 0).count(3).extra(0).receivers(60, true).spawn();
+        location.getWorld().spawnParticle(Particle.FLAME, location, 1, 0.1, 0.1, 0.1, 0);
     }
 
     @Override
