@@ -105,10 +105,13 @@ public class EffectListener implements Listener {
     public void shockUpdate() {
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (effectManager.hasEffect(player, EffectType.SHOCK)) {
+                player.playSound(net.kyori.adventure.sound.Sound.sound(Sound.ENTITY_PLAYER_HURT.key(),
+                        net.kyori.adventure.sound.Sound.Source.PLAYER,
+                        1f,
+                        1f), player);
                 player.playHurtAnimation(270);
             }
         }
-
     }
 
 

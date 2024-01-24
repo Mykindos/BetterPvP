@@ -37,11 +37,12 @@ public class MagmaBlade extends Skill implements PassiveSkill {
 
     @Override
     public String[] getDescription(int level) {
-
-        return new String[]{
+        return new String[] {
                 "Your sword is fueled by flames,",
                 "dealing an additional <val>" + getDamage(level) + "</val> damage",
-                "to players who are on fire"};
+                "to players who are on fire but",
+                "also extinguishes them."
+        };
     }
 
     public double getDamage(int level) {
@@ -69,6 +70,7 @@ public class MagmaBlade extends Skill implements PassiveSkill {
             LivingEntity ent = event.getDamagee();
             if (ent.getFireTicks() > 0) {
                 event.setDamage(event.getDamage() + getDamage(level));
+                ent.setFireTicks(0);
             }
         }
 
