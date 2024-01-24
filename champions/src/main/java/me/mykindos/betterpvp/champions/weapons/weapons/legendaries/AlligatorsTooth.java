@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.energy.EnergyHandler;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
@@ -140,7 +141,7 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
     @UpdateEvent(delay = 1000)
     public void onOxygendDrain() {
         for (Player player : Bukkit.getOnlinePlayers()) {
-            if (!player.isInWater()) continue;
+            if (!UtilBlock.isInWater(player)) continue;
             if (!isHoldingWeapon(player)) continue;
             player.setRemainingAir(player.getMaximumAir());
         }
@@ -148,7 +149,7 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
 
     @Override
     public boolean canUse(Player player) {
-        if (!player.isInWater()) {
+        if (!UtilBlock.isInWater(player)) {
             UtilMessage.simpleMessage(player, "Gator Stroke", "You can only use this ability in water!");
             return false;
         }
