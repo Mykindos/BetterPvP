@@ -245,11 +245,16 @@ public class ClanManager extends Manager<Clan> {
         Clan clan = getClanByPlayer(player).orElse(null);
         var territoryString = target.getTerritory().size() + "/" + (target.getMembers().size() + additionalClaims);
 
-        return Component.text(target.getName() + " Information").color(getRelation(clan, target).getPrimary()).append(Component.newline())
-                .append(Component.text(" Age: ").color(NamedTextColor.WHITE).append(UtilMessage.getMiniMessage("<yellow>%s\n", target.getAge())))
-                .append(Component.text(" Territory: ").color(NamedTextColor.WHITE).append(UtilMessage.getMiniMessage("<yellow>%s\n", territoryString)))
-                .append(Component.text(" Allies: ").color(NamedTextColor.WHITE).append(UtilMessage.getMiniMessage(getAllianceList(player, target)))).append(Component.newline())
-                .append(Component.text(" Enemies: ").color(NamedTextColor.WHITE).append(UtilMessage.getMiniMessage(getEnemyList(player, target)))).append(Component.newline())
+        return Component.text(target.getName() + " Information").color(getRelation(clan, target).getPrimary())
+                .appendNewline()
+                .append(Component.text(" Age: ").color(NamedTextColor.WHITE).append(UtilMessage.getMiniMessage("<yellow>%s", target.getAge())))
+                .appendNewline()
+                .append(Component.text(" Territory: ").color(NamedTextColor.WHITE).append(UtilMessage.getMiniMessage("<yellow>%s", territoryString)))
+                .appendNewline()
+                .append(Component.text(" Allies: ").color(NamedTextColor.WHITE).append(UtilMessage.getMiniMessage(getAllianceList(player, target))))
+                .appendNewline()
+                .append(Component.text(" Enemies: ").color(NamedTextColor.WHITE).append(UtilMessage.getMiniMessage(getEnemyList(player, target))))
+                .appendNewline()
                 .append(Component.text(" Members: ").color(NamedTextColor.WHITE).append(UtilMessage.getMiniMessage("%s", getMembersList(target))));
     }
 

@@ -7,13 +7,13 @@ import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.ApplyBuildEvent;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.DeleteBuildEvent;
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
+import me.mykindos.betterpvp.champions.champions.roles.RoleSoundProvider;
 import me.mykindos.betterpvp.champions.champions.roles.events.RoleChangeEvent;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.death.events.CustomDeathEvent;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
-import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
@@ -46,14 +46,14 @@ public class RoleListener implements Listener {
     private final RoleManager roleManager;
     private final ClientManager clientManager;
     private final BuildManager buildManager;
-    private final CooldownManager cooldownManager;
+    private final RoleSoundProvider soundProvider;
 
     @Inject
-    public RoleListener(RoleManager roleManager, ClientManager clientManager, BuildManager buildManager, CooldownManager cooldownManager) {
+    public RoleListener(RoleManager roleManager, ClientManager clientManager, BuildManager buildManager, RoleSoundProvider soundProvider) {
         this.roleManager = roleManager;
         this.clientManager = clientManager;
         this.buildManager = buildManager;
-        this.cooldownManager = cooldownManager;
+        this.soundProvider = soundProvider;
     }
 
     @EventHandler
@@ -200,30 +200,9 @@ public class RoleListener implements Listener {
         return new Component[]{};
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void damageSound(CustomDamageEvent event) {
-        if (event.isCancelled()) return;
-        if (!(event.getDamagee() instanceof Player damagee)) return;
-        if (!(event.getDamager() instanceof Player)) return;
-
-        Optional<Role> roleOptional = roleManager.getObject(damagee.getUniqueId().toString());
-        if (roleOptional.isPresent()) {
-            Role role = roleOptional.get();
-                switch (role) {
-                    case KNIGHT ->
-                            damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_BLAZE_HURT, 1.0F, 0.7F);
-                    case ASSASSIN ->
-                            damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1.0F, 2.0F);
-                    case BRUTE ->
-                            damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_BLAZE_HURT, 1.0F, 0.9F);
-                    case RANGER ->
-                            damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.4F);
-                    case MAGE ->
-                            damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.8F);
-                    case WARLOCK ->
-                            damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_BLAZE_HURT, 1.0F, 0.6F);
-                }
-        }
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void damageSound(PreCustomDamageEvent pre) {
+        pre.getCustomDamageEvent().setSoundProvider(soundProvider);
     }
 
     @EventHandler
