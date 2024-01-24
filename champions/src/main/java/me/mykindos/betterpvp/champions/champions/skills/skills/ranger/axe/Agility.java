@@ -23,19 +23,16 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Singleton
 @BPvPListener
 public class Agility extends Skill implements InteractSkill, CooldownSkill, Listener {
 
-    private final Set<UUID> active = new HashSet<>();
+    private final HashMap<UUID, Long> active = new HashMap<>();
 
     private double baseDuration;
 
@@ -100,49 +97,63 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
 
     @EventHandler
     public void endOnInteract(PlayerInteractEvent event) {
-        if (event.getHand() != EquipmentSlot.HAND) return;
-        if (!event.getAction().isRightClick()) return;
-
         Player player = event.getPlayer();
-        if (active.contains(player.getUniqueId())) {
+        if (active.containsKey(player.getUniqueId())) {
             active.remove(player.getUniqueId());
-            player.removePotionEffect(PotionEffectType.SPEED);
+            deactivate(player);
         }
     }
-
 
     @EventHandler
     public void onDamage(CustomDamageEvent event) {
         if (!(event.getDamagee() instanceof Player damagee)) return;
-        if (!(event.getDamager() instanceof Player damager)) return;
-
-        if (active.contains(damagee.getUniqueId())) {
+        if (active.containsKey(damagee.getUniqueId())) {
             int level = getLevel(damagee);
             event.setDamage(event.getDamage() * (1 - getDamageReduction(level)));
             event.setKnockback(false);
-            UtilMessage.message(damager, getClassType().getName(), damagee.getName() + " is using " + getName());
+            if (event.getDamager() instanceof Player damager) {
+                UtilMessage.message(damager, getClassType().getName(), damagee.getName() + " is using " + getName());
+            }
             damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 0.5F, 2.0F);
         }
-
+        if (!(event.getDamager() instanceof Player damager)) return;
         if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
             active.remove(damager.getUniqueId());
+            deactivate(damager);
         }
-
     }
 
-    @UpdateEvent(delay = 500)
+    @UpdateEvent(delay = 250)
     public void onUpdate() {
-        active.removeIf(uuid -> Bukkit.getPlayer(uuid) == null);
+       Iterator<Map.Entry<UUID, Long>> iterator = active.entrySet().iterator();
+       while (iterator.hasNext()) {
+           Map.Entry<UUID, Long> entry = iterator.next();
+           Player player = Bukkit.getPlayer(entry.getKey());
+           if (player == null) {
+              iterator.remove();
+              continue;
+           } else {
+               if (entry.getValue() - System.currentTimeMillis() <= 0) {
+                   deactivate(player);
+                   iterator.remove();
+               }
+           }
+       }
     }
-
 
     @Override
     public void activate(Player player, int level) {
-        if (!active.contains(player.getUniqueId())) {
+        if (!active.containsKey(player.getUniqueId())) {
             player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) (getDuration(level) * 20), speedStrength));
             player.getWorld().playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.5F, 0.5F);
-            active.add(player.getUniqueId());
+            active.put(player.getUniqueId(), (long) (System.currentTimeMillis() + (getDuration(level) * 1000L)));
         }
+    }
+
+    public void deactivate(Player player) {
+        UtilMessage.message(player, "Champions", UtilMessage.deserialize("<green>%s %s</green> has ended.", getName(), getLevel(player)));
+        player.getWorld().playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.5F, 0.25F);
+        player.removePotionEffect(PotionEffectType.SPEED);
     }
 
     @Override

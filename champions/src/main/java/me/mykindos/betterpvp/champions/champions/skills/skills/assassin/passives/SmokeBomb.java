@@ -23,6 +23,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerAttemptPickupItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -170,7 +171,8 @@ public class SmokeBomb extends Skill implements ToggleSkill, CooldownSkill, List
 
     @EventHandler
     public void onDamage(CustomDamageEvent event) {
-        if (event.getDamager() instanceof Player player && smoked.containsKey(player.getUniqueId())) {
+        if (event.getDamager() instanceof Player player && smoked.containsKey(player.getUniqueId())
+                && (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK)) {
             smoked.remove(player.getUniqueId());
             reappear(player);
         }

@@ -439,30 +439,19 @@ public class CombatListener implements Listener {
     }
 
     private void playDamageEffect(CustomDamageEvent event) {
-        event.getDamagee().playHurtAnimation(270);
+        final LivingEntity damagee = event.getDamagee();
+        damagee.playHurtAnimation(270);
         if (event.getProjectile() instanceof Arrow) {
             if (event.getDamager() instanceof Player player) {
-
                 player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.5f, 0.7f);
-                event.getDamager().getWorld().playSound(event.getDamagee().getLocation(), Sound.ENTITY_ARROW_HIT, 0.5f, 1.0f);
-
+                event.getDamager().getWorld().playSound(damagee.getLocation(), Sound.ENTITY_ARROW_HIT, 0.5f, 1.0f);
             }
-        } else {
-
-            event.getDamagee().getWorld().playSound(event.getDamagee().getLocation(),
-                    getDamageSound(event.getDamagee().getType()), 1.0F, 1.0F);
-
-        }
-    }
-
-    public Sound getDamageSound(EntityType entityType) {
-        try {
-            String entName = entityType.name().toUpperCase();
-            return Sound.valueOf("ENTITY_" + entName + "_HURT");
-        } catch (IllegalArgumentException ignore) {
         }
 
-        return Sound.ENTITY_PLAYER_HURT;
+        final net.kyori.adventure.sound.Sound sound = event.getSoundProvider().apply(event);
+        if (sound != null) {
+            damagee.getWorld().playSound(sound, damagee);
+        }
     }
 
     private void updateDurability(CustomDamageEvent event) {

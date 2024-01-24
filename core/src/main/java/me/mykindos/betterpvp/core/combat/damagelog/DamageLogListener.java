@@ -40,8 +40,8 @@ public class DamageLogListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onDeath(PlayerDeathEvent event) {
         final long deathTime = System.currentTimeMillis();
-        final ConcurrentLinkedDeque<DamageLog> log = new ConcurrentLinkedDeque<>(
-                damageLogManager.getObject(event.getPlayer().getUniqueId()).orElseThrow());
+        final ConcurrentLinkedDeque<DamageLog> log = new ConcurrentLinkedDeque<>(damageLogManager.getObject(event.getPlayer().getUniqueId())
+                .orElse(new ConcurrentLinkedDeque<>()));
         final ClickEvent clickEvent = ClickEvent.callback(
                 audience -> damageLogManager.showDeathSummary(deathTime, (Player) audience, log),
                 ClickCallback.Options.builder().uses(1).build()

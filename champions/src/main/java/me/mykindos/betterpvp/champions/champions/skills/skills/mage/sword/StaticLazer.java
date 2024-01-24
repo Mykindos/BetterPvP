@@ -179,8 +179,6 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
     }
 
     private void shoot(Player player, float charge, int level) {
-        UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s<gray>.", getName());
-
         // Cooldown
         championsManager.getCooldowns().removeCooldown(player, getName(), true);
         championsManager.getCooldowns().use(player,
