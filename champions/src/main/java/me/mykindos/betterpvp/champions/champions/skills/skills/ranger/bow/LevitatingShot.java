@@ -87,7 +87,7 @@ public class LevitatingShot extends PrepareArrowSkill {
 
     @Override
     public void displayTrail(Location location) {
-        Particle.REDSTONE.builder().location(location).color(128, 0, 128).count(3).extra(0).receivers(60, true).spawn();
+        location.getWorld().spawnParticle(Particle.SCULK_CHARGE_POP, location, 1, 0.1, 0.1, 0.1, 0);
     }
 
     @Override

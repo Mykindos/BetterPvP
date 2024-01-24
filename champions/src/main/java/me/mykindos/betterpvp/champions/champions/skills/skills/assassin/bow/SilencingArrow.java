@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -78,7 +79,7 @@ public class SilencingArrow extends PrepareArrowSkill {
 
     @Override
     public void displayTrail(Location location) {
-        Particle.REDSTONE.builder().location(location).color(125, 0, 125).count(3).extra(0).receivers(60, true).spawn();
+        location.getWorld().spawnParticle(Particle.SPELL, location, 1, 0.1, 0.1, 0.1, 0);
     }
 
 

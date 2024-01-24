@@ -11,12 +11,15 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+
+import java.util.Random;
 
 @Singleton
 @BPvPListener
@@ -89,7 +92,18 @@ public class ToxicArrow extends PrepareArrowSkill {
 
     @Override
     public void displayTrail(Location location) {
-        Particle.REDSTONE.builder().location(location).color(0, 255, 0).count(3).extra(0).receivers(60, true).spawn();
+        Random random = new Random();
+        double spread = 0.1;
+        double dx = (random.nextDouble() - 0.5) * spread;
+        double dy = (random.nextDouble() - 0.5) * spread;
+        double dz = (random.nextDouble() - 0.5) * spread;
+
+        Location particleLocation = location.clone().add(dx, dy, dz);
+
+        double red = 0.4;
+        double green = 1.0;
+        double blue = 0.4;
+        location.getWorld().spawnParticle(Particle.SPELL_MOB, particleLocation, 0, red, green, blue, 1.0);
     }
 
     public void loadSkillConfig(){

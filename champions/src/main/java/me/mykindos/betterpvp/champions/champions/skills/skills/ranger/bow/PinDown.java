@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Effect;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.Arrow;
@@ -91,7 +92,9 @@ public class PinDown extends Skill implements InteractSkill, CooldownSkill, List
 
     @Override
     public void activate(Player player, int level) {
-        UtilInventory.remove(player, Material.ARROW, 1);
+        if (player.getGameMode() != GameMode.CREATIVE) {
+            UtilInventory.remove(player, Material.ARROW, 1);
+        }
 
         Arrow proj = player.launchProjectile(Arrow.class);
         proj.setShooter(player);
@@ -117,13 +120,8 @@ public class PinDown extends Skill implements InteractSkill, CooldownSkill, List
                 return true;
             }
 
-            Particle.REDSTONE.builder()
-                    .location(arrow.getLocation())
-                    .color(128, 0, 128)
-                    .count(3)
-                    .extra(0)
-                    .receivers(60)
-                    .spawn();
+            arrow.getWorld().spawnParticle(Particle.CRIT, arrow.getLocation(), 1, 0, 0, 0, 0);
+
             return false;
         });
     }

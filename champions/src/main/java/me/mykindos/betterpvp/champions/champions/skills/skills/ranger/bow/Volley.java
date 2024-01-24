@@ -102,7 +102,7 @@ public class Volley extends PrepareArrowSkill {
 
     @Override
     public void displayTrail(Location location) {
-        Particle.REDSTONE.builder().location(location).color(255, 255, 0).count(3).extra(0).receivers(60, true).spawn();
+        location.getWorld().spawnParticle(Particle.CRIT, location, 1, 0, 0, 0, 0);
     }
 
     @EventHandler
