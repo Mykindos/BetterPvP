@@ -44,14 +44,11 @@ public class WorldBlockHandler {
             final long newExpiry = System.currentTimeMillis() + expiry;
             RestoreBlock restoreBlock = restoreBlockOptional.get();
             if (player != null) {
-                restoreBlock.addSummoner(player);
+                restoreBlock.setSummoner(player);
             }
             restoreBlock.setExpire(force ? newExpiry : Math.max(restoreBlock.getExpire(), newExpiry));
         } else {
-            RestoreBlock newRestoreBlock = new RestoreBlock(block, newMaterial, expiry);
-            if (player != null) {
-                newRestoreBlock.addSummoner(player);
-            }
+            RestoreBlock newRestoreBlock = new RestoreBlock(block, newMaterial, expiry, player);
             restoreBlocks.put(block, newRestoreBlock);
         }
     }

@@ -10,10 +10,11 @@ import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
 import me.mykindos.betterpvp.core.combat.data.DamageData;
 import me.mykindos.betterpvp.core.combat.events.*;
-import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.*;
+import me.mykindos.betterpvp.core.world.blocks.RestoreBlock;
+import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -27,8 +28,6 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,7 +35,7 @@ import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
+import java.util.Optional;
 
 import static me.mykindos.betterpvp.core.utilities.UtilMessage.message;
 
@@ -67,13 +66,16 @@ public class CombatListener implements Listener {
     private final ArmourManager armourManager;
     private final DamageLogManager damageLogManager;
 
+    private final WorldBlockHandler worldBlockHandler;
+
     private final List<CustomDamageAdapter> customDamageAdapters;
 
     @Inject
-    public CombatListener(ClientManager clientManager, ArmourManager armourManager, DamageLogManager damageLogManager) {
+    public CombatListener(ClientManager clientManager, ArmourManager armourManager, DamageLogManager damageLogManager, WorldBlockHandler worldBlockHandler) {
         this.clientManager = clientManager;
         this.armourManager = armourManager;
         this.damageLogManager = damageLogManager;
+        this.worldBlockHandler = worldBlockHandler;
         damageDataList = new ArrayList<>();
         customDamageAdapters = new ArrayList<>();
 
@@ -296,10 +298,14 @@ public class CombatListener implements Listener {
         }
 
         LivingEntity damager = getDamagerEntity(event);
+
         if (event.getCause() == DamageCause.SUFFOCATION) {
-            PersistentDataContainer pdc = UtilBlock.getPersistentDataContainer(damagee.getEyeLocation().getBlock());
-            if (pdc.has(CoreNamespaceKeys.BLOCK_SUMMONER_KEY)) {
-                damager = Bukkit.getPlayer(UUID.fromString(pdc.getOrDefault(CoreNamespaceKeys.BLOCK_SUMMONER_KEY, PersistentDataType.STRING, "0")));
+            Optional<RestoreBlock> restoreBlockOptional = worldBlockHandler.getRestoreBlock(damagee.getEyeLocation().getBlock());
+            if (restoreBlockOptional.isPresent()) {
+                Player newDamager = restoreBlockOptional.get().getSummoner();
+                if (newDamager != null) {
+                    damager = newDamager;
+                }
             }
         }
         Projectile proj = getProjectile(event);
