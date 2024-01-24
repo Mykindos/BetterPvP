@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -77,6 +78,7 @@ public class ViperStrikes extends Skill implements PassiveSkill, Listener {
 
         final int ticks = (int) (getDuration(level) * 20);
         damagee.addPotionEffect(PotionEffectType.POISON.createEffect(ticks, 0));
+        damagee.getWorld().playSound(damager.getLocation(), Sound.ENTITY_SPIDER_HURT, 1f, 2f);
         event.addReason(getName());
     }
 
