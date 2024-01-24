@@ -26,16 +26,13 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.UUID;
-import java.util.WeakHashMap;
+import java.util.*;
 
 @Singleton
 @BPvPListener
 public class Agility extends Skill implements InteractSkill, CooldownSkill, Listener {
 
-    private final WeakHashMap<UUID, Long> active = new WeakHashMap<>();
+    private final HashMap<UUID, Long> active = new HashMap<>();
 
     private double baseDuration;
 
@@ -137,8 +134,8 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
               continue;
            } else {
                if (entry.getValue() - System.currentTimeMillis() <= 0) {
-                   iterator.remove();
                    deactivate(player);
+                   iterator.remove();
                }
            }
        }
