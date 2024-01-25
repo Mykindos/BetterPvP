@@ -173,7 +173,7 @@ public class BoulderObject {
             display.setRotation(0f, 0f);
 
             // Shoot them out
-            vehicle.setVelocity(direction.multiply(0.7));
+            UtilVelocity.velocity(vehicle, direction, 0.7, false, 0.0, 0.0, 0.0, true, true);
         }
 
         final int maxDeconstructTicks = 40;
@@ -262,7 +262,7 @@ public class BoulderObject {
                 damaged.add(ent);
                 Vector knockback = ent.getLocation().toVector().subtract(impactLocation.toVector());
                 final double strength = (radius * radius - ent.getLocation().distanceSquared(impactLocation)) / (radius * radius);
-                UtilVelocity.velocity(ent, knockback, strength, false, 0.0, 0.0, 3.0, true);
+                UtilVelocity.velocity(ent, knockback, strength, false, 0.0, 0.0, 3.0, true, true);
                 UtilDamage.doCustomDamage(new CustomDamageEvent(ent, caster, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(), false, skill.getName()));
                 UtilMessage.simpleMessage(ent, skill.getName(), "<alt2>%s</alt2> hit you with <alt>%s</alt>.", caster.getName(), skill.getName());
             }

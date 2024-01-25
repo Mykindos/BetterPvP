@@ -15,6 +15,7 @@ dependencies {
     compileOnly(project(":core"))
     compileOnly(project(":progression"))
     compileOnly(libs.protocollib)
+    compileOnly(libs.modelengine)
 
     annotationProcessor(libs.lombok)
     compileOnly(libs.lombok)

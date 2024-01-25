@@ -1,31 +1,47 @@
 package me.mykindos.betterpvp.core.utilities.model;
 
+import lombok.Getter;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
 import org.bukkit.Location;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
+@Getter
 public class SoundEffect {
 
-    public static final SoundEffect HIGH_PITCH_PLING = new SoundEffect(Sound.BLOCK_NOTE_BLOCK_PLING, 1.6F);
-    public static final SoundEffect LOW_PITCH_PLING = new SoundEffect(Sound.BLOCK_NOTE_BLOCK_PLING, 0.6F);
-    public static final SoundEffect WRONG_ACTION = new SoundEffect(Sound.ENTITY_ITEM_BREAK, 0.6F);
+    public static final SoundEffect HIGH_PITCH_PLING = new SoundEffect(org.bukkit.Sound.BLOCK_NOTE_BLOCK_PLING, 1.6F);
+    public static final SoundEffect LOW_PITCH_PLING = new SoundEffect(org.bukkit.Sound.BLOCK_NOTE_BLOCK_PLING, 0.6F);
+    public static final SoundEffect WRONG_ACTION = new SoundEffect(org.bukkit.Sound.ENTITY_ITEM_BREAK, 0.6F);
 
     private final Sound sound;
-    private final float pitch;
-    private final float volume;
 
-    public SoundEffect(final Sound sound, final float pitch, final float volume) {
-        this.sound = sound;
-        this.pitch = pitch;
-        this.volume = volume;
+    public SoundEffect(final org.bukkit.Sound sound, final float pitch, final float volume) {
+        this(Sound.sound(sound.key(), Sound.Source.MASTER, volume, pitch));
     }
 
-    public SoundEffect(final Sound sound, final float pitch) {
+    public SoundEffect(final org.bukkit.Sound sound, final float pitch) {
         this(sound, pitch, 1F);
     }
 
-    public SoundEffect(final Sound sound) {
+    public SoundEffect(final org.bukkit.Sound sound) {
         this(sound, 1F, 1F);
+    }
+
+    public SoundEffect(final String namespace, final String key, final float pitch, final float volume) {
+        //noinspection PatternValidation
+        this.sound = Sound.sound(Key.key(namespace, key), net.kyori.adventure.sound.Sound.Source.MASTER, volume, pitch);
+    }
+
+    public SoundEffect(final String namespace, final String key, final float pitch) {
+        this(namespace, key, pitch, 1F);
+    }
+
+    public SoundEffect(final String namespace, final String key) {
+        this(namespace, key, 1F, 1F);
+    }
+
+    public SoundEffect(final Sound sound) {
+        this.sound = sound;
     }
 
     /**
@@ -34,7 +50,7 @@ public class SoundEffect {
      * @param location The location to play the sound effect at
      */
     public void play(final Location location) {
-        location.getWorld().playSound(location, this.sound, this.volume, this.pitch);
+        location.getWorld().playSound(location, this.sound.name().asString(), this.sound.volume(), this.sound.pitch());
     }
 
     /**
@@ -43,7 +59,7 @@ public class SoundEffect {
      * @param player The player to play the sound effect to
      */
     public void play(final Player player) {
-        player.playSound(player.getLocation(), this.sound, this.volume, this.pitch);
+        player.playSound(this.sound);
     }
 
     /**
@@ -53,7 +69,7 @@ public class SoundEffect {
      * @param location The location to play the sound effect at
      */
     public void play(final Player player, final Location location) {
-        player.playSound(location, this.sound, this.volume, this.pitch);
+        player.playSound(location, this.sound.name().asString(), this.sound.volume(), this.sound.pitch());
     }
 
 }
