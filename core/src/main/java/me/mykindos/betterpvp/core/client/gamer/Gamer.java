@@ -83,8 +83,7 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
             final ItemStack main = player.getInventory().getItemInMainHand();
             final ItemStack off = player.getInventory().getItemInOffHand();
             if (UtilItem.isCosmeticShield(main) || UtilItem.isCosmeticShield(off)) {
-                final int delay = player.getShieldBlockingDelay() * 50; // millis
-                return timeSinceLastBlock() < delay;
+                return timeSinceLastBlock() <= 250;
             }
 
             return player.isBlocking() || player.isHandRaised();

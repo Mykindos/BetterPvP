@@ -84,7 +84,7 @@ public class Cyclone extends Skill implements InteractSkill, CooldownSkill {
 
                     Vector velocity = UtilVelocity.getTrajectory(target, player);
                     // LogManager.addLog(target, player, "Cyclone", 0);
-                    UtilVelocity.velocity(target, velocity, 1.2D, false, 0.0D, 0.5D, 4.0D, true);
+                    UtilVelocity.velocity(target, velocity, 1.2D, false, 0.0D, 0.5D, 4.0D, true, true);
                 }
 
             }
