@@ -6,7 +6,6 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
 import me.mykindos.betterpvp.champions.champions.skills.SkillManager;
 import me.mykindos.betterpvp.champions.listeners.ChampionsListenerLoader;
-import me.mykindos.betterpvp.champions.weapons.WeaponManager;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.Command;
@@ -64,9 +63,6 @@ public class ChampionsCommand extends Command implements IConsoleCommand {
 
         @Inject
         private ItemHandler itemHandler;
-
-        @Inject
-        private WeaponManager weaponManager;
 
         @Inject
         private BuildManager buildManager;

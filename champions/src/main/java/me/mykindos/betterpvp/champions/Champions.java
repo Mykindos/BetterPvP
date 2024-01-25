@@ -10,13 +10,15 @@ import me.mykindos.betterpvp.champions.champions.skills.injector.SkillInjectorMo
 import me.mykindos.betterpvp.champions.commands.ChampionsCommandLoader;
 import me.mykindos.betterpvp.champions.injector.ChampionsInjectorModule;
 import me.mykindos.betterpvp.champions.listeners.ChampionsListenerLoader;
-import me.mykindos.betterpvp.champions.weapons.WeaponManager;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.config.ConfigInjectorModule;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.ModuleLoadedEvent;
+import me.mykindos.betterpvp.core.framework.adapter.Adapters;
+import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
+import me.mykindos.betterpvp.core.framework.adapter.PluginAdapters;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.recipes.RecipeHandler;
@@ -75,13 +77,15 @@ public class Champions extends BPvPPlugin {
             var itemHandler = injector.getInstance(ItemHandler.class);
             itemHandler.loadItemData("champions");
 
-            var weaponManager = injector.getInstance(WeaponManager.class);
-            weaponManager.load();
-
             var recipeHandler = injector.getInstance(RecipeHandler.class);
             recipeHandler.loadConfig(this.getConfig(), "champions");
 
             updateEventExecutor.loadPlugin(this);
+
+            final Adapters adapters = new Adapters(this);
+            final Reflections reflectionAdapters = new Reflections(PACKAGE);
+            adapters.loadAdapters(reflectionAdapters.getTypesAnnotatedWith(PluginAdapter.class));
+            adapters.loadAdapters(reflectionAdapters.getTypesAnnotatedWith(PluginAdapters.class));
         }
     }
 

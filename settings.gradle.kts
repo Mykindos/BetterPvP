@@ -86,6 +86,7 @@ dependencyResolutionManagement {
             // Library - Mythic
             library("mythic", "io.lumine", "Mythic-Dist").version("5.3.5")
             library("mythicdungeons", "net.playavalon", "MythicDungeons").version("1.3.0-SNAPSHOT")
+            library("modelengine", "com.ticxo.modelengine", "ModelEngine").version("R4.0.4")
 
             // Library - Protocol
             library("protocollib", "com.comphenix.protocol", "ProtocolLib").version("5.1.0")

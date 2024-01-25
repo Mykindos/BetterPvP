@@ -241,7 +241,7 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
         // Velocity
         final Vector direction = player.getLocation().toVector().subtract(target.getLocation().toVector()).normalize();
         final double strength = hookData.getThrowable().getItem().getVelocity().length();
-        UtilVelocity.velocity(target, direction, strength, false, 0, 0.7, 1.2, true);
+        UtilVelocity.velocity(target, direction, strength, false, 0, 0.7, 1.2, true, true);
         target.setFallDistance(0); // Reset their fall distance
 
         // Damage

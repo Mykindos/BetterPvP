@@ -18,6 +18,22 @@ public class UtilMath {
 
     public static Random random = new Random(System.nanoTime());
 
+    /**
+     * Rotates a vector towards a target vector by a specified delta.
+     *
+     * @param current The current vector.
+     * @param target The target vector.
+     * @param delta The delta by which to rotate the current vector towards the target. (0.0 - 1.0)
+     * @return The rotated vector.
+     */
+    public static Vector rotateTo(final Vector current, final Vector target, final float delta) {
+        return new Vector(
+                (1.0 - delta) * current.getX() + delta * target.getX(),
+                (1.0 - delta) * current.getY() + delta * target.getY(),
+                (1.0 - delta) * current.getZ() + delta * target.getZ()
+        );
+    }
+
     public static Transformation rotateAround(Transformation transformation, Quaternionf left, Quaternionf right, Vector3f relativePivot) {
         // Apply rotations
         Quaternionf rotation = new Quaternionf();

@@ -19,6 +19,7 @@ import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.ModuleLoadedEvent;
 import me.mykindos.betterpvp.core.framework.adapter.Adapters;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
+import me.mykindos.betterpvp.core.framework.adapter.PluginAdapters;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import org.bukkit.Bukkit;
@@ -83,7 +84,10 @@ public class Clans extends BPvPPlugin {
 
             updateEventExecutor.loadPlugin(this);
 
-            new Adapters(this).loadAdapters(new Reflections(PACKAGE).getTypesAnnotatedWith(PluginAdapter.class));
+            final Adapters adapters = new Adapters(this);
+            final Reflections reflectionAdapters = new Reflections(PACKAGE);
+            adapters.loadAdapters(reflectionAdapters.getTypesAnnotatedWith(PluginAdapter.class));
+            adapters.loadAdapters(reflectionAdapters.getTypesAnnotatedWith(PluginAdapters.class));
         }
     }
 
