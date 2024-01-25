@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
+import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.energy.EnergyHandler;
@@ -32,6 +33,8 @@ import org.bukkit.block.Block;
 import org.bukkit.block.Container;
 import org.bukkit.block.data.type.Gate;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.FishHook;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemFrame;
@@ -45,6 +48,7 @@ import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
@@ -62,6 +66,10 @@ import java.util.UUID;
 @Slf4j
 @BPvPListener
 public class ClansWorldListener extends ClanListener {
+
+    @Inject
+    @Config(path = "clans.claims.allow-gravity-blocks", defaultValue = "true")
+    private boolean allowGravityBlocks;
 
     private final Clans clans;
     private final EffectManager effectManager;
@@ -211,7 +219,7 @@ public class ClansWorldListener extends ClanListener {
 
             ClanRelation relation = clanManager.getRelation(clan, locationClan);
 
-            if (block.getType().hasGravity()) {
+            if (block.getType().hasGravity() && !allowGravityBlocks) {
                 final TerritoryInteractEvent tie = new TerritoryInteractEvent(player, locationClan, block, Event.Result.DENY, TerritoryInteractEvent.InteractionType.PLACE);
                 tie.callEvent();
                 if (tie.getResult() != Event.Result.DENY) {
@@ -741,6 +749,16 @@ public class ClansWorldListener extends ClanListener {
 
         if (event.getHitEntity() instanceof Item) {
             event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onFallingBlockSpawn(EntityChangeBlockEvent event) {
+        if (event.getEntityType() == EntityType.FALLING_BLOCK) {
+            Optional<Clan> clanOptional = clanManager.getClanByLocation(event.getBlock().getLocation());
+            if (clanOptional.isPresent()) {
+                event.setCancelled(true);
+            }
         }
     }
 }
