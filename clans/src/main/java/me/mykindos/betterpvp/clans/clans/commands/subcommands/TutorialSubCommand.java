@@ -28,14 +28,35 @@ public class TutorialSubCommand extends ClanSubCommand {
     List<Component> tutorialText = new ArrayList<>(List.of(
             UtilMessage.deserialize("Welcome to Clans! Clans is a long term factions like gamemode, with special weapons, kits, and bosses."),
             UtilMessage.deserialize("Clans can be a difficult game, it is possible to lose everything and start from scratch. This is not common, but can happen. Seasons periodically reset, and everyone starts from scratch."),
-            UtilMessage.deserialize("Enjoy the game how you want to play it, there is no right way to play Clans. If you like building, combat, farming, bosses, and more, there is something for you. Play with up to 7 friends and see where your journey takes you."),
-            UtilMessage.deserialize("The core of Clans is the <yellow>Clan</yellow>. You can make one by running")
+            UtilMessage.deserialize("Enjoy the game how you want to play it, there is no right way to play Clans. If you like building, combat, farming, bosses, and more, there is something for you. Play with up to <green>7</green> friends and see where your journey takes you."),
+            UtilMessage.deserialize("The core of Clans is the <gold>Clan</gold>. You can make one by running ")
                     .append(UtilMessage.deserialize("<yellow>/c create <name></yellow>").clickEvent(ClickEvent.suggestCommand("/c create ")))
-                    .append(UtilMessage.deserialize(", invite friends by running")), //and then join
+                    .append(UtilMessage.deserialize(", invite friends by running "))
+                    .append(UtilMessage.deserialize("<yellow>/c invite <player></yellow>").clickEvent(ClickEvent.suggestCommand("/c invite ")))
+                    .append(UtilMessage.deserialize(", and join a <yellow>Clan</yellow> you are invited to by running "))
+                    .append(UtilMessage.deserialize("<yellow>/c join <clan>").clickEvent(ClickEvent.suggestCommand("/c join "))),
+            UtilMessage.deserialize("<gold>Clans</gold> can claim territory by running ")
+                    .append(UtilMessage.deserialize("<yellow>/c claim</yellow>").clickEvent(ClickEvent.runCommand("/c help claim")))
+                    .append(UtilMessage.deserialize(", which you can use to store items. <red>Enemy</red> <gold>Clans</gold> can use cannons to besiege you, after reaching <green>100</green> <red>dominance</red> on you.")).appendNewline()
+                    .append(UtilMessage.deserialize(" <i>Related commands:</i> "))
+                    .append(UtilMessage.deserialize("<yellow>/c unclaim</yellow> ").clickEvent(ClickEvent.runCommand("/c help unclaim")))
+                    .append(UtilMessage.deserialize("<yellow>/c enemy <clan></yellow> ").clickEvent(ClickEvent.runCommand("/c help enemy")))
+                    .append(UtilMessage.deserialize("<yellow>/c neutral <clan></yellow> ").clickEvent(ClickEvent.runCommand("/c help neutral"))),
+            UtilMessage.deserialize("In your territory, you can set a location by running ")
+                    .append(UtilMessage.deserialize("<yellow>/c sethome</yellow> ").clickEvent(ClickEvent.runCommand("/c help sethome")))
+                    .append(UtilMessage.deserialize("that you can teleport back to by running "))
+                    .append(UtilMessage.deserialize("<yellow>/c home</yellow>").clickEvent(ClickEvent.runCommand("/c help home")))
+                    .append(UtilMessage.deserialize(". You can <green><bold>ally</bold></green> with other <gold>Clans</gold> by running "))
+                    .append(UtilMessage.deserialize("<yellow>/c ally <clan></yellow>").clickEvent(ClickEvent.suggestCommand("/c ally ")))
+                    .append(UtilMessage.deserialize(" and optionally trust them by running "))
+                    .append(UtilMessage.deserialize("<yellow>/c trust <clan></yellow> ").clickEvent(ClickEvent.runCommand("/c help trust"))),
+            UtilMessage.deserialize("You may only have up to <green>8</green> players between <green><bold>Allied</bold></green> and <aqua><bold>Own</bold></aqua> <gold>Clans</gold>. See ")
+                    .append(UtilMessage.deserialize("<yellow>/c help</yellow>").clickEvent(ClickEvent.runCommand("/c help")))
+                    .append(UtilMessage.deserialize(" for more information on Clan commands.")),
             UtilMessage.deserialize("")
-            //Clans
-            //Claiming
-            //Sieges
+            //Kits
+            //Progression
+            //
     ));
 
     @Inject
@@ -60,7 +81,7 @@ public class TutorialSubCommand extends ClanSubCommand {
         UtilServer.runTaskAsync(clans, () -> {
             Iterator<Component> iterator = tutorialText.iterator();
             if (iterator.hasNext()) {
-                runTutorial(player, iterator, 1 * 20);
+                runTutorial(player, iterator, 2 * 20);
             }
         });
     }
@@ -69,7 +90,7 @@ public class TutorialSubCommand extends ClanSubCommand {
         UtilMessage.message(player, "Tutorial", iterator.next());
         UtilServer.runTaskLater(clans, true, () -> {
             if (iterator.hasNext()) {
-                runTutorial(player, iterator, 1 * 20);
+                runTutorial(player, iterator, 2 * 20);
             }
         }, delay);
     }
