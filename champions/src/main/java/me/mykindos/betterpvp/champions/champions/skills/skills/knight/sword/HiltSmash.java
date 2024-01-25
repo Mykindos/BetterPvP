@@ -33,7 +33,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class  HiltSmash extends Skill implements CooldownSkill, Listener {
+public class HiltSmash extends Skill implements CooldownSkill, Listener {
 
     private WeakHashMap<Player, Boolean> rightClicked = new WeakHashMap<>();
 
