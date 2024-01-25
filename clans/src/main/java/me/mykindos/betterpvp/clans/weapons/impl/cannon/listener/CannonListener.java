@@ -140,6 +140,9 @@ public class CannonListener implements Listener {
                 event.addReason("Cannonball");
             }
         }
+
+        // Set sound provider to the cannon if the damagee is a cannon
+        this.cannonManager.of(event.getDamagee()).ifPresent(event::setSoundProvider);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

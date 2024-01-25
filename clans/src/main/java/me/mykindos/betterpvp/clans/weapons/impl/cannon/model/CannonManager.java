@@ -124,7 +124,6 @@ public class CannonManager extends Manager<Cannon> {
         golem.setAware(false);
         golem.setVisualFire(false);
         golem.setCollidable(false);
-        golem.setSilent(true);
     }
 
     public boolean isCannonPart(@NotNull Entity entity) {

@@ -42,4 +42,11 @@ public interface SoundProvider extends Function<@NotNull CustomDamageEvent, @Nul
         return source;
     }
 
+    /**
+     * @return Whether this sound provider should be emitted from the entity
+     */
+    default boolean fromEntity() {
+        return true;
+    }
+
 }
