@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
+import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
@@ -53,7 +54,22 @@ public class TutorialSubCommand extends ClanSubCommand {
             UtilMessage.deserialize("You may only have up to <green>8</green> players between <green><bold>Allied</bold></green> and <aqua><bold>Own</bold></aqua> <gold>Clans</gold>. See ")
                     .append(UtilMessage.deserialize("<yellow>/c help</yellow>").clickEvent(ClickEvent.runCommand("/c help")))
                     .append(UtilMessage.deserialize(" for more information on Clan commands.")),
-            UtilMessage.deserialize("")
+            UtilMessage.deserialize("There are currently <green>6</green> <gold>Champions</gold> classes, one for each armor set. Each has its strengths and weaknesses. There are many different skills to choose between, pick and choose the ones that fit your playstyle most"),
+            Component.text(Role.ASSASSIN.getName(), Role.ASSASSIN.getColor()).appendNewline()
+                    .append(UtilMessage.deserialize("Assassin is a quick and agile class. With relatively low health and strong counters, this is not an easy class to be caught out in. Primarily suited for attacking distracted or otherwise occupied enemies, it will struggle against enemies that are prepared.")),
+            Component.text(Role.KNIGHT.getName(), Role.KNIGHT.getColor()).appendNewline()
+                    .append(UtilMessage.deserialize("Knight is a strong, aggressive class. It has thrives being on the attack, having options to increase damage, while also having a few that can keep them alive long enough to kill their opponent.")),
+            Component.text(Role.BRUTE.getName(), Role.BRUTE.getColor()).appendNewline()
+                    .append(UtilMessage.deserialize("Brute is a powerhouse that is rarely moved by others. It has good crowd control and defensive abilities.")),
+            Component.text(Role.RANGER.getName(), Role.RANGER.getColor()).appendNewline()
+                    .append(UtilMessage.deserialize("Ranger is a ranged class skilled in the use of the bow. There are different options, rewarding precision, patience, or long distance accuracy.")),
+            Component.text(Role.MAGE.getName(), Role.MAGE.getColor()).appendNewline()
+                    .append(UtilMessage.deserialize("Mage is a class skilled with different elements. Choose between life, ice, fire, and earth to support your teammates, trap the enemy, and kill them.")),
+            Component.text(Role.WARLOCK.getName(), Role.WARLOCK.getColor()).appendNewline()
+                    .append(UtilMessage.deserialize("Warlock is a class focused on health. Some abilities require the sacrifice in health, others punish enemies for proximity and low health.")),
+            UtilMessage.deserialize("There is more than just combat, you could also level up other areas. Level up your Progression in <blue>Fishing</blue>, <silver>Mining</silver>, and <brown>Woodcutting</brown>")
+
+
             //Kits
             //Progression
             //
@@ -81,7 +97,7 @@ public class TutorialSubCommand extends ClanSubCommand {
         UtilServer.runTaskAsync(clans, () -> {
             Iterator<Component> iterator = tutorialText.iterator();
             if (iterator.hasNext()) {
-                runTutorial(player, iterator, 2 * 20);
+                runTutorial(player, iterator, 3 * 20);
             }
         });
     }
@@ -90,7 +106,7 @@ public class TutorialSubCommand extends ClanSubCommand {
         UtilMessage.message(player, "Tutorial", iterator.next());
         UtilServer.runTaskLater(clans, true, () -> {
             if (iterator.hasNext()) {
-                runTutorial(player, iterator, 2 * 20);
+                runTutorial(player, iterator, 3 * 20);
             }
         }, delay);
     }
