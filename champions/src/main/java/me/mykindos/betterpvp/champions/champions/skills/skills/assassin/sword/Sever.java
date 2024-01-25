@@ -3,35 +3,42 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.sword;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.roles.events.RoleChangeEvent;
+import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEvent;
+import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilDamage;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
+import me.mykindos.betterpvp.core.utilities.*;
+import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
+import org.bukkit.Bukkit;
+import org.bukkit.Sound;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class Sever extends PrepareSkill implements CooldownSkill, Listener {
-
-    private double damagePerSecond;
-
+public class Sever extends Skill implements CooldownSkill, Listener {
     private double baseDuration;
-
     private double durationIncreasePerLevel;
+
+    private WeakHashMap<Player, Boolean> rightClicked = new WeakHashMap<>();
 
     @Inject
     public Sever(Champions champions, ChampionsManager championsManager) {
@@ -47,9 +54,9 @@ public class Sever extends PrepareSkill implements CooldownSkill, Listener {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Right click with a Sword to prepare",
+                "Right click with a Sword to activate",
                 "",
-                "Your next hit applies a <val>" + getDuration(level) + "</val> second <effect>Bleed</effect>",
+                "Inflict a <val>" + getDuration(level) + "</val> second <effect>Bleed</effect>",
                 "dealing <stat>1</stat> heart per second",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
@@ -71,59 +78,58 @@ public class Sever extends PrepareSkill implements CooldownSkill, Listener {
     }
 
     @EventHandler
-    public void onChange(RoleChangeEvent event) {
-        active.remove(event.getPlayer().getUniqueId());
+    public void onEntityInteract(PlayerInteractEntityEvent event) {
+        if (event.getHand() == EquipmentSlot.OFF_HAND) return;
+        rightClicked.put(event.getPlayer(), true);
+        if (event.getRightClicked() instanceof LivingEntity entity ) {
+            onInteract(event.getPlayer(), entity);
+        } else {
+            onInteract(event.getPlayer(), null);
+        }
+        event.setCancelled(true);
     }
 
     @EventHandler
-    public void onDamage(CustomDamageEvent event) {
+    public void onInteract(PlayerInteractEvent event) {
+        if (event.getHand() == EquipmentSlot.OFF_HAND || !event.getAction().isRightClick()) return;
+        if (!rightClicked.getOrDefault(event.getPlayer(), false)) { // This means onInteract wasn't called through onEntityInteract
+            onInteract(event.getPlayer(), null);
+        }
+        rightClicked.remove(event.getPlayer()); // Reset the flag for next interactions
+    }
 
-        if (!(event.getDamager() instanceof Player player)) return;
-        if (!(event.getDamagee() instanceof Player damagee)) return;
-        if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
-        if (!active.contains(player.getUniqueId())) return;
+    private void onInteract(Player player, LivingEntity ent) {
         if (!isHolding(player)) return;
 
-        // TODO
-        //Weapon w = WeaponManager.getWeapon(player.getInventory().getItemInMainHand());
-        //if (w != null && w instanceof ILegendary) return;
-
         int level = getLevel(player);
-        runSever(player, damagee, level);
-        UtilMessage.simpleMessage(player, getClassType().getName(), "You severed <alt>" + damagee.getName() + "</alt>.");
-        UtilMessage.simpleMessage(damagee, getClassType().getName(), "You have been severed by <alt>" + player.getName() + "</alt>.");
-        active.remove(player.getUniqueId());
+        if (level <= 0) {
+            return; // Skill not active
+        }
 
-        championsManager.getCooldowns().removeCooldown(player, getName(), true);
-        championsManager.getCooldowns().use(player, getName(), getCooldown(level), showCooldownFinished());
-    }
+        final PlayerUseSkillEvent event = UtilServer.callEvent(new PlayerUseSkillEvent(player, this, level));
+        if (event.isCancelled()) {
+            return; // Skill was cancelled
+        }
 
-    private void runSever(Player damager, Player damagee, int level) {
-        new BukkitRunnable() {
-            int count = 0;
-
-            @Override
-            public void run() {
-                if (count >= getDuration(level) || damagee == null || damager == null || damagee.getHealth() <= 0) {
-                    this.cancel();
-                } else {
-                    if (championsManager.getCooldowns().use(damagee, "Sever-Damage", 0.75, false)) {
-                        var cde = new CustomDamageEvent(damagee, damager, null,
-                                DamageCause.CUSTOM, damagePerSecond, false, getName());
-                        cde.setIgnoreArmour(true);
-                        UtilDamage.doCustomDamage(cde);
-                    }
-                    count++;
+        if (ent != null && UtilMath.offset(player, ent) <= 3.0) {
+            Player damagee = (ent instanceof Player) ? (Player) ent : null;
+            if (!(damagee != null && UtilPlayer.getRelation(player, damagee) == EntityProperty.FRIENDLY)) {
+                // Apply the effect and messages
+                championsManager.getEffects().addEffect(ent, EffectType.BLEED, (long) getDuration(level) * 1000L);
+                ent.getWorld().playSound(ent.getLocation(), Sound.ENTITY_SPIDER_HURT, 1.0F, 1.5F);
+                if (damagee != null) {
+                    UtilMessage.simpleMessage(player, getClassType().getName(), "You severed <alt>" + damagee.getName() + "</alt>.");
+                    UtilMessage.simpleMessage(damagee, getClassType().getName(), "You have been severed by <alt>" + player.getName() + "</alt>.");
                 }
+            } else {
+                UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s", getName());
+                player.getWorld().playSound(player.getLocation(), Sound.ENTITY_IRON_GOLEM_ATTACK, 2.0f, 1.3f);
             }
-        }.runTaskTimer(champions, 20, 20);
-    }
-
-    @Override
-    public void loadSkillConfig() {
-        damagePerSecond = getConfig("damagePerSecond", 2.0, Double.class);
-        baseDuration = getConfig("baseDuration", 0.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
+        } else {
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s", getName());
+            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_IRON_GOLEM_ATTACK, 2.0f, 1.3f);
+        }
+        player.swingMainHand();
     }
 
 
@@ -133,12 +139,8 @@ public class Sever extends PrepareSkill implements CooldownSkill, Listener {
     }
 
     @Override
-    public void activate(Player player, int level) {
-        active.add(player.getUniqueId());
-    }
-
-    @Override
-    public Action[] getActions() {
-        return SkillActions.RIGHT_CLICK;
+    public void loadSkillConfig() {
+        baseDuration = getConfig("baseDuration", 1.0, Double.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
     }
 }
