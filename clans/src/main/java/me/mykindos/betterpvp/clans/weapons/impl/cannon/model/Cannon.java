@@ -5,10 +5,13 @@ import com.ticxo.modelengine.api.model.ModeledEntity;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
+import me.mykindos.betterpvp.core.combat.data.SoundProvider;
+import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
 import me.mykindos.betterpvp.core.utilities.model.ProgressColor;
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -21,12 +24,13 @@ import org.bukkit.entity.TextDisplay;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.UUID;
 
 @Getter
-public final class Cannon {
+public final class Cannon implements SoundProvider {
 
     public static final long COOLDOWN_LERP_OUT = 5_000L;
 
@@ -58,6 +62,16 @@ public final class Cannon {
         this.healthBar = healthBar;
         this.loaded = loaded;
         updateHealthBar();
+    }
+
+    @Override
+    public @Nullable Sound apply(@NotNull CustomDamageEvent event) {
+        return SoundProvider.DEFAULT.apply(event);
+    }
+
+    @Override
+    public boolean fromEntity() {
+        return false;
     }
 
     public @NotNull Location getLocation() {
