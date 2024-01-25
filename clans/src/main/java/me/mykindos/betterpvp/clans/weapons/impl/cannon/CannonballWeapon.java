@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.combat.weapon.Weapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.InteractWeapon;
 import me.mykindos.betterpvp.core.framework.adapter.Compatibility;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
+import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import org.bukkit.entity.Entity;
@@ -59,15 +60,7 @@ public class CannonballWeapon extends Weapon implements InteractWeapon {
         final CannonReloadEvent cannonReloadEvent = new CannonReloadEvent(cannon, player);
         cannonReloadEvent.callEvent();
         if (!cannonReloadEvent.isCancelled()) {
-            final ItemStack main = player.getInventory().getItemInMainHand();
-            final ItemStack off = player.getInventory().getItemInOffHand();
-            if (matches(main)) {
-                main.subtract();
-                player.getInventory().setItemInMainHand(main);
-            } else if (matches(off)) {
-                off.subtract();
-                player.getInventory().setItemInOffHand(off);
-            }
+            UtilInventory.remove(player, getMaterial(), 1);
         }
     }
 
