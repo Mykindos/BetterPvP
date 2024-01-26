@@ -23,6 +23,7 @@ import me.mykindos.betterpvp.core.utilities.*;
 import me.mykindos.betterpvp.core.utilities.model.display.DisplayComponent;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
@@ -70,7 +71,9 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
                 "Charges up to <val>" + getNumFlames(level) + "</val> flames",
                 "",
                 "Fire a scorching blast of fire that ignites ",
-                "anything it hits for <stat>" + getFireDuration(level) + "</stat> seconds"
+                "anything it hits for <stat>" + getFireDuration(level) + "</stat> seconds",
+                "",
+                "Cooldown: <val>" + getCooldown(level)
         };
     }
 
@@ -92,7 +95,7 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
 
     @Override
     public double getCooldown(int level) {
-        return cooldown - (level - 1d) * cooldownDecreasePerLevel;
+        return cooldown - (level - 1) * cooldownDecreasePerLevel;
     }
 
     @Override
@@ -173,22 +176,18 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
         UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s<gray>.", getName());
 
         float chargePercent = Math.min(chargeData.getCharge(), 1.0f);
-        System.out.println("chargePercent: "+ chargePercent);
         int numFlames = 1 + (int) (chargePercent * (getNumFlames(level) - 1));
-        System.out.println("numFlames: " +numFlames);
 
         Location headLocation = player.getEyeLocation();
         Vector direction = headLocation.getDirection();
 
         for (int i = 0; i < numFlames; i++) {
-            ItemStack blazePowder = new ItemStack(Material.BLAZE_POWDER);
-            ItemMeta meta = blazePowder.getItemMeta();
-            meta.setDisplayName("Inferno");
-            blazePowder.setItemMeta(meta);
+            Item fire = player.getWorld().dropItem(player.getEyeLocation(), new ItemStack(Material.BLAZE_POWDER));
+            championsManager.getThrowables().addThrowable(fire, player, getName(), 2000L);
 
-            Item flame = player.getWorld().dropItem(headLocation, blazePowder);
-            flame.setPickupDelay(Integer.MAX_VALUE);
-            flame.setVelocity(direction.clone().add(new Vector(Math.random() - 0.8, Math.random() - 0.8, Math.random() - 0.8).normalize().multiply(1))); // Increased velocity
+            fire.teleport(player.getEyeLocation());
+            fire.setVelocity(player.getLocation().getDirection().add(new Vector(UtilMath.randDouble(-0.2, 0.2), UtilMath.randDouble(-0.2, 0.3), UtilMath.randDouble(-0.2, 0.2))));
+            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_GHAST_SHOOT, 0.1F, 1.0F);
         }
 
         championsManager.getCooldowns().removeCooldown(player, getName(), true);
@@ -201,27 +200,16 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
                 this::shouldDisplayActionBar);
     }
 
-    @EventHandler
-    public void onItemTouchGround(EntityChangeBlockEvent event) {
-        Entity entity = event.getEntity();
-        if (entity instanceof Item) {
-            Item item = (Item) entity;
-            ItemStack stack = item.getItemStack();
-            if (stack.hasItemMeta() && "Inferno Flame".equals(stack.getItemMeta().getDisplayName())) {
-                item.remove();
-            }
-        }
-    }
-
     @Override
     public void loadSkillConfig(){
         baseFireDuration = getConfig("baseFireDuration", 2.5, Double.class);
         fireDurationIncreasePerLevel = getConfig("fireDurationIncreasePerLevel", 0.0, Double.class);
         baseDamage = getConfig("baseDamage", 1.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
+        cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 1.0, Double.class);
 
         chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 0.0, Double.class);
-        baseCharge = getConfig("baseCharge", 80.0, Double.class);
+        baseCharge = getConfig("baseCharge", 100.0, Double.class);
         baseNumFlames = getConfig("baseNumFlames", 6, Integer.class);
         numFlamesIncreasePerLevel = getConfig("numFlamesIncreasePerLevel", 2, Integer.class);
     }
