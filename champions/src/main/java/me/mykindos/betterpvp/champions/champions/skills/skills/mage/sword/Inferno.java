@@ -160,6 +160,7 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
 
                 CustomDamageEvent cde = new CustomDamageEvent(e.getCollision(), damager, null, DamageCause.FIRE, getDamage(level), false, "Inferno");
                 System.out.println("damage per fire: "+getDamage(level));
+                cde.setDamageDelay(0);
                 UtilDamage.doCustomDamage(cde);
             }
         }
