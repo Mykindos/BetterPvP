@@ -1,0 +1,13 @@
+cannon:
+  health: 20.0
+  spawn-cooldown: 30.0
+  shoot-cooldown: 5.0
+  fuse-seconds: 2.5
+  cannonball-damage: 15.0
+  cannonball-alive-seconds: 2.0
+  cannonball-velocity-strength: 1.3
+  block-collision-explode: true
+  entity-collision-explode: true
+handheld:
+  shoot-cooldown: 25.0
+  shoot-velocity: 2.5

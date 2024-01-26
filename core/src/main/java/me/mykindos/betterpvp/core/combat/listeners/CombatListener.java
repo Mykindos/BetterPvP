@@ -9,7 +9,12 @@ import me.mykindos.betterpvp.core.combat.armour.ArmourManager;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
 import me.mykindos.betterpvp.core.combat.data.DamageData;
-import me.mykindos.betterpvp.core.combat.events.*;
+import me.mykindos.betterpvp.core.combat.data.SoundProvider;
+import me.mykindos.betterpvp.core.combat.events.CustomDamageDurabilityEvent;
+import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.CustomDamageReductionEvent;
+import me.mykindos.betterpvp.core.combat.events.CustomKnockbackEvent;
+import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.*;
@@ -18,7 +23,15 @@ import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.entity.*;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EvokerFangs;
+import org.bukkit.entity.FishHook;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -297,7 +310,7 @@ public class CombatListener implements Listener {
         }
 
         LivingEntity damager = getDamagerEntity(event);
-
+        Entity damaging = getDamagingEntity(event);
         if (event.getCause() == DamageCause.SUFFOCATION) {
             Optional<RestoreBlock> restoreBlockOptional = worldBlockHandler.getRestoreBlock(damagee.getEyeLocation().getBlock());
             if (restoreBlockOptional.isPresent()) {
@@ -307,9 +320,9 @@ public class CombatListener implements Listener {
                 }
             }
         }
-        Projectile proj = getProjectile(event);
 
-        CustomDamageEvent cde = new CustomDamageEvent(damagee, damager, proj, event.getCause(), event.getDamage(), true);
+
+        CustomDamageEvent cde = new CustomDamageEvent(damagee, damager, damaging, event.getCause(), event.getDamage(), true);
         UtilDamage.doCustomDamage(cde);
 
         event.setCancelled(true);
@@ -401,15 +414,12 @@ public class CombatListener implements Listener {
         });
     }
 
-    private Projectile getProjectile(EntityDamageEvent event) {
+    private Entity getDamagingEntity(EntityDamageEvent event) {
         if (!(event instanceof EntityDamageByEntityEvent ev)) {
             return null;
         }
 
-        if ((ev.getDamager() instanceof Projectile)) {
-            return (Projectile) ev.getDamager();
-        }
-        return null;
+        return ev.getDamager();
     }
 
     public static LivingEntity getDamagerEntity(EntityDamageEvent event) {
@@ -420,6 +430,10 @@ public class CombatListener implements Listener {
 
         if ((ev.getDamager() instanceof LivingEntity)) {
             return (LivingEntity) ev.getDamager();
+        }
+
+        if (ev.getDamager() instanceof TNTPrimed tnt && tnt.getSource() instanceof LivingEntity ent) {
+            return ent;
         }
 
         if (!(ev.getDamager() instanceof Projectile projectile)) {
@@ -447,9 +461,14 @@ public class CombatListener implements Listener {
             }
         }
 
-        final net.kyori.adventure.sound.Sound sound = event.getSoundProvider().apply(event);
+        final SoundProvider provider = event.getSoundProvider();
+        final net.kyori.adventure.sound.Sound sound = provider.apply(event);
         if (sound != null) {
-            damagee.getWorld().playSound(sound, damagee);
+            if (provider.fromEntity()) {
+                damagee.getWorld().playSound(sound, damagee);
+            } else {
+                damagee.getWorld().playSound(damagee.getLocation(), sound.name().asString(), sound.volume(), sound.pitch());
+            }
         }
     }
 
