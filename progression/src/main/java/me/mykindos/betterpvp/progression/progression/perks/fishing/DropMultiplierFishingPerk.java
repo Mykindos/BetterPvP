@@ -54,6 +54,13 @@ public class DropMultiplierFishingPerk implements Listener, ProgressionPerk, Cha
     }
 
     @Override
+    public String[] getDescription(int level) {
+        return new String[] {
+                "TODO",
+        };
+    }
+
+    @Override
     public Class<? extends ProgressionTree>[] acceptedTrees() {
         return new Class[] {
                 Fishing.class

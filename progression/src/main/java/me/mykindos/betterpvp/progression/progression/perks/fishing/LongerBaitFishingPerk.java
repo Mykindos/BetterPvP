@@ -45,7 +45,16 @@ public class LongerBaitFishingPerk implements Listener, ProgressionPerk {
 
     @Override
     public String getName() {
-        return "Drop Multiplier Fishing";
+        return "Bait Duration Increase";
+    }
+
+    @Override
+    public String[] getDescription(int level) {
+        return new String[] {
+                "TODO",
+                "<stat>" + increasePerLevel + "%</stat> per Fishing level.",
+                "Currently increases duration of baits by <val>" + getPercentage(level) * 100 + "%</val>",
+        };
     }
 
     @Override
@@ -60,6 +69,10 @@ public class LongerBaitFishingPerk implements Listener, ProgressionPerk {
         return minLevel <= data.getLevel();
     }
 
+    private double getPercentage(int level) {
+        return (level * increasePerLevel / 100);
+    }
+
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBait(PlayerThrowBaitEvent event) {
         if (!enabled) return;
@@ -72,7 +85,7 @@ public class LongerBaitFishingPerk implements Listener, ProgressionPerk {
                     //make leveling more intuitive
                     level = level - minLevel;
                     Bait bait = event.getBait();
-                    double multiplier = (1f + (level * increasePerLevel / 100));
+                    double multiplier = (1f + getPercentage(level));
                     bait.setDurationTicks((long) (bait.getDurationTicks() * multiplier));
                 }).exceptionally(throwable1 -> {
                     log.error("Failed to check if player " + event.getPlayer().getName() + " has a level ", throwable);

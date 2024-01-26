@@ -57,6 +57,14 @@ public class DamageReductionFishingPerk implements Listener, ProgressionPerk {
     }
 
     @Override
+    public String[] getDescription(int level) {
+        return new String[] {
+                "TODO",
+        };
+    }
+
+
+    @Override
     public Class<? extends ProgressionTree>[] acceptedTrees() {
         return new Class[] {
                 Fishing.class
@@ -67,8 +75,6 @@ public class DamageReductionFishingPerk implements Listener, ProgressionPerk {
     public boolean canUse(Player player, ProgressionData<?> data) {
         return minLevel <= data.getLevel();
     }
-
-
 
     @EventHandler
     public void onStartFishing(PlayerStartFishingEvent event) {

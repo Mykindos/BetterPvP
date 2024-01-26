@@ -7,7 +7,11 @@ public interface ProgressionPerk {
 
     String getName();
 
+    String[] getDescription(int level);
+
     Class<? extends ProgressionTree>[] acceptedTrees();
 
     boolean canUse(Player player, ProgressionData<?> data);
+
+
 }

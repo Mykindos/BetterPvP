@@ -49,6 +49,14 @@ public class BaseFishingPerk implements Listener, ConfigAccessor, ProgressionPer
     }
 
     @Override
+    public String[] getDescription(int level) {
+        return new String[] {
+                "TODO",
+        };
+    }
+
+
+    @Override
     public Class<? extends ProgressionTree>[] acceptedTrees() {
         return new Class[] {
                 Fishing.class
