@@ -68,11 +68,9 @@ public class TutorialSubCommand extends ClanSubCommand {
             Component.text(Role.WARLOCK.getName(), Role.WARLOCK.getColor()).appendNewline()
                     .append(UtilMessage.deserialize("Warlock is a class focused on health. Some abilities require the sacrifice in health, others punish enemies for proximity and low health.")),
             UtilMessage.deserialize("There is more than just combat, you could also level up other areas. Level up your Progression in <blue>Fishing</blue>, <silver>Mining</silver>, and <brown>Woodcutting</brown>")
-
-
-            //Kits
             //Progression
-            //
+            //Shops
+            //Fields/Events
     ));
 
     @Inject
