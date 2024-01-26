@@ -131,7 +131,9 @@ public class CombatListener implements Listener {
 
                 String damagerUuid = event.getDamager() == null ? null : event.getDamager().getUniqueId().toString();
 
-                damageDataList.add(new DamageData(event.getDamagee().getUniqueId().toString(), event.getCause(), damagerUuid, event.getDamageDelay()));
+                if(event.getDamageDelay() > 0) {
+                    damageDataList.add(new DamageData(event.getDamagee().getUniqueId().toString(), event.getCause(), damagerUuid, event.getDamageDelay()));
+                }
 
                 if (event.isKnockback()) {
                     if (event.getDamager() != null) {
