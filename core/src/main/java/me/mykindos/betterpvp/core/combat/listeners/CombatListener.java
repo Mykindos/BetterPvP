@@ -316,7 +316,8 @@ public class CombatListener implements Listener {
         event.setCancelled(true);
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)public void handleCauseTimers(CustomDamageEvent event) {
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void handleCauseTimers(CustomDamageEvent event) {
 
         if (event.getDamageDelay() != 0) return;
 
