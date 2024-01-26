@@ -321,7 +321,7 @@ public class CombatListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void handleCauseTimers(CustomDamageEvent event) {
 
-        if (event.getDamageDelay() != 0) return;
+        if (event.getDamageDelay() == 0) return;
 
         if (event.getCause() == DamageCause.ENTITY_ATTACK
                 || event.getCause() == DamageCause.PROJECTILE
