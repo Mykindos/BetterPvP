@@ -501,7 +501,7 @@ skills:
     seismicslam:
       enabled: true
       maxlevel: 5
-      cooldown: 20.0
+      cooldown: 15.0
       radius: 5.5
       radiusIncreasePerLevel: 0.5
       baseDamage: 5.0

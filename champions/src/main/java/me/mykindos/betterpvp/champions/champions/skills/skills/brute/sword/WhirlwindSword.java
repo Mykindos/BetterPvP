@@ -46,7 +46,7 @@ public class WhirlwindSword extends Skill implements InteractSkill, CooldownSkil
         return new String[]{
                 "Right click with a Sword to activate",
                 "",
-                "Pulls all enemies within <stat>" + getDistance(level) + "</stat> blocks towards you",
+                "Pulls all enemies within <val>" + getDistance(level) + "</val> blocks towards you",
                 "and deals <val>" + getDamage(level) + "</val> damage",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
@@ -146,8 +146,8 @@ public class WhirlwindSword extends Skill implements InteractSkill, CooldownSkil
 
     @Override
     public void loadSkillConfig(){
-        baseDistance = getConfig("baseDistance", 7.0, Double.class);
-        distanceIncreasePerLevel = getConfig("distanceIncreasePerLevel", 0.0, Double.class);
+        baseDistance = getConfig("baseDistance", 4.0, Double.class);
+        distanceIncreasePerLevel = getConfig("distanceIncreasePerLevel", 1.0, Double.class);
         baseDamage = getConfig("damage", 3.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
     }
