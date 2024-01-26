@@ -81,7 +81,7 @@ public class Sever extends Skill implements CooldownSkill, Listener {
     public void onEntityInteract(PlayerInteractEntityEvent event) {
         if (event.getHand() == EquipmentSlot.OFF_HAND) return;
         rightClicked.put(event.getPlayer(), true);
-        if (event.getRightClicked() instanceof LivingEntity entity ) {
+        if (event.getRightClicked() instanceof LivingEntity entity) {
             onInteract(event.getPlayer(), entity);
         } else {
             onInteract(event.getPlayer(), null);
@@ -112,26 +112,23 @@ public class Sever extends Skill implements CooldownSkill, Listener {
         }
 
         if (ent != null && UtilMath.offset(player, ent) <= 3.0) {
-            Player damagee = (ent instanceof Player) ? (Player) ent : null;
-            if (!(damagee != null && UtilPlayer.getRelation(player, damagee) == EntityProperty.FRIENDLY)) {
-                // Apply the effect and messages
-                championsManager.getEffects().addEffect(ent, EffectType.BLEED, (long) getDuration(level) * 1000L);
-                ent.getWorld().playSound(ent.getLocation(), Sound.ENTITY_SPIDER_HURT, 1.0F, 1.5F);
-                if (damagee != null) {
-                    UtilMessage.simpleMessage(player, getClassType().getName(), "You severed <alt>" + damagee.getName() + "</alt>.");
-                    UtilMessage.simpleMessage(damagee, getClassType().getName(), "You have been severed by <alt>" + player.getName() + "</alt>.");
+            if (ent instanceof Player damagee) {
+                if (UtilPlayer.getRelation(player, damagee) == EntityProperty.FRIENDLY) {
+                    return;
                 }
-            } else {
-                UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s", getName());
-                player.getWorld().playSound(player.getLocation(), Sound.ENTITY_IRON_GOLEM_ATTACK, 2.0f, 1.3f);
             }
+            // Apply the effect and messages
+            championsManager.getEffects().addEffect(ent, EffectType.BLEED, (long) getDuration(level) * 1000L);
+            ent.getWorld().playSound(ent.getLocation(), Sound.ENTITY_SPIDER_HURT, 1.0F, 1.5F);
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You severed <alt>" + ent.getName() + "</alt>.");
+            UtilMessage.simpleMessage(ent, getClassType().getName(), "You have been severed by <alt>" + player.getName() + "</alt>.");
         } else {
             UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s", getName());
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_IRON_GOLEM_ATTACK, 2.0f, 1.3f);
         }
+
         player.swingMainHand();
     }
-
 
     @Override
     public double getCooldown(int level) {

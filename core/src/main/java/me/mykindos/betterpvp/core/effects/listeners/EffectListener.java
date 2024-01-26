@@ -95,13 +95,8 @@ public class EffectListener implements Listener {
     public void onBleed() {
         bleedEntities.keySet().removeIf(uuid -> {
             LivingEntity entity = (LivingEntity) Bukkit.getEntity(uuid);
-
-            if (entity == null || !entity.hasPotionEffect(PotionEffectType.BAD_OMEN)) {
-                if (entity != null) {
-                    entity.removePotionEffect(PotionEffectType.BAD_OMEN);
-                }
-                return true;
-            }
+            if (entity == null) return true;
+            if (!entity.hasPotionEffect(PotionEffectType.BAD_OMEN)) return true;
 
             long currentTime = System.currentTimeMillis();
             long lastBleedTime = lastBleedTimes.getOrDefault(uuid, 0L);
@@ -114,13 +109,9 @@ public class EffectListener implements Listener {
                 UtilDamage.doCustomDamage(cde);
                 lastBleedTimes.put(uuid, currentTime);
             }
-
             return false;
         });
     }
-
-
-
 
     @EventHandler
     public void onFall(EntityDamageEvent event) {

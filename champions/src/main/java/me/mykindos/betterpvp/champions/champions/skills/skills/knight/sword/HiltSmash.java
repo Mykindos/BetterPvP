@@ -30,7 +30,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class  HiltSmash extends Skill implements CooldownSkill, Listener {
+public class HiltSmash extends Skill implements CooldownSkill, Listener {
 
     private WeakHashMap<Player, Boolean> rightClicked = new WeakHashMap<>();
 
@@ -124,26 +124,22 @@ public class  HiltSmash extends Skill implements CooldownSkill, Listener {
         }
 
         if (ent != null && UtilMath.offset(player, ent) <= 3.0) {
-            Player damagee = (ent instanceof Player) ? (Player) ent : null;
-            if (!(damagee != null && UtilPlayer.getRelation(player, damagee) == EntityProperty.FRIENDLY)) {
-                // Apply the effect and messages
-                if (damagee != null) {
-                    UtilMessage.simpleMessage(damagee, getClassType().getName(), "<yellow>%s<gray> hit you with <green>%s<gray>.", player.getName(), getName() + " " + level);
-                    championsManager.getEffects().addEffect(damagee, EffectType.SHOCK, (long) (getDuration(level) * 1000L));
-                    championsManager.getEffects().addEffect(damagee, EffectType.SILENCE, (long) (getDuration(level) * 1000L));
+            if (ent instanceof Player damagee) {
+                if (UtilPlayer.getRelation(player, damagee) == EntityProperty.FRIENDLY) {
+                    return;
                 }
-
-                UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <yellow>%s<gray> with <green>%s<gray>.", ent.getName(), getName() + " " + level);
-                UtilDamage.doCustomDamage(new CustomDamageEvent(ent, player, null, DamageCause.ENTITY_ATTACK, 3 + level, false, getName()));
-                ent.getWorld().playSound(ent.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1.0F, 1.2F);
-            } else {
-                UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s", getName());
-                player.getWorld().playSound(player.getLocation(), Sound.ENTITY_IRON_GOLEM_ATTACK, 2.0f, 1.3f);
             }
+            UtilMessage.simpleMessage(ent, getClassType().getName(), "<yellow>%s<gray> hit you with <green>%s<gray>.", player.getName(), getName() + " " + level);
+            championsManager.getEffects().addEffect(ent, EffectType.SHOCK, (long) (getDuration(level) * 1000L));
+            championsManager.getEffects().addEffect(ent, EffectType.SILENCE, (long) (getDuration(level) * 1000L));
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <yellow>%s<gray> with <green>%s<gray>.", ent.getName(), getName() + " " + level);
+            UtilDamage.doCustomDamage(new CustomDamageEvent(ent, player, null, DamageCause.ENTITY_ATTACK, 3 + level, false, getName()));
+            ent.getWorld().playSound(ent.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1.0F, 1.2F);
         } else {
             UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s", getName());
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_IRON_GOLEM_ATTACK, 2.0f, 1.3f);
         }
+
         player.swingMainHand();
     }
 
