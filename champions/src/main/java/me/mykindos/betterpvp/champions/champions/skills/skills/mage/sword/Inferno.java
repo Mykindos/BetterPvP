@@ -151,13 +151,24 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
 
             if (e.getThrowable().getThrower() instanceof Player damager) {
                 int level = getLevel(damager);
-                e.getCollision().setFireTicks((int) (getFireDuration(level) * 20));
+                Entity collisionEntity = e.getCollision();
+                collisionEntity.setFireTicks((int) (getFireDuration(level) * 20));
+
+                Vector knockbackDirection = collisionEntity.getLocation().toVector()
+                        .subtract(damager.getLocation().toVector()).normalize();
+                double knockbackStrength = 0.1;
+                Vector knockbackVelocity = knockbackDirection.multiply(knockbackStrength);
+                collisionEntity.setVelocity(collisionEntity.getVelocity().add(knockbackVelocity));
+
+                damager.playSound(damager.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 1.2f);
+
                 CustomDamageEvent cde = new CustomDamageEvent(e.getCollision(), damager, null, DamageCause.FIRE, getDamage(level), false, "Inferno");
                 cde.setDamageDelay(0);
                 UtilDamage.doCustomDamage(cde);
             }
         }
     }
+
 
 
     @UpdateEvent
@@ -253,8 +264,8 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
         cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 1.0, Double.class);
 
         chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 0.0, Double.class);
-        baseCharge = getConfig("baseCharge", 100.0, Double.class);
-        baseNumFlames = getConfig("baseNumFlames", 6, Integer.class);
+        baseCharge = getConfig("baseCharge", 75.0, Double.class);
+        baseNumFlames = getConfig("baseNumFlames", 4, Integer.class);
         numFlamesIncreasePerLevel = getConfig("numFlamesIncreasePerLevel", 2, Integer.class);
     }
 
