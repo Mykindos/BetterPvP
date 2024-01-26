@@ -152,20 +152,25 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
 
                 Vector knockbackDirection = collisionEntity.getLocation().toVector()
                         .subtract(damager.getLocation().toVector()).normalize();
-                double knockbackStrength = 0.1;
+                double knockbackStrength = 0.25;
                 Vector knockbackVelocity = knockbackDirection.multiply(knockbackStrength);
                 collisionEntity.setVelocity(collisionEntity.getVelocity().add(knockbackVelocity));
 
                 damager.playSound(damager.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 1.2f);
 
                 CustomDamageEvent cde = new CustomDamageEvent(e.getCollision(), damager, null, DamageCause.FIRE, getDamage(level), false, "Inferno");
-                cde.setDamageDelay(0);
+                System.out.println("damage per fire: "+getDamage(level));
                 UtilDamage.doCustomDamage(cde);
             }
         }
     }
 
-
+    @EventHandler
+    public void onInfernoHit(CustomDamageEvent event){
+        if("Inferno".equals(event.getReason())){
+            event.setDamageDelay(0);
+        }
+    }
 
     @UpdateEvent
     public void updateCharge() {
@@ -232,7 +237,7 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
 
                 fire.teleport(shotgun.getPlayer().getEyeLocation());
                 Vector randomVector = new Vector(UtilMath.randDouble(-0.01, 0.01), UtilMath.randDouble(-0.01, 0.01), UtilMath.randDouble(-0.01, 0.01));
-                Vector increasedVelocity = shotgun.getPlayer().getLocation().getDirection().add(randomVector).multiply(2);
+                Vector increasedVelocity = shotgun.getPlayer().getLocation().getDirection().add(randomVector).multiply(3);
                 fire.setVelocity(increasedVelocity);
                 shotgun.getPlayer().getWorld().playSound(shotgun.getPlayer().getLocation(), Sound.ENTITY_GHAST_SHOOT, 0.1F, 1.0F);
 
@@ -273,7 +278,7 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
 
     @Override
     public void loadSkillConfig(){
-        baseFireDuration = getConfig("baseFireDuration", 2.0, Double.class);
+        baseFireDuration = getConfig("baseFireDuration", 2.5, Double.class);
         fireDurationIncreasePerLevel = getConfig("fireDurationIncreasePerLevel", 0.0, Double.class);
         baseDamage = getConfig("baseDamage", 1.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
