@@ -59,7 +59,7 @@ public class ClansCombatListener implements Listener {
         if (cde.getDamager() instanceof Player damager && cde.getDamagee() instanceof Player damagee) {
             if (!clanManager.canHurt(damager, damagee)) {
                 UtilMessage.message(damager, "Clans", "You cannot hurt <yellow>%s<gray>.", damagee.getName());
-                //event.setCancelled(true);
+                event.setCancelled(true);
                 return;
             }
         }

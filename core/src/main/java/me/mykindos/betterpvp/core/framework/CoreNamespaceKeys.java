@@ -18,6 +18,5 @@ public class CoreNamespaceKeys {
 
     public static final NamespacedKey DURABILITY_KEY = new NamespacedKey("core", "durability");
 
-    public static final NamespacedKey BLOCK_SUMMONER_KEY = new NamespacedKey("core", "block-summon-key");
 
 }

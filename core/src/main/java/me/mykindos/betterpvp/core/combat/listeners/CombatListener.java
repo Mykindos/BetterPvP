@@ -102,7 +102,6 @@ public class CombatListener implements Listener {
         }
 
         if (event.isDoVanillaEvent()) {
-            log.warn("doing vanilla event");
             return;
         }
 
@@ -228,7 +227,7 @@ public class CombatListener implements Listener {
 
         if (cde.getDamager() != null) {
             if (cde.getDamager().equals(cde.getDamagee())) {
-                //event.setCancelled(true);
+                event.setCancelled(true);
                 return;
             }
         }
