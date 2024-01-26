@@ -5,6 +5,8 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Map;
+
 
 public class UtilInventory {
 
@@ -24,24 +26,37 @@ public class UtilInventory {
         return required <= 0;
     }
 
+    private static boolean removeFromHand(Player player, ItemStack hand, Material item, int toRemove) {
+        if (player.getGameMode() == GameMode.CREATIVE) return true;
+        if (hand.getType() == item) {
+            if (hand.getAmount() > toRemove) {
+                hand.setAmount(hand.getAmount() - toRemove);
+            } else {
+                hand.setAmount(0);
+            }
+            return true;
+        }
+        return false;
+    }
+
     public static boolean remove(Player player, Material item, int toRemove) {
-        if(player.getGameMode() == GameMode.CREATIVE) return true;
+        if (player.getGameMode() == GameMode.CREATIVE) return true;
+
+        if (removeFromHand(player, player.getInventory().getItemInMainHand(), item, toRemove)) return true;
+        if (removeFromHand(player, player.getInventory().getItemInOffHand(), item, toRemove)) return true;
+
         if (contains(player, item, toRemove)) {
-            for (int i = 0; i < player.getInventory().getSize(); ++i) {
-                ItemStack stack = player.getInventory().getItem(i);
-                if (stack == null) continue;
-                if (stack.getType() == item) {
-                    if (stack.getAmount() > toRemove) {
-                        stack.setAmount(stack.getAmount() - toRemove);
-                    } else {
-                        player.getInventory().setItem(i, null);
-                    }
-
+            Map<Integer, ? extends ItemStack> allItems = player.getInventory().all(item);
+            for (Map.Entry<Integer, ? extends ItemStack> entry : allItems.entrySet()) {
+                ItemStack stack = entry.getValue();
+                if (stack.getAmount() > toRemove) {
+                    stack.setAmount(stack.getAmount() - toRemove);
                     return true;
-
+                } else {
+                    player.getInventory().setItem(entry.getKey(), null);
+                    toRemove -= stack.getAmount();
                 }
             }
-
         }
         return false;
     }

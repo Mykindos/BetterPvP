@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import me.mykindos.betterpvp.core.combat.data.SoundProvider;
 import me.mykindos.betterpvp.core.framework.events.CustomCancellableEvent;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LightningStrike;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Projectile;
@@ -19,13 +20,13 @@ public class CustomDamageEvent extends CustomCancellableEvent {
 
     @NotNull
     private final LivingEntity damagee;
-    private final LivingEntity damager;
-    private final Projectile projectile;
+    private LivingEntity damager;
+    private final Entity damagingEntity;
     private final DamageCause cause;
     private double damage;
     private double rawDamage;
     private boolean knockback;
-    private long damageDelay = 200;
+    private long damageDelay = 0;
     private LightningStrike lightning;
     private boolean ignoreArmour;
     private Set<String> reason = new HashSet<>();
@@ -37,56 +38,58 @@ public class CustomDamageEvent extends CustomCancellableEvent {
 
     /**
      * @param damagee   The entity taking damage
-     * @param damager   The entity dealing damage (if its a living entity)
-     * @param proj      The projectile dealing damage (if its a projectile)
+     * @param damager   The entity to take credit for this damage (if it's a living entity)
+     * @param damagingEntity The entity dealing causing the damage
      * @param cause     The cause of damage, e.g. fall damage
      * @param damage    The amount of damage to be dealt
      * @param knockback Whether or not the damage should knockback
      */
-    public CustomDamageEvent(@NotNull LivingEntity damagee, LivingEntity damager, Projectile proj, DamageCause cause, double damage, boolean knockback) {
+    public CustomDamageEvent(@NotNull LivingEntity damagee, LivingEntity damager, Entity damagingEntity, DamageCause cause, double damage, boolean knockback) {
         this.damagee = damagee;
         this.damager = damager;
-        this.projectile = proj;
+        this.damagingEntity = damagingEntity;
         this.cause = cause;
         this.damage = damage;
         this.rawDamage = damage;
         this.knockback = knockback;
-
     }
 
     /**
      * @param damagee   The entity taking damage
-     * @param damager   The entity dealing damage (if its a living entity)
-     * @param proj      The projectile dealing damage (if its a projectile)
+     * @param damager   The entity to take credit for this damage (if it's a living entity)
+     * @param damagingEntity The entity dealing causing the damage
      * @param cause     The cause of damage, e.g. fall damage
      * @param damage    The amount of damage to be dealt
      * @param knockback Whether or not the damage should knockback
      * @param reason    What caused the damage event
      */
-    public CustomDamageEvent(LivingEntity damagee, LivingEntity damager, Projectile proj, DamageCause cause, double damage, boolean knockback, String reason) {
-        this(damagee, damager, proj, cause, damage, knockback);
+    public CustomDamageEvent(LivingEntity damagee, LivingEntity damager, Entity damagingEntity, DamageCause cause, double damage, boolean knockback, String reason) {
+        this(damagee, damager, damagingEntity, cause, damage, knockback);
         this.reason.add(reason);
     }
 
     /**
      * @param damagee   The entity taking damage
-     * @param damager   The entity dealing damage (if its a living entity)
-     * @param proj      The projectile dealing damage (if its a projectile)
+     * @param damager   The entity to take credit for this damage (if it's a living entity)
+     * @param damagingEntity The entity dealing causing the damage
      * @param lightning The lightning strike dealing damage
      * @param cause     The cause of damage, e.g. fall damage
      * @param damage    The amount of damage to be dealt
      * @param knockback Whether or not the damage should knockback
      */
-    public CustomDamageEvent(LivingEntity damagee, LivingEntity damager, Projectile proj, LightningStrike lightning, DamageCause cause, double damage, boolean knockback) {
+    public CustomDamageEvent(LivingEntity damagee, LivingEntity damager, Entity damagingEntity, LightningStrike lightning, DamageCause cause, double damage, boolean knockback) {
         this.damagee = damagee;
         this.damager = damager;
-        this.projectile = proj;
+        this.damagingEntity = damagingEntity;
         this.cause = cause;
         this.damage = damage;
         this.rawDamage = damage;
         this.knockback = knockback;
         this.lightning = lightning;
+    }
 
+    public Projectile getProjectile() {
+        return damagingEntity instanceof Projectile ? (Projectile) damagingEntity : null;
     }
 
     public void addReason(String reason) {

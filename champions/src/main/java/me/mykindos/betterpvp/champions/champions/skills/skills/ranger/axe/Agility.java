@@ -118,27 +118,28 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
         }
         if (!(event.getDamager() instanceof Player damager)) return;
         if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
-            active.remove(damager.getUniqueId());
-            deactivate(damager);
+            if (active.containsKey(damager.getUniqueId())) {
+                active.remove(damager.getUniqueId());
+                deactivate(damager);
+            }
         }
     }
 
     @UpdateEvent(delay = 250)
     public void onUpdate() {
-       Iterator<Map.Entry<UUID, Long>> iterator = active.entrySet().iterator();
-       while (iterator.hasNext()) {
-           Map.Entry<UUID, Long> entry = iterator.next();
-           Player player = Bukkit.getPlayer(entry.getKey());
-           if (player == null) {
-              iterator.remove();
-              continue;
-           } else {
-               if (entry.getValue() - System.currentTimeMillis() <= 0) {
-                   deactivate(player);
-                   iterator.remove();
-               }
-           }
-       }
+        Iterator<Map.Entry<UUID, Long>> iterator = active.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<UUID, Long> entry = iterator.next();
+            Player player = Bukkit.getPlayer(entry.getKey());
+            if (player == null) {
+                iterator.remove();
+            } else {
+                if (entry.getValue() - System.currentTimeMillis() <= 0) {
+                    deactivate(player);
+                    iterator.remove();
+                }
+            }
+        }
     }
 
     @Override
