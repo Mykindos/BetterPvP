@@ -86,7 +86,7 @@ public class CannonManager extends Manager<Cannon> {
             }
 
             final UUID placedBy = Objects.requireNonNull(pdc.get(CoreNamespaceKeys.ORIGINAL_OWNER, CustomDataType.UUID));
-            final ModeledEntity modeledEntity = ModelEngineAPI.getModeledEntity(golem);;
+            final ModeledEntity modeledEntity = ModelEngineAPI.getModeledEntity(golem);
             if (modeledEntity == null || modeledEntity.isDestroyed()) {
                 return Optional.empty();
             }
