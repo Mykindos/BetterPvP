@@ -29,22 +29,18 @@ import org.bukkit.Sound;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.WeakHashMap;
+import java.util.*;
 
 @Singleton
 @BPvPListener
 public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkill {
     private final WeakHashMap<Player, ChargeData> charging = new WeakHashMap<>();
     private List<Item> blazePowders = new ArrayList<>();
+    private final HashMap<Player, Shotgun> shotguns = new HashMap<>();
 
     private final DisplayComponent actionBarComponent = ChargeData.getActionBar(this,
             charging,
@@ -206,17 +202,8 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
         float chargePercent = Math.min(chargeData.getCharge(), 1.0f);
         int numFlames = 1 + (int) (chargePercent * (getNumFlames(level) - 1));
 
-        for (int i = 0; i < numFlames; i++) {
-            Item fire = player.getWorld().dropItem(player.getEyeLocation(), new ItemStack(Material.BLAZE_POWDER));
-            championsManager.getThrowables().addThrowable(fire, player, getName(), 2000L);
-            blazePowders.add(fire);
-
-            fire.teleport(player.getEyeLocation());
-            Vector randomVector = new Vector(UtilMath.randDouble(-0.1, 0.1), UtilMath.randDouble(-0.1, 0.1), UtilMath.randDouble(-0.1, 0.1));
-            Vector increasedVelocity = player.getLocation().getDirection().add(randomVector).multiply(2);
-            fire.setVelocity(increasedVelocity);
-            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_GHAST_SHOOT, 0.1F, 2.0F - (float)(i * 0.1));
-        }
+        Shotgun shotgunInstance = new Shotgun(player, numFlames, 0, 1, System.currentTimeMillis() + 50); // Assuming 1 tick = 50 ms
+        shotguns.put(player, shotgunInstance);
 
         championsManager.getCooldowns().removeCooldown(player, getName(), true);
         championsManager.getCooldowns().use(player,
@@ -228,14 +215,42 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
                 this::shouldDisplayActionBar);
     }
 
+
     @UpdateEvent
     public void onUpdate() {
-        Iterator<Item> iterator = blazePowders.iterator();
-        while (iterator.hasNext()) {
-            Item blazePowder = iterator.next();
+        long currentTick = System.currentTimeMillis();
+        Iterator<Map.Entry<Player, Shotgun>> shotgunIterator = shotguns.entrySet().iterator();
+
+        while (shotgunIterator.hasNext()) {
+            Map.Entry<Player, Shotgun> entry = shotgunIterator.next();
+            Shotgun shotgun = entry.getValue();
+
+            if (currentTick >= shotgun.getNextShotTick() && shotgun.getFlamesShot() < shotgun.getTotalFlames()) {
+                Item fire = shotgun.getPlayer().getWorld().dropItem(shotgun.getPlayer().getEyeLocation(), new ItemStack(Material.BLAZE_POWDER));
+                championsManager.getThrowables().addThrowable(fire, shotgun.getPlayer(), getName(), 2000L);
+                blazePowders.add(fire);
+
+                fire.teleport(shotgun.getPlayer().getEyeLocation());
+                Vector randomVector = new Vector(UtilMath.randDouble(-0.01, 0.01), UtilMath.randDouble(-0.01, 0.01), UtilMath.randDouble(-0.01, 0.01));
+                Vector increasedVelocity = shotgun.getPlayer().getLocation().getDirection().add(randomVector).multiply(2);
+                fire.setVelocity(increasedVelocity);
+                shotgun.getPlayer().getWorld().playSound(shotgun.getPlayer().getLocation(), Sound.ENTITY_GHAST_SHOOT, 0.1F, 1.0F);
+
+                shotgun.setFlamesShot(shotgun.getFlamesShot() + 1);
+                shotgun.setNextShotTick(currentTick + shotgun.getDelayBetweenShots());
+            }
+
+            if (shotgun.getFlamesShot() >= shotgun.getTotalFlames()) {
+                shotgunIterator.remove();
+            }
+        }
+
+        Iterator<Item> blazePowderIterator = blazePowders.iterator();
+        while (blazePowderIterator.hasNext()) {
+            Item blazePowder = blazePowderIterator.next();
 
             if (!blazePowder.isValid()) {
-                iterator.remove();
+                blazePowderIterator.remove();
                 continue;
             }
 
@@ -243,7 +258,7 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
 
             if (location.getBlock().getType() == Material.WATER) {
                 blazePowder.remove();
-                iterator.remove();
+                blazePowderIterator.remove();
                 continue;
             }
 
@@ -255,6 +270,7 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
         }
     }
 
+
     @Override
     public void loadSkillConfig(){
         baseFireDuration = getConfig("baseFireDuration", 2.0, Double.class);
@@ -264,7 +280,7 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
         cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 1.0, Double.class);
 
         chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 0.0, Double.class);
-        baseCharge = getConfig("baseCharge", 75.0, Double.class);
+        baseCharge = getConfig("baseCharge", 100.0, Double.class);
         baseNumFlames = getConfig("baseNumFlames", 4, Integer.class);
         numFlamesIncreasePerLevel = getConfig("numFlamesIncreasePerLevel", 2, Integer.class);
     }
@@ -272,8 +288,11 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
     @Data
     @AllArgsConstructor
     private static class Shotgun {
-        private final ChargeData data;
-        private final int level;
+        private final Player player;
+        private final int totalFlames;
+        private int flamesShot;
+        private final long delayBetweenShots;
+        private long nextShotTick;
     }
 }
 

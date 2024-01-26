@@ -320,7 +320,7 @@ skills:
       baseDamage: 1.0
       damageIncreasePerLevel: 0.0
       chargeIncreasePerLevel: 0.0
-      baseCharge: 75.0
+      baseCharge: 100.0
       baseNumFlames: 4
       numFlamesIncreasePerLevel: 2
       cooldownDecreasePerLevel: 0.5
