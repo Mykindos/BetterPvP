@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.mage.sword;
 
 
+import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.AllArgsConstructor;
@@ -23,6 +24,7 @@ import me.mykindos.betterpvp.core.utilities.*;
 import me.mykindos.betterpvp.core.utilities.model.display.DisplayComponent;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -33,13 +35,17 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
 public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkill {
     private final WeakHashMap<Player, ChargeData> charging = new WeakHashMap<>();
+    private List<Item> blazePowders = new ArrayList<>();
+
     private final DisplayComponent actionBarComponent = ChargeData.getActionBar(this,
             charging,
             gamer -> true);
@@ -111,6 +117,11 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
     }
 
     @Override
+    public boolean shouldDisplayActionBar(Gamer gamer) {
+        return !charging.containsKey(gamer.getPlayer()) && isHolding(gamer.getPlayer());
+    }
+
+    @Override
     public Role getClassType() {
         return Role.MAGE;
     }
@@ -132,16 +143,22 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
             if (e.getCollision() instanceof ArmorStand) {
                 return;
             }
+
+            Item fireItem = e.getThrowable().getItem();
+            if (fireItem != null) {
+                fireItem.remove();
+            }
+
             if (e.getThrowable().getThrower() instanceof Player damager) {
                 int level = getLevel(damager);
                 e.getCollision().setFireTicks((int) (getFireDuration(level) * 20));
                 CustomDamageEvent cde = new CustomDamageEvent(e.getCollision(), damager, null, DamageCause.FIRE, getDamage(level), false, "Inferno");
                 cde.setDamageDelay(0);
                 UtilDamage.doCustomDamage(cde);
-                e.getThrowable().getImmunes().add(e.getCollision());
             }
         }
     }
+
 
     @UpdateEvent
     public void updateCharge() {
@@ -183,11 +200,14 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
 
         for (int i = 0; i < numFlames; i++) {
             Item fire = player.getWorld().dropItem(player.getEyeLocation(), new ItemStack(Material.BLAZE_POWDER));
-            championsManager.getThrowables().addThrowable(fire, player, getName(), 2000L);
+            championsManager.getThrowables().addThrowable(fire, player, getName(), 1000L);
+            blazePowders.add(fire);
 
             fire.teleport(player.getEyeLocation());
-            fire.setVelocity(player.getLocation().getDirection().add(new Vector(UtilMath.randDouble(-0.2, 0.2), UtilMath.randDouble(-0.2, 0.3), UtilMath.randDouble(-0.2, 0.2))));
-            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_GHAST_SHOOT, 0.1F, 1.0F);
+            Vector randomVector = new Vector(UtilMath.randDouble(-0.1, 0.1), UtilMath.randDouble(-0.1, 0.1), UtilMath.randDouble(-0.1, 0.1));
+            Vector increasedVelocity = player.getLocation().getDirection().add(randomVector).multiply(2);
+            fire.setVelocity(increasedVelocity);
+            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_GHAST_SHOOT, 0.1F, 2.0F - (float)(i * 0.1));
         }
 
         championsManager.getCooldowns().removeCooldown(player, getName(), true);
@@ -198,6 +218,26 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
                 true,
                 isCancellable(),
                 this::shouldDisplayActionBar);
+    }
+
+    @UpdateEvent
+    public void infernoParticles() {
+        Iterator<Item> iterator = blazePowders.iterator();
+        while (iterator.hasNext()) {
+            Item blazePowder = iterator.next();
+
+            if (!blazePowder.isValid()) {
+                iterator.remove();
+                continue;
+            }
+
+            Location location = blazePowder.getLocation();
+            new ParticleBuilder(Particle.FLAME)
+                    .extra(0)
+                    .location(location)
+                    .receivers(60, true)
+                    .spawn();
+        }
     }
 
     @Override
