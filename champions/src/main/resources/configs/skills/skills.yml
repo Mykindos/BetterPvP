@@ -492,7 +492,7 @@ skills:
     whirlwindsword:
       enabled: true
       maxlevel: 5
-      cooldown: 10.0
+      cooldown: 20.0
       cooldownDecreasePerLevel: 1.0
       baseDistance: 7.0
       distanceIncreasePerLevel: 0.0
