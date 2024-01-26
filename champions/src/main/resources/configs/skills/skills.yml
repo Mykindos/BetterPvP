@@ -314,16 +314,16 @@ skills:
     inferno:
       enabled: true
       maxlevel: 3
-      cooldown: 3.0
-      baseFireDuration: 2.5
+      cooldown: 2.0
+      baseFireDuration: 2.0
       fireDurationIncreasePerLevel: 0.0
       baseDamage: 1.0
       damageIncreasePerLevel: 0.0
       chargeIncreasePerLevel: 0.0
-      baseCharge: 80.0
+      baseCharge: 100.0
       baseNumFlames: 6
       numFlamesIncreasePerLevel: 2
-      cooldownDecreasePerLevel: 1.0
+      cooldownDecreasePerLevel: 0.5
     fireblast:
       enabled: true
       maxlevel: 5

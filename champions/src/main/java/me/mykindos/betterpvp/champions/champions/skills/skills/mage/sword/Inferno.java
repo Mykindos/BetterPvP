@@ -76,8 +76,8 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
                 "",
                 "Charges up to <val>" + getNumFlames(level) + "</val> flames",
                 "",
-                "Fire a scorching blast of fire that ignites ",
-                "anything it hits for <stat>" + getFireDuration(level) + "</stat> seconds",
+                "Release to shoot a scorching blast of fire",
+                "that ignites anything it hits for <stat>" + getFireDuration(level) + "</stat> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -195,12 +195,9 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
         float chargePercent = Math.min(chargeData.getCharge(), 1.0f);
         int numFlames = 1 + (int) (chargePercent * (getNumFlames(level) - 1));
 
-        Location headLocation = player.getEyeLocation();
-        Vector direction = headLocation.getDirection();
-
         for (int i = 0; i < numFlames; i++) {
             Item fire = player.getWorld().dropItem(player.getEyeLocation(), new ItemStack(Material.BLAZE_POWDER));
-            championsManager.getThrowables().addThrowable(fire, player, getName(), 1000L);
+            championsManager.getThrowables().addThrowable(fire, player, getName(), 2000L);
             blazePowders.add(fire);
 
             fire.teleport(player.getEyeLocation());
@@ -221,7 +218,7 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
     }
 
     @UpdateEvent
-    public void infernoParticles() {
+    public void onUpdate() {
         Iterator<Item> iterator = blazePowders.iterator();
         while (iterator.hasNext()) {
             Item blazePowder = iterator.next();
@@ -232,17 +229,24 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
             }
 
             Location location = blazePowder.getLocation();
+
+            if (location.getBlock().getType() == Material.WATER) {
+                blazePowder.remove();
+                iterator.remove();
+                continue;
+            }
+
             new ParticleBuilder(Particle.FLAME)
                     .extra(0)
                     .location(location)
-                    .receivers(60, true)
+                    .receivers(60)
                     .spawn();
         }
     }
 
     @Override
     public void loadSkillConfig(){
-        baseFireDuration = getConfig("baseFireDuration", 2.5, Double.class);
+        baseFireDuration = getConfig("baseFireDuration", 2.0, Double.class);
         fireDurationIncreasePerLevel = getConfig("fireDurationIncreasePerLevel", 0.0, Double.class);
         baseDamage = getConfig("baseDamage", 1.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
