@@ -14,13 +14,14 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
+import org.jetbrains.annotations.NotNull;
 import xyz.xenondevs.invui.gui.AbstractGui;
 import xyz.xenondevs.invui.item.impl.SimpleItem;
 
 import java.util.Set;
 
 @Slf4j
-public abstract class PerksMenu extends AbstractGui implements Windowed {
+public class PerksMenu extends AbstractGui implements Windowed {
     ProgressionTree tree;
     public static final TagResolver TAG_RESOLVER = TagResolver.resolver(
             TagResolver.resolver("val", Tag.styling(NamedTextColor.GREEN)),
@@ -29,6 +30,8 @@ public abstract class PerksMenu extends AbstractGui implements Windowed {
     );
     public PerksMenu(int width, int height, Player player, ProgressionTree tree) {
         super(width, height);
+
+        this.tree = tree;
         Set<ProgressionPerk> perks = tree.getPerks();
 
 
@@ -55,5 +58,13 @@ public abstract class PerksMenu extends AbstractGui implements Windowed {
                 .displayName(Component.text(perk.getName(), NamedTextColor.GREEN, TextDecoration.BOLD))
                 .flag(ItemFlag.HIDE_ATTRIBUTES);
         return builder.build().toSimpleItem();
+    }
+
+    /**
+     * @return The title of this menu.
+     */
+    @Override
+    public @NotNull Component getTitle() {
+        return Component.text(tree.getName());
     }
 }

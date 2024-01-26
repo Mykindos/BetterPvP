@@ -51,8 +51,8 @@ public class LongerBaitFishingPerk implements Listener, ProgressionPerk {
     @Override
     public String[] getDescription(int level) {
         return new String[] {
-                "TODO",
-                "<stat>" + increasePerLevel + "%</stat> per Fishing level.",
+                "Increases the duration of baits you throw by",
+                "<stat>" + increasePerLevel * 100 + "%</stat> per Fishing level.",
                 "Currently increases duration of baits by <val>" + getPercentage(level) * 100 + "%</val>",
         };
     }

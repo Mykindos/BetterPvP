@@ -48,7 +48,18 @@ public class DropMultiplierMiningPerk implements Listener, ProgressionPerk, Chan
 
     @Override
     public String getName() {
-        return "Drop Multiplier Mining";
+        return "Drop Chance Multiplier";
+    }
+
+    @Override
+    public String[] getDescription(int level) {
+        return new String[] {
+                "Increase the amount of items dropped while mining by",
+                "<stat>" + increasePerLevel + "%</stat> per Mining Level.",
+                "Every 100%, you have a guaranteed drop, with the remainder being",
+                "the chance to get another drop.",
+                "Currently increases your chances by <val>" + level * increasePerLevel + "%</val>"
+        };
     }
 
     @Override
@@ -74,7 +85,7 @@ public class DropMultiplierMiningPerk implements Listener, ProgressionPerk, Chan
                 mining.getLevel(player).whenComplete((level, throwable1) -> {
                     if (level > maxLevel) level = maxLevel;
                     level = level - minLevel;
-                    int drops = getChance (level * increasePerLevel);
+                    int drops = getChance(level * increasePerLevel);
                     if (drops == 0 || event.getItems().isEmpty()) return;
                     event.getItems().get(0).getItemStack().add(drops - 1);
                 }).exceptionally(throwable1 -> {
