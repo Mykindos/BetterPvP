@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.bow;
 
+import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
@@ -87,7 +88,13 @@ public class LevitatingShot extends PrepareArrowSkill {
 
     @Override
     public void displayTrail(Location location) {
-        Particle.REDSTONE.builder().location(location).color(128, 0, 128).count(3).extra(0).receivers(60, true).spawn();
+        new ParticleBuilder(Particle.ENCHANTMENT_TABLE)
+                .location(location)
+                .count(3)
+                .offset(0.1, 0.1, 0.1)
+                .extra(0)
+                .receivers(60)
+                .spawn();
     }
 
     @Override
