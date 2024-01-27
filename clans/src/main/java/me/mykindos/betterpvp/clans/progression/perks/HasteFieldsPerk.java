@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.events.ClanChangeTerritoryEvent;
 import me.mykindos.betterpvp.clans.progression.ProgressionAdapter;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -51,16 +52,21 @@ public class HasteFieldsPerk implements Listener, ConfigAccessor, ProgressionPer
 
     @Override
     public String getName() {
-        return "Faster Ores";
+        return "Fields Haste";
     }
 
     @Override
     public List<String> getDescription(Player player, ProgressionData<?> data) {
+        List<String> hasteLevelsAsString = hasteLevels.stream().map(Object::toString).toList();
+
+        String formattedHasteLevels = String.join("</stat>, <stat>", hasteLevelsAsString);
         List<String> description = new ArrayList<>(List.of(
-                "TODO"
+                "Gives a level of <effect>haste</effect> every",
+                "<stat>" + formattedHasteLevels + "</stat>" +  "Mining levels"
+
         ));
         if (canUse(player, data)) {
-            description.add("Can Use");
+            description.add("You currently receive <effect> Haste " + UtilFormat.getRomanNumeral(getHasteLevel(data.getLevel()) + 1) + "</effect> in Fields");
         }
         return description;
     }
@@ -78,6 +84,15 @@ public class HasteFieldsPerk implements Listener, ConfigAccessor, ProgressionPer
             return false;
         }
         return data.getLevel() >= hasteLevels.get(0);
+    }
+
+    private int getHasteLevel(int level) {
+        for (int i = hasteLevels.size() - 1; i >= 0; i--) {
+            if (level >= hasteLevels.get(i)) {
+                return i;
+            }
+        }
+        return 0;
     }
 
     @EventHandler
@@ -118,13 +133,7 @@ public class HasteFieldsPerk implements Listener, ConfigAccessor, ProgressionPer
                     return;
                 }
                 mining.getLevel(player).whenComplete((level, throwable1) -> {
-                    level = 500;
-                    for (int i = hasteLevels.size() - 1; i >= 0; i--) {
-                        if (level >= hasteLevels.get(i)) {
-                            addHaste(player, i);
-                            break;
-                        }
-                    }
+                    addHaste(player, getHasteLevel(level));
                 }).exceptionally(throwable1 -> {
                     log.error("Failed to check if player " + player.getName() + " has a level ", throwable);
                     return null;

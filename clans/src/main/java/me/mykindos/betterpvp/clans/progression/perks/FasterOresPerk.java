@@ -49,11 +49,10 @@ public class FasterOresPerk implements Listener, ConfigAccessor, ProgressionPerk
     @Override
     public List<String> getDescription(Player player, ProgressionData<?> data) {
         List<String> description = new ArrayList<>(List.of(
-                "TODO"
+                "Decreases the the time between ore spawns",
+                "in Lakes and Fields by <stat>" + speedMultiplier + "%</stat>",
+                "After Fishing level <stat>" + requiredLevel + "%</stat"
         ));
-        if (canUse(player, data)) {
-            description.add("Can Use");
-        }
         return description;
     }
 

@@ -53,11 +53,9 @@ public class BaseFishingPerk implements Listener, ConfigAccessor, ProgressionPer
     @Override
     public List<String> getDescription(Player player, ProgressionData<?> data) {
         List<String> description = new ArrayList<>(List.of(
-                "TODO"
+                "Allows the act of fishing outside of Fields/Lake",
+                "At Fishing Level <stat>" + requiredLevel + "</stat"
         ));
-        if (canUse(player, data)) {
-            description.add("Can Use");
-        }
         return description;
     }
 
