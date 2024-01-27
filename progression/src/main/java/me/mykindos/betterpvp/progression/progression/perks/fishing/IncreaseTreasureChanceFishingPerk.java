@@ -52,16 +52,17 @@ public class IncreaseTreasureChanceFishingPerk implements Listener, ProgressionP
 
     @Override
     public String getName() {
-        return "Increase Treasure Chance Fishing";
+        return "Increase Treasure Chance";
     }
 
     @Override
     public List<String> getDescription(Player player, ProgressionData<?> data) {
         List<String> description = new ArrayList<>(List.of(
-                "TODO"
+                "Increase the chance of fishing up treasure by",
+                "<stat>" + increasePerLevel + "%</stat> per Fishing Level."
         ));
         if (canUse(player, data)) {
-            description.add("Can Use");
+            description.add("Currently increases chance by <val>" + getIncrease(data.getLevel())/100 + "%</val>");
         }
         return description;
     }
@@ -79,6 +80,13 @@ public class IncreaseTreasureChanceFishingPerk implements Listener, ProgressionP
                 fishing.getLootTypes().getElements().stream().anyMatch(o -> (o instanceof TreasureType));
     }
 
+    public double getIncrease(int level) {
+        if (level > maxLevel) level = maxLevel;
+        //make leveling more intuitive
+        level = level - minLevel;
+        return level * increasePerLevel;
+    }
+
     @EventHandler (priority = EventPriority.HIGH)
     public void onCatch(PlayerCaughtFishEvent event) {
         if (!enabled) return;
@@ -90,11 +98,7 @@ public class IncreaseTreasureChanceFishingPerk implements Listener, ProgressionP
         fishing.hasPerk(player, getClass()).whenComplete((hasPerk, throwable) -> {
             if (hasPerk) {
                 fishing.getLevel(player).whenComplete((level, throwable1) -> {
-                    //cannot increase chance over the max level
-                    if (level > maxLevel) level = maxLevel;
-                    //make leveling more intuitive
-                    level = level - minLevel;
-                    double levelIncrease = level * increasePerLevel; // 100-based
+                    double levelIncrease = getIncrease(level); // 100-based
                     if (Math.random() * 100 > levelIncrease) return;
 
                     WeighedList<FishingLootType> lootTypes = new WeighedList<>();

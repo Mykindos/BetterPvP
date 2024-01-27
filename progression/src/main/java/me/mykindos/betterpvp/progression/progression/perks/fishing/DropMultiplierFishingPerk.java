@@ -53,7 +53,7 @@ public class DropMultiplierFishingPerk implements Listener, ProgressionPerk, Cha
 
     @Override
     public String getName() {
-        return "Drop Multiplier Fishing";
+        return "Drop Chance Multiplier";
     }
 
     @Override

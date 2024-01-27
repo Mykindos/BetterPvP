@@ -54,16 +54,19 @@ public class IncreaseFishWeightFishingPerk implements Listener, ProgressionPerk,
 
     @Override
     public String getName() {
-        return "Increase Fish Weight Fishing";
+        return "Increase Fish Weight";
     }
 
     @Override
     public List<String> getDescription(Player player, ProgressionData<?> data) {
         List<String> description = new ArrayList<>(List.of(
-                "TODO"
+                "Increase the amount of items dropped while fishing by",
+                "<stat>" + increasePerLevel + "%</stat> per Mining Level.",
+                "Every <stat>100%</stat>, you have a guaranteed drop, with the remainder being",
+                "the chance to get another drop."
         ));
         if (canUse(player, data)) {
-            description.add("Can Use");
+            description.add("Currently increases your chances by <val>" + data.getLevel() * increasePerLevel + "%</val>");
         }
         return description;
     }
@@ -81,6 +84,13 @@ public class IncreaseFishWeightFishingPerk implements Listener, ProgressionPerk,
         return minLevel <= data.getLevel();
     }
 
+    public double getIncrease(int level) {
+        if (level > maxLevel) level = maxLevel;
+        //make leveling more intuitive
+        level = level - minLevel;
+        return level * increasePerLevel;
+    }
+
     @EventHandler (priority = EventPriority.NORMAL)
     public void onCatch(PlayerCaughtFishEvent event) {
         if (!enabled) return;
@@ -90,11 +100,7 @@ public class IncreaseFishWeightFishingPerk implements Listener, ProgressionPerk,
             fishing.hasPerk(player, getClass()).whenComplete((hasPerk, throwable) -> {
                 if (hasPerk) {
                     fishing.getLevel(player).whenComplete((level, throwable1) -> {
-                        //cannot increase weight over the max level
-                        if (level > maxLevel) level = maxLevel;
-                        //make leveling more intuitive
-                        level = level - minLevel;
-                        double chanceMultiplier = getChance(level * increasePerLevel);
+                        double chanceMultiplier = getChance(getIncrease(level));
                         if (chanceMultiplier == 0) {
                             return;
                         }

@@ -59,7 +59,7 @@ public class DropMultiplierMiningPerk implements Listener, ProgressionPerk, Chan
         List<String> description = new ArrayList<>(List.of(
                 "Increase the amount of items dropped while mining by",
                 "<stat>" + increasePerLevel + "%</stat> per Mining Level.",
-                "Every 100%, you have a guaranteed drop, with the remainder being",
+                "Every <stat>100%</stat>, you have a guaranteed drop, with the remainder being",
                 "the chance to get another drop."
         ));
         if (canUse(player, data)) {

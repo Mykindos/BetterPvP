@@ -57,10 +57,11 @@ public class DamageReductionFishingPerk implements Listener, ProgressionPerk {
     @Override
     public List<String> getDescription(Player player, ProgressionData<?> data) {
         List<String> description = new ArrayList<>(List.of(
-                "TODO"
+                "Reduces the damage you take while actively fishing by",
+                "<stat>" + decreasePerLevel + "</stat> per Fishing level,"
         ));
         if (canUse(player, data)) {
-            description.add("Can Use");
+            description.add("Currently, you take <val>" + data.getLevel() * decreasePerLevel * 100 + "</val> less damage while actively fishing.");
         }
         return description;
     }
