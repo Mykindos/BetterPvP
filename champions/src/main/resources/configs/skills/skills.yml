@@ -313,15 +313,17 @@ skills:
       radiusIncreasePerLevel: 0.5
     inferno:
       enabled: true
-      maxlevel: 5
-      energy: 9
+      maxlevel: 3
+      cooldown: 3.0
       baseFireDuration: 2.5
       fireDurationIncreasePerLevel: 0.0
       baseDamage: 1.0
       damageIncreasePerLevel: 0.0
-      immuneTime: 0.45
-      fireTicks: 50
-      energyDecreasePerLevel: 1.0
+      chargeIncreasePerLevel: 0.0
+      baseCharge: 100.0
+      baseNumFlames: 4
+      numFlamesIncreasePerLevel: 2
+      cooldownDecreasePerLevel: 0.5
     fireblast:
       enabled: true
       maxlevel: 5
