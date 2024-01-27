@@ -439,14 +439,6 @@ skills:
       baseDuration: 7.0
       durationIncreasePerLevel: 0.0
       regenerationStrength: 0
-    cyclone:
-      enabled: true
-      maxlevel: 5
-      cooldown: 16.0
-      cooldownDecreasePerLevel: 1.0
-      baseDistance: 7.0
-      distanceIncreasePerLevel: 1.0
-      minimumDistance: 7
     polymorph:
       enabled: true
       maxlevel: 3
@@ -509,6 +501,15 @@ skills:
       damageIncreasePerLevel: 2.0
       cooldownDecreasePerLevel: 2.0
       slamDelay: 500
+    whirlwindsword:
+      enabled: true
+      maxlevel: 5
+      cooldown: 20.0
+      cooldownDecreasePerLevel: 1.0
+      baseDistance: 7.0
+      distanceIncreasePerLevel: 0.0
+      baseDamage: 3.0
+      damageIncreasePerLevel: 1.0
     cripplingblow:
       enabled: true
       maxlevel: 3
