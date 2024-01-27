@@ -61,7 +61,7 @@ public class CrimsonEmpowerment extends Skill implements InteractSkill, Cooldown
 
     @Override
     public Role getClassType() {
-        return Role.WARLOCK;
+        return Role.BRUTE;
     }
 
     @Override
@@ -84,7 +84,6 @@ public class CrimsonEmpowerment extends Skill implements InteractSkill, Cooldown
         double proposedHealth = player.getHealth() - (20 - (20 * healthReduction));
 
         player.setHealth(Math.max(0.5, proposedHealth));
-
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 2.0F);
         championsManager.getEffects().addEffect(player, EffectType.STRENGTH, 1, (long) (getDuration(level) * 1000L));
 

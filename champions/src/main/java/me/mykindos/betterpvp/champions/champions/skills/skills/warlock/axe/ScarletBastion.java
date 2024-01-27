@@ -48,23 +48,20 @@ public class ScarletBastion extends Skill implements InteractSkill, CooldownSkil
                 "",
                 "Sacrifice <val>" + UtilMath.round(getHealthReduction(level) * 100, 2) + "%</val> of your health to",
                 "grant all allies within <val>" + (radius + (level)) + "</val> blocks",
-                "<effect>Resistance " + UtilFormat.getRomanNumeral(resistanceStrength + 1) + "</effect> for <stat>" + duration + "</stat> seconds",
+                "<effect>Resistance " + UtilFormat.getRomanNumeral(resistanceStrength + 1) + "</effect> for <stat>" + duration + "</stat> seconds.",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
     }
 
-    public double getHealthReduction(int level) {
-        return baseHealthReduction - level * healthReductionDecreasePerLevel;
-    }
-
     @Override
     public Role getClassType() {
-        return Role.WARLOCK;
+        return Role.BRUTE;
     }
 
     @Override
     public SkillType getType() {
+
         return SkillType.AXE;
     }
 
@@ -74,27 +71,9 @@ public class ScarletBastion extends Skill implements InteractSkill, CooldownSkil
         return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
-    @Override
-    public boolean canUse(Player player) {
-        int level = getLevel(player);
-        double healthReduction = 1.0 - getHealthReduction(level);
-        double proposedHealth = player.getHealth() - (20 - (20 * healthReduction));
-
-        if (proposedHealth <= 0.5) {
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You do not have enough health to use <green>%s %d<gray>", getName(), level);
-            return false;
-        }
-
-        return true;
-    }
 
     @Override
     public void activate(Player player, int level) {
-        double healthReduction = 1.0 - getHealthReduction(level);
-        double proposedHealth = player.getHealth() - (20 - (20 * healthReduction));
-
-        player.setHealth(Math.max(0.5, proposedHealth));
-
         player.getWorld().playSound(player.getLocation().add(0.0, -1.0, 0.0), Sound.ENTITY_ENDER_DRAGON_GROWL, 1.8F, 2.5F);
         player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, (int) duration * 20, resistanceStrength));
         championsManager.getEffects().addEffect(player, EffectType.RESISTANCE, (long) (duration * 1000));
