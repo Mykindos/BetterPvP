@@ -129,8 +129,6 @@ public class Overcharge extends Skill implements InteractSkill, Listener {
 
                 double finalSize = baseSize * count;
 
-                System.out.print((float)finalSize);
-
                 Particle.DustOptions redDust = new Particle.DustOptions(Color.fromRGB(255, 0, 0), (float)finalSize);
                 new ParticleBuilder(Particle.REDSTONE)
                         .location(arrow.getLocation())
