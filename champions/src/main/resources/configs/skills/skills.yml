@@ -175,7 +175,7 @@ skills:
       enabled: true
       maxlevel: 3
       maxDamageIncreasePerLevel: 1.0
-      baseDamage: 0.5
+      baseDamage: 0.0
       damageIncreasePerLevel: 0.5
       baseMaxDamage: 1.0
       expirationTime: 5.0
@@ -226,7 +226,7 @@ skills:
     fury:
       enabled: true
       maxlevel: 3
-      baseDamage: 1.0
+      baseDamage: 0.5
       damageIncreasePerLevel: 0.5
       baseMaxDamage: 2.0
       maxDamageIncreasePerLevel: 1.0
@@ -499,13 +499,13 @@ skills:
       damageIncreasePerLevel: 2.0
       cooldownDecreasePerLevel: 2.0
       slamDelay: 500
-    whirlwindsword:
+    whirlwindaxe:
       enabled: true
       maxlevel: 5
       cooldown: 20.0
       cooldownDecreasePerLevel: 1.0
-      baseDistance: 7.0
-      distanceIncreasePerLevel: 0.0
+      baseDistance: 4.0
+      distanceIncreasePerLevel: 1.0
       baseDamage: 3.0
       damageIncreasePerLevel: 1.0
     sacrifice:
