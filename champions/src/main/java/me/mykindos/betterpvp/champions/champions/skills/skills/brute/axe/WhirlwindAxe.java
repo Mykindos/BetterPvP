@@ -77,7 +77,6 @@ public class WhirlwindAxe extends Skill implements InteractSkill, CooldownSkill 
         return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
-
     @Override
     public void activate(Player player, int level) {
         Vector vector = player.getLocation().toVector();

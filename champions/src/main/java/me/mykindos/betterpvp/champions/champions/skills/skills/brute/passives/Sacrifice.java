@@ -50,7 +50,7 @@ public class Sacrifice extends Skill implements PassiveSkill {
 
     @Override
     public Role getClassType() {
-        return Role.KNIGHT;
+        return Role.BRUTE;
     }
 
     @Override
