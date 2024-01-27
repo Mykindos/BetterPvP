@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.champions.champions.skills.skills.brute.sword;
+package me.mykindos.betterpvp.champions.champions.skills.skills.brute.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -23,7 +23,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.util.Vector;
 
 @Singleton
-public class WhirlwindSword extends Skill implements InteractSkill, CooldownSkill {
+public class WhirlwindAxe extends Skill implements InteractSkill, CooldownSkill {
 
     private double baseDistance;
     private double distanceIncreasePerLevel;
@@ -31,20 +31,20 @@ public class WhirlwindSword extends Skill implements InteractSkill, CooldownSkil
     private double damageIncreasePerLevel;
 
     @Inject
-    public WhirlwindSword(Champions champions, ChampionsManager championsManager) {
+    public WhirlwindAxe(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
 
     @Override
     public String getName() {
-        return "Whirlwind Sword";
+        return "Whirlwind Axe";
     }
 
     @Override
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Right click with a Sword to activate",
+                "Right click with an Axe to activate",
                 "",
                 "Pulls all enemies within <val>" + getDistance(level) + "</val> blocks towards you",
                 "and deals <val>" + getDamage(level) + "</val> damage",
@@ -68,13 +68,12 @@ public class WhirlwindSword extends Skill implements InteractSkill, CooldownSkil
 
     @Override
     public SkillType getType() {
-        return SkillType.SWORD;
+        return SkillType.AXE;
     }
 
 
     @Override
     public double getCooldown(int level) {
-
         return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
@@ -83,7 +82,6 @@ public class WhirlwindSword extends Skill implements InteractSkill, CooldownSkil
     public void activate(Player player, int level) {
         Vector vector = player.getLocation().toVector();
         vector.setY(vector.getY() + 2);
-
 
         for (LivingEntity target : UtilEntity.getNearbyEnemies(player, player.getLocation(), getDistance(level))) {
             if (!target.getName().equalsIgnoreCase(player.getName())) {

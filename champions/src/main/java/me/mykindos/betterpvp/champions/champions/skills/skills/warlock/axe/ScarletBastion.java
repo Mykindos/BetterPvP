@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.champions.champions.skills.skills.brute.axe;
+package me.mykindos.betterpvp.champions.champions.skills.skills.warlock.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Sound;
@@ -21,21 +22,22 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 @Singleton
-public class SpiritOfTheBear extends Skill implements InteractSkill, CooldownSkill {
+public class ScarletBastion extends Skill implements InteractSkill, CooldownSkill {
 
     private int radius;
     private double duration;
-
     private int resistanceStrength;
+    private double baseHealthReduction;
+    private double healthReductionDecreasePerLevel;
 
     @Inject
-    public SpiritOfTheBear(Champions champions, ChampionsManager championsManager) {
+    public ScarletBastion(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
 
     @Override
     public String getName() {
-        return "Spirit of the Bear";
+        return "Scarlet Bastion";
     }
 
     @Override
@@ -44,8 +46,8 @@ public class SpiritOfTheBear extends Skill implements InteractSkill, CooldownSki
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Call upon the spirit of the bear,",
-                "granting all allies within <val>" + (radius + (level)) + "</val> blocks",
+                "Sacrifice <val>" + UtilMath.round(getHealthReduction(level) * 100, 2) + "%</val> of your health to",
+                "grant all allies within <val>" + (radius + (level)) + "</val> blocks",
                 "<effect>Resistance " + UtilFormat.getRomanNumeral(resistanceStrength + 1) + "</effect> for <stat>" + duration + "</stat> seconds.",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
@@ -93,6 +95,9 @@ public class SpiritOfTheBear extends Skill implements InteractSkill, CooldownSki
         radius = getConfig("radius", 5, Integer.class);
         duration = getConfig("duration", 5.0, Double.class);
         resistanceStrength = getConfig("resistanceStrength", 1, Integer.class);
+
+        baseHealthReduction = getConfig("baseHealthReduction", 0.4, Double.class);
+        healthReductionDecreasePerLevel = getConfig("healthReductionDecreasePerLevel", 0.05, Double.class);
     }
 
 }

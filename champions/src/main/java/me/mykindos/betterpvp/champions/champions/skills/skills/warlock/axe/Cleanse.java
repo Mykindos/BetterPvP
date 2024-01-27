@@ -135,7 +135,7 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
 
     @Override
     public void loadSkillConfig() {
-        baseHealthReduction = getConfig("baseHealthReduction", 0.5, Double.class);
+        baseHealthReduction = getConfig("baseHealthReduction", 0.4, Double.class);
         healthReductionDecreasePerLevel = getConfig("healthReductionDecreasePerLevel", 0.05, Double.class);
         baseRange = getConfig("baseRange", 5.0, Double.class);
         rangeIncreasePerLevel = getConfig("rangeIncreasePerLevel", 1.0, Double.class);
