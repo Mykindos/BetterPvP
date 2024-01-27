@@ -28,6 +28,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Singleton
@@ -54,10 +55,14 @@ public class HasteFieldsPerk implements Listener, ConfigAccessor, ProgressionPer
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[] {
-                "TODO",
-        };
+    public List<String> getDescription(Player player, ProgressionData<?> data) {
+        List<String> description = new ArrayList<>(List.of(
+                "TODO"
+        ));
+        if (canUse(player, data)) {
+            description.add("Can Use");
+        }
+        return description;
     }
 
     @Override

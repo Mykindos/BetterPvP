@@ -17,6 +17,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @BPvPListener
 @Singleton
 @Slf4j
@@ -49,12 +52,15 @@ public class LongerBaitFishingPerk implements Listener, ProgressionPerk {
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[] {
+    public List<String> getDescription(Player player, ProgressionData<?> data) {
+        List<String> description = new ArrayList<>(List.of(
                 "Increases the duration of baits you throw by",
-                "<stat>" + increasePerLevel * 100 + "%</stat> per Fishing level.",
-                "Currently increases duration of baits by <val>" + getPercentage(level) * 100 + "%</val>",
-        };
+                "<stat>" + increasePerLevel * 100 + "%</stat> per Fishing level."
+                ));
+        if (canUse(player, data)) {
+            description.add("Currently increases duration of baits by <val>" + getPercentage(data.getLevel()) * 100 + "%</val>");
+        }
+        return description;
     }
 
     @Override

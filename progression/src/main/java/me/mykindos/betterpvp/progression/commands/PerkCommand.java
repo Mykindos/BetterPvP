@@ -10,7 +10,6 @@ import me.mykindos.betterpvp.progression.ProgressionsManager;
 import me.mykindos.betterpvp.progression.model.ProgressionTree;
 import me.mykindos.betterpvp.progression.model.menu.PerksMenu;
 import me.mykindos.betterpvp.progression.model.stats.ProgressionData;
-import net.kyori.adventure.text.Component;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -54,30 +53,24 @@ public class PerkCommand extends Command {
         }
 
         final ProgressionTree tree = treeOpt.get();
-        PerksMenu perksMenu = new PerksMenu(9, 2, player, tree);
-        perksMenu.show(player);
+        run(player, tree);
     }
 
 
-    private void run(Player player, Client target, ProgressionTree tree) {
-        final CompletableFuture<? extends ProgressionData<?>> loaded = tree.getStatsRepository().getDataAsync(target.getUniqueId());
+    private void run(Player player, ProgressionTree tree) {
+        final CompletableFuture<? extends ProgressionData<?>> loaded = tree.getStatsRepository().getDataAsync(player.getUniqueId());
         if (!loaded.isDone()) {
-            UtilMessage.message(player, "Stats", "Retrieving player data...");
+            UtilMessage.message(player, "Perks", "Retrieving player data...");
         }
 
-        final String targetName = target.getName();
         loaded.whenComplete((data, throwable) -> {
             if (throwable != null) {
-                UtilMessage.message(player, "Stats", "There was an error retrieving this player data.");
-                log.error("There was an error retrieving player data for {}", targetName, throwable);
+                UtilMessage.message(player, "Perks", "There was an error retrieving data.");
+                log.error("There was an error retrieving player data for {}", player.getName(), throwable);
                 return;
             }
-
-            UtilMessage.message(player, "Stats", "Player data for <alt2>%s</alt2>:", targetName);
-            UtilMessage.message(player, "Stats", "Level: <alt>%d", data.getLevel());
-            for (Component component : data.getDescription()) {
-                UtilMessage.message(player, "Stats", component);
-            }
+            PerksMenu perksMenu = new PerksMenu(9, 2, player, tree, data);
+            perksMenu.show(player);
         });
     }
 

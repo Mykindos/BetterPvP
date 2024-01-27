@@ -18,9 +18,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 @BPvPListener
@@ -48,7 +46,7 @@ public class DamageReductionFishingPerk implements Listener, ProgressionPerk {
     @Inject
     private Fishing fishing;
 
-    private Set<UUID> active = new HashSet<>();
+    private final Set<UUID> active = new HashSet<>();
 
 
     @Override
@@ -57,10 +55,14 @@ public class DamageReductionFishingPerk implements Listener, ProgressionPerk {
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[] {
-                "TODO",
-        };
+    public List<String> getDescription(Player player, ProgressionData<?> data) {
+        List<String> description = new ArrayList<>(List.of(
+                "TODO"
+        ));
+        if (canUse(player, data)) {
+            description.add("Can Use");
+        }
+        return description;
     }
 
 
