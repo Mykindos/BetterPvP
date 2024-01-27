@@ -21,10 +21,8 @@ import org.bukkit.potion.PotionEffectType;
 
 @Singleton
 public class SpiritOfTheWolf extends Skill implements InteractSkill, CooldownSkill {
-
     private int radius;
     private double duration;
-
     private int speedStrength;
 
     @Inject
@@ -58,7 +56,6 @@ public class SpiritOfTheWolf extends Skill implements InteractSkill, CooldownSki
 
     @Override
     public SkillType getType() {
-
         return SkillType.AXE;
     }
 
