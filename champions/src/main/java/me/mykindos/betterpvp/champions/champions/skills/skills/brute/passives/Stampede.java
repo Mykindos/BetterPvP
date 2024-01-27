@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import org.bukkit.Bukkit;
@@ -102,6 +103,7 @@ public class Stampede extends Skill implements PassiveSkill {
                             sprintStr.put(player, str + 1);
 
                             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_AMBIENT, 2.0F, 0.2F * str + 2.0F);
+                            UtilMessage.simpleMessage(player, getClassType().getName(), "Stampede Level: <yellow>%d", str + 1);
                         }
                     }
                 }

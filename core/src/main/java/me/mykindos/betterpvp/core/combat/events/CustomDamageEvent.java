@@ -26,7 +26,7 @@ public class CustomDamageEvent extends CustomCancellableEvent {
     private double damage;
     private double rawDamage;
     private boolean knockback;
-    private long damageDelay = 200;
+    private long damageDelay = 400;
     private LightningStrike lightning;
     private boolean ignoreArmour;
     private Set<String> reason = new HashSet<>();

@@ -131,7 +131,9 @@ public class CombatListener implements Listener {
 
                 String damagerUuid = event.getDamager() == null ? null : event.getDamager().getUniqueId().toString();
 
-                damageDataList.add(new DamageData(event.getDamagee().getUniqueId().toString(), event.getCause(), damagerUuid, event.getDamageDelay()));
+                if(event.getDamageDelay() > 0) {
+                    damageDataList.add(new DamageData(event.getDamagee().getUniqueId().toString(), event.getCause(), damagerUuid, event.getDamageDelay()));
+                }
 
                 if (event.isKnockback()) {
                     if (event.getDamager() != null) {
@@ -317,25 +319,27 @@ public class CombatListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void handleCauseTimers(CustomDamageEvent e) {
+    public void handleCauseTimers(CustomDamageEvent event) {
 
-        if (e.getCause() == DamageCause.ENTITY_ATTACK
-                || e.getCause() == DamageCause.PROJECTILE
-                || e.getCause() == DamageCause.CUSTOM) {
-            e.setDamageDelay(400);
+        if (event.getDamageDelay() == 0) return;
+
+        if (event.getCause() == DamageCause.ENTITY_ATTACK
+                || event.getCause() == DamageCause.PROJECTILE
+                || event.getCause() == DamageCause.CUSTOM) {
+            event.setDamageDelay(400);
         }
 
-        if (e.getCause() == DamageCause.POISON) {
-            e.setDamageDelay(1000);
+        if (event.getCause() == DamageCause.POISON) {
+            event.setDamageDelay(1000);
         }
 
-        if (e.getCause() == DamageCause.LAVA) {
-            e.setDamageDelay(400);
+        if (event.getCause() == DamageCause.LAVA) {
+            event.setDamageDelay(400);
         }
 
-        if (e.getDamagee().getLocation().getBlock().isLiquid()) {
-            if (e.getCause() == DamageCause.FIRE || e.getCause() == DamageCause.FIRE_TICK) {
-                e.cancel("Already in lava / liquid");
+        if (event.getDamagee().getLocation().getBlock().isLiquid()) {
+            if (event.getCause() == DamageCause.FIRE || event.getCause() == DamageCause.FIRE_TICK) {
+                event.cancel("Already in lava / liquid");
             }
         }
 
