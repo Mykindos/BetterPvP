@@ -29,13 +29,11 @@ public class Vengeance extends Skill implements PassiveSkill, Listener {
 
     private final WeakHashMap<Player, Integer> playerNumHitsMap = new WeakHashMap<>();
     private final WeakHashMap<Player, BukkitTask> playerTasks = new WeakHashMap<>();
-
     private double baseDamage;
     private double damageIncreasePerLevel;
-
     private double baseMaxDamage;
-
     private double maxDamageIncreasePerLevel;
+    private double expirationTime;
 
     @Inject
     public Vengeance(Champions champions, ChampionsManager championsManager) {
@@ -50,12 +48,11 @@ public class Vengeance extends Skill implements PassiveSkill, Listener {
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "For every subsequent hit, your damage",
-                "will increase by <val>" + getDamage(level) + "</val>",
+                "For every hit you took since last damaging",
+                "an enemy, your damage will increase by <val>" + getDamage(level) + "</val> damage",
+                "up to a maxiumum of" + getMaxDamage(level) + "</val> extra damage",
                 "",
-                "If you take damage, your damage will reset",
-                "",
-                "you can deal a maximum of <val>" + getMaxDamage(level) + "</val> extra damage"
+                "Extra damage will reset after <stat> "+ expirationTime + "</stat> seconds"
         };
     }
 
@@ -74,20 +71,17 @@ public class Vengeance extends Skill implements PassiveSkill, Listener {
 
     @Override
     public SkillType getType() {
-        return SkillType.PASSIVE_A;
+        return SkillType.PASSIVE_B;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onDamage(CustomDamageEvent event) {
         if (!(event.getDamagee() instanceof Player player)) return;
 
-        int level = getLevel(player);
-        if (level > 0) {
+        if (event.getDamager() instanceof Player) {
             int numHits = playerNumHitsMap.getOrDefault(player, 0);
-            if (numHits > 1) {
-                player.playSound(player.getLocation(), Sound.BLOCK_FIRE_EXTINGUISH, (float) 2.0, (float) 1.5);
-            }
-            playerNumHitsMap.put(player, 0);
+            numHits++;
+            playerNumHitsMap.put(player, numHits);
         }
     }
 
@@ -98,17 +92,14 @@ public class Vengeance extends Skill implements PassiveSkill, Listener {
         if (event.isCancelled()) return;
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
 
-        int numHits = playerNumHitsMap.getOrDefault(player, 0);
-        numHits++;
-        playerNumHitsMap.put(player, numHits);
-
         int level = getLevel(player);
         if (level > 0) {
-            double damageIncrease = Math.min(getMaxDamage(level), (numHits - 1) * getDamage(level));
-            if (damageIncrease > 0) {
-                event.setDamage(event.getDamage() + damageIncrease);
-                UtilMessage.simpleMessage(player, getClassType().getName(), "%s: <yellow>+%2.2f<gray> Bonus Damage", getName(), damageIncrease);
-            }
+            int numHitsTaken = playerNumHitsMap.getOrDefault(player, 0);
+            double damageIncrease = Math.min(getMaxDamage(level), numHitsTaken * getDamage(level));
+
+            event.setDamage(event.getDamage() + damageIncrease);
+
+            playerNumHitsMap.put(player, 0);
 
             if (playerTasks.containsKey(player)) {
                 playerTasks.get(player).cancel();
@@ -121,7 +112,7 @@ public class Vengeance extends Skill implements PassiveSkill, Listener {
                 if (!player.isDead()) {
                     player.playSound(player.getLocation(), Sound.BLOCK_FIRE_EXTINGUISH, (float) 2.0, (float) 1.5);
                 }
-            }, 100L);
+            }, (long)expirationTime * 20L);
 
             playerTasks.put(player, task);
         }
@@ -140,10 +131,11 @@ public class Vengeance extends Skill implements PassiveSkill, Listener {
 
     @Override
     public void loadSkillConfig() {
-        baseDamage = getConfig("baseDamage", 0.25, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.25, Double.class);
+        baseDamage = getConfig("baseDamage", 0.5, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.5, Double.class);
         baseMaxDamage = getConfig("baseMaxDamage", 1.0, Double.class);
-        maxDamageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
+        maxDamageIncreasePerLevel = getConfig("maxDamageIncreasePerLevel", 1.0, Double.class);
+        expirationTime = getConfig("expirationTime", 5.0, Double.class);
     }
 
 }

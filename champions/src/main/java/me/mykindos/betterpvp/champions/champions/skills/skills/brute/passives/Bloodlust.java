@@ -119,7 +119,7 @@ public class Bloodlust extends Skill implements PassiveSkill {
     @Override
     public SkillType getType() {
 
-        return SkillType.PASSIVE_B;
+        return SkillType.PASSIVE_A;
     }
 
     @Override
