@@ -145,6 +145,10 @@ skills:
       baseMultiplier: 1.6
       cooldownDecreasePerLevel: 1.0
       multiplierIncreasePerLevel: 0.2
+    resistance:
+      enabled: true
+      maxlevel: 3
+      increasePerLevel: 15
     ride:
       enabled: false
       cooldown: 30.0
@@ -170,15 +174,11 @@ skills:
     vengeance:
       enabled: true
       maxlevel: 3
-      damageIncrease: 0.25
-      canUseWhileSlowed: true
-      canUseWhileSilenced: false
-      canUseWhileStunned: false
-      canUseWhileLevitating: false
-      canUseInLiquid: false
-      baseDamage: 0.25
-      damageIncreasePerLevel: 0.25
+      maxDamageIncreasePerLevel: 1.0
+      baseDamage: 0.5
+      damageIncreasePerLevel: 0.5
       baseMaxDamage: 1.0
+      expirationTime: 5.0
     levelfield:
       enabled: true
       maxlevel: 3
@@ -559,10 +559,6 @@ skills:
       baseDuration: 5.0
       durationIncreasePerLevel: 1.0
       health: 4.0
-    resistance:
-      enabled: true
-      maxlevel: 3
-      increasePerLevel: 15
     overwhelm:
       enabled: true
       maxlevel: 3
