@@ -45,7 +45,7 @@ public class Resistance extends Skill implements PassiveSkill {
 
     @Override
     public Role getClassType() {
-        return Role.BRUTE;
+        return Role.KNIGHT;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

@@ -50,9 +50,9 @@ public class Vengeance extends Skill implements PassiveSkill, Listener {
         return new String[]{
                 "For every hit you took since last damaging",
                 "an enemy, your damage will increase by <val>" + getDamage(level) + "</val> damage",
-                "up to a maxiumum of" + getMaxDamage(level) + "</val> extra damage",
+                "up to a maxiumum of <val>" + getMaxDamage(level) + "</val> extra damage",
                 "",
-                "Extra damage will reset after <stat> "+ expirationTime + "</stat> seconds"
+                "Extra damage will reset after <stat>"+ expirationTime + "</stat> seconds"
         };
     }
 
@@ -71,7 +71,7 @@ public class Vengeance extends Skill implements PassiveSkill, Listener {
 
     @Override
     public SkillType getType() {
-        return SkillType.PASSIVE_B;
+        return SkillType.PASSIVE_A;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -131,7 +131,7 @@ public class Vengeance extends Skill implements PassiveSkill, Listener {
 
     @Override
     public void loadSkillConfig() {
-        baseDamage = getConfig("baseDamage", 0.5, Double.class);
+        baseDamage = getConfig("baseDamage", 0.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.5, Double.class);
         baseMaxDamage = getConfig("baseMaxDamage", 1.0, Double.class);
         maxDamageIncreasePerLevel = getConfig("maxDamageIncreasePerLevel", 1.0, Double.class);
