@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -67,10 +68,15 @@ public class TutorialSubCommand extends ClanSubCommand {
                     .append(UtilMessage.deserialize("Mage is a class skilled with different elements. Choose between life, ice, fire, and earth to support your teammates, trap the enemy, and kill them.")),
             Component.text(Role.WARLOCK.getName(), Role.WARLOCK.getColor()).appendNewline()
                     .append(UtilMessage.deserialize("Warlock is a class focused on health. Some abilities require the sacrifice in health, others punish enemies for proximity and low health.")),
-            UtilMessage.deserialize("There is more than just combat, you could also level up other areas. Level up your Progression in <blue>Fishing</blue>, <silver>Mining</silver>, and <brown>Woodcutting</brown>")
-            //Progression
-            //Shops
-            //Fields/Events
+            UtilMessage.deserialize("There is more than just combat, you could also level up other areas. Level up your Progression in <blue>Fishing</blue>, <white>Mining</white>, and <dark_red>Woodcutting</dark_red>"),
+            Component.text("Fishing", NamedTextColor.BLUE).appendNewline()
+                    .append(UtilMessage.deserialize("Take your rod and cast it into the Lake, fishing around for fish and treasures. Level up with catches, cast baits to entice fish, and upgrade your rod to catch heavier fish. Take your catch and sell it at shops, or take your treasure home.")),
+            Component.text("Mining", NamedTextColor.WHITE).appendNewline()
+                    .append(UtilMessage.deserialize("Take your pick and make your way to the mines, for there are riches in store. Earn experience, with 5x more in Fields. Higher levels lead to more drops and faster mining speeds.")),
+            UtilMessage.deserialize("In each cardinal direction there is a <aqua>Safezone</aqua> that contains <white>Shops</white>. Here, you can sell most items and buy essential goods."),
+            UtilMessage.deserialize("In the center of the map is <white>Fields</white>. A high traffic area, here you can find ores, places to fish, and a teleporter to events."),
+            UtilMessage.deserialize("From boss events, you have a chance to receive <light_purple><bold>Legendary</bold></light_purple> Weapons. These are strong, special weapons, imbued with unique capabilities."),
+            UtilMessage.deserialize("Good luck in your adventures and remember to have fun.")
     ));
 
     @Inject
