@@ -298,17 +298,6 @@ skills:
       baseSlowDuration: 1.5
       slowDurationIncreasePerLevel: 0.0
       slowStrength: 2
-    boulder:
-      enabled: true
-      cooldown: 25.0
-      maxlevel: 5
-      baseRadius: 4.0
-      baseHeal: 2.0
-      baseDamage: 3.0
-      cooldownDecreasePerLevel: 1.0
-      healingIncreasePerLevel: 1.0
-      damageIncreasePerLevel: 1.0
-      radiusIncreasePerLevel: 0.5
     inferno:
       enabled: true
       maxlevel: 3
@@ -489,6 +478,17 @@ skills:
       baseRadius: 3.0
       radius: 3
       slownessStrength: 0
+    boulder:
+      enabled: true
+      cooldown: 25.0
+      maxlevel: 5
+      baseRadius: 4.0
+      baseHeal: 2.0
+      baseDamage: 3.0
+      cooldownDecreasePerLevel: 1.0
+      healingIncreasePerLevel: 1.0
+      damageIncreasePerLevel: 1.0
+      radiusIncreasePerLevel: 0.5
     seismicslam:
       enabled: true
       maxlevel: 5
