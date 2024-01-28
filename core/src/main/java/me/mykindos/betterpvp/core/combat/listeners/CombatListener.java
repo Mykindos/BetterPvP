@@ -464,7 +464,6 @@ public class CombatListener implements Listener {
     private void updateDurability(CustomDamageEvent event) {
 
         CustomDamageDurabilityEvent durabilityEvent = UtilServer.callEvent(new CustomDamageDurabilityEvent(event));
-
         if (durabilityEvent.isDamageeTakeDurability()) {
             if (event.getDamagee() instanceof Player damagee) {
 
@@ -522,7 +521,14 @@ public class CombatListener implements Listener {
 
             }
         }
+    }
 
+    @EventHandler(priority = EventPriority.LOW)
+    public void onCustomDamageEvent(CustomDamageDurabilityEvent event) {
+        if (event.getCustomDamageEvent().getDamager() instanceof Player damager) {
+            if (event.getCustomDamageEvent().getCause() != DamageCause.ENTITY_ATTACK)
+                event.setDamagerTakeDurability(false);
+        }
     }
 
     @EventHandler

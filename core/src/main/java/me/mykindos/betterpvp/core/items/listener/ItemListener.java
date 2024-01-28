@@ -6,10 +6,12 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageDurabilityEvent;
 import me.mykindos.betterpvp.core.items.BPVPItem;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -27,7 +29,25 @@ public class ItemListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onDamageItem(PlayerItemDamageEvent event) {
         if (event.isCancelled()) return;
+        log.info("damage item");
         event.setCancelled(damageCustomItem(event.getPlayer(), event.getItem(), 1));
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onShootBow(EntityShootBowEvent event) {
+        if (event.isCancelled()) return;
+        if (event.getEntity() instanceof Player player) {
+            log.info("bow");
+            damageCustomItem(player, player.getInventory().getItemInMainHand(), 1);
+        }
+    }
+
+    @EventHandler
+    public void onBowHit (CustomDamageDurabilityEvent event) {
+        if (event.getCustomDamageEvent().getDamagingEntity() instanceof Arrow) {
+            //this was a bow shot, should already be handled when fired
+            event.setDamagerTakeDurability(false);
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
