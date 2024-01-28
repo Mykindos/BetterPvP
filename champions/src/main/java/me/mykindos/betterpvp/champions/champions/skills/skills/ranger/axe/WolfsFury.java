@@ -29,12 +29,11 @@ import java.util.WeakHashMap;
 @Singleton
 @BPvPListener
 public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Listener {
-
     private final WeakHashMap<Player, Long> active = new WeakHashMap<>();
     private final WeakHashMap<Player, Integer> missedSwings = new WeakHashMap<>();
     private double baseDuration;
     private double durationIncreasePerLevel;
-    private int strengthStrength;
+    private int strengthLevel;
     private int maxMissedSwings;
 
     @Inject
@@ -54,11 +53,12 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
                 "Right click with an Axe to activate",
                 "",
                 "Summon the power of the wolf, gaining",
-                "<effect>Strength " + UtilFormat.getRomanNumeral(strengthStrength + 1) + "</effect> for <val>" + getDuration(level) + "</val> seconds, and giving",
+                "<effect>Strength " + UtilFormat.getRomanNumeral(strengthLevel) + "</effect> for <val>" + getDuration(level) + "</val> seconds and giving",
                 "no knockback on your attacks",
                 "",
-                "If you miss <stat>" + maxMissedSwings + "</stat> consecutive attacks,",
+                "If you miss <stat>" + maxMissedSwings + "</stat> consecutive attacks",
                 "Wolfs Fury ends",
+                "",
                 "Cooldown: <val>" + getCooldown(level)
         };
     }
@@ -74,13 +74,11 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
 
     @Override
     public SkillType getType() {
-
         return SkillType.AXE;
     }
 
     @Override
     public double getCooldown(int level) {
-
         return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
@@ -102,8 +100,11 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
     @UpdateEvent(delay = 500)
     public void onUpdate() {
         active.entrySet().removeIf(entry -> {
+            Player player = entry.getKey();
             if (entry.getValue() - System.currentTimeMillis() <= 0) {
                 missedSwings.remove(entry.getKey());
+                UtilMessage.message(player, getClassType().getName(), "<alt>" + getName() + "</alt> ended");
+                player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WOLF_WHINE, 2f, 1);
                 return true;
             }
             return false;
@@ -122,7 +123,8 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
                 if (missedSwings.get(player) >= maxMissedSwings) {
                     active.remove(player);
                     missedSwings.remove(player);
-                    UtilMessage.message(player, getClassType().getName(), "<alt>" + getName() + "</alt> ended early");
+                    UtilMessage.message(player, getClassType().getName(), "<alt>" + getName() + "</alt> ended");
+                    player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WOLF_WHINE, 2f, 1);
                 }
             }
         }
@@ -145,6 +147,6 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
         baseDuration = getConfig("baseDuration", 3.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
         maxMissedSwings = getConfig("maxMissedSwings", 2, Integer.class);
-        strengthStrength = getConfig("strengthStrength", 3, Integer.class);
+        strengthLevel = getConfig("strengthStrength", 4, Integer.class);
     }
 }

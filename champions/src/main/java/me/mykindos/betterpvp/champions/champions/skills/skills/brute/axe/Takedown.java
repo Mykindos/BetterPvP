@@ -56,7 +56,7 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Hurl yourself forwards, dealing <stat>" + getDamage(level) + "</stat> damage,",
+                "Hurl yourself forwards, dealing <val>" + getDamage(level) + "</val> damage,",
                 "taking <val>" + getRecoilDamage(level)+"</val> damage, and applying <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength + 1) + "</effect>",
                 "to yourself and the target for <val>" + getDuration(level) + "</val> seconds",
                 "",

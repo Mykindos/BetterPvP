@@ -30,7 +30,6 @@ import org.bukkit.inventory.ItemStack;
 public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Listener {
 
     private final WorldBlockHandler blockHandler;
-
     private int sphereSize;
     private double baseDuration;
     private double durationIncreasePerLevel;

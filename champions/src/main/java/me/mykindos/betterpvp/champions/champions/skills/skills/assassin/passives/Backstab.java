@@ -45,7 +45,7 @@ public class Backstab extends Skill implements PassiveSkill, Listener {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Hitting an enemy from behind an opponent will",
+                "Hitting an enemy from behind will",
                 "increase your damage by <val>" + getDamageModifier(level)};
     }
 
@@ -81,7 +81,7 @@ public class Backstab extends Skill implements PassiveSkill, Listener {
 
     @Override
     public void loadSkillConfig(){
-        increasePerLevel = getConfig("increasePerLevel", 1.5, Double.class);
+        increasePerLevel = getConfig("increasePerLevel", 0.0, Double.class);
         baseIncrease = getConfig("baseIncrease", 1.5, Double.class);
     }
 }

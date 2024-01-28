@@ -64,7 +64,7 @@ public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listene
                 "Drop your Sword / Axe to activate",
                 "",
                 "Teleports you back in time <val>" + getDuration(level) + "</val> seconds, giving",
-                "you <effect> " + UtilFormat.getRomanNumeral(regenerationLevel + 1)  +"</effect> for <stat>" + getRegenerationTime(level) + "%</stat> seconds",
+                "you <effect>Regeneration " + UtilFormat.getRomanNumeral(regenerationLevel + 1)  +"</effect> for <stat>" + getRegenerationTime(level) + "</stat> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };

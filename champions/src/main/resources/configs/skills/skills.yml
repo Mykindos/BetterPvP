@@ -35,7 +35,7 @@ skills:
       enabled: true
       maxlevel: 3
       increasePerLevel: 1.5
-      baseIncrease: 1.5
+      baseIncrease: 0.0
     smokebomb:
       enabled: true
       cooldown: 50.0
@@ -231,7 +231,7 @@ skills:
       enabled: true
       maxlevel: 3
       baseBonusDamage: 0.0
-      bonusDamageIncreasePerLevel: 0.4
+      bonusDamageIncreasePerLevel: 0.5
     thorns:
       enabled: true
       maxlevel: 3
@@ -274,7 +274,7 @@ skills:
     hiltsmash:
       enabled: true
       maxlevel: 5
-      cooldown: 10.0
+      cooldown: 15.0
       cooldownDecreasePerLevel: 1.0
       baseDamage: 3.0
       damageIncreasePerLevel: 1.0
@@ -731,7 +731,7 @@ skills:
       baseDuration: 3.0
       cooldownDecreasePerLevel: 1.5
       durationIncreasePerLevel: 1.0
-      strengthStrength: 3
+      strengthLevel: 4
       maxMissedSwings: 2
     disengage:
       enabled: true
