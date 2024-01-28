@@ -11,7 +11,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -26,20 +25,10 @@ public class ItemListener implements Listener {
         this.itemHandler = itemHandler;
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onDamageItem(PlayerItemDamageEvent event) {
         if (event.isCancelled()) return;
-        log.info("damage item");
         event.setCancelled(damageCustomItem(event.getPlayer(), event.getItem(), 1));
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onShootBow(EntityShootBowEvent event) {
-        if (event.isCancelled()) return;
-        if (event.getEntity() instanceof Player player) {
-            log.info("bow");
-            damageCustomItem(player, player.getInventory().getItemInMainHand(), 1);
-        }
     }
 
     @EventHandler
