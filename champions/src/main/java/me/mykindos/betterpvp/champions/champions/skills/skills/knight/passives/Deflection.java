@@ -22,7 +22,6 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import java.util.HashMap;
 import java.util.UUID;
-import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
