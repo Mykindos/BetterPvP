@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.effects.events.EffectExpireEvent;
 import me.mykindos.betterpvp.core.effects.events.EffectReceiveEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
@@ -28,17 +29,21 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitTask;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+
+import static org.bukkit.Bukkit.getServer;
 
 @BPvPListener
 public class EffectListener implements Listener {
 
     private final Core core;
     private final EffectManager effectManager;
+    private final Map<UUID, Long> lastBleedTimes = new HashMap<>();
+    private final Map<UUID, Long> bleedEntities = new HashMap<>();
+
+
 
     @Inject
     public EffectListener(Core core, EffectManager effectManager) {
@@ -74,14 +79,38 @@ public class EffectListener implements Listener {
                 target.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, (int) ((effect.getRawLength() / 1000d) * 20), 0));
             } else if (effect.getEffectType() == EffectType.LEVITATION) {
                 target.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, (int) ((effect.getRawLength() / 1000d) * 20), effect.getLevel()));
-            } else if(effect.getEffectType() == EffectType.POISON) {
+            } else if (effect.getEffectType() == EffectType.POISON) {
                 target.addPotionEffect(new PotionEffect(PotionEffectType.POISON, (int) ((effect.getRawLength() / 1000d) * 20), effect.getLevel()));
             } else if (effect.getEffectType() == EffectType.NO_JUMP) {
                 target.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, (int) ((effect.getRawLength() / 1000d) * 20), 128, false, false, false));
+            } else if (effect.getEffectType() == EffectType.BLEED) {
+                target.addPotionEffect(new PotionEffect(PotionEffectType.BAD_OMEN, (int) ((effect.getRawLength() / 1000d) * 20), 0, false, false));
+                bleedEntities.put(target.getUniqueId(), System.currentTimeMillis());
             }
-
             effects.add(effect);
         }
+    }
+
+    @UpdateEvent
+    public void onBleed() {
+        bleedEntities.keySet().removeIf(uuid -> {
+            LivingEntity entity = (LivingEntity) Bukkit.getEntity(uuid);
+            if (entity == null) return true;
+            if (!entity.hasPotionEffect(PotionEffectType.BAD_OMEN)) return true;
+
+            long currentTime = System.currentTimeMillis();
+            long lastBleedTime = lastBleedTimes.getOrDefault(uuid, 0L);
+            int marginOfError = 20;
+
+            if (currentTime - lastBleedTime >= 1000 - marginOfError) {
+                // Apply damage to any LivingEntity (including players)
+                var cde = new CustomDamageEvent(entity, null, null, EntityDamageEvent.DamageCause.CUSTOM, 2.0, false, "Bleed");
+                cde.setIgnoreArmour(true);
+                UtilDamage.doCustomDamage(cde);
+                lastBleedTimes.put(uuid, currentTime);
+            }
+            return false;
+        });
     }
 
     @EventHandler

@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Location;
@@ -50,6 +51,7 @@ public class HealingShot extends PrepareArrowSkill {
                 "",
                 "Shoot an arrow that gives <effect>Regeneration III</effect>",
                 "to allies hit for <val>" + getDuration(level) + "</val> seconds",
+                "and cleanse them of all negative effects",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -94,6 +96,7 @@ public class HealingShot extends PrepareArrowSkill {
         if (target instanceof Player damagee) {
             if (UtilPlayer.isPlayerFriendly(damager, damagee)) {
                 damagee.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, (int) (getDuration(level) * 20), 2 ));
+                championsManager.getEffects().addEffect(damagee, EffectType.IMMUNETOEFFECTS, 1);
                 event.setCancelled(true);
             }
         }
@@ -122,5 +125,6 @@ public class HealingShot extends PrepareArrowSkill {
     public void loadSkillConfig() {
         baseDuration = getConfig("baseDuration", 4.0, Double.class);
         increaseDurationPerLevel = getConfig("increasePerLevel", 1.0, Double.class);
+        cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 1.0, Double.class);
     }
 }

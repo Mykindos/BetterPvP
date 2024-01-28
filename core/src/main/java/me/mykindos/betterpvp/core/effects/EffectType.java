@@ -22,7 +22,8 @@ public enum EffectType {
     IMMUNETOEFFECTS(false),
     LEVITATION(true),
     NO_JUMP(false),
-    NO_SPRINT(false);
+    NO_SPRINT(false),
+    BLEED(true);
 
     final boolean isNegative;
 

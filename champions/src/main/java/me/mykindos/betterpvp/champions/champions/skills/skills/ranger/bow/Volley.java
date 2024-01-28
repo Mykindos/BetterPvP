@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.bow;
 
+import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
@@ -26,8 +27,8 @@ import org.bukkit.util.Vector;
 public class Volley extends PrepareArrowSkill {
 
     public int baseNumArrows;
-
     private int numArrowsIncreasePerLevel;
+    private double damage;
 
     @Inject
     public Volley(Champions champions, ChampionsManager championsManager) {
@@ -47,6 +48,8 @@ public class Volley extends PrepareArrowSkill {
                 "",
                 "Your next shot is instant, and shoots a volley",
                 "of arrows in the direction you are facing",
+                "",
+                "Each arrow will deal <stat>" + damage + "</stat> damage",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -102,7 +105,13 @@ public class Volley extends PrepareArrowSkill {
 
     @Override
     public void displayTrail(Location location) {
-        Particle.REDSTONE.builder().location(location).color(255, 255, 0).count(3).extra(0).receivers(60, true).spawn();
+        new ParticleBuilder(Particle.CRIT)
+                .location(location)
+                .count(1)
+                .offset(0, 0, 0)
+                .extra(0)
+                .receivers(60)
+                .spawn();
     }
 
     @EventHandler
@@ -112,9 +121,8 @@ public class Volley extends PrepareArrowSkill {
         if(!arrows.contains(arrow)) return;
 
 
-        event.setDamage(8);
+        event.setDamage(damage);
         event.addReason(getName());
-
     }
 
 
@@ -138,5 +146,6 @@ public class Volley extends PrepareArrowSkill {
     public void loadSkillConfig() {
         baseNumArrows = getConfig("baseNumArrows", 10, Integer.class);
         numArrowsIncreasePerLevel = getConfig("numArrowsIncreasePerLevel", 0, Integer.class);
+        damage = getConfig("damage", 8.0, Double.class);
     }
 }
