@@ -134,8 +134,7 @@ public final class Cannon implements SoundProvider {
 
     public @Nullable TextDisplay getHealthBar() {
         if ((this.healthBar == null || this.healthBar.isDead() || !this.healthBar.isValid())) {
-            final Location location = this.activeModel.getBone("text_healthbar").orElseThrow().getLocation();
-            this.healthBar = getOrCreateDisplay(this, location, 40, ClansNamespacedKeys.CANNON_HEALTHBAR);
+            this.healthBar = getOrCreateDisplay(this, backingEntity.getLocation(), 40, ClansNamespacedKeys.CANNON_HEALTHBAR);
             this.healthBar.setTextOpacity((byte) 160);
         }
         return this.healthBar;
@@ -143,8 +142,7 @@ public final class Cannon implements SoundProvider {
 
     public @Nullable TextDisplay getInstructions() {
         if ((this.instructions == null || this.instructions.isDead() || !this.instructions.isValid())) {
-            final Location location = this.activeModel.getBone("text_legend").orElseThrow().getLocation();
-            this.instructions = getOrCreateDisplay(this, location, 5, ClansNamespacedKeys.CANNON_LEGEND);
+            this.instructions = getOrCreateDisplay(this, backingEntity.getLocation(), 5, ClansNamespacedKeys.CANNON_LEGEND);
         }
         return this.instructions;
     }
@@ -154,8 +152,12 @@ public final class Cannon implements SoundProvider {
             return;
         }
 
-        Objects.requireNonNull(getHealthBar()).text(healthBar());
-        Objects.requireNonNull(getInstructions()).text(instructions());
+        final TextDisplay health = Objects.requireNonNull(getHealthBar());
+        health.teleport(this.activeModel.getBone("text_healthbar").orElseThrow().getLocation());
+        health.text(healthBar());
+        final TextDisplay instructions = Objects.requireNonNull(getInstructions());
+        instructions.teleport(this.activeModel.getBone("text_legend").orElseThrow().getLocation());
+        instructions.text(instructions());
     }
 
     private TextComponent healthBar() {
