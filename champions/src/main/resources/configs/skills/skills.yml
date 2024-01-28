@@ -313,15 +313,17 @@ skills:
       radiusIncreasePerLevel: 0.5
     inferno:
       enabled: true
-      maxlevel: 5
-      energy: 9
+      maxlevel: 3
+      cooldown: 3.0
       baseFireDuration: 2.5
       fireDurationIncreasePerLevel: 0.0
       baseDamage: 1.0
       damageIncreasePerLevel: 0.0
-      immuneTime: 0.45
-      fireTicks: 50
-      energyDecreasePerLevel: 1.0
+      chargeIncreasePerLevel: 0.0
+      baseCharge: 100.0
+      baseNumFlames: 4
+      numFlamesIncreasePerLevel: 2
+      cooldownDecreasePerLevel: 0.5
     fireblast:
       enabled: true
       maxlevel: 5
@@ -437,14 +439,6 @@ skills:
       baseDuration: 7.0
       durationIncreasePerLevel: 0.0
       regenerationStrength: 0
-    cyclone:
-      enabled: true
-      maxlevel: 5
-      cooldown: 16.0
-      cooldownDecreasePerLevel: 1.0
-      baseDistance: 7.0
-      distanceIncreasePerLevel: 1.0
-      minimumDistance: 7
     polymorph:
       enabled: true
       maxlevel: 3
@@ -507,6 +501,15 @@ skills:
       damageIncreasePerLevel: 2.0
       cooldownDecreasePerLevel: 2.0
       slamDelay: 500
+    whirlwindsword:
+      enabled: true
+      maxlevel: 5
+      cooldown: 20.0
+      cooldownDecreasePerLevel: 1.0
+      baseDistance: 7.0
+      distanceIncreasePerLevel: 0.0
+      baseDamage: 3.0
+      damageIncreasePerLevel: 1.0
     cripplingblow:
       enabled: true
       maxlevel: 3
@@ -555,6 +558,7 @@ skills:
       maxStacks: 3
       baseDuration: 5.0
       durationIncreasePerLevel: 1.0
+      health: 4.0
     resistance:
       enabled: true
       maxlevel: 3
@@ -689,6 +693,7 @@ skills:
       cooldownDecreasePerLevel: 2.0
       baseNumArrows: 10
       numArrowsIncreasePerLevel: 0
+      damage: 8.0
     vitalityspores:
       enabled: true
       maxlevel: 5
@@ -700,7 +705,7 @@ skills:
       maxlevel: 3
       maxTimeBetweenShots: 5.0
       maxConsecutiveHits: 4
-      numMisses: 2
+      numMisses: 1
       maxTimeBetweenShotsIncreasePerLevel: 1.0
       baseDamage: 0.0
       damageIncreasePerLevel: 0.75
@@ -736,10 +741,10 @@ skills:
     healingshot:
       enabled: true
       maxlevel: 5
-      cooldown: 17.0
+      cooldown: 13.0
       baseDuration: 4.0
       increasePerLevel: 1.0
-      cooldownDecreasePerLevel: 3.0
+      cooldownDecreasePerLevel: 1.0
   warlock:
     bloodbarrier:
       enabled: true

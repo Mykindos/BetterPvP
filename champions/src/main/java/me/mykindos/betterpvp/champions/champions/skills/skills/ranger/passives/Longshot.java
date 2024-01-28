@@ -79,7 +79,7 @@ public class Longshot extends Skill implements PassiveSkill {
     }
 
 
-    @UpdateEvent
+    @UpdateEvent(delay=200)
     public void update() {
         Iterator<Arrow> it = arrows.keySet().iterator();
         while (it.hasNext()) {

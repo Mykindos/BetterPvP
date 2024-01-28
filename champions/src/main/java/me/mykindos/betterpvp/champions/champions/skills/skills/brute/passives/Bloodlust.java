@@ -38,6 +38,8 @@ public class Bloodlust extends Skill implements PassiveSkill {
 
     private int maxStacks;
 
+    private double health;
+
     @Inject
     public Bloodlust(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -53,8 +55,8 @@ public class Bloodlust extends Skill implements PassiveSkill {
 
         return new String[]{
                 "When an enemy dies within <stat>" + radius + "</stat> blocks,",
-                "you go into a Bloodlust, receiving",
-                "<effect>Speed I</effect> and <effect>Strength I</effect> for <val>" + getDuration(level) + "</val> seconds.",
+                "you go into a Bloodlust, receiving <stat>" + health + "</stat> health,",
+                "<effect>Speed I</effect>, and <effect>Strength I</effect> for <val>" + getDuration(level) + "</val> seconds",
                 "",
                 "Bloodlust can stack up to <stat>" + maxStacks + "</stat> times",
                 "boosting the level of <effect>Speed</effect> and <effect>Strength</effect>"};
@@ -87,6 +89,7 @@ public class Bloodlust extends Skill implements PassiveSkill {
                 }
                 championsManager.getEffects().addEffect(target, EffectType.STRENGTH, tempStr, (long) (getDuration(level) * 1000L));
                 target.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) (getDuration(level) * 20), tempStr));
+                target.setHealth(target.getHealth() + health);
                 UtilMessage.simpleMessage(target, getClassType().getName(), "You entered bloodlust at level: <alt2>" + tempStr + "</alt2>.");
                 target.getWorld().playSound(target.getLocation(), Sound.ENTITY_ZOMBIFIED_PIGLIN_ANGRY, 2.0F, 0.6F);
             }
@@ -125,5 +128,6 @@ public class Bloodlust extends Skill implements PassiveSkill {
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
         radius = getConfig("radius", 15, Integer.class);
         maxStacks = getConfig("maxStacks", 3, Integer.class);
+        health = getConfig("health", 4.0, Double.class);
     }
 }
