@@ -5,11 +5,17 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.ticxo.modelengine.api.animation.BlueprintAnimation;
 import com.ticxo.modelengine.api.animation.handler.IPriorityHandler;
+import com.ticxo.modelengine.api.entity.BaseEntity;
+import com.ticxo.modelengine.api.entity.BukkitEntity;
+import com.ticxo.modelengine.api.events.ModelRegistrationEvent;
+import com.ticxo.modelengine.api.events.RemoveModelEvent;
+import com.ticxo.modelengine.api.generator.ModelGenerator;
 import com.ticxo.modelengine.api.model.ActiveModel;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.weapons.impl.cannon.CannonballWeapon;
 import me.mykindos.betterpvp.clans.weapons.impl.cannon.event.CannonAimEvent;
 import me.mykindos.betterpvp.clans.weapons.impl.cannon.event.CannonFuseEvent;
+import me.mykindos.betterpvp.clans.weapons.impl.cannon.event.CannonPlaceEvent;
 import me.mykindos.betterpvp.clans.weapons.impl.cannon.event.CannonReloadEvent;
 import me.mykindos.betterpvp.clans.weapons.impl.cannon.event.CannonShootEvent;
 import me.mykindos.betterpvp.clans.weapons.impl.cannon.event.PreCannonShootEvent;
@@ -47,7 +53,6 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
-import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.RayTraceResult;
@@ -121,6 +126,11 @@ public class CannonListener implements Listener {
         return cannonball;
     }
 
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onSpawn(CannonPlaceEvent event) {
+        UtilServer.runTaskLater(clans, event.getCannon()::updateTag, 4L);
+    }
+
     // Make cannonballs give credit to the player who shot them
     @EventHandler(priority = EventPriority.LOWEST)
     public void onCustomDamage(final PreCustomDamageEvent pre) {
@@ -151,7 +161,7 @@ public class CannonListener implements Listener {
         // Play sound and increment cannonballs
         new SoundEffect("littleroom_cannon", "littleroom.cannon.closehatch").play(location);
         event.getCannon().setLoaded(true);
-        event.getCannon().updateHealthBar();
+        event.getCannon().updateTag();
 
         final ActiveModel activeModel = event.getCannon().getActiveModel();
         final IPriorityHandler animationHandler = ((IPriorityHandler) activeModel.getAnimationHandler());
@@ -270,7 +280,7 @@ public class CannonListener implements Listener {
             final Map.Entry<Cannon, UUID> next = iterator.next();
             final Cannon cannon = next.getKey();
             final long fuseTime = cannon.getLastFuseTime();
-            cannon.updateHealthBar();
+            cannon.updateTag();
 
             // Shoot cannon if fuse time has elapsed
             if (UtilTime.elapsed(fuseTime, (long) (this.cannonManager.getFuseSeconds() * 1000L))) {
@@ -281,13 +291,13 @@ public class CannonListener implements Listener {
             }
 
             // Passive particles
-            final Location location = cannon.getActiveModel().getBone("hatch").orElseThrow().getLocation();
+            final Location location = cannon.getActiveModel().getBone("fuse").orElseThrow().getLocation();
             new SoundEffect("littleroom_cannon", "littleroom.cannon.fuse", 1f, 1.3f).play(location);
             Particle.SMALL_FLAME.builder()
-                    .location(location.add(0, 0.2, 0))
+                    .location(location)
                     .count(0) // For directional particles, count must be 0
-                    .offset(0, 0.2, 0)
-                    .extra(0.4)
+                    .offset(0, 0.15, 0)
+                    .extra(0.2)
                     .receivers(60)
                     .spawn();
         }
@@ -303,13 +313,14 @@ public class CannonListener implements Listener {
                 continue;
             }
 
-            cannon.updateHealthBar();
+            cannon.updateTag();
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onAim(final CannonAimEvent event) {
         event.getCannon().rotate(event.getDirection());
+        event.getCannon().updateTag();
         new SoundEffect(Sound.BLOCK_IRON_DOOR_CLOSE, 0.3f, 0.5f).play(event.getCannon().getLocation());
     }
 
@@ -356,50 +367,63 @@ public class CannonListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onDeath(final EntityDeathEvent event) {
-        try {
-            this.cannonManager.of(event.getEntity()).ifPresent(cannon -> {
-                event.setDroppedExp(0);
-                event.getDrops().clear();
-                this.cannonManager.remove(cannon);
+        this.cannonManager.of(event.getEntity()).ifPresent(cannon -> {
+            event.setDroppedExp(0);
+            event.getDrops().clear();
+            this.cannonManager.remove(cannon);
 
-                // Death effect
-                Particle.SMOKE_LARGE.builder()
-                        .location(cannon.getLocation())
-                        .extra(0)
-                        .count(10)
-                        .offset(1, 1, 1)
-                        .receivers(60)
-                        .spawn();
+            // Death effect
+            Particle.SMOKE_LARGE.builder()
+                    .location(cannon.getLocation())
+                    .extra(0)
+                    .count(10)
+                    .offset(1, 1, 1)
+                    .receivers(60)
+                    .spawn();
 
-                // Drop cannonball if loaded
-                if (cannon.isLoaded()) {
-                    final Location location = cannon.getLocation();
-                    location.getWorld().dropItemNaturally(location, this.cannonballWeapon.getItemStack());
-                }
-            });
-        } catch (IllegalStateException ignored) {
-            // Ignore if the cannon has no healthbar, means they died
-        }
+            // Drop cannonball if loaded
+            if (cannon.isLoaded()) {
+                final Location location = cannon.getLocation();
+                location.getWorld().dropItemNaturally(location, this.cannonballWeapon.getItemStack());
+            }
+        });
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onRemove(final EntityRemoveFromWorldEvent event) {
-        try {
-            this.cannonManager.of(event.getEntity()).ifPresent(cannon -> {
-                this.cannonManager.remove(cannon);
+        this.cannonManager.of(event.getEntity()).ifPresent(cannon -> {
+            this.cannonManager.remove(cannon);
 
-                // Death effect
-                Particle.SMOKE_LARGE.builder()
-                        .location(cannon.getLocation())
-                        .extra(0)
-                        .count(10)
-                        .offset(1, 1, 1)
-                        .receivers(60)
-                        .spawn();
-            });
-        } catch (IllegalStateException ignored) {
-            // Ignore if the cannon has no healthbar, means they died
+            // Death effect
+            Particle.SMOKE_LARGE.builder()
+                    .location(cannon.getLocation())
+                    .extra(0)
+                    .count(10)
+                    .offset(1, 1, 1)
+                    .receivers(60)
+                    .spawn();
+        });
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onModelRemove(final RemoveModelEvent event) {
+        final BaseEntity<?> base = event.getModel().getModeledEntity().getBase();
+        if (!(base instanceof BukkitEntity bukkitEntity)) {
+            return;
         }
+
+        this.cannonManager.of(bukkitEntity.getOriginal()).ifPresent(cannon -> {
+            this.cannonManager.remove(cannon);
+
+            // Death effect
+            Particle.SMOKE_LARGE.builder()
+                    .location(cannon.getLocation())
+                    .extra(0)
+                    .count(10)
+                    .offset(1, 1, 1)
+                    .receivers(60)
+                    .spawn();
+        });
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
@@ -419,7 +443,7 @@ public class CannonListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onDamage(final CustomDamageEvent event) {
         try {
-            this.cannonManager.of(event.getDamagee()).ifPresent(Cannon::updateHealthBar);
+            this.cannonManager.of(event.getDamagee()).ifPresent(Cannon::updateTag);
         } catch (IllegalStateException ignored) {
             // Ignore if the cannon has no healthbar, means they died
         }
@@ -437,8 +461,11 @@ public class CannonListener implements Listener {
     }
 
     @EventHandler
-    public void onLoad(ServerLoadEvent event) {
-        this.cannonManager.load();
+    public void onLoad(ModelRegistrationEvent event) {
+        if (event.getPhase() != ModelGenerator.Phase.FINISHED) {
+            return;
+        }
+        UtilServer.runTask(clans, () -> this.cannonManager.load());
     }
 
 }
