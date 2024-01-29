@@ -10,7 +10,6 @@ import org.bukkit.event.Listener;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.UUID;
 
 @BPvPListener
 @Singleton

@@ -10,6 +10,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.craftbukkit.v1_20_R3.CraftWorld;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -99,5 +100,21 @@ public class UtilEntity {
         armorStand.setPersistent(false); // We don't want them to be saved in the world
         armorStand.setCollidable(false); // We don't want them to collide with anything
         return armorStand;
+    }
+
+    /**
+     * Changes the view range of the display to the specified amount of blocks
+     * @param display The display to change the view range of
+     * @param blocks The amount of blocks to change the view range to
+     */
+    public static void setViewRangeBlocks(@NotNull Display display, float blocks) {
+        display.setViewRange((float) (blocks / (net.minecraft.world.entity.Entity.getViewScale() * 64.0)));
+    }
+
+    /**
+     * Gets the view range of the display in blocks
+     */
+    public static float getViewRangeBlocks(@NotNull Display display) {
+        return display.getViewRange() * (float) (net.minecraft.world.entity.Entity.getViewScale() * 64.0);
     }
 }
