@@ -43,6 +43,7 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
     private HashMap<UUID, Double> healthStored = new HashMap<>();
     private HashMap<UUID, Long> lastHealTime = new HashMap<>();
     private HashMap<UUID, BukkitRunnable> trackingTrails = new HashMap<>();
+    private HashMap<UUID, Double> currentRotationAngle = new HashMap<>();
 
     @Inject
     public LifeBonds(Champions champions, ChampionsManager championsManager) {
@@ -92,7 +93,7 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
         for (UUID uuid : active) {
             Player cur = Bukkit.getPlayer(uuid);
             if (cur != null) {
-                cur.getWorld().playSound(cur.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 0.8F, 0.0F);
+                cur.getWorld().playSound(cur.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 0.8F, 1.0F);
             }
         }
     }
@@ -105,7 +106,6 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
                 int level = getLevel(player);
-                spawnParticleAboveHead(player);
                 if (level <= 0 || !championsManager.getEnergy().use(player, getName(), getEnergy(level) / 20, true) || championsManager.getEffects().hasEffect(player, EffectType.SILENCE)) {
                     iterator.remove();
                 } else {
@@ -116,11 +116,6 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
                 iterator.remove();
             }
         }
-    }
-
-    public void spawnParticleAboveHead(Player player) {
-        Location loc = player.getLocation().add(0, 1, 0);
-        player.getWorld().spawnParticle(Particle.CHERRY_LEAVES, loc, 2, 0.2, 0.2, 0.2, 0);
     }
 
     private void findAndHealLowestHealthPlayer(Player caster, double distance) {
@@ -150,7 +145,7 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
         if (healthDifference >= 2 && (highestHealthPlayer.getHealth() - healthDifference/2) > 0) {
             long currentTime = System.currentTimeMillis();
             long lastHeal = lastHealTime.getOrDefault(lowestHealthPlayer.getUniqueId(), 0L);
-            if (currentTime - lastHeal > (healSpeed * 1000L)) {
+            if (currentTime - lastHeal > (healCooldown * 1000L)) {
                 double healthToTransfer = healthDifference / 2;
                 highestHealthPlayer.setHealth(highestHealthPlayer.getHealth() - healthToTransfer);
                 healthStored.put(lowestHealthPlayer.getUniqueId(), healthToTransfer);
@@ -159,6 +154,33 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
             }
         }
     }
+
+    @UpdateEvent
+    public void createRings() {
+        for (UUID uuid : active) {
+            Player player = Bukkit.getPlayer(uuid);
+            if (player != null) {
+                Location center = player.getLocation().add(0, 1.0, 0);
+                double radius = getRadius(getLevel(player));
+                int numberOfPoints = 2;
+                double angleIncrement = 360.0 / numberOfPoints;
+
+                double currentAngle = currentRotationAngle.getOrDefault(uuid, 0.0);
+
+                for (int i = 0; i < numberOfPoints; i++) {
+                    double ringAngle = currentAngle + angleIncrement * i;
+                    double bottomX = center.getX() + radius * Math.cos(Math.toRadians(ringAngle));
+                    double bottomZ = center.getZ() + radius * Math.sin(Math.toRadians(ringAngle));
+                    Location bottomRingLocation = new Location(center.getWorld(), bottomX, center.getY(), bottomZ);
+                    center.getWorld().spawnParticle(Particle.CHERRY_LEAVES, bottomRingLocation, 1, 0, 0, 0, 0);
+
+                }
+                currentRotationAngle.put(uuid, (currentAngle + 6) % 360);
+            }
+        }
+    }
+
+
 
     private void createTrackingTrail(Player source, Player target) {
         BukkitRunnable trailTask = new BukkitRunnable() {
@@ -187,6 +209,7 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
                     double healthToAdd = healthStored.remove(target.getUniqueId());
                     target.setHealth(Math.min(target.getHealth() + healthToAdd, target.getMaxHealth()));
                     target.getWorld().spawnParticle(Particle.HEART, target.getLocation().add(0, 1.5, 0), 5, 0.5, 0.5, 0.5, 0);
+                    target.playSound(target.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 2f);
                     trackingTrails.remove(source.getUniqueId());
                     this.cancel();
                 }
