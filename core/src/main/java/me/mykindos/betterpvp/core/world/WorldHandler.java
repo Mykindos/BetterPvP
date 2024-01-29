@@ -30,7 +30,7 @@ public class WorldHandler {
 
     public Location getSpawnLocation() {
         // return random location from spawnLocations, assuming it has values
-        if (spawnLocations.size() > 0) {
+        if (!spawnLocations.isEmpty()) {
             return spawnLocations.values().stream().toList().get(UtilMath.randomInt(spawnLocations.size()));
         } else {
             // return default spawn location
