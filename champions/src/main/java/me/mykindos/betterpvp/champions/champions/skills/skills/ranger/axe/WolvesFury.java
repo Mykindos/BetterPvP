@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -97,14 +98,28 @@ public class WolvesFury extends Skill implements InteractSkill, CooldownSkill, L
 
     @UpdateEvent(delay = 500)
     public void onUpdate() {
-        active.entrySet().removeIf(entry -> entry.getValue() - System.currentTimeMillis() <= 0);
+        active.entrySet().removeIf(entry -> expire(entry.getKey()));
+    }
+
+    private boolean expire(Player player) {
+        if (active.get(player) - System.currentTimeMillis() <= 0) {
+            if (player == null) {
+                return true;
+            }
+
+            int level = getLevel(player);
+            UtilMessage.message(player, getClassType().getName(), UtilMessage.deserialize("<green>%s %s</green> has ended.", getName(), level));
+            return true;
+        }
+
+        return false;
     }
 
     @Override
     public void activate(Player player, int level) {
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WOLF_HOWL, 1.0f, 1.0f);
         active.put(player, (long) (System.currentTimeMillis() + (getDuration(level) * 1000L)));
-        championsManager.getEffects().addEffect(player, EffectType.STRENGTH, 1, (long) (getDuration(level) * 1000L));
+        championsManager.getEffects().addEffect(player, EffectType.STRENGTH, strengthStrength, (long) (getDuration(level) * 1000L));
     }
 
     @Override
