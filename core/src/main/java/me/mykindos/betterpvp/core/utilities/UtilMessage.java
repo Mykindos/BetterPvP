@@ -12,6 +12,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -252,7 +253,12 @@ public class UtilMessage {
     }
 
     public static Component deserialize(String message) {
-        return normalize(MiniMessage.miniMessage().deserialize(message, tagResolver));
+        String msg = message;
+        if(msg.contains(String.valueOf(UtilFormat.COLOR_CHAR))) {
+            msg = UtilFormat.stripColor(message);
+        }
+
+        return normalize(MiniMessage.miniMessage().deserialize(msg, tagResolver));
     }
 
     public static Component deserialize(String message, Object... args) {

@@ -83,6 +83,10 @@ dependencyResolutionManagement {
             // Library - InvUI (Inventory API)
             library("invui", "xyz.xenondevs.invui", "invui").versionRef("invui")
 
+            // Library - WorldEdit
+            library("fawe", "com.fastasyncworldedit", "FastAsyncWorldEdit-Core").version("2.8.4")
+            library("fawebukkit", "com.fastasyncworldedit", "FastAsyncWorldEdit-Bukkit").version("2.8.4")
+
             // Library - Mythic
             library("mythic", "io.lumine", "Mythic-Dist").version("5.3.5")
             library("mythicdungeons", "net.playavalon", "MythicDungeons").version("1.3.0-SNAPSHOT")
