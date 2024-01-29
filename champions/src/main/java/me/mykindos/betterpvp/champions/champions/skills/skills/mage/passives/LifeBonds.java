@@ -43,7 +43,6 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
     private HashMap<UUID, Double> healthStored = new HashMap<>();
     private HashMap<UUID, Long> lastHealTime = new HashMap<>();
     private HashMap<UUID, BukkitRunnable> trackingTrails = new HashMap<>();
-    private HashMap<UUID, Double> currentRotationAngle = new HashMap<>();
 
     @Inject
     public LifeBonds(Champions champions, ChampionsManager championsManager) {
@@ -118,8 +117,18 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
         }
     }
 
+    public void createParticlesForPlayers(Player caster, List<KeyValue<Player, EntityProperty>> nearbyPlayerKeyValues) {
+        caster.getWorld().spawnParticle(Particle.CHERRY_LEAVES, caster.getLocation().add(0, 1.0, 0), 1, 0.1, 0.1, 0.1, 0);
+
+        for (KeyValue<Player, EntityProperty> keyValue : nearbyPlayerKeyValues) {
+            Player player = keyValue.getKey();
+            player.getWorld().spawnParticle(Particle.CHERRY_LEAVES, player.getLocation().add(0, 1.0, 0), 1, 0.1, 0.1, 0.1, 0);
+        }
+    }
+
     private void findAndHealLowestHealthPlayer(Player caster, double distance) {
         List<KeyValue<Player, EntityProperty>> nearbyPlayerKeyValues = UtilPlayer.getNearbyPlayers(caster, caster.getLocation(), distance, EntityProperty.FRIENDLY);
+        createParticlesForPlayers(caster, nearbyPlayerKeyValues);
 
         Player highestHealthPlayer = caster;
         Player lowestHealthPlayer = caster;
@@ -155,33 +164,6 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
         }
     }
 
-    @UpdateEvent
-    public void createRings() {
-        for (UUID uuid : active) {
-            Player player = Bukkit.getPlayer(uuid);
-            if (player != null) {
-                Location center = player.getLocation().add(0, 1.0, 0);
-                double radius = getRadius(getLevel(player));
-                int numberOfPoints = 2;
-                double angleIncrement = 360.0 / numberOfPoints;
-
-                double currentAngle = currentRotationAngle.getOrDefault(uuid, 0.0);
-
-                for (int i = 0; i < numberOfPoints; i++) {
-                    double ringAngle = currentAngle + angleIncrement * i;
-                    double bottomX = center.getX() + radius * Math.cos(Math.toRadians(ringAngle));
-                    double bottomZ = center.getZ() + radius * Math.sin(Math.toRadians(ringAngle));
-                    Location bottomRingLocation = new Location(center.getWorld(), bottomX, center.getY(), bottomZ);
-                    center.getWorld().spawnParticle(Particle.CHERRY_LEAVES, bottomRingLocation, 1, 0, 0, 0, 0);
-
-                }
-                currentRotationAngle.put(uuid, (currentAngle + 6) % 360);
-            }
-        }
-    }
-
-
-
     private void createTrackingTrail(Player source, Player target) {
         BukkitRunnable trailTask = new BukkitRunnable() {
             Location currentLocation = source.getLocation().add(0, 1.5, 0);
@@ -189,12 +171,6 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
             @Override
             public void run() {
                 if (!target.isOnline() || !healthStored.containsKey(target.getUniqueId())) {
-                    trackingTrails.remove(source.getUniqueId());
-                    this.cancel();
-                    return;
-                }
-
-                if (source.getLocation().distance(target.getLocation()) > getRadius(getLevel(source))) {
                     trackingTrails.remove(source.getUniqueId());
                     this.cancel();
                     return;
@@ -209,7 +185,6 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
                     double healthToAdd = healthStored.remove(target.getUniqueId());
                     target.setHealth(Math.min(target.getHealth() + healthToAdd, target.getMaxHealth()));
                     target.getWorld().spawnParticle(Particle.HEART, target.getLocation().add(0, 1.5, 0), 5, 0.5, 0.5, 0.5, 0);
-                    target.playSound(target.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 2f);
                     trackingTrails.remove(source.getUniqueId());
                     this.cancel();
                 }
