@@ -126,18 +126,21 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
         final Vector vector = player.getLocation().getDirection().normalize().multiply(0.3D);
         vector.setY(0);
         final Location loc = player.getLocation().subtract(0.0D, 1.0D, 0.0D).add(vector);
+        loc.setY(Math.floor(loc.getY()));
         cooldownJump.put(player, new ArrayList<>());
         final BukkitTask runnable = new BukkitRunnable() {
 
             @Override
             public void run() {
 
-                if ((!UtilBlock.airFoliage(loc.getBlock())) && UtilBlock.solid(loc.getBlock())) {
-                    loc.add(0.0D, 1.0D, 0.0D);
+                for(int i = 0; i < 3; i++) {
                     if ((!UtilBlock.airFoliage(loc.getBlock())) && UtilBlock.solid(loc.getBlock())) {
-                        cancel();
-                        return;
+                        loc.add(0.0D, 1.0D, 0.0D);
                     }
+                }
+                if ((!UtilBlock.airFoliage(loc.getBlock())) && UtilBlock.solid(loc.getBlock())) {
+                    cancel();
+                    return;
                 }
 
                 if (loc.getBlock().getType().name().contains("DOOR")) {

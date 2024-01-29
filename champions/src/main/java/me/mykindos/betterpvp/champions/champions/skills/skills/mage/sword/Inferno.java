@@ -20,20 +20,30 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.*;
+import me.mykindos.betterpvp.core.utilities.UtilDamage;
+import me.mykindos.betterpvp.core.utilities.UtilMath;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.display.DisplayComponent;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
-import org.bukkit.entity.*;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -223,7 +233,7 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
             Map.Entry<Player, Shotgun> entry = shotgunIterator.next();
             Shotgun shotgun = entry.getValue();
 
-            if (currentTick >= shotgun.getNextShotTick() && shotgun.getFlamesShot() < shotgun.getTotalFlames()) {
+            if (currentTick >= shotgun.getNextShotTick() && shotgun.getFlamesShot() < shotgun.getTotalFlames() && isHolding(shotgun.getPlayer())) {
                 Item fire = shotgun.getPlayer().getWorld().dropItem(shotgun.getPlayer().getEyeLocation(), new ItemStack(Material.BLAZE_POWDER));
                 championsManager.getThrowables().addThrowable(fire, shotgun.getPlayer(), getName(), 2000L);
                 blazePowders.add(fire);
@@ -238,7 +248,7 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
                 shotgun.setNextShotTick(currentTick + shotgun.getDelayBetweenShots());
             }
 
-            if (shotgun.getFlamesShot() >= shotgun.getTotalFlames()) {
+            if (shotgun.getFlamesShot() >= shotgun.getTotalFlames() || !isHolding(shotgun.getPlayer())) {
                 shotgunIterator.remove();
             }
         }
