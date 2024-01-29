@@ -703,7 +703,7 @@ skills:
       maxlevel: 3
       baseDuration: 5.0
       durationDecreasePerLevel: 1.0
-      regenerationStrength: 1
+      regenerationStrength: 0
     sharpshooter:
       enabled: true
       maxlevel: 3
@@ -849,7 +849,7 @@ skills:
     grasp:
       enabled: true
       maxlevel: 5
-      cooldown: 20.0
+      cooldown: 30.0
       cooldownDecreasePerLevel: 1.5
       baseDistance: 10.0
       distanceIncreasePerLevel: 5.0

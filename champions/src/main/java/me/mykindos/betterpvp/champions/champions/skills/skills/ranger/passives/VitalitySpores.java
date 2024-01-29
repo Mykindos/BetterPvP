@@ -96,7 +96,7 @@ public class VitalitySpores extends Skill implements PassiveSkill {
         baseDuration = getConfig("baseDuration", 7.0, Double.class);
         durationDecreasePerLevel = getConfig("durationDecreasePerLevel", 1.0, Double.class);
 
-        regenerationStrength = getConfig("regenerationStrength", 1, Integer.class);
+        regenerationStrength = getConfig("regenerationStrength", 0, Integer.class);
     }
 
 }
