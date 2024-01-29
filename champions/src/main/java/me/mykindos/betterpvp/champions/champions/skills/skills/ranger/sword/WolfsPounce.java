@@ -220,7 +220,7 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
             // Mark as grounded if they're on the ground
             // If they're grounded for more than 250ms, remove them
             final Pounce pounce = pounces.get(player);
-            if (pounce.getGroundTime() == -1 && UtilBlock.isGrounded(player)) {
+            if (pounce.getGroundTime() == -1 && (UtilBlock.isGrounded(player) || UtilBlock.isInLiquid(player))) {
                 pounce.setGroundTime(System.currentTimeMillis());
             } else if (pounce.getGroundTime() != -1 && UtilTime.elapsed(pounce.getGroundTime(), 250)) {
                 iterator.remove();
