@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
@@ -21,6 +22,8 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,10 +37,12 @@ import java.util.UUID;
 public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
 
     private double baseRadius;
-
     private double radiusIncreasePerLevel;
-    private double duration;
-
+    private double healCooldown;
+    private double healSpeed;
+    private HashMap<UUID, Double> healthStored = new HashMap<>();
+    private HashMap<UUID, Long> lastHealTime = new HashMap<>();
+    private HashMap<UUID, BukkitRunnable> trackingTrails = new HashMap<>();
 
     @Inject
     public LifeBonds(Champions champions, ChampionsManager championsManager) {
@@ -87,28 +92,25 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
         for (UUID uuid : active) {
             Player cur = Bukkit.getPlayer(uuid);
             if (cur != null) {
-                cur.getWorld().playSound(cur.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 0.3F, 0.0F);
+                cur.getWorld().playSound(cur.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 0.8F, 0.0F);
             }
         }
     }
 
-    @UpdateEvent(delay = 125)
-    public void grassAura() {
+    @UpdateEvent
+    public void onUpdate() {
         Iterator<UUID> iterator = active.iterator();
         while (iterator.hasNext()) {
             UUID uuid = iterator.next();
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
                 int level = getLevel(player);
-                if (level <= 0 || !championsManager.getEnergy().use(player, getName(), getEnergy(level) / 2, true) || championsManager.getEffects().hasEffect(player, EffectType.SILENCE)) {
+                spawnParticleAboveHead(player);
+                if (level <= 0 || !championsManager.getEnergy().use(player, getName(), getEnergy(level) / 20, true) || championsManager.getEffects().hasEffect(player, EffectType.SILENCE)) {
                     iterator.remove();
                 } else {
                     double distance = getRadius(level);
-
-                    HashMap<Block, Double> blocks = UtilBlock.getInRadius(player.getLocation(), distance);
-
-                    shareHealth(player, distance);
-                    spawnParticlesAboveAllies(player, distance);
+                    findAndHealLowestHealthPlayer(player, distance);
                 }
             } else {
                 iterator.remove();
@@ -116,45 +118,83 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
         }
     }
 
-    private void spawnParticlesAboveAllies(Player player, double distance) {
-        List<Player> allies = getAllAllies(player, distance);
-        for (Player ally : allies) {
-            spawnParticleAboveHead(ally);
-        }
-    }
-
-    private List<Player> getAllAllies(Player player, double distance) {
-        List<Player> allies = UtilPlayer.getNearbyAllies(player, player.getLocation(), distance);
-        allies.add(player);
-        return allies;
-    }
-
-
-    private void spawnParticleAboveHead(Player player) {
+    public void spawnParticleAboveHead(Player player) {
         Location loc = player.getLocation().add(0, 1, 0);
         player.getWorld().spawnParticle(Particle.CHERRY_LEAVES, loc, 2, 0.2, 0.2, 0.2, 0);
     }
 
-    private void shareHealth(Player player, double distance) {
-        List<Player> allies = new ArrayList<>();
-        double totalHealth = player.getHealth();
-        allies.add(player);
+    private void findAndHealLowestHealthPlayer(Player caster, double distance) {
+        List<KeyValue<Player, EntityProperty>> nearbyPlayerKeyValues = UtilPlayer.getNearbyPlayers(caster, caster.getLocation(), distance, EntityProperty.FRIENDLY);
 
-        for (var data : UtilPlayer.getNearbyPlayers(player, distance)) {
-            Player target = data.getKey();
-            boolean friendly = data.getValue() == EntityProperty.FRIENDLY;
-            if (friendly && target.getHealth() > 0) {
-                totalHealth += target.getHealth();
-                allies.add(target);
+        Player highestHealthPlayer = caster;
+        Player lowestHealthPlayer = caster;
+        double highestHealth = caster.getHealth();
+        double lowestHealth = caster.getHealth();
+
+        for (KeyValue<Player, EntityProperty> keyValue : nearbyPlayerKeyValues) {
+            Player p = keyValue.getKey();
+            double health = p.getHealth();
+
+            if (health > highestHealth) {
+                highestHealth = health;
+                highestHealthPlayer = p;
+            }
+            if (health < lowestHealth) {
+                lowestHealth = health;
+                lowestHealthPlayer = p;
             }
         }
 
-        double sharedHealth = totalHealth / allies.size();
-        for (Player ally : allies) {
-            if (ally.getHealth() > 0) {
-                ally.setHealth(sharedHealth);
+        double healthDifference = highestHealth - lowestHealth;
+
+        if (healthDifference >= 2 && (highestHealthPlayer.getHealth() - healthDifference/2) > 0) {
+            long currentTime = System.currentTimeMillis();
+            long lastHeal = lastHealTime.getOrDefault(lowestHealthPlayer.getUniqueId(), 0L);
+            if (currentTime - lastHeal > (healSpeed * 1000L)) {
+                double healthToTransfer = healthDifference / 2;
+                highestHealthPlayer.setHealth(highestHealthPlayer.getHealth() - healthToTransfer);
+                healthStored.put(lowestHealthPlayer.getUniqueId(), healthToTransfer);
+                lastHealTime.put(lowestHealthPlayer.getUniqueId(), currentTime);
+                createTrackingTrail(highestHealthPlayer, lowestHealthPlayer);
             }
         }
+    }
+
+    private void createTrackingTrail(Player source, Player target) {
+        BukkitRunnable trailTask = new BukkitRunnable() {
+            Location currentLocation = source.getLocation().add(0, 1.5, 0);
+
+            @Override
+            public void run() {
+                if (!target.isOnline() || !healthStored.containsKey(target.getUniqueId())) {
+                    trackingTrails.remove(source.getUniqueId());
+                    this.cancel();
+                    return;
+                }
+
+                if (source.getLocation().distance(target.getLocation()) > getRadius(getLevel(source))) {
+                    trackingTrails.remove(source.getUniqueId());
+                    this.cancel();
+                    return;
+                }
+
+                Vector direction = target.getLocation().add(0, 1.5, 0).subtract(currentLocation).toVector().normalize().multiply(healSpeed);
+                currentLocation.add(direction);
+
+                source.getWorld().spawnParticle(Particle.CHERRY_LEAVES, currentLocation, 1, 0.1, 0.1, 0.1, 0);
+
+                if (currentLocation.distance(target.getLocation().add(0, 1.5, 0)) <= healSpeed) {
+                    double healthToAdd = healthStored.remove(target.getUniqueId());
+                    target.setHealth(Math.min(target.getHealth() + healthToAdd, target.getMaxHealth()));
+                    target.getWorld().spawnParticle(Particle.HEART, target.getLocation().add(0, 1.5, 0), 5, 0.5, 0.5, 0.5, 0);
+                    trackingTrails.remove(source.getUniqueId());
+                    this.cancel();
+                }
+            }
+        };
+
+        trailTask.runTaskTimer(champions, 1L, 1L);
+        trackingTrails.put(source.getUniqueId(), trailTask);
     }
 
     @Override
@@ -164,14 +204,12 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
 
     @Override
     public SkillType getType() {
-
         return SkillType.PASSIVE_B;
     }
 
 
     @Override
     public float getEnergy(int level) {
-
         return (float) (energy - ((level - 1) * energyDecreasePerLevel));
     }
 
@@ -183,6 +221,7 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
     public void loadSkillConfig() {
         baseRadius = getConfig("baseRadius", 2.0, Double.class);
         radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 1.0, Double.class);
-        duration = getConfig("duration", 2.0, Double.class);
+        healCooldown = getConfig("healCooldown", 3.0, Double.class);
+        healSpeed = getConfig("healSpeed", 0.4, Double.class);
     }
 }
