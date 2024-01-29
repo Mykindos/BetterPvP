@@ -68,7 +68,7 @@ public class BreakFall extends Skill implements PassiveSkill {
 
     }
     public void loadSkillConfig(){
-        baseDamageReduction = getConfig("baseDamageReduction", 5.0, Double.class);
-        damageReductionIncreasePerLevel = getConfig("damageReductionIncreasePerLevel", 1.0, Double.class);
+        baseDamageReduction = getConfig("baseDamageReduction", 2.0, Double.class);
+        damageReductionIncreasePerLevel = getConfig("damageReductionIncreasePerLevel", 2.0, Double.class);
     }
 }
