@@ -73,7 +73,7 @@ public class DeathListener implements Listener {
             final Component killerName = event.getKillerName().applyFallbackStyle(NamedTextColor.YELLOW);
             LivingEntity killer = event.getKiller();
             boolean with = false;
-            if (killer.getEquipment() != null) {
+            if (killer instanceof Player) {
                 ItemStack item = killer.getEquipment().getItemInMainHand();
                 if (reasons.length == 0 && item.getType() != Material.AIR) {
                     Component itemCmpt = Component.text(PlainTextComponentSerializer.plainText().serialize(item.displayName()).replaceAll("[\\[\\]]", ""), NamedTextColor.GREEN);
@@ -89,11 +89,11 @@ public class DeathListener implements Listener {
                         // Better english if the killer doesn't have a custom name
                         message = killedName
                                 .append(Component.text(" was killed by a ", NamedTextColor.GRAY)
-                                .append(killerName));
+                                        .append(killerName.applyFallbackStyle(NamedTextColor.YELLOW)));
                     } else {
                         message = killedName
                                 .append(Component.text(" was killed by ", NamedTextColor.GRAY))
-                                .append(customName.applyFallbackStyle(NamedTextColor.YELLOW));
+                                .append(customName.color(NamedTextColor.YELLOW));
                     }
                 } else {
                     message = killedName
@@ -102,9 +102,12 @@ public class DeathListener implements Listener {
                 }
             } else {
                 message = killedName.append(Component.text(" was killed by ", NamedTextColor.GRAY))
-                        .append(killerName)
-                        .append(Component.text(" with ", NamedTextColor.GRAY))
-                        .append(reason);
+                        .append(killerName.applyFallbackStyle(NamedTextColor.YELLOW));
+
+                if (killer instanceof Player) {
+                    message = message.append(Component.text(" with ", NamedTextColor.GRAY))
+                            .append(reason);
+                }
             }
         }
 
