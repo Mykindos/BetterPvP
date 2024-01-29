@@ -233,7 +233,7 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
             Map.Entry<Player, Shotgun> entry = shotgunIterator.next();
             Shotgun shotgun = entry.getValue();
 
-            if (currentTick >= shotgun.getNextShotTick() && shotgun.getFlamesShot() < shotgun.getTotalFlames()) {
+            if (currentTick >= shotgun.getNextShotTick() && shotgun.getFlamesShot() < shotgun.getTotalFlames() && isHolding(shotgun.getPlayer())) {
                 Item fire = shotgun.getPlayer().getWorld().dropItem(shotgun.getPlayer().getEyeLocation(), new ItemStack(Material.BLAZE_POWDER));
                 championsManager.getThrowables().addThrowable(fire, shotgun.getPlayer(), getName(), 2000L);
                 blazePowders.add(fire);
@@ -248,7 +248,7 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
                 shotgun.setNextShotTick(currentTick + shotgun.getDelayBetweenShots());
             }
 
-            if (shotgun.getFlamesShot() >= shotgun.getTotalFlames()) {
+            if (shotgun.getFlamesShot() >= shotgun.getTotalFlames() || !isHolding(shotgun.getPlayer())) {
                 shotgunIterator.remove();
             }
         }
