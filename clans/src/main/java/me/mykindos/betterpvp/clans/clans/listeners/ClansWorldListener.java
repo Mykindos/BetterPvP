@@ -34,7 +34,6 @@ import org.bukkit.block.Container;
 import org.bukkit.block.data.type.Gate;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.FishHook;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemFrame;

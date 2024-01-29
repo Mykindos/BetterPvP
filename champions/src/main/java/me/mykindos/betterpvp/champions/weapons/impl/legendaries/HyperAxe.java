@@ -1,9 +1,9 @@
 package me.mykindos.betterpvp.champions.weapons.impl.legendaries;
 
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.weapon.Weapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
