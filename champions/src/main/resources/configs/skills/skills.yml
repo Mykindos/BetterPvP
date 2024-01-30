@@ -896,9 +896,8 @@ skills:
     breakfall:
       enabled: true
       maxlevel: 3
-      damageReduction: 5.0
-      baseDamageReduction: 5.0
-      damageReductionIncreasePerLevel: 1.0
+      baseDamageReduction: 2.0
+      damageReductionIncreasePerLevel: 2.0
     fastrecovery:
       enabled: true
       maxlevel: 5
