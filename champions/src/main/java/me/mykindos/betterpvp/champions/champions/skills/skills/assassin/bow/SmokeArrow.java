@@ -21,6 +21,8 @@ import org.bukkit.event.block.Action;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.Random;
+
 @Singleton
 @BPvPListener
 public class SmokeArrow extends PrepareArrowSkill {
@@ -92,6 +94,12 @@ public class SmokeArrow extends PrepareArrowSkill {
         target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, effectDuration, 1));
         target.getWorld().playSound(target.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
 
+        new ParticleBuilder(Particle.EXPLOSION_LARGE)
+                .location(target.getLocation())
+                .count(1)
+                .receivers(60)
+                .spawn();
+
         UtilMessage.simpleMessage(target, getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s</alt>.", damager.getName(), getName());
         UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit <alt2>%s</alt2> with <alt>%s</alt>.", target.getName(), getName());
     }
@@ -103,8 +111,27 @@ public class SmokeArrow extends PrepareArrowSkill {
 
     @Override
     public void displayTrail(Location location) {
-        new ParticleBuilder(Particle.SMOKE_LARGE).extra(0).location(location).receivers(60, true).spawn();
+        Random random = new Random();
+        double spread = 0.1;
+        double dx = (random.nextDouble() - 0.5) * spread;
+        double dy = (random.nextDouble() - 0.5) * spread;
+        double dz = (random.nextDouble() - 0.5) * spread;
+
+        Location particleLocation = location.clone().add(dx, dy, dz);
+
+        double red = 0.2;
+        double green = 0.2;
+        double blue = 0.2;
+
+        new ParticleBuilder(Particle.SPELL_MOB)
+                .location(particleLocation)
+                .count(0)
+                .offset(red, green, blue)
+                .extra(1.0)
+                .receivers(60)
+                .spawn();
     }
+
 
     @Override
     public void loadSkillConfig() {

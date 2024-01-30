@@ -4,8 +4,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.EqualsAndHashCode;
 import me.mykindos.betterpvp.core.Core;
-import me.mykindos.betterpvp.core.redis.RedisAgent;
 import me.mykindos.betterpvp.core.redis.Redis;
+import me.mykindos.betterpvp.core.redis.RedisAgent;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import redis.clients.jedis.JedisPubSub;
 

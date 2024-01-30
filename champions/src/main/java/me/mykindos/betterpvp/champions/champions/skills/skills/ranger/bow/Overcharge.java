@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.bow;
 
+import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Data;
@@ -17,7 +18,9 @@ import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
@@ -116,6 +119,31 @@ public class Overcharge extends Skill implements InteractSkill, Listener {
             }
         }
 
+    }
+
+    @UpdateEvent
+    public void createRedDustParticles() {
+        bonus.forEach((arrow, bonusDamage) -> {
+            if (arrow.isValid() && !arrow.isDead() && !arrow.isOnGround() && bonus.get(arrow) > 0) {
+
+                double baseSize = 0.25;
+                double count = (bonus.get(arrow));
+
+                double finalSize = baseSize * count;
+
+                Particle.DustOptions redDust = new Particle.DustOptions(Color.fromRGB(255, 0, 0), (float)finalSize);
+                new ParticleBuilder(Particle.REDSTONE)
+                        .location(arrow.getLocation())
+                        .count(1)
+                        .offset(0.1, 0.1, 0.1)
+                        .extra(0)
+                        .data(redDust)
+                        .receivers(60)
+                        .spawn();
+            }
+        });
+
+        bonus.keySet().removeIf(arrow -> !arrow.isValid() || arrow.isDead() || arrow.isOnGround());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
