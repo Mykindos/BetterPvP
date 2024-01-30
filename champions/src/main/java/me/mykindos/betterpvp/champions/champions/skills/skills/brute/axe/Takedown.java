@@ -92,7 +92,7 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
     @Override
     public double getCooldown(int level) {
 
-        return cooldown - ((level - 1) * 2);
+        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
 

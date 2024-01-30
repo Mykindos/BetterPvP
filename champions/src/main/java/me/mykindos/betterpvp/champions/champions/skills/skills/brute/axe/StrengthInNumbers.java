@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -79,10 +80,11 @@ public class StrengthInNumbers extends Skill implements InteractSkill, CooldownS
     @Override
     public void activate(Player player, int level) {
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 2.0F);
-        championsManager.getEffects().addEffect(player, EffectType.STRENGTH, 1, (long) (getDuration(level) * 1000L));
+        championsManager.getEffects().addEffect(player, EffectType.STRENGTH, strengthStrength, (long) (getDuration(level) * 1000L));
 
         for (Player target : UtilPlayer.getNearbyAllies(player, player.getLocation(), radius)) {
-            championsManager.getEffects().addEffect(target, EffectType.STRENGTH, 1, (long) ((getDuration(level)* 1000L)));
+            championsManager.getEffects().addEffect(target, EffectType.STRENGTH, strengthStrength, (long) ((getDuration(level)* 1000L)));
+            UtilMessage.message(target, getName(), UtilMessage.deserialize("<yellow>%s</yellow> gave you <white>Strength "+ UtilFormat.getRomanNumeral(strengthStrength) + "</white> for <green>%s</green> seconds.", player.getName(), getDuration(level)));
         }
     }
 
