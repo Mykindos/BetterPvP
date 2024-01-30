@@ -385,8 +385,8 @@ skills:
       baseRadius: 2.0
       radiusIncreasePerLevel: 1.0
       energyDecreasePerLevel: 1.0
-      healCooldown: 3.0
-      healSpeed: 0.4
+      healCooldown: 2.0
+      healSpeed: 0.3
     magmablade:
       enabled: true
       maxlevel: 3

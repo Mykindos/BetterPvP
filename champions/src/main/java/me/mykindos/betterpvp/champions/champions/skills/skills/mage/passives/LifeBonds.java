@@ -219,7 +219,7 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
     public void loadSkillConfig() {
         baseRadius = getConfig("baseRadius", 2.0, Double.class);
         radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 1.0, Double.class);
-        healCooldown = getConfig("healCooldown", 3.0, Double.class);
-        healSpeed = getConfig("healSpeed", 0.4, Double.class);
+        healCooldown = getConfig("healCooldown", 2.0, Double.class);
+        healSpeed = getConfig("healSpeed", 0.3, Double.class);
     }
 }
