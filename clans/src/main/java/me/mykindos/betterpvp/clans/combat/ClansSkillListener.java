@@ -4,6 +4,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.combat.throwables.events.ThrowableHitEntityEvent;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerCanUseSkillEvent;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseItemEvent;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEvent;
@@ -28,10 +30,12 @@ import java.util.Optional;
 public class ClansSkillListener implements Listener {
 
     private final ClanManager clanManager;
+    private final ClientManager clientManager;
 
     @Inject
-    public ClansSkillListener(ClanManager clanManager) {
+    public ClansSkillListener(ClanManager clanManager, ClientManager clientManager) {
         this.clanManager = clanManager;
+        this.clientManager = clientManager;
     }
 
     @EventHandler(priority = EventPriority.HIGH)
@@ -106,5 +110,31 @@ public class ClansSkillListener implements Listener {
         if (!clanManager.canCast(event.getPlayer()) && event.isDangerous()) {
             event.setCancelled(true);
         }
+    }
+
+    @EventHandler
+    public void onThrowableCollision(ThrowableHitEntityEvent event) {
+        if (!(event.getCollision() instanceof Player target)) return;
+        if (!(event.getThrowable().getThrower() instanceof Player thrower)) return;
+
+        if (target.getGameMode() == GameMode.CREATIVE || target.getGameMode() == GameMode.SPECTATOR) {
+            event.setCancelled(true);
+            return;
+        }
+
+        if (event.getThrowable().isCanHitFriendlies()) {
+            boolean isAlly = clanManager.isAlly(thrower, target);
+            if (clanManager.isInSafeZone(target) && isAlly) {
+                event.setCancelled(true);
+                return;
+            } else if (isAlly) {
+                return;
+            }
+        }
+
+        if (!clanManager.canHurt(thrower, target)) {
+            event.setCancelled(true);
+        }
+
     }
 }
