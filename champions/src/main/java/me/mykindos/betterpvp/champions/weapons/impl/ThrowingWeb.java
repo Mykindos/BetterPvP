@@ -4,8 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableItem;
-import me.mykindos.betterpvp.core.combat.throwables.events.ThrowableHitEntityEvent;
-import me.mykindos.betterpvp.core.combat.throwables.events.ThrowableHitGroundEvent;
+import me.mykindos.betterpvp.core.combat.throwables.ThrowableListener;
 import me.mykindos.betterpvp.core.combat.weapon.Weapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.CooldownWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.InteractWeapon;
@@ -19,10 +18,12 @@ import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -36,7 +37,7 @@ import java.util.UUID;
 
 @Singleton
 @BPvPListener
-public class ThrowingWeb extends Weapon implements Listener, InteractWeapon, CooldownWeapon {
+public class ThrowingWeb extends Weapon implements Listener, InteractWeapon, CooldownWeapon, ThrowableListener {
 
     @Inject
     @Config(path = "weapons.throwing-web.cooldown", defaultValue = "10.0", configName = "weapons/standard")
@@ -80,7 +81,7 @@ public class ThrowingWeb extends Weapon implements Listener, InteractWeapon, Coo
         item.getItemStack().getItemMeta().getPersistentDataContainer().set(CoreNamespaceKeys.UUID_KEY, PersistentDataType.STRING, UUID.randomUUID().toString());
         item.setVelocity(player.getLocation().getDirection().multiply(1.8));
 
-        ThrowableItem throwableItem = new ThrowableItem(item, player, "Throwing Web", (long) (throwableExpiry * 1000L), true);
+        ThrowableItem throwableItem = new ThrowableItem(this, item, player, "Throwing Web", (long) (throwableExpiry * 1000L), true);
         throwableItem.setCollideGround(true);
         throwableItem.getImmunes().add(player);
         championsManager.getThrowables().addThrowable(throwableItem);
@@ -98,42 +99,29 @@ public class ThrowingWeb extends Weapon implements Listener, InteractWeapon, Coo
         }
     }
 
-    @EventHandler
-    public void onGroundCollide(ThrowableHitGroundEvent event) {
-        if (event.getThrowable().getName().equalsIgnoreCase("Throwing Web")) {
-
-            for (Block block : UtilBlock.getInRadius(event.getThrowable().getItem().getLocation().getBlock(), 1).keySet()) {
-                if (UtilBlock.airFoliage(block)) {
-                    if (!block.getType().name().contains("GATE") && !block.getType().name().contains("DOOR")) {
-                        blockHandler.addRestoreBlock(block, Material.COBWEB, (long) (duration * 1000L));
-                        Particle.BLOCK_CRACK.builder().data(Material.COBWEB.createBlockData())
-                                .location(block.getLocation()).count(1).receivers(30).extra(0).spawn();
-                    }
-                }
-            }
-
-
-            event.getThrowable().getItem().remove();
-        }
-
+    @Override
+    public void onThrowableHit(ThrowableItem throwableItem, LivingEntity thrower, LivingEntity hit) {
+        handleWebCollision(throwableItem);
     }
 
-    @EventHandler
-    public void onCollideEntity(ThrowableHitEntityEvent event) {
-        if (event.getThrowable().getName().equalsIgnoreCase("Throwing Web")) {
+    @Override
+    public void onThrowableHitGround(ThrowableItem throwableItem, LivingEntity thrower, Location location) {
+        handleWebCollision(throwableItem);
+    }
 
-            for (Block block : UtilBlock.getInRadius(event.getCollision().getLocation().getBlock(), 1).keySet()) {
-                if (UtilBlock.airFoliage(block)) {
-                    if (!block.getType().name().contains("GATE") && !block.getType().name().contains("DOOR")) {
-                        blockHandler.addRestoreBlock(block, Material.COBWEB, (long) (duration * 1000L));
-                        Particle.BLOCK_CRACK.builder().data(Material.COBWEB.createBlockData())
-                                .location(block.getLocation()).count(1).receivers(30).extra(0).spawn();
-                    }
+    private void handleWebCollision(ThrowableItem throwableItem) {
+        for (Block block : UtilBlock.getInRadius(throwableItem.getItem().getLocation().getBlock(), 1).keySet()) {
+            if (UtilBlock.airFoliage(block)) {
+                if (!block.getType().name().contains("GATE") && !block.getType().name().contains("DOOR")) {
+                    blockHandler.addRestoreBlock(block, Material.COBWEB, (long) (duration * 1000L));
+                    Particle.BLOCK_CRACK.builder().data(Material.COBWEB.createBlockData())
+                            .location(block.getLocation()).count(1).receivers(30).extra(0).spawn();
                 }
             }
-
-            event.getThrowable().getItem().remove();
         }
+
+
+        throwableItem.getItem().remove();
     }
 
     @Override
@@ -145,5 +133,6 @@ public class ThrowingWeb extends Weapon implements Listener, InteractWeapon, Coo
     public double getCooldown() {
         return cooldown;
     }
+
 
 }
