@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.champions.champions.skills.skills.mage.axe;
+package me.mykindos.betterpvp.champions.champions.skills.skills.brute.sword;
 
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
@@ -63,7 +63,7 @@ public class Boulder extends Skill implements Listener, InteractSkill, CooldownS
     @Override
     public String[] getDescription(int level) {
         return new String[] {
-                "Right click with an Axe to activate",
+                "Right click with a Sword to activate",
                 "",
                 "Throw a boulder forward that",
                 "deals <val>" + getDamage(level) + "</val> damage to all nearby",
@@ -93,12 +93,12 @@ public class Boulder extends Skill implements Listener, InteractSkill, CooldownS
 
     @Override
     public Role getClassType() {
-        return Role.MAGE;
+        return Role.BRUTE;
     }
 
     @Override
     public SkillType getType() {
-        return SkillType.AXE;
+        return SkillType.SWORD;
     }
 
     @Override
