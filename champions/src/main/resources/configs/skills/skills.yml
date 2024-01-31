@@ -175,7 +175,7 @@ skills:
       enabled: true
       maxlevel: 3
       maxDamageIncreasePerLevel: 1.0
-      baseDamage: 0.0
+      baseDamage: 0.5
       damageIncreasePerLevel: 0.5
       baseMaxDamage: 1.0
       expirationTime: 5.0
@@ -226,17 +226,19 @@ skills:
     fury:
       enabled: true
       maxlevel: 3
-      baseDamage: 0.5
-      damageIncreasePerLevel: 0.5
-      baseMaxDamage: 2.0
-      maxDamageIncreasePerLevel: 1.0
-      expirationTime: 5.0
+      baseBonusDamage: 0.0
+      bonusDamageIncreasePerLevel: 0.5
     thorns:
       enabled: true
       maxlevel: 3
       internalCooldown: 2.0
       baseDamage: 0.0
       damageIncreasePerLevel: 0.8
+    sacrifice:
+      enabled: true
+      maxlevel: 3
+      basePercentage: 0.0
+      percentageIncreasePerLevel: 0.08
     defensivestance:
       enabled: true
       maxlevel: 5
@@ -298,6 +300,17 @@ skills:
       baseSlowDuration: 1.5
       slowDurationIncreasePerLevel: 0.0
       slowStrength: 2
+    boulder:
+      enabled: true
+      cooldown: 25.0
+      maxlevel: 5
+      baseRadius: 4.0
+      baseHeal: 2.0
+      baseDamage: 3.0
+      cooldownDecreasePerLevel: 1.0
+      healingIncreasePerLevel: 1.0
+      damageIncreasePerLevel: 1.0
+      radiusIncreasePerLevel: 0.5
     inferno:
       enabled: true
       maxlevel: 3
@@ -465,7 +478,7 @@ skills:
       duration: 2.0
   brute:
     battletaunt:
-      enabled: false
+      enabled: true
       energy: 15
       maxlevel: 5
       cooldown: 0.5
@@ -478,17 +491,6 @@ skills:
       baseRadius: 3.0
       radius: 3
       slownessStrength: 0
-    boulder:
-      enabled: true
-      cooldown: 25.0
-      maxlevel: 5
-      baseRadius: 4.0
-      baseHeal: 2.0
-      baseDamage: 3.0
-      cooldownDecreasePerLevel: 1.0
-      healingIncreasePerLevel: 1.0
-      damageIncreasePerLevel: 1.0
-      radiusIncreasePerLevel: 0.5
     seismicslam:
       enabled: true
       maxlevel: 5
@@ -499,20 +501,15 @@ skills:
       damageIncreasePerLevel: 2.0
       cooldownDecreasePerLevel: 2.0
       slamDelay: 500
-    whirlwindaxe:
+    whirlwindsword:
       enabled: true
       maxlevel: 5
       cooldown: 20.0
       cooldownDecreasePerLevel: 1.0
-      baseDistance: 4.0
-      distanceIncreasePerLevel: 1.0
+      baseDistance: 7.0
+      distanceIncreasePerLevel: 0.0
       baseDamage: 3.0
       damageIncreasePerLevel: 1.0
-    sacrifice:
-      enabled: true
-      maxlevel: 3
-      basePercentage: 0.0
-      percentageIncreasePerLevel: 0.08
     cripplingblow:
       enabled: true
       maxlevel: 3
@@ -577,6 +574,24 @@ skills:
       duration: 9.0
       cooldownDecreasePerLevel: 1.0
       speedStrength: 1
+    spiritofthebear:
+      enabled: true
+      maxlevel: 5
+      cooldown: 20.0
+      radius: 5
+      duration: 5.0
+      cooldownDecreasePerLevel: 2.0
+      resistanceStrength: 1
+    strengthinnumbers:
+      enabled: true
+      maxlevel: 5
+      cooldown: 20.0
+      radius: 10
+      duration: 2.0
+      cooldownDecreasePerLevel: 1.0
+      baseDuration: 2.0
+      durationIncreasePerLevel: 2.0
+      strengthStrength: 1
   ranger:
     wolfspounce:
       enabled: true
@@ -745,27 +760,6 @@ skills:
       numAttacksToReducePerLevel: 0
       range: 8
       duration: 60.0
-    scarletbastion:
-      enabled: true
-      maxlevel: 5
-      cooldown: 20.0
-      radius: 5
-      duration: 5.0
-      cooldownDecreasePerLevel: 2.0
-      resistanceStrength: 1
-      baseHealthReduction: 0.4
-      healthReductionDecreasePerLevel: 0.05
-    crimsonempowerment:
-      enabled: true
-      maxlevel: 5
-      cooldown: 20.0
-      radius: 10
-      cooldownDecreasePerLevel: 1.0
-      baseDuration: 4.0
-      durationIncreasePerLevel: 2.0
-      strengthStrength: 1
-      baseHealthReduction: 0.5
-      healthReductionDecreasePerLevel: 0.05
     bloodshed:
       enabled: true
       maxlevel: 5
@@ -822,7 +816,7 @@ skills:
       canUseWhileStunned: true
       canUseWhileLevitating: true
       cooldownDecreasePerLevel: 1.0
-      baseHealthReduction: 0.4
+      baseHealthReduction: 0.5
       healthReductionDecreasePerLevel: 0.05
       baseRange: 5.0
       rangeIncreasePerLevel: 1.0
@@ -898,8 +892,9 @@ skills:
     breakfall:
       enabled: true
       maxlevel: 3
-      baseDamageReduction: 2.0
-      damageReductionIncreasePerLevel: 2.0
+      damageReduction: 5.0
+      baseDamageReduction: 5.0
+      damageReductionIncreasePerLevel: 1.0
     fastrecovery:
       enabled: true
       maxlevel: 5
