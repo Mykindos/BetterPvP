@@ -19,11 +19,13 @@ import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -68,7 +70,7 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
                 "<effect>Speed " + UtilFormat.getRomanNumeral(speedStrength + 1) + "</effect> for <val>" + (getDuration(level)) + "</val> seconds and ",
                 "<stat>" + (getDamageReduction(level) * 100) + "%</stat> reduced damage while active",
                 "",
-                "Agility ends if you interact",
+                "Agility ends if you left click",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -101,6 +103,10 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
 
     @EventHandler
     public void endOnInteract(PlayerInteractEvent event) {
+        if(event.getHand() != EquipmentSlot.HAND) return;
+        if(!event.getAction().isLeftClick()) return;
+        if (event.useItemInHand() == Event.Result.DENY) return;
+
         Player player = event.getPlayer();
         if (active.containsKey(player.getUniqueId())) {
             active.remove(player.getUniqueId());
