@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -79,10 +80,13 @@ public class ComboAttack extends Skill implements PassiveSkill, Listener {
             if (!repeat.containsKey(damager)) {
                 repeat.put(damager, 0.0);
             }
-            event.setDamage(event.getDamage() + repeat.get(damager));
-            repeat.put(damager, Math.min((level * damageIncrement), repeat.get(damager) + damageIncrement));
+            double cur = repeat.get(damager);
+            event.setDamage(event.getDamage() + cur);
+            repeat.put(damager, Math.min((level * damageIncrement), cur + damageIncrement));
             last.put(damager, System.currentTimeMillis());
             event.addReason(getName());
+
+            damager.getWorld().playSound(damager.getLocation(), Sound.BLOCK_NOTE_BLOCK_HAT, 1f, (float) (0.7f + (0.3f * repeat.get(damager))));
 
         }
     }
