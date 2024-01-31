@@ -43,35 +43,9 @@ public class ArrowListener implements Listener {
         this.champions = champions;
     }
 
-
-    @UpdateEvent
-    public void displayCritTrail() {
-        Iterator<Map.Entry<Arrow, Float>> it = arrows.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry<Arrow, Float> next = it.next();
-            Arrow arrow = next.getKey();
-            if (arrow == null) {
-                it.remove();
-            } else if (arrow.isDead()) {
-                it.remove();
-            } else {
-                if (critArrowsEnabled && next.getValue() == 1.0) {
-                    Location loc = arrow.getLocation().add(new Vector(0, 0.25, 0));
-                    Particle.CRIT.builder().location(loc).count(3).extra(0).receivers(60, true).spawn();
-                }
-            }
-        }
-    }
-
-    /**
-     * Disable bow critical hits
-     *
-     * @param event The event
-     */
     @EventHandler
     public void onShootBow(EntityShootBowEvent event) {
         if (event.getProjectile() instanceof Arrow arrow) {
-            arrow.setCritical(false);
             if (event.getEntity() instanceof Player player) {
                 arrow.setMetadata("ShotWith", new FixedMetadataValue(champions, player.getInventory().getItemInMainHand().getType().name()));
             }
