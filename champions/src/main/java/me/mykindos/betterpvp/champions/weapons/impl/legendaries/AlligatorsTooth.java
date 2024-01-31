@@ -28,6 +28,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -69,7 +70,7 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
     }
 
     @Override
-    public List<Component> getLore() {
+    public List<Component> getLore(ItemStack item) {
         List<Component> lore = new ArrayList<>();
         lore.add(Component.text("This deadly tooth was stolen from", NamedTextColor.WHITE));
         lore.add(Component.text("a nest of reptilian beasts long ago.", NamedTextColor.WHITE));

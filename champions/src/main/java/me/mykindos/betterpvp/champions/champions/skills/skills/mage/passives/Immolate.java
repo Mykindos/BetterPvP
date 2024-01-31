@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -45,6 +46,7 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
     private int speedStrength;
     private int strengthLevel;
     private double energyDecreasePerLevel;
+
     @Inject
     public Immolate(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -62,7 +64,7 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
                 "Drop your Sword / Axe to toggle",
                 "",
                 "Ignite yourself in flaming fury, gaining",
-                "<effect>Speed "+ UtilFormat.getRomanNumeral(speedStrength + 1) + "</effect>, <effect>Strength " + UtilFormat.getRomanNumeral(strengthLevel) + " </effect> and <effect>Fire Resistance",
+                "<effect>Speed " + UtilFormat.getRomanNumeral(speedStrength + 1) + "</effect>, <effect>Strength " + UtilFormat.getRomanNumeral(strengthLevel) + " </effect> and <effect>Fire Resistance",
                 "",
                 "You leave a trail of fire, which",
                 "ignites enemies for <stat>" + getFireTickDuration(level) + "</stat> seconds",
@@ -158,7 +160,7 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
             }
         }
     }
-    
+
     @UpdateEvent(delay = 100)
     public void createFireParticles() {
         for (UUID uuid : active) {
@@ -188,7 +190,9 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
 
             active.remove(player.getUniqueId());
 
-            player.removePotionEffect(PotionEffectType.SPEED);
+            if (!UtilPlayer.hasPotionEffect(player, PotionEffectType.SPEED, strengthLevel + 1)) {
+                player.removePotionEffect(PotionEffectType.SPEED);
+            }
             player.removePotionEffect(PotionEffectType.FIRE_RESISTANCE);
             championsManager.getEffects().removeEffect(player, EffectType.STRENGTH);
             sendState(player, false);

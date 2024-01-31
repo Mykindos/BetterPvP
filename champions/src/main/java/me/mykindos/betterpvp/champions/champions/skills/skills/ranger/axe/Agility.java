@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -157,7 +158,9 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
     public void deactivate(Player player) {
         UtilMessage.message(player, "Champions", UtilMessage.deserialize("<green>%s %s</green> has ended.", getName(), getLevel(player)));
         player.getWorld().playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.5F, 0.25F);
-        player.removePotionEffect(PotionEffectType.SPEED);
+        if (!UtilPlayer.hasPotionEffect(player, PotionEffectType.SPEED, speedStrength + 1)) {
+            player.removePotionEffect(PotionEffectType.SPEED);
+        }
     }
 
     @Override
