@@ -22,6 +22,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.UUID;
 
@@ -47,7 +48,7 @@ public class Void extends ActiveToggleSkill implements EnergySkill {
 
     @Override
     public String[] getDescription(int level) {
-        return new String[] {
+        return new String[]{
                 "Drop your Sword / Axe to toggle",
                 "",
                 "While in void form, you receive",
@@ -73,38 +74,55 @@ public class Void extends ActiveToggleSkill implements EnergySkill {
         return Role.MAGE;
     }
 
-    @UpdateEvent(delay = 1000)
-    public void audio() {
-        for (UUID uuid : active) {
-            Player player = Bukkit.getPlayer(uuid);
-            if (player != null) {
-                player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2F, 0.5F);
-                player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2F, 0.5F);
-            }
+    @Override
+    public boolean process(Player player) {
+        HashMap<String, Long> updateCooldowns = updaterCooldowns.get(player.getUniqueId());
+
+        if (updateCooldowns.getOrDefault("audio", 0L) < System.currentTimeMillis()) {
+            audio(player);
+            updateCooldowns.put("audio", System.currentTimeMillis() + 1000);
+        }
+
+        return doVoid(player);
+    }
+
+    @Override
+    public void toggleActive(Player player) {
+        if (championsManager.getEnergy().use(player, "Void", 5, false)) {
+            UtilMessage.simpleMessage(player, getClassType().getName(), "Void: <green>On");
+        } else {
+            cancel(player);
         }
     }
 
-    @UpdateEvent
-    public void update() {
-        Iterator<UUID> it = active.iterator();
-        while (it.hasNext()) {
-            UUID uuid = it.next();
-            Player player = Bukkit.getPlayer(uuid);
-            if (player == null) {
-                it.remove();
-                continue;
-            }
+    @Override
+    public void cancel(Player player) {
+        super.cancel(player);
+        player.removePotionEffect(PotionEffectType.INVISIBILITY);
+        player.removePotionEffect(PotionEffectType.SLOW);
+        championsManager.getEffects().removeEffect(player, EffectType.NO_JUMP);
+        UtilMessage.simpleMessage(player, getClassType().getName(), "Void: <red>Off");
+    }
 
-            int level = getLevel(player);
-            if (level <= 0 || !championsManager.getEnergy().use(player, getName(), getEnergy(level) / 20, true)) {
-                it.remove();
-                continue;
-            }
+    private void audio(Player player) {
 
-            player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 21, slownessStrength));
-            player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 21, 1, false, false, false));
-            championsManager.getEffects().addEffect(player, EffectType.NO_JUMP, 21);
+        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2F, 0.5F);
+        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2F, 0.5F);
+
+    }
+
+    private boolean doVoid(Player player) {
+
+        int level = getLevel(player);
+        if (level <= 0 || !championsManager.getEnergy().use(player, getName(), getEnergy(level) / 20, true)) {
+            return false;
         }
+
+        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 21, slownessStrength));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 21, 1, false, false, false));
+        championsManager.getEffects().addEffect(player, EffectType.NO_JUMP, 21);
+
+        return true;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -144,11 +162,10 @@ public class Void extends ActiveToggleSkill implements EnergySkill {
             UtilMessage.simpleMessage(player, getClassType().getName(), "Void: <red>Off");
         } else {
             active.add(player.getUniqueId());
-            if (championsManager.getEnergy().use(player, "Void", 5, false)) {
-                UtilMessage.simpleMessage(player, getClassType().getName(), "Void: <green>On");
-            }
+
         }
     }
+
 
     public void loadSkillConfig() {
         baseDamageReduction = getConfig("baseDamageReduction", 2.0, Double.class);
