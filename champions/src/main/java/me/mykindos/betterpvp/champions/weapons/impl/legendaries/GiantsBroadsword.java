@@ -29,6 +29,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -73,7 +74,7 @@ public class GiantsBroadsword extends ChannelWeapon implements InteractWeapon, L
     }
 
     @Override
-    public List<Component> getLore() {
+    public List<Component> getLore(ItemStack item) {
         List<Component> lore = new ArrayList<>();
         lore.add(Component.text("Forged in the godly mines of Plagieus,", NamedTextColor.WHITE));
         lore.add(Component.text("this sword has endured thousands of", NamedTextColor.WHITE));

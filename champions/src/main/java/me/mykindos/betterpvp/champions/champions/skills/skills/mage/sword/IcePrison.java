@@ -9,7 +9,7 @@ import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableItem;
-import me.mykindos.betterpvp.core.combat.throwables.events.ThrowableHitEvent;
+import me.mykindos.betterpvp.core.combat.throwables.ThrowableListener;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -19,15 +19,15 @@ import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 
 @Singleton
 @BPvPListener
-public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Listener {
+public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Listener, ThrowableListener {
 
     private final WorldBlockHandler blockHandler;
     private int sphereSize;
@@ -80,11 +80,18 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
         return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
-    @EventHandler
-    public void onThrowableHit(ThrowableHitEvent event) {
-        if (!event.getThrowable().getName().equals(getName())) return;
+    @Override
+    public void onThrowableHit(ThrowableItem throwableItem, LivingEntity thrower, LivingEntity hit) {
+        handleIcePrisonCollision(throwableItem);
+    }
 
-        Location center = event.getThrowable().getItem().getLocation();
+    @Override
+    public void onThrowableHitGround(ThrowableItem throwableItem, LivingEntity thrower, Location location) {
+        handleIcePrisonCollision(throwableItem);
+    }
+
+    private void handleIcePrisonCollision(ThrowableItem throwableItem) {
+        Location center = throwableItem.getItem().getLocation();
 
         for (Location loc : UtilMath.sphere(center, sphereSize, true)) {
             if (loc.getBlockX() == center.getBlockX() &&
@@ -95,7 +102,7 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
 
             if (loc.getBlock().getType().name().contains("REDSTONE")) continue;
             if (loc.getBlock().getType() == Material.AIR || UtilBlock.airFoliage(loc.getBlock())) {
-                int level = getLevel((Player) event.getThrowable().getThrower());
+                int level = getLevel((Player) throwableItem.getThrower());
                 blockHandler.addRestoreBlock(loc.getBlock(), Material.ICE, (long) (getDuration(level) * 1000));
 
                 loc.getBlock().setType(Material.ICE);
@@ -108,7 +115,7 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
     public void activate(Player player, int level) {
         Item item = player.getWorld().dropItem(player.getEyeLocation(), new ItemStack(Material.ICE));
         item.setVelocity(player.getLocation().getDirection().multiply(speed));
-        ThrowableItem throwableItem = new ThrowableItem(item, player, getName(), 10000, true);
+        ThrowableItem throwableItem = new ThrowableItem(this, item, player, getName(), 10000, true);
         throwableItem.setCollideGround(true);
         championsManager.getThrowables().addThrowable(throwableItem);
     }
@@ -125,4 +132,5 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
     public Action[] getActions() {
         return SkillActions.RIGHT_CLICK;
     }
+
 }

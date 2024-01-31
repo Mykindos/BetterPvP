@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import org.bukkit.Bukkit;
@@ -85,16 +86,15 @@ public class Stampede extends Skill implements PassiveSkill {
 
                 if (!player.isSprinting() || player.isInWater()) {
                     sprintTime.remove(player);
-                    sprintStr.remove(player);
-                    player.removePotionEffect(PotionEffectType.SPEED);
+                    int str = sprintStr.remove(player);
+
+                    if(!UtilPlayer.hasPotionEffect(player, PotionEffectType.SPEED, str + 2)) {
+                        player.removePotionEffect(PotionEffectType.SPEED);
+                    }
                 } else {
                     long time = sprintTime.get(player);
                     int str = sprintStr.get(player);
                     if (str >= 0) {
-                        if (player.hasPotionEffect(PotionEffectType.SPEED)) {
-                            player.removePotionEffect(PotionEffectType.SPEED);
-                        }
-
                         player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 40, str));
                     }
                     if (UtilTime.elapsed(time, (long) ((durationPerStack - level) * 1000L))) {
@@ -103,7 +103,7 @@ public class Stampede extends Skill implements PassiveSkill {
                             sprintStr.put(player, str + 1);
 
                             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_AMBIENT, 2.0F, 0.2F * str + 2.0F);
-                            UtilMessage.simpleMessage(player, getClassType().getName(), "Stampede Level: <yellow>%d", str + 1);
+                            UtilMessage.simpleMessage(player, getClassType().getName(), "Stampede Level: <yellow>%d", (str + 2));
                         }
                     }
                 }

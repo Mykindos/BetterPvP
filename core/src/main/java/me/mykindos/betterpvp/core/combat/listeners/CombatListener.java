@@ -131,7 +131,7 @@ public class CombatListener implements Listener {
 
                 String damagerUuid = event.getDamager() == null ? null : event.getDamager().getUniqueId().toString();
 
-                if(event.getDamageDelay() > 0) {
+                if (event.getDamageDelay() > 0) {
                     damageDataList.add(new DamageData(event.getDamagee().getUniqueId().toString(), event.getCause(), damagerUuid, event.getDamageDelay()));
                 }
 
@@ -170,6 +170,13 @@ public class CombatListener implements Listener {
     private void finalizeDamage(CustomDamageEvent event, CustomDamageReductionEvent reductionEvent) {
         updateDurability(event);
 
+        if (event.getProjectile() instanceof Arrow) {
+            if (event.getDamager() instanceof Player player) {
+                player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.5f, 0.7f);
+                event.getDamager().getWorld().playSound(event.getDamagee().getLocation(), Sound.ENTITY_ARROW_HIT, 0.5f, 1.0f);
+            }
+        }
+
         if (!event.getDamagee().isDead()) {
 
             if (event.getDamagee() instanceof Player player) {
@@ -207,8 +214,11 @@ public class CombatListener implements Listener {
     private void processDamageData(CustomDamageEvent event) {
         if (event.getDamagee() instanceof Player damagee) {
             final Gamer gamer = clientManager.search().online(damagee).getGamer();
-            gamer.setLastDamaged(System.currentTimeMillis());
             gamer.saveProperty(GamerProperty.DAMAGE_TAKEN, (double) gamer.getProperty(GamerProperty.DAMAGE_TAKEN).orElse(0D) + event.getDamage());
+
+            if (event.getDamager() != null) { // Only combat tag if they were damaged by an entity
+                gamer.setLastDamaged(System.currentTimeMillis());
+            }
         }
 
         if (event.getDamager() instanceof Player damager) {
@@ -443,12 +453,6 @@ public class CombatListener implements Listener {
     private void playDamageEffect(CustomDamageEvent event) {
         final LivingEntity damagee = event.getDamagee();
         damagee.playHurtAnimation(270);
-        if (event.getProjectile() instanceof Arrow) {
-            if (event.getDamager() instanceof Player player) {
-                player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.5f, 0.7f);
-                event.getDamager().getWorld().playSound(damagee.getLocation(), Sound.ENTITY_ARROW_HIT, 0.5f, 1.0f);
-            }
-        }
 
         final SoundProvider provider = event.getSoundProvider();
         final net.kyori.adventure.sound.Sound sound = provider.apply(event);
@@ -463,65 +467,7 @@ public class CombatListener implements Listener {
 
     private void updateDurability(CustomDamageEvent event) {
 
-        CustomDamageDurabilityEvent durabilityEvent = UtilServer.callEvent(new CustomDamageDurabilityEvent(event));
-
-        if (durabilityEvent.isDamageeTakeDurability()) {
-            if (event.getDamagee() instanceof Player damagee) {
-
-                for (ItemStack armour : damagee.getEquipment().getArmorContents()) {
-                    if (armour == null) continue;
-                    ItemMeta meta = armour.getItemMeta();
-                    if (meta instanceof Damageable armourMeta) {
-                        armourMeta.setDamage(armourMeta.getDamage() + 1);
-                        armour.setItemMeta(armourMeta);
-
-                        if (armourMeta.getDamage() > armour.getType().getMaxDurability()) {
-                            if (armour.getType().name().contains("HELMET")) {
-                                damagee.getEquipment().setHelmet(null);
-                            }
-                            if (armour.getType().name().contains("CHESTPLATE")) {
-                                damagee.getEquipment().setChestplate(null);
-                            }
-                            if (armour.getType().name().contains("LEGGINGS")) {
-                                damagee.getEquipment().setLeggings(null);
-                            }
-                            if (armour.getType().name().contains("BOOTS")) {
-                                damagee.getEquipment().setBoots(null);
-                            }
-
-                            damagee.playSound(damagee.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
-                        }
-                    }
-
-                }
-
-            }
-        }
-
-        if (durabilityEvent.isDamagerTakeDurability()) {
-            if (event.getDamager() instanceof Player damager) {
-                if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
-
-
-                ItemStack weapon = damager.getInventory().getItemInMainHand();
-                if (weapon.getType() == Material.AIR) return;
-                if (weapon.getType().getMaxDurability() == 0) return;
-
-                ItemMeta meta = weapon.getItemMeta();
-                if (meta instanceof Damageable weaponMeta) {
-                    weaponMeta.setDamage(weaponMeta.getDamage() + 1);
-                    weapon.setItemMeta(weaponMeta);
-
-                    if (weaponMeta.getDamage() > weapon.getType().getMaxDurability()) {
-                        damager.getInventory().setItemInMainHand(null);
-                        damager.playSound(damager.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
-                    }
-
-                }
-
-
-            }
-        }
+        UtilServer.callEvent(new CustomDamageDurabilityEvent(event));
 
     }
 
