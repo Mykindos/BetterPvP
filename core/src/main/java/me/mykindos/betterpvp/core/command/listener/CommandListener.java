@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.PlayerCommandSendEvent;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -73,6 +74,24 @@ public class CommandListener implements Listener {
 
             event.setCancelled(true);
         }
+    }
+
+    @EventHandler
+    public void onCommandListSent(PlayerCommandSendEvent event) {
+        Client client = clientManager.search().online(event.getPlayer());
+        if(event.getPlayer().isOp() || client.hasRank(Rank.ADMIN)) return;
+
+
+        event.getCommands().removeIf(command -> {
+
+            Optional<ICommand> commandOptional = commandManager.getCommand(command, new String[]{});
+            if (commandOptional.isPresent()) {
+                ICommand command1 = commandOptional.get();
+                return !client.hasRank(command1.getRequiredRank()) && !event.getPlayer().isOp();
+            }
+
+            return true;
+        });
     }
 
     private void promptInsufficientPrivileges(ICommand command, Player player) {
