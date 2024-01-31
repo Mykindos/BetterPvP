@@ -38,8 +38,9 @@ public class SpigotCommandWrapper extends org.bukkit.command.Command {
 
         if (args.length == 0) return new ArrayList<>();
 
+        Client client = null;
         if (sender instanceof Player player) {
-            Client client = clientManager.search(sender).inform(false).online(player);
+            client = clientManager.search(sender).inform(false).online(player);
             if (!client.hasRank(this.command.getRequiredRank()) && !sender.isOp()) {
                 return aliases;
             }
@@ -50,6 +51,9 @@ public class SpigotCommandWrapper extends org.bukkit.command.Command {
             if (subCommandOptional.isPresent()) {
                 ICommand subCommand = subCommandOptional.get();
                 if (subCommand.showTabCompletion(sender)) {
+                    if(client != null && !client.hasRank(subCommand.getRequiredRank())) {
+                        return new ArrayList<>();
+                    }
                     return subCommand.processTabComplete(sender, Arrays.copyOfRange(args, 1, args.length));
                 } else {
                     return new ArrayList<>();

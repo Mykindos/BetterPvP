@@ -7,7 +7,7 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.types.ActiveToggleSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableItem;
-import me.mykindos.betterpvp.core.combat.throwables.events.ThrowableHitEntityEvent;
+import me.mykindos.betterpvp.core.combat.throwables.ThrowableListener;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
@@ -22,6 +22,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityCombustEvent;
@@ -35,7 +36,7 @@ import java.util.UUID;
 
 @Singleton
 @BPvPListener
-public class Immolate extends ActiveToggleSkill implements EnergySkill {
+public class Immolate extends ActiveToggleSkill implements EnergySkill, ThrowableListener {
 
     private double baseFireTickDuration;
     private double fireTickDurationIncreasePerLevel;
@@ -112,7 +113,7 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill {
             if (player != null) {
                 Item fire = player.getWorld().dropItem(player.getLocation().add(0.0D, 0.5D, 0.0D), new ItemStack(Material.BLAZE_POWDER));
                 int level = getLevel(player);
-                ThrowableItem throwableItem = new ThrowableItem(fire, player, getName(), (long) (getFireTrailDuration(level) * 1000L));
+                ThrowableItem throwableItem = new ThrowableItem(this, fire, player, getName(), (long) (getFireTrailDuration(level) * 1000L));
                 championsManager.getThrowables().addThrowable(throwableItem);
 
                 fire.setVelocity(new Vector((Math.random() - 0.5D) / 3.0D, Math.random() / 3.0D, (Math.random() - 0.5D) / 3.0D));
@@ -120,16 +121,16 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill {
         }
     }
 
-    @EventHandler
-    public void onCollide(ThrowableHitEntityEvent e) {
-        if (!e.getThrowable().getName().equals(getName())) return;
-        if (!(e.getThrowable().getThrower() instanceof Player damager)) return;
-        if (e.getCollision().getFireTicks() > 0) return;
+    @Override
+    public void onThrowableHit(ThrowableItem throwableItem, LivingEntity thrower, LivingEntity hit) {
+        if (!(thrower instanceof Player damager)) return;
+        if (hit.getFireTicks() > 0) return;
 
         //LogManager.addLog(e.getCollision(), damager, "Immolate", 0);
         int level = getLevel(damager);
-        e.getCollision().setFireTicks((int) (getFireTickDuration(level) * 20));
+        hit.setFireTicks((int) (getFireTickDuration(level) * 20));
     }
+
     @UpdateEvent
     public void checkActive() {
         Iterator<UUID> iterator = active.iterator();
@@ -213,4 +214,5 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill {
         strengthLevel = getConfig("strengthLevel", 1, Integer.class);
         energyDecreasePerLevel = getConfig("energyDecreasePerLevel", 1.0, Double.class);
     }
+
 }

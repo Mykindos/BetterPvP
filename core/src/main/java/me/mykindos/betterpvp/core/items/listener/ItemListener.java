@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -33,9 +34,11 @@ public class ItemListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onCustomDamageDurability(CustomDamageDurabilityEvent event) {
         if (event.isDamagerTakeDurability() && event.getCustomDamageEvent().getDamager() instanceof Player damager) {
-            if (damageCustomItem(damager, damager.getInventory().getItemInMainHand(), 1)) {
-                //durability was handled, cancel it
-                event.setDamagerTakeDurability(false);
+            if (event.getCustomDamageEvent().getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
+                if (damageCustomItem(damager, damager.getInventory().getItemInMainHand(), 1)) {
+                    //durability was handled, cancel it
+                    event.setDamagerTakeDurability(false);
+                }
             }
         }
         if (event.isDamageeTakeDurability() && event.getCustomDamageEvent().getDamagee() instanceof Player damagee) {
@@ -50,10 +53,9 @@ public class ItemListener implements Listener {
     }
 
     /**
-     *
-     * @param player the player that the ItemStack is on
+     * @param player    the player that the ItemStack is on
      * @param itemStack the itemStack to try and damage
-     * @param damage the amount of damage to apply
+     * @param damage    the amount of damage to apply
      * @return true if the damage was processed (it was a custom item with durability), false if not
      */
     public boolean damageCustomItem(Player player, ItemStack itemStack, int damage) {

@@ -15,7 +15,8 @@ import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
-import me.mykindos.betterpvp.core.combat.throwables.events.ThrowableHitEntityEvent;
+import me.mykindos.betterpvp.core.combat.throwables.ThrowableItem;
+import me.mykindos.betterpvp.core.combat.throwables.ThrowableListener;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
@@ -29,10 +30,9 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
@@ -47,7 +47,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkill {
+public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkill, ThrowableListener {
     private final WeakHashMap<Player, ChargeData> charging = new WeakHashMap<>();
     private List<Item> blazePowders = new ArrayList<>();
     private final HashMap<Player, Shotgun> shotguns = new HashMap<>();
@@ -143,35 +143,32 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
         charging.put(player, chargeData);
     }
 
-    @EventHandler
-    public void onCollide(ThrowableHitEntityEvent e) {
-        if (e.getThrowable().getName().equals(getName())) {
-            if (e.getCollision() instanceof ArmorStand) {
-                return;
-            }
+    @Override
+    public void onThrowableHit(ThrowableItem throwableItem, LivingEntity thrower, LivingEntity hit) {
+        if (hit instanceof ArmorStand) {
+            return;
+        }
 
-            Item fireItem = e.getThrowable().getItem();
-            if (fireItem != null) {
-                fireItem.remove();
-            }
+        Item fireItem =throwableItem.getItem();
+        if (fireItem != null) {
+            fireItem.remove();
+        }
 
-            if (e.getThrowable().getThrower() instanceof Player damager) {
-                int level = getLevel(damager);
-                Entity collisionEntity = e.getCollision();
-                collisionEntity.setFireTicks((int) (getFireDuration(level) * 20));
+        if (thrower instanceof Player damager) {
+            int level = getLevel(damager);
+            hit.setFireTicks((int) (getFireDuration(level) * 20));
 
-                Vector knockbackDirection = collisionEntity.getLocation().toVector()
-                        .subtract(damager.getLocation().toVector()).normalize();
-                double knockbackStrength = 0.1;
-                Vector knockbackVelocity = knockbackDirection.multiply(knockbackStrength);
-                collisionEntity.setVelocity(collisionEntity.getVelocity().add(knockbackVelocity).setY(0.1));
+            Vector knockbackDirection = hit.getLocation().toVector()
+                    .subtract(damager.getLocation().toVector()).normalize();
+            double knockbackStrength = 0.1;
+            Vector knockbackVelocity = knockbackDirection.multiply(knockbackStrength);
+            hit.setVelocity(hit.getVelocity().add(knockbackVelocity).setY(0.1));
 
-                damager.playSound(damager.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 1.2f);
+            damager.playSound(damager.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 1.2f);
 
-                CustomDamageEvent cde = new CustomDamageEvent(e.getCollision(), damager, null, DamageCause.CUSTOM, getDamage(level), false, "Inferno");
-                cde.setDamageDelay(0);
-                UtilDamage.doCustomDamage(cde);
-            }
+            CustomDamageEvent cde = new CustomDamageEvent(hit, damager, null, DamageCause.CUSTOM, getDamage(level), false, "Inferno");
+            cde.setDamageDelay(0);
+            UtilDamage.doCustomDamage(cde);
         }
     }
 
@@ -235,7 +232,7 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
 
             if (currentTick >= shotgun.getNextShotTick() && shotgun.getFlamesShot() < shotgun.getTotalFlames() && isHolding(shotgun.getPlayer())) {
                 Item fire = shotgun.getPlayer().getWorld().dropItem(shotgun.getPlayer().getEyeLocation(), new ItemStack(Material.BLAZE_POWDER));
-                championsManager.getThrowables().addThrowable(fire, shotgun.getPlayer(), getName(), 2000L);
+                championsManager.getThrowables().addThrowable(this, fire, shotgun.getPlayer(), getName(), 2000L);
                 blazePowders.add(fire);
 
                 fire.teleport(shotgun.getPlayer().getEyeLocation());
