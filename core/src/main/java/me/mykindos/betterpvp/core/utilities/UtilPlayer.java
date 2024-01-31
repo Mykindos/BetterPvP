@@ -20,9 +20,11 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 public class UtilPlayer {
@@ -155,5 +157,10 @@ public class UtilPlayer {
 
         packet.getDataValueCollectionModifier().write(0, wrappedDataValueList);
         ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet);
+    }
+
+    public static boolean hasPotionEffect(Player player, PotionEffectType type, int amplifier) {
+        return player.hasPotionEffect(type)
+                && Objects.requireNonNull(player.getPotionEffect(type)).getAmplifier() <= amplifier;
     }
 }
