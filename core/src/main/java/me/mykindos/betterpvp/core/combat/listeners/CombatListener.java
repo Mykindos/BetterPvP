@@ -131,7 +131,7 @@ public class CombatListener implements Listener {
 
                 String damagerUuid = event.getDamager() == null ? null : event.getDamager().getUniqueId().toString();
 
-                if(event.getDamageDelay() > 0) {
+                if (event.getDamageDelay() > 0) {
                     damageDataList.add(new DamageData(event.getDamagee().getUniqueId().toString(), event.getCause(), damagerUuid, event.getDamageDelay()));
                 }
 
@@ -214,8 +214,11 @@ public class CombatListener implements Listener {
     private void processDamageData(CustomDamageEvent event) {
         if (event.getDamagee() instanceof Player damagee) {
             final Gamer gamer = clientManager.search().online(damagee).getGamer();
-            gamer.setLastDamaged(System.currentTimeMillis());
             gamer.saveProperty(GamerProperty.DAMAGE_TAKEN, (double) gamer.getProperty(GamerProperty.DAMAGE_TAKEN).orElse(0D) + event.getDamage());
+
+            if (event.getDamager() != null) { // Only combat tag if they were damaged by an entity
+                gamer.setLastDamaged(System.currentTimeMillis());
+            }
         }
 
         if (event.getDamager() instanceof Player damager) {
