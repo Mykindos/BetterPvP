@@ -51,7 +51,7 @@ public class SpigotCommandWrapper extends org.bukkit.command.Command {
             if (subCommandOptional.isPresent()) {
                 ICommand subCommand = subCommandOptional.get();
                 if (subCommand.showTabCompletion(sender)) {
-                    if(client != null && !client.hasRank(subCommand.getRequiredRank())) {
+                    if(client != null && !client.hasRank(subCommand.getRequiredRank()) && !sender.isOp()) {
                         return new ArrayList<>();
                     }
                     return subCommand.processTabComplete(sender, Arrays.copyOfRange(args, 1, args.length));
