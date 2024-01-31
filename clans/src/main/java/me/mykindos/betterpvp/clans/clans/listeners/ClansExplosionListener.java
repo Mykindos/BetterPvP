@@ -282,7 +282,9 @@ public class ClansExplosionListener extends ClanListener {
                 continue;
             }
 
-            block.breakNaturally();
+            if(!worldBlockHandler.isRestoreBlock(block)) {
+                block.breakNaturally();
+            }
 
         }
 
