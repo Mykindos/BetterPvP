@@ -463,65 +463,7 @@ public class CombatListener implements Listener {
 
     private void updateDurability(CustomDamageEvent event) {
 
-        CustomDamageDurabilityEvent durabilityEvent = UtilServer.callEvent(new CustomDamageDurabilityEvent(event));
-
-        if (durabilityEvent.isDamageeTakeDurability()) {
-            if (event.getDamagee() instanceof Player damagee) {
-
-                for (ItemStack armour : damagee.getEquipment().getArmorContents()) {
-                    if (armour == null) continue;
-                    ItemMeta meta = armour.getItemMeta();
-                    if (meta instanceof Damageable armourMeta) {
-                        armourMeta.setDamage(armourMeta.getDamage() + 1);
-                        armour.setItemMeta(armourMeta);
-
-                        if (armourMeta.getDamage() > armour.getType().getMaxDurability()) {
-                            if (armour.getType().name().contains("HELMET")) {
-                                damagee.getEquipment().setHelmet(null);
-                            }
-                            if (armour.getType().name().contains("CHESTPLATE")) {
-                                damagee.getEquipment().setChestplate(null);
-                            }
-                            if (armour.getType().name().contains("LEGGINGS")) {
-                                damagee.getEquipment().setLeggings(null);
-                            }
-                            if (armour.getType().name().contains("BOOTS")) {
-                                damagee.getEquipment().setBoots(null);
-                            }
-
-                            damagee.playSound(damagee.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
-                        }
-                    }
-
-                }
-
-            }
-        }
-
-        if (durabilityEvent.isDamagerTakeDurability()) {
-            if (event.getDamager() instanceof Player damager) {
-                if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
-
-
-                ItemStack weapon = damager.getInventory().getItemInMainHand();
-                if (weapon.getType() == Material.AIR) return;
-                if (weapon.getType().getMaxDurability() == 0) return;
-
-                ItemMeta meta = weapon.getItemMeta();
-                if (meta instanceof Damageable weaponMeta) {
-                    weaponMeta.setDamage(weaponMeta.getDamage() + 1);
-                    weapon.setItemMeta(weaponMeta);
-
-                    if (weaponMeta.getDamage() > weapon.getType().getMaxDurability()) {
-                        damager.getInventory().setItemInMainHand(null);
-                        damager.playSound(damager.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
-                    }
-
-                }
-
-
-            }
-        }
+        UtilServer.callEvent(new CustomDamageDurabilityEvent(event));
 
     }
 
