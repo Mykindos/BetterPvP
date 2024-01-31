@@ -43,6 +43,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
@@ -112,7 +113,7 @@ public class KnightsGreatlance extends ChannelWeapon implements InteractWeapon, 
     }
 
     @Override
-    public List<Component> getLore() {
+    public List<Component> getLore(ItemStack item) {
         List<Component> lore = new ArrayList<>();
         lore.add(Component.text("Relic of a bygone age.", NamedTextColor.WHITE));
         lore.add(Component.text("Emblazoned with cryptic runes, this", NamedTextColor.WHITE));

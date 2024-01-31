@@ -84,9 +84,7 @@ public class Bloodlust extends Skill implements PassiveSkill {
                 tempStr = Math.min(tempStr, maxStacks);
                 str.put(target, tempStr);
                 time.put(target, (long) (System.currentTimeMillis() + getDuration(level) * 1000));
-                if (target.hasPotionEffect(PotionEffectType.SPEED)) {
-                    target.removePotionEffect(PotionEffectType.SPEED);
-                }
+
                 championsManager.getEffects().addEffect(target, EffectType.STRENGTH, tempStr, (long) (getDuration(level) * 1000L));
                 target.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) (getDuration(level) * 20), tempStr));
                 target.setHealth(target.getHealth() + health);
