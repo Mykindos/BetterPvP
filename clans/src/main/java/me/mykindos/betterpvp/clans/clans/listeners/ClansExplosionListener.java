@@ -200,7 +200,6 @@ public class ClansExplosionListener extends ClanListener {
         final Set<Block> blocks = UtilBlock.getInRadius(event.getLocation(), event.getYield()).keySet();
         for (Block block : blocks) {
             if (protectedBlocks.contains(block.getType())) continue;
-            if (worldBlockHandler.isRestoreBlock(block)) continue;
             if (block.getType().isAir()) continue;
 
             if (block.isLiquid()) {
@@ -225,7 +224,6 @@ public class ClansExplosionListener extends ClanListener {
 
         for (Block block : event.blockList()) {
             if (protectedBlocks.contains(block.getType())) continue;
-            if (worldBlockHandler.isRestoreBlock(block)) continue;
 
             if (attackedClan == null) {
                 Optional<Clan> clanOptional = clanManager.getClanByLocation(block.getLocation());
