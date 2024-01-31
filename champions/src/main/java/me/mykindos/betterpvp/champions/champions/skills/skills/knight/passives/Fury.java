@@ -50,12 +50,11 @@ public class Fury extends Skill implements PassiveSkill, Listener {
     public String[] getDescription(int level) {
         return new String[]{
         "For every subsequent hit, your damage",
-                "will increase by <val>" + getDamage(level) + "</val>",
-                "up to a maximum of <val>" + getMaxDamage(level) + "</val> damage",
+                "will increase by <val>" + getDamage(level) + "</val> up to a maximum of <val>" + getMaxDamage(level) + "</val> damage",
                 "",
                 "If you take damage, your damage will reset",
                 "",
-                "Extra damage will reset after <stat> "+ expirationTime + "</stat> seconds"
+                "Extra damage will reset after <stat>"+ expirationTime + "</stat> seconds"
         };
     }
 

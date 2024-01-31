@@ -111,7 +111,7 @@ public class LevelField extends Skill implements ToggleSkill, CooldownSkill, Lis
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "For every enemy that outnumbers you within <stat>" + radius + "</stat> blocks, you",
+                "For every enemy that outnumbers you within <stat>" + radius + "</stat> blocks",
                 "",
                 "Deal: <val>" + (level * damageDealtPerPlayer) + "</val> more damage",
                 "Take: <val>" + (level * damageTakenPerPlayer) + "</val> less damage",
@@ -129,7 +129,6 @@ public class LevelField extends Skill implements ToggleSkill, CooldownSkill, Lis
 
     @Override
     public double getCooldown(int level) {
-
         return cooldown - ((level - 1));
     }
 
