@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.champions.champions.skills.skills.brute.passives;
+package me.mykindos.betterpvp.champions.champions.skills.skills.knight.passives;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -45,7 +45,7 @@ public class Resistance extends Skill implements PassiveSkill {
 
     @Override
     public Role getClassType() {
-        return Role.BRUTE;
+        return Role.KNIGHT;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -75,7 +75,6 @@ public class Resistance extends Skill implements PassiveSkill {
 
     @Override
     public SkillType getType() {
-
         return SkillType.PASSIVE_A;
     }
 

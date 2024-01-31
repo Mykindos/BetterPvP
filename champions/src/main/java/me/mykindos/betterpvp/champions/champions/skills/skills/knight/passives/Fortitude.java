@@ -74,7 +74,7 @@ public class Fortitude extends Skill implements PassiveSkill, Listener {
 
     @Override
     public SkillType getType() {
-        return SkillType.PASSIVE_B;
+        return SkillType.PASSIVE_A;
     }
 
 

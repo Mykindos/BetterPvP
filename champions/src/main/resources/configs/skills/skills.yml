@@ -160,6 +160,10 @@ skills:
       cooldownDecreasePerLevel: 1.0
       speedDuration: 3.0
       slownessStrength: 2
+    resistance:
+      enabled: true
+      maxlevel: 3
+      increasePerLevel: 15
     fortitude:
       enabled: true
       maxlevel: 3
@@ -170,15 +174,11 @@ skills:
     vengeance:
       enabled: true
       maxlevel: 3
-      damageIncrease: 0.25
-      canUseWhileSlowed: true
-      canUseWhileSilenced: false
-      canUseWhileStunned: false
-      canUseWhileLevitating: false
-      canUseInLiquid: false
-      baseDamage: 0.25
-      damageIncreasePerLevel: 0.25
+      baseDamage: 0.0
+      damageIncreasePerLevel: 0.5
+      baseMaxDamageIncreasePerLevel: 1.0
       baseMaxDamage: 1.0
+      expirationTime: 5.0
     levelfield:
       enabled: true
       maxlevel: 3
@@ -226,19 +226,17 @@ skills:
     fury:
       enabled: true
       maxlevel: 3
-      baseBonusDamage: 0.0
-      bonusDamageIncreasePerLevel: 0.5
+      baseDamage: 0.5
+      damageIncreasePerLevel: 0.5
+      baseMaxDamage: 2.0
+      maxDamageIncreasePerLevel: 1.0
+      expirationTime: 5.0
     thorns:
       enabled: true
       maxlevel: 3
       internalCooldown: 2.0
       baseDamage: 0.0
       damageIncreasePerLevel: 0.8
-    sacrifice:
-      enabled: true
-      maxlevel: 3
-      basePercentage: 0.0
-      percentageIncreasePerLevel: 0.08
     defensivestance:
       enabled: true
       maxlevel: 5
@@ -501,6 +499,11 @@ skills:
       damageIncreasePerLevel: 2.0
       cooldownDecreasePerLevel: 2.0
       slamDelay: 500
+    sacrifice:
+      enabled: true
+      maxlevel: 3
+      basePercentage: 0.0
+      percentageIncreasePerLevel: 0.08
     whirlwindsword:
       enabled: true
       maxlevel: 5
@@ -559,10 +562,6 @@ skills:
       baseDuration: 5.0
       durationIncreasePerLevel: 1.0
       health: 4.0
-    resistance:
-      enabled: true
-      maxlevel: 3
-      increasePerLevel: 15
     overwhelm:
       enabled: true
       maxlevel: 3
