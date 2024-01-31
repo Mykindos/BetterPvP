@@ -49,12 +49,22 @@ public class Fury extends Skill implements PassiveSkill, Listener {
     @Override
     public String[] getDescription(int level) {
         return new String[]{
+<<<<<<< HEAD
                 "For every subsequent hit, your damage will",
                 "increase by <val>" + getDamage(level) + "</val> up to a maximum of <val>" + getMaxDamage(level) + "</val> damage",
                 "",
                 "If you take damage, your damage will reset",
                 "",
                 "Extra damage will reset after <stat>"+ expirationTime + "</stat> seconds"
+=======
+                "For every subsequent hit, your damage",
+                "will increase by <val>" + getDamage(level) + "</val>",
+                "up to a maximum of <val>" + getMaxDamage(level) + "</val> damage",
+                "",
+                "If you take damage, your damage will reset",
+                "",
+                "Extra damage will reset after <stat> "+ expirationTime + "</stat> seconds"
+>>>>>>> 2475a22b (finished moving stuff)
         };
     }
 
@@ -133,7 +143,11 @@ public class Fury extends Skill implements PassiveSkill, Listener {
 
     @Override
     public void loadSkillConfig() {
+<<<<<<< HEAD
         baseDamage = getConfig("baseDamage", 0.5, Double.class);
+=======
+        baseDamage = getConfig("baseDamage", 1.0, Double.class);
+>>>>>>> 2475a22b (finished moving stuff)
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.5, Double.class);
         baseMaxDamage = getConfig("baseMaxDamage", 2.0, Double.class);
         maxDamageIncreasePerLevel = getConfig("maxDamageIncreasePerLevel", 1.0, Double.class);
