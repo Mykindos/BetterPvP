@@ -478,7 +478,7 @@ skills:
       duration: 2.0
   brute:
     battletaunt:
-      enabled: true
+      enabled: false
       energy: 15
       maxlevel: 5
       cooldown: 0.5
@@ -578,24 +578,6 @@ skills:
       duration: 9.0
       cooldownDecreasePerLevel: 1.0
       speedStrength: 1
-    spiritofthebear:
-      enabled: true
-      maxlevel: 5
-      cooldown: 20.0
-      radius: 5
-      duration: 5.0
-      cooldownDecreasePerLevel: 2.0
-      resistanceStrength: 1
-    strengthinnumbers:
-      enabled: true
-      maxlevel: 5
-      cooldown: 20.0
-      radius: 10
-      duration: 2.0
-      cooldownDecreasePerLevel: 1.0
-      baseDuration: 2.0
-      durationIncreasePerLevel: 2.0
-      strengthStrength: 1
   ranger:
     wolfspounce:
       enabled: true
@@ -764,6 +746,28 @@ skills:
       numAttacksToReducePerLevel: 0
       range: 8
       duration: 60.0
+    crimsonempowerment:
+      enabled: true
+      maxlevel: 5
+      cooldown: 20.0
+      radius: 10
+      duration: 2.0
+      cooldownDecreasePerLevel: 1.0
+      baseDuration: 2.0
+      durationIncreasePerLevel: 2.0
+      strengthStrength: 1
+      baseHealthReduction: 0.5
+      healthReductionDecreasePerLevel: 0.05
+    scarletbastion:
+      enabled: true
+      maxlevel: 5
+      cooldown: 20.0
+      radius: 5
+      duration: 5.0
+      cooldownDecreasePerLevel: 2.0
+      resistanceStrength: 1
+      baseHealthReduction: 0.4
+      healthReductionDecreasePerLevel: 0.05
     bloodshed:
       enabled: true
       maxlevel: 5

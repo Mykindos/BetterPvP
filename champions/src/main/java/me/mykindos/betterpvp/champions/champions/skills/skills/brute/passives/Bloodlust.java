@@ -29,15 +29,10 @@ public class Bloodlust extends Skill implements PassiveSkill {
 
     private final WeakHashMap<Player, Long> time = new WeakHashMap<>();
     private final WeakHashMap<Player, Integer> str = new WeakHashMap<>();
-
     private double baseDuration;
-
     private double durationIncreasePerLevel;
-
     private int radius;
-
     private int maxStacks;
-
     private double health;
 
     @Inject
@@ -116,8 +111,7 @@ public class Bloodlust extends Skill implements PassiveSkill {
 
     @Override
     public SkillType getType() {
-
-        return SkillType.PASSIVE_B;
+        return SkillType.PASSIVE_A;
     }
 
     @Override

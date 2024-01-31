@@ -24,7 +24,6 @@ public class SpiritOfTheWolf extends Skill implements InteractSkill, CooldownSki
 
     private int radius;
     private double duration;
-
     private int speedStrength;
 
     @Inject
@@ -58,13 +57,11 @@ public class SpiritOfTheWolf extends Skill implements InteractSkill, CooldownSki
 
     @Override
     public SkillType getType() {
-
         return SkillType.AXE;
     }
 
     @Override
     public double getCooldown(int level) {
-
         return cooldown - ((level - 1));
     }
 
