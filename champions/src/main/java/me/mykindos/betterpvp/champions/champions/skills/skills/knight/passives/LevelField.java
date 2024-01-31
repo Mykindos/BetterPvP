@@ -13,8 +13,10 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
+import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -85,7 +87,7 @@ public class LevelField extends Skill implements ToggleSkill, CooldownSkill, Lis
                 if (playersWithSkill.contains(player.getUniqueId())) {
                     Bukkit.getScheduler().runTask(champions, () -> {
                         try {
-                            int nearbyEnemies = UtilPlayer.getNearbyEnemies(player, player.getLocation(), radius).size();
+                            int nearbyEnemies = UtilEntity.getNearbyEntities(player, player.getLocation(), radius, EntityProperty.ENEMY).size();
                             int nearbyAllies = UtilPlayer.getNearbyAllies(player, player.getLocation(), radius).size();
                             int nearbyDifference = nearbyEnemies - nearbyAllies;
                             nearbyEnemiesCount.put(player.getUniqueId(), Math.max(0, (nearbyDifference - 1)));
