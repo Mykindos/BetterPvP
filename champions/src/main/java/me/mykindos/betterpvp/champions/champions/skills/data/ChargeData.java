@@ -29,7 +29,7 @@ public class ChargeData {
     private final float chargePerSecond; // 0 -> 1
     private long lastSound = 0;
     private long lastMessage = 0;
-    private long soundInterval = 150; // In millis
+    private long soundInterval = 100; // In millis
     private long messageInterval = 250; // In millis
 
     /**
@@ -46,8 +46,10 @@ public class ChargeData {
             return;
         }
 
-        player.playSound(player.getEyeLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.5f, 1f + charge);
-        lastSound = System.currentTimeMillis();
+        if (charge < 1) {
+            player.playSound(player.getEyeLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.5f, 1f + charge);
+            lastSound = System.currentTimeMillis();
+        }
     }
 
     public void messageSent() {
@@ -62,8 +64,9 @@ public class ChargeData {
      * Get the action bar component for a {@link ChargeData}.
      * <br>
      * <b>Note: The result of this method should be saved to be reused instead of creating a new one for each player</b>
+     *
      * @param showCondition Predicate to determine if the component should be shown
-     * @param supplier Supplier to get the {@link ChargeData} for a {@link Gamer}
+     * @param supplier      Supplier to get the {@link ChargeData} for a {@link Gamer}
      * @return The action bar component
      */
     public static DisplayComponent getActionBar(Predicate<Gamer> showCondition, Function<Gamer, ChargeData> supplier) {
@@ -83,7 +86,7 @@ public class ChargeData {
      * Get the action bar display for a {@link ChannelSkill}. Only displays if the player is holding skill item
      * and the player is in the charge map.
      *
-     * @param skill The skill to get the action bar for
+     * @param skill         The skill to get the action bar for
      * @param chargeDataMap The map of players to charge data. This should be a reference to the map in the skill
      *                      and not a copy of it.
      * @see ChargeData#getActionBar(Predicate, Function)
@@ -99,9 +102,9 @@ public class ChargeData {
      * Get the action bar display for a {@link ChannelSkill}. Only displays if the player is holding skill item
      * and the player is in the charge map.
      *
-     * @param skill The skill to get the action bar for
-     * @param chargeDataMap The map of players to charge data. This should be a reference to the map in the skill
-     *                      and not a copy of it.
+     * @param skill                   The skill to get the action bar for
+     * @param chargeDataMap           The map of players to charge data. This should be a reference to the map in the skill
+     *                                and not a copy of it.
      * @param additionalShowCondition Additional condition to determine if the component should be shown. The
      *                                gamer is guaranteed to be online.
      * @see ChargeData#getActionBar(Predicate, Function)
