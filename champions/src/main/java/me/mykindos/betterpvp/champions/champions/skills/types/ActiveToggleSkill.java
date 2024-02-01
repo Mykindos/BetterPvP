@@ -48,23 +48,23 @@ public abstract class ActiveToggleSkill extends Skill implements ToggleSkill, Li
 
     @EventHandler
     public void onCustomEffect(EffectReceiveEvent event) {
-        if ((event.getTarget() instanceof Player player)) {
-            if (hasSkill(player) && active.contains(player.getUniqueId())) {
-                int level = getLevel(player);
-                if (!canUseWhileSilenced() && (event.getEffect().getEffectType() == EffectType.SILENCE)) {
-                    UtilMessage.message(player, "Champions", UtilMessage.deserialize("<green>%s %s</green> was cancelled because you were <white>silenced</white>.", getName(), level));
-                    cancel(player);
-                }
-                if (!canUseWhileLevitating() && (event.getEffect().getEffectType() == EffectType.LEVITATION)) {
-                    UtilMessage.message(player, "Champions", UtilMessage.deserialize("<green>%s %s</green> was cancelled because you are now <white>levitating</white>.", getName(), level));
-                    cancel(player);
-                }
-                if (!canUseWhileStunned() && (event.getEffect().getEffectType() == EffectType.STUN)) {
-                    UtilMessage.message(player, "Champions", UtilMessage.deserialize("<green>%s %s</green> was cancelled because you were <white>stunned</white>.", getName(), level));
-                    cancel(player);
-                }
-            }
+        if (!(event.getTarget() instanceof Player player)) return;
+        if (!active.contains(player.getUniqueId())) return;
+        if (!hasSkill(player)) return;
+        int level = getLevel(player);
+        if (!canUseWhileSilenced() && (event.getEffect().getEffectType() == EffectType.SILENCE)) {
+            UtilMessage.message(player, "Champions", UtilMessage.deserialize("<green>%s %s</green> was cancelled because you were <white>silenced</white>.", getName(), level));
+            cancel(player);
         }
+        if (!canUseWhileLevitating() && (event.getEffect().getEffectType() == EffectType.LEVITATION)) {
+            UtilMessage.message(player, "Champions", UtilMessage.deserialize("<green>%s %s</green> was cancelled because you are now <white>levitating</white>.", getName(), level));
+            cancel(player);
+        }
+        if (!canUseWhileStunned() && (event.getEffect().getEffectType() == EffectType.STUN)) {
+            UtilMessage.message(player, "Champions", UtilMessage.deserialize("<green>%s %s</green> was cancelled because you were <white>stunned</white>.", getName(), level));
+            cancel(player);
+        }
+
     }
 
     @EventHandler
