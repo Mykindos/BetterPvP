@@ -96,12 +96,11 @@ public class Void extends ActiveToggleSkill implements EnergySkill {
     }
 
     @Override
-    public void cancel(Player player) {
-        super.cancel(player);
+    public void cancel(Player player, String reason) {
+        super.cancel(player, reason);
         player.removePotionEffect(PotionEffectType.INVISIBILITY);
         player.removePotionEffect(PotionEffectType.SLOW);
         championsManager.getEffects().removeEffect(player, EffectType.NO_JUMP);
-        UtilMessage.simpleMessage(player, getClassType().getName(), "Void: <red>Off");
     }
 
     private void audio(Player player) {

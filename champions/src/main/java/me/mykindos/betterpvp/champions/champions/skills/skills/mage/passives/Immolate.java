@@ -110,22 +110,22 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
     @Override
     public void toggleActive(Player player) {
         if (championsManager.getEnergy().use(player, getName(), 10, false)) {
-            sendState(player, true);
+            UtilMessage.simpleMessage(player, getClassType().getName(), "Immolate: <green>On");
         } else {
             cancel(player);
         }
     }
 
     @Override
-    public void cancel(Player player) {
-        super.cancel(player);
+    public void cancel(Player player, String reason) {
+        super.cancel(player, reason);
 
         if (!UtilPlayer.hasPotionEffect(player, PotionEffectType.SPEED, strengthLevel + 1)) {
             player.removePotionEffect(PotionEffectType.SPEED);
         }
         player.removePotionEffect(PotionEffectType.FIRE_RESISTANCE);
         championsManager.getEffects().removeEffect(player, EffectType.STRENGTH);
-        sendState(player, false);
+
     }
 
 
@@ -197,10 +197,6 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
         return (float) (energy - ((level - 1) * energyDecreasePerLevel));
     }
 
-
-    private void sendState(Player player, boolean state) {
-        UtilMessage.simpleMessage(player, getClassType().getName(), "Immolate: %s", state ? "<green>On" : "<red>Off");
-    }
 
     @Override
     public void loadSkillConfig() {

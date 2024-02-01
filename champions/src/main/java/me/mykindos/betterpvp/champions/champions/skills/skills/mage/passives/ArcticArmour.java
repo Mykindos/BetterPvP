@@ -213,12 +213,6 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill {
     }
 
     @Override
-    public void cancel(Player player) {
-        super.cancel(player);
-        UtilMessage.message(player, getClassType().getName(), "Arctic Armour: <red>Off");
-    }
-
-    @Override
     public void loadSkillConfig() {
         baseRadius = getConfig("baseRadius", 2, Integer.class);
         radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 1, Integer.class);

@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.effects.events.EffectReceiveEvent;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -19,12 +20,11 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+@Getter
 public abstract class ActiveToggleSkill extends Skill implements ToggleSkill, Listener {
 
-    @Getter
     protected final Set<UUID> active = new HashSet<>();
 
-    @Getter
     protected final HashMap<UUID, HashMap<String, Long>> updaterCooldowns = new HashMap<>();
 
     public ActiveToggleSkill(Champions champions, ChampionsManager championsManager) {
@@ -42,7 +42,16 @@ public abstract class ActiveToggleSkill extends Skill implements ToggleSkill, Li
     }
 
     public void cancel(Player player) {
+        cancel(player, null);
+    }
+
+    protected void cancel(Player player, String reason) {
         active.remove(player.getUniqueId());
+        if(reason == null) {
+            UtilMessage.simpleMessage(player, getClassType().getName(), "%s: <red>Off", getName());
+        } else {
+            UtilMessage.simpleMessage(player, getClassType().getName(), "%s: <red>Off <reset>(<alt2>%s</alt2>)", getName(), reason);
+        }
     }
 
     @EventHandler
@@ -50,13 +59,13 @@ public abstract class ActiveToggleSkill extends Skill implements ToggleSkill, Li
         if (!(event.getTarget() instanceof Player player)) return;
         if (!active.contains(player.getUniqueId())) return;
         if (!canUseWhileSilenced() && (event.getEffect().getEffectType() == EffectType.SILENCE)) {
-            cancel(player);
+            cancel(player, "Silenced");
         }
         if (!canUseWhileLevitating() && (event.getEffect().getEffectType() == EffectType.LEVITATION)) {
-            cancel(player);
+            cancel(player, "Levitating");
         }
         if (!canUseWhileStunned() && (event.getEffect().getEffectType() == EffectType.STUN)) {
-            cancel(player);
+            cancel(player, "Stunned");
         }
 
     }
@@ -65,7 +74,7 @@ public abstract class ActiveToggleSkill extends Skill implements ToggleSkill, Li
     public void onEnterWater(PlayerMoveEvent event) {
         if (UtilBlock.isInWater(event.getPlayer()) && !canUseInLiquid()) {
             if (active.contains(event.getPlayer().getUniqueId())) {
-                cancel(event.getPlayer());
+                cancel(event.getPlayer(), "Water");
             }
         }
     }
@@ -73,7 +82,7 @@ public abstract class ActiveToggleSkill extends Skill implements ToggleSkill, Li
     @Override
     public void toggle(Player player, int level) {
         if (active.contains(player.getUniqueId())) {
-            cancel(player);
+            cancel(player, null);
         } else {
             active.add(player.getUniqueId());
             updaterCooldowns.put(player.getUniqueId(), new HashMap<>());
@@ -84,6 +93,5 @@ public abstract class ActiveToggleSkill extends Skill implements ToggleSkill, Li
     public abstract boolean process(Player player);
 
     public abstract void toggleActive(Player player);
-
 
 }
