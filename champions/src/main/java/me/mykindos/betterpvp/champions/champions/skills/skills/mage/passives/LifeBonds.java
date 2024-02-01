@@ -90,14 +90,8 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
     @Override
     public void toggleActive(Player player) {
         if (championsManager.getEnergy().use(player, getName(), 10, false)) {
-            sendState(player, true);
+            UtilMessage.simpleMessage(player, getClassType().getName(), "Life Bonds: <green>On");
         }
-    }
-
-    @Override
-    public void cancel(Player player) {
-        super.cancel(player);
-        sendState(player, false);
     }
 
     private void audio(Player player) {
@@ -179,7 +173,7 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
     }
 
     private void sendState(Player player, boolean state) {
-        UtilMessage.simpleMessage(player, getClassType().getName(), "Life Bonds: %s", state ? "<green>On" : "<red>Off");
+
     }
 
     @Override

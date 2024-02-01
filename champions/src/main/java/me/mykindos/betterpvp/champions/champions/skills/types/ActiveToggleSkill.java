@@ -20,12 +20,11 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+@Getter
 public abstract class ActiveToggleSkill extends Skill implements ToggleSkill, Listener {
 
-    @Getter
     protected final Set<UUID> active = new HashSet<>();
 
-    @Getter
     protected final HashMap<UUID, HashMap<String, Long>> updaterCooldowns = new HashMap<>();
 
     public ActiveToggleSkill(Champions champions, ChampionsManager championsManager) {
@@ -43,7 +42,16 @@ public abstract class ActiveToggleSkill extends Skill implements ToggleSkill, Li
     }
 
     public void cancel(Player player) {
+        cancel(player, null);
+    }
+
+    protected void cancel(Player player, String reason) {
         active.remove(player.getUniqueId());
+        if(reason == null) {
+            UtilMessage.simpleMessage(player, getClassType().getName(), "%s: <red>Off", getName());
+        } else {
+            UtilMessage.simpleMessage(player, getClassType().getName(), "%s: <red>Off <reset>(<alt2>%s</alt2>)", getName(), reason);
+        }
     }
 
     @EventHandler
@@ -53,32 +61,30 @@ public abstract class ActiveToggleSkill extends Skill implements ToggleSkill, Li
         if (!hasSkill(player)) return;
         int level = getLevel(player);
         if (!canUseWhileSilenced() && (event.getEffect().getEffectType() == EffectType.SILENCE)) {
-            UtilMessage.message(player, "Champions", UtilMessage.deserialize("<green>%s %s</green> was cancelled because you were <white>silenced</white>.", getName(), level));
-            cancel(player);
+            cancel(player, "Silenced");
         }
         if (!canUseWhileLevitating() && (event.getEffect().getEffectType() == EffectType.LEVITATION)) {
-            UtilMessage.message(player, "Champions", UtilMessage.deserialize("<green>%s %s</green> was cancelled because you are now <white>levitating</white>.", getName(), level));
-            cancel(player);
+            cancel(player, "Levitating");
         }
         if (!canUseWhileStunned() && (event.getEffect().getEffectType() == EffectType.STUN)) {
-            UtilMessage.message(player, "Champions", UtilMessage.deserialize("<green>%s %s</green> was cancelled because you were <white>stunned</white>.", getName(), level));
-            cancel(player);
+            cancel(player, "Stunned");
         }
 
     }
 
     @EventHandler
     public void onEnterWater(PlayerMoveEvent event) {
-        Player player = event.getPlayer();
-        if (active.contains(player.getUniqueId()) && UtilBlock.isInWater(player) && !canUseInLiquid()) {
-            cancel(event.getPlayer());
+        if (UtilBlock.isInWater(event.getPlayer()) && !canUseInLiquid()) {
+            if (active.contains(event.getPlayer().getUniqueId())) {
+                cancel(event.getPlayer(), "Water");
+            }
         }
     }
 
     @Override
     public void toggle(Player player, int level) {
         if (active.contains(player.getUniqueId())) {
-            cancel(player);
+            cancel(player, null);
         } else {
             active.add(player.getUniqueId());
             updaterCooldowns.put(player.getUniqueId(), new HashMap<>());
@@ -89,6 +95,5 @@ public abstract class ActiveToggleSkill extends Skill implements ToggleSkill, Li
     public abstract boolean process(Player player);
 
     public abstract void toggleActive(Player player);
-
 
 }
