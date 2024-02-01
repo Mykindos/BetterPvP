@@ -131,7 +131,7 @@ public class CombatListener implements Listener {
 
                 String damagerUuid = event.getDamager() == null ? null : event.getDamager().getUniqueId().toString();
 
-                if(event.getDamageDelay() > 0) {
+                if (event.getDamageDelay() > 0) {
                     damageDataList.add(new DamageData(event.getDamagee().getUniqueId().toString(), event.getCause(), damagerUuid, event.getDamageDelay()));
                 }
 
@@ -170,6 +170,13 @@ public class CombatListener implements Listener {
     private void finalizeDamage(CustomDamageEvent event, CustomDamageReductionEvent reductionEvent) {
         updateDurability(event);
 
+        if (event.getProjectile() instanceof Arrow) {
+            if (event.getDamager() instanceof Player player) {
+                player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.5f, 0.7f);
+                event.getDamager().getWorld().playSound(event.getDamagee().getLocation(), Sound.ENTITY_ARROW_HIT, 0.5f, 1.0f);
+            }
+        }
+
         if (!event.getDamagee().isDead()) {
 
             if (event.getDamagee() instanceof Player player) {
@@ -207,8 +214,11 @@ public class CombatListener implements Listener {
     private void processDamageData(CustomDamageEvent event) {
         if (event.getDamagee() instanceof Player damagee) {
             final Gamer gamer = clientManager.search().online(damagee).getGamer();
-            gamer.setLastDamaged(System.currentTimeMillis());
             gamer.saveProperty(GamerProperty.DAMAGE_TAKEN, (double) gamer.getProperty(GamerProperty.DAMAGE_TAKEN).orElse(0D) + event.getDamage());
+
+            if (event.getDamager() != null) { // Only combat tag if they were damaged by an entity
+                gamer.setLastDamaged(System.currentTimeMillis());
+            }
         }
 
         if (event.getDamager() instanceof Player damager) {
@@ -443,12 +453,6 @@ public class CombatListener implements Listener {
     private void playDamageEffect(CustomDamageEvent event) {
         final LivingEntity damagee = event.getDamagee();
         damagee.playHurtAnimation(270);
-        if (event.getProjectile() instanceof Arrow) {
-            if (event.getDamager() instanceof Player player) {
-                player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.5f, 0.7f);
-                event.getDamager().getWorld().playSound(damagee.getLocation(), Sound.ENTITY_ARROW_HIT, 0.5f, 1.0f);
-            }
-        }
 
         final SoundProvider provider = event.getSoundProvider();
         final net.kyori.adventure.sound.Sound sound = provider.apply(event);

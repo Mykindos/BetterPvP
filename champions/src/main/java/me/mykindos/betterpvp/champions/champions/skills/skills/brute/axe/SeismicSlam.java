@@ -129,6 +129,10 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
                 continue;
             }
 
+            if(target.getLocation().getY() - player.getLocation().getY() >= 3){
+                continue;
+            }
+
             double percentageMultiplier = 1 - (UtilMath.offset(player, target) / (baseRadius + 0.5 * level));
 
             double scaledVelocity = 0.6 + (2 * percentageMultiplier);

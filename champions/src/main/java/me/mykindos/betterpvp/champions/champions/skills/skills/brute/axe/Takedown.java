@@ -15,12 +15,14 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -128,7 +130,7 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
     }
 
     public boolean isCollision(Player player) {
-        for (Player other : UtilPlayer.getNearbyEnemies(player, player.getLocation(), 1.5)) {
+        for (LivingEntity other : UtilEntity.getNearbyEnemies(player, player.getLocation(), 1.5)) {
             if (other.isDead()) continue;
 
             if (UtilMath.offset(player, other) < 1.5) {
@@ -143,7 +145,7 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
     }
 
 
-    public void doTakedown(Player player, Player target) {
+    public void doTakedown(Player player, LivingEntity target) {
         UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <alt>" + target.getName() + "</alt> with <alt>" + getName());
 
         UtilDamage.doCustomDamage(new CustomDamageEvent(target, player, null, DamageCause.CUSTOM, damage, false, "Takedown"));

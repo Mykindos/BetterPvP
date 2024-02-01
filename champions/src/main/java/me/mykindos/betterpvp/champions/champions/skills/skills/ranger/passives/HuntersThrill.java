@@ -85,7 +85,6 @@ public class HuntersThrill extends Skill implements PassiveSkill {
 
             StackingHitData hitData = data.get(damager);
             hitData.addCharge();
-            damager.removePotionEffect(PotionEffectType.SPEED);
             damager.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) (getDuration(getLevel(damager)) * 20), Math.min(maxConsecutiveHits, hitData.getCharge()) - 1));
         }
 

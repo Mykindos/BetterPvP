@@ -12,8 +12,7 @@ public interface IWeapon {
     Material getMaterial();
     Component getName();
     int getModel();
-    List<Component> getLore();
-
+    List<Component> getLore(ItemStack item);
     boolean isHoldingWeapon(Player player);
 
     boolean matches(ItemStack itemStack);

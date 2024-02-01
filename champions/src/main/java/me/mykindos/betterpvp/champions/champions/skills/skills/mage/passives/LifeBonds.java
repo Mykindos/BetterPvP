@@ -69,51 +69,54 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
     }
 
     @Override
-    public void toggle(Player player, int level) {
-        if (active.contains(player.getUniqueId())) {
-            active.remove(player.getUniqueId());
-            sendState(player, false);
+    public boolean process(Player player) {
+        HashMap<String, Long> updateCooldowns = updaterCooldowns.get(player.getUniqueId());
+
+        if (updateCooldowns.getOrDefault("audio", 0L) < System.currentTimeMillis()) {
+            audio(player);
+            updateCooldowns.put("audio", System.currentTimeMillis() + 1000);
+        }
+
+        if (updateCooldowns.getOrDefault("grassAura", 0L) < System.currentTimeMillis()) {
+            if (!grassAura(player)) {
+                return false;
+            }
+            updateCooldowns.put("grassAura", System.currentTimeMillis() + 100);
+        }
+
+        return true;
+    }
+
+    @Override
+    public void toggleActive(Player player) {
+        if (championsManager.getEnergy().use(player, getName(), 10, false)) {
+            sendState(player, true);
+        }
+    }
+
+    @Override
+    public void cancel(Player player) {
+        super.cancel(player);
+        sendState(player, false);
+    }
+
+    private void audio(Player player) {
+        player.getWorld().playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 0.3F, 0.0F);
+    }
+
+    private boolean grassAura(Player player) {
+
+        int level = getLevel(player);
+        if (level <= 0 || !championsManager.getEnergy().use(player, getName(), getEnergy(level) / 2, true) || championsManager.getEffects().hasEffect(player, EffectType.SILENCE)) {
+            return false;
         } else {
-            if (championsManager.getEnergy().use(player, getName(), 10, false)) {
-                active.add(player.getUniqueId());
-                sendState(player, true);
-            }
+            double distance = getRadius(level);
 
+            shareHealth(player, distance);
+            spawnParticlesAboveAllies(player, distance);
         }
-    }
 
-    @UpdateEvent(delay = 1000)
-    public void audio() {
-        for (UUID uuid : active) {
-            Player cur = Bukkit.getPlayer(uuid);
-            if (cur != null) {
-                cur.getWorld().playSound(cur.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 0.3F, 0.0F);
-            }
-        }
-    }
-
-    @UpdateEvent(delay = 125)
-    public void grassAura() {
-        Iterator<UUID> iterator = active.iterator();
-        while (iterator.hasNext()) {
-            UUID uuid = iterator.next();
-            Player player = Bukkit.getPlayer(uuid);
-            if (player != null) {
-                int level = getLevel(player);
-                if (level <= 0 || !championsManager.getEnergy().use(player, getName(), getEnergy(level) / 2, true) || championsManager.getEffects().hasEffect(player, EffectType.SILENCE)) {
-                    iterator.remove();
-                } else {
-                    double distance = getRadius(level);
-
-                    HashMap<Block, Double> blocks = UtilBlock.getInRadius(player.getLocation(), distance);
-
-                    shareHealth(player, distance);
-                    spawnParticlesAboveAllies(player, distance);
-                }
-            } else {
-                iterator.remove();
-            }
-        }
+        return true;
     }
 
     private void spawnParticlesAboveAllies(Player player, double distance) {
