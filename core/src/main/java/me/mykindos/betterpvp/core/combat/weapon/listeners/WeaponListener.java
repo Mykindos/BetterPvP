@@ -156,8 +156,12 @@ public class WeaponListener implements Listener {
             IWeapon weapon = weaponOptional.get();
             if(!(weapon instanceof BPVPItem item)) return;
 
+            if(weapon instanceof LegendaryWeapon legendaryWeapon){
+                legendaryWeapon.onInitialize(event.getItemMeta());
+            }
+
             event.getItemMeta().getPersistentDataContainer().set(CoreNamespaceKeys.CUSTOM_ITEM_KEY, PersistentDataType.STRING, item.getIdentifier());
-            var lore = new ArrayList<>(weapon.getLore());
+            var lore = new ArrayList<>(weapon.getLore(event.getItemStack()));
 
             var originalOwner = event.getItemMeta().getPersistentDataContainer().getOrDefault(CoreNamespaceKeys.ORIGINAL_OWNER, PersistentDataType.STRING, "");
             if (!originalOwner.isEmpty()) {

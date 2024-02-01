@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -31,6 +32,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.UUID;
 
@@ -45,6 +47,7 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
     private int speedStrength;
     private int strengthLevel;
     private double energyDecreasePerLevel;
+
     @Inject
     public Immolate(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -62,7 +65,7 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
                 "Drop your Sword / Axe to toggle",
                 "",
                 "Ignite yourself in flaming fury, gaining",
-                "<effect>Speed "+ UtilFormat.getRomanNumeral(speedStrength + 1) + "</effect>, <effect>Strength " + UtilFormat.getRomanNumeral(strengthLevel) + " </effect> and <effect>Fire Resistance",
+                "<effect>Speed " + UtilFormat.getRomanNumeral(speedStrength + 1) + "</effect>, <effect>Strength " + UtilFormat.getRomanNumeral(strengthLevel) + " </effect> and <effect>Fire Resistance",
                 "",
                 "You leave a trail of fire, which",
                 "ignites enemies for <stat>" + getFireTickDuration(level) + "</stat> seconds",
@@ -85,40 +88,84 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
         return Role.MAGE;
     }
 
-    @EventHandler
-    public void Combust(EntityCombustEvent e) {
-        if (e.getEntity() instanceof Player player) {
-            if (active.contains(player.getUniqueId())) {
-                e.setCancelled(true);
-            }
+
+    @Override
+    public boolean process(Player player) {
+
+        HashMap<String, Long> updateCooldowns = updaterCooldowns.get(player.getUniqueId());
+
+        if (updateCooldowns.getOrDefault("audio", 0L) < System.currentTimeMillis()) {
+            audio(player);
+            updateCooldowns.put("audio", System.currentTimeMillis() + 1000);
+        }
+
+        if (updateCooldowns.getOrDefault("fire", 0L) < System.currentTimeMillis()) {
+            fire(player);
+            updateCooldowns.put("fire", System.currentTimeMillis() + 100);
+        }
+
+        return doImmolate(player);
+    }
+
+    @Override
+    public void toggleActive(Player player) {
+        if (championsManager.getEnergy().use(player, getName(), 10, false)) {
+            sendState(player, true);
+        } else {
+            cancel(player);
         }
     }
 
+    @Override
+    public void cancel(Player player) {
+        super.cancel(player);
 
-    @UpdateEvent(delay = 1000)
-    public void audio() {
-        for (UUID uuid : active) {
-            Player player = Bukkit.getPlayer(uuid);
-            if (player != null) {
-                player.getWorld().playSound(player.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 0.3F, 0.0F);
-            }
-
+        if (!UtilPlayer.hasPotionEffect(player, PotionEffectType.SPEED, strengthLevel + 1)) {
+            player.removePotionEffect(PotionEffectType.SPEED);
         }
+        player.removePotionEffect(PotionEffectType.FIRE_RESISTANCE);
+        championsManager.getEffects().removeEffect(player, EffectType.STRENGTH);
+        sendState(player, false);
     }
 
-    @UpdateEvent(delay = 125)
-    public void fire() {
-        for (UUID uuid : active) {
-            Player player = Bukkit.getPlayer(uuid);
-            if (player != null) {
-                Item fire = player.getWorld().dropItem(player.getLocation().add(0.0D, 0.5D, 0.0D), new ItemStack(Material.BLAZE_POWDER));
-                int level = getLevel(player);
-                ThrowableItem throwableItem = new ThrowableItem(this, fire, player, getName(), (long) (getFireTrailDuration(level) * 1000L));
-                championsManager.getThrowables().addThrowable(throwableItem);
 
-                fire.setVelocity(new Vector((Math.random() - 0.5D) / 3.0D, Math.random() / 3.0D, (Math.random() - 0.5D) / 3.0D));
-            }
+    private void audio(Player player) {
+        player.getWorld().playSound(player.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 0.3F, 0.0F);
+    }
+
+    private void fire(Player player) {
+
+        Item fire = player.getWorld().dropItem(player.getLocation().add(0.0D, 0.5D, 0.0D), new ItemStack(Material.BLAZE_POWDER));
+        int level = getLevel(player);
+        ThrowableItem throwableItem = new ThrowableItem(this, fire, player, getName(), (long) (getFireTrailDuration(level) * 1000L));
+        championsManager.getThrowables().addThrowable(throwableItem);
+
+        fire.setVelocity(new Vector((Math.random() - 0.5D) / 3.0D, Math.random() / 3.0D, (Math.random() - 0.5D) / 3.0D));
+
+        World world = player.getWorld();
+        Location location = player.getLocation();
+        int particleCount = 10;
+        world.spawnParticle(Particle.FLAME, location, particleCount, 0.5, 0.5, 0.5, 0.05);
+
+    }
+
+    private boolean doImmolate(Player player) {
+
+        int level = getLevel(player);
+        if (level <= 0) {
+            return false;
+        } else if (!championsManager.getEnergy().use(player, getName(), getEnergy(level) / 5, true)) {
+            return false;
+        } else if (championsManager.getEffects().hasEffect(player, EffectType.SILENCE)) {
+            return false;
+        } else {
+            player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 25, speedStrength));
+            player.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 25, 0));
+            championsManager.getEffects().addEffect(player, EffectType.STRENGTH, strengthLevel, 1250L);
         }
+
+        return true;
+
     }
 
     @Override
@@ -131,43 +178,11 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
         hit.setFireTicks((int) (getFireTickDuration(level) * 20));
     }
 
-    @UpdateEvent
-    public void checkActive() {
-        Iterator<UUID> iterator = active.iterator();
-        while (iterator.hasNext()) {
-            UUID uuid = iterator.next();
-            Player player = Bukkit.getPlayer(uuid);
-            if (player != null) {
-                int level = getLevel(player);
-                if (level <= 0) {
-                    iterator.remove();
-                    sendState(player, false);
-                } else if (!championsManager.getEnergy().use(player, getName(), getEnergy(level) / 5, true)) {
-                    iterator.remove();
-                    sendState(player, false);
-                } else if (championsManager.getEffects().hasEffect(player, EffectType.SILENCE)) {
-                    iterator.remove();
-                    sendState(player, false);
-                } else {
-                    player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 25, speedStrength));
-                    player.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 25, 0));
-                    championsManager.getEffects().addEffect(player, EffectType.STRENGTH, strengthLevel, 1250L);
-                }
-            } else {
-                iterator.remove();
-            }
-        }
-    }
-    
-    @UpdateEvent(delay = 100)
-    public void createFireParticles() {
-        for (UUID uuid : active) {
-            Player player = Bukkit.getPlayer(uuid);
-            if (player != null) {
-                World world = player.getWorld();
-                Location location = player.getLocation();
-                int particleCount = 10;
-                world.spawnParticle(Particle.FLAME, location, particleCount, 0.5, 0.5, 0.5, 0.05);
+    @EventHandler
+    public void Combust(EntityCombustEvent e) {
+        if (e.getEntity() instanceof Player player) {
+            if (active.contains(player.getUniqueId())) {
+                e.setCancelled(true);
             }
         }
     }
@@ -182,23 +197,6 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
         return (float) (energy - ((level - 1) * energyDecreasePerLevel));
     }
 
-    @Override
-    public void toggle(Player player, int level) {
-        if (active.contains(player.getUniqueId())) {
-
-            active.remove(player.getUniqueId());
-
-            player.removePotionEffect(PotionEffectType.SPEED);
-            player.removePotionEffect(PotionEffectType.FIRE_RESISTANCE);
-            championsManager.getEffects().removeEffect(player, EffectType.STRENGTH);
-            sendState(player, false);
-        } else {
-            if (championsManager.getEnergy().use(player, getName(), 10, false)) {
-                active.add(player.getUniqueId());
-                sendState(player, true);
-            }
-        }
-    }
 
     private void sendState(Player player, boolean state) {
         UtilMessage.simpleMessage(player, getClassType().getName(), "Immolate: %s", state ? "<green>On" : "<red>Off");

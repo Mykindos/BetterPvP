@@ -93,6 +93,7 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergySkill
 
     @EventHandler
     public void onHit(CustomDamageEvent event) {
+        if(event.isCancelled()) return;
         if (event.getProjectile() instanceof Snowball snowball) {
             if (snow.containsKey(snowball)) {
                 LivingEntity damagee = event.getDamagee();

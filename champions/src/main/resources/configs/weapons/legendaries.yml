@@ -28,3 +28,9 @@ weapons:
     energy-per-tick: 1.0
     initial-energy-cost: 10.0
     strength: 0.7
+  hyper-axe:
+    damageDelay: 200
+    baseDamage: 4
+    dealsKnockback: false
+    usesEnergy: false
+    energyPerHit: 2

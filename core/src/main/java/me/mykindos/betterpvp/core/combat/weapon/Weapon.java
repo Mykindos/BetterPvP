@@ -47,6 +47,11 @@ public abstract class Weapon extends BPVPItem implements IWeapon {
         return matches(itemStack);
     }
 
+    @Override
+    public List<Component> getLore(ItemStack itemStack) {
+        return getLore();
+    }
+
     public int getModel() {
         return getCustomModelData();
     }

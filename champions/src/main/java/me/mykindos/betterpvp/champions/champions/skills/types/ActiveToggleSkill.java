@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.skills.types;
 
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -14,13 +15,18 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
 public abstract class ActiveToggleSkill extends Skill implements ToggleSkill, Listener {
 
+    @Getter
     protected final Set<UUID> active = new HashSet<>();
+
+    @Getter
+    protected final HashMap<UUID, HashMap<String, Long>> updaterCooldowns = new HashMap<>();
 
     public ActiveToggleSkill(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -70,5 +76,21 @@ public abstract class ActiveToggleSkill extends Skill implements ToggleSkill, Li
             cancel(event.getPlayer());
         }
     }
+
+    @Override
+    public void toggle(Player player, int level) {
+        if (active.contains(player.getUniqueId())) {
+            cancel(player);
+        } else {
+            active.add(player.getUniqueId());
+            updaterCooldowns.put(player.getUniqueId(), new HashMap<>());
+            toggleActive(player);
+        }
+    }
+
+    public abstract boolean process(Player player);
+
+    public abstract void toggleActive(Player player);
+
 
 }
