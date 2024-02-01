@@ -47,7 +47,7 @@ public abstract class ActiveToggleSkill extends Skill implements ToggleSkill, Li
 
     protected void cancel(Player player, String reason) {
         active.remove(player.getUniqueId());
-        if(reason == null) {
+        if (reason == null) {
             UtilMessage.simpleMessage(player, getClassType().getName(), "%s: <red>Off", getName());
         } else {
             UtilMessage.simpleMessage(player, getClassType().getName(), "%s: <red>Off <reset>(<alt2>%s</alt2>)", getName(), reason);
@@ -74,10 +74,8 @@ public abstract class ActiveToggleSkill extends Skill implements ToggleSkill, Li
 
     @EventHandler
     public void onEnterWater(PlayerMoveEvent event) {
-        if (UtilBlock.isInWater(event.getPlayer()) && !canUseInLiquid()) {
-            if (active.contains(event.getPlayer().getUniqueId())) {
-                cancel(event.getPlayer(), "Water");
-            }
+        if (active.contains(event.getPlayer().getUniqueId()) && UtilBlock.isInWater(event.getPlayer()) && !canUseInLiquid()) {
+            cancel(event.getPlayer(), "Water");
         }
     }
 
