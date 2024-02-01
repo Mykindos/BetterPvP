@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.components.champions.ISkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -210,8 +211,11 @@ public abstract class Skill implements ISkill {
     protected int getLevel(Player player) {
         Optional<BuildSkill> skillOptional = getSkill(player);
         int level = skillOptional.map(BuildSkill::getLevel).orElse(0);
-        if (level > 0 && SkillWeapons.isHolding(player, getType()) && SkillWeapons.hasBooster(player)) {
-            level++;
+
+        if(!(this instanceof PassiveSkill)) {
+            if (level > 0 && SkillWeapons.isHolding(player, getType()) && SkillWeapons.hasBooster(player)) {
+                level++;
+            }
         }
 
         return level;
