@@ -112,6 +112,14 @@ public class CannonListener implements Listener {
     @Config(path = "cannon.cannonball-damage", defaultValue = "15.0", configName = "weapons/cannon")
     private double cannonballDamage;
 
+    @Inject
+    @Config(path = "cannon.cannonball-damage-max-radius", defaultValue = "4.0", configName = "weapons/cannon")
+    private double cannonballDamageMaxRadius;
+
+    @Inject
+    @Config(path = "cannon.cannonball-damage-min-radius", defaultValue = "1.0", configName = "weapons/cannon")
+    private double cannonballDamageMinRadius;
+
     private TNTPrimed spawnCannonball(final @NotNull Cannon cannon, final @NotNull UUID caster) {
         final Location cannonLocation = cannon.getActiveModel().getBone("cannon2").orElseThrow().getLocation().clone();
         final TNTPrimed cannonball = cannon.getLocation().getWorld().spawn(cannonLocation, TNTPrimed.class);
@@ -145,7 +153,16 @@ public class CannonListener implements Listener {
             final Player player = Bukkit.getPlayer(originalOwner);
             if (player != null) {
                 event.setDamager(player);
-                event.setDamage(cannonballDamage);
+                double distance = tnt.getLocation().distance(event.getDamagee().getLocation());
+                double damage;
+                if (distance < cannonballDamageMinRadius) {
+                    damage = cannonballDamage;
+                } else if (distance > cannonballDamageMaxRadius) {
+                    damage = 0;
+                } else {
+                    damage = cannonballDamage * (distance - cannonballDamageMinRadius) / cannonballDamageMaxRadius - cannonballDamageMinRadius;
+                }
+                event.setDamage(damage);
                 event.setKnockback(false);
                 event.addReason("Cannonball");
             }
