@@ -47,17 +47,18 @@ public abstract class ActiveToggleSkill extends Skill implements ToggleSkill, Li
 
     @EventHandler
     public void onCustomEffect(EffectReceiveEvent event) {
-        if ((event.getTarget() instanceof Player player)) {
-            if (!canUseWhileSilenced() && (event.getEffect().getEffectType() == EffectType.SILENCE)) {
-                cancel(player);
-            }
-            if (!canUseWhileLevitating() && (event.getEffect().getEffectType() == EffectType.LEVITATION)) {
-                cancel(player);
-            }
-            if (!canUseWhileStunned() && (event.getEffect().getEffectType() == EffectType.STUN)) {
-                cancel(player);
-            }
+        if (!(event.getTarget() instanceof Player player)) return;
+        if (!active.contains(player.getUniqueId())) return;
+        if (!canUseWhileSilenced() && (event.getEffect().getEffectType() == EffectType.SILENCE)) {
+            cancel(player);
         }
+        if (!canUseWhileLevitating() && (event.getEffect().getEffectType() == EffectType.LEVITATION)) {
+            cancel(player);
+        }
+        if (!canUseWhileStunned() && (event.getEffect().getEffectType() == EffectType.STUN)) {
+            cancel(player);
+        }
+
     }
 
     @EventHandler

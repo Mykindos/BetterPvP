@@ -121,7 +121,7 @@ public class HyperAxe extends Weapon implements InteractWeapon, LegendaryWeapon,
     public void onInitialize(ItemMeta meta) {
 
         if (!meta.getPersistentDataContainer().has(ChampionsNamespacedKeys.HYPER_AXE_SPEED)) {
-            int level = UtilMath.randomInt(1, 4);
+            int level = UtilMath.randomInt(1, 5);
             meta.getPersistentDataContainer().set(ChampionsNamespacedKeys.HYPER_AXE_SPEED, PersistentDataType.INTEGER, level);
         }
 
