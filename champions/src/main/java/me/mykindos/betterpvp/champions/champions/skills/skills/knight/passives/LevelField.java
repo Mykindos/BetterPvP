@@ -202,13 +202,13 @@ public class LevelField extends Skill implements ToggleSkill, CooldownSkill, Lis
         List<UUID> keysToRemove = new ArrayList<>();
 
         toggleTimestamps.forEach((uuid, timestamp) -> {
-            if (currentTime - timestamp >= duration * 1000) {
+            if (currentTime - timestamp >= duration * 1000L) {
                 keysToRemove.add(uuid);
 
                 Player player = Bukkit.getPlayer(uuid);
                 if (player != null && player.isOnline()) {
                     player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
-                    UtilMessage.message(player, getClassType().getName(), "Level Field values reset.");
+                    UtilMessage.message(player, getClassType().getName(), UtilMessage.deserialize("<green>%s %d</green> has ended (reset).", getName(), getLevel(player)));
                 }
             }
         });
