@@ -64,7 +64,9 @@ public abstract class ActiveToggleSkill extends Skill implements ToggleSkill, Li
     @EventHandler
     public void onEnterWater(PlayerMoveEvent event) {
         if (UtilBlock.isInWater(event.getPlayer()) && !canUseInLiquid()) {
-            cancel(event.getPlayer());
+            if (active.contains(event.getPlayer().getUniqueId())) {
+                cancel(event.getPlayer());
+            }
         }
     }
 
