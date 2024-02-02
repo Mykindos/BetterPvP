@@ -384,12 +384,12 @@ skills:
     lifebonds:
       enabled: true
       maxlevel: 5
-      energy: 9
-      duration: 2.0
+      energy: 25
       baseRadius: 2.0
       radiusIncreasePerLevel: 1.0
-      minRadius: 2.0
       energyDecreasePerLevel: 1.0
+      healCooldown: 2.0
+      healSpeed: 0.3
     magmablade:
       enabled: true
       maxlevel: 3
