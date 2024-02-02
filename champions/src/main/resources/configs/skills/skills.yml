@@ -390,6 +390,7 @@ skills:
       energyDecreasePerLevel: 1.0
       healCooldown: 2.0
       healSpeed: 0.3
+      healMultiplier: 0.25
     magmablade:
       enabled: true
       maxlevel: 3

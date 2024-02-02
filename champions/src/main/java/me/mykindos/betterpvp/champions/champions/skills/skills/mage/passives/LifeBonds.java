@@ -40,6 +40,8 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
     private double radiusIncreasePerLevel;
     private double healCooldown;
     private double healSpeed;
+    private double healMultiplier;
+
     private final HashMap<UUID, Double> healthStored = new HashMap<>();
     private final HashMap<UUID, Long> lastHealTime = new HashMap<>();
     private final HashMap<UUID, BukkitRunnable> trackingTrails = new HashMap<>();
@@ -145,12 +147,12 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
         }
 
         double healthDifference = highestHealth - lowestHealth;
+        double healthToTransfer = healthDifference * healMultiplier;
 
-        if (healthDifference >= 2 && (highestHealthPlayer.getHealth() - healthDifference / 2) > 0) {
+        if (healthToTransfer >= 2 && (highestHealthPlayer.getHealth() - healthToTransfer) > 2) {
             long currentTime = System.currentTimeMillis();
             long lastHeal = lastHealTime.getOrDefault(lowestHealthPlayer.getUniqueId(), 0L);
             if (currentTime - lastHeal > (healCooldown * 1000L)) {
-                double healthToTransfer = healthDifference / 2;
                 highestHealthPlayer.setHealth(highestHealthPlayer.getHealth() - healthToTransfer);
                 healthStored.put(lowestHealthPlayer.getUniqueId(), healthToTransfer);
                 lastHealTime.put(lowestHealthPlayer.getUniqueId(), currentTime);
@@ -179,7 +181,7 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
 
                 if (currentLocation.distance(target.getLocation().add(0, 1.5, 0)) <= healSpeed) {
                     double healthToAdd = healthStored.remove(target.getUniqueId());
-                    target.setHealth(Math.min(target.getHealth() + healthToAdd, target.getMaxHealth()));
+                    target.setHealth(Math.min(target.getHealth() + healthToAdd, UtilPlayer.getMaxHealth(target)));
                     target.getWorld().spawnParticle(Particle.HEART, target.getLocation().add(0, 1.5, 0), 5, 0.5, 0.5, 0.5, 0);
                     trackingTrails.remove(source.getUniqueId());
                     this.cancel();
@@ -213,5 +215,6 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
         radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 1.0, Double.class);
         healCooldown = getConfig("healCooldown", 2.0, Double.class);
         healSpeed = getConfig("healSpeed", 0.3, Double.class);
+        healMultiplier = getConfig("healMultiplier", 0.25, Double.class);
     }
 }
