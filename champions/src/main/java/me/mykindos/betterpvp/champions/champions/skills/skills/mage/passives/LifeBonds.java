@@ -63,7 +63,7 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
                 "Connect to your allies within <val>" + getRadius(level) + "</val> blocks,",
                 "causing the highest health player in the",
                 "radius to transfer their health to the",
-                "lowest health player every <stat>" + healCooldown +"</stat> seconds",
+                "lowest health player every <stat>" + healCooldown + "</stat> seconds",
                 "",
                 "Energy / Second: <val>" + getEnergy(level)
 
@@ -83,14 +83,7 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
             updateCooldowns.put("audio", System.currentTimeMillis() + 1000);
         }
 
-        if (updateCooldowns.getOrDefault("onUpdate", 0L) < System.currentTimeMillis()) {
-            if (!onUpdate(player)) {
-                return false;
-            }
-            updateCooldowns.put("onUpdate", System.currentTimeMillis() + 50);
-        }
-
-        return true;
+        return onUpdate(player);
     }
 
     @Override
@@ -105,26 +98,15 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
     }
 
     public boolean onUpdate(Player player) {
-        List<UUID> toRemove = new ArrayList<>();
-        Iterator<UUID> iterator = active.iterator();
 
-        while (iterator.hasNext()) {
-            UUID uuid = iterator.next();
-            if (player != null) {
-                int level = getLevel(player);
-                if (level <= 0 || !championsManager.getEnergy().use(player, getName(), getEnergy(level) / 20, true) || championsManager.getEffects().hasEffect(player, EffectType.SILENCE)) {
-                    toRemove.add(uuid);
-                } else {
-                    double distance = getRadius(level);
-                    findAndHealLowestHealthPlayer(player, distance);
-                }
+        if (player != null) {
+            int level = getLevel(player);
+            if (level <= 0 || !championsManager.getEnergy().use(player, getName(), getEnergy(level) / 20, true) || championsManager.getEffects().hasEffect(player, EffectType.SILENCE)) {
+                return false;
             } else {
-                toRemove.add(uuid);
+                double distance = getRadius(level);
+                findAndHealLowestHealthPlayer(player, distance);
             }
-        }
-
-        for (UUID uuid : toRemove) {
-            active.remove(uuid);
         }
 
         return true;
@@ -164,7 +146,7 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
 
         double healthDifference = highestHealth - lowestHealth;
 
-        if (healthDifference >= 2 && (highestHealthPlayer.getHealth() - healthDifference/2) > 0) {
+        if (healthDifference >= 2 && (highestHealthPlayer.getHealth() - healthDifference / 2) > 0) {
             long currentTime = System.currentTimeMillis();
             long lastHeal = lastHealTime.getOrDefault(lowestHealthPlayer.getUniqueId(), 0L);
             if (currentTime - lastHeal > (healCooldown * 1000L)) {
@@ -183,8 +165,9 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
 
             @Override
             public void run() {
-                if (!target.isOnline() || !healthStored.containsKey(target.getUniqueId())) {
+                if (!target.isOnline() || !healthStored.containsKey(target.getUniqueId()) || target.isDead()) {
                     trackingTrails.remove(source.getUniqueId());
+                    healthStored.remove(target.getUniqueId());
                     this.cancel();
                     return;
                 }
