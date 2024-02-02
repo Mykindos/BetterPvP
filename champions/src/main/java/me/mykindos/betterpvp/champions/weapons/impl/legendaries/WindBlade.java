@@ -37,7 +37,7 @@ import java.util.List;
 public class WindBlade extends ChannelWeapon implements InteractWeapon, LegendaryWeapon, Listener {
 
     @Inject
-    @Config(path = "weapons.wind-blade.energy-per-tick", defaultValue = "1.0", configName = "weapons/legendaries")
+    @Config(path = "weapons.wind-blade.energy-per-tick", defaultValue = "1.5", configName = "weapons/legendaries")
     private double energyPerTick;
 
     @Inject
