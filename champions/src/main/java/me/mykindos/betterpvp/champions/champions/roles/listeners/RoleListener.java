@@ -205,7 +205,7 @@ public class RoleListener implements Listener {
         pre.getCustomDamageEvent().setSoundProvider(soundProvider);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onShootBow(EntityShootBowEvent event) {
         if (!(event.getEntity() instanceof Player player)) return;
 
