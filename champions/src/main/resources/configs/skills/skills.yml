@@ -126,13 +126,11 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 30.0
+      percentHealthRecovered: 0.25
       duration: 2.5
       canUseWhileSlowed: false
       cooldownDecreasePerLevel: 2.0
       durationIncreasePerLevel: 1.0
-      regenerationDuration: 6
-      regenerationLevel: 1
-      regenerationDurationIncreasePerLevel: 0
     evade:
       enabled: true
       maxlevel: 5
