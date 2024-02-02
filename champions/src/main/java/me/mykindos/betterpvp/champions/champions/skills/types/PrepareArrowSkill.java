@@ -47,6 +47,7 @@ public abstract class PrepareArrowSkill extends PrepareSkill implements Cooldown
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onShoot(EntityShootBowEvent event) {
+        if (event.isCancelled()) return;
         if (!(event.getEntity() instanceof Player player)) return;
         if (!active.contains(player.getUniqueId())) return;
         if (!(event.getProjectile() instanceof Arrow arrow)) return;

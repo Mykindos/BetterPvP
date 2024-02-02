@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.components.champions.ISkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -108,10 +109,10 @@ public abstract class Skill implements ISkill {
     }
 
     /**
-     * @param name name of the value
+     * @param name         name of the value
      * @param defaultValue default value
-     * @param type The type of default value
-     * @param <T> The type of default value
+     * @param type         The type of default value
+     * @param <T>          The type of default value
      * @return returns the config value if exists, or the default value if it does not. Does not save value in the config
      */
     protected <T> T getConfigObject(String name, T defaultValue, Class<T> type) {
@@ -210,6 +211,7 @@ public abstract class Skill implements ISkill {
     protected int getLevel(Player player) {
         Optional<BuildSkill> skillOptional = getSkill(player);
         int level = skillOptional.map(BuildSkill::getLevel).orElse(0);
+
         if (level > 0 && SkillWeapons.isHolding(player, getType()) && SkillWeapons.hasBooster(player)) {
             level++;
         }
