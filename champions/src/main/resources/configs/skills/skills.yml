@@ -900,8 +900,8 @@ skills:
       damageReductionIncreasePerLevel: 2.0
     fastrecovery:
       enabled: true
-      maxlevel: 5
-      percentagePerLevel: 0.2
+      maxlevel: 3
+      percentagePerLevel: 0.15
     swim:
       enabled: true
       maxlevel: 5
