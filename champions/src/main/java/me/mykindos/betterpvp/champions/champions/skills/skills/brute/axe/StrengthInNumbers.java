@@ -28,7 +28,7 @@ public class StrengthInNumbers extends Skill implements InteractSkill, CooldownS
 
     private double durationIncreasePerLevel;
 
-    private int strengthStrength;
+    private int strengthLevel;
 
     @Inject
     public StrengthInNumbers(Champions champions, ChampionsManager championsManager) {
@@ -47,7 +47,7 @@ public class StrengthInNumbers extends Skill implements InteractSkill, CooldownS
                 "Right click with an Axe to activate",
                 "",
                 "Grant all allies within <stat>" + radius + "</stat> blocks",
-                "<effect>Strength " + UtilFormat.getRomanNumeral(strengthStrength) + "</effect> for <val>" + getDuration(level) + "</val> seconds",
+                "<effect>Strength " + UtilFormat.getRomanNumeral(strengthLevel) + "</effect> for <val>" + getDuration(level) + "</val> seconds",
                 "",
                 "This does not give you the buff",
                 "",
@@ -80,11 +80,11 @@ public class StrengthInNumbers extends Skill implements InteractSkill, CooldownS
     @Override
     public void activate(Player player, int level) {
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 2.0F);
-        championsManager.getEffects().addEffect(player, EffectType.STRENGTH, strengthStrength, (long) (getDuration(level) * 1000L));
+        championsManager.getEffects().addEffect(player, EffectType.STRENGTH, strengthLevel, (long) (getDuration(level) * 1000L));
 
         for (Player target : UtilPlayer.getNearbyAllies(player, player.getLocation(), radius)) {
-            championsManager.getEffects().addEffect(target, EffectType.STRENGTH, strengthStrength, (long) ((getDuration(level)* 1000L)));
-            UtilMessage.message(target, getName(), UtilMessage.deserialize("<yellow>%s</yellow> gave you <white>Strength "+ UtilFormat.getRomanNumeral(strengthStrength) + "</white> for <green>%s</green> seconds.", player.getName(), getDuration(level)));
+            championsManager.getEffects().addEffect(target, EffectType.STRENGTH, strengthLevel, (long) ((getDuration(level)* 1000L)));
+            UtilMessage.message(target, getName(), UtilMessage.deserialize("<yellow>%s</yellow> gave you <white>Strength "+ UtilFormat.getRomanNumeral(strengthLevel) + "</white> for <green>%s</green> seconds.", player.getName(), getDuration(level)));
         }
     }
 
@@ -98,6 +98,6 @@ public class StrengthInNumbers extends Skill implements InteractSkill, CooldownS
         radius = getConfig("radius", 10, Integer.class);
         baseDuration = getConfig("baseDuration", 2.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 2.0, Double.class);
-        strengthStrength = getConfig("strengthStrength", 1, Integer.class);
+        strengthLevel = getConfig("strengthLevel", 1, Integer.class);
     }
 }
