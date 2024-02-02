@@ -118,7 +118,6 @@ public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Li
 
     @EventHandler
     public void onProjectileHit(ProjectileHitEvent event) {
-
         if (event.getEntity() instanceof LargeFireball largeFireball) {
             fireballs.remove(largeFireball);
 
@@ -143,8 +142,16 @@ public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Li
                 EntityProperty property = entry.getValue();
                 final LivingEntity target = entry.get();
 
-                Vector direction = target.getLocation().toVector().subtract(largeFireball.getLocation().toVector()).normalize();
-                UtilVelocity.velocity(target, direction, 0.5D, false, 0.0D, 1.2D, 2.0D, false);
+                Vector explosionToTarget = target.getLocation().toVector().subtract(largeFireball.getLocation().toVector());
+                double distance = explosionToTarget.length();
+                explosionToTarget.normalize();
+
+                // Scaling factor decreases with distance
+                double scalingFactor = 1 - (distance / radius);
+                scalingFactor = Math.max(scalingFactor, 0); // Ensure it doesn't go negative
+
+                // Apply scaled velocity
+                UtilVelocity.velocity(target, explosionToTarget, scalingFactor * 0.5D, false, 0.0D, scalingFactor * 1.2D, scalingFactor * 2.0D, false);
 
                 if (property == EntityProperty.ENEMY) {
                     UtilServer.runTaskLater(champions, () -> target.setFireTicks((int) (20 * getFireDuration(level))), 2);
@@ -155,6 +162,7 @@ public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Li
             }
         }
     }
+
 
     @EventHandler
     public void onExplode(EntityExplodeEvent event) {
@@ -190,7 +198,7 @@ public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Li
 
     @Override
     public void loadSkillConfig(){
-        speed = getConfig("speed", 0.25, Double.class);
+        speed = getConfig("speed", .15, Double.class);
         baseDamage = getConfig("baseDamage", 6.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
         baseFireDuration = getConfig("baseFireDuration", 2.0, Double.class);
