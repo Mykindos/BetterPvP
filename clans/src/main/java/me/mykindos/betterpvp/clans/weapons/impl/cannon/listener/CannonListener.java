@@ -154,13 +154,14 @@ public class CannonListener implements Listener {
             if (player != null) {
                 event.setDamager(player);
                 double distance = tnt.getLocation().distance(event.getDamagee().getLocation());
+                double deltaRadius = cannonballDamageMaxRadius - cannonballDamageMinRadius;
                 double damage;
-                if (distance < cannonballDamageMinRadius) {
+                if (distance <= cannonballDamageMinRadius) {
                     damage = cannonballDamage;
-                } else if (distance > cannonballDamageMaxRadius) {
+                } else if (distance >= cannonballDamageMaxRadius) {
                     damage = 0;
                 } else {
-                    damage = cannonballDamage * (distance - cannonballDamageMinRadius) / cannonballDamageMaxRadius - cannonballDamageMinRadius;
+                    damage = cannonballDamage * ((deltaRadius - (distance - cannonballDamageMinRadius)) / deltaRadius);
                 }
                 event.setDamage(damage);
                 event.setKnockback(false);
