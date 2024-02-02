@@ -91,6 +91,7 @@ public class Core extends BPvPPlugin {
         updateEventExecutor.initialize();
 
         InvUI.getInstance().setPlugin(this);
+
     }
 
     @Override
