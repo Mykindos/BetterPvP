@@ -62,8 +62,8 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
                 "",
                 "Connect to your allies within <val>" + getRadius(level) + "</val> blocks,",
                 "causing the highest health player in the",
-                "radius to transfer their health to the lowest",
-                "health player every <stat>" + healCooldown +"</stat> seconds",
+                "radius to transfer their health to the",
+                "lowest health player every <stat>" + healCooldown +"</stat> seconds",
                 "",
                 "Energy / Second: <val>" + getEnergy(level)
 
