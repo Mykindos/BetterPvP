@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -111,7 +112,8 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
                 return true;
             }
 
-            UtilVelocity.velocity(player, velocityStrength, 0.11, 1.0, true);
+            VelocityData velocityData = new VelocityData(player.getLocation().getDirection(), velocityStrength, false, 0, 0.11, 1.0, true);
+            UtilVelocity.velocity(player, null, velocityData);
             player.getWorld().spawnEntity(player.getLocation(), EntityType.LLAMA_SPIT);
             player.getWorld().playSound(player.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 0.5F, 1.5F);
             return false;

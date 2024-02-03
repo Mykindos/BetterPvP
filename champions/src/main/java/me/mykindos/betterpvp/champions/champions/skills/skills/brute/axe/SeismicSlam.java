@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
@@ -21,6 +22,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Sound;
@@ -141,7 +143,8 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
 
             double scaledVelocity = 0.6 + (2 * percentageMultiplier);
             Vector trajectory = UtilVelocity.getTrajectory2d(player.getLocation().toVector(), target.getLocation().toVector());
-            UtilVelocity.velocity(target, trajectory, scaledVelocity, true, 0, 0.2 + percentageMultiplier, 1.4, true, true);
+            VelocityData velocityData = new VelocityData(trajectory, scaledVelocity, true, 0, 0.2 + percentageMultiplier, 1.4, true);
+            UtilVelocity.velocity(target, player, velocityData);
 
             double damage = calculateDamage(player, target);
             UtilDamage.doCustomDamage(new CustomDamageEvent(target, player, null, DamageCause.CUSTOM, damage, false, getName()));
@@ -188,7 +191,9 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
         if (vec.getY() < 0) {
             vec.setY(vec.getY() * -1);
         }
-        UtilVelocity.velocity(player, vec, 0.6, false, 0, 0.8, 0.8, true);
+
+        VelocityData velocityData = new VelocityData(vec, 0.6, false, 0, 0.8, 0.8, true);
+        UtilVelocity.velocity(player, null, velocityData, VelocityType.CUSTOM);
 
         slams.put(player.getUniqueId(), System.currentTimeMillis());
         championsManager.getEffects().addEffect(player, EffectType.NOFALL, 1300L);
