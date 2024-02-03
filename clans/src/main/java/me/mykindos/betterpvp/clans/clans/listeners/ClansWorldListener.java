@@ -25,6 +25,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -58,6 +59,7 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.util.Vector;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -525,6 +527,7 @@ public class ClansWorldListener extends ClanListener {
     @EventHandler
     public void onBreakGate(BlockBreakEvent event) {
 
+        // TODO check if this is still necessary
         if (!event.getBlock().getType().name().contains("GATE")) return;
         Optional<Clan> playerClanOptional = clanManager.getClanByPlayer(event.getPlayer());
         Optional<Clan> locationClanOptional = clanManager.getClanByLocation(event.getBlock().getLocation());
@@ -535,9 +538,9 @@ public class ClansWorldListener extends ClanListener {
                 if (playerClanOptional.isEmpty() || !playerClanOptional.equals(locationClanOptional)) {
                     if (event.getPlayer().getLocation().distance(event.getBlock().getLocation()) < 1.5) {
 
-                        UtilVelocity.velocity(event.getPlayer(),
-                                UtilVelocity.getTrajectory(event.getPlayer().getLocation(), clanManager.closestWildernessBackwards(event.getPlayer())),
-                                0.5, true, 0.25, 0.25, 0.25, false);
+                        Vector vec = UtilVelocity.getTrajectory(event.getPlayer().getLocation(), clanManager.closestWildernessBackwards(event.getPlayer()));
+                        VelocityData velocityData = new VelocityData(vec, 0.5, true, 0.25, 0.25, 0.25, false);
+                        UtilVelocity.velocity(event.getPlayer(), null, velocityData);
 
                     }
                 }

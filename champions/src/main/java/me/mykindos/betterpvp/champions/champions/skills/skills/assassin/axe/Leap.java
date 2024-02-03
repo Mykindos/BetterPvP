@@ -8,12 +8,14 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -65,11 +67,13 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
     public void doLeap(Player player, boolean wallkick) {
 
         if (!wallkick) {
-            UtilVelocity.velocity(player, leapStrength, 0.2D, 1.0D, true);
+            VelocityData velocityData = new VelocityData(player.getLocation().getDirection(), leapStrength, false, 0.0D, 0.2D, 1.0D, true);
+            UtilVelocity.velocity(player, null, velocityData, VelocityType.CUSTOM);
         } else {
             Vector vec = player.getLocation().getDirection();
             vec.setY(0);
-            UtilVelocity.velocity(player, vec, wallKickStrength, false, 0.0D, 0.8D, 2.0D, true);
+            VelocityData velocityData = new VelocityData(vec, wallKickStrength, false, 0.0D, 0.8D, 2.0D, true);
+            UtilVelocity.velocity(player, null, velocityData, VelocityType.CUSTOM);
             UtilMessage.message(player, getClassType().getName(), "You used <alt>Wall Kick</alt>.");
         }
 

@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
@@ -23,6 +24,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -179,7 +181,8 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
     @Override
     public void activate(Player player, int leel) {
         Vector vec = player.getLocation().getDirection();
-        UtilVelocity.velocity(player, vec, 1.8D, false, 0.0D, 0.4D, 0.6D, false);
+        VelocityData velocityData = new VelocityData(vec, 1.8D, false, 0.0D, 0.4D, 0.6D, false);
+        UtilVelocity.velocity(player, null, velocityData, VelocityType.CUSTOM);
         active.put(player, System.currentTimeMillis());
     }
 
