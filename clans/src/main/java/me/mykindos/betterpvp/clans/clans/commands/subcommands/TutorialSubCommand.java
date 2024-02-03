@@ -59,7 +59,7 @@ public class TutorialSubCommand extends ClanSubCommand {
             Component.text(Role.ASSASSIN.getName(), Role.ASSASSIN.getColor()).appendNewline()
                     .append(UtilMessage.deserialize("Assassin is a quick and agile class. With relatively low health and strong counters, this is not an easy class to be caught out in. Primarily suited for attacking distracted or otherwise occupied enemies, it will struggle against enemies that are prepared.")),
             Component.text(Role.KNIGHT.getName(), Role.KNIGHT.getColor()).appendNewline()
-                    .append(UtilMessage.deserialize("Knight is a strong, aggressive class. It has thrives being on the attack, having options to increase damage, while also having a few that can keep them alive long enough to kill their opponent.")),
+                    .append(UtilMessage.deserialize("Knight is a strong, aggressive class. It thrives being on the attack, having options to increase damage, while also having a few that can keep them alive long enough to kill their opponent.")),
             Component.text(Role.BRUTE.getName(), Role.BRUTE.getColor()).appendNewline()
                     .append(UtilMessage.deserialize("Brute is a powerhouse that is rarely moved by others. It has good crowd control and defensive abilities.")),
             Component.text(Role.RANGER.getName(), Role.RANGER.getColor()).appendNewline()

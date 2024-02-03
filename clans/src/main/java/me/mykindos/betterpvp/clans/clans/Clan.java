@@ -145,7 +145,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
 
     public List<Player> getAdminsAsPlayers() {
         return getMembers().stream()
-                .filter(member -> member.getRank() == ClanMember.MemberRank.ADMIN)
+                .filter(member -> member.getRank().hasRank(ClanMember.MemberRank.ADMIN) )
                 .map(member -> Bukkit.getPlayer(UUID.fromString(member.getUuid())))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
