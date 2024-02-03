@@ -96,6 +96,8 @@ public class HealingShot extends PrepareArrowSkill {
         if (target instanceof Player damagee) {
             if (UtilPlayer.isPlayerFriendly(damager, damagee)) {
                 damagee.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, (int) (getDuration(level) * 20), 2 ));
+                target.getWorld().spawnParticle(Particle.HEART, target.getLocation().add(0, 1.5, 0), 5, 0.5, 0.5, 0.5, 0);
+                target.getWorld().playSound(target.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 2, 1.5F);
                 championsManager.getEffects().addEffect(damagee, EffectType.IMMUNETOEFFECTS, 1);
                 event.setCancelled(true);
             }
