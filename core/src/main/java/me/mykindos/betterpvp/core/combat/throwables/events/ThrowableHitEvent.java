@@ -4,7 +4,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableItem;
 import me.mykindos.betterpvp.core.framework.events.CustomCancellableEvent;
-import me.mykindos.betterpvp.core.framework.events.CustomEvent;
 
 @EqualsAndHashCode(callSuper = true)
 @Data

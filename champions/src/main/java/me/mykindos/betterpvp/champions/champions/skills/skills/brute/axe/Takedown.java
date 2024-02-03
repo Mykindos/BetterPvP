@@ -21,7 +21,6 @@ import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
@@ -102,7 +101,7 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
     @Override
     public double getCooldown(int level) {
 
-        return cooldown - ((level - 1) * 2);
+        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
 

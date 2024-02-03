@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -81,8 +82,11 @@ public class LevitatingShot extends PrepareArrowSkill {
     public void onHit(Player damager, LivingEntity target, int level) {
         if (target instanceof Player player) {
             championsManager.getEffects().addEffect(player, EffectType.LEVITATION, levitationStrength + 1, (int) (getDuration(level) * 1000));
+            UtilMessage.message(damager, getClassType().getName(), UtilMessage.deserialize("You hit <yellow>%s</yellow> with <green>%s %s</green>.", player.getName(), getName(), level));
+            UtilMessage.message(player, getClassType().getName(), UtilMessage.deserialize("You were hit by <yellow>%s</yellow> with <green>%s %s</green>", damager.getName(), getName(), level));
         } else {
-            target.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, (int) (getDuration(level) * 20), levitationStrength));
+            target.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, (int) (getDuration(level) * 20), levitationStrength + 1));
+            UtilMessage.message(damager, getClassType().getName(), UtilMessage.deserialize("You hit <yellow>%s</yellow> with <green>%s %s</green>.", target.getName(), getName(), level));
         }
     }
 
