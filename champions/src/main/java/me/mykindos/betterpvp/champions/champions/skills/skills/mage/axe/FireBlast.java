@@ -54,6 +54,7 @@ public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Li
     private double minFireDuration;
     private double minFireDurationIncreasePerLevel;
 
+
     @Inject
     public FireBlast(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -88,6 +89,7 @@ public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Li
 
     public double getRadius(int level){
         return radius + ((level - 1) * radiusIncreasePerLevel);
+
     }
     public double getMinFireDuration(int level){
         return minFireDuration + ((level - 1) * minFireDurationIncreasePerLevel);
@@ -158,7 +160,7 @@ public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Li
 
                 double scalingFactor = 1 - (distance / radius);
                 scalingFactor = Math.max(scalingFactor, 0);
-
+              
                 double yVelocity = 1.5D;
                 double scaledYVelocity = scalingFactor * yVelocity;
 
@@ -170,6 +172,7 @@ public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Li
                 double fireDuration = getMinFireDuration(level) + (scalingFactor * (getFireDuration(level) - getMinFireDuration(level)));
                 if (property == EntityProperty.ENEMY) {
                     UtilServer.runTaskLater(champions, () -> target.setFireTicks((int) (20 * fireDuration)), 2);
+
                 }
             }
         }

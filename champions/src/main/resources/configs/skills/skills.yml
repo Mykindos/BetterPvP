@@ -193,9 +193,12 @@ skills:
     cleave:
       enabled: true
       maxlevel: 3
-      baseDamage: 4.0
-      baseDistance: 2.0
-      distanceIncreasePerLevel: 1.0
+      baseDistance: 3.0
+      distanceIncreasePerLevel: 0.5
+      percentageOfDamage: 0.45
+      percentageOfDamageIncreasePerLevel: 0.15
+      maxEnemiesHit: 2
+      maxEnemiesHitIncreasePerLevel: 1
     riposte:
       enabled: true
       maxlevel: 3
