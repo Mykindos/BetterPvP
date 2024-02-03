@@ -125,7 +125,9 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener {
             return; // Skill was cancelled
         }
 
-        if (ent != null && UtilMath.offset(player, ent) <= 3.0) {
+        if(ent == null) return;
+
+        if (UtilMath.offset(player, ent) <= 3.0) {
             if (ent instanceof Player damagee) {
                 if (UtilPlayer.getRelation(player, damagee) == EntityProperty.FRIENDLY) {
                     return;
@@ -139,6 +141,7 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener {
         } else {
             UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s", getName());
         }
+        ent.getWorld().playSound(ent.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1.0F, 1.2F);
 
     }
 
