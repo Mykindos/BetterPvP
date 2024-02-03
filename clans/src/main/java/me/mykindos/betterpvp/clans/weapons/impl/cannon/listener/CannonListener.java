@@ -113,6 +113,10 @@ public class CannonListener implements Listener {
     private double cannonballDamage;
 
     @Inject
+    @Config(path = "cannon.cannonball-min-damage", defaultValue = "4.0", configName = "weapons/cannon")
+    private double cannonballMinDamage;
+
+    @Inject
     @Config(path = "cannon.cannonball-damage-max-radius", defaultValue = "4.0", configName = "weapons/cannon")
     private double cannonballDamageMaxRadius;
 
@@ -154,15 +158,7 @@ public class CannonListener implements Listener {
             if (player != null) {
                 event.setDamager(player);
                 double distance = tnt.getLocation().distance(event.getDamagee().getLocation());
-                double deltaRadius = cannonballDamageMaxRadius - cannonballDamageMinRadius;
-                double damage;
-                if (distance <= cannonballDamageMinRadius) {
-                    damage = cannonballDamage;
-                } else if (distance >= cannonballDamageMaxRadius) {
-                    damage = 0;
-                } else {
-                    damage = cannonballDamage * ((deltaRadius - (distance - cannonballDamageMinRadius)) / deltaRadius);
-                }
+                double damage = getDamage(distance);
                 event.setDamage(damage);
                 event.setKnockback(false);
                 event.addReason("Cannonball");
@@ -171,6 +167,19 @@ public class CannonListener implements Listener {
 
         // Set sound provider to the cannon if the damagee is a cannon
         this.cannonManager.of(event.getDamagee()).ifPresent(event::setSoundProvider);
+    }
+
+    private double getDamage(double distance) {
+        double deltaRadius = cannonballDamageMaxRadius - cannonballDamageMinRadius;
+        double damage;
+        if (distance <= cannonballDamageMinRadius) {
+            damage = cannonballDamage;
+        } else if (distance > cannonballDamageMaxRadius) {
+            damage = 0;
+        } else {
+            damage = Math.max(cannonballDamage * ((deltaRadius - (distance - cannonballDamageMinRadius)) / deltaRadius), cannonballMinDamage);
+        }
+        return damage;
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
