@@ -112,7 +112,7 @@ public class HoldPosition extends Skill implements InteractSkill, CooldownSkill,
 
             @Override
             public void run() {
-                if (ticksRun > durationTicks) {
+                if (ticksRun > durationTicks || getLevel(player) <= 0) {
                     this.cancel();
                     return;
                 }
