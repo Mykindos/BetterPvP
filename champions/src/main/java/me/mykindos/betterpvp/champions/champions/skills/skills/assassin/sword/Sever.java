@@ -106,23 +106,23 @@ public class Sever extends Skill implements CooldownSkill, Listener {
             return; // Skill was cancelled
         }
 
-        if (ent != null && UtilMath.offset(player, ent) <= 3.0) {
+        if(ent == null) return;
+
+        if (UtilMath.offset(player, ent) <= 3.0) {
             if (ent instanceof Player damagee) {
                 if (UtilPlayer.getRelation(player, damagee) == EntityProperty.FRIENDLY) {
                     return;
                 }
             }
-            // Apply the effect and messages
+
             championsManager.getEffects().addEffect(ent, EffectType.BLEED, (long) getDuration(level) * 1000L);
-            ent.getWorld().playSound(ent.getLocation(), Sound.ENTITY_SPIDER_HURT, 1.0F, 1.5F);
             UtilMessage.simpleMessage(player, getClassType().getName(), "You severed <alt>" + ent.getName() + "</alt>.");
             UtilMessage.simpleMessage(ent, getClassType().getName(), "You have been severed by <alt>" + player.getName() + "</alt>.");
         } else {
             UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s", getName());
-            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_IRON_GOLEM_ATTACK, 2.0f, 1.3f);
         }
+        ent.getWorld().playSound(ent.getLocation(), Sound.ENTITY_SPIDER_HURT, 1.0F, 1.5F);
 
-        player.swingMainHand();
     }
 
     @Override
