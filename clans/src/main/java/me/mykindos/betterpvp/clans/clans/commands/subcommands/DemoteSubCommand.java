@@ -77,7 +77,7 @@ public class DemoteSubCommand extends ClanSubCommand {
                 }
                 else if (client.isAdministrating() && targetMember.getRank().getPrivilege() >= member.getRank().getPrivilege()) {
                     clientManager.sendMessageToRank("Clans",
-                            UtilMessage.deserialize("<yellow>%s<gray> force demoted <yellow>%s", player.getName(), client.getName()),
+                            UtilMessage.deserialize("<yellow>%s<gray> force demoted <yellow>%s", player.getName(), found.getName()),
                             Rank.HELPER);
                 }
 
