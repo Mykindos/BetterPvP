@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
+import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
@@ -96,27 +97,26 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
             final LivingEntity damagee = event.getDamagee();
 
             if (running.containsKey(damager.getUniqueId())) {
-                if (System.currentTimeMillis() >= running.get(damager.getUniqueId())) {
+                if (expire(damager.getUniqueId())) {
                     running.remove(damager.getUniqueId());
                     return;
                 }
 
                 event.setKnockback(false);
 
-                damagee.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) slowDuration * 20, 2));
+                damagee.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) slowDuration * 20, slownessStrength));
                 damager.removePotionEffect(PotionEffectType.SPEED);
 
                 damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_ENDERMAN_SCREAM, 1.5F, 0.0F);
                 damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1.5F, 0.5F);
 
+                int level = getLevel(damager);
+
                 if (event.getDamagee() instanceof Player damaged) {
-                    UtilMessage.simpleMessage(damaged, getClassType().getName(), "<yellow>" + damager.getName() + "</yellow> hit you with <green>" + getName() + "</green>.");
-                    UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit <yellow>" + damaged.getName() + "</yellow> with <green>" + getName() + "</green>.");
-          
-                    running.remove(damager.getUniqueId());
-                    return;
+                    UtilMessage.simpleMessage(damaged, getClassType().getName(), "<yellow>" + damager.getName() + "</yellow> hit you with <green>" + getName() + " " + level + "</green>.");
                 }
 
+                UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit <yellow>" + event.getDamagee().getName() + "</yellow> with <green>" + getName() + " " + level + "</green>.");
                 running.remove(damager.getUniqueId());
             }
         }
@@ -124,7 +124,22 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
 
     @UpdateEvent(delay = 1000)
     public void onUpdate() {
-        running.entrySet().removeIf(entry -> entry.getValue() - System.currentTimeMillis() <= 0);
+        running.entrySet().removeIf(entry -> expire(entry.getKey()));
+    }
+
+    private boolean expire(UUID uiid) {
+        if (running.get(uiid) - System.currentTimeMillis() <= 0) {
+            Player player = Bukkit.getPlayer(uiid);
+            if (player == null) {
+                return true;
+            }
+
+            int level = getLevel(player);
+            UtilMessage.message(player, getClassType().getName(), UtilMessage.deserialize("<green>%s %s</green> has ended.", getName(), level));
+            return true;
+        }
+
+        return false;
     }
 
     @Override

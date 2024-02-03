@@ -11,12 +11,10 @@ import me.mykindos.betterpvp.core.combat.throwables.ThrowableListener;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
-import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -33,8 +31,6 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.UUID;
 
 @Singleton
 @BPvPListener
@@ -110,22 +106,22 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
     @Override
     public void toggleActive(Player player) {
         if (championsManager.getEnergy().use(player, getName(), 10, false)) {
-            sendState(player, true);
+            UtilMessage.simpleMessage(player, getClassType().getName(), "Immolate: <green>On");
         } else {
             cancel(player);
         }
     }
 
     @Override
-    public void cancel(Player player) {
-        super.cancel(player);
+    public void cancel(Player player, String reason) {
+        super.cancel(player, reason);
 
         if (!UtilPlayer.hasPotionEffect(player, PotionEffectType.SPEED, strengthLevel + 1)) {
             player.removePotionEffect(PotionEffectType.SPEED);
         }
         player.removePotionEffect(PotionEffectType.FIRE_RESISTANCE);
         championsManager.getEffects().removeEffect(player, EffectType.STRENGTH);
-        sendState(player, false);
+
     }
 
 
@@ -197,10 +193,6 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
         return (float) (energy - ((level - 1) * energyDecreasePerLevel));
     }
 
-
-    private void sendState(Player player, boolean state) {
-        UtilMessage.simpleMessage(player, getClassType().getName(), "Immolate: %s", state ? "<green>On" : "<red>Off");
-    }
 
     @Override
     public void loadSkillConfig() {

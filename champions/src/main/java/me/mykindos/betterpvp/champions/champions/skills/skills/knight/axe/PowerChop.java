@@ -92,7 +92,7 @@ public class PowerChop extends PrepareSkill implements CooldownSkill {
         if (level > 0) {
             event.setDamage(event.getDamage() + getBonusDamage(level));
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_IRON_GOLEM_HURT, 1.0F, 1.0F);
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <alt2>%s</alt2> with <alt>%s</alt>.", event.getDamagee().getName(), getName());
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <alt2>%s</alt2> with <alt>%s %d</alt>.", event.getDamagee().getName(), getName(), level);
             event.addReason(getName());
             charge.remove(player);
         }
@@ -103,7 +103,7 @@ public class PowerChop extends PrepareSkill implements CooldownSkill {
         charge.entrySet().removeIf(entry -> {
             if (UtilTime.elapsed(entry.getValue(), (long) timeToHit * 1000)) {
                 Player player = entry.getKey();
-                UtilMessage.simpleMessage(player, getClassType().getName(), "You failed to use <alt>%s</alt>.", getName());
+                UtilMessage.simpleMessage(player, getClassType().getName(), "You failed to use <alt>%s %d</alt>.", getName(), getLevel(player));
                 player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
                 return true;
             }

@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.parties;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.bukkit.Location;
 
 import java.util.UUID;
 
@@ -12,6 +13,7 @@ import java.util.UUID;
 public class PartyMember {
 
     private final UUID uuid;
+    private Location location;
     private PartyMemberReadyStatus status = PartyMemberReadyStatus.UNKNOWN;
 
     @Override

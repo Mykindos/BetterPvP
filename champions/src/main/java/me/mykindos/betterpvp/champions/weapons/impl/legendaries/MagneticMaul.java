@@ -22,6 +22,7 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.math.VectorLine;
+import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -213,7 +214,8 @@ public class MagneticMaul extends ChannelWeapon implements InteractWeapon, Legen
             }
 
             final Vector trajectory = pullLocation.toVector().subtract(entity.getLocation().toVector()).normalize().multiply(0.3);
-            UtilVelocity.velocity(entity, trajectory, 0.3, false, 0, 0, 1, true, true);
+            VelocityData velocityData = new VelocityData(trajectory, 0.3, false, 0, 0, 1, true);
+            UtilVelocity.velocity(entity, wielder, velocityData);
             playPullLine(wielder, entity);
         }
     }

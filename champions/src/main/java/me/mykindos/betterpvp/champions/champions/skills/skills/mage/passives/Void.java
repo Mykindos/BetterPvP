@@ -10,11 +10,9 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
-import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -23,8 +21,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.UUID;
 
 @Singleton
 @BPvPListener
@@ -96,12 +92,11 @@ public class Void extends ActiveToggleSkill implements EnergySkill {
     }
 
     @Override
-    public void cancel(Player player) {
-        super.cancel(player);
+    public void cancel(Player player, String reason) {
+        super.cancel(player, reason);
         player.removePotionEffect(PotionEffectType.INVISIBILITY);
         player.removePotionEffect(PotionEffectType.SLOW);
         championsManager.getEffects().removeEffect(player, EffectType.NO_JUMP);
-        UtilMessage.simpleMessage(player, getClassType().getName(), "Void: <red>Off");
     }
 
     private void audio(Player player) {
@@ -151,21 +146,6 @@ public class Void extends ActiveToggleSkill implements EnergySkill {
     public float getEnergy(int level) {
         return (float) (energy - ((level - 1) * energyDecreasePerLevel));
     }
-
-    @Override
-    public void toggle(Player player, int level) {
-        if (active.contains(player.getUniqueId())) {
-            active.remove(player.getUniqueId());
-            player.removePotionEffect(PotionEffectType.INVISIBILITY);
-            player.removePotionEffect(PotionEffectType.SLOW);
-            championsManager.getEffects().removeEffect(player, EffectType.NO_JUMP);
-            UtilMessage.simpleMessage(player, getClassType().getName(), "Void: <red>Off");
-        } else {
-            active.add(player.getUniqueId());
-
-        }
-    }
-
 
     public void loadSkillConfig() {
         baseDamageReduction = getConfig("baseDamageReduction", 2.0, Double.class);

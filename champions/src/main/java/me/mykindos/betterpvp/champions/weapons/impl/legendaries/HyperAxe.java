@@ -42,7 +42,7 @@ public class HyperAxe extends Weapon implements InteractWeapon, LegendaryWeapon,
     private int damageDelay;
 
     @Inject
-    @Config(path = "weapons.hyper-axe.baseDamage", defaultValue = "4", configName = "weapons/legendaries")
+    @Config(path = "weapons.hyper-axe.baseDamage", defaultValue = "4.0", configName = "weapons/legendaries")
     private double baseDamage;
 
     @Inject
@@ -121,7 +121,7 @@ public class HyperAxe extends Weapon implements InteractWeapon, LegendaryWeapon,
     public void onInitialize(ItemMeta meta) {
 
         if (!meta.getPersistentDataContainer().has(ChampionsNamespacedKeys.HYPER_AXE_SPEED)) {
-            int level = UtilMath.randomInt(1, 4);
+            int level = UtilMath.randomInt(1, 5);
             meta.getPersistentDataContainer().set(ChampionsNamespacedKeys.HYPER_AXE_SPEED, PersistentDataType.INTEGER, level);
         }
 

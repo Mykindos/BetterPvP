@@ -28,6 +28,7 @@ import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
@@ -235,7 +236,8 @@ public class KnightsGreatlance extends ChannelWeapon implements InteractWeapon, 
 
                 // Velocity
                 final Vector knockback = player.getLocation().getDirection();
-                UtilVelocity.velocity(hitEnt, knockback, 2.6, true, 0, 0.2, 1.4, true, true);
+                VelocityData velocityData = new VelocityData(knockback, 2.6, true, 0, 0.2, 1.4, true);
+                UtilVelocity.velocity(hitEnt, player, velocityData);
 
                 // Cooldown
                 this.cooldownManager.use(player,

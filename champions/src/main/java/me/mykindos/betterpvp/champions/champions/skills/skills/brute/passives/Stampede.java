@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
@@ -16,6 +17,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -124,7 +126,8 @@ public class Stampede extends Skill implements PassiveSkill {
         damager.removePotionEffect(PotionEffectType.SPEED);
 
         event.setKnockback(false);
-        UtilVelocity.velocity(event.getDamagee(), UtilVelocity.getTrajectory2d(damager, event.getDamagee()), 2.0D, true, 0.0D, 0.4D, 1.0D, true, true);
+        VelocityData velocityData = new VelocityData(UtilVelocity.getTrajectory2d(damager, event.getDamagee()), 2.0D, true, 0.0D, 0.4D, 1.0D, true);
+        UtilVelocity.velocity(event.getDamagee(), event.getDamager(), velocityData, VelocityType.KNOCKBACK);
         event.setDamage(event.getDamage() + ((str + 1) * damage));
     }
 

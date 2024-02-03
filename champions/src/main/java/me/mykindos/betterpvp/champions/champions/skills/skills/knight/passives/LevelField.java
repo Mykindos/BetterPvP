@@ -13,8 +13,10 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
+import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -85,7 +87,7 @@ public class LevelField extends Skill implements ToggleSkill, CooldownSkill, Lis
                 if (playersWithSkill.contains(player.getUniqueId())) {
                     Bukkit.getScheduler().runTask(champions, () -> {
                         try {
-                            int nearbyEnemies = UtilPlayer.getNearbyEnemies(player, player.getLocation(), radius).size();
+                            int nearbyEnemies = UtilEntity.getNearbyEntities(player, player.getLocation(), radius, EntityProperty.ENEMY).size();
                             int nearbyAllies = UtilPlayer.getNearbyAllies(player, player.getLocation(), radius).size();
                             int nearbyDifference = nearbyEnemies - nearbyAllies;
                             nearbyEnemiesCount.put(player.getUniqueId(), Math.max(0, (nearbyDifference - 1)));
@@ -199,13 +201,13 @@ public class LevelField extends Skill implements ToggleSkill, CooldownSkill, Lis
         List<UUID> keysToRemove = new ArrayList<>();
 
         toggleTimestamps.forEach((uuid, timestamp) -> {
-            if (currentTime - timestamp >= duration * 1000) {
+            if (currentTime - timestamp >= duration * 1000L) {
                 keysToRemove.add(uuid);
 
                 Player player = Bukkit.getPlayer(uuid);
                 if (player != null && player.isOnline()) {
                     player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
-                    UtilMessage.message(player, getClassType().getName(), "Level Field values reset.");
+                    UtilMessage.message(player, getClassType().getName(), UtilMessage.deserialize("<green>%s %d</green> has ended (reset).", getName(), getLevel(player)));
                 }
             }
         });

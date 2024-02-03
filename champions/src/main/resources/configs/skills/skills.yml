@@ -33,10 +33,9 @@ skills:
       poisonStrength: 1
     backstab:
       enabled: true
-      maxlevel: 5
-      increasePerLevel: 0.1
-      assassinDecrease: 0.2
-      baseIncrease: 0.2
+      maxlevel: 3
+      increasePerLevel: 1.5
+      baseIncrease: 0.0
     smokebomb:
       enabled: true
       cooldown: 50.0
@@ -92,9 +91,12 @@ skills:
       enabled: true
       cooldown: 13.0
       maxlevel: 5
-      maxTravelDistance: 16
+      maxTravelDistance: 9
       canUseWhileSlowed: false
       cooldownDecreasePerLevel: 1.0
+      distanceIncreasePerLevel: 3
+      deblinkTime: 6
+      deblinkTimeIncreasePerLevel: 0
     flash:
       enabled: true
       maxlevel: 5
@@ -191,9 +193,12 @@ skills:
     cleave:
       enabled: true
       maxlevel: 3
-      baseDamage: 4.0
-      baseDistance: 2.0
-      distanceIncreasePerLevel: 1.0
+      baseDistance: 3.0
+      distanceIncreasePerLevel: 0.5
+      percentageOfDamage: 0.45
+      percentageOfDamageIncreasePerLevel: 0.15
+      maxEnemiesHit: 2
+      maxEnemiesHitIncreasePerLevel: 1
     riposte:
       enabled: true
       maxlevel: 3
@@ -268,12 +273,13 @@ skills:
     hiltsmash:
       enabled: true
       maxlevel: 5
-      cooldown: 10.0
+      cooldown: 15.0
       cooldownDecreasePerLevel: 1.0
       baseDamage: 3.0
       damageIncreasePerLevel: 1.0
       baseDuration: 0.0
       durationIncreasePerLevel: 0.5
+      slowStrength: 2
   mage:
     staticlazer:
       enabled: true
@@ -286,6 +292,8 @@ skills:
       energyPerSecond: 32.0
       cooldownDecreasePerLevel: 1.0
       energyDecreasePerLevel: 1.0
+      collisionRadius: 1.8
+      explosionRadius: 4.0
     rupture:
       enabled: true
       cooldown: 12.0
@@ -326,17 +334,20 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 23.0
-      speed: 0.5
+      speed: .15
       damage: 6.0
+      fireDurationIncreasePerLevel: 2.0
       cooldownDecreasePerLevel: 2.0
       baseDamage: 6.0
       damageIncreasePerLevel: 0.0
-      baseFireDuration: 0.0
+      baseFireDuration: 2.0
+      radius: 6.0
+      radiusIncreasePerLevel: 0.5
     iceprison:
       enabled: true
       maxlevel: 5
       cooldown: 25.0
-      sphereSize: 5
+      sphereSize: 4
       speed: 1.5
       cooldownDecreasePerLevel: 2.0
       baseDuration: 5.0
@@ -379,12 +390,13 @@ skills:
     lifebonds:
       enabled: true
       maxlevel: 5
-      energy: 9
-      duration: 2.0
+      energy: 25
       baseRadius: 2.0
       radiusIncreasePerLevel: 1.0
-      minRadius: 2.0
       energyDecreasePerLevel: 1.0
+      healCooldown: 2.0
+      healSpeed: 0.3
+      healMultiplier: 0.25
     magmablade:
       enabled: true
       maxlevel: 3
@@ -523,21 +535,24 @@ skills:
       maxlevel: 5
       cooldown: 18.0
       cooldownDecreasePerLevel: 2.0
-      damage: 7.0
-      damageIncreasePerLevel: 2.0
+      damage: 5.0
+      damageIncreasePerLevel: 1.0
     colossus:
       enabled: true
       maxlevel: 3
-      reductionPerLevel: 0.25
+      reductionPerLevel: 0.20
     takedown:
       enabled: true
       maxlevel: 5
       cooldown: 25.0
-      damage: 10.0
-      cooldownDecreasePerLevel: 1.0
+      damage: 5.0
+      cooldownDecreasePerLevel: 2.0
       baseDuration: 1.0
       durationIncreasePerLevel: 1.0
       slownessStrength: 3
+      recoilDamage: 1.5
+      recoilDamageIncreasePerLevel: 0.5
+      damageIncreasePerLevel: 1.0
     stampede:
       enabled: true
       maxlevel: 5
@@ -661,13 +676,9 @@ skills:
     overcharge:
       enabled: true
       maxlevel: 5
-      baseDamageIncrement: 1.0
-      damageIncrementPerLevel: 0.0
-      baseDurationIncrement: 0.4
       baseMaxDamage: 2.0
       maxDamageIncreasePerLevel: 1.0
-      damageIncrement: 1
-      durationIncrement: 0.4
+      chargeSeconds: 3.0
     huntersthrill:
       enabled: true
       maxlevel: 5
@@ -695,8 +706,8 @@ skills:
       damage: 8.0
     vitalityspores:
       enabled: true
-      maxlevel: 5
-      baseDuration: 7.0
+      maxlevel: 3
+      baseDuration: 5.0
       durationDecreasePerLevel: 1.0
       regenerationStrength: 0
     sharpshooter:
@@ -719,14 +730,15 @@ skills:
       baseDamageReduction: 0.6
       damageReductionIncreasePerLevel: 0.0
       speedStrength: 1
-    wolvesfury:
+    wolfsfury:
       enabled: true
       maxlevel: 5
       cooldown: 25.0
       baseDuration: 3.0
       cooldownDecreasePerLevel: 1.5
       durationIncreasePerLevel: 1.0
-      strengthStrength: 1
+      strengthLevel: 4
+      maxMissedSwings: 2
     disengage:
       enabled: true
       maxlevel: 5
@@ -899,8 +911,8 @@ skills:
       damageReductionIncreasePerLevel: 2.0
     fastrecovery:
       enabled: true
-      maxlevel: 5
-      percentagePerLevel: 0.2
+      maxlevel: 3
+      percentagePerLevel: 0.15
     swim:
       enabled: true
       maxlevel: 5

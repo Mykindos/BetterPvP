@@ -4,6 +4,7 @@ import lombok.Data;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.framework.customtypes.CustomArmourStand;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
@@ -13,6 +14,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
+import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -173,7 +175,8 @@ public class BoulderObject {
             display.setRotation(0f, 0f);
 
             // Shoot them out
-            UtilVelocity.velocity(vehicle, direction, 0.7, false, 0.0, 0.0, 0.0, true, true);
+            VelocityData velocityData = new VelocityData(direction, 0.7, false, 0.0, 0.0, 0.0, true);
+            UtilVelocity.velocity(vehicle, caster, velocityData);
         }
 
         final int maxDeconstructTicks = 40;
@@ -262,7 +265,8 @@ public class BoulderObject {
                 damaged.add(ent);
                 Vector knockback = ent.getLocation().toVector().subtract(impactLocation.toVector());
                 final double strength = (radius * radius - ent.getLocation().distanceSquared(impactLocation)) / (radius * radius);
-                UtilVelocity.velocity(ent, knockback, strength, false, 0.0, 0.0, 3.0, true, true);
+                VelocityData velocityData = new VelocityData(knockback, strength, false, 0.0, 0.0, 3.0, true);
+                UtilVelocity.velocity(ent, caster, velocityData);
                 UtilDamage.doCustomDamage(new CustomDamageEvent(ent, caster, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(), false, skill.getName()));
                 UtilMessage.simpleMessage(ent, skill.getName(), "<alt2>%s</alt2> hit you with <alt>%s</alt>.", caster.getName(), skill.getName());
             }

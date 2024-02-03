@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -25,23 +26,17 @@ import java.util.WeakHashMap;
 @Singleton
 @BPvPListener
 public class Fortitude extends Skill implements PassiveSkill, Listener {
-
     private final WeakHashMap<Player, Double> health = new WeakHashMap<>();
     private final WeakHashMap<Player, Long> last = new WeakHashMap<>();
-
     private double healRate;
-
     private double baseHeal;
-
     private double healIncreasePerLevel;
-
     private double healInterval;
 
     @Inject
     public Fortitude(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
-
 
     @Override
     public String getName() {
@@ -77,7 +72,6 @@ public class Fortitude extends Skill implements PassiveSkill, Listener {
         return SkillType.PASSIVE_A;
     }
 
-
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onHit(CustomDamageEvent event) {
         if (!(event.getDamagee() instanceof Player player)) return;
@@ -96,6 +90,7 @@ public class Fortitude extends Skill implements PassiveSkill, Listener {
             if (UtilTime.elapsed(last.get(cur), (long) (healInterval * 1000))) {
                 health.put(cur, health.get(cur) - healRate);
                 last.put(cur, System.currentTimeMillis());
+                cur.getWorld().spawnParticle(Particle.HEART, cur.getLocation().add(0, 2, 0), 1, 0.2, 0.2, 0.2, 0);
                 if (health.get(cur) <= 0) {
                     remove.add(cur);
                 }

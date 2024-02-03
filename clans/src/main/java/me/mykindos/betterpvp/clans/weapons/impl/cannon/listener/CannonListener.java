@@ -24,7 +24,6 @@ import me.mykindos.betterpvp.clans.weapons.impl.cannon.model.CannonManager;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomEntityVelocityEvent;
-import me.mykindos.betterpvp.core.combat.events.CustomKnockbackEvent;
 import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
@@ -112,6 +111,18 @@ public class CannonListener implements Listener {
     @Config(path = "cannon.cannonball-damage", defaultValue = "15.0", configName = "weapons/cannon")
     private double cannonballDamage;
 
+    @Inject
+    @Config(path = "cannon.cannonball-min-damage", defaultValue = "4.0", configName = "weapons/cannon")
+    private double cannonballMinDamage;
+
+    @Inject
+    @Config(path = "cannon.cannonball-damage-max-radius", defaultValue = "4.0", configName = "weapons/cannon")
+    private double cannonballDamageMaxRadius;
+
+    @Inject
+    @Config(path = "cannon.cannonball-damage-min-radius", defaultValue = "1.0", configName = "weapons/cannon")
+    private double cannonballDamageMinRadius;
+
     private TNTPrimed spawnCannonball(final @NotNull Cannon cannon, final @NotNull UUID caster) {
         final Location cannonLocation = cannon.getActiveModel().getBone("cannon2").orElseThrow().getLocation().clone();
         final TNTPrimed cannonball = cannon.getLocation().getWorld().spawn(cannonLocation, TNTPrimed.class);
@@ -145,7 +156,9 @@ public class CannonListener implements Listener {
             final Player player = Bukkit.getPlayer(originalOwner);
             if (player != null) {
                 event.setDamager(player);
-                event.setDamage(cannonballDamage);
+                double distance = tnt.getLocation().distance(event.getDamagee().getLocation());
+                double damage = getDamage(distance);
+                event.setDamage(damage);
                 event.setKnockback(false);
                 event.addReason("Cannonball");
             }
@@ -153,6 +166,19 @@ public class CannonListener implements Listener {
 
         // Set sound provider to the cannon if the damagee is a cannon
         this.cannonManager.of(event.getDamagee()).ifPresent(event::setSoundProvider);
+    }
+
+    private double getDamage(double distance) {
+        double deltaRadius = cannonballDamageMaxRadius - cannonballDamageMinRadius;
+        double damage;
+        if (distance <= cannonballDamageMinRadius) {
+            damage = cannonballDamage;
+        } else if (distance > cannonballDamageMaxRadius) {
+            damage = 0;
+        } else {
+            damage = Math.max(cannonballDamage * ((deltaRadius - (distance - cannonballDamageMinRadius)) / deltaRadius), cannonballMinDamage);
+        }
+        return damage;
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -424,13 +450,6 @@ public class CannonListener implements Listener {
                     .receivers(60)
                     .spawn();
         });
-    }
-
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    public void onKnockback(final CustomKnockbackEvent event) {
-        if (this.cannonManager.isCannonPart(event.getDamagee())) {
-            event.setCancelled(true);
-        }
     }
 
     @EventHandler
