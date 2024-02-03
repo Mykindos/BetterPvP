@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.mage.axe;
 
 
+import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
@@ -68,10 +69,8 @@ public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Li
                 "Right click with an Axe to activate",
                 "",
                 "Launch a fireball which explodes on impact,",
-                "knocking back any players within <val>"+getRadius(level) +"</val> blocks",
+                "knocking back any players within <val>" + getRadius(level) + "</val> blocks",
                 "and igniting them for <val>" + getFireDuration(level) + "</val> seconds",
-                "",
-                "Self inflicted fire lasts half as long",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -133,6 +132,12 @@ public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Li
 
             final List<KeyValue<LivingEntity, EntityProperty>> nearby = UtilEntity.getNearbyEntities(shooter, largeFireball.getLocation(), getRadius(level), EntityProperty.ALL);
 
+            new ParticleBuilder(Particle.EXPLOSION_LARGE)
+                    .location(largeFireball.getLocation())
+                    .count(1)
+                    .receivers(60)
+                    .spawn();
+
             double radius = getRadius(level);
             if (shooter.getLocation().distance(largeFireball.getLocation()) <= radius && nearby.stream().noneMatch(entry -> entry.get().equals(shooter))) {
                 nearby.add(new KeyValue<>(shooter, EntityProperty.FRIENDLY));
@@ -146,18 +151,13 @@ public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Li
                 double distance = explosionToTarget.length();
                 explosionToTarget.normalize();
 
-                // Scaling factor decreases with distance
                 double scalingFactor = 1 - (distance / radius);
-                scalingFactor = Math.max(scalingFactor, 0); // Ensure it doesn't go negative
+                scalingFactor = Math.max(scalingFactor, 0);
 
-                // Apply scaled velocity
                 UtilVelocity.velocity(target, explosionToTarget, scalingFactor * 0.5D, false, 0.0D, scalingFactor * 1.2D, scalingFactor * 2.0D, false);
 
                 if (property == EntityProperty.ENEMY) {
                     UtilServer.runTaskLater(champions, () -> target.setFireTicks((int) (20 * getFireDuration(level))), 2);
-                }
-                else if (target.equals(shooter)){
-                    UtilServer.runTaskLater(champions, () -> target.setFireTicks((int) (20 * (getFireDuration(level) / 2))), 2);
                 }
             }
         }
