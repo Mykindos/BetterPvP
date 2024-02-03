@@ -101,11 +101,11 @@ public class Cleave extends Skill implements PassiveSkill, Listener {
 
     @Override
     public void loadSkillConfig() {
-        baseDistance = getConfig("baseDistance", 2.0, Double.class);
+        baseDistance = getConfig("baseDistance", 3.0, Double.class);
         distanceIncreasePerLevel = getConfig("distanceIncreasePerLevel", 1.0, Double.class);
-        percentageOfDamage = getConfig("percentageOfDamage", 0.25, Double.class);
-        percentageOfDamageIncreasePerLevel = getConfig("percentageOfDamageIncreasePerLevel", 0.10, Double.class);
-        maxEnemiesHit = getConfig("maxEnemiesHit", 3, Integer.class);
+        percentageOfDamage = getConfig("percentageOfDamage", 0.45, Double.class);
+        percentageOfDamageIncreasePerLevel = getConfig("percentageOfDamageIncreasePerLevel", 0.15, Double.class);
+        maxEnemiesHit = getConfig("maxEnemiesHit", 2, Integer.class);
         maxEnemiesHitIncreasePerLevel = getConfig("maxEnemiesHitIncreasePerLevel", 1, Integer.class);
     }
 

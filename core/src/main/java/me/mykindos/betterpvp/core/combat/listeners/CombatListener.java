@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageReductionEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomKnockbackEvent;
 import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
@@ -22,6 +23,7 @@ import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -388,11 +390,11 @@ public class CombatListener implements Listener {
             trajectory.setY(0.06);
         }
 
-        double velocity = 0.2D + trajectory.length() * 0.8D;
+        double strength = 0.2D + trajectory.length() * 0.8D;
         trajectory.multiply(event.getMultiplier());
 
-        UtilVelocity.velocity(event.getDamagee(),
-                trajectory, velocity, false, 0.0D, Math.abs(0.2D * knockback), 0.4D + (0.04D * knockback), true);
+        VelocityData velocityData = new VelocityData(trajectory, strength, false, 0.0D,  Math.abs(0.2D * knockback), 0.4D + (0.04D * knockback), true);
+        UtilVelocity.velocity(event.getDamagee(), event.getDamager(), velocityData, VelocityType.KNOCKBACK);
     }
 
     @UpdateEvent

@@ -36,6 +36,6 @@ public class ClassSelectionMenu extends AbstractGui implements Windowed {
     @NotNull
     @Override
     public Component getTitle() {
-        return Component.text("Pick a Kit");
+        return Component.text("Pick a Class");
     }
 }

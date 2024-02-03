@@ -21,6 +21,7 @@ import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
+import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LargeFireball;
@@ -167,7 +168,8 @@ public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Li
                 explosionToTarget.multiply(scalingFactor * 0.5D);
                 explosionToTarget.setY(scaledYVelocity);
 
-                UtilVelocity.velocity(target, explosionToTarget, 0.5, false, 0.0, scalingFactor * 2.0, scaledYVelocity, false);
+                VelocityData velocityData = new VelocityData(explosionToTarget, scalingFactor * 0.5D, false, 0.0D, scalingFactor * 1.2D, scalingFactor * 2.0D, false);
+                UtilVelocity.velocity(target, shooter, velocityData);
 
                 double fireDuration = getMinFireDuration(level) + (scalingFactor * (getFireDuration(level) - getMinFireDuration(level)));
                 if (property == EntityProperty.ENEMY) {
