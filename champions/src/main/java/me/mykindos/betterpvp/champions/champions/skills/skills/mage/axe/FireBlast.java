@@ -154,7 +154,7 @@ public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Li
                 double scalingFactor = 1 - (distance / radius);
                 scalingFactor = Math.max(scalingFactor, 0);
 
-                UtilVelocity.velocity(target, explosionToTarget, scalingFactor * 0.5D, false, 0.0D, scalingFactor * 1.2D, scalingFactor * 2.0D, false);
+                UtilVelocity.velocity(target, explosionToTarget, scalingFactor * 0.5D, false, 0.0D, scalingFactor * 1.2D, scalingFactor * 2.0D, false, true);
 
                 if (property == EntityProperty.ENEMY) {
                     UtilServer.runTaskLater(champions, () -> target.setFireTicks((int) (20 * getFireDuration(level))), 2);
