@@ -331,12 +331,15 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 23.0
-      speed: 0.5
+      speed: .15
       damage: 6.0
+      fireDurationIncreasePerLevel: 2.0
       cooldownDecreasePerLevel: 2.0
       baseDamage: 6.0
       damageIncreasePerLevel: 0.0
-      baseFireDuration: 0.0
+      baseFireDuration: 2.0
+      radius: 6.0
+      radiusIncreasePerLevel: 0.5
     iceprison:
       enabled: true
       maxlevel: 5
