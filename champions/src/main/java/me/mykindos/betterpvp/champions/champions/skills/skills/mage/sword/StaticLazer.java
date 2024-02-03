@@ -55,6 +55,8 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
     private double baseDamage;
     private double baseRange;
     private double energyPerSecond;
+    private double collisionRadius;
+    private double explosionRadius;
 
     @Inject
     public StaticLazer(Champions champions, ChampionsManager championsManager) {
@@ -137,6 +139,8 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
         baseDamage = getConfig("baseDamage", 6.0, Double.class);
         baseRange = getConfig("baseRange", 20.0, Double.class);
         energyPerSecond = getConfig("energyPerSecond", 24.0, Double.class);
+        collisionRadius = getConfig("collisionRadius", 1.8, Double.class);
+        explosionRadius = getConfig("explosionRadius", 4.0, Double.class);
     }
 
     @Override
@@ -187,7 +191,7 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
             final BoundingBox hitbox = BoundingBox.of(point, 0.5, 0.5, 0.5);
 
             // Check for entity and block collision
-            final List<LivingEntity> nearby = UtilEntity.getNearbyEnemies(player, point, 1.8);
+            final List<LivingEntity> nearby = UtilEntity.getNearbyEnemies(player, point, collisionRadius);
             final boolean collideEnt = !nearby.isEmpty();
             final boolean collideBlock = UtilBlock.solid(block) && UtilBlock.doesBoundingBoxCollide(hitbox, block);
             if (collideEnt || collideBlock) {
@@ -223,7 +227,7 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
 
         // Damage people
         final float damage = getDamage(level) * charge;
-        final List<LivingEntity> enemies = UtilEntity.getNearbyEnemies(player, point, 4);
+        final List<LivingEntity> enemies = UtilEntity.getNearbyEnemies(player, point, explosionRadius);
         for (LivingEntity enemy : enemies) {
             UtilDamage.doCustomDamage(new CustomDamageEvent(enemy, player, null, EntityDamageEvent.DamageCause.CUSTOM, damage, true, getName()));
         }

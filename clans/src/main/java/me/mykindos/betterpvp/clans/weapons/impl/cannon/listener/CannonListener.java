@@ -24,7 +24,6 @@ import me.mykindos.betterpvp.clans.weapons.impl.cannon.model.CannonManager;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomEntityVelocityEvent;
-import me.mykindos.betterpvp.core.combat.events.CustomKnockbackEvent;
 import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
@@ -451,13 +450,6 @@ public class CannonListener implements Listener {
                     .receivers(60)
                     .spawn();
         });
-    }
-
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    public void onKnockback(final CustomKnockbackEvent event) {
-        if (this.cannonManager.isCannonPart(event.getDamagee())) {
-            event.setCancelled(true);
-        }
     }
 
     @EventHandler

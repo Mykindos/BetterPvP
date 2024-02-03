@@ -24,6 +24,7 @@ import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.display.DisplayComponent;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -161,7 +162,8 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
         // Velocity
         final double charge = chargeData.getCharge();
         final double strength = 0.4 + (1.4 * charge);
-        UtilVelocity.velocity(player, strength, 0.2, 0.4 + (0.9 * charge), true);
+        VelocityData velocityData = new VelocityData(player.getLocation().getDirection(), strength, false, 0.0, 0.2, 0.4 + (0.9 * charge), true);
+        UtilVelocity.velocity(player, null, velocityData);
 
         // Pounce log
         pounces.put(player, new Pounce(chargeData, level, player.getLocation(), -1));

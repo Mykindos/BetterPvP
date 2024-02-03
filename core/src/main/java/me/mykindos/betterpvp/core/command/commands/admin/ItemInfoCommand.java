@@ -7,7 +7,6 @@ import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.craftbukkit.v1_20_R3.persistence.CraftPersistentDataContainer;
 import org.bukkit.entity.Player;
-import org.bukkit.persistence.PersistentDataType;
 
 @Singleton
 public class ItemInfoCommand extends Command {
