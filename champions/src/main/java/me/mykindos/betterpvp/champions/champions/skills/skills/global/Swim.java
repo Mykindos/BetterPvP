@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
+import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
@@ -14,6 +15,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -73,7 +75,8 @@ public class Swim extends Skill implements PassiveSkill, EnergySkill {
         if (level > 0) {
             if (championsManager.getCooldowns().use(player, getName(), internalCooldown, false)){
                 if (championsManager.getEnergy().use(player, getName(), getEnergy(level), true)) {
-                    UtilVelocity.velocity(player, 0.6D, 0.2D, 0.6D, false);
+                    VelocityData velocityData = new VelocityData(player.getLocation().getDirection(), 0.6D, false, 0.0, 0.2D, 0.6D, false);
+                    UtilVelocity.velocity(player, null, velocityData, VelocityType.CUSTOM);
                     player.getWorld().playSound(player.getLocation(), Sound.ENTITY_GENERIC_SPLASH, 0.3F, 2.0F);
                 }
             }
