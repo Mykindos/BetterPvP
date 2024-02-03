@@ -104,6 +104,11 @@ public class BuildRepository implements IRepository<RoleBuild> {
             UtilMessage.message(player, "Champions", UtilMessage.deserialize("<green>%s</green> has been disabled on this server, refunding <green>%s</green> skill point(s) and removing from <yellow>%s</yellow> build <green>%s</green>", skill.getName(), level, build.getRole().toString(), build.getId()));
             return;
         }
+
+        if (skill.getType() != type) {
+            return;
+        }
+
         build.setSkill(type, skill, level);
         build.takePoints(level);
     }
