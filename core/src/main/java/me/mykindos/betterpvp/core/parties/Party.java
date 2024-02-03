@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.parties;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.entity.Player;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -19,5 +20,9 @@ public class Party {
         this.members = new HashSet<>();
 
         members.add(new PartyMember(leader));
+    }
+
+    public PartyMember getMemberByPlayer(Player player) {
+        return members.stream().filter(member -> member.getUuid().equals(player.getUniqueId())).findFirst().orElse(null);
     }
 }

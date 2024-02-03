@@ -42,7 +42,7 @@ public class HyperAxe extends Weapon implements InteractWeapon, LegendaryWeapon,
     private int damageDelay;
 
     @Inject
-    @Config(path = "weapons.hyper-axe.baseDamage", defaultValue = "4", configName = "weapons/legendaries")
+    @Config(path = "weapons.hyper-axe.baseDamage", defaultValue = "4.0", configName = "weapons/legendaries")
     private double baseDamage;
 
     @Inject

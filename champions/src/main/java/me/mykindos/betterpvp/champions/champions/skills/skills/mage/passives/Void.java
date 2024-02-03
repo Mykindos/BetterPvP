@@ -96,12 +96,11 @@ public class Void extends ActiveToggleSkill implements EnergySkill {
     }
 
     @Override
-    public void cancel(Player player) {
-        super.cancel(player);
+    public void cancel(Player player, String reason) {
+        super.cancel(player, reason);
         player.removePotionEffect(PotionEffectType.INVISIBILITY);
         player.removePotionEffect(PotionEffectType.SLOW);
         championsManager.getEffects().removeEffect(player, EffectType.NO_JUMP);
-        UtilMessage.simpleMessage(player, getClassType().getName(), "Void: <red>Off");
     }
 
     private void audio(Player player) {
@@ -151,21 +150,6 @@ public class Void extends ActiveToggleSkill implements EnergySkill {
     public float getEnergy(int level) {
         return (float) (energy - ((level - 1) * energyDecreasePerLevel));
     }
-
-    @Override
-    public void toggle(Player player, int level) {
-        if (active.contains(player.getUniqueId())) {
-            active.remove(player.getUniqueId());
-            player.removePotionEffect(PotionEffectType.INVISIBILITY);
-            player.removePotionEffect(PotionEffectType.SLOW);
-            championsManager.getEffects().removeEffect(player, EffectType.NO_JUMP);
-            UtilMessage.simpleMessage(player, getClassType().getName(), "Void: <red>Off");
-        } else {
-            active.add(player.getUniqueId());
-
-        }
-    }
-
 
     public void loadSkillConfig() {
         baseDamageReduction = getConfig("baseDamageReduction", 2.0, Double.class);

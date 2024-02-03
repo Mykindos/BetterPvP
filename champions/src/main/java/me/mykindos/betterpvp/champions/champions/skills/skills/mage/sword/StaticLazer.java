@@ -164,20 +164,6 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
         }
     }
 
-    @EventHandler
-    public void onDamageReceived(CustomDamageEvent event) {
-        if (event.isCancelled() || !(event.getDamagee() instanceof Player player)) {
-            return;
-        }
-
-        if (hasSkill(player) && charging.containsKey(player)) {
-            charging.remove(player);
-            // Cues
-            UtilMessage.simpleMessage(player, getClassType().getName(), "<alt>%s</alt> was interrupted.", getName());
-            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WOLF_WHINE, 0.6f, 1.2f);
-        }
-    }
-
     private void shoot(Player player, float charge, int level) {
         // Cooldown
         championsManager.getCooldowns().removeCooldown(player, getName(), true);
