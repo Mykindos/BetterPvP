@@ -109,6 +109,10 @@ public class BuildRepository implements IRepository<RoleBuild> {
             return;
         }
 
+        if (level > skill.getMaxLevel()) {
+            level = skill.getMaxLevel();
+        }
+
         build.setSkill(type, skill, level);
         build.takePoints(level);
     }
