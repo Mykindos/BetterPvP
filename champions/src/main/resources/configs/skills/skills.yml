@@ -35,7 +35,7 @@ skills:
       enabled: true
       maxlevel: 3
       increasePerLevel: 1.5
-      baseIncrease: 0.0
+      baseIncrease: 1.5
     smokebomb:
       enabled: true
       cooldown: 50.0

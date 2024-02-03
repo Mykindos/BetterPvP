@@ -80,7 +80,7 @@ public class Backstab extends Skill implements PassiveSkill, Listener {
 
     @Override
     public void loadSkillConfig(){
-        increasePerLevel = getConfig("increasePerLevel", 0.0, Double.class);
+        increasePerLevel = getConfig("increasePerLevel", 1.5, Double.class);
         baseIncrease = getConfig("baseIncrease", 1.5, Double.class);
     }
 }
