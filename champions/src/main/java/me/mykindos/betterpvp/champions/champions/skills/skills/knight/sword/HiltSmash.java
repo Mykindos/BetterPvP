@@ -139,7 +139,6 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener {
         } else {
             UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s %d</green>.", getName(), level);
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_IRON_GOLEM_ATTACK, 2.0f, 1.3f);
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s", getName());
         }
 
     }
