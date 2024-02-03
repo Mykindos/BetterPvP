@@ -33,7 +33,9 @@ public abstract class ActiveToggleSkill extends Skill implements ToggleSkill, Li
 
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
-        cancel(event.getPlayer());
+        if(active.contains(event.getPlayer().getUniqueId())) {
+            cancel(event.getPlayer(), null);
+        }
     }
 
     @EventHandler

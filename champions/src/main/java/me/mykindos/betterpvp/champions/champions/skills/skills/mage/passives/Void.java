@@ -147,21 +147,6 @@ public class Void extends ActiveToggleSkill implements EnergySkill {
         return (float) (energy - ((level - 1) * energyDecreasePerLevel));
     }
 
-    @Override
-    public void toggle(Player player, int level) {
-        if (active.contains(player.getUniqueId())) {
-            active.remove(player.getUniqueId());
-            player.removePotionEffect(PotionEffectType.INVISIBILITY);
-            player.removePotionEffect(PotionEffectType.SLOW);
-            championsManager.getEffects().removeEffect(player, EffectType.NO_JUMP);
-            UtilMessage.simpleMessage(player, getClassType().getName(), "Void: <red>Off");
-        } else {
-            active.add(player.getUniqueId());
-
-        }
-    }
-
-
     public void loadSkillConfig() {
         baseDamageReduction = getConfig("baseDamageReduction", 2.0, Double.class);
         damageReductionIncreasePerLevel = getConfig("damageReductionIncreasePerLevel", 0.2, Double.class);

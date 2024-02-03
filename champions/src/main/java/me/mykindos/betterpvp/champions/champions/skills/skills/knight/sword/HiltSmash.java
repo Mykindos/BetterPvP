@@ -12,9 +12,9 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEvent;
-import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
@@ -29,6 +29,8 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.WeakHashMap;
 
@@ -36,15 +38,12 @@ import java.util.WeakHashMap;
 @BPvPListener
 public class HiltSmash extends Skill implements CooldownSkill, Listener {
 
-    private WeakHashMap<Player, Boolean> rightClicked = new WeakHashMap<>();
-
+    private final WeakHashMap<Player, Boolean> rightClicked = new WeakHashMap<>();
     private double baseDamage;
-
     private double damageIncreasePerLevel;
-
     private double baseDuration;
-
     private double durationIncreasePerLevel;
+    private int slowStrength;
 
     @Inject
     public HiltSmash(Champions champions, ChampionsManager championsManager) {
@@ -62,9 +61,8 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener {
                 "Right click with a Sword to activate",
                 "",
                 "Smash the hilt of your sword into",
-                "your opponent, dealing <val>" + getDamage(level) + "</val> damage,",
-                "applying <effect>Shock</effect> for <val>" + getDuration(level) + "</val> seconds,",
-                "and <effect>Silence</effect> the enemy for <val>" + getDuration(level) + "</val> seconds",
+                "your opponent, dealing <val>" + getDamage(level) + "</val> damage and",
+                "applying <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength + 1) + "</effect> for <val>" + getDuration(level) + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -134,17 +132,16 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener {
                 }
             }
             UtilMessage.simpleMessage(ent, getClassType().getName(), "<yellow>%s<gray> hit you with <green>%s %d<gray>.", player.getName(), getName(), level);
-            championsManager.getEffects().addEffect(ent, EffectType.SHOCK, (long) (getDuration(level) * 1000L));
-            championsManager.getEffects().addEffect(ent, EffectType.SILENCE, (long) (getDuration(level) * 1000L));
+            ent.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) (getDuration(level) * 20), slowStrength));
             UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <yellow>%s<gray> with <green>%s %d<gray>.", ent.getName(), getName(), level);
             UtilDamage.doCustomDamage(new CustomDamageEvent(ent, player, null, DamageCause.ENTITY_ATTACK, getDamage(level), false, getName()));
             ent.getWorld().playSound(ent.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1.0F, 1.2F);
         } else {
             UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s %d</green>.", getName(), level);
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_IRON_GOLEM_ATTACK, 2.0f, 1.3f);
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s", getName());
         }
 
-        player.swingMainHand();
     }
 
     @Override
@@ -158,5 +155,6 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener {
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
         baseDuration = getConfig("baseDuration", 0.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
+        slowStrength = getConfig("slowStrength", 2, Integer.class);
     }
 }
