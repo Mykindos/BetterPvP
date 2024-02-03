@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.combat.armour.ArmourManager;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -33,7 +34,7 @@ public class ClassSelectionButton extends SimpleItem {
         super(ItemView.builder().material(role.getChestplate())
                 .displayName(Component.text(role.getName(), role.getColor(), TextDecoration.BOLD))
                 .lore(List.of(UtilMessage.deserialize("Class Damage Reduction: <yellow>" + armorManager.getReductionForArmourSet(role.getChestplate().name().replace("_CHESTPLATE", "")) + "%"),
-                        UtilMessage.deserialize("Effective Health: <red>" + UtilFormat.formatNumber(20 / (1 - armorManager.getReductionForArmourSet(role.getChestplate().name().replace("_CHESTPLATE", "")) / 100), 1))))
+                        UtilMessage.deserialize("Effective Health: <red>" + (int) Math.floor(20 / (1 - armorManager.getReductionForArmourSet(role.getChestplate().name().replace("_CHESTPLATE", "")) / 100)))))
                 .flag(ItemFlag.HIDE_ATTRIBUTES)
                 .build());
         this.buildManager = buildManager;

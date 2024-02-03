@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -24,8 +25,11 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 public class Cleave extends Skill implements PassiveSkill, Listener {
 
     private double baseDistance;
-
     private double distanceIncreasePerLevel;
+    private double percentageOfDamage;
+    private double percentageOfDamageIncreasePerLevel;
+    private int maxEnemiesHit;
+    private int maxEnemiesHitIncreasePerLevel;
 
     @Inject
     public Cleave(Champions champions, ChampionsManager championsManager) {
@@ -41,14 +45,25 @@ public class Cleave extends Skill implements PassiveSkill, Listener {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Your axe attacks cleave onto nearby targets and deal damage",
+                "Your attacks deal <stat>" + UtilFormat.formatNumber((getPercentageOfDamage(level) * 100), 2) + "%</stat> of your damage to",
+                "all enemies within <val>" + getDistance(level) + "</val> blocks of your target enemy.",
                 "",
-                "Distance: <val>" + getDistance(level),
+                "Max Enemies Hit: <val>" + getMaxEnemiesHit(level) + "</val>",
+                "",
+                "Only works with axes."
         };
     }
 
+    public double getPercentageOfDamage(int level) {
+        return percentageOfDamage + ((level - 1) * percentageOfDamageIncreasePerLevel);
+    }
+
+    public double getMaxEnemiesHit(int level) {
+        return maxEnemiesHit + ((level - 1) * maxEnemiesHitIncreasePerLevel);
+    }
+
     public double getDistance(int level) {
-        return baseDistance + level * distanceIncreasePerLevel;
+        return baseDistance + ((level -1) * distanceIncreasePerLevel);
     }
 
     @Override
@@ -70,11 +85,16 @@ public class Cleave extends Skill implements PassiveSkill, Listener {
         if (event.hasReason(getName())) return; // Don't get stuck in an endless damage loop
 
         int level = getLevel(damager);
+        int enemiesHit = 0;
         if (level > 0) {
-            for (var target : UtilEntity.getNearbyEntities(damager, damager.getLocation(), getDistance(level), EntityProperty.ENEMY)) {
+            System.out.println(getDistance(level) + " : " + UtilEntity.getNearbyEntities(damager, event.getDamagee().getLocation(), getDistance(level), EntityProperty.ENEMY).size());
+            for (var target : UtilEntity.getNearbyEntities(damager, event.getDamagee().getLocation(), getDistance(level), EntityProperty.ENEMY)) {
                 if (target.get().equals(event.getDamagee())) continue;
+                if (enemiesHit >= getMaxEnemiesHit(level)) continue;
 
-                UtilDamage.doCustomDamage(new CustomDamageEvent(target.getKey(), damager, null, DamageCause.ENTITY_ATTACK, event.getDamage(), true, getName()));
+
+                UtilDamage.doCustomDamage(new CustomDamageEvent(target.getKey(), damager, null, DamageCause.ENTITY_ATTACK, event.getDamage() * getPercentageOfDamage(level), true, getName()));
+                enemiesHit++;
             }
         }
     }
@@ -83,6 +103,10 @@ public class Cleave extends Skill implements PassiveSkill, Listener {
     public void loadSkillConfig() {
         baseDistance = getConfig("baseDistance", 2.0, Double.class);
         distanceIncreasePerLevel = getConfig("distanceIncreasePerLevel", 1.0, Double.class);
+        percentageOfDamage = getConfig("percentageOfDamage", 0.25, Double.class);
+        percentageOfDamageIncreasePerLevel = getConfig("percentageOfDamageIncreasePerLevel", 0.10, Double.class);
+        maxEnemiesHit = getConfig("maxEnemiesHit", 3, Integer.class);
+        maxEnemiesHitIncreasePerLevel = getConfig("maxEnemiesHitIncreasePerLevel", 1, Integer.class);
     }
 
 
