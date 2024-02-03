@@ -294,6 +294,8 @@ skills:
       energyPerSecond: 32.0
       cooldownDecreasePerLevel: 1.0
       energyDecreasePerLevel: 1.0
+      collisionRadius: 1.8
+      explosionRadius: 4.0
     rupture:
       enabled: true
       cooldown: 12.0
