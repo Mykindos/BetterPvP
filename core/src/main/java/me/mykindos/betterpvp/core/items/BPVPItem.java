@@ -123,8 +123,10 @@ public class BPVPItem {
         }
         if (customModelData != 0) {
             if (itemMeta.hasCustomModelData()) {
+                log.warn(String.valueOf(itemMeta.hasCustomModelData()));
                 return itemMeta.getCustomModelData() == customModelData;
             }
+            return false;
         }
         return true;
     }
