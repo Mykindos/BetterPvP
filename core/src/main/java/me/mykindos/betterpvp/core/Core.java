@@ -15,6 +15,9 @@ import me.mykindos.betterpvp.core.config.ConfigInjectorModule;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.SharedDatabase;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
+import me.mykindos.betterpvp.core.framework.adapter.Adapters;
+import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
+import me.mykindos.betterpvp.core.framework.adapter.PluginAdapters;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
 import me.mykindos.betterpvp.core.injector.CoreInjectorModule;
 import me.mykindos.betterpvp.core.items.ItemHandler;
@@ -92,6 +95,10 @@ public class Core extends BPvPPlugin {
 
         InvUI.getInstance().setPlugin(this);
 
+        final Adapters adapters = new Adapters(this);
+        final Reflections reflectionAdapters = new Reflections(PACKAGE);
+        adapters.loadAdapters(reflectionAdapters.getTypesAnnotatedWith(PluginAdapter.class));
+        adapters.loadAdapters(reflectionAdapters.getTypesAnnotatedWith(PluginAdapters.class));
     }
 
     @Override
