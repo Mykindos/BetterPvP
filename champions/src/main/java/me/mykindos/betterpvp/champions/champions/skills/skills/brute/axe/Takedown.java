@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
@@ -40,14 +41,13 @@ import java.util.WeakHashMap;
 public class Takedown extends Skill implements InteractSkill, CooldownSkill, Listener {
 
     private final WeakHashMap<Player, Long> active = new WeakHashMap<>();
-
     private double damage;
-
     private double baseDuration;
-
     private double durationIncreasePerLevel;
-
     private int slownessStrength;
+    private double recoilDamage;
+    private double recoilDamageIncreasePerLevel;
+    private double damageIncreasePerLevel;
 
     @Inject
     public Takedown(Champions champions, ChampionsManager championsManager) {
@@ -65,16 +65,22 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Hurl yourself forwards",
-                "",
-                "If you collide with an enemy, you both",
-                "take <stat>" + damage + "</stat> damage and receive <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength + 1) + "</effect>",
-                "for <val>" + getDuration(level) + "</val> seconds",
+                "Hurl yourself forwards, dealing <val>" + getDamage(level) + "</val> damage,",
+                "taking <val>" + getRecoilDamage(level)+"</val> damage, and applying <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength + 1) + "</effect>",
+                "to yourself and the target for <val>" + getDuration(level) + "</val> seconds",
                 "",
                 "Cannot be used while grounded",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
+    }
+
+    public double getDamage(int level){
+        return damage + (level * damageIncreasePerLevel);
+    }
+
+    public double getRecoilDamage(int level){
+        return recoilDamage + level * recoilDamageIncreasePerLevel;
     }
 
     public double getDuration(int level) {
@@ -118,9 +124,6 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
 
 
             if (UtilBlock.isGrounded(player)) {
-                if (!player.hasPotionEffect(PotionEffectType.SLOW)) {
-                    player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 50, slownessStrength));
-                }
                 if (UtilTime.elapsed(next.getValue(), 750L)) {
                     it.remove();
                 }
@@ -144,17 +147,20 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
         return false;
     }
 
-
     public void doTakedown(Player player, LivingEntity target) {
+        int level = getLevel(player);
+
         UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <alt>" + target.getName() + "</alt> with <alt>" + getName());
 
+        UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <alt>" + target.getName() + "</alt> with <alt>" + getName());
         UtilDamage.doCustomDamage(new CustomDamageEvent(target, player, null, DamageCause.CUSTOM, damage, false, "Takedown"));
-
 
         UtilMessage.simpleMessage(target, getClassType().getName(), "<alt>" + player.getName() + "</alt> hit you with <alt>" + getName());
         UtilDamage.doCustomDamage(new CustomDamageEvent(player, target, null, DamageCause.CUSTOM, damage, false, "Takedown Recoil"));
 
         PotionEffect pot = new PotionEffect(PotionEffectType.SLOW, (int) (getDuration(getLevel(player))) * 20, slownessStrength);
+        championsManager.getEffects().addEffect(player, EffectType.NO_JUMP, (long) ((baseDuration + (level * durationIncreasePerLevel)) * 1000L));
+        championsManager.getEffects().addEffect(target, EffectType.NO_JUMP, (long) ((baseDuration + (level * durationIncreasePerLevel)) * 1000L));
         player.addPotionEffect(pot);
         target.addPotionEffect(pot);
     }
@@ -185,9 +191,12 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
 
     @Override
     public void loadSkillConfig(){
-        damage = getConfig("damage", 10.0, Double.class);
+        damage = getConfig("damage", 5.0, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
         baseDuration = getConfig("baseDuration", 1.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
         slownessStrength = getConfig("slownessStrength", 3, Integer.class);
+        recoilDamage = getConfig("recoilDamage", 1.5, Double.class);
+        recoilDamageIncreasePerLevel = getConfig("recoilDamageIncreasePerLevel", 0.5, Double.class);
     }
 }

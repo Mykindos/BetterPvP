@@ -3,6 +3,8 @@ package me.mykindos.betterpvp.core.world;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import org.bukkit.Bukkit;
+import org.bukkit.craftbukkit.v1_20_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_20_R3.CraftWorld;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -19,6 +21,7 @@ public class CoreWorldListener implements Listener {
     @Inject
     public CoreWorldListener(WorldHandler worldHandler) {
         this.worldHandler = worldHandler;
+        ((CraftServer) Bukkit.getServer()).getServer().setFlightAllowed(true);
     }
 
     @EventHandler
