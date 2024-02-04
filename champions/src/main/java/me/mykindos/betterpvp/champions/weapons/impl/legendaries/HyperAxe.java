@@ -38,6 +38,10 @@ import java.util.List;
 public class HyperAxe extends Weapon implements InteractWeapon, LegendaryWeapon, Listener {
 
     @Inject
+    @Config(path = "weapons.hyper-axe.enabled", defaultValue = "true", configName = "weapons/legendaries")
+    private boolean enabled;
+
+    @Inject
     @Config(path = "weapons.hyper-axe.damageDelay", defaultValue = "200", configName = "weapons/legendaries")
     private int damageDelay;
 
@@ -73,7 +77,9 @@ public class HyperAxe extends Weapon implements InteractWeapon, LegendaryWeapon,
 
     @EventHandler(priority = EventPriority.LOW)
     public void onEntityDamage(CustomDamageEvent event) {
-
+        if (!enabled) {
+            return;
+        }
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
         if (!(event.getDamager() instanceof Player player)) return;
         if (!isHoldingWeapon(player)) return;
@@ -134,6 +140,11 @@ public class HyperAxe extends Weapon implements InteractWeapon, LegendaryWeapon,
 
     @Override
     public void activate(Player player) {
+        if (!enabled) {
+            UtilMessage.simpleMessage(player, getSimpleName(), "This weapon is not enabled.");
+            return;
+        }
+
         ItemStack item = player.getInventory().getItemInMainHand();
         if (!item.hasItemMeta()) return;
 
@@ -152,10 +163,19 @@ public class HyperAxe extends Weapon implements InteractWeapon, LegendaryWeapon,
 
     @Override
     public boolean canUse(Player player) {
+        if (!enabled) {
+            UtilMessage.simpleMessage(player, getSimpleName(), "This weapon is not enabled.");
+            return false;
+        }
         if (UtilBlock.isInWater(player)) {
             UtilMessage.simpleMessage(player, "Hyper Axe", "You cannot use <green>Hyper Rush <gray>in water.");
             return false;
         }
         return true;
+    }
+
+    @Override
+    public boolean isEnabled(){
+        return enabled;
     }
 }

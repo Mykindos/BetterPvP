@@ -41,6 +41,10 @@ import java.util.UUID;
 public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, LegendaryWeapon, Listener {
 
     @Inject
+    @Config(path = "weapons.alligators-tooth.enabled", defaultValue = "true", configName = "weapons/legendaries")
+    private boolean enabled;
+
+    @Inject
     @Config(path = "weapons.alligators-tooth.energy-per-tick", defaultValue = "1.0", configName = "weapons/legendaries")
     private double energyPerTick;
 
@@ -86,11 +90,18 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
 
     @Override
     public void activate(Player player) {
+        if (!enabled) {
+            UtilMessage.simpleMessage(player, getSimpleName(), "This weapon is not enabled.");
+            return;
+        }
         active.add(player.getUniqueId());
     }
 
     @UpdateEvent
     public void doAlligatorsTooth() {
+        if (!enabled) {
+            return;
+        }
         final Iterator<UUID> iterator = active.iterator();
         while (iterator.hasNext()) {
             final Player player = Bukkit.getPlayer(iterator.next());
@@ -130,6 +141,9 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
 
     @EventHandler(priority = EventPriority.LOW)
     public void onDamage(CustomDamageEvent event) {
+        if (!enabled) {
+            return;
+        }
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
         if (!(event.getDamager() instanceof Player player)) return;
         if (!isHoldingWeapon(player)) return;
@@ -143,6 +157,9 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
 
     @UpdateEvent(delay = 1000)
     public void onOxygendDrain() {
+        if (!enabled) {
+            return;
+        }
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (!UtilBlock.isInWater(player)) continue;
             if (!isHoldingWeapon(player)) continue;
@@ -152,6 +169,10 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
 
     @Override
     public boolean canUse(Player player) {
+        if (!enabled) {
+            UtilMessage.simpleMessage(player, getSimpleName(), "This weapon is not enabled.");
+            return false;
+        }
         if (!UtilBlock.isInWater(player)) {
             UtilMessage.simpleMessage(player, "Gator Stroke", "You can only use this ability in water!");
             return false;
@@ -163,6 +184,11 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
     @Override
     public double getEnergy() {
         return initialEnergyCost;
+    }
+
+    @Override
+    public boolean isEnabled(){
+        return enabled;
     }
 
 }

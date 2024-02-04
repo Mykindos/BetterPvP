@@ -30,6 +30,9 @@ import org.bukkit.potion.PotionEffectType;
 @BPvPListener
 public class MushroomStew extends Weapon implements InteractWeapon, CooldownWeapon, Listener {
 
+    @Inject
+    @Config(path = "weapons.mushroom-stew.enabled", defaultValue = "true", configName = "weapons/standard")
+    private boolean enabled;
 
     @Inject
     @Config(path = "weapons.mushroom-stew.cooldown", defaultValue = "14.0", configName = "weapons/standard")
@@ -50,6 +53,10 @@ public class MushroomStew extends Weapon implements InteractWeapon, CooldownWeap
 
     @Override
     public void activate(Player player) {
+        if (!enabled) {
+            UtilMessage.simpleMessage(player, getSimpleName(), "This weapon is not enabled.");
+            return;
+        }
 
         player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, (int) (duration * 20L), level - 1));
         UtilMessage.message(player, "Item",
@@ -61,6 +68,9 @@ public class MushroomStew extends Weapon implements InteractWeapon, CooldownWeap
 
     @EventHandler (priority = EventPriority.HIGHEST)
     public void onCraftStew(PrepareItemCraftEvent event) {
+        if (!enabled) {
+            return;
+        }
         Recipe recipe = event.getRecipe();
         if(recipe == null) return;
 
@@ -81,5 +91,10 @@ public class MushroomStew extends Weapon implements InteractWeapon, CooldownWeap
     @Override
     public double getCooldown() {
         return cooldown;
+    }
+
+    @Override
+    public boolean isEnabled(){
+        return enabled;
     }
 }

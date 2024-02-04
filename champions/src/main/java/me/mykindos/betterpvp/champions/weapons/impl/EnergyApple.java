@@ -20,6 +20,10 @@ public class EnergyApple extends Weapon implements InteractWeapon, CooldownWeapo
     private final EnergyHandler energyHandler;
 
     @Inject
+    @Config(path = "weapons.energy-apple.enabled", defaultValue = "true", configName = "weapons/standard")
+    private boolean enabled;
+
+    @Inject
     @Config(path = "weapons.energy-apple.cooldown", defaultValue = "10.0", configName = "weapons/standard")
     private double cooldown;
 
@@ -35,6 +39,10 @@ public class EnergyApple extends Weapon implements InteractWeapon, CooldownWeapo
 
     @Override
     public void activate(Player player) {
+        if (!enabled) {
+            UtilMessage.simpleMessage(player, getSimpleName(), "This weapon is not enabled.");
+            return;
+        }
         energyHandler.regenerateEnergy(player, energyRegen);
         UtilMessage.message(player, "Item",
                 Component.text("You consumed an ", NamedTextColor.GRAY).append(getName().color(NamedTextColor.YELLOW)));
@@ -49,5 +57,10 @@ public class EnergyApple extends Weapon implements InteractWeapon, CooldownWeapo
     @Override
     public double getCooldown() {
         return cooldown;
+    }
+
+    @Override
+    public boolean isEnabled(){
+        return enabled;
     }
 }

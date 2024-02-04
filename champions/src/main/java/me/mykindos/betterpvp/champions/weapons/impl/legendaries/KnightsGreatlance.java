@@ -20,7 +20,7 @@ import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.energy.EnergyHandler;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
-import me.mykindos.betterpvp.core.items.BPVPItem;
+import me.mykindos.betterpvp.core.items.BPvPItem;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
@@ -67,6 +67,10 @@ public class KnightsGreatlance extends ChannelWeapon implements InteractWeapon, 
     private final CooldownManager cooldownManager;
     private final ClientManager clientManager;
     private final EffectManager effectManager;
+
+    @Inject
+    @Config(path = "weapons.knights-greatlance.enabled", defaultValue = "true", configName = "weapons/legendaries")
+    private boolean enabled;
 
     @Inject
     @Config(path = "weapons.knights-greatlance.energy-per-tick", defaultValue = "1.0", configName = "weapons/legendaries")
@@ -128,13 +132,17 @@ public class KnightsGreatlance extends ChannelWeapon implements InteractWeapon, 
     }
 
     @Override
-    public void loadWeapon(BPVPItem item) {
+    public void loadWeapon(BPvPItem item) {
         super.loadWeapon(item);
 
     }
 
     @Override
     public void activate(Player player) {
+        if (!enabled) {
+            UtilMessage.simpleMessage(player, getSimpleName(), "This weapon is not enabled.");
+            return;
+        }
         final Gamer gamer = clientManager.search().online(player).getGamer();
         if (!active.containsKey(player)) {
             gamer.getActionBar().add(250, actionBar);
@@ -156,6 +164,9 @@ public class KnightsGreatlance extends ChannelWeapon implements InteractWeapon, 
 
     @UpdateEvent
     public void doLance() {
+        if (!enabled) {
+            return;
+        }
         final Iterator<Map.Entry<Player, LanceData>> iterator = active.entrySet().iterator();
 
         while (iterator.hasNext()) {
@@ -281,6 +292,9 @@ public class KnightsGreatlance extends ChannelWeapon implements InteractWeapon, 
 
     @EventHandler(priority = EventPriority.LOW)
     public void onDamage(CustomDamageEvent event) {
+        if (!enabled) {
+            return;
+        }
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
         if (!(event.getDamager() instanceof Player damager)) return;
         if (isHoldingWeapon(damager)) {
@@ -290,6 +304,10 @@ public class KnightsGreatlance extends ChannelWeapon implements InteractWeapon, 
 
     @Override
     public boolean canUse(Player player) {
+        if (!enabled) {
+            UtilMessage.simpleMessage(player, getSimpleName(), "This weapon is not enabled.");
+            return false;
+        }
         if (UtilBlock.isInLiquid(player)) {
             UtilMessage.simpleMessage(player, "Knight's Greatlance", "You cannot use this weapon while in water!");
             return false;
@@ -312,4 +330,8 @@ public class KnightsGreatlance extends ChannelWeapon implements InteractWeapon, 
         private int ticksCharged;
     }
 
+    @Override
+    public boolean isEnabled(){
+        return enabled;
+    }
 }

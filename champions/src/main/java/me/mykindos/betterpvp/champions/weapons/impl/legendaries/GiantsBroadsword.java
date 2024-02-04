@@ -45,6 +45,9 @@ import java.util.UUID;
 public class GiantsBroadsword extends ChannelWeapon implements InteractWeapon, LegendaryWeapon, Listener {
 
     private static final String ABILITY_NAME = "Shield";
+    @Inject
+    @Config(path = "weapons.giants-broadsword.enabled", defaultValue = "true", configName = "weapons/legendaries")
+    private boolean enabled;
 
     @Inject
     @Config(path = "weapons.giants-broadsword.energy-per-tick", defaultValue = "1.5", configName = "weapons/legendaries")
@@ -90,6 +93,10 @@ public class GiantsBroadsword extends ChannelWeapon implements InteractWeapon, L
 
     @Override
     public void activate(Player player) {
+        if (!enabled) {
+            UtilMessage.simpleMessage(player, getSimpleName(), "This weapon is not enabled.");
+            return;
+        }
         active.add(player.getUniqueId());
         player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, -1, regenAmplifier, false, false));
     }
@@ -100,6 +107,9 @@ public class GiantsBroadsword extends ChannelWeapon implements InteractWeapon, L
 
     @UpdateEvent
     public void doRegen() {
+        if (!enabled) {
+            return;
+        }
         final Iterator<UUID> iterator = active.iterator();
         while (iterator.hasNext()) {
             Player player = Bukkit.getPlayer(iterator.next());
@@ -182,6 +192,9 @@ public class GiantsBroadsword extends ChannelWeapon implements InteractWeapon, L
 
     @EventHandler
     public void onSwapWeapon(PlayerItemHeldEvent event) {
+        if (!enabled) {
+            return;
+        }
         final Player player = event.getPlayer();
         if (matches(player.getInventory().getItem(event.getNewSlot()))) {
             holdingWeapon.add(player.getUniqueId());
@@ -200,6 +213,9 @@ public class GiantsBroadsword extends ChannelWeapon implements InteractWeapon, L
 
     @EventHandler(priority = EventPriority.LOW)
     public void onDamage(CustomDamageEvent event) {
+        if (!enabled) {
+            return;
+        }
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
         if (!(event.getDamager() instanceof Player damager)) return;
         if (isHoldingWeapon(damager)) {
@@ -213,6 +229,10 @@ public class GiantsBroadsword extends ChannelWeapon implements InteractWeapon, L
 
     @Override
     public boolean canUse(Player player) {
+        if (!enabled) {
+            UtilMessage.simpleMessage(player, getSimpleName(), "This weapon is not enabled.");
+            return false;
+        }
         return true;
     }
 
@@ -224,5 +244,10 @@ public class GiantsBroadsword extends ChannelWeapon implements InteractWeapon, L
     @Override
     public boolean useShield(Player player) {
         return active.contains(player.getUniqueId());
+    }
+
+    @Override
+    public boolean isEnabled(){
+        return enabled;
     }
 }

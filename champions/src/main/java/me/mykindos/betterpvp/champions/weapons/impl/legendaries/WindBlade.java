@@ -38,6 +38,10 @@ import java.util.List;
 public class WindBlade extends ChannelWeapon implements InteractWeapon, LegendaryWeapon, Listener {
 
     @Inject
+    @Config(path = "weapons.wind-blade.enabled", defaultValue = "true", configName = "weapons/legendaries")
+    private boolean enabled;
+
+    @Inject
     @Config(path = "weapons.wind-blade.energy-per-tick", defaultValue = "1.5", configName = "weapons/legendaries")
     private double energyPerTick;
 
@@ -80,11 +84,18 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
 
     @Override
     public void activate(Player player) {
+        if (!enabled) {
+            UtilMessage.simpleMessage(player, getSimpleName(), "This weapon is not enabled.");
+            return;
+        }
         active.add(player.getUniqueId());
     }
 
     @UpdateEvent
     public void doWindBlade() {
+        if (!enabled) {
+            return;
+        }
         active.removeIf(uuid -> {
             Player player = Bukkit.getPlayer(uuid);
             if (player == null) return true;
@@ -123,6 +134,9 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
 
     @EventHandler(priority = EventPriority.LOW)
     public void onDamage(CustomDamageEvent event) {
+        if (!enabled) {
+            return;
+        }
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
         if (!(event.getDamager() instanceof Player damager)) return;
         if (isHoldingWeapon(damager)) {
@@ -132,6 +146,9 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
 
     @EventHandler
     public void onFall(EntityDamageEvent event) {
+        if (!enabled) {
+            return;
+        }
         if (!(event.getEntity() instanceof Player player)) return;
         if (event.getCause() != EntityDamageEvent.DamageCause.FALL) return;
         if (isHoldingWeapon(player)) {
@@ -141,6 +158,10 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
 
     @Override
     public boolean canUse(Player player) {
+        if (!enabled) {
+            UtilMessage.simpleMessage(player, getSimpleName(), "This weapon is not enabled.");
+            return false;
+        }
         if (UtilBlock.isInLiquid(player)) {
             UtilMessage.simpleMessage(player, "Wind Blade", "You cannot use this weapon while in water!");
             return false;
@@ -152,5 +173,10 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
     @Override
     public double getEnergy() {
         return initialEnergyCost;
+    }
+
+    @Override
+    public boolean isEnabled(){
+        return enabled;
     }
 }

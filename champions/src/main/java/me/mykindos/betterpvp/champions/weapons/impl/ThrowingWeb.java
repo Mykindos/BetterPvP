@@ -11,12 +11,12 @@ import me.mykindos.betterpvp.core.combat.weapon.types.InteractWeapon;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
-import me.mykindos.betterpvp.core.items.BPVPItem;
+import me.mykindos.betterpvp.core.items.BPvPItem;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -38,6 +38,10 @@ import java.util.UUID;
 @Singleton
 @BPvPListener
 public class ThrowingWeb extends Weapon implements Listener, InteractWeapon, CooldownWeapon, ThrowableListener {
+
+    @Inject
+    @Config(path = "weapons.throwing-web.enabled", defaultValue = "true", configName = "weapons/standard")
+    private boolean enabled;
 
     @Inject
     @Config(path = "weapons.throwing-web.cooldown", defaultValue = "10.0", configName = "weapons/standard")
@@ -67,7 +71,7 @@ public class ThrowingWeb extends Weapon implements Listener, InteractWeapon, Coo
     }
 
     @Override
-    public void loadWeapon(BPVPItem item) {
+    public void loadWeapon(BPvPItem item) {
         super.loadWeapon(item);
         ShapedRecipe shapedRecipe = getShapedRecipe("*S*", "SSS", "*S*");
         shapedRecipe.setIngredient('*', Material.AIR);
@@ -77,11 +81,15 @@ public class ThrowingWeb extends Weapon implements Listener, InteractWeapon, Coo
 
     @Override
     public void activate(Player player) {
+        if (!enabled) {
+            UtilMessage.simpleMessage(player, getSimpleName(), "This weapon is not enabled.");
+            return;
+        }
         Item item = player.getWorld().dropItem(player.getEyeLocation(), new ItemStack(Material.COBWEB));
         item.getItemStack().getItemMeta().getPersistentDataContainer().set(CoreNamespaceKeys.UUID_KEY, PersistentDataType.STRING, UUID.randomUUID().toString());
         item.setVelocity(player.getLocation().getDirection().multiply(1.8));
 
-        ThrowableItem throwableItem = new ThrowableItem(this, item, player, "Throwing Web", (long) (throwableExpiry * 1000L), true);
+        ThrowableItem throwableItem = new ThrowableItem(this, item, player, getSimpleName(), (long) (throwableExpiry * 1000L), true);
         throwableItem.setCollideGround(true);
         throwableItem.getImmunes().add(player);
         championsManager.getThrowables().addThrowable(throwableItem);
@@ -91,9 +99,11 @@ public class ThrowingWeb extends Weapon implements Listener, InteractWeapon, Coo
 
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
+        if (!enabled) {
+            return;
+        }
         if (event.useItemInHand() != Event.Result.DENY && event.getAction().isLeftClick() && matches(event.getItem())) {
-            String name = PlainTextComponentSerializer.plainText().serialize(getName());
-            if (cooldownManager.use(event.getPlayer(), name, getCooldown(), showCooldownFinished(), true, false, x -> isHoldingWeapon(event.getPlayer()))) {
+            if (cooldownManager.use(event.getPlayer(), getSimpleName(), getCooldown(), showCooldownFinished(), true, false, x -> isHoldingWeapon(event.getPlayer()))) {
                 activate(event.getPlayer()); // also activate on left click
             }
         }
@@ -134,5 +144,8 @@ public class ThrowingWeb extends Weapon implements Listener, InteractWeapon, Coo
         return cooldown;
     }
 
-
+    @Override
+    public boolean isEnabled(){
+        return enabled;
+    }
 }

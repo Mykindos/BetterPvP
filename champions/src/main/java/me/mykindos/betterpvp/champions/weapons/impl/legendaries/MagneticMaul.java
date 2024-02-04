@@ -51,6 +51,10 @@ public class MagneticMaul extends ChannelWeapon implements InteractWeapon, Legen
     private static final String ABILITY_NAME = "Magnetism";
 
     @Inject
+    @Config(path = "weapons.magnetic-maul.enabled", defaultValue = "true", configName = "weapons/legendaries")
+    private boolean enabled;
+
+    @Inject
     @Config(path = "weapons.magnetic-maul.energy-per-tick", defaultValue = "1.0", configName = "weapons/legendaries")
     private double energyPerTick;
 
@@ -96,16 +100,27 @@ public class MagneticMaul extends ChannelWeapon implements InteractWeapon, Legen
 
     @Override
     public void activate(Player player) {
+        if (!enabled) {
+            UtilMessage.simpleMessage(player, getSimpleName(), "This weapon is not enabled.");
+            return;
+        }
         active.add(player.getUniqueId());
     }
 
     @Override
     public boolean canUse(Player player) {
+        if (!enabled) {
+            UtilMessage.simpleMessage(player, getSimpleName(), "This weapon is not enabled.");
+            return false;
+        }
         return true;
     }
 
     @UpdateEvent
     public void doMaul() {
+        if (!enabled) {
+           return;
+        }
         active.removeIf(uuid -> {
             Player player = Bukkit.getPlayer(uuid);
             if (player == null) return true;
@@ -222,6 +237,9 @@ public class MagneticMaul extends ChannelWeapon implements InteractWeapon, Legen
 
     @EventHandler(priority = EventPriority.LOW)
     public void onDamage(CustomDamageEvent event) {
+        if (!enabled) {
+            return;
+        }
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
         if (!(event.getDamager() instanceof Player damager)) return;
         if (isHoldingWeapon(damager)) {
@@ -232,6 +250,9 @@ public class MagneticMaul extends ChannelWeapon implements InteractWeapon, Legen
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onKB(CustomKnockbackEvent event) {
+        if (!enabled) {
+            return;
+        }
         if (!(event.getDamager() instanceof Player damager)) {
             return;
         }
@@ -252,4 +273,8 @@ public class MagneticMaul extends ChannelWeapon implements InteractWeapon, Legen
         return initialEnergyCost;
     }
 
+    @Override
+    public boolean isEnabled(){
+        return enabled;
+    }
 }
