@@ -69,7 +69,7 @@ public class MarkedForDeath extends PrepareArrowSkill {
 
     @Override
     public void onHit(Player damager, LivingEntity target, int level) {
-        UtilMessage.message(damager, getClassType().getName(), "You hit <yellow>%s</yellow> with <green>%s %s</green>.", target.getName(), getName(), level);
+        UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit <yellow>%s</yellow> with <green>%s %s</green>.", target.getName(), getName(), level);
         championsManager.getEffects().addEffect(target, EffectType.VULNERABILITY, vulnerabilityStrength, (long) ((baseDuration + (level * durationIncreasePerLevel) * 1000L)));
         if (!(target instanceof Player damagee)) return;
         UtilMessage.simpleMessage(damagee, getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s %s</alt>.", damager.getName(), getName(), level);
@@ -91,12 +91,6 @@ public class MarkedForDeath extends PrepareArrowSkill {
     public double getCooldown(int level) {
         return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
-
-    @Override
-    public boolean isCancellable() {
-        return true;
-    }
-
 
     @Override
     public void activate(Player player, int level) {
