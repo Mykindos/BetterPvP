@@ -8,12 +8,14 @@ import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.core.mobs.ActiveMob;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageIndicatorEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -61,7 +63,7 @@ public class DamageIndicatorAdapter implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onDamage(final CustomDamageEvent event) {
-        if (!enabled || !(event.getDamager() instanceof Player player)) {
+        if (!enabled || !(event.getDamager() instanceof Player player) || event.getDamagee() instanceof Player) {
             return;
         }
 
@@ -69,6 +71,9 @@ public class DamageIndicatorAdapter implements Listener {
         if (mobOpt.isEmpty()) {
             return; // Only add damage indicators for mythic mobs
         }
+
+        DamageIndicatorEvent damageIndicatorEvent = UtilServer.callEvent(new DamageIndicatorEvent(player, event.getDamagee(), event.getDamage()));
+        if(damageIndicatorEvent.isCancelled()) return;
 
         final Vector direction = player.getEyeLocation().getDirection();
         final Location spawnPoint;
