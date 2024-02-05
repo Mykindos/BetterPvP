@@ -52,7 +52,7 @@ public class Fury extends Skill implements PassiveSkill, Listener {
 
     @Override
     public SkillType getType() {
-        return SkillType.PASSIVE_A;
+        return SkillType.PASSIVE_B;
     }
 
     @EventHandler(priority = EventPriority.HIGH)
