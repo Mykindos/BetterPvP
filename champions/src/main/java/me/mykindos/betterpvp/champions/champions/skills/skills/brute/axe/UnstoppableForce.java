@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
@@ -146,7 +147,7 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill {
                     var cde = UtilDamage.doCustomDamage(new CustomDamageEvent(target, player, player, EntityDamageEvent.DamageCause.ENTITY_ATTACK, 20, false));
                     if (cde != null && !cde.isCancelled()) {
                         VelocityData targetVelocityData = new VelocityData(player.getLocation().getDirection(), 2, true, 0.4, 0.4, 0.4, true);
-                        UtilVelocity.velocity(target, player, targetVelocityData);
+                        UtilVelocity.velocity(target, player, targetVelocityData, VelocityType.KNOCKBACK);
                         player.getWorld().playSound(target.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.5f, 0.9f);
                     }
                 }
