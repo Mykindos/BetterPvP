@@ -141,7 +141,6 @@ public class HyperAxe extends Weapon implements InteractWeapon, LegendaryWeapon,
     @Override
     public void activate(Player player) {
         if (!enabled) {
-            UtilMessage.simpleMessage(player, getSimpleName(), "This weapon is not enabled.");
             return;
         }
 
@@ -164,7 +163,6 @@ public class HyperAxe extends Weapon implements InteractWeapon, LegendaryWeapon,
     @Override
     public boolean canUse(Player player) {
         if (!enabled) {
-            UtilMessage.simpleMessage(player, getSimpleName(), "This weapon is not enabled.");
             return false;
         }
         if (UtilBlock.isInWater(player)) {

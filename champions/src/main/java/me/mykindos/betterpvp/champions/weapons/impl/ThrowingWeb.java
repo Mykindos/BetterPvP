@@ -15,7 +15,6 @@ import me.mykindos.betterpvp.core.items.BPvPItem;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -82,7 +81,6 @@ public class ThrowingWeb extends Weapon implements Listener, InteractWeapon, Coo
     @Override
     public void activate(Player player) {
         if (!enabled) {
-            UtilMessage.simpleMessage(player, getSimpleName(), "This weapon is not enabled.");
             return;
         }
         Item item = player.getWorld().dropItem(player.getEyeLocation(), new ItemStack(Material.COBWEB));

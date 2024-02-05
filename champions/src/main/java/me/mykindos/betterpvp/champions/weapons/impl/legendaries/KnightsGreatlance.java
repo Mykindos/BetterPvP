@@ -140,7 +140,6 @@ public class KnightsGreatlance extends ChannelWeapon implements InteractWeapon, 
     @Override
     public void activate(Player player) {
         if (!enabled) {
-            UtilMessage.simpleMessage(player, getSimpleName(), "This weapon is not enabled.");
             return;
         }
         final Gamer gamer = clientManager.search().online(player).getGamer();
@@ -305,7 +304,6 @@ public class KnightsGreatlance extends ChannelWeapon implements InteractWeapon, 
     @Override
     public boolean canUse(Player player) {
         if (!enabled) {
-            UtilMessage.simpleMessage(player, getSimpleName(), "This weapon is not enabled.");
             return false;
         }
         if (UtilBlock.isInLiquid(player)) {

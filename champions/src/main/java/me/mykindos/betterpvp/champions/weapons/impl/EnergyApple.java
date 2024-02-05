@@ -40,7 +40,6 @@ public class EnergyApple extends Weapon implements InteractWeapon, CooldownWeapo
     @Override
     public void activate(Player player) {
         if (!enabled) {
-            UtilMessage.simpleMessage(player, getSimpleName(), "This weapon is not enabled.");
             return;
         }
         energyHandler.regenerateEnergy(player, energyRegen);

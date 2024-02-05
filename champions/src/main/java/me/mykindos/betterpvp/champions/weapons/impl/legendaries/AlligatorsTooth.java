@@ -91,7 +91,7 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
     @Override
     public void activate(Player player) {
         if (!enabled) {
-            UtilMessage.simpleMessage(player, getSimpleName(), "This weapon is not enabled.");
+            //UtilMessage.simpleMessage(player, getSimpleName(), "This weapon is not enabled.");
             return;
         }
         active.add(player.getUniqueId());
@@ -170,7 +170,6 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
     @Override
     public boolean canUse(Player player) {
         if (!enabled) {
-            UtilMessage.simpleMessage(player, getSimpleName(), "This weapon is not enabled.");
             return false;
         }
         if (!UtilBlock.isInWater(player)) {

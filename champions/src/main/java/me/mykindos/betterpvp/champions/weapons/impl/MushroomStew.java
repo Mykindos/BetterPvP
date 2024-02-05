@@ -54,7 +54,6 @@ public class MushroomStew extends Weapon implements InteractWeapon, CooldownWeap
     @Override
     public void activate(Player player) {
         if (!enabled) {
-            UtilMessage.simpleMessage(player, getSimpleName(), "This weapon is not enabled.");
             return;
         }
 
