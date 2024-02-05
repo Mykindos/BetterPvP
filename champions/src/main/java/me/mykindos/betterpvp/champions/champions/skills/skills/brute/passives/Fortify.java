@@ -16,18 +16,18 @@ import org.bukkit.event.EventPriority;
 
 @Singleton
 @BPvPListener
-public class Resistance extends Skill implements PassiveSkill {
+public class Fortify extends Skill implements PassiveSkill {
 
     public int increasePerLevel;
 
     @Inject
-    public Resistance(Champions champions, ChampionsManager championsManager) {
+    public Fortify(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
 
     @Override
     public String getName() {
-        return "Resistance";
+        return "Fortify";
     }
 
     @Override
@@ -81,6 +81,6 @@ public class Resistance extends Skill implements PassiveSkill {
 
     @Override
     public void loadSkillConfig(){
-        increasePerLevel = getConfig("increasePerLevel", 15, Integer.class);
+        increasePerLevel = getConfig("increasePerLevel", 10, Integer.class);
     }
 }

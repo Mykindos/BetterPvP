@@ -5,12 +5,13 @@ import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
 
 public class UtilDamage {
 
-    public static void doCustomDamage(CustomDamageEvent event) {
+    public static CustomDamageEvent doCustomDamage(CustomDamageEvent event) {
 
         PreCustomDamageEvent preCustomDamageEvent = UtilServer.callEvent(new PreCustomDamageEvent(event));
         if (!preCustomDamageEvent.isCancelled()) {
-            UtilServer.callEvent(event);
+            return UtilServer.callEvent(event);
         }
 
+        return null;
     }
 }

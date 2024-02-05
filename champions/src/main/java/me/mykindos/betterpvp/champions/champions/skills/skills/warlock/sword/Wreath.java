@@ -17,6 +17,8 @@ import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilPlayer;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -46,17 +48,13 @@ public class Wreath extends PrepareSkill implements CooldownSkill {
     private final WeakHashMap<Player, Long> cooldowns = new WeakHashMap<>();
 
     private int baseNumAttacks;
-
     private int numAttacksIncreasePerLevel;
     private double baseSlowDuration;
-
     private double slowDurationIncreasePerLevel;
-
     private double baseDamage;
-
     private double damageIncreasePerLevel;
-
     private int slowStrength;
+    private double healthPerEnemyHit;
 
     @Inject
     public Wreath(Champions champions, ChampionsManager championsManager) {
@@ -75,7 +73,9 @@ public class Wreath extends PrepareSkill implements CooldownSkill {
                 "",
                 "Your next <stat>" + getNumAttacks(level) + "</stat> attacks will release a barrage of",
                 "teeth that deal <val>" + String.format("%.2f", getDamage(level)) + "</val> damage and apply <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength + 1) + "</effect>",
-                "to their target for <stat>" + getSlowDuration(level) + "</stat> seconds",
+                "to their target for <stat>" + getSlowDuration(level) + "</stat> seconds.",
+                "",
+                "For each enemy hit, restore <val>" + healthPerEnemyHit + "</val> health.",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -184,21 +184,15 @@ public class Wreath extends PrepareSkill implements CooldownSkill {
                         CustomDamageEvent dmg = new CustomDamageEvent(target, player, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, getName());
                         UtilDamage.doCustomDamage(dmg);
                         target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) (getSlowDuration(level) * 20), slowStrength));
+                        UtilPlayer.health(player, healthPerEnemyHit);
                     }
 
                 }
 
             }.runTaskTimer(champions, 0, 1);
 
-            new BukkitRunnable() {
+            UtilServer.runTaskLater(champions, runnable::cancel, 60);
 
-                @Override
-                public void run() {
-                    runnable.cancel();
-
-                }
-
-            }.runTaskLater(champions, 60);
         } else {
             actives.remove(player);
         }
@@ -246,6 +240,8 @@ public class Wreath extends PrepareSkill implements CooldownSkill {
 
         baseDamage = getConfig("baseDamage", 2.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.66, Double.class);
+
+        healthPerEnemyHit = getConfig("healthPerEnemyHit", 1.0, Double.class);
 
         slowStrength = getConfig("slowStrength", 1, Integer.class);
     }

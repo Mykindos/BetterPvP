@@ -94,7 +94,7 @@ public class SmokeBomb extends Skill implements ToggleSkill, CooldownSkill, List
 
     @Override
     public SkillType getType() {
-        return SkillType.PASSIVE_B;
+        return SkillType.PASSIVE_A;
     }
 
     public double getDuration(int level) {
