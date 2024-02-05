@@ -19,6 +19,7 @@ import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Material;
@@ -111,7 +112,10 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
 
             event.setKnockback(false);
             event.setDamage(0);
-            UtilVelocity.velocity(damagee, vec, 3D, true, 0.0D, 0.4D, 1.5D, true);
+
+            VelocityData velocityData = new VelocityData(vec, 3, true, 0, 0.4, 1.5, true);
+            UtilVelocity.velocity(damagee, event.getDamager(), velocityData);
+
             championsManager.getEffects().addEffect(damagee, EffectType.NOFALL, 3000);
             ent.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) (getSlowDuration(level) * 20), slowStrength));
             UtilMessage.message(damagee, getClassType().getName(), "You successfully disengaged.");

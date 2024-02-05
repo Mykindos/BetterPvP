@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -137,14 +138,8 @@ public class RopedArrow extends PrepareArrowSkill {
         final int curStrength = this.strength.getOrDefault(player, 0);
         double mult = arrow.getVelocity().length() / 3.0D;
 
-        UtilVelocity.velocity(player,
-                vec,
-                2.5D + mult * curStrength,
-                false,
-                0.8D,
-                0.3D * mult,
-                1.5D * mult,
-                true);
+        VelocityData velocityData = new VelocityData(vec, 2.5D + mult * curStrength, false, 0.8D, 0.3D * mult, 1.5D * mult, true);
+        UtilVelocity.velocity(player, null, velocityData);
 
         arrow.getWorld().playSound(arrow.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
         arrows.remove(arrow);

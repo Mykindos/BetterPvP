@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
+import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
@@ -70,6 +71,8 @@ public class SkillButton extends ControlItem<SkillMenu> {
 
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
+        if (clickType == ClickType.DOUBLE_CLICK) return;
+
         BuildSkill buildSkill = roleBuild.getBuildSkill(skill.getType());
 
         int currentLevel = buildSkill == null ? 0 : buildSkill.getLevel();
@@ -145,6 +148,8 @@ public class SkillButton extends ControlItem<SkillMenu> {
             UtilServer.callEvent(new SkillUpdateEvent(player, buildSkill.getSkill(), roleBuild));
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1.0F, 2.0F);
             getGui().updateControlItems();
+        } else {
+            SoundEffect.WRONG_ACTION.play(player);
         }
     }
 

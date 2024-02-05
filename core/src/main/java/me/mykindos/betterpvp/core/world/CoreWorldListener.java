@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.world;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import io.papermc.paper.configuration.GlobalConfiguration;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_20_R3.CraftServer;
@@ -22,6 +23,7 @@ public class CoreWorldListener implements Listener {
     public CoreWorldListener(WorldHandler worldHandler) {
         this.worldHandler = worldHandler;
         ((CraftServer) Bukkit.getServer()).getServer().setFlightAllowed(true);
+        GlobalConfiguration.get().collisions.enablePlayerCollisions = false;
     }
 
     @EventHandler
@@ -30,7 +32,8 @@ public class CoreWorldListener implements Listener {
             worldHandler.loadSpawnLocations();
         }
 
-        ((CraftWorld) event.getWorld()).getHandle().getLevel().paperConfig().misc.disableRelativeProjectileVelocity = true;
+        var paperConfig = ((CraftWorld) event.getWorld()).getHandle().getLevel().paperConfig();
+        paperConfig.misc.disableRelativeProjectileVelocity = true;
     }
 
     @EventHandler

@@ -193,9 +193,12 @@ skills:
     cleave:
       enabled: true
       maxlevel: 3
-      baseDamage: 4.0
-      baseDistance: 2.0
-      distanceIncreasePerLevel: 1.0
+      baseDistance: 3.0
+      distanceIncreasePerLevel: 0.5
+      percentageOfDamage: 0.45
+      percentageOfDamageIncreasePerLevel: 0.15
+      maxEnemiesHit: 2
+      maxEnemiesHitIncreasePerLevel: 1
     riposte:
       enabled: true
       maxlevel: 3
@@ -291,6 +294,8 @@ skills:
       energyPerSecond: 32.0
       cooldownDecreasePerLevel: 1.0
       energyDecreasePerLevel: 1.0
+      collisionRadius: 1.8
+      explosionRadius: 4.0
     rupture:
       enabled: true
       cooldown: 12.0
@@ -527,18 +532,18 @@ skills:
       maxlevel: 5
       cooldown: 18.0
       cooldownDecreasePerLevel: 2.0
-      damage: 7.0
-      damageIncreasePerLevel: 2.0
+      damage: 5.0
+      damageIncreasePerLevel: 1.0
     colossus:
       enabled: true
       maxlevel: 3
-      reductionPerLevel: 0.25
+      reductionPerLevel: 0.20
     takedown:
       enabled: true
       maxlevel: 5
       cooldown: 25.0
       damage: 5.0
-      cooldownDecreasePerLevel: 1.0
+      cooldownDecreasePerLevel: 2.0
       baseDuration: 1.0
       durationIncreasePerLevel: 1.0
       slownessStrength: 3

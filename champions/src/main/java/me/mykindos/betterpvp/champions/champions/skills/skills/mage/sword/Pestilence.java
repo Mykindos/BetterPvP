@@ -155,6 +155,7 @@ public class Pestilence extends PrepareSkill implements CooldownSkill {
     @EventHandler
     public void onDamageReduction(CustomDamageEvent event) {
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
+        if (event.getDamager() == null) return;
         if (!event.getDamager().hasPotionEffect(PotionEffectType.POISON)) return;
 
         if (isInfected(event.getDamager())) {

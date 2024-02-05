@@ -31,7 +31,7 @@ import java.util.Set;
 public class ClansSidebarListener implements Listener {
 
     @Inject
-    @Config(path = "server.sidebar.title", defaultValue = "BetterPvP")
+    @Config(path = "server.sidebar.title", defaultValue = "Mineplex Clans")
     private String sidebarTitle;
 
     @Inject
@@ -56,12 +56,7 @@ public class ClansSidebarListener implements Listener {
             return;
         }
 
-        final Optional<Client> clientOpt = clientManager.search().online(event.getPlayer().getUniqueId());
-        if (clientOpt.isEmpty()) {
-            return;
-        }
-
-        final Client client = clientOpt.get();
+        final Client client = clientManager.search().online(event.getPlayer());
         if (!client.isLoaded()) {
             return;
         }
