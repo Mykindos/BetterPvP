@@ -132,6 +132,8 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
                 count++;
             }
         }
+
+        throwableItem.getItem().remove();
     }
 
 
@@ -141,7 +143,7 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
         orb.setVelocity(player.getLocation().getDirection());
         orb.setCanPlayerPickup(false);
         orb.setCanMobPickup(false);
-        ThrowableItem throwableItem = new ThrowableItem(this, orb, player, "Lightning Orb", 10000, true);
+        ThrowableItem throwableItem = new ThrowableItem(this, orb, player, "Lightning Orb", 10000, false);
         championsManager.getThrowables().addThrowable(throwableItem);
     }
 
