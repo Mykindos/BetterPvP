@@ -555,7 +555,7 @@ skills:
       maxlevel: 5
       cooldown: 15.0
       cooldownDecreasePerLevel: 1.0
-      energy: 45
+      energy: 55
       energyDecreasePerLevel: 3.0
       baseDamage: 4.0
       damageIncreasePerLevel: 1.0

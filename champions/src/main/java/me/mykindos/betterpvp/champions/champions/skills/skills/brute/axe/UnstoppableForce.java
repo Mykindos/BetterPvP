@@ -223,12 +223,21 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill {
     }
 
     @Override
+    public boolean canUse(Player player) {
+        if(!UtilBlock.isGrounded(player, 2)) {
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You must be on the ground to use this skill.");
+            return false;
+        }
+        return isHolding(player);
+    }
+
+    @Override
     public void loadSkillConfig() {
         baseDamage = getConfig("baseDamage", 4.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
         cooldown = getConfig("cooldown", 15.0, Double.class);
         cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 1.0, Double.class);
-        energy = getConfig("energy", 25, Integer.class);
+        energy = getConfig("energy", 55, Integer.class);
         energyDecreasePerLevel = getConfig("energyDecreasePerLevel", 1.0, Double.class);
         hitboxExpansion = getConfig("hitboxExpansion", 0.3, Double.class);
     }
