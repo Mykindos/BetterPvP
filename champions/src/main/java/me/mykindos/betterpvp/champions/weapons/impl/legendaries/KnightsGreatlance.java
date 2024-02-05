@@ -245,8 +245,8 @@ public class KnightsGreatlance extends ChannelWeapon implements InteractWeapon, 
                         ATTACK_NAME));
 
                 // Velocity
-                final Vector knockback = player.getLocation().getDirection();
-                VelocityData velocityData = new VelocityData(knockback, 2.6, true, 0, 0.2, 1.4, true);
+                final Vector vec = player.getLocation().getDirection();
+                VelocityData velocityData = new VelocityData(vec, 2.6, true, 0, 0.2, 1.4, true);
                 UtilVelocity.velocity(hitEnt, player, velocityData);
 
                 // Cooldown
@@ -266,9 +266,8 @@ public class KnightsGreatlance extends ChannelWeapon implements InteractWeapon, 
 
             // Move
             data.setLastLocation(newLocation);
-            Vector direction = player.getLocation().getDirection().multiply(chargeVelocity);
-            direction.setY(0); // Make them stick to the ground
-            player.setVelocity(direction);
+            VelocityData velocityData = new VelocityData(player.getLocation().getDirection(), chargeVelocity, true, 0, 0.0, 0.0, false);
+            UtilVelocity.velocity(player, null, velocityData);
 
             // Cues
             new ParticleBuilder(Particle.CRIT)
