@@ -46,7 +46,7 @@ public class AssassinListener implements Listener {
 
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onAssassinKnockback(CustomDamageEvent event) {
         if (event.isCancelled()) return;
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;

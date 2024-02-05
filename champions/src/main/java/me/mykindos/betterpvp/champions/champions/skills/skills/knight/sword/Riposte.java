@@ -130,9 +130,9 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
             double newHealth = getHealing(level);
             UtilPlayer.health(player, newHealth);
 
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s<gray>.", getName());
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s %d<gray>.", getName(), level);
             if (ent instanceof Player target) {
-                UtilMessage.simpleMessage(target, getClassType().getName(), "<yellow>%s<gray> used riposte!", player.getName());
+                UtilMessage.simpleMessage(target, getClassType().getName(), "<yellow>%s<gray> used <green>%s %d</green>", player.getName(), getName(), level);
             }
 
             active.remove(player.getUniqueId());
@@ -214,7 +214,7 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
 
     private void failRiposte(Player player) {
         handRaisedTime.remove(player.getUniqueId());
-        UtilMessage.message(player, getClassType().getName(), "Your Riposte failed.");
+        UtilMessage.message(player, getClassType().getName(), UtilMessage.deserialize("You failed <green>%s %d</green>", getName(), getLevel(player)));
         player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
     }
 

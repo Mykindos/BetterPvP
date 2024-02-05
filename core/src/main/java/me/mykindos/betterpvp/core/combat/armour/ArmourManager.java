@@ -67,4 +67,22 @@ public class ArmourManager extends Manager<Armour> {
         }
         return reduction;
     }
+
+    /**
+     * Get the reduction for a specific armour set
+     * Usage: getReductionForArmourSet("DIAMOND");
+     * @param material The material of the armour set
+     * @return The reduction for the armour set
+     */
+    public double getReductionForArmourSet(String material) {
+        double totalReduction = 0;
+
+        for (Armour armour : objects.values()) {
+            if (armour.getItemType().toLowerCase().startsWith(material.toLowerCase())) {
+                totalReduction += armour.getReduction();
+            }
+        }
+
+        return totalReduction;
+    }
 }

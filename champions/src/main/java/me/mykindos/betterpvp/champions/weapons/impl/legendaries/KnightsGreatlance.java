@@ -28,6 +28,7 @@ import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
@@ -234,8 +235,9 @@ public class KnightsGreatlance extends ChannelWeapon implements InteractWeapon, 
                         ATTACK_NAME));
 
                 // Velocity
-                final Vector knockback = player.getLocation().getDirection();
-                UtilVelocity.velocity(hitEnt, knockback, 2.6, true, 0, 0.2, 1.4, true, true);
+                final Vector vec = player.getLocation().getDirection();
+                VelocityData velocityData = new VelocityData(vec, 2.6, true, 0, 0.2, 1.4, true);
+                UtilVelocity.velocity(hitEnt, player, velocityData);
 
                 // Cooldown
                 this.cooldownManager.use(player,
@@ -254,9 +256,8 @@ public class KnightsGreatlance extends ChannelWeapon implements InteractWeapon, 
 
             // Move
             data.setLastLocation(newLocation);
-            Vector direction = player.getLocation().getDirection().multiply(chargeVelocity);
-            direction.setY(0); // Make them stick to the ground
-            player.setVelocity(direction);
+            VelocityData velocityData = new VelocityData(player.getLocation().getDirection(), chargeVelocity, true, 0, 0.0, 0.0, false);
+            UtilVelocity.velocity(player, null, velocityData);
 
             // Cues
             new ParticleBuilder(Particle.CRIT)

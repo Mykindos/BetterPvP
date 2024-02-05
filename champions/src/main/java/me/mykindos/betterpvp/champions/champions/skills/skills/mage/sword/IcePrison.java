@@ -30,7 +30,6 @@ import org.bukkit.inventory.ItemStack;
 public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Listener, ThrowableListener {
 
     private final WorldBlockHandler blockHandler;
-
     private int sphereSize;
     private double baseDuration;
     private double durationIncreasePerLevel;
@@ -123,7 +122,7 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
 
     @Override
     public void loadSkillConfig(){
-        sphereSize = getConfig("sphereSize", 5, Integer.class);
+        sphereSize = getConfig("sphereSize", 4, Integer.class);
         baseDuration = getConfig("baseDuration", 5.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
         speed = getConfig("speed", 1.5, Double.class);

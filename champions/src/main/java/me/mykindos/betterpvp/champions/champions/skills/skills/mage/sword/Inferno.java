@@ -158,14 +158,6 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
             int level = getLevel(damager);
             hit.setFireTicks((int) (getFireDuration(level) * 20));
 
-            Vector knockbackDirection = hit.getLocation().toVector()
-                    .subtract(damager.getLocation().toVector()).normalize();
-            double knockbackStrength = 0.1;
-            Vector knockbackVelocity = knockbackDirection.multiply(knockbackStrength);
-            hit.setVelocity(hit.getVelocity().add(knockbackVelocity).setY(0.1));
-
-            damager.playSound(damager.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 1.2f);
-
             CustomDamageEvent cde = new CustomDamageEvent(hit, damager, null, DamageCause.CUSTOM, getDamage(level), false, "Inferno");
             cde.setDamageDelay(0);
             UtilDamage.doCustomDamage(cde);

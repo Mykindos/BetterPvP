@@ -223,7 +223,6 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
 
 
             if (loc.getBlock().getType().name().contains("DOOR") || loc.getBlock().getType().name().contains("GATE")) {
-
                 return lastValid2;
             }
 
@@ -250,7 +249,6 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
             Location loc = damager.getLocation().subtract(vec);
 
             if (loc.getBlock().getType().name().contains("DOOR") || loc.getBlock().getType().name().contains("GATE")) {
-                UtilVelocity.velocity(damagee, UtilVelocity.getTrajectory(damagee, damager), 0.3, false, 0, 0.1, 0.2, false);
                 return lastValid;
             }
 
@@ -279,7 +277,6 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
             Location loc = damagee.getLocation().add(vec);
 
             if (loc.getBlock().getType().name().contains("DOOR") || loc.getBlock().getType().name().contains("GATE")) {
-                UtilVelocity.velocity(damagee, UtilVelocity.getTrajectory(damagee, damager), 0.3, false, 0, 0.1, 0.2, false);
                 return lastValid;
             }
 

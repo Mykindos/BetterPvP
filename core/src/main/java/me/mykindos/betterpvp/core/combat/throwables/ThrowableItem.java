@@ -42,6 +42,7 @@ public class ThrowableItem {
         this.removeOnCollision = removeOnCollision;
         this.singleCollision = true;
         this.collideGround = false;
+        this.canHitFriendlies = false;
         this.lastLocation = item.getLocation();
         item.setPickupDelay(Integer.MAX_VALUE);
     }

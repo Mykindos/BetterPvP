@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -90,7 +91,8 @@ public class WhirlwindSword extends Skill implements InteractSkill, CooldownSkil
                 if (player.hasLineOfSight(target)) {
 
                     Vector velocity = UtilVelocity.getTrajectory(target, player);
-                    UtilVelocity.velocity(target, velocity, 1.0D, false, 0.0D, 0.25D, 4.0D, true);
+                    VelocityData velocityData = new VelocityData(velocity, 1.0D, false, 0.0D, 0.25D, 4.0D, true);
+                    UtilVelocity.velocity(target, player, velocityData);
                     target.damage(getDamage(level));
                     UtilMessage.simpleMessage(target, getName(), "<alt>" + player.getName() + "</alt> hit you with <alt>" + getName());
                 }

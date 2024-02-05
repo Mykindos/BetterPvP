@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableItem;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableListener;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -25,6 +26,7 @@ import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.display.DisplayComponent;
 import org.bukkit.Location;
@@ -156,7 +158,7 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
             }
 
             shoot(player, data, level);
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You used <alt>" + getName() + "</alt>.");
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You used <alt>" + getName() + " " + level + "</alt>.");
             new SoundEffect(Sound.ENTITY_SPLASH_POTION_THROW, 2F, 0.8F).play(player.getLocation());
             iterator.remove();
         }
@@ -197,14 +199,9 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
         throwable.setCollideGround(true);
         throwable.setCanHitFriendlies(true);
         championsManager.getThrowables().addThrowable(throwable);
-        UtilVelocity.velocity(item,
-                player.getLocation().getDirection(),
-                1 + data.getCharge(),
-                false,
-                0,
-                0.2,
-                20,
-                false);
+
+        VelocityData velocityData = new VelocityData(player.getLocation().getDirection(), 1 + data.getCharge(), false, 0, 0.2, 20, false);
+        UtilVelocity.velocity(item, player, velocityData);
 
         hooks.put(player, new Hook(throwable, data, level));
         championsManager.getCooldowns().removeCooldown(player, getName(), true);
@@ -236,7 +233,8 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
         // Velocity
         final Vector direction = player.getLocation().toVector().subtract(hit.getLocation().toVector()).normalize();
         final double strength = hookData.getThrowable().getItem().getVelocity().length();
-        UtilVelocity.velocity(hit, direction, strength, false, 0, 0.7, 1.2, true, true);
+        VelocityData velocityData = new VelocityData(direction, strength, false, 0, 0.7, 1.2, true);
+        UtilVelocity.velocity(hit, thrower, velocityData, VelocityType.CUSTOM);
         hit.setFallDistance(0); // Reset their fall distance
 
         // Damage
@@ -245,8 +243,8 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
         UtilDamage.doCustomDamage(ev);
 
         // Cues
-        UtilMessage.message(hit, getClassType().getName(), "<alt2>" + player.getName() + "</alt2> pulled you with <alt>" + getName() + "</alt>.");
-        UtilMessage.message(player, getClassType().getName(), "You hit <alt2>" + hit.getName() + "</alt2> with <alt>" + getName() + "</alt>.");
+        UtilMessage.simpleMessage(hit, getClassType().getName(), "<alt2>" + player.getName() + "</alt2> pulled you with <alt>" + getName() + " " + level + "</alt>.");
+        UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <alt2>" + hit.getName() + "</alt2> with <alt>" + getName() + " " + level + "</alt>.");
         new SoundEffect(Sound.ENTITY_ARROW_HIT_PLAYER, 2f, 2f).play(player);
 
         throwableItem.getItem().remove();

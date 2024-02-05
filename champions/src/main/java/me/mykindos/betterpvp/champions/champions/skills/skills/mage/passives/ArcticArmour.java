@@ -10,17 +10,14 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
-import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilLocation;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
-import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -32,10 +29,8 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Singleton
 @BPvPListener
@@ -210,12 +205,6 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill {
     @Override
     public void toggleActive(Player player) {
         UtilMessage.message(player, getClassType().getName(), "Arctic Armour: <green>On");
-    }
-
-    @Override
-    public void cancel(Player player) {
-        super.cancel(player);
-        UtilMessage.message(player, getClassType().getName(), "Arctic Armour: <red>Off");
     }
 
     @Override
