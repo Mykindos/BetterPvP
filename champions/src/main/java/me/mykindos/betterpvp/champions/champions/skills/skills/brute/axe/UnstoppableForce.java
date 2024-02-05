@@ -19,6 +19,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilLocation;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
@@ -123,7 +124,7 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill {
             } else if (!isHolding(player)) {
                 finishUnstoppableForce(player);
                 iterator.remove();
-            } else if(UtilBlock.airFoliage(player.getLocation().clone().add(0, -2, 0).getBlock())) {
+            } else if(!UtilBlock.isGrounded(player, 2)) {
                 finishUnstoppableForce(player);
                 iterator.remove();
             } else {
