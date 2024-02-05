@@ -17,6 +17,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -78,7 +79,7 @@ public class SoulHarvest extends Skill implements PassiveSkill {
 
 
     @EventHandler
-    public void onDeath(PlayerDeathEvent event) {
+    public void onDeath(EntityDeathEvent event) {
         souls.add(new SoulData(event.getEntity().getUniqueId(), event.getEntity().getLocation(), System.currentTimeMillis() + 120_000));
     }
 

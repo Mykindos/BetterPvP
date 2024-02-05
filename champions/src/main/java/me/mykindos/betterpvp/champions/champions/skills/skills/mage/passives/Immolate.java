@@ -185,7 +185,7 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
 
     @Override
     public SkillType getType() {
-        return SkillType.PASSIVE_B;
+        return SkillType.PASSIVE_A;
     }
 
     @Override

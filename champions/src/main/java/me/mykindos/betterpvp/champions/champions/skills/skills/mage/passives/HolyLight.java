@@ -66,7 +66,7 @@ public class HolyLight extends Skill implements PassiveSkill {
 
     @Override
     public SkillType getType() {
-        return SkillType.PASSIVE_A;
+        return SkillType.PASSIVE_B;
     }
 
     private void activate(Player player, int level) {

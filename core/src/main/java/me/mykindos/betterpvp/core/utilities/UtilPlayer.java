@@ -8,6 +8,7 @@ import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
@@ -162,5 +163,22 @@ public class UtilPlayer {
     public static boolean hasPotionEffect(Player player, PotionEffectType type, int amplifier) {
         return player.hasPotionEffect(type)
                 && Objects.requireNonNull(player.getPotionEffect(type)).getAmplifier() <= amplifier;
+    }
+
+    public static Location getMidpoint(Player player) {
+        final Location location = player.getLocation();
+        final double height = player.getHeight();
+        return location.add(0.0, height / 2, 0.0);
+    }
+
+    public static void slowDrainHealth(BPvPPlugin plugin, Player player, double amount, int ticks, boolean canKill) {
+        double amountPerTick = amount / ticks;
+        for(int i = 0; i < ticks; i++) {
+            UtilServer.runTaskLater(plugin, () -> {
+                if(player.isDead()) return;
+                if(!canKill && player.getHealth() <= 1) return;
+                UtilPlayer.health(player, -amountPerTick);
+            }, i);
+        }
     }
 }

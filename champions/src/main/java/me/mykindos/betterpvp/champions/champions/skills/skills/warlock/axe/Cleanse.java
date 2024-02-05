@@ -27,15 +27,12 @@ import org.bukkit.event.block.Action;
 public class Cleanse extends Skill implements InteractSkill, CooldownSkill, Listener {
 
     private double baseDuration;
-
     private double durationIncreasePerLevel;
     private double baseRange;
-
     private double rangeIncreasePerLevel;
-
     private double baseHealthReduction;
-
     private double healthReductionDecreasePerLevel;
+
     @Inject
     public Cleanse(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -62,7 +59,7 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
     }
 
     public double getHealthReduction(int level) {
-        return baseHealthReduction - level * healthReductionDecreasePerLevel;
+        return baseHealthReduction - ((level - 1) * healthReductionDecreasePerLevel);
     }
 
     public double getRange(int level) {
@@ -107,9 +104,9 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
     @Override
     public void activate(Player player, int level) {
         double healthReduction = 1.0 - getHealthReduction(level);
-        double proposedHealth = player.getHealth() - (20 - (20 * healthReduction));
+        double proposedHealth = player.getHealth() - (player.getHealth() * healthReduction);
+        UtilPlayer.slowDrainHealth(champions, player, proposedHealth, 5, false);
 
-        player.setHealth(Math.max(0.5, proposedHealth));
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_EVOKER_PREPARE_WOLOLO, 1.0f, 0.9f);
         championsManager.getEffects().addEffect(player, EffectType.IMMUNETOEFFECTS, (long) (getDuration(level) * 1000L));
 

@@ -10,30 +10,26 @@ import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 @Singleton
-@BPvPListener
-public class Bloodshed extends Skill implements InteractSkill, CooldownSkill, Listener {
+public class Bloodshed extends Skill implements InteractSkill, CooldownSkill {
 
-   private double baseDuration;
-
-   private double durationIncreasePerLevel;
-
-   private double baseHealthReduction;
-
-   private double healthReductionDecreasePerLevel;
-
-   private int speedStrength;
+    private double radius;
+    private double radiusIncreasePerLevel;
+    private double duration;
+    private double durationIncreasePerLevel;
+    private int speedStrength;
+    private double baseHealthReduction;
+    private double healthReductionDecreasePerLevel;
 
     @Inject
     public Bloodshed(Champions champions, ChampionsManager championsManager) {
@@ -47,22 +43,28 @@ public class Bloodshed extends Skill implements InteractSkill, CooldownSkill, Li
 
     @Override
     public String[] getDescription(int level) {
+
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Sacrifice <val>" + UtilMath.round(getHealthReduction(level) * 100, 2) + "%" + "</val> of your health to grant",
-                "yourself <effect>Speed " + UtilFormat.getRomanNumeral(speedStrength + 1) + "</effect> for <val>" + getDuration(level) + "</val> seconds",
+                "Sacrifice <val>" + UtilMath.round(getHealthReduction(level) * 100, 2) + "%" + "</val> of your health to give",
+                "yourself and all allies within <val>" + getRadius(level) + "</val> blocks",
+                "a surge of speed, granting them <effect>Speed " + UtilFormat.getRomanNumeral(speedStrength + 1) + "</effect> for <stat>" + getDuration(level) + "</stat> seconds.",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
     }
 
     public double getHealthReduction(int level) {
-        return baseHealthReduction - level * healthReductionDecreasePerLevel;
+        return baseHealthReduction - ((level -1) * healthReductionDecreasePerLevel);
     }
 
     public double getDuration(int level) {
-        return baseDuration + level * durationIncreasePerLevel;
+        return duration + ((level - 1) * durationIncreasePerLevel);
+    }
+
+    public double getRadius(int level) {
+        return radius + ((level -1) * radiusIncreasePerLevel);
     }
 
     @Override
@@ -72,9 +74,33 @@ public class Bloodshed extends Skill implements InteractSkill, CooldownSkill, Li
 
     @Override
     public SkillType getType() {
+
         return SkillType.AXE;
     }
 
+    @Override
+    public double getCooldown(int level) {
+
+        return cooldown - ((level - 1));
+    }
+
+
+    @Override
+    public void activate(Player player,int level) {;
+        double healthReduction = 1.0 - getHealthReduction(level);
+        double proposedHealth = player.getHealth() - (player.getHealth() * healthReduction);
+        UtilPlayer.slowDrainHealth(champions, player, proposedHealth, 5, false);
+
+        player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) duration * 20, speedStrength));
+        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_RAVAGER_ROAR, 2.0f, 0.3f);
+        player.playSound(player.getLocation(), Sound.BLOCK_CONDUIT_AMBIENT, 2.0f, 2.0f);
+
+        for (Player target : UtilPlayer.getNearbyAllies(player, player.getLocation(), (radius + level))) {
+            target.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) (duration * 20), speedStrength));
+            UtilMessage.simpleMessage(target, getName(), "<yellow>%s</yellow> gave you <white>Speed "+ UtilFormat.getRomanNumeral(speedStrength + 1) + "</white> for <green>%s</green> seconds.", player.getName(), getDuration(level));
+            player.playSound(player.getLocation(), Sound.BLOCK_CONDUIT_AMBIENT, 2.0f, 2.0f);
+        }
+    }
 
     @Override
     public boolean canUse(Player player) {
@@ -82,7 +108,7 @@ public class Bloodshed extends Skill implements InteractSkill, CooldownSkill, Li
         double healthReduction = 1.0 - getHealthReduction(level);
         double proposedHealth = player.getHealth() - (20 - (20 * healthReduction));
 
-        if (proposedHealth <= 0.5) {
+        if (proposedHealth <= 1) {
             UtilMessage.simpleMessage(player, getClassType().getName(), "You do not have enough health to use <green>%s %d<gray>", getName(), level);
             return false;
         }
@@ -91,34 +117,18 @@ public class Bloodshed extends Skill implements InteractSkill, CooldownSkill, Li
     }
 
     @Override
-    public void activate(Player player, int level) {
-        double healthReduction = 1.0 - getHealthReduction(level);
-        double proposedHealth = player.getHealth() - (20 - (20 * healthReduction));
-
-        player.setHealth(Math.max(0.5, proposedHealth));
-        player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) (getDuration(level) * 20), speedStrength));
-        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_RAVAGER_ROAR, 2.0f, 0.3f);
-        player.playSound(player.getLocation(), Sound.BLOCK_CONDUIT_AMBIENT, 2.0f, 2.0f);
-    }
-
-    @Override
-    public double getCooldown(int level) {
-        return cooldown - (level) * cooldownDecreasePerLevel;
-    }
-
-    @Override
     public Action[] getActions() {
         return SkillActions.RIGHT_CLICK;
     }
 
     @Override
-    public void loadSkillConfig(){
-        baseHealthReduction = getConfig("baseHealthReduction", 0.5, Double.class);
+    public void loadSkillConfig() {
+        radius = getConfig("radius", 5.0, Double.class);
+        radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 1.0, Double.class);
+        duration = getConfig("duration", 9.0, Double.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.0, Double.class);
+        speedStrength = getConfig("speedStrength", 1, Integer.class);
+        baseHealthReduction = getConfig("baseHealthReduction", 0.4, Double.class);
         healthReductionDecreasePerLevel = getConfig("healthReductionDecreasePerLevel", 0.05, Double.class);
-
-        baseDuration = getConfig("baseDuration", 6.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
-
-        speedStrength = getConfig("speedStrength", 2, Integer.class);
     }
 }

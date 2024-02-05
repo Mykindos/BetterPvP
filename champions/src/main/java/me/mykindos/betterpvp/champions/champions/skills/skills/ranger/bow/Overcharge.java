@@ -257,6 +257,7 @@ public class Overcharge extends Skill implements InteractSkill, Listener {
         }
 
     }
+
     public void loadSkillConfig() {
         baseDamageIncrement = getConfig("baseDamageIncrement", 1.0, Double.class);
         damageIncrementPerLevel = getConfig("damageIncrementPerLevel", 0.0 , Double.class);

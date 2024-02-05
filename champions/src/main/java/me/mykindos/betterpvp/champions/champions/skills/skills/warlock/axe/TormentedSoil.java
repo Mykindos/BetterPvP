@@ -16,6 +16,9 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilMath;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -37,14 +40,13 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
     private final List<Torment> tormentList = new ArrayList<>();
 
     private double baseDuration;
-
     private double durationIncreasePerLevel;
     private double baseRange;
-
     private double rangeIncreasePerLevel;
-
     private double baseDamageIncrease;
     private double damageIncreasePerLevel;
+    private double baseHealthReduction;
+    private double healthReductionDecreasePerLevel;
 
     @Inject
     public TormentedSoil(Champions champions, ChampionsManager championsManager) {
@@ -54,7 +56,7 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
 
     @Override
     public String getName() {
-        return "Tormented Soul";
+        return "Tormented Soil";
     }
 
     @Override
@@ -62,14 +64,19 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Corrupt the earth around you, creating a ring that",
-                "debuffs enemies within it for <stat>" + getDuration(level) + "</stat> seconds.",
-                "Players within the ring take <stat>" + (getDamageIncrease(level) * 100) + "%</stat> more damage.",
+                "Sacrifice <val>" + UtilMath.round(getHealthReduction(level) * 100, 2) + "%" + "</val> of your health to create",
+                "a ring of torment for <stat>" + getDuration(level) + "</stat> seconds.",
+                "",
+                "Enemies within the ring take <stat>" + (getDamageIncrease(level) * 100) + "%</stat> more damage.",
                 "",
                 "Range: <val>" + getRange(level) + "</val> blocks.",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
+    }
+
+    public double getHealthReduction(int level) {
+        return baseHealthReduction - ((level - 1) * healthReductionDecreasePerLevel);
     }
 
     public double getRange(int level) {
@@ -157,6 +164,10 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
 
     @Override
     public void activate(Player player, int level) {
+        double healthReduction = 1.0 - getHealthReduction(level);
+        double proposedHealth = player.getHealth() - (player.getHealth() * healthReduction);
+        UtilPlayer.slowDrainHealth(champions, player, proposedHealth, 5, false);
+
         Location loc = player.getLocation().clone();
         if (!UtilBlock.solid(loc.getBlock())) {
             for (int i = 0; i < 10; i++) {
@@ -183,6 +194,22 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
         rangeIncreasePerLevel = getConfig("rangeIncreasePerLevel", 0.5, Double.class);
         baseDamageIncrease = getConfig("baseDamageIncrease", 0.33, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
+        baseHealthReduction = getConfig("baseHealthReduction", 0.5, Double.class);
+        healthReductionDecreasePerLevel = getConfig("healthReductionDecreasePerLevel", 0.05, Double.class);
+    }
+
+    @Override
+    public boolean canUse(Player player) {
+        int level = getLevel(player);
+        double healthReduction = 1.0 - getHealthReduction(level);
+        double proposedHealth = player.getHealth() - (20 - (20 * healthReduction));
+
+        if (proposedHealth <= 1) {
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You do not have enough health to use <green>%s %d<gray>", getName(), level);
+            return false;
+        }
+
+        return true;
     }
 
     @Data

@@ -51,9 +51,7 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
     private final HashMap<UUID, Long> slams = new HashMap<>();
 
     private double baseRadius;
-
     private double radiusIncreasePerLevel;
-
     private double baseDamage;
 
     public double damageIncreasePerLevel;
