@@ -103,7 +103,7 @@ public class RootingAxe extends Skill implements PassiveSkill, CooldownSkill {
     @Override
     public SkillType getType() {
 
-        return SkillType.PASSIVE_A;
+        return SkillType.PASSIVE_B;
     }
 
 

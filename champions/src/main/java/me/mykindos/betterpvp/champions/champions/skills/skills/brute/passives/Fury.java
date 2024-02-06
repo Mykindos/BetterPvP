@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.champions.champions.skills.skills.knight.passives;
+package me.mykindos.betterpvp.champions.champions.skills.skills.brute.passives;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -47,7 +47,7 @@ public class Fury extends Skill implements PassiveSkill, Listener {
 
     @Override
     public Role getClassType() {
-        return Role.KNIGHT;
+        return Role.BRUTE;
     }
 
     @Override

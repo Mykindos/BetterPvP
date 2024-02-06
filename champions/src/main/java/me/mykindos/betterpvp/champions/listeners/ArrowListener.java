@@ -25,7 +25,7 @@ public class ArrowListener implements Listener {
     private boolean critArrowsEnabled;
 
     @Inject
-    @Config(path = "combat.arrow-base-damage", defaultValue = "4.5")
+    @Config(path = "combat.arrow-base-damage", defaultValue = "6.0")
     private double baseArrowDamage;
 
     private final HashMap<Arrow, Float> arrows = new HashMap<>();

@@ -54,6 +54,7 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
     private double baseHealthReduction;
 
     private double healthReductionDecreasePerLevel;
+
     @Inject
     public BloodBarrier(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -81,7 +82,7 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
     }
 
     public double getHealthReduction(int level) {
-        return baseHealthReduction - level * healthReductionDecreasePerLevel;
+        return baseHealthReduction - ((level - 1) * healthReductionDecreasePerLevel);
     }
 
     public int numAttacksToReduce(int level) {
@@ -172,7 +173,7 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
         double healthReduction = 1.0 - getHealthReduction(level);
         double proposedHealth = player.getHealth() - (UtilPlayer.getMaxHealth(player) - (UtilPlayer.getMaxHealth(player) * healthReduction));
 
-        if (proposedHealth <= 0.5) {
+        if (proposedHealth <= 1) {
             UtilMessage.simpleMessage(player, getClassType().getName(), "You do not have enough health to use <green>%s %d<gray>", getName(), level);
             return false;
         }
@@ -183,8 +184,8 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
     @Override
     public void activate(Player player, int level) {
         double healthReduction = 1.0 - getHealthReduction(level);
-        double proposedHealth = player.getHealth() - (20 - (20 * healthReduction));
-        player.setHealth(Math.max(0.5, proposedHealth));
+        double proposedHealth = player.getHealth() - (player.getHealth() * healthReduction);
+        UtilPlayer.slowDrainHealth(champions, player, proposedHealth, 5, false);
 
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_EVOKER_PREPARE_ATTACK, 2.0f, 1.0f);
 
@@ -200,7 +201,7 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
     }
 
     @Override
-    public void loadSkillConfig(){
+    public void loadSkillConfig() {
         baseRange = getConfig("baseRange", 8.0, Double.class);
         rangeIncreasePerLevel = getConfig("rangeIncreasePerLevel", 1.0, Double.class);
 

@@ -44,6 +44,7 @@ import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -187,7 +188,7 @@ public class SkillListener implements Listener {
     // Show shield for channel skills
     @EventHandler
     public void onRightClick(RightClickEvent event) {
-        if (Compatibility.SWORD_BLOCKING) {
+        if (Compatibility.SWORD_BLOCKING && !UtilItem.isAxe(event.getPlayer().getInventory().getItemInMainHand())) {
             return; // Return if sword blocking is enabled
         }
 
@@ -215,9 +216,9 @@ public class SkillListener implements Listener {
 
                 if (skillOptional.isPresent()) {
                     Skill skill = skillOptional.get();
-                    if (skill instanceof ChannelSkill) {
+                    if (skill instanceof ChannelSkill channelSkill) {
                         event.setUseShield(true);
-                        event.setShieldModelData(RightClickEvent.INVISIBLE_SHIELD);
+                        event.setShieldModelData(channelSkill.isShieldInvisible() ? RightClickEvent.INVISIBLE_SHIELD : RightClickEvent.DEFAULT_SHIELD);
                     }
                 }
             }

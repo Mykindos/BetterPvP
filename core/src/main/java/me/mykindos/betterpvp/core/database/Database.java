@@ -130,7 +130,6 @@ public class Database {
         try {
             RowSetFactory factory = RowSetProvider.newFactory();
             rowset = factory.createCachedRowSet();
-            rowset.setFetchSize(100);
             @Cleanup
             PreparedStatement preparedStatement = connection.prepareStatement(statement.getQuery());
             for (int i = 1; i <= statement.getValues().length; i++) {

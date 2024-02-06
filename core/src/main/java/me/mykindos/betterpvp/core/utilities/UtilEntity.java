@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.craftbukkit.v1_20_R3.CraftWorld;
@@ -39,6 +40,11 @@ public class UtilEntity {
         return UtilPlayer.getRelation(player, other) != EntityProperty.FRIENDLY;
     };
 
+    public static Optional<Entity> getEntity(@NotNull World world, int id) {
+        return Optional.ofNullable(((CraftWorld) world).getHandle().getEntity(id))
+                .map(net.minecraft.world.entity.Entity::getBukkitEntity);
+    }
+
     public static Optional<RayTraceResult> interpolateCollision(@NotNull Location lastLocation, @NotNull Location destination, float raySize, @Nullable Predicate<Entity> entityFilter) {
         Preconditions.checkNotNull(lastLocation, "Last location cannot be null");
         Preconditions.checkNotNull(destination, "Destination cannot be null");
@@ -68,7 +74,7 @@ public class UtilEntity {
         List<KeyValue<LivingEntity, EntityProperty>> livingEntities = new ArrayList<>();
         source.getWorld().getLivingEntities().stream()
                 .filter(livingEntity -> {
-                    if(!source.getWorld().getName().equalsIgnoreCase(livingEntity.getWorld().getName())) return false;
+                    if(!source.getWorld().equals(livingEntity.getWorld())) return false;
                     if (livingEntity.equals(source)) return false;
                     if (livingEntity.getLocation().distance(location) > radius) return false;
                     return !(livingEntity instanceof ArmorStand);

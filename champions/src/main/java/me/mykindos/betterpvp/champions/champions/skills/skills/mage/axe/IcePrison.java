@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.champions.champions.skills.skills.mage.sword;
+package me.mykindos.betterpvp.champions.champions.skills.skills.mage.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -50,7 +50,7 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Right click with a Sword to activate",
+                "Right click with an Axe to activate",
                 "",
                 "Launches an icy orb, trapping any players within <stat>" + sphereSize  + "</stat>",
                 "blocks of it in a prison of ice for <stat>" + getDuration(level) + "</stat> seconds",
@@ -70,7 +70,7 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
 
     @Override
     public SkillType getType() {
-        return SkillType.SWORD;
+        return SkillType.AXE;
     }
 
 
