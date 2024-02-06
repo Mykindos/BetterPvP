@@ -146,6 +146,7 @@ public final class BlockTossObject {
             arrow.setVisualFire(false);
             arrow.setPersistent(false);
             arrow.setVisibleByDefault(false);
+            arrow.setShooter(caster);
         });
 
         // Throw sound cue
@@ -269,6 +270,10 @@ public final class BlockTossObject {
 
     // can be run out of main thread
     public void impact(Player caster) {
+        if (impacted) {
+            return;
+        }
+
         this.impacted = true;
         final Location impactLocation = getCenterLocation();
 
@@ -335,6 +340,8 @@ public final class BlockTossObject {
         for (ArmorStand vehicle : vehicles) {
             vehicle.remove();
         }
-        referenceEntity.remove();
+        if (referenceEntity.isValid()) {
+            referenceEntity.remove();
+        }
     }
 }
