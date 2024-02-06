@@ -26,6 +26,7 @@ dependencies {
     paperweight.paperDevBundle(libs.versions.paper)
     implementation(libs.reflections)
 
+    api(libs.prettytime)
     api(libs.bundles.data)
     api(libs.bundles.utils)
     api(libs.invui)
