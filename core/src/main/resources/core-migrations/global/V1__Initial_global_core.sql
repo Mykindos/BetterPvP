@@ -24,7 +24,7 @@ create table if not exists armour
 INSERT IGNORE INTO armour (Item, Reduction) VALUES ('CHAINMAIL_BOOTS', 7);
 INSERT IGNORE INTO armour (Item, Reduction) VALUES ('CHAINMAIL_CHESTPLATE', 16);
 INSERT IGNORE INTO armour (Item, Reduction) VALUES ('CHAINMAIL_HELMET', 8);
-INSERT IGNORE INTO armour (Item, Reduction) VALUES ('CHAINMAIL_LEGGINGS', 12);
+INSERT IGNORE INTO armour (Item, Reduction) VALUES ('CHAINMAIL_LEGGINGS', 14);
 INSERT IGNORE INTO armour (Item, Reduction) VALUES ('DIAMOND_BOOTS', 10);
 INSERT IGNORE INTO armour (Item, Reduction) VALUES ('DIAMOND_CHESTPLATE', 20);
 INSERT IGNORE INTO armour (Item, Reduction) VALUES ('DIAMOND_HELMET', 12);
