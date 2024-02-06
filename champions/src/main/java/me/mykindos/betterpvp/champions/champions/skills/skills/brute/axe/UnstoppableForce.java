@@ -89,7 +89,7 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill {
 
     @Override
     public void activate(Player player, int level) {
-        if(championsManager.getCooldowns().hasCooldown(player, getName())){
+        if (championsManager.getCooldowns().hasCooldown(player, getName())) {
             UtilMessage.simpleMessage(player, "Cooldown", "You cannot use <alt>%s</alt> for <alt>%s</alt> seconds.", getName(),
                     Math.max(0, championsManager.getCooldowns().getAbilityRecharge(player, getName()).getRemaining()));
             return;
@@ -125,15 +125,15 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill {
             } else if (!isHolding(player)) {
                 finishUnstoppableForce(player);
                 iterator.remove();
-            } else if(!UtilBlock.isGrounded(player, 2)) {
-                finishUnstoppableForce(player);
-                iterator.remove();
-            } else {
+
+            }
+
+            if (UtilBlock.isGrounded(player)) {
                 championsManager.getEffects().addEffect(player, EffectType.NO_JUMP, 100);
 
                 final Location newLocation = UtilPlayer.getMidpoint(player).clone();
 
-                VelocityData velocityData = new VelocityData(player.getLocation().getDirection(), 0.5, true, 0, -0.6, 0.0, false);
+                VelocityData velocityData = new VelocityData(player.getLocation().getDirection(), 0.5, true, 0, 0, 0.0, false);
                 UtilVelocity.velocity(player, null, velocityData);
 
                 final Optional<LivingEntity> hit = UtilEntity.interpolateCollision(newLocation,
@@ -151,18 +151,16 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill {
                         player.getWorld().playSound(target.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.5f, 0.9f);
                     }
                 }
-
             }
-
         }
 
     }
 
-    @UpdateEvent (delay = 100)
+    @UpdateEvent(delay = 100)
     public void doSound() {
         for (UUID uuid : active) {
             Player player = Bukkit.getPlayer(uuid);
-            if (player != null) {
+            if (player != null && UtilBlock.isGrounded(player)) {
                 UtilSound.playSound(player.getWorld(), player, Sound.ENTITY_PLAYER_SMALL_FALL, 0.5f, 0.7f);
             }
         }
@@ -225,10 +223,6 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill {
 
     @Override
     public boolean canUse(Player player) {
-        if(!UtilBlock.isGrounded(player, 2)) {
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You must be on the ground to use this skill.");
-            return false;
-        }
         return isHolding(player);
     }
 
