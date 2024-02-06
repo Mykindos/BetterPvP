@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.framework.adapter;
 
 import javax.inject.Singleton;
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -10,6 +11,7 @@ import java.lang.annotation.Target;
 @Singleton
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
+@Inherited
 @Repeatable(PluginAdapters.class)
 public @interface PluginAdapter {
 
