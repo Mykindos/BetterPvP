@@ -27,8 +27,11 @@ import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.ProjectileHitEvent;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -175,7 +178,7 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
     public void loadSkillConfig() {
         baseCharge = getConfig("baseCharge", 55.0, Double.class);
         chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 15.0, Double.class);
-        baseDamage = getConfig("baseDamage", 10.0, Double.class);
+        baseDamage = getConfig("baseDamage", 4.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 2.0, Double.class);
         baseRadius = getConfig("baseRadius", 4.0, Double.class);
         radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 0.5, Double.class);
@@ -231,6 +234,28 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
         }
     }
 
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onHit(ProjectileHitEvent event) {
+        if (!(event.getEntity() instanceof Arrow arrow) || !(arrow.getShooter() instanceof Player player)) {
+            return;
+        }
+
+        final List<BlockTossObject> boulderList = boulders.get(player);
+        if (boulderList == null) {
+            return;
+        }
+
+        for (BlockTossObject boulder : boulderList) {
+            if (arrow.equals(boulder.getReferenceEntity())) {
+                boulder.impact(player);
+                break;
+            }
+        }
+
+        event.setCancelled(true);
+        arrow.remove();
+    }
+
     @UpdateEvent
     public void collisionCheck() {
         final Iterator<Map.Entry<Player, List<BlockTossObject>>> iterator = boulders.entrySet().iterator();
@@ -255,15 +280,11 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
                         continue;
                     }
                 } else if (boulder.isThrown()) {
-                    if (referenceEntity.isInBlock()) {
+                    final List<Entity> nearby = referenceEntity.getNearbyEntities(hitBoxSize, hitBoxSize, hitBoxSize);
+                    nearby.remove(caster);
+                    nearby.removeIf(entity -> !(entity instanceof LivingEntity) || entity instanceof ArmorStand);
+                    if (!nearby.isEmpty()) {
                         boulder.impact(caster);
-                    } else {
-                        final List<Entity> nearby = referenceEntity.getNearbyEntities(hitBoxSize, hitBoxSize, hitBoxSize);
-                        nearby.remove(caster);
-                        nearby.removeIf(entity -> !(entity instanceof LivingEntity) || entity instanceof ArmorStand);
-                        if (!nearby.isEmpty()) {
-                            boulder.impact(caster);
-                        }
                     }
                 }
 

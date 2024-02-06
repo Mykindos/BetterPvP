@@ -310,7 +310,7 @@ skills:
       cooldownDecreasePerLevel: 1.0
       baseCharge: 55.0
       chargeIncreasePerLevel: 15.0
-      baseDamage: 10.0
+      baseDamage: 4.0
       damageIncreasePerLevel: 2.0
       baseRadius: 4.0
       radiusIncreasePerLevel: 0.5
