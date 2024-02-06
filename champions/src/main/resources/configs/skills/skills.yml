@@ -795,7 +795,7 @@ skills:
       baseDecreasePerPlayer: 0.05
       decreaseIncreasePerLevel: 0.0
       radius: 3
-    tormentedsoul:
+    tormentedsoil:
       enabled: true
       maxlevel: 5
       cooldown: 30.0

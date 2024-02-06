@@ -16,7 +16,9 @@ import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.Collection;
 import java.util.List;
@@ -49,7 +51,6 @@ public class ClanCommand extends Command {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-
         Optional<Clan> playerClanOptional = clanManager.getClanByPlayer(player);
         Clan playerClan = playerClanOptional.orElse(null);
 
