@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
@@ -50,6 +51,9 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
     private boolean blocksMelee;
 
     private boolean blocksArrow;
+
+    @Inject
+    private CooldownManager cooldownManager;
 
     @Inject
     public DefensiveStance(Champions champions, ChampionsManager championsManager) {
@@ -147,21 +151,20 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
                 continue;
             }
 
+            int level = getLevel(player);
 
             Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
-            if (!gamer.isHoldingRightClick()) {
-                iterator.remove();
-                continue;
-            }
+            if (!gamer.isHoldingRightClick()
+                    || !championsManager.getEnergy().use(player, getName(), getEnergy(level) / 2, true)
+                    || (level <= 0)
+                    || !isHolding(player)) {
 
-            int level = getLevel(player);
-            if (level <= 0) {
+                cooldownManager.removeCooldown(player, getName(), true);
+                cooldownManager.use(player, getName(), getCooldown(level), true);
+
                 iterator.remove();
-            } else if (!championsManager.getEnergy().use(player, getName(), getEnergy(level) / 2, true)) {
-                iterator.remove();
-            } else if (!isHolding(player)) {
-                iterator.remove();
-            } else {
+            }
+            else {
                 player.getWorld().playEffect(player.getLocation(), Effect.STEP_SOUND, 20);
             }
 
