@@ -389,16 +389,6 @@ skills:
       speedStrength: 0
       strengthLevel: 1
       energyDecreasePerLevel: 1.0
-    lifebonds:
-      enabled: true
-      maxlevel: 5
-      energy: 25
-      baseRadius: 2.0
-      radiusIncreasePerLevel: 1.0
-      energyDecreasePerLevel: 1.0
-      healCooldown: 2.0
-      healSpeed: 0.3
-      healMultiplier: 0.25
     magmablade:
       enabled: true
       maxlevel: 3
@@ -783,6 +773,16 @@ skills:
       baseHealthPercent: 0.25
       healthPercentIncreasePerLevel: 0.05
       speedStrength: 0
+    lifebonds:
+      enabled: true
+      maxlevel: 5
+      energy: 25
+      baseRadius: 2.0
+      radiusIncreasePerLevel: 1.0
+      energyDecreasePerLevel: 1.0
+      healCooldown: 2.0
+      healSpeed: 0.3
+      healMultiplier: 0.25
     soulharvest:
       enabled: true
       maxlevel: 3

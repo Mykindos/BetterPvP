@@ -1,5 +1,6 @@
-package me.mykindos.betterpvp.champions.champions.skills.skills.mage.passives;
+package me.mykindos.betterpvp.champions.champions.skills.skills.warlock.passives;
 
+import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
@@ -14,6 +15,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -72,13 +74,6 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
 
     @Override
     public boolean process(Player player) {
-        HashMap<String, Long> updateCooldowns = updaterCooldowns.get(player.getUniqueId());
-
-        if (updateCooldowns.getOrDefault("audio", 0L) < System.currentTimeMillis()) {
-            audio(player);
-            updateCooldowns.put("audio", System.currentTimeMillis() + 1000);
-        }
-
         return onUpdate(player);
     }
 
@@ -86,11 +81,8 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
     public void toggleActive(Player player) {
         if (championsManager.getEnergy().use(player, getName(), 10, false)) {
             UtilMessage.simpleMessage(player, getClassType().getName(), "Life Bonds: <green>On");
+            player.getWorld().playSound(player.getLocation(), Sound.BLOCK_BELL_USE, 2.0F, 0.1F);
         }
-    }
-
-    private void audio(Player player) {
-        player.getWorld().playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 0.3F, 0.0F);
     }
 
     public boolean onUpdate(Player player) {
@@ -109,11 +101,12 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
     }
 
     public void createParticlesForPlayers(Player caster, List<KeyValue<Player, EntityProperty>> nearbyPlayerKeyValues) {
-        caster.getWorld().spawnParticle(Particle.CHERRY_LEAVES, caster.getLocation().add(0, 1.0, 0), 1, 0.1, 0.1, 0.1, 0);
+        Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(255, 0, 0), 1);
+        new ParticleBuilder(Particle.REDSTONE).location(caster.getLocation().add(0, 1.0, 0)).count(1).offset(0.3, 0.3, 0.3).extra(0).receivers(30).data(dustOptions).spawn();
 
         for (KeyValue<Player, EntityProperty> keyValue : nearbyPlayerKeyValues) {
             Player player = keyValue.getKey();
-            player.getWorld().spawnParticle(Particle.CHERRY_LEAVES, player.getLocation().add(0, 1.0, 0), 1, 0.1, 0.1, 0.1, 0);
+            new ParticleBuilder(Particle.REDSTONE).location(player.getLocation().add(0, 1.0, 0)).count(1).offset(0.3, 0.1, 0.3).extra(0).receivers(30).data(dustOptions).spawn();
         }
     }
 
@@ -143,14 +136,17 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
         double healthDifference = highestHealth - lowestHealth;
         double healthToTransfer = healthDifference * healMultiplier;
 
-        if (healthToTransfer >= 2 && (highestHealthPlayer.getHealth() - healthToTransfer) > 2) {
+
+        if (healthDifference >= 2 && (highestHealthPlayer.getHealth() - healthToTransfer) > 2) {
             long currentTime = System.currentTimeMillis();
             long lastHeal = lastHealTime.getOrDefault(lowestHealthPlayer.getUniqueId(), 0L);
+
             if (currentTime - lastHeal > (healCooldown * 1000L)) {
                 highestHealthPlayer.setHealth(highestHealthPlayer.getHealth() - healthToTransfer);
                 healthStored.put(lowestHealthPlayer.getUniqueId(), healthToTransfer);
                 lastHealTime.put(lowestHealthPlayer.getUniqueId(), currentTime);
                 createTrackingTrail(highestHealthPlayer, lowestHealthPlayer);
+
             }
         }
     }
@@ -158,20 +154,21 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
     private void createTrackingTrail(Player source, Player target) {
         BukkitRunnable trailTask = new BukkitRunnable() {
             Location currentLocation = source.getLocation().add(0, 1.5, 0);
-
             @Override
             public void run() {
                 if (!target.isOnline() || !healthStored.containsKey(target.getUniqueId()) || target.isDead()) {
                     trackingTrails.remove(source.getUniqueId());
                     healthStored.remove(target.getUniqueId());
                     this.cancel();
+
                     return;
                 }
 
                 Vector direction = target.getLocation().add(0, 1.5, 0).subtract(currentLocation).toVector().normalize().multiply(healSpeed);
                 currentLocation.add(direction);
 
-                source.getWorld().spawnParticle(Particle.CHERRY_LEAVES, currentLocation, 1, 0.1, 0.1, 0.1, 0);
+                Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(255, 0, 0), 1);
+                new ParticleBuilder(Particle.REDSTONE).location(currentLocation).count(1).offset(0.0, 0.0, 0.0).extra(0).receivers(30).data(dustOptions).spawn();
 
                 if (currentLocation.distance(target.getLocation().add(0, 1.5, 0)) <= healSpeed) {
                     double healthToAdd = healthStored.remove(target.getUniqueId());
@@ -179,6 +176,7 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
                     target.getWorld().spawnParticle(Particle.HEART, target.getLocation().add(0, 1.5, 0), 5, 0.5, 0.5, 0.5, 0);
                     trackingTrails.remove(source.getUniqueId());
                     this.cancel();
+
                 }
             }
         };
@@ -189,7 +187,7 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
 
     @Override
     public Role getClassType() {
-        return Role.MAGE;
+        return Role.WARLOCK;
     }
 
     @Override
