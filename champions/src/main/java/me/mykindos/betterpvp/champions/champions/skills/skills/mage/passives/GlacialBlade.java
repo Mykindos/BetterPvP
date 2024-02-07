@@ -63,9 +63,9 @@ public class GlacialBlade extends Skill implements PassiveSkill, CooldownSkill, 
 
         return new String[]{
                 "Swinging your sword launches a glacial",
-                "shard dealing <val>" + getDamage(level) + "</val> damage to enemeis",
+                "shard that deals <val>" + getDamage(level) + "</val> damage to enemies",
                 "",
-                "If you are too close to your target, it will not activate",
+                "Will not work within melee range",
                 "",
                 "Internal Cooldown: <val>" + getCooldown(level)
         };
@@ -78,13 +78,13 @@ public class GlacialBlade extends Skill implements PassiveSkill, CooldownSkill, 
     @EventHandler
     public void onSwing(PlayerInteractEvent event) {
         if (!SkillWeapons.isHolding(event.getPlayer(), SkillType.SWORD)) return;
+        if (!event.getAction().isLeftClick()) return;
 
         Player player = event.getPlayer();
-
         int level = getLevel(player);
         if (level < 1) return;
 
-        if (!isObstructionNearby(player)) {
+        if (!isObstructionNearby(player) && !championsManager.getCooldowns().hasCooldown(player, getName())) {
             ItemStack ghastTear = new ItemStack(Material.GHAST_TEAR);
             Item ice = player.getWorld().dropItem(player.getEyeLocation(), ghastTear);
             ice.getWorld().playSound(ice.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 2f);
@@ -93,13 +93,7 @@ public class GlacialBlade extends Skill implements PassiveSkill, CooldownSkill, 
             iceShards.add(ice);
             shardMap.put(ice, player);
 
-            championsManager.getCooldowns().removeCooldown(player, getName(), true);
-            championsManager.getCooldowns().use(player,
-                    getName(),
-                    getCooldown(level),
-                    true,
-                    true,
-                    isCancellable());
+            championsManager.getCooldowns().use(player, getName(), getCooldown(level), true, true, isCancellable());
         }
     }
 
@@ -127,7 +121,8 @@ public class GlacialBlade extends Skill implements PassiveSkill, CooldownSkill, 
     public void onUpdate() {
         for (Item ice : new ArrayList<>(iceShards)) {
             if (!ice.isOnGround() && !ice.isDead()) {
-                ice.getWorld().spawnParticle(Particle.SNOWBALL, ice.getLocation(), 1);
+                Location iceLocation = ice.getLocation().add(0, 0.25, 0);
+                ice.getWorld().spawnParticle(Particle.SNOWBALL, iceLocation, 1);
             } else {
                 ice.remove();
                 iceShards.remove(ice);
