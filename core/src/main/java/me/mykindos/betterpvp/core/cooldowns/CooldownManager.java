@@ -50,6 +50,10 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
     }
 
     public boolean use(Player player, String ability, double duration, boolean inform, boolean removeOnDeath, boolean cancellable, @Nullable Predicate<Gamer> actionBarCondition) {
+        return use(player, ability, duration, inform, removeOnDeath, cancellable, actionBarCondition, 1000);
+    }
+
+    public boolean use(Player player, String ability, double duration, boolean inform, boolean removeOnDeath, boolean cancellable, @Nullable Predicate<Gamer> actionBarCondition, int actionBarPriority) {
         final Gamer gamer = clientManager.search().online(player).getGamer();
 
         // We add 1.5f to the duration in seconds, so they can see that it expired, and it doesn't instantly disappear
@@ -107,7 +111,7 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
             }
 
             cooldowns.put(ability, new Cooldown(duration, System.currentTimeMillis(), removeOnDeath, inform, cancellable));
-            gamer.getActionBar().add(1_000, actionBarComponent);
+            gamer.getActionBar().add(actionBarPriority, actionBarComponent);
             return true;
         }
 

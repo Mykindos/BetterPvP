@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 
@@ -70,7 +71,7 @@ public class ExcessiveForce extends Skill implements InteractSkill, CooldownSkil
     }
 
 
-    @EventHandler
+    @EventHandler (priority = EventPriority.HIGH)
     public void setKnockback(CustomDamageEvent event) {
         if (event.getDamager() instanceof Player damager) {
             if (active.containsKey(damager)) {

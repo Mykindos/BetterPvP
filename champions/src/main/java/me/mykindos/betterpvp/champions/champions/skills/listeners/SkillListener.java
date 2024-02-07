@@ -44,7 +44,6 @@ import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -105,14 +104,14 @@ public class SkillListener implements Listener {
 
         if (skill instanceof CooldownSkill cooldownSkill && !(skill instanceof PrepareArrowSkill)) {
             if (!cooldownManager.use(player, skill.getName(), cooldownSkill.getCooldown(level),
-                    cooldownSkill.showCooldownFinished(), true, cooldownSkill.isCancellable(), cooldownSkill::shouldDisplayActionBar)) {
+                    cooldownSkill.showCooldownFinished(), true, cooldownSkill.isCancellable(), cooldownSkill::shouldDisplayActionBar, cooldownSkill.getPriority())) {
                 event.setCancelled(true);
                 return;
             }
-        } else if (skill instanceof PrepareArrowSkill) {
+        } else if (skill instanceof PrepareArrowSkill prepareArrowSkill) {
             if (cooldownManager.hasCooldown(player, skill.getName())) {
 
-                if (((PrepareArrowSkill) skill).showCooldownFinished()) {
+                if (prepareArrowSkill.showCooldownFinished()) {
                     UtilMessage.simpleMessage(player, "Cooldown", "You cannot use <alt>%s</alt> for <alt>%s</alt> seconds.", skill.getName(),
                             Math.max(0, cooldownManager.getAbilityRecharge(player, skill.getName()).getRemaining()));
                 }
@@ -216,9 +215,12 @@ public class SkillListener implements Listener {
 
                 if (skillOptional.isPresent()) {
                     Skill skill = skillOptional.get();
+
                     if (skill instanceof ChannelSkill channelSkill) {
-                        event.setUseShield(true);
-                        event.setShieldModelData(channelSkill.isShieldInvisible() ? RightClickEvent.INVISIBLE_SHIELD : RightClickEvent.DEFAULT_SHIELD);
+                        if (channelSkill.shouldShowShield(player)) {
+                            event.setUseShield(true);
+                            event.setShieldModelData(channelSkill.isShieldInvisible() ? RightClickEvent.INVISIBLE_SHIELD : RightClickEvent.DEFAULT_SHIELD);
+                        }
                     }
                 }
             }
