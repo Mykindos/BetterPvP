@@ -426,6 +426,14 @@ skills:
       slowStrength: 2
       slowDuration: 2.0
       energyDecreasePerLevel: 1.0
+    glacialblade:
+      enabled: true
+      maxlevel: 3
+      cooldown: 3.0
+      cooldownDecreasePerLevel: 1.0
+      damage: 2.5
+      damageIncreasePerLevel: 1.0
+
     void:
       enabled: true
       maxlevel: 5
