@@ -159,9 +159,6 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
                     || (level <= 0)
                     || !isHolding(player)) {
 
-                cooldownManager.removeCooldown(player, getName(), true);
-                cooldownManager.use(player, getName(), getCooldown(level), true);
-
                 iterator.remove();
             }
             else {
@@ -175,7 +172,6 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
 
     @Override
     public float getEnergy(int level) {
-
         return (float) (energy - ((level - 1) * energyDecreasePerLevel));
     }
 
