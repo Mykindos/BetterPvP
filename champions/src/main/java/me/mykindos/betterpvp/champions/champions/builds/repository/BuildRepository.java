@@ -192,8 +192,8 @@ public class BuildRepository implements IRepository<RoleBuild> {
             RoleBuild knight = new RoleBuild(uuid, Role.valueOf("KNIGHT"), d);
             setSkill(knight, SkillType.SWORD, "Riposte", 3);
             setSkill(knight, SkillType.AXE, "Bulls Charge", 5);
-            setSkill(knight, SkillType.PASSIVE_A, "Vengeance", 3);
-            setSkill(knight, SkillType.PASSIVE_B, "Swordsmanship", 1);
+            setSkill(knight, SkillType.PASSIVE_A, "Swordsmanship", 1);
+            setSkill(knight, SkillType.PASSIVE_B, "Vengeance", 3);
 
             RoleBuild warlock = new RoleBuild(uuid, Role.valueOf("WARLOCK"), d);
             setSkill(warlock, SkillType.SWORD, "Leech", 4);
