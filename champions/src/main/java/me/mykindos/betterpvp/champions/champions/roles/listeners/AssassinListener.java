@@ -35,17 +35,6 @@ public class AssassinListener implements Listener {
     }
 
     @EventHandler
-    public void onFallDamage(CustomDamageEvent event) {
-        if (event.getCause() != EntityDamageEvent.DamageCause.FALL) return;
-        if (!(event.getDamagee() instanceof Player damagee)) return;
-
-        if (roleManager.hasRole(damagee, Role.ASSASSIN)) {
-            event.cancel("Feather falling");
-        }
-
-    }
-
-    @EventHandler
     public void onAssassinKnockback(CustomDamageEvent event) {
         if (event.isCancelled()) return;
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
