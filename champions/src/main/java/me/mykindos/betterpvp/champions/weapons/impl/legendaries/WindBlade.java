@@ -65,9 +65,6 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
 
     @Override
     public void activate(Player player) {
-        if (!enabled) {
-            return;
-        }
         active.add(player.getUniqueId());
     }
 
@@ -138,9 +135,6 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
 
     @Override
     public boolean canUse(Player player) {
-        if (!enabled) {
-            return false;
-        }
         if (UtilBlock.isInLiquid(player)) {
             UtilMessage.simpleMessage(player, "Wind Blade", "You cannot use this weapon while in water!");
             return false;

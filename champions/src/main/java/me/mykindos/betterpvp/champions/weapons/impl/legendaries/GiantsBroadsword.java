@@ -84,7 +84,7 @@ public class GiantsBroadsword extends ChannelWeapon implements InteractWeapon, L
 
     @UpdateEvent
     public void doRegen() {
-        if (!isEnabled()) {
+        if (!enabled) {
             return;
         }
         final Iterator<UUID> iterator = active.iterator();
@@ -169,7 +169,7 @@ public class GiantsBroadsword extends ChannelWeapon implements InteractWeapon, L
 
     @EventHandler
     public void onSwapWeapon(PlayerItemHeldEvent event) {
-        if (!isEnabled()) {
+        if (!enabled) {
             return;
         }
         final Player player = event.getPlayer();
@@ -190,7 +190,7 @@ public class GiantsBroadsword extends ChannelWeapon implements InteractWeapon, L
 
     @EventHandler(priority = EventPriority.LOW)
     public void onDamage(CustomDamageEvent event) {
-        if (!isEnabled()) {
+        if (!enabled) {
             return;
         }
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
@@ -206,9 +206,6 @@ public class GiantsBroadsword extends ChannelWeapon implements InteractWeapon, L
 
     @Override
     public boolean canUse(Player player) {
-        if (!isEnabled()) {
-            return false;
-        }
         return true;
     }
 

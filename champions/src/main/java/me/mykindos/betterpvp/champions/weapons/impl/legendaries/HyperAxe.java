@@ -117,10 +117,6 @@ public class HyperAxe extends Weapon implements InteractWeapon, LegendaryWeapon,
 
     @Override
     public void activate(Player player) {
-        if (!enabled) {
-            return;
-        }
-
         ItemStack item = player.getInventory().getItemInMainHand();
         if (!item.hasItemMeta()) return;
 
@@ -139,19 +135,11 @@ public class HyperAxe extends Weapon implements InteractWeapon, LegendaryWeapon,
 
     @Override
     public boolean canUse(Player player) {
-        if (!enabled) {
-            return false;
-        }
         if (UtilBlock.isInWater(player)) {
             UtilMessage.simpleMessage(player, "Hyper Axe", "You cannot use <green>Hyper Rush <gray>in water.");
             return false;
         }
         return true;
-    }
-
-    @Override
-    public boolean isEnabled(){
-        return enabled;
     }
 
     @Override

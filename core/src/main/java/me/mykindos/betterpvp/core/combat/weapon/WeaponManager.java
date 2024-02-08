@@ -37,10 +37,6 @@ public class WeaponManager extends Manager<IWeapon> {
     }
 
     public boolean load(Weapon weapon) {
-        if (!weapon.isEnabled()) {
-            log.info(weapon.getKey() + " is not enabled");
-            return false;
-        }
         BPvPItem item = itemHandler.getItem(weapon.getIdentifier());
         if (item == null) {
             log.error(weapon.getIdentifier() + " does not exist in itemRepository");
@@ -59,6 +55,16 @@ public class WeaponManager extends Manager<IWeapon> {
         Weapon weapon = plugin.getInjector().getInstance(clazz);
         plugin.getInjector().injectMembers(weapon);
         return load(weapon);
+    }
+
+    /**
+     * reload the configuration for all weapons
+     */
+    public void reload(BPvPPlugin plugin) {
+
+        getObjects().values().forEach(iWeapon -> {
+            iWeapon.loadConfig(plugin);
+        });
     }
 
     public Optional<IWeapon> getWeaponByItemStack(ItemStack itemStack) {

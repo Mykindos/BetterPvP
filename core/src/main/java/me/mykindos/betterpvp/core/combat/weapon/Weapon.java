@@ -43,7 +43,7 @@ public abstract class Weapon extends BPvPItem implements IWeapon {
     public Weapon(BPvPPlugin plugin, String key, List<Component> lore, String namespace) {
         super(namespace, key, Material.DEBUG_STICK, Component.text("Uninitialized Weapon"), lore, 0, 2, false, true);
         this.plugin = plugin;
-        loadConfig();
+        loadConfig(plugin);
     }
 
     public void loadWeapon(BPvPItem item) {
@@ -64,7 +64,6 @@ public abstract class Weapon extends BPvPItem implements IWeapon {
      * @return returns the config value if exists, or the default value if it does not. Saves the default value if no value exists
      */
     protected <T> T getConfig(String name, Object defaultValue, Class<T> type) {
-        log.info(getKey() + " " + getConfigName() + " " + getPath(name));
         return plugin.getConfig(getConfigName()).getOrSaveObject(getPath(name), defaultValue, type);
     }
 
@@ -91,7 +90,11 @@ public abstract class Weapon extends BPvPItem implements IWeapon {
         return getKey() + "." + name;
     }
 
-    public void loadConfig() {
+    public void loadConfig(BPvPPlugin plugin) {
+        if (!this.getPlugin().equals(plugin)) {
+            //only reload/load config when called by the correct plugin
+            return;
+        }
         enabled = getConfig("enabled", true, Boolean.class);
         if (this instanceof LegendaryWeapon) {
             baseDamage = getConfig("baseDamage", 8.0, Double.class);

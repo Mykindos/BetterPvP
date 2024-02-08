@@ -73,7 +73,7 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
 
     @UpdateEvent
     public void doAlligatorsTooth() {
-        if (!isEnabled()) {
+        if (!enabled) {
             return;
         }
         final Iterator<UUID> iterator = active.iterator();
@@ -131,7 +131,7 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
 
     @UpdateEvent(delay = 1000)
     public void onOxygendDrain() {
-        if (!isEnabled()) {
+        if (!enabled) {
             return;
         }
         for (Player player : Bukkit.getOnlinePlayers()) {
@@ -143,9 +143,6 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
 
     @Override
     public boolean canUse(Player player) {
-        if (!isEnabled()) {
-            return false;
-        }
         if (!UtilBlock.isInWater(player)) {
             UtilMessage.simpleMessage(player, "Gator Stroke", "You can only use this ability in water!");
             return false;

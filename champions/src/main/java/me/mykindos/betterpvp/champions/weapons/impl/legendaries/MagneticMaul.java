@@ -77,17 +77,11 @@ public class MagneticMaul extends ChannelWeapon implements InteractWeapon, Legen
 
     @Override
     public void activate(Player player) {
-        if (!enabled) {
-            return;
-        }
         active.add(player.getUniqueId());
     }
 
     @Override
     public boolean canUse(Player player) {
-        if (!enabled) {
-            return false;
-        }
         return true;
     }
 

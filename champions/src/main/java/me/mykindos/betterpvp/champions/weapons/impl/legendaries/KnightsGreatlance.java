@@ -114,9 +114,6 @@ public class KnightsGreatlance extends ChannelWeapon implements InteractWeapon, 
 
     @Override
     public void activate(Player player) {
-        if (!enabled) {
-            return;
-        }
         final Gamer gamer = clientManager.search().online(player).getGamer();
         if (!active.containsKey(player)) {
             gamer.getActionBar().add(250, actionBar);
@@ -271,9 +268,6 @@ public class KnightsGreatlance extends ChannelWeapon implements InteractWeapon, 
 
     @Override
     public boolean canUse(Player player) {
-        if (!enabled) {
-            return false;
-        }
         if (UtilBlock.isInLiquid(player)) {
             UtilMessage.simpleMessage(player, "Knight's Greatlance", "You cannot use this weapon while in water!");
             return false;
@@ -285,11 +279,6 @@ public class KnightsGreatlance extends ChannelWeapon implements InteractWeapon, 
     @Override
     public double getEnergy() {
         return initialEnergyCost;
-    }
-
-    @Override
-    public boolean isEnabled(){
-        return enabled;
     }
 
     @Override
