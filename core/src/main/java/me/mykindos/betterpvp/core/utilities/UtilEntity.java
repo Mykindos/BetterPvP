@@ -71,10 +71,10 @@ public class UtilEntity {
     }
 
     public static List<KeyValue<LivingEntity, EntityProperty>> getNearbyEntities(LivingEntity source, Location location, double radius, EntityProperty entityProperty) {
+        if(!source.getWorld().equals(location.getWorld())) return new ArrayList<>();
         List<KeyValue<LivingEntity, EntityProperty>> livingEntities = new ArrayList<>();
         source.getWorld().getLivingEntities().stream()
                 .filter(livingEntity -> {
-                    if(!source.getWorld().equals(livingEntity.getWorld())) return false;
                     if (livingEntity.equals(source)) return false;
                     if (livingEntity.getLocation().distance(location) > radius) return false;
                     return !(livingEntity instanceof ArmorStand);

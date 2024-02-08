@@ -3,7 +3,6 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.warlock.sword;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Data;
-import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;

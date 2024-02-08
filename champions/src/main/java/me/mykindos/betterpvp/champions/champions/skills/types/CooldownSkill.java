@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.champions.champions.skills.types;
 
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.components.champions.ISkill;
-import me.mykindos.betterpvp.core.components.champions.SkillType;
 
 public interface CooldownSkill extends ISkill {
 
@@ -17,7 +16,11 @@ public interface CooldownSkill extends ISkill {
     }
 
     default boolean shouldDisplayActionBar(Gamer gamer) {
-        return isHolding(gamer.getPlayer()) && (getType() == SkillType.AXE || getType() == SkillType.SWORD);
+        return isHolding(gamer.getPlayer());
+    }
+
+    default int getPriority() {
+        return 1000;
     }
 
 }

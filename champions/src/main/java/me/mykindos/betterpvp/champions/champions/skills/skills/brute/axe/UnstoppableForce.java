@@ -213,6 +213,11 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill {
     }
 
     @Override
+    public boolean shouldShowShield(Player player) {
+        return !championsManager.getCooldowns().hasCooldown(player, getName());
+    }
+
+    @Override
     public boolean canUse(Player player) {
         return isHolding(player);
     }

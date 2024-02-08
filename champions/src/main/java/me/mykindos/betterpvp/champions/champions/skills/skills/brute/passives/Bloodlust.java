@@ -20,7 +20,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -91,7 +90,7 @@ public class Bloodlust extends Skill implements PassiveSkill {
 
                 championsManager.getEffects().addEffect(player, EffectType.STRENGTH, tempStr, (long) (getDuration(level) * 1000L));
                 player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) (getDuration(level) * 20), tempStr));
-                player.setHealth(player.getHealth() + health);
+                UtilPlayer.health(player, health);
                 UtilMessage.simpleMessage(player, getClassType().getName(), "You entered bloodlust at level: <alt2>" + tempStr + "</alt2>.");
                 player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIFIED_PIGLIN_ANGRY, 2.0F, 0.6F);
             }

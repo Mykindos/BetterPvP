@@ -5,8 +5,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
-import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.ToggleSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.CooldownToggleSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -19,6 +18,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Listener;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -34,7 +34,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class BloodCompass extends Skill implements ToggleSkill, CooldownSkill {
+public class BloodCompass extends Skill implements CooldownToggleSkill, Listener {
 
     private int numLines;
     public double maxDistance;
