@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.menu.button.ForwardButton;
 import me.mykindos.betterpvp.core.menu.button.PreviousButton;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import xyz.xenondevs.invui.gui.AbstractPagedGui;
 import xyz.xenondevs.invui.gui.SlotElement;
 import xyz.xenondevs.invui.gui.structure.Markers;
@@ -20,7 +21,7 @@ public class ViewCollectionMenu extends AbstractPagedGui<Item> implements Window
 
     private final String title;
 
-    public ViewCollectionMenu(@NotNull String title, @NotNull List<Item> pool, @NotNull Windowed previous) {
+    public ViewCollectionMenu(@NotNull String title, @NotNull List<Item> pool, @Nullable Windowed previous) {
         super(9, 4, false, new Structure(
                 "# # # # # # # # #",
                 "# x x x x x x x #",

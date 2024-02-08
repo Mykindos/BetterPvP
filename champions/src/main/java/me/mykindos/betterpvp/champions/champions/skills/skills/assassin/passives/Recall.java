@@ -8,8 +8,7 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.skills.assassin.data.RecallData;
-import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.ToggleSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.CooldownToggleSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -31,7 +30,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listener {
+public class Recall extends Skill implements CooldownToggleSkill, Listener {
 
     public static final long MARKER_MILLIS = 200;
 
@@ -102,7 +101,7 @@ public class Recall extends Skill implements ToggleSkill, CooldownSkill, Listene
 
     @Override
     public SkillType getType() {
-        return SkillType.PASSIVE_B;
+        return SkillType.PASSIVE_A;
     }
 
     @Override

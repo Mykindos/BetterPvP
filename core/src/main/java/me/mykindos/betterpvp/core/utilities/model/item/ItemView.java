@@ -117,7 +117,7 @@ public class ItemView implements ItemProvider {
 
         final List<Component> curLore = meta.lore();
         if (curLore != null) {
-            meta.lore(UtilItem.removeItalic(curLore));
+            meta.lore(curLore.stream().map(component -> UtilMessage.normalize(component).decoration(TextDecoration.ITALIC, false)).toList());
         }
 
         if (enchantments != null) {

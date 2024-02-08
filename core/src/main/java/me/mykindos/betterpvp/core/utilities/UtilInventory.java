@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.utilities;
 
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -9,6 +10,10 @@ import java.util.Map;
 
 
 public class UtilInventory {
+
+    public static boolean isPlayerInventory(Player player, int containerId) {
+        return containerId == -2 || ((CraftPlayer) player).getHandle().inventoryMenu.containerId == containerId;
+    }
 
     public static boolean contains(Player player, Material item, int required) {
 

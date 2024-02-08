@@ -11,13 +11,15 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -72,24 +74,25 @@ public class Bloodlust extends Skill implements PassiveSkill {
     }
 
     @EventHandler
-    public void onDeath(PlayerDeathEvent event) {
+    public void onDeath(EntityDeathEvent event) {
 
-        for (Player target : UtilPlayer.getNearbyEnemies(event.getEntity(), event.getEntity().getLocation(), radius)) {
-            int level = getLevel(target);
+        for (LivingEntity target : UtilEntity.getNearbyEnemies(event.getEntity(), event.getEntity().getLocation(), radius)) {
+            if(!(target instanceof Player player)) continue;
+            int level = getLevel(player);
             if (level > 0) {
                 int tempStr = 0;
-                if (str.containsKey(target)) {
-                    tempStr = str.get(target) + 1;
+                if (str.containsKey(player)) {
+                    tempStr = str.get(player) + 1;
                 }
                 tempStr = Math.min(tempStr, maxStacks);
-                str.put(target, tempStr);
-                time.put(target, (long) (System.currentTimeMillis() + getDuration(level) * 1000));
+                str.put(player, tempStr);
+                time.put(player, (long) (System.currentTimeMillis() + getDuration(level) * 1000));
 
-                championsManager.getEffects().addEffect(target, EffectType.STRENGTH, tempStr, (long) (getDuration(level) * 1000L));
-                target.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) (getDuration(level) * 20), tempStr));
-                target.setHealth(target.getHealth() + health);
-                UtilMessage.simpleMessage(target, getClassType().getName(), "You entered bloodlust at level: <alt2>" + tempStr + "</alt2>.");
-                target.getWorld().playSound(target.getLocation(), Sound.ENTITY_ZOMBIFIED_PIGLIN_ANGRY, 2.0F, 0.6F);
+                championsManager.getEffects().addEffect(player, EffectType.STRENGTH, tempStr, (long) (getDuration(level) * 1000L));
+                player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) (getDuration(level) * 20), tempStr));
+                UtilPlayer.health(player, health);
+                UtilMessage.simpleMessage(player, getClassType().getName(), "You entered bloodlust at level: <alt2>" + tempStr + "</alt2>.");
+                player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIFIED_PIGLIN_ANGRY, 2.0F, 0.6F);
             }
 
         }

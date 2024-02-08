@@ -104,6 +104,6 @@ public class StunningShot extends PrepareArrowSkill {
     @Override
     public void loadSkillConfig() {
         baseDuration = getConfig("baseDuration", 0.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.3, Double.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.25, Double.class);
     }
 }

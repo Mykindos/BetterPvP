@@ -64,7 +64,7 @@ public class NullBlade extends Skill implements PassiveSkill, EnergySkill {
     @Override
     public SkillType getType() {
 
-        return SkillType.PASSIVE_A;
+        return SkillType.PASSIVE_B;
     }
 
     @Override

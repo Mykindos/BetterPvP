@@ -30,6 +30,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.util.Vector;
@@ -90,7 +91,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
     }
 
 
-    @EventHandler
+    @EventHandler (priority = EventPriority.LOW)
     public void onEvade(CustomDamageEvent event) {
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
         if (!(event.getDamagee() instanceof Player player)) return;

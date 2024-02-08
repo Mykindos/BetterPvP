@@ -3,8 +3,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.passive
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
-import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.ToggleSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.CooldownToggleSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -39,7 +38,7 @@ import java.util.UUID;
 
 @Singleton
 @BPvPListener
-public class SmokeBomb extends Skill implements ToggleSkill, CooldownSkill, Listener {
+public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener {
 
     private final Map<UUID, Long> smoked = new HashMap<>();
 
@@ -60,7 +59,7 @@ public class SmokeBomb extends Skill implements ToggleSkill, CooldownSkill, List
 
     @Override
     public String[] getDescription(int level) {
-        return new String[] {
+        return new String[]{
                 "Drop your Sword / Axe to activate",
                 "",
                 "Instantly <effect>Vanish</effect> before your foes",
@@ -94,7 +93,7 @@ public class SmokeBomb extends Skill implements ToggleSkill, CooldownSkill, List
 
     @Override
     public SkillType getType() {
-        return SkillType.PASSIVE_B;
+        return SkillType.PASSIVE_A;
     }
 
     public double getDuration(int level) {
@@ -218,4 +217,5 @@ public class SmokeBomb extends Skill implements ToggleSkill, CooldownSkill, List
         }
 
     }
+
 }

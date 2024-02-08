@@ -13,7 +13,7 @@ public class TimestampStatementValue extends StatementValue<Timestamp> {
     }
 
     public TimestampStatementValue(Instant value) {
-        this(Timestamp.from(value));
+        this(value == null ? null : Timestamp.from(value));
     }
 
     @Override
