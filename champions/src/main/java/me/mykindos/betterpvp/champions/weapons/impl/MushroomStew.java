@@ -40,10 +40,6 @@ public class MushroomStew extends Weapon implements InteractWeapon, CooldownWeap
 
     @Override
     public void activate(Player player) {
-        if (!enabled) {
-            return;
-        }
-
         player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, (int) (duration * 20L), level - 1));
         UtilMessage.message(player, "Item",
                 Component.text("You consumed a ", NamedTextColor.GRAY).append(getName().color(NamedTextColor.YELLOW)));

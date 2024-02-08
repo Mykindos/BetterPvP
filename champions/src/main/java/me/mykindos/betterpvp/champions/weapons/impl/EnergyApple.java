@@ -28,9 +28,6 @@ public class EnergyApple extends Weapon implements InteractWeapon, CooldownWeapo
 
     @Override
     public void activate(Player player) {
-        if (!enabled) {
-            return;
-        }
         energyHandler.regenerateEnergy(player, energyRegen);
         UtilMessage.message(player, "Item",
                 Component.text("You consumed an ", NamedTextColor.GRAY).append(getName().color(NamedTextColor.YELLOW)));

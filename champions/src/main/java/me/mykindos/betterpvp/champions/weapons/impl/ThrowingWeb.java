@@ -65,9 +65,6 @@ public class ThrowingWeb extends Weapon implements Listener, InteractWeapon, Coo
 
     @Override
     public void activate(Player player) {
-        if (!enabled) {
-            return;
-        }
         Item item = player.getWorld().dropItem(player.getEyeLocation(), new ItemStack(Material.COBWEB));
         item.getItemStack().getItemMeta().getPersistentDataContainer().set(CoreNamespaceKeys.UUID_KEY, PersistentDataType.STRING, UUID.randomUUID().toString());
         item.setVelocity(player.getLocation().getDirection().multiply(1.8));
