@@ -98,31 +98,35 @@ public class Sever extends Skill implements CooldownSkill, Listener {
 
         int level = getLevel(player);
         if (level <= 0) {
-            return; // Skill not active
+            return;
         }
 
         final PlayerUseSkillEvent event = UtilServer.callEvent(new PlayerUseSkillEvent(player, this, level));
         if (event.isCancelled()) {
-            return; // Skill was cancelled
+            return;
         }
 
-        if(ent == null) return;
+        if (ent == null) {
+            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SPIDER_HURT, 1.0F, 1.5F);
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s", getName());
+            return;
+        }
 
-        if (UtilMath.offset(player, ent) <= 3.0) {
-            if (ent instanceof Player damagee) {
-                if (UtilPlayer.getRelation(player, damagee) == EntityProperty.FRIENDLY) {
-                    return;
-                }
-            }
+        boolean withinRange = UtilMath.offset(player, ent) <= 3.0;
+        boolean isFriendly = false;
+        if (ent instanceof Player damagee) {
+            isFriendly = UtilPlayer.getRelation(player, damagee) == EntityProperty.FRIENDLY;
+        }
 
+        if (!withinRange || isFriendly) {
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s", getName());
+        } else {
             championsManager.getEffects().addEffect(ent, EffectType.BLEED, (long) getDuration(level) * 1000L);
             UtilMessage.simpleMessage(player, getClassType().getName(), "You severed <alt>" + ent.getName() + "</alt>.");
             UtilMessage.simpleMessage(ent, getClassType().getName(), "You have been severed by <alt>" + player.getName() + "</alt>.");
-        } else {
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s", getName());
         }
-        ent.getWorld().playSound(ent.getLocation(), Sound.ENTITY_SPIDER_HURT, 1.0F, 1.5F);
 
+        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SPIDER_HURT, 1.0F, 1.5F);
     }
 
     @Override
