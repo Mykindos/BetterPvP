@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.bow;
 
+import com.destroystokyo.paper.ParticleBuilder;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
@@ -69,16 +70,25 @@ public class SilencingArrow extends PrepareArrowSkill {
 
     @Override
     public void onHit(Player damager, LivingEntity target, int level) {
-        if (!(target instanceof Player damagee)) return;
-        championsManager.getEffects().addEffect(damagee, EffectType.SILENCE, (long) ((baseDuration + (level * durationIncreasePerLevel)) * 1000L));
-        if (championsManager.getEffects().hasEffect(damagee, EffectType.IMMUNETOEFFECTS)) {
-            UtilMessage.simpleMessage(damager, getClassType().getName(), "<alt>" + damagee.getName() + "</alt> is immune to your silence!");
+        championsManager.getEffects().addEffect(target, EffectType.SILENCE, (long) ((baseDuration + (level * durationIncreasePerLevel)) * 1000L));
+        if (championsManager.getEffects().hasEffect(target, EffectType.IMMUNETOEFFECTS)) {
+            UtilMessage.simpleMessage(damager, getClassType().getName(), "<alt>" + target.getName() + "</alt> is immune to your silence!");
+            return;
         }
+        UtilMessage.message(damager, getClassType().getName(), "You hit <yellow>%s</yellow> with <green>%s %s</green>.", target.getName(), getName(), level);
+        if (!(target instanceof Player damagee)) return;
+        UtilMessage.simpleMessage(damagee, getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s %s</alt>.", damager.getName(), getName(), level);
     }
 
     @Override
     public void displayTrail(Location location) {
-        Particle.REDSTONE.builder().location(location).color(125, 0, 125).count(3).extra(0).receivers(60, true).spawn();
+        new ParticleBuilder(Particle.SPELL)
+                .location(location)
+                .count(1)
+                .offset(0.1, 0.1, 0.1)
+                .extra(0)
+                .receivers(60)
+                .spawn();
     }
 
 

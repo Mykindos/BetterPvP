@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.bow;
 
+import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
@@ -11,12 +12,15 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+
+import java.util.Random;
 
 @Singleton
 @BPvPListener
@@ -84,13 +88,35 @@ public class ToxicArrow extends PrepareArrowSkill {
 
     @Override
     public void onHit(Player damager, LivingEntity target, int level) {
-        championsManager.getEffects().addEffect(target, EffectType.POISON, 2, (long) ((baseDuration + level) * 1000L));
+        championsManager.getEffects().addEffect(target, EffectType.POISON, poisonStrength, (long) ((baseDuration + level) * 1000L));
+        UtilMessage.message(damager, getClassType().getName(), "You hit <yellow>%s</yellow> with <green>%s %s</green>.", target.getName(), getName(), level);
+        if (!(target instanceof Player damagee)) return;
+        UtilMessage.simpleMessage(damagee, getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s %s</alt>.", damager.getName(), getName(), level);
     }
 
     @Override
     public void displayTrail(Location location) {
-        Particle.REDSTONE.builder().location(location).color(0, 255, 0).count(3).extra(0).receivers(60, true).spawn();
+        Random random = new Random();
+        double spread = 0.1;
+        double dx = (random.nextDouble() - 0.5) * spread;
+        double dy = (random.nextDouble() - 0.5) * spread;
+        double dz = (random.nextDouble() - 0.5) * spread;
+
+        Location particleLocation = location.clone().add(dx, dy, dz);
+
+        double red = 0.4;
+        double green = 1.0;
+        double blue = 0.4;
+
+        new ParticleBuilder(Particle.SPELL_MOB)
+                .location(particleLocation)
+                .count(0)
+                .offset(red, green, blue)
+                .extra(1.0)
+                .receivers(60)
+                .spawn();
     }
+
 
     public void loadSkillConfig(){
         baseDuration = getConfig("baseDuration", 6.0, Double.class);

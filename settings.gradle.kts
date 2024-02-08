@@ -14,6 +14,7 @@ if (File("./private/").exists()) {
     include(":private:dungeons")
     include(":private:blocking-mixins")
     include(":private:blocking")
+    include(":private:store")
 }
 
 pluginManagement {
@@ -79,9 +80,14 @@ dependencyResolutionManagement {
             library("jsr305", "com.google.code.findbugs", "jsr305").version("3.0.2")
             library("caffeine", "com.github.ben-manes.caffeine", "caffeine").version("3.1.8")
             library("okhttp", "com.squareup.okhttp3", "okhttp").version("4.10.0")
+            library("prettytime", "org.ocpsoft.prettytime", "prettytime").version("5.0.4.Final")
 
             // Library - InvUI (Inventory API)
             library("invui", "xyz.xenondevs.invui", "invui").versionRef("invui")
+
+            // Library - WorldEdit
+            library("fawe", "com.fastasyncworldedit", "FastAsyncWorldEdit-Core").version("2.8.4")
+            library("fawebukkit", "com.fastasyncworldedit", "FastAsyncWorldEdit-Bukkit").version("2.8.4")
 
             // Library - Mythic
             library("mythic", "io.lumine", "Mythic-Dist").version("5.3.5")

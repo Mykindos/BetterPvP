@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
 import me.mykindos.betterpvp.champions.champions.builds.menus.buttons.ClassSelectionButton;
 import me.mykindos.betterpvp.champions.champions.skills.SkillManager;
+import me.mykindos.betterpvp.core.combat.armour.ArmourManager;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
@@ -19,14 +20,14 @@ import java.util.Iterator;
 public class ClassSelectionMenu extends AbstractGui implements Windowed {
 
     @Inject
-    public ClassSelectionMenu(BuildManager buildManager, SkillManager skillManager) {
+    public ClassSelectionMenu(BuildManager buildManager, SkillManager skillManager, ArmourManager armourManager) {
         super(9, 3);
 
         int[] slots = new int[] {10, 11, 12, 14, 15, 16};
         final Iterator<Role> iterator = Arrays.stream(Role.values()).iterator();
         for (int slot : slots) {
             final Role role = iterator.next();
-            setItem(slot, new ClassSelectionButton(buildManager, skillManager, role, this));
+            setItem(slot, new ClassSelectionButton(buildManager, skillManager, role, armourManager, this));
         }
 
         setBackground(Menu.BACKGROUND_ITEM);
@@ -35,6 +36,6 @@ public class ClassSelectionMenu extends AbstractGui implements Windowed {
     @NotNull
     @Override
     public Component getTitle() {
-        return Component.text("Pick a Kit");
+        return Component.text("Pick a Class");
     }
 }

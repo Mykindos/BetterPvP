@@ -252,7 +252,12 @@ public class UtilMessage {
     }
 
     public static Component deserialize(String message) {
-        return normalize(MiniMessage.miniMessage().deserialize(message, tagResolver));
+        String msg = message;
+        if(msg.contains(String.valueOf(UtilFormat.COLOR_CHAR))) {
+            msg = UtilFormat.stripColor(message);
+        }
+
+        return normalize(MiniMessage.miniMessage().deserialize(msg, tagResolver));
     }
 
     public static Component deserialize(String message, Object... args) {

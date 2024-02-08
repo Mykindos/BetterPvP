@@ -17,7 +17,6 @@ import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.RayTraceResult;
 
 import java.util.HashMap;

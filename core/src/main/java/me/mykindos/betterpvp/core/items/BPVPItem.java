@@ -125,6 +125,7 @@ public class BPVPItem {
             if (itemMeta.hasCustomModelData()) {
                 return itemMeta.getCustomModelData() == customModelData;
             }
+            return false;
         }
         return true;
     }

@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.combat.click.events.RightClickEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
@@ -20,6 +21,7 @@ import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
+import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -118,7 +120,8 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
             final LivingEntity ent = bashedEntry.getKey();
 
             // Add velocity and damage
-            UtilVelocity.velocity(ent, direction, strength, false, 0, 0.3, 0.8 + 0.05 * level, true, true);
+            VelocityData velocityData = new VelocityData(direction, strength, false, 0, 0.3, 0.8 + 0.05 * level, true);
+            UtilVelocity.velocity(ent, player, velocityData, VelocityType.KNOCKBACK_CUSTOM);
             UtilDamage.doCustomDamage(new CustomDamageEvent(ent, player, null, EntityDamageEvent.DamageCause.FALL, 0.0, false, getName()));
 
             // Cancel fall damage if they're friendly

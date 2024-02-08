@@ -10,7 +10,10 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -32,6 +35,8 @@ public class HealingShot extends PrepareArrowSkill {
 
     double increaseDurationPerLevel;
 
+    int regenerationStrength;
+
     @Inject
     public HealingShot(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -48,8 +53,9 @@ public class HealingShot extends PrepareArrowSkill {
         return new String[]{
                 "Left click with a Bow to prepare",
                 "",
-                "Shoot an arrow that gives <effect>Regeneration III</effect>",
+                "Shoot an arrow that gives <effect>Regeneration " + UtilFormat.getRomanNumeral(regenerationStrength + 1) + "</effect>",
                 "to allies hit for <val>" + getDuration(level) + "</val> seconds",
+                "and cleanse them of all negative effects",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -93,7 +99,17 @@ public class HealingShot extends PrepareArrowSkill {
     public void onHit(Player damager, LivingEntity target, int level, PreCustomDamageEvent event) {
         if (target instanceof Player damagee) {
             if (UtilPlayer.isPlayerFriendly(damager, damagee)) {
-                damagee.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, (int) (getDuration(level) * 20), 2 ));
+
+                damagee.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, (int) (getDuration(level) * 20), regenerationStrength));
+
+                target.getWorld().spawnParticle(Particle.HEART, target.getLocation().add(0, 1.5, 0), 5, 0.5, 0.5, 0.5, 0);
+                target.getWorld().playSound(target.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 2, 1.5F);
+
+                championsManager.getEffects().addEffect(damagee, EffectType.IMMUNETOEFFECTS, 1);
+                UtilMessage.message(damager, getClassType().getName(), UtilMessage.deserialize("You hit <yellow>%s</yellow> with <green>%s %s</green>", damagee.getName(), getName(), level));
+                if (!damager.equals(damagee)) {
+                    UtilMessage.message(damagee, getClassType().getName(), UtilMessage.deserialize("You were hit by <yellow>%s</yellow> with <green>%s %s</green>", damager.getName(), getName(), level));
+                }
                 event.setCancelled(true);
             }
         }
@@ -122,5 +138,7 @@ public class HealingShot extends PrepareArrowSkill {
     public void loadSkillConfig() {
         baseDuration = getConfig("baseDuration", 4.0, Double.class);
         increaseDurationPerLevel = getConfig("increasePerLevel", 1.0, Double.class);
+
+        regenerationStrength = getConfig("regenerationStrength", 2, Integer.class);
     }
 }

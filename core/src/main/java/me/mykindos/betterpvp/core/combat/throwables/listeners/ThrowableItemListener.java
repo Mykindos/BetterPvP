@@ -10,7 +10,6 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
@@ -24,7 +23,7 @@ import org.bukkit.util.RayTraceResult;
 import java.util.List;
 
 @BPvPListener
-public class ThrowableListener implements Listener {
+public class ThrowableItemListener implements Listener {
 
     @Inject
     private ThrowableHandler throwableHandler;
@@ -42,6 +41,7 @@ public class ThrowableListener implements Listener {
 
     @EventHandler
     public void onCollision(ThrowableHitEvent event) {
+        if(event.isCancelled()) return;
         if (event.getThrowable().isRemoveOnCollision()) {
             event.getThrowable().getItem().remove();
         }
@@ -82,7 +82,7 @@ public class ThrowableListener implements Listener {
             return;
         }
 
-        UtilServer.callEvent(new ThrowableHitGroundEvent(throwable));
+        throwableHandler.processThrowableHitGround(throwable, new ThrowableHitGroundEvent(throwable, throwable.getItem().getLocation()));
     }
 
     private void checkEntityCollision(ThrowableItem throwable) {
@@ -95,7 +95,7 @@ public class ThrowableListener implements Listener {
         final List<LivingEntity> targets = UtilEntity.getNearbyEnemies(throwable.getThrower(), location, size);
         for (LivingEntity entity : targets) {
             if (throwable.getImmunes().contains(entity)) continue;
-            UtilServer.callEvent(new ThrowableHitEntityEvent(throwable, entity));
+            throwableHandler.processThrowableHitEntity(throwable, new ThrowableHitEntityEvent(throwable, entity));
             if (throwable.isSingleCollision()) {
                 break;
             }
@@ -113,7 +113,8 @@ public class ThrowableListener implements Listener {
 
             return !throwable.getImmunes().contains(living);
         }).map(RayTraceResult::getHitEntity).map(LivingEntity.class::cast).ifPresent(entity -> {
-            UtilServer.callEvent(new ThrowableHitEntityEvent(throwable, entity));
+            throwableHandler.processThrowableHitEntity(throwable, new ThrowableHitEntityEvent(throwable, entity));
         });
     }
+
 }

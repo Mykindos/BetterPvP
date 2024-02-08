@@ -2,12 +2,12 @@ package me.mykindos.betterpvp.champions.weapons.impl.legendaries;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.core.combat.weapon.types.ChannelWeapon;
-import me.mykindos.betterpvp.core.combat.weapon.types.InteractWeapon;
-import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.weapon.types.ChannelWeapon;
+import me.mykindos.betterpvp.core.combat.weapon.types.InteractWeapon;
+import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseItemEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.energy.EnergyHandler;
@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -28,6 +29,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -69,7 +71,7 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
     }
 
     @Override
-    public List<Component> getLore() {
+    public List<Component> getLore(ItemStack item) {
         List<Component> lore = new ArrayList<>();
         lore.add(Component.text("This deadly tooth was stolen from", NamedTextColor.WHITE));
         lore.add(Component.text("a nest of reptilian beasts long ago.", NamedTextColor.WHITE));
@@ -119,7 +121,8 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
                 continue;
             }
 
-            UtilVelocity.velocity(player, velocityStrength, 0.11D, 1.0D, true);
+            VelocityData velocityData = new VelocityData(player.getLocation().getDirection(), velocityStrength, false, 0, 0.11, 1.0, true);
+            UtilVelocity.velocity(player, null, velocityData);
             player.getWorld().playEffect(player.getLocation(), Effect.STEP_SOUND, Material.LAPIS_BLOCK);
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_FISH_SWIM, 0.8F, 1.5F);
         }

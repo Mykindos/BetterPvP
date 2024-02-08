@@ -59,7 +59,7 @@ public class ClientManager extends PlayerManager<Client> {
 
         this.store = Caffeine.newBuilder()
                 .scheduler(Scheduler.systemScheduler())
-                .expireAfter(new ClientExpiry())
+                .expireAfter(new ClientExpiry<>())
                 .removalListener((final UUID uuid, final Client client, final RemovalCause cause) -> {
                     if (uuid == null || client == null) {
                         return;

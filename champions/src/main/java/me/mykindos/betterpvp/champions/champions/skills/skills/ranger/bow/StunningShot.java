@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.bow;
 
+import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
@@ -73,13 +74,20 @@ public class StunningShot extends PrepareArrowSkill {
     @Override
     public void onHit(Player damager, LivingEntity target, int level) {
         if(!(target instanceof Player player)) return;
-        UtilMessage.message(player, getClassType().getName(), "You were hit by a " + getName());
+        UtilMessage.message(damager, getClassType().getName(), UtilMessage.deserialize("You hit <yellow>%s</yellow> with <green>%s %s</green>.", player.getName(), getName(), level));
+        UtilMessage.message(player, getClassType().getName(), UtilMessage.deserialize("You were hit by <yellow>%s</yellow> with <green>%s %s</green>", damager.getName(), getName(), level));
         championsManager.getEffects().addEffect(player, EffectType.STUN, (long) (getDuration(level) * 1000));
     }
 
     @Override
     public void displayTrail(Location location) {
-        Particle.REDSTONE.builder().location(location).color(0, 255, 0).count(3).extra(0).receivers(60, true).spawn();
+        new ParticleBuilder(Particle.SCULK_CHARGE_POP)
+                .location(location)
+                .count(1)
+                .offset(0.1, 0.1, 0.1)
+                .extra(0)
+                .receivers(60)
+                .spawn();
     }
 
     @Override
@@ -96,6 +104,6 @@ public class StunningShot extends PrepareArrowSkill {
     @Override
     public void loadSkillConfig() {
         baseDuration = getConfig("baseDuration", 0.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.3, Double.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.25, Double.class);
     }
 }

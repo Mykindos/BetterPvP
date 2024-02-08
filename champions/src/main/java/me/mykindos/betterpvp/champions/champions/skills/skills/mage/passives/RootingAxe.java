@@ -13,7 +13,6 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Effect;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -48,7 +47,7 @@ public class RootingAxe extends Skill implements PassiveSkill, CooldownSkill {
 
         return new String[]{
                 "Your axe rips players downward into the earth,",
-                " disrupting their movement, and stopping them",
+                "disrupting their movement, and stopping them",
                 "from jumping for <stat>" + getDuration(level) + "</stat> seconds",
                 "",
                 "Internal Cooldown: <val>" + getCooldown(level)
@@ -103,8 +102,7 @@ public class RootingAxe extends Skill implements PassiveSkill, CooldownSkill {
 
     @Override
     public SkillType getType() {
-
-        return SkillType.PASSIVE_A;
+        return SkillType.PASSIVE_B;
     }
 
 

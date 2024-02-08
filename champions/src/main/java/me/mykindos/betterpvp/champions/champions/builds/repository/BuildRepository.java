@@ -104,6 +104,15 @@ public class BuildRepository implements IRepository<RoleBuild> {
             UtilMessage.message(player, "Champions", UtilMessage.deserialize("<green>%s</green> has been disabled on this server, refunding <green>%s</green> skill point(s) and removing from <yellow>%s</yellow> build <green>%s</green>", skill.getName(), level, build.getRole().toString(), build.getId()));
             return;
         }
+
+        if (skill.getType() != type) {
+            return;
+        }
+
+        if (level > skill.getMaxLevel()) {
+            level = skill.getMaxLevel();
+        }
+
         build.setSkill(type, skill, level);
         build.takePoints(level);
     }
@@ -159,8 +168,8 @@ public class BuildRepository implements IRepository<RoleBuild> {
             RoleBuild assassin = new RoleBuild(uuid, Role.valueOf("ASSASSIN"), d);
             setSkill(assassin, SkillType.SWORD, "Sever", 3);
             setSkill(assassin, SkillType.AXE, "Leap", 5);
-            setSkill(assassin, SkillType.PASSIVE_A, "Backstab", 1);
-            setSkill(assassin, SkillType.PASSIVE_B, "Smoke Bomb", 3);
+            setSkill(assassin, SkillType.PASSIVE_A, "Smoke Bomb", 3);
+            setSkill(assassin, SkillType.PASSIVE_B, "Backstab", 1);
 
             RoleBuild brute = new RoleBuild(uuid, Role.valueOf("BRUTE"), d);
             setSkill(brute, SkillType.SWORD, "Flesh Hook", 3);
@@ -177,14 +186,14 @@ public class BuildRepository implements IRepository<RoleBuild> {
 
             RoleBuild mage = new RoleBuild(uuid, Role.valueOf("MAGE"), d);
             setSkill(mage, SkillType.SWORD, "Inferno", 5);
-            setSkill(mage, SkillType.AXE, "Molten Blast", 3);
-            setSkill(mage, SkillType.PASSIVE_A, "Holy Light", 2);
-            setSkill(mage, SkillType.PASSIVE_B, "Immolate", 2);
+            setSkill(mage, SkillType.AXE, "Fire Blast", 3);
+            setSkill(mage, SkillType.PASSIVE_A, "Immolate", 2);
+            setSkill(mage, SkillType.PASSIVE_B, "Holy Light", 2);
 
             RoleBuild knight = new RoleBuild(uuid, Role.valueOf("KNIGHT"), d);
             setSkill(knight, SkillType.SWORD, "Riposte", 3);
             setSkill(knight, SkillType.AXE, "Bulls Charge", 5);
-            setSkill(knight, SkillType.PASSIVE_A, "Fury", 3);
+            setSkill(knight, SkillType.PASSIVE_A, "Vengeance", 3);
             setSkill(knight, SkillType.PASSIVE_B, "Swordsmanship", 1);
 
             RoleBuild warlock = new RoleBuild(uuid, Role.valueOf("WARLOCK"), d);

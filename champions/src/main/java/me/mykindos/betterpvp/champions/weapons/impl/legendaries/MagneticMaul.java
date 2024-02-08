@@ -3,13 +3,13 @@ package me.mykindos.betterpvp.champions.weapons.impl.legendaries;
 import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.core.combat.weapon.types.ChannelWeapon;
-import me.mykindos.betterpvp.core.combat.weapon.types.InteractWeapon;
-import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomKnockbackEvent;
+import me.mykindos.betterpvp.core.combat.weapon.types.ChannelWeapon;
+import me.mykindos.betterpvp.core.combat.weapon.types.InteractWeapon;
+import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseItemEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.energy.EnergyHandler;
@@ -22,6 +22,7 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.math.VectorLine;
+import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -37,6 +38,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
@@ -79,7 +81,7 @@ public class MagneticMaul extends ChannelWeapon implements InteractWeapon, Legen
     }
 
     @Override
-    public List<Component> getLore() {
+    public List<Component> getLore(ItemStack item) {
         List<Component> lore = new ArrayList<>();
         lore.add(Component.text("For centuries, warlords used", NamedTextColor.WHITE));
         lore.add(Component.text("this hammer to control their", NamedTextColor.WHITE));
@@ -212,7 +214,8 @@ public class MagneticMaul extends ChannelWeapon implements InteractWeapon, Legen
             }
 
             final Vector trajectory = pullLocation.toVector().subtract(entity.getLocation().toVector()).normalize().multiply(0.3);
-            UtilVelocity.velocity(entity, trajectory, 0.3, false, 0, 0, 1, true, true);
+            VelocityData velocityData = new VelocityData(trajectory, 0.3, false, 0, 0, 1, true);
+            UtilVelocity.velocity(entity, wielder, velocityData);
             playPullLine(wielder, entity);
         }
     }

@@ -108,10 +108,10 @@ public abstract class Skill implements ISkill {
     }
 
     /**
-     * @param name name of the value
+     * @param name         name of the value
      * @param defaultValue default value
-     * @param type The type of default value
-     * @param <T> The type of default value
+     * @param type         The type of default value
+     * @param <T>          The type of default value
      * @return returns the config value if exists, or the default value if it does not. Does not save value in the config
      */
     protected <T> T getConfigObject(String name, T defaultValue, Class<T> type) {
@@ -210,6 +210,7 @@ public abstract class Skill implements ISkill {
     protected int getLevel(Player player) {
         Optional<BuildSkill> skillOptional = getSkill(player);
         int level = skillOptional.map(BuildSkill::getLevel).orElse(0);
+
         if (level > 0 && SkillWeapons.isHolding(player, getType()) && SkillWeapons.hasBooster(player)) {
             level++;
         }

@@ -24,21 +24,18 @@ public class BackButton extends ControlItem<Gui> {
 
     @Override
     public ItemProvider getItemProvider(Gui gui) {
-        if (previousMenu == null) {
-            return gui.getBackground();
-        }
-
         return ItemView.builder()
                 .material(Material.PAPER)
                 .customModelData(10003)
                 .fallbackMaterial(Material.ARROW)
-                .displayName(Component.text("Back", NamedTextColor.RED))
+                .displayName(Component.text(previousMenu == null ? "Close" : "Back", NamedTextColor.RED))
                 .build();
     }
 
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
         if (previousMenu == null) {
+            player.closeInventory();
             return;
         }
 

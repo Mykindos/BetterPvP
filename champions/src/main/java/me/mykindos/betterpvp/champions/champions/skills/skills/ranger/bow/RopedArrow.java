@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.bow;
 
+import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
@@ -12,10 +13,12 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -135,14 +138,8 @@ public class RopedArrow extends PrepareArrowSkill {
         final int curStrength = this.strength.getOrDefault(player, 0);
         double mult = arrow.getVelocity().length() / 3.0D;
 
-        UtilVelocity.velocity(player,
-                vec,
-                2.5D + mult * curStrength,
-                false,
-                0.8D,
-                0.3D * mult,
-                1.5D * mult,
-                true);
+        VelocityData velocityData = new VelocityData(vec, 2.5D + mult * curStrength, false, 0.8D, 0.3D * mult, 1.5D * mult, true);
+        UtilVelocity.velocity(player, null, velocityData);
 
         arrow.getWorld().playSound(arrow.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
         arrows.remove(arrow);
@@ -176,7 +173,15 @@ public class RopedArrow extends PrepareArrowSkill {
 
     @Override
     public void displayTrail(Location location) {
-        Particle.REDSTONE.builder().location(location).color(165, 42, 42).count(3).extra(0).receivers(60, true).spawn();
+        Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1);
+        new ParticleBuilder(Particle.REDSTONE)
+                .location(location)
+                .count(1)
+                .offset(0.1, 0.1, 0.1)
+                .extra(0)
+                .receivers(60)
+                .data(dustOptions)
+                .spawn();
     }
 
     @Override

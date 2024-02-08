@@ -6,10 +6,12 @@ import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.craftbukkit.v1_20_R3.CraftWorld;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -38,6 +40,11 @@ public class UtilEntity {
         return UtilPlayer.getRelation(player, other) != EntityProperty.FRIENDLY;
     };
 
+    public static Optional<Entity> getEntity(@NotNull World world, int id) {
+        return Optional.ofNullable(((CraftWorld) world).getHandle().getEntity(id))
+                .map(net.minecraft.world.entity.Entity::getBukkitEntity);
+    }
+
     public static Optional<RayTraceResult> interpolateCollision(@NotNull Location lastLocation, @NotNull Location destination, float raySize, @Nullable Predicate<Entity> entityFilter) {
         Preconditions.checkNotNull(lastLocation, "Last location cannot be null");
         Preconditions.checkNotNull(destination, "Destination cannot be null");
@@ -64,10 +71,10 @@ public class UtilEntity {
     }
 
     public static List<KeyValue<LivingEntity, EntityProperty>> getNearbyEntities(LivingEntity source, Location location, double radius, EntityProperty entityProperty) {
+        if(!source.getWorld().equals(location.getWorld())) return new ArrayList<>();
         List<KeyValue<LivingEntity, EntityProperty>> livingEntities = new ArrayList<>();
         source.getWorld().getLivingEntities().stream()
                 .filter(livingEntity -> {
-                    if(!source.getWorld().getName().equalsIgnoreCase(livingEntity.getWorld().getName())) return false;
                     if (livingEntity.equals(source)) return false;
                     if (livingEntity.getLocation().distance(location) > radius) return false;
                     return !(livingEntity instanceof ArmorStand);
@@ -99,5 +106,21 @@ public class UtilEntity {
         armorStand.setPersistent(false); // We don't want them to be saved in the world
         armorStand.setCollidable(false); // We don't want them to collide with anything
         return armorStand;
+    }
+
+    /**
+     * Changes the view range of the display to the specified amount of blocks
+     * @param display The display to change the view range of
+     * @param blocks The amount of blocks to change the view range to
+     */
+    public static void setViewRangeBlocks(@NotNull Display display, float blocks) {
+        display.setViewRange((float) (blocks / (net.minecraft.world.entity.Entity.getViewScale() * 64.0)));
+    }
+
+    /**
+     * Gets the view range of the display in blocks
+     */
+    public static float getViewRangeBlocks(@NotNull Display display) {
+        return display.getViewRange() * (float) (net.minecraft.world.entity.Entity.getViewScale() * 64.0);
     }
 }

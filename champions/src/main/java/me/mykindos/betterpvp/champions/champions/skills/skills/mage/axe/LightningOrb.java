@@ -11,7 +11,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableItem;
-import me.mykindos.betterpvp.core.combat.throwables.events.ThrowableHitEntityEvent;
+import me.mykindos.betterpvp.core.combat.throwables.ThrowableListener;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
@@ -23,7 +23,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -33,7 +32,7 @@ import org.bukkit.potion.PotionEffectType;
 
 @Singleton
 @BPvPListener
-public class LightningOrb extends Skill implements InteractSkill, CooldownSkill, Listener {
+public class LightningOrb extends Skill implements InteractSkill, CooldownSkill, Listener, ThrowableListener {
 
     private int maxTargets;
     private double baseSpreadDistance;
@@ -109,31 +108,32 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
     }
 
 
-    @EventHandler
-    public void onCollide(ThrowableHitEntityEvent event) {
-        if (!event.getThrowable().getName().equals(getName())) return;
-        if (!(event.getThrowable().getThrower() instanceof Player thrower)) return;
+    @Override
+    public void onThrowableHit(ThrowableItem throwableItem, LivingEntity thrower, LivingEntity hit) {
+        Player playerThrower = (Player) thrower;
 
-        int level = getLevel(thrower);
+        int level = getLevel(playerThrower);
         if (level > 0) {
             int count = 0;
-            for (LivingEntity ent : UtilEntity.getNearbyEnemies(thrower, event.getThrowable().getItem().getLocation(), getSpreadDistance(level))) {
+            for (LivingEntity ent : UtilEntity.getNearbyEnemies(playerThrower, throwableItem.getItem().getLocation(), getSpreadDistance(level))) {
 
                 if (count >= maxTargets) continue;
-                event.getThrowable().getImmunes().add(ent);
+                throwableItem.getImmunes().add(ent);
                 if (ent instanceof Player target) {
                     championsManager.getEffects().addEffect(target, EffectType.SHOCK, (long) (getShockDuration(level) * 1000));
                 }
 
                 ent.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) (getSlowDuration(level) * 20), slowStrength));
 
-                thrower.getLocation().getWorld().strikeLightning(ent.getLocation());
-                UtilDamage.doCustomDamage(new CustomDamageEvent(ent, event.getThrowable().getThrower(), null, DamageCause.CUSTOM, getDamage(level), false, getName()));
+                playerThrower.getLocation().getWorld().strikeLightning(ent.getLocation());
+                UtilDamage.doCustomDamage(new CustomDamageEvent(ent, playerThrower, null, DamageCause.CUSTOM, getDamage(level), false, getName()));
 
                 //ent.getWorld().playSound(ent.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1.0F, 1.0F);
                 count++;
             }
         }
+
+        throwableItem.getItem().remove();
     }
 
 
@@ -143,7 +143,7 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
         orb.setVelocity(player.getLocation().getDirection());
         orb.setCanPlayerPickup(false);
         orb.setCanMobPickup(false);
-        ThrowableItem throwableItem = new ThrowableItem(orb, player, "Lightning Orb", 10000, true);
+        ThrowableItem throwableItem = new ThrowableItem(this, orb, player, "Lightning Orb", 10000, false);
         championsManager.getThrowables().addThrowable(throwableItem);
     }
 
@@ -168,4 +168,5 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
     public Action[] getActions() {
         return SkillActions.RIGHT_CLICK;
     }
+
 }

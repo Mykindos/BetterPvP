@@ -15,11 +15,15 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageReductionEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomKnockbackEvent;
 import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.*;
-import me.mykindos.betterpvp.core.world.blocks.RestoreBlock;
-import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
+import me.mykindos.betterpvp.core.utilities.UtilDamage;
+import me.mykindos.betterpvp.core.utilities.UtilPlayer;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -38,9 +42,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.Damageable;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
@@ -133,7 +134,9 @@ public class CombatListener implements Listener {
 
                 String damagerUuid = event.getDamager() == null ? null : event.getDamager().getUniqueId().toString();
 
-                damageDataList.add(new DamageData(event.getDamagee().getUniqueId().toString(), event.getCause(), damagerUuid, event.getDamageDelay()));
+                if (event.getDamageDelay() > 0) {
+                    damageDataList.add(new DamageData(event.getDamagee().getUniqueId().toString(), event.getCause(), damagerUuid, event.getDamageDelay()));
+                }
 
                 if (event.isKnockback()) {
                     if (event.getDamager() != null) {
@@ -169,6 +172,13 @@ public class CombatListener implements Listener {
 
     private void finalizeDamage(CustomDamageEvent event, CustomDamageReductionEvent reductionEvent) {
         updateDurability(event);
+
+        if (event.getProjectile() instanceof Arrow) {
+            if (event.getDamager() instanceof Player player) {
+                player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.5f, 0.7f);
+                event.getDamager().getWorld().playSound(event.getDamagee().getLocation(), Sound.ENTITY_ARROW_HIT, 0.5f, 1.0f);
+            }
+        }
 
         if (!event.getDamagee().isDead()) {
 
@@ -207,8 +217,11 @@ public class CombatListener implements Listener {
     private void processDamageData(CustomDamageEvent event) {
         if (event.getDamagee() instanceof Player damagee) {
             final Gamer gamer = clientManager.search().online(damagee).getGamer();
-            gamer.setLastDamaged(System.currentTimeMillis());
             gamer.saveProperty(GamerProperty.DAMAGE_TAKEN, (double) gamer.getProperty(GamerProperty.DAMAGE_TAKEN).orElse(0D) + event.getDamage());
+
+            if (event.getDamager() != null) { // Only combat tag if they were damaged by an entity
+                gamer.setLastDamaged(System.currentTimeMillis());
+            }
         }
 
         if (event.getDamager() instanceof Player damager) {
@@ -329,28 +342,30 @@ public class CombatListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void handleCauseTimers(CustomDamageEvent e) {
+    public void handleCauseTimers(CustomDamageEvent event) {
 
-        if (e.getCause() == DamageCause.ENTITY_ATTACK
-                || e.getCause() == DamageCause.PROJECTILE
-                || e.getCause() == DamageCause.CUSTOM) {
-            e.setDamageDelay(400);
+        if (event.getDamageDelay() == 0) return;
+
+        if (event.getCause() == DamageCause.ENTITY_ATTACK
+                || event.getCause() == DamageCause.PROJECTILE
+                || event.getCause() == DamageCause.CUSTOM) {
+            event.setDamageDelay(400);
         }
 
-        if (e.getCause() == DamageCause.POISON) {
-            e.setDamageDelay(1000);
+        if (event.getCause() == DamageCause.POISON) {
+            event.setDamageDelay(1000);
         }
 
-        if (e.getCause() == DamageCause.LAVA) {
-            e.setDamageDelay(400);
+        if (event.getCause() == DamageCause.LAVA) {
+            event.setDamageDelay(400);
         }
 
-        if (e.getCause() == DamageCause.SUFFOCATION) {
-            e.setDamageDelay(400);
+        if (event.getCause() == DamageCause.SUFFOCATION) {
+            event.setDamageDelay(400);
         }
-        if (e.getDamagee().getLocation().getBlock().isLiquid()) {
-            if (e.getCause() == DamageCause.FIRE || e.getCause() == DamageCause.FIRE_TICK) {
-                e.cancel("Already in lava / liquid");
+        if (event.getDamagee().getLocation().getBlock().isLiquid()) {
+            if (event.getCause() == DamageCause.FIRE || e.getCause() == DamageCause.FIRE_TICK) {
+                event.cancel("Already in lava / liquid");
             }
         }
     }
@@ -387,11 +402,11 @@ public class CombatListener implements Listener {
             trajectory.setY(0.06);
         }
 
-        double velocity = 0.2D + trajectory.length() * 0.8D;
+        double strength = 0.2D + trajectory.length() * 0.8D;
         trajectory.multiply(event.getMultiplier());
 
-        UtilVelocity.velocity(event.getDamagee(),
-                trajectory, velocity, false, 0.0D, Math.abs(0.2D * knockback), 0.4D + (0.04D * knockback), true);
+        VelocityData velocityData = new VelocityData(trajectory, strength, false, 0.0D,  Math.abs(0.2D * knockback), 0.4D + (0.04D * knockback), true);
+        UtilVelocity.velocity(event.getDamagee(), event.getDamager(), velocityData, VelocityType.KNOCKBACK);
     }
 
     @UpdateEvent
@@ -454,12 +469,6 @@ public class CombatListener implements Listener {
     private void playDamageEffect(CustomDamageEvent event) {
         final LivingEntity damagee = event.getDamagee();
         damagee.playHurtAnimation(270);
-        if (event.getProjectile() instanceof Arrow) {
-            if (event.getDamager() instanceof Player player) {
-                player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.5f, 0.7f);
-                event.getDamager().getWorld().playSound(damagee.getLocation(), Sound.ENTITY_ARROW_HIT, 0.5f, 1.0f);
-            }
-        }
 
         final SoundProvider provider = event.getSoundProvider();
         final net.kyori.adventure.sound.Sound sound = provider.apply(event);
@@ -474,65 +483,7 @@ public class CombatListener implements Listener {
 
     private void updateDurability(CustomDamageEvent event) {
 
-        CustomDamageDurabilityEvent durabilityEvent = UtilServer.callEvent(new CustomDamageDurabilityEvent(event));
-
-        if (durabilityEvent.isDamageeTakeDurability()) {
-            if (event.getDamagee() instanceof Player damagee) {
-
-                for (ItemStack armour : damagee.getEquipment().getArmorContents()) {
-                    if (armour == null) continue;
-                    ItemMeta meta = armour.getItemMeta();
-                    if (meta instanceof Damageable armourMeta) {
-                        armourMeta.setDamage(armourMeta.getDamage() + 1);
-                        armour.setItemMeta(armourMeta);
-
-                        if (armourMeta.getDamage() > armour.getType().getMaxDurability()) {
-                            if (armour.getType().name().contains("HELMET")) {
-                                damagee.getEquipment().setHelmet(null);
-                            }
-                            if (armour.getType().name().contains("CHESTPLATE")) {
-                                damagee.getEquipment().setChestplate(null);
-                            }
-                            if (armour.getType().name().contains("LEGGINGS")) {
-                                damagee.getEquipment().setLeggings(null);
-                            }
-                            if (armour.getType().name().contains("BOOTS")) {
-                                damagee.getEquipment().setBoots(null);
-                            }
-
-                            damagee.playSound(damagee.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
-                        }
-                    }
-
-                }
-
-            }
-        }
-
-        if (durabilityEvent.isDamagerTakeDurability()) {
-            if (event.getDamager() instanceof Player damager) {
-                if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
-
-
-                ItemStack weapon = damager.getInventory().getItemInMainHand();
-                if (weapon.getType() == Material.AIR) return;
-                if (weapon.getType().getMaxDurability() == 0) return;
-
-                ItemMeta meta = weapon.getItemMeta();
-                if (meta instanceof Damageable weaponMeta) {
-                    weaponMeta.setDamage(weaponMeta.getDamage() + 1);
-                    weapon.setItemMeta(weaponMeta);
-
-                    if (weaponMeta.getDamage() > weapon.getType().getMaxDurability()) {
-                        damager.getInventory().setItemInMainHand(null);
-                        damager.playSound(damager.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
-                    }
-
-                }
-
-
-            }
-        }
+        UtilServer.callEvent(new CustomDamageDurabilityEvent(event));
 
     }
 

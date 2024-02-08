@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.brute.passives;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import io.papermc.paper.configuration.type.fallback.FallbackValue;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -17,18 +16,18 @@ import org.bukkit.event.EventPriority;
 
 @Singleton
 @BPvPListener
-public class Resistance extends Skill implements PassiveSkill {
+public class Fortify extends Skill implements PassiveSkill {
 
     public int increasePerLevel;
 
     @Inject
-    public Resistance(Champions champions, ChampionsManager championsManager) {
+    public Fortify(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
 
     @Override
     public String getName() {
-        return "Resistance";
+        return "Fortify";
     }
 
     @Override
@@ -82,6 +81,6 @@ public class Resistance extends Skill implements PassiveSkill {
 
     @Override
     public void loadSkillConfig(){
-        increasePerLevel = getConfig("increasePerLevel", 15, Integer.class);
+        increasePerLevel = getConfig("increasePerLevel", 10, Integer.class);
     }
 }

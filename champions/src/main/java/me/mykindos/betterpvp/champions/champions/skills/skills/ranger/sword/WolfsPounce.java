@@ -24,6 +24,7 @@ import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.display.DisplayComponent;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -161,7 +162,8 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
         // Velocity
         final double charge = chargeData.getCharge();
         final double strength = 0.4 + (1.4 * charge);
-        UtilVelocity.velocity(player, strength, 0.2, 0.4 + (0.9 * charge), true);
+        VelocityData velocityData = new VelocityData(player.getLocation().getDirection(), strength, false, 0.0, 0.2, 0.4 + (0.9 * charge), true);
+        UtilVelocity.velocity(player, null, velocityData);
 
         // Pounce log
         pounces.put(player, new Pounce(chargeData, level, player.getLocation(), -1));
@@ -220,7 +222,7 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
             // Mark as grounded if they're on the ground
             // If they're grounded for more than 250ms, remove them
             final Pounce pounce = pounces.get(player);
-            if (pounce.getGroundTime() == -1 && UtilBlock.isGrounded(player)) {
+            if (pounce.getGroundTime() == -1 && (UtilBlock.isGrounded(player) || UtilBlock.isInLiquid(player))) {
                 pounce.setGroundTime(System.currentTimeMillis());
             } else if (pounce.getGroundTime() != -1 && UtilTime.elapsed(pounce.getGroundTime(), 250)) {
                 iterator.remove();

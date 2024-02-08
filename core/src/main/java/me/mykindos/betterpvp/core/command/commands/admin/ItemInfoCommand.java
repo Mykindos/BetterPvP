@@ -5,8 +5,8 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import org.bukkit.craftbukkit.v1_20_R3.persistence.CraftPersistentDataContainer;
 import org.bukkit.entity.Player;
-import org.bukkit.persistence.PersistentDataType;
 
 @Singleton
 public class ItemInfoCommand extends Command {
@@ -25,11 +25,13 @@ public class ItemInfoCommand extends Command {
     @Override
     public void execute(Player player, Client client, String... args) {
 
-        var persistentData = player.getInventory().getItemInMainHand().getItemMeta().getPersistentDataContainer();
+        CraftPersistentDataContainer persistentData = (CraftPersistentDataContainer) player.getInventory().getItemInMainHand().getItemMeta().getPersistentDataContainer();
         if (persistentData.getKeys().isEmpty()) return;
-        persistentData.getKeys().forEach(key -> {
-            UtilMessage.simpleMessage(player, "Info", "<yellow>%s: <gray>%s", key.asString(), persistentData.getOrDefault(key, PersistentDataType.STRING, ""));
+
+        persistentData.getRaw().forEach((key, value) -> {
+            UtilMessage.simpleMessage(player, "Info", "<yellow>%s: <gray>%s", key, value.toString());
         });
+
 
     }
 

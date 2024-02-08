@@ -10,7 +10,6 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
-import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
@@ -19,7 +18,6 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -31,10 +29,8 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Singleton
 @BPvPListener
@@ -66,7 +62,7 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill {
                 "Drop your Sword / Axe to toggle",
                 "",
                 "Create a freezing area around",
-                "you in a <val>" + getRadius(level )+ "</val> Block radius",
+                "you in a <val>" + getRadius(level) + "</val> Block radius",
                 "",
                 "Allies inside this area receive <effect>Resistance " + UtilFormat.getRomanNumeral(resistanceStrength + 1) + "</effect>, and",
                 "enemies inside this area receive <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength + 1) + "</effect>",
@@ -88,64 +84,68 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill {
         return Role.MAGE;
     }
 
-    @UpdateEvent(delay = 1000)
-    public void audio() {
-        for (UUID uuid : active) {
-            Player cur = Bukkit.getPlayer(uuid);
-            if (cur != null) {
-                cur.getWorld().playSound(cur.getLocation(), Sound.WEATHER_RAIN, 0.3F, 0.0F);
-            }
+    @Override
+    public boolean process(Player player) {
+
+        HashMap<String, Long> updateCooldowns = updaterCooldowns.get(player.getUniqueId());
+
+        if (updateCooldowns.getOrDefault("audio", 0L) < System.currentTimeMillis()) {
+            audio(player);
+            updateCooldowns.put("audio", System.currentTimeMillis() + 1000);
         }
+
+        if (updateCooldowns.getOrDefault("snowAura", 0L) < System.currentTimeMillis()) {
+            if(!snowAura(player)) {
+                return false;
+            }
+            updateCooldowns.put("snowAura", System.currentTimeMillis() + 100);
+        }
+
+        return true;
     }
 
-    @UpdateEvent(delay = 125)
-    public void snowAura() {
-        Iterator<UUID> iterator = active.iterator();
-        while (iterator.hasNext()) {
-            UUID uuid = iterator.next();
-            Player player = Bukkit.getPlayer(uuid);
-            if (player == null) {
-                iterator.remove();
-                continue;
-            }
+    private void audio(Player player) {
+        player.getWorld().playSound(player.getLocation(), Sound.WEATHER_RAIN, 0.3F, 0.0F);
+    }
 
-            int level = getLevel(player);
-            final int distance = getRadius(level);
-            if (level <= 0) {
-                iterator.remove();
-                continue;
-            }
+    private boolean snowAura(Player player) {
 
-            if (!championsManager.getEnergy().use(player, getName(), getEnergy(level) / 2, true)) {
-                iterator.remove();
-                continue;
-            }
-
-            // Apply resistance and slow effects
-            final List<KeyValue<Player, EntityProperty>> nearby = UtilPlayer.getNearbyPlayers(player, distance);
-            nearby.add(new KeyValue<>(player, EntityProperty.FRIENDLY));
-            for (KeyValue<Player, EntityProperty> nearbyEnt : nearby) {
-                final Player target = nearbyEnt.getKey();
-                final boolean friendly = nearbyEnt.getValue() == EntityProperty.FRIENDLY;
-
-                if (friendly) {
-                    target.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20, resistanceStrength));
-                    championsManager.getEffects().addEffect(target, EffectType.RESISTANCE, resistanceStrength + 1, 1000);
-                } else {
-                    target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, slownessStrength));
-                }
-            }
-
-            // Apply cue effects
-            // Spin particles around the player in the radius
-            final int angle = (int) ((System.currentTimeMillis() / 10) % 360);
-            playEffects(player, distance, -angle);
-            playEffects(player, distance, angle);
-            playEffects(player, distance, -angle + 180);
-            playEffects(player, distance, angle + 180);
-
-            convertWaterToIce(player, getDuration(level), distance);
+        int level = getLevel(player);
+        final int distance = getRadius(level);
+        if (level <= 0) {
+            return false;
         }
+
+        if (!championsManager.getEnergy().use(player, getName(), getEnergy(level) / 2, true)) {
+            return false;
+        }
+
+        // Apply resistance and slow effects
+        final List<KeyValue<Player, EntityProperty>> nearby = UtilPlayer.getNearbyPlayers(player, distance);
+        nearby.add(new KeyValue<>(player, EntityProperty.FRIENDLY));
+        for (KeyValue<Player, EntityProperty> nearbyEnt : nearby) {
+            final Player target = nearbyEnt.getKey();
+            final boolean friendly = nearbyEnt.getValue() == EntityProperty.FRIENDLY;
+
+            if (friendly) {
+                target.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20, resistanceStrength));
+                championsManager.getEffects().addEffect(target, EffectType.RESISTANCE, resistanceStrength + 1, 1000);
+            } else {
+                target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, slownessStrength));
+            }
+        }
+
+        // Apply cue effects
+        // Spin particles around the player in the radius
+        final int angle = (int) ((System.currentTimeMillis() / 10) % 360);
+        playEffects(player, distance, -angle);
+        playEffects(player, distance, angle);
+        playEffects(player, distance, -angle + 180);
+        playEffects(player, distance, angle + 180);
+
+        convertWaterToIce(player, getDuration(level), distance);
+
+        return true;
     }
 
     private void playEffects(final Player player, float radius, float angle) {
@@ -194,7 +194,7 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill {
 
     @Override
     public SkillType getType() {
-        return SkillType.PASSIVE_B;
+        return SkillType.PASSIVE_A;
     }
 
     @Override
@@ -203,14 +203,8 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill {
     }
 
     @Override
-    public void toggle(Player player, int level) {
-        if (active.contains(player.getUniqueId())) {
-            active.remove(player.getUniqueId());
-            UtilMessage.message(player, getClassType().getName(), "Arctic Armour: <red>Off");
-        } else {
-            active.add(player.getUniqueId());
-            UtilMessage.message(player, getClassType().getName(), "Arctic Armour: <green>On");
-        }
+    public void toggleActive(Player player) {
+        UtilMessage.message(player, getClassType().getName(), "Arctic Armour: <green>On");
     }
 
     @Override
@@ -223,4 +217,6 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill {
         resistanceStrength = getConfig("resistanceStrength", 0, Integer.class);
         slownessStrength = getConfig("slownessStrength", 0, Integer.class);
     }
+
+
 }

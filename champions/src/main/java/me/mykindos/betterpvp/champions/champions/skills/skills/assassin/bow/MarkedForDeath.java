@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.bow;
 
+import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
@@ -68,15 +69,21 @@ public class MarkedForDeath extends PrepareArrowSkill {
 
     @Override
     public void onHit(Player damager, LivingEntity target, int level) {
+        UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit <yellow>%s</yellow> with <green>%s %s</green>.", target.getName(), getName(), level);
+        championsManager.getEffects().addEffect(target, EffectType.VULNERABILITY, vulnerabilityStrength, (long) ((baseDuration + (level * durationIncreasePerLevel) * 1000L)));
         if (!(target instanceof Player damagee)) return;
-
-        championsManager.getEffects().addEffect(damagee, EffectType.VULNERABILITY, vulnerabilityStrength, (long) ((baseDuration + (level * durationIncreasePerLevel) * 1000L)));
-        UtilMessage.simpleMessage(damagee, getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s</alt>.", damager.getName(), getName());
+        UtilMessage.simpleMessage(damagee, getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s %s</alt>.", damager.getName(), getName(), level);
     }
 
     @Override
     public void displayTrail(Location location) {
-        Particle.REDSTONE.builder().location(location).color(5, 5, 5).count(3).extra(0).receivers(60, true).spawn();
+        new ParticleBuilder(Particle.SPELL_MOB)
+                .location(location)
+                .count(1)
+                .offset(0.1, 0.1, 0.1)
+                .extra(0)
+                .receivers(60)
+                .spawn();
     }
 
 
@@ -84,12 +91,6 @@ public class MarkedForDeath extends PrepareArrowSkill {
     public double getCooldown(int level) {
         return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
-
-    @Override
-    public boolean isCancellable() {
-        return true;
-    }
-
 
     @Override
     public void activate(Player player, int level) {

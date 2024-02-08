@@ -13,7 +13,7 @@ public class SkillWeapons {
             case SWORD -> UtilItem.isSword(item);
             case AXE -> UtilItem.isAxe(item);
             case BOW -> UtilItem.isRanged(item);
-            default -> true; // Passives
+            default -> false; // Passives
         };
     }
 

@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillEquipE
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.champions.champions.roles.events.RoleChangeEvent;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.champions.champions.skills.SkillManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.champions.champions.skills.types.ActiveToggleSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
@@ -27,6 +28,7 @@ import me.mykindos.betterpvp.core.combat.click.events.RightClickEvent;
 import me.mykindos.betterpvp.core.components.champions.ISkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.components.champions.events.PlayerCanUseSkillEvent;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseInteractSkillEvent;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEvent;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseToggleSkillEvent;
@@ -35,11 +37,13 @@ import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.energy.EnergyHandler;
 import me.mykindos.betterpvp.core.framework.adapter.Compatibility;
+import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -54,9 +58,12 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
 @Singleton
 @BPvPListener
@@ -68,16 +75,18 @@ public class SkillListener implements Listener {
     private final EnergyHandler energyHandler;
     private final EffectManager effectManager;
     private final ClientManager clientManager;
+    private final SkillManager skillManager;
 
     @Inject
     public SkillListener(BuildManager buildManager, RoleManager roleManager, CooldownManager cooldownManager,
-                         EnergyHandler energyHandler, EffectManager effectManager, ClientManager clientManager) {
+                         EnergyHandler energyHandler, EffectManager effectManager, ClientManager clientManager, SkillManager skillManager) {
         this.buildManager = buildManager;
         this.roleManager = roleManager;
         this.cooldownManager = cooldownManager;
         this.energyHandler = energyHandler;
         this.effectManager = effectManager;
         this.clientManager = clientManager;
+        this.skillManager = skillManager;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -95,14 +104,14 @@ public class SkillListener implements Listener {
 
         if (skill instanceof CooldownSkill cooldownSkill && !(skill instanceof PrepareArrowSkill)) {
             if (!cooldownManager.use(player, skill.getName(), cooldownSkill.getCooldown(level),
-                    cooldownSkill.showCooldownFinished(), true, cooldownSkill.isCancellable(), cooldownSkill::shouldDisplayActionBar)) {
+                    cooldownSkill.showCooldownFinished(), true, cooldownSkill.isCancellable(), cooldownSkill::shouldDisplayActionBar, cooldownSkill.getPriority())) {
                 event.setCancelled(true);
                 return;
             }
-        } else if (skill instanceof PrepareArrowSkill) {
+        } else if (skill instanceof PrepareArrowSkill prepareArrowSkill) {
             if (cooldownManager.hasCooldown(player, skill.getName())) {
 
-                if (((PrepareArrowSkill) skill).showCooldownFinished()) {
+                if (prepareArrowSkill.showCooldownFinished()) {
                     UtilMessage.simpleMessage(player, "Cooldown", "You cannot use <alt>%s</alt> for <alt>%s</alt> seconds.", skill.getName(),
                             Math.max(0, cooldownManager.getAbilityRecharge(player, skill.getName()).getRemaining()));
                 }
@@ -178,7 +187,7 @@ public class SkillListener implements Listener {
     // Show shield for channel skills
     @EventHandler
     public void onRightClick(RightClickEvent event) {
-        if (Compatibility.SWORD_BLOCKING) {
+        if (Compatibility.SWORD_BLOCKING && !UtilItem.isAxe(event.getPlayer().getInventory().getItemInMainHand())) {
             return; // Return if sword blocking is enabled
         }
 
@@ -206,9 +215,12 @@ public class SkillListener implements Listener {
 
                 if (skillOptional.isPresent()) {
                     Skill skill = skillOptional.get();
-                    if (skill instanceof ChannelSkill) {
-                        event.setUseShield(true);
-                        event.setShieldModelData(RightClickEvent.INVISIBLE_SHIELD);
+
+                    if (skill instanceof ChannelSkill channelSkill) {
+                        if (channelSkill.shouldShowShield(player)) {
+                            event.setUseShield(true);
+                            event.setShieldModelData(channelSkill.isShieldInvisible() ? RightClickEvent.INVISIBLE_SHIELD : RightClickEvent.DEFAULT_SHIELD);
+                        }
                     }
                 }
             }
@@ -217,7 +229,6 @@ public class SkillListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onSkillActivate(PlayerInteractEvent event) {
-        if (event.useItemInHand() == Event.Result.DENY) return;
         if (event.getAction() == Action.PHYSICAL) return;
         if (event.getHand() == EquipmentSlot.OFF_HAND) return;
         if (cooldownManager.hasCooldown(event.getPlayer(), "DoorAccess")) return;
@@ -248,6 +259,8 @@ public class SkillListener implements Listener {
                 }
             }
         }
+
+        if (event.useItemInHand() == Event.Result.DENY) return;
 
         if (UtilBlock.usable(event.getClickedBlock())) return;
 
@@ -290,7 +303,7 @@ public class SkillListener implements Listener {
             UtilMessage.simpleMessage(player, skill.getClassType().getName(), "You prepared <green>%s %d<gray>.", skill.getName(), level);
 
         } else {
-            if (!(skill instanceof ChannelSkill)) {
+            if (!(skill instanceof ChannelSkill) && !(skill instanceof ActiveToggleSkill)) {
                 UtilMessage.simpleMessage(player, skill.getClassType().getName(), "You used <green>%s %d<gray>.", skill.getName(), level);
             }
         }
@@ -434,6 +447,34 @@ public class SkillListener implements Listener {
             UtilMessage.simpleMessage(player, skill.getClassType().getName(), "You cannot use <green>%s<gray> while stunned.", skill.getName());
             event.setCancelled(true);
         }
+    }
+
+    @UpdateEvent
+    public void processActiveToggleSkills() {
+        skillManager.getObjects().values().forEach(skill -> {
+            if (skill instanceof ActiveToggleSkill activeToggleSkill) {
+
+                List<UUID> activeCopy = new ArrayList<>(activeToggleSkill.getActive());
+                activeCopy.forEach(uuid -> {
+                    Player player = Bukkit.getPlayer(uuid);
+                    if (player != null) {
+                        PlayerCanUseSkillEvent event = UtilServer.callEvent(new PlayerCanUseSkillEvent(player, activeToggleSkill));
+                        if (event.isCancelled()) {
+                            activeToggleSkill.cancel(player);
+                            return;
+                        }
+
+                        if (!activeToggleSkill.process(player)) {
+                            activeToggleSkill.cancel(player);
+                        }
+                    } else {
+                        activeToggleSkill.getActive().remove(uuid);
+                        activeToggleSkill.getUpdaterCooldowns().remove(uuid);
+                    }
+                });
+
+            }
+        });
     }
 
 

@@ -7,14 +7,12 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomEntityVelocityEvent;
-import me.mykindos.betterpvp.core.combat.events.CustomKnockbackEvent;
+import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 
 @Singleton
@@ -52,25 +50,11 @@ public class Colossus extends Skill implements PassiveSkill {
         return SkillType.PASSIVE_A;
     }
 
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onKB(CustomKnockbackEvent event) {
-        if(!(event.getDamagee() instanceof Player player)) return;
-        DamageCause cause = event.getCustomDamageEvent().getCause();
-        if(cause == DamageCause.ENTITY_ATTACK || cause == DamageCause.PROJECTILE) {
-            int level = getLevel(player);
-            if(level > 0) {
-                event.setCanBypassMinimum(true);
-                double proposedKB = event.getDamage() * (1 - ((reductionPerLevel) * level));
-                event.setDamage(proposedKB);
-            }
-        }
-
-    }
-
     @EventHandler
     public void onCustomVelocity(CustomEntityVelocityEvent event) {
         if(!(event.getEntity() instanceof Player player)) return;
+        if(event.getVelocityType() != VelocityType.KNOCKBACK && event.getVelocityType() != VelocityType.KNOCKBACK_CUSTOM) return;
+
         int level = getLevel(player);
         if(level > 0) {
             event.setVector(event.getVector().multiply(1 - ((reductionPerLevel) * level)));
@@ -79,7 +63,7 @@ public class Colossus extends Skill implements PassiveSkill {
 
     @Override
     public void loadSkillConfig(){
-        reductionPerLevel = getConfig("reductionPerLevel", 0.25, Double.class);
+        reductionPerLevel = getConfig("reductionPerLevel", 0.20, Double.class);
     }
 
 }

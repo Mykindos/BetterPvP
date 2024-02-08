@@ -3,12 +3,12 @@ package me.mykindos.betterpvp.champions.weapons.impl.legendaries;
 import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.core.combat.weapon.types.ChannelWeapon;
-import me.mykindos.betterpvp.core.combat.weapon.types.InteractWeapon;
-import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.weapon.types.ChannelWeapon;
+import me.mykindos.betterpvp.core.combat.weapon.types.InteractWeapon;
+import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseItemEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.energy.EnergyHandler;
@@ -29,6 +29,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -73,7 +74,7 @@ public class GiantsBroadsword extends ChannelWeapon implements InteractWeapon, L
     }
 
     @Override
-    public List<Component> getLore() {
+    public List<Component> getLore(ItemStack item) {
         List<Component> lore = new ArrayList<>();
         lore.add(Component.text("Forged in the godly mines of Plagieus,", NamedTextColor.WHITE));
         lore.add(Component.text("this sword has endured thousands of", NamedTextColor.WHITE));

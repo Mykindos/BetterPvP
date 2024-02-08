@@ -17,7 +17,7 @@ import org.bukkit.entity.Player;
 public class EnergyHandler {
 
     @Inject
-    @Config(path = "energy.nerf-energy-regen", defaultValue = "true")
+    @Config(path = "energy.nerf-energy-regen", defaultValue = "false")
     private boolean nerfEnergyRegen;
 
     public static double baseEnergy = 150.0D;

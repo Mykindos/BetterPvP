@@ -4,8 +4,10 @@ import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.menus.BuildMenu;
 import me.mykindos.betterpvp.champions.champions.skills.SkillManager;
+import me.mykindos.betterpvp.core.combat.armour.ArmourManager;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.menu.Windowed;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
@@ -17,6 +19,8 @@ import org.bukkit.inventory.ItemFlag;
 import org.jetbrains.annotations.NotNull;
 import xyz.xenondevs.invui.item.impl.SimpleItem;
 
+import java.util.List;
+
 public class ClassSelectionButton extends SimpleItem {
 
     private final BuildManager buildManager;
@@ -24,9 +28,11 @@ public class ClassSelectionButton extends SimpleItem {
     private final SkillManager skillManager;
     private final Windowed parent;
 
-    public ClassSelectionButton(BuildManager buildManager, SkillManager skillManager, Role role, Windowed parent) {
+    public ClassSelectionButton(BuildManager buildManager, SkillManager skillManager, Role role, ArmourManager armorManager, Windowed parent) {
         super(ItemView.builder().material(role.getChestplate())
                 .displayName(Component.text(role.getName(), role.getColor(), TextDecoration.BOLD))
+                .lore(List.of(UtilMessage.deserialize("Class Damage Reduction: <yellow>" + armorManager.getReductionForArmourSet(role.getChestplate().name().replace("_CHESTPLATE", "")) + "%"),
+                        UtilMessage.deserialize("Effective Health: <red>" + (int) Math.floor(20 / (1 - armorManager.getReductionForArmourSet(role.getChestplate().name().replace("_CHESTPLATE", "")) / 100)))))
                 .flag(ItemFlag.HIDE_ATTRIBUTES)
                 .build());
         this.buildManager = buildManager;

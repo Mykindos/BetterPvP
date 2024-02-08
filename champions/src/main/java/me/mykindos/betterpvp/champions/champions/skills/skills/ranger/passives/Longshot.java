@@ -79,7 +79,7 @@ public class Longshot extends Skill implements PassiveSkill {
     }
 
 
-    @UpdateEvent
+    @UpdateEvent(delay=200)
     public void update() {
         Iterator<Arrow> it = arrows.keySet().iterator();
         while (it.hasNext()) {
@@ -142,7 +142,7 @@ public class Longshot extends Skill implements PassiveSkill {
 
     @Override
     public void loadSkillConfig(){
-        baseMaxDamage = getConfig("baseMaxDamage", 14.0, Double.class);
+        baseMaxDamage = getConfig("baseMaxDamage", 12.0, Double.class);
         maxDamageIncreasePerLevel = getConfig("maxDamageIncreasePerLevel", 1.0, Double.class);
         baseDamage = getConfig("baseDamage", 0.25, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
