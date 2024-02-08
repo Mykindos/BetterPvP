@@ -55,7 +55,6 @@ public class BreakFall extends Skill implements PassiveSkill {
         return SkillType.GLOBAL;
     }
 
-
     @EventHandler
     public void onFall(CustomDamageEvent e) {
         if(!(e.getDamagee() instanceof Player player)) return;
@@ -63,9 +62,13 @@ public class BreakFall extends Skill implements PassiveSkill {
 
         int level = getLevel(player);
         if(level > 0) {
-            e.setDamage(e.getDamage() - getDamageReduction(level));
+            if(e.getDamage() <= getDamageReduction(level)){
+                e.setCancelled(true);
+            }
+            else {
+                e.setDamage(e.getDamage() - getDamageReduction(level));
+            }
         }
-
     }
     public void loadSkillConfig(){
         baseDamageReduction = getConfig("baseDamageReduction", 2.0, Double.class);
