@@ -4,7 +4,6 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.passive
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
-import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -21,7 +20,6 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.Optional;
 
 @Singleton
 @BPvPListener
@@ -54,6 +52,7 @@ public class Backstab extends Skill implements PassiveSkill, Listener {
 
     @EventHandler
     public void onEntDamage(CustomDamageEvent event) {
+        if(event.isCancelled()) return;
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
         if (!(event.getDamager() instanceof Player damager)) return;
 
@@ -75,7 +74,7 @@ public class Backstab extends Skill implements PassiveSkill, Listener {
 
     @Override
     public SkillType getType() {
-        return SkillType.PASSIVE_A;
+        return SkillType.PASSIVE_B;
     }
 
     @Override

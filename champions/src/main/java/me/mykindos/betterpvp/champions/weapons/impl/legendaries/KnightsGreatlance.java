@@ -26,6 +26,7 @@ import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
@@ -120,19 +121,13 @@ public class KnightsGreatlance extends ChannelWeapon implements InteractWeapon, 
         if (!active.containsKey(player)) {
             gamer.getActionBar().add(250, actionBar);
         }
-        active.putIfAbsent(player, new LanceData(getMidpoint(player), gamer, 0));
+        active.putIfAbsent(player, new LanceData(UtilPlayer.getMidpoint(player), gamer, 0));
         this.effectManager.addEffect(player, EffectType.NO_JUMP, -50);
     }
 
     private void deactivate(Player player, LanceData data) {
         this.effectManager.removeEffect(player, EffectType.NO_JUMP);
         data.getGamer().getActionBar().remove(actionBar);
-    }
-
-    private Location getMidpoint(Player player) {
-        final Location location = player.getLocation();
-        final double height = player.getHeight();
-        return location.add(0.0, height / 2, 0.0);
     }
 
     @UpdateEvent
@@ -190,7 +185,7 @@ public class KnightsGreatlance extends ChannelWeapon implements InteractWeapon, 
             }
 
             // Get all enemies that collide with the player from the last location to the new location
-            final Location newLocation = getMidpoint(player);
+            final Location newLocation = UtilPlayer.getMidpoint(player);
             final Optional<LivingEntity> hit = UtilEntity.interpolateCollision(data.getLastLocation(),
                     newLocation,
                     0.6f,

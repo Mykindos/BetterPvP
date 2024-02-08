@@ -32,7 +32,7 @@ public class ConfirmationMenu extends AbstractGui implements Windowed {
                 .build());
 
         // Yes
-        SimpleItem yesItem = new SimpleItem(ItemView.builder().material(Material.EMERALD_BLOCK)
+        SimpleItem yesItem = new SimpleItem(ItemView.builder().material(Material.LIME_CONCRETE)
                 .displayName(Component.text("\u2714", NamedTextColor.GREEN))
                 .build(), click -> {
             click.getPlayer().closeInventory();
@@ -41,7 +41,7 @@ public class ConfirmationMenu extends AbstractGui implements Windowed {
         });
 
         // No
-        SimpleItem noItem = new SimpleItem(ItemView.builder().material(Material.REDSTONE_BLOCK)
+        SimpleItem noItem = new SimpleItem(ItemView.builder().material(Material.RED_CONCRETE)
                 .displayName(Component.text("\u2718", NamedTextColor.DARK_RED))
                 .build(), click -> {
             click.getPlayer().closeInventory();

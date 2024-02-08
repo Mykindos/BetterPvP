@@ -10,7 +10,7 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -21,13 +21,11 @@ public class Impotence extends Skill implements PassiveSkill {
 
     private double baseRadius;
     private double radiusIncreasePerLevel;
-
     private double baseDecrease;
-
     private double baseDecreasePerPlayer;
-
     private double decreaseIncreasePerLevel;
     private int maxEnemies;
+
     @Inject
     public Impotence(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -72,7 +70,7 @@ public class Impotence extends Skill implements PassiveSkill {
 
         int level = getLevel(player);
         if (level > 0) {
-            int nearby = UtilPlayer.getNearbyEnemies(player, player.getLocation(), getRadius(level)).size();
+            int nearby = UtilEntity.getNearbyEnemies(player, player.getLocation(), getRadius(level)).size();
             event.setDamage(event.getDamage() * (1 - calculateReduction(level, nearby)));
         }
     }

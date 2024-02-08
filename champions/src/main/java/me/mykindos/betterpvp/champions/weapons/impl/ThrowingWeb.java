@@ -86,7 +86,7 @@ public class ThrowingWeb extends Weapon implements Listener, InteractWeapon, Coo
             return;
         }
         if (event.useItemInHand() != Event.Result.DENY && event.getAction().isLeftClick() && matches(event.getItem())) {
-            if (cooldownManager.use(event.getPlayer(), getSimpleName(), getCooldown(), showCooldownFinished(), true, false, x -> isHoldingWeapon(event.getPlayer()))) {
+            if (cooldownManager.use(event.getPlayer(), getSimpleName(), getCooldown(), showCooldownFinished(), true, false, x -> isHoldingWeapon(event.getPlayer()), 1001)) {
                 activate(event.getPlayer()); // also activate on left click
             }
         }

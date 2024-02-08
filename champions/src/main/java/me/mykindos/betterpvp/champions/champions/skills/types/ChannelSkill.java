@@ -58,4 +58,12 @@ public abstract class ChannelSkill extends Skill implements Listener {
             cancel(event.getPlayer());
         }
     }
+
+    public boolean isShieldInvisible() {
+        return true;
+    }
+
+    public boolean shouldShowShield(Player player) {
+        return true;
+    }
 }

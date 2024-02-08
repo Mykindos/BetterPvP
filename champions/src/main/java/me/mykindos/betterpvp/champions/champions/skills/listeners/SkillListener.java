@@ -104,14 +104,14 @@ public class SkillListener implements Listener {
 
         if (skill instanceof CooldownSkill cooldownSkill && !(skill instanceof PrepareArrowSkill)) {
             if (!cooldownManager.use(player, skill.getName(), cooldownSkill.getCooldown(level),
-                    cooldownSkill.showCooldownFinished(), true, cooldownSkill.isCancellable(), cooldownSkill::shouldDisplayActionBar)) {
+                    cooldownSkill.showCooldownFinished(), true, cooldownSkill.isCancellable(), cooldownSkill::shouldDisplayActionBar, cooldownSkill.getPriority())) {
                 event.setCancelled(true);
                 return;
             }
-        } else if (skill instanceof PrepareArrowSkill) {
+        } else if (skill instanceof PrepareArrowSkill prepareArrowSkill) {
             if (cooldownManager.hasCooldown(player, skill.getName())) {
 
-                if (((PrepareArrowSkill) skill).showCooldownFinished()) {
+                if (prepareArrowSkill.showCooldownFinished()) {
                     UtilMessage.simpleMessage(player, "Cooldown", "You cannot use <alt>%s</alt> for <alt>%s</alt> seconds.", skill.getName(),
                             Math.max(0, cooldownManager.getAbilityRecharge(player, skill.getName()).getRemaining()));
                 }
@@ -187,7 +187,7 @@ public class SkillListener implements Listener {
     // Show shield for channel skills
     @EventHandler
     public void onRightClick(RightClickEvent event) {
-        if (Compatibility.SWORD_BLOCKING) {
+        if (Compatibility.SWORD_BLOCKING && !UtilItem.isAxe(event.getPlayer().getInventory().getItemInMainHand())) {
             return; // Return if sword blocking is enabled
         }
 
@@ -215,9 +215,12 @@ public class SkillListener implements Listener {
 
                 if (skillOptional.isPresent()) {
                     Skill skill = skillOptional.get();
-                    if (skill instanceof ChannelSkill) {
-                        event.setUseShield(true);
-                        event.setShieldModelData(RightClickEvent.INVISIBLE_SHIELD);
+
+                    if (skill instanceof ChannelSkill channelSkill) {
+                        if (channelSkill.shouldShowShield(player)) {
+                            event.setUseShield(true);
+                            event.setShieldModelData(channelSkill.isShieldInvisible() ? RightClickEvent.INVISIBLE_SHIELD : RightClickEvent.DEFAULT_SHIELD);
+                        }
                     }
                 }
             }

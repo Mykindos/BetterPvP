@@ -4,6 +4,7 @@ import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.utilities.model.WeighedList;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
@@ -14,9 +15,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,6 +28,35 @@ import java.util.List;
 import java.util.Map;
 
 public class UtilItem {
+
+    public static ItemStack convertType(@NotNull ItemStack itemStackIn, @NotNull Material to, @Nullable Integer toModel) {
+        ItemStack itemStack = itemStackIn.clone();
+        final Material from = itemStack.getType();
+        if (itemStack.getItemMeta() != null) {
+            final ItemMeta metaCopy = itemStack.getItemMeta().clone();
+            itemStack.setType(to);
+            final ItemMeta meta = itemStack.getItemMeta();
+            meta.setCustomModelData(toModel);
+
+            if (!metaCopy.hasDisplayName()) {
+                final String key = from.translationKey();
+                final Component name = Component.translatable(key, NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false);
+                meta.displayName(name);
+            }
+
+            // Durability
+            if (metaCopy instanceof Damageable oldItem && meta instanceof Damageable newItem) {
+                final int oldMaxDurability =from.getMaxDurability();
+                final int oldDurability = oldItem.getDamage();
+                final int newMaxDurability = to.getMaxDurability();
+                final int scaledDurability = (int) Math.round(((double) oldDurability / oldMaxDurability) * newMaxDurability);
+                newItem.setDamage(scaledDurability);
+            }
+
+            itemStack.setItemMeta(meta);
+        }
+        return itemStack;
+    }
 
     public static boolean isCosmeticShield(ItemStack item) {
         return item.getType() == Material.SHIELD && item.hasItemMeta()

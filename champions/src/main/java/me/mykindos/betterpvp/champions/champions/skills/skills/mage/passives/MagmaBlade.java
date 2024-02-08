@@ -56,7 +56,7 @@ public class MagmaBlade extends Skill implements PassiveSkill {
 
     @Override
     public SkillType getType() {
-        return SkillType.PASSIVE_A;
+        return SkillType.PASSIVE_B;
     }
 
     @EventHandler(priority = EventPriority.HIGH)

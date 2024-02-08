@@ -127,9 +127,9 @@ public class PowerChop extends PrepareSkill implements CooldownSkill {
     @Override
     public void loadSkillConfig() {
         timeToHit = getConfig("timeToHit", 1.0, Double.class);
-        baseBonusDamage = getConfig("baseBonusDamage", 2.0, Double.class);
-        bonusDamageIncreasePerLevel = getConfig("bonusDamageIncreasePerLevel", 0.75, Double.class);
-        minBonusDamage = getConfig("minBonusDamage", 0.75, Double.class);
+        baseBonusDamage = getConfig("baseBonusDamage", 1.0, Double.class);
+        bonusDamageIncreasePerLevel = getConfig("bonusDamageIncreasePerLevel", 0.5, Double.class);
+        minBonusDamage = getConfig("minBonusDamage", 0.5, Double.class);
     }
 
     @Override

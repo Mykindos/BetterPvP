@@ -194,7 +194,7 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
 
     @Override
     public SkillType getType() {
-        return SkillType.PASSIVE_B;
+        return SkillType.PASSIVE_A;
     }
 
 

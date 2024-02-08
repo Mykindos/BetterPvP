@@ -58,11 +58,12 @@ public class PropertyMapper {
                 continue;
             }
 
-            Object value = switch (type) {
+            Object value = switch (type.toLowerCase()) {
                 case "int" -> result.getInt(2);
                 case "boolean" -> Boolean.parseBoolean(result.getString(2));
                 case "double" -> Double.parseDouble(result.getString(2));
                 case "long" -> Long.parseLong(result.getString(2));
+                case "string" -> result.getString(2);
                 default -> Class.forName(type).cast(result.getObject(2));
             };
 

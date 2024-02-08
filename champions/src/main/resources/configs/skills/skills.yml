@@ -172,15 +172,11 @@ skills:
     vengeance:
       enabled: true
       maxlevel: 3
-      damageIncrease: 0.25
-      canUseWhileSlowed: true
-      canUseWhileSilenced: false
-      canUseWhileStunned: false
-      canUseWhileLevitating: false
-      canUseInLiquid: false
-      baseDamage: 0.25
-      damageIncreasePerLevel: 0.25
+      baseDamage: 0.0
+      damageIncreasePerLevel: 1.0
       baseMaxDamage: 1.0
+      baseMaxDamageIncreasePerLevel: 1.0
+      expirationTime: 5.0
     levelfield:
       enabled: true
       maxlevel: 3
@@ -209,7 +205,7 @@ skills:
       durationIncreasePerLevel: 0.0
       baseBonusDamageDuration: 2.0
       bonusDamageDurationIncreasePerLevel: 0.0
-      baseBonusDamage: 1.0
+      baseBonusDamage: 0.5
       bonusDamageIncreasePerLevel: 1.0
       baseHealing: 1.0
       healingIncreasePerLevel: 1.0
@@ -228,11 +224,6 @@ skills:
       timeOutOfCombat: 2.5
       damageIncreasePerCharge: 0.5
       baseDamageIncreasePerLevelPerCharge: 0.0
-    fury:
-      enabled: true
-      maxlevel: 3
-      baseBonusDamage: 0.0
-      bonusDamageIncreasePerLevel: 0.5
     thorns:
       enabled: true
       maxlevel: 3
@@ -263,9 +254,9 @@ skills:
       cooldown: 14.0
       timeToHit: 1.0
       cooldownDecreasePerLevel: 1.5
-      baseBonusDamage: 2.0
-      bonusDamageIncreasePerLevel: 0.75
-      minBonusDamage: 0.75
+      baseBonusDamage: 1.0
+      bonusDamageIncreasePerLevel: 0.5
+      minBonusDamage: 0.5
     deflection:
       enabled: true
       maxlevel: 3
@@ -308,17 +299,22 @@ skills:
       baseSlowDuration: 1.5
       slowDurationIncreasePerLevel: 0.0
       slowStrength: 2
-    boulder:
+    blocktoss:
       enabled: true
-      cooldown: 25.0
-      maxlevel: 5
-      baseRadius: 4.0
-      baseHeal: 2.0
-      baseDamage: 3.0
+      maxlevel: 3
+      cooldown: 10.0
       cooldownDecreasePerLevel: 1.0
-      healingIncreasePerLevel: 1.0
-      damageIncreasePerLevel: 1.0
+      baseCharge: 55.0
+      chargeIncreasePerLevel: 15.0
+      baseDamage: 4.0
+      damageIncreasePerLevel: 2.0
+      baseRadius: 4.0
       radiusIncreasePerLevel: 0.5
+      baseSpeed: 1.4
+      speedIncreasePerLevel: 0.1
+      hitBoxSize: 1.0
+      size: 0.6
+      sizePerLevel: 0.2
     inferno:
       enabled: true
       maxlevel: 3
@@ -426,6 +422,13 @@ skills:
       slowStrength: 2
       slowDuration: 2.0
       energyDecreasePerLevel: 1.0
+    glacialblade:
+      enabled: true
+      maxlevel: 3
+      cooldown: 2.5
+      cooldownDecreasePerLevel: 1.0
+      damage: 2.5
+      damageIncreasePerLevel: 1.0
     void:
       enabled: true
       maxlevel: 5
@@ -489,8 +492,17 @@ skills:
       durationIncreasePerLevel: 0.0
       duration: 2.0
   brute:
-    battletaunt:
+    fury:
       enabled: true
+      maxlevel: 3
+      baseDamage: 0.5
+      damageIncreasePerLevel: 0.5
+      bonusDamageIncreasePerLevel: 0.5
+      baseMaxDamage: 2.0
+      maxDamageIncreasePerLevel: 1.0
+      expirationTime: 5.0
+    battletaunt:
+      enabled: false
       energy: 15
       maxlevel: 5
       cooldown: 0.5
@@ -550,6 +562,16 @@ skills:
       recoilDamage: 1.5
       recoilDamageIncreasePerLevel: 0.5
       damageIncreasePerLevel: 1.0
+    unstoppableforce:
+      enabled: true
+      maxlevel: 5
+      cooldown: 22.0
+      cooldownDecreasePerLevel: 1.0
+      energy: 55
+      energyDecreasePerLevel: 3.0
+      baseDamage: 4.0
+      damageIncreasePerLevel: 1.0
+      hitboxExpansion: 0.3
     stampede:
       enabled: true
       maxlevel: 5
@@ -574,10 +596,10 @@ skills:
       baseDuration: 5.0
       durationIncreasePerLevel: 1.0
       health: 4.0
-    resistance:
+    fortify:
       enabled: true
       maxlevel: 3
-      increasePerLevel: 15
+      increasePerLevel: 10
     overwhelm:
       enabled: true
       maxlevel: 3
@@ -585,32 +607,6 @@ skills:
       healthOverTarget: 2.0
       baseMaxDamage: 0.0
       maxDamageIncreasePerLevel: 0.5
-    spiritofthewolf:
-      enabled: true
-      maxlevel: 5
-      cooldown: 15.0
-      radius: 5
-      duration: 9.0
-      cooldownDecreasePerLevel: 1.0
-      speedStrength: 1
-    spiritofthebear:
-      enabled: true
-      maxlevel: 5
-      cooldown: 20.0
-      radius: 5
-      duration: 5.0
-      cooldownDecreasePerLevel: 2.0
-      resistanceStrength: 1
-    strengthinnumbers:
-      enabled: true
-      maxlevel: 5
-      cooldown: 20.0
-      radius: 10
-      duration: 2.0
-      cooldownDecreasePerLevel: 1.0
-      baseDuration: 2.0
-      durationIncreasePerLevel: 2.0
-      strengthStrength: 1
   ranger:
     wolfspounce:
       enabled: true
@@ -630,7 +626,7 @@ skills:
       cooldown: 25.0
       cooldownDecreasePerLevel: 1.0
       baseDuration: 0.0
-      durationIncreasePerLevel: 0.3
+      durationIncreasePerLevel: 0.25
     incendiaryshot:
       enabled: true
       maxlevel: 5
@@ -664,7 +660,7 @@ skills:
       enabled: true
       maxlevel: 5
       deathMessageThreshold: 40.0
-      baseMaxDamage: 14.0
+      baseMaxDamage: 12.0
       maxDamageIncreasePerLevel: 1.0
       baseDamage: 0.25
       damageIncreasePerLevel: 0.0
@@ -715,7 +711,7 @@ skills:
       enabled: true
       maxlevel: 3
       maxTimeBetweenShots: 5.0
-      maxConsecutiveHits: 4
+      maxConsecutiveHits: 3
       numMisses: 1
       maxTimeBetweenShotsIncreasePerLevel: 1.0
       baseDamage: 0.0
@@ -779,14 +775,15 @@ skills:
     bloodshed:
       enabled: true
       maxlevel: 5
-      cooldown: 12.0
-      duration: 4.0
+      cooldown: 15.0
+      radius: 5.0
+      radiusIncreasePerLevel: 1.0
+      duration: 9.0
+      durationIncreasePerLevel: 0.0
       cooldownDecreasePerLevel: 1.0
-      baseHealthReduction: 0.5
+      speedStrength: 1
+      baseHealthReduction: 0.4
       healthReductionDecreasePerLevel: 0.05
-      baseDuration: 6.0
-      durationIncreasePerLevel: 0.5
-      speedStrength: 2
     bloodthirst:
       enabled: true
       maxlevel: 5
@@ -810,7 +807,7 @@ skills:
       baseDecreasePerPlayer: 0.05
       decreaseIncreasePerLevel: 0.0
       radius: 3
-    tormentedsoul:
+    tormentedsoil:
       enabled: true
       maxlevel: 5
       cooldown: 30.0
@@ -824,6 +821,8 @@ skills:
       rangeIncreasePerLevel: 0.5
       baseDamageIncrease: 0.33
       damageIncreasePerLevel: 0.0
+      baseHealthReduction: 0.5
+      healthReductionDecreasePerLevel: 0.05
     cleanse:
       enabled: true
       maxlevel: 5
@@ -872,7 +871,8 @@ skills:
       baseLeechedHealth: 1.0
       leachedHealthIncreasePerLevel: 0.0
       leechedHealth: 1.0
-      maxRangeFromCaster: 20
+      maximumEnemies: 2
+      maximumEnemiesIncreasePerLevel: 0
     wreath:
       enabled: true
       maxlevel: 5
@@ -887,6 +887,7 @@ skills:
       slowStrength: 1
       numAttacks: 3
       slowDuration: 2.0
+      healthPerEnemyHit: 1.0
     frailty:
       enabled: true
       maxlevel: 3
