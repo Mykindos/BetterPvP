@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.champions.weapons.impl.vanilla.weapons;
 
+import com.google.inject.Inject;
+import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.combat.weapon.Weapon;
 import me.mykindos.betterpvp.core.items.BPvPItem;
 import org.bukkit.Material;
@@ -9,8 +11,9 @@ import javax.inject.Singleton;
 
 @Singleton
 public class GoldenSword extends Weapon {
-    public GoldenSword() {
-        super("booster_sword");
+    @Inject
+    public GoldenSword(Champions champions) {
+        super(champions, "booster_sword");
     }
 
     @Override

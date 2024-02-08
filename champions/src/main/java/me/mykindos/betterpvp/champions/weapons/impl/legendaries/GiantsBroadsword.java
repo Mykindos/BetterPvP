@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.weapons.impl.legendaries;
 import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -10,7 +11,6 @@ import me.mykindos.betterpvp.core.combat.weapon.types.ChannelWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.InteractWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseItemEvent;
-import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.energy.EnergyHandler;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -45,33 +45,14 @@ import java.util.UUID;
 public class GiantsBroadsword extends ChannelWeapon implements InteractWeapon, LegendaryWeapon, Listener {
 
     private static final String ABILITY_NAME = "Shield";
-    @Inject
-    @Config(path = "weapons.giants-broadsword.enabled", defaultValue = "true", configName = "weapons/legendaries")
-    private boolean enabled;
-
-    @Inject
-    @Config(path = "weapons.giants-broadsword.energy-per-tick", defaultValue = "1.5", configName = "weapons/legendaries")
-    private double energyPerTick;
-
-    @Inject
-    @Config(path = "weapons.giants-broadsword.initial-energy-cost", defaultValue = "10.0", configName = "weapons/legendaries")
-    private double initialEnergyCost;
-
-    @Inject
-    @Config(path = "weapons.giants-broadsword.base-damage", defaultValue = "10.0", configName = "weapons/legendaries")
-    private double baseDamage;
-
-    @Inject
-    @Config(path = "weapons.giants-broadsword.regen-amplifier", defaultValue = "3", configName = "weapons/legendaries")
     private int regenAmplifier;
-
     private final EnergyHandler energyHandler;
     private final Set<UUID> holdingWeapon = new HashSet<>();
     private final ClientManager clientManager;
 
     @Inject
-    public GiantsBroadsword(EnergyHandler energyHandler, ClientManager clientManager) {
-        super("giants_broadsword");
+    public GiantsBroadsword(Champions champions, EnergyHandler energyHandler, ClientManager clientManager) {
+        super(champions, "giants_broadsword");
         this.energyHandler = energyHandler;
         this.clientManager = clientManager;
     }
@@ -93,10 +74,6 @@ public class GiantsBroadsword extends ChannelWeapon implements InteractWeapon, L
 
     @Override
     public void activate(Player player) {
-        if (!enabled) {
-            UtilMessage.simpleMessage(player, getSimpleName(), "This weapon is not enabled.");
-            return;
-        }
         active.add(player.getUniqueId());
         player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, -1, regenAmplifier, false, false));
     }
@@ -107,7 +84,7 @@ public class GiantsBroadsword extends ChannelWeapon implements InteractWeapon, L
 
     @UpdateEvent
     public void doRegen() {
-        if (!enabled) {
+        if (!isEnabled()) {
             return;
         }
         final Iterator<UUID> iterator = active.iterator();
@@ -192,7 +169,7 @@ public class GiantsBroadsword extends ChannelWeapon implements InteractWeapon, L
 
     @EventHandler
     public void onSwapWeapon(PlayerItemHeldEvent event) {
-        if (!enabled) {
+        if (!isEnabled()) {
             return;
         }
         final Player player = event.getPlayer();
@@ -213,7 +190,7 @@ public class GiantsBroadsword extends ChannelWeapon implements InteractWeapon, L
 
     @EventHandler(priority = EventPriority.LOW)
     public void onDamage(CustomDamageEvent event) {
-        if (!enabled) {
+        if (!isEnabled()) {
             return;
         }
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
@@ -229,7 +206,7 @@ public class GiantsBroadsword extends ChannelWeapon implements InteractWeapon, L
 
     @Override
     public boolean canUse(Player player) {
-        if (!enabled) {
+        if (!isEnabled()) {
             return false;
         }
         return true;
@@ -246,7 +223,7 @@ public class GiantsBroadsword extends ChannelWeapon implements InteractWeapon, L
     }
 
     @Override
-    public boolean isEnabled(){
-        return enabled;
+    public void loadWeaponConfig() {
+        regenAmplifier = getConfig("regenAmplifier", 3, Integer.class);
     }
 }

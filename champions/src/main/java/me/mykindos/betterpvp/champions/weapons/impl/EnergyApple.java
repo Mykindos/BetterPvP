@@ -2,10 +2,10 @@ package me.mykindos.betterpvp.champions.weapons.impl;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.combat.weapon.Weapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.CooldownWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.InteractWeapon;
-import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.energy.EnergyHandler;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
@@ -18,22 +18,11 @@ import org.bukkit.entity.Player;
 public class EnergyApple extends Weapon implements InteractWeapon, CooldownWeapon {
 
     private final EnergyHandler energyHandler;
-
-    @Inject
-    @Config(path = "weapons.energy-apple.enabled", defaultValue = "true", configName = "weapons/standard")
-    private boolean enabled;
-
-    @Inject
-    @Config(path = "weapons.energy-apple.cooldown", defaultValue = "10.0", configName = "weapons/standard")
-    private double cooldown;
-
-    @Inject
-    @Config(path = "weapons.energy-apple.energy-regen", defaultValue = "0.50", configName = "weapons/standard")
     private double energyRegen;
 
     @Inject
-    public EnergyApple(EnergyHandler energyHandler) {
-        super("energy_apple");
+    public EnergyApple(Champions champions, EnergyHandler energyHandler) {
+        super(champions, "energy_apple");
         this.energyHandler = energyHandler;
     }
 
@@ -59,7 +48,7 @@ public class EnergyApple extends Weapon implements InteractWeapon, CooldownWeapo
     }
 
     @Override
-    public boolean isEnabled(){
-        return enabled;
+    public void loadWeaponConfig() {
+        energyRegen = getConfig("energyRegen", 0.50, Double.class);
     }
 }

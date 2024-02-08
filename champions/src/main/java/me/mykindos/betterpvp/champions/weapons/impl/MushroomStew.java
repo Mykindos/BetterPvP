@@ -2,10 +2,10 @@ package me.mykindos.betterpvp.champions.weapons.impl;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.combat.weapon.Weapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.CooldownWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.InteractWeapon;
-import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
@@ -30,25 +30,12 @@ import org.bukkit.potion.PotionEffectType;
 @BPvPListener
 public class MushroomStew extends Weapon implements InteractWeapon, CooldownWeapon, Listener {
 
-    @Inject
-    @Config(path = "weapons.mushroom-stew.enabled", defaultValue = "true", configName = "weapons/standard")
-    private boolean enabled;
-
-    @Inject
-    @Config(path = "weapons.mushroom-stew.cooldown", defaultValue = "14.0", configName = "weapons/standard")
-    private double cooldown;
-
-    @Inject
-    @Config(path = "weapons.mushroom-stew.duration", defaultValue = "4.0", configName = "weapons/standard")
     private double duration;
-
-    @Inject
-    @Config(path = "weapons.mushroom-stew.level", defaultValue = "2", configName = "weapons/standard")
     private int level;
 
     @Inject
-    public MushroomStew() {
-        super("mushroom_stew");
+    public MushroomStew(Champions champions) {
+        super(champions, "mushroom_stew");
     }
 
     @Override
@@ -93,7 +80,8 @@ public class MushroomStew extends Weapon implements InteractWeapon, CooldownWeap
     }
 
     @Override
-    public boolean isEnabled(){
-        return enabled;
+    public void loadWeaponConfig() {
+        duration = getConfig("duration", 4.0, Double.class);
+        level = getConfig("level", 2, Integer.class);
     }
 }

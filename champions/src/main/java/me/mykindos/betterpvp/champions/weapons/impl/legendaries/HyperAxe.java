@@ -2,12 +2,12 @@ package me.mykindos.betterpvp.champions.weapons.impl.legendaries;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.utilities.ChampionsNamespacedKeys;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.weapon.Weapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.InteractWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
-import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.energy.EnergyHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -37,40 +37,17 @@ import java.util.List;
 @BPvPListener
 public class HyperAxe extends Weapon implements InteractWeapon, LegendaryWeapon, Listener {
 
-    @Inject
-    @Config(path = "weapons.hyper-axe.enabled", defaultValue = "true", configName = "weapons/legendaries")
-    private boolean enabled;
-
-    @Inject
-    @Config(path = "weapons.hyper-axe.damageDelay", defaultValue = "200", configName = "weapons/legendaries")
     private int damageDelay;
-
-    @Inject
-    @Config(path = "weapons.hyper-axe.baseDamage", defaultValue = "4.0", configName = "weapons/legendaries")
-    private double baseDamage;
-
-    @Inject
-    @Config(path = "weapons.hyper-axe.dealsKnockback", defaultValue = "false", configName = "weapons/legendaries")
     private boolean dealsKnockback;
-
-    @Inject
-    @Config(path = "weapons.hyper-axe.usesEnergy", defaultValue = "false", configName = "weapons/legendaries")
     private boolean usesEnergy;
-
-    @Inject
-    @Config(path = "weapons.hyper-axe.energyPerHit", defaultValue = "10", configName = "weapons/legendaries")
     private int energyPerHit;
-
-    @Inject
-    @Config(path = "weapons.hyper-axe.hyperRushCooldown", defaultValue = "16", configName = "weapons/legendaries")
     private double hyperRushCooldown;
-
     private final EnergyHandler energyHandler;
     private final CooldownManager cooldownManager;
 
     @Inject
-    public HyperAxe(EnergyHandler energyHandler, CooldownManager cooldownManager) {
-        super("hyper_axe");
+    public HyperAxe(Champions champions, EnergyHandler energyHandler, CooldownManager cooldownManager) {
+        super(champions, "hyper_axe");
         this.energyHandler = energyHandler;
         this.cooldownManager = cooldownManager;
     }
@@ -175,5 +152,14 @@ public class HyperAxe extends Weapon implements InteractWeapon, LegendaryWeapon,
     @Override
     public boolean isEnabled(){
         return enabled;
+    }
+
+    @Override
+    public void loadWeaponConfig() {
+        damageDelay = getConfig("damageDelay", 200, Integer.class);
+        dealsKnockback = getConfig("dealsKnockback", false, Boolean.class);
+        usesEnergy = getConfig("usesEnergy", false, Boolean.class);
+        energyPerHit = getConfig("energyPerHit", 10, Integer.class);
+        hyperRushCooldown = getConfig("hyperRushCooldown", 16.0, Double.class);
     }
 }

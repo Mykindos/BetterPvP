@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.weapons.impl.legendaries;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -9,7 +10,6 @@ import me.mykindos.betterpvp.core.combat.weapon.types.ChannelWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.InteractWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseItemEvent;
-import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.energy.EnergyHandler;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -37,32 +37,13 @@ import java.util.List;
 @BPvPListener
 public class WindBlade extends ChannelWeapon implements InteractWeapon, LegendaryWeapon, Listener {
 
-    @Inject
-    @Config(path = "weapons.wind-blade.enabled", defaultValue = "true", configName = "weapons/legendaries")
-    private boolean enabled;
-
-    @Inject
-    @Config(path = "weapons.wind-blade.energy-per-tick", defaultValue = "1.5", configName = "weapons/legendaries")
-    private double energyPerTick;
-
-    @Inject
-    @Config(path = "weapons.wind-blade.initial-energy-cost", defaultValue = "10.0", configName = "weapons/legendaries")
-    private double initialEnergyCost;
-
-    @Inject
-    @Config(path = "weapons.wind-blade.base-damage", defaultValue = "7.0", configName = "weapons/legendaries")
-    private double baseDamage;
-
-    @Inject
-    @Config(path = "weapons.wind-blade.strength", defaultValue = "0.7", configName = "weapons/legendaries")
     private double velocityStrength;
-
     private final EnergyHandler energyHandler;
     private final ClientManager clientManager;
 
     @Inject
-    public WindBlade(EnergyHandler energyHandler, ClientManager clientManager) {
-        super("wind_blade");
+    public WindBlade(Champions champions, EnergyHandler energyHandler, ClientManager clientManager) {
+        super(champions, "wind_blade");
         this.energyHandler = energyHandler;
         this.clientManager = clientManager;
     }
@@ -174,7 +155,7 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
     }
 
     @Override
-    public boolean isEnabled(){
-        return enabled;
+    public void loadWeaponConfig() {
+        velocityStrength = getConfig("velocityStrength", 0.7, Double.class);
     }
 }

@@ -1,36 +1,45 @@
-weapons:
-  knights-greatlance:
-    max-charge-ticks: 60
-    charge-cooldown: 5.0
-    base-damage: 8.0
-    charge-velocity: 1.5
-    energy-per-tick: 1.0
-    initial-energy-cost: 10.0
-  alligators-tooth:
-    base-damage: 8.0
-    bonus-damage: 4.0
-    energy-per-tick: 1.0
-    initial-energy-cost: 10.0
-    strength: 1.0
-  magnetic-maul:
-    base-damage: 8.0
-    energy-per-tick: 1.0
-    initial-energy-cost: 10.0
-    pull-fov: 80.3
-    pull-range: 10.0
-  giants-broadsword:
-    base-damage: 10.0
-    energy-per-tick: 1.5
-    initial-energy-cost: 10.0
-    regen-amplifier: 3
-  wind-blade:
-    base-damage: 7.0
-    energy-per-tick: 1.0
-    initial-energy-cost: 10.0
-    strength: 0.7
-  hyper-axe:
-    damageDelay: 200
-    baseDamage: 4
-    dealsKnockback: false
-    usesEnergy: false
-    energyPerHit: 2
+alligators_tooth:
+  enabled: true
+  baseDamage: 8.0
+  energyPerTick: 1.0
+  initialEnergyCost: 10.0
+  bonusDamage: 4.0
+  velocityStrength: 1.0
+wind_blade:
+  enabled: true
+  baseDamage: 7.0
+  energyPerTick: 1.5
+  initialEnergyCost: 10.0
+  velocityStrength: 0.7
+knights_greatlance:
+  enabled: true
+  baseDamage: 8.0
+  energyPerTick: 1.0
+  initialEnergyCost: 10.0
+  attackCooldown: 5.0
+  maxChargeTicks: 60
+  chargeVelocity: 1.5
+hyper_axe:
+  enabled: true
+  baseDamage: 4.0
+  damageDelay: 200
+  dealsKnockback: false
+  usesEnergy: false
+  energyPerHit: 10
+  hyperRushCooldown: 16.0
+giants_broadsword:
+  enabled: true
+  baseDamage: 10.0
+  energyPerTick: 1.5
+  initialEnergyCost: 10.0
+  regenAmplifier: 3
+magnetic_maul:
+  enabled: true
+  baseDamage: 8.0
+  energyPerTick: 1.0
+  initialEnergyCost: 10.0
+  pullRange: 10.0
+  pullFov: 80.3
+wings_of_zanzul:
+  enabled: true
+  baseDamage: 1.0

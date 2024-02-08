@@ -2,13 +2,13 @@ package me.mykindos.betterpvp.champions.weapons.impl;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableItem;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableListener;
 import me.mykindos.betterpvp.core.combat.weapon.Weapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.CooldownWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.InteractWeapon;
-import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.items.BPvPItem;
@@ -38,30 +38,15 @@ import java.util.UUID;
 @BPvPListener
 public class ThrowingWeb extends Weapon implements Listener, InteractWeapon, CooldownWeapon, ThrowableListener {
 
-    @Inject
-    @Config(path = "weapons.throwing-web.enabled", defaultValue = "true", configName = "weapons/standard")
-    private boolean enabled;
-
-    @Inject
-    @Config(path = "weapons.throwing-web.cooldown", defaultValue = "10.0", configName = "weapons/standard")
-    private double cooldown;
-
-    @Inject
-    @Config(path = "weapons.throwing-web.duration", defaultValue = "2.5", configName = "weapons/standard")
     private double duration;
-
-    @Inject
-    @Config(path = "weapons.throwing-web.throwable-expiry", defaultValue = "10.0", configName = "weapons/standard")
     private double throwableExpiry;
-
     private final ChampionsManager championsManager;
     private final WorldBlockHandler blockHandler;
-
     private final CooldownManager cooldownManager;
 
     @Inject
-    public ThrowingWeb(ChampionsManager championsManager, WorldBlockHandler blockHandler, CooldownManager cooldownManager) {
-        super("throwing_web");
+    public ThrowingWeb(Champions champions, ChampionsManager championsManager, WorldBlockHandler blockHandler, CooldownManager cooldownManager) {
+        super(champions, "throwing_web");
 
         this.championsManager = championsManager;
         this.blockHandler = blockHandler;
@@ -143,7 +128,8 @@ public class ThrowingWeb extends Weapon implements Listener, InteractWeapon, Coo
     }
 
     @Override
-    public boolean isEnabled(){
-        return enabled;
+    public void loadWeaponConfig() {
+        duration = getConfig("duration", 2.5, Double.class);
+        throwableExpiry = getConfig("throwableExpiry", 10.0, Double.class);
     }
 }

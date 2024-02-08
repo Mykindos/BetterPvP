@@ -1,16 +1,19 @@
 package me.mykindos.betterpvp.champions.weapons.impl.vanilla.armour;
 
+import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.combat.weapon.Weapon;
 import me.mykindos.betterpvp.core.items.BPvPItem;
 import org.bukkit.Material;
 import org.bukkit.inventory.recipe.CraftingBookCategory;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
 @Singleton
 public class NetheriteLeggings extends Weapon {
-    public NetheriteLeggings() {
-        super("warlock_leggings");
+    @Inject
+    public NetheriteLeggings(Champions champions) {
+        super(champions, "warlock_leggings");
     }
 
     @Override

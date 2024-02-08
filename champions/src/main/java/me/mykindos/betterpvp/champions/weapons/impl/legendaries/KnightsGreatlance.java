@@ -6,6 +6,7 @@ import com.google.inject.Singleton;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -13,7 +14,6 @@ import me.mykindos.betterpvp.core.combat.weapon.types.ChannelWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.InteractWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseItemEvent;
-import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.cooldowns.Cooldown;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
@@ -67,35 +67,9 @@ public class KnightsGreatlance extends ChannelWeapon implements InteractWeapon, 
     private final CooldownManager cooldownManager;
     private final ClientManager clientManager;
     private final EffectManager effectManager;
-
-    @Inject
-    @Config(path = "weapons.knights-greatlance.enabled", defaultValue = "true", configName = "weapons/legendaries")
-    private boolean enabled;
-
-    @Inject
-    @Config(path = "weapons.knights-greatlance.energy-per-tick", defaultValue = "1.0", configName = "weapons/legendaries")
-    private double energyPerTick;
-
-    @Inject
-    @Config(path = "weapons.knights-greatlance.initial-energy-cost", defaultValue = "10.0", configName = "weapons/legendaries")
-    private double initialEnergyCost;
-
-    @Inject
-    @Config(path = "weapons.knights-greatlance.base-damage", defaultValue = "8.0", configName = "weapons/legendaries")
-    private double baseDamage;
-
-    @Inject
-    @Config(path = "weapons.knights-greatlance.charge-cooldown", defaultValue = "5.0", configName = "weapons/legendaries")
     private double attackCooldown;
-
-    @Inject
-    @Config(path = "weapons.knights-greatlance.max-charge-ticks", defaultValue = "60", configName = "weapons/legendaries")
     private int maxChargeTicks;
-
-    @Inject
-    @Config(path = "weapons.knights-greatlance.charge-velocity", defaultValue = "1.5", configName = "weapons/legendaries")
     private double chargeVelocity;
-
     private final EnergyHandler energyHandler;
 
     private final PermanentComponent actionBar = new PermanentComponent(gmr -> {
@@ -109,8 +83,8 @@ public class KnightsGreatlance extends ChannelWeapon implements InteractWeapon, 
     });
 
     @Inject
-    public KnightsGreatlance(final CooldownManager cooldownManager, final ClientManager clientManager, final EffectManager effectManager, EnergyHandler energyHandler) {
-        super("knights_greatlance");
+    public KnightsGreatlance(Champions champions, final CooldownManager cooldownManager, final ClientManager clientManager, final EffectManager effectManager, EnergyHandler energyHandler) {
+        super(champions, "knights_greatlance");
         this.cooldownManager = cooldownManager;
         this.clientManager = clientManager;
         this.effectManager = effectManager;
@@ -318,6 +292,18 @@ public class KnightsGreatlance extends ChannelWeapon implements InteractWeapon, 
         return initialEnergyCost;
     }
 
+    @Override
+    public boolean isEnabled(){
+        return enabled;
+    }
+
+    @Override
+    public void loadWeaponConfig() {
+        attackCooldown = getConfig("attackCooldown", 5.0, Double.class);
+        maxChargeTicks = getConfig("maxChargeTicks", 60, Integer.class);
+        chargeVelocity = getConfig("chargeVelocity", 1.5, Double.class);
+    }
+
     @Getter
     @Setter
     @AllArgsConstructor
@@ -325,10 +311,5 @@ public class KnightsGreatlance extends ChannelWeapon implements InteractWeapon, 
         private @NotNull Location lastLocation;
         private @NotNull Gamer gamer;
         private int ticksCharged;
-    }
-
-    @Override
-    public boolean isEnabled(){
-        return enabled;
     }
 }

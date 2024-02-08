@@ -37,6 +37,10 @@ public class WeaponManager extends Manager<IWeapon> {
     }
 
     public boolean load(Weapon weapon) {
+        if (!weapon.isEnabled()) {
+            log.info(weapon.getKey() + " is not enabled");
+            return false;
+        }
         BPvPItem item = itemHandler.getItem(weapon.getIdentifier());
         if (item == null) {
             log.error(weapon.getIdentifier() + " does not exist in itemRepository");

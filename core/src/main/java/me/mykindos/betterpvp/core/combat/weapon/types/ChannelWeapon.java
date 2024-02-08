@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.combat.weapon.types;
 
 import me.mykindos.betterpvp.core.combat.weapon.Weapon;
 import me.mykindos.betterpvp.core.components.champions.weapons.IWeapon;
+import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -18,12 +19,12 @@ public abstract class ChannelWeapon extends Weapon implements IWeapon, Listener 
 
     protected final Set<UUID> active = new HashSet<>();
 
-    public ChannelWeapon(String key) {
-        super(key);
+    public ChannelWeapon(BPvPPlugin plugin, String key) {
+        super(plugin, key);
     }
 
-    public ChannelWeapon(String key, List<Component> lore) {
-        super(key, lore);
+    public ChannelWeapon(BPvPPlugin plugin, String key, List<Component> lore) {
+        super(key, plugin, lore);
     }
 
     public abstract double getEnergy();

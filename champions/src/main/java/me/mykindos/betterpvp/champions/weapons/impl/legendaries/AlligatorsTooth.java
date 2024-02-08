@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.weapons.impl.legendaries;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -9,7 +10,6 @@ import me.mykindos.betterpvp.core.combat.weapon.types.ChannelWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.InteractWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseItemEvent;
-import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.energy.EnergyHandler;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -39,37 +39,15 @@ import java.util.UUID;
 @Singleton
 @BPvPListener
 public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, LegendaryWeapon, Listener {
-
-    @Inject
-    @Config(path = "weapons.alligators-tooth.enabled", defaultValue = "true", configName = "weapons/legendaries")
-    private boolean enabled;
-
-    @Inject
-    @Config(path = "weapons.alligators-tooth.energy-per-tick", defaultValue = "1.0", configName = "weapons/legendaries")
-    private double energyPerTick;
-
-    @Inject
-    @Config(path = "weapons.alligators-tooth.initial-energy-cost", defaultValue = "10.0", configName = "weapons/legendaries")
-    private double initialEnergyCost;
-
-    @Inject
-    @Config(path = "weapons.alligators-tooth.base-damage", defaultValue = "8.0", configName = "weapons/legendaries")
-    private double baseDamage;
-
-    @Inject
-    @Config(path = "weapons.alligators-tooth.bonus-damage", defaultValue = "4.0", configName = "weapons/legendaries")
     private double bonusDamage;
-
-    @Inject
-    @Config(path = "weapons.alligators-tooth.strength", defaultValue = "1.0", configName = "weapons/legendaries")
     private double velocityStrength;
 
     private final EnergyHandler energyHandler;
     private final ClientManager clientManager;
 
     @Inject
-    public AlligatorsTooth(EnergyHandler energyHandler, ClientManager clientManager) {
-        super("alligators_tooth");
+    public AlligatorsTooth(Champions champions, EnergyHandler energyHandler, ClientManager clientManager) {
+        super(champions, "alligators_tooth");
         this.energyHandler = energyHandler;
         this.clientManager = clientManager;
     }
@@ -90,16 +68,12 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
 
     @Override
     public void activate(Player player) {
-        if (!enabled) {
-            //UtilMessage.simpleMessage(player, getSimpleName(), "This weapon is not enabled.");
-            return;
-        }
         active.add(player.getUniqueId());
     }
 
     @UpdateEvent
     public void doAlligatorsTooth() {
-        if (!enabled) {
+        if (!isEnabled()) {
             return;
         }
         final Iterator<UUID> iterator = active.iterator();
@@ -157,7 +131,7 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
 
     @UpdateEvent(delay = 1000)
     public void onOxygendDrain() {
-        if (!enabled) {
+        if (!isEnabled()) {
             return;
         }
         for (Player player : Bukkit.getOnlinePlayers()) {
@@ -169,7 +143,7 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
 
     @Override
     public boolean canUse(Player player) {
-        if (!enabled) {
+        if (!isEnabled()) {
             return false;
         }
         if (!UtilBlock.isInWater(player)) {
@@ -186,8 +160,8 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
     }
 
     @Override
-    public boolean isEnabled(){
-        return enabled;
+    public void loadWeaponConfig() {
+        bonusDamage = getConfig("bonusDamage", 4.0, Double.class);
+        velocityStrength = getConfig("velocityStrength", 1.0, Double.class);
     }
-
 }
