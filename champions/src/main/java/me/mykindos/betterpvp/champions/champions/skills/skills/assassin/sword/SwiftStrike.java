@@ -11,10 +11,12 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
+import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilLocation;
+import me.mykindos.betterpvp.core.utilities.math.VectorLine;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -36,24 +38,23 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class RecursiveStrike extends Skill implements InteractSkill, CooldownSkill, Listener {
+public class SwiftStrike extends Skill implements InteractSkill, CooldownSkill, Listener {
 
-    private final WeakHashMap<Player, Integer> playerHits = new WeakHashMap<>();
-    private double baseDamage;
-    private double damageIncreasePerLevel;
+    private int bleedTime;
     private double distance;
-    private int numHitsRequired;
+    private double cooldownReductionPerHit;
+    private double perHitReductionPerLevelIncrease;
     @Inject
     private CooldownManager cooldownManager;
 
     @Inject
-    public RecursiveStrike(Champions champions, ChampionsManager championsManager) {
+    public SwiftStrike(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
 
     @Override
     public String getName() {
-        return "Recursive Strike";
+        return "Swift Strike";
     }
 
 
@@ -62,16 +63,16 @@ public class RecursiveStrike extends Skill implements InteractSkill, CooldownSki
         return new String[]{
                 "Right click with a Sword to activate",
                 "",
-                "Dash forwards <stat>" + distance + "</stat> blocks and spin around,",
-                "dealing <val>" + getDamage(level) + "</val> damage to anything you pass through",
+                "Dash forwards <stat>" + distance + "</stat> blocks, giving anything",
+                "you pass through <effect>Bleed</effect> for <stat>" + bleedTime + "</stat> seconds",
                 "",
-                "Landing <val>" + numHitsRequired + "</val> hits will reset the cooldown",
+                "Every hit will reduce the cooldown by <val>" + getCooldownReductionPerHit(level) + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)};
     }
 
-    public double getDamage(int level) {
-        return baseDamage + (level - 1) * damageIncreasePerLevel;
+    public double getCooldownReductionPerHit(int level) {
+        return cooldownReductionPerHit + (level - 1) * perHitReductionPerLevelIncrease;
     }
 
     @Override
@@ -79,8 +80,6 @@ public class RecursiveStrike extends Skill implements InteractSkill, CooldownSki
         Location originalLocation = player.getLocation();
         final Vector direction = player.getEyeLocation().getDirection();
         Location teleportLocation = originalLocation.clone();
-
-        playerHits.put(player, 0);
 
         final int iterations = (int) Math.ceil(distance / 0.2);
         for (int i = 1; i <= iterations; i++) {
@@ -91,13 +90,7 @@ public class RecursiveStrike extends Skill implements InteractSkill, CooldownSki
                 if (entity instanceof Player && entity != player) {
                     LivingEntity target = (LivingEntity) entity;
 
-                    CustomDamageEvent cde = new CustomDamageEvent(target, player, player, EntityDamageEvent.DamageCause.CUSTOM, 2.0, false);
-                    UtilDamage.doCustomDamage(cde);
-                    int currentHits = playerHits.getOrDefault(player, 0);
-                    if (currentHits > 0) {
-                        currentHits -= 1;
-                        playerHits.put(player, currentHits);
-                    }
+                    championsManager.getEffects().addEffect(target, EffectType.BLEED, (long) bleedTime * 1000L);
 
                     break;
                 }
@@ -138,15 +131,18 @@ public class RecursiveStrike extends Skill implements InteractSkill, CooldownSki
             teleportLocation = newTeleportLocation;
         }
 
-        float newYaw = (player.getLocation().getYaw() + 180) % 360;
-        teleportLocation.setYaw(newYaw);
-        teleportLocation.setPitch(-player.getLocation().getPitch());
-
         player.leaveVehicle();
         teleportLocation = UtilLocation.shiftOutOfBlocks(teleportLocation, player.getBoundingBox());
 
         Particle.GUST.builder().location(player.getLocation()).count(1).receivers(30).extra(0).spawn();
         Particle.GUST.builder().location(teleportLocation).count(1).receivers(30).extra(0).spawn();
+
+        final Location lineStart = player.getLocation().add(0.0, player.getHeight() / 2, 0.0);
+        final Location lineEnd = teleportLocation.clone().add(0.0, player.getHeight() / 2, 0.0);
+        final VectorLine line = VectorLine.withStepSize(lineStart, lineEnd, 0.25f);
+        for (Location point : line.toLocations()) {
+            Particle.CRIT.builder().location(point).count(2).receivers(30).extra(0).spawn();
+        }
 
         player.teleportAsync(teleportLocation);
 
@@ -158,18 +154,9 @@ public class RecursiveStrike extends Skill implements InteractSkill, CooldownSki
         if (!(event.getDamager() instanceof Player player)) return;
         if (!(event.getDamagee() instanceof Player)) return;
         if (event.isCancelled()) return;
+        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
 
-        int numHits = playerHits.getOrDefault(player, 0);
-        numHits++;
-        playerHits.put(player, numHits);
-        int level = getLevel(player);
-
-        if (numHits >= numHitsRequired) {
-            cooldownManager.removeCooldown(player, getName(), true);
-            cooldownManager.use(player, getName(), 0, true);
-
-            playerHits.put(player, 0);
-        }
+        cooldownManager.reduceCooldown(player, getName(), cooldownReductionPerHit);
     }
 
 
@@ -199,9 +186,10 @@ public class RecursiveStrike extends Skill implements InteractSkill, CooldownSki
 
     @Override
     public void loadSkillConfig() {
-        baseDamage = getConfig("baseDamage", 3.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
-        distance = getConfig("distance", 4.0, Double.class);
-        numHitsRequired = getConfig("numHitsRequired", 3, Integer.class);
+        bleedTime = getConfig("bleedTime", 1, Integer.class);
+        distance = getConfig("distance", 5.0, Double.class);
+        cooldownReductionPerHit = getConfig("cooldownReductionPerHit", 3.0, Double.class);
+        perHitReductionPerLevelIncrease =getConfig("perHitReductionPerLevelIncrease", 0.5, Double.class);
+
     }
 }
