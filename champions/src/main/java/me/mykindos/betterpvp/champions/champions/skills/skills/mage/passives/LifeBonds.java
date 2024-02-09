@@ -143,7 +143,7 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
         double healthDifference = highestHealth - lowestHealth;
         double healthToTransfer = healthDifference * healMultiplier;
 
-        if (healthToTransfer >= 2 && (highestHealthPlayer.getHealth() - healthToTransfer) > 2) {
+        if (healthDifference >= 2 && (highestHealthPlayer.getHealth() - healthToTransfer) > 2) {
             long currentTime = System.currentTimeMillis();
             long lastHeal = lastHealTime.getOrDefault(lowestHealthPlayer.getUniqueId(), 0L);
             if (currentTime - lastHeal > (healCooldown * 1000L)) {
