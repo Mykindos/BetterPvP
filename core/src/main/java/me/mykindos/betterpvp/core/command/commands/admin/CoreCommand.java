@@ -82,7 +82,7 @@ public class CoreCommand extends Command implements IConsoleCommand {
         public void execute(CommandSender sender, String[] args) {
             core.reload();
             commandLoader.reload(core.getClass().getPackageName());
-            tipManager.reloadTips();
+            tipManager.reloadTips(core);
             resourcePackHandler.reload();
 
             UtilMessage.message(sender, "Core", "Successfully reloaded core");

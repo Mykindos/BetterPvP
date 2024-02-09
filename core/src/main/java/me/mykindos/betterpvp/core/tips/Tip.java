@@ -28,7 +28,7 @@ public abstract class Tip {
         this.defaultCategoryWeight = defaultCategoryWeight;
         this.defaultWeight = defaultWeight;
         this.component = component;
-        loadConfig();
+        loadConfig(plugin);
     }
 
     public Tip(BPvPPlugin plugin, int defaultCategoryWeight, int defaultWeight) {
@@ -55,7 +55,10 @@ public abstract class Tip {
         return this.plugin.getConfig().getOrSaveObject(path, defaultValue, type);
     }
 
-    public final void loadConfig() {
+    public final void loadConfig(BPvPPlugin plugin) {
+        if (!this.getPlugin().equals(plugin)) {
+            return;
+        }
         enabled = getConfig("enabled", true, Boolean.class);
         categoryWeight = getConfig("categoryWeight", this.defaultCategoryWeight, Integer.class);
         weight = getConfig("weight", this.defaultWeight, Integer.class);
