@@ -14,7 +14,6 @@ import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
-import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilLocation;
 import me.mykindos.betterpvp.core.utilities.math.VectorLine;
 import org.bukkit.Location;
@@ -34,11 +33,10 @@ import org.bukkit.util.Vector;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class SwiftStrike extends Skill implements InteractSkill, CooldownSkill, Listener {
+public class Slash extends Skill implements InteractSkill, CooldownSkill, Listener {
 
     private int bleedTime;
     private double distance;
@@ -48,13 +46,13 @@ public class SwiftStrike extends Skill implements InteractSkill, CooldownSkill, 
     private CooldownManager cooldownManager;
 
     @Inject
-    public SwiftStrike(Champions champions, ChampionsManager championsManager) {
+    public Slash(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
 
     @Override
     public String getName() {
-        return "Swift Strike";
+        return "Slash";
     }
 
 
