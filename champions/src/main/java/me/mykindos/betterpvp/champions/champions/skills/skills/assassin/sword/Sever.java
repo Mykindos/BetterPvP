@@ -32,7 +32,7 @@ import java.util.WeakHashMap;
 public class Sever extends Skill implements CooldownSkill, Listener {
     private double baseDuration;
     private double durationIncreasePerLevel;
-
+    private double hitDistance;
     private WeakHashMap<Player, Boolean> rightClicked = new WeakHashMap<>();
 
     @Inject
@@ -112,7 +112,7 @@ public class Sever extends Skill implements CooldownSkill, Listener {
             return;
         }
 
-        boolean withinRange = UtilMath.offset(player, ent) <= 3.0;
+        boolean withinRange = UtilMath.offset(player, ent) <= hitDistance;
         boolean isFriendly = false;
         if (ent instanceof Player damagee) {
             isFriendly = UtilPlayer.getRelation(player, damagee) == EntityProperty.FRIENDLY;
@@ -138,5 +138,6 @@ public class Sever extends Skill implements CooldownSkill, Listener {
     public void loadSkillConfig() {
         baseDuration = getConfig("baseDuration", 1.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
+        hitDistance = getConfig("hitDistance", 4.0, Double.class);
     }
 }

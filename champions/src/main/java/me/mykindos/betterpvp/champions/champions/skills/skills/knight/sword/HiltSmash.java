@@ -44,6 +44,7 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener {
     private double baseDuration;
     private double durationIncreasePerLevel;
     private int slowStrength;
+    private double hitDistance;
 
     @Inject
     public HiltSmash(Champions champions, ChampionsManager championsManager) {
@@ -125,7 +126,7 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener {
             return;
         }
 
-        boolean withinRange = ent != null && UtilMath.offset(player, ent) <= 3.0;
+        boolean withinRange = ent != null && UtilMath.offset(player, ent) <= hitDistance;
         boolean isFriendly = false;
 
         if (ent instanceof Player damagee) {
@@ -155,5 +156,6 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener {
         baseDuration = getConfig("baseDuration", 0.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
         slowStrength = getConfig("slowStrength", 2, Integer.class);
+        hitDistance = getConfig("hitDistance", 4.0, Double.class);
     }
 }
