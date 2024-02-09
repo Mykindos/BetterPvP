@@ -601,7 +601,6 @@ skills:
       enabled: true
       maxlevel: 5
       duration: 5.0
-      radius: 15
       maxStacks: 3
       baseDuration: 5.0
       durationIncreasePerLevel: 1.0
