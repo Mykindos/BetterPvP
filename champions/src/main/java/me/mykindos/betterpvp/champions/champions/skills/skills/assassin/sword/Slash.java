@@ -14,9 +14,11 @@ import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilLocation;
 import me.mykindos.betterpvp.core.utilities.math.VectorLine;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
@@ -38,10 +40,11 @@ import javax.inject.Singleton;
 @BPvPListener
 public class Slash extends Skill implements InteractSkill, CooldownSkill, Listener {
 
-    private int bleedTime;
     private double distance;
     private double cooldownReductionPerHit;
     private double perHitReductionPerLevelIncrease;
+    public double damage;
+    public double damageIncreasePerLevel;
     @Inject
     private CooldownManager cooldownManager;
 
@@ -55,14 +58,13 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
         return "Slash";
     }
 
-
     @Override
     public String[] getDescription(int level) {
         return new String[]{
                 "Right click with a Sword to activate",
                 "",
-                "Dash forwards <stat>" + distance + "</stat> blocks, giving anything",
-                "you pass through <effect>Bleed</effect> for <stat>" + bleedTime + "</stat> seconds",
+                "Dash forwards <stat>" + distance + "</stat> blocks, dealing <val>" + getDamage(level) + "</val>",
+                "damage to anything you pass through",
                 "",
                 "Every hit will reduce the cooldown by <val>" + getCooldownReductionPerHit(level) + "</val> seconds",
                 "",
@@ -71,6 +73,10 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
 
     public double getCooldownReductionPerHit(int level) {
         return cooldownReductionPerHit + (level - 1) * perHitReductionPerLevelIncrease;
+    }
+
+    public double getDamage(int level){
+        return damage + (damageIncreasePerLevel * (level - 1));
     }
 
     @Override
@@ -88,7 +94,10 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
                 if (entity instanceof Player && entity != player) {
                     LivingEntity target = (LivingEntity) entity;
 
-                    championsManager.getEffects().addEffect(target, EffectType.BLEED, (long) bleedTime * 1000L);
+                    CustomDamageEvent cde = new CustomDamageEvent(target, player, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, "Slash");
+                    UtilDamage.doCustomDamage(cde);
+                    target.getWorld().playSound(target.getLocation().add(0, 1, 0), Sound.ENTITY_PLAYER_HURT, 0.5f, 2f);
+                    target.getWorld().playSound(target.getLocation().add(0, 1, 0), Sound.ENTITY_PLAYER_HURT_SWEET_BERRY_BUSH, 0.5f, 2f);
 
                     break;
                 }
@@ -184,7 +193,8 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
 
     @Override
     public void loadSkillConfig() {
-        bleedTime = getConfig("bleedTime", 1, Integer.class);
+        damage = getConfig("damage", 3.0, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 2.0, Double.class);
         distance = getConfig("distance", 5.0, Double.class);
         cooldownReductionPerHit = getConfig("cooldownReductionPerHit", 3.0, Double.class);
         perHitReductionPerLevelIncrease =getConfig("perHitReductionPerLevelIncrease", 0.5, Double.class);

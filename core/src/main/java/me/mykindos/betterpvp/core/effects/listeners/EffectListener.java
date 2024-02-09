@@ -111,6 +111,7 @@ public class EffectListener implements Listener {
                 cde.setIgnoreArmour(true);
                 UtilDamage.doCustomDamage(cde);
 
+                entity.getWorld().playSound(entity.getLocation().add(0, 1, 0), Sound.ENTITY_PLAYER_HURT_FREEZE, 1f, 2f);
                 entity.getWorld().playEffect(entity.getLocation().add(0, 1, 0), org.bukkit.Effect.STEP_SOUND, Material.REDSTONE_BLOCK);
 
                 lastBleedTimes.put(uuid, currentTime);
