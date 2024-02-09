@@ -9,6 +9,15 @@ skills:
       cooldownDecreasePerLevel: 0.5
       leapStrength: 1.3
       wallKickStrength: 0.9
+    recursivestrike:
+      enabled: true
+      cooldown: 15.0
+      cooldownDecreasePerLevel: 2.0
+      maxlevel: 3
+      baseDamage: 3.0
+      damageIncreasePerLevel: 1.0
+      distance: 4.0
+      numHitsRequired: 3
     sever:
       enabled: true
       cooldown: 20.0
@@ -73,7 +82,7 @@ skills:
       damageIncrement: 1.0
       duration: 2.0
     concussion:
-      enabled: true
+      enabled: false
       cooldown: 16.0
       maxlevel: 3
       durationPerLevel: 1.5
