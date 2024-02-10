@@ -41,6 +41,7 @@ public class Longshot extends Skill implements PassiveSkill {
 
     private double damageIncreasePerLevel;
     private double deathMessageThreshold;
+    private double minDamage;
 
     @Inject
     public Longshot(Champions champions, ChampionsManager championsManager) {
@@ -59,6 +60,8 @@ public class Longshot extends Skill implements PassiveSkill {
         return new String[]{
                 "Shoot an arrow that deals an extra <stat>" + getDamage(level),
                 "damage per block it travels",
+                "",
+                "Your arrows start at <stat>" + minDamage + "</stat> damage",
                 "",
                 "Caps out at <val>" + getMaxDamage(level) + "</val> damage",
                 "",
@@ -123,7 +126,7 @@ public class Longshot extends Skill implements PassiveSkill {
         double length = UtilMath.offset(loc, event.getDamagee().getLocation());
         double damage = Math.min(getMaxDamage(level), length * getDamage(level));
 
-        event.setDamage(event.getDamage() + (damage));
+        event.setDamage(minDamage + (damage));
         event.addReason(getName() + (length > deathMessageThreshold ? " (" + (int) length + " blocks)" : ""));
 
     }
@@ -136,16 +139,16 @@ public class Longshot extends Skill implements PassiveSkill {
 
     @Override
     public SkillType getType() {
-
         return SkillType.PASSIVE_A;
     }
 
     @Override
     public void loadSkillConfig(){
-        baseMaxDamage = getConfig("baseMaxDamage", 12.0, Double.class);
-        maxDamageIncreasePerLevel = getConfig("maxDamageIncreasePerLevel", 1.0, Double.class);
-        baseDamage = getConfig("baseDamage", 0.25, Double.class);
+        baseMaxDamage = getConfig("baseMaxDamage", 14.0, Double.class);
+        maxDamageIncreasePerLevel = getConfig("maxDamageIncreasePerLevel", 2.0, Double.class);
+        baseDamage = getConfig("baseDamage", 0.4, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
+        minDamage = getConfig("minDamage", 1.0, Double.class);
 
         deathMessageThreshold = getConfig("deathMessageThreshold", 40.0, Double.class);
     }

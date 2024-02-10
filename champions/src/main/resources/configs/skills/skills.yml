@@ -658,12 +658,13 @@ skills:
       slownessStrength: 3
     longshot:
       enabled: true
-      maxlevel: 5
+      maxlevel: 3
       deathMessageThreshold: 40.0
-      baseMaxDamage: 12.0
-      maxDamageIncreasePerLevel: 1.0
-      baseDamage: 0.25
+      baseMaxDamage: 14.0
+      maxDamageIncreasePerLevel: 2.0
+      baseDamage: 0.4
       damageIncreasePerLevel: 0.0
+      minDamage: 1.0
     heavyarrows:
       enabled: true
       maxlevel: 5
