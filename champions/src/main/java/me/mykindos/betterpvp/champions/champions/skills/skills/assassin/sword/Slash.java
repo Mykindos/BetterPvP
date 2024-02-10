@@ -35,6 +35,7 @@ import org.bukkit.util.Vector;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.Arrays;
 
 @Singleton
 @BPvPListener
@@ -91,13 +92,13 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
             final Location checkLocation = originalLocation.clone().add(increment);
 
             for (Entity entity : player.getWorld().getNearbyEntities(checkLocation, 0.5, 0.5, 0.5)) {
-                if (entity instanceof Player && entity != player) {
+                if (entity != player) {
                     LivingEntity target = (LivingEntity) entity;
 
                     CustomDamageEvent cde = new CustomDamageEvent(target, player, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, "Slash");
                     UtilDamage.doCustomDamage(cde);
-                    target.getWorld().playSound(target.getLocation().add(0, 1, 0), Sound.ENTITY_PLAYER_HURT, 0.5f, 2f);
-                    target.getWorld().playSound(target.getLocation().add(0, 1, 0), Sound.ENTITY_PLAYER_HURT_SWEET_BERRY_BUSH, 0.5f, 2f);
+                    target.getWorld().playSound(target.getLocation().add(0, 1, 0), Sound.ENTITY_PLAYER_HURT, 0.2f, 2f);
+                    target.getWorld().playSound(target.getLocation().add(0, 1, 0), Sound.ITEM_TRIDENT_HIT, 0.2f, 1.5f);
 
                     break;
                 }
@@ -161,9 +162,13 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
         if (!(event.getDamager() instanceof Player player)) return;
         if (!(event.getDamagee() instanceof Player)) return;
         if (event.isCancelled()) return;
-        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
 
-        cooldownManager.reduceCooldown(player, getName(), cooldownReductionPerHit);
+        boolean isEntityAttack = event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK;
+        boolean isDashReason = Arrays.stream(event.getReason()).anyMatch(reason -> reason.equals("Slash"));
+
+        if (!isEntityAttack && !isDashReason) return;
+
+        cooldownManager.reduceCooldown(player, getName(), getCooldownReductionPerHit(getLevel(player)));
     }
 
 
@@ -194,7 +199,7 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
     @Override
     public void loadSkillConfig() {
         damage = getConfig("damage", 3.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 2.0, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
         distance = getConfig("distance", 5.0, Double.class);
         cooldownReductionPerHit = getConfig("cooldownReductionPerHit", 3.0, Double.class);
         perHitReductionPerLevelIncrease =getConfig("perHitReductionPerLevelIncrease", 0.5, Double.class);

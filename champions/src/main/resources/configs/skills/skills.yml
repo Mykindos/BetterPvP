@@ -11,14 +11,14 @@ skills:
       wallKickStrength: 0.9
     slash:
       enabled: true
-      cooldown: 11.0
+      cooldown: 19.0
       cooldownDecreasePerLevel: 1.0
       maxlevel: 3
       distance: 5.0
       cooldownReductionPerHit: 3.0
       perHitReductionPerLevelIncrease: 0.5
       damage: 3.0
-      damageIncreasePerLevel: 2.0
+      damageIncreasePerLevel: 1.0
     sever:
       enabled: true
       cooldown: 20.0
