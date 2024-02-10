@@ -49,7 +49,6 @@ public class ClanCommand extends Command {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-
         Optional<Clan> playerClanOptional = clanManager.getClanByPlayer(player);
         Clan playerClan = playerClanOptional.orElse(null);
 

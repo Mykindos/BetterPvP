@@ -5,8 +5,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
-import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.ToggleSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.CooldownToggleSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -39,7 +38,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
 @BPvPListener
-public class LevelField extends Skill implements ToggleSkill, CooldownSkill, Listener {
+public class LevelField extends Skill implements CooldownToggleSkill, Listener{
 
     private double radius;
     private double damageTakenPerPlayer;
