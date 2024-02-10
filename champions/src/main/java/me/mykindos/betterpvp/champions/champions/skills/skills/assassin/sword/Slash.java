@@ -67,13 +67,9 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
                 "Dash forwards <stat>" + distance + "</stat> blocks, dealing <val>" + getDamage(level) + "</val>",
                 "damage to anything you pass through",
                 "",
-                "Every hit will reduce the cooldown by <val>" + getCooldownReductionPerHit(level) + "</val> seconds",
+                "Every hit will reduce the cooldown by <stat>" + cooldownReductionPerHit + "</stat> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)};
-    }
-
-    public double getCooldownReductionPerHit(int level) {
-        return cooldownReductionPerHit + (level - 1) * perHitReductionPerLevelIncrease;
     }
 
     public double getDamage(int level){
@@ -168,7 +164,7 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
 
         if (!isEntityAttack && !isDashReason) return;
 
-        cooldownManager.reduceCooldown(player, getName(), getCooldownReductionPerHit(getLevel(player)));
+        cooldownManager.reduceCooldown(player, getName(), cooldownReductionPerHit);
     }
 
 
@@ -198,11 +194,9 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
 
     @Override
     public void loadSkillConfig() {
-        damage = getConfig("damage", 3.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
+        damage = getConfig("damage", 2.0, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 2.0, Double.class);
         distance = getConfig("distance", 5.0, Double.class);
-        cooldownReductionPerHit = getConfig("cooldownReductionPerHit", 3.0, Double.class);
-        perHitReductionPerLevelIncrease =getConfig("perHitReductionPerLevelIncrease", 0.5, Double.class);
-
+        cooldownReductionPerHit = getConfig("cooldownReductionPerHit", 4.0, Double.class);
     }
 }
