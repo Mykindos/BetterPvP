@@ -19,7 +19,7 @@ weapons:
     pull-fov: 80.3
     pull-range: 10.0
   giants-broadsword:
-    base-damage: 10.0
+    base-damage: 9.0
     energy-per-tick: 1.5
     initial-energy-cost: 10.0
     regen-amplifier: 3
@@ -28,9 +28,21 @@ weapons:
     energy-per-tick: 1.0
     initial-energy-cost: 10.0
     strength: 0.7
+  scythe:
+    base-damage: 8.0
+    black-hole-cooldown: 12.0
+    black-hole-hitbox: 0.5
+    black-hole-pull-radius: 5.0
+    black-hole-radius: 0.8
+    black-hole-speed: 3.0
+    black-hole-alive-seconds: 1.5
+    black-hole-expand-seconds: 0.75
+    black-hole-pull-strength: 0.12
+    heal-per-hit: 1.0
   hyper-axe:
+    baseDamage: 4.0
     damageDelay: 200
-    baseDamage: 4
-    dealsKnockback: false
+    dealsKnockback: true
+    energyPerHit: 10
+    hyperRushCooldown: 16.0
     usesEnergy: false
-    energyPerHit: 2
