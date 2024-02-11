@@ -62,7 +62,6 @@ public class IncendiaryShot extends PrepareArrowSkill {
 
     @Override
     public SkillType getType() {
-
         return SkillType.BOW;
     }
 
