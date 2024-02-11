@@ -55,7 +55,7 @@ public class GiantsBroadsword extends ChannelWeapon implements InteractWeapon, L
     private double initialEnergyCost;
 
     @Inject
-    @Config(path = "weapons.giants-broadsword.base-damage", defaultValue = "10.0", configName = "weapons/legendaries")
+    @Config(path = "weapons.giants-broadsword.base-damage", defaultValue = "9.0", configName = "weapons/legendaries")
     private double baseDamage;
 
     @Inject

@@ -46,7 +46,7 @@ public class HyperAxe extends Weapon implements InteractWeapon, LegendaryWeapon,
     private double baseDamage;
 
     @Inject
-    @Config(path = "weapons.hyper-axe.dealsKnockback", defaultValue = "false", configName = "weapons/legendaries")
+    @Config(path = "weapons.hyper-axe.dealsKnockback", defaultValue = "true", configName = "weapons/legendaries")
     private boolean dealsKnockback;
 
     @Inject
@@ -58,7 +58,7 @@ public class HyperAxe extends Weapon implements InteractWeapon, LegendaryWeapon,
     private int energyPerHit;
 
     @Inject
-    @Config(path = "weapons.hyper-axe.hyperRushCooldown", defaultValue = "16", configName = "weapons/legendaries")
+    @Config(path = "weapons.hyper-axe.hyperRushCooldown", defaultValue = "16.0", configName = "weapons/legendaries")
     private double hyperRushCooldown;
 
     private final EnergyHandler energyHandler;
