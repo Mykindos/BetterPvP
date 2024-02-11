@@ -15,8 +15,7 @@ skills:
       cooldownDecreasePerLevel: 1.0
       maxlevel: 3
       distance: 5.0
-      cooldownReductionPerHit: 3.0
-      perHitReductionPerLevelIncrease: 0.5
+      cooldownReductionPerHit: 4.0
       damage: 3.0
       damageIncreasePerLevel: 1.0
     sever:
