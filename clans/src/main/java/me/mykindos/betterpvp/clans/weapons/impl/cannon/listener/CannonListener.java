@@ -417,6 +417,10 @@ public class CannonListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onRemove(final EntityRemoveFromWorldEvent event) {
+        if (!UtilEntity.isRemoved(event.getEntity()) || !UtilEntity.getRemovalReason(event.getEntity()).isDestroy()) {
+            return;
+        }
+
         this.cannonManager.of(event.getEntity()).ifPresent(cannon -> {
             this.cannonManager.remove(cannon);
 
