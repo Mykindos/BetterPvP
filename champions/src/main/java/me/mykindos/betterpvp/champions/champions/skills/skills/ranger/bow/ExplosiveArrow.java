@@ -135,7 +135,7 @@ public class ExplosiveArrow extends PrepareArrowSkill {
             UtilVelocity.velocity(target, player, velocityData);
 
             if (property == EntityProperty.ENEMY) {
-                var cde = new CustomDamageEvent(target, null, null, EntityDamageEvent.DamageCause.CUSTOM, damage, false, "ExplosiveArrow");
+                var cde = new CustomDamageEvent(target, null, null, EntityDamageEvent.DamageCause.CUSTOM, damage, false, "Explosive Arrow");
                 UtilDamage.doCustomDamage(cde);
             }
         }
