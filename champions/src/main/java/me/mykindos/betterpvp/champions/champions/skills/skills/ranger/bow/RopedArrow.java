@@ -220,7 +220,7 @@ public class RopedArrow extends PrepareArrowSkill {
 
     @Override
     public void loadSkillConfig(){
-        fallDamageLimit = getConfig("fallDamageLimit", 4.0, Double.class);
+        fallDamageLimit = getConfig("fallDamageLimit", 8.0, Double.class);
     }
 
 }
