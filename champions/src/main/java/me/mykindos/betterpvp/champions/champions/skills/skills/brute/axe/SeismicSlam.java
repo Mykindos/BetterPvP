@@ -30,8 +30,10 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.util.Vector;
 
@@ -49,16 +51,15 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
 
     private final Set<UUID> active = new HashSet<>();
     private final HashMap<UUID, Long> slams = new HashMap<>();
+    private HashMap<UUID, Boolean> canTakeFall = new HashMap<>();
 
     private double baseRadius;
     private double radiusIncreasePerLevel;
     private double baseDamage;
-
     public double damageIncreasePerLevel;
-
     public double cooldownDecreasePerLevel;
-
     public int slamDelay;
+    public double fallDamageLimit;
 
     @Inject
     public SeismicSlam(Champions champions, ChampionsManager championsManager) {
@@ -113,12 +114,31 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
                 if (timeElapsed && isPlayerGrounded) {
                     slam(player);
                     iterator.remove();
+                    canTakeFall.put(player.getUniqueId(), true);
                 }
             } else {
                 iterator.remove();
             }
         }
 
+    }
+
+    @EventHandler
+    public void reduceFallDamage(CustomDamageEvent event) {
+        if (event.getCause() != DamageCause.FALL) return;
+
+
+        Player player = (Player) event.getDamagee();
+        UUID playerId = player.getUniqueId();
+
+        if (canTakeFall.containsKey(playerId) && canTakeFall.get(playerId)) {
+            if (event.getDamage() <= fallDamageLimit) {
+                event.setCancelled(true);
+            } else {
+                event.setDamage(event.getDamage() - fallDamageLimit);
+            }
+            canTakeFall.remove(playerId);
+        }
     }
 
 

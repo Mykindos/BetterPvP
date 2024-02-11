@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
@@ -27,11 +28,14 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.util.Vector;
 
+import java.util.HashMap;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.WeakHashMap;
 
 @Singleton
@@ -39,8 +43,10 @@ import java.util.WeakHashMap;
 public class RopedArrow extends PrepareArrowSkill {
 
     private static final int MAX_STRENGTH = 3;
-
     private final WeakHashMap<Player, Integer> strength = new WeakHashMap<>();
+    private HashMap<UUID, Boolean> canTakeFall = new HashMap<>();
+    public double fallDamageLimit;
+
 
     // Action bar
     private final PermanentComponent actionBarComponent = new PermanentComponent(gamer -> {
@@ -144,7 +150,25 @@ public class RopedArrow extends PrepareArrowSkill {
         arrow.getWorld().playSound(arrow.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
         arrows.remove(arrow);
         strength.remove(player);
-        championsManager.getEffects().addEffect(player, EffectType.NOFALL, 5000);
+        canTakeFall.put(player.getUniqueId(), true);
+    }
+
+    @EventHandler
+    public void reduceFallDamage(CustomDamageEvent event) {
+        if (event.getCause() != EntityDamageEvent.DamageCause.FALL) return;
+
+
+        Player player = (Player) event.getDamagee();
+        UUID playerId = player.getUniqueId();
+
+        if (canTakeFall.containsKey(playerId) && canTakeFall.get(playerId)) {
+            if (event.getDamage() <= fallDamageLimit) {
+                event.setCancelled(true);
+            } else {
+                event.setDamage(event.getDamage() - fallDamageLimit);
+            }
+            canTakeFall.remove(playerId);
+        }
     }
 
     @Override
@@ -192,6 +216,11 @@ public class RopedArrow extends PrepareArrowSkill {
     @Override
     public double getCooldown(int level) {
         return (double) cooldown - (level - 1) * cooldownDecreasePerLevel;
+    }
+
+    @Override
+    public void loadSkillConfig(){
+        fallDamageLimit = getConfig("fallDamageLimit", 4.0, Double.class);
     }
 
 }

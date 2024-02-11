@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -22,17 +23,25 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.util.Vector;
+
+import java.util.HashMap;
+import java.util.UUID;
 
 @Singleton
 @BPvPListener
 public class Leap extends Skill implements InteractSkill, CooldownSkill, Listener {
 
     private double leapStrength;
-
     private double wallKickStrength;
+    private HashMap<UUID, Boolean> canTakeFall = new HashMap<>();
+    public double fallDamageLimit;
+
+
 
     @Inject
     public Leap(Champions champions, ChampionsManager championsManager) {
@@ -80,7 +89,25 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
 
         player.getWorld().spawnEntity(player.getLocation(), EntityType.LLAMA_SPIT);
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BAT_TAKEOFF, 2.0F, 1.2F);
-        championsManager.getEffects().addEffect(player, EffectType.NOFALL, 2000L);
+        canTakeFall.put(player.getUniqueId(), true);
+    }
+
+    @EventHandler
+    public void reduceFallDamage(CustomDamageEvent event) {
+        if (event.getCause() != EntityDamageEvent.DamageCause.FALL) return;
+
+
+        Player player = (Player) event.getDamagee();
+        UUID playerId = player.getUniqueId();
+
+        if (canTakeFall.containsKey(playerId) && canTakeFall.get(playerId)) {
+            if (event.getDamage() <= fallDamageLimit) {
+                event.setCancelled(true);
+            } else {
+                event.setDamage(event.getDamage() - fallDamageLimit);
+            }
+            canTakeFall.remove(playerId);
+        }
     }
 
 
@@ -197,5 +224,7 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
     public void loadSkillConfig(){
         leapStrength = getConfig("leapStrength", 1.3, Double.class);
         wallKickStrength = getConfig("wallKickStrength", 0.9, Double.class);
+        fallDamageLimit = getConfig("fallDamageLimit", 4.0, Double.class);
+
     }
 }
