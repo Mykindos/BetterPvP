@@ -74,7 +74,7 @@ skills:
       duration: 2.0
     slash:
       enabled: true
-      cooldown: 16.0
+      cooldown: 17.0
       cooldownDecreasePerLevel: 1.0
       maxlevel: 3
       distance: 5.0
