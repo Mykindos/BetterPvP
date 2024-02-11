@@ -38,7 +38,7 @@ skills:
       baseIncrease: 0.0
     smokebomb:
       enabled: true
-      cooldown: 50.0
+      cooldown: 35.0
       maxlevel: 5
       baseDuration: 3.0
       blindDuration: 1.75
@@ -54,7 +54,7 @@ skills:
       durationIncreasePerLevel: 1.0
     smokearrow:
       enabled: true
-      maxlevel: 4
+      maxlevel: 5
       cooldown: 20.0
       baseDuration: 3.0
       cooldownDecreasePerLevel: 2.0
@@ -133,7 +133,7 @@ skills:
       durationIncreasePerLevel: 1.0
     evade:
       enabled: true
-      maxlevel: 5
+      maxlevel: 3
       cooldown: 15.0
       duration: 1.25
       forcedDamageDelay: 400
@@ -237,7 +237,7 @@ skills:
       percentageIncreasePerLevel: 0.08
     defensivestance:
       enabled: true
-      maxlevel: 5
+      maxlevel: 3
       energy: 7
       damage: 2.0
       baseDamage: 2.0
@@ -369,7 +369,7 @@ skills:
       shockDuration: 2.0
     swarm:
       enabled: true
-      maxlevel: 5
+      maxlevel: 3
       energy: 6
       batLifespan: 2.0
       batDamage: 1.0
@@ -415,7 +415,7 @@ skills:
       radiusIncreasePerLevel: 1.0
     blizzard:
       enabled: true
-      maxlevel: 5
+      maxlevel: 3
       energy: 45
       baseSlowDuration: 2.0
       slowDurationIncreasePerLevel: 0.0
@@ -431,7 +431,7 @@ skills:
       damageIncreasePerLevel: 1.0
     void:
       enabled: true
-      maxlevel: 5
+      maxlevel: 3
       energy: 30
       baseDamageReduction: 2.0
       damageReductionIncreasePerLevel: 0.2
@@ -448,7 +448,7 @@ skills:
       energyDecreasePerLevel: 2.0
     holylight:
       enabled: true
-      maxlevel: 5
+      maxlevel: 3
       baseRadius: 8.0
       radiusIncreasePerLevel: 1.0
       baseDuration: 7.0
@@ -574,7 +574,7 @@ skills:
       hitboxExpansion: 0.3
     stampede:
       enabled: true
-      maxlevel: 5
+      maxlevel: 3
       durationPerStack: 8.0
       damageMultiplier: 2.0
       maxSpeedStrength: 1
@@ -589,7 +589,7 @@ skills:
       durationIncreasePerLevel: 2.0
     bloodlust:
       enabled: true
-      maxlevel: 5
+      maxlevel: 3
       duration: 5.0
       maxStacks: 3
       baseDuration: 5.0
@@ -609,7 +609,7 @@ skills:
   ranger:
     wolfspounce:
       enabled: true
-      maxlevel: 5
+      maxlevel: 3
       cooldown: 8.0
       cooldownDecreasePerLevel: 1.0
       baseCharge: 40.0
@@ -657,7 +657,7 @@ skills:
       slownessStrength: 3
     longshot:
       enabled: true
-      maxlevel: 5
+      maxlevel: 3
       deathMessageThreshold: 40.0
       baseMaxDamage: 12.0
       maxDamageIncreasePerLevel: 1.0
@@ -665,7 +665,7 @@ skills:
       damageIncreasePerLevel: 0.0
     heavyarrows:
       enabled: true
-      maxlevel: 5
+      maxlevel: 3
       energy: 24
       basePushBack: 1.0
       energyDecreasePerLevel: 2.0
@@ -677,7 +677,7 @@ skills:
       chargeSeconds: 3.0
     huntersthrill:
       enabled: true
-      maxlevel: 5
+      maxlevel: 3
       maxTimeBetweenShots: 8.0
       maxConsecutiveHits: 4
       maxTimeBetweenShotsIncreasePerLevel: 1.0
@@ -737,7 +737,7 @@ skills:
       maxMissedSwings: 2
     disengage:
       enabled: true
-      maxlevel: 5
+      maxlevel: 3
       cooldown: 12.0
       baseSlowDuration: 2.0
       cooldownDecreasePerLevel: 0.0
@@ -785,7 +785,7 @@ skills:
       healthReductionDecreasePerLevel: 0.05
     bloodthirst:
       enabled: true
-      maxlevel: 5
+      maxlevel: 3
       baseHealthPercent: 0.25
       healthPercentIncreasePerLevel: 0.05
       speedStrength: 0
@@ -896,7 +896,7 @@ skills:
       damagePercentIncreasePerLevel: 0.05
     siphon:
       enabled: true
-      maxlevel: 5
+      maxlevel: 3
       baseRadius: 3.0
       radiusIncreasePerLevel: 1.0
       baseEnergySiphoned: 1.0
