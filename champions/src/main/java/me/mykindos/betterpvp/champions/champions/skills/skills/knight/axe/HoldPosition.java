@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -112,6 +113,7 @@ public class HoldPosition extends Skill implements InteractSkill, CooldownSkill,
             @Override
             public void run() {
                 if (ticksRun > durationTicks || getLevel(player) <= 0) {
+                    UtilMessage.message(player, getClassType().getName(), UtilMessage.deserialize("<green>%s %d</green> has ended.", getName(), getLevel(player)));
                     this.cancel();
                     return;
                 }

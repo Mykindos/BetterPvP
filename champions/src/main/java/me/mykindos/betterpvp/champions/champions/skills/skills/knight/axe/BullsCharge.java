@@ -16,6 +16,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -74,8 +75,8 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
     public void activate(Player player, int level) {
         player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) speedDuration * 20, speedStrength));
         UtilSound.playSound(player.getWorld(), player, Sound.ENTITY_ENDERMAN_SCREAM, 1.5F, 0);
-        player.getWorld().playEffect(player.getLocation(), Effect.STEP_SOUND, 49);
-        running.put(player.getUniqueId(), System.currentTimeMillis() + 4000L);
+        player.getWorld().playEffect(player.getLocation(), Effect.STEP_SOUND, Material.OBSIDIAN);
+        running.put(player.getUniqueId(), System.currentTimeMillis() + (long)(speedDuration * 1000));
     }
 
     @EventHandler(priority = EventPriority.HIGH)
@@ -122,7 +123,7 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
         }
     }
 
-    @UpdateEvent(delay = 1000)
+    @UpdateEvent(delay = 100)
     public void onUpdate() {
         running.entrySet().removeIf(entry -> expire(entry.getKey()));
     }

@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -80,13 +81,15 @@ public class ExcessiveForce extends Skill implements InteractSkill, CooldownSkil
         }
     }
 
-    @UpdateEvent(delay = 125)
+    @UpdateEvent(delay = 100)
     public void onUpdate() {
         Iterator<Map.Entry<Player, Long>> it = active.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry<Player, Long> next = it.next();
+            Player player = next.getKey();
             if (next.getValue() - System.currentTimeMillis() <= 0) {
                 it.remove();
+                UtilMessage.message(player, getClassType().getName(), UtilMessage.deserialize("<green>%s %d</green> has ended.", getName(), getLevel(player)));
                 continue;
             }
 
