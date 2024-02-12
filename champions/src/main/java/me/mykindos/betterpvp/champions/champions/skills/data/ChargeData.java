@@ -7,8 +7,10 @@ import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.components.champions.ISkill;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
+import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.display.DisplayComponent;
 import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
+import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
@@ -41,6 +43,17 @@ public class ChargeData {
         this.charge = Math.min(1, this.charge + (chargePerSecond / 20));
     }
 
+    public void tickSound(SoundEffect sound, Location location, boolean force) {
+        if (!UtilTime.elapsed(lastSound, soundInterval)) {
+            return;
+        }
+
+        if (force || charge < 1) {
+            sound.play(location);
+            lastSound = System.currentTimeMillis();
+        }
+    }
+
     public void tickSound(Player player) {
         if (!UtilTime.elapsed(lastSound, soundInterval)) {
             return;
@@ -69,7 +82,7 @@ public class ChargeData {
      * @param supplier      Supplier to get the {@link ChargeData} for a {@link Gamer}
      * @return The action bar component
      */
-    public static DisplayComponent getActionBar(Predicate<Gamer> showCondition, Function<Gamer, ChargeData> supplier) {
+    public static DisplayComponent getActionBar(Predicate<Gamer> showCondition, Function<Gamer, ? extends ChargeData> supplier) {
         return new PermanentComponent(gamer -> {
             final Player player = gamer.getPlayer();
             if (player == null || !showCondition.test(gamer)) {
@@ -91,7 +104,7 @@ public class ChargeData {
      *                      and not a copy of it.
      * @see ChargeData#getActionBar(Predicate, Function)
      */
-    public static DisplayComponent getActionBar(ISkill skill, Map<Player, ChargeData> chargeDataMap) {
+    public static DisplayComponent getActionBar(ISkill skill, Map<Player, ? extends ChargeData> chargeDataMap) {
         return getActionBar(
                 gmr -> gmr.isOnline() && chargeDataMap.containsKey(gmr.getPlayer()) && skill.isHolding(gmr.getPlayer()),
                 gmr -> chargeDataMap.get(gmr.getPlayer())
@@ -109,7 +122,7 @@ public class ChargeData {
      *                                gamer is guaranteed to be online.
      * @see ChargeData#getActionBar(Predicate, Function)
      */
-    public static DisplayComponent getActionBar(ISkill skill, Map<Player, ChargeData> chargeDataMap, Predicate<Gamer> additionalShowCondition) {
+    public static DisplayComponent getActionBar(ISkill skill, Map<Player, ? extends ChargeData> chargeDataMap, Predicate<Gamer> additionalShowCondition) {
         return getActionBar(
                 gmr -> gmr.isOnline() && chargeDataMap.containsKey(gmr.getPlayer()) && skill.isHolding(gmr.getPlayer()) && additionalShowCondition.test(gmr),
                 gmr -> chargeDataMap.get(gmr.getPlayer())

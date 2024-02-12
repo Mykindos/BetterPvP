@@ -25,7 +25,6 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Slf4j
 public class UtilPlayer {
@@ -161,8 +160,8 @@ public class UtilPlayer {
     }
 
     public static boolean hasPotionEffect(Player player, PotionEffectType type, int amplifier) {
-        return player.hasPotionEffect(type)
-                && Objects.requireNonNull(player.getPotionEffect(type)).getAmplifier() <= amplifier;
+        return player.getActivePotionEffects().stream().anyMatch(potionEffect -> potionEffect.getType() == type
+                && potionEffect.getAmplifier() >= amplifier);
     }
 
     public static Location getMidpoint(Player player) {
@@ -173,10 +172,10 @@ public class UtilPlayer {
 
     public static void slowDrainHealth(BPvPPlugin plugin, Player player, double amount, int ticks, boolean canKill) {
         double amountPerTick = amount / ticks;
-        for(int i = 0; i < ticks; i++) {
+        for (int i = 0; i < ticks; i++) {
             UtilServer.runTaskLater(plugin, () -> {
-                if(player.isDead()) return;
-                if(!canKill && player.getHealth() <= 1) return;
+                if (player.isDead()) return;
+                if (!canKill && player.getHealth() <= 1) return;
                 UtilPlayer.health(player, -amountPerTick);
             }, i);
         }

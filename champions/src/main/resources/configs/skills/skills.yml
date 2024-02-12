@@ -172,15 +172,11 @@ skills:
     vengeance:
       enabled: true
       maxlevel: 3
-      damageIncrease: 0.25
-      canUseWhileSlowed: true
-      canUseWhileSilenced: false
-      canUseWhileStunned: false
-      canUseWhileLevitating: false
-      canUseInLiquid: false
-      baseDamage: 0.25
-      damageIncreasePerLevel: 0.25
+      baseDamage: 0.0
+      damageIncreasePerLevel: 1.0
       baseMaxDamage: 1.0
+      baseMaxDamageIncreasePerLevel: 1.0
+      expirationTime: 5.0
     levelfield:
       enabled: true
       maxlevel: 3
@@ -303,21 +299,26 @@ skills:
       baseSlowDuration: 1.5
       slowDurationIncreasePerLevel: 0.0
       slowStrength: 2
-    boulder:
+    blocktoss:
       enabled: true
-      cooldown: 25.0
-      maxlevel: 5
-      baseRadius: 4.0
-      baseHeal: 2.0
-      baseDamage: 3.0
+      maxlevel: 3
+      cooldown: 10.0
       cooldownDecreasePerLevel: 1.0
-      healingIncreasePerLevel: 1.0
-      damageIncreasePerLevel: 1.0
+      baseCharge: 55.0
+      chargeIncreasePerLevel: 15.0
+      baseDamage: 4.0
+      damageIncreasePerLevel: 2.0
+      baseRadius: 4.0
       radiusIncreasePerLevel: 0.5
+      baseSpeed: 1.4
+      speedIncreasePerLevel: 0.1
+      hitBoxSize: 1.0
+      size: 0.6
+      sizePerLevel: 0.2
     inferno:
       enabled: true
       maxlevel: 3
-      cooldown: 3.0
+      cooldown: 8.0
       baseFireDuration: 2.5
       fireDurationIncreasePerLevel: 0.0
       baseDamage: 1.0
@@ -415,12 +416,19 @@ skills:
     blizzard:
       enabled: true
       maxlevel: 5
-      energy: 9
+      energy: 45
       baseSlowDuration: 2.0
       slowDurationIncreasePerLevel: 0.0
       slowStrength: 2
       slowDuration: 2.0
       energyDecreasePerLevel: 1.0
+    glacialblade:
+      enabled: true
+      maxlevel: 3
+      cooldown: 2.5
+      cooldownDecreasePerLevel: 1.0
+      damage: 2.5
+      damageIncreasePerLevel: 1.0
     void:
       enabled: true
       maxlevel: 5
@@ -487,8 +495,12 @@ skills:
     fury:
       enabled: true
       maxlevel: 3
-      baseBonusDamage: 0.0
+      baseDamage: 0.5
+      damageIncreasePerLevel: 0.5
       bonusDamageIncreasePerLevel: 0.5
+      baseMaxDamage: 2.0
+      maxDamageIncreasePerLevel: 1.0
+      expirationTime: 5.0
     battletaunt:
       enabled: false
       energy: 15
@@ -509,8 +521,8 @@ skills:
       cooldown: 20.0
       radius: 5.5
       radiusIncreasePerLevel: 0.5
-      baseDamage: 5.0
-      damageIncreasePerLevel: 2.0
+      baseDamage: 1.0
+      damageIncreasePerLevel: 1.0
       cooldownDecreasePerLevel: 2.0
       slamDelay: 500
     whirlwindsword:
@@ -579,7 +591,6 @@ skills:
       enabled: true
       maxlevel: 5
       duration: 5.0
-      radius: 15
       maxStacks: 3
       baseDuration: 5.0
       durationIncreasePerLevel: 1.0
@@ -795,7 +806,7 @@ skills:
       baseDecreasePerPlayer: 0.05
       decreaseIncreasePerLevel: 0.0
       radius: 3
-    tormentedsoul:
+    tormentedsoil:
       enabled: true
       maxlevel: 5
       cooldown: 30.0

@@ -62,4 +62,8 @@ public abstract class ChannelSkill extends Skill implements Listener {
     public boolean isShieldInvisible() {
         return true;
     }
+
+    public boolean shouldShowShield(Player player) {
+        return true;
+    }
 }

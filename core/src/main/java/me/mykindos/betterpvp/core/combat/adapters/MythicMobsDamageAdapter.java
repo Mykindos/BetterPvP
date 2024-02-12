@@ -5,7 +5,8 @@ import io.lumine.mythic.core.mobs.ActiveMob;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import org.bukkit.Bukkit;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -26,6 +27,11 @@ public class MythicMobsDamageAdapter implements Listener {
                 event.setDamage(event.getDamage() * damagee.getType().getDamageModifiers().get(event.getCause().name()));
             }
         }
+    }
+
+    @EventHandler
+    public void onFetchEntity(FetchNearbyEntityEvent<?> event) {
+        event.getEntities().removeIf(entity -> UtilFormat.stripColor(entity.getKey().getName()).isEmpty());
     }
 
 }
