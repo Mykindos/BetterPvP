@@ -81,6 +81,41 @@ public class UtilLocation {
     }
 
     /**
+     * Get a specified number of points on the circumference of a circle with the given radius and center.
+     *
+     * @param center The center of the circle
+     * @param radius The radius of the circle
+     * @param points The number of points to get
+     * @return A list of locations on the circumference of the circle
+     */
+    public static List<Location> getCircumference(final Location center, final double radius, final int points) {
+        Preconditions.checkState(radius > 0, "Radius must be greater than 0");
+        final List<Location> circle = new ArrayList<>();
+        final int increment = 360 / points;
+        for (int i = 0; i < 360; i += increment) {
+            circle.add(fromFixedAngleDistance(center, radius, i));
+        }
+        return circle;
+    }
+
+    public static List<Location> getSphere(final Location location, final double radius, final int points) {
+        Preconditions.checkState(radius > 0, "Radius must be greater than 0");
+        final List<Location> sphere = new ArrayList<>();
+        for (double i = 0; i <= Math.PI; i += Math.PI / points) {
+            double currentRadius = Math.sin(i) * radius;
+            double y = Math.cos(i) * radius;
+            for (double a = 0; a < Math.PI * 2; a+= Math.PI / points) {
+                double x = Math.cos(a) * currentRadius;
+                double z = Math.sin(a) * currentRadius;
+                location.add(x, y, z);
+                sphere.add(location.clone());
+                location.subtract(x, y, z);
+            }
+        }
+        return sphere;
+    }
+
+    /**
      * Check if a location is in front of an entity's screen, even if there's an obstacle between.
      *
      * @param entity The entity to check.

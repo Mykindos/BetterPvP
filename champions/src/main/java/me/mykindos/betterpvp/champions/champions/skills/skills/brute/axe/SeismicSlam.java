@@ -206,8 +206,8 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
     public void loadSkillConfig(){
         baseRadius = getConfig("baseRadius", 5.5, Double.class);
         radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 0.5, Double.class);
-        baseDamage = getConfig("baseDamage", 5.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 2.0, Double.class);
+        baseDamage = getConfig("baseDamage", 1.0, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
         cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 2.0, Double.class);
         slamDelay = getConfig("slamDelay",500, Integer.class);
     }
