@@ -4,6 +4,7 @@ import com.ticxo.modelengine.api.ModelEngineAPI;
 import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -24,6 +25,11 @@ public class ModelEngineDamageAdapter implements Listener {
         if(ModelEngineAPI.getNMSHandler().getEntityHandler().castHitbox(event.getCustomDamageEvent().getDamagee()) != null) {
             event.setCancelled(true);
         }
+    }
+
+    @EventHandler
+    public void onFetchEntity(FetchNearbyEntityEvent<?> event) {
+        event.getEntities().removeIf(entity -> ModelEngineAPI.getNMSHandler().getEntityHandler().castHitbox(entity.getKey()) != null);
     }
 
 }
