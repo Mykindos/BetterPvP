@@ -78,14 +78,12 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergySkill
 
     @Override
     public SkillType getType() {
-
         return SkillType.SWORD;
     }
 
 
     @Override
     public float getEnergy(int level) {
-
         return (float) (energy - ((level - 1) * energyDecreasePerLevel));
     }
 
@@ -109,7 +107,7 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergySkill
 
                 damagee.setVelocity(pushBackVelocity);
 
-                damagee.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) getSlowDuration(level), slowStrength));
+                damagee.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) (getSlowDuration(level) * 20), slowStrength));
 
                 event.cancel("Snowball");
                 snow.remove(snowball);
@@ -136,14 +134,14 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergySkill
             int level = getLevel(player);
             if (level <= 0) {
                 iterator.remove();
-            } else if (!championsManager.getEnergy().use(player, getName(), getEnergy(level) / 4, true)) {
+            } else if (!championsManager.getEnergy().use(player, getName(), getEnergy(level) / 20, true)) {
                 iterator.remove();
             } else if (!isHolding(player)) {
                 iterator.remove();
             } else {
                 Snowball s = player.launchProjectile(Snowball.class);
                 s.getLocation().add(0, 1, 0);
-                s.setVelocity(player.getLocation().getDirection().add(new Vector(UtilMath.randDouble(-0.2, 0.2), UtilMath.randDouble(-0.2, 0.4), UtilMath.randDouble(-0.3, 0.3))));
+                s.setVelocity(player.getLocation().getDirection().add(new Vector(UtilMath.randDouble(-0.1, 0.1), UtilMath.randDouble(-0.1, 0.1), UtilMath.randDouble(-0.1, 0.1))));
                 player.getWorld().playSound(player.getLocation(), Sound.BLOCK_SNOW_STEP, 1f, 0.4f);
                 snow.put(s, player);
             }

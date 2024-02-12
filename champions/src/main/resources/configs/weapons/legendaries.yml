@@ -29,7 +29,7 @@ hyper_axe:
   hyperRushCooldown: 16.0
 giants_broadsword:
   enabled: true
-  baseDamage: 10.0
+  baseDamage: 9.0
   energyPerTick: 1.5
   initialEnergyCost: 10.0
   regenAmplifier: 3

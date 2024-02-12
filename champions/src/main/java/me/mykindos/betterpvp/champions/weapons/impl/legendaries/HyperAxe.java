@@ -145,7 +145,7 @@ public class HyperAxe extends Weapon implements InteractWeapon, LegendaryWeapon,
     @Override
     public void loadWeaponConfig() {
         damageDelay = getConfig("damageDelay", 200, Integer.class);
-        dealsKnockback = getConfig("dealsKnockback", false, Boolean.class);
+        dealsKnockback = getConfig("dealsKnockback", true, Boolean.class);
         usesEnergy = getConfig("usesEnergy", false, Boolean.class);
         energyPerHit = getConfig("energyPerHit", 10, Integer.class);
         hyperRushCooldown = getConfig("hyperRushCooldown", 16.0, Double.class);
