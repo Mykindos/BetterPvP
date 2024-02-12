@@ -28,8 +28,8 @@ public class Void extends ActiveToggleSkill implements EnergySkill {
 
     public double baseDamageReduction;
     public double damageReductionIncreasePerLevel;
-    public int baseEnergyReduction;
-    public int energyReductionDecreasePerLevel;
+    public double baseEnergyReduction;
+    public double energyReductionDecreasePerLevel;
     public int slownessStrength;
 
     @Inject
@@ -48,10 +48,10 @@ public class Void extends ActiveToggleSkill implements EnergySkill {
                 "Drop your Sword / Axe to toggle",
                 "",
                 "While in void form, you receive",
-                "<effect>Slownesss " + UtilFormat.getRomanNumeral(slownessStrength + 1) + "</effect>, and take no Knockback",
+                "<effect>Slownesss " + UtilFormat.getRomanNumeral(slownessStrength + 1) + "</effect>, and take no knockback",
                 "",
-                "Reduces incoming damage by <stat>" + getDamageReduction(level) + "</stat>,",
-                "but burns <stat>" + getEnergyReduction(level) + "</stat> of your energy",
+                "Every point of damage you take will be",
+                "reduced by <val" + getDamageReduction(level) + "</val> and drain <val>" + getEnergyReduction(level) + "</val> energy",
                 "",
                 "Energy / Second: <val>" + getEnergy(level)
         };
@@ -131,8 +131,10 @@ public class Void extends ActiveToggleSkill implements EnergySkill {
             return;
         }
 
+        double energyReduced = event.getDamage() * getEnergyReduction(level);
+        System.out.println("energy calculated: " +energyReduced);
         event.setDamage(event.getDamage() - getDamageReduction(level));
-        championsManager.getEnergy().degenerateEnergy(damagee, getEnergyReduction(level) / 100);
+        championsManager.getEnergy().degenerateEnergy(damagee, energyReduced / 100);
 
         event.setKnockback(false);
     }
@@ -151,8 +153,8 @@ public class Void extends ActiveToggleSkill implements EnergySkill {
         baseDamageReduction = getConfig("baseDamageReduction", 2.0, Double.class);
         damageReductionIncreasePerLevel = getConfig("damageReductionIncreasePerLevel", 0.2, Double.class);
 
-        baseEnergyReduction = getConfig("baseEnergyReduction", 20, Integer.class);
-        energyReductionDecreasePerLevel = getConfig("energyReductionDecreasePerLevel", 1, Integer.class);
+        baseEnergyReduction = getConfig("baseEnergyReduction", 3.0, Double.class);
+        energyReductionDecreasePerLevel = getConfig("energyReductionDecreasePerLevel", 0.5, Double.class);
 
         slownessStrength = getConfig("slownessStrength", 2, Integer.class);
     }

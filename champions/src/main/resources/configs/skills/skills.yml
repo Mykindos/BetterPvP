@@ -431,12 +431,12 @@ skills:
       damageIncreasePerLevel: 1.0
     void:
       enabled: true
-      maxlevel: 5
+      maxlevel: 3
       energy: 30
       baseDamageReduction: 2.0
       damageReductionIncreasePerLevel: 0.2
-      baseEnergyReduction: 20
-      energyReductionDecreasePerLevel: 1
+      baseEnergyReduction: 3.0
+      energyReductionDecreasePerLevel: 0.5
       slownessStrength: 2
       damageReduction: 5
       energyReduction: 20
