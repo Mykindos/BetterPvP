@@ -230,5 +230,6 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 2.0, Double.class);
         cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 2.0, Double.class);
         slamDelay = getConfig("slamDelay",500, Integer.class);
+        fallDamageLimit = getConfig("fallDamageLimit", 6.0, Double.class);
     }
 }
