@@ -62,8 +62,7 @@ public class Longshot extends Skill implements PassiveSkill {
                 "damage per block it travels",
                 "",
                 "Your arrows start at <stat>" + minDamage + "</stat> damage",
-                "",
-                "Caps out at <val>" + getMaxDamage(level) + "</val> damage",
+                "and cap out at <val>" + getMaxDamage(level) + "</val> damage",
                 "",
                 "Cannot be used in own territory"};
     }
