@@ -43,3 +43,14 @@ magnetic_maul:
 wings_of_zanzul:
   enabled: true
   baseDamage: 1.0
+scythe:
+  enabled: true
+  baseDamage: 8.0
+  cooldown: 12.0
+  blackHoleRadius: 0.8
+  blackHoleSpeed: 3.0
+  blackHoleHitbox: 0.5
+  blackHolePullStrength: 0.12
+  blackHolePullRadius: 5.0
+  blackHoleAliveSeconds: 1.5
+  blackHoleExpandSeconds: 0.75

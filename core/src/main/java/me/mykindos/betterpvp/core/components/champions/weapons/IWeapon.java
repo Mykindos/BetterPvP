@@ -24,4 +24,8 @@ public interface IWeapon {
 
     boolean matches(ItemStack itemStack);
 
+    default String getConfigName() {
+        return "weapons/standard";
+    }
+
 }

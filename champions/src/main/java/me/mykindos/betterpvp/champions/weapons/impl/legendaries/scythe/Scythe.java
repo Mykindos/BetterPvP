@@ -3,12 +3,12 @@ package me.mykindos.betterpvp.champions.weapons.impl.legendaries.scythe;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.weapon.Weapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.CooldownWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.InteractWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
-import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -25,49 +25,19 @@ public class Scythe extends Weapon implements InteractWeapon, CooldownWeapon, Le
 
     protected final WeakHashMap<Player, List<BlackHole>> blackHoles = new WeakHashMap<>();
 
-    @Inject
-    @Config(path = "weapons.scythe.base-damage", defaultValue = "8.0", configName = "weapons/legendaries")
     protected double baseDamage;
-
-    @Inject
-    @Config(path = "weapons.scythe.heal-per-hit", defaultValue = "1.0", configName = "weapons/legendaries")
     protected double healPerHit;
-
-    @Inject
-    @Config(path = "weapons.scythe.black-hole-cooldown", defaultValue = "12.0", configName = "weapons/legendaries")
-    protected double blackHoleCooldown;
-
-    @Inject
-    @Config(path = "weapons.scythe.black-hole-radius", defaultValue = "0.8", configName = "weapons/legendaries")
     protected double blackHoleRadius;
-
-    @Inject
-    @Config(path = "weapons.scythe.black-hole-speed", defaultValue = "3.0", configName = "weapons/legendaries")
     protected double blackHoleSpeed;
-
-    @Inject
-    @Config(path = "weapons.scythe.black-hole-hitbox", defaultValue = "0.5", configName = "weapons/legendaries")
     protected double blackHoleHitbox;
-
-    @Inject
-    @Config(path = "weapons.scythe.black-hole-pull-strength", defaultValue = "0.12", configName = "weapons/legendaries")
     protected double blackHolePullStrength;
-
-    @Inject
-    @Config(path = "weapons.scythe.black-hole-pull-radius", defaultValue = "5.0", configName = "weapons/legendaries")
     protected double blackHolePullRadius;
-
-    @Inject
-    @Config(path = "weapons.scythe.black-hole-alive-seconds", defaultValue = "1.5", configName = "weapons/legendaries")
     protected double blackHoleAliveSeconds;
-
-    @Inject
-    @Config(path = "weapons.scythe.black-hole-expand-seconds", defaultValue = "0.75", configName = "weapons/legendaries")
     protected double blackHoleExpandSeconds;
 
     @Inject
-    public Scythe(final ClientManager clientManager) {
-        super("scythe");
+    public Scythe(Champions champions, final ClientManager clientManager) {
+        super(champions, "scythe");
     }
 
     @Override
@@ -107,6 +77,17 @@ public class Scythe extends Weapon implements InteractWeapon, CooldownWeapon, Le
 
     @Override
     public double getCooldown() {
-        return blackHoleCooldown;
+        return cooldown;
+    }
+
+    @Override
+    public void loadWeaponConfig() {
+        blackHoleRadius = getConfig("blackHoleRadius", 0.8, Double.class);
+        blackHoleSpeed = getConfig("blackHoleSpeed", 3.0, Double.class);
+        blackHoleHitbox = getConfig("blackHoleHitbox", 0.5, Double.class);
+        blackHolePullStrength = getConfig("blackHolePullStrength", 0.12, Double.class);
+        blackHolePullRadius = getConfig("blackHolePullRadius", 5.0, Double.class);
+        blackHoleAliveSeconds = getConfig("blackHoleAliveSeconds", 1.5, Double.class);
+        blackHoleExpandSeconds = getConfig("blackHoleExpandSeconds", 0.75, Double.class);
     }
 }

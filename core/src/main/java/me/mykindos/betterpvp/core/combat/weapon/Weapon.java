@@ -78,14 +78,6 @@ public abstract class Weapon extends BPvPItem implements IWeapon {
         return plugin.getConfig(getConfigName()).getObject(getPath(name), type, defaultValue);
     }
 
-    protected String getConfigName() {
-        String weaponType = "standard";
-        if (this instanceof LegendaryWeapon) {
-            weaponType = "legendaries";
-        }
-        return "weapons/" + weaponType;
-    }
-
     protected String getPath(String name) {
         return getKey() + "." + name;
     }
