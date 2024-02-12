@@ -174,15 +174,14 @@ public class BuildRepository implements IRepository<RoleBuild> {
             RoleBuild brute = new RoleBuild(uuid, Role.valueOf("BRUTE"), d);
             setSkill(brute, SkillType.SWORD, "Flesh Hook", 3);
             setSkill(brute, SkillType.AXE, "Seismic Slam", 5);
-            setSkill(brute, SkillType.PASSIVE_A, "Colossus", 1);
-            setSkill(brute, SkillType.PASSIVE_B, "Stampede", 3);
-
+            setSkill(brute, SkillType.PASSIVE_A, "Stampede", 3);
+            setSkill(brute, SkillType.PASSIVE_B, "Colossus", 1);
 
             RoleBuild ranger = new RoleBuild(uuid, Role.valueOf("RANGER"), d);
             setSkill(ranger, SkillType.SWORD, "Disengage", 3);
             setSkill(ranger, SkillType.BOW, "Incendiary Shot", 5);
-            setSkill(ranger, SkillType.PASSIVE_A, "Longshot", 3);
-            setSkill(ranger, SkillType.PASSIVE_B, "Sharpshooter", 1);
+            setSkill(ranger, SkillType.PASSIVE_B, "Longshot", 3);
+            setSkill(ranger, SkillType.PASSIVE_A, "Barbed Arrows", 1);
 
             RoleBuild mage = new RoleBuild(uuid, Role.valueOf("MAGE"), d);
             setSkill(mage, SkillType.SWORD, "Inferno", 5);
@@ -193,8 +192,8 @@ public class BuildRepository implements IRepository<RoleBuild> {
             RoleBuild knight = new RoleBuild(uuid, Role.valueOf("KNIGHT"), d);
             setSkill(knight, SkillType.SWORD, "Riposte", 3);
             setSkill(knight, SkillType.AXE, "Bulls Charge", 5);
-            setSkill(knight, SkillType.PASSIVE_A, "Vengeance", 3);
-            setSkill(knight, SkillType.PASSIVE_B, "Swordsmanship", 1);
+            setSkill(knight, SkillType.PASSIVE_A, "Swordsmanship", 1);
+            setSkill(knight, SkillType.PASSIVE_B, "Vengeance", 3);
 
             RoleBuild warlock = new RoleBuild(uuid, Role.valueOf("WARLOCK"), d);
             setSkill(warlock, SkillType.SWORD, "Leech", 4);

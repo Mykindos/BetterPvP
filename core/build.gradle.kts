@@ -21,6 +21,7 @@ publishing {
 
 dependencies {
     compileOnly(libs.mythic)
+    compileOnly(libs.modelengine)
     compileOnly(libs.protocollib)
     compileOnly(libs.bundles.paper)
     paperweight.paperDevBundle(libs.versions.paper)

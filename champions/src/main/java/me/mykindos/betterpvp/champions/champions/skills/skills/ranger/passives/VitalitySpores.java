@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -20,9 +21,15 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.HashMap;
+import java.util.UUID;
+import java.util.WeakHashMap;
+
 @Singleton
 @BPvPListener
 public class VitalitySpores extends Skill implements PassiveSkill {
+
+    private final WeakHashMap<Player, Long> lastDamagedMap;
 
     private double baseDuration;
 
@@ -33,6 +40,7 @@ public class VitalitySpores extends Skill implements PassiveSkill {
     @Inject
     public VitalitySpores(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
+        this.lastDamagedMap = new WeakHashMap<>();
     }
 
     @Override
@@ -65,8 +73,8 @@ public class VitalitySpores extends Skill implements PassiveSkill {
         for (Player player : Bukkit.getOnlinePlayers()) {
             int level = getLevel(player);
             if (level > 0) {
-                Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
-                if (UtilTime.elapsed(gamer.getLastDamaged(), (long) (getDuration(level) * 1000L))) {
+                long lastDamaged = lastDamagedMap.getOrDefault(player, 0L);
+                if (UtilTime.elapsed(lastDamaged, (long) (getDuration(level) * 1000L))) {
                     player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20, regenerationStrength));
                 }
             }
@@ -79,16 +87,19 @@ public class VitalitySpores extends Skill implements PassiveSkill {
         if (!(event.getDamagee() instanceof Player player)) return;
 
         if (hasSkill(player)) {
-            if (player.hasPotionEffect(PotionEffectType.REGENERATION)) {
+            if(!UtilPlayer.hasPotionEffect(player, PotionEffectType.REGENERATION, regenerationStrength + 1)) {
                 player.removePotionEffect(PotionEffectType.REGENERATION);
             }
+
+            lastDamagedMap.put(player, System.currentTimeMillis());
         }
     }
 
+
+
     @Override
     public SkillType getType() {
-
-        return SkillType.PASSIVE_B;
+        return SkillType.PASSIVE_A;
     }
 
     @Override

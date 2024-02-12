@@ -7,8 +7,10 @@ import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.components.champions.ISkill;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
+import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.display.DisplayComponent;
 import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
+import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
@@ -39,6 +41,17 @@ public class ChargeData {
     public void tick() {
         // Divide over 100 to get multiplication factor since it's in 100% scale for display
         this.charge = Math.min(1, this.charge + (chargePerSecond / 20));
+    }
+
+    public void tickSound(SoundEffect sound, Location location, boolean force) {
+        if (!UtilTime.elapsed(lastSound, soundInterval)) {
+            return;
+        }
+
+        if (force || charge < 1) {
+            sound.play(location);
+            lastSound = System.currentTimeMillis();
+        }
     }
 
     public void tickSound(Player player) {
