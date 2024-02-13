@@ -155,7 +155,7 @@ public class Recall extends Skill implements CooldownToggleSkill, Listener {
 
         Iterator<Location> iterator = markers.iterator();
         new BukkitRunnable() {
-            Location significantLocation = player.getLocation(); // Start with the player's current location.
+            Location significantLocation = player.getLocation(); // Start with the players current location
 
             @Override
             public void run() {
@@ -163,24 +163,24 @@ public class Recall extends Skill implements CooldownToggleSkill, Listener {
                 while (iterator.hasNext()) {
                     Location currentLocation = iterator.next();
                     if (significantLocation.distance(currentLocation) > 2) {
-                        // Draw particle trail from significantLocation to currentLocation.
+                        // Draw particle trail from significantLocation to currentLocation
                         drawParticleTrail(significantLocation, currentLocation);
-                        // Teleport the player to the current location.
+                        // Teleport the player to the current location
                         teleportPlayer(player, currentLocation);
-                        significantLocation = currentLocation; // Update the last significant location.
+                        significantLocation = currentLocation; // Update the last significant location
                         foundDistantLocation = true;
-                        break; // Exit the loop as we found a distant location.
+                        break; // Exit the loop as we found a distant location
                     }
                 }
 
                 if (!foundDistantLocation) {
-                    // If no further significant location found, draw particle trail to final location and teleport.
-                    if (!significantLocation.equals(markers.getLast())) { // Ensure it's not the same as the last significant location.
+                    // If no further significant location found, draw particle trail to final location and teleport
+                    if (!significantLocation.equals(markers.getLast())) { // Ensure it's not the same as the last significant location
                         drawParticleTrail(significantLocation, markers.getLast());
                         teleportPlayer(player, markers.getLast());
                     }
-                    this.cancel(); // Cancel the task as we're done processing.
-                    clearEffects(player, recallData); // Clear effects and recall data.
+                    this.cancel(); // Cancel the task as we're done processing
+                    clearEffects(player, recallData); // Clear effects and recall data
                 }
             }
 
