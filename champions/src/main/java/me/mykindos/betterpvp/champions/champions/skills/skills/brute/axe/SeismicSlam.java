@@ -100,10 +100,10 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
 
     @UpdateEvent
     public void onUpdate() {
-        Iterator<Map.Entry<UUID, Long>> iterator = slams.entrySet().iterator();
-
-        while (iterator.hasNext()) {
-            Map.Entry<UUID, Long> entry = iterator.next();
+        // Existing slam logic
+        Iterator<Map.Entry<UUID, Long>> slamIterator = slams.entrySet().iterator();
+        while (slamIterator.hasNext()) {
+            Map.Entry<UUID, Long> entry = slamIterator.next();
             Player player = Bukkit.getPlayer(entry.getKey());
 
             if (player != null) {
@@ -113,20 +113,30 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
 
                 if (timeElapsed && isPlayerGrounded) {
                     slam(player);
-                    iterator.remove();
-                    canTakeFall.put(player.getUniqueId(), true);
+                    slamIterator.remove();
                 }
             } else {
-                iterator.remove();
+                slamIterator.remove();
             }
         }
 
+        Iterator<Map.Entry<UUID, Boolean>> fallIterator = canTakeFall.entrySet().iterator();
+        while (fallIterator.hasNext()) {
+            Map.Entry<UUID, Boolean> entry = fallIterator.next();
+            Player player = Bukkit.getPlayer(entry.getKey());
+            if (player != null && (UtilBlock.isGrounded(player) || player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType().isSolid())) {
+                Bukkit.getScheduler().runTaskLater(champions, () -> {
+                    if (canTakeFall.containsKey(player.getUniqueId())) {
+                        canTakeFall.remove(player.getUniqueId());
+                    }
+                }, 2L);
+            }
+        }
     }
 
     @EventHandler
     public void reduceFallDamage(CustomDamageEvent event) {
         if (event.getCause() != DamageCause.FALL) return;
-
 
         Player player = (Player) event.getDamagee();
         UUID playerId = player.getUniqueId();
@@ -210,6 +220,7 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
             vec.setY(vec.getY() * -1);
         }
 
+        canTakeFall.put(player.getUniqueId(), true);
         VelocityData velocityData = new VelocityData(vec, 0.6, false, 0, 0.8, 0.8, true);
         UtilVelocity.velocity(player, null, velocityData, VelocityType.CUSTOM);
 

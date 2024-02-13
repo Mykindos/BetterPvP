@@ -12,17 +12,21 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -34,6 +38,8 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.util.Vector;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.WeakHashMap;
@@ -157,7 +163,6 @@ public class RopedArrow extends PrepareArrowSkill {
     public void reduceFallDamage(CustomDamageEvent event) {
         if (event.getCause() != EntityDamageEvent.DamageCause.FALL) return;
 
-
         Player player = (Player) event.getDamagee();
         UUID playerId = player.getUniqueId();
 
@@ -168,6 +173,22 @@ public class RopedArrow extends PrepareArrowSkill {
                 event.setDamage(event.getDamage() - fallDamageLimit);
             }
             canTakeFall.remove(playerId);
+        }
+    }
+
+    @UpdateEvent
+    public void onUpdate() {
+        Iterator<Map.Entry<UUID, Boolean>> iterator = canTakeFall.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<UUID, Boolean> entry = iterator.next();
+            Player player = Bukkit.getPlayer(entry.getKey());
+            if (player != null && (UtilBlock.isGrounded(player) || player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType().isSolid())) {
+                Bukkit.getScheduler().runTaskLater(champions, () -> {
+                    if (canTakeFall.containsKey(player.getUniqueId())) {
+                        canTakeFall.remove(player.getUniqueId());
+                    }
+                }, 2L);
+            }
         }
     }
 

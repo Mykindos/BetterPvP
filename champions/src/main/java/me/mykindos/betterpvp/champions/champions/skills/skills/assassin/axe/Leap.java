@@ -13,11 +13,13 @@ import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
+import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -30,6 +32,8 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.util.Vector;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.UUID;
 
 @Singleton
@@ -75,7 +79,6 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
     }
 
     public void doLeap(Player player, boolean wallkick) {
-
         if (!wallkick) {
             VelocityData velocityData = new VelocityData(player.getLocation().getDirection(), leapStrength, false, 0.0D, 0.2D, 1.0D, true);
             UtilVelocity.velocity(player, null, velocityData, VelocityType.CUSTOM);
@@ -107,6 +110,22 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
                 event.setDamage(event.getDamage() - fallDamageLimit);
             }
             canTakeFall.remove(playerId);
+        }
+    }
+
+    @UpdateEvent
+    public void onUpdate() {
+        Iterator<Map.Entry<UUID, Boolean>> iterator = canTakeFall.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<UUID, Boolean> entry = iterator.next();
+            Player player = Bukkit.getPlayer(entry.getKey());
+            if (player != null && (UtilBlock.isGrounded(player) || player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType().isSolid())) {
+                Bukkit.getScheduler().runTaskLater(champions, () -> {
+                    if (canTakeFall.containsKey(player.getUniqueId())) {
+                        canTakeFall.remove(player.getUniqueId());
+                    }
+                }, 2L);
+            }
         }
     }
 
