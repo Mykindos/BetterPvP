@@ -41,8 +41,8 @@ skills:
       cooldown: 35.0
       maxlevel: 3
       baseDuration: 3.0
-      effectDuration: 5
-      effectRadius: 5.0
+      effectDuration: 3
+      effectRadius: 4.0
       slownessLevel: 1
       effectRadiusIncreasePerLevel: 1.0
       effectDurationIncreasePerLevel: 1

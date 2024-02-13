@@ -67,7 +67,7 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener {
                 "Instantly Vanish before your foes",
                 "for <stat>" + duration + "</stat> seconds, inflicting <effect>Blindness",
                 "and <effect>Slowness " + UtilFormat.getRomanNumeral(slownessLevel + 1) + "</effect> to enemies within <stat>" + getRadius(level),
-                "blocks for <val>" + getEffectDuration(level) + "</val seconds",
+                "blocks for <val>" + getEffectDuration(level) + "</val> seconds",
                 "",
                 "Interacting or taking damage will",
                 "cause you to reappear",
@@ -84,8 +84,8 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener {
     public void loadSkillConfig() {
         duration = getConfig("duration", 3.0, Double.class);
         effectDurationIncreasePerLevel = getConfig("effectDurationIncreasePerLevel", 1, Integer.class);
-        effectDuration = getConfig("effectDuration", 5, Integer.class);
-        effectRadius = getConfig("effectRadius", 5.0, Double.class);
+        effectDuration = getConfig("effectDuration", 3, Integer.class);
+        effectRadius = getConfig("effectRadius", 4.0, Double.class);
         effectRadiusIncreasePerLevel = getConfig("effectRadiusIncreasePerLevel", 1.0, Double.class);
         slownessLevel = getConfig("slownessLevel", 1, Integer.class);
     }
