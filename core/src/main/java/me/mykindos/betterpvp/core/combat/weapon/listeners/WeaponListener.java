@@ -18,7 +18,7 @@ import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateLoreEvent;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateNameEvent;
 import me.mykindos.betterpvp.core.framework.events.items.SpecialItemDropEvent;
-import me.mykindos.betterpvp.core.items.BPVPItem;
+import me.mykindos.betterpvp.core.items.BPvPItem;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -97,6 +97,10 @@ public class WeaponListener implements Listener {
         if (weaponOptional.isEmpty()) return;
 
         IWeapon weapon = weaponOptional.get();
+        if (!weapon.isEnabled()) {
+            UtilMessage.simpleMessage(player, weapon.getSimpleName(), "This weapon is not enabled.");
+            return;
+        }
         if (weapon instanceof InteractWeapon interactWeapon) {
             if (!interactWeapon.canUse(player)) {
                 return;
@@ -142,7 +146,7 @@ public class WeaponListener implements Listener {
         Optional<IWeapon> weaponOptional = weaponManager.getWeaponByItemStack(event.getItemStack());
         if (weaponOptional.isPresent()) {
             IWeapon weapon = weaponOptional.get();
-            if(!(weapon instanceof BPVPItem item)) return;
+            if(!(weapon instanceof BPvPItem item)) return;
 
             event.getItemMeta().getPersistentDataContainer().set(CoreNamespaceKeys.CUSTOM_ITEM_KEY, PersistentDataType.STRING, item.getIdentifier());
             event.setItemName(weapon.getName());
@@ -154,7 +158,7 @@ public class WeaponListener implements Listener {
         Optional<IWeapon> weaponOptional = weaponManager.getWeaponByItemStack(event.getItemStack());
         if (weaponOptional.isPresent()) {
             IWeapon weapon = weaponOptional.get();
-            if(!(weapon instanceof BPVPItem item)) return;
+            if(!(weapon instanceof BPvPItem item)) return;
 
             if(weapon instanceof LegendaryWeapon legendaryWeapon){
                 legendaryWeapon.onInitialize(event.getItemMeta());
@@ -225,7 +229,7 @@ public class WeaponListener implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         for (IWeapon weapon : weaponManager.getObjects().values()) {
-            if (weapon instanceof BPVPItem item) {
+            if (weapon instanceof BPvPItem item) {
                 item.getRecipeKeys().forEach(key -> event.getPlayer().discoverRecipe(key));
             }
         }

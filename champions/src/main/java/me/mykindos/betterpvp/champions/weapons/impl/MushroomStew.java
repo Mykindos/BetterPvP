@@ -2,10 +2,10 @@ package me.mykindos.betterpvp.champions.weapons.impl;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.combat.weapon.Weapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.CooldownWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.InteractWeapon;
-import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
@@ -30,27 +30,16 @@ import org.bukkit.potion.PotionEffectType;
 @BPvPListener
 public class MushroomStew extends Weapon implements InteractWeapon, CooldownWeapon, Listener {
 
-
-    @Inject
-    @Config(path = "weapons.mushroom-stew.cooldown", defaultValue = "14.0", configName = "weapons/standard")
-    private double cooldown;
-
-    @Inject
-    @Config(path = "weapons.mushroom-stew.duration", defaultValue = "4.0", configName = "weapons/standard")
     private double duration;
-
-    @Inject
-    @Config(path = "weapons.mushroom-stew.level", defaultValue = "2", configName = "weapons/standard")
     private int level;
 
     @Inject
-    public MushroomStew() {
-        super("mushroom_stew");
+    public MushroomStew(Champions champions) {
+        super(champions, "mushroom_stew");
     }
 
     @Override
     public void activate(Player player) {
-
         player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, (int) (duration * 20L), level - 1));
         UtilMessage.message(player, "Item",
                 Component.text("You consumed a ", NamedTextColor.GRAY).append(getName().color(NamedTextColor.YELLOW)));
@@ -61,6 +50,9 @@ public class MushroomStew extends Weapon implements InteractWeapon, CooldownWeap
 
     @EventHandler (priority = EventPriority.HIGHEST)
     public void onCraftStew(PrepareItemCraftEvent event) {
+        if (!enabled) {
+            return;
+        }
         Recipe recipe = event.getRecipe();
         if(recipe == null) return;
 
@@ -81,5 +73,11 @@ public class MushroomStew extends Weapon implements InteractWeapon, CooldownWeap
     @Override
     public double getCooldown() {
         return cooldown;
+    }
+
+    @Override
+    public void loadWeaponConfig() {
+        duration = getConfig("duration", 4.0, Double.class);
+        level = getConfig("level", 2, Integer.class);
     }
 }

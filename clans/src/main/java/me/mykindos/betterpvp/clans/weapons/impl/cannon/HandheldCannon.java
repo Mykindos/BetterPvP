@@ -2,10 +2,10 @@ package me.mykindos.betterpvp.clans.weapons.impl.cannon;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.core.combat.weapon.Weapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.CooldownWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.InteractWeapon;
-import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import org.bukkit.Material;
@@ -20,17 +20,11 @@ import org.bukkit.entity.TNTPrimed;
 @Singleton
 public class HandheldCannon extends Weapon implements InteractWeapon, CooldownWeapon {
 
-    @Inject
-    @Config(path = "handheld.shoot-cooldown", defaultValue = "25.0", configName = "weapons/cannon")
-    private double cooldown;
-
-    @Inject
-    @Config(path = "handheld.shoot-velocity", defaultValue = "2.5", configName = "weapons/cannon")
     private double velocity;
 
     @Inject
-    public HandheldCannon() {
-        super("clans", "handheld_cannon");
+    public HandheldCannon(Clans clans) {
+        super(clans, "handheld_cannon", "clans");
     }
 
     @Override
@@ -51,4 +45,8 @@ public class HandheldCannon extends Weapon implements InteractWeapon, CooldownWe
         return cooldown;
     }
 
+    @Override
+    public void loadWeaponConfig() {
+        velocity = getConfig("velocity", 2.5, Double.class);
+    }
 }

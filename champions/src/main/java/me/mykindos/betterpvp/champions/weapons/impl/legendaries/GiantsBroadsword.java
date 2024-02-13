@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.weapons.impl.legendaries;
 import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -10,7 +11,6 @@ import me.mykindos.betterpvp.core.combat.weapon.types.ChannelWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.InteractWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseItemEvent;
-import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.energy.EnergyHandler;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -45,30 +45,14 @@ import java.util.UUID;
 public class GiantsBroadsword extends ChannelWeapon implements InteractWeapon, LegendaryWeapon, Listener {
 
     private static final String ABILITY_NAME = "Shield";
-
-    @Inject
-    @Config(path = "weapons.giants-broadsword.energy-per-tick", defaultValue = "1.5", configName = "weapons/legendaries")
-    private double energyPerTick;
-
-    @Inject
-    @Config(path = "weapons.giants-broadsword.initial-energy-cost", defaultValue = "10.0", configName = "weapons/legendaries")
-    private double initialEnergyCost;
-
-    @Inject
-    @Config(path = "weapons.giants-broadsword.base-damage", defaultValue = "10.0", configName = "weapons/legendaries")
-    private double baseDamage;
-
-    @Inject
-    @Config(path = "weapons.giants-broadsword.regen-amplifier", defaultValue = "3", configName = "weapons/legendaries")
     private int regenAmplifier;
-
     private final EnergyHandler energyHandler;
     private final Set<UUID> holdingWeapon = new HashSet<>();
     private final ClientManager clientManager;
 
     @Inject
-    public GiantsBroadsword(EnergyHandler energyHandler, ClientManager clientManager) {
-        super("giants_broadsword");
+    public GiantsBroadsword(Champions champions, EnergyHandler energyHandler, ClientManager clientManager) {
+        super(champions, "giants_broadsword");
         this.energyHandler = energyHandler;
         this.clientManager = clientManager;
     }
@@ -100,6 +84,9 @@ public class GiantsBroadsword extends ChannelWeapon implements InteractWeapon, L
 
     @UpdateEvent
     public void doRegen() {
+        if (!enabled) {
+            return;
+        }
         final Iterator<UUID> iterator = active.iterator();
         while (iterator.hasNext()) {
             Player player = Bukkit.getPlayer(iterator.next());
@@ -182,6 +169,9 @@ public class GiantsBroadsword extends ChannelWeapon implements InteractWeapon, L
 
     @EventHandler
     public void onSwapWeapon(PlayerItemHeldEvent event) {
+        if (!enabled) {
+            return;
+        }
         final Player player = event.getPlayer();
         if (matches(player.getInventory().getItem(event.getNewSlot()))) {
             holdingWeapon.add(player.getUniqueId());
@@ -200,6 +190,9 @@ public class GiantsBroadsword extends ChannelWeapon implements InteractWeapon, L
 
     @EventHandler(priority = EventPriority.LOW)
     public void onDamage(CustomDamageEvent event) {
+        if (!enabled) {
+            return;
+        }
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
         if (!(event.getDamager() instanceof Player damager)) return;
         if (isHoldingWeapon(damager)) {
@@ -224,5 +217,10 @@ public class GiantsBroadsword extends ChannelWeapon implements InteractWeapon, L
     @Override
     public boolean useShield(Player player) {
         return active.contains(player.getUniqueId());
+    }
+
+    @Override
+    public void loadWeaponConfig() {
+        regenAmplifier = getConfig("regenAmplifier", 3, Integer.class);
     }
 }

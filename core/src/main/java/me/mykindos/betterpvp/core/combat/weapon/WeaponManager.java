@@ -8,7 +8,7 @@ import me.mykindos.betterpvp.core.components.champions.weapons.IWeapon;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.adapter.Adapters;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
-import me.mykindos.betterpvp.core.items.BPVPItem;
+import me.mykindos.betterpvp.core.items.BPvPItem;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import org.bukkit.inventory.ItemStack;
 import org.reflections.Reflections;
@@ -37,7 +37,7 @@ public class WeaponManager extends Manager<IWeapon> {
     }
 
     public boolean load(Weapon weapon) {
-        BPVPItem item = itemHandler.getItem(weapon.getIdentifier());
+        BPvPItem item = itemHandler.getItem(weapon.getIdentifier());
         if (item == null) {
             log.error(weapon.getIdentifier() + " does not exist in itemRepository");
             return false;
@@ -55,6 +55,16 @@ public class WeaponManager extends Manager<IWeapon> {
         Weapon weapon = plugin.getInjector().getInstance(clazz);
         plugin.getInjector().injectMembers(weapon);
         return load(weapon);
+    }
+
+    /**
+     * reload the configuration for all weapons
+     */
+    public void reload(BPvPPlugin plugin) {
+
+        getObjects().values().forEach(iWeapon -> {
+            iWeapon.loadConfig(plugin);
+        });
     }
 
     public Optional<IWeapon> getWeaponByItemStack(ItemStack itemStack) {

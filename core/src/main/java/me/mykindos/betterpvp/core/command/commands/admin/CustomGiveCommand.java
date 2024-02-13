@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
-import me.mykindos.betterpvp.core.items.BPVPItem;
+import me.mykindos.betterpvp.core.items.BPvPItem;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
@@ -42,7 +42,7 @@ public class CustomGiveCommand extends Command {
             return;
         }
 
-        BPVPItem item = itemHandler.getItem(args[1]);
+        BPvPItem item = itemHandler.getItem(args[1]);
         if (item == null) {
             UtilMessage.message(player, "Command", UtilMessage.deserialize("<green>%s</green> is not a valid item", args[1]));
             return;
