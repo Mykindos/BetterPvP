@@ -11,27 +11,27 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
 @Singleton
-public class ClanInviteTip extends ClanTip implements ISuggestCommand {
+public class ClanUnclaimTip extends ClanTip implements ISuggestCommand {
 
     @Inject
-    public ClanInviteTip(Clans clans) {
-        super(clans, 2, 1);
+    public ClanUnclaimTip(Clans clans) {
+        super(clans, 1, 1);
         setComponent(generateComponent());
     }
 
     @Override
     public String getName() {
-        return "claninvite";
+        return "clanunclaim";
     }
 
     @Override
     public Component generateComponent() {
-        Component suggestComponent = suggestCommand("/c invite <player>", "/c invite ");
-        return Component.text("You can invite a player to your clan by running ", NamedTextColor.GRAY).append(suggestComponent);
+        Component suggestComponent = suggestCommand("/c unclaim", "/c unclaim");
+        return Component.text("You can unclaim territory by running ", NamedTextColor.GRAY).append(suggestComponent);
     }
 
     @Override
     public boolean isValid(Player player, Clan clan) {
-        return clan != null && clan.getAdminsAsPlayers().contains(player);
+        return clan != null && clan.getAdminsAsPlayers().contains(player) && !clan.getTerritory().isEmpty();
     }
 }
