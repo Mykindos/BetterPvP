@@ -124,13 +124,15 @@ skills:
       poisonStrength: 2
     recall:
       enabled: true
-      maxlevel: 5
+      maxlevel: 3
       cooldown: 30.0
-      percentHealthRecovered: 0.25
-      duration: 2.5
-      canUseWhileSlowed: false
+      health: 5.0
+      healthIncreasePerLevel: 1.0
+      regenerationLevel: 1
+      regenerationDuration: 3.0
+      regenerationDurationIncreasePerLevel: 1.0
+      duration: 3.0
       cooldownDecreasePerLevel: 2.0
-      durationIncreasePerLevel: 1.0
     evade:
       enabled: true
       maxlevel: 5

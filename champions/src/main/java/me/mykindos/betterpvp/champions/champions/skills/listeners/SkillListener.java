@@ -449,6 +449,17 @@ public class SkillListener implements Listener {
         }
     }
 
+    @EventHandler
+    public void onUseSkillWhileRecalling(PlayerUseSkillEvent event){
+        if (event.isCancelled()) return;
+        Player player = event.getPlayer();
+        ISkill skill = event.getSkill();
+        if (effectManager.hasEffect(player, EffectType.RECALLING)) {
+            UtilMessage.simpleMessage(player, skill.getClassType().getName(), "You cannot use <green>%s<gray> while recalling.", skill.getName());
+            event.setCancelled(true);
+        }
+    }
+
     @UpdateEvent
     public void processActiveToggleSkills() {
         skillManager.getObjects().values().forEach(skill -> {

@@ -23,6 +23,7 @@ public enum EffectType {
     LEVITATION(true),
     NO_JUMP(false),
     NO_SPRINT(false),
+    RECALLING(false),
     BLEED(true);
 
     final boolean isNegative;

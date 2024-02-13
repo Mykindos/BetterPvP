@@ -228,6 +228,16 @@ public class EffectListener implements Listener {
         }
     }
 
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void cancelRecallDamage(CustomDamageEvent event) {
+        if (event.getDamagee() instanceof Player player) {
+            Optional<Effect> effectOptional = effectManager.getEffect(player, EffectType.RECALLING);
+            effectOptional.ifPresent(effect -> {
+                event.setCancelled(true);
+            });
+        }
+    }
+
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onLoadingTextureDamage(CustomDamageEvent event) {
