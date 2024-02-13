@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.tips;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
@@ -21,12 +22,13 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
+@Slf4j
 @Singleton
 @BPvPListener
 public class TipListener implements Listener {
 
     @Inject
-    @Config(path = "core.tips.timeBetweenTips", defaultValue = "5.0")
+    @Config(path = "core.tips.timeBetweenTips", defaultValue = "150.0")
     public double timeBetweenTips;
 
     public final Core core;
@@ -54,7 +56,7 @@ public class TipListener implements Listener {
             final Client client = clientManager.search().online(player);
             final Gamer gamer = client.getGamer();
             if ((boolean) client.getProperty(ClientProperty.TIPS_ENABLED).orElse(true)) {
-                if (UtilTime.elapsed(gamer.getLastTip(), (long) timeBetweenTips * 60000)) {
+                if (UtilTime.elapsed(gamer.getLastTip(), (long) timeBetweenTips * 1000L)) {
                     UtilServer.runTaskAsync(core, () -> UtilServer.callEvent(new TipEvent(player, gamer)));
                 }
             }
@@ -78,6 +80,8 @@ public class TipListener implements Listener {
             Tip tip = tipList.random();
             UtilMessage.message(player, "Tips", tip.getComponent());
             event.getGamer().setLastTipNow();
+        } else {
+            log.error("No valid tips for " + player.getName());
         }
 
     }

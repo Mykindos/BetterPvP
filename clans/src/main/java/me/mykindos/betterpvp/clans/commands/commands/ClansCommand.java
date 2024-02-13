@@ -87,7 +87,7 @@ public class ClansCommand extends Command implements IConsoleCommand {
             clans.reload();
 
             commandLoader.reload(clans.getClass().getPackageName());
-            tipManager.reloadTips();
+            tipManager.reloadTips(clans);
 
             fields.reload(clans);
             clansWeaponManager.reload();
