@@ -7,4 +7,8 @@ public interface LegendaryWeapon extends IWeapon {
 
     default void onInitialize(ItemMeta meta) {};
 
+    @Override
+    default String getConfigName() {
+        return "weapons/legendaries";
+    }
 }

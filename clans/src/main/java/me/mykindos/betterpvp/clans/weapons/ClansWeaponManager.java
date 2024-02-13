@@ -26,5 +26,9 @@ public class ClansWeaponManager {
         new Reflections(getClass().getPackageName()).getSubTypesOf(Weapon.class).forEach(clazz -> weaponManager.load(clans, adapters, clazz));
     }
 
+    public void reload() {
+        weaponManager.reload(clans);
+    }
+
 }
 

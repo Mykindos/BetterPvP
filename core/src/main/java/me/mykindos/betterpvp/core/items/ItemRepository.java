@@ -19,7 +19,7 @@ import java.util.List;
 
 @Singleton
 @Slf4j
-public class ItemRepository implements IRepository<BPVPItem> {
+public class ItemRepository implements IRepository<BPvPItem> {
 
     private Database database;
 
@@ -29,12 +29,12 @@ public class ItemRepository implements IRepository<BPVPItem> {
     }
 
     @Override
-    public List<BPVPItem> getAll() {
+    public List<BPvPItem> getAll() {
         return null;
     }
 
-    public List<BPVPItem> getItemsForModule(String namespace) {
-        List<BPVPItem> items = new ArrayList<>();
+    public List<BPvPItem> getItemsForModule(String namespace) {
+        List<BPvPItem> items = new ArrayList<>();
         String query = "SELECT * FROM items WHERE Namespace = ?";
         CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(namespace)));
         try {
@@ -55,7 +55,7 @@ public class ItemRepository implements IRepository<BPVPItem> {
                     continue;
                 }
 
-                items.add(new BPVPItem(namespace, key, material, name, lore, maxDurability, customModelData, glowing, uuid));
+                items.add(new BPvPItem(namespace, key, material, name, lore, maxDurability, customModelData, glowing, uuid));
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -93,7 +93,7 @@ public class ItemRepository implements IRepository<BPVPItem> {
     }
 
     @Override
-    public void save(BPVPItem object) {
+    public void save(BPvPItem object) {
         throw new NotImplementedException();
     }
 }

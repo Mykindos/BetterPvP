@@ -4,10 +4,12 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
+import me.mykindos.betterpvp.core.items.type.IBPvPItem;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -35,7 +37,7 @@ import java.util.UUID;
 @Slf4j
 @Getter
 @Setter
-public class BPVPItem {
+public class BPvPItem implements IBPvPItem {
     private String namespace;
     private String key;
     private NamespacedKey namespacedKey;
@@ -48,7 +50,7 @@ public class BPVPItem {
     private boolean giveUUID;
     private List<NamespacedKey> recipeKeys;
 
-    public BPVPItem(String namespace, String key, Material material, Component name, List<Component> lore, int maxDurability, int customModelData, boolean glowing, boolean uuid) {
+    public BPvPItem(String namespace, String key, Material material, Component name, List<Component> lore, int maxDurability, int customModelData, boolean glowing, boolean uuid) {
         this.namespace = namespace;
         this.key = key;
         this.namespacedKey = new NamespacedKey(namespace, key);
@@ -109,6 +111,11 @@ public class BPVPItem {
     public @NotNull Component getName() {
         return this.name;
     }
+
+    public String getSimpleName() {
+        return PlainTextComponentSerializer.plainText().serialize(getName());
+    }
+
 
     /**
      * @param itemStack the item stack to compare to

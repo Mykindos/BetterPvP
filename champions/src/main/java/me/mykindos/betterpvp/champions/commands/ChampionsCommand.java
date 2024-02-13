@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
 import me.mykindos.betterpvp.champions.champions.skills.SkillManager;
 import me.mykindos.betterpvp.champions.listeners.ChampionsListenerLoader;
+import me.mykindos.betterpvp.champions.weapons.ChampionsWeaponManager;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.Command;
@@ -71,6 +72,9 @@ public class ChampionsCommand extends Command implements IConsoleCommand {
         @Inject
         private TipManager tipManager;
 
+        @Inject
+        private ChampionsWeaponManager championsWeaponManager;
+
         @Override
         public String getName() {
             return "reload";
@@ -94,8 +98,8 @@ public class ChampionsCommand extends Command implements IConsoleCommand {
             skillManager.reloadSkills();
             buildManager.reloadBuilds();
             itemHandler.loadItemData("champions");
-
             tipManager.reloadTips(champions);
+            championsWeaponManager.reload();
 
             UtilMessage.message(sender, "Champions", "Successfully reloaded champions");
         }

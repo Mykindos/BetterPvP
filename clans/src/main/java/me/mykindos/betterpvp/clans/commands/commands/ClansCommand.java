@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.commands.ClansCommandLoader;
 import me.mykindos.betterpvp.clans.fields.Fields;
 import me.mykindos.betterpvp.clans.listener.ClansListenerLoader;
+import me.mykindos.betterpvp.clans.weapons.ClansWeaponManager;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.Command;
@@ -63,6 +64,9 @@ public class ClansCommand extends Command implements IConsoleCommand {
         @Inject
         private Fields fields;
 
+        @Inject
+        private ClansWeaponManager clansWeaponManager;
+
         @Override
         public String getName() {
             return "reload";
@@ -86,6 +90,7 @@ public class ClansCommand extends Command implements IConsoleCommand {
             tipManager.reloadTips(clans);
 
             fields.reload(clans);
+            clansWeaponManager.reload();
 
             UtilMessage.message(sender, "Clans", "Successfully reloaded clans");
         }

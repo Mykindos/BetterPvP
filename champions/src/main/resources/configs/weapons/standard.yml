@@ -1,15 +1,34 @@
-weapons:
-  tnt-cannon:
-    cooldown: 25.0
-    velocity: 2.5
-  throwing-web:
-    cooldown: 10.0
-    duration: 2.5
-    throwable-expiry: 10.0
-  mushroom-stew:
-    cooldown: 14.0
-    duration: 4.0
-    level: 2
-  energy-apple:
-    cooldown: 10.0
-    energy-regen: 0.5
+throwing_web:
+  enabled: true
+  cooldown: 10.0
+  duration: 2.5
+  throwableExpiry: 10.0
+mushroom_stew:
+  enabled: true
+  cooldown: 14.0
+  duration: 4.0
+  level: 2
+warlock_boots:
+  enabled: true
+warlock_vest:
+  enabled: true
+booster_sword:
+  enabled: true
+ranger_vest:
+  enabled: true
+warlock_leggings:
+  enabled: true
+warlock_helmet:
+  enabled: true
+ranger_leggings:
+  enabled: true
+energy_apple:
+  enabled: true
+  cooldown: 10.0
+  energyRegen: 0.5
+ranger_boots:
+  enabled: true
+power_sword:
+  enabled: true
+ranger_helmet:
+  enabled: true
