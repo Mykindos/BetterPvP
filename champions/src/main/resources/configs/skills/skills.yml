@@ -38,13 +38,15 @@ skills:
       baseIncrease: 0.0
     smokebomb:
       enabled: true
-      cooldown: 50.0
-      maxlevel: 5
+      cooldown: 35.0
+      maxlevel: 3
       baseDuration: 3.0
-      blindDuration: 1.75
-      blindRadius: 4.0
+      effectDuration: 5
+      effectRadius: 5.0
+      slownessLevel: 1
+      effectRadiusIncreasePerLevel: 1.0
+      effectDurationIncreasePerLevel: 1
       cooldownDecreasePerLevel: 2.5
-      durationIncreasePerLevel: 1.0
     silencingarrow:
       enabled: true
       maxlevel: 5

@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.effects.events.EffectExpireEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -41,11 +42,12 @@ import java.util.UUID;
 public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener {
 
     private final Map<UUID, Long> smoked = new HashMap<>();
-
-    private double baseDuration;
-    private double durationIncreasePerLevel;
-    private double blindDuration;
-    private double blindRadius;
+    private double duration;
+    private int effectDuration;
+    private double effectRadius;
+    private int effectDurationIncreasePerLevel;
+    private double effectRadiusIncreasePerLevel;
+    private int slownessLevel;
 
     @Inject
     public SmokeBomb(Champions champions, ChampionsManager championsManager) {
@@ -62,13 +64,13 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener {
         return new String[]{
                 "Drop your Sword / Axe to activate",
                 "",
-                "Instantly <effect>Vanish</effect> before your foes",
-                "for a maximum of <val>" + getDuration(level) + "</val> seconds,",
-                "inflicting <effect>Blindness</effect> to enemies",
-                "within <stat>" + blindRadius + "</stat> blocks for <stat>" + blindDuration + "</stat> seconds",
+                "Instantly Vanish before your foes",
+                "for <stat>" + duration + "</stat> seconds, inflicting <effect>Blindness",
+                "and <effect>Slowness " + UtilFormat.getRomanNumeral(slownessLevel + 1) + "</effect> to enemies within <stat>" + getRadius(level),
+                "blocks for <val>" + getEffectDuration(level) + "</val seconds",
                 "",
-                "Interacting with your surroundings",
-                "will cause you to reappear",
+                "Interacting or taking damage will",
+                "cause you to reappear",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -80,10 +82,12 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener {
     }
 
     public void loadSkillConfig() {
-        baseDuration = getConfig("baseDuration", 3.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
-        blindDuration = getConfig("blindDuration", 1.75, Double.class);
-        blindRadius = getConfig("blindRadius", 4.0, Double.class);
+        duration = getConfig("duration", 3.0, Double.class);
+        effectDurationIncreasePerLevel = getConfig("effectDurationIncreasePerLevel", 1, Integer.class);
+        effectDuration = getConfig("effectDuration", 5, Integer.class);
+        effectRadius = getConfig("effectRadius", 5.0, Double.class);
+        effectRadiusIncreasePerLevel = getConfig("effectRadiusIncreasePerLevel", 1.0, Double.class);
+        slownessLevel = getConfig("slownessLevel", 1, Integer.class);
     }
 
     @Override
@@ -96,17 +100,22 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener {
         return SkillType.PASSIVE_A;
     }
 
-    public double getDuration(int level) {
-        return baseDuration + (level * durationIncreasePerLevel);
+    public double getEffectDuration(int level) {
+        return effectDuration + ((level-1) * effectDurationIncreasePerLevel);
+    }
+    public double getRadius(int level){
+        return effectRadius + ((level - 1) * effectRadiusIncreasePerLevel);
     }
 
     @Override
     public void toggle(Player player, int level) {
-        // Effects
-        championsManager.getEffects().addEffect(player, EffectType.INVISIBILITY, (long) (getDuration(level) * 1000L));
+        championsManager.getEffects().addEffect(player, EffectType.INVISIBILITY, (long) (duration * 1000L));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, (int) (duration * 20), 0, false, false));
         smoked.put(player.getUniqueId(), System.currentTimeMillis());
-        for (Player target : UtilPlayer.getNearbyEnemies(player, player.getLocation(), blindRadius)) {
-            target.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, (int) (blindDuration * 20), 0));
+        for (Player target : UtilPlayer.getNearbyEnemies(player, player.getLocation(), getRadius(level))) {
+            target.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, (int) ((getEffectDuration(level) + 1.0) * 20), 0)); //extra second because of the blindness fade at the end
+            target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) (getEffectDuration(level) * 20), slownessLevel));
+            championsManager.getEffects().addEffect(target, EffectType.CONFUSED, (long) getEffectDuration(level) * 1000L);
         }
 
         // Display particle to those only within 30 blocks
@@ -122,7 +131,6 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener {
                 .offset(3, 3, 3)
                 .spawn();
 
-        player.playSound(player.getLocation(), Sound.BLOCK_CONDUIT_AMBIENT, 2.0f, 1.f);
         for (int i = 0; i < 3; i++) {
             player.getWorld().playSound(player.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 2.0F, 0.5F);
         }
@@ -130,6 +138,7 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener {
 
     private void reappear(Player player) {
         championsManager.getEffects().removeEffect(player, EffectType.INVISIBILITY);
+        player.removePotionEffect(PotionEffectType.INVISIBILITY);
         UtilServer.callEvent(new EffectExpireEvent(player, new Effect(player.getUniqueId().toString(), EffectType.INVISIBILITY, 1, 0))); // Do this incase
         UtilMessage.message(player, getClassType().getName(), "You have reappeared.");
     }
@@ -153,7 +162,7 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener {
     }
 
     @EventHandler
-    public void onPickup(PlayerAttemptPickupItemEvent event) {
+    public void onPickup(PlayerAttemptPickupItemEvent event) { //bit suspicious
         Player player = event.getPlayer();
         if (smoked.containsKey(player.getUniqueId())) {
             interact(player);
@@ -194,28 +203,10 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener {
             // Remove if expire
             final long castTime = smoked.get(player.getUniqueId());
             final int level = getLevel(player);
-            if (level <= 0 || UtilTime.elapsed(castTime, (long) (getDuration(level) * 1000L))) {
+            if (level <= 0 || UtilTime.elapsed(castTime, (long) duration * 1000L)) {
                 reappear(player);
                 it.remove();
-                continue;
-            }
-
-            // Passive particles
-            final double random = Math.random();
-            if (random < 0.1) {
-                player.getWorld().playEffect(player.getLocation(), org.bukkit.Effect.STEP_SOUND, 0, 60);
-            }
-            if (random < 0.3) {
-                Particle.SMOKE_NORMAL.builder()
-                        .location(player.getLocation())
-                        .receivers(30)
-                        .offset(0, 0.2, 0)
-                        .count(5)
-                        .extra(0)
-                        .spawn();
             }
         }
-
     }
-
 }
