@@ -131,7 +131,7 @@ public class Sever extends Skill implements CooldownSkill, Listener {
 
     @Override
     public double getCooldown(int level) {
-        return cooldown - cooldownDecreasePerLevel;
+        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
     @Override
