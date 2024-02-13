@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.clans.weapons.impl.cannon;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.weapons.impl.cannon.event.CannonPlaceEvent;
 import me.mykindos.betterpvp.clans.weapons.impl.cannon.event.PreCannonPlaceEvent;
 import me.mykindos.betterpvp.clans.weapons.impl.cannon.model.Cannon;
@@ -31,8 +32,8 @@ public class CannonWeapon extends Weapon implements InteractWeapon, CooldownWeap
     private final Map<UUID, Location> cannonLocations = new HashMap<>();
 
     @Inject
-    public CannonWeapon(CannonManager cannonManager) {
-        super("clans", "cannon");
+    public CannonWeapon(Clans clans,  CannonManager cannonManager) {
+        super(clans, "cannon", "clans");
         this.cannonManager = cannonManager;
     }
 

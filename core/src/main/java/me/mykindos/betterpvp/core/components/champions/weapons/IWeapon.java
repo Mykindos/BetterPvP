@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.components.champions.weapons;
 
+import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -15,6 +16,16 @@ public interface IWeapon {
     List<Component> getLore(ItemStack item);
     boolean isHoldingWeapon(Player player);
 
+    boolean isEnabled();
+
+    String getSimpleName();
+
+    void loadConfig(BPvPPlugin plugin);
+
     boolean matches(ItemStack itemStack);
+
+    default String getConfigName() {
+        return "weapons/standard";
+    }
 
 }
