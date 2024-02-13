@@ -26,4 +26,9 @@ public class ChampionsWeaponManager {
         new Reflections(getClass().getPackageName()).getSubTypesOf(Weapon.class).forEach(clazz -> weaponManager.load(champions, adapters, clazz));
     }
 
+    public void reload() {
+        weaponManager.reload(champions);
+    }
+
+
 }

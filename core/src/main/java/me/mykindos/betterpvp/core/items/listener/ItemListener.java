@@ -3,7 +3,7 @@ package me.mykindos.betterpvp.core.items.listener;
 import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageDurabilityEvent;
-import me.mykindos.betterpvp.core.items.BPVPItem;
+import me.mykindos.betterpvp.core.items.BPvPItem;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.entity.Player;
@@ -59,7 +59,7 @@ public class ItemListener implements Listener {
      * @return true if the damage was processed (it was a custom item with durability), false if not
      */
     public boolean damageCustomItem(Player player, ItemStack itemStack, int damage) {
-        BPVPItem item = itemHandler.getItem(itemStack);
+        BPvPItem item = itemHandler.getItem(itemStack);
         if (item != null && item.getMaxDurability() >= 0) {
             item.damageItem(player, itemStack, damage);
             return true;

@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.weapons.impl.legendaries;
 import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -11,7 +12,6 @@ import me.mykindos.betterpvp.core.combat.weapon.types.ChannelWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.InteractWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseItemEvent;
-import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.energy.EnergyHandler;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
@@ -49,33 +49,14 @@ import java.util.List;
 public class MagneticMaul extends ChannelWeapon implements InteractWeapon, LegendaryWeapon, Listener {
 
     private static final String ABILITY_NAME = "Magnetism";
-
-    @Inject
-    @Config(path = "weapons.magnetic-maul.energy-per-tick", defaultValue = "1.0", configName = "weapons/legendaries")
-    private double energyPerTick;
-
-    @Inject
-    @Config(path = "weapons.magnetic-maul.initial-energy-cost", defaultValue = "10.0", configName = "weapons/legendaries")
-    private double initialEnergyCost;
-
-    @Inject
-    @Config(path = "weapons.magnetic-maul.base-damage", defaultValue = "8.0", configName = "weapons/legendaries")
-    private double baseDamage;
-
-    @Inject
-    @Config(path = "weapons.magnetic-maul.pull-range", defaultValue = "10.0", configName = "weapons/legendaries")
     private double pullRange;
-
-    @Inject
-    @Config(path = "weapons.magnetic-maul.pull-fov", defaultValue = "80.3", configName = "weapons/legendaries")
     private double pullFov;
-
     private final EnergyHandler energyHandler;
     private final ClientManager clientManager;
 
     @Inject
-    public MagneticMaul(EnergyHandler energyHandler, ClientManager clientManager) {
-        super("magnetic_maul");
+    public MagneticMaul(Champions champions, EnergyHandler energyHandler, ClientManager clientManager) {
+        super(champions, "magnetic_maul");
         this.energyHandler = energyHandler;
         this.clientManager = clientManager;
     }
@@ -106,6 +87,9 @@ public class MagneticMaul extends ChannelWeapon implements InteractWeapon, Legen
 
     @UpdateEvent
     public void doMaul() {
+        if (!enabled) {
+           return;
+        }
         active.removeIf(uuid -> {
             Player player = Bukkit.getPlayer(uuid);
             if (player == null) return true;
@@ -222,6 +206,9 @@ public class MagneticMaul extends ChannelWeapon implements InteractWeapon, Legen
 
     @EventHandler(priority = EventPriority.LOW)
     public void onDamage(CustomDamageEvent event) {
+        if (!enabled) {
+            return;
+        }
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
         if (!(event.getDamager() instanceof Player damager)) return;
         if (isHoldingWeapon(damager)) {
@@ -232,6 +219,9 @@ public class MagneticMaul extends ChannelWeapon implements InteractWeapon, Legen
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onKB(CustomKnockbackEvent event) {
+        if (!enabled) {
+            return;
+        }
         if (!(event.getDamager() instanceof Player damager)) {
             return;
         }
@@ -252,4 +242,9 @@ public class MagneticMaul extends ChannelWeapon implements InteractWeapon, Legen
         return initialEnergyCost;
     }
 
+    @Override
+    public void loadWeaponConfig() {
+        pullRange = getConfig("pullRange", 10.0, Double.class);
+        pullFov = getConfig("pullFov", 80.3, Double.class);
+    }
 }

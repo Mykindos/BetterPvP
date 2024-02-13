@@ -2,21 +2,20 @@ package me.mykindos.betterpvp.champions.weapons.impl;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableItem;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableListener;
 import me.mykindos.betterpvp.core.combat.weapon.Weapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.CooldownWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.InteractWeapon;
-import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
-import me.mykindos.betterpvp.core.items.BPVPItem;
+import me.mykindos.betterpvp.core.items.BPvPItem;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -39,26 +38,15 @@ import java.util.UUID;
 @BPvPListener
 public class ThrowingWeb extends Weapon implements Listener, InteractWeapon, CooldownWeapon, ThrowableListener {
 
-    @Inject
-    @Config(path = "weapons.throwing-web.cooldown", defaultValue = "10.0", configName = "weapons/standard")
-    private double cooldown;
-
-    @Inject
-    @Config(path = "weapons.throwing-web.duration", defaultValue = "2.5", configName = "weapons/standard")
     private double duration;
-
-    @Inject
-    @Config(path = "weapons.throwing-web.throwable-expiry", defaultValue = "10.0", configName = "weapons/standard")
     private double throwableExpiry;
-
     private final ChampionsManager championsManager;
     private final WorldBlockHandler blockHandler;
-
     private final CooldownManager cooldownManager;
 
     @Inject
-    public ThrowingWeb(ChampionsManager championsManager, WorldBlockHandler blockHandler, CooldownManager cooldownManager) {
-        super("throwing_web");
+    public ThrowingWeb(Champions champions, ChampionsManager championsManager, WorldBlockHandler blockHandler, CooldownManager cooldownManager) {
+        super(champions, "throwing_web");
 
         this.championsManager = championsManager;
         this.blockHandler = blockHandler;
@@ -67,7 +55,7 @@ public class ThrowingWeb extends Weapon implements Listener, InteractWeapon, Coo
     }
 
     @Override
-    public void loadWeapon(BPVPItem item) {
+    public void loadWeapon(BPvPItem item) {
         super.loadWeapon(item);
         ShapedRecipe shapedRecipe = getShapedRecipe("*S*", "SSS", "*S*");
         shapedRecipe.setIngredient('*', Material.AIR);
@@ -81,7 +69,7 @@ public class ThrowingWeb extends Weapon implements Listener, InteractWeapon, Coo
         item.getItemStack().getItemMeta().getPersistentDataContainer().set(CoreNamespaceKeys.UUID_KEY, PersistentDataType.STRING, UUID.randomUUID().toString());
         item.setVelocity(player.getLocation().getDirection().multiply(1.8));
 
-        ThrowableItem throwableItem = new ThrowableItem(this, item, player, "Throwing Web", (long) (throwableExpiry * 1000L), true);
+        ThrowableItem throwableItem = new ThrowableItem(this, item, player, getSimpleName(), (long) (throwableExpiry * 1000L), true);
         throwableItem.setCollideGround(true);
         throwableItem.getImmunes().add(player);
         championsManager.getThrowables().addThrowable(throwableItem);
@@ -91,9 +79,11 @@ public class ThrowingWeb extends Weapon implements Listener, InteractWeapon, Coo
 
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
+        if (!enabled) {
+            return;
+        }
         if (event.useItemInHand() != Event.Result.DENY && event.getAction().isLeftClick() && matches(event.getItem())) {
-            String name = PlainTextComponentSerializer.plainText().serialize(getName());
-            if (cooldownManager.use(event.getPlayer(), name, getCooldown(), showCooldownFinished(), true, false, x -> isHoldingWeapon(event.getPlayer()), 1001)) {
+            if (cooldownManager.use(event.getPlayer(), getSimpleName(), getCooldown(), showCooldownFinished(), true, false, x -> isHoldingWeapon(event.getPlayer()), 1001)) {
                 activate(event.getPlayer()); // also activate on left click
             }
         }
@@ -134,5 +124,9 @@ public class ThrowingWeb extends Weapon implements Listener, InteractWeapon, Coo
         return cooldown;
     }
 
-
+    @Override
+    public void loadWeaponConfig() {
+        duration = getConfig("duration", 2.5, Double.class);
+        throwableExpiry = getConfig("throwableExpiry", 10.0, Double.class);
+    }
 }

@@ -1,6 +1,8 @@
 package me.mykindos.betterpvp.champions.weapons.impl.legendaries;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.combat.weapon.Weapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -16,9 +18,9 @@ import java.util.List;
 @Singleton
 @BPvPListener
 public class WingsOfZanzul extends Weapon implements LegendaryWeapon, Listener {
-
-    public WingsOfZanzul() {
-        super("wings_of_zanzul");
+    @Inject
+    public WingsOfZanzul(Champions champions) {
+        super(champions, "wings_of_zanzul");
     }
 
     @EventHandler
