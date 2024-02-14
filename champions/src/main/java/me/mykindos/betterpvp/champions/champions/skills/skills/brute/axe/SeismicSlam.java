@@ -20,6 +20,7 @@ import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
@@ -125,7 +126,7 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
             Map.Entry<UUID, Boolean> entry = fallIterator.next();
             Player player = Bukkit.getPlayer(entry.getKey());
             if (player != null && (UtilBlock.isGrounded(player) || player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType().isSolid())) {
-                Bukkit.getScheduler().runTaskLater(champions, () -> {
+                UtilServer.runTaskLater(champions, () -> {
                     if (canTakeFall.containsKey(player.getUniqueId())) {
                         canTakeFall.remove(player.getUniqueId());
                     }
@@ -133,6 +134,8 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
             }
         }
     }
+
+
 
     @EventHandler
     public void reduceFallDamage(CustomDamageEvent event) {

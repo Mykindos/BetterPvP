@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
@@ -178,12 +179,12 @@ public class RopedArrow extends PrepareArrowSkill {
 
     @UpdateEvent
     public void onUpdate() {
-        Iterator<Map.Entry<UUID, Boolean>> iterator = canTakeFall.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<UUID, Boolean> entry = iterator.next();
+        Iterator<Map.Entry<UUID, Boolean>> fallIterator = canTakeFall.entrySet().iterator();
+        while (fallIterator.hasNext()) {
+            Map.Entry<UUID, Boolean> entry = fallIterator.next();
             Player player = Bukkit.getPlayer(entry.getKey());
             if (player != null && (UtilBlock.isGrounded(player) || player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType().isSolid())) {
-                Bukkit.getScheduler().runTaskLater(champions, () -> {
+                UtilServer.runTaskLater(champions, () -> {
                     if (canTakeFall.containsKey(player.getUniqueId())) {
                         canTakeFall.remove(player.getUniqueId());
                     }
