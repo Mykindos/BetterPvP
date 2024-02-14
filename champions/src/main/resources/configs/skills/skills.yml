@@ -17,6 +17,7 @@ skills:
       cooldownDecreasePerLevel: 1.0
       baseDuration: 0.0
       durationIncreasePerLevel: 1.0
+      hitDistance: 4.0
     shockingstrikes:
       enabled: true
       maxlevel: 3
@@ -273,6 +274,7 @@ skills:
       baseDuration: 0.0
       durationIncreasePerLevel: 0.5
       slowStrength: 2
+      hitDistance: 4.0
   mage:
     staticlazer:
       enabled: true
