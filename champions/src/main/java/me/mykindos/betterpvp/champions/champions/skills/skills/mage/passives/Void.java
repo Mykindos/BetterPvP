@@ -51,7 +51,7 @@ public class Void extends ActiveToggleSkill implements EnergySkill {
                 "<effect>Slownesss " + UtilFormat.getRomanNumeral(slownessStrength + 1) + "</effect>, and take no knockback",
                 "",
                 "Every point of damage you take will be",
-                "reduced by <val" + getDamageReduction(level) + "</val> and drain <val>" + getEnergyReduction(level) + "</val> energy",
+                "reduced by <val>" + getDamageReduction(level) + "</val> and drain <val>" + getEnergyReduction(level) + "</val> energy",
                 "",
                 "Energy / Second: <val>" + getEnergy(level)
         };
