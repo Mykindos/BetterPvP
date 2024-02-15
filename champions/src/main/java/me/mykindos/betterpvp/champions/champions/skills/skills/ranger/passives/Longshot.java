@@ -114,7 +114,7 @@ public class Longshot extends Skill implements PassiveSkill {
 
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.LOW)
     public void onDamage(CustomDamageEvent event) {
         if(!(event.getProjectile() instanceof Arrow arrow)) return;
         if(!(event.getDamager() instanceof Player damager)) return;
