@@ -167,13 +167,13 @@ public class ClientSQLLayer {
         ConcurrentHashMap<String, Statement> statements = new ConcurrentHashMap<>(queuedSharedStatUpdates);
         queuedSharedStatUpdates.clear();
         sharedDatabase.executeBatch(statements.values().stream().toList(), async);
+        log.info("Updated client stats with {} queries", statements.size());
 
         // Gamer
         statements = new ConcurrentHashMap<>(queuedStatUpdates);
         queuedStatUpdates.clear();
         database.executeBatch(statements.values().stream().toList(), async);
-
-        log.info("Updated client and gamer stats with {} queries", statements.size());
+        log.info("Updated gamer stats with {} queries", statements.size());
     }
 
 

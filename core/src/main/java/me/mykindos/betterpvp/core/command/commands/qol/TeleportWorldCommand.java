@@ -37,7 +37,7 @@ public class TeleportWorldCommand extends Command {
             World world = Bukkit.getWorld(args[0]);
             if (world == null) {
                 UtilMessage.message(player, "Teleport", "World does not exist, creating it...");
-                WorldCreator worldCreator = new WorldCreator(args[0]);
+                WorldCreator worldCreator = new WorldCreator(args[0]).generateStructures(false);
                 if (args.length > 1) {
                     if (args[1].equalsIgnoreCase("void")) {
                         worldCreator.generator(new VoidWorldGenerator());

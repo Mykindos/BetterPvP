@@ -127,7 +127,7 @@ public class Recall extends Skill implements CooldownToggleSkill, Listener {
 
         // Teleport Logic
         Location teleportLocation = markers.getLast();
-        player.teleportAsync(teleportLocation);
+        player.teleportAsync(teleportLocation).thenAccept(result -> player.setFallDistance(0));
 
         // Heal Logic
         double heal = UtilPlayer.getMaxHealth(player) * percentHealthRecovered;
