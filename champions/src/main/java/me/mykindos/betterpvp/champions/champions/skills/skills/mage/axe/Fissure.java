@@ -75,7 +75,7 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
                 "Players struck by wall will receive",
                 "<effect>Slowness "+ UtilFormat.getRomanNumeral(slownessLevel + 1) + "</effect> for <val>" + getSlowDuration(level) + "</val> seconds and take",
                 "<val>" + getDamage(level) + "</val> damage for every block fissure",
-                "fissure has travelled",
+                "has travelled",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
