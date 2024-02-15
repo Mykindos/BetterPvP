@@ -138,8 +138,7 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
         player.leaveVehicle();
         teleportLocation = UtilLocation.shiftOutOfBlocks(teleportLocation, player.getBoundingBox());
 
-        Particle.GUST.builder().location(player.getLocation()).count(1).receivers(30).extra(0).spawn();
-        Particle.GUST.builder().location(teleportLocation).count(1).receivers(30).extra(0).spawn();
+        Particle.SWEEP_ATTACK.builder().location(teleportLocation).count(1).receivers(30).extra(0).spawn();
 
         final Location lineStart = player.getLocation().add(0.0, player.getHeight() / 2, 0.0);
         final Location lineEnd = teleportLocation.clone().add(0.0, player.getHeight() / 2, 0.0);
