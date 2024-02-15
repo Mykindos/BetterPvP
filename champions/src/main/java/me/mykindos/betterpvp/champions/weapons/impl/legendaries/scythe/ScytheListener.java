@@ -44,7 +44,7 @@ public class ScytheListener implements Listener {
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
         if (!(event.getDamager() instanceof Player damager)) return;
         if (scythe.isHoldingWeapon(damager)) {
-            event.setDamage(scythe.baseDamage);
+            event.setDamage(scythe.getBaseDamage());
             UtilPlayer.health(damager, scythe.healPerHit);
         }
     }
