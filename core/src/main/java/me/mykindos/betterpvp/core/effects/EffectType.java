@@ -20,6 +20,7 @@ public enum EffectType {
     FRAILTY(true),
     TEXTURELOADING(false),
     IMMUNETOEFFECTS(false),
+    CONFUSION(true),
     LEVITATION(true),
     NO_JUMP(false),
     NO_SPRINT(false),

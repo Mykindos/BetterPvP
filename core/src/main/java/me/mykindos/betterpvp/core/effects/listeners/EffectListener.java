@@ -15,6 +15,8 @@ import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -77,7 +79,7 @@ public class EffectListener implements Listener {
             } else if (effect.getEffectType() == EffectType.SILENCE) {
                 target.getWorld().playSound(target.getLocation(), Sound.ENTITY_BAT_AMBIENT, 2.0F, 1.0F);
                 UtilMessage.simpleMessage(target, "Silence", "You have been silenced for <alt>%s</alt> seconds.", effect.getRawLength() / 1000d);
-            } else if (effect.getEffectType() == EffectType.VULNERABILITY) {
+            }else if (effect.getEffectType() == EffectType.VULNERABILITY) {
                 target.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, (int) ((effect.getRawLength() / 1000d) * 20), 0));
             } else if (effect.getEffectType() == EffectType.LEVITATION) {
                 target.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, (int) ((effect.getRawLength() / 1000d) * 20), effect.getLevel()));
@@ -113,6 +115,47 @@ public class EffectListener implements Listener {
             }
             return false;
         });
+    }
+
+    @UpdateEvent(delay = 300)
+    public void playStepSoundsForConfusedPlayers() {
+        Bukkit.getOnlinePlayers().forEach(player -> {
+            if (effectManager.hasEffect(player, EffectType.CONFUSION)) {
+                int dx = (int) (Math.random() * 11) - 5;
+                int dz = (int) (Math.random() * 11) - 5;
+
+                Location loc = player.getLocation().add(dx, 0, dz);
+                loc.setY(loc.getWorld().getHighestBlockYAt(loc) - 1);
+
+                Material blockType = loc.getBlock().getType();
+
+                if (!blockType.equals(Material.AIR)) {
+                    playStepSoundForBlock(loc, player);
+                }
+            }
+        });
+    }
+
+
+    private void playStepSoundForBlock(Location loc, Player player) {
+        Material blockType = loc.getBlock().getType();
+        Sound soundToPlay = getStepSoundForBlock(blockType);
+
+        if (soundToPlay != null) {
+            player.getWorld().playSound(loc, soundToPlay, 0.6f, 1.0f);
+        }
+    }
+
+    private Sound getStepSoundForBlock(Material blockType) {
+        String blockTypeName = blockType.name();
+
+        if (blockTypeName.contains("STONE")) {
+            return Sound.BLOCK_STONE_STEP;
+        } else if (blockTypeName.contains("SAND")) {
+            return Sound.BLOCK_SAND_STEP;
+        } else {
+            return Sound.BLOCK_GRASS_STEP;
+        }
     }
 
     @EventHandler
