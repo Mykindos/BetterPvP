@@ -153,6 +153,7 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
                 target.setPitch(currentPitch);
 
                 player.teleport(target);
+                player.setFallDistance(0);
                 player.getWorld().playEffect(player.getLocation(), Effect.BLAZE_SHOOT, 0);
             }
         }, 1);

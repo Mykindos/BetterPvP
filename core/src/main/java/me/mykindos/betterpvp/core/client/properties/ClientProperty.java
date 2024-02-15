@@ -13,6 +13,7 @@ public enum ClientProperty {
     COOLDOWN_DISPLAY,
     CHAT_ENABLED,
     LUNAR,
-    LAST_MESSAGED
+    LAST_MESSAGED,
+    TIME_PLAYED
 
 }
