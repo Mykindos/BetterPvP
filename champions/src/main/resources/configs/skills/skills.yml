@@ -432,7 +432,7 @@ skills:
     void:
       enabled: true
       maxlevel: 3
-      energy: 30
+      energy: 40
       baseDamageReduction: 2.0
       damageReductionIncreasePerLevel: 0.2
       baseEnergyReduction: 3.0
