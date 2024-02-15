@@ -104,7 +104,6 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener {
     public void toggle(Player player, int level) {
         // Effects
         championsManager.getEffects().addEffect(player, EffectType.INVISIBILITY, (long) (getDuration(level) * 1000L));
-        player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, (int)(getDuration(level) * 20), 0));
         smoked.put(player.getUniqueId(), System.currentTimeMillis());
         for (Player target : UtilPlayer.getNearbyEnemies(player, player.getLocation(), blindRadius)) {
             target.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, (int) (blindDuration * 20), 0));
