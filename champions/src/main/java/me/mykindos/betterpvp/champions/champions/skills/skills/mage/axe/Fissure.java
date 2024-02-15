@@ -222,13 +222,16 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
                 }
 
                 Block blockToPlace = baseBlock.getRelative(BlockFace.UP, currentHeight);
-                Material materialToSet = determineMaterialToSet(baseBlock, currentHeight, totalHeight);
-                blockToPlace.setType(materialToSet, false);
-                player.getWorld().playEffect(blockToPlace.getLocation(), Effect.STEP_SOUND, materialToSet);
 
-                checkForEntityCollisions(blockToPlace, currentIndex, player);
+                if (UtilBlock.airFoliage(blockToPlace)) {
+                    Material materialToSet = determineMaterialToSet(baseBlock, currentHeight, totalHeight);
+                    blockToPlace.setType(materialToSet, false);
+                    player.getWorld().playEffect(blockToPlace.getLocation(), Effect.STEP_SOUND, materialToSet);
 
-                playerCreatedBlocks.computeIfAbsent(player, k -> new HashSet<>()).add(blockToPlace);
+                    checkForEntityCollisions(blockToPlace, currentIndex, player);
+
+                    playerCreatedBlocks.computeIfAbsent(player, k -> new HashSet<>()).add(blockToPlace);
+                }
 
                 if (currentHeight >= totalHeight) {
                     prepareForNextColumn();
