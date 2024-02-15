@@ -48,6 +48,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
     public double duration;
     public int forcedDamageDelay;
     public double internalCooldown;
+    public double internalCooldownDecreasePerLevel;
 
     @Inject
     private CooldownManager cooldownManager;
@@ -70,8 +71,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
                 "",
                 "If a player hits you while Evading, you",
                 "will teleport behind the attacker and your",
-                "cooldown will be set between <stat>" + internalCooldown + "</stat> and <stat>" + (internalCooldown + duration) + "</stat>",
-                "seconds, based on the duration you held it for",
+                "cooldown will be set to a minimum of  <val>" + getInternalCooldown(level) + "</val> seconds ",
                 "",
                 "Hold crouch while Evading to teleport backwards",
                 "",
@@ -86,8 +86,11 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
 
     @Override
     public SkillType getType() {
-
         return SkillType.SWORD;
+    }
+
+    public double getInternalCooldown(int level){
+        return internalCooldown - ((level - 1) * internalCooldownDecreasePerLevel);
     }
 
 
@@ -119,9 +122,11 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
             player.teleport(target);
             cooldownManager.removeCooldown(player, getName(), true);
 
+            int level = getLevel(player);
+
             long channelTime = System.currentTimeMillis() - handRaisedTime.get(player.getUniqueId());
             double channelTimeInSeconds = channelTime / 1000.0;
-            double newCooldown = internalCooldown + channelTimeInSeconds;
+            double newCooldown = getInternalCooldown(level) + channelTimeInSeconds;
 
             cooldownManager.use(player, getName(), newCooldown, true);
             handRaisedTime.remove(player.getUniqueId());
@@ -312,6 +317,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
     public void loadSkillConfig() {
         duration = getConfig("duration", 1.25, Double.class);
         forcedDamageDelay = getConfig("forcedDamageDelay", 400, Integer.class);
-        internalCooldown = getConfig("internalCooldown", 0.5, Double.class);
+        internalCooldown = getConfig("internalCooldown", 0.6, Double.class);
+        internalCooldownDecreasePerLevel = getConfig("internalCooldownDecreasePerLevel", 0.1, Double.class);
     }
 }

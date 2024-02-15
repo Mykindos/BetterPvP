@@ -139,7 +139,8 @@ skills:
       duration: 1.25
       forcedDamageDelay: 400
       cooldownDecreasePerLevel: 1.0
-      internalCooldown: 0.5
+      internalCooldown: 0.6
+      internalCooldownDecreasePerLevel: 0.1
   knight:
     shieldsmash:
       enabled: true
