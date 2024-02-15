@@ -58,11 +58,11 @@ public class Void extends ActiveToggleSkill implements EnergySkill {
     }
 
     public double getDamageReduction(int level) {
-        return baseDamageReduction + level * damageReductionIncreasePerLevel;
+        return baseDamageReduction + ((level - 1) * damageReductionIncreasePerLevel);
     }
 
     public double getEnergyReduction(int level) {
-        return baseEnergyReduction - level * energyReductionDecreasePerLevel;
+        return baseEnergyReduction - ((level - 1) * energyReductionDecreasePerLevel);
     }
 
     @Override
