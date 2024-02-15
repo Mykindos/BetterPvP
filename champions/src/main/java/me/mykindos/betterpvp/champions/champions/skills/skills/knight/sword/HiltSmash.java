@@ -44,6 +44,7 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener {
     private double baseDuration;
     private double durationIncreasePerLevel;
     private int slowStrength;
+    private double hitDistance;
 
     @Inject
     public HiltSmash(Champions champions, ChampionsManager championsManager) {
@@ -117,33 +118,30 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener {
 
         int level = getLevel(player);
         if (level <= 0) {
-            return; // Skill not active
+            return;
         }
 
-        final PlayerUseSkillEvent event = UtilServer.callEvent(new PlayerUseSkillEvent(player, this, level));
-        if (event.isCancelled()) {
-            return; // Skill was cancelled
+        final PlayerUseSkillEvent skillEvent = UtilServer.callEvent(new PlayerUseSkillEvent(player, this, level));
+        if (skillEvent.isCancelled()) {
+            return;
         }
 
-        if(ent == null) return;
+        boolean withinRange = ent != null && UtilMath.offset(player, ent) <= hitDistance;
+        boolean isFriendly = false;
 
-        if (UtilMath.offset(player, ent) <= 3.0) {
-            if (ent instanceof Player damagee) {
-                if (UtilPlayer.getRelation(player, damagee) == EntityProperty.FRIENDLY) {
-                    return;
-                }
-            }
+        if (ent instanceof Player damagee) {
+            isFriendly = UtilPlayer.getRelation(player, damagee) == EntityProperty.FRIENDLY;
+        }
+
+        if (ent == null || !withinRange || isFriendly) {
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s %d</green>.", getName(), level);
+        } else {
             UtilMessage.simpleMessage(ent, getClassType().getName(), "<yellow>%s<gray> hit you with <green>%s %d<gray>.", player.getName(), getName(), level);
             ent.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) (getDuration(level) * 20), slowStrength));
             UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <yellow>%s<gray> with <green>%s %d<gray>.", ent.getName(), getName(), level);
             UtilDamage.doCustomDamage(new CustomDamageEvent(ent, player, null, DamageCause.ENTITY_ATTACK, getDamage(level), false, getName()));
-            ent.getWorld().playSound(ent.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1.0F, 1.2F);
-        } else {
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s %d</green>.", getName(), level);
-            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_IRON_GOLEM_ATTACK, 2.0f, 1.3f);
         }
-        ent.getWorld().playSound(ent.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1.0F, 1.2F);
-
+        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 1.0F, 1.2F);
     }
 
     @Override
@@ -158,5 +156,6 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener {
         baseDuration = getConfig("baseDuration", 0.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
         slowStrength = getConfig("slowStrength", 2, Integer.class);
+        hitDistance = getConfig("hitDistance", 4.0, Double.class);
     }
 }

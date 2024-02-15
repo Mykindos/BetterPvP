@@ -5,11 +5,13 @@ import me.mykindos.betterpvp.core.framework.customtypes.CustomArmourStand;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
+import me.mykindos.betterpvp.core.utilities.model.EntityRemovalReason;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.craftbukkit.v1_20_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_20_R3.entity.CraftEntity;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
@@ -22,11 +24,28 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
 public class UtilEntity {
+
+    public static boolean isRemoved(@NotNull Entity entity) {
+        return ((CraftEntity) entity).getHandle().isRemoved();
+    }
+
+    public static EntityRemovalReason getRemovalReason(@NotNull Entity entity) {
+        final net.minecraft.world.entity.Entity handle = ((CraftEntity) entity).getHandle();
+        Preconditions.checkArgument(handle.isRemoved(), "Entity must be removed");
+        return switch(Objects.requireNonNull(handle.getRemovalReason())) {
+            case KILLED -> EntityRemovalReason.KILLED;
+            case DISCARDED -> EntityRemovalReason.DISCARDED;
+            case UNLOADED_TO_CHUNK -> EntityRemovalReason.UNLOADED_TO_CHUNK;
+            case UNLOADED_WITH_PLAYER -> EntityRemovalReason.UNLOADED_TO_PLAYER;
+            case CHANGED_DIMENSION -> EntityRemovalReason.DIMENSION_CHANGED;
+        };
+    }
 
     public static final BiPredicate<Player, Entity> IS_ENEMY = (player, entity) -> {
         if (!(entity instanceof LivingEntity) || entity.equals(player)) {

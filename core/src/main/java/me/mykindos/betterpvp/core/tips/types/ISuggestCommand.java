@@ -1,14 +1,14 @@
-package me.mykindos.betterpvp.clans.tips.types;
+package me.mykindos.betterpvp.core.tips.types;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 
-public interface IRunCommand {
-    default Component runCommand(String command) {
+public interface ISuggestCommand {
+    default Component suggestCommand(String command, String suggestCommand) {
         return Component.text(command, NamedTextColor.YELLOW)
-                .clickEvent(ClickEvent.runCommand(command))
+                .clickEvent(ClickEvent.suggestCommand(suggestCommand))
                 .hoverEvent(HoverEvent.showText(Component.text(command)));
     }
 }

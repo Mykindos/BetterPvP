@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
+import me.mykindos.betterpvp.core.combat.weapon.WeaponManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.IConsoleCommand;
 import me.mykindos.betterpvp.core.command.SubCommand;
@@ -63,6 +64,9 @@ public class CoreCommand extends Command implements IConsoleCommand {
         @Inject
         private ResourcePackHandler resourcePackHandler;
 
+        @Inject
+        private WeaponManager weaponManager;
+
         @Override
         public String getName() {
             return "reload";
@@ -82,8 +86,9 @@ public class CoreCommand extends Command implements IConsoleCommand {
         public void execute(CommandSender sender, String[] args) {
             core.reload();
             commandLoader.reload(core.getClass().getPackageName());
-            tipManager.reloadTips();
+            tipManager.reloadTips(core);
             resourcePackHandler.reload();
+            weaponManager.reload(core);
 
             UtilMessage.message(sender, "Core", "Successfully reloaded core");
         }

@@ -1,0 +1,4 @@
+handheld_cannon:
+  enabled: false
+  cooldown: 25.0
+  velocity: 2.5
