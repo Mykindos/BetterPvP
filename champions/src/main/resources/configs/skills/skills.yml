@@ -134,7 +134,7 @@ skills:
       durationIncreasePerLevel: 1.0
     evade:
       enabled: true
-      maxlevel: 5
+      maxlevel: 3
       cooldown: 15.0
       duration: 1.25
       forcedDamageDelay: 400
