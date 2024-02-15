@@ -25,7 +25,6 @@ public class Scythe extends Weapon implements InteractWeapon, CooldownWeapon, Le
 
     protected final WeakHashMap<Player, List<BlackHole>> blackHoles = new WeakHashMap<>();
 
-    protected double baseDamage;
     protected double healPerHit;
     protected double blackHoleRadius;
     protected double blackHoleSpeed;
