@@ -131,6 +131,7 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener {
 
     private void reappear(Player player) {
         championsManager.getEffects().removeEffect(player, EffectType.INVISIBILITY);
+        player.removePotionEffect(PotionEffectType.INVISIBILITY);
         UtilServer.callEvent(new EffectExpireEvent(player, new Effect(player.getUniqueId().toString(), EffectType.INVISIBILITY, 1, 0))); // Do this incase
         UtilMessage.message(player, getClassType().getName(), "You have reappeared.");
     }
