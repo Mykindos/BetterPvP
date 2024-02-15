@@ -82,7 +82,7 @@ public class EffectListener implements Listener {
             }else if (effect.getEffectType() == EffectType.VULNERABILITY) {
                 target.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, (int) ((effect.getRawLength() / 1000d) * 20), 0));
             }else if(effect.getEffectType() == EffectType.INVISIBILITY){
-                target.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, (int)((effect.getRawLength() / 1000d) * 20), 0, true));
+                target.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, (int)((effect.getRawLength() / 1000d) * 20), 0, true, true));
             }else if (effect.getEffectType() == EffectType.LEVITATION) {
                 target.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, (int) ((effect.getRawLength() / 1000d) * 20), effect.getLevel()));
             } else if (effect.getEffectType() == EffectType.POISON) {
