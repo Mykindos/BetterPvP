@@ -405,16 +405,6 @@ skills:
     moltenshield:
       enabled: true
       maxlevel: 1
-    defensiveaura:
-      enabled: true
-      maxlevel: 5
-      cooldown: 30.0
-      duration: 10.0
-      cooldownDecreasePerLevel: 2.0
-      baseDuration: 10.0
-      durationIncreasePerLevel: 0.0
-      baseRadius: 6.0
-      radiusIncreasePerLevel: 1.0
     blizzard:
       enabled: true
       maxlevel: 5
