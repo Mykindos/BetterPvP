@@ -74,7 +74,7 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
                 "",
                 "Players struck by wall will receive",
                 "<effect>Slowness "+ UtilFormat.getRomanNumeral(slownessLevel + 1) + "</effect> for <val>" + getSlowDuration(level) + "</val> seconds and take",
-                "<val>" + getDamage(level) + "</val> damage for every block fissure",
+                "<val>" + (Math.round(getDamage(level) * 10) / 10.0) + "</val> damage for every block fissure",
                 "has travelled",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
@@ -158,9 +158,21 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
                 Block checkBlock = currentLocation.getWorld().getBlockAt(currentLocation.getBlockX(), currY, currentLocation.getBlockZ());
 
                 if (!UtilBlock.airFoliage(checkBlock) && UtilBlock.airFoliage(checkBlock.getRelative(BlockFace.UP))) {
-                    pathBlocks.add(checkBlock);
                     suitableBlockFound = true;
                     lastSuitableY = checkBlock.getY();
+                    boolean isBlockAlreadyAdded = false;
+                    for (Block block : pathBlocks) {
+                        if (block.getLocation().equals(checkBlock.getLocation())) {
+                            isBlockAlreadyAdded = true;
+                            break;
+                        }
+                    }
+                    if (!isBlockAlreadyAdded) {
+                        pathBlocks.add(checkBlock);
+                    } else {
+                        i--;
+                        break;
+                    }
                 } else if (!UtilBlock.airFoliage(checkBlock) && !UtilBlock.airFoliage(checkBlock.getRelative(BlockFace.UP))) {
                     currY++;
                     if (lastSuitableY - currY > (height + 1)) {
