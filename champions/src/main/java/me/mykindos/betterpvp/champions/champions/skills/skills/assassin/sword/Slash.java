@@ -12,10 +12,14 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilLocation;
+import me.mykindos.betterpvp.core.utilities.UtilPlayer;
+import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.math.VectorLine;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -36,6 +40,7 @@ import org.bukkit.util.Vector;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.Arrays;
+import java.util.List;
 
 @Singleton
 @BPvPListener
@@ -87,17 +92,18 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
             final Vector increment = direction.clone().multiply(0.2 * i);
             final Location checkLocation = originalLocation.clone().add(increment);
 
-            for (Entity entity : player.getWorld().getNearbyEntities(checkLocation, 0.5, 0.5, 0.5)) {
-                if (entity != player) {
-                    LivingEntity target = (LivingEntity) entity;
 
-                    CustomDamageEvent cde = new CustomDamageEvent(target, player, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, "Slash");
-                    UtilDamage.doCustomDamage(cde);
-                    target.getWorld().playSound(target.getLocation().add(0, 1, 0), Sound.ENTITY_PLAYER_HURT, 0.2f, 2f);
-                    target.getWorld().playSound(target.getLocation().add(0, 1, 0), Sound.ITEM_TRIDENT_HIT, 0.2f, 1.5f);
+            List<KeyValue<LivingEntity, EntityProperty>> nearbyEntities = UtilEntity.getNearbyEntities(player, checkLocation, 1, EntityProperty.ENEMY);
+            for (KeyValue<LivingEntity, EntityProperty> keyValue : nearbyEntities) {
+                LivingEntity entity = keyValue.getKey();
 
-                    break;
-                }
+                CustomDamageEvent cde = new CustomDamageEvent(entity, player, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, "Slash");
+                UtilDamage.doCustomDamage(cde);
+                cde.setDamageDelay(0);
+                entity.getWorld().playSound(entity.getLocation().add(0, 1, 0), Sound.ENTITY_PLAYER_HURT, 0.2f, 2f);
+                entity.getWorld().playSound(entity.getLocation().add(0, 1, 0), Sound.ITEM_TRIDENT_HIT, 0.2f, 1.5f);
+
+                break;
             }
 
             BoundingBox relativeBoundingBox = UtilLocation.copyAABBToLocation(player.getBoundingBox(), checkLocation);
@@ -155,7 +161,6 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
     @EventHandler(priority = EventPriority.HIGH)
     public void onHit(CustomDamageEvent event) {
         if (!(event.getDamager() instanceof Player player)) return;
-        if (!(event.getDamagee() instanceof Player)) return;
         if (event.isCancelled()) return;
 
         boolean isEntityAttack = event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK;
