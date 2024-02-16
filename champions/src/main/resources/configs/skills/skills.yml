@@ -429,7 +429,7 @@ skills:
       maxlevel: 3
       cooldown: 2.5
       cooldownDecreasePerLevel: 1.0
-      damage: 2.5
+      damage: 1.5
       damageIncreasePerLevel: 1.0
     void:
       enabled: true

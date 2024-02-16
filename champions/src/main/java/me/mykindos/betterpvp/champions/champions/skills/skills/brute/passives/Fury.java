@@ -59,7 +59,7 @@ public class Fury extends Skill implements PassiveSkill, Listener {
     }
 
     public double getDamage(int level) {
-        return baseDamage + level * damageIncreasePerLevel;
+        return baseDamage + ((level - 1) * damageIncreasePerLevel);
     }
 
     public double getMaxDamage(int level) {
