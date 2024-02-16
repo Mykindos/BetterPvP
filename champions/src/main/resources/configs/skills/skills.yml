@@ -743,7 +743,7 @@ skills:
       maxlevel: 5
       cooldown: 12.0
       baseSlowDuration: 2.0
-      cooldownDecreasePerLevel: 0.0
+      cooldownDecreasePerLevel: 1.0
       slowDurationIncreasePerLevel: 1.0
       baseChannelDuration: 1.0
       channelDurationincreasePerLevel: 0.0
