@@ -456,6 +456,12 @@ skills:
       effectDuration: 1
       slownessLevel: 1
       effectDurationIncreasePerLevel: 1
+      gateCheckEnabled: true
+      doorCheckEnabled: true
+      fissureForbiddenBlocks:
+        - TNT
+        - ANVIL
+        - ENCHANTING_TABLE
     nullblade:
       enabled: true
       maxlevel: 5

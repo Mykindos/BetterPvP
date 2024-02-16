@@ -20,6 +20,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
+import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
 import org.bukkit.*;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.*;
@@ -34,12 +35,14 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Singleton
 @BPvPListener
 public class Fissure extends Skill implements InteractSkill, CooldownSkill, Listener {
 
+    private final WorldBlockHandler blockHandler;
     private int fissureDistance;
     private double fissureExpireDuration;
     private double damagePerBlock;
@@ -47,15 +50,13 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
     private double damagePerBlockIncreasePerLevel;
     private int effectDuration;
     private int slownessLevel;
-    private final Map<Player, ArrayList<Block>> playerFissurePaths = new HashMap<>();
-    private final Map<Player, HashSet<Player>> playerHits = new HashMap<>();
-    private final Map<Player, HashSet<Block>> playerCreatedBlocks = new HashMap<>();
-    private final Map<Player, Integer> fissureExpirationTasks = new HashMap<>();
-
+    private final Map<Player, ArrayList<Block>> playerFissurePaths = new WeakHashMap<>();
+    private final Map<Player, HashSet<Player>> playerHits = new WeakHashMap<>();
 
     @Inject
-    public Fissure(Champions champions, ChampionsManager championsManager) {
+    public Fissure(Champions champions, ChampionsManager championsManager, WorldBlockHandler blockHandler) {
         super(champions, championsManager);
+        this.blockHandler = blockHandler;
     }
 
     @Override
@@ -114,22 +115,7 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
     }
 
     public void activate(Player player, int level) {
-
-        if (fissureExpirationTasks.containsKey(player)) {
-            int taskId = fissureExpirationTasks.get(player);
-            Bukkit.getScheduler().cancelTask(taskId);
-            fissureExpirationTasks.remove(player);
-        }
-
-        removeFissure(player);
         createFissurePath(player);
-
-        int newTaskId = Bukkit.getScheduler().runTaskLater(champions, () -> {
-            removeFissure(player);
-            fissureExpirationTasks.remove(player);
-        }, (long)(fissureExpireDuration * 20)).getTaskId();
-
-        fissureExpirationTasks.put(player, newTaskId);
     }
 
 
@@ -146,7 +132,6 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
 
         for (int i = 0; i < fissureDistance; i++) {
             currentLocation.add(direction);
-            System.out.println("currentDistance:" + (i+1));
 
             int currY = lastSuitableY;
 
@@ -227,6 +212,10 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
             @Override
             public void run() {
                 if (currentIndex >= pathBlocks.size()) {
+
+                    playerFissurePaths.remove(player);
+                    playerHits.remove(player);
+
                     this.cancel();
                     return;
                 }
@@ -241,12 +230,10 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
 
                 if (UtilBlock.airFoliage(blockToPlace)) {
                     Material materialToSet = determineMaterialToSet(baseBlock, currentHeight, totalHeight);
-                    blockToPlace.setType(materialToSet, false);
+                    blockHandler.addRestoreBlock(blockToPlace, materialToSet, (long)(fissureExpireDuration * 1000));
                     player.getWorld().playEffect(blockToPlace.getLocation(), Effect.STEP_SOUND, materialToSet);
 
                     checkForEntityCollisions(blockToPlace, currentIndex, player);
-
-                    playerCreatedBlocks.computeIfAbsent(player, k -> new HashSet<>()).add(blockToPlace);
                 }
 
                 if (currentHeight >= totalHeight) {
@@ -283,8 +270,6 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
         }.runTaskTimer(champions, 0L, 1L);
     }
 
-
-
     private void onEntityCollision(Entity entity, int blocksTraveled, Player player) {
 
         if (!(entity instanceof LivingEntity) || entity.equals(player)) {
@@ -309,55 +294,21 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
         }
     }
 
+    private Set<Material> forbiddenBlockTypes;
+    private boolean gateCheckEnabled;
+    private boolean doorCheckEnabled;
 
-    public void removeFissure(Player player) {
-        HashSet<Block> createdBlocks = playerCreatedBlocks.get(player);
-        if (createdBlocks != null) {
-            for (Block block : createdBlocks) {
-                Material blockMaterial = block.getType();
-                if(block.getType() != Material.AIR){
-                block.setType(Material.AIR);
-                player.getWorld().playEffect(block.getLocation(), Effect.STEP_SOUND, blockMaterial);
-                }
-            }
-            createdBlocks.clear();
-        }
 
-        playerFissurePaths.remove(player);
-        playerHits.remove(player);
-        playerCreatedBlocks.remove(player);
-    }
 
     private boolean isForbiddenBlockType(Material material) {
-        Set<Material> forbiddenBlockTypes = EnumSet.of(
-                Material.TNT,
-                Material.ANVIL,
-                Material.ENCHANTING_TABLE
-        );
-
-        if (forbiddenBlockTypes.contains(material)) {
-            return true;
-        }
-
+        boolean isForbidden = forbiddenBlockTypes.contains(material);
         String materialName = material.name().toUpperCase();
 
-        if (materialName.contains("DOOR") || materialName.contains("GATE")) {
-            return true;
-        }
+        boolean doorGateCheck = (doorCheckEnabled && materialName.contains("DOOR")) || (gateCheckEnabled && materialName.contains("GATE"));
 
-        return false;
+        return isForbidden || doorGateCheck;
     }
 
-
-    @EventHandler
-    public void onFissureBlockBreak(BlockBreakEvent event) {
-        for (Map.Entry<Player, HashSet<Block>> entry : playerCreatedBlocks.entrySet()) {
-            if (entry.getValue().contains(event.getBlock())) {
-                event.setCancelled(true);
-                break;
-            }
-        }
-    }
 
     @Override
     public double getCooldown(int level) {
@@ -373,6 +324,15 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
         effectDuration = getConfig("effectDuration", 1, Integer.class);
         effectDurationIncreasePerLevel = getConfig("effectDurationIncreasePerLevel", 1, Integer.class);
         slownessLevel = getConfig("slownessLevel", 1, Integer.class);
+
+        List<String> forbiddenBlocksList = getConfig("fissureForbiddenBlocks", new ArrayList<String>(), List.class);
+        forbiddenBlockTypes = forbiddenBlocksList.stream()
+                .map(String::toUpperCase)
+                .map(Material::valueOf)
+                .collect(Collectors.toSet());
+
+        gateCheckEnabled = getConfig("gateCheckEnabled", true, Boolean.class);
+        doorCheckEnabled = getConfig("doorCheckEnabled", true, Boolean.class);
     }
 
     @Override
