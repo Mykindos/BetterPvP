@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableItem;
@@ -40,7 +41,7 @@ import java.util.Map;
 
 @Singleton
 @BPvPListener
-public class GlacialBlade extends Skill implements PassiveSkill, CooldownSkill, ThrowableListener {
+public class GlacialBlade extends Skill implements PassiveSkill, CooldownSkill, EnergySkill, ThrowableListener {
 
     private double damage;
     private double damageIncreasePerLevel;
@@ -74,6 +75,10 @@ public class GlacialBlade extends Skill implements PassiveSkill, CooldownSkill, 
     public double getDamage(int level){
         return damage + ((level - 1) * damageIncreasePerLevel);
     }
+    @Override
+    public float getEnergy(int level) {
+        return energy;
+    }
 
     @EventHandler
     public void onSwing(PlayerInteractEvent event) {
@@ -84,7 +89,11 @@ public class GlacialBlade extends Skill implements PassiveSkill, CooldownSkill, 
         int level = getLevel(player);
         if (level < 1) return;
 
-        if (!isObstructionNearby(player) && !championsManager.getCooldowns().hasCooldown(player, getName())) {
+        if(championsManager.getCooldowns().hasCooldown(player, getName())) return;
+
+        if (!championsManager.getEnergy().use(player, getName(), getEnergy(level), true)) return;
+
+        if (!isObstructionNearby(player)) {
             ItemStack ghastTear = new ItemStack(Material.GHAST_TEAR);
             Item ice = player.getWorld().dropItem(player.getEyeLocation(), ghastTear);
             ice.getWorld().playSound(ice.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 2f);

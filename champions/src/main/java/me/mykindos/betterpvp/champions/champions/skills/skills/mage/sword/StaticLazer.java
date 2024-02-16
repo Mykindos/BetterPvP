@@ -54,8 +54,6 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
     private double baseCharge;
     private double baseDamage;
     private double baseRange;
-    private double energyPerSecond;
-    private double energyPerSecondReductionPerLevel;
     private double collisionRadius;
     private double explosionRadius;
 
@@ -87,7 +85,7 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
     }
 
     private float getEnergyPerSecond(int level) {
-        return (float) (energyPerSecond - ((level - 1) * energyPerSecondReductionPerLevel));
+        return (float) (energy - ((level - 1) * energyDecreasePerLevel));
     }
 
     private float getRange(int level) {
@@ -137,10 +135,8 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
         baseCharge = getConfig("baseCharge", 40.0, Double.class);
         baseDamage = getConfig("baseDamage", 6.0, Double.class);
         baseRange = getConfig("baseRange", 20.0, Double.class);
-        energyPerSecond = getConfig("energyPerSecond", 24.0, Double.class);
         collisionRadius = getConfig("collisionRadius", 1.8, Double.class);
         explosionRadius = getConfig("explosionRadius", 4.0, Double.class);
-        energyPerSecondReductionPerLevel = getConfig("energyPerSecondReductionPerLevel", 2.0, Double.class);
     }
 
     @Override

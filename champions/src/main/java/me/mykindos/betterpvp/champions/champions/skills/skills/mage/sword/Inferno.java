@@ -64,8 +64,6 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
     private double damageIncreasePerLevel;
     private int baseNumFlames;
     private int numFlamesIncreasePerLevel;
-    private double energyPerSecond;
-    private double energyPerSecondReductionPerLevel;
 
     @Inject
     public Inferno(Champions champions, ChampionsManager championsManager) {
@@ -98,7 +96,7 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
     }
 
     private float getEnergyPerSecond(int level) {
-        return (float) (energyPerSecond - ((level - 1) * energyPerSecondReductionPerLevel));
+        return (float) (energy - ((level - 1) * energyDecreasePerLevel));
     }
 
     public int getNumFlames(int level){
@@ -292,9 +290,6 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
         baseCharge = getConfig("baseCharge", 100.0, Double.class);
         baseNumFlames = getConfig("baseNumFlames", 4, Integer.class);
         numFlamesIncreasePerLevel = getConfig("numFlamesIncreasePerLevel", 2, Integer.class);
-
-        energyPerSecondReductionPerLevel = getConfig("energyPerSecondReductionPerLevel", 2.0, Double.class);
-        energyPerSecond = getConfig("energyPerSecond", 24.0, Double.class);
     }
 
     @Data
