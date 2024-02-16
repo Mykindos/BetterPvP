@@ -639,13 +639,6 @@ skills:
       slowDuration: 3.0
       slowDurationIncreasePerLevel: 0.0
       slowStrength: 1
-    stunningshot:
-      enabled: true
-      maxlevel: 5
-      cooldown: 25.0
-      cooldownDecreasePerLevel: 1.0
-      baseDuration: 0.0
-      durationIncreasePerLevel: 0.25
     incendiaryshot:
       enabled: true
       maxlevel: 5
