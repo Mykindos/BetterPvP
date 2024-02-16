@@ -203,6 +203,10 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
                     LivingEntity entity = keyValue.getKey();
                     if (entity.getLocation().getBlockY() == block.getY() + 1 || entity.getLocation().getBlock().equals(block)) {
                         int level = getLevel(player);
+
+                        entity.getWorld().playEffect(entity.getLocation(), Effect.STEP_SOUND, block.getType());
+                        entity.getWorld().playEffect(entity.getLocation().add(0, 1, 0), Effect.STEP_SOUND, block.getType());
+
                         entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, getSlowDuration(level) * 20, slownessLevel));
                     }
                 }
