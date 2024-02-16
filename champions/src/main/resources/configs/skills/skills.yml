@@ -443,6 +443,24 @@ skills:
       damageReduction: 5
       energyReduction: 20
       energyDecreasePerLevel: 2.0
+    fissure:
+      enabled: true
+      maxLevel: 5
+      cooldown: 15.0
+      baseDamage: 1.6
+      damageIncreasePerLevel: 0.4
+      fissureDistance: 14
+      fissureDistanceIncreasePerLevel: 0
+      fissureExpireDuration: 10.0
+      baseExtraDamagePerBlock: 0.4
+      baseExtraDamagePerBlockIncreasePerLevel: 0.2
+      effectDuration: 1
+      slownessLevel: 1
+      effectDurationIncreasePerLevel: 1
+      gateCheckEnabled: true
+      doorCheckEnabled: true
+      fissureForbiddenBlocks:
+        - TNT
     nullblade:
       enabled: true
       maxlevel: 5
