@@ -73,14 +73,6 @@ skills:
       maxlevel: 3
       damageIncrement: 1.0
       duration: 2.0
-    concussion:
-      enabled: true
-      cooldown: 16.0
-      maxlevel: 3
-      durationPerLevel: 1.5
-      cooldownDecreasePerLevel: 1.0
-      baseDuration: 0.0
-      durationIncreasePerLevel: 1.5
     excessiveforce:
       enabled: true
       cooldown: 16.0
