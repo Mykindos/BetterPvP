@@ -71,7 +71,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
                 "",
                 "If a player hits you while Evading, you",
                 "will teleport behind the attacker and your",
-                "cooldown will be set to a minimum of  <val>" + getInternalCooldown(level) + "</val> seconds ",
+                "cooldown will be set to a minimum of <val>" + getInternalCooldown(level) + "</val> seconds ",
                 "",
                 "Hold crouch while Evading to teleport backwards",
                 "",
