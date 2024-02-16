@@ -13,6 +13,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.block.BlockFromToEvent;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -53,6 +54,13 @@ public class RestoreBlockListener implements Listener {
                 || addCollidingRestoreBlock(block, block.getRelative(BlockFace.WEST));
 
         if (colliding) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onFallingBlockSpawn(EntityChangeBlockEvent event) {
+        if (blockHandler.isRestoreBlock(event.getBlock())) {
             event.setCancelled(true);
         }
     }
