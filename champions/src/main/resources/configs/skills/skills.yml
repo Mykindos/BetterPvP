@@ -475,7 +475,7 @@ skills:
       durationIncreasePerLevel: 0.0
       regenerationStrength: 0
     polymorph:
-      enabled: true
+      enabled: false
       maxlevel: 3
       cooldown: 45.0
       duration: 8.0
