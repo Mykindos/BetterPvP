@@ -61,13 +61,6 @@ skills:
       cooldownDecreasePerLevel: 2.0
       durationIncreasePerLevel: 1.0
       slownessStrength: 1
-    silencingstrikes:
-      enabled: true
-      maxlevel: 3
-      hitsNeeded: 3
-      timeSpan: 0.8
-      baseDuration: 0.0
-      durationIncreasePerLevel: 1.0
     comboattack:
       enabled: true
       maxlevel: 3
