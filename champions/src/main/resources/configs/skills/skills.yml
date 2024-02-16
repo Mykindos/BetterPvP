@@ -450,6 +450,7 @@ skills:
       baseDamage: 1.6
       damageIncreasePerLevel: 0.4
       fissureDistance: 14
+      fissureDistanceIncreasePerLevel: 0
       fissureExpireDuration: 10.0
       baseExtraDamagePerBlock: 0.4
       baseExtraDamagePerBlockIncreasePerLevel: 0.2
@@ -460,8 +461,6 @@ skills:
       doorCheckEnabled: true
       fissureForbiddenBlocks:
         - TNT
-        - ANVIL
-        - ENCHANTING_TABLE
     nullblade:
       enabled: true
       maxlevel: 5
