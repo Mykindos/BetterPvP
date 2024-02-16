@@ -285,6 +285,7 @@ skills:
       baseDamage: 2.0
       baseRange: 20.0
       energyPerSecond: 32.0
+      energyPerSecondReductionPerLevel: 2.0
       cooldownDecreasePerLevel: 1.0
       energyDecreasePerLevel: 1.0
       collisionRadius: 1.8
@@ -320,7 +321,8 @@ skills:
     inferno:
       enabled: true
       maxlevel: 3
-      cooldown: 8.0
+      cooldown: 4.0
+      energy: 25
       baseFireDuration: 2.5
       fireDurationIncreasePerLevel: 0.0
       baseDamage: 1.0
@@ -328,6 +330,8 @@ skills:
       chargeIncreasePerLevel: 0.0
       baseCharge: 100.0
       baseNumFlames: 4
+      energyPerSecond: 30.0
+      energyPerSecondReductionPerLevel: 2.0
       numFlamesIncreasePerLevel: 2
       cooldownDecreasePerLevel: 0.5
     fireblast:
