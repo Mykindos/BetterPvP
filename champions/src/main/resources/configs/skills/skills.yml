@@ -249,15 +249,6 @@ skills:
       blocksArrow: false
       energyDecreasePerLevel: 1.0
       internalCooldown: 1.0
-    powerchop:
-      enabled: true
-      maxlevel: 5
-      cooldown: 14.0
-      timeToHit: 1.0
-      cooldownDecreasePerLevel: 1.5
-      baseBonusDamage: 1.0
-      bonusDamageIncreasePerLevel: 0.5
-      minBonusDamage: 0.5
     deflection:
       enabled: true
       maxlevel: 3
