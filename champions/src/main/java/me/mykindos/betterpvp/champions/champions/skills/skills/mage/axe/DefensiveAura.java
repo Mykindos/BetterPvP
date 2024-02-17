@@ -58,7 +58,7 @@ public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill
     }
 
     public double getRadius(int level) {
-        return baseRadius + level * radiusIncreasePerLevel;
+        return baseRadius + ((level-1) * radiusIncreasePerLevel);
     }
 
     public double getDuration(int level) {

@@ -45,7 +45,7 @@ public class SmokeArrow extends PrepareArrowSkill {
 
     @Override
     public String[] getDescription(int level) {
-        return new String[] {
+        return new String[]{
                 "Left click with a Bow to prepare",
                 "",
                 "Your next arrow will give <effect>Blindness</effect>",
@@ -56,7 +56,7 @@ public class SmokeArrow extends PrepareArrowSkill {
     }
 
     private double getEffectDuration(int level) {
-        return baseDuration + (level * durationIncreasePerLevel);
+        return baseDuration + ((level - 1) * durationIncreasePerLevel);
     }
 
     @Override
@@ -71,7 +71,7 @@ public class SmokeArrow extends PrepareArrowSkill {
 
     @Override
     public double getCooldown(int level) {
-        return cooldown - (level * cooldownDecreasePerLevel);
+        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
     @Override

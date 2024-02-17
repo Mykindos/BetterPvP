@@ -72,11 +72,11 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill {
     }
 
     public int getRadius(int level) {
-        return baseRadius + level * radiusIncreasePerLevel;
+        return baseRadius + ((level - 1) * radiusIncreasePerLevel);
     }
 
     public double getDuration(int level) {
-        return baseDuration + level * durationIncreasePerLevel;
+        return baseDuration + ((level - 1) * durationIncreasePerLevel);
     }
 
     @Override
@@ -95,7 +95,7 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill {
         }
 
         if (updateCooldowns.getOrDefault("snowAura", 0L) < System.currentTimeMillis()) {
-            if(!snowAura(player)) {
+            if (!snowAura(player)) {
                 return false;
             }
             updateCooldowns.put("snowAura", System.currentTimeMillis() + 100);

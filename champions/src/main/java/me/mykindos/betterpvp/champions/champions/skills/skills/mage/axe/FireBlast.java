@@ -79,18 +79,19 @@ public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Li
     }
 
     public double getDamage(int level) {
-        return baseDamage + level * damageIncreasePerLevel;
+        return baseDamage + ((level - 1) * damageIncreasePerLevel);
     }
 
     public double getFireDuration(int level) {
-        return baseFireDuration + (level * fireDurationIncreasePerLevel);
+        return baseFireDuration + ((level - 1) * fireDurationIncreasePerLevel);
     }
 
-    public double getRadius(int level){
+    public double getRadius(int level) {
         return radius + ((level - 1) * radiusIncreasePerLevel);
 
     }
-    public double getMinFireDuration(int level){
+
+    public double getMinFireDuration(int level) {
         return minFireDuration + ((level - 1) * minFireDurationIncreasePerLevel);
     }
 
@@ -159,7 +160,7 @@ public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Li
 
                 double scalingFactor = 1 - (distance / radius);
                 scalingFactor = Math.max(scalingFactor, 0);
-              
+
                 double yVelocity = 1.5D;
                 double scaledYVelocity = scalingFactor * yVelocity;
 
@@ -212,7 +213,7 @@ public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Li
     }
 
     @Override
-    public void loadSkillConfig(){
+    public void loadSkillConfig() {
         speed = getConfig("speed", .15, Double.class);
         baseDamage = getConfig("baseDamage", 6.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);

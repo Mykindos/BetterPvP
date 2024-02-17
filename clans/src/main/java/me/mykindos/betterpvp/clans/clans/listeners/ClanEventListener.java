@@ -326,7 +326,12 @@ public class ClanEventListener extends ClanListener {
         Clan clan = event.getClan();
         Clan target = event.getTargetClan();
 
-        if (inviteHandler.isInvited(clan, target, "Alliance") || inviteHandler.isInvited(target, clan, "Alliance")) {
+        if(inviteHandler.isInvited(target, clan, "Alliance")){
+            UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You already have a pending alliance request with <yellow>%s<gray>.", target.getName());
+            return;
+        }
+
+        if (inviteHandler.isInvited(clan, target, "Alliance")) {
 
             UtilServer.callEvent(new ClanAllianceEvent(event.getPlayer(), clan, target));
             return;
@@ -365,7 +370,12 @@ public class ClanEventListener extends ClanListener {
         Clan clan = event.getClan();
         Clan target = event.getTargetClan();
 
-        if (inviteHandler.isInvited(clan, target, "Trust") || inviteHandler.isInvited(target, clan, "Trust")) {
+        if(inviteHandler.isInvited(target, clan, "Trust")){
+            UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You already have a pending trust request with <yellow>%s<gray>.", target.getName());
+            return;
+        }
+
+        if (inviteHandler.isInvited(clan, target, "Trust")) {
 
             UtilServer.callEvent(new ClanTrustEvent(event.getPlayer(), clan, target));
             return;
@@ -423,7 +433,13 @@ public class ClanEventListener extends ClanListener {
         Clan target = event.getTargetClan();
 
         if (clan.isEnemy(target)) {
-            if (inviteHandler.isInvited(clan, target, "Neutral") || inviteHandler.isInvited(target, clan, "Neutral")) {
+
+            if(inviteHandler.isInvited(target, clan, "Neutral")){
+                UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You already have a pending neutral request with <red>%s<gray>.", target.getName());
+                return;
+            }
+
+            if (inviteHandler.isInvited(clan, target, "Neutral")) {
 
                 UtilServer.callEvent(new ClanNeutralEvent(event.getPlayer(), clan, target));
                 return;

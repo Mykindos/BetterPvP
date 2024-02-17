@@ -21,6 +21,7 @@ public class BreakFall extends Skill implements PassiveSkill {
     private double baseDamageReduction;
 
     private double damageReductionIncreasePerLevel;
+
     @Inject
     public BreakFall(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -41,7 +42,7 @@ public class BreakFall extends Skill implements PassiveSkill {
     }
 
     public double getDamageReduction(int level) {
-        return baseDamageReduction + damageReductionIncreasePerLevel * level;
+        return baseDamageReduction + (damageReductionIncreasePerLevel * (level - 1));
     }
 
     @Override
@@ -57,20 +58,20 @@ public class BreakFall extends Skill implements PassiveSkill {
 
     @EventHandler
     public void onFall(CustomDamageEvent e) {
-        if(!(e.getDamagee() instanceof Player player)) return;
-        if(e.getCause() != DamageCause.FALL) return;
+        if (!(e.getDamagee() instanceof Player player)) return;
+        if (e.getCause() != DamageCause.FALL) return;
 
         int level = getLevel(player);
-        if(level > 0) {
-            if(e.getDamage() <= getDamageReduction(level)){
+        if (level > 0) {
+            if (e.getDamage() <= getDamageReduction(level)) {
                 e.setCancelled(true);
-            }
-            else {
+            } else {
                 e.setDamage(e.getDamage() - getDamageReduction(level));
             }
         }
     }
-    public void loadSkillConfig(){
+
+    public void loadSkillConfig() {
         baseDamageReduction = getConfig("baseDamageReduction", 2.0, Double.class);
         damageReductionIncreasePerLevel = getConfig("damageReductionIncreasePerLevel", 2.0, Double.class);
     }

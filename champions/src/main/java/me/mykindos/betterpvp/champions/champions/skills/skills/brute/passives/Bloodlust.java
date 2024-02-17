@@ -69,7 +69,7 @@ public class Bloodlust extends Skill implements PassiveSkill {
     }
 
     public double getDuration(int level) {
-        return baseDuration + durationIncreasePerLevel * level;
+        return baseDuration + (durationIncreasePerLevel * (level - 1));
     }
 
     @Override
@@ -80,11 +80,11 @@ public class Bloodlust extends Skill implements PassiveSkill {
     @EventHandler
     public void onDeath(EntityDeathEvent event) {
         DamageLog lastDamager = damageLogManager.getLastDamager(event.getEntity());
-        if(lastDamager == null) return;
-        if(!(lastDamager.getDamager() instanceof Player player)) return;
+        if (lastDamager == null) return;
+        if (!(lastDamager.getDamager() instanceof Player player)) return;
 
         int level = getLevel(player);
-        if(level > 0) {
+        if (level > 0) {
             int tempStr = 0;
             if (str.containsKey(player)) {
                 tempStr = str.get(player) + 1;

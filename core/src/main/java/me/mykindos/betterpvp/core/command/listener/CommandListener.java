@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.command.CommandManager;
 import me.mykindos.betterpvp.core.command.ICommand;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.logging.Logger;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -36,6 +37,8 @@ public class CommandListener implements Listener {
     public void onPlayerCommandPreProcess(PlayerCommandPreprocessEvent event) {
         Client client = clientManager.search().online(event.getPlayer());
         String commandName = event.getMessage().substring(1).toLowerCase();
+
+        Logger.info("%s executed command: %s", event.getPlayer().getName(), event.getMessage());
 
         if (commandName.contains(" ")) {
             commandName = commandName.split(" ")[0];

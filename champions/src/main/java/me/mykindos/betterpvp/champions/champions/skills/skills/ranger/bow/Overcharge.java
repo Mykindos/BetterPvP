@@ -86,11 +86,11 @@ public class Overcharge extends Skill implements InteractSkill, Listener {
     }
 
     public double getDamageIncrement(int level) {
-        return baseDamageIncrement + level * damageIncrementPerLevel;
+        return baseDamageIncrement + ((level-1) * damageIncrementPerLevel);
     }
 
     public double getMaxDamage(int level) {
-        return baseMaxDamage + level * maxDamageIncreasePerLevel;
+        return baseMaxDamage + ((level-1) * maxDamageIncreasePerLevel);
     }
 
     @Override

@@ -41,6 +41,7 @@ public class Longshot extends Skill implements PassiveSkill {
 
     private double damageIncreasePerLevel;
     private double deathMessageThreshold;
+    private double minDamage;
 
     @Inject
     public Longshot(Champions champions, ChampionsManager championsManager) {
@@ -60,17 +61,18 @@ public class Longshot extends Skill implements PassiveSkill {
                 "Shoot an arrow that deals an extra <stat>" + getDamage(level),
                 "damage per block it travels",
                 "",
-                "Caps out at <val>" + getMaxDamage(level) + "</val> damage",
+                "Your arrows start at <stat>" + minDamage + "</stat> damage",
+                "and cap out at <val>" + getMaxDamage(level) + "</val> damage",
                 "",
                 "Cannot be used in own territory"};
     }
 
     public double getMaxDamage(int level) {
-        return baseMaxDamage + level * maxDamageIncreasePerLevel;
+        return baseMaxDamage + ((level - 1) * maxDamageIncreasePerLevel);
     }
 
     public double getDamage(int level) {
-        return baseDamage + level* damageIncreasePerLevel;
+        return baseDamage + level * damageIncreasePerLevel;
     }
 
     @Override
@@ -79,7 +81,7 @@ public class Longshot extends Skill implements PassiveSkill {
     }
 
 
-    @UpdateEvent(delay=200)
+    @UpdateEvent(delay = 200)
     public void update() {
         Iterator<Arrow> it = arrows.keySet().iterator();
         while (it.hasNext()) {
@@ -100,30 +102,30 @@ public class Longshot extends Skill implements PassiveSkill {
     @EventHandler
     public void onShoot(EntityShootBowEvent event) {
         if (!(event.getEntity() instanceof Player player)) return;
-        if(!(event.getProjectile() instanceof Arrow arrow)) return;
+        if (!(event.getProjectile() instanceof Arrow arrow)) return;
 
         int level = getLevel(player);
-        if(level > 0) {
+        if (level > 0) {
             PlayerCanUseSkillEvent skillEvent = UtilServer.callEvent(new PlayerCanUseSkillEvent(player, this));
-            if(!skillEvent.isCancelled()) {
+            if (!skillEvent.isCancelled()) {
                 arrows.put(arrow, arrow.getLocation());
             }
         }
 
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.LOW)
     public void onDamage(CustomDamageEvent event) {
-        if(!(event.getProjectile() instanceof Arrow arrow)) return;
-        if(!(event.getDamager() instanceof Player damager)) return;
-        if(!arrows.containsKey(arrow)) return;
+        if (!(event.getProjectile() instanceof Arrow arrow)) return;
+        if (!(event.getDamager() instanceof Player damager)) return;
+        if (!arrows.containsKey(arrow)) return;
 
         Location loc = arrows.remove(arrow);
         int level = getLevel(damager);
         double length = UtilMath.offset(loc, event.getDamagee().getLocation());
         double damage = Math.min(getMaxDamage(level), length * getDamage(level));
 
-        event.setDamage(event.getDamage() + (damage));
+        event.setDamage(minDamage + (damage));
         event.addReason(getName() + (length > deathMessageThreshold ? " (" + (int) length + " blocks)" : ""));
 
     }
@@ -140,11 +142,12 @@ public class Longshot extends Skill implements PassiveSkill {
     }
 
     @Override
-    public void loadSkillConfig(){
-        baseMaxDamage = getConfig("baseMaxDamage", 12.0, Double.class);
-        maxDamageIncreasePerLevel = getConfig("maxDamageIncreasePerLevel", 1.0, Double.class);
-        baseDamage = getConfig("baseDamage", 0.25, Double.class);
+    public void loadSkillConfig() {
+        baseMaxDamage = getConfig("baseMaxDamage", 14.0, Double.class);
+        maxDamageIncreasePerLevel = getConfig("maxDamageIncreasePerLevel", 2.0, Double.class);
+        baseDamage = getConfig("baseDamage", 0.4, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
+        minDamage = getConfig("minDamage", 1.0, Double.class);
 
         deathMessageThreshold = getConfig("deathMessageThreshold", 40.0, Double.class);
     }

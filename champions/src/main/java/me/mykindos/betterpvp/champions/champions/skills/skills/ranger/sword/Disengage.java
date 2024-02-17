@@ -27,6 +27,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.potion.PotionEffect;
@@ -78,11 +79,11 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
     }
 
     public double getSlowDuration(int level) {
-        return baseSlowDuration + level * slowDurationIncreasePerLevel;
+        return baseSlowDuration + ((level - 1) * slowDurationIncreasePerLevel);
     }
 
     public double getChannelDuration(int level) {
-        return baseChannelDuration + level * channelDurationincreasePerLevel;
+        return baseChannelDuration + ((level - 1) * channelDurationincreasePerLevel);
     }
 
     @Override
@@ -96,7 +97,7 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
         return SkillType.SWORD;
     }
 
-    @EventHandler
+    @EventHandler (priority = EventPriority.HIGHEST)
     public void onDamage(CustomDamageEvent event) {
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
         if (!(event.getDamagee() instanceof Player damagee)) return;
@@ -180,7 +181,7 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
     @Override
     public double getCooldown(int level) {
 
-        return cooldown - level * cooldownDecreasePerLevel;
+        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
     @Override
@@ -196,12 +197,12 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
     }
 
     @Override
-    public void loadSkillConfig(){
+    public void loadSkillConfig() {
         baseSlowDuration = getConfig("baseSlowDuration", 2.0, Double.class);
         slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 1.0, Double.class);
 
         baseChannelDuration = getConfig("baseChannelDuration", 1.0, Double.class);
-        channelDurationincreasePerLevel =  getConfig("channelDurationincreasePerLevel", 0.0, Double.class);
+        channelDurationincreasePerLevel = getConfig("channelDurationincreasePerLevel", 0.0, Double.class);
 
         slowStrength = getConfig("slowStrength", 3, Integer.class);
     }

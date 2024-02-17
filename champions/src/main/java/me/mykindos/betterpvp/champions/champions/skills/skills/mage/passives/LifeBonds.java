@@ -67,7 +67,7 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
     }
 
     public double getRadius(int level) {
-        return baseRadius + level * radiusIncreasePerLevel;
+        return baseRadius + ((level-1) * radiusIncreasePerLevel);
     }
 
     @Override

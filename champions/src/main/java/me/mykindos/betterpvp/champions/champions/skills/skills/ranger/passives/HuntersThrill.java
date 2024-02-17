@@ -38,7 +38,6 @@ public class HuntersThrill extends Skill implements PassiveSkill {
     private int maxConsecutiveHits;
 
 
-
     @Inject
     public HuntersThrill(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -60,11 +59,11 @@ public class HuntersThrill extends Skill implements PassiveSkill {
     }
 
     public double getMaxTimeBetweenShots(int level) {
-        return baseMaxTimeBetweenShots + level * maxTimeBetweenShotsIncreasePerLevel;
+        return baseMaxTimeBetweenShots + ((level - 1) * maxTimeBetweenShotsIncreasePerLevel);
     }
 
     public double getDuration(int level) {
-        return baseDuration + level * durationIncreasePerLevel;
+        return baseDuration + ((level - 1) * durationIncreasePerLevel);
     }
 
     @Override
@@ -74,12 +73,12 @@ public class HuntersThrill extends Skill implements PassiveSkill {
 
     @EventHandler
     public void onArrowHit(CustomDamageEvent event) {
-        if(!(event.getProjectile() instanceof Arrow)) return;
-        if(!(event.getDamager() instanceof Player damager)) return;
+        if (!(event.getProjectile() instanceof Arrow)) return;
+        if (!(event.getDamager() instanceof Player damager)) return;
 
         int level = getLevel(damager);
-        if(level > 0) {
-            if(!data.containsKey(damager)) {
+        if (level > 0) {
+            if (!data.containsKey(damager)) {
                 data.put(damager, new StackingHitData());
             }
 
@@ -91,7 +90,7 @@ public class HuntersThrill extends Skill implements PassiveSkill {
     }
 
 
-    @UpdateEvent(delay=100)
+    @UpdateEvent(delay = 100)
     public void updateHuntersThrillData() {
         data.entrySet().removeIf(entry -> System.currentTimeMillis() > entry.getValue().getLastHit() + (long) ((getMaxTimeBetweenShots(getLevel(entry.getKey()))) * 1000L));
     }
@@ -102,7 +101,7 @@ public class HuntersThrill extends Skill implements PassiveSkill {
     }
 
     @Override
-    public void loadSkillConfig(){
+    public void loadSkillConfig() {
         baseMaxTimeBetweenShots = getConfig("maxTimeBetweenShots", 8.0, Double.class);
         maxTimeBetweenShotsIncreasePerLevel = getConfig("maxTimeBetweenShotsIncreasePerLevel", 1.0, Double.class);
         baseDuration = getConfig("maxTimeBetweenShotsIncreasePerLevel", 6.0, Double.class);

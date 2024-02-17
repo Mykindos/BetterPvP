@@ -66,7 +66,7 @@ public class PowerChop extends PrepareSkill implements CooldownSkill {
     }
 
     public double getBonusDamage(int level) {
-        return (Math.max(minBonusDamage, baseBonusDamage + level * bonusDamageIncreasePerLevel));
+        return (Math.max(minBonusDamage, baseBonusDamage + ((level-1) * bonusDamageIncreasePerLevel)));
     }
 
     @Override

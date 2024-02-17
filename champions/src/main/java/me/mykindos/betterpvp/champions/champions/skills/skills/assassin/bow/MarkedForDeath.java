@@ -48,8 +48,8 @@ public class MarkedForDeath extends PrepareArrowSkill {
         return new String[]{
                 "Left click with a Bow to prepare",
                 "",
-                "Your next arrow will give players <effect>Vulnerability "+ UtilFormat.getRomanNumeral(vulnerabilityStrength) + "</effect>",
-                "for <val>" + (baseDuration + (level * durationIncreasePerLevel)) + "</val> seconds,",
+                "Your next arrow will give players <effect>Vulnerability " + UtilFormat.getRomanNumeral(vulnerabilityStrength) + "</effect>",
+                "for <val>" + (baseDuration + ((level - 1) * durationIncreasePerLevel)) + "</val> seconds,",
                 "causing them to take <stat>" + (vulnerabilityStrength * 25) + "%</stat> additional damage",
                 "from all targets.",
                 "",
@@ -70,7 +70,7 @@ public class MarkedForDeath extends PrepareArrowSkill {
     @Override
     public void onHit(Player damager, LivingEntity target, int level) {
         UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit <yellow>%s</yellow> with <green>%s %s</green>.", target.getName(), getName(), level);
-        championsManager.getEffects().addEffect(target, EffectType.VULNERABILITY, vulnerabilityStrength, (long) ((baseDuration + (level * durationIncreasePerLevel) * 1000L)));
+        championsManager.getEffects().addEffect(target, EffectType.VULNERABILITY, vulnerabilityStrength, (long) ((baseDuration + ((level - 1) * durationIncreasePerLevel) * 1000L)));
         if (!(target instanceof Player damagee)) return;
         UtilMessage.simpleMessage(damagee, getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s %s</alt>.", damager.getName(), getName(), level);
     }
@@ -104,7 +104,7 @@ public class MarkedForDeath extends PrepareArrowSkill {
     }
 
     @Override
-    public void loadSkillConfig(){
+    public void loadSkillConfig() {
         baseDuration = getConfig("baseDuration", 6.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
         vulnerabilityStrength = getConfig("vulnerabilityStrength", 1, Integer.class);

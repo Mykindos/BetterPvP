@@ -80,7 +80,7 @@ public class Flash extends Skill implements InteractSkill, Listener {
 
     @Override
     public String[] getDescription(int level) {
-        return new String[] {
+        return new String[]{
                 "Right click with an Axe to activate",
                 "",
                 "Teleport <stat>" + teleportDistance + "</stat> blocks forward",
@@ -97,7 +97,7 @@ public class Flash extends Skill implements InteractSkill, Listener {
     }
 
     private double getRechargeSeconds(int level) {
-        return baseRechargeSeconds - (level * rechargeReductionPerLevel);
+        return baseRechargeSeconds - ((level - 1) * rechargeReductionPerLevel);
     }
 
     @Override
@@ -228,7 +228,8 @@ public class Flash extends Skill implements InteractSkill, Listener {
         // Asynchronously because, for some reason, spigot fires PlayerInteractEvent twice if the player looks at a block
         // causing them to use the skill again after being teleported
         // teleportAsync somehow fixes that
-        player.teleportAsync(teleportLocation);
+        player.teleportAsync(teleportLocation).thenAccept(result -> player.setFallDistance(0));
+
 
         // Lessen charges and add cooldown to prevent from instantly getting a flash charge if they're full
         final int curCharges = charges.get(player).getCharges();

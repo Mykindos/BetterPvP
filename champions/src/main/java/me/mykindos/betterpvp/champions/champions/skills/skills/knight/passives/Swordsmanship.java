@@ -64,7 +64,7 @@ public class Swordsmanship extends Skill implements PassiveSkill {
     }
 
     public double getDamage(int charge, int level) {
-        return charge * (baseDamageIncreasePerLevelPerCharge + level * (damageIncreasePerCharge * damageMultiplierPerLevelPerCharge));
+        return charge * (baseDamageIncreasePerLevelPerCharge + ((level -1) * (damageIncreasePerCharge * damageMultiplierPerLevelPerCharge)));
     }
 
     @Override
