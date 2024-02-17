@@ -94,11 +94,11 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
     }
 
     public double getDamage(int level) {
-        return (damagePerBlock + (level * damagePerBlockIncreasePerLevel));
+        return (damagePerBlock + ((level - 1) * damagePerBlockIncreasePerLevel));
     }
 
     public int getSlowDuration(int level) {
-        return effectDuration + (level * effectDurationIncreasePerLevel);
+        return effectDuration + ((level - 1) * effectDurationIncreasePerLevel);
     }
 
     public int getFissureDistance(int level) {
@@ -168,7 +168,7 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
 
     public void doBlockUpdate(FissureCast fissureCast, FissureBlock fissureBlock) {
         Block targetBlock = fissureBlock.getBlock();
-        if(UtilBlock.airFoliage(targetBlock)) {
+        if (UtilBlock.airFoliage(targetBlock)) {
             Material materialToSet = fissureBlock.getMaterialToSet();
             blockHandler.addRestoreBlock(targetBlock, materialToSet, (long) (fissureExpireDuration * 1000));
             targetBlock.getWorld().playEffect(targetBlock.getLocation(), Effect.STEP_SOUND, materialToSet);
@@ -182,8 +182,8 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
 
     private void processCollision(FissureCast fissureCast, FissureBlock fissureBlock, int distance) {
 
-        for(LivingEntity livingEntity : fissureBlock.getNearbyEntities()) {
-            if(fissureCast.getEntitiesHit().contains(livingEntity.getUniqueId())) continue;
+        for (LivingEntity livingEntity : fissureBlock.getNearbyEntities()) {
+            if (fissureCast.getEntitiesHit().contains(livingEntity.getUniqueId())) continue;
 
             double damage = getDamage(distance, fissureCast.getLevel());
             UtilDamage.doCustomDamage(new CustomDamageEvent(livingEntity, fissureCast.getPlayer(), null, EntityDamageEvent.DamageCause.CUSTOM, damage, false, "Fissure"));
@@ -201,11 +201,11 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
             return true;
         }
 
-        if(block.getBlockData() instanceof Openable || block.getBlockData() instanceof Directional) {
+        if (block.getBlockData() instanceof Openable || block.getBlockData() instanceof Directional) {
             return true;
         }
 
-        if(!UtilBlock.solid(block)) {
+        if (!UtilBlock.solid(block)) {
             return true;
         }
 

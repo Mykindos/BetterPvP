@@ -108,8 +108,9 @@ public class ComboAttack extends Skill implements PassiveSkill, Listener {
             last.remove(player);
         }
     }
+
     @Override
-    public void loadSkillConfig(){
+    public void loadSkillConfig() {
         damageIncrement = getConfig("damageIncrement", 1.0, Double.class);
         duration = getConfig("duration", 2.0, Double.class);
     }
