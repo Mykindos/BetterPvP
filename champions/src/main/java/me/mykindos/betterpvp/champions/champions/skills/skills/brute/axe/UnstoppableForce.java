@@ -135,7 +135,7 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill {
 
                 if (hit.isPresent()) {
                     final LivingEntity target = hit.get();
-                    var cde = UtilDamage.doCustomDamage(new CustomDamageEvent(target, player, player, EntityDamageEvent.DamageCause.ENTITY_ATTACK, 20, false));
+                    var cde = UtilDamage.doCustomDamage(new CustomDamageEvent(target, player, player, EntityDamageEvent.DamageCause.ENTITY_ATTACK, 20, false, getName()));
                     if (cde != null && !cde.isCancelled()) {
                         VelocityData targetVelocityData = new VelocityData(player.getLocation().getDirection(), 2, true, 0.4, 0.4, 0.4, true);
                         UtilVelocity.velocity(target, player, targetVelocityData, VelocityType.KNOCKBACK_CUSTOM);

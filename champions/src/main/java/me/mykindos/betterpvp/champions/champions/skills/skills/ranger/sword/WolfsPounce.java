@@ -283,8 +283,8 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
 
             // Check if they still are blocking and charge
             if (isHolding(player) && gamer.isHoldingRightClick()) {
-                // Reset their charge if they're not on the ground
-                if (!UtilBlock.isGrounded(player)) {
+                // Check if the player is grounded or the block directly beneath them is solid
+                if (!UtilBlock.isGrounded(player, 2)){
                     if (charge.canSendMessage()) {
                         UtilMessage.simpleMessage(player, getClassType().getName(), "You cannot use <alt>" + getName() + "</alt> in the air.");
                         charge.messageSent();

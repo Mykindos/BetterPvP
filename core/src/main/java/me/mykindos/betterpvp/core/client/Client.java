@@ -28,6 +28,7 @@ public class Client extends PropertyContainer implements IMapListener, CacheObje
     private final @NotNull String uuid;
     private @NotNull String name;
     private @NotNull Rank rank;
+    private long connectionTime;
 
     boolean administrating;
     boolean online;
@@ -38,6 +39,7 @@ public class Client extends PropertyContainer implements IMapListener, CacheObje
         this.uuid = uuid;
         this.name = name;
         this.rank = rank;
+        this.connectionTime = System.currentTimeMillis();
         properties.registerListener(this);
     }
 

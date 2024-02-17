@@ -20,6 +20,7 @@ import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
@@ -30,8 +31,10 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.util.Vector;
 
@@ -49,16 +52,15 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
 
     private final Set<UUID> active = new HashSet<>();
     private final HashMap<UUID, Long> slams = new HashMap<>();
+    private HashMap<UUID, Boolean> canTakeFall = new HashMap<>();
 
     private double baseRadius;
     private double radiusIncreasePerLevel;
     private double baseDamage;
-
     public double damageIncreasePerLevel;
-
     public double cooldownDecreasePerLevel;
-
     public int slamDelay;
+    public double fallDamageLimit;
 
     @Inject
     public SeismicSlam(Champions champions, ChampionsManager championsManager) {
@@ -99,10 +101,10 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
 
     @UpdateEvent
     public void onUpdate() {
-        Iterator<Map.Entry<UUID, Long>> iterator = slams.entrySet().iterator();
-
-        while (iterator.hasNext()) {
-            Map.Entry<UUID, Long> entry = iterator.next();
+        // Existing slam logic
+        Iterator<Map.Entry<UUID, Long>> slamIterator = slams.entrySet().iterator();
+        while (slamIterator.hasNext()) {
+            Map.Entry<UUID, Long> entry = slamIterator.next();
             Player player = Bukkit.getPlayer(entry.getKey());
 
             if (player != null) {
@@ -112,13 +114,44 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
 
                 if (timeElapsed && isPlayerGrounded) {
                     slam(player);
-                    iterator.remove();
+                    slamIterator.remove();
                 }
             } else {
-                iterator.remove();
+                slamIterator.remove();
             }
         }
 
+        Iterator<Map.Entry<UUID, Boolean>> fallIterator = canTakeFall.entrySet().iterator();
+        while (fallIterator.hasNext()) {
+            Map.Entry<UUID, Boolean> entry = fallIterator.next();
+            Player player = Bukkit.getPlayer(entry.getKey());
+            if (player != null && (UtilBlock.isGrounded(player) || player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType().isSolid())) {
+                UtilServer.runTaskLater(champions, () -> {
+                    if (canTakeFall.containsKey(player.getUniqueId())) {
+                        canTakeFall.remove(player.getUniqueId());
+                    }
+                }, 2L);
+            }
+        }
+    }
+
+
+
+    @EventHandler
+    public void reduceFallDamage(CustomDamageEvent event) {
+        if (event.getCause() != DamageCause.FALL) return;
+
+        Player player = (Player) event.getDamagee();
+        UUID playerId = player.getUniqueId();
+
+        if (canTakeFall.containsKey(playerId) && canTakeFall.get(playerId)) {
+            if (event.getDamage() <= fallDamageLimit) {
+                event.setCancelled(true);
+            } else {
+                event.setDamage(event.getDamage() - fallDamageLimit);
+            }
+            canTakeFall.remove(playerId);
+        }
     }
 
 
@@ -190,6 +223,7 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
             vec.setY(vec.getY() * -1);
         }
 
+        canTakeFall.put(player.getUniqueId(), true);
         VelocityData velocityData = new VelocityData(vec, 0.6, false, 0, 0.8, 0.8, true);
         UtilVelocity.velocity(player, null, velocityData, VelocityType.CUSTOM);
 
@@ -206,9 +240,10 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
     public void loadSkillConfig(){
         baseRadius = getConfig("baseRadius", 5.5, Double.class);
         radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 0.5, Double.class);
-        baseDamage = getConfig("baseDamage", 5.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 2.0, Double.class);
+        baseDamage = getConfig("baseDamage", 1.0, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
         cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 2.0, Double.class);
         slamDelay = getConfig("slamDelay",500, Integer.class);
+        fallDamageLimit = getConfig("fallDamageLimit", 6.0, Double.class);
     }
 }

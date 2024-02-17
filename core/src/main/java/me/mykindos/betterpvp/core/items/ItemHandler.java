@@ -35,7 +35,7 @@ public class ItemHandler {
 
     private final ItemRepository itemRepository;
 
-    private final HashMap<String, BPVPItem> itemMap = new HashMap<>();
+    private final HashMap<String, BPvPItem> itemMap = new HashMap<>();
 
     @Inject
     @Config(path = "items.hideAttributes", defaultValue = "true")
@@ -51,7 +51,7 @@ public class ItemHandler {
     }
 
     public void loadItemData(String module) {
-        List<BPVPItem> items = itemRepository.getItemsForModule(module);
+        List<BPvPItem> items = itemRepository.getItemsForModule(module);
         items.forEach(item -> itemMap.put(item.getIdentifier(), item));
     }
 
@@ -83,7 +83,7 @@ public class ItemHandler {
             itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         }
 
-        BPVPItem item = getItem(itemStack);
+        BPvPItem item = getItem(itemStack);
         if (item != null) {
             item.itemify(itemStack);
 
@@ -122,11 +122,11 @@ public class ItemHandler {
         return itemMap.keySet();
     }
 
-    public BPVPItem getItem(String identifier) {
+    public BPvPItem getItem(String identifier) {
         return itemMap.get(identifier);
     }
 
-    public BPVPItem getItem(ItemStack itemStack) {
+    public BPvPItem getItem(ItemStack itemStack) {
         if(itemStack.getItemMeta() == null) return null;
 
         //try quick way
@@ -135,14 +135,14 @@ public class ItemHandler {
             return getItem(dataContainer.get(CoreNamespaceKeys.CUSTOM_ITEM_KEY, PersistentDataType.STRING));
         }
         //do expensive lookup
-        for (BPVPItem item : itemMap.values()) {
+        for (BPvPItem item : itemMap.values()) {
             if (item.matches(itemStack)) return item;
         }
 
         return null;
     }
 
-    public void replaceItem(String identifier, BPVPItem newItem) {
+    public void replaceItem(String identifier, BPvPItem newItem) {
         itemMap.replace(identifier, newItem);
     }
 }

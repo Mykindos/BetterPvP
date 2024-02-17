@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.clans.weapons.impl.cannon;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.weapons.impl.cannon.event.CannonReloadEvent;
 import me.mykindos.betterpvp.clans.weapons.impl.cannon.model.Cannon;
 import me.mykindos.betterpvp.clans.weapons.impl.cannon.model.CannonManager;
@@ -24,8 +25,8 @@ public class CannonballWeapon extends Weapon implements InteractWeapon {
     private final CannonManager cannonManager;
 
     @Inject
-    public CannonballWeapon(CannonManager cannonManager) {
-        super("clans", "cannonball");
+    public CannonballWeapon(Clans clans, CannonManager cannonManager) {
+        super(clans, "cannonball", "clans");
         this.cannonManager = cannonManager;
     }
 

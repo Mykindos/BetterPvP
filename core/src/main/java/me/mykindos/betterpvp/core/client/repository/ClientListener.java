@@ -157,6 +157,16 @@ public class ClientListener implements Listener {
                 }
             }
         }
+
+        event.getClient().setConnectionTime(System.currentTimeMillis());
+    }
+
+    @EventHandler (priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onClientQuit(ClientQuitEvent event) {
+        Client client = event.getClient();
+        client.putProperty(ClientProperty.TIME_PLAYED, (long) client.getProperty(ClientProperty.TIME_PLAYED).orElse(0L)
+                + (System.currentTimeMillis() - client.getConnectionTime()));
+        client.setConnectionTime(System.currentTimeMillis());
     }
 
     @EventHandler (priority = EventPriority.MONITOR)
