@@ -851,7 +851,7 @@ skills:
       canUseWhileStunned: true
       canUseWhileLevitating: true
       cooldownDecreasePerLevel: 1.0
-      baseHealthReduction: 0.5
+      baseHealthReduction: 0.3
       healthReductionDecreasePerLevel: 0.05
       baseRange: 5.0
       rangeIncreasePerLevel: 1.0
