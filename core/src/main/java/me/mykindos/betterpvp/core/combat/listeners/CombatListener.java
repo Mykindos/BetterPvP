@@ -24,7 +24,6 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
-import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -79,17 +78,13 @@ public class CombatListener implements Listener {
     private final ClientManager clientManager;
     private final ArmourManager armourManager;
     private final DamageLogManager damageLogManager;
-
-    private final WorldBlockHandler worldBlockHandler;
-
     private final List<CustomDamageAdapter> customDamageAdapters;
 
     @Inject
-    public CombatListener(ClientManager clientManager, ArmourManager armourManager, DamageLogManager damageLogManager, WorldBlockHandler worldBlockHandler) {
+    public CombatListener(ClientManager clientManager, ArmourManager armourManager, DamageLogManager damageLogManager) {
         this.clientManager = clientManager;
         this.armourManager = armourManager;
         this.damageLogManager = damageLogManager;
-        this.worldBlockHandler = worldBlockHandler;
         damageDataList = new ArrayList<>();
         customDamageAdapters = new ArrayList<>();
 
