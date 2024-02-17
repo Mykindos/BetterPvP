@@ -55,7 +55,7 @@ public class RootingAxe extends Skill implements PassiveSkill, CooldownSkill {
     }
 
     private double getDuration(int level) {
-        return baseDuration + level * durationIncreasePerLevel;
+        return baseDuration + ((level-1) * durationIncreasePerLevel);
     }
 
     @Override

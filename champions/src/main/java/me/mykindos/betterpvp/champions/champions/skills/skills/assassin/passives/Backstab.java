@@ -47,12 +47,12 @@ public class Backstab extends Skill implements PassiveSkill, Listener {
     }
 
     public double getDamageModifier(int level) {
-        return baseIncrease + (level * increasePerLevel);
+        return baseIncrease + ((level - 1) * increasePerLevel);
     }
 
     @EventHandler
     public void onEntDamage(CustomDamageEvent event) {
-        if(event.isCancelled()) return;
+        if (event.isCancelled()) return;
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
         if (!(event.getDamager() instanceof Player damager)) return;
 
@@ -78,7 +78,7 @@ public class Backstab extends Skill implements PassiveSkill, Listener {
     }
 
     @Override
-    public void loadSkillConfig(){
+    public void loadSkillConfig() {
         increasePerLevel = getConfig("increasePerLevel", 0.0, Double.class);
         baseIncrease = getConfig("baseIncrease", 1.5, Double.class);
     }

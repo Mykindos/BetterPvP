@@ -76,8 +76,8 @@ public class Grasp extends Skill implements InteractSkill, CooldownSkill, Listen
                 "Right click with a Sword to activate",
                 "",
                 "Create a wall of skulls that closes in on",
-                "you from <val>" + getDistance(level) +"</val> blocks away, dragging along",
-                "all enemies and dealing <val>" + getDamage(level) +"</val> damage",
+                "you from <val>" + getDistance(level) + "</val> blocks away, dragging along",
+                "all enemies and dealing <val>" + getDamage(level) + "</val> damage",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
 
@@ -85,11 +85,11 @@ public class Grasp extends Skill implements InteractSkill, CooldownSkill, Listen
     }
 
     public double getDistance(int level) {
-        return baseDistance + level * distanceIncreasePerLevel;
+        return baseDistance + ((level - 1) * distanceIncreasePerLevel);
     }
 
     public double getDamage(int level) {
-        return baseDamage + level * damageIncreasePerLevel;
+        return baseDamage + ((level - 1) * damageIncreasePerLevel);
     }
 
     @Override
@@ -232,7 +232,7 @@ public class Grasp extends Skill implements InteractSkill, CooldownSkill, Listen
 
     @Override
     public double getCooldown(int level) {
-        return cooldown - (level * cooldownDecreasePerLevel);
+        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
 
@@ -247,6 +247,7 @@ public class Grasp extends Skill implements InteractSkill, CooldownSkill, Listen
 
         return true;
     }
+
     @Override
     public void loadSkillConfig() {
         baseDistance = getConfig("baseDistance", 10.0, Double.class);

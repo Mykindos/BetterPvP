@@ -248,7 +248,7 @@ skills:
       blocksMelee: true
       blocksArrow: false
       energyDecreasePerLevel: 1.0
-      internalCooldown: 1.0
+      internalCooldown: 2.0
     powerchop:
       enabled: true
       maxlevel: 5
@@ -851,7 +851,7 @@ skills:
       canUseWhileStunned: true
       canUseWhileLevitating: true
       cooldownDecreasePerLevel: 1.0
-      baseHealthReduction: 0.5
+      baseHealthReduction: 0.3
       healthReductionDecreasePerLevel: 0.05
       baseRange: 5.0
       rangeIncreasePerLevel: 1.0

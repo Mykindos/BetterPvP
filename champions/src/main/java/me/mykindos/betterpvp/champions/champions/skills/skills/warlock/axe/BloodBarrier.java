@@ -86,19 +86,19 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
     }
 
     public int numAttacksToReduce(int level) {
-        return baseNumAttacksToReduce + level * numAttacksToReducePerLevel;
+        return baseNumAttacksToReduce + ((level - 1) * numAttacksToReducePerLevel);
     }
 
     public double getRange(int level) {
-        return baseRange + level * rangeIncreasePerLevel;
+        return baseRange + ((level - 1) * rangeIncreasePerLevel);
     }
 
     public double getDamageReduction(int level) {
-        return baseDamageReduction + level * damageReductionPerLevel;
+        return baseDamageReduction + ((level - 1) * damageReductionPerLevel);
     }
 
     public double getDuration(int level) {
-        return baseDuration + level * durationIncreasePerLevel;
+        return baseDuration + ((level - 1) * durationIncreasePerLevel);
     }
 
     @Override
@@ -164,7 +164,7 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
 
     @Override
     public double getCooldown(int level) {
-        return cooldown - (level * cooldownDecreasePerLevel);
+        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
     @Override

@@ -82,11 +82,11 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
     }
 
     public double getDamage(int level) {
-        return baseDamage + damageIncreasePerLevel * level;
+        return baseDamage + (damageIncreasePerLevel * (level -1));
     }
 
     public double getDamageReduction(int level) {
-        return baseDamageReduction + damageReductionPerLevel * level;
+        return baseDamageReduction + (damageReductionPerLevel * (level-1));
     }
 
     @Override
@@ -196,7 +196,7 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
         baseDamageReduction = getConfig("baseDamageReduction", 1.0, Double.class);
         damageReductionPerLevel = getConfig("damageReductionPerLevel", 0.0, Double.class);
-        internalCooldown = getConfig("internalCooldown", 1.0, Double.class);
+        internalCooldown = getConfig("internalCooldown", 2.0, Double.class);
         blocksMelee = getConfig("blocksMelee", true, Boolean.class);
         blocksArrow = getConfig("blocksArrow", false, Boolean.class);
     }

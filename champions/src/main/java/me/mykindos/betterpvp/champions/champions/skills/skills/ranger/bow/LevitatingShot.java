@@ -58,7 +58,7 @@ public class LevitatingShot extends PrepareArrowSkill {
     }
 
     public double getDuration(int level) {
-        return baseDuration + level * durationIncreasePerLevel;
+        return baseDuration + ((level-1) * durationIncreasePerLevel);
     }
 
     @Override

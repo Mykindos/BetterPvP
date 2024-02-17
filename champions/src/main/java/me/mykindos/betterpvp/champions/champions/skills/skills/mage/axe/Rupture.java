@@ -87,11 +87,11 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
     }
 
     public double getDamage(int level) {
-        return baseDamage + level * damageIncreasePerLevel;
+        return baseDamage + ((level -1) * damageIncreasePerLevel);
     }
 
     public double getSlowDuration(int level) {
-        return baseSlowDuration + level * slowDurationIncreasePerLevel;
+        return baseSlowDuration + ((level-1) * slowDurationIncreasePerLevel);
     }
 
     @Override

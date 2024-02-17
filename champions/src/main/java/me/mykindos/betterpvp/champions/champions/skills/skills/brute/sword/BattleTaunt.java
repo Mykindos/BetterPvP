@@ -80,9 +80,9 @@ public class BattleTaunt extends ChannelSkill implements InteractSkill, Cooldown
                 Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
                 if (gamer.isHoldingRightClick()) {
                     int level = getLevel(player);
-                    if(level <= 0){
+                    if (level <= 0) {
                         activeIterator.remove();
-                    }else if (!championsManager.getEnergy().use(player, getName(), getEnergy(level) / 2, true)) {
+                    } else if (!championsManager.getEnergy().use(player, getName(), getEnergy(level) / 2, true)) {
                         activeIterator.remove();
                     } else if (!player.getInventory().getItemInMainHand().getType().name().contains("SWORD")) {
                         activeIterator.remove();
@@ -139,11 +139,11 @@ public class BattleTaunt extends ChannelSkill implements InteractSkill, Cooldown
 
     @Override
     public double getCooldown(int level) {
-        return cooldown - level * cooldownDecreasePerLevel;
+        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
     @Override
-    public boolean showCooldownFinished(){
+    public boolean showCooldownFinished() {
         return false;
     }
 

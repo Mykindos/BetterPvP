@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -109,6 +110,10 @@ public class EffectListener implements Listener {
                 var cde = new CustomDamageEvent(entity, null, null, EntityDamageEvent.DamageCause.CUSTOM, 2.0, false, "Bleed");
                 cde.setIgnoreArmour(true);
                 UtilDamage.doCustomDamage(cde);
+
+                entity.getWorld().playSound(entity.getLocation().add(0, 1, 0), Sound.ENTITY_PLAYER_HURT_FREEZE, 1f, 2f);
+                entity.getWorld().playEffect(entity.getLocation().add(0, 1, 0), org.bukkit.Effect.STEP_SOUND, Material.REDSTONE_BLOCK);
+
                 lastBleedTimes.put(uuid, currentTime);
             }
             return false;

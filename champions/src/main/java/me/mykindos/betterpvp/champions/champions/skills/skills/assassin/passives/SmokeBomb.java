@@ -97,7 +97,7 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener {
     }
 
     public double getDuration(int level) {
-        return baseDuration + (level * durationIncreasePerLevel);
+        return baseDuration + ((level - 1) * durationIncreasePerLevel);
     }
 
     @Override

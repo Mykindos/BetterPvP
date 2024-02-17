@@ -48,7 +48,7 @@ public class CripplingBlow extends Skill implements PassiveSkill {
     }
 
     public double getDuration(int level) {
-        return baseDuration + level * durationIncreasePerLevel;
+        return baseDuration + ((level - 1) * durationIncreasePerLevel);
     }
 
     @Override
@@ -63,7 +63,7 @@ public class CripplingBlow extends Skill implements PassiveSkill {
         if (!SkillWeapons.isHolding(player, SkillType.AXE)) return;
 
         int level = getLevel(player);
-        if(level > 0) {
+        if (level > 0) {
             LivingEntity target = event.getDamagee();
             target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) (getDuration(level) * 20), slownessStrength));
             event.addReason(getName());
@@ -79,7 +79,7 @@ public class CripplingBlow extends Skill implements PassiveSkill {
     }
 
     @Override
-    public void loadSkillConfig(){
+    public void loadSkillConfig() {
         baseDuration = getConfig("baseDuration", 2.0, Double.class);
         durationIncreasePerLevel = getConfig("baseDuration", 0.5, Double.class);
         slownessStrength = getConfig("baseDuration", 0, Integer.class);

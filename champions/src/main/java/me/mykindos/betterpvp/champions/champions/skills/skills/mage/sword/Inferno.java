@@ -90,15 +90,15 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
     }
 
     public double getFireDuration(int level) {
-        return baseFireDuration + level * fireDurationIncreasePerLevel;
+        return baseFireDuration + ((level - 1) * fireDurationIncreasePerLevel);
     }
 
-    public int getNumFlames(int level){
-        return baseNumFlames + level * numFlamesIncreasePerLevel;
+    public int getNumFlames(int level) {
+        return baseNumFlames + ((level - 1) * numFlamesIncreasePerLevel);
     }
 
     public double getDamage(int level) {
-        return baseDamage + level * damageIncreasePerLevel;
+        return baseDamage + ((level - 1) * damageIncreasePerLevel);
     }
 
     private double getChargePerSecond(int level) {
@@ -118,6 +118,7 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
     public void trackPlayer(Player player, Gamer gamer) {
         gamer.getActionBar().add(900, actionBarComponent);
     }
+
     public void invalidatePlayer(Player player, Gamer gamer) {
         gamer.getActionBar().remove(actionBarComponent);
     }
@@ -149,7 +150,7 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
             return;
         }
 
-        Item fireItem =throwableItem.getItem();
+        Item fireItem = throwableItem.getItem();
         if (fireItem != null) {
             fireItem.remove();
         }
@@ -224,7 +225,7 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
 
             if (currentTick >= shotgun.getNextShotTick() && shotgun.getFlamesShot() < shotgun.getTotalFlames() && isHolding(shotgun.getPlayer())) {
                 Item fire = shotgun.getPlayer().getWorld().dropItem(shotgun.getPlayer().getEyeLocation(), new ItemStack(Material.BLAZE_POWDER));
-                championsManager.getThrowables().addThrowable(this, fire, shotgun.getPlayer(), getName(), 2000L);
+                championsManager.getThrowables().addThrowable(this, fire, shotgun.getPlayer(), getName(), 2000L, true);
                 blazePowders.add(fire);
 
                 fire.teleport(shotgun.getPlayer().getEyeLocation());
@@ -269,7 +270,7 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
 
 
     @Override
-    public void loadSkillConfig(){
+    public void loadSkillConfig() {
         baseFireDuration = getConfig("baseFireDuration", 2.5, Double.class);
         fireDurationIncreasePerLevel = getConfig("fireDurationIncreasePerLevel", 0.0, Double.class);
         baseDamage = getConfig("baseDamage", 1.0, Double.class);

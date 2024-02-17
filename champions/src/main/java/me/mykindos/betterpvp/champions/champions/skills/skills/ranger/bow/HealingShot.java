@@ -127,11 +127,11 @@ public class HealingShot extends PrepareArrowSkill {
 
     @Override
     public double getCooldown(int level) {
-        return cooldown - (level * cooldownDecreasePerLevel);
+        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
     public double getDuration(int level) {
-        return baseDuration + (level * increaseDurationPerLevel);
+        return baseDuration + ((level - 1) * increaseDurationPerLevel);
     }
 
     @Override

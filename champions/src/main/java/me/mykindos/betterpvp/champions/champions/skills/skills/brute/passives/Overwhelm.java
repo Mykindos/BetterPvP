@@ -50,7 +50,7 @@ public class Overwhelm extends Skill implements PassiveSkill {
     }
 
     public double getMaxDamage(int level) {
-        return baseMaxDamage + level * maxDamageIncreasePerLevel;
+        return baseMaxDamage + ((level-1) * maxDamageIncreasePerLevel);
     }
 
     @Override

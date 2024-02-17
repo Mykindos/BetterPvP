@@ -40,7 +40,7 @@ public class Fortify extends Skill implements PassiveSkill {
     }
 
     private int getPercent(int level) {
-        return level * increasePerLevel;
+        return ((level - 1) * increasePerLevel);
     }
 
     @Override
@@ -63,7 +63,7 @@ public class Fortify extends Skill implements PassiveSkill {
 
         if (event.getDamager() instanceof Player damager) {
             int level = getLevel(damager);
-            if(level > 0) {
+            if (level > 0) {
                 double modifier = getPercent(level);
                 double modifier2 = modifier >= 10 ? 0.01 : 0.1;
 
@@ -80,7 +80,7 @@ public class Fortify extends Skill implements PassiveSkill {
     }
 
     @Override
-    public void loadSkillConfig(){
+    public void loadSkillConfig() {
         increasePerLevel = getConfig("increasePerLevel", 10, Integer.class);
     }
 }
