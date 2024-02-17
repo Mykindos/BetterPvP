@@ -63,7 +63,7 @@ public class SoulHarvest extends Skill implements PassiveSkill {
     }
 
     private double getBuffDuration(int level) {
-        return baseBuffDuration + level * buffDurationIncreasePerLevel;
+        return baseBuffDuration + ((level - 1) * buffDurationIncreasePerLevel);
     }
 
     @Override

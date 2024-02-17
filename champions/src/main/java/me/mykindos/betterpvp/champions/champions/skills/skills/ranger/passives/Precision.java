@@ -37,13 +37,13 @@ public class Precision extends Skill implements PassiveSkill {
     @Override
     public String[] getDescription(int level) {
 
-        return new String[] {
+        return new String[]{
                 "Your arrows deal <val>" + getDamage(level) + "</val> bonus damage on hit"
         };
     }
 
     public double getDamage(int level) {
-        return baseDamage + damageIncreasePerLevel * level;
+        return baseDamage + (damageIncreasePerLevel * (level - 1));
     }
 
     @Override
@@ -59,11 +59,11 @@ public class Precision extends Skill implements PassiveSkill {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onDamage(CustomDamageEvent event) {
-        if(!(event.getProjectile() instanceof Arrow)) return;
-        if(!(event.getDamager() instanceof Player damager)) return;
+        if (!(event.getProjectile() instanceof Arrow)) return;
+        if (!(event.getDamager() instanceof Player damager)) return;
 
         int level = getLevel(damager);
-        if(level > 0) {
+        if (level > 0) {
             event.setDamage(event.getDamage() + getDamage(level));
         }
 

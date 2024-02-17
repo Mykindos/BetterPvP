@@ -248,7 +248,7 @@ skills:
       blocksMelee: true
       blocksArrow: false
       energyDecreasePerLevel: 1.0
-      internalCooldown: 1.0
+      internalCooldown: 2.0
     powerchop:
       enabled: true
       maxlevel: 5
@@ -432,7 +432,7 @@ skills:
       energyDecreasePerLevel: 2.0
       cooldown: 2.5
       cooldownDecreasePerLevel: 1.0
-      damage: 2.5
+      damage: 1.5
       damageIncreasePerLevel: 1.0
     void:
       enabled: true
@@ -446,6 +446,24 @@ skills:
       damageReduction: 5
       energyReduction: 20
       energyDecreasePerLevel: 2.0
+    fissure:
+      enabled: true
+      maxLevel: 5
+      cooldown: 15.0
+      baseDamage: 1.6
+      damageIncreasePerLevel: 0.4
+      fissureDistance: 14
+      fissureDistanceIncreasePerLevel: 0
+      fissureExpireDuration: 10.0
+      baseExtraDamagePerBlock: 0.4
+      baseExtraDamagePerBlockIncreasePerLevel: 0.2
+      effectDuration: 1
+      slownessLevel: 1
+      effectDurationIncreasePerLevel: 1
+      gateCheckEnabled: true
+      doorCheckEnabled: true
+      fissureForbiddenBlocks:
+        - TNT
     nullblade:
       enabled: true
       maxlevel: 5
@@ -453,7 +471,7 @@ skills:
       energyDecreasePerLevel: 2.0
     holylight:
       enabled: true
-      maxlevel: 5
+      maxlevel: 3
       baseRadius: 8.0
       radiusIncreasePerLevel: 1.0
       baseDuration: 7.0
@@ -579,7 +597,7 @@ skills:
       hitboxExpansion: 0.3
     stampede:
       enabled: true
-      maxlevel: 5
+      maxlevel: 3
       durationPerStack: 8.0
       damageMultiplier: 2.0
       maxSpeedStrength: 1
@@ -594,7 +612,7 @@ skills:
       durationIncreasePerLevel: 2.0
     bloodlust:
       enabled: true
-      maxlevel: 5
+      maxlevel: 3
       duration: 5.0
       maxStacks: 3
       baseDuration: 5.0
@@ -671,7 +689,7 @@ skills:
       minDamage: 1.0
     heavyarrows:
       enabled: true
-      maxlevel: 5
+      maxlevel: 3
       energy: 24
       basePushBack: 1.0
       energyDecreasePerLevel: 2.0
@@ -683,7 +701,7 @@ skills:
       chargeSeconds: 3.0
     huntersthrill:
       enabled: true
-      maxlevel: 5
+      maxlevel: 3
       maxTimeBetweenShots: 8.0
       maxConsecutiveHits: 4
       maxTimeBetweenShotsIncreasePerLevel: 1.0
@@ -791,7 +809,7 @@ skills:
       healthReductionDecreasePerLevel: 0.05
     bloodthirst:
       enabled: true
-      maxlevel: 5
+      maxlevel: 3
       baseHealthPercent: 0.25
       healthPercentIncreasePerLevel: 0.05
       speedStrength: 0
@@ -902,7 +920,7 @@ skills:
       damagePercentIncreasePerLevel: 0.05
     siphon:
       enabled: true
-      maxlevel: 5
+      maxlevel: 3
       baseRadius: 3.0
       radiusIncreasePerLevel: 1.0
       baseEnergySiphoned: 1.0

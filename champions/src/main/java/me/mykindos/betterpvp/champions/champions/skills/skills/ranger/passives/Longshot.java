@@ -68,11 +68,11 @@ public class Longshot extends Skill implements PassiveSkill {
     }
 
     public double getMaxDamage(int level) {
-        return baseMaxDamage + level * maxDamageIncreasePerLevel;
+        return baseMaxDamage + ((level - 1) * maxDamageIncreasePerLevel);
     }
 
     public double getDamage(int level) {
-        return baseDamage + level* damageIncreasePerLevel;
+        return baseDamage + level * damageIncreasePerLevel;
     }
 
     @Override
@@ -81,7 +81,7 @@ public class Longshot extends Skill implements PassiveSkill {
     }
 
 
-    @UpdateEvent(delay=200)
+    @UpdateEvent(delay = 200)
     public void update() {
         Iterator<Arrow> it = arrows.keySet().iterator();
         while (it.hasNext()) {
@@ -102,12 +102,12 @@ public class Longshot extends Skill implements PassiveSkill {
     @EventHandler
     public void onShoot(EntityShootBowEvent event) {
         if (!(event.getEntity() instanceof Player player)) return;
-        if(!(event.getProjectile() instanceof Arrow arrow)) return;
+        if (!(event.getProjectile() instanceof Arrow arrow)) return;
 
         int level = getLevel(player);
-        if(level > 0) {
+        if (level > 0) {
             PlayerCanUseSkillEvent skillEvent = UtilServer.callEvent(new PlayerCanUseSkillEvent(player, this));
-            if(!skillEvent.isCancelled()) {
+            if (!skillEvent.isCancelled()) {
                 arrows.put(arrow, arrow.getLocation());
             }
         }
@@ -116,9 +116,9 @@ public class Longshot extends Skill implements PassiveSkill {
 
     @EventHandler(priority = EventPriority.LOW)
     public void onDamage(CustomDamageEvent event) {
-        if(!(event.getProjectile() instanceof Arrow arrow)) return;
-        if(!(event.getDamager() instanceof Player damager)) return;
-        if(!arrows.containsKey(arrow)) return;
+        if (!(event.getProjectile() instanceof Arrow arrow)) return;
+        if (!(event.getDamager() instanceof Player damager)) return;
+        if (!arrows.containsKey(arrow)) return;
 
         Location loc = arrows.remove(arrow);
         int level = getLevel(damager);
@@ -142,7 +142,7 @@ public class Longshot extends Skill implements PassiveSkill {
     }
 
     @Override
-    public void loadSkillConfig(){
+    public void loadSkillConfig() {
         baseMaxDamage = getConfig("baseMaxDamage", 14.0, Double.class);
         maxDamageIncreasePerLevel = getConfig("maxDamageIncreasePerLevel", 2.0, Double.class);
         baseDamage = getConfig("baseDamage", 0.4, Double.class);

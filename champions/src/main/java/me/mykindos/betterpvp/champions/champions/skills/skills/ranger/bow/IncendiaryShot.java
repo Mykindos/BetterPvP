@@ -52,7 +52,7 @@ public class IncendiaryShot extends PrepareArrowSkill {
     }
 
     public double getBurnDuration(int level) {
-        return baseBurnDuration + level * burnDurationIncreasePerLevel;
+        return baseBurnDuration + ((level-1) * burnDurationIncreasePerLevel);
     }
 
     @Override

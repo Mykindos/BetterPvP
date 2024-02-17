@@ -46,7 +46,7 @@ public class MagmaBlade extends Skill implements PassiveSkill {
     }
 
     public double getDamage(int level) {
-        return baseDamage + level * damageIncreasePerLevel;
+        return baseDamage + ((level-1) * damageIncreasePerLevel);
     }
 
     @Override

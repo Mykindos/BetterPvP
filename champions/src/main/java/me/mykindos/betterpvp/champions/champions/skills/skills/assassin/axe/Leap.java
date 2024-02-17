@@ -12,7 +12,6 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
@@ -99,18 +98,17 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
     @EventHandler
     public void reduceFallDamage(CustomDamageEvent event) {
         if (event.getCause() != EntityDamageEvent.DamageCause.FALL) return;
+        if (event.getDamagee() instanceof Player player) {
+            UUID playerId = player.getUniqueId();
 
-
-        Player player = (Player) event.getDamagee();
-        UUID playerId = player.getUniqueId();
-
-        if (canTakeFall.containsKey(playerId) && canTakeFall.get(playerId)) {
-            if (event.getDamage() <= fallDamageLimit) {
-                event.setCancelled(true);
-            } else {
-                event.setDamage(event.getDamage() - fallDamageLimit);
+            if (canTakeFall.containsKey(playerId) && canTakeFall.get(playerId)) {
+                if (event.getDamage() <= fallDamageLimit) {
+                    event.setCancelled(true);
+                } else {
+                    event.setDamage(event.getDamage() - fallDamageLimit);
+                }
+                canTakeFall.remove(playerId);
             }
-            canTakeFall.remove(playerId);
         }
     }
 

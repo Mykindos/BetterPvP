@@ -77,11 +77,11 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
     }
 
     public double getDuration(int level) {
-        return baseDuration + level * durationIncreasePerLevel;
+        return baseDuration + ((level - 1) * durationIncreasePerLevel);
     }
 
     public double getDamageReduction(int level) {
-        return baseDamageReduction + level * damageReductionIncreasePerLevel;
+        return baseDamageReduction + ((level - 1) * damageReductionIncreasePerLevel);
     }
 
     @Override
@@ -103,8 +103,8 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
 
     @EventHandler
     public void endOnInteract(PlayerInteractEvent event) {
-        if(event.getHand() != EquipmentSlot.HAND) return;
-        if(!event.getAction().isLeftClick()) return;
+        if (event.getHand() != EquipmentSlot.HAND) return;
+        if (!event.getAction().isLeftClick()) return;
         if (event.useItemInHand() == Event.Result.DENY) return;
 
         Player player = event.getPlayer();
