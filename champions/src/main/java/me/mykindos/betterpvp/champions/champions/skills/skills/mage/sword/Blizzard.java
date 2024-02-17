@@ -68,7 +68,7 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergySkill
     }
 
     public double getSlowDuration(int level) {
-        return baseSlowDuration + level * slowDurationIncreasePerLevel;
+        return baseSlowDuration + ((level-1) * slowDurationIncreasePerLevel);
     }
 
     @Override

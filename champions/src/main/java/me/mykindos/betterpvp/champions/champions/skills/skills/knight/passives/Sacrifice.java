@@ -45,7 +45,7 @@ public class Sacrifice extends Skill implements PassiveSkill {
     }
 
     public double getPercentage(int level) {
-        return basePercentage + level * percentageIncreasePerLevel;
+        return basePercentage + ((level - 1) * percentageIncreasePerLevel);
     }
 
     @Override

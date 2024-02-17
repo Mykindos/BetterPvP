@@ -54,7 +54,7 @@ public class Fury extends Skill implements PassiveSkill, Listener {
                 "",
                 "If you take damage, your damage will reset",
                 "",
-                "Extra damage will reset after <stat>"+ expirationTime + "</stat> seconds"
+                "Extra damage will reset after <stat>" + expirationTime + "</stat> seconds"
         };
     }
 
@@ -63,7 +63,7 @@ public class Fury extends Skill implements PassiveSkill, Listener {
     }
 
     public double getMaxDamage(int level) {
-        return baseMaxDamage + level * maxDamageIncreasePerLevel;
+        return baseMaxDamage + ((level - 1) * maxDamageIncreasePerLevel);
     }
 
     @Override
@@ -114,7 +114,7 @@ public class Fury extends Skill implements PassiveSkill, Listener {
                 if (!player.isDead()) {
                     player.playSound(player.getLocation(), Sound.BLOCK_FIRE_EXTINGUISH, (float) 2.0, (float) 1.5);
                 }
-            }, (long)expirationTime * 20L);
+            }, (long) expirationTime * 20L);
 
             playerTasks.put(player, task);
         }

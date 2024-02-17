@@ -36,6 +36,7 @@ public class Siphon extends Skill implements PassiveSkill {
     private double energySiphonedIncreasePerLevel;
 
     private int speedStrength;
+
     @Inject
     public Siphon(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -57,11 +58,11 @@ public class Siphon extends Skill implements PassiveSkill {
     }
 
     public double getRadius(int level) {
-        return baseRadius + level * radiusIncreasePerLevel;
+        return baseRadius + ((level - 1) * radiusIncreasePerLevel);
     }
 
     public double getEnergySiphoned(int level) {
-        return baseEnergySiphoned + level * energySiphonedIncreasePerLevel;
+        return baseEnergySiphoned + ((level - 1) * energySiphonedIncreasePerLevel);
     }
 
     @Override
@@ -73,9 +74,9 @@ public class Siphon extends Skill implements PassiveSkill {
     public void onUpdate() {
         for (Player player : Bukkit.getOnlinePlayers()) {
             int level = getLevel(player);
-            if(level > 0) {
-                for(Player target : UtilPlayer.getNearbyEnemies(player, player.getLocation(), getRadius(level))) {
-                    championsManager.getEnergy().degenerateEnergy(target, ((float) getEnergySiphoned(level))/10.0f);
+            if (level > 0) {
+                for (Player target : UtilPlayer.getNearbyEnemies(player, player.getLocation(), getRadius(level))) {
+                    championsManager.getEnergy().degenerateEnergy(target, ((float) getEnergySiphoned(level)) / 10.0f);
                     new BukkitRunnable() {
                         private final Location position = target.getLocation().add(0, 1, 0);
 

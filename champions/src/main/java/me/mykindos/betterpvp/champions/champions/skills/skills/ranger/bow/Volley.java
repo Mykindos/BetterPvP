@@ -56,7 +56,7 @@ public class Volley extends PrepareArrowSkill {
     }
 
     public int getNumArrows(int level) {
-        return baseNumArrows + level * numArrowsIncreasePerLevel;
+        return baseNumArrows + ((level-1) * numArrowsIncreasePerLevel);
     }
 
     @Override

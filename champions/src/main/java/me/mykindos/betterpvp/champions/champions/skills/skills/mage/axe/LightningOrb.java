@@ -80,15 +80,15 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
     }
 
     public double getSlowDuration(int level) {
-        return baseSlowDuration + level * slowDurationIncreasePerLevel;
+        return baseSlowDuration + ((level-1) * slowDurationIncreasePerLevel);
     }
 
     public double getShockDuration(int level) {
-        return baseShockDuration + level * shockDurationIncreasePerLevel;
+        return baseShockDuration + ((level-1) * shockDurationIncreasePerLevel);
     }
 
     public double getDamage(int level) {
-        return baseDamage + level * damageIncreasePerLevel;
+        return baseDamage + ((level-1) * damageIncreasePerLevel);
     }
 
     @Override
@@ -104,7 +104,7 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
     @Override
     public double getCooldown(int level) {
 
-        return cooldown - level * cooldownDecreasePerLevel;
+        return cooldown - ((level-1) * cooldownDecreasePerLevel);
     }
 
 

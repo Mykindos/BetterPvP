@@ -50,7 +50,7 @@ public class Sharpshooter extends Skill implements PassiveSkill {
     public String[] getDescription(int level) {
         return new String[]{
                 "You deal <val>" + getDamage(level) + "</val> extra damage for",
-                "each consecutive hit up to a maximum of <stat>"+ maxConsecutiveHits +"</stat> hits",
+                "each consecutive hit up to a maximum of <stat>" + maxConsecutiveHits + "</stat> hits",
                 "",
                 "After <val>" + getMaxTimeBetweenShots(level) + "</val> seconds, or after missing <stat>" + numMisses + "</stat> time,",
                 "your arrow damage will reset"
@@ -58,11 +58,11 @@ public class Sharpshooter extends Skill implements PassiveSkill {
     }
 
     public double getDamage(int level) {
-        return baseDamage + damageIncreasePerLevel * level;
+        return baseDamage + (damageIncreasePerLevel * (level - 1));
     }
 
     public double getMaxTimeBetweenShots(int level) {
-        return baseMaxTimeBetweenShots + level * maxTimeBetweenShotsIncreasePerLevel;
+        return baseMaxTimeBetweenShots + ((level - 1) * maxTimeBetweenShotsIncreasePerLevel);
     }
 
     @Override
@@ -72,12 +72,12 @@ public class Sharpshooter extends Skill implements PassiveSkill {
 
     @EventHandler
     public void onArrowHit(CustomDamageEvent event) {
-        if(!(event.getProjectile() instanceof Arrow)) return;
-        if(!(event.getDamager() instanceof Player damager)) return;
+        if (!(event.getProjectile() instanceof Arrow)) return;
+        if (!(event.getDamager() instanceof Player damager)) return;
 
         int level = getLevel(damager);
-        if(level > 0) {
-            if(!data.containsKey(damager)) {
+        if (level > 0) {
+            if (!data.containsKey(damager)) {
                 data.put(damager, new StackingHitData());
             }
 
@@ -89,27 +89,27 @@ public class Sharpshooter extends Skill implements PassiveSkill {
 
     @EventHandler
     public void onArrowMiss(ProjectileHitEvent event) {
-        if(!(event.getEntity() instanceof Arrow)) return;
+        if (!(event.getEntity() instanceof Arrow)) return;
         Arrow arrow = (Arrow) event.getEntity();
-        if(!(arrow.getShooter() instanceof Player)) return;
-        if(event.getHitEntity() != null) return;
+        if (!(arrow.getShooter() instanceof Player)) return;
+        if (event.getHitEntity() != null) return;
 
         Player shooter = (Player) arrow.getShooter();
         int level = shooter.getLevel();
 
-        if(level > 0){
+        if (level > 0) {
             misses.put(shooter, misses.getOrDefault(shooter, 0) + 1);
-            if(misses.get(shooter) >= numMisses) {
+            if (misses.get(shooter) >= numMisses) {
                 data.remove(shooter);
                 misses.put(shooter, 0);
             }
         }
     }
 
-    @UpdateEvent(delay=100)
+    @UpdateEvent(delay = 100)
     public void updateSharpshooterData() {
         data.entrySet().removeIf(entry -> {
-            if(System.currentTimeMillis() > entry.getValue().getLastHit() + (long) (getMaxTimeBetweenShots(getLevel(entry.getKey())) * 1000L)) {
+            if (System.currentTimeMillis() > entry.getValue().getLastHit() + (long) (getMaxTimeBetweenShots(getLevel(entry.getKey())) * 1000L)) {
                 misses.remove(entry.getKey());
                 return true;
             }
@@ -124,7 +124,7 @@ public class Sharpshooter extends Skill implements PassiveSkill {
     }
 
     @Override
-    public void loadSkillConfig(){
+    public void loadSkillConfig() {
         baseMaxTimeBetweenShots = getConfig("maxTimeBetweenShots", 5.0, Double.class);
         maxTimeBetweenShotsIncreasePerLevel = getConfig("maxTimeBetweenShotsIncreasePerLevel", 1.0, Double.class);
         maxConsecutiveHits = getConfig("maxConsecutiveHits", 3, Integer.class);

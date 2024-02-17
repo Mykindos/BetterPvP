@@ -51,7 +51,7 @@ public class ThreateningShout extends Skill implements InteractSkill, CooldownSk
     }
 
     public double getDuration(int level) {
-        return baseDuration + (level * durationIncreasePerLevel);
+        return baseDuration + ((level - 1) * durationIncreasePerLevel);
     }
 
     @Override

@@ -86,19 +86,19 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
     }
 
     public double getDuration(int level) {
-        return baseDuration + level * durationIncreasePerLevel;
+        return baseDuration + ((level - 1) * durationIncreasePerLevel);
     }
 
     public double getBonusDamage(int level) {
-        return baseBonusDamage + (level - 1) * bonusDamageIncreasePerLevel;
+        return baseBonusDamage + ((level - 1) * bonusDamageIncreasePerLevel);
     }
 
     public double getBonusDamageDuration(int level) {
-        return baseBonusDamageDuration + level * bonusDamageDurationIncreasePerLevel;
+        return baseBonusDamageDuration + ((level - 1) * bonusDamageDurationIncreasePerLevel);
     }
 
     public double getHealing(int level) {
-        return baseHealing + (level - 1) * healingIncreasePerLevel;
+        return baseHealing + ((level - 1) * healingIncreasePerLevel);
     }
 
     @Override

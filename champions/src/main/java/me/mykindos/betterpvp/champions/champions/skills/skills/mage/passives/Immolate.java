@@ -72,11 +72,11 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
     }
 
     public double getFireTickDuration(int level) {
-        return baseFireTickDuration + level * fireTickDurationIncreasePerLevel;
+        return baseFireTickDuration + ((level-1) * fireTickDurationIncreasePerLevel);
     }
 
     public double getFireTrailDuration(int level) {
-        return baseFireTrailDuration + level * fireTrailDurationIncreasePerLevel;
+        return baseFireTrailDuration + ((level-1) * fireTrailDurationIncreasePerLevel);
     }
 
     @Override

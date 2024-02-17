@@ -51,7 +51,7 @@ public class StunningShot extends PrepareArrowSkill {
     }
 
     public double getDuration(int level) {
-        return baseDuration + durationIncreasePerLevel * level;
+        return baseDuration + (durationIncreasePerLevel * (level-1));
     }
 
     @Override

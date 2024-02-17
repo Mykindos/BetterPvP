@@ -59,7 +59,7 @@ public class Fortitude extends Skill implements PassiveSkill, Listener {
     }
 
     public double getMaxHeal(int level) {
-        return baseHeal + level * healIncreasePerLevel;
+        return baseHeal + ((level -1) * healIncreasePerLevel);
     }
 
     @Override

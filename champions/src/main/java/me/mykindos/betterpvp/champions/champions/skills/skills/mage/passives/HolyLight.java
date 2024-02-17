@@ -52,11 +52,11 @@ public class HolyLight extends Skill implements PassiveSkill {
     }
 
     public double getRadius(int level) {
-        return baseRadius + level * radiusIncreasePerLevel;
+        return baseRadius + ((level-1) * radiusIncreasePerLevel);
     }
 
     public double getDuration(int level) {
-        return baseDuration + level * durationIncreasePerLevel;
+        return baseDuration + ((level-1) * durationIncreasePerLevel);
     }
 
     @Override
