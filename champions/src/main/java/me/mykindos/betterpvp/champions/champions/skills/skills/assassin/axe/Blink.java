@@ -210,6 +210,7 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
             Location finalLocation = targetLocation.add(direction.clone().multiply(-1));
             player.leaveVehicle();
             player.teleport(finalLocation);
+            player.setFallDistance(0);
 
             championsManager.getCooldowns().use(player, "Deblink", 0.25, false);
             player.getWorld().playEffect(player.getLocation(), Effect.BLAZE_SHOOT, 0);
