@@ -34,7 +34,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.util.Vector;
 
@@ -140,17 +139,17 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
     @EventHandler
     public void reduceFallDamage(CustomDamageEvent event) {
         if (event.getCause() != DamageCause.FALL) return;
+        if (event.getDamagee() instanceof Player player) {
+            UUID playerId = player.getUniqueId();
 
-        Player player = (Player) event.getDamagee();
-        UUID playerId = player.getUniqueId();
-
-        if (canTakeFall.containsKey(playerId) && canTakeFall.get(playerId)) {
-            if (event.getDamage() <= fallDamageLimit) {
-                event.setCancelled(true);
-            } else {
-                event.setDamage(event.getDamage() - fallDamageLimit);
+            if (canTakeFall.containsKey(playerId) && canTakeFall.get(playerId)) {
+                if (event.getDamage() <= fallDamageLimit) {
+                    event.setCancelled(true);
+                } else {
+                    event.setDamage(event.getDamage() - fallDamageLimit);
+                }
+                canTakeFall.remove(playerId);
             }
-            canTakeFall.remove(playerId);
         }
     }
 
