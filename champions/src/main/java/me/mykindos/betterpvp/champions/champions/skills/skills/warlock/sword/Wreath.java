@@ -202,7 +202,7 @@ public class Wreath extends PrepareSkill implements CooldownSkill {
 
     @Override
     public double getCooldown(int level) {
-        return cooldown - (level * cooldownDecreasePerLevel);
+        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
     @Override
@@ -230,8 +230,9 @@ public class Wreath extends PrepareSkill implements CooldownSkill {
 
         return true;
     }
+
     @Override
-    public void loadSkillConfig(){
+    public void loadSkillConfig() {
         baseNumAttacks = getConfig("baseNumAttacks", 3, Integer.class);
         numAttacksIncreasePerLevel = getConfig("numAttacksIncreasePerLevel", 0, Integer.class);
 

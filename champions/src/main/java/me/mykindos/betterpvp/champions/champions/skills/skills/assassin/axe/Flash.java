@@ -80,7 +80,7 @@ public class Flash extends Skill implements InteractSkill, Listener {
 
     @Override
     public String[] getDescription(int level) {
-        return new String[] {
+        return new String[]{
                 "Right click with an Axe to activate",
                 "",
                 "Teleport <stat>" + teleportDistance + "</stat> blocks forward",
@@ -97,7 +97,7 @@ public class Flash extends Skill implements InteractSkill, Listener {
     }
 
     private double getRechargeSeconds(int level) {
-        return baseRechargeSeconds - (level * rechargeReductionPerLevel);
+        return baseRechargeSeconds - ((level - 1) * rechargeReductionPerLevel);
     }
 
     @Override

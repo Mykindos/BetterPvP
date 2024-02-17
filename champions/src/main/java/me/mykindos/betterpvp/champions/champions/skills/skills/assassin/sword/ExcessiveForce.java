@@ -71,7 +71,7 @@ public class ExcessiveForce extends Skill implements InteractSkill, CooldownSkil
     }
 
 
-    @EventHandler (priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGH)
     public void setKnockback(CustomDamageEvent event) {
         if (event.getDamager() instanceof Player damager) {
             if (active.containsKey(damager)) {
@@ -90,7 +90,7 @@ public class ExcessiveForce extends Skill implements InteractSkill, CooldownSkil
                 continue;
             }
 
-            if(!championsManager.getRoles().hasRole(next.getKey(), Role.ASSASSIN)){
+            if (!championsManager.getRoles().hasRole(next.getKey(), Role.ASSASSIN)) {
                 it.remove();
             }
 
@@ -114,7 +114,7 @@ public class ExcessiveForce extends Skill implements InteractSkill, CooldownSkil
 
     @Override
     public double getCooldown(int level) {
-        return cooldown - (level * cooldownDecreasePerLevel);
+        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
     @Override
