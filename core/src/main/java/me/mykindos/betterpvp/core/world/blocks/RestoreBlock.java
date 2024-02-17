@@ -6,7 +6,7 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,9 +22,9 @@ public class RestoreBlock {
     private int blockLevel;
 
     @Nullable
-    private Player summoner;
+    private LivingEntity summoner;
 
-    public RestoreBlock(Block block, Material newMaterial, long expire, @Nullable Player summoner) {
+    public RestoreBlock(Block block, Material newMaterial, long expire, @Nullable LivingEntity summoner) {
         this.block = block;
         this.newMaterial = newMaterial;
         this.expire = System.currentTimeMillis() + expire;

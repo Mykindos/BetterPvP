@@ -24,7 +24,6 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
-import me.mykindos.betterpvp.core.world.blocks.RestoreBlock;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -51,7 +50,6 @@ import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import static me.mykindos.betterpvp.core.utilities.UtilMessage.message;
 
@@ -326,16 +324,6 @@ public class CombatListener implements Listener {
 
         LivingEntity damager = getDamagerEntity(event);
         Entity damaging = getDamagingEntity(event);
-        if (event.getCause() == DamageCause.SUFFOCATION) {
-            Optional<RestoreBlock> restoreBlockOptional = worldBlockHandler.getRestoreBlock(damagee.getEyeLocation().getBlock());
-            if (restoreBlockOptional.isPresent()) {
-                Player newDamager = restoreBlockOptional.get().getSummoner();
-                if (newDamager != null) {
-                    damager = newDamager;
-                }
-            }
-        }
-
 
         CustomDamageEvent cde = new CustomDamageEvent(damagee, damager, damaging, event.getCause(), event.getDamage(), true);
         UtilDamage.doCustomDamage(cde);
