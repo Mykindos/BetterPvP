@@ -82,11 +82,11 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
     }
 
     public double getDamage(int level) {
-        return baseDamage + damageIncreasePerLevel * level;
+        return baseDamage + (damageIncreasePerLevel * (level -1));
     }
 
     public double getDamageReduction(int level) {
-        return baseDamageReduction + damageReductionPerLevel * level;
+        return baseDamageReduction + (damageReductionPerLevel * (level-1));
     }
 
     @Override

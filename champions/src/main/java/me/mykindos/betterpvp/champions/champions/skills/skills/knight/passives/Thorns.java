@@ -54,7 +54,7 @@ public class Thorns extends Skill implements PassiveSkill, Listener {
     }
 
     public double getDamage(int level) {
-        return baseDamage + level * damageIncreasePerLevel;
+        return baseDamage + ((level - 1) * damageIncreasePerLevel);
     }
 
     @Override

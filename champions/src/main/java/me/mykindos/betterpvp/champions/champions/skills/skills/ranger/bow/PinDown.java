@@ -68,7 +68,7 @@ public class PinDown extends Skill implements InteractSkill, CooldownSkill, List
     }
 
     public double getDuration(int level) {
-        return baseDuration + durationIncreasePerLevel * level;
+        return baseDuration + (durationIncreasePerLevel * (level-1));
     }
 
     @Override

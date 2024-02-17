@@ -85,12 +85,12 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
         };
     }
 
-    public double getSlamDamage(int level){
-        return baseDamage + (level * damageIncreasePerLevel);
+    public double getSlamDamage(int level) {
+        return baseDamage + ((level - 1) * damageIncreasePerLevel);
     }
 
     public double getRadius(int level) {
-        return baseRadius + radiusIncreasePerLevel * (level);
+        return baseRadius + (radiusIncreasePerLevel * (level - 1));
     }
 
     @Override
@@ -135,7 +135,6 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
     }
 
 
-
     @EventHandler
     public void reduceFallDamage(CustomDamageEvent event) {
         if (event.getCause() != DamageCause.FALL) return;
@@ -154,7 +153,6 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
     }
 
 
-
     public void slam(final Player player) {
         active.remove(player.getUniqueId());
 
@@ -166,7 +164,7 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
                 continue;
             }
 
-            if(target.getLocation().getY() - player.getLocation().getY() >= 3){
+            if (target.getLocation().getY() - player.getLocation().getY() >= 3) {
                 continue;
             }
             double percentageMultiplier = 1 - (UtilMath.offset(player, target) / getRadius(level));
@@ -212,7 +210,7 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
     @Override
     public double getCooldown(int level) {
 
-        return cooldown - (level * cooldownDecreasePerLevel);
+        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
     @Override
@@ -236,13 +234,13 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
     }
 
     @Override
-    public void loadSkillConfig(){
+    public void loadSkillConfig() {
         baseRadius = getConfig("baseRadius", 5.5, Double.class);
         radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 0.5, Double.class);
         baseDamage = getConfig("baseDamage", 1.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
         cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 2.0, Double.class);
-        slamDelay = getConfig("slamDelay",500, Integer.class);
+        slamDelay = getConfig("slamDelay", 500, Integer.class);
         fallDamageLimit = getConfig("fallDamageLimit", 6.0, Double.class);
     }
 }

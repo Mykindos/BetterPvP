@@ -56,11 +56,11 @@ public class Vengeance extends Skill implements PassiveSkill, Listener {
     }
 
     public double getDamage(int level) {
-        return baseDamage + level * damageIncreasePerLevel;
+        return baseDamage + ((level - 1) * damageIncreasePerLevel);
     }
 
     public double getMaxDamage(int level) {
-        return baseMaxDamage + level * maxDamageIncreasePerLevel;
+        return baseMaxDamage + ((level -1) * maxDamageIncreasePerLevel);
     }
 
     @Override

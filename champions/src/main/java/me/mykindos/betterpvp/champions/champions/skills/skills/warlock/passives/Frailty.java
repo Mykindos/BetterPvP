@@ -62,11 +62,11 @@ public class Frailty extends Skill implements PassiveSkill {
     }
 
     public double getHealthPercent(int level) {
-        return baseHealthPercent + level * healthPercentIncreasePerLevel;
+        return baseHealthPercent + ((level - 1) * healthPercentIncreasePerLevel);
     }
 
-    public double getDamagePercent (int level) {
-        return baseDamagePercent + level * damagePercentIncreasePerLevel;
+    public double getDamagePercent(int level) {
+        return baseDamagePercent + ((level - 1) * damagePercentIncreasePerLevel);
     }
 
     @Override

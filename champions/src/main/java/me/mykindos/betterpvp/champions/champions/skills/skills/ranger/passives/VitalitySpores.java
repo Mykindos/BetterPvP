@@ -60,7 +60,7 @@ public class VitalitySpores extends Skill implements PassiveSkill {
     }
 
     public double getDuration(int level) {
-        return baseDuration - level * durationDecreasePerLevel;
+        return baseDuration - ((level - 1) * durationDecreasePerLevel);
     }
 
     @Override
@@ -87,7 +87,7 @@ public class VitalitySpores extends Skill implements PassiveSkill {
         if (!(event.getDamagee() instanceof Player player)) return;
 
         if (hasSkill(player)) {
-            if(!UtilPlayer.hasPotionEffect(player, PotionEffectType.REGENERATION, regenerationStrength + 1)) {
+            if (!UtilPlayer.hasPotionEffect(player, PotionEffectType.REGENERATION, regenerationStrength + 1)) {
                 player.removePotionEffect(PotionEffectType.REGENERATION);
             }
 
@@ -96,14 +96,13 @@ public class VitalitySpores extends Skill implements PassiveSkill {
     }
 
 
-
     @Override
     public SkillType getType() {
         return SkillType.PASSIVE_A;
     }
 
     @Override
-    public void loadSkillConfig(){
+    public void loadSkillConfig() {
         baseDuration = getConfig("baseDuration", 7.0, Double.class);
         durationDecreasePerLevel = getConfig("durationDecreasePerLevel", 1.0, Double.class);
 
