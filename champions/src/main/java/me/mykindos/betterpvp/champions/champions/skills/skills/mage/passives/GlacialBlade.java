@@ -93,7 +93,7 @@ public class GlacialBlade extends Skill implements PassiveSkill, CooldownSkill, 
             iceShards.add(ice);
             shardMap.put(ice, player);
 
-            championsManager.getCooldowns().use(player, getName(), getCooldown(level), true, true, isCancellable());
+            championsManager.getCooldowns().use(player, getName(), getCooldown(level), false, true, isCancellable());
         }
     }
 
