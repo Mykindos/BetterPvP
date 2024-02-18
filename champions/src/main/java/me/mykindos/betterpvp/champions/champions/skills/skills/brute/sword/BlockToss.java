@@ -86,7 +86,7 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
                 "Boulder size increases at a rate",
                 "of <val>" + getChargePerSecond(level) + "</val> per level.",
                 "",
-                "Recharge: <val>" + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level)
         };
     }
 
