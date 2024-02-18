@@ -257,7 +257,7 @@ public final class BlockTossObject {
 
             final Location location = referenceEntity.getLocation();
             location.setPitch(oldPitch + pitchDelta);
-            location.setYaw(caster.getYaw());
+            location.setYaw(displayEnt.getYaw());
             displayEnt.teleport(location);
         }
 
