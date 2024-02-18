@@ -38,8 +38,11 @@ public class Stampede extends Skill implements PassiveSkill {
 
     private double durationPerStack;
     private double damage;
-
     private int maxSpeedStrength;
+    private double durationPerStackDecreasePerLevel;
+    private double damageIncreasePerLevel;
+    private double knockback;
+    private double knockbackIncreasePerLevel;
 
     @Inject
     public Stampede(Champions champions, ChampionsManager championsManager) {
@@ -57,16 +60,30 @@ public class Stampede extends Skill implements PassiveSkill {
         return new String[]{
                 "You slowly build up speed as you",
                 "sprint, gaining one level of <effect>Speed</effect>",
-                "for every <val>" + (durationPerStack - level) + "</val> seconds, up to a max",
+                "for every <val>" + getDurationPerStack(level) + "</val> seconds, up to a max",
                 "of <effect>Speed " + UtilFormat.getRomanNumeral(maxSpeedStrength + 1) + "</effect>",
                 "",
-                "Attacking during stampede deals",
-                "<stat>" + damage + "</stat> bonus damage per speed level"};
+                "Attacking during stampede deals <val>" + getDamage(level) + "</val> bonus",
+                "bonus damage and <val>"+ getBonusKnockback(level) + "x</val> extra knockback",
+                "per speed level"
+        };
     }
 
     @Override
     public Role getClassType() {
         return Role.BRUTE;
+    }
+
+    public double getDamage(int level){
+        return damage + ((level - 1) * damageIncreasePerLevel);
+    }
+
+    public double getBonusKnockback(int level){
+        return knockback + ((level - 1) * knockbackIncreasePerLevel);
+    }
+
+    public double getDurationPerStack(int level){
+        return durationPerStack - ((level - 1) * durationPerStackDecreasePerLevel);
     }
 
     @Override
@@ -104,7 +121,7 @@ public class Stampede extends Skill implements PassiveSkill {
                         if (str < maxSpeedStrength) {
                             sprintStr.put(player, str + 1);
 
-                            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_AMBIENT, 2.0F, 0.2F * str + 2.0F);
+                            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_AMBIENT, 2.0F, 0.2F * str + 1.2F);
                             UtilMessage.simpleMessage(player, getClassType().getName(), "Stampede Level: <yellow>%d", (str + 2));
                         }
                     }
@@ -116,25 +133,45 @@ public class Stampede extends Skill implements PassiveSkill {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onDamage(CustomDamageEvent event) {
-        if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
-        if (!(event.getDamager() instanceof Player damager)) return;
-        int str = sprintStr.getOrDefault(damager, -1);
-        if (str < 0) return;
 
-        sprintTime.remove(damager);
-        sprintStr.remove(damager);
-        damager.removePotionEffect(PotionEffectType.SPEED);
+        if (event.getDamager() instanceof Player damager) {
 
-        event.setKnockback(false);
-        VelocityData velocityData = new VelocityData(UtilVelocity.getTrajectory2d(damager, event.getDamagee()), 2.0D, true, 0.0D, 0.4D, 1.0D, true);
-        UtilVelocity.velocity(event.getDamagee(), event.getDamager(), velocityData, VelocityType.KNOCKBACK);
-        event.setDamage(event.getDamage() + ((str + 1) * damage));
+            if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
+            int str = sprintStr.getOrDefault(damager, 0);
+            if (str < 1) return;
+
+            int level = getLevel(damager);
+
+            sprintTime.remove(damager);
+            sprintStr.remove(damager);
+            damager.removePotionEffect(PotionEffectType.SPEED);
+
+            double bonusKnockback = getBonusKnockback(level);
+
+            event.setKnockback(false);
+            VelocityData velocityData = new VelocityData(UtilVelocity.getTrajectory2d(damager, event.getDamagee()), bonusKnockback, true, 0.0D, 0.4D, 1.0D, true);
+            UtilVelocity.velocity(event.getDamagee(), damager, velocityData, VelocityType.KNOCKBACK);
+
+            double additionalDamage = (str + 1) * getDamage(level);
+            event.setDamage(event.getDamage() + additionalDamage);
+        } else if (event.getDamagee() instanceof Player player) {
+
+            sprintTime.remove(player);
+            sprintStr.remove(player);
+            if(player.hasPotionEffect(PotionEffectType.SPEED)) {
+                player.removePotionEffect(PotionEffectType.SPEED);
+            }
+        }
     }
 
     @Override
     public void loadSkillConfig() {
-        durationPerStack = getConfig("durationPerStack", 8.0, Double.class);
-        damage = getConfig("damageMultiplier", 2.0, Double.class);
-        maxSpeedStrength = getConfig("maxSpeedStrength", 1, Integer.class);
+        durationPerStack = getConfig("durationPerStack", 4.0, Double.class);
+        durationPerStackDecreasePerLevel = getConfig("durationPerStackDecreasePerLevel", 1.0, Double.class);
+        damage = getConfig("damage", 0.5, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.5, Double.class);
+        maxSpeedStrength = getConfig("maxSpeedStrength", 2, Integer.class);
+        knockbackIncreasePerLevel = getConfig("knockbackIncreasePerLevel", 0.5, Double.class);
+        knockback = getConfig("knockback", 0.5, Double.class);
     }
 }
