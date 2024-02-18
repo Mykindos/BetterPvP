@@ -82,7 +82,7 @@ public class Overwhelm extends Skill implements PassiveSkill {
     public void loadSkillConfig(){
         bonusDamage = getConfig("bonusDamage", 1.0, Double.class);
         healthOverTarget = getConfig("healthOverTarget", 2.0, Double.class);
-        baseMaxDamage = getConfig("baseMaxDamage", 0.0, Double.class);
+        baseMaxDamage = getConfig("baseMaxDamage", 0.5, Double.class);
         maxDamageIncreasePerLevel = getConfig("maxDamageIncreasePerLevel", 0.5, Double.class);
     }
 

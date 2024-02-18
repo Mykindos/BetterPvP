@@ -71,7 +71,7 @@ public class Precision extends Skill implements PassiveSkill {
 
     @Override
     public void loadSkillConfig() {
-        baseDamage = getConfig("baseDamage", 0.0, Double.class);
+        baseDamage = getConfig("baseDamage", 0.5, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.5, Double.class);
     }
 }

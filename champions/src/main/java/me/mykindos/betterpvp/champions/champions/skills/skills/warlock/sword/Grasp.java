@@ -253,7 +253,7 @@ public class Grasp extends Skill implements InteractSkill, CooldownSkill, Listen
         baseDistance = getConfig("baseDistance", 10.0, Double.class);
         distanceIncreasePerLevel = getConfig("distanceIncreasePerLevel", 5.0, Double.class);
 
-        baseDamage = getConfig("baseDamage", 0.0, Double.class);
+        baseDamage = getConfig("baseDamage", 2.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
     }
 }

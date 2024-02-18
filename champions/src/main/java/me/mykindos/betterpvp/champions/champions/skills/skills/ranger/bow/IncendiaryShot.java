@@ -107,7 +107,7 @@ public class IncendiaryShot extends PrepareArrowSkill {
 
     @Override
     public void loadSkillConfig() {
-        baseBurnDuration = getConfig("baseBurnDuration", 0.0, Double.class);
+        baseBurnDuration = getConfig("baseBurnDuration", 1.5, Double.class);
         burnDurationIncreasePerLevel = getConfig("burnDurationIncreasePerLevel", 1.5, Double.class);
 
     }
