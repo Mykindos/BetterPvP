@@ -8,7 +8,6 @@ import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.weapon.types.ChannelWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
-import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.display.DisplayComponent;
@@ -37,64 +36,20 @@ public class Scythe extends ChannelWeapon implements LegendaryWeapon, Listener {
     protected final Map<UUID, Soul> souls = new HashMap<>();
     private final ClientManager clientManager;
 
-    @Inject
-    @Config(path = "scythe.base-damage", defaultValue = "8.0", configName = "weapons/legendaries")
     protected double baseDamage;
-
-    @Inject
-    @Config(path = "scythe.max-souls-damage", defaultValue = "4.0", configName = "weapons/legendaries")
     protected double maxSoulsDamage;
-
-    @Inject
-    @Config(path = "scythe.max-souls",  defaultValue = "3", configName = "weapons/legendaries")
     protected int maxSouls;
-
-    @Inject
-    @Config(path = "scythe.soul-harvest-seconds", defaultValue = "1.5", configName = "weapons/legendaries")
     protected double soulHarvestSeconds;
-
-    @Inject
-    @Config(path = "scythe.soul-expiry-seconds", defaultValue = "10.0", configName = "weapons/legendaries")
     protected double soulExpirySeconds;
-
-    @Inject
-    @Config(path = "scythe.soul-expiry-per-second", defaultValue = "0.3", configName = "weapons/legendaries")
     protected double soulExpiryPerSecond;
-
-    @Inject
-    @Config(path = "scythe.soul-despawn-seconds", defaultValue = "7.5", configName = "weapons/legendaries")
     protected double soulDespawnSeconds;
-
-    @Inject
-    @Config(path = "scythe.soul-view-distance-blocks", defaultValue = "60", configName = "weapons/legendaries")
     protected int soulViewDistanceBlocks;
-
-    @Inject
-    @Config(path = "scythe.souls-per-player", defaultValue = "1.0", configName = "weapons/legendaries")
     protected double soulsPerPlayer;
-
-    @Inject
-    @Config(path = "scythe.souls-per-mob", defaultValue = "0.5", configName = "weapons/legendaries")
     protected double soulsPerMob;
-
-    @Inject
-    @Config(path = "scythe.summon-player-soul-chance", defaultValue = "1.0", configName = "weapons/legendaries")
     protected double summonPlayerSoulChance;
-
-    @Inject
-    @Config(path = "scythe.summon-mob-soul-chance", defaultValue = "0.2", configName = "weapons/legendaries")
     protected double summonMobSoulChance;
-
-    @Inject
-    @Config(path = "scythe.speed-amplifier-per-soul", defaultValue = "1.0", configName = "weapons/legendaries")
     protected double speedAmplifierPerSoul;
-
-    @Inject
-    @Config(path = "scythe.base-heal", defaultValue = "0.25", configName = "weapons/legendaries")
     protected double baseHeal;
-
-    @Inject
-    @Config(path = "scythe.heal-per-soul", defaultValue = "0.05", configName = "weapons/legendaries")
     protected double healPerSoul;
 
     @SuppressWarnings("DataFlowIssue")
@@ -192,5 +147,24 @@ public class Scythe extends ChannelWeapon implements LegendaryWeapon, Listener {
     @Override
     public double getEnergy() {
         return 0; // No energy
+    }
+
+    @Override
+    public void loadWeaponConfig() {
+        baseDamage = getConfig("baseDamage", 8.0, Double.class);
+        maxSoulsDamage = getConfig("maxSoulsDamage", 4.0, Double.class);
+        maxSouls = getConfig("maxSouls", 3, Integer.class);
+        soulHarvestSeconds = getConfig("soulHarvestSeconds", 1.5, Double.class);
+        soulExpirySeconds = getConfig("soulExpirySeconds", 10.0, Double.class);
+        soulExpiryPerSecond = getConfig("soulExpiryPerSecond", 0.3, Double.class);
+        soulDespawnSeconds = getConfig("soulDespawnSeconds", 7.5, Double.class);
+        soulViewDistanceBlocks = getConfig("soulViewDistanceBlocks", 60, Integer.class);
+        soulsPerPlayer = getConfig("soulsPerPlayer", 1.0, Double.class);
+        soulsPerMob = getConfig("soulsPerMob", 1.0, Double.class);
+        summonPlayerSoulChance = getConfig("summonPlayerSoulChance", 1.0, Double.class);
+        summonMobSoulChance = getConfig("summonMobSoulChance", 0.4, Double.class);
+        speedAmplifierPerSoul = getConfig("speedAmplifierPerSoul", 1.0, Double.class);
+        baseHeal = getConfig("baseHeal", 0.25, Double.class);
+        healPerSoul = getConfig("healPerSoul", 0.05, Double.class);
     }
 }

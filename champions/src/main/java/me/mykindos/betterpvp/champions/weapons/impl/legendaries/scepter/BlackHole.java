@@ -60,7 +60,7 @@ public class BlackHole {
             final Optional<Location> result = tryImpact();
             result.ifPresent(this::impact);
             if (result.isEmpty()) {
-            move();
+                move();
             }
 
             // Play travel particles
