@@ -280,13 +280,12 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 9.0
-      energy: 24
       baseCharge: 40.0
       baseDamage: 2.0
       baseRange: 20.0
-      energyPerSecond: 32.0
+      energy: 30
+      energyDecreasePerLevel: 2.0
       cooldownDecreasePerLevel: 1.0
-      energyDecreasePerLevel: 1.0
       collisionRadius: 1.8
       explosionRadius: 4.0
     rupture:
@@ -320,7 +319,9 @@ skills:
     inferno:
       enabled: true
       maxlevel: 3
-      cooldown: 8.0
+      cooldown: 4.0
+      energy: 25
+      energyDecreasePerLevel: 2.0
       baseFireDuration: 2.5
       fireDurationIncreasePerLevel: 0.0
       baseDamage: 1.0
@@ -418,7 +419,7 @@ skills:
     blizzard:
       enabled: true
       maxlevel: 5
-      energy: 45
+      energy: 25
       baseSlowDuration: 2.0
       slowDurationIncreasePerLevel: 0.0
       slowStrength: 2
@@ -427,6 +428,8 @@ skills:
     glacialblade:
       enabled: true
       maxlevel: 3
+      energy: 20
+      energyDecreasePerLevel: 2.0
       cooldown: 2.5
       cooldownDecreasePerLevel: 1.0
       damage: 1.5
