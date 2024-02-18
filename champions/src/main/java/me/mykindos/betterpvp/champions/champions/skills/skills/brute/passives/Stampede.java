@@ -155,13 +155,11 @@ public class Stampede extends Skill implements PassiveSkill {
             double additionalDamage = (str + 1) * getDamage(level);
             event.setDamage(event.getDamage() + additionalDamage);
         } else if (event.getDamagee() instanceof Player player) {
-            int str = sprintStr.getOrDefault(player, 0);
-            if (str < 1) return;
 
+            sprintTime.remove(player);
+            sprintStr.remove(player);
             if(player.hasPotionEffect(PotionEffectType.SPEED)) {
                 player.removePotionEffect(PotionEffectType.SPEED);
-                sprintTime.remove(player);
-                sprintStr.remove(player);
             }
         }
     }
