@@ -86,7 +86,7 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
                 "Boulder size increases at a rate",
                 "of <val>" + getChargePerSecond(level) + "</val> per level.",
                 "",
-                "Recharge: <val>" + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level)
         };
     }
 
@@ -112,7 +112,11 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
 
     @Override
     public double getCooldown(int level) {
-        return cooldown - (level - 1d) * cooldownDecreasePerLevel;
+        if (cooldown - (level - 1d) * cooldownDecreasePerLevel < 1) {
+            return 0;
+        } else {
+            return cooldown - (level - 1d) * cooldownDecreasePerLevel;
+        }
     }
 
     @Override
