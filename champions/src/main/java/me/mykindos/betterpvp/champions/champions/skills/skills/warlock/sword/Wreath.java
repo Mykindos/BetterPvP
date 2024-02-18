@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.warlock.sword;
 
+import com.comphenix.protocol.PacketType;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
@@ -9,6 +10,7 @@ import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -116,6 +118,16 @@ public class Wreath extends PrepareSkill implements CooldownSkill {
     }
 
     @EventHandler
+    public void onDamage(PreCustomDamageEvent event) {
+        if(!(event.getCustomDamageEvent().getDamager() instanceof Player player)) return;
+        if(event.getCustomDamageEvent().getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
+        if (!isHolding(player)) return;
+        if (!actives.containsKey(player)) return;
+
+        processPlayerAction(player);
+    }
+
+    @EventHandler
     public void onSwing(PlayerInteractEvent event) {
         if (event.getHand() != EquipmentSlot.HAND) return;
         if (!event.getAction().isLeftClick()) return;
@@ -123,7 +135,12 @@ public class Wreath extends PrepareSkill implements CooldownSkill {
         if (!actives.containsKey(event.getPlayer())) return;
 
         Player player = event.getPlayer();
-        int stacks = actives.get(event.getPlayer());
+        processPlayerAction(player);
+
+    }
+
+    private void processPlayerAction(Player player) {
+        int stacks = actives.get(player);
         if (stacks > 0) {
             int level = getLevel(player);
             if (level <= 0) return;
@@ -196,7 +213,6 @@ public class Wreath extends PrepareSkill implements CooldownSkill {
         } else {
             actives.remove(player);
         }
-
     }
 
 
