@@ -200,7 +200,7 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
         throwable.setCanHitFriendlies(true);
         championsManager.getThrowables().addThrowable(throwable);
 
-        VelocityData velocityData = new VelocityData(player.getLocation().getDirection(), 1 + data.getCharge(), false, 0, 0.2, 20, false);
+        VelocityData velocityData = new VelocityData(player.getLocation().getDirection(), getVelocityStrength(level) * data.getCharge(), false, 0, 0.2, 20, false);
         UtilVelocity.velocity(item, player, velocityData);
 
         hooks.put(player, new Hook(throwable, data, level));
