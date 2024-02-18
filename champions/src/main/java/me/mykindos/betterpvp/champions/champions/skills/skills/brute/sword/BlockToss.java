@@ -112,11 +112,7 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
 
     @Override
     public double getCooldown(int level) {
-        if (cooldown - (level - 1d) * cooldownDecreasePerLevel < 1) {
-            return 0;
-        } else {
-            return cooldown - (level - 1d) * cooldownDecreasePerLevel;
-        }
+        return cooldown - (level - 1d) * cooldownDecreasePerLevel;
     }
 
     @Override
