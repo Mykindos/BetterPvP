@@ -13,6 +13,8 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Container;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.entity.LivingEntity;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,41 +31,47 @@ public class WorldBlockHandler {
     private Core core;
 
     public void addRestoreBlock(Block block, Material newMaterial, long expiry) {
-        addRestoreBlock(block, newMaterial, expiry, true);
+        addRestoreBlock(null, block, newMaterial, expiry, true);
     }
 
     /**
      * Adds a block to be restored
+     * @param entity The entity that summoned this block
      * @param block Block to restore
      * @param newMaterial Material to restore to
      * @param expiry Time in milliseconds to restore
      * @param force Whether to override an existing restore block's expiry or choose the higher value
      */
-    public void addRestoreBlock(Block block, Material newMaterial, long expiry, boolean force) {
+    public void addRestoreBlock(@Nullable LivingEntity entity, Block block, Material newMaterial, long expiry, boolean force) {
         Optional<RestoreBlock> restoreBlockOptional = getRestoreBlock(block);
         if (restoreBlockOptional.isPresent()) {
             final long newExpiry = System.currentTimeMillis() + expiry;
             RestoreBlock restoreBlock = restoreBlockOptional.get();
+            if (entity != null) {
+                restoreBlock.setSummoner(entity);
+            }
             restoreBlock.setExpire(force ? newExpiry : Math.max(restoreBlock.getExpire(), newExpiry));
         } else {
-            restoreBlocks.put(block, new RestoreBlock(block, newMaterial, expiry));
+            RestoreBlock newRestoreBlock = new RestoreBlock(block, newMaterial, expiry, entity);
+            restoreBlocks.put(block, newRestoreBlock);
         }
     }
 
     public void scheduleRestoreBlock(Block block, Material newMaterial, long delay, long expiry) {
-        scheduleRestoreBlock(block, newMaterial, delay, expiry, true);
+        scheduleRestoreBlock(null, block, newMaterial, delay, expiry, true);
     }
 
     /**
      * Adds a block to be restored after a delay
+     * @param entity The entity that summoned this block
      * @param block Block to restore
      * @param newMaterial Material to restore to
      * @param delay Delay in milliseconds
      * @param expiry Time in milliseconds to restore
      * @param force Whether to override an existing restore block's expiry or choose the higher value
      */
-    public void scheduleRestoreBlock(Block block, Material newMaterial, long delay, long expiry, boolean force) {
-        this.scheduledBlocks.put(() -> addRestoreBlock(block, newMaterial, expiry, force), System.currentTimeMillis() + delay);
+    public void scheduleRestoreBlock(@Nullable LivingEntity entity, Block block, Material newMaterial, long delay, long expiry, boolean force) {
+        this.scheduledBlocks.put(() -> addRestoreBlock(entity, block, newMaterial, expiry, force), System.currentTimeMillis() + delay);
     }
 
     public boolean isRestoreBlock(Block block) {

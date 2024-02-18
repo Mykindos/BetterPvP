@@ -3,20 +3,24 @@ package me.mykindos.betterpvp.core.world.blocks;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.MutableGraph;
 import com.google.inject.Inject;
+import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Optional;
 
 @SuppressWarnings("UnstableApiUsage")
 @BPvPListener
@@ -100,6 +104,20 @@ public class RestoreBlockListener implements Listener {
             event.setCancelled(true);
         }
     }
+
+    @EventHandler
+    public void onSuffocationDamage(CustomDamageEvent event) {
+        if (event.getCause() == EntityDamageEvent.DamageCause.SUFFOCATION) {
+            Optional<RestoreBlock> restoreBlockOptional = blockHandler.getRestoreBlock(event.getDamagee().getEyeLocation().getBlock());
+            if (restoreBlockOptional.isPresent()) {
+                LivingEntity newDamager = restoreBlockOptional.get().getSummoner();
+                if (newDamager != null && event.getDamager() == null) {
+                    event.setDamager(newDamager);
+                }
+            }
+        }
+    }
+
 
     // Attempt to update a block if it's not colliding with any restore blocks
     private void attemptUpdate(Block block) {
