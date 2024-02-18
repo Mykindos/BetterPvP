@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.champions.weapons.impl.legendaries.scythe;
+package me.mykindos.betterpvp.champions.weapons.impl.legendaries.scepter;
 
 import com.google.common.base.Preconditions;
 import lombok.Getter;
@@ -58,8 +58,10 @@ public class BlackHole {
     public void tick() {
         if (!impacted) {
             final Optional<Location> result = tryImpact();
-            move();
             result.ifPresent(this::impact);
+            if (result.isEmpty()) {
+            move();
+            }
 
             // Play travel particles
             Particle.REDSTONE.builder()
@@ -67,7 +69,7 @@ public class BlackHole {
                     .count(1)
                     .extra(0.5)
                     .offset(0.1, 0.1, 0.1)
-                    .data(new Particle.DustOptions(Color.BLACK, 2))
+                    .data(new Particle.DustOptions(Color.fromRGB(64, 138, 199), 2))
                     .receivers(60)
                     .spawn();
             return;
@@ -86,7 +88,9 @@ public class BlackHole {
             for (Location point : sphere) {
                 final Location direction = location.clone().subtract(point);
                 direction.multiply(1 - charge);
-                Particle.SQUID_INK.builder()
+                final Color color = Math.random() > 0.5 ? Color.fromRGB(37, 78, 112) : Color.fromRGB(64, 138, 199);
+                Particle.REDSTONE.builder()
+                        .data(new Particle.DustOptions(color, 2))
                         .location(point.clone().add(direction))
                         .count(1)
                         .extra(0)
@@ -94,10 +98,11 @@ public class BlackHole {
                         .spawn();
             }
 
-            Particle.DRAGON_BREATH.builder()
+            Particle.GLOW.builder()
                     .location(location)
                     .count(1)
-                    .extra(0.2)
+                    .extra(0.5)
+                    .offset(0.5, 0.5, 0.5)
                     .receivers(60)
                     .spawn();
 
