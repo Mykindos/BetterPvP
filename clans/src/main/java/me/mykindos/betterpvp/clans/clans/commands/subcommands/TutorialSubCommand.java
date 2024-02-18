@@ -55,19 +55,20 @@ public class TutorialSubCommand extends ClanSubCommand {
             UtilMessage.deserialize("You may only have up to <green>8</green> players between <green><bold>Allied</bold></green> and <aqua><bold>Own</bold></aqua> <aqua>Clans</aqua>. See ")
                     .append(UtilMessage.deserialize("<yellow>/c help</yellow>").clickEvent(ClickEvent.runCommand("/c help")))
                     .append(UtilMessage.deserialize(" for more information on Clan commands.")),
-            UtilMessage.deserialize("There are currently <green>6</green> <gold>Champions</gold> <dark_purple>classes</dark_purple>, one for each armor set. Each has its strengths and weaknesses. There are many different skills to choose between, pick and choose the ones that fit your playstyle most"),
+            UtilMessage.deserialize("There are currently <green>6</green> <gold>Champions</gold> <dark_purple>classes</dark_purple>, one for each armor set. Each has its strengths and weaknesses. There are many different <white>skills</white> to choose between, pick and choose the ones that fit your playstyle most"),
             Component.text(Role.ASSASSIN.getName(), Role.ASSASSIN.getColor()).appendNewline()
-                    .append(UtilMessage.deserialize("Assassin is a quick and agile class. With relatively low health and strong counters, this is not an easy class to be caught out in. Primarily suited for attacking distracted or otherwise occupied enemies, it will struggle against enemies that are prepared.")),
+                    .append(UtilMessage.deserialize(Role.ASSASSIN.getDescription())),
             Component.text(Role.KNIGHT.getName(), Role.KNIGHT.getColor()).appendNewline()
-                    .append(UtilMessage.deserialize("Knight is a strong, aggressive class. It thrives being on the attack, having options to increase damage, while also having a few that can keep them alive long enough to kill their opponent.")),
+                    .append(UtilMessage.deserialize(Role.KNIGHT.getDescription())),
             Component.text(Role.BRUTE.getName(), Role.BRUTE.getColor()).appendNewline()
-                    .append(UtilMessage.deserialize("Brute is a powerhouse that is rarely moved by others. It has good crowd control and defensive abilities.")),
+                    .append(UtilMessage.deserialize(Role.BRUTE.getDescription())),
             Component.text(Role.RANGER.getName(), Role.RANGER.getColor()).appendNewline()
-                    .append(UtilMessage.deserialize("Ranger is a ranged class skilled in the use of the bow. There are different options, rewarding precision, patience, or long distance accuracy.")),
+                    .append(UtilMessage.deserialize(Role.RANGER.getDescription())),
             Component.text(Role.MAGE.getName(), Role.MAGE.getColor()).appendNewline()
-                    .append(UtilMessage.deserialize("Mage is a class skilled with different elements. Choose between life, ice, fire, and earth to support your teammates, trap the enemy, and kill them.")),
+                    .append(UtilMessage.deserialize(Role.MAGE.getDescription())),
             Component.text(Role.WARLOCK.getName(), Role.WARLOCK.getColor()).appendNewline()
-                    .append(UtilMessage.deserialize("Warlock is a class focused on health. Some abilities require the sacrifice in health, others punish enemies for proximity and low health.")),
+                    .append(UtilMessage.deserialize(Role.WARLOCK.getDescription())),
+            UtilMessage.deserialize("You can adjust <white>skills</white> for any <dark_purple>class</dark_purple> at an enchanting table. You can save up to <yellow>4</yellow> <dark_purple>builds</dark_purple>."),
             UtilMessage.deserialize("There is more than just combat, you could also level up other areas. Level up your Progression in <blue>Fishing</blue>, <white>Mining</white>, and <dark_red>Woodcutting</dark_red>"),
             Component.text("Fishing", NamedTextColor.BLUE).appendNewline()
                     .append(UtilMessage.deserialize("Take your rod and cast it into the <blue>Lake</blue>, fishing around for fish and treasures. Level up with catches, cast baits to entice fish, and upgrade your rod to catch heavier fish. Take your catch and sell it at shops, or take your treasure home.")),
