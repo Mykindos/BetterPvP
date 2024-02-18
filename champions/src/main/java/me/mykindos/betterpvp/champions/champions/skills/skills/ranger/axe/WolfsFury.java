@@ -16,6 +16,7 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -23,6 +24,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.WeakHashMap;
 
@@ -108,9 +110,7 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
         }
         if ((active.get(player) - System.currentTimeMillis() <= 0) || force) {
             missedSwings.remove(player);
-            int level = getLevel(player);
-            UtilMessage.message(player, getClassType().getName(), UtilMessage.deserialize("<green>%s %s</green> has ended.", getName(), level));
-            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WOLF_WHINE, 2f, 1);
+            deactivate(player);
             return true;
         }
         return false;
@@ -138,6 +138,15 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WOLF_GROWL, 2f, 1.2f);
         active.put(player, (long) (System.currentTimeMillis() + (getDuration(level) * 1000L)));
         championsManager.getEffects().addEffect(player, EffectType.STRENGTH, strengthLevel, (long) (getDuration(level) * 1000L));
+    }
+
+    public void deactivate(Player player) {
+        UtilMessage.message(player, getClassType().getName(), UtilMessage.deserialize("<green>%s %s</green> has ended.", getName(), getLevel(player)));
+        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WOLF_WHINE, 2f, 1);
+        if (championsManager.getEffects().hasEffect(player, EffectType.STRENGTH)) {
+            championsManager.getEffects().removeEffect(player, EffectType.STRENGTH);
+            player.removePotionEffect(PotionEffectType.INCREASE_DAMAGE);
+        }
     }
 
     @Override
