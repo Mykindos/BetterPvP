@@ -78,7 +78,6 @@ public class CombatListener implements Listener {
     private final ClientManager clientManager;
     private final ArmourManager armourManager;
     private final DamageLogManager damageLogManager;
-
     private final List<CustomDamageAdapter> customDamageAdapters;
 
     @Inject
@@ -346,13 +345,14 @@ public class CombatListener implements Listener {
             event.setDamageDelay(400);
         }
 
+        if (event.getCause() == DamageCause.SUFFOCATION) {
+            event.setDamageDelay(400);
+        }
         if (event.getDamagee().getLocation().getBlock().isLiquid()) {
             if (event.getCause() == DamageCause.FIRE || event.getCause() == DamageCause.FIRE_TICK) {
                 event.cancel("Already in lava / liquid");
             }
         }
-
-
     }
 
     @EventHandler
@@ -446,6 +446,8 @@ public class CombatListener implements Listener {
         if (!(projectile.getShooter() instanceof LivingEntity)) {
             return null;
         }
+
+
         return (LivingEntity) projectile.getShooter();
     }
 
