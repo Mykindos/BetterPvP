@@ -56,8 +56,6 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
     private double damage;
     private double damageIncreasePerLevel;
     private double cooldownDecreasePerLevel;
-    private double velocitySrengthPerLevel;
-    private double baseVelocityStrength;
 
     @Inject
     public FleshHook(Champions champions, ChampionsManager championsManager) {
@@ -74,10 +72,9 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
         return new String[] {
                 "Hold right click with a Sword to channel",
                 "",
-                "Charge a hook that latches onto enemies,",
-                "pulling them towards you with a strength",
-                "of <val>" + UtilFormat.formatNumber(getVelocityStrength(level)) + "</val> and dealing <val>"
-                        + UtilFormat.formatNumber(getDamage(level)) + "</val> damage.",
+                "Charge a hook that latches onto",
+                "enemies pulling them towards you" ,
+                "and dealing <val>" + UtilFormat.formatNumber(getDamage(level)) + "</val> damage.",
                 "",
                 "Cooldown: <val>" + getCooldown(level),
         };
@@ -91,10 +88,6 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
     @Override
     public void invalidatePlayer(Player player, Gamer gamer) {
         gamer.getActionBar().remove(actionBarComponent);
-    }
-
-    private float getVelocityStrength(int level) {
-        return (float) (baseVelocityStrength + (velocitySrengthPerLevel * (level - 1)));
     }
 
     public double getDamage(int level){
@@ -200,7 +193,7 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
         throwable.setCanHitFriendlies(true);
         championsManager.getThrowables().addThrowable(throwable);
 
-        VelocityData velocityData = new VelocityData(player.getLocation().getDirection(), getVelocityStrength(level) * data.getCharge(), false, 0, 0.2, 20, false);
+        VelocityData velocityData = new VelocityData(player.getLocation().getDirection(), 1 + data.getCharge(), false, 0, 0.2, 20, false);
         UtilVelocity.velocity(item, player, velocityData);
 
         hooks.put(player, new Hook(throwable, data, level));
@@ -257,8 +250,6 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
         damage = getConfig("damage", 5.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
         cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 2.0, Double.class);
-        baseVelocityStrength = getConfig("baseVelocityStrength", 1.2, Double.class);
-        velocitySrengthPerLevel = getConfig("velocityStrengthPerLevel", 0.3, Double.class);
     }
 
 
