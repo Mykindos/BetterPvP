@@ -99,7 +99,7 @@ public class Scythe extends ChannelWeapon implements LegendaryWeapon, Listener {
 
     @SuppressWarnings("DataFlowIssue")
     private final DisplayComponent actionBar = ChargeData.getActionBar(
-            gmr -> gmr.isOnline() || !tracked.containsKey(gmr.getPlayer()) || !isHoldingWeapon(gmr.getPlayer()),
+            gmr -> gmr.isOnline() && tracked.containsKey(gmr.getPlayer()) && isHoldingWeapon(gmr.getPlayer()),
             gmr -> tracked.get(gmr.getPlayer()).getChargeData()
     );
 
