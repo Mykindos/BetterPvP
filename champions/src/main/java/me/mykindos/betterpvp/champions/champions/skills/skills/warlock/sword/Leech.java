@@ -63,7 +63,7 @@ public class Leech extends PrepareSkill implements CooldownSkill {
         return new String[]{
                 "Right click with a Sword to activate",
                 "",
-                "Create a soul link with your target, and up to <val>" + getMaximumEnemies(level) + "</val> enemies",
+                "Create a soul link with your target, and up to <stat>" + getMaximumEnemies(level) + "</stat> enemies",
                 "within <stat>" + getRange(level) + "</stat> blocks of your target.",
                 "",
                 "Linked targets have <stat>" + getLeechedHealth(level) + "</stat> health leeched per second",
@@ -292,7 +292,7 @@ public class Leech extends PrepareSkill implements CooldownSkill {
         leachedHealthIncreasePerLevel = getConfig("leachedHealthIncreasePerLevel", 0.0, Double.class);
 
         maximumEnemies = getConfig("maximumEnemies", 2, Integer.class);
-        maximumEnemiesIncreasePerLevel = getConfig("maximumEnemiesIncreasePerLevel", 1, Integer.class);
+        maximumEnemiesIncreasePerLevel = getConfig("maximumEnemiesIncreasePerLevel", 0, Integer.class);
     }
 
     @Data
