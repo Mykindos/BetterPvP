@@ -895,7 +895,7 @@ skills:
       leachedHealthIncreasePerLevel: 0.0
       leechedHealth: 1.0
       maximumEnemies: 2
-      maximumEnemiesIncreasePerLevel: 0
+      maximumEnemiesIncreasePerLevel: 1
     wreath:
       enabled: true
       maxlevel: 5
