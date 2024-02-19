@@ -39,9 +39,7 @@ public class Soul {
 
     private Collection<Player> getNearbyActive(Scythe scythe) {
         return scythe.tracked.keySet().stream()
-                .filter(player -> player.getWorld().equals(location.getWorld()))
-                .filter(player -> player.getLocation().distanceSquared(location) <= scythe.soulViewDistanceBlocks * scythe.soulViewDistanceBlocks)
-                .filter(scythe::isHoldingWeapon)
+                .filter(player -> canSee(player, scythe) && scythe.isHoldingWeapon(player))
                 .toList();
     }
 
@@ -57,7 +55,17 @@ public class Soul {
                 .spawn();
     }
 
-    public void show(Player player, boolean selected) {
+    public boolean canSee(Player player, Scythe scythe) {
+        return !player.getUniqueId().equals(owner)
+                && player.getWorld().equals(location.getWorld())
+                && player.getLocation().distanceSquared(location) <= scythe.soulViewDistanceBlocks * scythe.soulViewDistanceBlocks;
+    }
+
+    public void show(Player player, boolean selected, Scythe scythe) {
+        if (!canSee(player, scythe)) {
+            return;
+        }
+
         final Color color = selected ? Color.GREEN : Color.RED;
         final Vector3f scale = selected ? new Vector3f(1.5f, 1.5f, 1.5f) : new Vector3f(1f, 1f, 1f);
         player.showEntity(JavaPlugin.getPlugin(Champions.class), display);
