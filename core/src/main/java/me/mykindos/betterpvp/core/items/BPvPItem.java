@@ -89,11 +89,9 @@ public class BPvPItem implements IBPvPItem {
             dataContainer.set(CoreNamespaceKeys.CUSTOM_ITEM_KEY, PersistentDataType.STRING, getIdentifier());
         }
         if (getMaxDurability() >= 0) {
-            int durability = UtilItem.getOrSaveCustomDurability(itemMeta, getMaxDurability());
-            applyLore(itemMeta, durability);
-        } else {
-            applyLore(itemMeta);
+            UtilItem.getOrSaveCustomDurability(itemMeta, getMaxDurability());
         }
+        applyLore(itemMeta);
         itemStack.setItemMeta(itemMeta);
         return itemStack;
     }
@@ -306,7 +304,7 @@ public class BPvPItem implements IBPvPItem {
                 return;
             }
         }
-        applyLore(itemMeta, newDurability);
+        applyLore(itemMeta);
         setDurabilityDisplayPercentage(itemMeta);
         itemStack.setItemMeta(itemMeta);
 
@@ -316,19 +314,21 @@ public class BPvPItem implements IBPvPItem {
         return applyLore(itemMeta, getLore());
     }
 
+    //public ItemMeta applyLore(ItemMeta itemMeta, int durability) {
+    //    return applyLore(itemMeta, getLore(), durability);
+    //}
+
     public ItemMeta applyLore(ItemMeta itemMeta, List<Component> lore) {
-        itemMeta.lore(UtilItem.removeItalic(lore));
-        return itemMeta;
-    }
-
-    public ItemMeta applyLore(ItemMeta itemMeta, int durability) {
-        return applyLore(itemMeta, getLore(), durability);
-    }
-
-    public ItemMeta applyLore(ItemMeta itemMeta, List<Component> lore, int durability) {
 
         List<Component> newLore = UtilItem.removeItalic(lore);
-        newLore.add(0, UtilMessage.deserialize("<grey>Durability: %s</grey>", durability).decoration(TextDecoration.ITALIC, false));
+        PersistentDataContainer pdc = itemMeta.getPersistentDataContainer();
+        if (pdc.has(CoreNamespaceKeys.DURABILITY_KEY)) {
+            newLore.add(0, UtilMessage.deserialize("<grey>Durability: %s</grey>", pdc.get(CoreNamespaceKeys.DURABILITY_KEY, PersistentDataType.INTEGER)).decoration(TextDecoration.ITALIC, false));
+        }
+        if (pdc.has(CoreNamespaceKeys.UUID_KEY)) {
+            newLore.add(UtilMessage.deserialize("<yellow>%s</yellow>", pdc.get(CoreNamespaceKeys.UUID_KEY, PersistentDataType.STRING)).decoration(TextDecoration.ITALIC, false));
+        }
+
         itemMeta.lore(newLore);
         return itemMeta;
     }

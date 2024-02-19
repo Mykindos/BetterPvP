@@ -30,6 +30,6 @@ public interface IBPvPItem {
     void damageItem(Player player, ItemStack itemStack, int damage);
     ItemMeta applyLore(ItemMeta itemMeta);
     ItemMeta applyLore(ItemMeta itemMeta, List<Component> lore);
-    ItemMeta applyLore(ItemMeta itemMeta, int durability);
-    public ItemMeta applyLore(ItemMeta itemMeta, List<Component> lore, int durability);
+    //ItemMeta applyLore(ItemMeta itemMeta, int durability);
+    //ItemMeta applyLore(ItemMeta itemMeta, List<Component> lore, int durability);
 }

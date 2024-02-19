@@ -108,13 +108,7 @@ public class ItemHandler {
 
             var loreUpdateEvent = UtilServer.callEvent(new ItemUpdateLoreEvent(itemStack, itemMeta, new ArrayList<>(item.getLore())));
 
-
-
-            if (dataContainer.has(CoreNamespaceKeys.DURABILITY_KEY)) {
-                item.applyLore(itemMeta, loreUpdateEvent.getItemLore(), dataContainer.getOrDefault(CoreNamespaceKeys.DURABILITY_KEY, PersistentDataType.INTEGER, item.getMaxDurability()));
-            } else {
-                item.applyLore(itemMeta, loreUpdateEvent.getItemLore());
-            }
+            item.applyLore(itemMeta, loreUpdateEvent.getItemLore());
 
             if (item.isGlowing() || dataContainer.has(CoreNamespaceKeys.GLOW_KEY)) {
                 UtilItem.addGlow(itemMeta);

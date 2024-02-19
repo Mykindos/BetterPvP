@@ -86,7 +86,7 @@ public class Champions extends BPvPPlugin {
             championsTipManager.loadTips(PACKAGE);
 
             var uuidManager = injector.getInstance(UUIDManager.class);
-            uuidManager.loadObjectsFromNamespace("clans");
+            uuidManager.loadObjectsFromNamespace("champions");
 
             updateEventExecutor.loadPlugin(this);
 

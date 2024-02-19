@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.items.listener;
 
 import com.google.inject.Inject;
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.combat.events.KillContributionEvent;
 import me.mykindos.betterpvp.core.combat.stats.model.Contribution;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
@@ -8,12 +9,13 @@ import me.mykindos.betterpvp.core.items.logger.UUIDItem;
 import me.mykindos.betterpvp.core.items.logger.UUIDManager;
 import me.mykindos.betterpvp.core.items.logger.UuidLogger;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDropItemEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
@@ -26,6 +28,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @BPvPListener
+@Slf4j
 public class UuidListener implements Listener {
 
     @Inject
@@ -38,7 +41,8 @@ public class UuidListener implements Listener {
             return;
         }
         UUIDItem uuidItem = uuidItemOptional.get();
-        int logID = UuidLogger.logID("%s picked up %s at %s", uuidItem.getUuid(), event.getEntity().getName(), event.getEntity().getLocation());
+        Location location = event.getEntity().getLocation();
+        int logID = UuidLogger.logID("%s picked up %s at (%s, %s, %s)", event.getEntity().getName(), uuidItem.getUuid(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
         if (event.getEntity() instanceof Player player) {
             UuidLogger.AddUUIDMetaInfo(logID, uuidItem.getUuid(), UuidLogger.UuidLogType.PICKUP, player.getUniqueId());
         } else {
@@ -47,18 +51,16 @@ public class UuidListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onUUIDDrop(EntityDropItemEvent event) {
+    public void onUUIDDrop(PlayerDropItemEvent event) {
+        log.info(event.getItemDrop().toString());
         Optional<UUIDItem> uuidItemOptional = getUUIDItem(event.getItemDrop().getItemStack());
         if (uuidItemOptional.isEmpty()) {
             return;
         }
         UUIDItem uuidItem = uuidItemOptional.get();
-        int logID = UuidLogger.logID("%s dropped %s at %s", uuidItem.getUuid(), event.getEntity().getName(), event.getEntity().getLocation());
-        if (event.getEntity() instanceof Player player) {
-            UuidLogger.AddUUIDMetaInfo(logID, uuidItem.getUuid(), UuidLogger.UuidLogType.PICKUP, player.getUniqueId());
-        } else {
-            UuidLogger.AddUUIDMetaInfo(logID, uuidItem.getUuid(), UuidLogger.UuidLogType.PICKUP, null);
-        }
+        Location location = event.getPlayer().getLocation();
+        int logID = UuidLogger.logID("%s dropped %s at (%s, %s, %s)", uuidItem.getUuid(), event.getPlayer().getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        UuidLogger.AddUUIDMetaInfo(logID, uuidItem.getUuid(), UuidLogger.UuidLogType.DROP, event.getPlayer().getUniqueId());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
