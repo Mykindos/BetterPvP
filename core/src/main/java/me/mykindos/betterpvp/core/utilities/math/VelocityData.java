@@ -17,8 +17,9 @@ public class VelocityData {
     double maxY;
 
     boolean groundBoost;
+    boolean resetFallDistance;
 
-    public VelocityData(Vector vector, double strength, boolean setY, double baseY, double addY, double maxY, boolean groundBoost) {
+    public VelocityData(Vector vector, double strength, boolean setY, double baseY, double addY, double maxY, boolean groundBoost, boolean resetFallDistance) {
         this.vector = vector;
         this.strength = strength;
         this.setY = setY;
@@ -28,9 +29,12 @@ public class VelocityData {
         this.groundBoost = groundBoost;
     }
 
+    public VelocityData(Vector vector, double strength, boolean setY, double baseY, double addY, double maxY, boolean groundBoost) {
+        this(vector, strength, setY, baseY, addY, maxY, groundBoost, true);
+    }
+
     public VelocityData(Vector vector, double strength, double addY, double maxY, boolean groundBoost) {
         this(vector, strength, false, 0.0D, addY, maxY, groundBoost);
     }
-
 
 }
