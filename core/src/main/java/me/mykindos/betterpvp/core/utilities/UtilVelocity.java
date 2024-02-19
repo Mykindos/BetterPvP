@@ -47,7 +47,9 @@ public class UtilVelocity {
                 vec.setY(vec.getY() + 0.2D);
             }
 
-            target.setFallDistance(0.0F);
+            if (data.isResetFallDistance()) {
+                target.setFallDistance(0.0F);
+            }
 
             CustomEntityVelocityEvent customEntityVelocityEvent = UtilServer.callEvent(new CustomEntityVelocityEvent(target, source, velocityType, vec));
             if(customEntityVelocityEvent.isCancelled()) return;
