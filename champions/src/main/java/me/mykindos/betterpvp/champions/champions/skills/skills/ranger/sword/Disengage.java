@@ -173,7 +173,7 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
         iterator.remove();
         handRaisedTime.remove(playerId);
         if (player != null) {
-            UtilMessage.message(player, getClassType().getName(), UtilMessage.deserialize("You failed <green>%s %d</green>", getName(), getLevel(player)));
+            UtilMessage.simpleMessage(player, getClassType().getName(),"You failed <green>%s %d</green>", getName(), getLevel(player));
         }
     }
 
