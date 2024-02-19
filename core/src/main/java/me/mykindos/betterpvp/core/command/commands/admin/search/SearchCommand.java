@@ -118,4 +118,72 @@ public class SearchCommand extends Command {
             return ArgumentType.NONE.name();
         }
     }
+
+    @Singleton
+    @SubCommand(SearchCommand.class)
+    public static class SearchPlayerSubCommand extends Command {
+
+        @Inject
+        ClientManager clientManager;
+
+        @Override
+        public String getName() {
+            return "player";
+        }
+
+        @Override
+        public String getDescription() {
+            return "Search for an item by a player";
+        }
+
+        public Component getUsage() {
+            return UtilMessage.deserialize("<green>Usage: <player> [amount]");
+        }
+
+        @Override
+        public void execute(Player player, Client client, String... args) {
+            if (args.length < 1) {
+                UtilMessage.message(player, "Search", getUsage());
+                return;
+            }
+
+            clientManager.search().offline(args[0], clientOptional -> {
+                if (clientOptional.isEmpty()) {
+                    UtilMessage.message(player, "Search", UtilMessage.deserialize("<yellow>%s</yellow> is not a valid Player.", args[0]));
+                    return;
+                }
+                int amount = 5;
+
+                if (args.length > 1) {
+                    try {
+                        amount = Integer.parseInt(args[1]);
+                        if (amount < 1) {
+                            throw new NumberFormatException();
+                        }
+                    } catch (NumberFormatException e) {
+                        UtilMessage.message(player, "Search", UtilMessage.deserialize("<green>%s</green> is not a valid integer. Integer must be >= 1.", args[1]));
+                        return;
+                    }
+                }
+
+                Client client1 = clientOptional.get();
+                clientManager.sendMessageToRank("Search", UtilMessage.deserialize("<yellow>%s</yellow> is retrieving logs for <yellow>%s</yellow>", player.getName(), client1.getName()), Rank.HELPER);
+
+                List<String> logs = UuidLogger.getPlayerLogs(client1.getUniqueId(), amount);
+                UtilMessage.message(player, "Search", "Retrieving the last <green>%s</green> logs for <yellow>%s</yellow>", amount, client1.getName());
+
+                for (String log : logs) {
+                    UtilMessage.message(player, "Search", UtilMessage.deserialize("<white>" + log + "</white>"));
+                }
+            });
+        }
+
+        @Override
+        public String getArgumentType(int argCount) {
+            if (argCount == 1) {
+                return ArgumentType.PLAYER.name();
+            }
+            return ArgumentType.NONE.name();
+        }
+    }
 }

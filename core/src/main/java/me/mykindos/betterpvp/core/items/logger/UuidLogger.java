@@ -69,6 +69,35 @@ public class UuidLogger {
         return logList;
     }
 
+    /**
+     *
+     * @param playerUuid the uuid of the legend
+     * @param amount the number of logs to retrieve
+     * @return A list of the last amount of logs relating to this player
+     */
+    public static List<String> getPlayerLogs(UUID playerUuid, int amount) {
+        List<String> logList = new ArrayList<>();
+        if (amount < 0) {
+            return logList;
+        }
+
+        String query = "CALL GetUuidLogsByPlayer(?, ?)";
+        CachedRowSet result = database.executeQuery( new Statement(query,
+                        new UuidStatementValue(playerUuid),
+                        new IntegerStatementValue(amount)
+                )
+        );
+
+        try {
+            while(result.next()) {
+                logList.add(result.getTimestamp(1).toString() + " " + result.getString(2));
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return logList;
+    }
+
 
     public static int logID(String message, Object... args) {
         assert database != null;
