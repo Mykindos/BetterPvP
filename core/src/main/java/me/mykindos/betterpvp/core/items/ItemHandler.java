@@ -8,6 +8,8 @@ import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateLoreEvent;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateNameEvent;
+import me.mykindos.betterpvp.core.items.logger.UUIDItem;
+import me.mykindos.betterpvp.core.items.logger.UUIDManager;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -28,12 +30,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 @Slf4j
 @Singleton
 public class ItemHandler {
 
     private final ItemRepository itemRepository;
+
+    private final UUIDManager uuidManager;
 
     private final HashMap<String, BPvPItem> itemMap = new HashMap<>();
 
@@ -46,8 +51,9 @@ public class ItemHandler {
     private boolean hideEnchants;
 
     @Inject
-    public ItemHandler(Core core, ItemRepository itemRepository) {
+    public ItemHandler(Core core, ItemRepository itemRepository, UUIDManager uuidManager) {
         this.itemRepository = itemRepository;
+        this.uuidManager = uuidManager;
     }
 
     public void loadItemData(String module) {
@@ -87,12 +93,22 @@ public class ItemHandler {
         if (item != null) {
             item.itemify(itemStack);
 
+            PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
+
+            if (item.isGiveUUID()) {
+                if (!dataContainer.has(CoreNamespaceKeys.UUID_KEY)) {
+                    UUID newUuid = UUID.randomUUID();
+                    dataContainer.set(CoreNamespaceKeys.UUID_KEY, PersistentDataType.STRING, newUuid.toString());
+                    uuidManager.addUuid(new UUIDItem(newUuid, item.getNamespace(), item.getKey()));
+                }
+            }
+
             var nameUpdateEvent = UtilServer.callEvent(new ItemUpdateNameEvent(itemStack, itemMeta, item.getName()));
             itemMeta.displayName(nameUpdateEvent.getItemName().decoration(TextDecoration.ITALIC, false));
 
             var loreUpdateEvent = UtilServer.callEvent(new ItemUpdateLoreEvent(itemStack, itemMeta, new ArrayList<>(item.getLore())));
 
-            PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
+
 
             if (dataContainer.has(CoreNamespaceKeys.DURABILITY_KEY)) {
                 item.applyLore(itemMeta, loreUpdateEvent.getItemLore(), dataContainer.getOrDefault(CoreNamespaceKeys.DURABILITY_KEY, PersistentDataType.INTEGER, item.getMaxDurability()));
@@ -107,6 +123,7 @@ public class ItemHandler {
                     itemStack.removeEnchantment(entry.getKey());
                 }
             }
+
         } else {
             final PersistentDataContainer pdc = itemMeta.getPersistentDataContainer();
             if (!pdc.getOrDefault(CoreNamespaceKeys.IMMUTABLE_KEY, PersistentDataType.BOOLEAN, false)) {
@@ -115,6 +132,7 @@ public class ItemHandler {
         }
 
         itemStack.setItemMeta(itemMeta);
+
         return itemStack;
     }
 

@@ -29,7 +29,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 /**
  * Basic item data class, imported via database
@@ -86,11 +85,6 @@ public class BPvPItem implements IBPvPItem {
         ItemMeta itemMeta = itemStack.getItemMeta();
         PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
         itemMeta.displayName(getName());
-        if (isGiveUUID()) {
-            if (!dataContainer.has(CoreNamespaceKeys.UUID_KEY)) {
-                dataContainer.set(CoreNamespaceKeys.UUID_KEY, PersistentDataType.STRING, UUID.randomUUID().toString());
-            }
-        }
         if (!dataContainer.has(CoreNamespaceKeys.CUSTOM_ITEM_KEY)) {
             dataContainer.set(CoreNamespaceKeys.CUSTOM_ITEM_KEY, PersistentDataType.STRING, getIdentifier());
         }

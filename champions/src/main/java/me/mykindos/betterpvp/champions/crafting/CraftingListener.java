@@ -99,6 +99,7 @@ public class CraftingListener implements Listener {
 
         event.setResult(itemHandler.updateNames(result));
 
+
         // Don't ask why, it's just required for some stupid reason
         UtilServer.runTaskLater(champions, () -> event.getInventory().setRepairCost(0), 1);
 

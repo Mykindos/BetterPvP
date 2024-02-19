@@ -21,6 +21,8 @@ import me.mykindos.betterpvp.core.framework.adapter.PluginAdapters;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
 import me.mykindos.betterpvp.core.injector.CoreInjectorModule;
 import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.items.logger.UUIDManager;
+import me.mykindos.betterpvp.core.items.logger.UuidLogger;
 import me.mykindos.betterpvp.core.listener.loader.CoreListenerLoader;
 import me.mykindos.betterpvp.core.logging.Logger;
 import me.mykindos.betterpvp.core.recipes.RecipeHandler;
@@ -70,6 +72,7 @@ public class Core extends BPvPPlugin {
         redis.credentials(this.getConfig());
 
         injector.getInstance(Logger.class);
+        injector.getInstance(UuidLogger.class);
 
         var coreListenerLoader = injector.getInstance(CoreListenerLoader.class);
         coreListenerLoader.registerListeners(PACKAGE);
@@ -89,6 +92,9 @@ public class Core extends BPvPPlugin {
 
         var weaponManager = injector.getInstance(WeaponManager.class);
         weaponManager.load();
+
+        var uuidManager = injector.getInstance(UUIDManager.class);
+        uuidManager.loadObjectsFromNamespace("core");
 
         updateEventExecutor.loadPlugin(this);
         updateEventExecutor.initialize();
