@@ -79,7 +79,7 @@ public class Sacrifice extends Skill implements PassiveSkill {
         }
     }
     public void loadSkillConfig() {
-        basePercentage = getConfig("basePercentage", 0.0, Double.class);
+        basePercentage = getConfig("basePercentage", 0.08, Double.class);
         percentageIncreasePerLevel = getConfig("percentageIncreasePerLevel", 0.08, Double.class);
     }
 }

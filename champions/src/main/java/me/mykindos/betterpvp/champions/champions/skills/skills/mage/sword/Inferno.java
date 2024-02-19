@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -47,7 +48,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkill, ThrowableListener {
+public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkill, EnergySkill, ThrowableListener {
     private final WeakHashMap<Player, ChargeData> charging = new WeakHashMap<>();
     private List<Item> blazePowders = new ArrayList<>();
     private final HashMap<Player, Shotgun> shotguns = new HashMap<>();
@@ -85,12 +86,18 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
                 "Release to shoot a scorching blast of fire",
                 "that ignites anything it hits for <stat>" + getFireDuration(level) + "</stat> seconds",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level),
+                "Energy: <val>" + getEnergyPerSecond(level)
         };
     }
 
     public double getFireDuration(int level) {
         return baseFireDuration + ((level - 1) * fireDurationIncreasePerLevel);
+    }
+
+
+    private float getEnergyPerSecond(int level) {
+        return (float) (energy - ((level - 1) * energyDecreasePerLevel));
     }
 
     public int getNumFlames(int level) {
@@ -103,6 +110,10 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
 
     private double getChargePerSecond(int level) {
         return baseCharge + (chargeIncreasePerLevel * (level - 1));
+    }
+    @Override
+    public float getEnergy(int level) {
+        return energy;
     }
 
     @Override
@@ -183,7 +194,7 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
                 continue;
             }
 
-            if (isHolding(player) && gamer.isHoldingRightClick()) {
+            if (isHolding(player) && gamer.isHoldingRightClick() && championsManager.getEnergy().use(player, getName(), getEnergyPerSecond(level) / 20, true)) {
                 charge.tick();
                 charge.tickSound(player);
                 continue;
@@ -229,7 +240,7 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
                 blazePowders.add(fire);
 
                 fire.teleport(shotgun.getPlayer().getEyeLocation());
-                Vector randomVector = new Vector(UtilMath.randDouble(-0.1, 0.1), UtilMath.randDouble(-0.1, 0.1), UtilMath.randDouble(-0.1, 0.1));
+                Vector randomVector = new Vector(UtilMath.randDouble(-0.01, 0.01), UtilMath.randDouble(-0.01, 0.01), UtilMath.randDouble(-0.01, 0.1));
                 Vector increasedVelocity = shotgun.getPlayer().getLocation().getDirection().add(randomVector).multiply(3);
                 fire.setVelocity(increasedVelocity);
                 shotgun.getPlayer().getWorld().playSound(shotgun.getPlayer().getLocation(), Sound.ENTITY_GHAST_SHOOT, 0.1F, 1.0F);

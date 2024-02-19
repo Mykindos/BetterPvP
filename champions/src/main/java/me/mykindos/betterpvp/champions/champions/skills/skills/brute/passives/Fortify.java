@@ -40,7 +40,7 @@ public class Fortify extends Skill implements PassiveSkill {
     }
 
     private int getPercent(int level) {
-        return ((level - 1) * increasePerLevel);
+        return ((level) * increasePerLevel);
     }
 
     @Override

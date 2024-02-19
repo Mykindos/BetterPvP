@@ -25,8 +25,8 @@ import javax.inject.Singleton;
 @BPvPListener
 public class Backstab extends Skill implements PassiveSkill, Listener {
 
-    private double baseIncrease;
-    private double increasePerLevel;
+    private double damageIncreasePerLevel;
+    private double damage;
 
     @Inject
     public Backstab(Champions champions, ChampionsManager championsManager) {
@@ -47,7 +47,7 @@ public class Backstab extends Skill implements PassiveSkill, Listener {
     }
 
     public double getDamageModifier(int level) {
-        return baseIncrease + ((level - 1) * increasePerLevel);
+        return damage + ((level - 1) * damageIncreasePerLevel);
     }
 
     @EventHandler
@@ -79,7 +79,7 @@ public class Backstab extends Skill implements PassiveSkill, Listener {
 
     @Override
     public void loadSkillConfig() {
-        increasePerLevel = getConfig("increasePerLevel", 0.0, Double.class);
-        baseIncrease = getConfig("baseIncrease", 1.5, Double.class);
+        damageIncreasePerLevel = getConfig("increasePerLevel", 1.5, Double.class);
+        damage = getConfig("baseIncrease", 1.5, Double.class);
     }
 }

@@ -115,7 +115,7 @@ public class SilencingStrikes extends Skill implements PassiveSkill, Listener {
     public void loadSkillConfig() {
         hitsNeeded = getConfig("hitsNeeded", 3, Integer.class);
         timeSpan = getConfig("timeSpan", 0.8, Double.class);
-        baseDuration = getConfig("baseDuration", 0.0, Double.class);
+        baseDuration = getConfig("baseDuration", 1.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
     }
 }

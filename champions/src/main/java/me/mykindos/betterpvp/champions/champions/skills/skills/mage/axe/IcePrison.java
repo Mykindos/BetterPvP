@@ -103,8 +103,9 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
             if (loc.getBlock().getType().name().contains("REDSTONE")) continue;
             if (loc.getBlock().getType() == Material.AIR || UtilBlock.airFoliage(loc.getBlock())) {
                 int level = getLevel((Player) throwableItem.getThrower());
-                blockHandler.addRestoreBlock(loc.getBlock(), Material.ICE, (long) (getDuration(level) * 1000));
-
+                if (throwableItem.getThrower() instanceof Player player) {
+                    blockHandler.addRestoreBlock(player, loc.getBlock(), Material.ICE, (long) (getDuration(level) * 1000), true);
+                }
                 loc.getBlock().setType(Material.ICE);
             }
         }

@@ -75,7 +75,7 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
                 "and giving your attacker <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength + 1) + "</effect> for",
                 "<val>" + getSlowDuration(level) + "</val> seconds",
                 "",
-                "Cooldown: <stat>" + getCooldown(level)};
+                "Cooldown: <val>" + getCooldown(level)};
     }
 
     public double getSlowDuration(int level) {
@@ -114,7 +114,7 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
             event.setKnockback(false);
             event.setDamage(0);
 
-            VelocityData velocityData = new VelocityData(vec, 3, true, 0, 0.4, 1.5, true);
+            VelocityData velocityData = new VelocityData(vec, 2.2, true, 0, 0.4, 1.5, true);
             UtilVelocity.velocity(damagee, event.getDamager(), velocityData);
 
             championsManager.getEffects().addEffect(damagee, EffectType.NOFALL, 3000);

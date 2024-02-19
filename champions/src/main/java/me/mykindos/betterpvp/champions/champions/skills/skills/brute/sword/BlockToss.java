@@ -86,7 +86,7 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
                 "Boulder size increases at a rate",
                 "of <val>" + getChargePerSecond(level) + "</val> per level.",
                 "",
-                "Recharge: <val>" + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level)
         };
     }
 
@@ -159,6 +159,10 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
             clonedBlocks.add(Bukkit.createBlockData(Material.DIRT));
             clonedBlocks.add(Bukkit.createBlockData(Material.COBBLESTONE));
             clonedBlocks.add(Bukkit.createBlockData(Material.STONE));
+        }
+
+        if (charging.containsKey(player)) {
+            return;
         }
 
         final BlockTossObject boulder = new BlockTossObject(clonedBlocks, this, player);
@@ -234,7 +238,7 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onHit(ProjectileHitEvent event) {
         if (!(event.getEntity() instanceof Arrow arrow) || !(arrow.getShooter() instanceof Player player)) {
             return;
@@ -283,7 +287,7 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
                     final List<Entity> nearby = referenceEntity.getNearbyEntities(hitBoxSize, hitBoxSize, hitBoxSize);
                     nearby.remove(caster);
                     nearby.removeIf(entity -> !(entity instanceof LivingEntity) || entity instanceof ArmorStand);
-                    if (!nearby.isEmpty()) {
+                    if (!nearby.isEmpty() || !referenceEntity.getLocation().getBlock().isPassable()) {
                         boulder.impact(caster);
                     }
                 }

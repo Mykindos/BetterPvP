@@ -165,6 +165,7 @@ public class Stampede extends Skill implements PassiveSkill {
 
         double additionalDamage = (str + 1) * getDamage(level);
         event.setDamage(event.getDamage() + additionalDamage);
+
     }
 
     @Override

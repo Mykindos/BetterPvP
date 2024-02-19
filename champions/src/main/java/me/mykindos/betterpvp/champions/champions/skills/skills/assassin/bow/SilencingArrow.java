@@ -75,7 +75,7 @@ public class SilencingArrow extends PrepareArrowSkill {
             UtilMessage.simpleMessage(damager, getClassType().getName(), "<alt>" + target.getName() + "</alt> is immune to your silence!");
             return;
         }
-        UtilMessage.message(damager, getClassType().getName(), "You hit <yellow>%s</yellow> with <green>%s %s</green>.", target.getName(), getName(), level);
+        UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit <yellow>%s</yellow> with <green>%s %s</green>.", target.getName(), getName(), level);
         if (!(target instanceof Player damagee)) return;
         UtilMessage.simpleMessage(damagee, getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s %s</alt>.", damager.getName(), getName(), level);
     }
