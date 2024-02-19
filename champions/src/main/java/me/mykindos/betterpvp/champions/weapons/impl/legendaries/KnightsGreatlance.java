@@ -119,11 +119,9 @@ public class KnightsGreatlance extends ChannelWeapon implements InteractWeapon, 
             gamer.getActionBar().add(250, actionBar);
         }
         active.putIfAbsent(player, new LanceData(UtilPlayer.getMidpoint(player), gamer, 0));
-        this.effectManager.addEffect(player, EffectType.NO_JUMP, -50);
     }
 
     private void deactivate(Player player, LanceData data) {
-        this.effectManager.removeEffect(player, EffectType.NO_JUMP);
         data.getGamer().getActionBar().remove(actionBar);
     }
 
@@ -232,6 +230,7 @@ public class KnightsGreatlance extends ChannelWeapon implements InteractWeapon, 
 
             // Move
             data.setLastLocation(newLocation);
+            this.effectManager.addEffect(player, EffectType.NO_JUMP, 100);
             VelocityData velocityData = new VelocityData(player.getLocation().getDirection(), chargeVelocity, true, 0, 0.0, 0.0, false);
             UtilVelocity.velocity(player, null, velocityData);
 
