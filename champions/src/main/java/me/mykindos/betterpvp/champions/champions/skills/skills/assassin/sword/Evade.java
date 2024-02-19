@@ -175,7 +175,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
                     if (!gamer.isHoldingRightClick()) {
                         handRaisedTime.remove(player.getUniqueId());
                         it.remove();
-                        UtilMessage.message(player, getClassType().getName(), UtilMessage.deserialize("You failed <green>%s %d</green>", getName(), getLevel(player)));
+                        UtilMessage.message(player, getClassType().getName(), UtilMessage.deserialize("You failed <green>%s %d</green>", getName(), level));
                         player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
                     } else if (!handRaisedTime.containsKey(player.getUniqueId())) {
                         it.remove();
