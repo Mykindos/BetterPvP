@@ -13,9 +13,8 @@ skills:
       enabled: true
       cooldown: 20.0
       maxlevel: 3
-      damagePerSecond: 2.0
       cooldownDecreasePerLevel: 1.0
-      baseDuration: 0.0
+      baseDuration: 1.0
       durationIncreasePerLevel: 1.0
       hitDistance: 4.0
     shockingstrikes:
@@ -35,8 +34,8 @@ skills:
     backstab:
       enabled: true
       maxlevel: 3
-      increasePerLevel: 1.5
-      baseIncrease: 0.0
+      damageIncreasePerLevel: 1.5
+      damage: 1.5
     smokebomb:
       enabled: true
       cooldown: 50.0
@@ -66,7 +65,7 @@ skills:
       maxlevel: 3
       hitsNeeded: 3
       timeSpan: 0.8
-      baseDuration: 0.0
+      baseDuration: 1.0
       durationIncreasePerLevel: 1.0
     comboattack:
       enabled: true
@@ -174,9 +173,9 @@ skills:
     vengeance:
       enabled: true
       maxlevel: 3
-      baseDamage: 0.0
+      baseDamage: 1.0
       damageIncreasePerLevel: 1.0
-      baseMaxDamage: 1.0
+      baseMaxDamage: 2.0
       baseMaxDamageIncreasePerLevel: 1.0
       expirationTime: 5.0
     levelfield:
@@ -225,7 +224,7 @@ skills:
       timeBetweenCharges: 2.0
       timeOutOfCombat: 2.5
       damageIncreasePerCharge: 0.5
-      baseDamageIncreasePerLevelPerCharge: 0.0
+      baseDamageIncreasePerLevelPerCharge: 1.0
     thorns:
       enabled: true
       maxlevel: 3
@@ -235,7 +234,7 @@ skills:
     sacrifice:
       enabled: true
       maxlevel: 3
-      basePercentage: 0.0
+      basePercentage: 0.08
       percentageIncreasePerLevel: 0.08
     defensivestance:
       enabled: true
@@ -342,7 +341,7 @@ skills:
       cooldownDecreasePerLevel: 2.0
       baseDamage: 6.0
       damageIncreasePerLevel: 0.0
-      baseFireDuration: 2.0
+      minFireDuration: 4.0
       radius: 6.0
       radiusIncreasePerLevel: 0.5
     iceprison:
@@ -402,7 +401,7 @@ skills:
     magmablade:
       enabled: true
       maxlevel: 3
-      baseDamage: 0.0
+      baseDamage: 1.0
       damageIncreasePerLevel: 1.0
     moltenshield:
       enabled: true
@@ -431,8 +430,8 @@ skills:
       maxlevel: 3
       energy: 20
       energyDecreasePerLevel: 2.0
-      cooldown: 2.5
-      cooldownDecreasePerLevel: 1.0
+      cooldown: 2.0
+      cooldownDecreasePerLevel: 0.5
       damage: 1.5
       damageIncreasePerLevel: 1.0
     void:
@@ -628,7 +627,7 @@ skills:
       maxlevel: 3
       bonusDamage: 1.0
       healthOverTarget: 2.0
-      baseMaxDamage: 0.0
+      baseMaxDamage: 0.5
       maxDamageIncreasePerLevel: 0.5
   ranger:
     wolfspounce:
@@ -655,7 +654,7 @@ skills:
       maxlevel: 5
       cooldown: 14.0
       cooldownDecreasePerLevel: 1.0
-      baseBurnDuration: 0.0
+      baseBurnDuration: 1.5
       burnDurationIncreasePerLevel: 1.5
     ropedarrow:
       enabled: true
@@ -676,7 +675,7 @@ skills:
       maxlevel: 5
       cooldown: 13.0
       cooldownDecreasePerLevel: 1.5
-      baseDuration: 0.0
+      baseDuration: 1.5
       durationIncreasePerLevel: 1.5
       slownessStrength: 3
     longshot:
@@ -709,7 +708,7 @@ skills:
     precision:
       enabled: true
       maxlevel: 3
-      baseDamage: 0.0
+      baseDamage: 0.5
       damageIncreasePerLevel: 0.5
     barbedarrows:
       enabled: true
@@ -738,7 +737,7 @@ skills:
       maxConsecutiveHits: 3
       numMisses: 1
       maxTimeBetweenShotsIncreasePerLevel: 1.0
-      baseDamage: 0.0
+      baseDamage: 0.75
       damageIncreasePerLevel: 0.75
     agility:
       enabled: true
@@ -883,7 +882,7 @@ skills:
       cooldownDecreasePerLevel: 1.5
       baseDistance: 10.0
       distanceIncreasePerLevel: 5.0
-      baseDamage: 0.0
+      baseDamage: 2.0
       damageIncreasePerLevel: 1.0
     leech:
       enabled: true

@@ -74,7 +74,7 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
                 "",
                 "Charge a hook that latches onto",
                 "enemies pulling them towards you" ,
-                "and dealing <val>" + UtilFormat.formatNumber(getDamage(level)) + "</val> damage.",
+                "and dealing <val>" + getDamage(level) + "</val> damage.",
                 "",
                 "Cooldown: <val>" + getCooldown(level),
         };
