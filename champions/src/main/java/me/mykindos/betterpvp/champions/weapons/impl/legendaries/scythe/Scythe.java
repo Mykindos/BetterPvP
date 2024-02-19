@@ -36,7 +36,6 @@ public class Scythe extends ChannelWeapon implements LegendaryWeapon, Listener {
     protected final Map<UUID, Soul> souls = new HashMap<>();
     private final ClientManager clientManager;
 
-    protected double baseDamage;
     protected double maxSoulsDamage;
     protected int maxSouls;
     protected double soulHarvestSeconds;
@@ -78,7 +77,7 @@ public class Scythe extends ChannelWeapon implements LegendaryWeapon, Listener {
                 });
 
         for (Soul soul : souls.values()) {
-            soul.show(player, false);
+            soul.show(player, false, this);
         }
     }
 
@@ -151,7 +150,6 @@ public class Scythe extends ChannelWeapon implements LegendaryWeapon, Listener {
 
     @Override
     public void loadWeaponConfig() {
-        baseDamage = getConfig("baseDamage", 8.0, Double.class);
         maxSoulsDamage = getConfig("maxSoulsDamage", 4.0, Double.class);
         maxSouls = getConfig("maxSouls", 3, Integer.class);
         soulHarvestSeconds = getConfig("soulHarvestSeconds", 1.5, Double.class);
@@ -165,6 +163,6 @@ public class Scythe extends ChannelWeapon implements LegendaryWeapon, Listener {
         summonMobSoulChance = getConfig("summonMobSoulChance", 0.4, Double.class);
         speedAmplifierPerSoul = getConfig("speedAmplifierPerSoul", 1.0, Double.class);
         baseHeal = getConfig("baseHeal", 0.25, Double.class);
-        healPerSoul = getConfig("healPerSoul", 0.05, Double.class);
+        healPerSoul = getConfig("healPerSoul", 0.1, Double.class);
     }
 }

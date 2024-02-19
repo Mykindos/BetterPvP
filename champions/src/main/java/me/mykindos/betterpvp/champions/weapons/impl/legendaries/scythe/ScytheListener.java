@@ -73,7 +73,7 @@ public class ScytheListener implements Listener {
         if (!(event.getDamager() instanceof Player damager)) return;
         if (scythe.isHoldingWeapon(damager) && scythe.tracked.containsKey(damager)) {
             final double soulCount = scythe.tracked.get(damager).getSoulCount();
-            event.setDamage(scythe.baseDamage + scythe.maxSoulsDamage * soulCount / scythe.maxSouls);
+            event.setDamage(scythe.getBaseDamage() + scythe.maxSoulsDamage * soulCount / scythe.maxSouls);
             UtilPlayer.health(damager, scythe.baseHeal + scythe.healPerSoul * soulCount);
         }
     }
@@ -205,11 +205,11 @@ public class ScytheListener implements Listener {
             Soul oldTarget = data.getTargetSoul();
             if (target != oldTarget) {
                 if (oldTarget != null) {
-                    oldTarget.show(player, false);
+                    oldTarget.show(player, false, scythe);
                 }
 
                 if (target != null) {
-                    target.show(player, true);
+                    target.show(player, true, scythe);
                 }
             }
 
@@ -239,7 +239,7 @@ public class ScytheListener implements Listener {
                     data.playHarvestProgress();
                 } else {
                     data.playHarvest(soul);
-                    scythe.souls.remove(soul);
+                    scythe.souls.remove(soul.getUniqueId());
                     Bukkit.getScheduler().runTaskLater(JavaPlugin.getPlugin(Champions.class), soul.getDisplay()::remove, 2);
                 }
             } else if (target != null && !target.isHarvesting()) {
@@ -271,7 +271,7 @@ public class ScytheListener implements Listener {
     }
 
     protected void trySummonSoul(LivingEntity entity, double soulCount) {
-        if (entity instanceof ArmorStand armorStand) {
+        if (entity instanceof ArmorStand) {
             return;
         }
 
@@ -306,7 +306,7 @@ public class ScytheListener implements Listener {
             );
             spawned.setTransformation(transformation);
 
-            if (entity instanceof Player player) {
+            if (entity instanceof Player) {
                 try {
                     final ItemStack item = new SkullBuilder(entity.getUniqueId()).get();
                     spawned.setItemStack(item);
@@ -323,7 +323,10 @@ public class ScytheListener implements Listener {
 
         // Show to everyone who can see the soul
         for (Player toShow : scythe.tracked.keySet()) {
-            soul.show(toShow, false);
+            if (!scythe.isHoldingWeapon(toShow)) {
+                continue;
+            }
+            soul.show(toShow, false, scythe);
         }
     }
 
