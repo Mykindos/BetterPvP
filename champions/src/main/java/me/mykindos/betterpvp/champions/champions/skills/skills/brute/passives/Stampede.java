@@ -133,42 +133,43 @@ public class Stampede extends Skill implements PassiveSkill {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onDamage(CustomDamageEvent event) {
+        if (!(event.getDamagee() instanceof Player damagee)) return;
 
-        if (event.getDamager() instanceof Player damager) {
+        int str = sprintStr.getOrDefault(damagee, 0);
+        if (str < 1) return;
 
-            if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
-            int str = sprintStr.getOrDefault(damager, 0);
-            if (str < 1) return;
-
-            int level = getLevel(damager);
-
-            sprintTime.remove(damager);
-            sprintStr.remove(damager);
-            damager.removePotionEffect(PotionEffectType.SPEED);
-
-            double bonusKnockback = getBonusKnockback(level);
-
-            event.setKnockback(false);
-            VelocityData velocityData = new VelocityData(UtilVelocity.getTrajectory2d(damager, event.getDamagee()), bonusKnockback, true, 0.0D, 0.4D, 1.0D, true);
-            UtilVelocity.velocity(event.getDamagee(), damager, velocityData, VelocityType.KNOCKBACK);
-
-            double additionalDamage = (str + 1) * getDamage(level);
-            event.setDamage(event.getDamage() + additionalDamage);
-        } else if (event.getDamagee() instanceof Player player) {
-            int str = sprintStr.getOrDefault(player, 0);
-            if (str < 1) return;
-
-            if(player.hasPotionEffect(PotionEffectType.SPEED)) {
-                player.removePotionEffect(PotionEffectType.SPEED);
-                sprintTime.remove(player);
-                sprintStr.remove(player);
-            }
+        if(damagee.hasPotionEffect(PotionEffectType.SPEED)) {
+            damagee.removePotionEffect(PotionEffectType.SPEED);
+            sprintTime.remove(damagee);
+            sprintStr.remove(damagee);
         }
+    }
+
+    public void onHit(CustomDamageEvent event){
+        if (!(event.getDamager() instanceof Player damager)) return;
+        if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
+        int str = sprintStr.getOrDefault(damager, 0);
+        if (str < 1) return;
+
+        int level = getLevel(damager);
+
+        sprintTime.remove(damager);
+        sprintStr.remove(damager);
+        damager.removePotionEffect(PotionEffectType.SPEED);
+
+        double bonusKnockback = getBonusKnockback(level);
+
+        event.setKnockback(false);
+        VelocityData velocityData = new VelocityData(UtilVelocity.getTrajectory2d(damager, event.getDamagee()), bonusKnockback, true, 0.0D, 0.4D, 1.0D, true);
+        UtilVelocity.velocity(event.getDamagee(), damager, velocityData, VelocityType.KNOCKBACK);
+
+        double additionalDamage = (str + 1) * getDamage(level);
+        event.setDamage(event.getDamage() + additionalDamage);
     }
 
     @Override
     public void loadSkillConfig() {
-        durationPerStack = getConfig("durationPerStack", 4.0, Double.class);
+        durationPerStack = getConfig("durationPerStack", 6.0, Double.class);
         durationPerStackDecreasePerLevel = getConfig("durationPerStackDecreasePerLevel", 1.0, Double.class);
         damage = getConfig("damage", 0.5, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.5, Double.class);
