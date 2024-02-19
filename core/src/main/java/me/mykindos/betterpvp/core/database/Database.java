@@ -51,24 +51,34 @@ public class Database {
         UtilServer.runTaskAsync(core, () -> executeUpdate(statement));
     }
 
+    public void executeUpdate(Statement statement) {
+        executeUpdate(statement, null);
+    }
+
     /**
      * @param statement The statement and values
      */
-    public void executeUpdate(Statement statement) {
+    public void executeUpdate(Statement statement, Consumer<ResultSet> callback) {
         Connection connection = getConnection().getDatabaseConnection();
         try {
             @Cleanup
-            PreparedStatement preparedStatement = connection.prepareStatement(statement.getQuery());
+            PreparedStatement preparedStatement = connection.prepareStatement(statement.getQuery(), java.sql.Statement.RETURN_GENERATED_KEYS);
             for (int i = 1; i <= statement.getValues().length; i++) {
                 StatementValue<?> val = statement.getValues()[i - 1];
                 preparedStatement.setObject(i, val.getValue(), val.getType());
             }
             preparedStatement.executeUpdate();
 
+            if (callback != null) {
+                callback.accept(preparedStatement.getGeneratedKeys());
+            }
+
         } catch (SQLException ex) {
             log.error("Error executing update: {}", statement.getQuery(), ex);
         }
     }
+
+
 
     public void executeBatch(List<Statement> statements, boolean async) {
         executeBatch(statements, async, null);
@@ -119,6 +129,8 @@ public class Database {
             }
         }
     }
+
+
 
     /**
      * @param statement The statement and values

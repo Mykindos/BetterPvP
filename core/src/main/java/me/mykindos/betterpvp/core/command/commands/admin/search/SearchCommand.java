@@ -106,7 +106,7 @@ public class SearchCommand extends Command {
             UtilMessage.message(player, "Search", "Retrieving the last <green>%s</green> logs for <yellow>%s</yellow> (<green>%s</green>)", amount, uuid.toString(), uuidItem.getIdentifier());
 
             for (String log : logs) {
-                UtilMessage.message(player, "Search", UtilMessage.deserialize(log));
+                UtilMessage.message(player, "Search", UtilMessage.deserialize("<white>" + log + "</white>"));
             }
         }
 

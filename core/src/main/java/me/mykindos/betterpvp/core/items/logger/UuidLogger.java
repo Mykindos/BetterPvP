@@ -15,6 +15,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Singleton
 @Slf4j
@@ -76,23 +77,20 @@ public class UuidLogger {
         log.info(logMessage);
         StringStatementValue stringStatementValueLevel = new StringStatementValue("LEGEND");
         StringStatementValue stringStatementValueMessage = new StringStatementValue(logMessage);
-
+        AtomicInteger id = new AtomicInteger(-1);
         database.executeUpdate(new Statement("INSERT INTO logs (Level, Message) VALUES (?, ?)",
                 stringStatementValueLevel,
                 stringStatementValueMessage
-        ));
-        String query = "SELECT id FROM logs WHERE Level = ? AND Message = ?";
-        CachedRowSet result = database.executeQuery(new Statement(query, stringStatementValueLevel, stringStatementValueMessage));
-        try {
-            if (!result.first()) {
-                log.error("Could not find the id for Level = " + "LEGEND" + ", Message = " + logMessage);
-                return -1;
+        ), resultSet -> {
+            try {
+                if (resultSet.next()) {
+                    id.set(resultSet.getInt(1));
+                }
+            } catch (SQLException ex) {
+              ex.printStackTrace();
             }
-            return result.getInt(1);
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            return -1;
-        }
+        });
+        return id.get();
     }
 
      public enum UuidLogType {
@@ -109,9 +107,9 @@ public class UuidLogger {
           */
          DEATH,
          /**
-          * An UUIDItem is spawned
+          * An UUIDItem is picked up or moved from an inventory
           */
-         SPAWN,
+         RETREIVE,
          /**
           * An UUIDItem is stored in a container
           */
