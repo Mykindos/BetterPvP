@@ -133,16 +133,7 @@ public class UuidListener implements Listener {
             if (event.getAction().name().contains("PICKUP")) {
                 Optional<UUIDItem> uuidItemsOptional = getUUIDItem(event.getCurrentItem());
                 if (uuidItemsOptional.isPresent()) {
-                    UUIDItem uuidItem = uuidItemsOptional.get();
-                    Location location = Objects.requireNonNull(event.getClickedInventory()).getLocation();
                     lastInventory.put(player, event.getClickedInventory());
-                    /*
-                    int logID = UuidLogger.logID("%s retrieved %s from %s at (%s, %s, %s) in %s", player.getName(), uuidItem.getUuid(), Objects.requireNonNull(event.getClickedInventory()).getType().name(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
-                    if (logID < 0) {
-                        return;
-                    }
-                    UuidLogger.AddUUIDMetaInfo(logID, uuidItem.getUuid(), UuidLogger.UuidLogType.RETREIVE, player.getUniqueId());
-                     */
                 }
             }
         }
@@ -157,28 +148,7 @@ public class UuidListener implements Listener {
         if (event.isCancelled()) return;
         if (event.getWhoClicked() instanceof Player player) {
             if (event.getAction().name().contains("PLACE")){
-                Optional<UUIDItem> UuidItemOptional = getUUIDItem(event.getCursor());
-                if (UuidItemOptional.isPresent()) {
-                    //TODO Add handing for different type for retrieving/storing
-                    //we are placing a UUID item
-                    UUIDItem item = UuidItemOptional.get();
-                    Location location = Objects.requireNonNull(event.getClickedInventory()).getLocation();
-                    assert lastInventory.containsKey(player);
-                    if (lastInventory.get(player) == event.getClickedInventory()) {
-                        //this is a move between the same inventory. We don't care about it.
-                        log.info("Last inventory the same, don't need to update");
-                        lastInventory.remove(player);
-                        return;
-                    }
-                    InventoryType inventoryType = Objects.requireNonNull(event.getClickedInventory()).getType();
-                    int logID = UuidLogger.logID("%s placed %s in %s from %s at (%s, %s, %s) in %s", player.getName(), item.getUuid(), inventoryType.name(), lastInventory.get(player).getType().name(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
-                    if (logID < 0) {
-                        lastInventory.remove(player);
-                        return;
-                    }
-                    UuidLogger.AddUUIDMetaInfo(logID, item.getUuid(), inventoryType.equals(InventoryType.PLAYER) ? UuidLogger.UuidLogType.RETREIVE : UuidLogger.UuidLogType.CONTAINER_STORE, player.getUniqueId());
-                    lastInventory.remove(player);
-                }
+                placeItemLogic(player, event.getClickedInventory(), event.getCursor());
             }
         }
     }
@@ -188,24 +158,7 @@ public class UuidListener implements Listener {
         if (event.isCancelled()) return;
         if (event.getWhoClicked() instanceof Player player) {
             if (event.getAction().equals(InventoryAction.SWAP_WITH_CURSOR)) {
-                //first, do placing logic
-                Optional<UUIDItem> UuidItemOptional1 = getUUIDItem(event.getCursor());
-                if (UuidItemOptional1.isPresent()) {
-                    //we are placing a UUID item
-                    UUIDItem item = UuidItemOptional1.get();
-                    Location location = Objects.requireNonNull(event.getClickedInventory()).getLocation();
-                    assert lastInventory.containsKey(player);
-                    if (lastInventory.get(player) == event.getClickedInventory()) {
-                        log.info("Last inventory the same, don't need to update");
-                    } else {
-                        InventoryType inventoryType = Objects.requireNonNull(event.getClickedInventory()).getType();
-                        int logID = UuidLogger.logID("%s placed %s in %s from %s at (%s, %s, %s) in %s", player.getName(), item.getUuid(), inventoryType.name(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
-                        if (logID >= 0) {
-                            UuidLogger.AddUUIDMetaInfo(logID, item.getUuid(), inventoryType.equals(InventoryType.PLAYER) ? UuidLogger.UuidLogType.RETREIVE : UuidLogger.UuidLogType.CONTAINER_STORE, player.getUniqueId());
-                        }
-                    }
-                    lastInventory.remove(player);
-                }
+                placeItemLogic(player, event.getClickedInventory(), event.getCursor());
                 //now do pickup logic
                 Optional<UUIDItem> uuidItemsOptional = getUUIDItem(event.getCurrentItem());
                 if (uuidItemsOptional.isPresent()) {
@@ -216,46 +169,17 @@ public class UuidListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onInventoryHotbarSwap(InventoryClickEvent event) {
+    public void onInventoryHotbar(InventoryClickEvent event) {
         if (event.isCancelled()) return;
         if (event.getWhoClicked() instanceof Player player) {
-            if (event.getAction().equals(InventoryAction.HOTBAR_SWAP)) {
-                log.info("HOTBAR_SWAP");
-                if (!event.getClickedInventory().getType().equals(InventoryType.PLAYER)) {
-                    Optional<UUIDItem> UuidItemOptional = getUUIDItem(event.getCurrentItem());
-                    if (UuidItemOptional.isPresent()) {
-                        log.info("INVENTORY -> Player");
-                        UUIDItem item = UuidItemOptional.get();
-                        Location location = event.getClickedInventory().getLocation();
-                        int logID = UuidLogger.logID("%s retrieved %s from %s at (%s, %s, %s) in %s", player.getName(), item.getUuid(), Objects.requireNonNull(event.getClickedInventory()).getType().name(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
-                        if (logID >= 0) {
-                            UuidLogger.AddUUIDMetaInfo(logID, item.getUuid(), UuidLogger.UuidLogType.RETREIVE, player.getUniqueId());
-                        }
-                    } else {
-                        //this might still be a swap, just in the opposite direction
-                        //need to run this after this event finishes, otherwise it won't be in the slot
-                        UtilServer.runTaskLater(core, false, () -> {
-                            ItemStack itemStack = event.getClickedInventory().getItem(event.getSlot());
-                            Optional<UUIDItem> UuidItemOptional2 = getUUIDItem(itemStack);
-                            if (UuidItemOptional2.isPresent()) {
-                                log.info("Player -> Inventory");
-                                UUIDItem item = UuidItemOptional2.get();
-                                Location location = event.getClickedInventory().getLocation();
-                                int logID = UuidLogger.logID("%s stored %s at %s (%s, %s, %s) in %s", player.getName(), item.getUuid(), Objects.requireNonNull(event.getClickedInventory()).getType().name(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
-                                if (logID >= 0) {
-                                    UuidLogger.AddUUIDMetaInfo(logID, item.getUuid(), UuidLogger.UuidLogType.CONTAINER_STORE, player.getUniqueId());
-                                }
-                            }
-                        }, 1);
+            if (event.getAction().name().contains("HOTBAR")) {
+                if (!Objects.requireNonNull(event.getClickedInventory()).getType().equals(InventoryType.PLAYER)) {
+                    processRetrieveItem(player, event.getClickedInventory(), event.getCurrentItem());
+                    UtilServer.runTaskLater(core, false, () -> processStoreItemInSlot(player, event.getClickedInventory(), event.getSlot()), 1);
                     }
-                } else {
-                    //dont care
-                    log.info("Player -> Player");
                 }
             }
         }
-    }
-
 
     @EventHandler
     public void InventoryClickEvent(InventoryClickEvent event) {
@@ -270,6 +194,50 @@ public class UuidListener implements Listener {
         log.info("Click " + event.getClick());
         log.info("Hotbar button " + event.getHotbarButton());
         log.info("SlotType " + event.getSlotType());
+    }
+
+    private void placeItemLogic(Player player, Inventory inventory, ItemStack itemStack) {
+        if (lastInventory.containsKey(player)) {
+            if (!(lastInventory.get(player) == inventory)) {
+                assert inventory != null;
+                if (inventory.getType().equals(InventoryType.PLAYER)) {
+                    processRetrieveItem(player, lastInventory.get(player), itemStack);
+                } else {
+                    processStoreItem(player, lastInventory.get(player), itemStack);
+                }
+            }
+        }
+        lastInventory.remove(player);
+    }
+
+    private void processRetrieveItem(Player player, Inventory inventory, ItemStack itemStack) {
+        Optional<UUIDItem> UuidItemOptional = getUUIDItem(itemStack);
+        if (UuidItemOptional.isPresent()) {
+            UUIDItem item = UuidItemOptional.get();
+            Location location = inventory.getLocation();
+            assert location != null;
+            int logID = UuidLogger.logID("%s retrieved %s from %s at (%s, %s, %s) in %s", player.getName(), item.getUuid(), Objects.requireNonNull(inventory).getType().name(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
+            if (logID >= 0) {
+                UuidLogger.AddUUIDMetaInfo(logID, item.getUuid(), UuidLogger.UuidLogType.RETREIVE, player.getUniqueId());
+            }
+        }
+    }
+
+    private void processStoreItem(Player player, Inventory inventory, ItemStack itemStack) {
+        Optional<UUIDItem> UuidItemOptional = getUUIDItem(itemStack);
+        if (UuidItemOptional.isPresent()) {
+            UUIDItem item = UuidItemOptional.get();
+            Location location = inventory.getLocation();
+            assert location != null;
+            int logID = UuidLogger.logID("%s stored %s in %s (%s, %s, %s) in %s", player.getName(), item.getUuid(), inventory.getType().name(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
+            if (logID >= 0) {
+                UuidLogger.AddUUIDMetaInfo(logID, item.getUuid(), UuidLogger.UuidLogType.CONTAINER_STORE, player.getUniqueId());
+            }
+        }
+    }
+
+    private void processStoreItemInSlot(Player player, Inventory inventory, int slot) {
+        processStoreItem(player, inventory, inventory.getItem(slot));
     }
 
     private List<UUIDItem> getUUIDItems(Player player) {
