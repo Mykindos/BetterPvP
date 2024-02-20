@@ -170,12 +170,13 @@ public class UuidListener implements Listener {
                         lastInventory.remove(player);
                         return;
                     }
-                    int logID = UuidLogger.logID("%s placed %s in %s from %s at (%s, %s, %s) in %s", player.getName(), item.getUuid(), Objects.requireNonNull(event.getClickedInventory()).getType().name(), lastInventory.get(player).getType().name(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
+                    InventoryType inventoryType = Objects.requireNonNull(event.getClickedInventory()).getType();
+                    int logID = UuidLogger.logID("%s placed %s in %s from %s at (%s, %s, %s) in %s", player.getName(), item.getUuid(), inventoryType.name(), lastInventory.get(player).getType().name(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
                     if (logID < 0) {
                         lastInventory.remove(player);
                         return;
                     }
-                    UuidLogger.AddUUIDMetaInfo(logID, item.getUuid(), UuidLogger.UuidLogType.RETREIVE, player.getUniqueId());
+                    UuidLogger.AddUUIDMetaInfo(logID, item.getUuid(), inventoryType.equals(InventoryType.PLAYER) ? UuidLogger.UuidLogType.RETREIVE : UuidLogger.UuidLogType.CONTAINER_STORE, player.getUniqueId());
                     lastInventory.remove(player);
                 }
             }
@@ -197,9 +198,10 @@ public class UuidListener implements Listener {
                     if (lastInventory.get(player) == event.getClickedInventory()) {
                         log.info("Last inventory the same, don't need to update");
                     } else {
-                        int logID = UuidLogger.logID("%s placed %s in %s from %s at (%s, %s, %s) in %s", player.getName(), item.getUuid(), Objects.requireNonNull(event.getClickedInventory()).getType().name(), lastInventory.get(player).getType().name(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
+                        InventoryType inventoryType = Objects.requireNonNull(event.getClickedInventory()).getType();
+                        int logID = UuidLogger.logID("%s placed %s in %s from %s at (%s, %s, %s) in %s", player.getName(), item.getUuid(), inventoryType.name(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
                         if (logID >= 0) {
-                            UuidLogger.AddUUIDMetaInfo(logID, item.getUuid(), UuidLogger.UuidLogType.RETREIVE, player.getUniqueId());
+                            UuidLogger.AddUUIDMetaInfo(logID, item.getUuid(), inventoryType.equals(InventoryType.PLAYER) ? UuidLogger.UuidLogType.RETREIVE : UuidLogger.UuidLogType.CONTAINER_STORE, player.getUniqueId());
                         }
                     }
                     lastInventory.remove(player);
