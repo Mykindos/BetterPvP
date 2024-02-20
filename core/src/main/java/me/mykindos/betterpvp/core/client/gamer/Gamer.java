@@ -42,7 +42,7 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
 
     private long lastDamaged;
     private long lastTip;
-    private long lastBlock;
+    private long lastBlock = -1;
     private String lastAdminMessenger;
 
     public Gamer(String uuid) {
