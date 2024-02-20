@@ -215,7 +215,7 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
 
     private void failRiposte(Player player) {
         handRaisedTime.remove(player.getUniqueId());
-        UtilMessage.message(player, getClassType().getName(), UtilMessage.deserialize("You failed <green>%s %d</green>", getName(), getLevel(player)));
+        UtilMessage.simpleMessage(player, getClassType().getName(),"You failed <green>%s %d</green>", getName(), getLevel(player));
         player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
     }
 
