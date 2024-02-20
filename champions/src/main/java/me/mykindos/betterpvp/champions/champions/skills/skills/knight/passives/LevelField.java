@@ -124,26 +124,24 @@ public class LevelField extends Skill implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onDamageReceive(CustomDamageEvent event) {
+        if(!(event.getDamagee() instanceof Player defender)) return;
         if (event.isCancelled()) return;
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
 
-        Player defender = (event.getDamagee() instanceof Player) ? (Player) event.getDamagee() : null;
-
         int level = getLevel(defender);
-        if (defender != null && level > 0) {
+        if (level > 0) {
             processLevelFieldSkill(defender, event, false, level);
         }
     }
 
     @EventHandler
     public void onDamageDeal(CustomDamageEvent event) {
+        if(!(event.getDamager() instanceof Player attacker)) return;
         if (event.isCancelled()) return;
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
 
-        Player attacker = (event.getDamager() instanceof Player) ? (Player) event.getDamager() : null;
-
         var level = getLevel(attacker);
-        if (attacker != null && level > 0) {
+        if (level > 0) {
             processLevelFieldSkill(attacker, event, true, level);
         }
     }
