@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.knight.passives;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.val;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -38,14 +39,16 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
 @BPvPListener
-public class LevelField extends Skill implements Listener{
+public class LevelField extends Skill implements Listener {
 
     private double radius;
+    private double radiusIncreasePerLevel;
     private int maxEnemies;
     private int maxEnemiesIncreasePerLevel;
-    private double radiusIncreasePerLevel;
+    private double baseDamage;
+    private double damageIncreasePerLevel;
 
-    private final HashMap<UUID, Integer> playerNearbyDifferenceMap = new HashMap<>();
+    private HashMap<UUID, Integer> playerNearbyDifferenceMap = new HashMap<>();
 
     private final PermanentComponent actionBarComponent = new PermanentComponent(gamer -> {
         Player player = gamer.getPlayer();
@@ -56,14 +59,22 @@ public class LevelField extends Skill implements Listener{
         int level = getLevel(player);
         int totalSquares = getMaxEnemies(level);
         Integer nearbyDifference = playerNearbyDifferenceMap.getOrDefault(player.getUniqueId(), 0);
-        int redSquares = Math.min(nearbyDifference, totalSquares);
 
+        int squares;
+        NamedTextColor color;
+        if (nearbyDifference >= 0) {
+            squares = Math.min(nearbyDifference, totalSquares);
+            color = NamedTextColor.RED;
+        } else {
+            squares = Math.min(-nearbyDifference, totalSquares);
+            color = NamedTextColor.GREEN;
+        }
 
         return Component.text("")
                 .color(NamedTextColor.WHITE)
                 .decorate(TextDecoration.BOLD)
-                .append(Component.text("\u25A0".repeat(redSquares)).color(NamedTextColor.RED))
-                .append(Component.text("\u25A0".repeat(Math.max(0, totalSquares - redSquares))).color(NamedTextColor.GRAY));
+                .append(Component.text("\u25A0".repeat(squares)).color(color))
+                .append(Component.text("\u25A0".repeat(Math.max(0, totalSquares - squares))).color(NamedTextColor.GRAY));
     });
 
     @Inject
@@ -89,12 +100,16 @@ public class LevelField extends Skill implements Listener{
         };
     }
 
-    public int getMaxEnemies(int level){
+    public int getMaxEnemies(int level) {
         return maxEnemies + ((level - 1) * maxEnemiesIncreasePerLevel);
     }
 
-    public double getRadius(int level){
+    public double getRadius(int level) {
         return radius + ((level - 1) * radiusIncreasePerLevel);
+    }
+
+    public double getDamage(int level) {
+        return baseDamage + ((level - 1) * damageIncreasePerLevel);
     }
 
     @Override
@@ -108,55 +123,69 @@ public class LevelField extends Skill implements Listener{
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onDamage(CustomDamageEvent event){
+    public void onDamageReceive(CustomDamageEvent event) {
+        if (event.isCancelled()) return;
+        if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
+
+        Player defender = (event.getDamagee() instanceof Player) ? (Player) event.getDamagee() : null;
+
+        int level = getLevel(defender);
+        if (defender != null && level > 0) {
+            processLevelFieldSkill(defender, event, false, level);
+        }
+    }
+
+    @EventHandler
+    public void onDamageDeal(CustomDamageEvent event) {
         if (event.isCancelled()) return;
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
 
         Player attacker = (event.getDamager() instanceof Player) ? (Player) event.getDamager() : null;
-        Player defender = (event.getDamagee() instanceof Player) ? (Player) event.getDamagee() : null;
 
-        if (attacker != null && getLevel(attacker) > 0) {
-            processLevelFieldSkill(attacker, event, true);
-        }
-
-        if (defender != null && getLevel(defender) > 0) {
-            processLevelFieldSkill(defender, event, false);
+        var level = getLevel(attacker);
+        if (attacker != null && level > 0) {
+            processLevelFieldSkill(attacker, event, true, level);
         }
     }
 
-    private void processLevelFieldSkill(Player relevantPlayer, CustomDamageEvent event, boolean isAttacker) {
-        int nearbyEnemies = UtilPlayer.getNearbyEnemies(relevantPlayer, relevantPlayer.getLocation(), radius).size();
-        int nearbyAllies = UtilPlayer.getNearbyAllies(relevantPlayer, relevantPlayer.getLocation(), radius).size();
+    private void processLevelFieldSkill(Player relevantPlayer, CustomDamageEvent event, boolean isAttacker, int level) {
+        int nearbyEnemies = UtilEntity.getNearbyEnemies(relevantPlayer, relevantPlayer.getLocation(), radius).size();
+        int nearbyAllies = UtilPlayer.getNearbyAllies(relevantPlayer, relevantPlayer.getLocation(), radius).size() + 1;
         int nearbyDifference = nearbyEnemies - nearbyAllies;
 
         if (nearbyDifference < 1) return;
 
+        double damageMod = nearbyDifference * getDamage(level);
+
         if (isAttacker) {
-            event.setDamage(event.getDamage() + nearbyDifference);
+            event.setDamage(event.getDamage() + damageMod);
         } else {
-            event.setDamage(event.getDamage() - nearbyDifference);
+            event.setDamage(event.getDamage() - damageMod);
         }
     }
 
-    @UpdateEvent
+    @UpdateEvent(delay = 250)
     public void updateDisplay() {
         HashMap<UUID, Integer> updatedMap = new HashMap<>();
 
         for (UUID playerUUID : playerNearbyDifferenceMap.keySet()) {
             Player player = Bukkit.getPlayer(playerUUID);
+            if (player == null) continue;
+
             int level = getLevel(player);
+            if (level <= 0) continue;
+
             double radius = getRadius(level);
-            if (player != null && player.isOnline()) {
-                int nearbyEnemies = UtilPlayer.getNearbyEnemies(player, player.getLocation(), radius).size();
-                int nearbyAllies = UtilPlayer.getNearbyAllies(player, player.getLocation(), radius).size();
-                int nearbyDifference = Math.max(0,nearbyEnemies - nearbyAllies);
+            if (player.isOnline()) {
+                int nearbyEnemies = UtilEntity.getNearbyEnemies(player, player.getLocation(), radius).size();
+                int nearbyAllies = UtilPlayer.getNearbyAllies(player, player.getLocation(), radius).size() + 1;
+                int nearbyDifference = nearbyEnemies - nearbyAllies;
 
                 updatedMap.put(playerUUID, nearbyDifference);
 
             }
         }
-        playerNearbyDifferenceMap.clear();
-        playerNearbyDifferenceMap.putAll(updatedMap);
+        playerNearbyDifferenceMap = updatedMap;
     }
 
     @Override
@@ -173,9 +202,11 @@ public class LevelField extends Skill implements Listener{
     }
 
     public void loadSkillConfig() {
-        radius = getConfig("radius", 4.0, Double.class);
+        radius = getConfig("radius", 6.0, Double.class);
         radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 2.0, Double.class);
         maxEnemies = getConfig("maxEnemies", 2, Integer.class);
         maxEnemiesIncreasePerLevel = getConfig("maxEnemiesIncreasePerLevel", 1, Integer.class);
+        baseDamage = getConfig("baseDamage", 1.0, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
     }
 }
