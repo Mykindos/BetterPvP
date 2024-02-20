@@ -38,23 +38,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
 @BPvPListener
-public class LevelField extends Skill implements CooldownToggleSkill, Listener{
+public class LevelField extends Skill implements Listener{
 
     private double radius;
-    private double damageTakenPerPlayer;
-    private double damageDealtPerPlayer;
-    private int duration;
     private int maxEnemies;
-    private double levelFieldUpdateTime;
-    private HashMap<UUID, Integer> lockedValues = new HashMap<>();
-    private HashMap<UUID, Long> toggleTimestamps = new HashMap<>();
-    private ConcurrentHashMap<UUID, Integer> nearbyEnemiesCount = new ConcurrentHashMap<>();
-    private Set<UUID> playersWithSkill = Collections.newSetFromMap(new ConcurrentHashMap<>());
-    private int updateTaskId = -1;
+    private int maxEnemiesIncreasePerLevel;
+    private double radiusIncreasePerLevel;
 
-    public int getLevelFieldUpdateTime(){
-        return (int)(levelFieldUpdateTime * 20);
-    }
+    private final HashMap<UUID, Integer> playerNearbyDifferenceMap = new HashMap<>();
 
     private final PermanentComponent actionBarComponent = new PermanentComponent(gamer -> {
         Player player = gamer.getPlayer();
@@ -62,42 +53,18 @@ public class LevelField extends Skill implements CooldownToggleSkill, Listener{
             return null;
         }
 
-        Integer lockedCount = lockedValues.get(player.getUniqueId());
-        Integer count;
+        int level = getLevel(player);
+        int totalSquares = getMaxEnemies(level);
+        Integer nearbyDifference = playerNearbyDifferenceMap.getOrDefault(player.getUniqueId(), 0);
+        int redSquares = Math.min(nearbyDifference, totalSquares);
 
-        if (lockedCount != null) {
-            count = lockedCount;
-        } else {
-            count = nearbyEnemiesCount.getOrDefault(player.getUniqueId(), 0);
-        }
-
-        int displaySquares = Math.min(count, maxEnemies);
 
         return Component.text("")
                 .color(NamedTextColor.WHITE)
                 .decorate(TextDecoration.BOLD)
-                .append(Component.text("\u25A0".repeat(displaySquares)).color(NamedTextColor.RED))
-                .append(Component.text("\u25A0".repeat(Math.max(0, maxEnemies - displaySquares))).color(NamedTextColor.GRAY));
+                .append(Component.text("\u25A0".repeat(redSquares)).color(NamedTextColor.RED))
+                .append(Component.text("\u25A0".repeat(Math.max(0, totalSquares - redSquares))).color(NamedTextColor.GRAY));
     });
-
-    private void startPeriodicEnemyCountUpdate() {
-        updateTaskId = Bukkit.getScheduler().runTaskTimerAsynchronously(champions, () -> {
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                if (playersWithSkill.contains(player.getUniqueId())) {
-                    Bukkit.getScheduler().runTask(champions, () -> {
-                        try {
-                            int nearbyEnemies = UtilEntity.getNearbyEntities(player, player.getLocation(), radius, EntityProperty.ENEMY).size();
-                            int nearbyAllies = UtilPlayer.getNearbyAllies(player, player.getLocation(), radius).size();
-                            int nearbyDifference = nearbyEnemies - nearbyAllies;
-                            nearbyEnemiesCount.put(player.getUniqueId(), Math.max(0, (nearbyDifference - 1)));
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    });
-                }
-            }
-        }, 0L, getLevelFieldUpdateTime()).getTaskId();
-    }
 
     @Inject
     public LevelField(Champions champions, ChampionsManager championsManager) {
@@ -112,26 +79,27 @@ public class LevelField extends Skill implements CooldownToggleSkill, Listener{
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "For every enemy that outnumbers you within <stat>" + radius + "</stat> blocks, you",
+                "You deal X more damage",
+                "You take X less damage",
+                "X = (NearbyEnemies) - (NearbyAllies)",
                 "",
-                "Deal: <val>" + (level * damageDealtPerPlayer) + "</val> more damage",
-                "Take: <val>" + (level * damageTakenPerPlayer) + "</val> less damage",
+                "Damage can be altered a maximum of <val>" + getMaxEnemies(level),
                 "",
-                "Drop weapon to lock in values for the next <stat>" + duration + "</stat> seconds",
-                "",
-                "Maximum number of enemies: <stat>"+ maxEnemies,
+                "Radius: <val>" + getRadius(level)
         };
+    }
+
+    public int getMaxEnemies(int level){
+        return maxEnemies + ((level - 1) * maxEnemiesIncreasePerLevel);
+    }
+
+    public double getRadius(int level){
+        return radius + ((level - 1) * radiusIncreasePerLevel);
     }
 
     @Override
     public Role getClassType() {
         return Role.KNIGHT;
-    }
-
-    @Override
-    public double getCooldown(int level) {
-
-        return cooldown - ((level - 1));
     }
 
     @Override
@@ -157,95 +125,57 @@ public class LevelField extends Skill implements CooldownToggleSkill, Listener{
     }
 
     private void processLevelFieldSkill(Player relevantPlayer, CustomDamageEvent event, boolean isAttacker) {
-        int level = getLevel(relevantPlayer);
+        int nearbyEnemies = UtilPlayer.getNearbyEnemies(relevantPlayer, relevantPlayer.getLocation(), radius).size();
+        int nearbyAllies = UtilPlayer.getNearbyAllies(relevantPlayer, relevantPlayer.getLocation(), radius).size();
+        int nearbyDifference = nearbyEnemies - nearbyAllies;
 
-        Integer lockedDifference = lockedValues.get(relevantPlayer.getUniqueId());
-        int nearbyDifference;
-
-        if (lockedDifference != null) {
-            nearbyDifference = lockedDifference;
-        } else {
-            int nearbyEnemies = UtilPlayer.getNearbyEnemies(relevantPlayer, relevantPlayer.getLocation(), radius).size();
-            int nearbyAllies = UtilPlayer.getNearbyAllies(relevantPlayer, relevantPlayer.getLocation(), radius).size();
-            nearbyDifference = nearbyEnemies - nearbyAllies;
-        }
-
-        if (nearbyDifference <= 1) return; // no effect if not outnumbered
-
-        double damageModifier = (nearbyDifference - 1) * (damageTakenPerPlayer * level);
+        if (nearbyDifference < 1) return;
 
         if (isAttacker) {
-            event.setDamage(event.getDamage() + damageModifier);
+            event.setDamage(event.getDamage() + nearbyDifference);
         } else {
-            event.setDamage(event.getDamage() - damageModifier);
+            event.setDamage(event.getDamage() - nearbyDifference);
         }
     }
 
-    @Override
-    public void toggle(Player player, int level) {
-        int nearbyEnemies = UtilPlayer.getNearbyEnemies(player, player.getLocation(), radius).size();
-        int nearbyAllies = UtilPlayer.getNearbyAllies(player, player.getLocation(), radius).size();
-        int nearbyDifference = (nearbyEnemies - nearbyAllies);
+    @UpdateEvent
+    public void updateDisplay() {
+        HashMap<UUID, Integer> updatedMap = new HashMap<>();
 
-        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WARDEN_DEATH, 2.0f, 2.0f);
+        for (UUID playerUUID : playerNearbyDifferenceMap.keySet()) {
+            Player player = Bukkit.getPlayer(playerUUID);
+            int level = getLevel(player);
+            double radius = getRadius(level);
+            if (player != null && player.isOnline()) {
+                int nearbyEnemies = UtilPlayer.getNearbyEnemies(player, player.getLocation(), radius).size();
+                int nearbyAllies = UtilPlayer.getNearbyAllies(player, player.getLocation(), radius).size();
+                int nearbyDifference = Math.max(0,nearbyEnemies - nearbyAllies);
 
+                updatedMap.put(playerUUID, nearbyDifference);
 
-        lockedValues.put(player.getUniqueId(), Math.max(nearbyDifference - 1, 0));
-        toggleTimestamps.put(player.getUniqueId(), System.currentTimeMillis());
-    }
-
-    @UpdateEvent(delay = 500)
-    public void onUpdate() {
-        long currentTime = System.currentTimeMillis();
-
-        List<UUID> keysToRemove = new ArrayList<>();
-
-        toggleTimestamps.forEach((uuid, timestamp) -> {
-            if (currentTime - timestamp >= duration * 1000L) {
-                keysToRemove.add(uuid);
-
-                Player player = Bukkit.getPlayer(uuid);
-                if (player != null && player.isOnline()) {
-                    player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
-                    UtilMessage.message(player, getClassType().getName(), UtilMessage.deserialize("<green>%s %d</green> has ended (reset).", getName(), getLevel(player)));
-                }
             }
-        });
-
-        for (UUID key : keysToRemove) {
-            lockedValues.remove(key);
-            toggleTimestamps.remove(key);
         }
+        playerNearbyDifferenceMap.clear();
+        playerNearbyDifferenceMap.putAll(updatedMap);
     }
-
 
     @Override
     public void invalidatePlayer(Player player, Gamer gamer) {
         gamer.getActionBar().remove(actionBarComponent);
-        playersWithSkill.remove(player.getUniqueId());
-
-        if (playersWithSkill.isEmpty() && updateTaskId != -1) {
-            Bukkit.getScheduler().cancelTask(updateTaskId);
-            updateTaskId = -1;
-        }
+        playerNearbyDifferenceMap.remove(player.getUniqueId());
     }
 
     @Override
     public void trackPlayer(Player player, Gamer gamer) {
         gamer.getActionBar().add(900, actionBarComponent);
-        playersWithSkill.add(player.getUniqueId());
+        playerNearbyDifferenceMap.put(player.getUniqueId(), 0);
 
-        if (updateTaskId == -1) {
-            startPeriodicEnemyCountUpdate();
-        }
     }
 
     public void loadSkillConfig() {
-        radius = getConfig("radius", 8.0, Double.class);
-        damageDealtPerPlayer = getConfig("damagePerPlayer", 0.5, Double.class);
-        damageTakenPerPlayer = getConfig("damagePerPlayer", 0.5, Double.class);
-        duration = getConfig("duration", 7, Integer.class);
-        maxEnemies = getConfig("maxEnemies", 5, Integer.class);
-        levelFieldUpdateTime = getConfig("levelFieldUpdateTime", 1.0, Double.class);
+        radius = getConfig("radius", 4.0, Double.class);
+        radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 2.0, Double.class);
+        maxEnemies = getConfig("maxEnemies", 2, Integer.class);
+        maxEnemiesIncreasePerLevel = getConfig("maxEnemiesIncreasePerLevel", 1, Integer.class);
     }
 }
