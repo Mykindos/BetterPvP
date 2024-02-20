@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.items.logger.UUIDItem;
 import me.mykindos.betterpvp.core.items.logger.UUIDManager;
 import me.mykindos.betterpvp.core.items.logger.UuidLogger;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -19,9 +20,11 @@ import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
@@ -131,7 +134,7 @@ public class UuidListener implements Listener {
                 Optional<UUIDItem> uuidItemsOptional = getUUIDItem(event.getCurrentItem());
                 if (uuidItemsOptional.isPresent()) {
                     UUIDItem uuidItem = uuidItemsOptional.get();
-                    Location location = player.getLocation();
+                    Location location = Objects.requireNonNull(event.getClickedInventory()).getLocation();
                     lastInventory.put(player, event.getClickedInventory());
                     /*
                     int logID = UuidLogger.logID("%s retrieved %s from %s at (%s, %s, %s) in %s", player.getName(), uuidItem.getUuid(), Objects.requireNonNull(event.getClickedInventory()).getType().name(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
@@ -156,9 +159,10 @@ public class UuidListener implements Listener {
             if (event.getAction().name().contains("PLACE")){
                 Optional<UUIDItem> UuidItemOptional = getUUIDItem(event.getCursor());
                 if (UuidItemOptional.isPresent()) {
+                    //TODO Add handing for different type for retrieving/storing
                     //we are placing a UUID item
                     UUIDItem item = UuidItemOptional.get();
-                    Location location = player.getLocation();
+                    Location location = Objects.requireNonNull(event.getClickedInventory()).getLocation();
                     assert lastInventory.containsKey(player);
                     if (lastInventory.get(player) == event.getClickedInventory()) {
                         //this is a move between the same inventory. We don't care about it.
@@ -182,13 +186,13 @@ public class UuidListener implements Listener {
     public void onInventorySwapWithCursor(InventoryClickEvent event) {
         if (event.isCancelled()) return;
         if (event.getWhoClicked() instanceof Player player) {
-            if (event.getAction().equals(InventoryAction.SWAP_WITH_CURSOR)){
+            if (event.getAction().equals(InventoryAction.SWAP_WITH_CURSOR)) {
                 //first, do placing logic
                 Optional<UUIDItem> UuidItemOptional1 = getUUIDItem(event.getCursor());
                 if (UuidItemOptional1.isPresent()) {
                     //we are placing a UUID item
                     UUIDItem item = UuidItemOptional1.get();
-                    Location location = player.getLocation();
+                    Location location = Objects.requireNonNull(event.getClickedInventory()).getLocation();
                     assert lastInventory.containsKey(player);
                     if (lastInventory.get(player) == event.getClickedInventory()) {
                         log.info("Last inventory the same, don't need to update");
@@ -209,9 +213,51 @@ public class UuidListener implements Listener {
         }
     }
 
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onInventoryHotbarSwap(InventoryClickEvent event) {
+        if (event.isCancelled()) return;
+        if (event.getWhoClicked() instanceof Player player) {
+            if (event.getAction().equals(InventoryAction.HOTBAR_SWAP)) {
+                log.info("HOTBAR_SWAP");
+                if (!event.getClickedInventory().getType().equals(InventoryType.PLAYER)) {
+                    Optional<UUIDItem> UuidItemOptional = getUUIDItem(event.getCurrentItem());
+                    if (UuidItemOptional.isPresent()) {
+                        log.info("INVENTORY -> Player");
+                        UUIDItem item = UuidItemOptional.get();
+                        Location location = event.getClickedInventory().getLocation();
+                        int logID = UuidLogger.logID("%s retrieved %s from %s at (%s, %s, %s) in %s", player.getName(), item.getUuid(), Objects.requireNonNull(event.getClickedInventory()).getType().name(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
+                        if (logID >= 0) {
+                            UuidLogger.AddUUIDMetaInfo(logID, item.getUuid(), UuidLogger.UuidLogType.RETREIVE, player.getUniqueId());
+                        }
+                    } else {
+                        //this might still be a swap, just in the opposite direction
+                        //need to run this after this event finishes, otherwise it won't be in the slot
+                        UtilServer.runTaskLater(core, false, () -> {
+                            ItemStack itemStack = event.getClickedInventory().getItem(event.getSlot());
+                            Optional<UUIDItem> UuidItemOptional2 = getUUIDItem(itemStack);
+                            if (UuidItemOptional2.isPresent()) {
+                                log.info("Player -> Inventory");
+                                UUIDItem item = UuidItemOptional2.get();
+                                Location location = event.getClickedInventory().getLocation();
+                                int logID = UuidLogger.logID("%s stored %s at %s (%s, %s, %s) in %s", player.getName(), item.getUuid(), Objects.requireNonNull(event.getClickedInventory()).getType().name(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
+                                if (logID >= 0) {
+                                    UuidLogger.AddUUIDMetaInfo(logID, item.getUuid(), UuidLogger.UuidLogType.CONTAINER_STORE, player.getUniqueId());
+                                }
+                            }
+                        }, 1);
+                    }
+                } else {
+                    //dont care
+                    log.info("Player -> Player");
+                }
+            }
+        }
+    }
+
 
     @EventHandler
     public void InventoryClickEvent(InventoryClickEvent event) {
+        //debug
         log.info("");
         log.info("Click Event");
         log.info("Action " + event.getAction().toString());
@@ -229,9 +275,7 @@ public class UuidListener implements Listener {
         player.getInventory().forEach(itemStack -> {
             if (itemStack != null) {
                 Optional<UUIDItem> uuidItemOptional = getUUIDItem(itemStack);
-                if (uuidItemOptional.isPresent()) {
-                    uuidItemList.add(getUUIDItem(itemStack).orElseThrow());
-                }
+                uuidItemOptional.ifPresent(uuidItemList::add);
             }
         });
         return uuidItemList;
@@ -239,9 +283,12 @@ public class UuidListener implements Listener {
 
     private Optional<UUIDItem> getUUIDItem(ItemStack itemStack) {
         if (itemStack != null) {
-            PersistentDataContainer pdc = itemStack.getItemMeta().getPersistentDataContainer();
-            if (pdc.has(CoreNamespaceKeys.UUID_KEY)) {
-                return uuidManager.getObject(UUID.fromString(Objects.requireNonNull(pdc.get(CoreNamespaceKeys.UUID_KEY, PersistentDataType.STRING))));
+            ItemMeta itemMeta = itemStack.getItemMeta();
+            if (itemMeta != null) {
+                PersistentDataContainer pdc = itemMeta.getPersistentDataContainer();
+                if (pdc.has(CoreNamespaceKeys.UUID_KEY)) {
+                    return uuidManager.getObject(UUID.fromString(Objects.requireNonNull(pdc.get(CoreNamespaceKeys.UUID_KEY, PersistentDataType.STRING))));
+                }
             }
         }
         return Optional.empty();
