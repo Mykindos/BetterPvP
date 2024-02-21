@@ -26,7 +26,7 @@ create table if not exists uuidlogmeta
     CONSTRAINT uuidlogmeta_id_fk
         FOREIGN KEY (LogUUID) REFERENCES logs (id),
     CONSTRAINT uuidlogmeta_uuid_fk
-        FOREIGN KEY (ItemUUID) REFERENCES uuiditems (UUID),
+        FOREIGN KEY (ItemUUID) REFERENCES uuiditems (UUID)
 );
 
 DROP PROCEDURE IF EXISTS GetUuidLogsByUuid;
@@ -35,7 +35,7 @@ BEGIN
     SELECT Timestamp, Message FROM logs, uuidlogmeta
         WHERE ItemUUID = UniqueID
         AND LogUUID = logs.id
-        ORDER BY logs.id DESC
+        ORDER BY Timestamp DESC
         LIMIT amount;
 END;
 
@@ -46,6 +46,6 @@ BEGIN
         WHERE UUID = PlayerUuid
         AND UUIDtype = 'PLAYER'
         AND LogUUID = logs.id
-        ORDER BY logs.id DESC
+        ORDER BY Timestamp DESC
         LIMIT amount;
 END;

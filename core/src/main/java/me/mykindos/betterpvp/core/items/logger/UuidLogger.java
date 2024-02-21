@@ -155,6 +155,10 @@ public class UuidLogger extends Logger {
           * UUIDItem holder dies
           */
          DEATH,
+         /**'
+          * UUIDItem holder dies to a player
+          */
+         DEATH_PLAYER,
          /**
           * An UUIDItem is picked up or moved from an inventory
           */
@@ -167,6 +171,10 @@ public class UuidLogger extends Logger {
           * An UUIDItem is dropped due to a container being destroyed
           */
          CONTAINER_BREAK,
+         /**
+          * An UUIDItem is moved by one inventory to another
+          */
+         INVENTORY_MOVE,
          /**
           * An UUIDItem holder logs out
           */

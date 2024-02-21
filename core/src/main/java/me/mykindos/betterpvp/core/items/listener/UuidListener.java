@@ -19,12 +19,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.ItemDespawnEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.server.PluginDisableEvent;
@@ -245,8 +247,58 @@ public class UuidListener implements Listener {
             UuidLogger.AddItemUUIDMetaInfoNone(logUUID, uuidItem.getUuid(), UuidLogger.UuidLogType.DESPAWN);
         });
     }
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onInventoryMoveEvent(InventoryMoveItemEvent event) {
+        getUUIDItem(event.getItem()).ifPresent(uuidItem -> {
+            Location locationSource = event.getSource().getLocation();
+            Location locationDestination = event.getDestination().getLocation();
+            assert locationSource != null;
+            assert locationDestination != null;
+            UUID logUUID = UuidLogger.legend("%s moved from %s (%s, %s, %s) to %s (%s, %s, %s) in %s",
+                    uuidItem.getUuid(),
+                    event.getSource().getType().toString(), locationSource.getBlockX(), locationSource.getBlockY(), locationSource.getBlockZ(),
+                    event.getDestination().getType().toString(), locationDestination.getBlockX(), locationDestination.getBlockY(), locationDestination.getBlockZ(),
+                    locationDestination.getWorld().getName()
+                    );
+            UuidLogger.AddItemUUIDMetaInfoNone(logUUID, uuidItem.getUuid(), UuidLogger.UuidLogType.INVENTORY_MOVE);
+        });
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onBlockDropItemEvent(BlockDropItemEvent event) {
+        event.getItems().forEach(item -> {
+            getUUIDItem(item.getItemStack()).ifPresent(uuidItem -> {
+                Location location = event.getBlock().getLocation();
+                UUID logUUID = UuidLogger.legend("%s caused %s to be dropped from block %s at (%s, %s, %s) in %s",
+                        event.getPlayer().getName(), uuidItem.getUuid(), event.getBlockState().getType().name(),
+                        location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName()
+                        );
+                UuidLogger.AddItemUUIDMetaInfoPlayer(logUUID, uuidItem.getUuid(), UuidLogger.UuidLogType.CONTAINER_BREAK, event.getPlayer().getUniqueId());
+            });
+        });
+    }
 
     @EventHandler
+    public void BlockDropItemEvent(BlockDropItemEvent event) {
+        log.info("");
+        log.info("BlockDropItemEvent");
+        log.info("Player " + event.getPlayer());
+        log.info("Drops");
+        event.getItems().forEach(item -> log.info("" + item.getItemStack()));
+        log.info("Block State " + event.getBlockState());
+    }
+
+    /*@EventHandler(priority = EventPriority.MONITOR)
+    public void onInventoryMoveEventLogs(InventoryMoveItemEvent event) {
+        log.info("");
+        log.info("InventoryMoveItemEvent");
+        log.info("Item " + event.getItem());
+        log.info("Source " + event.getSource().getType() + " " + event.getSource());
+        log.info("Initiator " + event.getInitiator().getType() + " " + event.getInitiator());
+        log.info("Destination " + event.getDestination().getType() + " " + event.getDestination());
+    }*/
+
+    /*@EventHandler
     public void InventoryClickEvent(InventoryClickEvent event) {
         //debug
         log.info("");
@@ -259,7 +311,7 @@ public class UuidListener implements Listener {
         log.info("Click " + event.getClick());
         log.info("Hotbar button " + event.getHotbarButton());
         log.info("SlotType " + event.getSlotType());
-    }
+    }*/
 
     private void processExit(Player player) {
         if (lastHeldUUIDItem.containsKey(player) && lastInventory.containsKey(player)) {
