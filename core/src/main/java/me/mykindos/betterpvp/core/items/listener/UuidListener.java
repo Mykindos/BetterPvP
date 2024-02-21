@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.items.listener;
 import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.client.events.ClientQuitEvent;
 import me.mykindos.betterpvp.core.combat.events.KillContributionEvent;
 import me.mykindos.betterpvp.core.combat.stats.model.Contribution;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
@@ -10,7 +11,9 @@ import me.mykindos.betterpvp.core.items.logger.UUIDItem;
 import me.mykindos.betterpvp.core.items.logger.UUIDManager;
 import me.mykindos.betterpvp.core.items.logger.UuidLogger;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -20,8 +23,10 @@ import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -48,6 +53,7 @@ public class UuidListener implements Listener {
     UUIDManager uuidManager;
 
     private final Map<Player, Inventory> lastInventory = new HashMap<>();
+    private final Map<Player, UUIDItem> lastHeldUUIDItem = new HashMap<>();
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onUUIDPickup(EntityPickupItemEvent event) {
@@ -134,6 +140,7 @@ public class UuidListener implements Listener {
                 Optional<UUIDItem> uuidItemsOptional = getUUIDItem(event.getCurrentItem());
                 if (uuidItemsOptional.isPresent()) {
                     lastInventory.put(player, event.getClickedInventory());
+                    lastHeldUUIDItem.put(player, uuidItemsOptional.get());
                 }
             }
         }
@@ -163,6 +170,7 @@ public class UuidListener implements Listener {
                 Optional<UUIDItem> uuidItemsOptional = getUUIDItem(event.getCurrentItem());
                 if (uuidItemsOptional.isPresent()) {
                     lastInventory.put(player, event.getClickedInventory());
+                    lastHeldUUIDItem.put(player, uuidItemsOptional.get());
                 }
             }
         }
@@ -176,10 +184,64 @@ public class UuidListener implements Listener {
                 if (!Objects.requireNonNull(event.getClickedInventory()).getType().equals(InventoryType.PLAYER)) {
                     processRetrieveItem(player, event.getClickedInventory(), event.getCurrentItem());
                     UtilServer.runTaskLater(core, false, () -> processStoreItemInSlot(player, event.getClickedInventory(), event.getSlot()), 1);
-                    }
                 }
             }
         }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onMoveToOtherInventory(InventoryClickEvent event) {
+        if (event.isCancelled()) return;
+        if (event.getWhoClicked() instanceof Player player) {
+            if (event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
+                Inventory inventory = event.getClickedInventory();
+                assert inventory != null;
+                if (inventory.getType().equals(InventoryType.PLAYER)) {
+                    processStoreItem(player, event.getInventory(), event.getCurrentItem());
+                } else {
+                    processRetrieveItem(player, inventory, event.getCurrentItem());
+                }
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onCloseInventory(InventoryCloseEvent event) {
+        if (event.getPlayer() instanceof Player player) {
+            processExit(player);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerLogout(ClientQuitEvent event) {
+        processExit(event.getPlayer());
+    }
+
+    @EventHandler
+    public void onPluginDisable(PluginDisableEvent event) {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            processExit(player);
+        }
+    }
+
+    /**
+     * Prevent UUID items from being duplicated in creative
+     * @param event
+     */
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onItemClone(InventoryClickEvent event) {
+        if (event.isCancelled()) return;
+        if (event.getWhoClicked() instanceof Player player) {
+            if (event.getAction().equals(InventoryAction.CLONE_STACK)) {
+                Optional<UUIDItem> UuidItemOptional = getUUIDItem(event.getCursor());
+                if (UuidItemOptional.isPresent()) {
+                    event.setCancelled(true);
+                    UtilMessage.message(player, "Core", "You cannot clone this item.");
+                }
+            }
+        }
+    }
+
 
     @EventHandler
     public void InventoryClickEvent(InventoryClickEvent event) {
@@ -196,6 +258,22 @@ public class UuidListener implements Listener {
         log.info("SlotType " + event.getSlotType());
     }
 
+    private void processExit(Player player) {
+        if (lastHeldUUIDItem.containsKey(player) && lastInventory.containsKey(player)) {
+            //the player is holding an item, and the inventory has closed. This means they have the item.
+            UUIDItem item = lastHeldUUIDItem.get(player);
+            Inventory inventory = lastInventory.get(player);
+            Location location = inventory.getLocation();
+            assert location != null;
+            int logID = UuidLogger.logID("%s retrieved %s from %s at (%s, %s, %s) in %s", player.getName(), item.getUuid(), Objects.requireNonNull(inventory).getType().name(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
+            if (logID >= 0) {
+                UuidLogger.AddUUIDMetaInfo(logID, item.getUuid(), UuidLogger.UuidLogType.RETREIVE, player.getUniqueId());
+            }
+            lastHeldUUIDItem.remove(player);
+            lastInventory.remove(player);
+        }
+    }
+
     private void placeItemLogic(Player player, Inventory inventory, ItemStack itemStack) {
         if (lastInventory.containsKey(player)) {
             if (!(lastInventory.get(player) == inventory)) {
@@ -203,11 +281,12 @@ public class UuidListener implements Listener {
                 if (inventory.getType().equals(InventoryType.PLAYER)) {
                     processRetrieveItem(player, lastInventory.get(player), itemStack);
                 } else {
-                    processStoreItem(player, lastInventory.get(player), itemStack);
+                    processStoreItem(player, inventory, itemStack);
                 }
             }
         }
         lastInventory.remove(player);
+        lastHeldUUIDItem.remove(player);
     }
 
     private void processRetrieveItem(Player player, Inventory inventory, ItemStack itemStack) {
@@ -229,7 +308,7 @@ public class UuidListener implements Listener {
             UUIDItem item = UuidItemOptional.get();
             Location location = inventory.getLocation();
             assert location != null;
-            int logID = UuidLogger.logID("%s stored %s in %s (%s, %s, %s) in %s", player.getName(), item.getUuid(), inventory.getType().name(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
+            int logID = UuidLogger.logID("%s stored %s in %s at (%s, %s, %s) in %s", player.getName(), item.getUuid(), inventory.getType().name(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
             if (logID >= 0) {
                 UuidLogger.AddUUIDMetaInfo(logID, item.getUuid(), UuidLogger.UuidLogType.CONTAINER_STORE, player.getUniqueId());
             }
