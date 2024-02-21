@@ -8,6 +8,8 @@ import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
+import me.mykindos.betterpvp.core.logging.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.sql.rowset.CachedRowSet;
@@ -15,38 +17,70 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Singleton
 @Slf4j
-public class UuidLogger {
+public class UuidLogger extends Logger {
 
-    private static Database database;
 
     @Inject
     public UuidLogger(Database database) {
-        UuidLogger.database = database;
+        super(database);
     }
 
-    public static void AddUUIDMetaInfo(int id, UUID uuid, UuidLogType type, @Nullable UUID Player) {
+    /**
+     *
+     * @param id - the UUID of the log this information is about
+     * @param itemUuid - the UUID of the item this information is about
+     * @param type - the type of log this is
+     * @param uuid - UUID of the player
+     */
+    public static void AddItemUUIDMetaInfoPlayer(UUID id, UUID itemUuid, UuidLogType type, @Nullable UUID uuid) {
+        AddItemUUIDMetaInfo(id, itemUuid, type, uuid, UUIDType.PLAYER);
+    }
 
-        String query = "INSERT INTO uuidlogmeta (logId, UUID, Type, Player) VALUES (?, ?, ?, ?)";
+    /**
+     *
+     * @param id - the UUID of the log this information is about
+     * @param itemUuid - the UUID of the item this information is about
+     * @param type - the type of log this is
+     */
+    public static void AddItemUUIDMetaInfoNone(UUID id, UUID itemUuid, UuidLogType type) {
+        AddItemUUIDMetaInfo(id, itemUuid, type, null, UUIDType.NONE);
+    }
+
+
+    /**
+     *
+     * @param logUUID - the UUID of the log this information is about
+     * @param itemUuid - the UUID of the item this information is about
+     * @param type - the type of log this is
+     * @param uuid - UUID of type uuidType
+     * @param uuidType - the type of UUID uuid is.
+     */
+    public static void AddItemUUIDMetaInfo(@NotNull UUID logUUID, @NotNull UUID itemUuid, @NotNull UuidLogType type, @Nullable UUID uuid, @NotNull UUIDType uuidType) {
+        UUID metaUUID = UUID.randomUUID();
+
+
+        String query = "INSERT INTO uuidlogmeta (id, LogUUID, ItemUUID, Type, UUID, UUIDtype) VALUES (?, ?, ?, ?, ?, ?)";
         database.executeUpdate(new Statement(query,
-                new IntegerStatementValue(id),
-                new UuidStatementValue(uuid),
+                new UuidStatementValue(metaUUID),
+                new UuidStatementValue(logUUID),
+                new UuidStatementValue(itemUuid),
                 new StringStatementValue(type.name()),
-                new StringStatementValue(Player == null ? null : Player.toString())
+                new StringStatementValue(uuid == null ? null : uuid.toString()),
+                new StringStatementValue(uuidType.name())
                 )
         );
     }
 
     /**
      *
-     * @param uuid the uuid of the legend
+     * @param itemUUID the uuid of the item
      * @param amount the number of logs to retrieve
      * @return A list of the last amount of logs relating to this uiid
      */
-    public static List<String> getUuidLogs(UUID uuid, int amount) {
+    public static List<String> getUuidLogs(UUID itemUUID, int amount) {
         List<String> logList = new ArrayList<>();
         if (amount < 0) {
             return logList;
@@ -54,7 +88,7 @@ public class UuidLogger {
 
         String query = "CALL GetUuidLogsByUuid(?, ?)";
         CachedRowSet result = database.executeQuery( new Statement(query,
-                new UuidStatementValue(uuid),
+                new UuidStatementValue(itemUUID),
                 new IntegerStatementValue(amount)
                 )
         );
@@ -71,7 +105,7 @@ public class UuidLogger {
 
     /**
      *
-     * @param playerUuid the uuid of the legend
+     * @param playerUuid the uuid of the player
      * @param amount the number of logs to retrieve
      * @return A list of the last amount of logs relating to this player
      */
@@ -99,27 +133,13 @@ public class UuidLogger {
     }
 
 
-    public static int logID(String message, Object... args) {
-        assert database != null;
+    public static UUID legend(String message, Object... args) {
+        return log("LEGEND", message, args);
+    }
 
-        String logMessage = String.format(message, args);
-        log.info(logMessage);
-        StringStatementValue stringStatementValueLevel = new StringStatementValue("LEGEND");
-        StringStatementValue stringStatementValueMessage = new StringStatementValue(logMessage);
-        AtomicInteger id = new AtomicInteger(-1);
-        database.executeUpdate(new Statement("INSERT INTO logs (Level, Message) VALUES (?, ?)",
-                stringStatementValueLevel,
-                stringStatementValueMessage
-        ), resultSet -> {
-            try {
-                if (resultSet.next()) {
-                    id.set(resultSet.getInt(1));
-                }
-            } catch (SQLException ex) {
-              ex.printStackTrace();
-            }
-        });
-        return id.get();
+    public enum UUIDType {
+        PLAYER,
+        NONE
     }
 
      public enum UuidLogType {
