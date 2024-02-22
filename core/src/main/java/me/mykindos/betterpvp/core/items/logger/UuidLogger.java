@@ -9,11 +9,13 @@ import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
 import me.mykindos.betterpvp.core.logging.Logger;
+import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.sql.rowset.CachedRowSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -95,7 +97,8 @@ public class UuidLogger extends Logger {
 
         try {
             while(result.next()) {
-                logList.add(result.getTimestamp(1).toString() + " " + result.getString(2));
+                Timestamp timestamp = result.getTimestamp(1);
+                logList.add("<green>" + UtilTime.getTime(  System.currentTimeMillis() - timestamp.getTime(), 2) + "</green> ago " + result.getString(2));
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -124,7 +127,8 @@ public class UuidLogger extends Logger {
 
         try {
             while(result.next()) {
-                logList.add(result.getTimestamp(1).toString() + " " + result.getString(2));
+                Timestamp timestamp = result.getTimestamp(1);
+                logList.add("<green>" + UtilTime.getTime(  System.currentTimeMillis() - timestamp.getTime(), 2) + "</green> ago " + result.getString(2));
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -183,6 +187,10 @@ public class UuidLogger extends Logger {
           * An UUIDItem is moved by one inventory to another
           */
          INVENTORY_MOVE,
+         /**
+          * An UUIDItem is dispensed from a block
+          */
+         BLOCK_DISPENSE,
          /**
           * An UUIDItem holder logs out
           */

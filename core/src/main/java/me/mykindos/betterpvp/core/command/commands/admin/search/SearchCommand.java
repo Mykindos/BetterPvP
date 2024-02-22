@@ -32,6 +32,7 @@ public class SearchCommand extends Command {
 
     @Override
     public void execute(Player player, Client client, String... args) {
+        UtilMessage.message(player, "Search", UtilMessage.deserialize("<green>Usage: /search <item|player></green>"));
     }
 
     @Override
@@ -74,7 +75,7 @@ public class SearchCommand extends Command {
             try {
                 uuid = UUID.fromString(args[0]);
             } catch (IllegalArgumentException e) {
-                UtilMessage.message(player, "Search", UtilMessage.deserialize("<yellow>%s</yellow> is not a valid UUID.", args[0]));
+                UtilMessage.message(player, "Search", UtilMessage.deserialize("<light_purple>%s</light_purple> is not a valid UUID.", args[0]));
                 return;
             }
 
@@ -95,15 +96,15 @@ public class SearchCommand extends Command {
             Optional<UUIDItem> uuidItemOptional = uuidManager.getObject(uuid);
 
             if (uuidItemOptional.isEmpty()) {
-                UtilMessage.message(player, "Search", UtilMessage.deserialize("There is no item with the UUID <yellow>%s</yellow>", uuid.toString()));
+                UtilMessage.message(player, "Search", UtilMessage.deserialize("There is no item with the UUID <light_purple>%s</light_purple>", uuid.toString()));
                 return;
             }
 
             UUIDItem uuidItem = uuidItemOptional.get();
-            clientManager.sendMessageToRank("Search", UtilMessage.deserialize("<yellow>%s</yellow> is retrieving logs for <yellow>%s</yellow> (<green>%s</green>)", player.getName(), uuid.toString(), uuidItem.getIdentifier()), Rank.HELPER);
+            clientManager.sendMessageToRank("Search", UtilMessage.deserialize("<yellow>%s</yellow> is retrieving logs for <light_purple>%s</light_purple> (<green>%s</green>)", player.getName(), uuid.toString(), uuidItem.getIdentifier()), Rank.HELPER);
 
             List<String> logs = UuidLogger.getUuidLogs(uuid, amount);
-            UtilMessage.message(player, "Search", "Retrieving the last <green>%s</green> logs for <yellow>%s</yellow> (<green>%s</green>)", amount, uuid.toString(), uuidItem.getIdentifier());
+            UtilMessage.message(player, "Search", "Retrieving the last <green>%s</green> logs for <light_purple>%s</light_purple> (<green>%s</green>)", amount, uuid.toString(), uuidItem.getIdentifier());
 
             for (String log : logs) {
                 UtilMessage.message(player, "Search", UtilMessage.deserialize("<white>" + log + "</white>"));
