@@ -134,7 +134,7 @@ public class LevelField extends Skill implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler (priority = EventPriority.LOW)
     public void onDamageDeal(CustomDamageEvent event) {
         if(!(event.getDamager() instanceof Player attacker)) return;
         if (event.isCancelled()) return;
@@ -153,7 +153,7 @@ public class LevelField extends Skill implements Listener {
 
         if (nearbyDifference < 1) return;
 
-        double damageMod = nearbyDifference * getDamage(level);
+        double damageMod = Math.min(nearbyDifference, getMaxEnemies(level)) * getDamage(level);
 
         if (isAttacker) {
             event.setDamage(event.getDamage() + damageMod);
