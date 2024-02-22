@@ -3,19 +3,37 @@ package me.mykindos.betterpvp.core.command.commands.admin;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.Rank;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
+import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.items.BPvPItem;
 import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.items.logger.UUIDItem;
+import me.mykindos.betterpvp.core.items.logger.UUIDManager;
+import me.mykindos.betterpvp.core.items.logger.UuidLogger;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
+
+import java.util.Objects;
+import java.util.UUID;
 
 public class CustomGiveCommand extends Command {
 
     @Inject
     ItemHandler itemHandler;
+
+    @Inject
+    ClientManager clientManager;
+
+    @Inject
+    UUIDManager uuidManager;
 
     @Singleton
     @Override
@@ -63,8 +81,24 @@ public class CustomGiveCommand extends Command {
             }
         }
 
+        clientManager.sendMessageToRank("Core", UtilMessage.deserialize("<yellow>%s</yellow> gave <yellow>%s</yellow> [<green>%s</green>] x<green>%s</green>", player.getName(), target.getName(), item.getIdentifier(), count), Rank.HELPER);
 
         ItemStack itemStack = itemHandler.updateNames(item.getItemStack(count));
+        itemHandler.updateNames(itemStack);
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        UUIDItem uuidItem = null;
+
+        if (itemMeta != null) {
+            PersistentDataContainer pdc = itemMeta.getPersistentDataContainer();
+            if (pdc.has(CoreNamespaceKeys.UUID_KEY)) {
+                uuidItem = uuidManager.getObject(UUID.fromString(Objects.requireNonNull(pdc.get(CoreNamespaceKeys.UUID_KEY, PersistentDataType.STRING)))).orElse(null);
+            }
+        }
+        if (uuidItem != null) {
+            UUID logID = UuidLogger.legend("%s spawned and gave %s to %s", player.getName(), uuidItem.getUuid(), target.getName());
+            UuidLogger.AddItemUUIDMetaInfoPlayer(logID, uuidItem.getUuid(), UuidLogger.UuidLogType.SPAWN, player.getUniqueId());
+            UuidLogger.AddItemUUIDMetaInfoPlayer(logID, uuidItem.getUuid(), UuidLogger.UuidLogType.PICKUP, target.getUniqueId());
+        }
         target.getInventory().addItem(itemStack);
         //todo handle items that do not fit in inventory
     }

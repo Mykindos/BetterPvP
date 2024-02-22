@@ -144,6 +144,10 @@ public class UuidLogger extends Logger {
 
      public enum UuidLogType {
          /**
+          * An UUIDItem is spawned
+           */
+         SPAWN,
+        /**
           * Someone kills  of the UUIDItem holder
           */
          KILL,
@@ -155,7 +159,7 @@ public class UuidLogger extends Logger {
           * UUIDItem holder dies
           */
          DEATH,
-         /**'
+         /**
           * UUIDItem holder dies to a player
           */
          DEATH_PLAYER,

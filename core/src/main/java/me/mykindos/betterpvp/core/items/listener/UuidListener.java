@@ -114,7 +114,7 @@ public class UuidListener implements Listener {
         Location location = victim.getLocation();
         for (UUIDItem item : uuidItemsList) {
             UUID logID = UuidLogger.legend("%s was killed while holding %s by %s at (%s, %s, %s) in %s, contributed by %s", victim.getName(), item.getUuid(), killer.getName(), victim.getLocation().toString(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName(), contributors);
-            UuidLogger.AddItemUUIDMetaInfoPlayer(logID, item.getUuid(), UuidLogger.UuidLogType.DEATH, victim.getUniqueId());
+            UuidLogger.AddItemUUIDMetaInfoPlayer(logID, item.getUuid(), UuidLogger.UuidLogType.DEATH_PLAYER, victim.getUniqueId());
             UuidLogger.AddItemUUIDMetaInfoPlayer(logID, item.getUuid(), UuidLogger.UuidLogType.KILL, killer.getUniqueId());
             for (Player player : contributions.keySet()) {
                 UuidLogger.AddItemUUIDMetaInfoPlayer(logID, item.getUuid(), UuidLogger.UuidLogType.CONTRIBUTOR, player.getUniqueId());
@@ -319,6 +319,21 @@ public class UuidListener implements Listener {
     }
 
     /*@EventHandler(priority = EventPriority.MONITOR)
+    public void InventoryCreativeEvent(InventoryCreativeEvent event) {
+        log.info("");
+        log.info("InvetoryCreativeEvent Event");
+        log.info("Action " + event.getAction().toString());
+        log.info("Current " + (event.getCurrentItem() == null ? null : event.getCurrentItem().toString()));
+        log.info("Cursor " + (event.getCursor() == null ? null : event.getCursor().toString()));
+        log.info("Clicked Inventory " + event.getClickedInventory());
+        log.info("Slot " + event.getSlot());
+        log.info("Raw slot " + event.getRawSlot());
+        log.info("Click " + event.getClick());
+        log.info("Hotbar button " + event.getHotbarButton());
+        log.info("SlotType " + event.getSlotType());
+    }*/
+
+    /*@EventHandler(priority = EventPriority.MONITOR)
     public void InventoryOpenEvent(InventoryOpenEvent event) {
         log.info("");
         log.info("InventoryOpenEvent");
@@ -464,5 +479,3 @@ public class UuidListener implements Listener {
         return Optional.empty();
     }
 }
-
-
