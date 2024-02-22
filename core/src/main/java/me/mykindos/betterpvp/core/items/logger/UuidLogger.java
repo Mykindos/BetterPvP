@@ -172,6 +172,10 @@ public class UuidLogger extends Logger {
           */
          CONTAINER_BREAK,
          /**
+          * An UUIDItem is picked up by an inventory
+          */
+         INVENTORY_PICKUP,
+         /**
           * An UUIDItem is moved by one inventory to another
           */
          INVENTORY_MOVE,
