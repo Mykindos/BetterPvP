@@ -5,6 +5,7 @@ import me.mykindos.betterpvp.core.framework.customtypes.CustomArmourStand;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
+import me.mykindos.betterpvp.core.utilities.events.GetEntityRelationshipEvent;
 import me.mykindos.betterpvp.core.utilities.model.EntityRemovalReason;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -56,8 +57,16 @@ public class UtilEntity {
             return true;
         }
 
-        return UtilPlayer.getRelation(player, other) != EntityProperty.FRIENDLY;
+        return getRelation(player, other) != EntityProperty.FRIENDLY;
     };
+
+    public static boolean isEntityFriendly(LivingEntity entity, LivingEntity target) {
+        return getRelation(entity, target) == EntityProperty.FRIENDLY;
+    }
+
+    public static EntityProperty getRelation(LivingEntity entity, LivingEntity target) {
+        return UtilServer.callEvent(new GetEntityRelationshipEvent(entity, target)).getEntityProperty();
+    }
 
     public static Optional<Entity> getEntity(@NotNull World world, int id) {
         return Optional.ofNullable(((CraftWorld) world).getHandle().getEntity(id))

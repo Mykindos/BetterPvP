@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEvent;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
@@ -115,7 +116,7 @@ public class Sever extends Skill implements CooldownSkill, Listener {
         boolean withinRange = UtilMath.offset(player, ent) <= hitDistance;
         boolean isFriendly = false;
         if (ent instanceof Player damagee) {
-            isFriendly = UtilPlayer.getRelation(player, damagee) == EntityProperty.FRIENDLY;
+            isFriendly = UtilEntity.getRelation(player, damagee) == EntityProperty.FRIENDLY;
         }
 
         if (!withinRange || isFriendly) {

@@ -182,9 +182,9 @@ public class KnightsGreatlance extends ChannelWeapon implements InteractWeapon, 
             // Get all enemies that collide with the player from the last location to the new location
             final Location newLocation = UtilPlayer.getMidpoint(player);
             final Optional<LivingEntity> hit = UtilEntity.interpolateCollision(data.getLastLocation(),
-                    newLocation,
-                    0.6f,
-                    ent -> UtilEntity.IS_ENEMY.test(player, ent))
+                            newLocation,
+                            0.6f,
+                            ent -> UtilEntity.IS_ENEMY.test(player, ent))
                     .map(RayTraceResult::getHitEntity).map(LivingEntity.class::cast);
 
             final int charge = data.getTicksCharged();
@@ -193,20 +193,21 @@ public class KnightsGreatlance extends ChannelWeapon implements InteractWeapon, 
                 final LivingEntity hitEnt = hit.get();
                 final double damage = 2 + (10 * percentage);
 
-                // Remove data
-                deactivate(player, data);
-
-                // Sound
-                new SoundEffect(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1.5f, 0.5f).play(player.getLocation());
-
                 // Damage
-                UtilDamage.doCustomDamage(new CustomDamageEvent(hitEnt,
+                CustomDamageEvent customDamageEvent = UtilDamage.doCustomDamage(new CustomDamageEvent(hitEnt,
                         player,
                         null,
                         EntityDamageEvent.DamageCause.CUSTOM,
                         damage,
                         false,
                         ATTACK_NAME));
+                if (customDamageEvent == null || customDamageEvent.isCancelled()) continue;
+
+                // Remove data
+                deactivate(player, data);
+
+                // Sound
+                new SoundEffect(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1.5f, 0.5f).play(player.getLocation());
 
                 // Velocity
                 final Vector vec = player.getLocation().getDirection();

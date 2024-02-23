@@ -47,7 +47,6 @@ public class EffectListener implements Listener {
     private final Map<UUID, Long> bleedEntities = new HashMap<>();
 
 
-
     @Inject
     public EffectListener(Core core, EffectManager effectManager) {
         this.core = core;
@@ -213,7 +212,7 @@ public class EffectListener implements Listener {
     }
 
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onStrengthDamage(CustomDamageEvent event) {
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
         if (event.getDamager() instanceof Player player) {
@@ -224,13 +223,12 @@ public class EffectListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onDamage(CustomDamageEvent event) {
-        if (event.getDamagee() instanceof Player player) {
-            Optional<Effect> effectOptional = effectManager.getEffect(player, EffectType.VULNERABILITY);
-            effectOptional.ifPresent(effect -> {
-                if (event.getCause() == EntityDamageEvent.DamageCause.LIGHTNING) return;
-                event.setDamage((event.getDamage() * (1.0 + (effect.getLevel() * 0.25))));
-            });
-        }
+        if(event.isCancelled()) return;
+        Optional<Effect> effectOptional = effectManager.getEffect(event.getDamagee(), EffectType.VULNERABILITY);
+        effectOptional.ifPresent(effect -> {
+            if (event.getCause() == EntityDamageEvent.DamageCause.LIGHTNING) return;
+            event.setDamage((event.getDamage() * (1.0 + (effect.getLevel() * 0.25))));
+        });
     }
 
 
@@ -259,7 +257,7 @@ public class EffectListener implements Listener {
 
     @EventHandler
     public void poisonDamageMultiplier(CustomDamageEvent event) {
-        if(event.getCause() != EntityDamageEvent.DamageCause.POISON) return;
+        if (event.getCause() != EntityDamageEvent.DamageCause.POISON) return;
         Optional<Effect> effectOptional = effectManager.getEffect(event.getDamagee(), EffectType.POISON);
         effectOptional.ifPresent(effect -> event.setDamage(event.getDamage() * effect.getLevel()));
     }
@@ -336,7 +334,7 @@ public class EffectListener implements Listener {
         }
 
         for (EffectType value : EffectType.values()) {
-            if(!value.isNegative()) continue;
+            if (!value.isNegative()) continue;
             effectManager.removeEffect(target, value);
         }
 
@@ -345,7 +343,7 @@ public class EffectListener implements Listener {
 
     @EventHandler
     public void onSprint(PlayerToggleSprintEvent event) {
-        if(effectManager.hasEffect(event.getPlayer(), EffectType.NO_SPRINT)){
+        if (effectManager.hasEffect(event.getPlayer(), EffectType.NO_SPRINT)) {
             event.getPlayer().setSprinting(false);
         }
     }

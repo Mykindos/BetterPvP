@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
@@ -98,7 +99,7 @@ public class HealingShot extends PrepareArrowSkill {
 
     public void onHit(Player damager, LivingEntity target, int level, PreCustomDamageEvent event) {
         if (target instanceof Player damagee) {
-            if (UtilPlayer.isPlayerFriendly(damager, damagee)) {
+            if (UtilEntity.isEntityFriendly(damager, damagee)) {
 
                 damagee.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, (int) (getDuration(level) * 20), regenerationStrength));
 

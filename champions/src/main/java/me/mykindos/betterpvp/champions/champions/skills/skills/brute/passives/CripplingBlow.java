@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -60,6 +61,7 @@ public class CripplingBlow extends Skill implements PassiveSkill {
     @EventHandler
     public void onDamage(CustomDamageEvent event) {
         if (!(event.getDamager() instanceof Player player)) return;
+        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
         if (!SkillWeapons.isHolding(player, SkillType.AXE)) return;
 
         int level = getLevel(player);

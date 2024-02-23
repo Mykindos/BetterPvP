@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -130,7 +131,7 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener {
         boolean isFriendly = false;
 
         if (ent instanceof Player damagee) {
-            isFriendly = UtilPlayer.getRelation(player, damagee) == EntityProperty.FRIENDLY;
+            isFriendly = UtilEntity.getRelation(player, damagee) == EntityProperty.FRIENDLY;
         }
 
         if (ent == null || !withinRange || isFriendly) {

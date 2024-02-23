@@ -12,7 +12,7 @@ import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
-import me.mykindos.betterpvp.core.utilities.events.GetPlayerRelationshipEvent;
+import me.mykindos.betterpvp.core.utilities.events.GetEntityRelationshipEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -76,15 +76,6 @@ public class UtilPlayer {
         UtilServer.callEvent(fetchNearbyEntityEvent);
 
         return fetchNearbyEntityEvent.getEntities();
-    }
-
-    public static boolean isPlayerFriendly(Player player, Player target) {
-        return getRelation(player, target) == EntityProperty.FRIENDLY;
-    }
-
-    public static EntityProperty getRelation(Player player, Player target) {
-        GetPlayerRelationshipEvent getPlayerRelationshipEvent = UtilServer.callEvent(new GetPlayerRelationshipEvent(player, target));
-        return getPlayerRelationshipEvent.getEntityProperty();
     }
 
     public static int getPing(Player player) {
