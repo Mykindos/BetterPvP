@@ -13,7 +13,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
-import me.mykindos.betterpvp.core.utilities.events.GetPlayerRelationshipEvent;
+import me.mykindos.betterpvp.core.utilities.events.GetEntityRelationshipEvent;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -47,9 +47,11 @@ public class ClansSkillListener implements Listener {
     }
 
     @EventHandler
-    public void onGetPlayerPropertyEvent(GetPlayerRelationshipEvent event) {
-        boolean isAlly = clanManager.isAlly(event.getPlayer(), event.getTarget());
-        event.setEntityProperty(isAlly ? EntityProperty.FRIENDLY : EntityProperty.ENEMY);
+    public void onGetPlayerPropertyEvent(GetEntityRelationshipEvent event) {
+        if(event.getEntity() instanceof Player player && event.getTarget() instanceof Player target) {
+            boolean isAlly = clanManager.isAlly(player, target);
+            event.setEntityProperty(isAlly ? EntityProperty.FRIENDLY : EntityProperty.ENEMY);
+        }
     }
 
     @EventHandler
