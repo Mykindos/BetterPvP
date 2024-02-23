@@ -15,7 +15,6 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.sql.rowset.CachedRowSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -96,9 +95,9 @@ public class UuidLogger extends Logger {
         );
 
         try {
-            while(result.next()) {
-                Timestamp timestamp = result.getTimestamp(1);
-                logList.add("<green>" + UtilTime.getTime(  System.currentTimeMillis() - timestamp.getTime(), 2) + "</green> ago " + result.getString(2));
+            while (result.next()) {
+                long time = result.getLong(1);
+                logList.add("<green>" + UtilTime.getTime(  System.currentTimeMillis() - time, 2) + "</green> ago " + result.getString(2));
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -127,8 +126,8 @@ public class UuidLogger extends Logger {
 
         try {
             while(result.next()) {
-                Timestamp timestamp = result.getTimestamp(1);
-                logList.add("<green>" + UtilTime.getTime(  System.currentTimeMillis() - timestamp.getTime(), 2) + "</green> ago " + result.getString(2));
+                long time = result.getLong(1);
+                logList.add("<green>" + UtilTime.getTime(  System.currentTimeMillis() - time, 2) + "</green> ago " + result.getString(2));
             }
         } catch (SQLException ex) {
             ex.printStackTrace();

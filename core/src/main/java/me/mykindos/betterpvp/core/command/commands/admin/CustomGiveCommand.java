@@ -95,7 +95,7 @@ public class CustomGiveCommand extends Command {
             }
         }
         if (uuidItem != null) {
-            UUID logID = UuidLogger.legend("<yellow>%s</yellow> <blue>spawned</blue> and gave <light_purple%s</light_purple> to <yellow>%s</yellow>", player.getName(), uuidItem.getUuid(), target.getName());
+            UUID logID = UuidLogger.legend("<yellow>%s</yellow> <blue>spawned</blue> and gave <light_purple>e%s</light_purple> to <yellow>%s</yellow>", player.getName(), uuidItem.getUuid(), target.getName());
             UuidLogger.AddItemUUIDMetaInfoPlayer(logID, uuidItem.getUuid(), UuidLogger.UuidLogType.SPAWN, player.getUniqueId());
             UuidLogger.AddItemUUIDMetaInfoPlayer(logID, uuidItem.getUuid(), UuidLogger.UuidLogType.PICKUP, target.getUniqueId());
         }

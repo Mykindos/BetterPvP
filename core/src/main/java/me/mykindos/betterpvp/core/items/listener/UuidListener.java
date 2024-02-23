@@ -68,6 +68,12 @@ public class UuidListener implements Listener {
             InventoryType.WORKBENCH
     ));
 
+    public List<InventoryType> InventoryFurnaceType = new ArrayList<>(List.of(
+            InventoryType.FURNACE,
+            InventoryType.BLAST_FURNACE,
+            InventoryType.SMOKER
+    ));
+
     private final Map<Player, Inventory> lastInventory = new HashMap<>();
     private final Map<Player, UUIDItem> lastHeldUUIDItem = new HashMap<>();
 
@@ -219,6 +225,10 @@ public class UuidListener implements Listener {
             if (event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
                 Inventory inventory = event.getClickedInventory();
                 assert inventory != null;
+                if (InventoryFurnaceType.contains(event.getInventory().getType()) && !event.getInventory().equals(event.getClickedInventory())) {
+                    //this is a furnace, UUIDItems cannot be shift clicked in, but can be shift clicked out
+                    return;
+                }
                 if (inventory.getType().equals(InventoryType.PLAYER)) {
                     processStoreItem(player, event.getInventory(), event.getCurrentItem());
                 } else {

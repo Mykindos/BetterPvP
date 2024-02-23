@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.logging;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
+import me.mykindos.betterpvp.core.database.query.values.LongStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
 
@@ -27,10 +28,11 @@ public class Logger {
         String logMessage = String.format(message, args);
         log.info(logMessage);
         UUID logID = UUID.randomUUID();
-        database.executeUpdate(new Statement("INSERT INTO logs (id, Level, Message) VALUES (?, ?, ?)",
+        database.executeUpdate(new Statement("INSERT INTO logs (id, Level, Message, Time) VALUES (?, ?, ?, ?)",
                 new UuidStatementValue(logID),
                 new StringStatementValue(level),
-                new StringStatementValue(logMessage)
+                new StringStatementValue(logMessage),
+                new LongStatementValue(System.currentTimeMillis())
         ));
         return logID;
     }

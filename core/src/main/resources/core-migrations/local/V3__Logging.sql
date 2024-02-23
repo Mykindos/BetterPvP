@@ -3,7 +3,7 @@ create table if not exists logs
     id        varchar(255)                       primary key,
     Level     varchar(255)                          not null,
     Message   text                                  not null,
-    Timestamp timestamp default current_timestamp() not null
+    Time      bigint                                not null
 );
 
 create table if not exists uuiditems
@@ -32,20 +32,20 @@ create table if not exists uuidlogmeta
 DROP PROCEDURE IF EXISTS GetUuidLogsByUuid;
 CREATE PROCEDURE GetUuidLogsByUuid(UniqueID varchar(255), amount int)
 BEGIN
-    SELECT Timestamp, Message FROM logs, uuidlogmeta
+    SELECT Time, Message FROM logs, uuidlogmeta
         WHERE ItemUUID = UniqueID
         AND LogUUID = logs.id
-        ORDER BY Timestamp DESC
+        ORDER BY Time DESC
         LIMIT amount;
 END;
 
 DROP PROCEDURE IF EXISTS GetUuidLogsByPlayer;
 CREATE PROCEDURE GetUuidLogsByPlayer(PlayerUuid varchar(255), amount int)
 BEGIN
-    SELECT Timestamp, Message FROM logs, uuidlogmeta
+    SELECT Time, Message FROM logs, uuidlogmeta
         WHERE UUID = PlayerUuid
         AND UUIDtype = 'PLAYER'
         AND LogUUID = logs.id
-        ORDER BY Timestamp DESC
+        ORDER BY Time DESC
         LIMIT amount;
 END;
