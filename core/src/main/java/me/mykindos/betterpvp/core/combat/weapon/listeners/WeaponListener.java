@@ -119,6 +119,8 @@ public class WeaponListener implements Listener {
                     cooldownWeapon.showCooldownFinished(), true, false, x -> weapon.isHoldingWeapon(player))) {
                 return;
             }
+
+            player.setCooldown(weapon.getMaterial(), (int) (cooldownWeapon.getCooldown() * 20L));
         }
 
         if (weapon instanceof ChannelWeapon channelWeapon) {
