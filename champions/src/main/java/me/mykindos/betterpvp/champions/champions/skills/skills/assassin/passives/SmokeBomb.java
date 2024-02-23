@@ -79,13 +79,6 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener {
         return Role.ASSASSIN;
     }
 
-    public void loadSkillConfig() {
-        baseDuration = getConfig("baseDuration", 3.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
-        blindDuration = getConfig("blindDuration", 1.75, Double.class);
-        blindRadius = getConfig("blindRadius", 4.0, Double.class);
-    }
-
     @Override
     public double getCooldown(int level) {
         return cooldown - ((level - 1) * cooldownDecreasePerLevel);
@@ -136,7 +129,7 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener {
 
     private void interact(Player player) {
         final long castTime = smoked.get(player.getUniqueId());
-        if (!UtilTime.elapsed(castTime, 25L)) {
+        if (!UtilTime.elapsed(castTime, 100L)) {
             return;
         }
 
@@ -216,6 +209,13 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener {
             }
         }
 
+    }
+
+    public void loadSkillConfig() {
+        baseDuration = getConfig("baseDuration", 3.0, Double.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
+        blindDuration = getConfig("blindDuration", 1.75, Double.class);
+        blindRadius = getConfig("blindRadius", 4.0, Double.class);
     }
 
 }
