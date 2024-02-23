@@ -32,7 +32,7 @@ create table if not exists uuidlogmeta
 DROP PROCEDURE IF EXISTS GetUuidLogsByUuid;
 CREATE PROCEDURE GetUuidLogsByUuid(UniqueID varchar(255), amount int)
 BEGIN
-    SELECT Time, Message FROM logs, uuidlogmeta
+    SELECT DISTINCT Time, Message FROM logs, uuidlogmeta
         WHERE ItemUUID = UniqueID
         AND LogUUID = logs.id
         ORDER BY Time DESC
@@ -42,7 +42,7 @@ END;
 DROP PROCEDURE IF EXISTS GetUuidLogsByPlayer;
 CREATE PROCEDURE GetUuidLogsByPlayer(PlayerUuid varchar(255), amount int)
 BEGIN
-    SELECT Time, Message FROM logs, uuidlogmeta
+    SELECT DISTINCT Time, Message FROM logs, uuidlogmeta
         WHERE UUID = PlayerUuid
         AND UUIDtype = 'PLAYER'
         AND LogUUID = logs.id
