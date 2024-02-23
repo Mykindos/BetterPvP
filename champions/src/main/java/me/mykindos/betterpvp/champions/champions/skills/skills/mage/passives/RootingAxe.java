@@ -17,6 +17,11 @@ import org.bukkit.Effect;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Openable;
+import org.bukkit.block.data.type.Door;
+import org.bukkit.block.data.type.Ladder;
+import org.bukkit.block.data.type.Slab;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Wither;
@@ -76,13 +81,13 @@ public class RootingAxe extends Skill implements PassiveSkill, CooldownSkill {
             Block block = event.getDamagee().getLocation().getBlock().getRelative(0, -1, 0);
 
             LivingEntity damagee = event.getDamagee();
-            if (damager.getLocation().getBlock().getRelative(BlockFace.DOWN).getType().name().contains("_SLAB") || block.getType().name().contains("_STEP") || block.getType() == Material.OAK_SLAB || block.getType().name().contains("STAIR")) {
+            BlockData blockData = block.getBlockData();
+            if (blockData instanceof Slab || blockData instanceof Openable || blockData instanceof Ladder) {
                 return;
             }
 
             Block blockMoreUnder = damagee.getLocation().getBlock().getRelative(0, -2, 0);
-            if (blockMoreUnder.getType().name().contains("LADDER") || blockMoreUnder.getType().name().contains("GATE")
-                    || !UtilBlock.solid(blockMoreUnder.getType())) {
+            if(!isRootable(blockMoreUnder)) {
                 return;
             }
 
@@ -91,13 +96,18 @@ public class RootingAxe extends Skill implements PassiveSkill, CooldownSkill {
                 if (!UtilBlock.airFoliage(block) && !block.isLiquid() && !blockMoreUnder.isLiquid()) {
 
                     if (championsManager.getCooldowns().use(damager, getName(), getCooldown(level), false)) {
-                        damagee.teleport(damagee.getLocation().add(0, -0.9, 0));
+                        damagee.teleport(damagee.getLocation().add(0, -1, 0));
                         damagee.getWorld().playEffect(damagee.getLocation(), Effect.STEP_SOUND, damagee.getLocation().getBlock().getType());
                         damagee.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, (int) (getDuration(level) * 20), -5));
                     }
                 }
             }
         }
+    }
+
+    private boolean isRootable(Block block) {
+        BlockData blockData = block.getBlockData();
+        return !(blockData instanceof Slab || blockData instanceof Openable || blockData instanceof Ladder) && UtilBlock.solid(block);
     }
 
     @Override
