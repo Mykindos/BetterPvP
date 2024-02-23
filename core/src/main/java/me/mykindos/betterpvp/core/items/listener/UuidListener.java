@@ -3,10 +3,12 @@ package me.mykindos.betterpvp.core.items.listener;
 import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
 import me.mykindos.betterpvp.core.client.events.ClientQuitEvent;
 import me.mykindos.betterpvp.core.combat.events.KillContributionEvent;
 import me.mykindos.betterpvp.core.combat.stats.model.Contribution;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
+import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.items.logger.UUIDItem;
 import me.mykindos.betterpvp.core.items.logger.UUIDManager;
 import me.mykindos.betterpvp.core.items.logger.UuidLogger;
@@ -79,11 +81,7 @@ public class UuidListener implements Listener {
 
 
     //todo looping check of players, make sure only 1 of item exists
-    //todo tnt stuff
-    //todo Logout/Login
-    //todo Server stop update (players drop items they are holding)
     //todo logs/disable for music disk player
-    //todo shift click into furnace
 
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -241,8 +239,34 @@ public class UuidListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onCloseInventory(InventoryCloseEvent event) {
         if (event.getPlayer() instanceof Player player) {
-            processExit(player);
+            if (lastHeldUUIDItem.containsKey(player) && lastInventory.containsKey(player)) {
+                //the player is holding an item, and the inventory has closed. This means they have the item.
+                UUIDItem item = lastHeldUUIDItem.get(player);
+                Inventory inventory = lastInventory.get(player);
+                if (inventory.getType().equals(InventoryType.PLAYER)) {
+                    //The last inventory is player, so not actually retrieving
+                    lastHeldUUIDItem.remove(player);
+                    lastInventory.remove(player);
+                    return;
+                }
+                Location location = inventory.getLocation();
+                assert location != null;
+                UUID logID = UuidLogger.legend("<yellow>%s</yellow> <green>retrieved</green> <light_purple>%s</yellow> from <aqua>%s</aqua> at (<green>%s</green>, <green>%s</green>, <green>%s</green>) in <green>%s</green>", player.getName(), item.getUuid(), Objects.requireNonNull(inventory).getType().name(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
+                UuidLogger.AddItemUUIDMetaInfoPlayer(logID, item.getUuid(), UuidLogger.UuidLogType.RETREIVE, player.getUniqueId());
+
+                lastHeldUUIDItem.remove(player);
+                lastInventory.remove(player);
+            }
         }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerLogin(ClientJoinEvent event) {
+        Location location = event.getPlayer().getLocation();
+        getUUIDItems(event.getPlayer()).forEach(uuidItem -> {
+            UUID logUUID = UuidLogger.legend("<yellow>%s</yellow> <blue>Logged</blue< <green>in</green> with <light_purple>%s</light_purple> at (<green>%s</green>, <green>%s</green>, <green>%s</green>) in <green>%s</green>", event.getPlayer().getName(), uuidItem.getUuid(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
+            UuidLogger.AddItemUUIDMetaInfoNone(logUUID, uuidItem.getUuid(), UuidLogger.UuidLogType.LOGOUT);
+        });
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -368,6 +392,11 @@ public class UuidListener implements Listener {
         });
     }
 
+    @UpdateEvent(delay = 1 * 1000 & 60)
+    public void checkPlayers() {
+
+    }
+
     private void processExit(Player player) {
         if (lastHeldUUIDItem.containsKey(player) && lastInventory.containsKey(player)) {
             //the player is holding an item, and the inventory has closed. This means they have the item.
@@ -381,12 +410,18 @@ public class UuidListener implements Listener {
             }
             Location location = inventory.getLocation();
             assert location != null;
-            UUID logID = UuidLogger.legend("<yellow>%s</yellow> <green>retrieved</green> <light_purple>%s</yellow> from <aqua>%s</aqua> at (<green>%s</green>, <green>%s</green>, <green>%s</green>) in <green>%s</green>", player.getName(), item.getUuid(), Objects.requireNonNull(inventory).getType().name(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
-            UuidLogger.AddItemUUIDMetaInfoPlayer(logID, item.getUuid(), UuidLogger.UuidLogType.RETREIVE, player.getUniqueId());
+            UUID logID = UuidLogger.legend("<yellow>%s</yellow> <red>dropped</red> due to disconnect <light_purple>%s</yellow> from <aqua>%s</aqua> at (<green>%s</green>, <green>%s</green>, <green>%s</green>) in <green>%s</green>", player.getName(), item.getUuid(), Objects.requireNonNull(inventory).getType().name(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
+            UuidLogger.AddItemUUIDMetaInfoPlayer(logID, item.getUuid(), UuidLogger.UuidLogType.DROP, player.getUniqueId());
+            UuidLogger.AddItemUUIDMetaInfoPlayer(logID, item.getUuid(), UuidLogger.UuidLogType.LOGOUT, player.getUniqueId());
 
             lastHeldUUIDItem.remove(player);
             lastInventory.remove(player);
         }
+        Location location = player.getLocation();
+        getUUIDItems(player).forEach(uuidItem -> {
+            UUID logUUID = UuidLogger.legend("<yellow>%s</yellow> <blue>Logged</blue> <red>out</red> with <light_purple>%s</light_purple> at (<green>%s</green>, <green>%s</green>, <green>%s</green>) in <green>%s</green>", player.getName(), uuidItem.getUuid(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
+            UuidLogger.AddItemUUIDMetaInfoNone(logUUID, uuidItem.getUuid(), UuidLogger.UuidLogType.LOGOUT);
+        });
     }
 
     private void placeItemLogic(Player player, Inventory inventory, ItemStack itemStack) {
@@ -436,7 +471,6 @@ public class UuidListener implements Listener {
     }
 
     private void processStoreItemInSlot(Player player, Inventory inventory, int slot) {
-
         processStoreItem(player, inventory, inventory.getItem(slot));
     }
 
