@@ -761,8 +761,9 @@ skills:
       baseDuration: 3.0
       cooldownDecreasePerLevel: 1.5
       durationIncreasePerLevel: 1.0
-      strengthLevel: 4
-      maxMissedSwings: 2
+      strengthLevel: 2
+      baseMissedSwings: 2
+      missedSwingsIncreasePerLevel: 0.5
     disengage:
       enabled: true
       maxlevel: 5
