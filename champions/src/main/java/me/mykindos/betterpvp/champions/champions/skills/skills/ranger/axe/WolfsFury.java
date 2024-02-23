@@ -16,7 +16,6 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -36,7 +35,9 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
     private double baseDuration;
     private double durationIncreasePerLevel;
     private int strengthLevel;
-    private int maxMissedSwings;
+
+    private int baseMissedSwings;
+    private double missedSwingsIncreasePerLevel;
 
     @Inject
     public WolfsFury(Champions champions, ChampionsManager championsManager) {
@@ -58,7 +59,7 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
                 "<effect>Strength " + UtilFormat.getRomanNumeral(strengthLevel) + "</effect> for <val>" + getDuration(level) + "</val> seconds and giving",
                 "no knockback on your attacks",
                 "",
-                "If you miss <stat>" + maxMissedSwings + "</stat> consecutive attacks",
+                "If you miss <val>" + getMaxMissedSwings(level) + "</val> consecutive attacks",
                 "Wolfs Fury ends",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
@@ -67,6 +68,10 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
 
     public double getDuration(int level) {
         return baseDuration + level * durationIncreasePerLevel;
+    }
+
+    public int getMaxMissedSwings(int level) {
+        return (int) Math.floor(baseMissedSwings + ((level -1) * missedSwingsIncreasePerLevel));
     }
 
     @Override
@@ -125,7 +130,7 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
         if(level > 0) {
             if (active.containsKey(player)) {
                 missedSwings.put(player, missedSwings.getOrDefault(player, 0) + 1);
-                if (missedSwings.get(player) >= maxMissedSwings) {
+                if (missedSwings.get(player) >= getMaxMissedSwings(level)) {
                     expire(player, true);
                     active.remove(player);
                 }
@@ -158,7 +163,8 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
     public void loadSkillConfig(){
         baseDuration = getConfig("baseDuration", 3.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
-        maxMissedSwings = getConfig("maxMissedSwings", 2, Integer.class);
-        strengthLevel = getConfig("strengthLevel", 4, Integer.class);
+        baseMissedSwings = getConfig("baseMissedSwings", 2, Integer.class);
+        missedSwingsIncreasePerLevel = getConfig("missedSwingsIncreasePerLevel", 0.5, Double.class); // 1 extra swing per 2 levels
+        strengthLevel = getConfig("strengthLevel", 2, Integer.class);
     }
 }

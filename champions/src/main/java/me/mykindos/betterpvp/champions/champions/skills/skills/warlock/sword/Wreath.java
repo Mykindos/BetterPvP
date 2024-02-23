@@ -59,8 +59,8 @@ public class Wreath extends Skill implements InteractSkill, CooldownSkill {
         return new String[]{
                 "Right click with a Sword to cast",
                 "",
-                "Release a barrage of teeth that deal <val>" + String.format("%.2f", getDamage(level)) + "</val> damage ",
-                "and apply <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength + 1) + "</effect>",
+                "Release a barrage of teeth that",
+                "deal <val>" + String.format("%.2f", getDamage(level)) + "</val> damage and apply <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength + 1) + "</effect>",
                 "to their target for <stat>" + getSlowDuration(level) + "</stat> seconds.",
                 "",
                 "For each enemy hit, restore <val>" + healthPerEnemyHit + "</val> health.",
