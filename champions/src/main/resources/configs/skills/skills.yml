@@ -300,22 +300,6 @@ skills:
       baseSlowDuration: 1.5
       slowDurationIncreasePerLevel: 0.0
       slowStrength: 2
-    blocktoss:
-      enabled: true
-      maxlevel: 3
-      cooldown: 10.0
-      cooldownDecreasePerLevel: 1.0
-      baseCharge: 55.0
-      chargeIncreasePerLevel: 15.0
-      baseDamage: 4.0
-      damageIncreasePerLevel: 2.0
-      baseRadius: 4.0
-      radiusIncreasePerLevel: 0.5
-      baseSpeed: 1.4
-      speedIncreasePerLevel: 0.1
-      hitBoxSize: 1.0
-      size: 0.6
-      sizePerLevel: 0.2
     inferno:
       enabled: true
       maxlevel: 3
@@ -569,6 +553,22 @@ skills:
       cooldownDecreasePerLevel: 2.0
       damage: 5.0
       damageIncreasePerLevel: 1.0
+    blocktoss:
+      enabled: true
+      maxlevel: 5
+      cooldown: 10.0
+      cooldownDecreasePerLevel: 1.0
+      baseCharge: 55.0
+      chargeIncreasePerLevel: 15.0
+      baseDamage: 4.0
+      damageIncreasePerLevel: 1.0
+      baseRadius: 4.0
+      radiusIncreasePerLevel: 0.5
+      baseSpeed: 1.4
+      speedIncreasePerLevel: 0.1
+      hitBoxSize: 1.0
+      size: 0.6
+      sizePerLevel: 0.2
     colossus:
       enabled: true
       maxlevel: 3

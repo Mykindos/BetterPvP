@@ -46,14 +46,17 @@ public class NullBlade extends Skill implements PassiveSkill, EnergySkill {
     @EventHandler
     public void onDamage(CustomDamageEvent event) {
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
-        if (!(event.getDamagee() instanceof Player target)) return;
+
         if (!(event.getDamager() instanceof Player dam)) return;
 
         int level = getLevel(dam);
         if (level > 0) {
             double degeneration = getEnergy(level) * 0.01;
 
-            championsManager.getEnergy().degenerateEnergy(target, degeneration);
+            if (event.getDamagee() instanceof Player target) {
+                championsManager.getEnergy().degenerateEnergy(target, degeneration);
+            }
+
             championsManager.getEnergy().regenerateEnergy(dam, degeneration);
         }
 
