@@ -72,7 +72,7 @@ public class ClansMovementListener extends ClanListener {
 
     public void displayOwner(Player player, Clan locationClan) {
 
-        Component component = Component.empty().color(NamedTextColor.YELLOW).append(Component.text("Wilderness"));
+        Component component = Component.empty();
 
         Clan clan = null;
         Optional<Clan> clanOptional = clanManager.getClanByPlayer(player);
@@ -98,6 +98,8 @@ public class ClansMovementListener extends ClanListener {
                     append = UtilMessage.deserialize(clanManager.getDominanceString(clan, locationClan));
                 }
             }
+        } else {
+            append = Component.text("Wilderness", NamedTextColor.GRAY);
         }
 
         if (locationClan != null) {
