@@ -92,7 +92,7 @@ public class Cleave extends Skill implements PassiveSkill, Listener {
                 if (enemiesHit >= getMaxEnemiesHit(level)) continue;
 
 
-                UtilDamage.doCustomDamage(new CustomDamageEvent(target.getKey(), damager, null, DamageCause.ENTITY_ATTACK, event.getDamage() * getPercentageOfDamage(level), true, getName()));
+                UtilDamage.doCustomDamage(new CustomDamageEvent(target.getKey(), damager, null, DamageCause.CUSTOM, event.getDamage() * getPercentageOfDamage(level), true, getName()));
                 enemiesHit++;
             }
         }
