@@ -84,10 +84,9 @@ public class Vengeance extends Skill implements PassiveSkill, Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.LOW)
     public void onHit(CustomDamageEvent event) {
         if (!(event.getDamager() instanceof Player player)) return;
-        if (!(event.getDamagee() instanceof Player)) return;
         if (event.isCancelled()) return;
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
 
