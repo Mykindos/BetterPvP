@@ -903,10 +903,8 @@ skills:
     wreath:
       enabled: true
       maxlevel: 5
-      cooldown: 30.0
-      cooldownDecreasePerLevel: 2.0
-      baseNumAttacks: 3
-      numAttacksIncreasePerLevel: 0
+      cooldown: 11.0
+      cooldownDecreasePerLevel: 1.0
       baseSlowDuration: 2.0
       slowDurationIncreasePerLevel: 0.0
       baseDamage: 2.0
