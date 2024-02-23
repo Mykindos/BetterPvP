@@ -104,10 +104,8 @@ public class HuntersThrill extends Skill implements PassiveSkill {
     public void loadSkillConfig() {
         baseMaxTimeBetweenShots = getConfig("maxTimeBetweenShots", 8.0, Double.class);
         maxTimeBetweenShotsIncreasePerLevel = getConfig("maxTimeBetweenShotsIncreasePerLevel", 1.0, Double.class);
-        baseDuration = getConfig("maxTimeBetweenShotsIncreasePerLevel", 6.0, Double.class);
-        durationIncreasePerLevel = getConfig("maxTimeBetweenShotsIncreasePerLevel", 0.0, Double.class);
-
-
+        baseDuration = getConfig("baseDuration", 6.0, Double.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.0, Double.class);
         maxConsecutiveHits = getConfig("maxConsecutiveHits", 4, Integer.class);
     }
 

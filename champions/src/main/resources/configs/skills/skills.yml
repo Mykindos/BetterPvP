@@ -709,6 +709,8 @@ skills:
       maxTimeBetweenShots: 8.0
       maxConsecutiveHits: 4
       maxTimeBetweenShotsIncreasePerLevel: 1.0
+      baseDuration: 6.0
+      durationIncreasePerLevel: 0.0
     precision:
       enabled: true
       maxlevel: 3
