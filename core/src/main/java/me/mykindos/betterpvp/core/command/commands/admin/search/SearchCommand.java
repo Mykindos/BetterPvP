@@ -7,11 +7,13 @@ import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.SubCommand;
+import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.items.logger.UUIDItem;
 import me.mykindos.betterpvp.core.items.logger.UUIDManager;
 import me.mykindos.betterpvp.core.items.logger.UuidLogger;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -184,6 +186,45 @@ public class SearchCommand extends Command {
             if (argCount == 1) {
                 return ArgumentType.PLAYER.name();
             }
+            return ArgumentType.NONE.name();
+        }
+    }
+
+    @Singleton
+    @SubCommand(SearchCommand.class)
+    public static class SearchOnlineSubCommand extends Command {
+
+        @Inject
+        ClientManager clientManager;
+
+        @Inject
+        ItemHandler itemHandler;
+
+        @Override
+        public String getName() {
+            return "online";
+        }
+
+        @Override
+        public String getDescription() {
+            return "Return all UUID Items currently held by players";
+        }
+
+        @Override
+        public void execute(Player player, Client client, String... args) {
+                clientManager.sendMessageToRank("Search", UtilMessage.deserialize("<yellow>%s</yellow> is retrieving all <light_purple>UUIDitems</light_purple> currently being held", player.getName()), Rank.HELPER);
+
+                for (Player player1 : Bukkit.getOnlinePlayers()) {
+                    Component component = UtilMessage.deserialize("<yellow>%s</yellow> is holding:", player1.getName());
+                    for (UUIDItem uuidItem : itemHandler.getUUIDItems(player1)) {
+                        component = component.appendNewline().append(UtilMessage.deserialize("(<green>%s</green>) <light_purple>%s</light_purple>", uuidItem.getIdentifier(), uuidItem.getUuid()));
+                    }
+                    UtilMessage.message(player, "Search", component);
+                }
+        }
+
+        @Override
+        public String getArgumentType(int argCount) {
             return ArgumentType.NONE.name();
         }
     }

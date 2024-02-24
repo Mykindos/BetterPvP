@@ -19,6 +19,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -29,6 +30,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -156,5 +159,29 @@ public class ItemHandler {
 
     public void replaceItem(String identifier, BPvPItem newItem) {
         itemMap.replace(identifier, newItem);
+    }
+
+    public List<UUIDItem> getUUIDItems(Player player) {
+        List<UUIDItem> uuidItemList = new ArrayList<>();
+        player.getInventory().forEach(itemStack -> {
+            if (itemStack != null) {
+                Optional<UUIDItem> uuidItemOptional = getUUIDItem(itemStack);
+                uuidItemOptional.ifPresent(uuidItemList::add);
+            }
+        });
+        return uuidItemList;
+    }
+
+    public Optional<UUIDItem> getUUIDItem(ItemStack itemStack) {
+        if (itemStack != null) {
+            ItemMeta itemMeta = itemStack.getItemMeta();
+            if (itemMeta != null) {
+                PersistentDataContainer pdc = itemMeta.getPersistentDataContainer();
+                if (pdc.has(CoreNamespaceKeys.UUID_KEY)) {
+                    return uuidManager.getObject(UUID.fromString(Objects.requireNonNull(pdc.get(CoreNamespaceKeys.UUID_KEY, PersistentDataType.STRING))));
+                }
+            }
+        }
+        return Optional.empty();
     }
 }
