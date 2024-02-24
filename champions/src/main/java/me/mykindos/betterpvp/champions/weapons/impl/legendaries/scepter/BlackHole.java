@@ -2,15 +2,17 @@ package me.mykindos.betterpvp.champions.weapons.impl.legendaries.scepter;
 
 import lombok.Getter;
 import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
+import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilLocation;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.math.VectorLine;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
-import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.RayTraceResult;
@@ -90,11 +92,8 @@ public class BlackHole extends ScepterProjectile {
                     .spawn();
 
             // Pull entities
-            for (LivingEntity entity : location.getNearbyLivingEntities(pullRadius)) {
-                if (entity instanceof ArmorStand) {
-                    continue;
-                }
-
+            for (KeyValue<LivingEntity, EntityProperty> nearbyEnt : UtilEntity.getNearbyEntities(caster, location, pullRadius, EntityProperty.ALL)) {
+                LivingEntity entity = nearbyEnt.getKey();
                 final Location entityLocation = entity.getLocation();
                 final Vector direction = location.toVector().subtract(entityLocation.toVector()).normalize();
                 entity.setFallDistance(0);
