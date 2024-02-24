@@ -761,7 +761,7 @@ skills:
       maxlevel: 5
       cooldown: 25.0
       baseDuration: 3.0
-      cooldownDecreasePerLevel: 1.5
+      cooldownDecreasePerLevel: 2.5
       durationIncreasePerLevel: 1.0
       strengthLevel: 2
       baseMissedSwings: 2
@@ -910,7 +910,7 @@ skills:
       cooldownDecreasePerLevel: 1.0
       baseSlowDuration: 2.0
       slowDurationIncreasePerLevel: 0.0
-      baseDamage: 2.0
+      baseDamage: 4.0
       damageIncreasePerLevel: 0.66
       slowStrength: 1
       numAttacks: 3
