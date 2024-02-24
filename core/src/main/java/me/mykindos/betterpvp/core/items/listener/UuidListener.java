@@ -21,11 +21,13 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Container;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
@@ -39,6 +41,7 @@ import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.inventory.InventoryPickupItemEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -87,11 +90,6 @@ public class UuidListener implements Listener {
 
     private final Map<Player, Inventory> lastInventory = new HashMap<>();
     private final Map<Player, UUIDItem> lastHeldUUIDItem = new HashMap<>();
-
-
-    //todo looping check of players, make sure only 1 of item exists
-    //todo logs/disable for music disk player
-
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onUUIDPickup(EntityPickupItemEvent event) {
@@ -320,6 +318,18 @@ public class UuidListener implements Listener {
                 event.setCancelled(true);
                 if (event.getWhoClicked() instanceof Player player) {
                     UtilMessage.message(player, "Core", UtilMessage.deserialize("You cannot use this item as fuel."));
+                }
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onMusicDiskPlay(PlayerInteractEvent event) {
+        if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+            if (Objects.requireNonNull(event.getClickedBlock()).getType().equals(Material.JUKEBOX)) {
+                if (itemHandler.getUUIDItem(event.getItem()).isPresent()) {
+                    //prevent using an UUIDItem in a Jukebox
+                    event.setCancelled(true);
                 }
             }
         }
