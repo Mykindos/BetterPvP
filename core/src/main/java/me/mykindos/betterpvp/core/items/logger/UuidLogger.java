@@ -97,7 +97,7 @@ public class UuidLogger extends Logger {
         try {
             while (result.next()) {
                 long time = result.getLong(1);
-                logList.add("<green>" + UtilTime.getTime(  System.currentTimeMillis() - time, 2) + "</green> ago " + result.getString(2));
+                logList.add("<green>" + UtilTime.getTime(System.currentTimeMillis() - time, 2) + " ago</green> " + result.getString(2));
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -127,7 +127,7 @@ public class UuidLogger extends Logger {
         try {
             while(result.next()) {
                 long time = result.getLong(1);
-                logList.add("<green>" + UtilTime.getTime(  System.currentTimeMillis() - time, 2) + "</green> ago " + result.getString(2));
+                logList.add("<green>" + UtilTime.getTime(System.currentTimeMillis() - time, 2) + " ago</green>  " + result.getString(2));
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
