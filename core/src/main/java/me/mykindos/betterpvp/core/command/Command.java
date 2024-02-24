@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.items.ItemHandler;
-import me.mykindos.betterpvp.core.items.logger.UUIDManager;
+import me.mykindos.betterpvp.core.items.uuiditem.UUIDManager;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;

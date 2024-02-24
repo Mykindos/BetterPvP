@@ -11,8 +11,8 @@ import me.mykindos.betterpvp.core.combat.events.KillContributionEvent;
 import me.mykindos.betterpvp.core.combat.stats.model.Contribution;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.items.ItemHandler;
-import me.mykindos.betterpvp.core.items.logger.UUIDItem;
-import me.mykindos.betterpvp.core.items.logger.UuidLogger;
+import me.mykindos.betterpvp.core.items.uuiditem.UUIDItem;
+import me.mykindos.betterpvp.core.logging.UuidLogger;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -271,7 +271,7 @@ public class UuidListener implements Listener {
     public void onPlayerLogin(ClientJoinEvent event) {
         Location location = event.getPlayer().getLocation();
         itemHandler.getUUIDItems(event.getPlayer()).forEach(uuidItem -> {
-            UUID logUUID = UuidLogger.legend("<yellow>%s</yellow> <blue>Logged</blue< <green>in</green> with <light_purple>%s</light_purple> at (<green>%s</green>, <green>%s</green>, <green>%s</green>) in <green>%s</green>", event.getPlayer().getName(), uuidItem.getUuid(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
+            UUID logUUID = UuidLogger.legend("<yellow>%s</yellow> <blue>Logged</blue> <green>in</green> with <light_purple>%s</light_purple> at (<green>%s</green>, <green>%s</green>, <green>%s</green>) in <green>%s</green>", event.getPlayer().getName(), uuidItem.getUuid(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
             UuidLogger.AddItemUUIDMetaInfoNone(logUUID, uuidItem.getUuid(), UuidLogger.UuidLogType.LOGOUT);
         });
     }

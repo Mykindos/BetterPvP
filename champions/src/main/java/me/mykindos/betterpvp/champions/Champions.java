@@ -22,7 +22,7 @@ import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapters;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
 import me.mykindos.betterpvp.core.items.ItemHandler;
-import me.mykindos.betterpvp.core.items.logger.UUIDManager;
+import me.mykindos.betterpvp.core.items.uuiditem.UUIDManager;
 import me.mykindos.betterpvp.core.recipes.RecipeHandler;
 import org.bukkit.Bukkit;
 import org.reflections.Reflections;

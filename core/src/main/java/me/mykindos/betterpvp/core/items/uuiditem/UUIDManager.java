@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.items.logger;
+package me.mykindos.betterpvp.core.items.uuiditem;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;

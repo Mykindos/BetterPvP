@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.command.commands.admin.search;
+package me.mykindos.betterpvp.core.command.commands.admin;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -8,9 +8,9 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.items.ItemHandler;
-import me.mykindos.betterpvp.core.items.logger.UUIDItem;
-import me.mykindos.betterpvp.core.items.logger.UUIDManager;
-import me.mykindos.betterpvp.core.items.logger.UuidLogger;
+import me.mykindos.betterpvp.core.items.uuiditem.UUIDItem;
+import me.mykindos.betterpvp.core.items.uuiditem.UUIDManager;
+import me.mykindos.betterpvp.core.logging.UuidLogger;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;

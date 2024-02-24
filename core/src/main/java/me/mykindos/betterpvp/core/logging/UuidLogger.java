@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.items.logger;
+package me.mykindos.betterpvp.core.logging;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -8,7 +8,6 @@ import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
-import me.mykindos.betterpvp.core.logging.Logger;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -210,6 +209,10 @@ public class UuidLogger extends Logger {
           * An UUIDItem despawns
           */
          DESPAWN,
+         /**
+          * A custom, manual generated log
+          */
+         CUSTOM
 
     }
 }
