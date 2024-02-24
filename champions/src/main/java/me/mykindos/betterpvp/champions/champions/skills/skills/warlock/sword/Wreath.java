@@ -167,7 +167,7 @@ public class Wreath extends Skill implements InteractSkill, CooldownSkill {
         baseSlowDuration = getConfig("baseSlowDuration", 2.0, Double.class);
         slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.0, Double.class);
 
-        baseDamage = getConfig("baseDamage", 2.0, Double.class);
+        baseDamage = getConfig("baseDamage", 4.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.66, Double.class);
 
         healthPerEnemyHit = getConfig("healthPerEnemyHit", 1.0, Double.class);

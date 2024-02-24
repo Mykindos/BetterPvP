@@ -23,6 +23,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.WeakHashMap;
@@ -123,6 +124,9 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
 
     @EventHandler
     public void onMiss(PlayerInteractEvent event) {
+        if(event.getHand() != EquipmentSlot.HAND) return;
+        if(!event.getAction().isLeftClick()) return;
+
         Player player = event.getPlayer();
 
         int level = getLevel(player);
