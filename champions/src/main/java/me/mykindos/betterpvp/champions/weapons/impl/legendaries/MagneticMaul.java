@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomKnockbackEvent;
+import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.weapon.types.ChannelWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.InteractWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
@@ -205,14 +206,17 @@ public class MagneticMaul extends ChannelWeapon implements InteractWeapon, Legen
     }
 
     @EventHandler(priority = EventPriority.LOW)
-    public void onDamage(CustomDamageEvent event) {
+    public void onDamage(PreCustomDamageEvent event) {
         if (!enabled) {
             return;
         }
-        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
-        if (!(event.getDamager() instanceof Player damager)) return;
+
+        CustomDamageEvent cde = event.getCustomDamageEvent();
+
+        if (cde.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
+        if (!(cde.getDamager() instanceof Player damager)) return;
         if (isHoldingWeapon(damager)) {
-            event.setDamage(baseDamage);
+            cde.setDamage(baseDamage);
         }
     }
 

@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseItemEvent;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
@@ -68,18 +69,28 @@ public class ScytheListener implements Listener {
     private CooldownManager cooldownManager;
 
     @EventHandler(priority = EventPriority.LOW)
-    public void onDamage(CustomDamageEvent event) {
-        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
-        if (!(event.getDamager() instanceof Player damager)) return;
+    public void onDamage(PreCustomDamageEvent event) {
+        if(!scythe.isEnabled()) {
+            return;
+        }
+
+        CustomDamageEvent cde = event.getCustomDamageEvent();
+
+        if (cde.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
+        if (!(cde.getDamager() instanceof Player damager)) return;
         if (scythe.isHoldingWeapon(damager) && scythe.tracked.containsKey(damager)) {
             final double soulCount = scythe.tracked.get(damager).getSoulCount();
-            event.setDamage(scythe.getBaseDamage() + scythe.maxSoulsDamage * soulCount / scythe.maxSouls);
+            cde.setDamage(scythe.getBaseDamage() + scythe.maxSoulsDamage * soulCount / scythe.maxSouls);
             UtilPlayer.health(damager, scythe.baseHeal + scythe.healPerSoul * soulCount);
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onJoin(PlayerJoinEvent event) {
+        if(!scythe.isEnabled()) {
+            return;
+        }
+
         final PlayerInventory inventory = event.getPlayer().getInventory();
         if (scythe.matches(inventory.getItemInMainHand()) || scythe.matches(inventory.getItemInOffHand())) {
             scythe.active(event.getPlayer());
@@ -88,6 +99,10 @@ public class ScytheListener implements Listener {
 
     @EventHandler
     public void onSwapWeapon(PlayerItemHeldEvent event) {
+        if(!scythe.isEnabled()) {
+            return;
+        }
+
         final Player player = event.getPlayer();
         if (scythe.matches(player.getInventory().getItem(event.getNewSlot()))) {
             scythe.active(player);
@@ -98,6 +113,10 @@ public class ScytheListener implements Listener {
 
     @EventHandler
     public void onSlotChange(PlayerInventorySlotChangeEvent event) {
+        if(!scythe.isEnabled()) {
+            return;
+        }
+
         if (scythe.matches(event.getNewItemStack())) {
             scythe.active(event.getPlayer());
         } else if (scythe.matches(event.getOldItemStack()) && Arrays.stream(event.getPlayer().getInventory().getContents()).noneMatch(scythe::matches)) {
@@ -107,6 +126,10 @@ public class ScytheListener implements Listener {
 
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
+        if(!scythe.isEnabled()) {
+            return;
+        }
+
         // Remove all souls from the player who died
         final Player damagee = event.getEntity();
         if  (scythe.tracked.containsKey(damagee)) {
@@ -117,6 +140,10 @@ public class ScytheListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onDeath(CustomDamageEvent event) {
+        if(!scythe.isEnabled()) {
+            return;
+        }
+
         if (event.getDamagee() instanceof ArmorStand) {
             return;
         }
@@ -160,6 +187,10 @@ public class ScytheListener implements Listener {
 
     @UpdateEvent
     public void doScythe() {
+        if(!scythe.isEnabled()) {
+            return;
+        }
+
         final Iterator<Map.Entry<Player, ScytheData>> iterator = scythe.tracked.entrySet().iterator();
 
         while (iterator.hasNext()) {

@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.weapons.impl.legendaries.scepter;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.entity.Player;
@@ -25,16 +26,25 @@ public class ScepterListener implements Listener {
     private Scepter scepter;
 
     @EventHandler(priority = EventPriority.LOW)
-    public void onDamage(CustomDamageEvent event) {
-        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
-        if (!(event.getDamager() instanceof Player damager)) return;
+    public void onDamage(PreCustomDamageEvent event) {
+        if (!scepter.isEnabled()) {
+            return;
+        }
+
+        CustomDamageEvent cde = event.getCustomDamageEvent();
+
+        if (cde.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
+        if (!(cde.getDamager() instanceof Player damager)) return;
         if (scepter.isHoldingWeapon(damager)) {
-            event.setDamage(scepter.getBaseDamage());
+            cde.setDamage(scepter.getBaseDamage());
         }
     }
 
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
+        if (!scepter.isEnabled()) {
+            return;
+        }
         if (event.getHand() != EquipmentSlot.HAND || !event.getAction().isLeftClick()) {
             return;
         }
@@ -46,6 +56,10 @@ public class ScepterListener implements Listener {
 
     @UpdateEvent
     public void doBeam() {
+        if (!scepter.isEnabled()) {
+            return;
+        }
+
         final Iterator<Map.Entry<Player, List<MeridianBeam>>> iterator = scepter.beams.entrySet().iterator();
 
         while (iterator.hasNext()) {
@@ -76,6 +90,10 @@ public class ScepterListener implements Listener {
 
     @UpdateEvent
     public void doBlackHole() {
+        if (!scepter.isEnabled()) {
+            return;
+        }
+
         final Iterator<Map.Entry<Player, List<BlackHole>>> iterator = scepter.blackHoles.entrySet().iterator();
 
         while (iterator.hasNext()) {
