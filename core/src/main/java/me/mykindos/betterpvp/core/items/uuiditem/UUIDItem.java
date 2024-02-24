@@ -16,6 +16,7 @@ public class UUIDItem {
     public String namespace;
     private String key;
     private NamespacedKey namespacedKey;
+
     public UUIDItem (UUID uuid, String namespace, String key) {
         this.uuid = uuid;
         this.namespace = namespace;

@@ -314,10 +314,6 @@ public class BPvPItem implements IBPvPItem {
         return applyLore(itemMeta, getLore());
     }
 
-    //public ItemMeta applyLore(ItemMeta itemMeta, int durability) {
-    //    return applyLore(itemMeta, getLore(), durability);
-    //}
-
     public ItemMeta applyLore(ItemMeta itemMeta, List<Component> lore) {
 
         List<Component> newLore = UtilItem.removeItalic(lore);

@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.items.listener;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Rank;
@@ -12,6 +13,7 @@ import me.mykindos.betterpvp.core.combat.stats.model.Contribution;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDItem;
+import me.mykindos.betterpvp.core.logging.Logger;
 import me.mykindos.betterpvp.core.logging.UuidLogger;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -55,19 +57,17 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+@Singleton
 @BPvPListener
 @Slf4j
 public class UuidListener implements Listener {
 
 
-    @Inject
-    Core core;
+    private final Core core;
 
-    @Inject
-    ItemHandler itemHandler;
+    private final ItemHandler itemHandler;
 
-    @Inject
-    ClientManager clientManager;
+    private final ClientManager clientManager;
 
     private final double UUIDCheckTimeSeconds = 120;
 
@@ -91,6 +91,13 @@ public class UuidListener implements Listener {
     private final Map<Player, Inventory> lastInventory = new HashMap<>();
     private final Map<Player, UUIDItem> lastHeldUUIDItem = new HashMap<>();
 
+    @Inject
+    public UuidListener(Core core, ItemHandler itemHandler, ClientManager clientManager) {
+        this.core = core;
+        this.itemHandler = itemHandler;
+        this.clientManager = clientManager;
+    }
+
     @EventHandler(priority = EventPriority.MONITOR)
     public void onUUIDPickup(EntityPickupItemEvent event) {
         if (event.isCancelled()) return;
@@ -100,7 +107,8 @@ public class UuidListener implements Listener {
         }
         UUIDItem uuidItem = uuidItemOptional.get();
         Location location = event.getEntity().getLocation();
-        UUID logID = UuidLogger.legend("<yellow>%s</yellow> <green>picked</green> up <light_purple>%s</light_purple> at (<green>%s</green>, <green>%s</green>, <green>%s</green>) in <green>%s</green>", event.getEntity().getName(), uuidItem.getUuid(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
+        UUID logID = Logger.info("<yellow>%s</yellow> <green>picked</green> up <light_purple>%s</light_purple> at (<green>%s</green>, <green>%s</green>, <green>%s</green>) in <green>%s</green>",
+                event.getEntity().getName(), uuidItem.getUuid(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
         if (event.getEntity() instanceof Player player) {
             UuidLogger.AddItemUUIDMetaInfoPlayer(logID, uuidItem.getUuid(), UuidLogger.UuidLogType.PICKUP, player.getUniqueId());
         } else {
@@ -116,7 +124,8 @@ public class UuidListener implements Listener {
         }
         UUIDItem uuidItem = uuidItemOptional.get();
         Location location = event.getPlayer().getLocation();
-        UUID logID = UuidLogger.legend("<yellow>%s</yellow> <red>dropped</red> <light_purple>%s</light_purple> at (<green>%s</green>, <green>%s</green>, <green>%s</green>) in <green>%s</green>", event.getPlayer().getName(), uuidItem.getUuid(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
+        UUID logID = Logger.info("<yellow>%s</yellow> <red>dropped</red> <light_purple>%s</light_purple> at (<green>%s</green>, <green>%s</green>, <green>%s</green>) in <green>%s</green>",
+                event.getPlayer().getName(), uuidItem.getUuid(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
         UuidLogger.AddItemUUIDMetaInfoPlayer(logID, uuidItem.getUuid(), UuidLogger.UuidLogType.DROP, event.getPlayer().getUniqueId());
     }
 
@@ -136,7 +145,8 @@ public class UuidListener implements Listener {
         }
         Location location = victim.getLocation();
         for (UUIDItem item : uuidItemsList) {
-            UUID logID = UuidLogger.legend("<yellow>%s</yellow> was killed while holding <light_purple>%s<light_purple> by <yellow>%s</yellow> at (<green>%s</green>, <green>%s</green>, <green>%s</green>) in <green>%s</green>, contributed by %s", victim.getName(), item.getUuid(), killer.getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName(), contributors);
+            UUID logID = Logger.info("<yellow>%s</yellow> was killed while holding <light_purple>%s<light_purple> by <yellow>%s</yellow> at (<green>%s</green>, <green>%s</green>, <green>%s</green>) in <green>%s</green>, contributed by %s",
+                    victim.getName(), item.getUuid(), killer.getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName(), contributors);
             UuidLogger.AddItemUUIDMetaInfoPlayer(logID, item.getUuid(), UuidLogger.UuidLogType.DEATH_PLAYER, victim.getUniqueId());
             UuidLogger.AddItemUUIDMetaInfoPlayer(logID, item.getUuid(), UuidLogger.UuidLogType.KILL, killer.getUniqueId());
             for (Player player : contributions.keySet()) {
@@ -153,7 +163,8 @@ public class UuidListener implements Listener {
         if (uuidItemsList.isEmpty()) return;
         Location location = player.getLocation();
         for (UUIDItem item : uuidItemsList) {
-            UUID logID = UuidLogger.legend("<yellow>%s</yellow> <red>died</red> while holding <light_purple>%s</light_purple> at (<green>%s</green>, <green>%s</green>, <green>%s</green>) in <green>%s</green>", player.getName(), item.getUuid(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
+            UUID logID = Logger.info("<yellow>%s</yellow> <red>died</red> while holding <light_purple>%s</light_purple> at (<green>%s</green>, <green>%s</green>, <green>%s</green>) in <green>%s</green>",
+                    player.getName(), item.getUuid(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
             UuidLogger.AddItemUUIDMetaInfoPlayer(logID, item.getUuid(), UuidLogger.UuidLogType.DEATH, player.getUniqueId());
         }
     }
@@ -258,7 +269,8 @@ public class UuidListener implements Listener {
                 }
                 Location location = inventory.getLocation();
                 assert location != null;
-                UUID logID = UuidLogger.legend("<yellow>%s</yellow> <green>retrieved</green> <light_purple>%s</yellow> from <aqua>%s</aqua> at (<green>%s</green>, <green>%s</green>, <green>%s</green>) in <green>%s</green>", player.getName(), item.getUuid(), Objects.requireNonNull(inventory).getType().name(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
+                UUID logID = Logger.info("<yellow>%s</yellow> <green>retrieved</green> <light_purple>%s</yellow> from <aqua>%s</aqua> at (<green>%s</green>, <green>%s</green>, <green>%s</green>) in <green>%s</green>",
+                        player.getName(), item.getUuid(), Objects.requireNonNull(inventory).getType().name(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
                 UuidLogger.AddItemUUIDMetaInfoPlayer(logID, item.getUuid(), UuidLogger.UuidLogType.RETREIVE, player.getUniqueId());
 
                 lastHeldUUIDItem.remove(player);
@@ -271,7 +283,8 @@ public class UuidListener implements Listener {
     public void onPlayerLogin(ClientJoinEvent event) {
         Location location = event.getPlayer().getLocation();
         itemHandler.getUUIDItems(event.getPlayer()).forEach(uuidItem -> {
-            UUID logUUID = UuidLogger.legend("<yellow>%s</yellow> <blue>Logged</blue> <green>in</green> with <light_purple>%s</light_purple> at (<green>%s</green>, <green>%s</green>, <green>%s</green>) in <green>%s</green>", event.getPlayer().getName(), uuidItem.getUuid(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
+            UUID logUUID = Logger.info("<yellow>%s</yellow> <blue>Logged</blue> <green>in</green> with <light_purple>%s</light_purple> at (<green>%s</green>, <green>%s</green>, <green>%s</green>) in <green>%s</green>",
+                    event.getPlayer().getName(), uuidItem.getUuid(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
             UuidLogger.AddItemUUIDMetaInfoNone(logUUID, uuidItem.getUuid(), UuidLogger.UuidLogType.LOGOUT);
         });
     }
@@ -280,14 +293,6 @@ public class UuidListener implements Listener {
     public void onPlayerLogout(ClientQuitEvent event) {
         processExit(event.getPlayer());
     }
-
-    /*@EventHandler
-    public void onPluginDisable(PluginDisableEvent event) {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            processExit(player);
-        }
-    }
-     */
 
     /**
      * Prevent UUID items from being duplicated in creative
@@ -339,7 +344,8 @@ public class UuidListener implements Listener {
     public void onItemDespawn(ItemDespawnEvent event) {
         itemHandler.getUUIDItem(event.getEntity().getItemStack()).ifPresent(uuidItem -> {
             Location location = event.getEntity().getLocation();
-            UUID logUUID = UuidLogger.legend("<light_purple>%s</light_purple> <red><bold>despawned</bold></red> at (<green>%s</green>, <green>%s</green>, <green>%s</green>) in <green>%s</green>", uuidItem.getUuid(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
+            UUID logUUID = Logger.info("<light_purple>%s</light_purple> <red><bold>despawned</bold></red> at (<green>%s</green>, <green>%s</green>, <green>%s</green>) in <green>%s</green>",
+                    uuidItem.getUuid(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
             UuidLogger.AddItemUUIDMetaInfoNone(logUUID, uuidItem.getUuid(), UuidLogger.UuidLogType.DESPAWN);
         });
     }
@@ -350,7 +356,7 @@ public class UuidListener implements Listener {
             Location locationDestination = event.getDestination().getLocation();
             assert locationSource != null;
             assert locationDestination != null;
-            UUID logUUID = UuidLogger.legend("<light_purple>>%s</light_purple> moved from <aqua>%s</aqua> (<green>%s</green>, <green>%s</green>, <green>%s</green>) to <aqua>%s</aqua> (<green>%s</green>, <green>%s</green>, <green>%s</green>) in <green>%s</green>",
+            UUID logUUID = Logger.info("<light_purple>>%s</light_purple> moved from <aqua>%s</aqua> (<green>%s</green>, <green>%s</green>, <green>%s</green>) to <aqua>%s</aqua> (<green>%s</green>, <green>%s</green>, <green>%s</green>) in <green>%s</green>",
                     uuidItem.getUuid(),
                     event.getSource().getType().toString(), locationSource.getBlockX(), locationSource.getBlockY(), locationSource.getBlockZ(),
                     event.getDestination().getType().toString(), locationDestination.getBlockX(), locationDestination.getBlockY(), locationDestination.getBlockZ(),
@@ -364,7 +370,8 @@ public class UuidListener implements Listener {
         itemHandler.getUUIDItem(event.getItem().getItemStack()).ifPresent(uuidItem -> {
             Location location = event.getInventory().getLocation();
             assert location != null;
-            UUID logUUID = UuidLogger.legend("<light_purple>%s</light_purple> was picked up by block <aqua>%s</aqua> at (<green>%s</green>, <green>%s</green>, <green>%s</green>) in <green>%s</green>", uuidItem.getUuid(), event.getInventory().getType().name(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
+            UUID logUUID = Logger.info("<light_purple>%s</light_purple> was picked up by block <aqua>%s</aqua> at (<green>%s</green>, <green>%s</green>, <green>%s</green>) in <green>%s</green>",
+                    uuidItem.getUuid(), event.getInventory().getType().name(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
             UuidLogger.AddItemUUIDMetaInfoNone(logUUID, uuidItem.getUuid(), UuidLogger.UuidLogType.INVENTORY_PICKUP);
         });
     }
@@ -374,7 +381,7 @@ public class UuidListener implements Listener {
         event.getItems().forEach(item -> {
             itemHandler.getUUIDItem(item.getItemStack()).ifPresent(uuidItem -> {
                 Location location = event.getBlock().getLocation();
-                UUID logUUID = UuidLogger.legend("<yellow>%s</yellow> caused <light_purple>%s</light_purple> to be <red>dropped</red> from block <aqua>%s</aqua> at (<green>%s</green>, <green>%s</green>, <green>%s</green>) in <green>%s</green>",
+                UUID logUUID = Logger.info("<yellow>%s</yellow> caused <light_purple>%s</light_purple> to be <red>dropped</red> from block <aqua>%s</aqua> at (<green>%s</green>, <green>%s</green>, <green>%s</green>) in <green>%s</green>",
                         event.getPlayer().getName(), uuidItem.getUuid(), event.getBlockState().getType().name(),
                         location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName()
                         );
@@ -387,7 +394,7 @@ public class UuidListener implements Listener {
     public void onBlockDispenseEvent(BlockDispenseEvent event) {
         itemHandler.getUUIDItem(event.getItem()).ifPresent(uuidItem -> {
             Location location = event.getBlock().getLocation();
-            UUID logUUID = UuidLogger.legend("<light_purple>%s</light_purple> was <red>dispensed</red> from block <aqua>%s</aqua> at (<green>%s</green>, <green>%s</green>, <green>%s</green>) in <green>%s</green>",
+            UUID logUUID = Logger.info("<light_purple>%s</light_purple> was <red>dispensed</red> from block <aqua>%s</aqua> at (<green>%s</green>, <green>%s</green>, <green>%s</green>) in <green>%s</green>",
                     uuidItem.getUuid(), event.getBlock().getType().name(),
                     location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName()
             );
@@ -402,7 +409,7 @@ public class UuidListener implements Listener {
                 container.getInventory().forEach(itemStack -> {
                     itemHandler.getUUIDItem(itemStack).ifPresent(uuidItem -> {
                         Location location = container.getLocation();
-                        UUID logUUID = UuidLogger.legend("<light_purple>$s</light_purple> was <red>dropped</red> due to explosion from <aqua>%s</aqua> at (<green>%s</green>, <green>%s</green>, <green>%s</green>) in <green>%s</green>",
+                        UUID logUUID = Logger.info("<light_purple>$s</light_purple> was <red>dropped</red> due to explosion from <aqua>%s</aqua> at (<green>%s</green>, <green>%s</green>, <green>%s</green>) in <green>%s</green>",
                                 uuidItem.getUuid(), container.getType().name(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName()
                                 );
                         UuidLogger.AddItemUUIDMetaInfoNone(logUUID, uuidItem.getUuid(), UuidLogger.UuidLogType.CONTAINER_BREAK);
@@ -447,7 +454,7 @@ public class UuidListener implements Listener {
             }
             Location location = inventory.getLocation();
             assert location != null;
-            UUID logID = UuidLogger.legend("<yellow>%s</yellow> <red>dropped</red> due to disconnect <light_purple>%s</yellow> from <aqua>%s</aqua> at (<green>%s</green>, <green>%s</green>, <green>%s</green>) in <green>%s</green>", player.getName(), item.getUuid(), Objects.requireNonNull(inventory).getType().name(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
+            UUID logID = Logger.info("<yellow>%s</yellow> <red>dropped</red> due to disconnect <light_purple>%s</yellow> from <aqua>%s</aqua> at (<green>%s</green>, <green>%s</green>, <green>%s</green>) in <green>%s</green>", player.getName(), item.getUuid(), Objects.requireNonNull(inventory).getType().name(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
             UuidLogger.AddItemUUIDMetaInfoPlayer(logID, item.getUuid(), UuidLogger.UuidLogType.DROP, player.getUniqueId());
             UuidLogger.AddItemUUIDMetaInfoPlayer(logID, item.getUuid(), UuidLogger.UuidLogType.LOGOUT, player.getUniqueId());
 
@@ -456,7 +463,7 @@ public class UuidListener implements Listener {
         }
         Location location = player.getLocation();
         itemHandler.getUUIDItems(player).forEach(uuidItem -> {
-            UUID logUUID = UuidLogger.legend("<yellow>%s</yellow> <blue>Logged</blue> <red>out</red> with <light_purple>%s</light_purple> at (<green>%s</green>, <green>%s</green>, <green>%s</green>) in <green>%s</green>", player.getName(), uuidItem.getUuid(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
+            UUID logUUID = Logger.info("<yellow>%s</yellow> <blue>Logged</blue> <red>out</red> with <light_purple>%s</light_purple> at (<green>%s</green>, <green>%s</green>, <green>%s</green>) in <green>%s</green>", player.getName(), uuidItem.getUuid(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
             UuidLogger.AddItemUUIDMetaInfoNone(logUUID, uuidItem.getUuid(), UuidLogger.UuidLogType.LOGOUT);
         });
     }
@@ -487,7 +494,8 @@ public class UuidListener implements Listener {
                 UUIDItem item = UuidItemOptional.get();
                 Location location = inventory.getLocation();
                 assert location != null;
-                UUID logID = UuidLogger.legend("<yellow>%s</yellow> <green>retrieved</green> <light_purple>%s</light_purple> from <aqua>%s</aqua> at (<green>%s</green>, <green>%s</green>, <green>%s</green>) in <green>%s</green>", player.getName(), item.getUuid(), Objects.requireNonNull(inventory).getType().name(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
+                UUID logID = Logger.info("<yellow>%s</yellow> <green>retrieved</green> <light_purple>%s</light_purple> from <aqua>%s</aqua> at (<green>%s</green>, <green>%s</green>, <green>%s</green>) in <green>%s</green>",
+                        player.getName(), item.getUuid(), Objects.requireNonNull(inventory).getType().name(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
                 UuidLogger.AddItemUUIDMetaInfoPlayer(logID, item.getUuid(), UuidLogger.UuidLogType.RETREIVE, player.getUniqueId());
             }
         }
@@ -501,7 +509,8 @@ public class UuidListener implements Listener {
                 UUIDItem item = UuidItemOptional.get();
                 Location location = inventory.getLocation();
                 assert location != null;
-                UUID logID = UuidLogger.legend("<yellow>%s</yellow> <red>stored</red> <light_purple>%s</light_purple> in <aqua>%s</aqua> at (<green>%s</green>, <green>%s</green>, <green>%s</green>) in <green>%s</green>", player.getName(), item.getUuid(), inventory.getType().name(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
+                UUID logID = Logger.info("<yellow>%s</yellow> <red>stored</red> <light_purple>%s</light_purple> in <aqua>%s</aqua> at (<green>%s</green>, <green>%s</green>, <green>%s</green>) in <green>%s</green>",
+                        player.getName(), item.getUuid(), inventory.getType().name(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
                 UuidLogger.AddItemUUIDMetaInfoPlayer(logID, item.getUuid(), UuidLogger.UuidLogType.CONTAINER_STORE, player.getUniqueId());
             }
         }

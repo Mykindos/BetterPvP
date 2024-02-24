@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.items.uuiditem;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
@@ -12,12 +13,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Singleton
 public class UUIDRepository implements IRepository<UUIDItem> {
 
-    private Database database;
+    private final Database database;
 
     @Inject
-    UUIDRepository(Database database) {
+    public UUIDRepository(Database database) {
         this.database = database;
     }
 
@@ -43,7 +45,7 @@ public class UUIDRepository implements IRepository<UUIDItem> {
     }
 
     @Override
-    public void save (UUIDItem object) {
+    public void save(UUIDItem object) {
         String query = "INSERT INTO uuiditems (UUID, Namespace, Keyname) VALUES (?, ?, ?);";
         database.executeUpdate(new Statement(query,
                 new UuidStatementValue(object.getUuid()),

@@ -15,7 +15,7 @@ import java.util.UUID;
 @Slf4j
 public class Logger {
 
-    protected static Database database;
+    private static Database database;
 
     @Inject
     public Logger(Database database) {
@@ -37,20 +37,20 @@ public class Logger {
         return logID;
     }
 
-    public static void info(String message, Object... args) {
-        log("INFO", message, args);
+    public static UUID info(String message, Object... args) {
+        return log("INFO", message, args);
     }
 
-    public static void error(String message, Object... args) {
-        log("ERROR", message, args);
+    public static UUID error(String message, Object... args) {
+        return log("ERROR", message, args);
     }
 
-    public static void warn(String message, Object... args) {
-        log("WARN", message, args);
+    public static UUID warn(String message, Object... args) {
+       return log("WARN", message, args);
     }
 
-    public static void trace(String message, Object... args) {
-        log("TRACE", message, args);
+    public static UUID trace(String message, Object... args) {
+        return log("TRACE", message, args);
     }
 
 }

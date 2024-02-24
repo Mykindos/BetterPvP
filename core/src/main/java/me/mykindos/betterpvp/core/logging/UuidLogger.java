@@ -20,12 +20,13 @@ import java.util.UUID;
 
 @Singleton
 @Slf4j
-public class UuidLogger extends Logger {
+public class UuidLogger {
 
+    private static Database database;
 
     @Inject
     public UuidLogger(Database database) {
-        super(database);
+        UuidLogger.database = database;
     }
 
     /**
@@ -132,11 +133,6 @@ public class UuidLogger extends Logger {
             ex.printStackTrace();
         }
         return logList;
-    }
-
-
-    public static UUID legend(String message, Object... args) {
-        return log("LEGEND", message, args);
     }
 
     public enum UUIDType {

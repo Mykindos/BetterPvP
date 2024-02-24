@@ -14,8 +14,10 @@ import me.mykindos.betterpvp.core.logging.UuidLogger;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -116,9 +118,23 @@ public class SearchCommand extends Command {
         @Override
         public String getArgumentType(int argCount) {
             if (argCount == 1) {
-                return ArgumentType.ITEMUUID.name();
+                return "ITEMUUID";
             }
             return ArgumentType.NONE.name();
+        }
+        @Override
+        public List<String> processTabComplete(CommandSender sender, String[] args) {
+            List<String> tabCompletions = new ArrayList<>();
+
+            if (args.length == 0) return super.processTabComplete(sender, args);;
+
+            String lowercaseArg = args[args.length - 1].toLowerCase();
+            if (getArgumentType(args.length).equals("ITEMUUID")) {
+                tabCompletions.addAll(uuidManager.getObjects().keySet().stream()
+                    .filter(uuid -> uuid.toLowerCase().contains(lowercaseArg)).toList());
+            }
+            tabCompletions.addAll(super.processTabComplete(sender, args));
+            return tabCompletions;
         }
     }
 

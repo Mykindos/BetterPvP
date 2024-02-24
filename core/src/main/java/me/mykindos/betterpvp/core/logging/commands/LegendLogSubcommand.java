@@ -9,6 +9,8 @@ import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.SubCommand;
+import me.mykindos.betterpvp.core.items.uuiditem.UUIDManager;
+import me.mykindos.betterpvp.core.logging.Logger;
 import me.mykindos.betterpvp.core.logging.UuidLogger;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
@@ -25,8 +27,15 @@ import java.util.UUID;
 @Singleton
 @SubCommand(LogCommand.class)
 public class LegendLogSubcommand extends Command {
+
+    private final ClientManager clientManager;
+    private final UUIDManager uuidManager;
+
     @Inject
-    ClientManager clientManager;
+    public LegendLogSubcommand(ClientManager clientManager, UUIDManager uuidManager) {
+        this.clientManager = clientManager;
+        this.uuidManager = uuidManager;
+    }
 
     @Override
     public String getName() {
@@ -39,12 +48,12 @@ public class LegendLogSubcommand extends Command {
     }
 
     public Component getUsage() {
-        return UtilMessage.deserialize("<green>Usage: /log <UUID> <player|null>");
+        return UtilMessage.deserialize("<green>Usage: /log <UUID> <player|null> <message>");
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        if (args.length < 2) {
+        if (args.length < 3) {
             log.info(String.valueOf(args.length));
             UtilMessage.message(player, "Log", getUsage());
             return;
@@ -78,18 +87,18 @@ public class LegendLogSubcommand extends Command {
 
     public void run(Player player, UUID uuid, @Nullable Client client, String message) {
         String finalMessage = "<light_purple>" + uuid.toString() + "</light_purple> " + message;
-        UUID logID = UuidLogger.legend(finalMessage);
+        UUID logID = Logger.info(finalMessage);
         UuidLogger.AddItemUUIDMetaInfoPlayer(logID, uuid, UuidLogger.UuidLogType.CUSTOM, player.getUniqueId());
         if (client != null) {
             UuidLogger.AddItemUUIDMetaInfoPlayer(logID, uuid, UuidLogger.UuidLogType.CUSTOM, client.getUniqueId());
         }
-        clientManager.sendMessageToRank("Log", UtilMessage.deserialize("<yellow>%s</yellow>Generated a custom legend log: " + finalMessage, player.getName()), Rank.HELPER);
+        clientManager.sendMessageToRank("Log", UtilMessage.deserialize("<yellow>%s</yellow> Generated a custom legend log: " + finalMessage, player.getName()), Rank.HELPER);
     }
 
     @Override
     public String getArgumentType(int argCount) {
         if (argCount == 1) {
-            return ArgumentType.ITEMUUID.name();
+            return "ITEMUUID";
         }
         if (argCount == 2) {
             return ArgumentType.PLAYER.name();
@@ -102,8 +111,17 @@ public class LegendLogSubcommand extends Command {
     public List<String> processTabComplete(CommandSender sender, String[] args) {
         //explicitly add null if it is a player
         List<String> tabCompletions = new ArrayList<>();
+
+        if (args.length == 0) return super.processTabComplete(sender, args);
+
         if (getArgumentType(args.length).equals("PLAYER")) {
             tabCompletions.add("null");
+        }
+
+        String lowercaseArg = args[args.length - 1].toLowerCase();
+        if (getArgumentType(args.length).equals("ITEMUUID")) {
+            tabCompletions.addAll(uuidManager.getObjects().keySet().stream()
+                    .filter(uuid -> uuid.toLowerCase().contains(lowercaseArg)).toList());
         }
         tabCompletions.addAll(super.processTabComplete(sender, args));
         return tabCompletions;

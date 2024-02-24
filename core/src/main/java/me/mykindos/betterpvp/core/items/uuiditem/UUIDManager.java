@@ -8,7 +8,7 @@ import java.util.List;
 
 @Singleton
 public class UUIDManager extends Manager<UUIDItem> {
-    UUIDRepository uuidRepository;
+    private final UUIDRepository uuidRepository;
 
     @Inject
     public UUIDManager(UUIDRepository uuidRepository) {
