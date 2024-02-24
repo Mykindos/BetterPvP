@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.utilities.ChampionsNamespacedKeys;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.weapon.Weapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.InteractWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
@@ -53,12 +54,14 @@ public class HyperAxe extends Weapon implements InteractWeapon, LegendaryWeapon,
     }
 
     @EventHandler(priority = EventPriority.LOW)
-    public void onEntityDamage(CustomDamageEvent event) {
+    public void onDamage(PreCustomDamageEvent event) {
         if (!enabled) {
             return;
         }
-        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
-        if (!(event.getDamager() instanceof Player player)) return;
+
+        CustomDamageEvent cde = event.getCustomDamageEvent();
+        if (cde.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
+        if (!(cde.getDamager() instanceof Player player)) return;
         if (!isHoldingWeapon(player)) return;
 
         if (usesEnergy) {
@@ -67,9 +70,9 @@ public class HyperAxe extends Weapon implements InteractWeapon, LegendaryWeapon,
             }
         }
 
-        event.setDamage(baseDamage);
-        event.setKnockback(dealsKnockback);
-        event.setDamageDelay(damageDelay);
+        cde.setDamage(baseDamage);
+        cde.setKnockback(dealsKnockback);
+        cde.setDamageDelay(damageDelay);
 
     }
 
