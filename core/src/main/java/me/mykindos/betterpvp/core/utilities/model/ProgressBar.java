@@ -33,7 +33,7 @@ public class ProgressBar {
     }
 
     public TextComponent build() {
-        int progressCount = (int) (progress * barLength);
+        int progressCount = (int) Math.ceil(progress * barLength);
         if (inverted) {
             progressCount = barLength - progressCount;
         }
