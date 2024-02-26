@@ -43,6 +43,8 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
     private double bonusDamage;
     private double velocityStrength;
 
+    private int soundUpdateCounter;
+
     private final EnergyHandler energyHandler;
     private final ClientManager clientManager;
 
@@ -109,8 +111,12 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
 
             VelocityData velocityData = new VelocityData(player.getLocation().getDirection(), velocityStrength, false, 0, 0.11, 1.0, true);
             UtilVelocity.velocity(player, null, velocityData);
-            player.getWorld().playEffect(player.getLocation(), Effect.STEP_SOUND, Material.LAPIS_BLOCK);
-            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_FISH_SWIM, 0.8F, 1.5F);
+            
+            if (++soundUpdateCounter % 3 == 0)
+            {
+                player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_SPLASH, 0.5F, 1.25F);
+                player.getWorld().playEffect(player.getLocation(), Effect.STEP_SOUND, Material.LAPIS_BLOCK);
+            }
         }
     }
 
