@@ -153,7 +153,7 @@ public class ClansExplosionListener extends ClanListener {
                     final Client client = clientManager.search().online(event.getPlayer());
                     if (!client.isAdministrating()) {
                         UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You cannot place blocks for <green>%s</green>.",
-                                UtilTime.getTime(playerClan.getLastTntedTime() - System.currentTimeMillis(), UtilTime.TimeUnit.BEST, 1));
+                                UtilTime.getTime(playerClan.getLastTntedTime() - System.currentTimeMillis(), 1));
                         event.setCancelled(true);
                     }
                 }

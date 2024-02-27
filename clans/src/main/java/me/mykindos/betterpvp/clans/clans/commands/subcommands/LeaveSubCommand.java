@@ -70,7 +70,7 @@ public class LeaveSubCommand extends ClanSubCommand {
         }
 
         if (System.currentTimeMillis() < clan.getLastTntedTime()) {
-            UtilMessage.message(player, "Clans", "You cannot leave your clan for <alt>" + UtilTime.getTime(clan.getLastTntedTime() - System.currentTimeMillis(), UtilTime.TimeUnit.BEST, 1));
+            UtilMessage.message(player, "Clans", "You cannot leave your clan for <alt>" + UtilTime.getTime(clan.getLastTntedTime() - System.currentTimeMillis(), 1));
             return;
         }
 
