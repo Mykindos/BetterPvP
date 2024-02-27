@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.clans.commands.commands;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.Clans;
+import me.mykindos.betterpvp.clans.clans.vault.blacklist.ClanVaultBlacklist;
 import me.mykindos.betterpvp.clans.commands.ClansCommandLoader;
 import me.mykindos.betterpvp.clans.fields.Fields;
 import me.mykindos.betterpvp.clans.listener.ClansListenerLoader;
@@ -67,6 +68,9 @@ public class ClansCommand extends Command implements IConsoleCommand {
         @Inject
         private ClansWeaponManager clansWeaponManager;
 
+        @Inject
+        private ClanVaultBlacklist clanVaultBlacklist;
+
         @Override
         public String getName() {
             return "reload";
@@ -91,6 +95,7 @@ public class ClansCommand extends Command implements IConsoleCommand {
 
             fields.reload(clans);
             clansWeaponManager.reload();
+            clanVaultBlacklist.reload();
 
             UtilMessage.message(sender, "Clans", "Successfully reloaded clans");
         }

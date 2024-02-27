@@ -1,6 +1,9 @@
 package me.mykindos.betterpvp.clans.clans.menus.buttons;
 
 import me.mykindos.betterpvp.clans.clans.Clan;
+import me.mykindos.betterpvp.clans.clans.menus.ClanMenu;
+import me.mykindos.betterpvp.clans.clans.vault.ClanVault;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
@@ -12,9 +15,9 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.jetbrains.annotations.NotNull;
 import xyz.xenondevs.invui.item.ItemProvider;
-import xyz.xenondevs.invui.item.impl.AbstractItem;
+import xyz.xenondevs.invui.item.impl.controlitem.ControlItem;
 
-public class ClanVaultButton extends AbstractItem {
+public class ClanVaultButton extends ControlItem<ClanMenu> {
 
     private final Clan clan;
 
@@ -23,7 +26,7 @@ public class ClanVaultButton extends AbstractItem {
     }
 
     @Override
-    public ItemProvider getItemProvider() {
+    public ItemProvider getItemProvider(ClanMenu clanMenu) {
         return ItemView.builder()
                 .material(Material.ENDER_CHEST)
                 .displayName(Component.text("Clan Vault", NamedTextColor.GOLD, TextDecoration.BOLD))
@@ -33,6 +36,12 @@ public class ClanVaultButton extends AbstractItem {
 
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
-        // todo: @Mykindos implement clan vault
+        final ClanVault vault = clan.getVault();
+        if (vault.isLocked()) {
+            UtilMessage.message(player, "Clans", "<red>The clan vault is currently in use by: <dark_red>%s</dark_red>.", vault.getLockedBy());
+            return;
+        }
+
+        vault.show(player, getGui());
     }
 }
