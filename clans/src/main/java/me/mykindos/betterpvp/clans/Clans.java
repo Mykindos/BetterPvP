@@ -22,6 +22,7 @@ import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapters;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
 import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.items.uuiditem.UUIDManager;
 import org.bukkit.Bukkit;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
@@ -81,6 +82,9 @@ public class Clans extends BPvPPlugin {
 
             var perkManager = injector.getInstance(ClanPerkManager.class);
             perkManager.scan();
+
+            var uuidManager = injector.getInstance(UUIDManager.class);
+            uuidManager.loadObjectsFromNamespace("clans");
 
             updateEventExecutor.loadPlugin(this);
 

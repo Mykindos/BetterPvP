@@ -115,7 +115,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
     }
 
     public String getAge() {
-        return UtilTime.getTime(System.currentTimeMillis() - getTimeCreated(), UtilTime.TimeUnit.BEST, 1);
+        return UtilTime.getTime(System.currentTimeMillis() - getTimeCreated(), 1);
     }
 
     /**
@@ -259,7 +259,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
         if (getTerritory().isEmpty()) {
             return "\u221E";
         }
-        return UtilTime.getTime((getEnergy() / getEnergyRatio()) * 3600000, UtilTime.TimeUnit.BEST, 2);
+        return UtilTime.getTime((getEnergy() / getEnergyRatio()) * 3600000, 2);
 
     }
 

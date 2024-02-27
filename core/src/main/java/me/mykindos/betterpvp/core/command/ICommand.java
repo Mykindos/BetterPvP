@@ -73,6 +73,7 @@ public interface ICommand {
         WORLD,
         BOOLEAN,
         CUSTOMITEM,
+        ITEMUUID
     }
 
 }

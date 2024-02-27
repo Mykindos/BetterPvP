@@ -33,7 +33,7 @@ public class PlayerAdminCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Send an admin message to a player";
+        return "Send a message to staff";
     }
 
     @Override

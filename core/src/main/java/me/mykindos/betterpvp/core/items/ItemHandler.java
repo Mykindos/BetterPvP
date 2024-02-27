@@ -8,6 +8,8 @@ import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateLoreEvent;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateNameEvent;
+import me.mykindos.betterpvp.core.items.uuiditem.UUIDItem;
+import me.mykindos.betterpvp.core.items.uuiditem.UUIDManager;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -17,6 +19,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -27,13 +30,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 @Slf4j
 @Singleton
 public class ItemHandler {
 
     private final ItemRepository itemRepository;
+
+    private final UUIDManager uuidManager;
 
     private final HashMap<String, BPvPItem> itemMap = new HashMap<>();
 
@@ -46,8 +54,9 @@ public class ItemHandler {
     private boolean hideEnchants;
 
     @Inject
-    public ItemHandler(Core core, ItemRepository itemRepository) {
+    public ItemHandler(Core core, ItemRepository itemRepository, UUIDManager uuidManager) {
         this.itemRepository = itemRepository;
+        this.uuidManager = uuidManager;
     }
 
     public void loadItemData(String module) {
@@ -87,18 +96,22 @@ public class ItemHandler {
         if (item != null) {
             item.itemify(itemStack);
 
+            PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
+
+            if (item.isGiveUUID()) {
+                if (!dataContainer.has(CoreNamespaceKeys.UUID_KEY)) {
+                    UUID newUuid = UUID.randomUUID();
+                    dataContainer.set(CoreNamespaceKeys.UUID_KEY, PersistentDataType.STRING, newUuid.toString());
+                    uuidManager.addUuid(new UUIDItem(newUuid, item.getNamespace(), item.getKey()));
+                }
+            }
+
             var nameUpdateEvent = UtilServer.callEvent(new ItemUpdateNameEvent(itemStack, itemMeta, item.getName()));
             itemMeta.displayName(nameUpdateEvent.getItemName().decoration(TextDecoration.ITALIC, false));
 
             var loreUpdateEvent = UtilServer.callEvent(new ItemUpdateLoreEvent(itemStack, itemMeta, new ArrayList<>(item.getLore())));
 
-            PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
-
-            if (dataContainer.has(CoreNamespaceKeys.DURABILITY_KEY)) {
-                item.applyLore(itemMeta, loreUpdateEvent.getItemLore(), dataContainer.getOrDefault(CoreNamespaceKeys.DURABILITY_KEY, PersistentDataType.INTEGER, item.getMaxDurability()));
-            } else {
-                item.applyLore(itemMeta, loreUpdateEvent.getItemLore());
-            }
+            item.applyLore(itemMeta, loreUpdateEvent.getItemLore());
 
             if (item.isGlowing() || dataContainer.has(CoreNamespaceKeys.GLOW_KEY)) {
                 UtilItem.addGlow(itemMeta);
@@ -107,6 +120,7 @@ public class ItemHandler {
                     itemStack.removeEnchantment(entry.getKey());
                 }
             }
+
         } else {
             final PersistentDataContainer pdc = itemMeta.getPersistentDataContainer();
             if (!pdc.getOrDefault(CoreNamespaceKeys.IMMUTABLE_KEY, PersistentDataType.BOOLEAN, false)) {
@@ -115,6 +129,7 @@ public class ItemHandler {
         }
 
         itemStack.setItemMeta(itemMeta);
+
         return itemStack;
     }
 
@@ -144,5 +159,29 @@ public class ItemHandler {
 
     public void replaceItem(String identifier, BPvPItem newItem) {
         itemMap.replace(identifier, newItem);
+    }
+
+    public List<UUIDItem> getUUIDItems(Player player) {
+        List<UUIDItem> uuidItemList = new ArrayList<>();
+        player.getInventory().forEach(itemStack -> {
+            if (itemStack != null) {
+                Optional<UUIDItem> uuidItemOptional = getUUIDItem(itemStack);
+                uuidItemOptional.ifPresent(uuidItemList::add);
+            }
+        });
+        return uuidItemList;
+    }
+
+    public Optional<UUIDItem> getUUIDItem(ItemStack itemStack) {
+        if (itemStack != null) {
+            ItemMeta itemMeta = itemStack.getItemMeta();
+            if (itemMeta != null) {
+                PersistentDataContainer pdc = itemMeta.getPersistentDataContainer();
+                if (pdc.has(CoreNamespaceKeys.UUID_KEY)) {
+                    return uuidManager.getObject(UUID.fromString(Objects.requireNonNull(pdc.get(CoreNamespaceKeys.UUID_KEY, PersistentDataType.STRING))));
+                }
+            }
+        }
+        return Optional.empty();
     }
 }

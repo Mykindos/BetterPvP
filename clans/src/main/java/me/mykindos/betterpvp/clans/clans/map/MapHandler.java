@@ -152,7 +152,7 @@ public class MapHandler {
             } catch (IOException | ParseException e) {
                 e.printStackTrace();
             }
-            log.info("Loaded map data in {}", UtilTime.getTime(System.currentTimeMillis() - l, UtilTime.TimeUnit.SECONDS, 2));
+            log.info("Loaded map data in {}", UtilTime.getTime(System.currentTimeMillis() - l, 2));
         });
     }
 
@@ -185,7 +185,7 @@ public class MapHandler {
                 } catch (IOException e) {
                     log.error("Failed to save map data", e);
                 }
-                log.info("Saved map data in {}", UtilTime.getTime(System.currentTimeMillis() - l, UtilTime.TimeUnit.SECONDS, 2));
+                log.info("Saved map data in {}", UtilTime.getTime(System.currentTimeMillis() - l, 2));
             }
         }.runTaskAsynchronously(clans);
     }

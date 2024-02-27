@@ -108,7 +108,7 @@ public class UtilTime {
 
     }
 
-    public static String getTime(double d, TimeUnit unit, int decPoint) {
+    public static String getTime(double d, int decPoint) {
         return UtilTime.convert(d, TimeUnit.BEST, decPoint) + " "
                 + UtilTime.getTimeUnit2(d);
     }
