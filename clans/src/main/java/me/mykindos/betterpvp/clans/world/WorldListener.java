@@ -21,6 +21,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Container;
+import org.bukkit.block.data.Lightable;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -91,7 +92,16 @@ public class WorldListener implements Listener {
 
             if (event.getPlayer().getInventory().getItemInMainHand().getType() == Material.FLINT_AND_STEEL) {
                 Block clickedBlock = event.getClickedBlock();
-                if (clickedBlock != null && clickedBlock.getType() != Material.TNT && clickedBlock.getType() != Material.NETHERRACK) {
+                if (clickedBlock != null && clickedBlock.getType().name().contains("CANDLE")) {
+                    if (clickedBlock.getBlockData() instanceof Lightable lightable) {
+                        if (lightable.isLit()) {
+                            event.setCancelled(true);
+                            return;
+                        }
+                    }
+                }
+                if (clickedBlock != null && clickedBlock.getType() != Material.TNT && clickedBlock.getType() != Material.NETHERRACK &&
+                        !clickedBlock.getType().name().contains("CANDLE")) {
                     UtilMessage.message(event.getPlayer(), "Flint and Steel", "You may not use Flint and Steel on this block type!");
                     event.setCancelled(true);
                 }
