@@ -100,28 +100,36 @@ public class RoleBuild {
 
     }
 
+    public Component getBuildSkillComponent(SkillType type) {
+        Skill skill;
+        BuildSkill buildSkill = null;
+        switch (type) {
+            case SWORD -> buildSkill = swordSkill;
+            case AXE -> buildSkill = axeSkill;
+            case PASSIVE_A -> buildSkill = passiveA;
+            case BOW -> buildSkill = bow;
+            case GLOBAL -> buildSkill = global;
+            case PASSIVE_B -> buildSkill = passiveB;
+        }
+        if (buildSkill == null || buildSkill.getSkill() == null) {
+            return Component.empty();
+        }
+        skill = buildSkill.getSkill();
+        return buildSkill.getComponent()
+                .clickEvent(ClickEvent.runCommand("/skilldescription " + skill.getName().replace(" ", "_") + " " + buildSkill.getLevel()))
+                .hoverEvent(HoverEvent.showText(UtilMessage.deserialize("<white>Click</white> to see skill description")));
+    }
+
     /**
      * @return The component representation of a build
      */
     public Component getBuildComponent() {
-        Component sword = getSwordSkill() == null ? Component.empty() : getSwordSkill().getComponent()
-                .clickEvent(ClickEvent.runCommand("/skilldescription " + getSwordSkill().getSkill().getName().replace(" ", "_") + " " + getSwordSkill().getLevel()))
-                .hoverEvent(HoverEvent.showText(UtilMessage.deserialize("<white>Click</white> to see skill description")));
-        Component axe = getAxeSkill() == null ? Component.empty() : getAxeSkill().getComponent()
-                .clickEvent(ClickEvent.runCommand("/skilldescription " + getAxeSkill().getSkill().getName().replace(" ", "_") + " " + getAxeSkill().getLevel()))
-                .hoverEvent(HoverEvent.showText(UtilMessage.deserialize("<white>Click</white> to see skill description")));
-        Component bow = getBow() == null ? Component.empty() : getBow().getComponent()
-                .clickEvent(ClickEvent.runCommand("/skilldescription " + getBow().getSkill().getName().replace(" ", "_") + " " + getBow().getLevel()))
-                .hoverEvent(HoverEvent.showText(UtilMessage.deserialize("<white>Click</white> to see skill description")));;
-        Component passivea = getPassiveA() == null ? Component.empty() : getPassiveA().getComponent()
-                .clickEvent(ClickEvent.runCommand("/skilldescription " + getPassiveA().getSkill().getName().replace(" ", "_") + " " + getPassiveA().getLevel()))
-                .hoverEvent(HoverEvent.showText(UtilMessage.deserialize("<white>Click</white> to see skill description")));;
-        Component passiveb = getPassiveB() == null ? Component.empty() : getPassiveB().getComponent()
-                .clickEvent(ClickEvent.runCommand("/skilldescription " + getPassiveB().getSkill().getName().replace(" ", "_") + " " + getPassiveB().getLevel()))
-                .hoverEvent(HoverEvent.showText(UtilMessage.deserialize("<white>Click</white> to see skill description")));;
-        Component global = getGlobal() == null ? Component.empty() : getGlobal().getComponent()
-                .clickEvent(ClickEvent.runCommand("/skilldescription " + getGlobal().getSkill().getName().replace(" ", "_") + " " + getGlobal().getLevel()))
-                .hoverEvent(HoverEvent.showText(UtilMessage.deserialize("<white>Click</white> to see skill description")));;
+        Component sword = getBuildSkillComponent(SkillType.SWORD);
+        Component axe = getBuildSkillComponent(SkillType.AXE);
+        Component bow = getBuildSkillComponent(SkillType.BOW);
+        Component passivea = getBuildSkillComponent(SkillType.PASSIVE_A);
+        Component passiveb = getBuildSkillComponent(SkillType.PASSIVE_B);
+        Component global = getBuildSkillComponent(SkillType.GLOBAL);
 
         Component component = Component.text("Sword: ", NamedTextColor.WHITE).append(sword).appendNewline()
                 .append(Component.text("Axe: ", NamedTextColor.WHITE).append(axe).appendNewline())
