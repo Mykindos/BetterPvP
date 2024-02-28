@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -59,7 +60,8 @@ public class SendSkills extends Command {
             Role role = roleOptional.get();
             RoleBuild build = builds.getActiveBuilds().get(role.getName());
             if (build != null) {
-                Component messageComponent = UtilMessage.deserialize("<white>I am currently running <green>%s</green>:", role.getName()).appendNewline().append(build.getBuildComponent());
+                Component messageComponent = UtilMessage.deserialize("<white>I am currently running <green>%s</green>:", role.getName()).decoration(TextDecoration.BOLD, false)
+                        .appendNewline().append(build.getBuildComponent());
                 UtilServer.runTaskAsync(champions, () -> UtilServer.callEvent(new ChatSentEvent(player, Bukkit.getOnlinePlayers(), UtilMessage.deserialize("<yellow>%s:</yellow>"), messageComponent)));
             }
         }
