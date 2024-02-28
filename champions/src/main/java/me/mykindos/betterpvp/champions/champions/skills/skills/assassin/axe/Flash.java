@@ -31,6 +31,8 @@ import org.bukkit.event.block.Action;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
+
+
 import java.util.Iterator;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -55,8 +57,7 @@ public class Flash extends Skill implements InteractSkill, Listener {
 
         return Component.text(getName() + " ").color(NamedTextColor.WHITE).decorate(TextDecoration.BOLD)
                 .append(Component.text("\u25A0".repeat(newCharges)).color(NamedTextColor.GREEN))
-                .append(Component.text("\u25A0".repeat(newCharges >= maxCharges ? 0 : 1)).color(NamedTextColor.YELLOW))
-                .append(Component.text("\u25A0".repeat(Math.max(0, maxCharges - newCharges - 1))).color(NamedTextColor.RED));
+                .append(Component.text("\u25A0".repeat(Math.max(0, maxCharges - newCharges))).color(NamedTextColor.RED));
     });
 
     private int baseMaxCharges;
