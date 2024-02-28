@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateLoreEvent;
 import me.mykindos.betterpvp.core.items.BPvPItem;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
@@ -31,6 +32,7 @@ import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -81,11 +83,18 @@ public class InventorySkillListener implements Listener {
 
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPickup(EntityPickupItemEvent event) {
         if (event.isCancelled()) return;
         if (event.getEntity() instanceof Player player) {
-            processItem(player, true, event.getItem().getItemStack());
+            //updateName overrides, so need to run this after
+            ItemStack item = event.getItem().getItemStack();
+            if (UtilItem.isAxe(item) || UtilItem.isRanged(item) || UtilItem.isSword(item))
+            {
+                //need to check the whole inventory, for reasons beyond my comprehension
+                UtilServer.runTaskLater(champions, () -> player.getInventory().forEach(itemStack -> processItem(player, true, itemStack)), 1);
+            }
+
         }
     }
 
@@ -110,6 +119,11 @@ public class InventorySkillListener implements Listener {
     @EventHandler
     public void onBuildApply(ApplyBuildEvent event) {
         event.getPlayer().getInventory().forEach(itemStack -> processItem(event.getPlayer(), true, itemStack));
+    }
+
+    @EventHandler
+    public void onClientJoin (PlayerLoginEvent event) {
+        UtilServer.runTaskLater(champions, () -> event.getPlayer().getInventory().forEach(itemStack -> processItem(event.getPlayer(), true, itemStack)), 40);
     }
 
     public void processItem(Player player, boolean playInventory, ItemStack itemStack) {
