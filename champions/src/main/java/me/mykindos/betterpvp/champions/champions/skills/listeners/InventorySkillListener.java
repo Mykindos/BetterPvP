@@ -7,6 +7,9 @@ import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
 import me.mykindos.betterpvp.champions.champions.builds.BuildSkill;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.menus.SkillMenu;
+import me.mykindos.betterpvp.champions.champions.builds.menus.events.ApplyBuildEvent;
+import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillEquipEvent;
+import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillUpdateEvent;
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -19,7 +22,6 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -95,12 +97,25 @@ public class InventorySkillListener implements Listener {
         }
     }
 
+    @EventHandler
+    public void onSkillEquip(SkillEquipEvent event) {
+        event.getPlayer().getInventory().forEach(itemStack -> processItem(event.getPlayer(), true, itemStack));
+    }
+
+    @EventHandler
+    public void onSkillUpdate(SkillUpdateEvent event) {
+        event.getPlayer().getInventory().forEach(itemStack -> processItem(event.getPlayer(), true, itemStack));
+    }
+
+    @EventHandler
+    public void onBuildApply(ApplyBuildEvent event) {
+        event.getPlayer().getInventory().forEach(itemStack -> processItem(event.getPlayer(), true, itemStack));
+    }
 
     public void processItem(Player player, boolean playInventory, ItemStack itemStack) {
         if (itemStack == null) {
             return;
         }
-        Material itemMaterial = itemStack.getType();
         SkillType skillType = SkillWeapons.getTypeFrom(itemStack);
         if (skillType == null) {
             return;
