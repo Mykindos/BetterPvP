@@ -172,32 +172,17 @@ public class RoleListener implements Listener {
         return false;
     }
 
-    public Component[] equipMessage(Player player, Role role) {
+    public Component equipMessage(Player player, Role role) {
         Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(player.getUniqueId().toString());
         if (gamerBuildsOptional.isPresent()) {
             GamerBuilds builds = gamerBuildsOptional.get();
 
             RoleBuild build = builds.getActiveBuilds().get(role.getName());
             if (build != null) {
-
-                String sword = build.getSwordSkill() == null ? "" : build.getSwordSkill().getString();
-                String axe = build.getAxeSkill() == null ? "" : build.getAxeSkill().getString();
-                String bow = build.getBow() == null ? "" : build.getBow().getString();
-                String passivea = build.getPassiveA() == null ? "" : build.getPassiveA().getString();
-                String passiveb = build.getPassiveB() == null ? "" : build.getPassiveB().getString();
-                String global = build.getGlobal() == null ? "" : build.getGlobal().getString();
-                return new Component[]{
-                        Component.text("Sword: ", NamedTextColor.GREEN).append(Component.text(sword, NamedTextColor.WHITE)),
-                        Component.text("Axe: ", NamedTextColor.GREEN).append(Component.text(axe, NamedTextColor.WHITE)),
-                        Component.text("Bow: ", NamedTextColor.GREEN).append(Component.text(bow, NamedTextColor.WHITE)),
-                        Component.text("Passive A: ", NamedTextColor.GREEN).append(Component.text(passivea, NamedTextColor.WHITE)),
-                        Component.text("Passive B: ", NamedTextColor.GREEN).append(Component.text(passiveb, NamedTextColor.WHITE)),
-                        Component.text("Global: ", NamedTextColor.GREEN).append(Component.text(global, NamedTextColor.WHITE))
-                };
+                return build.getBuildComponent();
+                }
             }
-        }
-
-        return new Component[]{};
+        return Component.empty();
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)

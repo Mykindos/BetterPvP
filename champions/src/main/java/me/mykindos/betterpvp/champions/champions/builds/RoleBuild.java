@@ -4,7 +4,10 @@ import lombok.Data;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 
 import java.util.ArrayList;
@@ -101,19 +104,31 @@ public class RoleBuild {
      * @return The component representation of a build
      */
     public Component getBuildComponent() {
-        String sword = getSwordSkill() == null ? "" : getSwordSkill().getString();
-        String axe = getAxeSkill() == null ? "" : getAxeSkill().getString();
-        String bow = getBow() == null ? "" : getBow().getString();
-        String passivea = getPassiveA() == null ? "" : getPassiveA().getString();
-        String passiveb = getPassiveB() == null ? "" : getPassiveB().getString();
-        String global = getGlobal() == null ? "" : getGlobal().getString();
+        Component sword = getSwordSkill() == null ? Component.empty() : getSwordSkill().getComponent()
+                .clickEvent(ClickEvent.runCommand("/skilldescription " + getSwordSkill().getSkill().getName().replace(" ", "_") + " " + getSwordSkill().getLevel()))
+                .hoverEvent(HoverEvent.showText(UtilMessage.deserialize("<white>Click</white> to see skill description")));
+        Component axe = getAxeSkill() == null ? Component.empty() : getAxeSkill().getComponent()
+                .clickEvent(ClickEvent.runCommand("/skilldescription " + getAxeSkill().getSkill().getName().replace(" ", "_") + " " + getAxeSkill().getLevel()))
+                .hoverEvent(HoverEvent.showText(UtilMessage.deserialize("<white>Click</white> to see skill description")));
+        Component bow = getBow() == null ? Component.empty() : getBow().getComponent()
+                .clickEvent(ClickEvent.runCommand("/skilldescription " + getBow().getSkill().getName().replace(" ", "_") + " " + getBow().getLevel()))
+                .hoverEvent(HoverEvent.showText(UtilMessage.deserialize("<white>Click</white> to see skill description")));;
+        Component passivea = getPassiveA() == null ? Component.empty() : getPassiveA().getComponent()
+                .clickEvent(ClickEvent.runCommand("/skilldescription " + getPassiveA().getSkill().getName().replace(" ", "_") + " " + getPassiveA().getLevel()))
+                .hoverEvent(HoverEvent.showText(UtilMessage.deserialize("<white>Click</white> to see skill description")));;
+        Component passiveb = getPassiveB() == null ? Component.empty() : getPassiveB().getComponent()
+                .clickEvent(ClickEvent.runCommand("/skilldescription " + getPassiveB().getSkill().getName().replace(" ", "_") + " " + getPassiveB().getLevel()))
+                .hoverEvent(HoverEvent.showText(UtilMessage.deserialize("<white>Click</white> to see skill description")));;
+        Component global = getGlobal() == null ? Component.empty() : getGlobal().getComponent()
+                .clickEvent(ClickEvent.runCommand("/skilldescription " + getGlobal().getSkill().getName().replace(" ", "_") + " " + getGlobal().getLevel()))
+                .hoverEvent(HoverEvent.showText(UtilMessage.deserialize("<white>Click</white> to see skill description")));;
 
-        Component component =  Component.text("Sword: ", NamedTextColor.GREEN).append(Component.text(sword, NamedTextColor.WHITE)).appendNewline()
-                .append(Component.text("Axe: ", NamedTextColor.GREEN).append(Component.text(axe, NamedTextColor.WHITE))).appendNewline()
-                .append(Component.text("Bow: ", NamedTextColor.GREEN).append(Component.text(bow, NamedTextColor.WHITE))).appendNewline()
-                .append(Component.text("Passive A: ", NamedTextColor.GREEN).append(Component.text(passivea, NamedTextColor.WHITE))).appendNewline()
-                .append(Component.text("Passive B: ", NamedTextColor.GREEN).append(Component.text(passiveb, NamedTextColor.WHITE))).appendNewline()
-                .append(Component.text("Global: ", NamedTextColor.GREEN).append(Component.text(global, NamedTextColor.WHITE)));
+        Component component = Component.text("Sword: ", NamedTextColor.WHITE).append(sword).appendNewline()
+                .append(Component.text("Axe: ", NamedTextColor.WHITE).append(axe).appendNewline())
+                .append(Component.text("Bow: ", NamedTextColor.WHITE).append(bow).appendNewline())
+                .append(Component.text("Passive A: ", NamedTextColor.WHITE).append(passivea).appendNewline())
+                .append(Component.text("Passive B: ", NamedTextColor.WHITE).append(passiveb).appendNewline())
+                .append(Component.text("Global: ", NamedTextColor.WHITE).append(global));
         return component;
     }
 
