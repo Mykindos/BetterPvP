@@ -740,11 +740,10 @@ skills:
       enabled: true
       maxlevel: 3
       maxTimeBetweenShots: 5.0
-      maxConsecutiveHits: 3
-      numMisses: 1
-      maxTimeBetweenShotsIncreasePerLevel: 1.0
-      baseDamage: 0.75
-      damageIncreasePerLevel: 0.75
+      maxConsecutiveHits: 2
+      maxConsecuteiveHitsIncreasePerLevel: 2
+      baseDamage: 1.0
+      damageIncreasePerLevel: 0.0
     agility:
       enabled: true
       maxlevel: 5

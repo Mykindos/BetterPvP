@@ -130,7 +130,7 @@ public class HoldPosition extends Skill implements InteractSkill, CooldownSkill,
         Random random = new Random();
         for (int i = 0; i < 5; i++) {
             double x = loc.getX() + (random.nextDouble() - 0.5) * 0.9;
-            double y = loc.getY();
+            double y = loc.getY() + (0.25 + (random.nextDouble() - 0.5) * 0.9);
             double z = loc.getZ() + (random.nextDouble() - 0.5) * 0.9;
             player.getWorld().spawnParticle(Particle.SPELL_MOB, new Location(loc.getWorld(), x, y, z), 0, 0.5, 0.5, 0.5, 0);
         }
