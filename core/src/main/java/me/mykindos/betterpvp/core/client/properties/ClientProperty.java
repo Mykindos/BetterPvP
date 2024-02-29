@@ -9,6 +9,7 @@ public enum ClientProperty {
 
     SIDEBAR_ENABLED,
     TIPS_ENABLED,
+    DROP_PROTECTION_ENABLED,
     STAFF_CHAT,
     COOLDOWN_DISPLAY,
     CHAT_ENABLED,

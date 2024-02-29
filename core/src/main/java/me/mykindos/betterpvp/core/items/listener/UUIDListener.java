@@ -4,9 +4,11 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
 import me.mykindos.betterpvp.core.client.events.ClientQuitEvent;
+import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.events.KillContributionEvent;
 import me.mykindos.betterpvp.core.combat.stats.model.Contribution;
@@ -18,6 +20,7 @@ import me.mykindos.betterpvp.core.logging.Logger;
 import me.mykindos.betterpvp.core.logging.UUIDLogger;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.UtilTime;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -70,6 +73,7 @@ public class UUIDListener implements Listener {
     private final ClientManager clientManager;
 
     private final double UUIDCheckTimeSeconds = 120;
+    private final long UUIDdropTimeMs = 500L;
 
     private final Set<UUID> uuidSet = new HashSet<>();
 
@@ -91,11 +95,31 @@ public class UUIDListener implements Listener {
     private final Map<Player, Inventory> lastInventory = new HashMap<>();
     private final Map<Player, UUIDItem> lastHeldUUIDItem = new HashMap<>();
 
+    private final Map<UUID, Long> lastUUIDDropTime = new HashMap<>();
+
     @Inject
     public UUIDListener(Core core, ItemHandler itemHandler, ClientManager clientManager) {
         this.core = core;
         this.itemHandler = itemHandler;
         this.clientManager = clientManager;
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onUUIDItemDrop(PlayerDropItemEvent event) {
+        Client client = clientManager.search().online(event.getPlayer());
+        if ((boolean) client.getProperty(ClientProperty.DROP_PROTECTION_ENABLED).orElse(false)) {
+            itemHandler.getUUIDItem(event.getItemDrop().getItemStack()).ifPresent(uuidItem -> {
+                if (lastUUIDDropTime.containsKey(uuidItem.getUuid()) && !UtilTime.elapsed(lastUUIDDropTime.get(uuidItem.getUuid()), UUIDdropTimeMs)) {
+                } else {
+                    UtilMessage.message(event.getPlayer(), "Drop", UtilMessage.deserialize("<white>Drop Protection</white> <green>enabled</green>. You must drop twice quickly to drop this item. You can turn this off in ")
+                            .append(UtilMessage.deserialize("<yellow>/settings</yellow>")
+                            .hoverEvent(HoverEvent.showText(UtilMessage.deserialize("<yellow>/settings</yellow>")))
+                            .clickEvent(ClickEvent.runCommand("/settings"))));
+                    lastUUIDDropTime.put(uuidItem.getUuid(), System.currentTimeMillis());
+                    event.setCancelled(true);
+                }
+            });
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

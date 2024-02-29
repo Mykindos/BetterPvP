@@ -68,6 +68,7 @@ INSERT IGNORE INTO property_map VALUES ("FRAGMENTS", "int");
 INSERT IGNORE INTO property_map VALUES ("SIDEBAR_ENABLED", "boolean");
 INSERT IGNORE INTO property_map VALUES ("CLAN_MENU_ENABLED", "boolean");
 INSERT IGNORE INTO property_map VALUES ("TIPS_ENABLED", "boolean");
+INSERT IGNORE INTO property_map VALUES ("DROP_PROTECTION_ENABLED", "boolean");
 INSERT IGNORE INTO property_map VALUES ("ALLY_CHAT", "boolean");
 INSERT IGNORE INTO property_map VALUES ("CLAN_CHAT", "boolean");
 INSERT IGNORE INTO property_map VALUES ("STAFF_CHAT", "boolean");
