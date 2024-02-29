@@ -69,7 +69,7 @@ public class Stampede extends Skill implements PassiveSkill {
                 "of <effect>Speed " + UtilFormat.getRomanNumeral(maxSpeedStrength + 1) + "</effect>",
                 "",
                 "Attacking during stampede deals <val>" + getDamage(level) + "</val> bonus",
-                "bonus damage and <val>"+ getBonusKnockback(level) + "x</val> extra knockback",
+                "bonus damage and <val>" + getBonusKnockback(level) + "x</val> extra knockback",
                 "per speed level"
         };
     }
@@ -84,15 +84,15 @@ public class Stampede extends Skill implements PassiveSkill {
         playerData.remove(player);
     }
 
-    public double getDamage(int level){
+    public double getDamage(int level) {
         return damage + ((level - 1) * damageIncreasePerLevel);
     }
 
-    public double getBonusKnockback(int level){
+    public double getBonusKnockback(int level) {
         return knockback + ((level - 1) * knockbackIncreasePerLevel);
     }
 
-    public double getDurationPerStack(int level){
+    public double getDurationPerStack(int level) {
         return durationPerStack - ((level - 1) * durationPerStackDecreasePerLevel);
     }
 
@@ -148,14 +148,13 @@ public class Stampede extends Skill implements PassiveSkill {
     @EventHandler
     public void onPlayerToggleSprint(PlayerToggleSprintEvent event) {
         Player player = event.getPlayer();
-        if (!playerData.containsKey(player)) return;
-        boolean isSprinting = event.isSprinting();
 
-        StampedeData data = playerData.getOrDefault(player, new StampedeData(System.currentTimeMillis(), 0));
-
-        if (isSprinting) {
-            data.setSprintTime(System.currentTimeMillis());
-            playerData.put(player, data);
+        if (event.isSprinting()) {
+            if (getLevel(player) > 0) {
+                StampedeData data = playerData.getOrDefault(player, new StampedeData(System.currentTimeMillis(), 0));
+                data.setSprintTime(System.currentTimeMillis());
+                playerData.put(player, data);
+            }
         } else {
             removeSpeed(player);
         }
@@ -170,7 +169,7 @@ public class Stampede extends Skill implements PassiveSkill {
 
 
     @EventHandler
-    public void onHit(CustomDamageEvent event){
+    public void onHit(CustomDamageEvent event) {
         if (!(event.getDamager() instanceof Player damager)) return;
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
         StampedeData data = playerData.get(damager);
