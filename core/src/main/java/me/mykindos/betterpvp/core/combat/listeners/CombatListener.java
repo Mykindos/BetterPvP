@@ -468,7 +468,12 @@ public class CombatListener implements Listener {
 
     private void updateDurability(CustomDamageEvent event) {
 
-        UtilServer.callEvent(new CustomDamageDurabilityEvent(event));
+        CustomDamageDurabilityEvent cdde = new CustomDamageDurabilityEvent(event);
+        if(!event.isDoDurability()) {
+            cdde.setDamagerTakeDurability(false);
+        }
+
+        UtilServer.callEvent(cdde);
 
     }
 

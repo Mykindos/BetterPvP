@@ -20,13 +20,13 @@ import java.util.UUID;
 
 @Singleton
 @Slf4j
-public class UuidLogger {
+public class UUIDLogger {
 
     private static Database database;
 
     @Inject
-    public UuidLogger(Database database) {
-        UuidLogger.database = database;
+    public UUIDLogger(Database database) {
+        UUIDLogger.database = database;
     }
 
     /**
@@ -36,8 +36,8 @@ public class UuidLogger {
      * @param type - the type of log this is
      * @param uuid - UUID of the player
      */
-    public static void AddItemUUIDMetaInfoPlayer(UUID id, UUID itemUuid, UuidLogType type, @Nullable UUID uuid) {
-        AddItemUUIDMetaInfo(id, itemUuid, type, uuid, UUIDType.PLAYER);
+    public static void addItemUUIDMetaInfoPlayer(UUID id, UUID itemUuid, UUIDLogType type, @Nullable UUID uuid) {
+        addItemUUIDMetaInfo(id, itemUuid, type, uuid, UUIDType.PLAYER);
     }
 
     /**
@@ -46,8 +46,8 @@ public class UuidLogger {
      * @param itemUuid - the UUID of the item this information is about
      * @param type - the type of log this is
      */
-    public static void AddItemUUIDMetaInfoNone(UUID id, UUID itemUuid, UuidLogType type) {
-        AddItemUUIDMetaInfo(id, itemUuid, type, null, UUIDType.NONE);
+    public static void addItemUUIDMetaInfoNone(UUID id, UUID itemUuid, UUIDLogType type) {
+        addItemUUIDMetaInfo(id, itemUuid, type, null, UUIDType.NONE);
     }
 
 
@@ -59,7 +59,7 @@ public class UuidLogger {
      * @param uuid - UUID of type uuidType
      * @param uuidType - the type of UUID uuid is.
      */
-    public static void AddItemUUIDMetaInfo(@NotNull UUID logUUID, @NotNull UUID itemUuid, @NotNull UuidLogType type, @Nullable UUID uuid, @NotNull UUIDType uuidType) {
+    public static void addItemUUIDMetaInfo(@NotNull UUID logUUID, @NotNull UUID itemUuid, @NotNull UUIDLogger.UUIDLogType type, @Nullable UUID uuid, @NotNull UUIDType uuidType) {
         UUID metaUUID = UUID.randomUUID();
 
 
@@ -140,7 +140,7 @@ public class UuidLogger {
         NONE
     }
 
-     public enum UuidLogType {
+     public enum UUIDLogType {
          /**
           * An UUIDItem is spawned
            */

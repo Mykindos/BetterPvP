@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.command.commands.admin;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -10,12 +11,14 @@ import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDItem;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDManager;
-import me.mykindos.betterpvp.core.logging.UuidLogger;
+import me.mykindos.betterpvp.core.logging.UUIDLogger;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,11 +40,6 @@ public class SearchCommand extends Command {
     @Override
     public void execute(Player player, Client client, String... args) {
         UtilMessage.message(player, "Search", UtilMessage.deserialize("<green>Usage: /search <item|player></green>"));
-    }
-
-    @Override
-    public String getArgumentType(int argCount) {
-        return ArgumentType.SUBCOMMAND.name();
     }
 
     @Singleton
@@ -107,12 +105,16 @@ public class SearchCommand extends Command {
             UUIDItem uuidItem = uuidItemOptional.get();
             clientManager.sendMessageToRank("Search", UtilMessage.deserialize("<yellow>%s</yellow> is retrieving logs for <light_purple>%s</light_purple> (<green>%s</green>)", player.getName(), uuid.toString(), uuidItem.getIdentifier()), Rank.HELPER);
 
-            List<String> logs = UuidLogger.getUuidLogs(uuid, amount);
-            UtilMessage.message(player, "Search", "Retrieving the last <green>%s</green> logs for <light_purple>%s</light_purple> (<green>%s</green>)", amount, uuid.toString(), uuidItem.getIdentifier());
+            final int finalAmount = amount;
+            UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> {
+                List<String> logs = UUIDLogger.getUuidLogs(uuid, finalAmount);
+                UtilMessage.message(player, "Search", "Retrieving the last <green>%s</green> logs for <light_purple>%s</light_purple> (<green>%s</green>)", finalAmount, uuid.toString(), uuidItem.getIdentifier());
 
-            for (String log : logs) {
-                UtilMessage.message(player, "Search", UtilMessage.deserialize("<white>" + log + "</white>"));
-            }
+                for (String log : logs) {
+                    UtilMessage.message(player, "Search", UtilMessage.deserialize("<white>" + log + "</white>"));
+                }
+            });
+
         }
 
         @Override
@@ -122,16 +124,17 @@ public class SearchCommand extends Command {
             }
             return ArgumentType.NONE.name();
         }
+
         @Override
         public List<String> processTabComplete(CommandSender sender, String[] args) {
             List<String> tabCompletions = new ArrayList<>();
 
-            if (args.length == 0) return super.processTabComplete(sender, args);;
+            if (args.length == 0) return super.processTabComplete(sender, args);
 
             String lowercaseArg = args[args.length - 1].toLowerCase();
             if (getArgumentType(args.length).equals("ITEMUUID")) {
                 tabCompletions.addAll(uuidManager.getObjects().keySet().stream()
-                    .filter(uuid -> uuid.toLowerCase().contains(lowercaseArg)).toList());
+                        .filter(uuid -> uuid.toLowerCase().contains(lowercaseArg)).toList());
             }
             tabCompletions.addAll(super.processTabComplete(sender, args));
             return tabCompletions;
@@ -185,15 +188,20 @@ public class SearchCommand extends Command {
                     }
                 }
 
-                Client client1 = clientOptional.get();
-                clientManager.sendMessageToRank("Search", UtilMessage.deserialize("<yellow>%s</yellow> is retrieving logs for <yellow>%s</yellow>", player.getName(), client1.getName()), Rank.HELPER);
+                Client targetClient = clientOptional.get();
+                clientManager.sendMessageToRank("Search", UtilMessage.deserialize("<yellow>%s</yellow> is retrieving logs for <yellow>%s</yellow>", player.getName(), targetClient.getName()), Rank.HELPER);
 
-                List<String> logs = UuidLogger.getPlayerLogs(client1.getUniqueId(), amount);
-                UtilMessage.message(player, "Search", "Retrieving the last <green>%s</green> logs for <yellow>%s</yellow>", amount, client1.getName());
+                final int finalAmount = amount;
+                UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> {
+                    List<String> logs = UUIDLogger.getPlayerLogs(targetClient.getUniqueId(), finalAmount);
+                    UtilMessage.message(player, "Search", "Retrieving the last <green>%s</green> logs for <yellow>%s</yellow>", finalAmount, targetClient.getName());
 
-                for (String log : logs) {
-                    UtilMessage.message(player, "Search", UtilMessage.deserialize("<white>" + log + "</white>"));
-                }
+                    for (String log : logs) {
+                        UtilMessage.message(player, "Search", UtilMessage.deserialize("<white>" + log + "</white>"));
+                    }
+                });
+
+
             });
         }
 
@@ -228,15 +236,15 @@ public class SearchCommand extends Command {
 
         @Override
         public void execute(Player player, Client client, String... args) {
-                clientManager.sendMessageToRank("Search", UtilMessage.deserialize("<yellow>%s</yellow> is retrieving all <light_purple>UUIDitems</light_purple> currently being held", player.getName()), Rank.HELPER);
+            clientManager.sendMessageToRank("Search", UtilMessage.deserialize("<yellow>%s</yellow> is retrieving all <light_purple>UUIDitems</light_purple> currently being held", player.getName()), Rank.HELPER);
 
-                for (Player player1 : Bukkit.getOnlinePlayers()) {
-                    Component component = UtilMessage.deserialize("<yellow>%s</yellow> is holding:", player1.getName());
-                    for (UUIDItem uuidItem : itemHandler.getUUIDItems(player1)) {
-                        component = component.appendNewline().append(UtilMessage.deserialize("(<green>%s</green>) <light_purple>%s</light_purple>", uuidItem.getIdentifier(), uuidItem.getUuid()));
-                    }
-                    UtilMessage.message(player, "Search", component);
+            for (Player online : Bukkit.getOnlinePlayers()) {
+                Component component = UtilMessage.deserialize("<yellow>%s</yellow> is holding:", online.getName());
+                for (UUIDItem uuidItem : itemHandler.getUUIDItems(online)) {
+                    component = component.appendNewline().append(UtilMessage.deserialize("(<green>%s</green>) <light_purple>%s</light_purple>", uuidItem.getIdentifier(), uuidItem.getUuid()));
                 }
+                UtilMessage.message(player, "Search", component);
+            }
         }
 
         @Override
