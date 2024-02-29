@@ -906,16 +906,17 @@ skills:
     wreath:
       enabled: true
       maxlevel: 5
-      cooldown: 11.0
-      cooldownDecreasePerLevel: 1.0
       baseSlowDuration: 2.0
       slowDurationIncreasePerLevel: 0.0
       baseDamage: 4.0
       damageIncreasePerLevel: 0.66
       slowStrength: 1
-      numAttacks: 3
       slowDuration: 2.0
       healthPerEnemyHit: 1.0
+      maxCharges: 3
+      maxChargesIncreasePerLevel: 0
+      rechargeSeconds: 10.0
+      rechargeSecondsDecreasePerLevel: 1.0
     frailty:
       enabled: true
       maxlevel: 3
