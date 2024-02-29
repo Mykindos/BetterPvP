@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class FlashData {
 
-    int charges = 0;
+    private int charges = 0;
 
     public void addCharge(){
         charges++;

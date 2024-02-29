@@ -116,7 +116,8 @@ public class Wreath extends Skill implements InteractSkill, Listener {
 
     @Override
     public boolean canUse(Player player) {
-        if (charges.containsKey(player) && charges.get(player).getCharges() > 0) {
+        WreathData wreathData = charges.get(player);
+        if (wreathData != null && wreathData.getCharges() > 0) {
             return true;
         }
 
@@ -201,7 +202,6 @@ public class Wreath extends Skill implements InteractSkill, Listener {
                 for (LivingEntity target : UtilEntity.getNearbyEnemies(player, fangs.getLocation(), 1.5)) {
                     CustomDamageEvent dmg = new CustomDamageEvent(target, player, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, getName());
                     UtilDamage.doCustomDamage(dmg);
-                    dmg.setDamageDelay(0);
                     target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) (getSlowDuration(level) * 20), slowStrength));
                     UtilPlayer.health(player, healthPerEnemyHit);
                 }
@@ -247,14 +247,21 @@ public class Wreath extends Skill implements InteractSkill, Listener {
 
     @Override
     public void activate(Player player, int level) {
-        final int curCharges = charges.get(player).getCharges();
+        WreathData wreathData = charges.get(player);
+        if (wreathData == null) {
+            return;
+        }
+
+        final int curCharges = wreathData.getCharges();
         processPlayerAction(player, level);
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_RAVAGER_ATTACK, 2.0f, 1.8f);
+
         if (curCharges >= getMaxCharges(level)) {
             championsManager.getCooldowns().use(player, getName(), getRechargeSeconds(level), false, true, true);
         }
+
         final int newCharges = curCharges - 1;
-        charges.get(player).setCharges(newCharges);
+        wreathData.setCharges(newCharges);
     }
 
     @Override

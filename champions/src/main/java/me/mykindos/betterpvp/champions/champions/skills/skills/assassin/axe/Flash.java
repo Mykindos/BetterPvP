@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.skills.assassin.data.FlashData;
+import me.mykindos.betterpvp.champions.champions.skills.skills.warlock.data.WreathData;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -134,9 +135,9 @@ public class Flash extends Skill implements InteractSkill, Listener {
         UtilMessage.simpleMessage(player, getClassType().getName(), "Flash Charges: <alt2>" + charges);
     }
 
-    @Override
     public boolean canUse(Player player) {
-        if (charges.containsKey(player) && charges.get(player).getCharges() > 0) {
+        FlashData flashData = charges.get(player);
+        if (flashData != null && flashData.getCharges() > 0) {
             return true;
         }
 
@@ -233,12 +234,18 @@ public class Flash extends Skill implements InteractSkill, Listener {
 
 
         // Lessen charges and add cooldown to prevent from instantly getting a flash charge if they're full
-        final int curCharges = charges.get(player).getCharges();
+        FlashData flashData = charges.get(player);
+        if (flashData == null) {
+            return;
+        }
+
+        final int curCharges = flashData.getCharges();
         if (curCharges >= getMaxCharges(level)) {
             championsManager.getCooldowns().use(player, getName(), getRechargeSeconds(level), false, true, true);
         }
+
         final int newCharges = curCharges - 1;
-        charges.get(player).setCharges(newCharges);
+        flashData.setCharges(newCharges);
 
         // Cues
         notifyCharges(player, newCharges);
