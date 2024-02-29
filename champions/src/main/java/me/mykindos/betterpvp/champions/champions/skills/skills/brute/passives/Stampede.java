@@ -2,10 +2,14 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.brute.passives;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
+import lombok.Setter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.champions.champions.skills.skills.brute.data.StampedeData;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -24,18 +28,19 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.player.PlayerToggleSprintEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
 public class Stampede extends Skill implements PassiveSkill {
 
-    private final WeakHashMap<Player, Long> sprintTime = new WeakHashMap<>();
-    private final WeakHashMap<Player, Integer> sprintStr = new WeakHashMap<>();
-
+    private final WeakHashMap<Player, StampedeData> playerData = new WeakHashMap<>();
     private double durationPerStack;
     private double damage;
     private int maxSpeedStrength;
@@ -64,7 +69,7 @@ public class Stampede extends Skill implements PassiveSkill {
                 "of <effect>Speed " + UtilFormat.getRomanNumeral(maxSpeedStrength + 1) + "</effect>",
                 "",
                 "Attacking during stampede deals <val>" + getDamage(level) + "</val> bonus",
-                "bonus damage and <val>"+ getBonusKnockback(level) + "x</val> extra knockback",
+                "bonus damage and <val>" + getBonusKnockback(level) + "x</val> extra knockback",
                 "per speed level"
         };
     }
@@ -74,97 +79,116 @@ public class Stampede extends Skill implements PassiveSkill {
         return Role.BRUTE;
     }
 
-    public double getDamage(int level){
+    @Override
+    public void invalidatePlayer(Player player, Gamer gamer) {
+        playerData.remove(player);
+    }
+
+    public double getDamage(int level) {
         return damage + ((level - 1) * damageIncreasePerLevel);
     }
 
-    public double getBonusKnockback(int level){
+    public double getBonusKnockback(int level) {
         return knockback + ((level - 1) * knockbackIncreasePerLevel);
     }
 
-    public double getDurationPerStack(int level){
+    public double getDurationPerStack(int level) {
         return durationPerStack - ((level - 1) * durationPerStackDecreasePerLevel);
     }
 
     @Override
     public SkillType getType() {
-
         return SkillType.PASSIVE_A;
     }
 
-    @UpdateEvent(delay = 250)
+    @UpdateEvent
     public void updateSpeed() {
-
-        for (Player player : Bukkit.getOnlinePlayers()) {
+        for (Map.Entry<Player, StampedeData> entry : playerData.entrySet()) {
+            Player player = entry.getKey();
+            StampedeData data = entry.getValue();
             int level = getLevel(player);
-            if (level > 0) {
-                if (!sprintTime.containsKey(player)) {
-                    sprintTime.put(player, System.currentTimeMillis());
-                    sprintStr.put(player, -1);
-                }
+            if (level < 1) return;
 
-                if (!player.isSprinting() || player.isInWater()) {
-                    sprintTime.remove(player);
-                    int str = sprintStr.remove(player);
+            boolean isSprintingNow = player.isSprinting() && !player.isInWater();
 
-                    if(!UtilPlayer.hasPotionEffect(player, PotionEffectType.SPEED, str + 2)) {
-                        player.removePotionEffect(PotionEffectType.SPEED);
-                    }
-                } else {
-                    long time = sprintTime.get(player);
-                    int str = sprintStr.get(player);
-                    if (str >= 0) {
-                        player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 40, str));
-                    }
-                    if (UtilTime.elapsed(time, (long) ((durationPerStack - level) * 1000L))) {
-                        sprintTime.put(player, System.currentTimeMillis());
-                        if (str < maxSpeedStrength) {
-                            sprintStr.put(player, str + 1);
+            if (data == null) {
+                data = new StampedeData(System.currentTimeMillis(), 0);
+                playerData.put(player, data);
+            } else if (isSprintingNow) {
+                if (UtilTime.elapsed(data.getSprintTime(), (long) ((getDurationPerStack(level)) * 1000L))) {
+                    if (data.getSprintStrength() < (maxSpeedStrength + 1)) {
+                        data.setSprintTime(System.currentTimeMillis());
+                        data.setSprintStrength(data.getSprintStrength() + 1);
 
-                            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_AMBIENT, 2.0F, 0.2F * str + 1.2F);
-                            UtilMessage.simpleMessage(player, getClassType().getName(), "Stampede Level: <yellow>%d", (str + 2));
-                        }
+                        player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 40, data.getSprintStrength() - 1, false, false));
+                        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_AMBIENT, 2.0F, 0.2F * data.getSprintStrength() + 1.2F);
+                        UtilMessage.simpleMessage(player, getClassType().getName(), "Stampede Level: <yellow>%d", data.getSprintStrength());
                     }
                 }
+                if (data.getSprintStrength() > 0) {
+                    player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 20 * 5, data.getSprintStrength() - 1, false, false));
+                }
+            } else {
+                removeSpeed(player);
             }
+        }
+    }
+
+    public void removeSpeed(Player player) {
+        StampedeData data = playerData.get(player);
+        if (data == null || data.getSprintStrength() < 1) return;
+
+        playerData.remove(player);
+
+        if (!UtilPlayer.hasPotionEffect(player, PotionEffectType.SPEED, data.getSprintStrength())) {
+            player.removePotionEffect(PotionEffectType.SPEED);
+        }
+    }
+
+    @EventHandler
+    public void onPlayerToggleSprint(PlayerToggleSprintEvent event) {
+        Player player = event.getPlayer();
+
+        if (event.isSprinting()) {
+            if (getLevel(player) > 0) {
+                StampedeData data = playerData.getOrDefault(player, new StampedeData(System.currentTimeMillis(), 0));
+                data.setSprintTime(System.currentTimeMillis());
+                playerData.put(player, data);
+            }
+        } else {
+            removeSpeed(player);
         }
     }
 
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onDamage(CustomDamageEvent event) {
-
-        if (event.getDamager() instanceof Player damager) {
-
-            if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
-            int str = sprintStr.getOrDefault(damager, 0);
-            if (str < 1) return;
-
-            int level = getLevel(damager);
-
-            sprintTime.remove(damager);
-            sprintStr.remove(damager);
-            damager.removePotionEffect(PotionEffectType.SPEED);
-
-            double bonusKnockback = getBonusKnockback(level);
-
-            event.setKnockback(false);
-            VelocityData velocityData = new VelocityData(UtilVelocity.getTrajectory2d(damager, event.getDamagee()), bonusKnockback, true, 0.0D, 0.4D, 1.0D, true);
-            UtilVelocity.velocity(event.getDamagee(), damager, velocityData, VelocityType.KNOCKBACK);
-
-            double additionalDamage = (str + 1) * getDamage(level);
-            event.setDamage(event.getDamage() + additionalDamage);
-        } else if (event.getDamagee() instanceof Player player) {
-            int str = sprintStr.getOrDefault(player, 0);
-            if (str < 1) return;
-
-            if(player.hasPotionEffect(PotionEffectType.SPEED)) {
-                player.removePotionEffect(PotionEffectType.SPEED);
-                sprintTime.remove(player);
-                sprintStr.remove(player);
-            }
-        }
+        if (!(event.getDamagee() instanceof Player damagee)) return;
+        removeSpeed(damagee);
     }
+
+
+    @EventHandler
+    public void onHit(CustomDamageEvent event) {
+        if (!(event.getDamager() instanceof Player damager)) return;
+        if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
+        StampedeData data = playerData.get(damager);
+        if (data == null || data.getSprintStrength() < 1) return;
+
+        int str = data.getSprintStrength();
+        int level = getLevel(damager);
+
+        event.setKnockback(false);
+        damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 1.0F, 1.5F);
+        VelocityData velocityData = new VelocityData(UtilVelocity.getTrajectory2d(damager, event.getDamagee()), getBonusKnockback(level) * str, true, 0.0D, 0.4D, 1.0D, true);
+        UtilVelocity.velocity(event.getDamagee(), damager, velocityData, VelocityType.KNOCKBACK);
+
+        double additionalDamage = getDamage(level) * str;
+        event.setDamage(event.getDamage() + additionalDamage);
+
+        removeSpeed(damager);
+    }
+
 
     @Override
     public void loadSkillConfig() {
