@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.skills.assassin.data.FlashData;
+import me.mykindos.betterpvp.champions.champions.skills.skills.warlock.data.WreathData;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -30,6 +31,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+
+
 
 import java.util.Iterator;
 import java.util.Map;
@@ -55,8 +58,7 @@ public class Flash extends Skill implements InteractSkill, Listener {
 
         return Component.text(getName() + " ").color(NamedTextColor.WHITE).decorate(TextDecoration.BOLD)
                 .append(Component.text("\u25A0".repeat(newCharges)).color(NamedTextColor.GREEN))
-                .append(Component.text("\u25A0".repeat(newCharges >= maxCharges ? 0 : 1)).color(NamedTextColor.YELLOW))
-                .append(Component.text("\u25A0".repeat(Math.max(0, maxCharges - newCharges - 1))).color(NamedTextColor.RED));
+                .append(Component.text("\u25A0".repeat(Math.max(0, maxCharges - newCharges))).color(NamedTextColor.RED));
     });
 
     private int baseMaxCharges;
@@ -133,9 +135,9 @@ public class Flash extends Skill implements InteractSkill, Listener {
         UtilMessage.simpleMessage(player, getClassType().getName(), "Flash Charges: <alt2>" + charges);
     }
 
-    @Override
     public boolean canUse(Player player) {
-        if (charges.containsKey(player) && charges.get(player).getCharges() > 0) {
+        FlashData flashData = charges.get(player);
+        if (flashData != null && flashData.getCharges() > 0) {
             return true;
         }
 
@@ -232,12 +234,18 @@ public class Flash extends Skill implements InteractSkill, Listener {
 
 
         // Lessen charges and add cooldown to prevent from instantly getting a flash charge if they're full
-        final int curCharges = charges.get(player).getCharges();
+        FlashData flashData = charges.get(player);
+        if (flashData == null) {
+            return;
+        }
+
+        final int curCharges = flashData.getCharges();
         if (curCharges >= getMaxCharges(level)) {
             championsManager.getCooldowns().use(player, getName(), getRechargeSeconds(level), false, true, true);
         }
+
         final int newCharges = curCharges - 1;
-        charges.get(player).setCharges(newCharges);
+        flashData.setCharges(newCharges);
 
         // Cues
         notifyCharges(player, newCharges);

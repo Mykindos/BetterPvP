@@ -1,9 +1,9 @@
-package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.data;
+package me.mykindos.betterpvp.champions.champions.skills.skills.warlock.data;
 
 import lombok.Data;
 
 @Data
-public class FlashData {
+public class WreathData {
 
     private int charges = 0;
 
