@@ -85,7 +85,7 @@ public class SkillsCommand extends Command {
             Role role = roleOptional.get();
             RoleBuild build = builds.getActiveBuilds().get(role.getName());
             if (build != null) {
-                UtilMessage.message(player, build.getBuildComponent());
+                UtilMessage.message(player, "Skills", UtilMessage.deserialize("Your Build:").appendNewline().append(build.getBuildComponent()));
             }
         }
     }

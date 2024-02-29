@@ -4,7 +4,10 @@ import lombok.Data;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 
 import java.util.ArrayList;
@@ -97,23 +100,43 @@ public class RoleBuild {
 
     }
 
+    public Component getBuildSkillComponent(SkillType type) {
+        Skill skill;
+        BuildSkill buildSkill = null;
+        switch (type) {
+            case SWORD -> buildSkill = swordSkill;
+            case AXE -> buildSkill = axeSkill;
+            case PASSIVE_A -> buildSkill = passiveA;
+            case BOW -> buildSkill = bow;
+            case GLOBAL -> buildSkill = global;
+            case PASSIVE_B -> buildSkill = passiveB;
+        }
+        if (buildSkill == null || buildSkill.getSkill() == null) {
+            return Component.empty();
+        }
+        skill = buildSkill.getSkill();
+        return buildSkill.getComponent()
+                .clickEvent(ClickEvent.runCommand("/skilldescription " + skill.getName().replace(" ", "_") + " " + buildSkill.getLevel()))
+                .hoverEvent(HoverEvent.showText(UtilMessage.deserialize("<white>Click</white> to see skill description")));
+    }
+
     /**
      * @return The component representation of a build
      */
     public Component getBuildComponent() {
-        String sword = getSwordSkill() == null ? "" : getSwordSkill().getString();
-        String axe = getAxeSkill() == null ? "" : getAxeSkill().getString();
-        String bow = getBow() == null ? "" : getBow().getString();
-        String passivea = getPassiveA() == null ? "" : getPassiveA().getString();
-        String passiveb = getPassiveB() == null ? "" : getPassiveB().getString();
-        String global = getGlobal() == null ? "" : getGlobal().getString();
+        Component sword = getBuildSkillComponent(SkillType.SWORD);
+        Component axe = getBuildSkillComponent(SkillType.AXE);
+        Component bow = getBuildSkillComponent(SkillType.BOW);
+        Component passivea = getBuildSkillComponent(SkillType.PASSIVE_A);
+        Component passiveb = getBuildSkillComponent(SkillType.PASSIVE_B);
+        Component global = getBuildSkillComponent(SkillType.GLOBAL);
 
-        Component component =  Component.text("Sword: ", NamedTextColor.GREEN).append(Component.text(sword, NamedTextColor.WHITE)).appendNewline()
-                .append(Component.text("Axe: ", NamedTextColor.GREEN).append(Component.text(axe, NamedTextColor.WHITE))).appendNewline()
-                .append(Component.text("Bow: ", NamedTextColor.GREEN).append(Component.text(bow, NamedTextColor.WHITE))).appendNewline()
-                .append(Component.text("Passive A: ", NamedTextColor.GREEN).append(Component.text(passivea, NamedTextColor.WHITE))).appendNewline()
-                .append(Component.text("Passive B: ", NamedTextColor.GREEN).append(Component.text(passiveb, NamedTextColor.WHITE))).appendNewline()
-                .append(Component.text("Global: ", NamedTextColor.GREEN).append(Component.text(global, NamedTextColor.WHITE)));
+        Component component = Component.text("Sword: ", NamedTextColor.WHITE).append(sword).appendNewline()
+                .append(Component.text("Axe: ", NamedTextColor.WHITE).append(axe).appendNewline())
+                .append(Component.text("Bow: ", NamedTextColor.WHITE).append(bow).appendNewline())
+                .append(Component.text("Passive A: ", NamedTextColor.WHITE).append(passivea).appendNewline())
+                .append(Component.text("Passive B: ", NamedTextColor.WHITE).append(passiveb).appendNewline())
+                .append(Component.text("Global: ", NamedTextColor.WHITE).append(global));
         return component;
     }
 
