@@ -7,6 +7,7 @@ import lombok.Setter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.champions.champions.skills.skills.brute.data.StampedeData;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -39,20 +40,7 @@ import java.util.WeakHashMap;
 @BPvPListener
 public class Stampede extends Skill implements PassiveSkill {
 
-    private static class StampedeData {
-        @Getter @Setter
-        private long sprintTime;
-        @Getter @Setter
-        private int sprintStrength;
-
-        public StampedeData(long sprintTime, int sprintStrength) {
-            this.sprintTime = sprintTime;
-            this.sprintStrength = sprintStrength;
-        }
-    }
-
     private final WeakHashMap<Player, StampedeData> playerData = new WeakHashMap<>();
-    private final WeakHashMap<Player, Boolean> activePlayers = new WeakHashMap<>();
     private double durationPerStack;
     private double damage;
     private int maxSpeedStrength;
@@ -92,13 +80,7 @@ public class Stampede extends Skill implements PassiveSkill {
     }
 
     @Override
-    public void trackPlayer(Player player, Gamer gamer) {
-        activePlayers.put(player, true);
-    }
-
-    @Override
     public void invalidatePlayer(Player player, Gamer gamer) {
-        activePlayers.remove(player);
         playerData.remove(player);
     }
 
@@ -121,13 +103,14 @@ public class Stampede extends Skill implements PassiveSkill {
 
     @UpdateEvent
     public void updateSpeed() {
-        for (Player player : activePlayers.keySet()) {
+        for (Map.Entry<Player, StampedeData> entry : playerData.entrySet()) {
+            Player player = entry.getKey();
+            StampedeData data = entry.getValue();
             int level = getLevel(player);
             if (level < 1) return;
 
             boolean isSprintingNow = player.isSprinting() && !player.isInWater();
 
-            StampedeData data = playerData.get(player);
             if (data == null) {
                 data = new StampedeData(System.currentTimeMillis(), 0);
                 playerData.put(player, data);
@@ -166,18 +149,21 @@ public class Stampede extends Skill implements PassiveSkill {
     @EventHandler
     public void onPlayerToggleSprint(PlayerToggleSprintEvent event) {
         Player player = event.getPlayer();
-        if (!activePlayers.containsKey(player)) return;
-
         boolean isSprinting = event.isSprinting();
-        StampedeData data = playerData.getOrDefault(player, new StampedeData(System.currentTimeMillis(), 0));
+
+        StampedeData data = playerData.get(player);
+        if (data == null) {
+            data = new StampedeData(System.currentTimeMillis(), 0);
+        }
 
         if (isSprinting) {
             data.setSprintTime(System.currentTimeMillis());
-            playerData.put(player, data);
+            playerData.put(player, data); // Ensure the updated data is saved
         } else {
             removeSpeed(player);
         }
     }
+
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onDamage(CustomDamageEvent event) {
