@@ -6,9 +6,9 @@ import lombok.Setter;
 
 @Data
 public class StampedeData {
-    @Getter @Setter
+
     private long sprintTime;
-    @Getter @Setter
+
     private int sprintStrength;
 
     public StampedeData(long sprintTime, int sprintStrength) {
