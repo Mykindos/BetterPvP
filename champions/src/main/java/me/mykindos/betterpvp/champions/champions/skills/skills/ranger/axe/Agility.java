@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.axe;
 
+import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
@@ -17,6 +18,8 @@ import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -28,10 +31,12 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Random;
 import java.util.UUID;
 
 @Singleton
@@ -91,13 +96,11 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
 
     @Override
     public SkillType getType() {
-
         return SkillType.AXE;
     }
 
     @Override
     public double getCooldown(int level) {
-
         return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
@@ -135,7 +138,7 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
         }
     }
 
-    @UpdateEvent(delay = 250)
+    @UpdateEvent
     public void onUpdate() {
         Iterator<Map.Entry<UUID, Long>> iterator = active.entrySet().iterator();
         while (iterator.hasNext()) {
@@ -144,6 +147,7 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
             if (player == null) {
                 iterator.remove();
             } else {
+                spawnSkillParticles(player);
                 if (entry.getValue() - System.currentTimeMillis() <= 0) {
                     deactivate(player);
                     iterator.remove();
@@ -151,6 +155,24 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
             }
         }
     }
+
+    @UpdateEvent
+    private void spawnSkillParticles(Player player) {
+        Location loc = player.getLocation();
+        Random random = new Random();
+        double x = loc.getX() + (random.nextDouble() - 0.5) * 0.5;
+        double y = loc.getY() + (1 + (random.nextDouble() - 0.5) * 0.9);
+        double z = loc.getZ() + (random.nextDouble() - 0.5) * 0.5;
+        Location particleLoc = new Location(loc.getWorld(), x, y, z);
+        new ParticleBuilder(Particle.SPELL)
+                .location(particleLoc)
+                .count(1)
+                .offset(0.1, 0.1, 0.1)
+                .extra(0)
+                .receivers(60)
+                .spawn();
+    }
+
 
     @Override
     public void activate(Player player, int level) {
@@ -180,7 +202,6 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
         baseDamageReduction = getConfig("baseDamageReduction", 0.60, Double.class);
         damageReductionIncreasePerLevel = getConfig("damageReductionIncreasePerLevel", 0.0, Double.class);
-
         speedStrength = getConfig("speedStrength", 1, Integer.class);
     }
 }
