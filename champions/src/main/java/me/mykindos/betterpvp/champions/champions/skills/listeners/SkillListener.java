@@ -25,6 +25,8 @@ import me.mykindos.betterpvp.champions.champions.skills.types.ToggleSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.click.events.RightClickEvent;
+import me.mykindos.betterpvp.core.combat.weapon.WeaponManager;
+import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
 import me.mykindos.betterpvp.core.components.champions.ISkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -32,6 +34,7 @@ import me.mykindos.betterpvp.core.components.champions.events.PlayerCanUseSkillE
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseInteractSkillEvent;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEvent;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseToggleSkillEvent;
+import me.mykindos.betterpvp.core.components.champions.weapons.IWeapon;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectType;
@@ -52,6 +55,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -60,6 +64,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -76,10 +81,13 @@ public class SkillListener implements Listener {
     private final EffectManager effectManager;
     private final ClientManager clientManager;
     private final SkillManager skillManager;
+    private final WeaponManager weaponManager;
+
+    private final HashSet<UUID> InventoryDrop = new HashSet<>();
 
     @Inject
     public SkillListener(BuildManager buildManager, RoleManager roleManager, CooldownManager cooldownManager,
-                         EnergyHandler energyHandler, EffectManager effectManager, ClientManager clientManager, SkillManager skillManager) {
+                         EnergyHandler energyHandler, EffectManager effectManager, ClientManager clientManager, SkillManager skillManager, WeaponManager weaponManager) {
         this.buildManager = buildManager;
         this.roleManager = roleManager;
         this.cooldownManager = cooldownManager;
@@ -87,6 +95,7 @@ public class SkillListener implements Listener {
         this.effectManager = effectManager;
         this.clientManager = clientManager;
         this.skillManager = skillManager;
+        this.weaponManager = weaponManager;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -150,11 +159,28 @@ public class SkillListener implements Listener {
     }
 
     @EventHandler
+    public void onInventoryDrop(InventoryClickEvent event) {
+        if (event.getAction().name().contains("DROP")) {
+            if (event.getWhoClicked() instanceof Player player) {
+                InventoryDrop.add(player.getUniqueId());
+            }
+        }
+    }
+
+    @EventHandler
     public void onDrop(PlayerDropItemEvent event) {
         Player player = event.getPlayer();
+        if (InventoryDrop.contains(player.getUniqueId())) {
+            InventoryDrop.remove(player.getUniqueId());
+            return;
+        }
         ItemStack droppedItem = event.getItemDrop().getItemStack();
         if (!UtilItem.isAxe(droppedItem) && !UtilItem.isSword(droppedItem)) {
-            return;
+            Optional<IWeapon> iWeaponOptional = weaponManager.getWeaponByItemStack(droppedItem);
+            if (iWeaponOptional.isEmpty() || !(iWeaponOptional.get() instanceof LegendaryWeapon))
+            {
+                return;
+            }
         }
 
         Optional<Role> roleOptional = roleManager.getObject(player.getUniqueId().toString());
