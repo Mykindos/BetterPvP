@@ -145,20 +145,17 @@ public class Stampede extends Skill implements PassiveSkill {
         }
     }
 
-
     @EventHandler
     public void onPlayerToggleSprint(PlayerToggleSprintEvent event) {
         Player player = event.getPlayer();
+        if (!playerData.containsKey(player)) return;
         boolean isSprinting = event.isSprinting();
 
-        StampedeData data = playerData.get(player);
-        if (data == null) {
-            data = new StampedeData(System.currentTimeMillis(), 0);
-        }
+        StampedeData data = playerData.getOrDefault(player, new StampedeData(System.currentTimeMillis(), 0));
 
         if (isSprinting) {
             data.setSprintTime(System.currentTimeMillis());
-            playerData.put(player, data); // Ensure the updated data is saved
+            playerData.put(player, data);
         } else {
             removeSpeed(player);
         }
