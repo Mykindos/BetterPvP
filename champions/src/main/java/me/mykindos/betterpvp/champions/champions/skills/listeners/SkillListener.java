@@ -83,7 +83,7 @@ public class SkillListener implements Listener {
     private final SkillManager skillManager;
     private final WeaponManager weaponManager;
 
-    private final HashSet<Player> InventoryDrop = new HashSet<>();
+    private final HashSet<UUID> InventoryDrop = new HashSet<>();
 
     @Inject
     public SkillListener(BuildManager buildManager, RoleManager roleManager, CooldownManager cooldownManager,
@@ -162,7 +162,7 @@ public class SkillListener implements Listener {
     public void onInventoryDrop(InventoryClickEvent event) {
         if (event.getAction().name().contains("DROP")) {
             if (event.getWhoClicked() instanceof Player player) {
-                InventoryDrop.add(player);
+                InventoryDrop.add(player.getUniqueId());
             }
         }
     }
@@ -170,8 +170,8 @@ public class SkillListener implements Listener {
     @EventHandler
     public void onDrop(PlayerDropItemEvent event) {
         Player player = event.getPlayer();
-        if (InventoryDrop.contains(player)) {
-            InventoryDrop.remove(player);
+        if (InventoryDrop.contains(player.getUniqueId())) {
+            InventoryDrop.remove(player.getUniqueId());
             return;
         }
         ItemStack droppedItem = event.getItemDrop().getItemStack();
