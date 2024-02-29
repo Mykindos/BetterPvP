@@ -1,6 +1,6 @@
 create table if not exists logs
 (
-    id        varchar(255)                       primary key,
+    id        varchar(36)                           primary key,
     Level     varchar(255)                          not null,
     Message   text                                  not null,
     Time      bigint                                not null
@@ -8,18 +8,18 @@ create table if not exists logs
 
 create table if not exists uuiditems
 (
-    UUID        varchar(255)    PRIMARY KEY,
+    UUID        varchar(36)     PRIMARY KEY,
     Namespace   varchar(255)    NOT NULL,
     Keyname     varchar(255)    NOT NULL
 );
 
 create table if not exists uuidlogmeta
 (
-    id          varchar(255)    PRIMARY KEY,
-    LogUUID     varchar(255)    not null,
-    ItemUUID    varchar(255)    not null,
+    id          varchar(36)     PRIMARY KEY,
+    LogUUID     varchar(36)     not null,
+    ItemUUID    varchar(36)     not null,
     Type        varchar(255)    not null,
-    UUID        varchar(255)    default null,
+    UUID        varchar(36)    default null,
     UUIDtype    varchar(255)    default null,
 
 
@@ -30,22 +30,27 @@ create table if not exists uuidlogmeta
 );
 
 DROP PROCEDURE IF EXISTS GetUuidLogsByUuid;
-CREATE PROCEDURE GetUuidLogsByUuid(UniqueID varchar(255), amount int)
+CREATE PROCEDURE GetUuidLogsByUuid(UniqueID varchar(36), amount int)
 BEGIN
-    SELECT DISTINCT Time, Message FROM logs, uuidlogmeta
-        WHERE ItemUUID = UniqueID
-        AND LogUUID = logs.id
-        ORDER BY Time DESC
-        LIMIT amount;
+    SELECT DISTINCT Time, Message
+    FROM logs
+        INNER JOIN uuidlogmeta ON logs.id = uuidlogmeta.LogUUID
+    WHERE ItemUUID = UniqueID
+    ORDER BY Time DESC
+    LIMIT amount;
 END;
 
 DROP PROCEDURE IF EXISTS GetUuidLogsByPlayer;
-CREATE PROCEDURE GetUuidLogsByPlayer(PlayerUuid varchar(255), amount int)
+CREATE PROCEDURE GetUuidLogsByPlayer(PlayerUuid varchar(36), amount int)
 BEGIN
-    SELECT DISTINCT Time, Message FROM logs, uuidlogmeta
-        WHERE UUID = PlayerUuid
-        AND UUIDtype = 'PLAYER'
-        AND LogUUID = logs.id
-        ORDER BY Time DESC
-        LIMIT amount;
+    SELECT DISTINCT Time, Message
+    FROM logs
+        INNER JOIN uuidqqlogmeta ON logs.id = uuidlogmeta.LogUUID
+    WHERE UUID = PlayerUuid
+      AND UUIDtype = 'PLAYER'
+    ORDER BY Time DESC
+    LIMIT amount;
 END;
+
+ALTER TABLE uuidlogmeta ADD INDEX (UUID);
+ALTER TABLE uuidlogmeta ADD INDEX (ItemUUID);

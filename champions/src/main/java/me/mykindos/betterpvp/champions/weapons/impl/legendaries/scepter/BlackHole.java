@@ -70,6 +70,8 @@ public class BlackHole extends ScepterProjectile {
             chargeData.tick();
             chargeData.tickSound(new SoundEffect(Sound.BLOCK_CONDUIT_DEACTIVATE, 2f, 1f), location, true);
 
+            var particleReceivers = location.getNearbyPlayers(60);
+
             for (Location point : sphere) {
                 final Location direction = location.clone().subtract(point);
                 direction.multiply(1 - charge);
@@ -79,7 +81,7 @@ public class BlackHole extends ScepterProjectile {
                         .location(point.clone().add(direction))
                         .count(1)
                         .extra(0)
-                        .receivers(60)
+                        .receivers(particleReceivers)
                         .spawn();
             }
 
@@ -88,7 +90,7 @@ public class BlackHole extends ScepterProjectile {
                     .count(1)
                     .extra(0.5)
                     .offset(0.5, 0.5, 0.5)
-                    .receivers(60)
+                    .receivers(particleReceivers)
                     .spawn();
 
             // Pull entities

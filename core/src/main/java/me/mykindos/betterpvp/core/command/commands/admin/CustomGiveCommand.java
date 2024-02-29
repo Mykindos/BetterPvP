@@ -12,7 +12,7 @@ import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDItem;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDManager;
 import me.mykindos.betterpvp.core.logging.Logger;
-import me.mykindos.betterpvp.core.logging.UuidLogger;
+import me.mykindos.betterpvp.core.logging.UUIDLogger;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -103,8 +103,8 @@ public class CustomGiveCommand extends Command {
         }
         if (uuidItem != null) {
             UUID logID = Logger.info("<yellow>%s</yellow> <blue>spawned</blue> and gave <light_purple>e%s</light_purple> to <yellow>%s</yellow>", player.getName(), uuidItem.getUuid(), target.getName());
-            UuidLogger.AddItemUUIDMetaInfoPlayer(logID, uuidItem.getUuid(), UuidLogger.UuidLogType.SPAWN, player.getUniqueId());
-            UuidLogger.AddItemUUIDMetaInfoPlayer(logID, uuidItem.getUuid(), UuidLogger.UuidLogType.PICKUP, target.getUniqueId());
+            UUIDLogger.addItemUUIDMetaInfoPlayer(logID, uuidItem.getUuid(), UUIDLogger.UUIDLogType.SPAWN, player.getUniqueId());
+            UUIDLogger.addItemUUIDMetaInfoPlayer(logID, uuidItem.getUuid(), UUIDLogger.UUIDLogType.PICKUP, target.getUniqueId());
         }
         target.getInventory().addItem(itemStack);
         //todo handle items that do not fit in inventory
