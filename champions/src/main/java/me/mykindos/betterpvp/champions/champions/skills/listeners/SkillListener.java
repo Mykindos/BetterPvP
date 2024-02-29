@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.listeners;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
 import me.mykindos.betterpvp.champions.champions.builds.BuildSkill;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
@@ -52,6 +53,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -60,6 +62,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -67,6 +70,7 @@ import java.util.UUID;
 
 @Singleton
 @BPvPListener
+@Slf4j
 public class SkillListener implements Listener {
 
     private final BuildManager buildManager;
@@ -76,6 +80,8 @@ public class SkillListener implements Listener {
     private final EffectManager effectManager;
     private final ClientManager clientManager;
     private final SkillManager skillManager;
+
+    private final HashSet<Player> InventoryDrop = new HashSet<>();
 
     @Inject
     public SkillListener(BuildManager buildManager, RoleManager roleManager, CooldownManager cooldownManager,
@@ -150,8 +156,21 @@ public class SkillListener implements Listener {
     }
 
     @EventHandler
+    public void onInventoryDrop(InventoryClickEvent event) {
+        if (event.getAction().name().contains("DROP")) {
+            if (event.getWhoClicked() instanceof Player player) {
+                InventoryDrop.add(player);
+            }
+        }
+    }
+
+    @EventHandler
     public void onDrop(PlayerDropItemEvent event) {
         Player player = event.getPlayer();
+        if (InventoryDrop.contains(player)) {
+            InventoryDrop.remove(player);
+            return;
+        }
         ItemStack droppedItem = event.getItemDrop().getItemStack();
         if (!UtilItem.isAxe(droppedItem) && !UtilItem.isSword(droppedItem)) {
             return;
