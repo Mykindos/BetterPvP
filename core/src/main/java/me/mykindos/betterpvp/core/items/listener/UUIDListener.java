@@ -380,6 +380,7 @@ public class UUIDListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onBlockDropItemEvent(BlockDropItemEvent event) {
+        if (event.isCancelled()) return;
         event.getItems().forEach(item -> {
             itemHandler.getUUIDItem(item.getItemStack()).ifPresent(uuidItem -> {
                 Location location = event.getBlock().getLocation();
