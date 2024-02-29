@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.champions.champions.skills.listeners;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
 import me.mykindos.betterpvp.champions.champions.builds.BuildSkill;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
@@ -73,7 +72,6 @@ import java.util.UUID;
 
 @Singleton
 @BPvPListener
-@Slf4j
 public class SkillListener implements Listener {
 
     private final BuildManager buildManager;
