@@ -223,8 +223,8 @@ skills:
       maxlevel: 3
       timeBetweenCharges: 2.0
       timeOutOfCombat: 2.5
-      damageIncreasePerCharge: 0.5
-      baseDamageIncreasePerLevelPerCharge: 1.0
+      baseDamagePerCharge: 1.0
+      damageIncreasePerLevel: 0.0
     thorns:
       enabled: true
       maxlevel: 3
@@ -629,9 +629,9 @@ skills:
     overwhelm:
       enabled: true
       maxlevel: 3
-      bonusDamage: 1.0
+      bonusDamage: 0.0
       healthOverTarget: 2.0
-      baseMaxDamage: 0.5
+      baseMaxDamage: 1.0
       maxDamageIncreasePerLevel: 0.5
   ranger:
     wolfspounce:

@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 @Singleton
@@ -56,7 +57,7 @@ public class BreakFall extends Skill implements PassiveSkill {
         return SkillType.GLOBAL;
     }
 
-    @EventHandler
+    @EventHandler (priority = EventPriority.HIGHEST)
     public void onFall(CustomDamageEvent e) {
         if (!(e.getDamagee() instanceof Player player)) return;
         if (e.getCause() != DamageCause.FALL) return;
