@@ -73,16 +73,16 @@ public class Overwhelm extends Skill implements PassiveSkill {
             double difference = (player.getHealth() - ent.getHealth()) / healthOverTarget;
             if (difference > 0) {
                 difference = Math.min(difference, getMaxDamage(level));
-                event.setDamage(event.getDamage() + difference * bonusDamage);
+                event.setDamage(event.getDamage() + (difference * bonusDamage));
             }
         }
     }
 
     @Override
     public void loadSkillConfig(){
-        bonusDamage = getConfig("bonusDamage", 1.0, Double.class);
+        bonusDamage = getConfig("bonusDamage", 0.5, Double.class);
         healthOverTarget = getConfig("healthOverTarget", 2.0, Double.class);
-        baseMaxDamage = getConfig("baseMaxDamage", 0.5, Double.class);
+        baseMaxDamage = getConfig("baseMaxDamage", 1.0, Double.class);
         maxDamageIncreasePerLevel = getConfig("maxDamageIncreasePerLevel", 0.5, Double.class);
     }
 
