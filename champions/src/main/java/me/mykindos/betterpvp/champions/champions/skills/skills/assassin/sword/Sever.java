@@ -109,7 +109,7 @@ public class Sever extends Skill implements CooldownSkill, Listener, InteractSki
         drawParticleLine(playerChestLocation, directionVector, hitDistance, player);
 
         // use this to get make sure the entities are enemies
-        List<KeyValue<LivingEntity, EntityProperty>> keyValueList = UtilEntity.getNearbyEntities(player, midpointLocation, hitDistance / 2, EntityProperty.FRIENDLY);
+        List<KeyValue<LivingEntity, EntityProperty>> keyValueList = UtilEntity.getNearbyEntities(player, midpointLocation, hitDistance / 2, EntityProperty.ENEMY);
 
         // extract LivingEntity objects from the key values
         List<LivingEntity> nearbyEntities = keyValueList.stream()
