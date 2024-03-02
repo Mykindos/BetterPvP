@@ -14,9 +14,11 @@ skills:
       cooldown: 20.0
       maxlevel: 3
       cooldownDecreasePerLevel: 1.0
-      baseDuration: 1.0
-      durationIncreasePerLevel: 1.0
-      hitDistance: 4.0
+      baseDuration: 3.0
+      durationIncreasePerLevel: 0.0
+      hitDistance: 5.0
+      radius: 15.0
+      degreesIncreasePerLevel: 15.0
     shockingstrikes:
       enabled: true
       maxlevel: 3

@@ -3,11 +3,14 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.sword;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEvent;
 import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
@@ -15,26 +18,37 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.util.RayTraceResult;
+import org.bukkit.util.Vector;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.List;
 import java.util.WeakHashMap;
+import java.util.stream.Collectors;
 
 @Singleton
 @BPvPListener
-public class Sever extends Skill implements CooldownSkill, Listener {
+public class Sever extends Skill implements CooldownSkill, Listener, InteractSkill {
     private double baseDuration;
     private double durationIncreasePerLevel;
     private double hitDistance;
-    private WeakHashMap<Player, Boolean> rightClicked = new WeakHashMap<>();
+    private double degrees;
+    private double degreesIncreasePerLevel;
 
     @Inject
     public Sever(Champions champions, ChampionsManager championsManager) {
@@ -52,8 +66,8 @@ public class Sever extends Skill implements CooldownSkill, Listener {
         return new String[]{
                 "Right click with a Sword to activate",
                 "",
-                "Inflict a <val>" + getDuration(level) + "</val> second <effect>Bleed</effect>",
-                "dealing <stat>1</stat> heart per second",
+                "Sever the air in front of you, giving anything",
+                "within <val>"+ getDegrees(level) + "</val> degrees <effect>Bleed</effect> for <stat>" + getDuration(level) + "</stat> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -61,6 +75,10 @@ public class Sever extends Skill implements CooldownSkill, Listener {
 
     public double getDuration(int level) {
         return baseDuration + ((level - 1) * durationIncreasePerLevel);
+    }
+
+    public double getDegrees(int level){
+        return degrees + ((level - 1) * degreesIncreasePerLevel);
     }
 
     @Override
@@ -73,62 +91,61 @@ public class Sever extends Skill implements CooldownSkill, Listener {
         return SkillType.SWORD;
     }
 
-    @EventHandler
-    public void onEntityInteract(PlayerInteractEntityEvent event) {
-        if (event.getHand() == EquipmentSlot.OFF_HAND) return;
-        rightClicked.put(event.getPlayer(), true);
-        if (event.getRightClicked() instanceof LivingEntity entity) {
-            onInteract(event.getPlayer(), entity);
-        } else {
-            onInteract(event.getPlayer(), null);
-        }
-        event.setCancelled(true);
+    @Override
+    public Action[] getActions() {
+        return SkillActions.RIGHT_CLICK;
     }
 
-    @EventHandler
-    public void onInteract(PlayerInteractEvent event) {
-        if (event.getHand() == EquipmentSlot.OFF_HAND || !event.getAction().isRightClick()) return;
-        if (!rightClicked.getOrDefault(event.getPlayer(), false)) { // This means onInteract wasn't called through onEntityInteract
-            onInteract(event.getPlayer(), null);
-        }
-        rightClicked.remove(event.getPlayer()); // Reset the flag for next interactions
-    }
-
-    private void onInteract(Player player, LivingEntity ent) {
-        if (!isHolding(player)) return;
-
-        int level = getLevel(player);
+    @Override
+    public void activate(Player player, int level) {
         if (level <= 0) {
             return;
         }
 
-        final PlayerUseSkillEvent event = UtilServer.callEvent(new PlayerUseSkillEvent(player, this, level));
-        if (event.isCancelled()) {
-            return;
-        }
+        Vector directionVector = player.getLocation().getDirection().normalize().multiply(hitDistance / 2);
+        Location midpointLocation = player.getLocation().clone().add(directionVector);
+        Location playerChestLocation = player.getLocation().clone().add(0, 1, 0);
 
-        if (ent == null) {
-            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SPIDER_HURT, 1.0F, 1.5F);
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s", getName());
-            return;
-        }
+        drawParticleLine(playerChestLocation, directionVector, hitDistance, player);
 
-        boolean withinRange = UtilMath.offset(player, ent) <= hitDistance;
-        boolean isFriendly = false;
-        if (ent instanceof Player damagee) {
-            isFriendly = UtilEntity.getRelation(player, damagee) == EntityProperty.FRIENDLY;
-        }
+        // use this to get make sure the entities are enemies
+        List<KeyValue<LivingEntity, EntityProperty>> keyValueList = UtilEntity.getNearbyEntities(player, midpointLocation, hitDistance / 2, EntityProperty.FRIENDLY);
 
-        if (!withinRange || isFriendly) {
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s", getName());
-        } else {
-            championsManager.getEffects().addEffect(ent, EffectType.BLEED, (long) getDuration(level) * 1000L);
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You severed <alt>" + ent.getName() + "</alt>.");
-            UtilMessage.simpleMessage(ent, getClassType().getName(), "You have been severed by <alt>" + player.getName() + "</alt>.");
+        // extract LivingEntity objects from the key values
+        List<LivingEntity> nearbyEntities = keyValueList.stream()
+                .map(KeyValue::getKey) // get each key from list
+                .collect(Collectors.toList()); // collect to list
+
+        Vector playerDirection = player.getLocation().getDirection().normalize();
+
+        // filter entities not within the specified angle
+        nearbyEntities.removeIf(entity -> {
+            Vector toEntity = entity.getLocation().subtract(player.getLocation()).toVector().normalize();
+            double angle = toEntity.angle(playerDirection);
+            return Math.toDegrees(angle) > getDegrees(level);
+        });
+
+        // apply effects to remaining entities
+        for (LivingEntity target : nearbyEntities) {
+            championsManager.getEffects().addEffect(target, EffectType.BLEED, (long) getDuration(level) * 1000L);
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You severed <alt>" + target.getName() + "</alt>.");
+            UtilMessage.simpleMessage(target, getClassType().getName(), "You have been severed by <alt>" + player.getName() + "</alt>.");
+
         }
 
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SPIDER_HURT, 1.0F, 1.5F);
     }
+
+    private void drawParticleLine(Location startLocation, Vector directionVector, double distance, Player player) {
+        Particle.DustOptions dustOptions = new Particle.DustOptions(Color.RED, 0.5f);
+        int points = (int) (distance * 15);
+        for (int i = 0; i <= points; i++) {
+            double increment = i / (double) points;
+            Location point = startLocation.clone().add(directionVector.clone().multiply(increment));
+            player.getWorld().spawnParticle(Particle.REDSTONE, point, 1, dustOptions);
+        }
+    }
+
 
     @Override
     public double getCooldown(int level) {
@@ -137,8 +154,10 @@ public class Sever extends Skill implements CooldownSkill, Listener {
 
     @Override
     public void loadSkillConfig() {
-        baseDuration = getConfig("baseDuration", 1.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
-        hitDistance = getConfig("hitDistance", 4.0, Double.class);
+        baseDuration = getConfig("baseDuration", 3.0, Double.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.0, Double.class);
+        hitDistance = getConfig("hitDistance", 5.0, Double.class);
+        degrees = getConfig("degrees", 15.0, Double.class);
+        degreesIncreasePerLevel = getConfig("degreesIncreasePerLevel", 15.0, Double.class);
     }
 }
