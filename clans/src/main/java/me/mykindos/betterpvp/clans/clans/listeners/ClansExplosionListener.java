@@ -284,6 +284,8 @@ public class ClansExplosionListener extends ClanListener {
 
             if(!worldBlockHandler.isRestoreBlock(block)) {
                 block.breakNaturally();
+            } else {
+                block.setType(Material.AIR);
             }
 
         }
