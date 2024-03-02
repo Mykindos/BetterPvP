@@ -104,7 +104,7 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
             if (hasCooldown(player, ability)) {
 
                 if (inform) {
-                    UtilMessage.simpleMessage(player, "Cooldown", "You cannot use <alt>%s</alt> for <alt>%s</alt> seconds.", ability, Math.max(0, getAbilityRecharge(player, ability).getRemaining()));
+                    informCooldown(player, ability);
                 }
 
                 return false;
@@ -128,6 +128,10 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
         }
 
         return false;
+    }
+
+    public void informCooldown(Player player, String ability) {
+        UtilMessage.simpleMessage(player, "Cooldown", "You cannot use <alt>%s</alt> for <alt>%s</alt> seconds.", ability, Math.max(0, getAbilityRecharge(player, ability).getRemaining()));
     }
 
     public Cooldown getAbilityRecharge(Player player, String ability) {
