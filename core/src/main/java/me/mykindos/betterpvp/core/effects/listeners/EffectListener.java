@@ -227,7 +227,7 @@ public class EffectListener implements Listener {
         Optional<Effect> effectOptional = effectManager.getEffect(event.getDamagee(), EffectType.VULNERABILITY);
         effectOptional.ifPresent(effect -> {
             if (event.getCause() == EntityDamageEvent.DamageCause.LIGHTNING) return;
-            double damageIncrease = 0.25 + (effect.getLevel() - 1) * 0.10;
+            double damageIncrease = 0.1 + (effect.getLevel() - 1) * 0.10;
             event.setDamage(event.getDamage() * (1.0 + damageIncrease));
         });
     }
