@@ -32,7 +32,9 @@ public class ClassSelectionButton extends SimpleItem {
         super(ItemView.builder().material(role.getChestplate())
                 .displayName(Component.text(role.getName(), role.getColor(), TextDecoration.BOLD))
                 .lore(List.of(UtilMessage.deserialize("Class Damage Reduction: <yellow>" + armorManager.getReductionForArmourSet(role.getChestplate().name().replace("_CHESTPLATE", "")) + "%"),
-                        UtilMessage.deserialize("Effective Health: <red>" + (int) Math.floor(20 / (1 - armorManager.getReductionForArmourSet(role.getChestplate().name().replace("_CHESTPLATE", "")) / 100)))))
+                        UtilMessage.deserialize("Effective Health: <red>" + (int) Math.floor(20 / (1 - armorManager.getReductionForArmourSet(role.getChestplate().name().replace("_CHESTPLATE", "")) / 100))),
+                        Component.text(""),
+                        UtilMessage.deserialize("Click to manage your builds.")))
                 .flag(ItemFlag.HIDE_ATTRIBUTES)
                 .build());
         this.buildManager = buildManager;
