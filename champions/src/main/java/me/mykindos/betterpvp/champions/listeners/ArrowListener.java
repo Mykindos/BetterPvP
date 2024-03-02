@@ -3,8 +3,12 @@ package me.mykindos.betterpvp.champions.listeners;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.config.Config;
+import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateLoreEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import net.kyori.adventure.text.Component;
+import org.bukkit.Material;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -64,6 +68,14 @@ public class ArrowListener implements Listener {
             }
         }
 
+    }
+
+    @EventHandler
+    public void onUpdateLore(ItemUpdateLoreEvent event) {
+        if(event.getItemStack().getType() == Material.ARROW) {
+            event.getItemLore().clear();
+            event.getItemLore().add(UtilMessage.deserialize("<reset>Damage: <green>%s", baseArrowDamage));
+        }
     }
 
     /*
