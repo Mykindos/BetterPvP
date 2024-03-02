@@ -124,7 +124,7 @@ public class ItemHandler {
         } else {
             final PersistentDataContainer pdc = itemMeta.getPersistentDataContainer();
             if (!pdc.getOrDefault(CoreNamespaceKeys.IMMUTABLE_KEY, PersistentDataType.BOOLEAN, false)) {
-                itemMeta.displayName(Component.text(UtilFormat.cleanString(material.name())).color(NamedTextColor.YELLOW));
+                itemMeta.displayName(Component.text(UtilFormat.cleanString(material.name())).color(NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
             }
         }
 
