@@ -111,11 +111,29 @@ public class SkillListener implements Listener {
             return;
         }
 
+        if (skill instanceof EnergySkill energySkill && !(skill instanceof ActiveToggleSkill)) {
+            if (energySkill.getEnergy(level) > 0) {
+                if(skill instanceof CooldownSkill cooldownSkill) {
+                    if(cooldownManager.hasCooldown(player, skill.getName())) {
+                        if(cooldownSkill.showCooldownFinished()) {
+                            cooldownManager.informCooldown(player, skill.getName());
+                        }
+                        event.setCancelled(true);
+                        return;
+                    }
+                }
+                if (!energyHandler.use(player, skill.getName(), energySkill.getEnergy(level), true)) {
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+
+        }
+
         if (skill instanceof CooldownSkill cooldownSkill && !(skill instanceof PrepareArrowSkill)) {
             if (!cooldownManager.use(player, skill.getName(), cooldownSkill.getCooldown(level),
                     cooldownSkill.showCooldownFinished(), true, cooldownSkill.isCancellable(), cooldownSkill::shouldDisplayActionBar, cooldownSkill.getPriority())) {
                 event.setCancelled(true);
-                return;
             }
         } else if (skill instanceof PrepareArrowSkill prepareArrowSkill) {
             if (cooldownManager.hasCooldown(player, skill.getName())) {
@@ -125,18 +143,9 @@ public class SkillListener implements Listener {
                             Math.max(0, cooldownManager.getAbilityRecharge(player, skill.getName()).getRemaining()));
                 }
                 event.setCancelled(true);
-                return;
             }
         }
 
-        if (skill instanceof EnergySkill energySkill && !(skill instanceof ActiveToggleSkill)) {
-            if (energySkill.getEnergy(level) > 0) {
-                if (!energyHandler.use(player, skill.getName(), energySkill.getEnergy(level), true)) {
-                    event.setCancelled(true);
-                }
-            }
-
-        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
