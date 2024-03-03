@@ -165,9 +165,9 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
 
     public void loadSkillConfig() {
         speedDuration = getConfig("speedDuration", 3.0, Double.class);
+        speedStrength = getConfig("speedStrength", 2, Integer.class);
         slowDuration = getConfig("slowDuration", 3.0, Double.class);
         slownessStrength = getConfig("slownessStrength", 2, Integer.class);
-        speedStrength = getConfig("slownessStrength", 2, Integer.class);
     }
 
 }

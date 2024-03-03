@@ -83,8 +83,8 @@ public class CripplingBlow extends Skill implements PassiveSkill {
     @Override
     public void loadSkillConfig() {
         baseDuration = getConfig("baseDuration", 2.0, Double.class);
-        durationIncreasePerLevel = getConfig("baseDuration", 0.5, Double.class);
-        slownessStrength = getConfig("baseDuration", 0, Integer.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
+        slownessStrength = getConfig("slownessStrength", 0, Integer.class);
     }
 
 }

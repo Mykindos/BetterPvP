@@ -35,7 +35,7 @@ skills:
       enabled: true
       maxlevel: 3
       damageIncreasePerLevel: 1.5
-      damage: 1.5
+      baseDamage: 1.5
     smokebomb:
       enabled: true
       cooldown: 50.0
@@ -163,6 +163,7 @@ skills:
       cooldownDecreasePerLevel: 1.0
       speedDuration: 3.0
       slownessStrength: 2
+      speedStrength: 2
     fortitude:
       enabled: true
       maxlevel: 3
@@ -218,6 +219,7 @@ skills:
       baseDuration: 5.0
       slowDuration: 0.5
       slownessStrength: 3
+      resistanceStrength: 1
     swordsmanship:
       enabled: true
       maxlevel: 3
@@ -544,8 +546,9 @@ skills:
     cripplingblow:
       enabled: true
       maxlevel: 3
-      slowDuration: 2.0
       baseDuration: 2.0
+      durationIncreasePerLevel: 0.5
+      slownessStrength: 0
     fleshhook:
       enabled: true
       maxlevel: 5
