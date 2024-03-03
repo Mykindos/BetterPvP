@@ -58,21 +58,24 @@ public class SkillMenu extends AbstractGui implements Windowed {
         setItem(27, getSkillType(Material.RED_DYE, "Class Passive A Skills"));
         setItem(36, getSkillType(Material.ORANGE_DYE, "Class Passive B Skills"));
         setItem(45, getSkillType(Material.YELLOW_DYE, "Global Passive Skills"));
-        setItem(8, new ControlItem<SkillMenu>() {
-            @Override
-            public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
-                // ignored
-            }
 
-            @Override
-            public ItemProvider getItemProvider(SkillMenu gui) {
-                return ItemView.builder()
-                        .material(Material.NETHER_STAR)
-                        .amount(Math.max(1, roleBuild.getPoints()))
-                        .displayName(Component.text(roleBuild.getPoints() + " Skill Points Remaining", NamedTextColor.GREEN, TextDecoration.BOLD))
-                        .build();
-            }
-        });
+        if(roleBuild.getPoints() > 0) {
+            setItem(8, new ControlItem<SkillMenu>() {
+                @Override
+                public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
+                    // ignored
+                }
+
+                @Override
+                public ItemProvider getItemProvider(SkillMenu gui) {
+                    return ItemView.builder()
+                            .material(Material.NETHER_STAR)
+                            .amount(Math.max(1, roleBuild.getPoints()))
+                            .displayName(Component.text(roleBuild.getPoints() + " Skill Points Remaining", NamedTextColor.GREEN, TextDecoration.BOLD))
+                            .build();
+                }
+            });
+        }
 
         int slotNumber = 0;
         int swordSlotNumber = 1;
