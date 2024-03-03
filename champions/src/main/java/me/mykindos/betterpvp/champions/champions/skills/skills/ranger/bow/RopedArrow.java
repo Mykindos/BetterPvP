@@ -47,27 +47,9 @@ import java.util.WeakHashMap;
 @Singleton
 @BPvPListener
 public class RopedArrow extends PrepareArrowSkill {
-
-    private static final int MAX_STRENGTH = 3;
-    private final WeakHashMap<Player, Integer> strength = new WeakHashMap<>();
     private HashMap<UUID, Boolean> canTakeFall = new HashMap<>();
     public double fallDamageLimit;
 
-
-    // Action bar
-    private final PermanentComponent actionBarComponent = new PermanentComponent(gamer -> {
-        final Player player = gamer.getPlayer();
-
-        // Only display charges in hotbar if holding the weapon
-        if (player == null || !strength.containsKey(player) || !isHolding(player)) {
-            return null; // Skip if not online or not charging
-        }
-
-        final int curStrength = strength.get(player);
-        return Component.text(getName() + " Strength ").color(NamedTextColor.WHITE).decorate(TextDecoration.BOLD)
-                .append(Component.text("\u25A0".repeat(curStrength)).color(NamedTextColor.GREEN))
-                .append(Component.text("\u25A0".repeat(Math.max(0, MAX_STRENGTH - curStrength))).color(NamedTextColor.RED));
-    });
 
     @Inject
     public RopedArrow(Champions champions, ChampionsManager championsManager) {
@@ -87,24 +69,8 @@ public class RopedArrow extends PrepareArrowSkill {
                 "Your next arrow will pull you",
                 "towards the location it hits",
                 "",
-                "Left click when your shot is already",
-                "prepared to cycle pull strengths. Your",
-                "cooldown will be doubled for each strength",
-                "level",
-                "",
                 "Cooldown: <val>" + getCooldown(level) + "</val>"
         };
-    }
-
-    @Override
-    public void invalidatePlayer(Player player, Gamer gamer) {
-        strength.remove(player);
-        gamer.getActionBar().remove(actionBarComponent);
-    }
-
-    @Override
-    public void trackPlayer(Player player, Gamer gamer) {
-        gamer.getActionBar().add(900, actionBarComponent);
     }
 
     @Override
@@ -118,25 +84,9 @@ public class RopedArrow extends PrepareArrowSkill {
     }
 
     @Override
-    public void processEntityShootBowEvent(EntityShootBowEvent event, Player player, int level, Arrow arrow) {
-        super.processEntityShootBowEvent(event, player, level, arrow);
-        final int strengthLvl = this.strength.getOrDefault(player, 1);
-        final double cdMult = Math.pow(2, strengthLvl - 1d);
-        championsManager.getCooldowns().removeCooldown(player, getName(), true);
-        championsManager.getCooldowns().use(player,
-                getName(),
-                getCooldown(level) * cdMult,
-                showCooldownFinished(),
-                false,
-                isCancellable(),
-                this::shouldDisplayActionBar);
-    }
-
-    @Override
     public void activate(Player player, int level) {
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
         active.add(player.getUniqueId());
-        strength.put(player, 1);
     }
 
     @EventHandler
@@ -147,15 +97,12 @@ public class RopedArrow extends PrepareArrowSkill {
         if (!hasSkill(player)) return;
 
         Vector vec = UtilVelocity.getTrajectory(player, arrow);
-        final int curStrength = this.strength.getOrDefault(player, 0);
-        double mult = arrow.getVelocity().length() / 3.0D;
 
-        VelocityData velocityData = new VelocityData(vec, 2.5D + mult * curStrength, false, 0.8D, 0.3D * mult, 1.5D * mult, true);
+        VelocityData velocityData = new VelocityData(vec, 1.8D, false, 0.8D, 0.3D, 1.5D, true);
         UtilVelocity.velocity(player, null, velocityData);
 
         arrow.getWorld().playSound(arrow.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
         arrows.remove(arrow);
-        strength.remove(player);
         canTakeFall.put(player.getUniqueId(), true);
     }
 
@@ -189,25 +136,6 @@ public class RopedArrow extends PrepareArrowSkill {
                 }, 2L);
             }
         }
-    }
-
-    @Override
-    public boolean canUse(Player player) {
-        if (active.contains(player.getUniqueId())) {
-            // Meaning they have already prepared a shot
-            int curStrength = strength.compute(player, (p, current) -> {
-                final int newStrength = Optional.ofNullable(current).orElse(0) + 1;
-                if (newStrength > MAX_STRENGTH) {
-                    return 1;
-                } else {
-                    return newStrength;
-                }
-            });
-
-            player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.4f + curStrength * 0.2f);
-            return false;
-        }
-        return super.canUse(player);
     }
 
     @Override
