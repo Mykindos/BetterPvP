@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
 import me.mykindos.betterpvp.core.utilities.events.GetEntityRelationshipEvent;
 import me.mykindos.betterpvp.core.utilities.model.EntityRemovalReason;
+import me.mykindos.betterpvp.core.utilities.model.MultiRayTraceResult;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
@@ -24,9 +25,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
@@ -71,6 +74,23 @@ public class UtilEntity {
     public static Optional<Entity> getEntity(@NotNull World world, int id) {
         return Optional.ofNullable(((CraftWorld) world).getHandle().getEntity(id))
                 .map(net.minecraft.world.entity.Entity::getBukkitEntity);
+    }
+
+    public static Optional<MultiRayTraceResult> interpolateMultiCollision(@NotNull Location lastLocation, @NotNull Location destination, float raySize, @Nullable Predicate<Entity> entityFilter) {
+        Set<RayTraceResult> hits = new HashSet<>();
+        boolean empty;
+        do {
+            Optional<RayTraceResult> hit = UtilEntity.interpolateCollision(lastLocation,
+                    destination,
+                    raySize,
+                    ent -> hits.stream().noneMatch(result -> result.getHitEntity() == ent) && (entityFilter == null || entityFilter.test(ent)));
+            hit.ifPresent(hits::add);
+            empty = hit.isEmpty();
+        } while (!empty);
+
+        return hits.isEmpty()
+                ? Optional.empty()
+                : Optional.of(new MultiRayTraceResult(hits.toArray(new RayTraceResult[0])));
     }
 
     public static Optional<RayTraceResult> interpolateCollision(@NotNull Location lastLocation, @NotNull Location destination, float raySize, @Nullable Predicate<Entity> entityFilter) {

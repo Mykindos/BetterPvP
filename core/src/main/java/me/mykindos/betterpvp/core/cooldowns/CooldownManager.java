@@ -134,6 +134,26 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
         UtilMessage.simpleMessage(player, "Cooldown", "You cannot use <alt>%s</alt> for <alt>%s</alt> seconds.", ability, Math.max(0, getAbilityRecharge(player, ability).getRemaining()));
     }
 
+    public void reduceCooldown(Player player, String ability, double reductionSeconds) {
+        Optional<ConcurrentHashMap<String, Cooldown>> cooldownOptional = getObject(player.getUniqueId().toString());
+        if (cooldownOptional.isPresent()) {
+            ConcurrentHashMap<String, Cooldown> cooldowns = cooldownOptional.get();
+            Cooldown cooldown = cooldowns.get(ability);
+            if (cooldown != null) {
+                long reductionMillis = (long) (reductionSeconds * 1000);
+                long newSystemTime = cooldown.getSystemTime() - reductionMillis;
+
+                if (newSystemTime > cooldown.getSystemTime()) {
+                    newSystemTime = cooldown.getSystemTime();
+                }
+
+                Cooldown newCooldown = new Cooldown(cooldown.getSeconds() / 1000.0, newSystemTime, cooldown.isRemoveOnDeath(), cooldown.isInform(), cooldown.isCancellable());
+
+                cooldowns.put(ability, newCooldown);
+            }
+        }
+    }
+
     public Cooldown getAbilityRecharge(Player player, String ability) {
         Optional<ConcurrentHashMap<String, Cooldown>> cooldownOptional = getObject(player.getUniqueId().toString());
         if (cooldownOptional.isPresent()) {
