@@ -80,6 +80,18 @@ skills:
       cooldownDecreasePerLevel: 1.0
       baseDuration: 0.0
       durationIncreasePerLevel: 1.5
+    slash:
+      enabled: true
+      maxlevel: 3
+      cooldown: 17.0
+      cooldownDecreasePerLevel: 1.0
+      damage: 2.0
+      damageIncreasePerLevel: 2.0
+      distance: 5.0
+      cooldownReductionPerHit: 4.0
+      distanceIncreasePerLevel: 1.0
+      cooldownReduction: 4.0
+      cooldownReductionPerLevel: 1.0
     excessiveforce:
       enabled: true
       cooldown: 16.0
