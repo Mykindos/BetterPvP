@@ -143,8 +143,8 @@ public class HoldPosition extends Skill implements InteractSkill, CooldownSkill,
 
     public void loadSkillConfig() {
         baseDuration = getConfig("baseDuration", 5.0, Double.class);
-        durationIncreasePerLevel = getConfig("slowDuration", 0.5, Double.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
         slownessStrength = getConfig("slownessStrength", 3, Integer.class);
-        resistanceStrength = getConfig("slownessStrength", 1, Integer.class);
+        resistanceStrength = getConfig("resistanceStrength", 1, Integer.class);
     }
 }
