@@ -27,6 +27,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -83,6 +84,7 @@ public class GlacialBlade extends Skill implements PassiveSkill, CooldownSkill, 
     public void onSwing(PlayerInteractEvent event) {
         if (!SkillWeapons.isHolding(event.getPlayer(), SkillType.SWORD)) return;
         if (!event.getAction().isLeftClick()) return;
+        if(event.useItemInHand() == Event.Result.DENY) return;
 
         Player player = event.getPlayer();
         int level = getLevel(player);
