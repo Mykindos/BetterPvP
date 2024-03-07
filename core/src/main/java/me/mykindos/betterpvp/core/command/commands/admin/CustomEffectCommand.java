@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -65,13 +66,12 @@ public class CustomEffectCommand extends Command {
                 return;
             }
 
-            EffectType effect;
-            try {
-                effect = EffectType.valueOf(args[1].toUpperCase());
-            } catch (IllegalArgumentException e) {
+            EffectType effect = EffectTypes.getEffectTypes().stream().filter(effectType -> effectType.getName().equalsIgnoreCase(args[1])).findFirst().orElse(null);
+            if(effect == null) {
                 UtilMessage.message(player, "Core", UtilMessage.deserialize("<yellow>%s</yellow> is not a valid effect", args[1]));
                 return;
             }
+
             int duration = 30;
             if (args.length >= 3) {
                 try {
@@ -94,7 +94,7 @@ public class CustomEffectCommand extends Command {
 
             }
             effectManager.addEffect(target, effect, strength, duration * 1000L);
-            Component message = UtilMessage.deserialize("<yellow>%s</yellow> applied <white>%s %s</white> to <yellow>%s</yellow> for <green>%s</green> seconds", player.getName(), effect.name(), strength, target.getName(), duration);
+            Component message = UtilMessage.deserialize("<yellow>%s</yellow> applied <white>%s %s</white> to <yellow>%s</yellow> for <green>%s</green> seconds", player.getName(), effect.getName(), strength, target.getName(), duration);
             gamerManager.sendMessageToRank("Effect", message, Rank.HELPER);
         }
 
@@ -142,16 +142,15 @@ public class CustomEffectCommand extends Command {
                 gamerManager.sendMessageToRank("Effect", message, Rank.HELPER);
                 return;
             }
-            EffectType effect;
-            try {
-                effect = EffectType.valueOf(args[1].toUpperCase());
-            } catch (IllegalArgumentException e) {
+
+            EffectType effect = EffectTypes.getEffectTypes().stream().filter(effectType -> effectType.getName().equalsIgnoreCase(args[1])).findFirst().orElse(null);
+            if(effect == null) {
                 UtilMessage.message(player, "Core", UtilMessage.deserialize("<yellow>%s</yellow> is not a valid effect", args[1]));
                 return;
             }
 
             effectManager.removeEffect(target, effect);
-            Component message = UtilMessage.deserialize("<yellow>%s</yellow> removed <white>%s</white> from <yellow>%s</yellow>", player.getName(), effect.name(), target.getName());
+            Component message = UtilMessage.deserialize("<yellow>%s</yellow> removed <white>%s</white> from <yellow>%s</yellow>", player.getName(), effect.getName(), target.getName());
             gamerManager.sendMessageToRank("Effect", message, Rank.HELPER);
         }
 

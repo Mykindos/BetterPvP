@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
@@ -16,8 +17,6 @@ import me.mykindos.betterpvp.core.utilities.UtilSound;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 @Singleton
 @BPvPListener
@@ -74,16 +73,7 @@ public class Bloodthirst extends Skill implements PassiveSkill {
                     double distanceA = player.getLocation().distance(target.getLocation());
                     double distanceB = player.getLocation().add(player.getLocation().getDirection()).distance(target.getLocation());
                     if (distanceA - distanceB > 0.6) {
-                        if (player.hasPotionEffect(PotionEffectType.SPEED)) {
-                            PotionEffect speed = player.getPotionEffect(PotionEffectType.SPEED);
-                            if (speed != null) {
-                                if (speed.getAmplifier() < speedStrength) {
-                                    player.removePotionEffect(PotionEffectType.SPEED);
-                                }
-                            }
-                        }
-
-                        player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 30, speedStrength));
+                        championsManager.getEffects().addEffect(player, player, EffectTypes.SPEED, speedStrength, 1500);
                         UtilSound.playSound(player.getWorld(), player, Sound.ENTITY_WARDEN_HEARTBEAT, 1, 0.2f);
                         break;
                     }

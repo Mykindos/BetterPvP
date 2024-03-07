@@ -10,14 +10,13 @@ import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import java.util.WeakHashMap;
 
@@ -84,7 +83,7 @@ public class HuntersThrill extends Skill implements PassiveSkill {
 
             StackingHitData hitData = data.get(damager);
             hitData.addCharge();
-            damager.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) (getDuration(getLevel(damager)) * 20), Math.min(maxConsecutiveHits, hitData.getCharge()) - 1));
+            championsManager.getEffects().addEffect(damager, EffectTypes.SPEED, Math.min(maxConsecutiveHits, hitData.getCharge()), (long) (getDuration(level) * 1000));
         }
 
     }

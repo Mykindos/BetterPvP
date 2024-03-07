@@ -7,7 +7,7 @@ mushroom_stew:
   enabled: true
   cooldown: 14.0
   duration: 4.0
-  level: 2
+  level: 3
 warlock_boots:
   enabled: true
 warlock_vest:

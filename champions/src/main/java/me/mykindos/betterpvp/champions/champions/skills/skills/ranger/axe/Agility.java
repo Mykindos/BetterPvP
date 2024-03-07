@@ -12,11 +12,11 @@ import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -29,8 +29,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -176,7 +174,7 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
     @Override
     public void activate(Player player, int level) {
         if (!active.containsKey(player.getUniqueId())) {
-            player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) (getDuration(level) * 20), speedStrength));
+            championsManager.getEffects().addEffect(player, EffectTypes.SPEED, getName(), speedStrength, (long) getDuration(level) * 1000);
             player.getWorld().playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.5F, 0.5F);
             active.put(player.getUniqueId(), (long) (System.currentTimeMillis() + (getDuration(level) * 1000L)));
         }
@@ -185,9 +183,7 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
     public void deactivate(Player player) {
         UtilMessage.message(player, "Champions", UtilMessage.deserialize("<green>%s %s</green> has ended.", getName(), getLevel(player)));
         player.getWorld().playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.5F, 0.25F);
-        if (!UtilPlayer.hasPotionEffect(player, PotionEffectType.SPEED, speedStrength + 1)) {
-            player.removePotionEffect(PotionEffectType.SPEED);
-        }
+        championsManager.getEffects().removeEffect(player, EffectTypes.SPEED, getName());
     }
 
     @Override
@@ -201,6 +197,6 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
         baseDamageReduction = getConfig("baseDamageReduction", 0.60, Double.class);
         damageReductionIncreasePerLevel = getConfig("damageReductionIncreasePerLevel", 0.0, Double.class);
-        speedStrength = getConfig("speedStrength", 1, Integer.class);
+        speedStrength = getConfig("speedStrength", 2, Integer.class);
     }
 }

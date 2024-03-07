@@ -14,7 +14,7 @@ import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
@@ -161,7 +161,7 @@ public class Swarm extends ChannelSkill implements InteractSkill, EnergySkill, L
                             if (!UtilTime.elapsed(batCD.get(other), 500)) continue;
                         }
                         batCD.put((Player) other, System.currentTimeMillis());
-                        championsManager.getEffects().addEffect((Player) other, EffectType.SHOCK, 800L);
+                        championsManager.getEffects().addEffect(other, EffectTypes.SHOCK, 800L);
                     }
 
 

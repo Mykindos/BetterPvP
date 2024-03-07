@@ -11,7 +11,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
@@ -30,8 +30,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileHitEvent;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import java.util.WeakHashMap;
 
@@ -152,8 +150,8 @@ public class PinDown extends Skill implements InteractSkill, CooldownSkill, List
         }
 
         final int level = getLevel(shooter);
-        target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) (getDuration(level) * 20), slownessStrength));
-        championsManager.getEffects().addEffect(target, EffectType.NO_JUMP, (long) getDuration(level) * 1000);
+        championsManager.getEffects().addEffect(target, EffectTypes.SLOWNESS, slownessStrength, (long) getDuration(level) * 1000);
+        championsManager.getEffects().addEffect(target, EffectTypes.NO_JUMP, (long) getDuration(level) * 1000);
         UtilMessage.message(shooter, getName(), "You hit <alt2>%s</alt2> with <alt>%s %s</alt>.", target.getName(), getName(), level);
         UtilMessage.message(target, getName(), "<alt2>%s</alt2> hit you with <alt>%s %s</alt>.", shooter.getName(), getName(), level);
         arrows.remove(arrow);
@@ -173,6 +171,6 @@ public class PinDown extends Skill implements InteractSkill, CooldownSkill, List
     public void loadSkillConfig() {
         baseDuration = getConfig("baseDuration", 1.5, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.5, Double.class);
-        slownessStrength = getConfig("slownessStrength", 3, Integer.class);
+        slownessStrength = getConfig("slownessStrength", 4, Integer.class);
     }
 }

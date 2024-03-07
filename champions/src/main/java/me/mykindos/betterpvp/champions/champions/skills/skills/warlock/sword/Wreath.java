@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
@@ -35,8 +36,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
@@ -202,7 +201,7 @@ public class Wreath extends Skill implements InteractSkill, Listener {
                 for (LivingEntity target : UtilEntity.getNearbyEnemies(player, fangs.getLocation(), 1.5)) {
                     CustomDamageEvent dmg = new CustomDamageEvent(target, player, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, getName());
                     UtilDamage.doCustomDamage(dmg);
-                    target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) (getSlowDuration(level) * 20), slowStrength));
+                    championsManager.getEffects().addEffect(target, player, EffectTypes.SLOWNESS, slowStrength, (long) (getSlowDuration(level) * 1000));
                     UtilPlayer.health(player, healthPerEnemyHit);
                 }
 
@@ -276,7 +275,7 @@ public class Wreath extends Skill implements InteractSkill, Listener {
         baseDamage = getConfig("baseDamage", 4.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.66, Double.class);
         healthPerEnemyHit = getConfig("healthPerEnemyHit", 1.0, Double.class);
-        slowStrength = getConfig("slowStrength", 1, Integer.class);
+        slowStrength = getConfig("slowStrength", 2, Integer.class);
         maxCharges = getConfig("maxCharges", 3, Integer.class);
         maxChargesIncreasePerLevel = getConfig("maxChargesIncreasePerLevel", 0, Integer.class);
         rechargeSeconds = getConfig("rechargeSeconds", 10.0, Double.class);

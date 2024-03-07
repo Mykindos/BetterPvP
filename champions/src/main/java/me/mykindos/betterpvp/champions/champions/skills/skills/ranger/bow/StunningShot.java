@@ -9,7 +9,7 @@ import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Location;
@@ -76,7 +76,7 @@ public class StunningShot extends PrepareArrowSkill {
         if(!(target instanceof Player player)) return;
         UtilMessage.message(damager, getClassType().getName(), UtilMessage.deserialize("You hit <yellow>%s</yellow> with <green>%s %s</green>.", player.getName(), getName(), level));
         UtilMessage.message(player, getClassType().getName(), UtilMessage.deserialize("You were hit by <yellow>%s</yellow> with <green>%s %s</green>", damager.getName(), getName(), level));
-        championsManager.getEffects().addEffect(player, EffectType.STUN, (long) (getDuration(level) * 1000));
+        championsManager.getEffects().addEffect(player, EffectTypes.STUN, (long) (getDuration(level) * 1000));
     }
 
     @Override

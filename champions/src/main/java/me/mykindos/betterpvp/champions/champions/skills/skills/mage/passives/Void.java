@@ -9,7 +9,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -17,8 +17,6 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import java.util.HashMap;
 
@@ -94,9 +92,9 @@ public class Void extends ActiveToggleSkill implements EnergySkill {
     @Override
     public void cancel(Player player, String reason) {
         super.cancel(player, reason);
-        player.removePotionEffect(PotionEffectType.INVISIBILITY);
-        player.removePotionEffect(PotionEffectType.SLOW);
-        championsManager.getEffects().removeEffect(player, EffectType.NO_JUMP);
+        championsManager.getEffects().removeEffect(player, EffectTypes.INVISIBILITY, getName());
+        championsManager.getEffects().removeEffect(player, EffectTypes.SLOWNESS, getName());
+        championsManager.getEffects().removeEffect(player, EffectTypes.NO_JUMP, getName());
     }
 
     private void audio(Player player) {
@@ -113,9 +111,9 @@ public class Void extends ActiveToggleSkill implements EnergySkill {
             return false;
         }
 
-        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 21, slownessStrength));
-        player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 21, 1, false, false, false));
-        championsManager.getEffects().addEffect(player, EffectType.NO_JUMP, 21);
+        championsManager.getEffects().addEffect(player, EffectTypes.SLOWNESS, getName(), slownessStrength, 55);
+        championsManager.getEffects().addEffect(player, EffectTypes.INVISIBILITY, getName(), 1, 55);
+        championsManager.getEffects().addEffect(player, EffectTypes.NO_JUMP, getName(), 1, 55);
 
         return true;
     }
@@ -155,6 +153,6 @@ public class Void extends ActiveToggleSkill implements EnergySkill {
         baseEnergyReduction = getConfig("baseEnergyReduction", 3.0, Double.class);
         energyReductionDecreasePerLevel = getConfig("energyReductionDecreasePerLevel", 0.5, Double.class);
 
-        slownessStrength = getConfig("slownessStrength", 2, Integer.class);
+        slownessStrength = getConfig("slownessStrength", 3, Integer.class);
     }
 }

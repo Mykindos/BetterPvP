@@ -10,7 +10,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.effects.events.EffectClearEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
@@ -108,10 +108,10 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
         UtilPlayer.slowDrainHealth(champions, player, proposedHealth, 5, false);
 
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_EVOKER_PREPARE_WOLOLO, 1.0f, 0.9f);
-        championsManager.getEffects().addEffect(player, EffectType.IMMUNETOEFFECTS, (long) (getDuration(level) * 1000L));
+        championsManager.getEffects().addEffect(player, EffectTypes.IMMUNE, (long) (getDuration(level) * 1000L));
 
         for (Player ally : UtilPlayer.getNearbyAllies(player, player.getLocation(), getRange(level))) {
-            championsManager.getEffects().addEffect(ally, EffectType.IMMUNETOEFFECTS, (long) (getDuration(level) * 1000L));
+            championsManager.getEffects().addEffect(ally, EffectTypes.IMMUNE, (long) (getDuration(level) * 1000L));
             UtilMessage.simpleMessage(ally, "Cleanse", "You were cleansed of negative by <alt>" + player.getName());
             UtilServer.callEvent(new EffectClearEvent(ally));
         }
