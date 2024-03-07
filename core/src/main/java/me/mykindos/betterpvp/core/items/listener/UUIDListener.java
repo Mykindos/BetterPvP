@@ -147,7 +147,7 @@ public class UUIDListener implements Listener {
         }
         Location location = victim.getLocation();
         for (UUIDItem item : uuidItemsList) {
-            UUID logID = Logger.info("<yellow>%s</yellow> was killed while holding <light_purple>%s<light_purple> by <yellow>%s</yellow> at (<green>%s</green>, <green>%s</green>, <green>%s</green>) in <green>%s</green>, contributed by %s",
+            UUID logID = Logger.info("<yellow>%s</yellow> was killed while holding <light_purple>%s</light_purple> by <yellow>%s</yellow> at (<green>%s</green>, <green>%s</green>, <green>%s</green>) in <green>%s</green>, contributed by %s",
                     victim.getName(), item.getUuid(), killer.getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName(), contributors);
             UUIDLogger.addItemUUIDMetaInfoPlayer(logID, item.getUuid(), UUIDLogger.UUIDLogType.DEATH_PLAYER, victim.getUniqueId());
             UUIDLogger.addItemUUIDMetaInfoPlayer(logID, item.getUuid(), UUIDLogger.UUIDLogType.KILL, killer.getUniqueId());

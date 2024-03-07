@@ -70,9 +70,9 @@ public class LegendLogSubcommand extends Command {
         String message = String.join(" ", Arrays.stream(args).toList().subList(2, args.length));
 
         if (!args[1].equalsIgnoreCase("null")) {
-            clientManager.search().offline(args[0], clientOptional -> {
+            clientManager.search().offline(args[1], clientOptional -> {
                 if (clientOptional.isEmpty()) {
-                    UtilMessage.message(player, "Search", UtilMessage.deserialize("<yellow>%s</yellow> is not a valid Player.", args[0]));
+                    UtilMessage.message(player, "Search", UtilMessage.deserialize("<yellow>%s</yellow> is not a valid Player.", args[1]));
                     return;
                 }
                 run(player, uuid, clientOptional.get(), message);
