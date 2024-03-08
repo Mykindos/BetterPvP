@@ -41,6 +41,8 @@ import java.util.List;
 import java.util.WeakHashMap;
 import java.util.stream.Collectors;
 
+import static me.mykindos.betterpvp.core.utilities.UtilEntity.getNearbyEnemies;
+
 @Singleton
 @BPvPListener
 public class Sever extends Skill implements CooldownSkill, Listener, InteractSkill {
@@ -108,29 +110,20 @@ public class Sever extends Skill implements CooldownSkill, Listener, InteractSki
 
         drawParticleLine(playerChestLocation, directionVector, hitDistance, player);
 
-        // use this to get make sure the entities are enemies
-        List<KeyValue<LivingEntity, EntityProperty>> keyValueList = UtilEntity.getNearbyEntities(player, midpointLocation, hitDistance / 2, EntityProperty.ENEMY);
-
-        // extract LivingEntity objects from the key values
-        List<LivingEntity> nearbyEntities = keyValueList.stream()
-                .map(KeyValue::getKey) // get each key from list
-                .collect(Collectors.toList()); // collect to list
+        List<LivingEntity> nearbyEnemies = getNearbyEnemies(player, midpointLocation, hitDistance / 2);
 
         Vector playerDirection = player.getLocation().getDirection().normalize();
 
-        // filter entities not within the specified angle
-        nearbyEntities.removeIf(entity -> {
+        nearbyEnemies.removeIf(entity -> {
             Vector toEntity = entity.getLocation().subtract(player.getLocation()).toVector().normalize();
             double angle = toEntity.angle(playerDirection);
             return Math.toDegrees(angle) > getDegrees(level);
         });
 
-        // apply effects to remaining entities
-        for (LivingEntity target : nearbyEntities) {
+        for (LivingEntity target : nearbyEnemies) {
             championsManager.getEffects().addEffect(target, EffectType.BLEED, (long) getDuration(level) * 1000L);
             UtilMessage.simpleMessage(player, getClassType().getName(), "You severed <alt>" + target.getName() + "</alt>.");
             UtilMessage.simpleMessage(target, getClassType().getName(), "You have been severed by <alt>" + player.getName() + "</alt>.");
-
         }
 
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SPIDER_HURT, 1.0F, 1.5F);
