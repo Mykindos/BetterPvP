@@ -23,8 +23,7 @@ public class StunListener implements Listener {
 
     @EventHandler
     public void onMove(PlayerMoveEvent event) {
-        if (event.getFrom().getX() != event.getTo().getX() || event.getFrom().getZ() != event.getTo().getZ()
-                || event.getFrom().getY() != event.getTo().getY()) {
+        if (event.hasChangedPosition()) {
             if (effectManager.hasEffect(event.getPlayer(), EffectTypes.STUN)) {
                 event.setCancelled(true);
             }
