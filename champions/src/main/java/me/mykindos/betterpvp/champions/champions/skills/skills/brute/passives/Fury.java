@@ -109,9 +109,6 @@ public class Fury extends Skill implements PassiveSkill, Listener {
             BukkitTask task = Bukkit.getScheduler().runTaskLater(champions, () -> {
                 playerNumHitsMap.put(player, 0);
                 playerTasks.remove(player);
-                if (!player.isDead()) {
-                    player.playSound(player.getLocation(), Sound.BLOCK_FIRE_EXTINGUISH, (float) 2.0, (float) 1.5);
-                }
             }, (long) expirationTime * 20L);
 
             playerTasks.put(player, task);

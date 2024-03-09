@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -90,6 +91,7 @@ public class Thorns extends Skill implements PassiveSkill, Listener {
 
         if (timestamps.size() == 3) {
             double reflectedDamage = event.getDamage() * getDamagePercent(getLevel(player));
+            player.playSound(player.getLocation(), Sound.ENCHANT_THORNS_HIT, 1.0F, 1.0F);
             UtilDamage.doCustomDamage(new CustomDamageEvent(damager, player, null, DamageCause.ENTITY_ATTACK, reflectedDamage, true, getName()));
             timestamps.clear();
         }
