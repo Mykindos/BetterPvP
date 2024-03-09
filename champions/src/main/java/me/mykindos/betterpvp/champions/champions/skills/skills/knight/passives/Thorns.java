@@ -72,12 +72,14 @@ public class Thorns extends Skill implements PassiveSkill, Listener {
         return SkillType.PASSIVE_A;
     }
 
-    @EventHandler (priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onDamage(CustomDamageEvent event) {
         if (event.isCancelled()) return;
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
         if (!(event.getDamagee() instanceof Player player)) return;
         if (event.getDamager() == null) return;
+
+        if(getLevel(player) < 1) return;
 
         LivingEntity damager = event.getDamager();
         hitTimestamps.putIfAbsent(player, new LinkedList<>());
