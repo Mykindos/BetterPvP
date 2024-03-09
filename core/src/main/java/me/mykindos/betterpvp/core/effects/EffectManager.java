@@ -121,7 +121,7 @@ public class EffectManager extends Manager<List<Effect>> {
         Optional<List<Effect>> effectsOptional = getObject(target.getUniqueId().toString());
         effectsOptional.ifPresent(effects -> {
             effects.removeIf(effect -> {
-                if (effect.getUuid().equals(target.getUniqueId().toString()) && effect.getEffectType() == type) {
+                if (effect.getEffectType() == type) {
 
                     if (effect.getEffectType() instanceof VanillaEffectType vanillaEffectType) {
                         vanillaEffectType.onExpire(target, effect);
@@ -140,7 +140,7 @@ public class EffectManager extends Manager<List<Effect>> {
         Optional<List<Effect>> effectsOptional = getObject(target.getUniqueId().toString());
         effectsOptional.ifPresent(effects -> {
             effects.removeIf(effect -> {
-                if (effect.getUuid().equals(target.getUniqueId().toString()) && effect.getEffectType() == type && effect.getName().equalsIgnoreCase(name)) {
+                if (effect.getEffectType() == type && effect.getName().equalsIgnoreCase(name)) {
 
                     if (effect.getEffectType() instanceof VanillaEffectType vanillaEffectType) {
                         vanillaEffectType.onExpire(target, effect);

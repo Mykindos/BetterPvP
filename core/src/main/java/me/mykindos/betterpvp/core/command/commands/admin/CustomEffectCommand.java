@@ -66,7 +66,7 @@ public class CustomEffectCommand extends Command {
                 return;
             }
 
-            EffectType effect = EffectTypes.getEffectTypes().stream().filter(effectType -> effectType.getName().equalsIgnoreCase(args[1])).findFirst().orElse(null);
+            EffectType effect = EffectTypes.getEffectTypes().stream().filter(effectType -> effectType.getName().equalsIgnoreCase(args[1].replace("_", " "))).findFirst().orElse(null);
             if(effect == null) {
                 UtilMessage.message(player, "Core", UtilMessage.deserialize("<yellow>%s</yellow> is not a valid effect", args[1]));
                 return;

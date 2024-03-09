@@ -132,7 +132,7 @@ public class HyperAxe extends Weapon implements InteractWeapon, LegendaryWeapon,
             int duration = meta.getPersistentDataContainer().getOrDefault(ChampionsNamespacedKeys.HYPER_AXE_DURATION, PersistentDataType.INTEGER, 80);
             if (cooldownManager.use(player, "Hyper Rush", hyperRushCooldown, true)) {
                 UtilMessage.simpleMessage(player, "Hyper Axe", "You used <green>Hyper Rush<gray>.");
-                effectManager.addEffect(player, EffectTypes.SPEED, level, (long) (duration / 20) * 1000);
+                effectManager.addEffect(player, EffectTypes.SPEED, level, (long) ((duration / 20d) * 1000));
                 UtilSound.playSound(player.getWorld(), player.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1, 1);
             }
         }
