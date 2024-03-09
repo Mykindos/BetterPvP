@@ -109,7 +109,7 @@ public class Polymorph extends PrepareSkill implements CooldownSkill {
         Iterator<Entry<LivingEntity, Long>> it = polymorphed.entrySet().iterator();
         while (it.hasNext()) {
             Entry<LivingEntity, Long> next = it.next();
-            if (UtilTime.elapsed(next.getValue(), (long) polymorphDuration * 1000)) {
+            if (UtilTime.elapsed(next.getValue(), (long) (polymorphDuration * 1000))) {
                 UtilMessage.message(next.getKey(), getName(), "You are no longer polymorphed.");
                 DisguiseAPI.undisguiseToAll(next.getKey());
                 it.remove();

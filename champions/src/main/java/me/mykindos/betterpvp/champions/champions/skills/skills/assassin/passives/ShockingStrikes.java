@@ -73,7 +73,7 @@ public class ShockingStrikes extends Skill implements PassiveSkill, Listener {
         if (level <= 0) return;
 
         championsManager.getEffects().addEffect(damagee, damager, EffectTypes.SHOCK, (long) (getDuration(level) * 1000L));
-        championsManager.getEffects().addEffect(damagee, damager, EffectTypes.SLOWNESS, slownessStrength, (long) slownessDuration * 1000);
+        championsManager.getEffects().addEffect(damagee, damager, EffectTypes.SLOWNESS, slownessStrength, (long) (slownessDuration * 1000));
         event.addReason(getName());
 
     }
