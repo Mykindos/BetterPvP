@@ -244,7 +244,7 @@ skills:
       maxlevel: 3
       baseDamagePercent: 0.4
       percentIncreasePerLevel: 0.1
-      reflectTime: 1.5
+      reflectTime: 2.0
     sacrifice:
       enabled: true
       maxlevel: 3

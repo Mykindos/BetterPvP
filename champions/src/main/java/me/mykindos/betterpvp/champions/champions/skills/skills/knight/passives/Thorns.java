@@ -111,6 +111,6 @@ public class Thorns extends Skill implements PassiveSkill, Listener {
     public void loadSkillConfig() {
         baseDamagePercent = getConfig("returnDamagePercent", 0.4, Double.class);
         percentIncreasePerLevel = getConfig("percentIncreasePerLevel", 0.1, Double.class);
-        reflectTime = getConfig("reflectTime", 1.5, Double.class);
+        reflectTime = getConfig("reflectTime", 2.0, Double.class);
     }
 }
