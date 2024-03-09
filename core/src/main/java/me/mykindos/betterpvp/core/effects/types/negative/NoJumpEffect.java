@@ -34,5 +34,10 @@ public class NoJumpEffect extends VanillaEffectType {
         UtilEffect.applyCraftEffect(livingEntity, new PotionEffect(getVanillaPotionType(), effect.getVanillaDuration() + 1, defaultAmplifier()));
     }
 
+    @Override
+    public void checkActive(LivingEntity livingEntity, Effect effect) {
+        UtilEffect.applyCraftEffect(livingEntity, new PotionEffect(getVanillaPotionType(), effect.getRemainingVanillaDuration() + 1, defaultAmplifier()));
+    }
+
 }
 

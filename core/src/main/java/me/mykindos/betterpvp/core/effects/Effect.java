@@ -41,10 +41,10 @@ public class Effect {
     }
 
     public int getVanillaDuration() {
-        return (int) ((rawLength / 1000) * 20);
+        return (int) ((rawLength / 1000d) * 20);
     }
 
     public int getRemainingVanillaDuration() {
-        return (int) ((getRemainingDuration() / 1000) * 20);
+        return (int) ((getRemainingDuration() / 1000d) * 20);
     }
 }

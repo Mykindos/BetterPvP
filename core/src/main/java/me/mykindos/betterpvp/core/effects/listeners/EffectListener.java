@@ -71,14 +71,6 @@ public class EffectListener implements Listener {
 
     }
 
-
-    @EventHandler
-    public void poisonDamageMultiplier(CustomDamageEvent event) {
-        if (event.getCause() != EntityDamageEvent.DamageCause.POISON) return;
-        Optional<Effect> effectOptional = effectManager.getEffect(event.getDamagee(), EffectTypes.POISON);
-        effectOptional.ifPresent(effect -> event.setDamage(event.getDamage() * effect.getAmplifier()));
-    }
-
     @EventHandler
     public void onEventClear(EffectClearEvent event) {
         effectManager.removeNegativeEffects(event.getPlayer());
