@@ -43,7 +43,7 @@ public class MushroomStew extends Weapon implements InteractWeapon, CooldownWeap
 
     @Override
     public void activate(Player player) {
-        effectManager.addEffect(player, EffectTypes.REGENERATION, level, (long) duration * 1000);
+        effectManager.addEffect(player, EffectTypes.REGENERATION, level, (long) (duration * 1000));
         UtilMessage.message(player, "Item",
                 Component.text("You consumed a ", NamedTextColor.GRAY).append(getName().color(NamedTextColor.YELLOW)));
         UtilSound.playSound(player, Sound.ENTITY_PLAYER_BURP, 1f, 1f, false);
@@ -81,6 +81,6 @@ public class MushroomStew extends Weapon implements InteractWeapon, CooldownWeap
     @Override
     public void loadWeaponConfig() {
         duration = getConfig("duration", 4.0, Double.class);
-        level = getConfig("level", 3, Integer.class);
+        level = getConfig("level", 2, Integer.class);
     }
 }

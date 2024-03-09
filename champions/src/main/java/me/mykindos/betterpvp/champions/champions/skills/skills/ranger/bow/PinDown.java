@@ -150,8 +150,8 @@ public class PinDown extends Skill implements InteractSkill, CooldownSkill, List
         }
 
         final int level = getLevel(shooter);
-        championsManager.getEffects().addEffect(target, EffectTypes.SLOWNESS, slownessStrength, (long) getDuration(level) * 1000);
-        championsManager.getEffects().addEffect(target, EffectTypes.NO_JUMP, (long) getDuration(level) * 1000);
+        championsManager.getEffects().addEffect(target, EffectTypes.SLOWNESS, slownessStrength, (long) (getDuration(level) * 1000));
+        championsManager.getEffects().addEffect(target, EffectTypes.NO_JUMP, (long) (getDuration(level) * 1000));
         UtilMessage.message(shooter, getName(), "You hit <alt2>%s</alt2> with <alt>%s %s</alt>.", target.getName(), getName(), level);
         UtilMessage.message(target, getName(), "<alt2>%s</alt2> hit you with <alt>%s %s</alt>.", shooter.getName(), getName(), level);
         arrows.remove(arrow);

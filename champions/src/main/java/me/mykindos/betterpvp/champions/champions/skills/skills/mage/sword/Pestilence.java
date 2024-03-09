@@ -100,7 +100,7 @@ public class Pestilence extends PrepareSkill implements CooldownSkill {
                     }
                 }
                 for (LivingEntity target : newInfections) {
-                    entry.getValue().addInfection(championsManager, target, (long) infectionDuration * 1000);
+                    entry.getValue().addInfection(championsManager, target, (long) (infectionDuration * 1000));
                 }
             }
         }
@@ -145,7 +145,7 @@ public class Pestilence extends PrepareSkill implements CooldownSkill {
         int level = getLevel(damager);
         if (level > 0) {
             PestilenceData data = new PestilenceData();
-            data.addInfection(championsManager, event.getDamagee(), (long) infectionDuration * 1000);
+            data.addInfection(championsManager, event.getDamagee(), (long) (infectionDuration * 1000));
             pestilenceData.put(damager.getUniqueId(), data);
             active.remove(damager.getUniqueId());
         }
@@ -209,7 +209,6 @@ public class Pestilence extends PrepareSkill implements CooldownSkill {
         private final ConcurrentHashMap<LivingEntity, DamageData> currentlyInfected = new ConcurrentHashMap<>();
 
         public void addInfection(ChampionsManager championsManager, LivingEntity entity, long length) {
-
             championsManager.getEffects().addEffect(entity, EffectTypes.POISON, 1, length);
             currentlyInfected.put(entity, new DamageData(length));
         }
