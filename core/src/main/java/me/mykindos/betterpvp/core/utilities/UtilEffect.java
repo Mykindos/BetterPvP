@@ -16,7 +16,8 @@ public class UtilEffect {
                 || effect.getType().getName().contains("BLINDNESS")
                 || effect.getType().getName().contains("WITHER")
                 || effect.getType().getName().contains("LEVITATION")
-                || effect.getType().getName().contains("OMEN");
+                || effect.getType().getName().contains("OMEN")
+                || effect.getType().getName().contains("DARKNESS");
     }
 
     public static void applyCraftEffect(LivingEntity livingEntity, PotionEffect effect) {
