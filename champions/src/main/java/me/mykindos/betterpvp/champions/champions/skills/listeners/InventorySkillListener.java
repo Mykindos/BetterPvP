@@ -59,7 +59,7 @@ public class InventorySkillListener implements Listener {
     }
 
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onInventoryPickup(InventoryClickEvent event) {
         if (event.isCancelled()) return;
         if (event.getWhoClicked() instanceof Player player) {
@@ -107,27 +107,27 @@ public class InventorySkillListener implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onRoleChange(RoleChangeEvent event) {
         event.getPlayer().getInventory().forEach(itemStack -> processItem(event.getPlayer(), true, itemStack));
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onSkillEquip(SkillEquipEvent event) {
         event.getPlayer().getInventory().forEach(itemStack -> processItem(event.getPlayer(), true, itemStack));
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onSkillUpdate(SkillUpdateEvent event) {
         event.getPlayer().getInventory().forEach(itemStack -> processItem(event.getPlayer(), true, itemStack));
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onBuildApply(ApplyBuildEvent event) {
         event.getPlayer().getInventory().forEach(itemStack -> processItem(event.getPlayer(), true, itemStack));
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onClientJoin (PlayerLoginEvent event) {
         UtilServer.runTaskLater(champions, () -> event.getPlayer().getInventory().forEach(itemStack -> processItem(event.getPlayer(), true, itemStack)), 40);
     }

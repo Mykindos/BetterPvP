@@ -19,6 +19,9 @@ clans:
     interestIntervalInHours: 24
     interestRate: 2.5
   clan:
+    vault:
+      max-size: 28
+      base-size: 9
     default:
       energy: 2400
       level: 1

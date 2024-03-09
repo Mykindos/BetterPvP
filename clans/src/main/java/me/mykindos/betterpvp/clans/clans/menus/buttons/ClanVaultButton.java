@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.clans.clans.menus.buttons;
 
 import me.mykindos.betterpvp.clans.clans.Clan;
+import me.mykindos.betterpvp.clans.clans.menus.ClanMenu;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
@@ -12,9 +13,9 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.jetbrains.annotations.NotNull;
 import xyz.xenondevs.invui.item.ItemProvider;
-import xyz.xenondevs.invui.item.impl.AbstractItem;
+import xyz.xenondevs.invui.item.impl.controlitem.ControlItem;
 
-public class ClanVaultButton extends AbstractItem {
+public class ClanVaultButton extends ControlItem<ClanMenu> {
 
     private final Clan clan;
 
@@ -23,7 +24,7 @@ public class ClanVaultButton extends AbstractItem {
     }
 
     @Override
-    public ItemProvider getItemProvider() {
+    public ItemProvider getItemProvider(ClanMenu clanMenu) {
         return ItemView.builder()
                 .material(Material.ENDER_CHEST)
                 .displayName(Component.text("Clan Vault", NamedTextColor.GOLD, TextDecoration.BOLD))
@@ -33,6 +34,6 @@ public class ClanVaultButton extends AbstractItem {
 
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
-        // todo: @Mykindos implement clan vault
+        player.chat("/clan vault");
     }
 }

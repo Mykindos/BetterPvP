@@ -49,6 +49,10 @@ public class ClanPerkManager extends Manager<ClanPerk> {
         return objects.values().stream().sorted(Comparator.comparingInt(ClanPerk::getMinimumLevel)).toList();
     }
 
+    public boolean hasPerk(Clan clan, ClanPerk perk) {
+        return getPerks(clan).contains(perk);
+    }
+
     public boolean hasPerk(Clan clan, Class<?> perk) {
         return getPerks(clan).stream().anyMatch(perk::isInstance);
     }
