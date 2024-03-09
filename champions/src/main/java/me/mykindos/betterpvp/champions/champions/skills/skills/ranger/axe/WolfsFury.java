@@ -117,7 +117,7 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
         }
         if (!isHolding(player)) {
             expire(player, true);
-            return true;
+            deactivate(player);
         }
         if ((active.get(player) - System.currentTimeMillis() <= 0) || force) {
             missedSwings.remove(player);
