@@ -2,8 +2,6 @@ package me.mykindos.betterpvp.clans.clans.menus.buttons;
 
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.menus.ClanMenu;
-import me.mykindos.betterpvp.clans.clans.vault.ClanVault;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
@@ -36,12 +34,6 @@ public class ClanVaultButton extends ControlItem<ClanMenu> {
 
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
-        final ClanVault vault = clan.getVault();
-        if (vault.isLocked()) {
-            UtilMessage.message(player, "Clans", "<red>The clan vault is currently in use by: <dark_red>%s</dark_red>.", vault.getLockedBy());
-            return;
-        }
-
-        vault.show(player, getGui());
+        player.chat("/clan vault");
     }
 }

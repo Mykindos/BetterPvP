@@ -36,12 +36,12 @@ public class VaultSubCommand extends ClanSubCommand {
     @Override
     public void execute(Player player, Client client, String... args) {
         Clan clan = clanManager.getClanByPlayer(player).orElseThrow();
-        if (!clan.getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.ADMIN)) {
-            UtilMessage.message(player, "Clans", "Only the clan admins can access the clan vault.");
+        final ClanVault vault = clan.getVault();
+        if (!vault.hasPermission(player)) {
+            UtilMessage.message(player, "Clans", "You do not have permission to access the clan vault.");
             return;
         }
 
-        final ClanVault vault = clan.getVault();
         if (vault.isLocked()) {
             UtilMessage.message(player, "Clans", "<red>The clan vault is currently in use by: <dark_red>%s</dark_red>.", vault.getLockedBy());
             return;

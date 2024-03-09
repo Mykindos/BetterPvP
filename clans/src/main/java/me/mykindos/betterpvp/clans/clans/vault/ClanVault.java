@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.leveling.ClanPerkManager;
 import me.mykindos.betterpvp.clans.clans.leveling.perk.model.ClanVaultSlot;
 import me.mykindos.betterpvp.clans.clans.repository.ClanRepository;
+import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -37,6 +38,10 @@ public final class ClanVault {
     public ClanVault(Clan clan, @NotNull Map<Integer, @NotNull ItemStack> contents) {
         this.clan = clan;
         this.contents = contents;
+    }
+
+    public boolean hasPermission(Player player) {
+        return clan.getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.ADMIN);
     }
 
     public boolean isLocked() {
