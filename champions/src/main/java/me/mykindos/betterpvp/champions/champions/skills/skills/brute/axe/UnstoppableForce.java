@@ -120,7 +120,7 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill {
             }
 
             if (UtilBlock.isGrounded(player)) {
-                championsManager.getEffects().addEffect(player, EffectTypes.NO_JUMP, getName(), 1, 1100, true);
+                championsManager.getEffects().addEffect(player, EffectTypes.NO_JUMP, getName(), 1, 100, true);
 
                 final Location newLocation = UtilPlayer.getMidpoint(player).clone();
 
