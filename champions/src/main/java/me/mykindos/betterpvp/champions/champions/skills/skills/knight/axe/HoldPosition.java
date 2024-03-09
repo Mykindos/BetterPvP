@@ -58,7 +58,7 @@ public class HoldPosition extends Skill implements InteractSkill, CooldownSkill,
                 "Right click with an Axe to activate",
                 "",
                 "Hold your position, gaining",
-                "<effect>Resistance " + UtilFormat.getRomanNumeral(resistanceStrength) + "</effect>,<effect> Slowness " + UtilFormat.getRomanNumeral(slownessStrength + 1) + "</effect> and no",
+                "<effect>Resistance " + UtilFormat.getRomanNumeral(resistanceStrength) + "</effect>,<effect> Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> and no",
                 "knockback for <val>" + getDuration(level) + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
@@ -142,7 +142,7 @@ public class HoldPosition extends Skill implements InteractSkill, CooldownSkill,
     public void loadSkillConfig() {
         baseDuration = getConfig("baseDuration", 5.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
-        slownessStrength = getConfig("slownessStrength", 3, Integer.class);
-        resistanceStrength = getConfig("resistanceStrength", 1, Integer.class);
+        slownessStrength = getConfig("slownessStrength", 4, Integer.class);
+        resistanceStrength = getConfig("resistanceStrength", 4, Integer.class);
     }
 }
