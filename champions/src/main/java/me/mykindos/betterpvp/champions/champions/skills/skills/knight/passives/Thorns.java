@@ -91,7 +91,7 @@ public class Thorns extends Skill implements PassiveSkill, Listener {
 
         if (timestamps.size() == 3) {
             double reflectedDamage = event.getDamage() * getDamagePercent(getLevel(player));
-            player.playSound(player.getLocation(), Sound.ENCHANT_THORNS_HIT, 1.0F, 1.0F);
+            player.getWorld().playSound(player.getLocation(), Sound.ENCHANT_THORNS_HIT, 1.0F, 1.0F);
             UtilDamage.doCustomDamage(new CustomDamageEvent(damager, player, null, DamageCause.ENTITY_ATTACK, reflectedDamage, true, getName()));
             timestamps.clear();
         }
