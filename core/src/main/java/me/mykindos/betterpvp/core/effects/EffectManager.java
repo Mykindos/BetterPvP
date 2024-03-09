@@ -142,10 +142,6 @@ public class EffectManager extends Manager<List<Effect>> {
             effects.removeIf(effect -> {
                 if (effect.getEffectType() == type && effect.getName().equalsIgnoreCase(name)) {
 
-                    if (effect.getEffectType() instanceof VanillaEffectType vanillaEffectType) {
-                        vanillaEffectType.onExpire(target, effect);
-                    }
-
                     UtilServer.callEvent(new EffectExpireEvent(target, effect));
                     return true;
                 }
@@ -159,9 +155,7 @@ public class EffectManager extends Manager<List<Effect>> {
     public void removeAllEffects(LivingEntity target) {
         var effects = objects.remove(target.getUniqueId().toString());
         effects.forEach(effect -> {
-            if (effect.getEffectType() instanceof VanillaEffectType vanillaEffectType) {
-                target.removePotionEffect(vanillaEffectType.getVanillaPotionType());
-            }
+            UtilServer.callEvent(new EffectExpireEvent(target, effect));
         });
     }
 

@@ -46,12 +46,11 @@ public class EffectListener implements Listener {
                 if (entity instanceof LivingEntity livingEntity) {
                     if (effect.hasExpired() && !effect.isPermanent()) {
 
-                        EffectExpireEvent event = UtilServer.callEvent(new EffectExpireEvent(livingEntity, effect));
-                        if (!event.isCancelled()) {
-                            effect.getEffectType().onExpire(livingEntity, effect);
+                        UtilServer.callEvent(new EffectExpireEvent(livingEntity, effect));
+                        effect.getEffectType().onExpire(livingEntity, effect);
 
-                            return true;
-                        }
+                        return true;
+
                     } else {
                         if (effect.getEffectType() instanceof VanillaEffectType vanillaEffectType) {
                             vanillaEffectType.checkActive(livingEntity, effect);
