@@ -88,9 +88,9 @@ public class SmokeArrow extends PrepareArrowSkill {
 
     @Override
     public void onHit(Player damager, LivingEntity target, int level) {
-        final int effectDuration = (int) (getEffectDuration(level) * 20L);
+        final int effectDuration = (int) (getEffectDuration(level) * 1000L);
         championsManager.getEffects().addEffect(target, damager, EffectTypes.BLINDNESS, 1, effectDuration);
-        championsManager.getEffects().addEffect(target, damager, EffectTypes.SLOWNESS, 1, effectDuration);
+        championsManager.getEffects().addEffect(target, damager, EffectTypes.SLOWNESS, 2, effectDuration);
         target.getWorld().playSound(target.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
 
         new ParticleBuilder(Particle.EXPLOSION_LARGE)
