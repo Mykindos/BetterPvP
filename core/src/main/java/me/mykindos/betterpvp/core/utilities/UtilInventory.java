@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Map;
+import java.util.function.Predicate;
 
 
 public class UtilInventory {
@@ -66,4 +67,13 @@ public class UtilInventory {
         return false;
     }
 
+    public static int getCount(ItemStack[] contents, Predicate<ItemStack> matches) {
+        int count = 0;
+        for (ItemStack item : contents) {
+            if (item != null && matches.test(item)) {
+                count += item.getAmount();
+            }
+        }
+        return count;
+    }
 }

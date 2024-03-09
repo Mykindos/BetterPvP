@@ -1,7 +1,8 @@
 package me.mykindos.betterpvp.clans.clans.vault;
 
 import me.mykindos.betterpvp.clans.Clans;
-import me.mykindos.betterpvp.clans.clans.vault.blacklist.ClanVaultBlacklist;
+import me.mykindos.betterpvp.clans.clans.vault.restriction.ClanVaultRestrictions;
+import me.mykindos.betterpvp.clans.clans.vault.restriction.VaultRestriction;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
@@ -22,6 +23,8 @@ import xyz.xenondevs.invui.inventory.VirtualInventory;
 import xyz.xenondevs.invui.item.Item;
 import xyz.xenondevs.invui.item.impl.SimpleItem;
 
+import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.UUID;
 
 public class GuiClanVault extends AbstractGui implements Windowed {
@@ -43,7 +46,7 @@ public class GuiClanVault extends AbstractGui implements Windowed {
 
         // Virtual inventory
         final Clans clans = JavaPlugin.getPlugin(Clans.class);
-        final ClanVaultBlacklist blacklist = clans.getInjector().getInstance(ClanVaultBlacklist.class);
+        final ClanVaultRestrictions restrictions = clans.getInjector().getInstance(ClanVaultRestrictions.class);
         final int maxSize = clans.getConfig().getOrSaveInt("clans.clan.vault.max-size", 28);
         final int size = vault.getSize();
 
@@ -69,10 +72,29 @@ public class GuiClanVault extends AbstractGui implements Windowed {
 
         // Update handler
         virtualInventory.setPreUpdateHandler(event -> {
-            if (event.getNewItem() != null && blacklist.isBlacklisted(vault,event.getNewItem())) {
-                event.setCancelled(true);
-                SoundEffect.WRONG_ACTION.play(viewer);
+            final ItemStack item = event.getNewItem();
+            if (item == null) {
+                return; // Empty slot
             }
+
+            final Optional<VaultRestriction> restrictionOpt = restrictions.getAvailable(vault, item);
+            if (restrictionOpt.isEmpty()) {
+                return; // No restriction, item is allowed
+            }
+
+            final VaultRestriction restriction = restrictionOpt.get();
+            final OptionalInt remainingOpt = restriction.getRemainingCount(vault);
+            if (remainingOpt.isEmpty()) {
+                return; // Infinite count
+            }
+
+            final int remainingCount = remainingOpt.getAsInt();
+            if (remainingCount > 0 && event.getAddedAmount() <= remainingCount) {
+                return; // Item is allowed
+            }
+
+            SoundEffect.WRONG_ACTION.play(viewer);
+            event.setCancelled(true);
         });
 
         // Populate this AbstractGui with the contents of the virtual inventory

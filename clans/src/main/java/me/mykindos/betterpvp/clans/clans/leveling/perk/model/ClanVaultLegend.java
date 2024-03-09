@@ -11,14 +11,14 @@ public abstract class ClanVaultLegend implements ClanPerk {
     private final int count;
     private final int minReq;
 
-    protected ClanVaultLegend(int slots, int minReq) {
-        this.count = slots;
+    protected ClanVaultLegend(int count, int minReq) {
+        this.count = count;
         this.minReq = minReq;
     }
 
     @Override
     public String getName() {
-        return "+" + count + " Vault Slots";
+        return count + " Vault Legends";
     }
 
     @Override
@@ -29,7 +29,7 @@ public abstract class ClanVaultLegend implements ClanPerk {
     @Override
     public Component[] getDescription() {
         return new Component[] {
-                Component.text("Gain " + count + " extra slots for your clan vault.", NamedTextColor.GRAY)
+                Component.text(count + " legendaries are allowed in your clan vault.", NamedTextColor.GRAY)
         };
     }
 
