@@ -157,10 +157,11 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
         UtilMessage.simpleMessage(target, getClassType().getName(), "<alt>" + player.getName() + "</alt> hit you with <alt>" + getName());
         UtilDamage.doCustomDamage(new CustomDamageEvent(player, target, null, DamageCause.CUSTOM, getRecoilDamage(level), false, "Takedown Recoil"));
 
-        championsManager.getEffects().addEffect(player, EffectTypes.NO_JUMP, (long) ((baseDuration + ((level - 1) * durationIncreasePerLevel)) * 1000L));
-        championsManager.getEffects().addEffect(target, player, EffectTypes.NO_JUMP, (long) ((baseDuration + ((level - 1) * durationIncreasePerLevel)) * 1000L));
-        championsManager.getEffects().addEffect(player, EffectTypes.SLOWNESS, slownessStrength, (long) ((baseDuration + ((level - 1) * durationIncreasePerLevel)) * 1000L));
-        championsManager.getEffects().addEffect(target, player, EffectTypes.SLOWNESS, slownessStrength, (long) ((baseDuration + ((level - 1) * durationIncreasePerLevel)) * 1000L));
+        long duration = (long) ((baseDuration + ((level - 1) * durationIncreasePerLevel)) * 1000L);
+        championsManager.getEffects().addEffect(player, EffectTypes.NO_JUMP, duration);
+        championsManager.getEffects().addEffect(target, player, EffectTypes.NO_JUMP, duration);
+        championsManager.getEffects().addEffect(player, EffectTypes.SLOWNESS, slownessStrength, duration);
+        championsManager.getEffects().addEffect(target, player, EffectTypes.SLOWNESS, slownessStrength, duration);
     }
 
     @Override
