@@ -73,22 +73,10 @@ public class Thorns extends Skill implements PassiveSkill, Listener {
 
     @EventHandler (priority = EventPriority.HIGHEST)
     public void onDamage(CustomDamageEvent event) {
-        System.out.println("[Thorns] Damage event triggered.");
-
-        if (event.isCancelled()) {
-            System.out.println("[Thorns] Event is cancelled.");
-            return;
-        }
-        if (event.getCause() != DamageCause.ENTITY_ATTACK) {
-            System.out.println("[Thorns] Damage cause is not ENTITY_ATTACK.");
-            return;
-        }
-        if (!(event.getDamagee() instanceof Player player)) {
-            System.out.println("[Thorns] Damagee is not a Player.");
-            return;
-        }
+        if (event.isCancelled()) return;
+        if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
+        if (!(event.getDamagee() instanceof Player player)) return;
         if (event.getDamager() == null) return;
-
 
         LivingEntity damager = event.getDamager();
         hitTimestamps.putIfAbsent(player, new LinkedList<>());
