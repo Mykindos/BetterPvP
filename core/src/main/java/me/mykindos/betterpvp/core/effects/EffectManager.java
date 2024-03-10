@@ -46,7 +46,11 @@ public class EffectManager extends Manager<List<Effect>> {
     }
 
     public void addEffect(LivingEntity target, LivingEntity applier, EffectType type, String name, int level, long length, boolean overwrite) {
-        Effect effect = new Effect(target.getUniqueId().toString(), applier, type, name, level, length, false);
+        addEffect(target, applier, type, name, level, length, overwrite, false);
+    }
+
+    public void addEffect(LivingEntity target, LivingEntity applier, EffectType type, String name, int level, long length, boolean overwrite, boolean permanent) {
+        Effect effect = new Effect(target.getUniqueId().toString(), applier, type, name, level, length, permanent);
         EffectReceiveEvent event = UtilServer.callEvent(new EffectReceiveEvent(target, effect));
 
         if (!event.isCancelled()) {

@@ -327,29 +327,31 @@ public class CombatListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void handleCauseTimers(CustomDamageEvent event) {
+    public void handleCauseTimers(PreCustomDamageEvent event) {
 
-        if (event.getDamageDelay() == 0) return;
+        CustomDamageEvent cde = event.getCustomDamageEvent();
+        if (cde.getDamageDelay() == 0) return;
 
-        if (event.getCause() == DamageCause.ENTITY_ATTACK
-                || event.getCause() == DamageCause.PROJECTILE
-                || event.getCause() == DamageCause.CUSTOM) {
-            event.setDamageDelay(400);
+        if (cde.getCause() == DamageCause.ENTITY_ATTACK
+                || cde.getCause() == DamageCause.PROJECTILE
+                || cde.getCause() == DamageCause.CUSTOM) {
+            cde.setDamageDelay(400);
         }
 
-        if (event.getCause() == DamageCause.POISON) {
-            event.setDamageDelay(1000);
+        if (cde.getCause() == DamageCause.POISON) {
+            cde.setDamageDelay(1000);
         }
 
-        if (event.getCause() == DamageCause.LAVA) {
-            event.setDamageDelay(400);
+        if (cde.getCause() == DamageCause.LAVA) {
+            cde.setDamageDelay(400);
         }
 
-        if (event.getCause() == DamageCause.SUFFOCATION) {
-            event.setDamageDelay(400);
+        if (cde.getCause() == DamageCause.SUFFOCATION) {
+            cde.setDamageDelay(400);
         }
-        if (event.getDamagee().getLocation().getBlock().isLiquid()) {
-            if (event.getCause() == DamageCause.FIRE || event.getCause() == DamageCause.FIRE_TICK) {
+
+        if (cde.getDamagee().getLocation().getBlock().isLiquid()) {
+            if (cde.getCause() == DamageCause.FIRE || cde.getCause() == DamageCause.FIRE_TICK) {
                 event.cancel("Already in lava / liquid");
             }
         }
