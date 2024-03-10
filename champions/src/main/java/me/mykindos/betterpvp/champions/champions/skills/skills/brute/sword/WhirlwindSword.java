@@ -55,11 +55,11 @@ public class WhirlwindSword extends Skill implements InteractSkill, CooldownSkil
     }
 
     public double getDistance(int level) {
-        return baseDistance + level * distanceIncreasePerLevel;
+        return baseDistance + (level - 1) * distanceIncreasePerLevel;
     }
 
     public double getDamage(int level){
-        return baseDamage + level * damageIncreasePerLevel;
+        return baseDamage + (level - 1) * damageIncreasePerLevel;
     }
 
     @Override
