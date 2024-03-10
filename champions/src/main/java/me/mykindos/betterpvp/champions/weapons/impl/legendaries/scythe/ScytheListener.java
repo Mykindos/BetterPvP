@@ -76,6 +76,7 @@ public class ScytheListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOW)
     public void onDamage(PreCustomDamageEvent event) {
+        if(event.isCancelled()) return;
         if(!scythe.isEnabled()) {
             return;
         }
@@ -87,6 +88,20 @@ public class ScytheListener implements Listener {
         if (scythe.isHoldingWeapon(damager) && scythe.tracked.containsKey(damager)) {
             final double soulCount = scythe.tracked.get(damager).getSoulCount();
             cde.setDamage(scythe.getBaseDamage() + scythe.maxSoulsDamage * soulCount / scythe.maxSouls);
+        }
+    }
+
+    @EventHandler
+    public void onHeal(CustomDamageEvent event) {
+        if(event.isCancelled()) return;
+        if(!scythe.isEnabled()) {
+            return;
+        }
+
+        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
+        if (!(event.getDamager() instanceof Player damager)) return;
+        if (scythe.isHoldingWeapon(damager) && scythe.tracked.containsKey(damager)) {
+            final double soulCount = scythe.tracked.get(damager).getSoulCount();
             UtilPlayer.health(damager, scythe.baseHeal + scythe.healPerSoul * soulCount);
         }
     }
