@@ -11,7 +11,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Sound;
@@ -77,7 +77,7 @@ public class ThreateningShout extends Skill implements InteractSkill, CooldownSk
     public void activate(Player player, int level) {
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 2.0F, 2.0F);
         for (LivingEntity target : UtilEntity.getNearbyEnemies(player, player.getLocation(), radius + level)) {
-            championsManager.getEffects().addEffect(target, EffectType.VULNERABILITY, (long) (getDuration(level) * 1000L));
+            championsManager.getEffects().addEffect(target, EffectTypes.VULNERABILITY, (long) (getDuration(level) * 1000L));
             UtilMessage.message(target, getName(), "<yellow>%s</yellow> gave you <white>Vulnerability</white> for <green>%s</green> seconds.", player.getName(), getDuration(level));
         }
 

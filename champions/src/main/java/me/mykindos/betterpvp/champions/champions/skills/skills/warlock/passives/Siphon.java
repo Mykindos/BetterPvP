@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
@@ -18,8 +19,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -92,7 +91,7 @@ public class Siphon extends Skill implements PassiveSkill {
                                 if (UtilMath.randomInt(10) == 1) {
                                     UtilPlayer.health(player, 1);
                                 }
-                                player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 50, speedStrength));
+                                championsManager.getEffects().addEffect(player, EffectTypes.SPEED, getName(), speedStrength, 2500, true);
                                 this.cancel();
                                 return;
                             }
@@ -121,6 +120,6 @@ public class Siphon extends Skill implements PassiveSkill {
         baseEnergySiphoned = getConfig("baseEnergySiphoned", 1.0, Double.class);
         energySiphonedIncreasePerLevel = getConfig("energySiphonedIncreasePerLevel", 0.0, Double.class);
 
-        speedStrength = getConfig("speedStrength", 1, Integer.class);
+        speedStrength = getConfig("speedStrength", 2, Integer.class);
     }
 }

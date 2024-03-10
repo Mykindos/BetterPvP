@@ -23,7 +23,7 @@ skills:
       baseDuration: 0.0
       baseIncrease: 1.0
       slownessDuration: 1.0
-      slownessStrength: 0
+      slownessStrength: 1
     viperstrikes:
       enabled: true
       maxlevel: 3
@@ -66,7 +66,7 @@ skills:
       hitsNeeded: 3
       timeSpan: 0.8
       baseDuration: 1.0
-      durationIncreasePerLevel: 1.0
+      durationIncreasePerLevel: 0.5
     comboattack:
       enabled: true
       maxlevel: 3
@@ -174,8 +174,8 @@ skills:
       slowDuration: 3.0
       cooldownDecreasePerLevel: 1.0
       speedDuration: 3.0
-      slownessStrength: 2
-      speedStrength: 2
+      slownessStrength: 3
+      speedStrength: 3
     fortitude:
       enabled: true
       maxlevel: 3
@@ -230,8 +230,8 @@ skills:
       cooldownDecreasePerLevel: 2.0
       baseDuration: 5.0
       slowDuration: 0.5
-      slownessStrength: 3
-      resistanceStrength: 1
+      slownessStrength: 4
+      resistanceStrength: 4
     swordsmanship:
       enabled: true
       maxlevel: 3
@@ -287,7 +287,7 @@ skills:
       damageIncreasePerLevel: 1.0
       baseDuration: 0.0
       durationIncreasePerLevel: 0.5
-      slowStrength: 2
+      slowStrength: 3
       hitDistance: 4.0
   mage:
     staticlazer:
@@ -313,7 +313,7 @@ skills:
       damageIncreasePerLevel: 0.0
       baseSlowDuration: 1.5
       slowDurationIncreasePerLevel: 0.0
-      slowStrength: 2
+      slowStrength: 3
     inferno:
       enabled: true
       maxlevel: 3
@@ -359,7 +359,7 @@ skills:
       cooldownDecreasePerLevel: 2.0
       spreadDistanceIncreasePerLevel: 0.5
       slowDurationIncreasePerLevel: 0.0
-      slowStrength: 1
+      slowStrength: 2
       shockDurationIncreasePerLevel: 0.0
       baseDamage: 11.0
       damageIncreasePerLevel: 0.0
@@ -383,7 +383,7 @@ skills:
       fireTickDurationIncreasePerLevel: 0.0
       baseFireTrailDuration: 2.0
       fireTrailDurationIncreasePerLevel: 0.0
-      speedStrength: 0
+      speedStrength: 1
       strengthLevel: 1
       energyDecreasePerLevel: 1.0
     lifebonds:
@@ -414,13 +414,14 @@ skills:
       durationIncreasePerLevel: 0.0
       baseRadius: 6.0
       radiusIncreasePerLevel: 1.0
+      healthBoostStrength: 1
     blizzard:
       enabled: true
       maxlevel: 5
       energy: 25
       baseSlowDuration: 2.0
       slowDurationIncreasePerLevel: 0.0
-      slowStrength: 2
+      slowStrength: 3
       slowDuration: 2.0
       energyDecreasePerLevel: 1.0
     glacialblade:
@@ -440,7 +441,7 @@ skills:
       damageReductionIncreasePerLevel: 0.2
       baseEnergyReduction: 3.0
       energyReductionDecreasePerLevel: 0.5
-      slownessStrength: 2
+      slownessStrength: 3
       damageReduction: 5
       energyReduction: 20
       energyDecreasePerLevel: 2.0
@@ -456,7 +457,7 @@ skills:
       baseExtraDamagePerBlock: 0.4
       baseExtraDamagePerBlockIncreasePerLevel: 0.2
       effectDuration: 1
-      slownessLevel: 1
+      slownessLevel: 2
       effectDurationIncreasePerLevel: 1
       gateCheckEnabled: true
       doorCheckEnabled: true
@@ -474,7 +475,7 @@ skills:
       radiusIncreasePerLevel: 1.0
       baseDuration: 7.0
       durationIncreasePerLevel: 0.0
-      regenerationStrength: 0
+      regenerationStrength: 1
     polymorph:
       enabled: true
       maxlevel: 3
@@ -490,8 +491,8 @@ skills:
       radiusIncreasePerLevel: 1
       baseDuration: 2.0
       durationIncreasePerLevel: 0.0
-      resistanceStrength: 0
-      slownessStrength: 0
+      resistanceStrength: 1
+      slownessStrength: 1
       minRadius: 2
       duration: 2.0
       energyDecreasePerLevel: 0.5
@@ -535,7 +536,7 @@ skills:
       maxlevel: 3
       baseRadius: 3.0
       radius: 3
-      slownessStrength: 0
+      slownessStrength: 1
     seismicslam:
       enabled: true
       maxlevel: 5
@@ -560,7 +561,7 @@ skills:
       maxlevel: 3
       baseDuration: 2.0
       durationIncreasePerLevel: 0.5
-      slownessStrength: 0
+      slownessStrength: 1
     fleshhook:
       enabled: true
       maxlevel: 5
@@ -596,7 +597,7 @@ skills:
       cooldownDecreasePerLevel: 2.0
       baseDuration: 1.0
       durationIncreasePerLevel: 1.0
-      slownessStrength: 3
+      slownessStrength: 4
       recoilDamage: 1.5
       recoilDamageIncreasePerLevel: 0.5
       damageIncreasePerLevel: 1.0
@@ -619,7 +620,7 @@ skills:
       durationPerStackDecreasePerLevel: 1.0
       knockbackIncreasePerLevel: 0.5
       knockback: 0.5
-      maxSpeedStrength: 2
+      maxSpeedStrength: 3
     threateningshout:
       enabled: true
       maxlevel: 5
@@ -660,7 +661,7 @@ skills:
       damageIncreasePerLevel: 1.0
       slowDuration: 3.0
       slowDurationIncreasePerLevel: 0.0
-      slowStrength: 1
+      slowStrength: 2
     stunningshot:
       enabled: true
       maxlevel: 5
@@ -687,7 +688,7 @@ skills:
       cooldownDecreasePerLevel: 1.0
       baseDuration: 1.0
       durationIncreasePerLevel: 0.5
-      levitationStrength: 3
+      levitationStrength: 4
     pindown:
       enabled: true
       maxlevel: 5
@@ -695,7 +696,7 @@ skills:
       cooldownDecreasePerLevel: 1.5
       baseDuration: 1.5
       durationIncreasePerLevel: 1.5
-      slownessStrength: 3
+      slownessStrength: 4
     longshot:
       enabled: true
       maxlevel: 3
@@ -735,7 +736,7 @@ skills:
       maxlevel: 3
       baseDuration: 2.0
       durationIncreasePerLevel: 0.5
-      slownessStrength: 1
+      slownessStrength: 2
     volley:
       enabled: true
       maxlevel: 5
@@ -749,7 +750,7 @@ skills:
       maxlevel: 3
       baseDuration: 5.0
       durationDecreasePerLevel: 1.0
-      regenerationStrength: 0
+      regenerationStrength: 1
     sharpshooter:
       enabled: true
       maxlevel: 3
@@ -768,7 +769,7 @@ skills:
       durationIncreasePerLevel: 1.0
       baseDamageReduction: 0.6
       damageReductionIncreasePerLevel: 0.0
-      speedStrength: 1
+      speedStrength: 2
     wolfsfury:
       enabled: true
       maxlevel: 5
@@ -788,7 +789,7 @@ skills:
       slowDurationIncreasePerLevel: 1.0
       baseChannelDuration: 1.0
       channelDurationincreasePerLevel: 0.0
-      slowStrength: 3
+      slowStrength: 4
     healingshot:
       enabled: true
       maxlevel: 5
@@ -796,6 +797,7 @@ skills:
       baseDuration: 4.0
       increasePerLevel: 1.0
       cooldownDecreasePerLevel: 1.0
+      regenerationStrength: 3
   warlock:
     bloodbarrier:
       enabled: true
@@ -824,7 +826,7 @@ skills:
       duration: 9.0
       durationIncreasePerLevel: 0.0
       cooldownDecreasePerLevel: 1.0
-      speedStrength: 1
+      speedStrength: 2
       baseHealthReduction: 0.4
       healthReductionDecreasePerLevel: 0.05
     bloodthirst:
@@ -838,8 +840,8 @@ skills:
       maxlevel: 3
       baseBuffDuration: 2.0
       buffDurationIncreasePerLevel: 1.0
-      speedStrength: 1
-      regenerationStrength: 1
+      speedStrength: 2
+      regenerationStrength: 2
     impotence:
       enabled: true
       maxlevel: 3
@@ -923,7 +925,7 @@ skills:
       slowDurationIncreasePerLevel: 0.0
       baseDamage: 4.0
       damageIncreasePerLevel: 0.66
-      slowStrength: 1
+      slowStrength: 2
       slowDuration: 2.0
       healthPerEnemyHit: 1.0
       maxCharges: 3
@@ -944,7 +946,7 @@ skills:
       radiusIncreasePerLevel: 1.0
       baseEnergySiphoned: 1.0
       energySiphonedIncreasePerLevel: 0.0
-      speedStrength: 1
+      speedStrength: 2
       radius: 4
       energySiphoned: 1.0
   global:
@@ -957,6 +959,11 @@ skills:
       enabled: true
       maxlevel: 3
       percentagePerLevel: 0.15
+    resistance:
+      enabled: true
+      maxlevel: 3
+      baseDurationReduction: 20.0
+      durationReductionPerLevel: 10.0
     swim:
       enabled: true
       maxlevel: 5

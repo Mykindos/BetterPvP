@@ -10,7 +10,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerCanUseSkillEvent;
-import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
@@ -82,7 +82,7 @@ public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill {
         if (!(event.getProjectile() instanceof Arrow arrow)) return;
 
         if (UtilBlock.isInLiquid(player)
-                || championsManager.getEffects().hasEffect(player, EffectType.STUN)) {
+                || championsManager.getEffects().hasEffect(player, EffectTypes.STUN)) {
             return;
         }
 

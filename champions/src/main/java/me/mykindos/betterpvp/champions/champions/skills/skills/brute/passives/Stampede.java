@@ -12,11 +12,11 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
@@ -26,8 +26,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -62,7 +60,7 @@ public class Stampede extends Skill implements PassiveSkill {
                 "You slowly build up speed as you",
                 "sprint, gaining one level of <effect>Speed</effect>",
                 "for every <val>" + getDurationPerStack(level) + "</val> seconds, up to a max",
-                "of <effect>Speed " + UtilFormat.getRomanNumeral(maxSpeedStrength + 1) + "</effect>",
+                "of <effect>Speed " + UtilFormat.getRomanNumeral(maxSpeedStrength) + "</effect>",
                 "",
                 "Attacking during stampede deals <val>" + getDamage(level) + "</val> bonus",
                 "bonus damage and <val>" + getBonusKnockback(level) + "x</val> extra knockback",
@@ -97,7 +95,7 @@ public class Stampede extends Skill implements PassiveSkill {
         return SkillType.PASSIVE_A;
     }
 
-    @UpdateEvent
+    @UpdateEvent (delay = 200)
     public void updateSpeed() {
         for (Map.Entry<Player, StampedeData> entry : playerData.entrySet()) {
             Player player = entry.getKey();
@@ -112,17 +110,17 @@ public class Stampede extends Skill implements PassiveSkill {
                 playerData.put(player, data);
             } else if (isSprintingNow) {
                 if (UtilTime.elapsed(data.getSprintTime(), (long) ((getDurationPerStack(level)) * 1000L))) {
-                    if (data.getSprintStrength() < (maxSpeedStrength + 1)) {
+                    if (data.getSprintStrength() < maxSpeedStrength ) {
                         data.setSprintTime(System.currentTimeMillis());
                         data.setSprintStrength(data.getSprintStrength() + 1);
 
-                        player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 40, data.getSprintStrength() - 1, false, false));
+                        championsManager.getEffects().addEffect(player, player, EffectTypes.SPEED, getName(), data.getSprintStrength(), 2200, true);
                         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_AMBIENT, 2.0F, 0.2F * data.getSprintStrength() + 1.2F);
                         UtilMessage.simpleMessage(player, getClassType().getName(), "Stampede Level: <yellow>%d", data.getSprintStrength());
                     }
                 }
                 if (data.getSprintStrength() > 0) {
-                    player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 20 * 5, data.getSprintStrength() - 1, false, false));
+                    championsManager.getEffects().addEffect(player, player, EffectTypes.SPEED, getName(), data.getSprintStrength(), 2200, true);
                 }
             } else {
                 removeSpeed(player);
@@ -136,9 +134,7 @@ public class Stampede extends Skill implements PassiveSkill {
 
         playerData.remove(player);
 
-        if (!UtilPlayer.hasPotionEffect(player, PotionEffectType.SPEED, data.getSprintStrength())) {
-            player.removePotionEffect(PotionEffectType.SPEED);
-        }
+        championsManager.getEffects().removeEffect(player, EffectTypes.SPEED, getName());
     }
 
     @EventHandler
@@ -192,7 +188,7 @@ public class Stampede extends Skill implements PassiveSkill {
         durationPerStackDecreasePerLevel = getConfig("durationPerStackDecreasePerLevel", 1.0, Double.class);
         damage = getConfig("damage", 0.5, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.5, Double.class);
-        maxSpeedStrength = getConfig("maxSpeedStrength", 2, Integer.class);
+        maxSpeedStrength = getConfig("maxSpeedStrength", 3, Integer.class);
         knockbackIncreasePerLevel = getConfig("knockbackIncreasePerLevel", 0.5, Double.class);
         knockback = getConfig("knockback", 0.5, Double.class);
     }

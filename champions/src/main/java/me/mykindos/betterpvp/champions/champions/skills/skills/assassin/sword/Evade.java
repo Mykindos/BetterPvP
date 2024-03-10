@@ -14,7 +14,7 @@ import me.mykindos.betterpvp.core.combat.events.CustomEntityVelocityEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
-import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
@@ -188,9 +188,9 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
                         it.remove();
                     } else if (UtilBlock.isInLiquid(player)) {
                         it.remove();
-                    } else if (championsManager.getEffects().hasEffect(player, EffectType.SILENCE)) {
+                    } else if (championsManager.getEffects().hasEffect(player, EffectTypes.SILENCE)) {
                         it.remove();
-                    } else if (championsManager.getEffects().hasEffect(player, EffectType.STUN)) {
+                    } else if (championsManager.getEffects().hasEffect(player, EffectTypes.STUN)) {
                         it.remove();
                     } else if (UtilTime.elapsed(handRaisedTime.get(player.getUniqueId()), (long) duration * 1000)) {
                         handRaisedTime.remove(player.getUniqueId());

@@ -10,11 +10,10 @@ import me.mykindos.betterpvp.core.combat.throwables.ThrowableItem;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableListener;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -26,8 +25,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import java.util.HashMap;
@@ -61,7 +58,7 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
                 "Drop your Sword / Axe to toggle",
                 "",
                 "Ignite yourself in flaming fury, gaining",
-                "<effect>Speed " + UtilFormat.getRomanNumeral(speedStrength + 1) + "</effect>, <effect>Strength " + UtilFormat.getRomanNumeral(strengthLevel) + " </effect> and <effect>Fire Resistance",
+                "<effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect>, <effect>Strength " + UtilFormat.getRomanNumeral(strengthLevel) + "</effect> and <effect>Fire Resistance",
                 "",
                 "You leave a trail of fire, which",
                 "ignites enemies for <stat>" + getFireTickDuration(level) + "</stat> seconds",
@@ -116,11 +113,9 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
     public void cancel(Player player, String reason) {
         super.cancel(player, reason);
 
-        if (!UtilPlayer.hasPotionEffect(player, PotionEffectType.SPEED, strengthLevel + 1)) {
-            player.removePotionEffect(PotionEffectType.SPEED);
-        }
-        player.removePotionEffect(PotionEffectType.FIRE_RESISTANCE);
-        championsManager.getEffects().removeEffect(player, EffectType.STRENGTH);
+        championsManager.getEffects().removeEffect(player, EffectTypes.SPEED, getName());
+        championsManager.getEffects().removeEffect(player, EffectTypes.FIRE_RESISTANCE, getName());
+        championsManager.getEffects().removeEffect(player, EffectTypes.STRENGTH, getName());
 
     }
 
@@ -152,12 +147,12 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
             return false;
         } else if (!championsManager.getEnergy().use(player, getName(), getEnergy(level) / 5, true)) {
             return false;
-        } else if (championsManager.getEffects().hasEffect(player, EffectType.SILENCE)) {
+        } else if (championsManager.getEffects().hasEffect(player, EffectTypes.SILENCE)) {
             return false;
         } else {
-            player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 25, speedStrength));
-            player.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 25, 0));
-            championsManager.getEffects().addEffect(player, EffectType.STRENGTH, strengthLevel, 1250L);
+            championsManager.getEffects().addEffect(player, EffectTypes.SPEED, getName(), speedStrength, 1250, true);
+            championsManager.getEffects().addEffect(player, EffectTypes.FIRE_RESISTANCE, getName(), 1, 1250, true);
+            championsManager.getEffects().addEffect(player, EffectTypes.STRENGTH, getName(), strengthLevel, 1250, true);
         }
 
         return true;
@@ -200,7 +195,7 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
         fireTickDurationIncreasePerLevel = getConfig("fireTickDurationIncreasePerLevel", 0.0, Double.class);
         baseFireTrailDuration = getConfig("baseFireTrailDuration", 2.0, Double.class);
         fireTrailDurationIncreasePerLevel = getConfig("fireTrailDurationIncreasePerLevel", 0.0, Double.class);
-        speedStrength = getConfig("speedStrength", 0, Integer.class);
+        speedStrength = getConfig("speedStrength", 1, Integer.class);
         strengthLevel = getConfig("strengthLevel", 1, Integer.class);
         energyDecreasePerLevel = getConfig("energyDecreasePerLevel", 1.0, Double.class);
     }

@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
@@ -35,8 +36,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -96,7 +95,7 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
         return (damagePerBlock + ((level - 1) * damagePerBlockIncreasePerLevel));
     }
 
-    public int getSlowDuration(int level) {
+    public double getSlowDuration(int level) {
         return effectDuration + ((level - 1) * effectDurationIncreasePerLevel);
     }
 
@@ -144,7 +143,7 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
 
                 for (LivingEntity entity : fissureBlock.getNearbyEntities()) {
                     if (entity.getLocation().getBlockY() == block.getY() + 1 || entity.getLocation().getBlock().equals(block)) {
-                        entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, getSlowDuration(level) * 20, slownessLevel));
+                        championsManager.getEffects().addEffect(entity, player, EffectTypes.SLOWNESS,slownessLevel, (long) (getSlowDuration(level) * 1000));
                     }
                 }
             }
@@ -228,7 +227,7 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
         damagePerBlockIncreasePerLevel = getConfig("baseExtraDamagePerBlockIncreasePerLevel", 0.2, Double.class);
         effectDuration = getConfig("effectDuration", 1, Integer.class);
         effectDurationIncreasePerLevel = getConfig("effectDurationIncreasePerLevel", 1, Integer.class);
-        slownessLevel = getConfig("slownessLevel", 1, Integer.class);
+        slownessLevel = getConfig("slownessLevel", 2, Integer.class);
 
         var forbidden = List.of("TNT", "ENCHANTING_TABLE");
         forbiddenBlockTypes = (List<String>) getConfig("fissureForbiddenBlocks", forbidden, List.class);

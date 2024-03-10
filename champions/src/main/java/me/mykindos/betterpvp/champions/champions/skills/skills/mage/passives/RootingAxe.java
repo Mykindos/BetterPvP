@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import org.bukkit.Effect;
@@ -24,8 +25,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Wither;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 @Singleton
 @BPvPListener
@@ -95,7 +94,7 @@ public class RootingAxe extends Skill implements PassiveSkill, CooldownSkill {
                     if (championsManager.getCooldowns().use(damager, getName(), getCooldown(level), false)) {
                         damagee.teleport(damagee.getLocation().add(0, -1, 0));
                         damagee.getWorld().playEffect(damagee.getLocation(), Effect.STEP_SOUND, damagee.getLocation().getBlock().getType());
-                        damagee.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, (int) (getDuration(level) * 20), -5));
+                        championsManager.getEffects().addEffect(damagee, damager, EffectTypes.NO_JUMP, (long) (getDuration(level) * 1000));
                     }
                 }
             }
