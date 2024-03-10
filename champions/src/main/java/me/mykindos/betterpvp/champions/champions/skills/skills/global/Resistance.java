@@ -40,7 +40,7 @@ public class Resistance extends Skill implements PassiveSkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Negative effects have their duration reduced by <stat>" + getDurationReduction(level) + "%</stat>",
+                "Negative effects have their duration reduced by <val>" + getDurationReduction(level) + "%</val>",
                 "",
                 "Self-inflicted effects are not affected by this skill."
         };

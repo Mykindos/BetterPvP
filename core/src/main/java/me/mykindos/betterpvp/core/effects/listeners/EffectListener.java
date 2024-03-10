@@ -38,7 +38,7 @@ public class EffectListener implements Listener {
         effectManager.removeAllEffects(event.getEntity());
     }
 
-    @UpdateEvent
+    @UpdateEvent (priority = 999)
     public void onUpdate() {
         effectManager.getObjects().forEach((key, value) -> {
             value.removeIf(effect -> {

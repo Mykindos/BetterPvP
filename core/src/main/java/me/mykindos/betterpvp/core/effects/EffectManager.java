@@ -57,11 +57,16 @@ public class EffectManager extends Manager<List<Effect>> {
                 }
             }
 
-            if(overwrite) {
+            if (overwrite) {
                 Effect overwriteEffect = getEffect(target, type, name).orElse(null);
-                if(overwriteEffect != null) {
+                if (overwriteEffect != null) {
                     overwriteEffect.setAmplifier(level);
                     overwriteEffect.setLength(length);
+
+                    if(effect.getEffectType() instanceof VanillaEffectType vanillaEffectType) {
+                        vanillaEffectType.checkActive(target, effect);
+                    }
+
                     return;
                 }
             }

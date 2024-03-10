@@ -31,12 +31,12 @@ public class NoJumpEffect extends VanillaEffectType {
 
     @Override
     public void onReceive(LivingEntity livingEntity, Effect effect) {
-        UtilEffect.applyCraftEffect(livingEntity, new PotionEffect(getVanillaPotionType(), effect.getVanillaDuration() + 1, defaultAmplifier()));
+        UtilEffect.applyCraftEffect(livingEntity, new PotionEffect(getVanillaPotionType(), effect.getVanillaDuration(), defaultAmplifier()));
     }
 
     @Override
     public void checkActive(LivingEntity livingEntity, Effect effect) {
-        UtilEffect.applyCraftEffect(livingEntity, new PotionEffect(getVanillaPotionType(), effect.getRemainingVanillaDuration() + 1, defaultAmplifier()));
+        UtilEffect.applyCraftEffect(livingEntity, new PotionEffect(getVanillaPotionType(), effect.getRemainingVanillaDuration(), defaultAmplifier()));
     }
 
 }

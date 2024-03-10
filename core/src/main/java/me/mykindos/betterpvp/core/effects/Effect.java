@@ -21,14 +21,14 @@ public class Effect {
         this.applier = applier;
         this.effectType = effectType;
         this.name = name;
-        this.rawLength = length;
-        this.length = System.currentTimeMillis() + length;
+        this.rawLength = length + 50;
+        this.length = System.currentTimeMillis() + length + 50;
         this.amplifier = amplifier;
         this.permanent = permanent;
     }
 
     public void setLength(long length) {
-        this.length = System.currentTimeMillis() + length;
+        this.length = System.currentTimeMillis() + length + 50;
         this.rawLength = length;
     }
 
@@ -41,10 +41,10 @@ public class Effect {
     }
 
     public int getVanillaDuration() {
-        return (int) ((rawLength / 1000d) * 20);
+        return (int) Math.ceil((rawLength / 1000d) * 20d);
     }
 
     public int getRemainingVanillaDuration() {
-        return (int) ((getRemainingDuration() / 1000d) * 20);
+        return (int) Math.ceil((getRemainingDuration() / 1000d) * 20d);
     }
 }

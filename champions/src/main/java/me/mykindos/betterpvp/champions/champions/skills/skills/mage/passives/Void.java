@@ -46,7 +46,7 @@ public class Void extends ActiveToggleSkill implements EnergySkill {
                 "Drop your Sword / Axe to toggle",
                 "",
                 "While in void form, you receive",
-                "<effect>Slownesss " + UtilFormat.getRomanNumeral(slownessStrength + 1) + "</effect>, and take no knockback",
+                "<effect>Slownesss " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect>, and take no knockback",
                 "",
                 "Every point of damage you take will be",
                 "reduced by <val>" + getDamageReduction(level) + "</val> and drain <val>" + getEnergyReduction(level) + "</val> energy",
@@ -98,10 +98,7 @@ public class Void extends ActiveToggleSkill implements EnergySkill {
     }
 
     private void audio(Player player) {
-
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2F, 0.5F);
-        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2F, 0.5F);
-
     }
 
     private boolean doVoid(Player player) {
@@ -111,9 +108,9 @@ public class Void extends ActiveToggleSkill implements EnergySkill {
             return false;
         }
 
-        championsManager.getEffects().addEffect(player, EffectTypes.SLOWNESS, getName(), slownessStrength, 55);
-        championsManager.getEffects().addEffect(player, EffectTypes.INVISIBILITY, getName(), 1, 55);
-        championsManager.getEffects().addEffect(player, EffectTypes.NO_JUMP, getName(), 1, 55);
+        championsManager.getEffects().addEffect(player, EffectTypes.SLOWNESS, getName(), slownessStrength, 50, true);
+        championsManager.getEffects().addEffect(player, EffectTypes.INVISIBILITY, getName(), 1, 50, true);
+        championsManager.getEffects().addEffect(player, EffectTypes.NO_JUMP, getName(), 1, 50, true);
 
         return true;
     }
