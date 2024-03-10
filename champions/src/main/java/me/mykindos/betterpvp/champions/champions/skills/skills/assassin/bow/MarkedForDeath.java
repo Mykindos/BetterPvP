@@ -50,12 +50,16 @@ public class MarkedForDeath extends PrepareArrowSkill {
                 "Left click with a Bow to prepare",
                 "",
                 "Your next arrow will give players <effect>Vulnerability " + UtilFormat.getRomanNumeral(vulnerabilityStrength) + "</effect>",
-                "for <val>" + (baseDuration + ((level - 1) * durationIncreasePerLevel)) + "</val> seconds,",
+                "for <val>" + getDuration(level) + "</val> seconds,",
                 "causing them to take <stat>" + (vulnerabilityStrength * 25) + "%</stat> additional damage",
                 "from all targets.",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
+    }
+
+    public double getDuration(int level) {
+        return (baseDuration + ((level - 1) * durationIncreasePerLevel));
     }
 
     @Override
@@ -71,7 +75,7 @@ public class MarkedForDeath extends PrepareArrowSkill {
     @Override
     public void onHit(Player damager, LivingEntity target, int level) {
         UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit <yellow>%s</yellow> with <green>%s %s</green>.", target.getName(), getName(), level);
-        championsManager.getEffects().addEffect(target, EffectTypes.VULNERABILITY, vulnerabilityStrength, (long) ((baseDuration + ((level - 1) * durationIncreasePerLevel)) * 1000L));
+        championsManager.getEffects().addEffect(target, EffectTypes.VULNERABILITY, vulnerabilityStrength, (long) (getDuration(level) * 1000L));
         if (!(target instanceof Player damagee)) return;
         UtilMessage.simpleMessage(damagee, getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s %s</alt>.", damager.getName(), getName(), level);
     }

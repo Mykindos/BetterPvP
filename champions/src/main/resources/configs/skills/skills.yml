@@ -21,7 +21,7 @@ skills:
       enabled: true
       maxlevel: 3
       baseDuration: 0.0
-      baseIncrease: 1.0
+      durationIncreasePerLevel: 1.0
       slownessDuration: 1.0
       slownessStrength: 1
     viperstrikes:
@@ -78,7 +78,7 @@ skills:
       maxlevel: 3
       durationPerLevel: 1.5
       cooldownDecreasePerLevel: 1.0
-      baseDuration: 0.0
+      baseDuration: 1.5
       durationIncreasePerLevel: 1.5
     slash:
       enabled: true
