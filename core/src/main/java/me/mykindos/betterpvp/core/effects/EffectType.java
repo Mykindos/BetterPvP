@@ -34,4 +34,8 @@ public abstract class EffectType {
 
     }
 
+    public String getDescription(int level) {
+        return "";
+    }
+
 }

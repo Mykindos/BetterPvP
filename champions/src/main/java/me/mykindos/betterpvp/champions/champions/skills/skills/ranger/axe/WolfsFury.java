@@ -62,7 +62,9 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
                 "If you miss <val>" + getMaxMissedSwings(level) + "</val> consecutive attacks",
                 "Wolfs Fury ends",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level),
+                "",
+                EffectTypes.STRENGTH.getDescription(strengthLevel)
         };
     }
 

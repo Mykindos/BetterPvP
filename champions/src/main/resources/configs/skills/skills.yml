@@ -630,6 +630,7 @@ skills:
       cooldownDecreasePerLevel: 1.0
       baseDuration: 3.0
       durationIncreasePerLevel: 2.0
+      vulnerabilityStrength: 2
     bloodlust:
       enabled: true
       maxlevel: 3

@@ -59,7 +59,7 @@ public class SkillMenu extends AbstractGui implements Windowed {
         setItem(36, getSkillType(Material.ORANGE_DYE, "Class Passive B Skills"));
         setItem(45, getSkillType(Material.YELLOW_DYE, "Global Passive Skills"));
 
-        if(roleBuild.getPoints() > 0) {
+
             setItem(8, new ControlItem<SkillMenu>() {
                 @Override
                 public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
@@ -70,12 +70,12 @@ public class SkillMenu extends AbstractGui implements Windowed {
                 public ItemProvider getItemProvider(SkillMenu gui) {
                     return ItemView.builder()
                             .material(Material.NETHER_STAR)
-                            .amount(Math.max(1, roleBuild.getPoints()))
+                            .amount(roleBuild.getPoints())
                             .displayName(Component.text(roleBuild.getPoints() + " Skill Points Remaining", NamedTextColor.GREEN, TextDecoration.BOLD))
                             .build();
                 }
             });
-        }
+
 
         int slotNumber = 0;
         int swordSlotNumber = 1;

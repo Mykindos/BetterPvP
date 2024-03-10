@@ -33,7 +33,7 @@ public class Effect {
     }
 
     public boolean hasExpired() {
-        return rawLength >= 0 && length - System.currentTimeMillis() <= 0;
+        return rawLength >= 0 && length - System.currentTimeMillis() <= 0 && !permanent;
     }
 
     public long getRemainingDuration() {
@@ -41,10 +41,10 @@ public class Effect {
     }
 
     public int getVanillaDuration() {
-        return (int) Math.ceil((rawLength / 1000d) * 20d);
+        return permanent ? -1 : (int) Math.ceil((rawLength / 1000d) * 20d);
     }
 
     public int getRemainingVanillaDuration() {
-        return (int) Math.ceil((getRemainingDuration() / 1000d) * 20d);
+        return permanent ? -1 : (int) Math.ceil((getRemainingDuration() / 1000d) * 20d);
     }
 }
