@@ -285,7 +285,7 @@ skills:
       cooldownDecreasePerLevel: 1.0
       baseDamage: 3.0
       damageIncreasePerLevel: 1.0
-      baseDuration: 0.0
+      baseDuration: 0.5
       durationIncreasePerLevel: 0.5
       slowStrength: 3
       hitDistance: 4.0
@@ -645,7 +645,7 @@ skills:
     overwhelm:
       enabled: true
       maxlevel: 3
-      bonusDamage: 0.0
+      bonusDamage: 0.5
       healthOverTarget: 2.0
       baseMaxDamage: 1.0
       maxDamageIncreasePerLevel: 0.5

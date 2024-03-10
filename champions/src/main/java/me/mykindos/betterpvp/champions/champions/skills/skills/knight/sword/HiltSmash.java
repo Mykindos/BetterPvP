@@ -62,7 +62,7 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener {
                 "",
                 "Smash the hilt of your sword into",
                 "your opponent, dealing <val>" + getDamage(level) + "</val> damage and",
-                "applying <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength + 1) + "</effect> for <val>" + getDuration(level) + "</val> seconds",
+                "applying <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect> for <val>" + getDuration(level) + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -152,7 +152,7 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener {
     public void loadSkillConfig() {
         baseDamage = getConfig("baseDamage", 3.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
-        baseDuration = getConfig("baseDuration", 0.0, Double.class);
+        baseDuration = getConfig("baseDuration", 0.5, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
         slowStrength = getConfig("slowStrength", 3, Integer.class);
         hitDistance = getConfig("hitDistance", 4.0, Double.class);
