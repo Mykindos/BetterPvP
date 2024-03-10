@@ -1,3 +1,4 @@
+
 package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.bow;
 
 import com.destroystokyo.paper.ParticleBuilder;
@@ -9,7 +10,7 @@ import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -70,7 +71,7 @@ public class MarkedForDeath extends PrepareArrowSkill {
     @Override
     public void onHit(Player damager, LivingEntity target, int level) {
         UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit <yellow>%s</yellow> with <green>%s %s</green>.", target.getName(), getName(), level);
-        championsManager.getEffects().addEffect(target, EffectType.VULNERABILITY, vulnerabilityStrength, (long) ((baseDuration + ((level - 1) * durationIncreasePerLevel) * 1000L)));
+        championsManager.getEffects().addEffect(target, EffectTypes.VULNERABILITY, vulnerabilityStrength, (long) ((baseDuration + ((level - 1) * durationIncreasePerLevel)) * 1000L));
         if (!(target instanceof Player damagee)) return;
         UtilMessage.simpleMessage(damagee, getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s %s</alt>.", damager.getName(), getName(), level);
     }

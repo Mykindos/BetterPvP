@@ -15,7 +15,7 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.effects.EffectManager;
-import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.energy.EnergyHandler;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -115,7 +115,7 @@ public class ClansWorldListener extends ClanListener {
             if (player.getLocation().getY() < 150) continue;
             clanManager.getClanByLocation(player.getLocation()).ifPresent(clan -> {
                 if (clan.isAdmin() && clan.getName().toLowerCase().contains("spawn")) {
-                    effectManager.addEffect(player, EffectType.NOFALL, 7000);
+                    effectManager.addEffect(player, EffectTypes.NO_FALL, 7000);
                 }
             });
         }

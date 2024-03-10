@@ -20,7 +20,6 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -147,11 +146,6 @@ public class UtilPlayer {
 
         packet.getDataValueCollectionModifier().write(0, wrappedDataValueList);
         ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet);
-    }
-
-    public static boolean hasPotionEffect(Player player, PotionEffectType type, int amplifier) {
-        return player.getActivePotionEffects().stream().anyMatch(potionEffect -> potionEffect.getType() == type
-                && potionEffect.getAmplifier() >= amplifier);
     }
 
     public static Location getMidpoint(Player player) {

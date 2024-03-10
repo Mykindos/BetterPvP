@@ -37,7 +37,7 @@ import me.mykindos.betterpvp.core.components.champions.events.PlayerUseToggleSki
 import me.mykindos.betterpvp.core.components.champions.weapons.IWeapon;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
-import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.energy.EnergyHandler;
 import me.mykindos.betterpvp.core.framework.adapter.Compatibility;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
@@ -409,7 +409,7 @@ public class SkillListener implements Listener {
         ISkill skill = event.getSkill();
         if (skill.ignoreNegativeEffects()) return;
         if (skill.canUseWhileSilenced()) return;
-        if (effectManager.hasEffect(player, EffectType.SILENCE)) {
+        if (effectManager.hasEffect(player, EffectTypes.SILENCE)) {
             UtilMessage.simpleMessage(player, skill.getClassType().getName(), "You cannot use <green>%s<gray> while silenced.", skill.getName());
             player.playSound(player.getLocation(), Sound.ENTITY_BAT_HURT, 1.0f, 1.0f);
             event.setCancelled(true);
@@ -478,7 +478,7 @@ public class SkillListener implements Listener {
         ISkill skill = event.getSkill();
         if (skill.ignoreNegativeEffects()) return;
         if (skill.canUseWhileStunned()) return;
-        if (effectManager.hasEffect(player, EffectType.STUN)) {
+        if (effectManager.hasEffect(player, EffectTypes.STUN)) {
             UtilMessage.simpleMessage(player, skill.getClassType().getName(), "You cannot use <green>%s<gray> while stunned.", skill.getName());
             event.setCancelled(true);
         }

@@ -10,7 +10,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -66,7 +66,7 @@ public class Swim extends Skill implements PassiveSkill, EnergySkill {
             return;
         }
 
-        if (championsManager.getEffects().hasEffect(player, EffectType.SILENCE)) {
+        if (championsManager.getEffects().hasEffect(player, EffectTypes.SILENCE)) {
             UtilMessage.message(player, getName(), "You cannot use Swim while silenced!");
             return;
         }

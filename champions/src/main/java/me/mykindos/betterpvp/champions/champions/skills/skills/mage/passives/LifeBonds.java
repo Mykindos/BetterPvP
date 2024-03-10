@@ -8,7 +8,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.ActiveToggleSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -97,7 +97,8 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
 
         if (player != null) {
             int level = getLevel(player);
-            if (level <= 0 || !championsManager.getEnergy().use(player, getName(), getEnergy(level) / 20, true) || championsManager.getEffects().hasEffect(player, EffectType.SILENCE)) {
+            if (level <= 0 || !championsManager.getEnergy().use(player, getName(), getEnergy(level) / 20, true)
+                    || championsManager.getEffects().hasEffect(player, EffectTypes.SILENCE)) {
                 return false;
             } else {
                 double distance = getRadius(level);

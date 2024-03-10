@@ -10,6 +10,8 @@ import me.mykindos.betterpvp.core.combat.weapon.Weapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.InteractWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
+import me.mykindos.betterpvp.core.effects.EffectManager;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.energy.EnergyHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
@@ -28,8 +30,6 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,12 +45,14 @@ public class HyperAxe extends Weapon implements InteractWeapon, LegendaryWeapon,
     private double hyperRushCooldown;
     private final EnergyHandler energyHandler;
     private final CooldownManager cooldownManager;
+    private final EffectManager effectManager;
 
     @Inject
-    public HyperAxe(Champions champions, EnergyHandler energyHandler, CooldownManager cooldownManager) {
+    public HyperAxe(Champions champions, EnergyHandler energyHandler, CooldownManager cooldownManager, EffectManager effectManager) {
         super(champions, "hyper_axe");
         this.energyHandler = energyHandler;
         this.cooldownManager = cooldownManager;
+        this.effectManager = effectManager;
     }
 
     @EventHandler(priority = EventPriority.LOW)
@@ -130,7 +132,7 @@ public class HyperAxe extends Weapon implements InteractWeapon, LegendaryWeapon,
             int duration = meta.getPersistentDataContainer().getOrDefault(ChampionsNamespacedKeys.HYPER_AXE_DURATION, PersistentDataType.INTEGER, 80);
             if (cooldownManager.use(player, "Hyper Rush", hyperRushCooldown, true)) {
                 UtilMessage.simpleMessage(player, "Hyper Axe", "You used <green>Hyper Rush<gray>.");
-                player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, duration, level - 1));
+                effectManager.addEffect(player, EffectTypes.SPEED, level, (long) ((duration / 20d) * 1000));
                 UtilSound.playSound(player.getWorld(), player.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1, 1);
             }
         }

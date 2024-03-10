@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
@@ -17,8 +18,6 @@ import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -118,7 +117,8 @@ public class Intimidation extends Skill implements PassiveSkill {
                 if (sounds) {
                     UtilSound.playSound(enemy, Sound.ENTITY_WARDEN_HEARTBEAT, 1f, 1f, true);
                 }
-                enemy.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 10, slownessStrength));
+
+                championsManager.getEffects().addEffect(enemy, player, EffectTypes.SLOWNESS, getName(), slownessStrength, 500, true);
             } else if (trackedEnemies.get(player).remove(enemy)) {
                 UtilPlayer.clearWarningEffect(enemy); // Clear them if they are no longer in front
             }
@@ -138,6 +138,6 @@ public class Intimidation extends Skill implements PassiveSkill {
     @Override
     public void loadSkillConfig() {
         radius = getConfig("radius", 3, Integer.class);
-        slownessStrength = getConfig("slownessStrength", 0, Integer.class);
+        slownessStrength = getConfig("slownessStrength", 1, Integer.class);
     }
 }

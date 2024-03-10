@@ -9,7 +9,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
@@ -88,7 +88,7 @@ public class SilencingStrikes extends Skill implements PassiveSkill, Listener {
             silenceData.setLastHit(System.currentTimeMillis());
             event.addReason(getName());
             if (silenceData.getCount() == hitsNeeded) {
-                championsManager.getEffects().addEffect(damagee, EffectType.SILENCE, (long) ((getDuration(level) * 1000L) * 0.75));
+                championsManager.getEffects().addEffect(damagee, EffectTypes.SILENCE, (long) ((getDuration(level) * 1000L)));
                 data.remove(silenceData);
             }
         }
@@ -116,6 +116,6 @@ public class SilencingStrikes extends Skill implements PassiveSkill, Listener {
         hitsNeeded = getConfig("hitsNeeded", 3, Integer.class);
         timeSpan = getConfig("timeSpan", 0.8, Double.class);
         baseDuration = getConfig("baseDuration", 1.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
     }
 }

@@ -259,7 +259,6 @@ public class BPvPItem implements IBPvPItem {
      * @param player    the player damaging
      * @param itemStack the ItemStack to damage
      * @param damage    the damage the ItemStack should take
-     * @return the damaged ItemStack
      */
     public void damageItem(Player player, ItemStack itemStack, int damage) {
         if (getMaxDurability() < 0) return;

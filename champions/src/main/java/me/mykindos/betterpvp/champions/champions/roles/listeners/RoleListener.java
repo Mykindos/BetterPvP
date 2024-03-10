@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.UtilEffect;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
@@ -82,12 +83,10 @@ public class RoleListener implements Listener {
 
         for (PotionEffect effect : player.getActivePotionEffects()) {
 
-            if (effect.getType().getName().equals("POISON")
-                    || effect.getType().getName().equals("CONFUSION")
-                    || effect.getType().getName().equals("BLINDNESS")) {
-
+            if(UtilEffect.isNegativePotionEffect(effect)) {
                 continue;
             }
+
             player.removePotionEffect(effect.getType());
 
         }

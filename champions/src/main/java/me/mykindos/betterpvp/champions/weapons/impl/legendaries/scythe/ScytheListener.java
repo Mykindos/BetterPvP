@@ -12,6 +12,8 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseItemEvent;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
+import me.mykindos.betterpvp.core.effects.EffectManager;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
@@ -56,17 +58,21 @@ import java.util.Map;
 @Slf4j
 public class ScytheListener implements Listener {
 
-    @Inject
-    private Scythe scythe;
+    private final Scythe scythe;
+    private final ClientManager clientManager;
+    private final DamageLogManager damageLogManager;
+    private final CooldownManager cooldownManager;
+    private final EffectManager effectManager;
 
     @Inject
-    private ClientManager clientManager;
+    public ScytheListener(Scythe scythe, ClientManager clientManager, DamageLogManager damageLogManager, CooldownManager cooldownManager, EffectManager effectManager) {
+        this.scythe = scythe;
+        this.clientManager = clientManager;
+        this.damageLogManager = damageLogManager;
+        this.cooldownManager = cooldownManager;
+        this.effectManager = effectManager;
+    }
 
-    @Inject
-    private DamageLogManager damageLogManager;
-
-    @Inject
-    private CooldownManager cooldownManager;
 
     @EventHandler(priority = EventPriority.LOW)
     public void onDamage(PreCustomDamageEvent event) {
@@ -219,9 +225,9 @@ public class ScytheListener implements Listener {
 
             // Effects
             data.playPassive();
-            final int speedLevel = (int) (scythe.speedAmplifierPerSoul * (data.getSoulCount())) - 1;
+            final int speedLevel = (int) (scythe.speedAmplifierPerSoul * (data.getSoulCount()));
             if (speedLevel >= 0) {
-                PotionEffectType.SPEED.createEffect(3,speedLevel).apply(player);
+                effectManager.addEffect(player, EffectTypes.SPEED, "Scythe", speedLevel, 150, true);
             }
 
             // Stop harvesting if they're not holding the weapon

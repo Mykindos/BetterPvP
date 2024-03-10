@@ -14,7 +14,7 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEvent;
-import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -26,8 +26,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import java.util.Iterator;
 import java.util.Map.Entry;
@@ -88,10 +86,10 @@ public class Polymorph extends PrepareSkill implements CooldownSkill {
             ent.getWorld().playSound(ent.getLocation(), Sound.ENTITY_SHEEP_AMBIENT, 2.0f, 1.0f);
             polymorphed.put(ent, System.currentTimeMillis());
 
-            ent.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) (polymorphDuration * 20), 2));
+            championsManager.getEffects().addEffect(ent, player, EffectTypes.SLOWNESS, 2, (long) polymorphDuration * 1000);
             UtilMessage.simpleMessage(player, getName(), "You polymorphed <green>%s<gray>.", ent.getName());
             if (ent instanceof Player target) {
-                championsManager.getEffects().addEffect(target, EffectType.SILENCE, (long) polymorphDuration * 1000);
+                championsManager.getEffects().addEffect(target, EffectTypes.SILENCE, (long) polymorphDuration * 1000);
                 UtilMessage.simpleMessage(target, getName(), "<green>%s<gray> polymorphed you.", player.getName());
             }
             active.remove(player.getUniqueId());
@@ -111,7 +109,7 @@ public class Polymorph extends PrepareSkill implements CooldownSkill {
         Iterator<Entry<LivingEntity, Long>> it = polymorphed.entrySet().iterator();
         while (it.hasNext()) {
             Entry<LivingEntity, Long> next = it.next();
-            if (UtilTime.elapsed(next.getValue(), (long) polymorphDuration * 1000)) {
+            if (UtilTime.elapsed(next.getValue(), (long) (polymorphDuration * 1000))) {
                 UtilMessage.message(next.getKey(), getName(), "You are no longer polymorphed.");
                 DisguiseAPI.undisguiseToAll(next.getKey());
                 it.remove();

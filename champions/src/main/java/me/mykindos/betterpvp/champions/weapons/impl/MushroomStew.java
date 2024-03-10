@@ -6,6 +6,8 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.combat.weapon.Weapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.CooldownWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.InteractWeapon;
+import me.mykindos.betterpvp.core.effects.EffectManager;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
@@ -23,24 +25,25 @@ import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 @Singleton
 @BPvPListener
 public class MushroomStew extends Weapon implements InteractWeapon, CooldownWeapon, Listener {
 
+    private final EffectManager effectManager;
+
     private double duration;
     private int level;
 
     @Inject
-    public MushroomStew(Champions champions) {
+    public MushroomStew(Champions champions, EffectManager effectManager) {
         super(champions, "mushroom_stew");
+        this.effectManager = effectManager;
     }
 
     @Override
     public void activate(Player player) {
-        player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, (int) (duration * 20L), level - 1));
+        effectManager.addEffect(player, EffectTypes.REGENERATION, level, (long) (duration * 1000));
         UtilMessage.message(player, "Item",
                 Component.text("You consumed a ", NamedTextColor.GRAY).append(getName().color(NamedTextColor.YELLOW)));
         UtilSound.playSound(player, Sound.ENTITY_PLAYER_BURP, 1f, 1f, false);

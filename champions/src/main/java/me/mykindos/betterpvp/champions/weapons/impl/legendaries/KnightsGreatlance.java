@@ -18,7 +18,7 @@ import me.mykindos.betterpvp.core.components.champions.events.PlayerUseItemEvent
 import me.mykindos.betterpvp.core.cooldowns.Cooldown;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
-import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.energy.EnergyHandler;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.items.BPvPItem;
@@ -232,7 +232,7 @@ public class KnightsGreatlance extends ChannelWeapon implements InteractWeapon, 
 
             // Move
             data.setLastLocation(newLocation);
-            this.effectManager.addEffect(player, EffectType.NO_JUMP, 100);
+            this.effectManager.addEffect(player, EffectTypes.NO_JUMP, 100);
             VelocityData velocityData = new VelocityData(player.getLocation().getDirection(), chargeVelocity, true, 0, 0.0, 0.0, false);
             UtilVelocity.velocity(player, null, velocityData);
 

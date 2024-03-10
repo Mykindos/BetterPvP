@@ -1,31 +1,50 @@
 package me.mykindos.betterpvp.core.effects;
 
 import lombok.Data;
+import org.bukkit.entity.LivingEntity;
 
 @Data
 public class Effect {
-    private final String uuid;
-    private final EffectType effectType;
-    private final long length;
-    private final long rawLength;
-    private int level;
 
-    public Effect(String uuid, EffectType effectType, long length) {
+    private final String uuid;
+    private LivingEntity applier;
+    private final EffectType effectType;
+    private final String name;
+    private long length;
+    private long rawLength;
+    private int amplifier;
+    private final boolean permanent;
+
+
+    public Effect(String uuid, LivingEntity applier, EffectType effectType, String name, int amplifier, long length, boolean permanent) {
         this.uuid = uuid;
+        this.applier = applier;
         this.effectType = effectType;
-        this.rawLength = length;
-        this.length = System.currentTimeMillis() + length;
+        this.name = name;
+        this.rawLength = length + 50;
+        this.length = System.currentTimeMillis() + length + 50;
+        this.amplifier = amplifier;
+        this.permanent = permanent;
     }
 
-    public Effect(String uuid, EffectType effectType, int level, long length) {
-        this.uuid = uuid;
-        this.effectType = effectType;
+    public void setLength(long length) {
+        this.length = System.currentTimeMillis() + length + 50;
         this.rawLength = length;
-        this.length = System.currentTimeMillis() + length;
-        this.level = level;
     }
 
     public boolean hasExpired() {
         return rawLength >= 0 && length - System.currentTimeMillis() <= 0;
+    }
+
+    public long getRemainingDuration() {
+        return length - System.currentTimeMillis();
+    }
+
+    public int getVanillaDuration() {
+        return (int) Math.ceil((rawLength / 1000d) * 20d);
+    }
+
+    public int getRemainingVanillaDuration() {
+        return (int) Math.ceil((getRemainingDuration() / 1000d) * 20d);
     }
 }

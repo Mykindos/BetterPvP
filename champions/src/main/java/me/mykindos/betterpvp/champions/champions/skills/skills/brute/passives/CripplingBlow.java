@@ -10,14 +10,13 @@ import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 @Singleton
 @BPvPListener
@@ -67,7 +66,7 @@ public class CripplingBlow extends Skill implements PassiveSkill {
         int level = getLevel(player);
         if (level > 0) {
             LivingEntity target = event.getDamagee();
-            target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) (getDuration(level) * 20), slownessStrength));
+            championsManager.getEffects().addEffect(target, player, EffectTypes.SLOWNESS, slownessStrength, (long) (getDuration(level) * 1000));
             event.addReason(getName());
             event.setKnockback(false);
         }
@@ -84,7 +83,7 @@ public class CripplingBlow extends Skill implements PassiveSkill {
     public void loadSkillConfig() {
         baseDuration = getConfig("baseDuration", 2.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
-        slownessStrength = getConfig("slownessStrength", 0, Integer.class);
+        slownessStrength = getConfig("slownessStrength", 1, Integer.class);
     }
 
 }

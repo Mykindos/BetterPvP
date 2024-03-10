@@ -11,7 +11,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -23,7 +23,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -59,7 +58,7 @@ public class HoldPosition extends Skill implements InteractSkill, CooldownSkill,
                 "Right click with an Axe to activate",
                 "",
                 "Hold your position, gaining",
-                "<effect>Resistance " + UtilFormat.getRomanNumeral(resistanceStrength + 1) + "</effect>,<effect> Slowness " + UtilFormat.getRomanNumeral(slownessStrength + 1) + "</effect> and no",
+                "<effect>Resistance " + UtilFormat.getRomanNumeral(resistanceStrength) + "</effect>,<effect> Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> and no",
                 "knockback for <val>" + getDuration(level) + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
@@ -99,11 +98,11 @@ public class HoldPosition extends Skill implements InteractSkill, CooldownSkill,
 
     @Override
     public void activate(Player player, int level) {
-        championsManager.getEffects().addEffect(player, EffectType.RESISTANCE, resistanceStrength - 1, (long) getDuration(level) * 1000);
-        player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, (int) (getDuration(level) * 20), resistanceStrength));
-        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) getDuration(level) * 20, slownessStrength));
-        championsManager.getEffects().addEffect(player, EffectType.NO_JUMP, (long) getDuration(level) * 1000);
-        championsManager.getEffects().addEffect(player, EffectType.NO_SPRINT, (long) getDuration(level) * 1000);
+        long duration = (long) (getDuration(level) * 1000);
+        championsManager.getEffects().addEffect(player, player, EffectTypes.RESISTANCE, resistanceStrength, duration);
+        championsManager.getEffects().addEffect(player, player, EffectTypes.SLOWNESS, slownessStrength, duration);
+        championsManager.getEffects().addEffect(player, player, EffectTypes.NO_JUMP, duration);
+        championsManager.getEffects().addEffect(player, player, EffectTypes.NO_SPRINT, duration);
         player.setSprinting(false);
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1F, 0.5F);
         
@@ -144,7 +143,7 @@ public class HoldPosition extends Skill implements InteractSkill, CooldownSkill,
     public void loadSkillConfig() {
         baseDuration = getConfig("baseDuration", 5.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
-        slownessStrength = getConfig("slownessStrength", 3, Integer.class);
-        resistanceStrength = getConfig("resistanceStrength", 1, Integer.class);
+        slownessStrength = getConfig("slownessStrength", 4, Integer.class);
+        resistanceStrength = getConfig("resistanceStrength", 4, Integer.class);
     }
 }

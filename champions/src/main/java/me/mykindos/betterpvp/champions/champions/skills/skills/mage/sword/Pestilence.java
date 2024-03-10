@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.PrepareSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.effects.events.EffectClearEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -24,7 +25,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
@@ -100,7 +100,7 @@ public class Pestilence extends PrepareSkill implements CooldownSkill {
                     }
                 }
                 for (LivingEntity target : newInfections) {
-                    entry.getValue().addInfection(target, (long) infectionDuration * 1000);
+                    entry.getValue().addInfection(championsManager, target, (long) (infectionDuration * 1000));
                 }
             }
         }
@@ -145,7 +145,7 @@ public class Pestilence extends PrepareSkill implements CooldownSkill {
         int level = getLevel(damager);
         if (level > 0) {
             PestilenceData data = new PestilenceData();
-            data.addInfection(event.getDamagee(), (long) infectionDuration * 1000);
+            data.addInfection(championsManager, event.getDamagee(), (long) (infectionDuration * 1000));
             pestilenceData.put(damager.getUniqueId(), data);
             active.remove(damager.getUniqueId());
         }
@@ -208,8 +208,8 @@ public class Pestilence extends PrepareSkill implements CooldownSkill {
         private final ConcurrentHashMap<LivingEntity, DamageData> oldInfected = new ConcurrentHashMap<>();
         private final ConcurrentHashMap<LivingEntity, DamageData> currentlyInfected = new ConcurrentHashMap<>();
 
-        public void addInfection(LivingEntity entity, long length) {
-            entity.addPotionEffect(new PotionEffect(PotionEffectType.POISON, (int) ((length / 1000) * 20), 0));
+        public void addInfection(ChampionsManager championsManager, LivingEntity entity, long length) {
+            championsManager.getEffects().addEffect(entity, EffectTypes.POISON, 1, length);
             currentlyInfected.put(entity, new DamageData(length));
         }
 
