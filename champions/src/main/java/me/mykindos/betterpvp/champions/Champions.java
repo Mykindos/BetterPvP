@@ -5,6 +5,7 @@ import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.SneakyThrows;
 import me.mykindos.betterpvp.champions.champions.skills.SkillManager;
 import me.mykindos.betterpvp.champions.champions.skills.injector.SkillInjectorModule;
 import me.mykindos.betterpvp.champions.commands.ChampionsCommandLoader;
@@ -48,6 +49,7 @@ public class Champions extends BPvPPlugin {
 
     private ChampionsListenerLoader championsListenerLoader;
 
+    @SneakyThrows
     @Override
     public void onEnable() {
         saveDefaultConfig();
@@ -94,6 +96,9 @@ public class Champions extends BPvPPlugin {
             final Reflections reflectionAdapters = new Reflections(PACKAGE);
             adapters.loadAdapters(reflectionAdapters.getTypesAnnotatedWith(PluginAdapter.class));
             adapters.loadAdapters(reflectionAdapters.getTypesAnnotatedWith(PluginAdapters.class));
+
+            // We do this to force the static initializer to run, can be removed if we import this class anywhere
+            Class.forName("me.mykindos.betterpvp.champions.effects.ChampionsEffectTypes");
         }
     }
 

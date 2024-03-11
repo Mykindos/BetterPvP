@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.listeners;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
 import me.mykindos.betterpvp.champions.champions.builds.BuildSkill;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
@@ -22,6 +23,8 @@ import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.ToggleSkill;
+import me.mykindos.betterpvp.champions.effects.ChampionsEffectTypes;
+import me.mykindos.betterpvp.champions.effects.types.SkillBoostEffect;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.click.events.RightClickEvent;
@@ -36,6 +39,7 @@ import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEven
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseToggleSkillEvent;
 import me.mykindos.betterpvp.core.components.champions.weapons.IWeapon;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
+import me.mykindos.betterpvp.core.effects.Effect;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.energy.EnergyHandler;
@@ -72,6 +76,7 @@ import java.util.UUID;
 
 @Singleton
 @BPvPListener
+@Slf4j
 public class SkillListener implements Listener {
 
     private final BuildManager buildManager;
@@ -96,6 +101,7 @@ public class SkillListener implements Listener {
         this.clientManager = clientManager;
         this.skillManager = skillManager;
         this.weaponManager = weaponManager;
+
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -113,9 +119,9 @@ public class SkillListener implements Listener {
 
         if (skill instanceof EnergySkill energySkill && !(skill instanceof ActiveToggleSkill)) {
             if (energySkill.getEnergy(level) > 0) {
-                if(skill instanceof CooldownSkill cooldownSkill) {
-                    if(cooldownManager.hasCooldown(player, skill.getName())) {
-                        if(cooldownSkill.showCooldownFinished()) {
+                if (skill instanceof CooldownSkill cooldownSkill) {
+                    if (cooldownManager.hasCooldown(player, skill.getName())) {
+                        if (cooldownSkill.showCooldownFinished()) {
                             cooldownManager.informCooldown(player, skill.getName());
                         }
                         event.setCancelled(true);
@@ -186,8 +192,7 @@ public class SkillListener implements Listener {
         ItemStack droppedItem = event.getItemDrop().getItemStack();
         if (!UtilItem.isAxe(droppedItem) && !UtilItem.isSword(droppedItem)) {
             Optional<IWeapon> iWeaponOptional = weaponManager.getWeaponByItemStack(droppedItem);
-            if (iWeaponOptional.isEmpty() || !(iWeaponOptional.get() instanceof LegendaryWeapon))
-            {
+            if (iWeaponOptional.isEmpty() || !(iWeaponOptional.get() instanceof LegendaryWeapon)) {
                 return;
             }
         }
@@ -520,6 +525,14 @@ public class SkillListener implements Listener {
         if ((skillType == SkillType.AXE || skillType == SkillType.SWORD || skillType == SkillType.BOW)
                 && SkillWeapons.hasBooster(player)) {
             level++;
+        }
+
+        for (Effect effect : effectManager.getEffects(player, SkillBoostEffect.class)) {
+            if (effect.getEffectType() instanceof SkillBoostEffect skillBoostEffect) {
+                if (skillBoostEffect.hasSkillType(skillType)) {
+                    level += effect.getAmplifier();
+                }
+            }
         }
 
         return level;
