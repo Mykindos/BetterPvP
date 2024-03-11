@@ -1,6 +1,8 @@
 package me.mykindos.betterpvp.core.energy;
 
 import com.google.inject.Inject;
+import me.mykindos.betterpvp.core.effects.EffectManager;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.energy.events.DegenerateEnergyEvent;
 import me.mykindos.betterpvp.core.energy.events.RegenerateEnergyEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
@@ -20,10 +22,12 @@ import org.bukkit.inventory.EquipmentSlot;
 public class EnergyListener implements Listener {
 
     private final EnergyHandler energyHandler;
+    private final EffectManager effectManager;
 
     @Inject
-    public EnergyListener(EnergyHandler energyHandler) {
+    public EnergyListener(EnergyHandler energyHandler, EffectManager effectManager) {
         this.energyHandler = energyHandler;
+        this.effectManager = effectManager;
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -38,6 +42,11 @@ public class EnergyListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onDegen(DegenerateEnergyEvent event) {
+        if(event.isCancelled()) return;
+        effectManager.getEffect(event.getPlayer(), EffectTypes.ENERGY_REDUCTION).ifPresent(effect -> {
+            event.setEnergy(event.getEnergy() * (1 - (effect.getAmplifier() / 100d)));
+        });
+
         energyHandler.degenerateEnergy(event.getPlayer(), event.getEnergy());
     }
 
