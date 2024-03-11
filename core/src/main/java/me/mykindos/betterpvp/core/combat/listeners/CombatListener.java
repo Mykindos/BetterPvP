@@ -16,6 +16,8 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageReductionEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomKnockbackEvent;
 import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
+import me.mykindos.betterpvp.core.effects.EffectManager;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
@@ -78,13 +80,15 @@ public class CombatListener implements Listener {
     private final ClientManager clientManager;
     private final ArmourManager armourManager;
     private final DamageLogManager damageLogManager;
+    private final EffectManager effectManager;
     private final List<CustomDamageAdapter> customDamageAdapters;
 
     @Inject
-    public CombatListener(ClientManager clientManager, ArmourManager armourManager, DamageLogManager damageLogManager) {
+    public CombatListener(ClientManager clientManager, ArmourManager armourManager, DamageLogManager damageLogManager, EffectManager effectManager) {
         this.clientManager = clientManager;
         this.armourManager = armourManager;
         this.damageLogManager = damageLogManager;
+        this.effectManager = effectManager;
         damageDataList = new ArrayList<>();
         customDamageAdapters = new ArrayList<>();
 
@@ -117,6 +121,12 @@ public class CombatListener implements Listener {
         // TODO cancel this elsewhere...
         if (event.getDamagee() instanceof ArmorStand) {
             return;
+        }
+
+        if(event.getDamageDelay() > 0) {
+            effectManager.getEffect(event.getDamager(), EffectTypes.ATTACK_SPEED).ifPresent(effect -> {
+                event.setDamageDelay((long) (event.getDamageDelay() * (1 - (effect.getAmplifier() / 100d))));
+            });
         }
 
         damage(event);
