@@ -514,6 +514,11 @@ skills:
       durationIncreasePerLevel: 0.0
       duration: 2.0
   brute:
+     aerobatics:
+      enabled: true
+      maxlevel: 3
+      percent: 0.3
+      percentIncreasePerLevel: 0.1
     fury:
       enabled: true
       maxlevel: 3
