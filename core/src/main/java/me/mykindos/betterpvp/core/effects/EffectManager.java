@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 @Singleton
 public class EffectManager extends Manager<List<Effect>> {
@@ -37,6 +38,10 @@ public class EffectManager extends Manager<List<Effect>> {
         addEffect(target, applier, type, type.defaultAmplifier(), length);
     }
 
+    public void addEffect(LivingEntity target, LivingEntity applier, EffectType type, long length, Predicate<LivingEntity> removalPredicate) {
+        addEffect(target, applier, type, "", type.defaultAmplifier(), length, removalPredicate);
+    }
+
     public void addEffect(LivingEntity target, LivingEntity applier, EffectType type, int level, long length) {
         addEffect(target, applier, type, "", level, length);
     }
@@ -45,14 +50,30 @@ public class EffectManager extends Manager<List<Effect>> {
         addEffect(target, applier, type, name, level, length, false);
     }
 
+    public void addEffect(LivingEntity target, LivingEntity applier, EffectType type, String name, int level, long length, Predicate<LivingEntity> removalPredicate) {
+        addEffect(target, applier, type, name, level, length, false, false, removalPredicate);
+    }
+
     public void addEffect(LivingEntity target, LivingEntity applier, EffectType type, String name, int level, long length, boolean overwrite) {
         addEffect(target, applier, type, name, level, length, overwrite, false);
     }
 
     public void addEffect(LivingEntity target, LivingEntity applier, EffectType type, String name, int level, long length, boolean overwrite, boolean permanent) {
-        Effect effect = new Effect(target.getUniqueId().toString(), applier, type, name, level, length, permanent);
-        EffectReceiveEvent event = UtilServer.callEvent(new EffectReceiveEvent(target, effect));
+        addEffect(target, applier, type, name, level, length, overwrite, permanent, null);
+    }
 
+    public void addEffect(LivingEntity target, LivingEntity applier, EffectType type, String name, int level, long length, boolean overwrite, boolean permanent, Predicate<LivingEntity> removalPredicate) {
+        Effect effect = new Effect(target.getUniqueId().toString(), applier, type, name, level, length, permanent, removalPredicate);
+        addEffect(target, effect, overwrite);
+    }
+
+    public void addEffect(LivingEntity target, Effect effect) {
+          addEffect(target, effect, false);
+    }
+
+    public void addEffect(LivingEntity target, Effect effect, boolean overwrite) {
+        EffectReceiveEvent event = UtilServer.callEvent(new EffectReceiveEvent(target, effect));
+        EffectType type = effect.getEffectType();
         if (!event.isCancelled()) {
 
             if (!type.canStack()) {
@@ -62,10 +83,10 @@ public class EffectManager extends Manager<List<Effect>> {
             }
 
             if (overwrite) {
-                Effect overwriteEffect = getEffect(target, type, name).orElse(null);
+                Effect overwriteEffect = getEffect(target, type, effect.getName()).orElse(null);
                 if (overwriteEffect != null) {
-                    overwriteEffect.setAmplifier(level);
-                    overwriteEffect.setLength(length);
+                    overwriteEffect.setAmplifier(effect.getAmplifier());
+                    overwriteEffect.setLength(effect.getLength());
 
                     if(effect.getEffectType() instanceof VanillaEffectType vanillaEffectType) {
                         vanillaEffectType.checkActive(target, effect);

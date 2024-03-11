@@ -41,7 +41,7 @@ public class EffectListener implements Listener {
             value.removeIf(effect -> {
                 Entity entity = Bukkit.getEntity(UUID.fromString(effect.getUuid()));
                 if (entity instanceof LivingEntity livingEntity) {
-                    if (effect.hasExpired()) {
+                    if (effect.hasExpired() || (effect.getRemovalPredicate() != null && effect.getRemovalPredicate().test(livingEntity))) {
 
                         UtilServer.callEvent(new EffectExpireEvent(livingEntity, effect));
                         return true;
