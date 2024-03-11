@@ -61,6 +61,7 @@ dependencyResolutionManagement {
             // Library - Kyori Adventure (does not come with Paper)
             library("adventure-text-minimessage", "net.kyori:adventure-text-minimessage:4.14.0")
             library("adventure-platform-bukkit", "net.kyori:adventure-platform-bukkit:4.3.1")
+            library("mini-placeholders", "io.github.miniplaceholders:miniplaceholders-api:2.2.2")
 
             // Library - Jackson
             library("jackson-core", "com.fasterxml.jackson.core", "jackson-core").versionRef("jackson")
