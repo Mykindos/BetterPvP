@@ -120,7 +120,7 @@ public class Sever extends Skill implements CooldownSkill, Listener, InteractSki
         });
 
         for (LivingEntity target : nearbyEnemies) {
-            championsManager.getEffects().addEffect(ent, player, EffectTypes.BLEED, 1, (long) (getDuration(level) * 1000L));
+            championsManager.getEffects().addEffect(target, player, EffectTypes.BLEED, 1, (long) (getDuration(level) * 1000L));
             UtilMessage.simpleMessage(player, getClassType().getName(), "You severed <alt>" + target.getName() + "</alt>.");
             UtilMessage.simpleMessage(target, getClassType().getName(), "You have been severed by <alt>" + player.getName() + "</alt>.");
         }
