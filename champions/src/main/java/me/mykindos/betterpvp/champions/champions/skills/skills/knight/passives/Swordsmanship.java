@@ -31,9 +31,9 @@ public class Swordsmanship extends Skill implements PassiveSkill {
     private double timeBetweenCharges;
     private double timeOutOfCombat;
 
-    private double damageIncreasePerCharge;
+    private double baseDamagePerCharge;
 
-    private double baseDamageIncreasePerLevelPerCharge;
+    private double damageIncreasePerLevel;
 
     private double damageMultiplierPerLevelPerCharge;
 
@@ -57,14 +57,14 @@ public class Swordsmanship extends Skill implements PassiveSkill {
                 "storing up to a maximum of <val>" + (level) + "</val> charges",
                 "",
                 "When you attack, your damage is increased",
-                "by <stat>" + getDamage(1, level) + "</stat> for each charge you have",
+                "by <val>" + getDamage(1, level) + "</val> for each charge you have",
                 "",
                 "This only applies to swords"
         };
     }
 
     public double getDamage(int charge, int level) {
-        return charge * (baseDamageIncreasePerLevelPerCharge + ((level -1) * (damageIncreasePerCharge * damageMultiplierPerLevelPerCharge)));
+        return (baseDamagePerCharge + ((level - 1) * damageIncreasePerLevel)) * charge;
     }
 
     @Override
@@ -123,9 +123,8 @@ public class Swordsmanship extends Skill implements PassiveSkill {
     public void loadSkillConfig() {
         timeBetweenCharges = getConfig("timeBetweenCharges", 2.0, Double.class);
         timeOutOfCombat = getConfig("timeOutOfCombat", 2.5, Double.class);
-        damageIncreasePerCharge = getConfig("damageIncreasePerCharge", 0.5, Double.class);
-        baseDamageIncreasePerLevelPerCharge = getConfig("baseDamageIncreasePerLevelPerCharge", 1.0, Double.class);
-        damageMultiplierPerLevelPerCharge = getConfig("baseDamageIncreasePerLevelPerCharge", 1.0, Double.class);
+        baseDamagePerCharge = getConfig("baseDamagePerCharge", 1.0, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
     }
 
 }

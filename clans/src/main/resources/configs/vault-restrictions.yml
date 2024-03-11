@@ -1,0 +1,24 @@
+# This file is used to restrict the items that can be stored in the clan vault.
+# Format:
+#   <arbitrary name>:
+#     type: <MATERIAL NAME | FULLY QUALIFIED CLASS NAME>
+#     model: <INTEGER> (if not present, all models are blacklisted | can only be present if type is MATERIAL NAME)
+#     allowed: <INTEGER AT LEAST 1> (if not present, the item is blacklisted | cannot be present if allowed is set to a list | -1 to allow infinite amounts)
+#       - <CLAN_PERK_NAME:INTEGER> (cannot be present if allowed is set to a static number)
+restrictions:
+  stone:
+    type: STONE
+    allowed: 2
+  dirt:
+    type: DIRT
+  legends:
+    type: me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon
+    allowed:
+      - 1 Vault Legends:1
+      - 2 Vault Legends:2
+      - 3 Vault Legends:3
+      - 4 Vault Legends:4
+  hyper_axe:
+    type: music_disc_ward
+    model: 1
+    allowed: 1

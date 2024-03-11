@@ -9,13 +9,12 @@ import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEvent;
-import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import org.bukkit.Color;
@@ -121,7 +120,7 @@ public class Sever extends Skill implements CooldownSkill, Listener, InteractSki
         });
 
         for (LivingEntity target : nearbyEnemies) {
-            championsManager.getEffects().addEffect(target, EffectType.BLEED, (long) getDuration(level) * 1000L);
+            championsManager.getEffects().addEffect(ent, player, EffectTypes.BLEED, 1, (long) (getDuration(level) * 1000L));
             UtilMessage.simpleMessage(player, getClassType().getName(), "You severed <alt>" + target.getName() + "</alt>.");
             UtilMessage.simpleMessage(target, getClassType().getName(), "You have been severed by <alt>" + player.getName() + "</alt>.");
         }

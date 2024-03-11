@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
@@ -17,8 +18,6 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 @Singleton
 @BPvPListener
@@ -85,13 +84,14 @@ public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill
 
     @Override
     public void activate(Player player, int level) {
-        player.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, (int) (getDuration(level) * 20), healthBoostStrength));
+        championsManager.getEffects().addEffect(player, player, EffectTypes.HEALTH_BOOST, healthBoostStrength, (long) (getDuration(level) * 1000L));
+
         AttributeInstance playerMaxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
         if (playerMaxHealth != null) {
             player.setHealth(Math.min(player.getHealth() + 4 * (healthBoostStrength + 1), playerMaxHealth.getValue()));
             for (Player target : UtilPlayer.getNearbyAllies(player, player.getLocation(), getRadius(level))) {
 
-                target.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, (int) (getDuration(level) * 20), healthBoostStrength));
+                championsManager.getEffects().addEffect(target, player, EffectTypes.HEALTH_BOOST, healthBoostStrength, (long) (getDuration(level) * 1000L));
                 AttributeInstance targetMaxHealth = target.getAttribute(Attribute.GENERIC_MAX_HEALTH);
                 if (targetMaxHealth != null) {
                     target.setHealth(Math.min(target.getHealth() + 4 * (healthBoostStrength + 1), targetMaxHealth.getValue()));
@@ -106,7 +106,7 @@ public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.0, Double.class);
         baseRadius = getConfig("baseRadius", 6.0, Double.class);
         radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 1.0, Double.class);
-        healthBoostStrength = getConfig("radiusIncreasePerLevel", 0, Integer.class);
+        healthBoostStrength = getConfig("healthBoostStrength", 1, Integer.class);
     }
 
     @Override

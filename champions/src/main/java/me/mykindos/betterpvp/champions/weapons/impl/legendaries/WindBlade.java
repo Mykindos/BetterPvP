@@ -24,7 +24,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -103,14 +102,13 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
 
             VelocityData velocityData = new VelocityData(player.getLocation().getDirection(), velocityStrength, false, 0, 0, 1, false);
             UtilVelocity.velocity(player, null, velocityData);
-            player.getWorld().spawnEntity(player.getLocation(), EntityType.LLAMA_SPIT);
-            player.getWorld().playSound(player.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 0.3F, 1.5F);
+            player.getWorld().playSound(player.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 0.2F, 1.5F);
             return false;
         });
 
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.LOW)
     public void onDamage(PreCustomDamageEvent event) {
         if (!enabled) {
             return;
@@ -121,6 +119,7 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
         if (!(cde.getDamager() instanceof Player damager)) return;
         if (isHoldingWeapon(damager)) {
             cde.setDamage(baseDamage);
+            cde.setRawDamage(baseDamage);
         }
     }
 

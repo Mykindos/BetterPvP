@@ -11,7 +11,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
@@ -22,8 +22,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -118,7 +116,7 @@ public class Frailty extends Skill implements PassiveSkill {
                 if (level <= 0) return;
                 for (LivingEntity target : UtilEntity.getNearbyEnemies(player, player.getLocation(), 5)) {
                     if (UtilPlayer.getHealthPercentage(target) < getHealthPercent(level)) {
-                        target.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 30, 0));
+                        championsManager.getEffects().addEffect(target, player, EffectTypes.WITHER, 1, 1500);
                     }
                 }
             }
@@ -133,7 +131,7 @@ public class Frailty extends Skill implements PassiveSkill {
         int level = getLevel(damager);
         if (level > 0) {
             if (event.getDamagee() instanceof Player damagee) {
-                if (championsManager.getEffects().hasEffect(damagee, EffectType.IMMUNETOEFFECTS)) {
+                if (championsManager.getEffects().hasEffect(damagee, EffectTypes.IMMUNE)) {
                     return;
                 }
             }

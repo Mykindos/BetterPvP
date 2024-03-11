@@ -4,26 +4,31 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
 import me.mykindos.betterpvp.core.client.events.ClientQuitEvent;
+import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.events.KillContributionEvent;
 import me.mykindos.betterpvp.core.combat.stats.model.Contribution;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDItem;
+import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.logging.Logger;
 import me.mykindos.betterpvp.core.logging.UUIDLogger;
-import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.block.Container;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -91,11 +96,55 @@ public class UUIDListener implements Listener {
     private final Map<Player, Inventory> lastInventory = new HashMap<>();
     private final Map<Player, UUIDItem> lastHeldUUIDItem = new HashMap<>();
 
+    private final Map<UUID, Long> lastUUIDDropTime = new HashMap<>();
+    private final Map<UUID, Long> lastMessageTime = new HashMap<>();
+
     @Inject
     public UUIDListener(Core core, ItemHandler itemHandler, ClientManager clientManager) {
         this.core = core;
         this.itemHandler = itemHandler;
         this.clientManager = clientManager;
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onUUIDItemDrop(PlayerDropItemEvent event) {
+        if (event.isCancelled()) return;
+        Client client = clientManager.search().online(event.getPlayer());
+
+        if (!(boolean) client.getProperty(ClientProperty.DROP_PROTECTION_ENABLED).orElse(false)) {
+            return; // Drop protection is disabled
+        }
+
+        final Optional<UUIDItem> itemOpt = itemHandler.getUUIDItem(event.getItemDrop().getItemStack());
+        if (itemOpt.isEmpty()) {
+            return; // Not an UUIDItem
+        }
+
+        // Remove the drop attempt each time
+        // It'll either be re-added if they couldn't drop the item, or the item will be dropped,
+        // so we don't need to keep track of it
+        final UUIDItem item = itemOpt.get();
+        final long dropTime = Objects.requireNonNullElse(lastUUIDDropTime.remove(item.getUuid()), 0L);
+        if (UtilTime.elapsed(dropTime, 500)) {
+            // Didn't re-drop in time
+            final long lastMessage = lastMessageTime.getOrDefault(client.getUniqueId(), 0L);
+            if (UtilTime.elapsed(lastMessage, 5000)) {
+                UtilMessage.message(event.getPlayer(), "Settings",
+                        "<green>Drop Protection Enabled</green> <white>|</white> " +
+                                "Double press <alt2><key:key.drop></alt2> to drop this item. " +
+                                "Click <red><click:run_command:/settings>here</click></red> to turn this setting off.");
+                lastMessageTime.put(client.getUniqueId(), System.currentTimeMillis());
+            }
+
+            new SoundEffect(Sound.BLOCK_NOTE_BLOCK_BASS, 1F, 2F).play(event.getPlayer());
+            event.setCancelled(true);
+
+            // Log the drop attempt
+            lastUUIDDropTime.put(item.getUuid(), System.currentTimeMillis());
+            return;
+        }
+
+        lastMessageTime.remove(client.getUniqueId());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -147,7 +196,7 @@ public class UUIDListener implements Listener {
         }
         Location location = victim.getLocation();
         for (UUIDItem item : uuidItemsList) {
-            UUID logID = Logger.info("<yellow>%s</yellow> was killed while holding <light_purple>%s<light_purple> by <yellow>%s</yellow> at (<green>%s</green>, <green>%s</green>, <green>%s</green>) in <green>%s</green>, contributed by %s",
+            UUID logID = Logger.info("<yellow>%s</yellow> was killed while holding <light_purple>%s</light_purple> by <yellow>%s</yellow> at (<green>%s</green>, <green>%s</green>, <green>%s</green>) in <green>%s</green>, contributed by %s",
                     victim.getName(), item.getUuid(), killer.getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName(), contributors);
             UUIDLogger.addItemUUIDMetaInfoPlayer(logID, item.getUuid(), UUIDLogger.UUIDLogType.DEATH_PLAYER, victim.getUniqueId());
             UUIDLogger.addItemUUIDMetaInfoPlayer(logID, item.getUuid(), UUIDLogger.UUIDLogType.KILL, killer.getUniqueId());

@@ -10,20 +10,16 @@ import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import java.util.WeakHashMap;
 
@@ -93,8 +89,8 @@ public class Bloodlust extends Skill implements PassiveSkill {
             str.put(player, tempStr);
             time.put(player, (long) (System.currentTimeMillis() + getDuration(level) * 1000));
 
-            championsManager.getEffects().addEffect(player, EffectType.STRENGTH, tempStr, (long) (getDuration(level) * 1000L));
-            player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) (getDuration(level) * 20), tempStr - 1));
+            championsManager.getEffects().addEffect(player, player, EffectTypes.STRENGTH, getName(), tempStr, (long) (getDuration(level) * 1000L), true);
+            championsManager.getEffects().addEffect(player, player, EffectTypes.SPEED, getName(), tempStr, (long) (getDuration(level) * 1000), true);
             UtilPlayer.health(player, health);
             UtilMessage.simpleMessage(player, getClassType().getName(), "You entered bloodlust at level: <alt2>" + (tempStr + 1) + "</alt2>.");
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIFIED_PIGLIN_ANGRY, 2.0F, 0.6F);

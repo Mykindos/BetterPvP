@@ -53,7 +53,7 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
                 "Right click with an Axe to activate",
                 "",
                 "Launches an icy orb, trapping any players within <stat>" + sphereSize  + "</stat>",
-                "blocks of it in a prison of ice for <stat>" + getDuration(level) + "</stat> seconds",
+                "blocks of it in a prison of ice for <val>" + getDuration(level) + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };

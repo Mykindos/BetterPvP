@@ -37,7 +37,7 @@ import me.mykindos.betterpvp.core.components.champions.events.PlayerUseToggleSki
 import me.mykindos.betterpvp.core.components.champions.weapons.IWeapon;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
-import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.energy.EnergyHandler;
 import me.mykindos.betterpvp.core.framework.adapter.Compatibility;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
@@ -111,11 +111,29 @@ public class SkillListener implements Listener {
             return;
         }
 
+        if (skill instanceof EnergySkill energySkill && !(skill instanceof ActiveToggleSkill)) {
+            if (energySkill.getEnergy(level) > 0) {
+                if(skill instanceof CooldownSkill cooldownSkill) {
+                    if(cooldownManager.hasCooldown(player, skill.getName())) {
+                        if(cooldownSkill.showCooldownFinished()) {
+                            cooldownManager.informCooldown(player, skill.getName());
+                        }
+                        event.setCancelled(true);
+                        return;
+                    }
+                }
+                if (!energyHandler.use(player, skill.getName(), energySkill.getEnergy(level), true)) {
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+
+        }
+
         if (skill instanceof CooldownSkill cooldownSkill && !(skill instanceof PrepareArrowSkill)) {
             if (!cooldownManager.use(player, skill.getName(), cooldownSkill.getCooldown(level),
                     cooldownSkill.showCooldownFinished(), true, cooldownSkill.isCancellable(), cooldownSkill::shouldDisplayActionBar, cooldownSkill.getPriority())) {
                 event.setCancelled(true);
-                return;
             }
         } else if (skill instanceof PrepareArrowSkill prepareArrowSkill) {
             if (cooldownManager.hasCooldown(player, skill.getName())) {
@@ -125,18 +143,9 @@ public class SkillListener implements Listener {
                             Math.max(0, cooldownManager.getAbilityRecharge(player, skill.getName()).getRemaining()));
                 }
                 event.setCancelled(true);
-                return;
             }
         }
 
-        if (skill instanceof EnergySkill energySkill && !(skill instanceof ActiveToggleSkill)) {
-            if (energySkill.getEnergy(level) > 0) {
-                if (!energyHandler.use(player, skill.getName(), energySkill.getEnergy(level), true)) {
-                    event.setCancelled(true);
-                }
-            }
-
-        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -400,7 +409,7 @@ public class SkillListener implements Listener {
         ISkill skill = event.getSkill();
         if (skill.ignoreNegativeEffects()) return;
         if (skill.canUseWhileSilenced()) return;
-        if (effectManager.hasEffect(player, EffectType.SILENCE)) {
+        if (effectManager.hasEffect(player, EffectTypes.SILENCE)) {
             UtilMessage.simpleMessage(player, skill.getClassType().getName(), "You cannot use <green>%s<gray> while silenced.", skill.getName());
             player.playSound(player.getLocation(), Sound.ENTITY_BAT_HURT, 1.0f, 1.0f);
             event.setCancelled(true);
@@ -469,7 +478,7 @@ public class SkillListener implements Listener {
         ISkill skill = event.getSkill();
         if (skill.ignoreNegativeEffects()) return;
         if (skill.canUseWhileStunned()) return;
-        if (effectManager.hasEffect(player, EffectType.STUN)) {
+        if (effectManager.hasEffect(player, EffectTypes.STUN)) {
             UtilMessage.simpleMessage(player, skill.getClassType().getName(), "You cannot use <green>%s<gray> while stunned.", skill.getName());
             event.setCancelled(true);
         }

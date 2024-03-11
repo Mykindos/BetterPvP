@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
@@ -25,8 +26,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -73,7 +72,7 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
 
     @Override
     public void activate(Player player, int level) {
-        player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) speedDuration * 20, speedStrength));
+        championsManager.getEffects().addEffect(player, EffectTypes.SPEED, getName(), speedStrength, (long) (speedDuration * 1000L));
         UtilSound.playSound(player.getWorld(), player, Sound.ENTITY_ENDERMAN_SCREAM, 1.5F, 0);
         player.getWorld().playEffect(player.getLocation(), Effect.STEP_SOUND, Material.OBSIDIAN);
         running.put(player.getUniqueId(), System.currentTimeMillis() + (long)(speedDuration * 1000));
@@ -105,8 +104,8 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
 
                 event.setKnockback(false);
 
-                damagee.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) slowDuration * 20, slownessStrength));
-                damager.removePotionEffect(PotionEffectType.SPEED);
+                championsManager.getEffects().addEffect(damagee, damager, EffectTypes.SLOWNESS, slownessStrength, (long) (slowDuration * 1000L));
+                championsManager.getEffects().removeEffect(damager, EffectTypes.SPEED, getName());
 
                 damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_ENDERMAN_SCREAM, 1.5F, 0.0F);
                 damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1.5F, 0.5F);
@@ -165,9 +164,9 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
 
     public void loadSkillConfig() {
         speedDuration = getConfig("speedDuration", 3.0, Double.class);
+        speedStrength = getConfig("speedStrength", 3, Integer.class);
         slowDuration = getConfig("slowDuration", 3.0, Double.class);
-        slownessStrength = getConfig("slownessStrength", 2, Integer.class);
-        speedStrength = getConfig("slownessStrength", 2, Integer.class);
+        slownessStrength = getConfig("slownessStrength", 3, Integer.class);
     }
 
 }

@@ -46,9 +46,22 @@ public class GeneralSettingsMenu extends AbstractGui implements SettingCategory 
                     .get();
         }).build();
 
+        final Description dropDescription = Description.builder().icon(lang -> {
+            final boolean chatSetting = (boolean) client.getProperty(ClientProperty.DROP_PROTECTION_ENABLED).orElse(false);
+            final NamedTextColor color = chatSetting ? NamedTextColor.GREEN : NamedTextColor.RED;
+            return ItemView.builder()
+                    .material(Material.WRITABLE_BOOK)
+                    .displayName(Component.text("Drop Protection", color))
+                    .lore(Component.text("Whether to enable drop protection or not.", NamedTextColor.GRAY))
+                    .frameLore(true)
+                    .build()
+                    .get();
+        }).build();
+
         addItems(
                 new SettingsButton(client, ClientProperty.TIPS_ENABLED, tipDescription),
-                new SettingsButton(client, ClientProperty.CHAT_ENABLED, chatDescription)
+                new SettingsButton(client, ClientProperty.CHAT_ENABLED, chatDescription),
+                new SettingsButton(client, ClientProperty.DROP_PROTECTION_ENABLED, dropDescription)
         );
     }
 

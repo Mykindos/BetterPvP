@@ -12,7 +12,6 @@ import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
-import me.mykindos.betterpvp.core.utilities.events.GetEntityRelationshipEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -21,7 +20,6 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -148,11 +146,6 @@ public class UtilPlayer {
 
         packet.getDataValueCollectionModifier().write(0, wrappedDataValueList);
         ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet);
-    }
-
-    public static boolean hasPotionEffect(Player player, PotionEffectType type, int amplifier) {
-        return player.getActivePotionEffects().stream().anyMatch(potionEffect -> potionEffect.getType() == type
-                && potionEffect.getAmplifier() >= amplifier);
     }
 
     public static Location getMidpoint(Player player) {

@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.champions.champions.builds.menus.events.ApplyBuildE
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillEquipEvent;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillUpdateEvent;
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
+import me.mykindos.betterpvp.champions.champions.roles.events.RoleChangeEvent;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -58,7 +59,7 @@ public class InventorySkillListener implements Listener {
     }
 
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onInventoryPickup(InventoryClickEvent event) {
         if (event.isCancelled()) return;
         if (event.getWhoClicked() instanceof Player player) {
@@ -106,27 +107,32 @@ public class InventorySkillListener implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onRoleChange(RoleChangeEvent event) {
+        event.getPlayer().getInventory().forEach(itemStack -> processItem(event.getPlayer(), true, itemStack));
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onSkillEquip(SkillEquipEvent event) {
         event.getPlayer().getInventory().forEach(itemStack -> processItem(event.getPlayer(), true, itemStack));
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onSkillUpdate(SkillUpdateEvent event) {
         event.getPlayer().getInventory().forEach(itemStack -> processItem(event.getPlayer(), true, itemStack));
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onBuildApply(ApplyBuildEvent event) {
         event.getPlayer().getInventory().forEach(itemStack -> processItem(event.getPlayer(), true, itemStack));
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onClientJoin (PlayerLoginEvent event) {
         UtilServer.runTaskLater(champions, () -> event.getPlayer().getInventory().forEach(itemStack -> processItem(event.getPlayer(), true, itemStack)), 40);
     }
 
-    public void processItem(Player player, boolean playInventory, ItemStack itemStack) {
+    public void processItem(Player player, boolean playerInventory, ItemStack itemStack) {
         if (itemStack == null) {
             return;
         }
@@ -139,7 +145,7 @@ public class InventorySkillListener implements Listener {
             //expect that all items are BPvPItems that we want to alter
             return;
         }
-        if (playInventory) {
+        if (playerInventory) {
             //player is placing this item, it needs to be updated
             Optional<Role> roleOptional = roleManager.getObject(player.getUniqueId());
             if (roleOptional.isEmpty()) {

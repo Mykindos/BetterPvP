@@ -15,32 +15,30 @@ import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
-import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
-import org.bukkit.*;
-import org.bukkit.block.BlockFace;
+import org.bukkit.Effect;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.block.Container;
 import org.bukkit.block.data.Directional;
 import org.bukkit.block.data.Openable;
-import org.bukkit.entity.*;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.block.Block;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Singleton
@@ -58,7 +56,7 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
     private int slownessLevel;
     private List<String> forbiddenBlockTypes;
 
-    private List<FissureCast> activeCasts = new ArrayList<>();
+    private final List<FissureCast> activeCasts = new ArrayList<>();
 
     @Inject
     public Fissure(Champions champions, ChampionsManager championsManager, WorldBlockHandler blockHandler) {
@@ -97,7 +95,7 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
         return (damagePerBlock + ((level - 1) * damagePerBlockIncreasePerLevel));
     }
 
-    public int getSlowDuration(int level) {
+    public double getSlowDuration(int level) {
         return effectDuration + ((level - 1) * effectDurationIncreasePerLevel);
     }
 
@@ -145,7 +143,7 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
 
                 for (LivingEntity entity : fissureBlock.getNearbyEntities()) {
                     if (entity.getLocation().getBlockY() == block.getY() + 1 || entity.getLocation().getBlock().equals(block)) {
-                        entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, getSlowDuration(level) * 20, slownessLevel));
+                        championsManager.getEffects().addEffect(entity, player, EffectTypes.SLOWNESS,slownessLevel, (long) (getSlowDuration(level) * 1000));
                     }
                 }
             }
@@ -219,6 +217,7 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
         return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void loadSkillConfig() {
         fissureDistance = getConfig("fissureDistance", 14, Integer.class);
@@ -228,10 +227,10 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
         damagePerBlockIncreasePerLevel = getConfig("baseExtraDamagePerBlockIncreasePerLevel", 0.2, Double.class);
         effectDuration = getConfig("effectDuration", 1, Integer.class);
         effectDurationIncreasePerLevel = getConfig("effectDurationIncreasePerLevel", 1, Integer.class);
-        slownessLevel = getConfig("slownessLevel", 1, Integer.class);
+        slownessLevel = getConfig("slownessLevel", 2, Integer.class);
 
         var forbidden = List.of("TNT", "ENCHANTING_TABLE");
-        forbiddenBlockTypes = getConfig("fissureForbiddenBlocks", forbidden, List.class);
+        forbiddenBlockTypes = (List<String>) getConfig("fissureForbiddenBlocks", forbidden, List.class);
 
     }
 

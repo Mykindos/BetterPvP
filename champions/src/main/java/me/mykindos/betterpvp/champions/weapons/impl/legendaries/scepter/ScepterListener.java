@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -45,7 +46,7 @@ public class ScepterListener implements Listener {
         if (!scepter.isEnabled()) {
             return;
         }
-        if (event.getHand() != EquipmentSlot.HAND || !event.getAction().isLeftClick()) {
+        if (event.getHand() != EquipmentSlot.HAND || !event.getAction().isLeftClick() || event.useItemInHand() == Event.Result.DENY) {
             return;
         }
 

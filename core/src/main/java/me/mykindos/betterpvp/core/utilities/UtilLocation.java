@@ -13,6 +13,8 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,11 +24,95 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class UtilLocation {
 
     public static final float DEFAULT_FOV = 73f;
+
+    private static boolean wouldCollide(Block block, BoundingBox boundingBox) {
+        return !block.isPassable() && UtilBlock.doesBoundingBoxCollide(boundingBox, block);
+    }
+
+    public static void teleportForward(@NotNull LivingEntity entity, double teleportDistance, boolean fallDamage, @Nullable Consumer<Boolean> then) {
+        // Iterate from their location to their destination
+        // Modify the base location by the direction they are facing
+        Location teleportLocation = entity.getLocation();
+        final Vector direction = entity.getEyeLocation().getDirection();
+
+        final int iterations = (int) Math.ceil(teleportDistance / 0.2f);
+        for (int i = 1; i <= iterations; i++) {
+            // Extend their location by the direction they are facing by 0.2 blocks per iteration
+            final Vector increment = direction.clone().multiply(0.2 * i);
+            final Location newLocation = entity.getLocation().add(increment);
+
+            // Get the bounding box of the entity as if they were standing on the new location
+            BoundingBox relativeBoundingBox = UtilLocation.copyAABBToLocation(entity.getBoundingBox(), newLocation);
+
+            // Only cancel for collision if the block isn't passable AND we hit its collision shape
+            final Location blockOnTop = newLocation.clone().add(0, 1.0, 0);
+            if (wouldCollide(blockOnTop.getBlock(), relativeBoundingBox)) {
+                break;
+            }
+
+            // We know they won't suffocate because we checked the block above them
+            // Now check their feet and see if we can skip this block to allow for through-block flash
+            Location newTeleportLocation = newLocation;
+            if (wouldCollide(newLocation.getBlock(), relativeBoundingBox)) {
+                // If the block at their feet is not passable, try to skip it IF
+                // and ONLY IF there isn't a third block above forming a 1x1 gap
+                // This allows for through-block flash
+                if (!blockOnTop.clone().add(0.0, 1.0, 0.0).getBlock().isPassable()) {
+//                if (wouldCollide(blockOnTop.clone().add(0.0, 1.0, 0.0).getBlock(), relativeBoundingBox)) {
+                    break;
+                }
+
+                // At this point, we can ATTEMPT to skip the block at their feet
+                final Vector horizontalIncrement = increment.clone().setY(0);
+                final Location frontLocation = entity.getLocation().add(horizontalIncrement);
+                relativeBoundingBox = UtilLocation.copyAABBToLocation(entity.getBoundingBox(), frontLocation);
+                if (wouldCollide(frontLocation.getBlock(), relativeBoundingBox)) {
+                    continue; // Cancel if that block we're skipping to is not passable
+                }
+
+                newTeleportLocation = frontLocation;
+            }
+
+            final Location headBlock = newLocation.clone().add(0.0, relativeBoundingBox.getHeight(), 0.0);
+            if (wouldCollide(headBlock.getBlock(), relativeBoundingBox)) {
+                break; // Stop raying if we hit a block above their head
+            }
+
+            if (!entity.hasLineOfSight(newLocation) && !entity.hasLineOfSight(headBlock)) {
+                break; // Stop raying if we don't have line of sight
+            }
+
+            teleportLocation = newTeleportLocation;
+        }
+
+        // Adjust pitch and yaw to match the direction they are facing
+        teleportLocation.setPitch(entity.getLocation().getPitch());
+        teleportLocation.setYaw(entity.getLocation().getYaw());
+
+        // Shift them out of the location to avoid PHASING and SUFFOCATION
+        entity.leaveVehicle();
+        teleportLocation = UtilLocation.shiftOutOfBlocks(teleportLocation, entity.getBoundingBox());
+
+        // Teleport
+        // Asynchronously because, for some reason, spigot fires PlayerInteractEvent twice if the entity looks at a block
+        // causing them to use the skill again after being teleported
+        // teleportAsync somehow fixes that
+        entity.teleportAsync(teleportLocation).thenAccept(result ->  {
+            if (!fallDamage) {
+                entity.setFallDistance(0);
+            }
+
+            if (then != null) {
+                then.accept(result);
+            }
+        });
+    }
 
     public static Set<Location> getBoundingBoxCorners(final World world, final BoundingBox boundingBox) {
         return new HashSet<>(Arrays.asList(

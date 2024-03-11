@@ -10,12 +10,11 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -25,8 +24,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 @Singleton
 @BPvPListener
@@ -101,12 +98,12 @@ public class HealingShot extends PrepareArrowSkill {
         if (target instanceof Player damagee) {
             if (UtilEntity.isEntityFriendly(damager, damagee)) {
 
-                damagee.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, (int) (getDuration(level) * 20), regenerationStrength));
+                championsManager.getEffects().addEffect(damagee, damager, EffectTypes.REGENERATION, regenerationStrength, (long) (getDuration(level) * 1000));
 
                 target.getWorld().spawnParticle(Particle.HEART, target.getLocation().add(0, 1.5, 0), 5, 0.5, 0.5, 0.5, 0);
                 target.getWorld().playSound(target.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 2, 1.5F);
 
-                championsManager.getEffects().addEffect(damagee, EffectType.IMMUNETOEFFECTS, 1);
+                championsManager.getEffects().addEffect(damagee, EffectTypes.IMMUNE, 1);
                 UtilMessage.message(damager, getClassType().getName(), UtilMessage.deserialize("You hit <yellow>%s</yellow> with <green>%s %s</green>", damagee.getName(), getName(), level));
                 if (!damager.equals(damagee)) {
                     UtilMessage.message(damagee, getClassType().getName(), UtilMessage.deserialize("You were hit by <yellow>%s</yellow> with <green>%s %s</green>", damager.getName(), getName(), level));
@@ -139,7 +136,6 @@ public class HealingShot extends PrepareArrowSkill {
     public void loadSkillConfig() {
         baseDuration = getConfig("baseDuration", 4.0, Double.class);
         increaseDurationPerLevel = getConfig("increasePerLevel", 1.0, Double.class);
-
-        regenerationStrength = getConfig("regenerationStrength", 2, Integer.class);
+        regenerationStrength = getConfig("regenerationStrength", 3, Integer.class);
     }
 }

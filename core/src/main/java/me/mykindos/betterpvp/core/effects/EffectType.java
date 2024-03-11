@@ -1,33 +1,41 @@
 package me.mykindos.betterpvp.core.effects;
 
-import lombok.Getter;
+import lombok.Data;
+import org.bukkit.entity.LivingEntity;
 
-@Getter
-public enum EffectType {
+@Data
+public abstract class EffectType {
 
-    SILENCE(true),
-    VULNERABILITY(true),
-    STUN(true),
-    SHOCK(true),
-    STRENGTH(false),
-    NOFALL(false),
-    POISON(true),
-    PROTECTION(false),
-    PVPLOCK(false),
-    RESISTANCE(false),
-    INVISIBILITY(false),
-    INVULNERABILITY(false),
-    FRAILTY(true),
-    TEXTURELOADING(false),
-    IMMUNETOEFFECTS(false),
-    LEVITATION(true),
-    NO_JUMP(false),
-    NO_SPRINT(false),
-    BLEED(true);
+    public abstract String getName();
+    public abstract boolean isNegative();
 
-    final boolean isNegative;
-
-    EffectType(boolean isNegative) {
-        this.isNegative = isNegative;
+    /**
+     * If true, players can receive multiple instances of this effect
+     * If false and a player receives this effect, it will replace the current effect
+     * @return True if the effect can stack
+     */
+    public boolean canStack() {
+        return true;
     }
+
+    public int defaultAmplifier() {
+        return 1;
+    }
+
+    public void onReceive(LivingEntity livingEntity, Effect effect) {
+
+    }
+
+    public void onExpire(LivingEntity livingEntity, Effect effect) {
+
+    }
+
+    public void onTick(LivingEntity livingEntity, Effect effect) {
+
+    }
+
+    public String getDescription(int level) {
+        return "";
+    }
+
 }

@@ -197,7 +197,10 @@ public class ClientListener implements Listener {
         if(tipsOptional.isEmpty()){
             client.saveProperty(ClientProperty.TIPS_ENABLED, true);
         }
-
+        Optional<Boolean> dropOptional = client.getProperty(ClientProperty.DROP_PROTECTION_ENABLED);
+        if(dropOptional.isEmpty()){
+            client.saveProperty(ClientProperty.DROP_PROTECTION_ENABLED, true);
+        }
     }
 
     @UpdateEvent(delay = 120_000)

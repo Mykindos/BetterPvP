@@ -12,13 +12,13 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEvent;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import org.bukkit.Sound;
@@ -30,8 +30,6 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import java.util.WeakHashMap;
 
@@ -64,7 +62,7 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener {
                 "",
                 "Smash the hilt of your sword into",
                 "your opponent, dealing <val>" + getDamage(level) + "</val> damage and",
-                "applying <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength + 1) + "</effect> for <val>" + getDuration(level) + "</val> seconds",
+                "applying <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect> for <val>" + getDuration(level) + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -138,7 +136,7 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener {
             UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s %d</green>.", getName(), level);
         } else {
             UtilMessage.simpleMessage(ent, getClassType().getName(), "<yellow>%s<gray> hit you with <green>%s %d<gray>.", player.getName(), getName(), level);
-            ent.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) (getDuration(level) * 20), slowStrength));
+            championsManager.getEffects().addEffect(ent, player, EffectTypes.SLOWNESS, slowStrength, (long) (getDuration(level) * 1000));
             UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <yellow>%s<gray> with <green>%s %d<gray>.", ent.getName(), getName(), level);
             UtilDamage.doCustomDamage(new CustomDamageEvent(ent, player, null, DamageCause.ENTITY_ATTACK, getDamage(level), false, getName()));
         }
@@ -154,9 +152,9 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener {
     public void loadSkillConfig() {
         baseDamage = getConfig("baseDamage", 3.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
-        baseDuration = getConfig("baseDuration", 0.0, Double.class);
+        baseDuration = getConfig("baseDuration", 0.5, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
-        slowStrength = getConfig("slowStrength", 2, Integer.class);
+        slowStrength = getConfig("slowStrength", 3, Integer.class);
         hitDistance = getConfig("hitDistance", 4.0, Double.class);
     }
 }

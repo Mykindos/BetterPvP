@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanProperty;
 import me.mykindos.betterpvp.clans.clans.insurance.Insurance;
 import me.mykindos.betterpvp.clans.clans.insurance.InsuranceType;
+import me.mykindos.betterpvp.clans.clans.vault.ClanVault;
 import me.mykindos.betterpvp.core.components.clans.IClan;
 import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
@@ -75,12 +76,17 @@ public class ClanRepository implements IRepository<Clan> {
                 boolean admin = result.getBoolean(4);
                 boolean safe = result.getBoolean(5);
                 String banner = result.getString(6);
+                final String vault = result.getString(7);
 
                 Clan clan = new Clan(clanId);
                 clan.setName(name);
                 clan.setHome(home);
                 clan.setAdmin(admin);
                 clan.setSafe(safe);
+
+                if (vault != null) {
+                    clan.setVault(ClanVault.of(clan, vault));
+                }
 
                 if(banner != null && !banner.isEmpty()) {
                     final ItemStack bannerItem = ItemStack.deserializeBytes(Base64.getDecoder().decode(banner));
@@ -200,6 +206,13 @@ public class ClanRepository implements IRepository<Clan> {
         String query = "UPDATE clans SET Safe = ? WHERE id = ?;";
         database.executeUpdateAsync(new Statement(query,
                 new BooleanStatementValue(clan.isSafe()),
+                new UuidStatementValue(clan.getId())));
+    }
+
+    public void updateClanVault(Clan clan) {
+        String query = "UPDATE clans SET Vault = ? WHERE id = ?;";
+        database.executeUpdateAsync(new Statement(query,
+                new StringStatementValue(clan.getVault().serialize()),
                 new UuidStatementValue(clan.getId())));
     }
 

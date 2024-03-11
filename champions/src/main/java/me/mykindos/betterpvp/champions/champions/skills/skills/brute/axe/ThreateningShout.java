@@ -11,8 +11,9 @@ import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
@@ -24,8 +25,8 @@ public class ThreateningShout extends Skill implements InteractSkill, CooldownSk
 
     private int radius;
     private double baseDuration;
-
     private double durationIncreasePerLevel;
+    private int vulnerabilityStrength;
 
     @Inject
     public ThreateningShout(Champions champions, ChampionsManager championsManager) {
@@ -45,9 +46,11 @@ public class ThreateningShout extends Skill implements InteractSkill, CooldownSk
                 "",
                 "Release a roar, which frightens all",
                 "enemies within <val>" + (radius + level) + "</val> blocks and grants",
-                "them <effect>Vulnerability</effect> for <val>" + getDuration(level) + "</val> seconds",
+                "them <effect>Vulnerability " + UtilFormat.getRomanNumeral(vulnerabilityStrength) + "</effect> for <val>" + getDuration(level) + "</val> seconds",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level),
+                "",
+                EffectTypes.VULNERABILITY.getDescription(vulnerabilityStrength)
         };
     }
 
@@ -77,7 +80,7 @@ public class ThreateningShout extends Skill implements InteractSkill, CooldownSk
     public void activate(Player player, int level) {
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 2.0F, 2.0F);
         for (LivingEntity target : UtilEntity.getNearbyEnemies(player, player.getLocation(), radius + level)) {
-            championsManager.getEffects().addEffect(target, EffectType.VULNERABILITY, (long) (getDuration(level) * 1000L));
+            championsManager.getEffects().addEffect(target, EffectTypes.VULNERABILITY, (long) (getDuration(level) * 1000L));
             UtilMessage.message(target, getName(), "<yellow>%s</yellow> gave you <white>Vulnerability</white> for <green>%s</green> seconds.", player.getName(), getDuration(level));
         }
 
@@ -93,5 +96,6 @@ public class ThreateningShout extends Skill implements InteractSkill, CooldownSk
         radius = getConfig("radius", 4, Integer.class);
         baseDuration = getConfig("baseDuration", 3.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 2.0, Double.class);
+        vulnerabilityStrength = getConfig("vulnerabilityStrength", 2, Integer.class);
     }
 }

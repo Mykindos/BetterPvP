@@ -10,7 +10,7 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.effects.events.EffectReceiveEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -120,7 +120,7 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill {
             }
 
             if (UtilBlock.isGrounded(player)) {
-                championsManager.getEffects().addEffect(player, EffectType.NO_JUMP, 100);
+                championsManager.getEffects().addEffect(player, EffectTypes.NO_JUMP, getName(), 1, 100, true);
 
                 final Location newLocation = UtilPlayer.getMidpoint(player).clone();
 
@@ -135,7 +135,7 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill {
 
                 if (hit.isPresent()) {
                     final LivingEntity target = hit.get();
-                    var cde = UtilDamage.doCustomDamage(new CustomDamageEvent(target, player, player, EntityDamageEvent.DamageCause.CUSTOM, 20, false, getName()));
+                    var cde = UtilDamage.doCustomDamage(new CustomDamageEvent(target, player, player, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, getName()));
                     if (cde != null && !cde.isCancelled()) {
                         VelocityData targetVelocityData = new VelocityData(player.getLocation().getDirection(), 2, true, 0.4, 0.4, 0.4, true);
                         UtilVelocity.velocity(target, player, targetVelocityData, VelocityType.KNOCKBACK_CUSTOM);
@@ -160,7 +160,7 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill {
     private void finishUnstoppableForce(Player player) {
         championsManager.getCooldowns().use(player, getName(), getCooldown(getLevel(player)), true,
                 true, false, isHolding(player) && (getType() == SkillType.AXE));
-        championsManager.getEffects().removeEffect(player, EffectType.NO_JUMP);
+        championsManager.getEffects().removeEffect(player, EffectTypes.NO_JUMP, getName());
     }
 
     @EventHandler
@@ -179,7 +179,9 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill {
     @EventHandler
     public void onNegativeEffect(EffectReceiveEvent event) {
         if (!active.contains(event.getTarget().getUniqueId())) return;
-        if (event.getEffect().getEffectType() == EffectType.STUN || event.getEffect().getEffectType() == EffectType.SILENCE) {
+        if (event.getEffect().getEffectType() == EffectTypes.STUN
+                || event.getEffect().getEffectType() == EffectTypes.SILENCE
+                || event.getEffect().getEffectType() == EffectTypes.SLOWNESS) {
             event.setCancelled(true);
         }
     }

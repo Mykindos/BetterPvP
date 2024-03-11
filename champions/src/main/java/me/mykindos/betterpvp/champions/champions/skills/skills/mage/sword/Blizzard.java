@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
@@ -23,8 +24,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowball;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import java.util.Iterator;
@@ -95,10 +94,6 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergySkill
             if (snow.containsKey(snowball)) {
                 LivingEntity damagee = event.getDamagee();
 
-                if (damagee.hasPotionEffect(PotionEffectType.SLOW)) {
-                    damagee.removePotionEffect(PotionEffectType.SLOW);
-                }
-
                 int level = getLevel((Player) event.getDamager());
 
                 Vector direction = snowball.getVelocity().normalize().multiply(1);
@@ -107,7 +102,7 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergySkill
 
                 damagee.setVelocity(pushBackVelocity);
 
-                damagee.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) (getSlowDuration(level) * 20), slowStrength));
+                championsManager.getEffects().addEffect(damagee, event.getDamager(), EffectTypes.SLOWNESS, slowStrength, (long) (getSlowDuration(level) * 1000));
 
                 event.cancel("Snowball");
                 snow.remove(snowball);
@@ -161,6 +156,6 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergySkill
     public void loadSkillConfig() {
         baseSlowDuration = getConfig("baseSlowDuration", 2.0, Double.class);
         slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.0, Double.class);
-        slowStrength = getConfig("slowStrength", 2, Integer.class);
+        slowStrength = getConfig("slowStrength", 3, Integer.class);
     }
 }
