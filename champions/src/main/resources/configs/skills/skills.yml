@@ -645,7 +645,7 @@ skills:
       durationIncreasePerLevel: 1.0
       health: 4.0
     fortify:
-      enabled: true
+      enabled: false
       maxlevel: 3
       increasePerLevel: 10
     overwhelm:
