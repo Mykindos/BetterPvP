@@ -126,6 +126,17 @@ public class EffectManager extends Manager<List<Effect>> {
         return getEffect(target, type, name).isPresent();
     }
 
+    public List<Effect> getEffects(LivingEntity target, Class<? extends EffectType> typeClass) {
+        Optional<List<Effect>> effectsOptional = getObject(target.getUniqueId().toString());
+        if (effectsOptional.isPresent()) {
+            List<Effect> effects = effectsOptional.get();
+            return effects.stream().filter(effect -> typeClass.isInstance(effect.getEffectType()))
+                    .toList();
+        } else {
+            return new ArrayList<>();
+        }
+    }
+
     public void removeEffect(LivingEntity target, EffectType type) {
         Optional<List<Effect>> effectsOptional = getObject(target.getUniqueId().toString());
         effectsOptional.ifPresent(effects -> {

@@ -29,6 +29,7 @@ import me.mykindos.betterpvp.core.effects.types.positive.VanishEffect;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 public class EffectTypes {
@@ -68,9 +69,14 @@ public class EffectTypes {
 
     // </editor-fold>
 
-    private static EffectType createEffectType(EffectType effectType) {
+    public static EffectType createEffectType(EffectType effectType) {
+        log.info("Added effect: {}", effectType.getName());
         effectTypes.add(effectType);
         return effectType;
+    }
+
+    public static Optional<EffectType> getEffectTypeByName(String name) {
+        return effectTypes.stream().filter(effectType -> effectType.getName().equalsIgnoreCase(name)).findFirst();
     }
 
 }
