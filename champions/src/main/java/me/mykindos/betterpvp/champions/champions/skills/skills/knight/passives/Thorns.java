@@ -91,7 +91,7 @@ public class Thorns extends Skill implements PassiveSkill, Listener {
     @Override
     public void loadSkillConfig() {
         internalCooldown = getConfig("internalCooldown", 2.0, Double.class);
-        baseDamage = getConfig("baseDamage", 0.0, Double.class);
+        baseDamage = getConfig("baseDamage", 0.8, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.8, Double.class);
     }
 }
