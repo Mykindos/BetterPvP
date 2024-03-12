@@ -31,9 +31,10 @@ public class Thorns extends Skill implements PassiveSkill, Listener {
 
     private final Map<LivingEntity, Queue<Long>> hitTimestamps = new HashMap<>();
 
-    private double baseDamagePercent;
-    private double percentIncreasePerLevel;
+    private double baseDamage;
+    private double damageIncreasePerLevel;
     private double reflectTime;
+    private int  hitsToTrigger;
 
     @Inject
     public Thorns(Champions champions, ChampionsManager championsManager) {
@@ -50,12 +51,12 @@ public class Thorns extends Skill implements PassiveSkill, Listener {
 
         return new String[]{
                 "If you are hit 3 times within <stat>" + getReflectTime(level) +"</stat> seconds",
-                "you will reflect back <val>" + (int)(getDamagePercent(level) * 100) + "%</val> of the damage",
+                "you will reflect back <val>" + getDamagePercent(level) + "%</val> damage",
         };
     }
 
-    public double getDamagePercent(int level) {
-        return baseDamagePercent + ((level - 1) * percentIncreasePerLevel);
+    public double getDamage(int level) {
+        return baseDamage + ((level - 1) * damageIncreasePerLevel);
     }
 
     public double getReflectTime(int level){
@@ -91,18 +92,18 @@ public class Thorns extends Skill implements PassiveSkill, Listener {
             timestamps.poll();
         }
 
-        if (timestamps.size() == 3) {
-            double reflectedDamage = event.getDamage() * getDamagePercent(getLevel(player));
+        if (timestamps.size() == hitsToTrigger) {
             player.getWorld().playSound(player.getLocation(), Sound.ENCHANT_THORNS_HIT, 1.0F, 1.0F);
-            UtilDamage.doCustomDamage(new CustomDamageEvent(damager, player, null, DamageCause.ENTITY_ATTACK, reflectedDamage, true, getName()));
+            UtilDamage.doCustomDamage(new CustomDamageEvent(damager, player, null, DamageCause.ENTITY_ATTACK, getDamage(getLevel(player)), true, getName()));
             timestamps.clear();
         }
     }
 
     @Override
     public void loadSkillConfig() {
-        baseDamagePercent = getConfig("returnDamagePercent", 0.4, Double.class);
-        percentIncreasePerLevel = getConfig("percentIncreasePerLevel", 0.1, Double.class);
+        baseDamage = getConfig("baseDamage", 3.0, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
         reflectTime = getConfig("reflectTime", 2.0, Double.class);
+        hitsToTrigger = getConfig("hitsToTrigger", 3, Integer.class);
     }
 }
