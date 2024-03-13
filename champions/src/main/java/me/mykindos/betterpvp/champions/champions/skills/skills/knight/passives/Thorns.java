@@ -50,7 +50,7 @@ public class Thorns extends Skill implements PassiveSkill, Listener {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "If you are hit 3 times within <stat>" + getReflectTime(level) +"</stat> seconds",
+                "If you are hit <stat>" + hitsToTrigger + "</stat> times within <stat>" + getReflectTime(level) +"</stat> seconds",
                 "you will reflect back <val>" + getDamagePercent(level) + "%</val> damage",
         };
     }
