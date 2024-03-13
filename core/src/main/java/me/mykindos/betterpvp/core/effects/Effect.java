@@ -32,8 +32,8 @@ public class Effect {
     }
 
     public void setLength(long length) {
+        this.rawLength = length + 50;
         this.length = System.currentTimeMillis() + length + 50;
-        this.rawLength = length;
     }
 
     public boolean hasExpired() {

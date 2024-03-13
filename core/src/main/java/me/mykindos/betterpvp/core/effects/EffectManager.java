@@ -86,7 +86,7 @@ public class EffectManager extends Manager<List<Effect>> {
                 Effect overwriteEffect = getEffect(target, type, effect.getName()).orElse(null);
                 if (overwriteEffect != null) {
                     overwriteEffect.setAmplifier(effect.getAmplifier());
-                    overwriteEffect.setLength(effect.getLength());
+                    overwriteEffect.setLength(effect.getLength() - System.currentTimeMillis());
 
                     if(effect.getEffectType() instanceof VanillaEffectType vanillaEffectType) {
                         vanillaEffectType.checkActive(target, effect);
