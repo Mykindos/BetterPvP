@@ -59,7 +59,7 @@ public class PinDown extends Skill implements InteractSkill, CooldownSkill, List
                 "Left click with a Bow to activate",
                 "",
                 "Quickly launch an arrow that gives enemies",
-                "<effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength + 1) + "</effect> for <val>" + getDuration(level) + "</val> seconds",
+                "<effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> for <val>" + getDuration(level) + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
