@@ -243,7 +243,7 @@ skills:
       enabled: true
       maxlevel: 3
       internalCooldown: 2.0
-      baseDamage: 0.0
+      baseDamage: 0.8
       damageIncreasePerLevel: 0.8
     sacrifice:
       enabled: true
@@ -295,11 +295,14 @@ skills:
       maxlevel: 5
       cooldown: 9.0
       baseCharge: 40.0
+      chargeIncreasePerLevel: 10.0
       baseDamage: 2.0
+      damageIncreasePerLevel: 2.0
       baseRange: 20.0
+      rangeIncreasePerLevel: 10.0
       energy: 30
       energyDecreasePerLevel: 2.0
-      cooldownDecreasePerLevel: 1.0
+      cooldownDecreasePerLevel: 0.5
       collisionRadius: 1.8
       explosionRadius: 4.0
     rupture:
@@ -349,7 +352,7 @@ skills:
       sphereSize: 4
       speed: 1.5
       cooldownDecreasePerLevel: 2.0
-      baseDuration: 5.0
+      baseDuration: 6.0
       durationIncreasePerLevel: 0.5
     lightningorb:
       enabled: true
@@ -393,9 +396,12 @@ skills:
       baseRadius: 2.0
       radiusIncreasePerLevel: 1.0
       energyDecreasePerLevel: 1.0
-      healCooldown: 2.0
-      healSpeed: 0.3
-      healMultiplier: 0.25
+      baseHealCooldown: 2.0
+      healCooldownDecreasePerLevel: 0.0
+      baseHealSpeed: 0.3
+      healSpeedIncreasePerLevel: 0.0
+      baseHealMultiplier: 0.25
+      healMultiplierIncreasePerLevel: 0.0
     magmablade:
       enabled: true
       maxlevel: 3
