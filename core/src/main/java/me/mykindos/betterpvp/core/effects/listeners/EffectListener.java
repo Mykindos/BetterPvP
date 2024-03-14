@@ -1,10 +1,8 @@
 package me.mykindos.betterpvp.core.effects.listeners;
 
 import com.google.inject.Inject;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.effects.Effect;
 import me.mykindos.betterpvp.core.effects.EffectManager;
-import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.effects.VanillaEffectType;
 import me.mykindos.betterpvp.core.effects.events.EffectClearEvent;
 import me.mykindos.betterpvp.core.effects.events.EffectExpireEvent;
@@ -15,11 +13,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @BPvPListener
@@ -44,11 +41,8 @@ public class EffectListener implements Listener {
             value.removeIf(effect -> {
                 Entity entity = Bukkit.getEntity(UUID.fromString(effect.getUuid()));
                 if (entity instanceof LivingEntity livingEntity) {
-                    if (effect.hasExpired() && !effect.isPermanent()) {
-
+                    if ((effect.hasExpired() && !effect.isPermanent()) || (effect.getRemovalPredicate() != null && effect.getRemovalPredicate().test(livingEntity))) {
                         UtilServer.callEvent(new EffectExpireEvent(livingEntity, effect));
-                        effect.getEffectType().onExpire(livingEntity, effect);
-
                         return true;
 
                     } else {
@@ -68,6 +62,12 @@ public class EffectListener implements Listener {
 
         effectManager.getObjects().entrySet().removeIf(entry -> entry.getValue().isEmpty());
 
+    }
+
+    @EventHandler (priority = EventPriority.MONITOR)
+    public void onExpire(EffectExpireEvent event) {
+        Effect effect = event.getEffect();
+        effect.getEffectType().onExpire(event.getTarget(), effect);
     }
 
     @EventHandler

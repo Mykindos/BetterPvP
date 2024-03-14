@@ -108,7 +108,7 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
 
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.LOW)
     public void onDamage(PreCustomDamageEvent event) {
         if (!enabled) {
             return;
@@ -119,6 +119,7 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
         if (!(cde.getDamager() instanceof Player damager)) return;
         if (isHoldingWeapon(damager)) {
             cde.setDamage(baseDamage);
+            cde.setRawDamage(baseDamage);
         }
     }
 

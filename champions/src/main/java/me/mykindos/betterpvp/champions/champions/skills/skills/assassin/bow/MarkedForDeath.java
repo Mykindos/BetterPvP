@@ -51,10 +51,10 @@ public class MarkedForDeath extends PrepareArrowSkill {
                 "",
                 "Your next arrow will give players <effect>Vulnerability " + UtilFormat.getRomanNumeral(vulnerabilityStrength) + "</effect>",
                 "for <val>" + getDuration(level) + "</val> seconds,",
-                "causing them to take <stat>" + (vulnerabilityStrength * 25) + "%</stat> additional damage",
-                "from all targets.",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level),
+                "",
+                EffectTypes.VULNERABILITY.getDescription(vulnerabilityStrength)
         };
     }
 
@@ -112,6 +112,6 @@ public class MarkedForDeath extends PrepareArrowSkill {
     public void loadSkillConfig() {
         baseDuration = getConfig("baseDuration", 6.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
-        vulnerabilityStrength = getConfig("vulnerabilityStrength", 1, Integer.class);
+        vulnerabilityStrength = getConfig("vulnerabilityStrength", 4, Integer.class);
     }
 }

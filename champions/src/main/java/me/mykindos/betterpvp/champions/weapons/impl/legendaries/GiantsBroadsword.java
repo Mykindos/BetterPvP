@@ -78,7 +78,8 @@ public class GiantsBroadsword extends ChannelWeapon implements InteractWeapon, L
     @Override
     public void activate(Player player) {
         active.add(player.getUniqueId());
-        effectManager.addEffect(player, EffectTypes.REGENERATION, "Giants Broadsword", regenAmplifier, Integer.MAX_VALUE);
+        effectManager.addEffect(player, player, EffectTypes.REGENERATION, "Giants Broadsword", regenAmplifier, -1, true, true);
+
     }
 
     private void deactivate(Player player) {
@@ -139,6 +140,8 @@ public class GiantsBroadsword extends ChannelWeapon implements InteractWeapon, L
                     .extra(0.2f)
                     .receivers(60)
                     .spawn();
+
+
         }
 
         // Passive particles
