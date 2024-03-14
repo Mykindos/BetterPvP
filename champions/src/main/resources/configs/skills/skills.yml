@@ -838,9 +838,9 @@ skills:
     bloodthirst:
       enabled: true
       maxlevel: 3
-      baseHealthPercent: 0.25
+      baseHealthPercent: 0.30
       healthPercentIncreasePerLevel: 0.05
-      speedStrength: 0
+      speedStrength: 1
     soulharvest:
       enabled: true
       maxlevel: 3
@@ -852,7 +852,7 @@ skills:
       enabled: true
       maxlevel: 3
       maxEnemies: 3
-      baseRadius: 3.0
+      baseRadius: 4.0
       radiusIncreasePerLevel: 1.0
       baseDecrease: 0.15
       baseDecreasePerPlayer: 0.05

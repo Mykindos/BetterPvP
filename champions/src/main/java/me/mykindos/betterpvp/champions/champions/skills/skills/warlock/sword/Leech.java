@@ -73,11 +73,11 @@ public class Leech extends PrepareSkill implements CooldownSkill {
     }
 
     public double getRange(int level) {
-        return baseRange + level * rangeIncreasePerLevel;
+        return baseRange + (level - 1) * rangeIncreasePerLevel;
     }
 
     public double getLeechedHealth(int level) {
-        return baseLeechedHealth + level * leachedHealthIncreasePerLevel;
+        return baseLeechedHealth + (level - 1) * leachedHealthIncreasePerLevel;
     }
 
     @Override
