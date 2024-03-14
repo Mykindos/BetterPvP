@@ -144,7 +144,7 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
     }
 
     private void pounce(Player player, ChargeData chargeData, int level) {
-        UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s<gray>.", getName());
+        UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s %d<gray>.", getName(), level);
 
         // Velocity
         final double charge = chargeData.getCharge();
@@ -295,7 +295,7 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
         chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 10.0, Double.class);
         baseDamage = getConfig("baseDamage", 2.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
-        baseSlowDuration = getConfig("slowDuration", 3.0, Double.class);
+        baseSlowDuration = getConfig("baseSlowDuration", 3.0, Double.class);
         slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.0, Double.class);
 
         slowStrength = getConfig("slowStrength", 2, Integer.class);

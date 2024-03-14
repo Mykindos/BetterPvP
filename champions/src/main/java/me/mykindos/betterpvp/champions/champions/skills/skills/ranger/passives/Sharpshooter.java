@@ -110,7 +110,7 @@ public class Sharpshooter extends Skill implements PassiveSkill {
 
     @Override
     public void loadSkillConfig() {
-        baseMaxTimeBetweenShots = getConfig("maxTimeBetweenShots", 5.0, Double.class);
+        baseMaxTimeBetweenShots = getConfig("baseMaxTimeBetweenShots", 5.0, Double.class);
         maxTimeBetweenShotsIncreasePerLevel = getConfig("maxTimeBetweenShotsIncreasePerLevel", 0.0, Double.class);
         maxConsecutiveHits = getConfig("maxConsecutiveHits", 2, Integer.class);
         baseDamage = getConfig("baseDamage", 1.0, Double.class);
