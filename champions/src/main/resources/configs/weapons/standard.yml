@@ -5,7 +5,7 @@ throwing_web:
   throwableExpiry: 10.0
 mushroom_stew:
   enabled: true
-  cooldown: 14.0
+  cooldown: 10.0
   duration: 4.0
   level: 2
 warlock_boots:
