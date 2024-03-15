@@ -75,11 +75,11 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Fissure the earth infront of you,",
+                "Fissure the earth in front of you,",
                 "creating an impassable wall",
                 "",
                 "Players struck by wall will receive",
-                "<effect>Slowness " + UtilFormat.getRomanNumeral(slownessLevel + 1) + "</effect> for <val>" + getSlowDuration(level) + "</val> seconds and take",
+                "<effect>Slowness " + UtilFormat.getRomanNumeral(slownessLevel) + "</effect> for <val>" + getSlowDuration(level) + "</val> seconds and take",
                 "<val>" + (Math.round(getDamage(level) * 10) / 10.0) + "</val> damage for every block fissure",
                 "has travelled",
                 "",
@@ -88,7 +88,7 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
     }
 
     public double getDamage(int blocksTraveled, int level) {
-        return (damagePerBlock + ((level - 1) * damagePerBlockIncreasePerLevel)) * blocksTraveled;
+        return getDamage(level) * blocksTraveled;
     }
 
     public double getDamage(int level) {

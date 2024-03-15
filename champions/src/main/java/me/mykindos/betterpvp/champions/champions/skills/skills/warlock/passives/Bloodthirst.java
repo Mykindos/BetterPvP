@@ -45,12 +45,12 @@ public class Bloodthirst extends Skill implements PassiveSkill {
                 "to detect nearby enemies below <val>" + getHealthPercent(level) * 100 + "%</val> health",
                 "",
                 "While running towards weak enemies,",
-                "you receive <effect>Speed " + UtilFormat.getRomanNumeral(speedStrength + 1) + "</effect>"
+                "you receive <effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect>"
         };
     }
 
     public double getHealthPercent(int level) {
-        return baseHealthPercent + level * healthPercentIncreasePerLevel;
+        return baseHealthPercent + (level - 1) * healthPercentIncreasePerLevel;
     }
 
     @Override
@@ -93,9 +93,9 @@ public class Bloodthirst extends Skill implements PassiveSkill {
 
     @Override
     public void loadSkillConfig() {
-        baseHealthPercent = getConfig("baseHealthPercent", 0.25, Double.class);
+        baseHealthPercent = getConfig("baseHealthPercent", 0.30, Double.class);
         healthPercentIncreasePerLevel = getConfig("healthPercentIncreasePerLevel", 0.05, Double.class);
 
-        speedStrength = getConfig("speedStrength", 0, Integer.class);
+        speedStrength = getConfig("speedStrength", 1, Integer.class);
     }
 }

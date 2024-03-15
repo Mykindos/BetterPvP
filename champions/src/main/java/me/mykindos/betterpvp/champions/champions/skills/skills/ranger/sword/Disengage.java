@@ -70,7 +70,7 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
                 "",
                 "If you are attacked while channeling for less than <stat>" + getChannelDuration(level) + "</stat> seconds,",
                 "you successfully disengage, leaping backwards",
-                "and giving your attacker <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength + 1) + "</effect> for",
+                "and giving your attacker <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect> for",
                 "<val>" + getSlowDuration(level) + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)};

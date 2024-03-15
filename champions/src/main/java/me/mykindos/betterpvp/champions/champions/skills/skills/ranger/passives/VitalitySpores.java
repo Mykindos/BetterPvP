@@ -49,7 +49,7 @@ public class VitalitySpores extends Skill implements PassiveSkill {
         return new String[]{
                 "After <val>" + getDuration(level) + "</val> seconds of not taking damage,",
                 "forest spores surround you, giving",
-                "you <effect>Regeneration " + UtilFormat.getRomanNumeral(regenerationStrength + 1) + "</effect>",
+                "you <effect>Regeneration " + UtilFormat.getRomanNumeral(regenerationStrength) + "</effect>",
                 "",
                 "You will keep the buff until you take damage"};
     }

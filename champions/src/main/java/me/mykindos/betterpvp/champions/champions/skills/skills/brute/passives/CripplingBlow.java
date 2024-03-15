@@ -43,7 +43,7 @@ public class CripplingBlow extends Skill implements PassiveSkill {
 
         return new String[]{
                 "Enemies you hit with an axe don't take knockback",
-                "and receive <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength + 1) + "</effect> for <val>" + getDuration(level) + "</val> seconds"
+                "and receive <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> for <val>" + getDuration(level) + "</val> seconds"
         };
     }
 

@@ -65,7 +65,7 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
                 "Right click with an Axe to activate",
                 "",
                 "Hurl yourself forwards, dealing <val>" + getDamage(level) + "</val> damage,",
-                "taking <val>" + getRecoilDamage(level) + "</val> damage, and applying <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength + 1) + "</effect>",
+                "taking <val>" + getRecoilDamage(level) + "</val> damage, and applying <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect>",
                 "to yourself and the target for <val>" + getDuration(level) + "</val> seconds",
                 "",
                 "Cannot be used while grounded",
@@ -149,15 +149,15 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
     public void doTakedown(Player player, LivingEntity target) {
         int level = getLevel(player);
 
-        UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <alt>" + target.getName() + "</alt> with <alt>" + getName());
+        UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <alt>" + target.getName() + "</alt> with <alt>" + getName() + " " + level);
 
-        UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <alt>" + target.getName() + "</alt> with <alt>" + getName());
+        UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <alt>" + target.getName() + "</alt> with <alt>" + getName() + " " + level);
         UtilDamage.doCustomDamage(new CustomDamageEvent(target, player, null, DamageCause.CUSTOM, getDamage(level), false, "Takedown"));
 
-        UtilMessage.simpleMessage(target, getClassType().getName(), "<alt>" + player.getName() + "</alt> hit you with <alt>" + getName());
+        UtilMessage.simpleMessage(target, getClassType().getName(), "<alt>" + player.getName() + "</alt> hit you with <alt>" + getName() + " " + level);
         UtilDamage.doCustomDamage(new CustomDamageEvent(player, target, null, DamageCause.CUSTOM, getRecoilDamage(level), false, "Takedown Recoil"));
 
-        long duration = (long) ((baseDuration + ((level - 1) * durationIncreasePerLevel)) * 1000L);
+        long duration = (long) (getDuration(level) * 1000L);
         championsManager.getEffects().addEffect(player, EffectTypes.NO_JUMP, duration);
         championsManager.getEffects().addEffect(target, player, EffectTypes.NO_JUMP, duration);
         championsManager.getEffects().addEffect(player, EffectTypes.SLOWNESS, slownessStrength, duration);

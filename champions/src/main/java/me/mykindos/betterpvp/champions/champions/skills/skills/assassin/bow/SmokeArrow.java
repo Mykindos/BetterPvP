@@ -48,7 +48,7 @@ public class SmokeArrow extends PrepareArrowSkill {
                 "Left click with a Bow to prepare",
                 "",
                 "Your next arrow will give <effect>Blindness</effect>",
-                "and <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength + 1) + "</effect> to the target for <val>" + getEffectDuration(level) + "</val> seconds.",
+                "and <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> to the target for <val>" + getEffectDuration(level) + "</val> seconds.",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -90,7 +90,7 @@ public class SmokeArrow extends PrepareArrowSkill {
     public void onHit(Player damager, LivingEntity target, int level) {
         final int effectDuration = (int) (getEffectDuration(level) * 1000L);
         championsManager.getEffects().addEffect(target, damager, EffectTypes.BLINDNESS, 1, effectDuration);
-        championsManager.getEffects().addEffect(target, damager, EffectTypes.SLOWNESS, 2, effectDuration);
+        championsManager.getEffects().addEffect(target, damager, EffectTypes.SLOWNESS, slownessStrength, effectDuration);
         target.getWorld().playSound(target.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
 
         new ParticleBuilder(Particle.EXPLOSION_LARGE)

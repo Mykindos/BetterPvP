@@ -55,7 +55,7 @@ public class SoulHarvest extends Skill implements PassiveSkill {
                 "which is only visible to " + getClassType().getName(),
                 "",
                 "Collected souls give bursts of",
-                "<effect>Speed " + UtilFormat.getRomanNumeral(speedStrength + 1) + "</effect> and <effect>Regeneration " + UtilFormat.getRomanNumeral(regenerationStrength + 1) + "</effect>",
+                "<effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect> and <effect>Regeneration " + UtilFormat.getRomanNumeral(regenerationStrength) + "</effect>",
                 "",
                 "Buff duration: <val>" + getBuffDuration(level) + "</val> seconds"
         };

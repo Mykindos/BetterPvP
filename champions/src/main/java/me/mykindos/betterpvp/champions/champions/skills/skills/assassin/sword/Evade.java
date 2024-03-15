@@ -117,12 +117,12 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
         } else {
             target = findLocationBehind(ent, player);
         }
-
+        int level = getLevel(player);
         if (target != null) {
             player.teleport(target);
             cooldownManager.removeCooldown(player, getName(), true);
 
-            int level = getLevel(player);
+
 
             long channelTime = System.currentTimeMillis() - handRaisedTime.get(player.getUniqueId());
             double channelTimeInSeconds = channelTime / 1000.0;
@@ -132,10 +132,10 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
             handRaisedTime.remove(player.getUniqueId());
         }
 
-        UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s<gray>.", getName());
+        UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s %s<gray>.", getName(), level);
 
         if (ent instanceof Player temp) {
-            UtilMessage.simpleMessage(temp, getClassType().getName(), "<yellow>%s<gray> used evade!", player.getName());
+            UtilMessage.simpleMessage(temp, getClassType().getName(), "<yellow>%s<gray> used <green>%s %s</green>!", player.getName(), getName(), level);
         }
 
         active.remove(player.getUniqueId());
@@ -299,7 +299,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
 
     @Override
     public double getCooldown(int level) {
-        return cooldown - level;
+        return cooldown - (level - 1);
     }
 
     @Override
