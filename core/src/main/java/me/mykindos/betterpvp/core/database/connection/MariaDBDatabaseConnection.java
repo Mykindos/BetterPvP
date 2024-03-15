@@ -42,7 +42,7 @@ public class MariaDBDatabaseConnection implements IDatabaseConnection {
                 try {
                     connection = DriverManager.getConnection(url, sqlUsername, sqlPassword);
                 } catch (SQLException ex) {
-                    ex.printStackTrace();
+                    log.error("Failed to connect to the MariaDB database. Please check your connection settings.", ex);
                 }
             }
         } catch (SQLException e) {
