@@ -23,7 +23,7 @@ import org.bukkit.event.block.Action;
 @Singleton
 public class ThreateningShout extends Skill implements InteractSkill, CooldownSkill {
 
-    private int radius;
+    private double radius;
     private double baseDuration;
     private double durationIncreasePerLevel;
     private int vulnerabilityStrength;
@@ -93,7 +93,7 @@ public class ThreateningShout extends Skill implements InteractSkill, CooldownSk
 
     @Override
     public void loadSkillConfig() {
-        radius = getConfig("radius", 4, Integer.class);
+        radius = getConfig("radius", 4.0, Double.class);
         baseDuration = getConfig("baseDuration", 3.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 2.0, Double.class);
         vulnerabilityStrength = getConfig("vulnerabilityStrength", 2, Integer.class);

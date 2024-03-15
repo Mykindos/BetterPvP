@@ -50,9 +50,9 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
     private int fissureDistanceIncreasePerLevel;
     private double fissureExpireDuration;
     private double damagePerBlock;
-    private int effectDurationIncreasePerLevel;
     private double damagePerBlockIncreasePerLevel;
-    private int effectDuration;
+    private double effectDuration;
+    private double effectDurationIncreasePerLevel;
     private int slownessLevel;
     private List<String> forbiddenBlockTypes;
 
@@ -225,12 +225,12 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
         fissureExpireDuration = getConfig("fissureExpireDuration", 10.0, Double.class);
         damagePerBlock = getConfig("baseExtraDamagePerBlock", 0.6, Double.class);
         damagePerBlockIncreasePerLevel = getConfig("baseExtraDamagePerBlockIncreasePerLevel", 0.2, Double.class);
-        effectDuration = getConfig("effectDuration", 1, Integer.class);
-        effectDurationIncreasePerLevel = getConfig("effectDurationIncreasePerLevel", 1, Integer.class);
+        effectDuration = getConfig("effectDuration", 1.0, Double.class);
+        effectDurationIncreasePerLevel = getConfig("effectDurationIncreasePerLevel", 1.0, Double.class);
         slownessLevel = getConfig("slownessLevel", 2, Integer.class);
 
         var forbidden = List.of("TNT", "ENCHANTING_TABLE");
-        forbiddenBlockTypes = (List<String>) getConfig("fissureForbiddenBlocks", forbidden, List.class);
+        forbiddenBlockTypes = getConfig("fissureForbiddenBlocks", forbidden, List.class);
 
     }
 

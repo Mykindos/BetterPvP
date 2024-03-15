@@ -462,9 +462,9 @@ skills:
       fissureExpireDuration: 10.0
       baseExtraDamagePerBlock: 0.4
       baseExtraDamagePerBlockIncreasePerLevel: 0.2
-      effectDuration: 1
+      effectDuration: 1.0
       slownessLevel: 2
-      effectDurationIncreasePerLevel: 1
+      effectDurationIncreasePerLevel: 1.0
       gateCheckEnabled: true
       doorCheckEnabled: true
       fissureForbiddenBlocks:
@@ -631,7 +631,7 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 20.0
-      radius: 4
+      radius: 4.0
       duration: 3.0
       cooldownDecreasePerLevel: 1.0
       baseDuration: 3.0

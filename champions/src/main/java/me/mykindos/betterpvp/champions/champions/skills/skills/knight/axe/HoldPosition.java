@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -126,7 +127,7 @@ public class HoldPosition extends Skill implements InteractSkill, CooldownSkill,
 
     private void spawnMobSpellParticles(Player player) {
         Location loc = player.getLocation();
-        Random random = new Random();
+        Random random = UtilMath.RANDOM;
         for (int i = 0; i < 5; i++) {
             double x = loc.getX() + (random.nextDouble() - 0.5) * 0.9;
             double y = loc.getY() + (0.25 + (random.nextDouble() - 0.5) * 0.9);

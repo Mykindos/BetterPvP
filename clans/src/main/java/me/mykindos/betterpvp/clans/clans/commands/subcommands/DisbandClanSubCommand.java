@@ -44,7 +44,7 @@ public class DisbandClanSubCommand extends ClanSubCommand {
     @Override
     public void execute(Player player, Client client, String... args) {
 
-        Clan clan = clanManager.getClanByPlayer(player).orElseThrow();;
+        Clan clan = clanManager.getClanByPlayer(player).orElseThrow();
         Optional<ClanMember> leaderOptional = clan.getLeader();
         if (leaderOptional.isPresent()) {
             ClanMember leader = leaderOptional.get();
@@ -60,7 +60,7 @@ public class DisbandClanSubCommand extends ClanSubCommand {
             }
 
             if (System.currentTimeMillis() < clan.getLastTntedTime()) {
-                UtilMessage.simpleMessage(player, "Clans", "You cannot disband your clan for <alt>" + UtilTime.getTime(clan.getLastTntedTime() - System.currentTimeMillis(), 1));
+                UtilMessage.simpleMessage(player, "Clans", "You cannot disband your clan for <alt>" + UtilTime.getTime((clan.getLastTntedTime() - System.currentTimeMillis()), 1));
                 return;
             }
 

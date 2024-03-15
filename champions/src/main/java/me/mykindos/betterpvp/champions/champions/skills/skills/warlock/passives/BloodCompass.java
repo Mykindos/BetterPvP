@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Bukkit;
@@ -44,7 +45,6 @@ public class BloodCompass extends Skill implements CooldownToggleSkill, Listener
     public double maxDistanceIncreasePerLevel;
     public int effectDurationIncreasePerLevel;
 
-    public double cooldownDecreasePerLevel;
     private final Map<Player, List<List<Location>>> playerMarkersMap = new WeakHashMap<>();
     private final Map<Player, WeakHashMap<Integer, Player>> playerLineToPlayerMap = new WeakHashMap<>();
     private final Map<Player, Integer> playerTaskIdMap = new WeakHashMap<>();
@@ -112,14 +112,6 @@ public class BloodCompass extends Skill implements CooldownToggleSkill, Listener
     public void toggle(Player player, int level) {
         resetDrawingState(player);
         findEnemies(player, level);
-
-        List<List<Location>> markers = playerMarkersMap.get(player);
-        Map<Integer, Player> lineToPlayerMap = playerLineToPlayerMap.get(player);
-
-        for (int lineIndex = 0; lineIndex < markers.size(); lineIndex++) {
-            List<Location> points = markers.get(lineIndex);
-            Player target = lineToPlayerMap.get(lineIndex);
-        }
 
         startDrawingLines(player);
     }
@@ -211,7 +203,7 @@ public class BloodCompass extends Skill implements CooldownToggleSkill, Listener
             point.add(0, heightFactor, 0);
             point.add(waveFactor, waveFactor, waveFactor);
 
-            Random random = new Random();
+            Random random = UtilMath.RANDOM;
             point.add(random.nextDouble() - 0.5, random.nextDouble() - 0.5, random.nextDouble() - 0.5);
 
             points.add(point);
@@ -228,7 +220,7 @@ public class BloodCompass extends Skill implements CooldownToggleSkill, Listener
         World world = start.getWorld();
         double distance = start.distance(end);
         int points = (int) (distance * 10);
-        Random random = new Random();
+        Random random = UtilMath.RANDOM;
         int level = getLevel(player);
 
         for (int i = 0; i <= points; i++) {
@@ -287,6 +279,5 @@ public class BloodCompass extends Skill implements CooldownToggleSkill, Listener
         effectDurationIncreasePerLevel = getConfig("effectDurationIncreasePerLevel", 1, Integer.class);
         maxDistanceIncreasePerLevel = getConfig("maxDistanceIncreasePerLevel", 0.0, Double.class);
         escapeRadiusIncreasePerLevel = getConfig("escapeRadiusIncreasePerLevel", 0.0, Double.class);
-        cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 1.0, Double.class);
     }
 }

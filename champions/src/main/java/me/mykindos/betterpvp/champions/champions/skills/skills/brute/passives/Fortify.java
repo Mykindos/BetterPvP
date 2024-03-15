@@ -54,7 +54,7 @@ public class Fortify extends Skill implements PassiveSkill {
         if (event.getDamagee() instanceof Player damagee) {
             int level = getLevel(damagee);
             if (level > 0) {
-                double modifier = level * 15;
+                double modifier = level * 15d;
 
                 event.setDamage(event.getDamage() * (1.0 - (modifier / 100)));
             }
