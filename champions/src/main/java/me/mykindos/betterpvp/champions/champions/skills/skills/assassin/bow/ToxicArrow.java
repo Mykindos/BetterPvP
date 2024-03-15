@@ -50,11 +50,15 @@ public class ToxicArrow extends PrepareArrowSkill {
                 "Left click with a Bow to prepare",
                 "",
                 "Your next arrow will give your target ",
-                "<effect>Poison " + UtilFormat.getRomanNumeral(poisonStrength) + "</effect> for <val>" + (baseDuration + level) + "</val> seconds",
+                "<effect>Poison " + UtilFormat.getRomanNumeral(poisonStrength) + "</effect> for <val>" + getDuration(level) + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
 
         };
+    }
+
+    public double getDuration(int level) {
+        return (baseDuration + (level - 1) * durationIncreasePerLevel);
     }
 
     @Override

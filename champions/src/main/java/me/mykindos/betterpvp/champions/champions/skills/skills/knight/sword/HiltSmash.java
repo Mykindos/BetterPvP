@@ -69,11 +69,11 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener {
     }
 
     public double getDamage(int level) {
-        return baseDamage + ((level-1) * damageIncreasePerLevel);
+        return baseDamage + ((level - 1) * damageIncreasePerLevel);
     }
 
     public double getDuration(int level) {
-        return baseDuration + ((level-1) * durationIncreasePerLevel);
+        return baseDuration + ((level - 1) * durationIncreasePerLevel);
     }
 
     @Override

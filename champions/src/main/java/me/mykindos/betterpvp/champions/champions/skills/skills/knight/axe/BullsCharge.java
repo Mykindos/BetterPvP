@@ -39,8 +39,10 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
     private final HashMap<UUID, Long> running = new HashMap<>();
 
     private double speedDuration;
+    private double speedDurationIncreasePerLevel;
 
     private double slowDuration;
+    private double slowDurationIncreasePerLevel;
 
     private int speedStrength;
 
@@ -61,8 +63,8 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Enter a rage, gaining <effect>Speed " + UtilFormat.getRomanNumeral(speedStrength + 1) + "</effect> for ",
-                "and giving <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength + 1) + "</effect> to anything you hit for <stat>" + slowDuration + "</stat> seconds",
+                "Enter a rage, gaining <effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect> for <stat>" + getSpeedDuration(level) + "</stat> seconds",
+                "and giving <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> to anything you hit for <stat>" + getSlowDuration(level) + "</stat> seconds",
                 "",
                 "While charging, you take no knockback",
                 "",
@@ -70,12 +72,20 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
         };
     }
 
+    public double getSpeedDuration(int level) {
+        return speedDuration + (level - 1) * speedDurationIncreasePerLevel;
+    }
+
+    public double getSlowDuration(int level) {
+        return slowDuration + (level - 1) * slowDurationIncreasePerLevel;
+    }
+
     @Override
     public void activate(Player player, int level) {
-        championsManager.getEffects().addEffect(player, EffectTypes.SPEED, getName(), speedStrength, (long) (speedDuration * 1000L));
+        championsManager.getEffects().addEffect(player, EffectTypes.SPEED, getName(), speedStrength, (long) (getSpeedDuration(level) * 1000L));
         UtilSound.playSound(player.getWorld(), player, Sound.ENTITY_ENDERMAN_SCREAM, 1.5F, 0);
         player.getWorld().playEffect(player.getLocation(), Effect.STEP_SOUND, Material.OBSIDIAN);
-        running.put(player.getUniqueId(), System.currentTimeMillis() + (long)(speedDuration * 1000));
+        running.put(player.getUniqueId(), System.currentTimeMillis() + (long)(getSpeedDuration(level) * 1000));
     }
 
     @EventHandler(priority = EventPriority.HIGH)
@@ -101,16 +111,14 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
                     running.remove(damager.getUniqueId());
                     return;
                 }
-
+                int level = getLevel(damager);
                 event.setKnockback(false);
 
-                championsManager.getEffects().addEffect(damagee, damager, EffectTypes.SLOWNESS, slownessStrength, (long) (slowDuration * 1000L));
+                championsManager.getEffects().addEffect(damagee, damager, EffectTypes.SLOWNESS, slownessStrength, (long) (getSlowDuration(level) * 1000L));
                 championsManager.getEffects().removeEffect(damager, EffectTypes.SPEED, getName());
 
                 damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_ENDERMAN_SCREAM, 1.5F, 0.0F);
                 damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1.5F, 0.5F);
-
-                int level = getLevel(damager);
 
                 if (event.getDamagee() instanceof Player damaged) {
                     UtilMessage.simpleMessage(damaged, getClassType().getName(), "<yellow>" + damager.getName() + "</yellow> hit you with <green>" + getName() + " " + level + "</green>.");
@@ -165,8 +173,11 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
     @Override
     public void loadSkillConfig() {
         speedDuration = getConfig("speedDuration", 3.0, Double.class);
+        speedDurationIncreasePerLevel = getConfig("speedDurationIncreasePerLevel", 0.0, Double.class);
         speedStrength = getConfig("speedStrength", 3, Integer.class);
+
         slowDuration = getConfig("slowDuration", 3.0, Double.class);
+        slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.0, Double.class);
         slownessStrength = getConfig("slownessStrength", 3, Integer.class);
     }
 

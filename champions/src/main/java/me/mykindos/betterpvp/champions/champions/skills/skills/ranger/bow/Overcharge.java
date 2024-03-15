@@ -54,9 +54,10 @@ public class Overcharge extends Skill implements InteractSkill, Listener {
 
     private double damageIncrementPerLevel;
 
-    private double durationIncrement;
+    private double baseDurationIncrement;
     
-    private double durationIncrementPerLevel;
+    private double durationDecreasePerLevel;
+
 
     private double baseMaxDamage;
 
@@ -79,7 +80,7 @@ public class Overcharge extends Skill implements InteractSkill, Listener {
                 "Hold right click with a Bow to use",
                 "",
                 "Draw back harder on your bow, giving",
-                "<stat>" + baseDamageIncrement + "</stat> bonus damage per <stat>" + durationIncrement + "</stat> seconds",
+                "<stat>" + getDamageIncrement(level) + "</stat> bonus damage per <stat>" + getDurationIncrement(level) + "</stat> seconds",
                 "",
                 "Maximum Damage: <val>" + getMaxDamage(level)
         };
@@ -91,6 +92,10 @@ public class Overcharge extends Skill implements InteractSkill, Listener {
 
     public double getMaxDamage(int level) {
         return baseMaxDamage + ((level-1) * maxDamageIncreasePerLevel);
+    }
+
+    private double getDurationIncrement(int level) {
+        return baseDurationIncrement + ((level - 1) * durationDecreasePerLevel);
     }
 
     @Override
@@ -163,7 +168,7 @@ public class Overcharge extends Skill implements InteractSkill, Listener {
             OverchargeData data = iterator.next().getValue();
             Player player = Bukkit.getPlayer(data.getUuid());
             if (player != null) {
-
+                int level = getLevel(player);
                 if (!charging.contains(player.getUniqueId())) {
                     iterator.remove();
                     continue;
@@ -193,7 +198,7 @@ public class Overcharge extends Skill implements InteractSkill, Listener {
                     continue;
                 }
 
-                if (UtilTime.elapsed(data.getLastCharge(), (long) (durationIncrement * 1000))) {
+                if (UtilTime.elapsed(data.getLastCharge(), (long) (getDurationIncrement(level) * 1000))) {
                     if (data.getCharge() < data.getMaxCharge()) {
                         data.addCharge();
                         UtilMessage.simpleMessage(player, getClassType().getName(), "%s: <yellow>+%d<gray> Bonus Damage", getName(), data.getCharge());
@@ -261,7 +266,8 @@ public class Overcharge extends Skill implements InteractSkill, Listener {
     public void loadSkillConfig() {
         baseDamageIncrement = getConfig("baseDamageIncrement", 1.0, Double.class);
         damageIncrementPerLevel = getConfig("damageIncrementPerLevel", 0.0 , Double.class);
-        durationIncrement = getConfig("baseDurationIncrement", 0.4, Double.class);
+        baseDurationIncrement = getConfig("baseDurationIncrement", 0.4, Double.class);
+        durationDecreasePerLevel = getConfig("baseDurationIncrement", 0.0, Double.class);
 
         baseMaxDamage = getConfig("baseMaxDamage", 2.0, Double.class);
         maxDamageIncreasePerLevel = getConfig("maxDamageIncreasePerLevel", 1.0, Double.class);

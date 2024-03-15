@@ -78,7 +78,7 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
                 "",
                 "Rupture the earth in the direction",
                 "you are facing, dealing <stat>" + getDamage(level) + "</stat> damage,",
-                "knocking up and giving <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength + 1) + "</effect> to enemies",
+                "knocking up and giving <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect> to enemies",
                 "hit for <stat>" + getSlowDuration(level) + "</stat> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)

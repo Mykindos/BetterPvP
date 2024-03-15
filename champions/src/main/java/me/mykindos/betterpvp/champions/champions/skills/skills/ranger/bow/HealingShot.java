@@ -51,7 +51,7 @@ public class HealingShot extends PrepareArrowSkill {
         return new String[]{
                 "Left click with a Bow to prepare",
                 "",
-                "Shoot an arrow that gives <effect>Regeneration " + UtilFormat.getRomanNumeral(regenerationStrength + 1) + "</effect>",
+                "Shoot an arrow that gives <effect>Regeneration " + UtilFormat.getRomanNumeral(regenerationStrength) + "</effect>",
                 "to allies hit for <val>" + getDuration(level) + "</val> seconds",
                 "and cleanse them of all negative effects",
                 "",

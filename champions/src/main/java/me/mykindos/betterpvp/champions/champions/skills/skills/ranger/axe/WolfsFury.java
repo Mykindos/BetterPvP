@@ -69,7 +69,7 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
     }
 
     public double getDuration(int level) {
-        return baseDuration + level * durationIncreasePerLevel;
+        return baseDuration + (level - 1) * durationIncreasePerLevel;
     }
 
     public int getMaxMissedSwings(int level) {
@@ -165,7 +165,7 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
 
     @Override
     public void loadSkillConfig() {
-        baseDuration = getConfig("baseDuration", 3.0, Double.class);
+        baseDuration = getConfig("baseDuration", 4.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
         baseMissedSwings = getConfig("baseMissedSwings", 2, Integer.class);
         missedSwingsIncreasePerLevel = getConfig("missedSwingsIncreasePerLevel", 0.5, Double.class); // 1 extra swing per 2 levels

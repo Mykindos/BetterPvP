@@ -14,7 +14,6 @@ import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
@@ -53,9 +52,6 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
     private boolean blocksArrow;
 
     @Inject
-    private CooldownManager cooldownManager;
-
-    @Inject
     public DefensiveStance(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
@@ -82,11 +78,11 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
     }
 
     public double getDamage(int level) {
-        return baseDamage + (damageIncreasePerLevel * (level -1));
+        return baseDamage + (damageIncreasePerLevel * (level - 1));
     }
 
     public double getDamageReduction(int level) {
-        return baseDamageReduction + (damageReductionPerLevel * (level-1));
+        return baseDamageReduction + (damageReductionPerLevel * (level - 1));
     }
 
     @Override

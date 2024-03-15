@@ -70,7 +70,7 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
                 "Right click with an Axe to activate",
                 "",
                 "Sprint with great agility, gaining",
-                "<effect>Speed " + UtilFormat.getRomanNumeral(speedStrength + 1) + "</effect> for <val>" + (getDuration(level)) + "</val> seconds and ",
+                "<effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect> for <val>" + (getDuration(level)) + "</val> seconds and ",
                 "<stat>" + (getDamageReduction(level) * 100) + "%</stat> reduced damage while active",
                 "",
                 "Agility ends if you left click",
