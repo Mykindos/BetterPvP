@@ -9,6 +9,7 @@ skills:
       cooldownDecreasePerLevel: 0.5
       leapStrength: 1.3
       wallKickStrength: 0.9
+      wallKickInternalCooldown: 1.0
     sever:
       enabled: true
       cooldown: 20.0
