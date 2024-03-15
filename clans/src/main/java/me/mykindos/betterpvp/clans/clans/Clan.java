@@ -117,7 +117,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
     }
 
     public String getAge() {
-        return UtilTime.getTime(System.currentTimeMillis() - getTimeCreated(), 1);
+        return UtilTime.getTime((System.currentTimeMillis() - getTimeCreated()), 1);
     }
 
     /**
