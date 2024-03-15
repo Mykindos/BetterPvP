@@ -18,6 +18,7 @@ import org.bukkit.event.EventHandler;
 @BPvPListener
 public class FastRecovery extends Skill implements PassiveSkill {
 
+    private double basePercentage;
     private double percentagePerLevel;
 
     @Inject
@@ -35,11 +36,15 @@ public class FastRecovery extends Skill implements PassiveSkill {
 
         return new String[]{
                 "Increase your energy regeneration speed",
-                "by <val>" + ((percentagePerLevel * 100) * level) + "%",
+                "by <val>" + getPercentage(level) + "%",
                 "",
                 "Does not work with legendary items equipped"
 
         };
+    }
+
+    public double getPercentage(int level) {
+        return basePercentage + ((level - 1) * percentagePerLevel);
     }
 
     @Override
@@ -53,7 +58,7 @@ public class FastRecovery extends Skill implements PassiveSkill {
 
         int level = getLevel(player);
         if(level > 0) {
-            event.setEnergy(event.getEnergy() * (1.0 + (percentagePerLevel * level)));
+            event.setEnergy(event.getEnergy() * (1.0 + getPercentage(level)));
         }
 
     }
@@ -66,6 +71,7 @@ public class FastRecovery extends Skill implements PassiveSkill {
 
     @Override
     public void loadSkillConfig(){
+        basePercentage = getConfig("basePercentage", 0.20, Double.class);
         percentagePerLevel = getConfig("percentagePerLevel", 0.20, Double.class);
     }
 

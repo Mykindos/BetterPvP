@@ -24,7 +24,6 @@ public class HolyLight extends Skill implements PassiveSkill {
     public double baseRadius;
 
     public double radiusIncreasePerLevel;
-
     public int regenerationStrength;
 
     public double baseDuration;
@@ -47,7 +46,7 @@ public class HolyLight extends Skill implements PassiveSkill {
         return new String[]{
                 "Create an aura that gives",
                 "yourself and all allies within",
-                "<val>" + getRadius(level) + "</val> blocks <effect>Regeneration " + UtilFormat.getRomanNumeral(regenerationStrength + 1) + "</effect>"};
+                "<val>" + getRadius(level) + "</val> blocks <effect>Regeneration " + UtilFormat.getRomanNumeral(regenerationStrength) + "</effect>"};
     }
 
     public double getRadius(int level) {

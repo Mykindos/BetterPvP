@@ -40,13 +40,13 @@ public class BarbedArrows extends Skill implements PassiveSkill {
     @Override
     public String[] getDescription(int level) {
         return new String[] {
-                "Your arrows apply <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength + 1) + "</effect> to any",
+                "Your arrows apply <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> to any",
                 "damageable target for <val>" + (getDuration(level)) + "</val> seconds"
         };
     }
 
     public double getDuration(int level) {
-        return baseDuration + level * durationIncreasePerLevel;
+        return baseDuration + (level - 1) * durationIncreasePerLevel;
     }
 
     @Override
@@ -74,7 +74,7 @@ public class BarbedArrows extends Skill implements PassiveSkill {
 
     @Override
     public void loadSkillConfig(){
-        baseDuration = getConfig("baseDuration", 2.0, Double.class);
+        baseDuration = getConfig("baseDuration", 2.5, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
         slownessStrength = getConfig("slownessStrength", 2, Integer.class);
     }

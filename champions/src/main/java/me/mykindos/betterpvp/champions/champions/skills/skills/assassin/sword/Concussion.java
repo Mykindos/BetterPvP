@@ -46,14 +46,14 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener 
         return new String[]{
                 "Right click with a Sword to prepare",
                 "",
-                "Your next hit will <effect>Blind</effect> the target for <val>" + (durationIncreasePerLevel * level) + "</val> seconds",
+                "Your next hit will <effect>Blind</effect> the target for <val>" + getDuration(level) + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
     }
 
     public double getDuration(int level) {
-        return baseDuration + (durationIncreasePerLevel * level);
+        return baseDuration + (durationIncreasePerLevel * (level - 1));
     }
 
     @Override
@@ -122,7 +122,7 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener 
 
     @Override
     public void loadSkillConfig() {
-        baseDuration = getConfig("baseDuration", 0.0, Double.class);
+        baseDuration = getConfig("baseDuration", 1.5, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.5, Double.class);
     }
 }
