@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.core.utilities;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -21,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UtilBlock {
 
     public static Collection<BoundingBox> getBoundingBoxes(final Block block) {

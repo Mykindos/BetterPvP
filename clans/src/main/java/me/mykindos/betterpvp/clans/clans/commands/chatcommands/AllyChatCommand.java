@@ -8,7 +8,6 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.properties.ClientProperty;
-import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
@@ -20,13 +19,10 @@ import java.util.Optional;
 @Singleton
 public class AllyChatCommand extends Command {
 
-    private final ClientManager clientManager;
-
     private final ClanManager clanManager;
 
     @Inject
-    public AllyChatCommand(ClientManager clientManager, ClanManager clanManager){
-        this.clientManager = clientManager;
+    public AllyChatCommand(ClanManager clanManager){
         this.clanManager = clanManager;
 
         aliases.add("ac");

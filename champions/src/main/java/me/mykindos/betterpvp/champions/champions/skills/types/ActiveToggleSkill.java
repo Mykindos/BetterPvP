@@ -28,7 +28,7 @@ public abstract class ActiveToggleSkill extends Skill implements ToggleSkill, Li
 
     protected final HashMap<UUID, HashMap<String, Long>> updaterCooldowns = new HashMap<>();
 
-    public ActiveToggleSkill(Champions champions, ChampionsManager championsManager) {
+    protected ActiveToggleSkill(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
 

@@ -25,7 +25,7 @@ public class UUIDRepository implements IRepository<UUIDItem> {
 
     @Override
     public List<UUIDItem> getAll() {
-        return null;
+        return new ArrayList<>();
     }
 
     public List<UUIDItem> getUUIDItemsForModule(String namespace) {

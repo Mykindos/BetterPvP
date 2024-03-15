@@ -4,15 +4,12 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import io.netty.buffer.ByteBuf;
 import lombok.NonNull;
-import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import me.mykindos.betterpvp.core.framework.sidebar.text.TextProvider;
 import me.mykindos.betterpvp.core.framework.sidebar.util.buffer.ByteBufNetOutput;
 import me.mykindos.betterpvp.core.framework.sidebar.util.buffer.NetOutput;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-
-import java.util.Iterator;
 
 @UtilityClass
 public class ScoreboardPackets {

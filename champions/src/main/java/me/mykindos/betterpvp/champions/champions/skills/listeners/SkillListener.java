@@ -23,7 +23,6 @@ import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.ToggleSkill;
-import me.mykindos.betterpvp.champions.effects.ChampionsEffectTypes;
 import me.mykindos.betterpvp.champions.effects.types.SkillBoostEffect;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;

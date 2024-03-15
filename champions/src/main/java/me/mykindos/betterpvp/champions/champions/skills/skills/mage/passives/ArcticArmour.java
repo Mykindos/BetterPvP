@@ -137,8 +137,8 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill {
         final int angle = (int) ((System.currentTimeMillis() / 10) % 360);
         playEffects(player, distance, -angle);
         playEffects(player, distance, angle);
-        playEffects(player, distance, -angle + 180);
-        playEffects(player, distance, angle + 180);
+        playEffects(player, distance, -angle + 180f);
+        playEffects(player, distance, angle + 180f);
 
         convertWaterToIce(player, getDuration(level), distance);
 

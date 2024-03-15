@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.core.utilities;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -14,9 +16,10 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UtilMath {
 
-    public static Random random = new Random(System.nanoTime());
+    public static final Random RANDOM = new Random(System.nanoTime());
 
     /**
      * Rotates a vector towards a target vector by a specified delta.

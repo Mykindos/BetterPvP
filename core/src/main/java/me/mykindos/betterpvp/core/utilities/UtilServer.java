@@ -1,10 +1,13 @@
 package me.mykindos.betterpvp.core.utilities;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 import org.bukkit.scheduler.BukkitTask;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UtilServer {
 
     /**
