@@ -26,8 +26,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDismountEvent;
 import org.bukkit.inventory.ItemStack;
-import org.spigotmc.event.entity.EntityDismountEvent;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -39,10 +39,7 @@ import java.util.WeakHashMap;
 public class Ride extends Skill implements InteractSkill, CooldownSkill, Listener {
 
     private final WeakHashMap<Player, HorseData> horseData = new WeakHashMap<>();
-
-
     private double lifespan;
-    private double horseHealth;
 
     @Inject
     public Ride(Champions champions, ChampionsManager championsManager) {

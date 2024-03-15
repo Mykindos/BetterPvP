@@ -389,7 +389,7 @@ public final class Reflection {
                 throw new IllegalArgumentException("Unknown variable: " + variable);
 
             // Assume the expanded variables are all packages, and append a dot
-            if (replacement.length() > 0 && matcher.end() < name.length() && name.charAt(matcher.end()) != '.')
+            if (!replacement.isEmpty() && matcher.end() < name.length() && name.charAt(matcher.end()) != '.')
                 replacement += ".";
             matcher.appendReplacement(output, Matcher.quoteReplacement(replacement));
         }

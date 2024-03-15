@@ -123,7 +123,7 @@ public class CombatListener implements Listener {
             return;
         }
 
-        if(event.getDamageDelay() > 0) {
+        if (event.getDamageDelay() > 0 && event.getDamager() != null) {
             effectManager.getEffect(event.getDamager(), EffectTypes.ATTACK_SPEED).ifPresent(effect -> {
                 event.setDamageDelay((long) (event.getDamageDelay() * (1 - (effect.getAmplifier() / 100d))));
             });
@@ -143,13 +143,12 @@ public class CombatListener implements Listener {
                     damageDataList.add(new DamageData(event.getDamagee().getUniqueId().toString(), event.getCause(), damagerUuid, event.getDamageDelay()));
                 }
 
-                if (event.isKnockback()) {
-                    if (event.getDamager() != null) {
-                        CustomKnockbackEvent cke = UtilServer.callEvent(new CustomKnockbackEvent(event.getDamagee(), event.getDamager(), event.getDamage(), event));
-                        if (!cke.isCancelled()) {
-                            applyKB(cke);
-                        }
+                if (event.isKnockback() && event.getDamager() != null) {
+                    CustomKnockbackEvent cke = UtilServer.callEvent(new CustomKnockbackEvent(event.getDamagee(), event.getDamager(), event.getDamage(), event));
+                    if (!cke.isCancelled()) {
+                        applyKB(cke);
                     }
+
                 }
 
                 CustomDamageReductionEvent customDamageReductionEvent = UtilServer.callEvent(new CustomDamageReductionEvent(event, event.getDamage()));
@@ -402,7 +401,7 @@ public class CombatListener implements Listener {
         double strength = 0.2D + trajectory.length() * 0.8D;
         trajectory.multiply(event.getMultiplier());
 
-        VelocityData velocityData = new VelocityData(trajectory, strength, false, 0.0D,  Math.abs(0.2D * knockback), 0.4D + (0.04D * knockback), true);
+        VelocityData velocityData = new VelocityData(trajectory, strength, false, 0.0D, Math.abs(0.2D * knockback), 0.4D + (0.04D * knockback), true);
         UtilVelocity.velocity(event.getDamagee(), event.getDamager(), velocityData, VelocityType.KNOCKBACK);
     }
 
@@ -481,7 +480,7 @@ public class CombatListener implements Listener {
     private void updateDurability(CustomDamageEvent event) {
 
         CustomDamageDurabilityEvent cdde = new CustomDamageDurabilityEvent(event);
-        if(!event.isDoDurability()) {
+        if (!event.isDoDurability()) {
             cdde.setDamagerTakeDurability(false);
         }
 

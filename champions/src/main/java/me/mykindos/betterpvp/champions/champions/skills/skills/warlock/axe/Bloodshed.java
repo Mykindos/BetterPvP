@@ -80,12 +80,12 @@ public class Bloodshed extends Skill implements InteractSkill, CooldownSkill {
     @Override
     public double getCooldown(int level) {
 
-        return cooldown - ((level - 1));
+        return cooldown - (level - 1);
     }
 
 
     @Override
-    public void activate(Player player,int level) {;
+    public void activate(Player player,int level) {
         double healthReduction = 1.0 - getHealthReduction(level);
         double proposedHealth = player.getHealth() - (player.getHealth() * healthReduction);
         UtilPlayer.slowDrainHealth(champions, player, proposedHealth, 5, false);

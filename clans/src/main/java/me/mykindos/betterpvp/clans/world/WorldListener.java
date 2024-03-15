@@ -71,6 +71,12 @@ public class WorldListener implements Listener {
     private final ClientManager clientManager;
     private final ItemHandler itemHandler;
 
+    /*
+     * Throws out red dye everywhere when players die
+     * Creates a blood splatter effect
+     */
+    private final HashMap<Item, Long> blood = new HashMap<>();
+
     @Inject
     public WorldListener(ClientManager clientManager, ItemHandler itemHandler) {
         this.clientManager = clientManager;
@@ -453,11 +459,6 @@ public class WorldListener implements Listener {
         }
     }
 
-    /*
-     * Throws out red dye everywhere when players die
-     * Creates a blood splatter effect
-     */
-    public static HashMap<Item, Long> blood = new HashMap<>();
 
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
@@ -474,8 +475,8 @@ public class WorldListener implements Listener {
     /*
      * Makes sure the blood items get removed after 500 milliseconds
      */
-    @UpdateEvent(delay = 250)
-    public void blood() {
+    @UpdateEvent(delay = 500)
+    public void cleanBlood() {
         if (blood.isEmpty()) {
             return;
         }

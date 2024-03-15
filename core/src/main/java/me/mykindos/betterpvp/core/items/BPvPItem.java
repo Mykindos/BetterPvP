@@ -333,7 +333,7 @@ public class BPvPItem implements IBPvPItem {
             if (getMaxDurability() < 0) return;
             int durability = calculateDurability(itemMeta);
             double durabilityPercent = calculateDurabilityPercent(durability);
-            damageableMeta.setDamage(Math.max(1, (int) ((getMaterial().getMaxDurability() * (1 - durabilityPercent)))));
+            damageableMeta.setDamage(Math.max(1, (int) (getMaterial().getMaxDurability() * (1 - durabilityPercent))));
         }
     }
 

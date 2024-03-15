@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.core.utilities;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.combat.events.CustomEntityVelocityEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
@@ -8,6 +10,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.Vector;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UtilVelocity {
 
     public static Vector getTrajectory2d(Entity from, Entity to) {

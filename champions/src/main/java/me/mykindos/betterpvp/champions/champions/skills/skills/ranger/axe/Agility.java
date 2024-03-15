@@ -16,6 +16,7 @@ import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -156,7 +157,8 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
     @UpdateEvent
     private void spawnSkillParticles(Player player) {
         Location loc = player.getLocation();
-        Random random = new Random();
+
+        Random random = UtilMath.RANDOM;
         double x = loc.getX() + (random.nextDouble() - 0.5) * 0.5;
         double y = loc.getY() + (1 + (random.nextDouble() - 0.5) * 0.9);
         double z = loc.getZ() + (random.nextDouble() - 0.5) * 0.5;

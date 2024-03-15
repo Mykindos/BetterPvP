@@ -28,19 +28,19 @@ public abstract class Weapon extends BPvPItem implements IWeapon {
     protected double baseDamage;
     protected double cooldown;
 
-    public Weapon(BPvPPlugin plugin, String key) {
-        this(key, plugin, (List<Component>) null);
+    protected Weapon(BPvPPlugin plugin, String key) {
+        this(key, plugin, null);
     }
 
-    public Weapon(String key, BPvPPlugin plugin, List<Component> lore) {
+    protected Weapon(String key, BPvPPlugin plugin, List<Component> lore) {
         this(plugin, key, lore, "champions");
     }
 
-    public Weapon(BPvPPlugin plugin, String key, String namespace) {
+    protected Weapon(BPvPPlugin plugin, String key, String namespace) {
         this(plugin, key, null, namespace);
     }
 
-    public Weapon(BPvPPlugin plugin, String key, List<Component> lore, String namespace) {
+    protected Weapon(BPvPPlugin plugin, String key, List<Component> lore, String namespace) {
         super(namespace, key, Material.DEBUG_STICK, Component.text("Uninitialized Weapon"), lore, 0, 2, false, true);
         this.plugin = plugin;
         loadConfig(plugin);

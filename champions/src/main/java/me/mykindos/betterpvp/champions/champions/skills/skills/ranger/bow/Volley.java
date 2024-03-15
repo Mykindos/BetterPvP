@@ -100,7 +100,7 @@ public class Volley extends PrepareArrowSkill {
 
     @Override
     public void onHit(Player damager, LivingEntity target, int level) {
-
+        // Do nothing
     }
 
     @Override
@@ -115,7 +115,7 @@ public class Volley extends PrepareArrowSkill {
     }
 
     @EventHandler
-    public void onHit(CustomDamageEvent event) {
+    public void onArrowHit(CustomDamageEvent event) {
         if(!(event.getDamager() instanceof Player)) return;
         if(!(event.getProjectile() instanceof Arrow arrow)) return;
         if(!arrows.contains(arrow)) return;

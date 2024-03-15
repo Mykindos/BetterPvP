@@ -253,7 +253,7 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
 
 
     @Value
-    private class Hook {
+    private static class Hook {
         ThrowableItem throwable;
         ChargeData data;
         int level;

@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.core.utilities;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.bukkit.craftbukkit.v1_20_R3.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_20_R3.potion.CraftPotionUtil;
 import org.bukkit.entity.LivingEntity;
@@ -7,6 +9,7 @@ import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UtilEffect {
 
     public static boolean isNegativePotionEffect(PotionEffect effect) {

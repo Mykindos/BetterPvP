@@ -48,24 +48,6 @@ import java.util.WeakHashMap;
 @BPvPListener
 public class Wreath extends Skill implements InteractSkill, Listener {
 
-    private final WeakHashMap<Player, WreathData> charges = new WeakHashMap<>();
-
-    private final PermanentComponent actionBarComponent = new PermanentComponent(gamer -> {
-        final Player player = gamer.getPlayer();
-
-        // Only display charges in hotbar if holding the weapon
-        if (player == null || !charges.containsKey(player) || !isHolding(player)) {
-            return null; // Skip if not online or not charging
-        }
-
-        final int maxCharges = getMaxCharges(getLevel(player));
-        final int newCharges = charges.get(player).getCharges();
-
-        return Component.text(getName() + " ").color(NamedTextColor.WHITE).decorate(TextDecoration.BOLD)
-                .append(Component.text("\u25A0".repeat(newCharges)).color(NamedTextColor.GREEN))
-                .append(Component.text("\u25A0".repeat(Math.max(0, maxCharges - newCharges))).color(NamedTextColor.RED));
-    });
-
     private int maxCharges;
     private int maxChargesIncreasePerLevel;
     private double rechargeSeconds;
@@ -76,6 +58,24 @@ public class Wreath extends Skill implements InteractSkill, Listener {
     private double damageIncreasePerLevel;
     private int slowStrength;
     private double healthPerEnemyHit;
+    
+    private final WeakHashMap<Player, WreathData> charges = new WeakHashMap<>();
+
+    private final PermanentComponent actionBarComponent = new PermanentComponent(gamer -> {
+        final Player player = gamer.getPlayer();
+
+        // Only display charges in hotbar if holding the weapon
+        if (player == null || !charges.containsKey(player) || !isHolding(player)) {
+            return null; // Skip if not online or not charging
+        }
+
+        final int currentMaxCharges = getMaxCharges(getLevel(player));
+        final int newCharges = charges.get(player).getCharges();
+
+        return Component.text(getName() + " ").color(NamedTextColor.WHITE).decorate(TextDecoration.BOLD)
+                .append(Component.text("\u25A0".repeat(newCharges)).color(NamedTextColor.GREEN))
+                .append(Component.text("\u25A0".repeat(Math.max(0, currentMaxCharges - newCharges))).color(NamedTextColor.RED));
+    });
 
     @Inject
     public Wreath(Champions champions, ChampionsManager championsManager) {

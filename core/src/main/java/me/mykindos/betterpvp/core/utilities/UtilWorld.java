@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.core.utilities;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -8,6 +10,7 @@ import org.bukkit.entity.Player;
 
 import java.util.Collection;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UtilWorld {
 
     public static String chunkToPrettyString(Chunk chunk) {

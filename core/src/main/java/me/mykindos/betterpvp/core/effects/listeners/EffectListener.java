@@ -19,7 +19,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.potion.PotionEffect;
 
 import java.util.UUID;
 
@@ -43,33 +45,31 @@ public class EffectListener implements Listener {
 
     @UpdateEvent(priority = 999)
     public void onUpdate() {
-        effectManager.getObjects().forEach((key, value) -> {
-            value.removeIf(effect -> {
-                Entity entity = Bukkit.getEntity(UUID.fromString(effect.getUuid()));
-                if (effect.hasExpired() && !effect.isPermanent()) {
-                    if (entity instanceof LivingEntity livingEntity) {
-                        UtilServer.callEvent(new EffectExpireEvent(livingEntity, effect));
-                    }
-
-                    return true; // We still want to remove expired effects if the player is offline
-                }
-
+        effectManager.getObjects().forEach((key, value) -> value.removeIf(effect -> {
+            Entity entity = Bukkit.getEntity(UUID.fromString(effect.getUuid()));
+            if (effect.hasExpired() && !effect.isPermanent()) {
                 if (entity instanceof LivingEntity livingEntity) {
-                    if (effect.getRemovalPredicate() != null && effect.getRemovalPredicate().test(livingEntity)) {
-                        UtilServer.callEvent(new EffectExpireEvent(livingEntity, effect));
-                        return true;
-                    }
-
-                    if (effect.getEffectType() instanceof VanillaEffectType vanillaEffectType) {
-                        vanillaEffectType.checkActive(livingEntity, effect);
-                    }
-
-                    effect.getEffectType().onTick(livingEntity, effect);
+                    UtilServer.callEvent(new EffectExpireEvent(livingEntity, effect));
                 }
 
-                return false;
-            });
-        });
+                return true; // We still want to remove expired effects if the player is offline
+            }
+
+            if (entity instanceof LivingEntity livingEntity) {
+                if (effect.getRemovalPredicate() != null && effect.getRemovalPredicate().test(livingEntity)) {
+                    UtilServer.callEvent(new EffectExpireEvent(livingEntity, effect));
+                    return true;
+                }
+
+                if (effect.getEffectType() instanceof VanillaEffectType vanillaEffectType) {
+                    vanillaEffectType.checkActive(livingEntity, effect);
+                }
+
+                effect.getEffectType().onTick(livingEntity, effect);
+            }
+
+            return false;
+        }));
 
         effectManager.getObjects().entrySet().removeIf(entry -> entry.getValue().isEmpty());
 
@@ -93,6 +93,13 @@ public class EffectListener implements Listener {
                 event.getPlayer().setHealth(UtilPlayer.getMaxHealth(event.getPlayer()));
             }
         }, 1);
+    }
+
+    @EventHandler
+    public void onJoin(PlayerJoinEvent event) {
+        for(PotionEffect potionEffect : event.getPlayer().getActivePotionEffects()) {
+            event.getPlayer().removePotionEffect(potionEffect.getType());
+        }
     }
 
 }

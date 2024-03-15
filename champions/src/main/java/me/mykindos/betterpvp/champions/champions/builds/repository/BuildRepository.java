@@ -39,7 +39,7 @@ public class BuildRepository implements IRepository<RoleBuild> {
 
     @Override
     public List<RoleBuild> getAll() {
-        return null;
+        return new ArrayList<>();
     }
 
     public void loadBuilds(GamerBuilds builds) {
