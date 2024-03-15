@@ -1,13 +1,16 @@
 package me.mykindos.betterpvp.core.effects.listeners;
 
 import com.google.inject.Inject;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.effects.Effect;
 import me.mykindos.betterpvp.core.effects.EffectManager;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.effects.VanillaEffectType;
 import me.mykindos.betterpvp.core.effects.events.EffectClearEvent;
 import me.mykindos.betterpvp.core.effects.events.EffectExpireEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
@@ -16,17 +19,20 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 
 import java.util.UUID;
 
 @BPvPListener
 public class EffectListener implements Listener {
 
+    private final Core core;
     private final EffectManager effectManager;
 
 
     @Inject
-    public EffectListener(EffectManager effectManager) {
+    public EffectListener(Core core, EffectManager effectManager) {
+        this.core = core;
         this.effectManager = effectManager;
     }
 
@@ -35,25 +41,30 @@ public class EffectListener implements Listener {
         effectManager.removeAllEffects(event.getEntity());
     }
 
-    @UpdateEvent (priority = 999)
+    @UpdateEvent(priority = 999)
     public void onUpdate() {
         effectManager.getObjects().forEach((key, value) -> {
             value.removeIf(effect -> {
                 Entity entity = Bukkit.getEntity(UUID.fromString(effect.getUuid()));
+                if (effect.hasExpired() && !effect.isPermanent()) {
+                    if (entity instanceof LivingEntity livingEntity) {
+                        UtilServer.callEvent(new EffectExpireEvent(livingEntity, effect));
+                    }
+
+                    return true; // We still want to remove expired effects if the player is offline
+                }
+
                 if (entity instanceof LivingEntity livingEntity) {
-                    if ((effect.hasExpired() && !effect.isPermanent()) || (effect.getRemovalPredicate() != null && effect.getRemovalPredicate().test(livingEntity))) {
+                    if (effect.getRemovalPredicate() != null && effect.getRemovalPredicate().test(livingEntity)) {
                         UtilServer.callEvent(new EffectExpireEvent(livingEntity, effect));
                         return true;
+                    }
 
-                    } else {
-                        if (effect.getEffectType() instanceof VanillaEffectType vanillaEffectType) {
-                            vanillaEffectType.checkActive(livingEntity, effect);
-                        }
+                    if (effect.getEffectType() instanceof VanillaEffectType vanillaEffectType) {
+                        vanillaEffectType.checkActive(livingEntity, effect);
                     }
 
                     effect.getEffectType().onTick(livingEntity, effect);
-                } else {
-                    return true;
                 }
 
                 return false;
@@ -64,7 +75,7 @@ public class EffectListener implements Listener {
 
     }
 
-    @EventHandler (priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onExpire(EffectExpireEvent event) {
         Effect effect = event.getEffect();
         effect.getEffectType().onExpire(event.getTarget(), effect);
@@ -73,6 +84,15 @@ public class EffectListener implements Listener {
     @EventHandler
     public void onEventClear(EffectClearEvent event) {
         effectManager.removeNegativeEffects(event.getPlayer());
+    }
+
+    @EventHandler
+    public void onRespawn(PlayerRespawnEvent event) {
+        UtilServer.runTaskLater(core, () -> {
+            if(effectManager.hasEffect(event.getPlayer(), EffectTypes.HEALTH_BOOST)) {
+                event.getPlayer().setHealth(UtilPlayer.getMaxHealth(event.getPlayer()));
+            }
+        }, 1);
     }
 
 }

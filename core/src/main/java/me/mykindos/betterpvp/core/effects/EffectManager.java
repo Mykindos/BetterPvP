@@ -194,10 +194,17 @@ public class EffectManager extends Manager<List<Effect>> {
 
 
     public void removeAllEffects(LivingEntity target) {
-        var effects = objects.remove(target.getUniqueId().toString());
-        if(effects != null) {
-            effects.forEach(effect -> UtilServer.callEvent(new EffectExpireEvent(target, effect)));
-        }
+        objects.getOrDefault(target.getUniqueId().toString(), new ArrayList<>()).removeIf(effect -> {
+
+            if(!effect.isPermanent()) {
+                UtilServer.callEvent(new EffectExpireEvent(target, effect));
+                return true;
+            }
+
+
+            return false;
+        });
+
     }
 
     public void removeNegativeEffects(LivingEntity target) {
