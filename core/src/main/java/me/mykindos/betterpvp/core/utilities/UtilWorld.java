@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.utilities;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -9,8 +10,10 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.util.Collection;
+import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
+@Slf4j
 public class UtilWorld {
 
     public static String chunkToPrettyString(Chunk chunk) {
@@ -28,8 +31,8 @@ public class UtilWorld {
             if (world != null) {
                 return world.getChunkAt(Integer.parseInt(tokens[1]), Integer.parseInt(tokens[2]));
             }
-        } catch (Exception var4) {
-            var4.printStackTrace();
+        } catch (Exception ex) {
+            log.error("Error parsing chunk from string: " + string);
         }
 
         return null;
@@ -58,7 +61,9 @@ public class UtilWorld {
         if (chunkList.isEmpty()) {
             return null;
         }
-        Chunk closestChunk = (Chunk) chunkList.stream().findFirst().get();
+
+        Optional<Chunk> chunkOptional = chunkList.stream().findFirst();
+        Chunk closestChunk = chunkOptional.get();
 
         int y = (int) player.getY();
 
