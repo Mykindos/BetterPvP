@@ -16,10 +16,9 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
-import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
@@ -31,7 +30,6 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.util.Vector;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 @Singleton
@@ -43,7 +41,7 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
     private double wallKickInternalCooldown;
     private double fallDamageLimit;
 
-    private final HashMap<UUID, Boolean> canTakeFall = new HashMap<>();
+    private final HashMap<UUID, Long> canTakeFall = new HashMap<>();
 
     @Inject
     public Leap(Champions champions, ChampionsManager championsManager) {
@@ -90,7 +88,7 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
 
         player.getWorld().spawnEntity(player.getLocation(), EntityType.LLAMA_SPIT);
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BAT_TAKEOFF, 2.0F, 1.2F);
-        canTakeFall.put(player.getUniqueId(), true);
+        canTakeFall.put(player.getUniqueId(), System.currentTimeMillis());
     }
 
     @EventHandler
@@ -112,12 +110,7 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
 
     @UpdateEvent
     public void onUpdate() {
-        for (Map.Entry<UUID, Boolean> entry : canTakeFall.entrySet()) {
-            Player player = Bukkit.getPlayer(entry.getKey());
-            if (player != null && UtilBlock.isGrounded(player)) {
-                UtilServer.runTaskLater(champions, () -> canTakeFall.remove(player.getUniqueId()), 2L);
-            }
-        }
+        canTakeFall.entrySet().removeIf(entry -> UtilTime.elapsed(entry.getValue(), 2000));
     }
 
     public boolean wallKick(Player player) {
