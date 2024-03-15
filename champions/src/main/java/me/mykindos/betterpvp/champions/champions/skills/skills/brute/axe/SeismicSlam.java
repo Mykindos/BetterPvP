@@ -31,35 +31,28 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.util.Vector;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 @Singleton
 @BPvPListener
 public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, Listener {
-
-    private final Set<UUID> active = new HashSet<>();
     private final HashMap<UUID, Long> slams = new HashMap<>();
-    private HashMap<UUID, Boolean> canTakeFall = new HashMap<>();
 
     private double baseRadius;
     private double radiusIncreasePerLevel;
     private double baseDamage;
-    public double damageIncreasePerLevel;
-    public double cooldownDecreasePerLevel;
-    public int slamDelay;
-    public double fallDamageLimit;
+    private double damageIncreasePerLevel;
+    private int slamDelay;
+    private double fallDamageLimit;
 
     @Inject
     public SeismicSlam(Champions champions, ChampionsManager championsManager) {
@@ -120,41 +113,10 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
             }
         }
 
-        Iterator<Map.Entry<UUID, Boolean>> fallIterator = canTakeFall.entrySet().iterator();
-        while (fallIterator.hasNext()) {
-            Map.Entry<UUID, Boolean> entry = fallIterator.next();
-            Player player = Bukkit.getPlayer(entry.getKey());
-            if (player != null && (UtilBlock.isGrounded(player) || player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType().isSolid())) {
-                UtilServer.runTaskLater(champions, () -> {
-                    if (canTakeFall.containsKey(player.getUniqueId())) {
-                        canTakeFall.remove(player.getUniqueId());
-                    }
-                }, 2L);
-            }
-        }
-    }
-
-
-    @EventHandler
-    public void reduceFallDamage(CustomDamageEvent event) {
-        if (event.getCause() != DamageCause.FALL) return;
-        if (event.getDamagee() instanceof Player player) {
-            UUID playerId = player.getUniqueId();
-
-            if (canTakeFall.containsKey(playerId) && canTakeFall.get(playerId)) {
-                if (event.getDamage() <= fallDamageLimit) {
-                    event.setCancelled(true);
-                } else {
-                    event.setDamage(event.getDamage() - fallDamageLimit);
-                }
-                canTakeFall.remove(playerId);
-            }
-        }
     }
 
 
     public void slam(final Player player) {
-        active.remove(player.getUniqueId());
 
         int level = getLevel(player);
         List<LivingEntity> targets = UtilEntity.getNearbyEnemies(player, player.getLocation(), getRadius(level));
@@ -220,12 +182,14 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
             vec.setY(vec.getY() * -1);
         }
 
-        canTakeFall.put(player.getUniqueId(), true);
         VelocityData velocityData = new VelocityData(vec, 0.6, false, 0, 0.8, 0.8, true);
         UtilVelocity.velocity(player, null, velocityData, VelocityType.CUSTOM);
 
         slams.put(player.getUniqueId(), System.currentTimeMillis());
-        championsManager.getEffects().addEffect(player, EffectTypes.NO_FALL, 1300L);
+        UtilServer.runTaskLater(champions, () -> {
+            championsManager.getEffects().addEffect(player, player, EffectTypes.NO_FALL,getName(), (int) fallDamageLimit,
+                    50L, true, true, UtilBlock::isGrounded);
+        }, 3L);
     }
 
     @Override
@@ -239,8 +203,7 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
         radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 0.5, Double.class);
         baseDamage = getConfig("baseDamage", 1.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
-        cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 2.0, Double.class);
         slamDelay = getConfig("slamDelay", 500, Integer.class);
-        fallDamageLimit = getConfig("fallDamageLimit", 6.0, Double.class);
+        fallDamageLimit = getConfig("fallDamageLimit", 20.0, Double.class);
     }
 }

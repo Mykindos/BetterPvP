@@ -17,4 +17,9 @@ public class NoFallEffect extends EffectType {
         return false;
     }
 
+    @Override
+    public int defaultAmplifier() {
+        return 1000; // Default will reduce fall damage by 1000, which is effectively immunity
+    }
+
 }

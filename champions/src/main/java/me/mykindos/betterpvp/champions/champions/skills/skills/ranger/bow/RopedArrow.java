@@ -7,41 +7,30 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
-import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
-import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.util.Vector;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.UUID;
 
 @Singleton
 @BPvPListener
 public class RopedArrow extends PrepareArrowSkill {
-    private HashMap<UUID, Boolean> canTakeFall = new HashMap<>();
-    public double fallDamageLimit;
-
+    private double fallDamageLimit;
 
     @Inject
     public RopedArrow(Champions champions, ChampionsManager championsManager) {
@@ -95,40 +84,12 @@ public class RopedArrow extends PrepareArrowSkill {
 
         arrow.getWorld().playSound(arrow.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
         arrows.remove(arrow);
-        canTakeFall.put(player.getUniqueId(), true);
+        UtilServer.runTaskLater(champions, () -> {
+            championsManager.getEffects().addEffect(player, player, EffectTypes.NO_FALL,getName(), (int) fallDamageLimit,
+                    50L, true, true, UtilBlock::isGrounded);
+        }, 3L);
     }
 
-    @EventHandler
-    public void reduceFallDamage(CustomDamageEvent event) {
-        if (event.getCause() != EntityDamageEvent.DamageCause.FALL) return;
-        if (event.getDamagee() instanceof Player player) {
-            UUID playerId = player.getUniqueId();
-            if (canTakeFall.containsKey(playerId) && canTakeFall.get(playerId)) {
-                if (event.getDamage() <= fallDamageLimit) {
-                    event.setCancelled(true);
-                } else {
-                    event.setDamage(event.getDamage() - fallDamageLimit);
-                }
-                canTakeFall.remove(playerId);
-            }
-        }
-    }
-
-    @UpdateEvent
-    public void onUpdate() {
-        Iterator<Map.Entry<UUID, Boolean>> fallIterator = canTakeFall.entrySet().iterator();
-        while (fallIterator.hasNext()) {
-            Map.Entry<UUID, Boolean> entry = fallIterator.next();
-            Player player = Bukkit.getPlayer(entry.getKey());
-            if (player != null && (UtilBlock.isGrounded(player) || player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType().isSolid())) {
-                UtilServer.runTaskLater(champions, () -> {
-                    if (canTakeFall.containsKey(player.getUniqueId())) {
-                        canTakeFall.remove(player.getUniqueId());
-                    }
-                }, 2L);
-            }
-        }
-    }
 
     @Override
     public void onHit(Player damager, LivingEntity target, int level) {
@@ -155,7 +116,7 @@ public class RopedArrow extends PrepareArrowSkill {
 
     @Override
     public double getCooldown(int level) {
-        return (double) cooldown - (level - 1) * cooldownDecreasePerLevel;
+        return cooldown - (level - 1) * cooldownDecreasePerLevel;
     }
 
     @Override
