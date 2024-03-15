@@ -45,6 +45,7 @@ public class CreateClanSubCommand extends ClanSubCommand {
         return "Create a clan";
     }
 
+    @Override
     public String getUsage() {
         return super.getUsage() + " <name>";
     }
@@ -62,10 +63,6 @@ public class CreateClanSubCommand extends ClanSubCommand {
         }
 
         String clanName = args[0];
-        if (clanName.matches("^.*[^a-zA-Z0-9].*$")) {
-            UtilMessage.message(player, "Command", "Invalid characters in Clan name.");
-            return;
-        }
 
         if (clanName.length() < minCharactersInClanName) {
             UtilMessage.message(player, "Command", "Clan name too short. Minimum length is [" + minCharactersInClanName + "].");
@@ -74,6 +71,11 @@ public class CreateClanSubCommand extends ClanSubCommand {
 
         if (clanName.length() > maxCharactersInClanName) {
             UtilMessage.message(player, "Command", "Clan name too long. Maximum length is [" + maxCharactersInClanName + "].");
+            return;
+        }
+
+        if (clanName.matches("^.*[^a-zA-Z0-9].*$")) {
+            UtilMessage.message(player, "Command", "Invalid characters in Clan name.");
             return;
         }
 
