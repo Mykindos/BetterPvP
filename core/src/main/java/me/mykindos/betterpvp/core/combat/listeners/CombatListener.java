@@ -118,7 +118,6 @@ public class CombatListener implements Listener {
             return;
         }
 
-        // TODO cancel this elsewhere...
         if (event.getDamagee() instanceof ArmorStand) {
             return;
         }
@@ -439,8 +438,8 @@ public class CombatListener implements Listener {
             return null;
         }
 
-        if ((ev.getDamager() instanceof LivingEntity)) {
-            return (LivingEntity) ev.getDamager();
+        if ((ev.getDamager() instanceof LivingEntity damager)) {
+            return damager;
         }
 
         if (ev.getDamager() instanceof TNTPrimed tnt && tnt.getSource() instanceof LivingEntity ent) {
