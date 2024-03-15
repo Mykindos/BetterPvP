@@ -41,6 +41,7 @@ public class ComboAttack extends Skill implements PassiveSkill, Listener {
         return "Combo Attack";
     }
 
+    private double baseDamageIncrement;
     private double damageIncrement;
     private double duration;
 
@@ -51,10 +52,14 @@ public class ComboAttack extends Skill implements PassiveSkill, Listener {
                 "Each time you attack, your",
                 "damage increases by <stat>" + damageIncrement + "</stat>",
                 "",
-                "You can deal up to <val>" + (level * damageIncrement) + "</val> bonus damage",
+                "You can deal up to <val>" + getMaxDamageIncrement(level) + "</val> bonus damage",
                 "",
                 "Not attacking for <stat>" + duration + "</stat> seconds",
                 "will reset your bonus damage"};
+    }
+
+    public double getMaxDamageIncrement(int level) {
+        return baseDamageIncrement + (level - 1) * damageIncrement;
     }
 
     @Override
@@ -82,7 +87,7 @@ public class ComboAttack extends Skill implements PassiveSkill, Listener {
             }
             double cur = repeat.get(damager);
             event.setDamage(event.getDamage() + cur);
-            repeat.put(damager, Math.min((level * damageIncrement), cur + damageIncrement));
+            repeat.put(damager, Math.min(getMaxDamageIncrement(level), cur + damageIncrement));
             last.put(damager, System.currentTimeMillis());
             event.addReason(getName());
 
@@ -111,6 +116,7 @@ public class ComboAttack extends Skill implements PassiveSkill, Listener {
 
     @Override
     public void loadSkillConfig() {
+        baseDamageIncrement = getConfig("baseDamageIncrement", 1.0, Double.class);
         damageIncrement = getConfig("damageIncrement", 1.0, Double.class);
         duration = getConfig("duration", 2.0, Double.class);
     }

@@ -58,7 +58,7 @@ public class Deflection extends Skill implements PassiveSkill {
     }
 
     public int getMaxCharges(int level) {
-        return baseCharges + level;
+        return baseCharges + (level - 1);
     }
 
     @Override
@@ -118,7 +118,7 @@ public class Deflection extends Skill implements PassiveSkill {
     public void loadSkillConfig() {
         timeBetweenCharges = getConfig("timeBetweenCharges", 2.0, Double.class);
         timeOutOfCombat = getConfig("timeOutOfCombat", 2.0, Double.class);
-        baseCharges = getConfig("baseCharges", 0, Integer.class);
+        baseCharges = getConfig("baseCharges", 1, Integer.class);
     }
 
 }

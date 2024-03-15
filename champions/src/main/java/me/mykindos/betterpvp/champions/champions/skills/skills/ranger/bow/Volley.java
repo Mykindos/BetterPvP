@@ -28,7 +28,8 @@ public class Volley extends PrepareArrowSkill {
 
     public int baseNumArrows;
     private int numArrowsIncreasePerLevel;
-    private double damage;
+    private double baseDamage;
+    private double damageIncreasePerLevel;
 
     @Inject
     public Volley(Champions champions, ChampionsManager championsManager) {
@@ -49,14 +50,17 @@ public class Volley extends PrepareArrowSkill {
                 "Your next shot is instant, and shoots a volley",
                 "of arrows in the direction you are facing",
                 "",
-                "Each arrow will deal <stat>" + damage + "</stat> damage",
+                "Each arrow will deal <stat>" + getDamage(level) + "</stat> damage",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
     }
 
     public int getNumArrows(int level) {
-        return baseNumArrows + ((level-1) * numArrowsIncreasePerLevel);
+        return baseNumArrows + ((level - 1) * numArrowsIncreasePerLevel);
+    }
+    private double getDamage(int level) {
+        return baseDamage + ((level - 1) * damageIncreasePerLevel);
     }
 
     @Override
@@ -116,12 +120,12 @@ public class Volley extends PrepareArrowSkill {
 
     @EventHandler
     public void onHit(CustomDamageEvent event) {
-        if(!(event.getDamager() instanceof Player)) return;
+        if(!(event.getDamager() instanceof Player player)) return;
         if(!(event.getProjectile() instanceof Arrow arrow)) return;
         if(!arrows.contains(arrow)) return;
 
 
-        event.setDamage(damage);
+        event.setDamage(getDamage(getLevel(player)));
         event.addReason(getName());
     }
 
@@ -146,6 +150,7 @@ public class Volley extends PrepareArrowSkill {
     public void loadSkillConfig() {
         baseNumArrows = getConfig("baseNumArrows", 10, Integer.class);
         numArrowsIncreasePerLevel = getConfig("numArrowsIncreasePerLevel", 0, Integer.class);
-        damage = getConfig("damage", 8.0, Double.class);
+        baseDamage = getConfig("baseDamage", 8.0, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
     }
 }

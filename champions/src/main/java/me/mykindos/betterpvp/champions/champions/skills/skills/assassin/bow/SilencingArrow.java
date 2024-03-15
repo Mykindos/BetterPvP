@@ -45,11 +45,15 @@ public class SilencingArrow extends PrepareArrowSkill {
                 "Left click with a Bow to prepare",
                 "",
                 "Your next arrow will <effect>Silence</effect> your",
-                "target for <val>" + (baseDuration + ((level - 1) * durationIncreasePerLevel)) + "</val> seconds, making them",
+                "target for <val>" + getDuration(level) + "</val> seconds, making them",
                 "unable to use any non-passive skills",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
+    }
+
+    public double getDuration(int level) {
+        return (baseDuration + ((level - 1) * durationIncreasePerLevel));
     }
 
     @Override
@@ -70,7 +74,7 @@ public class SilencingArrow extends PrepareArrowSkill {
 
     @Override
     public void onHit(Player damager, LivingEntity target, int level) {
-        championsManager.getEffects().addEffect(target, EffectTypes.SILENCE, (long) ((baseDuration + ((level - 1) * durationIncreasePerLevel)) * 1000L));
+        championsManager.getEffects().addEffect(target, EffectTypes.SILENCE, (long) (getDuration(level)) * 1000L);
         if (championsManager.getEffects().hasEffect(target, EffectTypes.IMMUNE)) {
             UtilMessage.simpleMessage(damager, getClassType().getName(), "<alt>" + target.getName() + "</alt> is immune to your silence!");
             return;

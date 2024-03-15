@@ -60,7 +60,7 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
     }
 
     private double getDuration(int level) {
-        return baseDuration + level * durationIncreasePerLevel;
+        return baseDuration + (level - 1) * durationIncreasePerLevel;
     }
 
     @Override
@@ -124,7 +124,7 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
     @Override
     public void loadSkillConfig(){
         sphereSize = getConfig("sphereSize", 4, Integer.class);
-        baseDuration = getConfig("baseDuration", 5.0, Double.class);
+        baseDuration = getConfig("baseDuration", 6.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
         speed = getConfig("speed", 1.5, Double.class);
     }
