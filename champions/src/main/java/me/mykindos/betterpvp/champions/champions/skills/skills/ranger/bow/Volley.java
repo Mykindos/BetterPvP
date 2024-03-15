@@ -50,7 +50,7 @@ public class Volley extends PrepareArrowSkill {
                 "Your next shot is instant, and shoots a volley",
                 "of arrows in the direction you are facing",
                 "",
-                "Each arrow will deal <stat>" + baseDamage + "</stat> damage",
+                "Each arrow will deal <stat>" + getDamage(level) + "</stat> damage",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -120,12 +120,12 @@ public class Volley extends PrepareArrowSkill {
 
     @EventHandler
     public void onHit(CustomDamageEvent event) {
-        if(!(event.getDamager() instanceof Player)) return;
+        if(!(event.getDamager() instanceof Player player)) return;
         if(!(event.getProjectile() instanceof Arrow arrow)) return;
         if(!arrows.contains(arrow)) return;
 
 
-        event.setDamage(baseDamage);
+        event.setDamage(getDamage(getLevel(player)));
         event.addReason(getName());
     }
 

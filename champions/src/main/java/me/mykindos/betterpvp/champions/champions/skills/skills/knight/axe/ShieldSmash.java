@@ -39,7 +39,7 @@ import java.util.List;
 
 @Singleton
 @BPvPListener
-public class  ShieldSmash extends Skill implements InteractSkill, CooldownSkill, Listener {
+public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, Listener {
 
     private double baseMultiplier;
 
