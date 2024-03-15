@@ -112,7 +112,9 @@ public class EffectManager extends Manager<List<Effect>> {
 
 
     public Optional<Effect> getEffect(LivingEntity target, EffectType type) {
-
+        if (target == null) {
+            return Optional.empty();
+        }
         Optional<List<Effect>> effectsOptional = getObject(target.getUniqueId().toString());
         if (effectsOptional.isPresent()) {
             List<Effect> effects = effectsOptional.get();
