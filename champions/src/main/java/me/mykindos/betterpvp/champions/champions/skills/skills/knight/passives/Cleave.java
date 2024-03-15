@@ -58,7 +58,7 @@ public class Cleave extends Skill implements PassiveSkill, Listener {
         return percentageOfDamage + ((level - 1) * percentageOfDamageIncreasePerLevel);
     }
 
-    public double getMaxEnemiesHit(int level) {
+    public int getMaxEnemiesHit(int level) {
         return maxEnemiesHit + ((level - 1) * maxEnemiesHitIncreasePerLevel);
     }
 
