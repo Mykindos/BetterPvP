@@ -27,6 +27,7 @@ public class VelocityData {
         this.addY = addY;
         this.maxY = maxY;
         this.groundBoost = groundBoost;
+        this.resetFallDistance = resetFallDistance;
     }
 
     public VelocityData(Vector vector, double strength, boolean setY, double baseY, double addY, double maxY, boolean groundBoost) {

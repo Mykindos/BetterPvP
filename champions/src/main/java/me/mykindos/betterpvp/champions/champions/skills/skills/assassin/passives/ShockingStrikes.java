@@ -7,15 +7,13 @@ import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -26,7 +24,7 @@ public class ShockingStrikes extends Skill implements PassiveSkill, Listener {
 
     private double baseDuration;
 
-    private double durationIncrease;
+    private double durationIncreasePerLevel;
 
     private double slownessDuration;
 
@@ -47,13 +45,13 @@ public class ShockingStrikes extends Skill implements PassiveSkill, Listener {
 
         return new String[]{
                 "Your attacks <effect>Shock</effect> targets for",
-                "<val>" + getDuration(level) + "</val> second, giving them <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength + 1) + "</effect>",
+                "<val>" + getDuration(level) + "</val> second, giving them <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect>",
                 "and <effect>Screen-Shake</effect>"
         };
     }
 
     public double getDuration(int level) {
-        return baseDuration + durationIncrease * level;
+        return baseDuration + (durationIncreasePerLevel * (level - 1));
     }
 
     @Override
@@ -70,12 +68,11 @@ public class ShockingStrikes extends Skill implements PassiveSkill, Listener {
     public void onDamage(CustomDamageEvent event) {
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
         if (!(event.getDamager() instanceof Player damager)) return;
-        if (!(event.getDamagee() instanceof Player damagee)) return;
         int level = getLevel(damager);
         if (level <= 0) return;
 
-        championsManager.getEffects().addEffect(damagee, EffectType.SHOCK, (long) (getDuration(level) * 1000L));
-        damagee.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) (slownessDuration * 20), slownessStrength));
+        championsManager.getEffects().addEffect(event.getDamagee(), damager, EffectTypes.SHOCK, (long) (getDuration(level) * 1000L));
+        championsManager.getEffects().addEffect(event.getDamagee(), damager, EffectTypes.SLOWNESS, slownessStrength, (long) (slownessDuration * 1000));
         event.addReason(getName());
 
     }
@@ -83,8 +80,8 @@ public class ShockingStrikes extends Skill implements PassiveSkill, Listener {
     @Override
     public void loadSkillConfig() {
         baseDuration = getConfig("baseDuration", 0.0, Double.class);
-        durationIncrease = getConfig("baseIncrease", 1.0, Double.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
         slownessDuration = getConfig("slownessDuration", 1.0, Double.class);
-        slownessStrength = getConfig("slownessStrength", 0, Integer.class);
+        slownessStrength = getConfig("slownessStrength", 1, Integer.class);
     }
 }

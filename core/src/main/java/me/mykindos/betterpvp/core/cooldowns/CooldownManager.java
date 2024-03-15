@@ -7,8 +7,10 @@ import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.cooldowns.events.CooldownEvent;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
 import me.mykindos.betterpvp.core.utilities.model.display.TimedComponent;
 import net.kyori.adventure.text.Component;
@@ -110,9 +112,15 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
                 return false;
             }
 
-            cooldowns.put(ability, new Cooldown(duration, System.currentTimeMillis(), removeOnDeath, inform, cancellable));
-            gamer.getActionBar().add(actionBarPriority, actionBarComponent);
-            return true;
+            Cooldown cooldown = new Cooldown(duration, System.currentTimeMillis(), removeOnDeath, inform, cancellable);
+            CooldownEvent event = UtilServer.callEvent(new CooldownEvent(player, cooldown));
+            if(!event.isCancelled()) {
+                cooldowns.put(ability, cooldown);
+                gamer.getActionBar().add(actionBarPriority, actionBarComponent);
+                return true;
+            }
+
+           return false;
         }
 
         log.error("Could not find cooldown entry for {}", player.getName());

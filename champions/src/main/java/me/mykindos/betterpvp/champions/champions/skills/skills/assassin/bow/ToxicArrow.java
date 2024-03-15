@@ -9,9 +9,10 @@ import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -49,11 +50,15 @@ public class ToxicArrow extends PrepareArrowSkill {
                 "Left click with a Bow to prepare",
                 "",
                 "Your next arrow will give your target ",
-                "<effect>Poison " + UtilFormat.getRomanNumeral(poisonStrength) + "</effect> for <val>" + (baseDuration + level) + "</val> seconds",
+                "<effect>Poison " + UtilFormat.getRomanNumeral(poisonStrength) + "</effect> for <val>" + getDuration(level) + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
 
         };
+    }
+
+    public double getDuration(int level) {
+        return (baseDuration + (level - 1) * durationIncreasePerLevel);
     }
 
     @Override
@@ -88,7 +93,7 @@ public class ToxicArrow extends PrepareArrowSkill {
 
     @Override
     public void onHit(Player damager, LivingEntity target, int level) {
-        championsManager.getEffects().addEffect(target, EffectType.POISON, poisonStrength, (long) ((baseDuration + level) * 1000L));
+        championsManager.getEffects().addEffect(target, EffectTypes.POISON, poisonStrength, (long) ((baseDuration + level) * 1000L));
         UtilMessage.message(damager, getClassType().getName(), "You hit <yellow>%s</yellow> with <green>%s %s</green>.", target.getName(), getName(), level);
         if (!(target instanceof Player damagee)) return;
         UtilMessage.simpleMessage(damagee, getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s %s</alt>.", damager.getName(), getName(), level);
@@ -96,7 +101,7 @@ public class ToxicArrow extends PrepareArrowSkill {
 
     @Override
     public void displayTrail(Location location) {
-        Random random = new Random();
+        Random random = UtilMath.RANDOM;
         double spread = 0.1;
         double dx = (random.nextDouble() - 0.5) * spread;
         double dy = (random.nextDouble() - 0.5) * spread;

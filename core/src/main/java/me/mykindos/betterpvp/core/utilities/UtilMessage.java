@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.core.utilities;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.client.Rank;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
@@ -16,6 +18,7 @@ import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UtilMessage {
 
     private static final TagResolver tagResolver = TagResolver.resolver(

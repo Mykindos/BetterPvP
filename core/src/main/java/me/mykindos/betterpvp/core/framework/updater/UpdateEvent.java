@@ -21,4 +21,6 @@ public @interface UpdateEvent {
      */
     boolean isAsync() default false;
 
+    int priority() default 0;
+
 }

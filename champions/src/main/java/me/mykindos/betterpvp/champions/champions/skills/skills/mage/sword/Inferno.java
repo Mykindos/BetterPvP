@@ -206,7 +206,7 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
     }
 
     private void shotgun(Player player, ChargeData chargeData, int level) {
-        UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s<gray>.", getName());
+        UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s %d<gray>.", getName(), level);
 
         float chargePercent = Math.min(chargeData.getCharge(), 1.0f);
         int numFlames = 1 + (int) (chargePercent * (getNumFlames(level) - 1));
@@ -284,12 +284,13 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
     public void loadSkillConfig() {
         baseFireDuration = getConfig("baseFireDuration", 2.5, Double.class);
         fireDurationIncreasePerLevel = getConfig("fireDurationIncreasePerLevel", 0.0, Double.class);
+
         baseDamage = getConfig("baseDamage", 1.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
-        cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 1.0, Double.class);
 
-        chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 0.0, Double.class);
         baseCharge = getConfig("baseCharge", 100.0, Double.class);
+        chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 0.0, Double.class);
+
         baseNumFlames = getConfig("baseNumFlames", 4, Integer.class);
         numFlamesIncreasePerLevel = getConfig("numFlamesIncreasePerLevel", 2, Integer.class);
     }

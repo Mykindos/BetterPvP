@@ -8,6 +8,8 @@ import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.bukkit.Material;
 
 import java.util.HashMap;
@@ -18,6 +20,7 @@ import java.util.Map;
  * @author Lukas Alt
  * @since 08.05.2023
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UtilConverter {
 
     public static <V> EquivalentConverter<Int2ObjectMap<V>> getInt2ObjectMapConverter(EquivalentConverter<V> valConverter) {

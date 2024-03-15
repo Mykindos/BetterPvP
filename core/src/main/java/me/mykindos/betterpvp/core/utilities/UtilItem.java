@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.core.utilities;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.utilities.model.WeighedList;
@@ -27,6 +29,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UtilItem {
 
     public static ItemStack convertType(@NotNull ItemStack itemStackIn, @NotNull Material to, @Nullable Integer toModel) {
@@ -109,7 +112,7 @@ public class UtilItem {
             im.lore(components);
         }
 
-        im.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_POTION_EFFECTS);
+        im.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ITEM_SPECIFICS);
 
         item.setItemMeta(im);
         return item;

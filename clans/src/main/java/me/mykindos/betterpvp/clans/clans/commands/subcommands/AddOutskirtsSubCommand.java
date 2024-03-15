@@ -34,6 +34,7 @@ public class AddOutskirtsSubCommand extends ClanSubCommand {
         return "addoutskirts";
     }
 
+    @Override
     public String getUsage() {
         return super.getUsage() + " [borderSize]";
     }
@@ -62,7 +63,7 @@ public class AddOutskirtsSubCommand extends ClanSubCommand {
             return;
         }
 
-        Clan clan = clanManager.getClanByPlayer(player).orElseThrow();;
+        Clan clan = clanManager.getClanByPlayer(player).orElseThrow();
         Clan outskirts = outskirtsOptional.get();
 
         int claims = 0;

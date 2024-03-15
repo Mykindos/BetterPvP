@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
@@ -18,8 +19,6 @@ import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +55,7 @@ public class SoulHarvest extends Skill implements PassiveSkill {
                 "which is only visible to " + getClassType().getName(),
                 "",
                 "Collected souls give bursts of",
-                "<effect>Speed " + UtilFormat.getRomanNumeral(speedStrength + 1) + "</effect> and <effect>Regeneration " + UtilFormat.getRomanNumeral(regenerationStrength + 1) + "</effect>",
+                "<effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect> and <effect>Regeneration " + UtilFormat.getRomanNumeral(regenerationStrength) + "</effect>",
                 "",
                 "Buff duration: <val>" + getBuffDuration(level) + "</val> seconds"
         };
@@ -120,13 +119,13 @@ public class SoulHarvest extends Skill implements PassiveSkill {
         baseBuffDuration = getConfig("baseBuffDuration", 2.0, Double.class);
         buffDurationIncreasePerLevel = getConfig("buffDurationIncreasePerLevel", 1.0, Double.class);
 
-        speedStrength = getConfig("speedStrength", 1, Integer.class);
-        regenerationStrength = getConfig("regenerationStrength", 1, Integer.class);
+        speedStrength = getConfig("speedStrength", 2, Integer.class);
+        regenerationStrength = getConfig("regenerationStrength", 2, Integer.class);
     }
 
     private void giveEffect(Player player, int level) {
-        player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) (getBuffDuration(level) * 20), speedStrength));
-        player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, (int) (getBuffDuration(level) * 20), regenerationStrength));
+        championsManager.getEffects().addEffect(player, EffectTypes.SPEED, speedStrength, (long) (getBuffDuration(level) * 1000));
+        championsManager.getEffects().addEffect(player, EffectTypes.REGENERATION, regenerationStrength, (long) (getBuffDuration(level) * 1000));
     }
 
     @Data

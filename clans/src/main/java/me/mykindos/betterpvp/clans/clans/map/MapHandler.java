@@ -49,7 +49,7 @@ public class MapHandler {
     public int updateInterval;
 
     private final Clans clans;
-    public final HashMap<UUID, Set<ChunkData>> clanMapData = new HashMap<>();
+    public final Map<UUID, Set<ChunkData>> clanMapData = new HashMap<>();
     public final Map<UUID, MapSettings> mapSettingsMap = new HashMap<>();
 
     @Inject
@@ -118,7 +118,7 @@ public class MapHandler {
             }
             loadMapData((MinimapRenderer) map.getRenderers().get(0));
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Failed to load map", ex);
         }
     }
 
@@ -150,9 +150,9 @@ public class MapHandler {
                     });
                 });
             } catch (IOException | ParseException e) {
-                e.printStackTrace();
+                log.error("Failed to load map data", e);
             }
-            log.info("Loaded map data in {}", UtilTime.getTime(System.currentTimeMillis() - l, 2));
+            log.info("Loaded map data in {}", UtilTime.getTime((System.currentTimeMillis() - l), 2));
         });
     }
 
@@ -185,7 +185,7 @@ public class MapHandler {
                 } catch (IOException e) {
                     log.error("Failed to save map data", e);
                 }
-                log.info("Saved map data in {}", UtilTime.getTime(System.currentTimeMillis() - l, 2));
+                log.info("Saved map data in {}", UtilTime.getTime((System.currentTimeMillis() - l), 2));
             }
         }.runTaskAsynchronously(clans);
     }

@@ -6,6 +6,7 @@ create table if not exists clans
     Admin     tinyint     null default 0,
     Safe      tinyint     null default 0,
     Banner    TEXT        null,
+    Vault     TEXT        null default null,
     constraint clans_pk
         primary key (id)
 );

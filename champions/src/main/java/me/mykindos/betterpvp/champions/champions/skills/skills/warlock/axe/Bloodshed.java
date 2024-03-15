@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -17,8 +18,6 @@ import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 @Singleton
 public class Bloodshed extends Skill implements InteractSkill, CooldownSkill {
@@ -49,7 +48,7 @@ public class Bloodshed extends Skill implements InteractSkill, CooldownSkill {
                 "",
                 "Sacrifice <val>" + UtilMath.round(getHealthReduction(level) * 100, 2) + "%" + "</val> of your health to give",
                 "yourself and all allies within <val>" + getRadius(level) + "</val> blocks",
-                "a surge of speed, granting them <effect>Speed " + UtilFormat.getRomanNumeral(speedStrength + 1) + "</effect> for <stat>" + getDuration(level) + "</stat> seconds.",
+                "a surge of speed, granting them <effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect> for <stat>" + getDuration(level) + "</stat> seconds.",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -81,22 +80,22 @@ public class Bloodshed extends Skill implements InteractSkill, CooldownSkill {
     @Override
     public double getCooldown(int level) {
 
-        return cooldown - ((level - 1));
+        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
 
     @Override
-    public void activate(Player player,int level) {;
+    public void activate(Player player,int level) {
         double healthReduction = 1.0 - getHealthReduction(level);
         double proposedHealth = player.getHealth() - (player.getHealth() * healthReduction);
         UtilPlayer.slowDrainHealth(champions, player, proposedHealth, 5, false);
 
-        player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) duration * 20, speedStrength));
+        championsManager.getEffects().addEffect(player, EffectTypes.SPEED, speedStrength, (long) (duration * 1000));
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_RAVAGER_ROAR, 2.0f, 0.3f);
         player.playSound(player.getLocation(), Sound.BLOCK_CONDUIT_AMBIENT, 2.0f, 2.0f);
 
         for (Player target : UtilPlayer.getNearbyAllies(player, player.getLocation(), (radius + level))) {
-            target.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) (duration * 20), speedStrength));
+            championsManager.getEffects().addEffect(target, EffectTypes.SPEED, speedStrength, (long) (duration * 1000));
             UtilMessage.simpleMessage(target, getName(), "<yellow>%s</yellow> gave you <white>Speed "+ UtilFormat.getRomanNumeral(speedStrength + 1) + "</white> for <green>%s</green> seconds.", player.getName(), getDuration(level));
             player.playSound(player.getLocation(), Sound.BLOCK_CONDUIT_AMBIENT, 2.0f, 2.0f);
         }
@@ -127,7 +126,7 @@ public class Bloodshed extends Skill implements InteractSkill, CooldownSkill {
         radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 1.0, Double.class);
         duration = getConfig("duration", 9.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.0, Double.class);
-        speedStrength = getConfig("speedStrength", 1, Integer.class);
+        speedStrength = getConfig("speedStrength", 2, Integer.class);
         baseHealthReduction = getConfig("baseHealthReduction", 0.4, Double.class);
         healthReductionDecreasePerLevel = getConfig("healthReductionDecreasePerLevel", 0.05, Double.class);
     }

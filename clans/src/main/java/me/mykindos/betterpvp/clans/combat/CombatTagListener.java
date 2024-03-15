@@ -6,9 +6,10 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
-import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import net.kyori.adventure.text.Component;
@@ -28,7 +29,7 @@ import java.util.UUID;
 
 @BPvPListener
 public class CombatTagListener implements Listener {
-    private Set<UUID> playersShownSafeMessage = new HashSet<>();
+    private final Set<UUID> playersShownSafeMessage = new HashSet<>();
     private final ClientManager clientManager;
     private final EffectManager effectManager;
     private final ClanManager clanManager;
@@ -45,11 +46,11 @@ public class CombatTagListener implements Listener {
         for (final Player player : Bukkit.getOnlinePlayers()) {
             final Gamer gamer = clientManager.search().online(player).getGamer();
             if (!UtilTime.elapsed(gamer.getLastDamaged(), 15000)) {
-                if (effectManager.hasEffect(player, EffectType.INVISIBILITY)) return;
+                if (effectManager.hasEffect(player, EffectTypes.VANISH)) return;
 
                 if (!clanManager.isInSafeZone(player)) return; // don't do this if player isn't in a safe zone
 
-                Random rand = new Random();
+                Random rand = UtilMath.RANDOM;
 
                 for (int i = 0; i < 10; i++) {
                     double offsetX = (rand.nextDouble() * 2 - 1) * 0.25;

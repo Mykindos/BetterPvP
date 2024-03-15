@@ -1,11 +1,14 @@
 package me.mykindos.betterpvp.core.utilities;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UtilSound {
 
     public static void playSound(Player player, org.bukkit.Sound sound, float volume, float pitch, boolean followPlayer) {

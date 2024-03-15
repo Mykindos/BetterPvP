@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.PrepareSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.entity.Player;
@@ -17,8 +18,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -47,14 +46,14 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener 
         return new String[]{
                 "Right click with a Sword to prepare",
                 "",
-                "Your next hit will <effect>Blind</effect> the target for <val>" + (durationIncreasePerLevel * level) + "</val> seconds",
+                "Your next hit will <effect>Blind</effect> the target for <val>" + getDuration(level) + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
     }
 
     public double getDuration(int level) {
-        return baseDuration + (durationIncreasePerLevel * level);
+        return baseDuration + (durationIncreasePerLevel * (level - 1));
     }
 
     @Override
@@ -91,7 +90,7 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener 
 
         if (active.contains(damager.getUniqueId())) {
             e.addReason("Concussion");
-            damagee.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, (int) getDuration(level) * 20, 0));
+            championsManager.getEffects().addEffect(damagee, damager, EffectTypes.BLINDNESS, 1, (long) (getDuration(level) * 1000));
             UtilMessage.simpleMessage(damager, getName(), "You gave <alt>" + damagee.getName() + "</alt> a concussion.");
             UtilMessage.simpleMessage(damagee, getName(), "<alt>" + damager.getName() + "</alt> gave you a concussion.");
             active.remove(damager.getUniqueId());
@@ -123,7 +122,7 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener 
 
     @Override
     public void loadSkillConfig() {
-        baseDuration = getConfig("baseDuration", 0.0, Double.class);
+        baseDuration = getConfig("baseDuration", 1.5, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.5, Double.class);
     }
 }

@@ -1,0 +1,34 @@
+package me.mykindos.betterpvp.core.effects.listeners.effects;
+
+import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.effects.Effect;
+import me.mykindos.betterpvp.core.effects.EffectManager;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
+import me.mykindos.betterpvp.core.listener.BPvPListener;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageEvent;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.util.Optional;
+
+@Singleton
+@BPvPListener
+public class PoisonListener implements Listener {
+
+    private final EffectManager effectManager;
+
+    @Inject
+    public PoisonListener(EffectManager effectManager) {
+        this.effectManager = effectManager;
+    }
+
+    @EventHandler
+    public void poisonDamageMultiplier(CustomDamageEvent event) {
+        if (event.getCause() != EntityDamageEvent.DamageCause.POISON) return;
+        Optional<Effect> effectOptional = effectManager.getEffect(event.getDamagee(), EffectTypes.POISON);
+        effectOptional.ifPresent(effect -> event.setDamage(event.getDamage() * effect.getAmplifier()));
+    }
+
+}

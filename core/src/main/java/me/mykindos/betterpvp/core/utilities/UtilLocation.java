@@ -2,6 +2,8 @@ package me.mykindos.betterpvp.core.utilities;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.utilities.math.VectorLine;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -27,6 +29,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UtilLocation {
 
     public static final float DEFAULT_FOV = 73f;

@@ -8,7 +8,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.ActiveToggleSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
@@ -24,8 +24,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -64,8 +62,8 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill {
                 "Create a freezing area around",
                 "you in a <val>" + getRadius(level) + "</val> Block radius",
                 "",
-                "Allies inside this area receive <effect>Resistance " + UtilFormat.getRomanNumeral(resistanceStrength + 1) + "</effect>, and",
-                "enemies inside this area receive <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength + 1) + "</effect>",
+                "Allies inside this area receive <effect>Resistance " + UtilFormat.getRomanNumeral(resistanceStrength) + "</effect>, and",
+                "enemies inside this area receive <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect>",
                 "",
                 "Energy / Second: <val>" + getEnergy(level)
         };
@@ -128,10 +126,9 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill {
             final boolean friendly = nearbyEnt.getValue() == EntityProperty.FRIENDLY;
 
             if (friendly) {
-                target.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20, resistanceStrength));
-                championsManager.getEffects().addEffect(target, EffectType.RESISTANCE, resistanceStrength + 1, 1000);
+                championsManager.getEffects().addEffect(target, EffectTypes.RESISTANCE, resistanceStrength, 1000);
             } else {
-                target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, slownessStrength));
+                championsManager.getEffects().addEffect(target, player, EffectTypes.SLOWNESS, slownessStrength, 1000);
             }
         }
 
@@ -140,8 +137,8 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill {
         final int angle = (int) ((System.currentTimeMillis() / 10) % 360);
         playEffects(player, distance, -angle);
         playEffects(player, distance, angle);
-        playEffects(player, distance, -angle + 180);
-        playEffects(player, distance, angle + 180);
+        playEffects(player, distance, -angle + 180f);
+        playEffects(player, distance, angle + 180f);
 
         convertWaterToIce(player, getDuration(level), distance);
 
@@ -214,8 +211,8 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill {
         baseDuration = getConfig("baseDuration", 2.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.0, Double.class);
 
-        resistanceStrength = getConfig("resistanceStrength", 0, Integer.class);
-        slownessStrength = getConfig("slownessStrength", 0, Integer.class);
+        resistanceStrength = getConfig("resistanceStrength", 1, Integer.class);
+        slownessStrength = getConfig("slownessStrength", 1, Integer.class);
     }
 
 

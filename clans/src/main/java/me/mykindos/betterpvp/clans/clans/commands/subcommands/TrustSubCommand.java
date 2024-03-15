@@ -36,6 +36,7 @@ public class TrustSubCommand extends ClanSubCommand {
         return "Form a trust with an ally clan, allowing them to use your clan's doors.";
     }
 
+    @Override
     public String getUsage() {
         return super.getUsage() + " <clan>";
     }

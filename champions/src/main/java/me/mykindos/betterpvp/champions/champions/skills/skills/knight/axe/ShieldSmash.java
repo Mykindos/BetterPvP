@@ -13,7 +13,7 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
@@ -126,7 +126,7 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
 
             // Cancel fall damage if they're friendly
             if (bashedEntry.getValue() == EntityProperty.FRIENDLY && ent instanceof Player friendly) {
-                championsManager.getEffects().addEffect(friendly, EffectType.NOFALL, 10_000);
+                championsManager.getEffects().addEffect(friendly, EffectTypes.NO_FALL, 10_000);
             }
 
             // Inform them

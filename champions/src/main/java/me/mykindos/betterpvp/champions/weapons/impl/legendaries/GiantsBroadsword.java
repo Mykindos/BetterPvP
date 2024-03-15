@@ -12,6 +12,8 @@ import me.mykindos.betterpvp.core.combat.weapon.types.ChannelWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.InteractWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseItemEvent;
+import me.mykindos.betterpvp.core.effects.EffectManager;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.energy.EnergyHandler;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -31,8 +33,6 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -50,12 +50,14 @@ public class GiantsBroadsword extends ChannelWeapon implements InteractWeapon, L
     private final EnergyHandler energyHandler;
     private final Set<UUID> holdingWeapon = new HashSet<>();
     private final ClientManager clientManager;
+    private final EffectManager effectManager;
 
     @Inject
-    public GiantsBroadsword(Champions champions, EnergyHandler energyHandler, ClientManager clientManager) {
+    public GiantsBroadsword(Champions champions, EnergyHandler energyHandler, ClientManager clientManager, EffectManager effectManager) {
         super(champions, "giants_broadsword");
         this.energyHandler = energyHandler;
         this.clientManager = clientManager;
+        this.effectManager = effectManager;
     }
 
     @Override
@@ -76,11 +78,18 @@ public class GiantsBroadsword extends ChannelWeapon implements InteractWeapon, L
     @Override
     public void activate(Player player) {
         active.add(player.getUniqueId());
-        player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, -1, regenAmplifier, false, false));
+        effectManager.addEffect(player, player, EffectTypes.REGENERATION, "Giants Broadsword", regenAmplifier, -1, true, true,
+                (livingEntity) -> {
+                    if (livingEntity instanceof Player p) {
+                        return p.getInventory().getItemInMainHand().getType() != getMaterial();
+                    }
+                    return false;
+                });
+
     }
 
     private void deactivate(Player player) {
-        player.removePotionEffect(PotionEffectType.REGENERATION);
+        effectManager.removeEffect(player, EffectTypes.REGENERATION, "Giants Broadsword");
     }
 
     @UpdateEvent
@@ -137,6 +146,8 @@ public class GiantsBroadsword extends ChannelWeapon implements InteractWeapon, L
                     .extra(0.2f)
                     .receivers(60)
                     .spawn();
+
+
         }
 
         // Passive particles

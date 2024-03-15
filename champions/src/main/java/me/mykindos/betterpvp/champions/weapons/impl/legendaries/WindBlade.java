@@ -24,7 +24,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -109,7 +108,7 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
 
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.LOW)
     public void onDamage(PreCustomDamageEvent event) {
         if (!enabled) {
             return;
@@ -120,6 +119,7 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
         if (!(cde.getDamager() instanceof Player damager)) return;
         if (isHoldingWeapon(damager)) {
             cde.setDamage(baseDamage);
+            cde.setRawDamage(baseDamage);
         }
     }
 

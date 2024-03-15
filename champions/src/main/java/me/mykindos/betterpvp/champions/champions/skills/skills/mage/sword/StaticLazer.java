@@ -52,8 +52,11 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
     private final DisplayComponent actionBarComponent = ChargeData.getActionBar(this, charging);
 
     private double baseCharge;
+    private double chargeIncreasePerLevel;
     private double baseDamage;
+    private double damageIncreasePerLevel;
     private double baseRange;
+    private double rangeIncreasePerLevel;
     private double collisionRadius;
     private double explosionRadius;
 
@@ -89,15 +92,15 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
     }
 
     private float getRange(int level) {
-        return (float) baseRange + 10 * (level - 1);
+        return (float) (baseRange + rangeIncreasePerLevel * (level - 1));
     }
 
-    private float getDamage(int level) {
-        return (float) baseDamage + 2 * (level - 1);
+    private double getDamage(int level) {
+        return baseDamage + damageIncreasePerLevel * (level - 1);
     }
 
     private float getChargePerSecond(int level) {
-        return (float) baseCharge + (10 * (level - 1)); // Increment of 10% per level
+        return (float) (baseCharge + (chargeIncreasePerLevel * (level - 1))); // Increment of 10% per level
     }
 
     @Override
@@ -107,12 +110,12 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
 
     @Override
     public float getEnergy(int level) {
-        return energy;
+        return (float) (energy - energyDecreasePerLevel * (level - 1));
     }
 
     @Override
     public double getCooldown(int level) {
-        return cooldown - (level - 1) * 0.5;
+        return cooldown - (level - 1) * cooldownDecreasePerLevel;
     }
 
     @Override
@@ -133,8 +136,14 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
     @Override
     public void loadSkillConfig(){
         baseCharge = getConfig("baseCharge", 40.0, Double.class);
+        chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 10.0, Double.class);
+
         baseDamage = getConfig("baseDamage", 6.0, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 2.0, Double.class);
+
         baseRange = getConfig("baseRange", 20.0, Double.class);
+        rangeIncreasePerLevel = getConfig("rangeIncreasePerLevel", 10.0, Double.class);
+
         collisionRadius = getConfig("collisionRadius", 1.8, Double.class);
         explosionRadius = getConfig("explosionRadius", 4.0, Double.class);
     }
@@ -222,7 +231,7 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
         firework.detonate();
 
         // Damage people
-        final float damage = getDamage(level) * charge;
+        final double damage = getDamage(level) * charge;
         final List<LivingEntity> enemies = UtilEntity.getNearbyEnemies(player, point, explosionRadius);
         for (LivingEntity enemy : enemies) {
             UtilDamage.doCustomDamage(new CustomDamageEvent(enemy, player, null, EntityDamageEvent.DamageCause.CUSTOM, damage, true, getName()));

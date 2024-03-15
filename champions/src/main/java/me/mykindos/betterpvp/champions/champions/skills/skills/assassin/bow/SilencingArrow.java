@@ -7,7 +7,7 @@ import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Location;
@@ -45,11 +45,15 @@ public class SilencingArrow extends PrepareArrowSkill {
                 "Left click with a Bow to prepare",
                 "",
                 "Your next arrow will <effect>Silence</effect> your",
-                "target for <val>" + (baseDuration + ((level - 1) * durationIncreasePerLevel)) + "</val> seconds, making them",
+                "target for <val>" + getDuration(level) + "</val> seconds, making them",
                 "unable to use any non-passive skills",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
+    }
+
+    public double getDuration(int level) {
+        return (baseDuration + ((level - 1) * durationIncreasePerLevel));
     }
 
     @Override
@@ -70,8 +74,8 @@ public class SilencingArrow extends PrepareArrowSkill {
 
     @Override
     public void onHit(Player damager, LivingEntity target, int level) {
-        championsManager.getEffects().addEffect(target, EffectType.SILENCE, (long) ((baseDuration + ((level - 1) * durationIncreasePerLevel)) * 1000L));
-        if (championsManager.getEffects().hasEffect(target, EffectType.IMMUNETOEFFECTS)) {
+        championsManager.getEffects().addEffect(target, EffectTypes.SILENCE, (long) (getDuration(level)) * 1000L);
+        if (championsManager.getEffects().hasEffect(target, EffectTypes.IMMUNE)) {
             UtilMessage.simpleMessage(damager, getClassType().getName(), "<alt>" + target.getName() + "</alt> is immune to your silence!");
             return;
         }

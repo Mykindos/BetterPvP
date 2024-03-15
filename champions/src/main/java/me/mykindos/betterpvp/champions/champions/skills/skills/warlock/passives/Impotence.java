@@ -51,7 +51,7 @@ public class Impotence extends Skill implements PassiveSkill {
     }
 
     private double getRadius(int level) {
-        return baseRadius + level * radiusIncreasePerLevel;
+        return baseRadius + (level - 1) * radiusIncreasePerLevel;
     }
 
     @Override
@@ -76,12 +76,12 @@ public class Impotence extends Skill implements PassiveSkill {
     }
 
     private double calculateReduction(int level, int nearby) {
-        return (baseDecrease + level * decreaseIncreasePerLevel) + (Math.min(nearby, maxEnemies) * baseDecreasePerPlayer);
+        return (baseDecrease + (level - 1) * decreaseIncreasePerLevel) + (Math.min(nearby, maxEnemies) * baseDecreasePerPlayer);
     }
 
     @Override
     public void loadSkillConfig() {
-        baseRadius = getConfig("baseRadius", 3.0, Double.class);
+        baseRadius = getConfig("baseRadius", 4.0, Double.class);
         radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 1.0, Double.class);
 
         baseDecrease = getConfig("baseDecrease", 0.15, Double.class);

@@ -259,7 +259,6 @@ public class BPvPItem implements IBPvPItem {
      * @param player    the player damaging
      * @param itemStack the ItemStack to damage
      * @param damage    the damage the ItemStack should take
-     * @return the damaged ItemStack
      */
     public void damageItem(Player player, ItemStack itemStack, int damage) {
         if (getMaxDurability() < 0) return;
@@ -334,7 +333,7 @@ public class BPvPItem implements IBPvPItem {
             if (getMaxDurability() < 0) return;
             int durability = calculateDurability(itemMeta);
             double durabilityPercent = calculateDurabilityPercent(durability);
-            damageableMeta.setDamage(Math.max(1, (int) ((getMaterial().getMaxDurability() * (1 - durabilityPercent)))));
+            damageableMeta.setDamage(Math.max(1, (int) (getMaterial().getMaxDurability() * (1 - durabilityPercent))));
         }
     }
 

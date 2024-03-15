@@ -4,12 +4,13 @@ import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
-import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.effects.events.EffectReceiveEvent;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -27,7 +28,7 @@ public abstract class ActiveToggleSkill extends Skill implements ToggleSkill, Li
 
     protected final HashMap<UUID, HashMap<String, Long>> updaterCooldowns = new HashMap<>();
 
-    public ActiveToggleSkill(Champions champions, ChampionsManager championsManager) {
+    protected ActiveToggleSkill(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
 
@@ -56,19 +57,20 @@ public abstract class ActiveToggleSkill extends Skill implements ToggleSkill, Li
         }
     }
 
-    @EventHandler
+    @EventHandler (priority = EventPriority.MONITOR)
     public void onCustomEffect(EffectReceiveEvent event) {
+        if(event.isCancelled()) return;
         if (!(event.getTarget() instanceof Player player)) return;
         if (!active.contains(player.getUniqueId())) return;
         if (!hasSkill(player)) return;
-        int level = getLevel(player);
-        if (!canUseWhileSilenced() && (event.getEffect().getEffectType() == EffectType.SILENCE)) {
+
+        if (!canUseWhileSilenced() && (event.getEffect().getEffectType() == EffectTypes.SILENCE)) {
             cancel(player, "Silenced");
         }
-        if (!canUseWhileLevitating() && (event.getEffect().getEffectType() == EffectType.LEVITATION)) {
+        if (!canUseWhileLevitating() && (event.getEffect().getEffectType() == EffectTypes.LEVITATION)) {
             cancel(player, "Levitating");
         }
-        if (!canUseWhileStunned() && (event.getEffect().getEffectType() == EffectType.STUN)) {
+        if (!canUseWhileStunned() && (event.getEffect().getEffectType() == EffectTypes.STUN)) {
             cancel(player, "Stunned");
         }
 

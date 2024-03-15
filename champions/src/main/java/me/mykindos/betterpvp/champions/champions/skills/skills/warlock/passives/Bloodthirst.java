@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
@@ -16,8 +17,6 @@ import me.mykindos.betterpvp.core.utilities.UtilSound;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 @Singleton
 @BPvPListener
@@ -46,12 +45,12 @@ public class Bloodthirst extends Skill implements PassiveSkill {
                 "to detect nearby enemies below <val>" + getHealthPercent(level) * 100 + "%</val> health",
                 "",
                 "While running towards weak enemies,",
-                "you receive <effect>Speed " + UtilFormat.getRomanNumeral(speedStrength + 1) + "</effect>"
+                "you receive <effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect>"
         };
     }
 
     public double getHealthPercent(int level) {
-        return baseHealthPercent + level * healthPercentIncreasePerLevel;
+        return baseHealthPercent + (level - 1) * healthPercentIncreasePerLevel;
     }
 
     @Override
@@ -74,16 +73,7 @@ public class Bloodthirst extends Skill implements PassiveSkill {
                     double distanceA = player.getLocation().distance(target.getLocation());
                     double distanceB = player.getLocation().add(player.getLocation().getDirection()).distance(target.getLocation());
                     if (distanceA - distanceB > 0.6) {
-                        if (player.hasPotionEffect(PotionEffectType.SPEED)) {
-                            PotionEffect speed = player.getPotionEffect(PotionEffectType.SPEED);
-                            if (speed != null) {
-                                if (speed.getAmplifier() < speedStrength) {
-                                    player.removePotionEffect(PotionEffectType.SPEED);
-                                }
-                            }
-                        }
-
-                        player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 30, speedStrength));
+                        championsManager.getEffects().addEffect(player, player, EffectTypes.SPEED, speedStrength, 1500);
                         UtilSound.playSound(player.getWorld(), player, Sound.ENTITY_WARDEN_HEARTBEAT, 1, 0.2f);
                         break;
                     }
@@ -103,9 +93,9 @@ public class Bloodthirst extends Skill implements PassiveSkill {
 
     @Override
     public void loadSkillConfig() {
-        baseHealthPercent = getConfig("baseHealthPercent", 0.25, Double.class);
+        baseHealthPercent = getConfig("baseHealthPercent", 0.30, Double.class);
         healthPercentIncreasePerLevel = getConfig("healthPercentIncreasePerLevel", 0.05, Double.class);
 
-        speedStrength = getConfig("speedStrength", 0, Integer.class);
+        speedStrength = getConfig("speedStrength", 1, Integer.class);
     }
 }

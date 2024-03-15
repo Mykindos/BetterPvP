@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.lunar.nethandler;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.lunar.nethandler.client.LCPacketBossBar;
 import me.mykindos.betterpvp.lunar.nethandler.client.LCPacketClientVoice;
 import me.mykindos.betterpvp.lunar.nethandler.client.LCPacketCooldown;
@@ -39,6 +40,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 public abstract class LCPacket {
 
     private static final Map<Class, Integer> classToId = new HashMap<>();
@@ -105,7 +107,7 @@ public abstract class LCPacket {
 
                 return packet;
             } catch (IOException | InstantiationException | IllegalAccessException ex) {
-                ex.printStackTrace();
+                log.error("Failed to handle lunar packet", ex);
             }
         }
 
@@ -123,7 +125,7 @@ public abstract class LCPacket {
         try {
             packet.write(wrappedBuffer);
         } catch (IOException ex) {
-            ex.printStackTrace();
+            log.error("Failed to write lunar packet", ex);
         }
 
         return wrappedBuffer.buf();

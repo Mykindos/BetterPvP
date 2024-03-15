@@ -8,8 +8,10 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
@@ -17,9 +19,8 @@ import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -75,8 +76,11 @@ public class Siphon extends Skill implements PassiveSkill {
         for (Player player : Bukkit.getOnlinePlayers()) {
             int level = getLevel(player);
             if (level > 0) {
-                for (Player target : UtilPlayer.getNearbyEnemies(player, player.getLocation(), getRadius(level))) {
-                    championsManager.getEnergy().degenerateEnergy(target, ((float) getEnergySiphoned(level)) / 10.0f);
+                for (LivingEntity target : UtilEntity.getNearbyEnemies(player, player.getLocation(), getRadius(level))) {
+                    if (target instanceof Player playerTarget) {
+                        championsManager.getEnergy().degenerateEnergy(playerTarget, ((float) getEnergySiphoned(level)) / 10.0f);
+                    }
+
                     new BukkitRunnable() {
                         private final Location position = target.getLocation().add(0, 1, 0);
 
@@ -92,7 +96,7 @@ public class Siphon extends Skill implements PassiveSkill {
                                 if (UtilMath.randomInt(10) == 1) {
                                     UtilPlayer.health(player, 1);
                                 }
-                                player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 50, speedStrength));
+                                championsManager.getEffects().addEffect(player, EffectTypes.SPEED, getName(), speedStrength, 2500, true);
                                 this.cancel();
                                 return;
                             }
@@ -121,6 +125,6 @@ public class Siphon extends Skill implements PassiveSkill {
         baseEnergySiphoned = getConfig("baseEnergySiphoned", 1.0, Double.class);
         energySiphonedIncreasePerLevel = getConfig("energySiphonedIncreasePerLevel", 0.0, Double.class);
 
-        speedStrength = getConfig("speedStrength", 1, Integer.class);
+        speedStrength = getConfig("speedStrength", 2, Integer.class);
     }
 }

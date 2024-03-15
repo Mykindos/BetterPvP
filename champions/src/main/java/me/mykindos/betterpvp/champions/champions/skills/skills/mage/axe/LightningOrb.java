@@ -14,7 +14,7 @@ import me.mykindos.betterpvp.core.combat.throwables.ThrowableItem;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableListener;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
@@ -27,8 +27,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 @Singleton
 @BPvPListener
@@ -69,14 +67,14 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
                 "Launch an electric orb that upon directly hitting a player",
                 "will strike up to <stat>" + maxTargets + "</stat> targets within <val>" + getSpreadDistance(level) + "</val> blocks",
                 "with lightning, dealing <stat>" + getDamage(level) + "</stat> damage, <effect>Shocking</effect> them for <stat>" + getShockDuration(level) + "</stat> seconds, and",
-                "giving them <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength + 1) + "</effect> for <stat>" + getSlowDuration(level) + "</stat> seconds",
+                "giving them <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect> for <stat>" + getSlowDuration(level) + "</stat> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
     }
     
     public double getSpreadDistance(int level) {
-        return baseSpreadDistance + level * spreadDistanceIncreasePerLevel;
+        return baseSpreadDistance + (level - 1) * spreadDistanceIncreasePerLevel;
     }
 
     public double getSlowDuration(int level) {
@@ -120,10 +118,10 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
                 if (count >= maxTargets) continue;
                 throwableItem.getImmunes().add(ent);
                 if (ent instanceof Player target) {
-                    championsManager.getEffects().addEffect(target, EffectType.SHOCK, (long) (getShockDuration(level) * 1000));
+                    championsManager.getEffects().addEffect(target, EffectTypes.SHOCK, (long) (getShockDuration(level) * 1000));
                 }
 
-                ent.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) (getSlowDuration(level) * 20), slowStrength));
+                championsManager.getEffects().addEffect(ent, playerThrower, EffectTypes.SLOWNESS, slowStrength, (long) (getSlowDuration(level) * 1000));
 
                 playerThrower.getLocation().getWorld().strikeLightning(ent.getLocation());
                 UtilDamage.doCustomDamage(new CustomDamageEvent(ent, playerThrower, null, DamageCause.CUSTOM, getDamage(level), false, getName()));
@@ -155,7 +153,7 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
 
         baseSlowDuration = getConfig("slowDuration", 4.0, Double.class);
         slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.0, Double.class);
-        slowStrength = getConfig("slowStrength", 1, Integer.class);
+        slowStrength = getConfig("slowStrength", 2, Integer.class);
 
         baseShockDuration = getConfig("baseShockDuration", 2.0, Double.class);
         shockDurationIncreasePerLevel = getConfig("shockDurationIncreasePerLevel", 0.0, Double.class);

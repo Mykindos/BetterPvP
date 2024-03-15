@@ -15,11 +15,14 @@ import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Slf4j
 public class DiscordWebhook {
 
     private final String webhookUrl;
+    private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
 
     public DiscordWebhook(String webhookUrl) {
         this.webhookUrl = webhookUrl;
@@ -32,8 +35,7 @@ public class DiscordWebhook {
      */
     public void send(DiscordMessage message) {
 
-        new Thread(() ->
-        {
+        EXECUTOR.submit(() -> {
 
             OkHttpClient httpClient = new OkHttpClient();
             RequestBody requestBody = RequestBody.create(toJson(message).toString().getBytes());
@@ -56,7 +58,7 @@ public class DiscordWebhook {
             }
 
 
-        }).start();
+        });
     }
 
 

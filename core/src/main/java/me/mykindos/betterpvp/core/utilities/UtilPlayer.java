@@ -6,6 +6,8 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.WrappedDataValue;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import com.comphenix.protocol.wrappers.WrappedWatchableObject;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
@@ -20,12 +22,12 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UtilPlayer {
 
     public static void setWarningEffect(Player player, int warningDelaySeconds) {
@@ -67,7 +69,7 @@ public class UtilPlayer {
                 .filter(worldPlayer -> {
                     if (worldPlayer.equals(player)) return false;
                     if (!worldPlayer.getWorld().getName().equalsIgnoreCase(location.getWorld().getName())) return false;
-                    return !(worldPlayer.getLocation().distance(location) > radius);
+                    return worldPlayer.getLocation().distance(location) <= radius;
                 })
                 .forEach(ent -> players.add(new KeyValue<>(ent, entityProperty)));
 
@@ -147,11 +149,6 @@ public class UtilPlayer {
 
         packet.getDataValueCollectionModifier().write(0, wrappedDataValueList);
         ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet);
-    }
-
-    public static boolean hasPotionEffect(Player player, PotionEffectType type, int amplifier) {
-        return player.getActivePotionEffects().stream().anyMatch(potionEffect -> potionEffect.getType() == type
-                && potionEffect.getAmplifier() >= amplifier);
     }
 
     public static Location getMidpoint(Player player) {

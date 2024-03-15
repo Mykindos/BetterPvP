@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.builds.repository;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -26,6 +27,7 @@ import java.util.List;
 import static java.util.UUID.fromString;
 
 @Singleton
+@Slf4j
 public class BuildRepository implements IRepository<RoleBuild> {
 
     private final Database database;
@@ -39,7 +41,7 @@ public class BuildRepository implements IRepository<RoleBuild> {
 
     @Override
     public List<RoleBuild> getAll() {
-        return null;
+        return new ArrayList<>();
     }
 
     public void loadBuilds(GamerBuilds builds) {
@@ -81,7 +83,7 @@ public class BuildRepository implements IRepository<RoleBuild> {
 
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            log.error("Failed to load builds", ex);
         }
 
     }

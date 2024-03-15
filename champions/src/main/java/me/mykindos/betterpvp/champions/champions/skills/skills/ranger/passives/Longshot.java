@@ -58,8 +58,8 @@ public class Longshot extends Skill implements PassiveSkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Shoot an arrow that deals an extra <stat>" + getDamage(level),
-                "damage per block it travels",
+                "Your arrows now deal damage that increases",
+                "by <stat>" + getDamage(level) + "</stat> damage per block it travels",
                 "",
                 "Your arrows start at <stat>" + minDamage + "</stat> damage",
                 "and cap out at <val>" + getMaxDamage(level) + "</val> damage",
@@ -68,11 +68,11 @@ public class Longshot extends Skill implements PassiveSkill {
     }
 
     public double getMaxDamage(int level) {
-        return baseMaxDamage + ((level - 1) * maxDamageIncreasePerLevel);
+        return minDamage + baseMaxDamage + ((level - 1) * maxDamageIncreasePerLevel);
     }
 
     public double getDamage(int level) {
-        return baseDamage + level * damageIncreasePerLevel;
+        return baseDamage + (level - 1) * damageIncreasePerLevel;
     }
 
     @Override

@@ -9,8 +9,10 @@ import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -18,8 +20,6 @@ import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import java.util.Random;
 
@@ -49,7 +49,7 @@ public class SmokeArrow extends PrepareArrowSkill {
                 "Left click with a Bow to prepare",
                 "",
                 "Your next arrow will give <effect>Blindness</effect>",
-                "and <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength + 1) + "</effect> to the target for <val>" + getEffectDuration(level) + "</val> seconds.",
+                "and <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> to the target for <val>" + getEffectDuration(level) + "</val> seconds.",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -89,9 +89,9 @@ public class SmokeArrow extends PrepareArrowSkill {
 
     @Override
     public void onHit(Player damager, LivingEntity target, int level) {
-        final int effectDuration = (int) (getEffectDuration(level) * 20L);
-        target.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, effectDuration, 1));
-        target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, effectDuration, 1));
+        final int effectDuration = (int) (getEffectDuration(level) * 1000L);
+        championsManager.getEffects().addEffect(target, damager, EffectTypes.BLINDNESS, 1, effectDuration);
+        championsManager.getEffects().addEffect(target, damager, EffectTypes.SLOWNESS, slownessStrength, effectDuration);
         target.getWorld().playSound(target.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
 
         new ParticleBuilder(Particle.EXPLOSION_LARGE)
@@ -111,7 +111,7 @@ public class SmokeArrow extends PrepareArrowSkill {
 
     @Override
     public void displayTrail(Location location) {
-        Random random = new Random();
+        Random random = UtilMath.RANDOM;
         double spread = 0.1;
         double dx = (random.nextDouble() - 0.5) * spread;
         double dy = (random.nextDouble() - 0.5) * spread;

@@ -4,11 +4,10 @@ import com.google.inject.Inject;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.effects.EffectManager;
-import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 abstract class CustomEffectSubCommand extends Command {
@@ -22,13 +21,15 @@ abstract class CustomEffectSubCommand extends Command {
     public List<String> processTabComplete(CommandSender sender, String[] args) {
         List<String> tabCompletions = new ArrayList<>();
 
-        if (args.length == 0) return super.processTabComplete(sender, args);;
+        if (args.length == 0) return super.processTabComplete(sender, args);
+
 
         String lowercaseArg = args[args.length - 1].toLowerCase();
-        switch(getArgumentType(args.length)) {
-            case "EFFECT" ->
-                    tabCompletions.addAll(Arrays.stream(EffectType.values()).map(EffectType::toString).filter(name -> name.toLowerCase().startsWith(lowercaseArg)).toList());
+        if (getArgumentType(args.length).equals("EFFECT")) {
+            tabCompletions.addAll(EffectTypes.getEffectTypes().stream().map(type -> type.getName().replace(" ", "_"))
+                    .filter(name -> name.toLowerCase().startsWith(lowercaseArg)).toList());
         }
+        
         tabCompletions.addAll(super.processTabComplete(sender, args));
         return tabCompletions;
     }

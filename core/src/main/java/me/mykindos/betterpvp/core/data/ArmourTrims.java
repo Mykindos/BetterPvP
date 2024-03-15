@@ -5,6 +5,8 @@ import org.bukkit.inventory.meta.trim.TrimPattern;
 
 public class ArmourTrims {
 
+    private ArmourTrims() {}
+
     public static final TrimMaterial[] TRIM_MATERIALS = {
             TrimMaterial.COPPER,
             TrimMaterial.DIAMOND,

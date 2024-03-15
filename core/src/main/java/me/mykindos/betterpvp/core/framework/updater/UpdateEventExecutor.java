@@ -11,7 +11,11 @@ import org.bukkit.Bukkit;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Singleton
@@ -19,8 +23,8 @@ public class UpdateEventExecutor {
 
     private final Core core;
 
-    public HashMap<Long, Integer> lastRunTimers = new HashMap<>();
-    public HashMap<Object, HashMap<Method, UpdateEvent>> updateMethods = new HashMap<>();
+    public Map<Long, Integer> lastRunTimers = new HashMap<>();
+    public List<UpdateEventContainer> updateEvents = new ArrayList<>();
 
     // Depending on server performance, an update event running every tick may skip an interval. This allows the event to rollover to the next interval.
     @Config(path = "update-event.allow-rollover", defaultValue = "false")
@@ -41,19 +45,18 @@ public class UpdateEventExecutor {
 
         for (var listener : listeners) {
             var methods = listener.getClass().getMethods();
-            HashMap<Method, UpdateEvent> methodMap = new HashMap<>();
             for (var method : methods) {
 
                 var updateEvent = method.getAnnotation(UpdateEvent.class);
                 if (updateEvent == null) continue;
 
-                methodMap.put(method, updateEvent);
+                updateEvents.add(new UpdateEventContainer(listener, method, updateEvent));
 
             }
 
-            updateMethods.put(listener, methodMap);
-
         }
+
+        Collections.sort(updateEvents);
 
     }
 
@@ -62,28 +65,24 @@ public class UpdateEventExecutor {
         var updateTimers = new HashMap<Long, Integer>();
         int currentTick = Bukkit.getCurrentTick();
 
-        for (var entry : updateMethods.entrySet()) {
+        for(var entry : updateEvents) {
+            var event = entry.getUpdateEvent();
+            int tickDelay = (int) event.delay() / 50;
+            Integer lastRunTick = lastRunTimers.get(event.delay());
+            if (lastRunTick != null) {
+                if (lastRunTick <= currentTick) {
+                    callUpdater(event, entry.getMethod(), entry.getInstance());
 
-            for (var method : entry.getValue().entrySet()) {
-                var event = method.getValue();
-                int tickDelay = (int) event.delay() / 50;
-                Integer lastRunTick = lastRunTimers.get(event.delay());
-                if (lastRunTick != null) {
-                    if (lastRunTick <= currentTick) {
-                        callUpdater(event, method.getKey(), entry.getKey());
-
-                        if (allowRollover) {
+                    if (allowRollover) {
+                        updateTimers.put(event.delay(), currentTick + tickDelay);
+                    } else {
+                        if (!updateTimers.containsKey(event.delay())) {
                             updateTimers.put(event.delay(), currentTick + tickDelay);
-                        } else {
-                            if (!updateTimers.containsKey(event.delay())) {
-                                updateTimers.put(event.delay(), currentTick + tickDelay);
-                            }
                         }
                     }
-                } else {
-                    lastRunTimers.put(event.delay(), currentTick + tickDelay);
                 }
-
+            } else {
+                lastRunTimers.put(event.delay(), currentTick + tickDelay);
             }
         }
 
@@ -93,6 +92,7 @@ public class UpdateEventExecutor {
 
     private void callUpdater(UpdateEvent updateEvent, Method method, Object obj) {
         UtilServer.runTask(core, updateEvent.isAsync(), () -> executeMethod(method, obj));
+
     }
 
     private void executeMethod(Method method, Object obj) {

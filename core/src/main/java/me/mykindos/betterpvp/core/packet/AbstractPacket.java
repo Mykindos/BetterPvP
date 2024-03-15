@@ -58,7 +58,7 @@ public abstract class AbstractPacket {
      *
      * @param type - the packet type.
      */
-    public AbstractPacket(PacketType type) {
+    protected AbstractPacket(PacketType type) {
         this.handle = new PacketContainer(type);
         this.handle.getModifier().writeDefaults();
     }

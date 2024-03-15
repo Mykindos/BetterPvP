@@ -7,14 +7,11 @@ import me.mykindos.betterpvp.champions.champions.skills.types.CooldownToggleSkil
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.effects.Effect;
-import me.mykindos.betterpvp.core.effects.EffectType;
-import me.mykindos.betterpvp.core.effects.events.EffectExpireEvent;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
@@ -26,8 +23,6 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerAttemptPickupItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -96,10 +91,10 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener {
     @Override
     public void toggle(Player player, int level) {
         // Effects
-        championsManager.getEffects().addEffect(player, EffectType.INVISIBILITY, (long) (getDuration(level) * 1000L));
+        championsManager.getEffects().addEffect(player, EffectTypes.VANISH, getName(), 1, (long) (getDuration(level) * 1000L));
         smoked.put(player.getUniqueId(), System.currentTimeMillis());
         for (Player target : UtilPlayer.getNearbyEnemies(player, player.getLocation(), blindRadius)) {
-            target.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, (int) (blindDuration * 20), 0));
+            championsManager.getEffects().addEffect(target, player, EffectTypes.BLINDNESS, 1, (long) (blindDuration * 1000L));
         }
 
         // Display particle to those only within 30 blocks
@@ -122,8 +117,7 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener {
     }
 
     private void reappear(Player player) {
-        championsManager.getEffects().removeEffect(player, EffectType.INVISIBILITY);
-        UtilServer.callEvent(new EffectExpireEvent(player, new Effect(player.getUniqueId().toString(), EffectType.INVISIBILITY, 1, 0))); // Do this incase
+        championsManager.getEffects().removeEffect(player, EffectTypes.VANISH, getName());
         UtilMessage.message(player, getClassType().getName(), "You have reappeared.");
     }
 
