@@ -238,12 +238,25 @@ public class SearchCommand extends Command {
         public void execute(Player player, Client client, String... args) {
             clientManager.sendMessageToRank("Search", UtilMessage.deserialize("<yellow>%s</yellow> is retrieving all <light_purple>UUIDitems</light_purple> currently being held", player.getName()), Rank.HELPER);
 
+            boolean atLeastOneUUIDItemFound = false;
             for (Player online : Bukkit.getOnlinePlayers()) {
+                boolean hasAtLeastOneUUIDItem = false;
                 Component component = UtilMessage.deserialize("<yellow>%s</yellow> is holding:", online.getName());
                 for (UUIDItem uuidItem : itemHandler.getUUIDItems(online)) {
+                    if (!hasAtLeastOneUUIDItem) {
+                        hasAtLeastOneUUIDItem = true;
+                    }
                     component = component.appendNewline().append(UtilMessage.deserialize("(<green>%s</green>) <light_purple>%s</light_purple>", uuidItem.getIdentifier(), uuidItem.getUuid()));
                 }
-                UtilMessage.message(player, "Search", component);
+                if (hasAtLeastOneUUIDItem) {
+                    atLeastOneUUIDItemFound = true;
+                    UtilMessage.message(player, "Search", component);
+                }
+
+            }
+            if (!atLeastOneUUIDItemFound) {
+                //there are no UUIDItems being held
+                UtilMessage.message(player, "Search", "There are currently no UUIDItems being held");
             }
         }
 
