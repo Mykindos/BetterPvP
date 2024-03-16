@@ -241,7 +241,7 @@ public class SearchCommand extends Command {
             boolean atLeastOneUUIDItemFound = false;
             for (Player online : Bukkit.getOnlinePlayers()) {
                 boolean hasAtLeastOneUUIDItem = false;
-                Component component = UtilMessage.deserialize("<yellow>%s</yellow> is holding:", online.getName());;
+                Component component = UtilMessage.deserialize("<yellow>%s</yellow> is holding:", online.getName());
                 for (UUIDItem uuidItem : itemHandler.getUUIDItems(online)) {
                     if (!hasAtLeastOneUUIDItem) {
                         hasAtLeastOneUUIDItem = true;
