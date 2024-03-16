@@ -72,12 +72,11 @@ public class ViperStrikes extends Skill implements PassiveSkill, Listener {
     public void onDamage(CustomDamageEvent event) {
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
         if (!(event.getDamager() instanceof Player damager)) return;
-        if (!(event.getDamagee() instanceof Player damagee)) return;
         int level = getLevel(damager);
         if (level <= 0) return;
 
-        championsManager.getEffects().addEffect(damagee, damager, EffectTypes.POISON, poisonStrength, (long) (getDuration(level) * 1000L));
-        damagee.getWorld().playSound(damager.getLocation(), Sound.ENTITY_SPIDER_HURT, 1f, 2f);
+        championsManager.getEffects().addEffect(event.getDamagee(), damager, EffectTypes.POISON, poisonStrength, (long) (getDuration(level) * 1000L));
+        event.getDamagee().getWorld().playSound(damager.getLocation(), Sound.ENTITY_SPIDER_HURT, 1f, 2f);
         event.addReason(getName());
     }
 

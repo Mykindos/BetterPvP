@@ -48,24 +48,6 @@ import java.util.WeakHashMap;
 @BPvPListener
 public class Wreath extends Skill implements InteractSkill, Listener {
 
-    private final WeakHashMap<Player, WreathData> charges = new WeakHashMap<>();
-
-    private final PermanentComponent actionBarComponent = new PermanentComponent(gamer -> {
-        final Player player = gamer.getPlayer();
-
-        // Only display charges in hotbar if holding the weapon
-        if (player == null || !charges.containsKey(player) || !isHolding(player)) {
-            return null; // Skip if not online or not charging
-        }
-
-        final int maxCharges = getMaxCharges(getLevel(player));
-        final int newCharges = charges.get(player).getCharges();
-
-        return Component.text(getName() + " ").color(NamedTextColor.WHITE).decorate(TextDecoration.BOLD)
-                .append(Component.text("\u25A0".repeat(newCharges)).color(NamedTextColor.GREEN))
-                .append(Component.text("\u25A0".repeat(Math.max(0, maxCharges - newCharges))).color(NamedTextColor.RED));
-    });
-
     private int maxCharges;
     private int maxChargesIncreasePerLevel;
     private double rechargeSeconds;
@@ -76,6 +58,26 @@ public class Wreath extends Skill implements InteractSkill, Listener {
     private double damageIncreasePerLevel;
     private int slowStrength;
     private double healthPerEnemyHit;
+    private double healthPerEnemyHitIncreasePerLevel;
+
+    private final WeakHashMap<Player, WreathData> charges = new WeakHashMap<>();
+
+
+    private final PermanentComponent actionBarComponent = new PermanentComponent(gamer -> {
+        final Player player = gamer.getPlayer();
+
+        // Only display charges in hotbar if holding the weapon
+        if (player == null || !charges.containsKey(player) || !isHolding(player)) {
+            return null; // Skip if not online or not charging
+        }
+
+        final int currentMaxCharges = getMaxCharges(getLevel(player));
+        final int newCharges = charges.get(player).getCharges();
+
+        return Component.text(getName() + " ").color(NamedTextColor.WHITE).decorate(TextDecoration.BOLD)
+                .append(Component.text("\u25A0".repeat(newCharges)).color(NamedTextColor.GREEN))
+                .append(Component.text("\u25A0".repeat(Math.max(0, currentMaxCharges - newCharges))).color(NamedTextColor.RED));
+    });
 
     @Inject
     public Wreath(Champions champions, ChampionsManager championsManager) {
@@ -93,10 +95,10 @@ public class Wreath extends Skill implements InteractSkill, Listener {
                 "Right click with a Sword to activate",
                 "",
                 "Release a barrage of teeth that",
-                "deal <val>" + String.format("%.2f", getDamage(level)) + "</val> damage and apply <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength + 1) + "</effect>",
+                "deal <val>" + String.format("%.2f", getDamage(level)) + "</val> damage and apply <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect>",
                 "to their target for <stat>" + getSlowDuration(level) + "</stat> seconds.",
                 "",
-                "For each enemy hit, restore <val>" + healthPerEnemyHit + "</val> health.",
+                "For each enemy hit, restore <stat>" + getHealthPerEnemyHit(level) + "</stat> health.",
                 "",
                 "Store up to <stat>" + getMaxCharges(level) + "</stat> charges",
                 "",
@@ -111,6 +113,10 @@ public class Wreath extends Skill implements InteractSkill, Listener {
 
     public double getSlowDuration(int level) {
         return baseSlowDuration + ((level - 1) * slowDurationIncreasePerLevel);
+    }
+
+    public double getHealthPerEnemyHit(int level) {
+        return healthPerEnemyHit + (level - 1) * healthPerEnemyHitIncreasePerLevel;
     }
 
     @Override
@@ -202,7 +208,7 @@ public class Wreath extends Skill implements InteractSkill, Listener {
                     CustomDamageEvent dmg = new CustomDamageEvent(target, player, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, getName());
                     UtilDamage.doCustomDamage(dmg);
                     championsManager.getEffects().addEffect(target, player, EffectTypes.SLOWNESS, slowStrength, (long) (getSlowDuration(level) * 1000));
-                    UtilPlayer.health(player, healthPerEnemyHit);
+                    UtilPlayer.health(player, getHealthPerEnemyHit(level));
                 }
 
             }
@@ -272,12 +278,18 @@ public class Wreath extends Skill implements InteractSkill, Listener {
     public void loadSkillConfig() {
         baseSlowDuration = getConfig("baseSlowDuration", 2.0, Double.class);
         slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.0, Double.class);
+
         baseDamage = getConfig("baseDamage", 4.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.66, Double.class);
+
         healthPerEnemyHit = getConfig("healthPerEnemyHit", 1.0, Double.class);
+        healthPerEnemyHitIncreasePerLevel = getConfig("healthPerEnemyHitIncreasePerLevel", 0.0, Double.class);
+
         slowStrength = getConfig("slowStrength", 2, Integer.class);
+
         maxCharges = getConfig("maxCharges", 3, Integer.class);
         maxChargesIncreasePerLevel = getConfig("maxChargesIncreasePerLevel", 0, Integer.class);
+
         rechargeSeconds = getConfig("rechargeSeconds", 10.0, Double.class);
         rechargeSecondsDecreasePerLevel = getConfig("rechargeSecondsDecreasePerLevel", 1.0, Double.class);
     }

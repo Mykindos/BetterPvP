@@ -117,7 +117,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
     }
 
     public String getAge() {
-        return UtilTime.getTime(System.currentTimeMillis() - getTimeCreated(), 1);
+        return UtilTime.getTime((System.currentTimeMillis() - getTimeCreated()), 1);
     }
 
     /**
@@ -269,7 +269,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
      * @return The amount of energy a clan will lose per hour
      */
     public double getEnergyRatio() {
-        return getTerritory().size() * 25;
+        return getTerritory().size() * 25d;
     }
 
     public ClanRelation getRelation(@Nullable Clan targetClan) {

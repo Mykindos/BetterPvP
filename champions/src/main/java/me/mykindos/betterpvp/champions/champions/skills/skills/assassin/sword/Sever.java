@@ -108,9 +108,7 @@ public class Sever extends Skill implements CooldownSkill, Listener, InteractSki
         Location playerChestLocation = player.getLocation().clone().add(0, 1, 0);
 
         drawParticleLine(playerChestLocation, directionVector, hitDistance, player);
-
         List<LivingEntity> nearbyEnemies = getNearbyEnemies(player, midpointLocation, hitDistance / 2);
-
         Vector playerDirection = player.getLocation().getDirection().normalize();
 
         nearbyEnemies.removeIf(entity -> {

@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.core.utilities;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.bukkit.craftbukkit.v1_20_R3.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_20_R3.potion.CraftPotionUtil;
 import org.bukkit.entity.LivingEntity;
@@ -7,17 +9,14 @@ import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.stream.Stream;
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UtilEffect {
 
     public static boolean isNegativePotionEffect(PotionEffect effect) {
-        return effect.getType().getName().contains("SLOW")
-                || effect.getType().getName().contains("CONFUSION")
-                || effect.getType().getName().contains("POISON")
-                || effect.getType().getName().contains("BLINDNESS")
-                || effect.getType().getName().contains("WITHER")
-                || effect.getType().getName().contains("LEVITATION")
-                || effect.getType().getName().contains("OMEN")
-                || effect.getType().getName().contains("DARKNESS");
+        return Stream.of("SLOW", "CONFUSION", "POISON", "BLINDNESS", "WITHER", "LEVITATION", "OMEN", "DARKNESS")
+                .anyMatch(s -> effect.getType().getKey().getKey().toUpperCase().contains(s));
     }
 
     public static void applyCraftEffect(LivingEntity livingEntity, PotionEffect effect) {

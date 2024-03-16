@@ -55,11 +55,11 @@ public class WhirlwindSword extends Skill implements InteractSkill, CooldownSkil
     }
 
     public double getDistance(int level) {
-        return baseDistance + level * distanceIncreasePerLevel;
+        return baseDistance + (level - 1) * distanceIncreasePerLevel;
     }
 
     public double getDamage(int level){
-        return baseDamage + level * damageIncreasePerLevel;
+        return baseDamage + (level - 1) * damageIncreasePerLevel;
     }
 
     @Override
@@ -121,7 +121,7 @@ public class WhirlwindSword extends Skill implements InteractSkill, CooldownSkil
                 }
 
                 for (int p = 0; p < particlesPerTick; p++) {
-                    double progress = (i + (double)p * increment / particlesPerTick) % points;
+                    double progress = (i + p * increment / particlesPerTick) % points;
                     for (int spiral = 0; spiral < numSpirals; spiral++) {
                         double startAngle = spiral * Math.PI * 2 / numSpirals;
                         double angle = 2 * Math.PI * progress / points + startAngle;

@@ -15,6 +15,9 @@ import me.mykindos.betterpvp.core.effects.types.negative.SlownessEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.StunEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.VulnerabilityEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.WitherEffect;
+import me.mykindos.betterpvp.core.effects.types.positive.AttackSpeedEffect;
+import me.mykindos.betterpvp.core.effects.types.positive.CooldownReductionEffect;
+import me.mykindos.betterpvp.core.effects.types.positive.EnergyReductionEffect;
 import me.mykindos.betterpvp.core.effects.types.positive.FireResistanceEffect;
 import me.mykindos.betterpvp.core.effects.types.positive.HealthBoostEffect;
 import me.mykindos.betterpvp.core.effects.types.positive.ImmuneEffect;
@@ -29,6 +32,7 @@ import me.mykindos.betterpvp.core.effects.types.positive.VanishEffect;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 public class EffectTypes {
@@ -65,12 +69,20 @@ public class EffectTypes {
     public static final EffectType NO_FALL = createEffectType(new NoFallEffect());
     public static final EffectType HEALTH_BOOST = createEffectType(new HealthBoostEffect());
     public static final EffectType REGENERATION = createEffectType(new RegenerationEffect());
+    public static final EffectType COOLDOWN_REDUCTION = createEffectType(new CooldownReductionEffect());
+    public static final EffectType ENERGY_REDUCTION = createEffectType(new EnergyReductionEffect());
+    public static final EffectType ATTACK_SPEED = createEffectType(new AttackSpeedEffect());
 
     // </editor-fold>
 
-    private static EffectType createEffectType(EffectType effectType) {
+    public static EffectType createEffectType(EffectType effectType) {
+        log.info("Added effect: {}", effectType.getName());
         effectTypes.add(effectType);
         return effectType;
+    }
+
+    public static Optional<EffectType> getEffectTypeByName(String name) {
+        return effectTypes.stream().filter(effectType -> effectType.getName().equalsIgnoreCase(name)).findFirst();
     }
 
 }

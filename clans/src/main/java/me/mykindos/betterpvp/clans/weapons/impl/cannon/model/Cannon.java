@@ -185,14 +185,14 @@ public final class Cannon implements SoundProvider {
         if (lastShotTime < lastFuseTime) {
             // If the cannon is fusing, display the fuse time
             final double secondsLeft = (lastFuseTime + fuseTime - System.currentTimeMillis()) / 1000d;
-            final ProgressBar fuseBar = new ProgressBar((float) (secondsLeft / (fuseTime / 1000)), 25)
+            final ProgressBar fuseBar = new ProgressBar((float) (secondsLeft / (fuseTime / 1000d)), 25)
                     .inverted()
                     .withCharacter(' ');
             component.append(fuseBar.build().decoration(TextDecoration.STRIKETHROUGH, true));
         } else if (!UtilTime.elapsed(lastShotTime, useCooldown)) {
             // If the cannon is on cooldown, display the cooldown
             final double secondsLeft = (lastShotTime + useCooldown - System.currentTimeMillis()) / 1000d;
-            final TextColor color = ProgressColor.of((float) (secondsLeft / (useCooldown / 1000))).inverted().getTextColor();
+            final TextColor color = ProgressColor.of((float) (secondsLeft / (useCooldown / 1000d))).inverted().getTextColor();
             final String timeText = UtilFormat.formatNumber(secondsLeft, 1);
             component.append(Component.text(timeText + "s", color, TextDecoration.BOLD));
         } else if (isLoaded()) {

@@ -95,7 +95,7 @@ public class PillageListener implements Listener {
             clanManager.getInsuranceQueue().addAll(insuranceList);
             clanManager.getRepository().deleteInsuranceForClan(clan);
             clan.getInsurance().clear();
-        }, 20 * 60 * 2);
+        }, 20 * 60 * 2L);
     }
 
     @UpdateEvent(delay = 30000)

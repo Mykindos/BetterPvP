@@ -61,7 +61,6 @@ public class ClanCommand extends Command {
                 if (clanMenuEnabled.isPresent()) {
                     if (clanMenuEnabled.get()) {
                         openClanMenu(player, playerClan, playerClan);
-                        return;
                     } else {
                         displayChat(player, playerClan);
                     }
@@ -108,7 +107,7 @@ public class ClanCommand extends Command {
                 .append(Component.text("Enemies: ", NamedTextColor.WHITE)).append(UtilMessage.getMiniMessage(clanManager.getEnemyListDom(player, clan))).appendNewline()
                 .append(Component.text("Members: ", NamedTextColor.WHITE)).append(UtilMessage.getMiniMessage(clanManager.getMembersList(clan))).appendNewline()
                 .append(Component.text("Cooldown: ", NamedTextColor.WHITE)).append(UtilMessage.getMiniMessage((!clan.isNoDominanceCooldownActive() ? "<green>No"
-                        : "<red>" + UtilTime.getTime(clan.getNoDominanceCooldown() - System.currentTimeMillis(), 1)))).appendNewline()
+                        : "<red>" + UtilTime.getTime((clan.getNoDominanceCooldown() - System.currentTimeMillis()), 1)))).appendNewline()
                 .append(Component.text("Energy: ", NamedTextColor.WHITE)).append(Component.text(clan.getEnergy() + " - (", NamedTextColor.YELLOW)
                         .append(Component.text(clan.getEnergyTimeRemaining(), NamedTextColor.GOLD).append(Component.text(")", NamedTextColor.YELLOW)))).appendNewline()
                 .append(Component.text("Level: ", NamedTextColor.WHITE)).append(Component.text(clan.getLevel(), NamedTextColor.GOLD)).appendNewline()

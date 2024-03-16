@@ -100,11 +100,11 @@ public class TutorialSubCommand extends ClanSubCommand {
     }
 
     @Override
-    public void execute(Player player, Client client, String... args) {;
+    public void execute(Player player, Client client, String... args) {
         UtilServer.runTaskAsync(clans, () -> {
             Iterator<Component> iterator = tutorialText.iterator();
             if (iterator.hasNext()) {
-                runTutorial(player, iterator, 3 * 20);
+                runTutorial(player, iterator, 3 * 20L);
             }
         });
     }
@@ -113,7 +113,7 @@ public class TutorialSubCommand extends ClanSubCommand {
         UtilMessage.message(player, "Tutorial", iterator.next());
         UtilServer.runTaskLater(clans, true, () -> {
             if (iterator.hasNext()) {
-                runTutorial(player, iterator, 3 * 20);
+                runTutorial(player, iterator, 3 * 20L);
             }
         }, delay);
     }

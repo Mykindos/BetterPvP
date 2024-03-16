@@ -50,9 +50,9 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
     private int fissureDistanceIncreasePerLevel;
     private double fissureExpireDuration;
     private double damagePerBlock;
-    private int effectDurationIncreasePerLevel;
     private double damagePerBlockIncreasePerLevel;
-    private int effectDuration;
+    private double effectDuration;
+    private double effectDurationIncreasePerLevel;
     private int slownessLevel;
     private List<String> forbiddenBlockTypes;
 
@@ -75,11 +75,11 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Fissure the earth infront of you,",
+                "Fissure the earth in front of you,",
                 "creating an impassable wall",
                 "",
                 "Players struck by wall will receive",
-                "<effect>Slowness " + UtilFormat.getRomanNumeral(slownessLevel + 1) + "</effect> for <val>" + getSlowDuration(level) + "</val> seconds and take",
+                "<effect>Slowness " + UtilFormat.getRomanNumeral(slownessLevel) + "</effect> for <val>" + getSlowDuration(level) + "</val> seconds and take",
                 "<val>" + (Math.round(getDamage(level) * 10) / 10.0) + "</val> damage for every block fissure",
                 "has travelled",
                 "",
@@ -88,7 +88,7 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
     }
 
     public double getDamage(int blocksTraveled, int level) {
-        return (damagePerBlock + ((level - 1) * damagePerBlockIncreasePerLevel)) * blocksTraveled;
+        return getDamage(level) * blocksTraveled;
     }
 
     public double getDamage(int level) {
@@ -225,12 +225,12 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
         fissureExpireDuration = getConfig("fissureExpireDuration", 10.0, Double.class);
         damagePerBlock = getConfig("baseExtraDamagePerBlock", 0.6, Double.class);
         damagePerBlockIncreasePerLevel = getConfig("baseExtraDamagePerBlockIncreasePerLevel", 0.2, Double.class);
-        effectDuration = getConfig("effectDuration", 1, Integer.class);
-        effectDurationIncreasePerLevel = getConfig("effectDurationIncreasePerLevel", 1, Integer.class);
+        effectDuration = getConfig("effectDuration", 1.0, Double.class);
+        effectDurationIncreasePerLevel = getConfig("effectDurationIncreasePerLevel", 1.0, Double.class);
         slownessLevel = getConfig("slownessLevel", 2, Integer.class);
 
         var forbidden = List.of("TNT", "ENCHANTING_TABLE");
-        forbiddenBlockTypes = (List<String>) getConfig("fissureForbiddenBlocks", forbidden, List.class);
+        forbiddenBlockTypes = getConfig("fissureForbiddenBlocks", forbidden, List.class);
 
     }
 

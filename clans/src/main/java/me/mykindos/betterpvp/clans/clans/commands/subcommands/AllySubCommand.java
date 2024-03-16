@@ -41,6 +41,7 @@ public class AllySubCommand extends ClanSubCommand {
         return "Form an alliance with another clan";
     }
 
+    @Override
     public String getUsage() {
         return super.getUsage() + " <clan>";
     }

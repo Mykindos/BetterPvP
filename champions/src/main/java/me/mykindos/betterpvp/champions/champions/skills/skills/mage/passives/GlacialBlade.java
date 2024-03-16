@@ -77,7 +77,7 @@ public class GlacialBlade extends Skill implements PassiveSkill, CooldownSkill, 
     }
     @Override
     public float getEnergy(int level) {
-        return energy;
+        return (float) (energy + (level - 1) * energyDecreasePerLevel);
     }
 
     @EventHandler

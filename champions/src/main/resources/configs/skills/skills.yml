@@ -9,6 +9,8 @@ skills:
       cooldownDecreasePerLevel: 0.5
       leapStrength: 1.3
       wallKickStrength: 0.9
+      wallKickInternalCooldown: 1.0
+      fallDamageLimit: 8.0
     sever:
       enabled: true
       cooldown: 20.0
@@ -23,7 +25,7 @@ skills:
       enabled: true
       maxlevel: 3
       baseDuration: 0.0
-      baseIncrease: 1.0
+      durationIncreasePerLevel: 1.0
       slownessDuration: 1.0
       slownessStrength: 1
     viperstrikes:
@@ -80,7 +82,7 @@ skills:
       maxlevel: 3
       durationPerLevel: 1.5
       cooldownDecreasePerLevel: 1.0
-      baseDuration: 0.0
+      baseDuration: 1.5
       durationIncreasePerLevel: 1.5
     slash:
       enabled: true
@@ -245,7 +247,7 @@ skills:
       enabled: true
       maxlevel: 3
       internalCooldown: 2.0
-      baseDamage: 0.0
+      baseDamage: 0.8
       damageIncreasePerLevel: 0.8
     sacrifice:
       enabled: true
@@ -297,11 +299,14 @@ skills:
       maxlevel: 5
       cooldown: 9.0
       baseCharge: 40.0
+      chargeIncreasePerLevel: 10.0
       baseDamage: 2.0
+      damageIncreasePerLevel: 2.0
       baseRange: 20.0
+      rangeIncreasePerLevel: 10.0
       energy: 30
       energyDecreasePerLevel: 2.0
-      cooldownDecreasePerLevel: 1.0
+      cooldownDecreasePerLevel: 0.5
       collisionRadius: 1.8
       explosionRadius: 4.0
     rupture:
@@ -351,7 +356,7 @@ skills:
       sphereSize: 4
       speed: 1.5
       cooldownDecreasePerLevel: 2.0
-      baseDuration: 5.0
+      baseDuration: 6.0
       durationIncreasePerLevel: 0.5
     lightningorb:
       enabled: true
@@ -395,9 +400,12 @@ skills:
       baseRadius: 2.0
       radiusIncreasePerLevel: 1.0
       energyDecreasePerLevel: 1.0
-      healCooldown: 2.0
-      healSpeed: 0.3
-      healMultiplier: 0.25
+      baseHealCooldown: 2.0
+      healCooldownDecreasePerLevel: 0.0
+      baseHealSpeed: 0.3
+      healSpeedIncreasePerLevel: 0.0
+      baseHealMultiplier: 0.25
+      healMultiplierIncreasePerLevel: 0.0
     magmablade:
       enabled: true
       maxlevel: 3
@@ -458,9 +466,9 @@ skills:
       fissureExpireDuration: 10.0
       baseExtraDamagePerBlock: 0.4
       baseExtraDamagePerBlockIncreasePerLevel: 0.2
-      effectDuration: 1
+      effectDuration: 1.0
       slownessLevel: 2
-      effectDurationIncreasePerLevel: 1
+      effectDurationIncreasePerLevel: 1.0
       gateCheckEnabled: true
       doorCheckEnabled: true
       fissureForbiddenBlocks:
@@ -549,6 +557,7 @@ skills:
       damageIncreasePerLevel: 1.0
       cooldownDecreasePerLevel: 2.0
       slamDelay: 500
+      fallDamageLimit: 20.0
     whirlwindsword:
       enabled: true
       maxlevel: 5
@@ -627,7 +636,7 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 20.0
-      radius: 4
+      radius: 4.0
       duration: 3.0
       cooldownDecreasePerLevel: 1.0
       baseDuration: 3.0
@@ -662,7 +671,7 @@ skills:
       chargeIncreasePerLevel: 10.0
       baseDamage: 2.0
       damageIncreasePerLevel: 1.0
-      slowDuration: 3.0
+      baseSlowDuration: 3.0
       slowDurationIncreasePerLevel: 0.0
       slowStrength: 2
     stunningshot:
@@ -684,6 +693,7 @@ skills:
       maxlevel: 5
       cooldown: 8.0
       cooldownDecreasePerLevel: 1.0
+      fallDamageLimit: 8.0
     levitatingshot:
       enabled: true
       maxlevel: 5
@@ -724,7 +734,7 @@ skills:
     huntersthrill:
       enabled: true
       maxlevel: 3
-      maxTimeBetweenShots: 8.0
+      baseMaxTimeBetweenShots: 8.0
       maxConsecutiveHits: 4
       maxTimeBetweenShotsIncreasePerLevel: 1.0
       baseDuration: 6.0
@@ -758,7 +768,7 @@ skills:
       enabled: true
       maxlevel: 3
       maxTimeBetweenShots: 5.0
-      maxConsecutiveHits: 2
+      baseMaxConsecutiveHits: 2
       maxConsecuteiveHitsIncreasePerLevel: 2
       baseDamage: 1.0
       damageIncreasePerLevel: 0.0
@@ -835,9 +845,9 @@ skills:
     bloodthirst:
       enabled: true
       maxlevel: 3
-      baseHealthPercent: 0.25
+      baseHealthPercent: 0.30
       healthPercentIncreasePerLevel: 0.05
-      speedStrength: 0
+      speedStrength: 1
     soulharvest:
       enabled: true
       maxlevel: 3
@@ -849,7 +859,7 @@ skills:
       enabled: true
       maxlevel: 3
       maxEnemies: 3
-      baseRadius: 3.0
+      baseRadius: 4.0
       radiusIncreasePerLevel: 1.0
       baseDecrease: 0.15
       baseDecreasePerPlayer: 0.05

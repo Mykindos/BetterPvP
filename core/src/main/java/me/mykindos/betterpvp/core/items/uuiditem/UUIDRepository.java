@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.items.uuiditem;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Singleton
+@Slf4j
 public class UUIDRepository implements IRepository<UUIDItem> {
 
     private final Database database;
@@ -25,23 +27,23 @@ public class UUIDRepository implements IRepository<UUIDItem> {
 
     @Override
     public List<UUIDItem> getAll() {
-        return null;
+        return new ArrayList<>();
     }
 
     public List<UUIDItem> getUUIDItemsForModule(String namespace) {
-        List<UUIDItem> UUIDItems = new ArrayList<>();
+        List<UUIDItem> items = new ArrayList<>();
         String query = "SELECT * FROM uuiditems WHERE Namespace = ?";
         CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(namespace)));
         try {
             while (result.next()) {
                 UUID uuid = UUID.fromString(result.getString(1));
                 String key = result.getString(3);
-                UUIDItems.add(new UUIDItem(uuid, namespace, key));
+                items.add(new UUIDItem(uuid, namespace, key));
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Failed to load UUIDItems for module: {}", namespace, ex);
         }
-        return UUIDItems;
+        return items;
     }
 
     @Override

@@ -1,6 +1,8 @@
 package me.mykindos.betterpvp.core.utilities;
 
 import com.google.common.base.Preconditions;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang.WordUtils;
 import org.apache.commons.text.similarity.CosineSimilarity;
 import org.bukkit.Bukkit;
@@ -13,6 +15,7 @@ import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UtilFormat {
 
     public static final char COLOR_CHAR = '\u00A7';

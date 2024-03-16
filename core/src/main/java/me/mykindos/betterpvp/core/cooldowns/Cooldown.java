@@ -7,7 +7,7 @@ import me.mykindos.betterpvp.core.utilities.UtilTime;
 @Data
 public class Cooldown {
 
-    private final double seconds;
+    private double seconds;
     private final long systemTime;
     private final boolean removeOnDeath;
     private final boolean inform;

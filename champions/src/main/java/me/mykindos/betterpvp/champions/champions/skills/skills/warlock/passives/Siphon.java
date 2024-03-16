@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
@@ -18,6 +19,7 @@ import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -74,8 +76,11 @@ public class Siphon extends Skill implements PassiveSkill {
         for (Player player : Bukkit.getOnlinePlayers()) {
             int level = getLevel(player);
             if (level > 0) {
-                for (Player target : UtilPlayer.getNearbyEnemies(player, player.getLocation(), getRadius(level))) {
-                    championsManager.getEnergy().degenerateEnergy(target, ((float) getEnergySiphoned(level)) / 10.0f);
+                for (LivingEntity target : UtilEntity.getNearbyEnemies(player, player.getLocation(), getRadius(level))) {
+                    if (target instanceof Player playerTarget) {
+                        championsManager.getEnergy().degenerateEnergy(playerTarget, ((float) getEnergySiphoned(level)) / 10.0f);
+                    }
+
                     new BukkitRunnable() {
                         private final Location position = target.getLocation().add(0, 1, 0);
 

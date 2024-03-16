@@ -54,7 +54,6 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
 
     private double damage;
     private double damageIncreasePerLevel;
-    private double cooldownDecreasePerLevel;
 
     @Inject
     public FleshHook(Champions champions, ChampionsManager championsManager) {
@@ -248,12 +247,11 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
     public void loadSkillConfig() {
         damage = getConfig("damage", 5.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
-        cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 2.0, Double.class);
     }
 
 
     @Value
-    private class Hook {
+    private static class Hook {
         ThrowableItem throwable;
         ChargeData data;
         int level;

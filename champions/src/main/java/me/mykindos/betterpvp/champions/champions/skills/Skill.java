@@ -11,9 +11,11 @@ import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
+import me.mykindos.betterpvp.champions.effects.types.SkillBoostEffect;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.components.champions.ISkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
+import me.mykindos.betterpvp.core.effects.Effect;
 import org.bukkit.entity.Player;
 
 import java.util.Optional;
@@ -213,6 +215,14 @@ public abstract class Skill implements ISkill {
 
         if (level > 0 && SkillWeapons.isHolding(player, getType()) && SkillWeapons.hasBooster(player)) {
             level++;
+        }
+
+        for (Effect effect : championsManager.getEffects().getEffects(player, SkillBoostEffect.class)) {
+            if (effect.getEffectType() instanceof SkillBoostEffect skillBoostEffect) {
+                if (skillBoostEffect.hasSkillType(getType())) {
+                    level += effect.getAmplifier();
+                }
+            }
         }
 
         return level;

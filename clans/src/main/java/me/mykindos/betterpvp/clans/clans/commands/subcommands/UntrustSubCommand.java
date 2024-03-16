@@ -36,6 +36,7 @@ public class UntrustSubCommand extends ClanSubCommand {
         return "Revoke trust with an ally clan.";
     }
 
+    @Override
     public String getUsage() {
         return super.getUsage() + " <clan>";
     }

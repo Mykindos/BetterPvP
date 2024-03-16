@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.clans.clans.map.nms;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -12,6 +14,7 @@ import java.util.function.Function;
 
 @SuppressWarnings("JavaReflectionMemberAccess")
 @Slf4j
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UtilMapMaterial {
 
     private static Field PROPERTIES_FUNCTION;

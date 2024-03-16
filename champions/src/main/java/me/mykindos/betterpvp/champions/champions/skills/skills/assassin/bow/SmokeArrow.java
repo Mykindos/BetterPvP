@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -48,7 +49,7 @@ public class SmokeArrow extends PrepareArrowSkill {
                 "Left click with a Bow to prepare",
                 "",
                 "Your next arrow will give <effect>Blindness</effect>",
-                "and <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength + 1) + "</effect> to the target for <val>" + getEffectDuration(level) + "</val> seconds.",
+                "and <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> to the target for <val>" + getEffectDuration(level) + "</val> seconds.",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -90,7 +91,7 @@ public class SmokeArrow extends PrepareArrowSkill {
     public void onHit(Player damager, LivingEntity target, int level) {
         final int effectDuration = (int) (getEffectDuration(level) * 1000L);
         championsManager.getEffects().addEffect(target, damager, EffectTypes.BLINDNESS, 1, effectDuration);
-        championsManager.getEffects().addEffect(target, damager, EffectTypes.SLOWNESS, 2, effectDuration);
+        championsManager.getEffects().addEffect(target, damager, EffectTypes.SLOWNESS, slownessStrength, effectDuration);
         target.getWorld().playSound(target.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
 
         new ParticleBuilder(Particle.EXPLOSION_LARGE)
@@ -110,7 +111,7 @@ public class SmokeArrow extends PrepareArrowSkill {
 
     @Override
     public void displayTrail(Location location) {
-        Random random = new Random();
+        Random random = UtilMath.RANDOM;
         double spread = 0.1;
         double dx = (random.nextDouble() - 0.5) * spread;
         double dy = (random.nextDouble() - 0.5) * spread;

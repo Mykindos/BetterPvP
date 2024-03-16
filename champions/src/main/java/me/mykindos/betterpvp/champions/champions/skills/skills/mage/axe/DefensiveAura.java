@@ -50,7 +50,7 @@ public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill
                 "Right click with an Axe to activate",
                 "",
                 "Gives you, and all allies within <val>" + getRadius(level) + "</val> blocks",
-                "<effect>Health Boost " + UtilFormat.getRomanNumeral(healthBoostStrength + 1) + "</effect> for <stat>" + baseDuration + "</stat> seconds",
+                "<effect>Health Boost " + UtilFormat.getRomanNumeral(healthBoostStrength) + "</effect> for <stat>" + getDuration(level) + "</stat> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -61,7 +61,7 @@ public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill
     }
 
     public double getDuration(int level) {
-        return baseDuration + durationIncreasePerLevel;
+        return baseDuration + (level - 1) * durationIncreasePerLevel;
     }
 
     @Override

@@ -48,7 +48,7 @@ public class Bloodshed extends Skill implements InteractSkill, CooldownSkill {
                 "",
                 "Sacrifice <val>" + UtilMath.round(getHealthReduction(level) * 100, 2) + "%" + "</val> of your health to give",
                 "yourself and all allies within <val>" + getRadius(level) + "</val> blocks",
-                "a surge of speed, granting them <effect>Speed " + UtilFormat.getRomanNumeral(speedStrength + 1) + "</effect> for <stat>" + getDuration(level) + "</stat> seconds.",
+                "a surge of speed, granting them <effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect> for <stat>" + getDuration(level) + "</stat> seconds.",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -80,12 +80,12 @@ public class Bloodshed extends Skill implements InteractSkill, CooldownSkill {
     @Override
     public double getCooldown(int level) {
 
-        return cooldown - ((level - 1));
+        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
 
     @Override
-    public void activate(Player player,int level) {;
+    public void activate(Player player,int level) {
         double healthReduction = 1.0 - getHealthReduction(level);
         double proposedHealth = player.getHealth() - (player.getHealth() * healthReduction);
         UtilPlayer.slowDrainHealth(champions, player, proposedHealth, 5, false);

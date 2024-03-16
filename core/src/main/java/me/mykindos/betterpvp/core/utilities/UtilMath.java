@@ -1,5 +1,8 @@
 package me.mykindos.betterpvp.core.utilities;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -14,9 +17,11 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@Slf4j
 public class UtilMath {
 
-    public static Random random = new Random(System.nanoTime());
+    public static final Random RANDOM = new Random(System.nanoTime());
 
     /**
      * Rotates a vector towards a target vector by a specified delta.
@@ -170,7 +175,7 @@ public class UtilMath {
         try {
             i = Integer.parseInt(value);
         } catch (NumberFormatException ex) {
-            ex.printStackTrace();
+            log.error("Failed to parse Integer from " + value, ex);
         }
 
         if (i < min) {
@@ -195,13 +200,13 @@ public class UtilMath {
         if (!sphere) {
             for (Location l : blocks) {
                 World w = l.getWorld();
-                int X = l.getBlockX();
-                int Y = l.getBlockY();
-                int Z = l.getBlockZ();
-                Location front = new Location(w, X + 1, Y, Z);
-                Location back = new Location(w, X - 1, Y, Z);
-                Location left = new Location(w, X, Y, Z + 1);
-                Location right = new Location(w, X, Y, Z - 1);
+                int x = l.getBlockX();
+                int y = l.getBlockY();
+                int z = l.getBlockZ();
+                Location front = new Location(w, x + 1d, y, z);
+                Location back = new Location(w, x - 1d, y, z);
+                Location left = new Location(w, x, y, z + 1d);
+                Location right = new Location(w, x, y, z - 1d);
                 if (!(blocks.contains(front) && blocks.contains(back) && blocks.contains(left) && blocks.contains(right))) {
                     edge.add(l);
                 }
@@ -209,15 +214,15 @@ public class UtilMath {
         } else {
             for (Location l : blocks) {
                 World w = l.getWorld();
-                int X = l.getBlockX();
-                int Y = l.getBlockY();
-                int Z = l.getBlockZ();
-                Location front = new Location(w, X + 1, Y, Z);
-                Location back = new Location(w, X - 1, Y, Z);
-                Location left = new Location(w, X, Y, Z + 1);
-                Location right = new Location(w, X, Y, Z - 1);
-                Location top = new Location(w, X, Y + 1, Z);
-                Location bottom = new Location(w, X, Y - 1, Z);
+                int x = l.getBlockX();
+                int y = l.getBlockY();
+                int z = l.getBlockZ();
+                Location front = new Location(w, x + 1d, y, z);
+                Location back = new Location(w, x - 1d, y, z);
+                Location left = new Location(w, x, y, z + 1d);
+                Location right = new Location(w, x, y, z - 1d);
+                Location top = new Location(w, x, y + 1d, z);
+                Location bottom = new Location(w, x, y - 1d, z);
                 if (!(blocks.contains(front) && blocks.contains(back) && blocks.contains(left) && blocks.contains(right) && blocks.contains(top) && blocks.contains(bottom))) {
                     edge.add(l);
                 }
@@ -237,16 +242,16 @@ public class UtilMath {
     public static Set<Location> sphere(Location location, int radius, boolean hollow) {
         Set<Location> blocks = new HashSet<Location>();
         World world = location.getWorld();
-        int X = location.getBlockX();
-        int Y = location.getBlockY();
-        int Z = location.getBlockZ();
+        int blockX = location.getBlockX();
+        int blockY = location.getBlockY();
+        int blockZ = location.getBlockZ();
         int radiusSquared = radius * radius;
 
         if (hollow) {
-            for (int x = X - radius; x <= X + radius; x++) {
-                for (int y = Y - radius; y <= Y + radius; y++) {
-                    for (int z = Z - radius; z <= Z + radius; z++) {
-                        if ((X - x) * (X - x) + (Y - y) * (Y - y) + (Z - z) * (Z - z) <= radiusSquared) {
+            for (int x = blockX - radius; x <= blockX + radius; x++) {
+                for (int y = blockY - radius; y <= blockY + radius; y++) {
+                    for (int z = blockZ - radius; z <= blockZ + radius; z++) {
+                        if ((blockX - x) * (blockX - x) + (blockY - y) * (blockY - y) + (blockZ - z) * (blockZ - z) <= radiusSquared) {
                             Location block = new Location(world, x, y, z);
                             blocks.add(block);
                         }
@@ -255,10 +260,10 @@ public class UtilMath {
             }
             return makeHollow(blocks, true);
         } else {
-            for (int x = X - radius; x <= X + radius; x++) {
-                for (int y = Y - radius; y <= Y + radius; y++) {
-                    for (int z = Z - radius; z <= Z + radius; z++) {
-                        if ((X - x) * (X - x) + (Y - y) * (Y - y) + (Z - z) * (Z - z) <= radiusSquared) {
+            for (int x = blockX - radius; x <= blockX + radius; x++) {
+                for (int y = blockY - radius; y <= blockY + radius; y++) {
+                    for (int z = blockZ - radius; z <= blockZ + radius; z++) {
+                        if ((blockX - x) * (blockX - x) + (blockY - y) * (blockY - y) + (blockZ - z) * (blockZ - z) <= radiusSquared) {
                             Location block = new Location(world, x, y, z);
                             blocks.add(block);
                         }

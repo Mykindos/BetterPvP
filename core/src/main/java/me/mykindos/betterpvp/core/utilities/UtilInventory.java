@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.core.utilities;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer;
@@ -9,7 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Map;
 import java.util.function.Predicate;
 
-
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UtilInventory {
 
     public static boolean isPlayerInventory(Player player, int containerId) {

@@ -97,10 +97,10 @@ public class UUIDLogger {
         try {
             while (result.next()) {
                 long time = result.getLong(1);
-                logList.add("<green>" + UtilTime.getTime(System.currentTimeMillis() - time, 2) + " ago</green> " + result.getString(2));
+                logList.add("<green>" + UtilTime.getTime((System.currentTimeMillis() - time), 2) + " ago</green> " + result.getString(2));
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            log.error("Failed to get UUID logs", ex);
         }
         return logList;
     }
@@ -127,10 +127,10 @@ public class UUIDLogger {
         try {
             while(result.next()) {
                 long time = result.getLong(1);
-                logList.add("<green>" + UtilTime.getTime(System.currentTimeMillis() - time, 2) + " ago</green>  " + result.getString(2));
+                logList.add("<green>" + UtilTime.getTime((System.currentTimeMillis() - time), 2) + " ago</green>  " + result.getString(2));
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            log.error("Failed to get player logs", ex);
         }
         return logList;
     }

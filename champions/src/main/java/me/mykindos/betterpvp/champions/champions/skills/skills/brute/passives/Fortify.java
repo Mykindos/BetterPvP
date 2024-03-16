@@ -18,6 +18,7 @@ import org.bukkit.event.EventPriority;
 @BPvPListener
 public class Fortify extends Skill implements PassiveSkill {
 
+    public int base;
     public int increasePerLevel;
 
     @Inject
@@ -40,7 +41,7 @@ public class Fortify extends Skill implements PassiveSkill {
     }
 
     private int getPercent(int level) {
-        return ((level) * increasePerLevel);
+        return (base + (level - 1) * increasePerLevel);
     }
 
     @Override
@@ -53,7 +54,7 @@ public class Fortify extends Skill implements PassiveSkill {
         if (event.getDamagee() instanceof Player damagee) {
             int level = getLevel(damagee);
             if (level > 0) {
-                double modifier = level * 15;
+                double modifier = level * 15d;
 
                 event.setDamage(event.getDamage() * (1.0 - (modifier / 100)));
             }
@@ -79,6 +80,7 @@ public class Fortify extends Skill implements PassiveSkill {
 
     @Override
     public void loadSkillConfig() {
+        base = getConfig("base", 10, Integer.class);
         increasePerLevel = getConfig("increasePerLevel", 10, Integer.class);
     }
 }

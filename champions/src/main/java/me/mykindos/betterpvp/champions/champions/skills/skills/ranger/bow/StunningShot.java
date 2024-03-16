@@ -24,9 +24,8 @@ import org.bukkit.event.block.Action;
 public class StunningShot extends PrepareArrowSkill {
 
     private double baseDuration;
-
     private double durationIncreasePerLevel;
-
+    
     @Inject
     public StunningShot(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);

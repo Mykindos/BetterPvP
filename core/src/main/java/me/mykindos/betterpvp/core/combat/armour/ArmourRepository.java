@@ -42,7 +42,7 @@ public class ArmourRepository implements IRepository<Armour> {
     }
 
     @Override
-    public void save(Armour object) {
+    public void save(Armour object) { // No saves done during runtime
 
     }
 }

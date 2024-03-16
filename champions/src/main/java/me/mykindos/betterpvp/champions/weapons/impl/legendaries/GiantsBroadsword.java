@@ -78,7 +78,13 @@ public class GiantsBroadsword extends ChannelWeapon implements InteractWeapon, L
     @Override
     public void activate(Player player) {
         active.add(player.getUniqueId());
-        effectManager.addEffect(player, player, EffectTypes.REGENERATION, "Giants Broadsword", regenAmplifier, -1, true, true);
+        effectManager.addEffect(player, player, EffectTypes.REGENERATION, "Giants Broadsword", regenAmplifier, -1, true, true,
+                (livingEntity) -> {
+                    if (livingEntity instanceof Player p) {
+                        return p.getInventory().getItemInMainHand().getType() != getMaterial();
+                    }
+                    return false;
+                });
 
     }
 

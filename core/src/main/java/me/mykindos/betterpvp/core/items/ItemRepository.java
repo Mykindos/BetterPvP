@@ -30,7 +30,7 @@ public class ItemRepository implements IRepository<BPvPItem> {
 
     @Override
     public List<BPvPItem> getAll() {
-        return null;
+        return new ArrayList<>();
     }
 
     public List<BPvPItem> getItemsForModule(String namespace) {
@@ -58,7 +58,7 @@ public class ItemRepository implements IRepository<BPvPItem> {
                 items.add(new BPvPItem(namespace, key, material, name, lore, maxDurability, customModelData, glowing, uuid));
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Failed to load items for module {}", namespace, ex);
         }
         return items;
     }
@@ -73,7 +73,7 @@ public class ItemRepository implements IRepository<BPvPItem> {
                 lore.add(UtilMessage.deserialize(result.getString(3)).decoration(TextDecoration.ITALIC, false));
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Failed to load lore for item {}", id, ex);
         }
         return lore;
     }
@@ -87,7 +87,7 @@ public class ItemRepository implements IRepository<BPvPItem> {
                 return result.getInt(2);
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Failed to load max durability for item {}", id, ex);
         }
         return -1;
     }

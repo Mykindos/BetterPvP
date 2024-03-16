@@ -123,7 +123,7 @@ public class ClaimSubCommand extends ClanSubCommand {
             }
         }
 
-        if (clan.getTerritory().size() > 0 && !isNextToExistingClaim && !clan.isAdmin()) {
+        if (!clan.getTerritory().isEmpty() && !isNextToExistingClaim && !clan.isAdmin()) {
             UtilMessage.message(player, "Clans", "You must claim next to your own territory");
             return;
         }

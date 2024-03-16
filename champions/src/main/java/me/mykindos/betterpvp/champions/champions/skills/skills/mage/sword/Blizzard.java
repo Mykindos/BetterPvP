@@ -59,7 +59,7 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergySkill
         return new String[]{
                 "Hold right click with a Sword to channel.",
                 "",
-                "Release a blizzard that gives <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength + 1) + "</effect>",
+                "Release a blizzard that gives <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect>",
                 "for <stat>" + getSlowDuration(level) + "</stat> seconds and pushes enemies back",
                 "",
                 "Energy: <val>" + getEnergy(level)

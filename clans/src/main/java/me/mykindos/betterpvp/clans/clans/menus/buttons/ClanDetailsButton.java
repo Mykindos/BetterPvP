@@ -46,7 +46,7 @@ public class ClanDetailsButton extends ControlItem<ClanMenu> {
         if (tntProtectionOptional.isPresent()) {
             long tntProtection = tntProtectionOptional.get();
             if (tntProtection > System.currentTimeMillis()) {
-                final String time = UtilTime.getTime2(tntProtection - System.currentTimeMillis(), UtilTime.TimeUnit.MINUTES, 1);
+                final String time = UtilTime.getTime2((tntProtection - System.currentTimeMillis()), UtilTime.TimeUnit.MINUTES, 1);
                 tntProtectionCmpt = Component.text("Active in " + time, NamedTextColor.RED);
             } else {
                 tntProtectionCmpt = Component.text("Yes", NamedTextColor.GREEN);

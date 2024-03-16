@@ -15,8 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.Map;
 
 @Slf4j
 @Singleton
@@ -24,7 +23,7 @@ public class UpdateEventExecutor {
 
     private final Core core;
 
-    public HashMap<Long, Integer> lastRunTimers = new HashMap<>();
+    public Map<Long, Integer> lastRunTimers = new HashMap<>();
     public List<UpdateEventContainer> updateEvents = new ArrayList<>();
 
     // Depending on server performance, an update event running every tick may skip an interval. This allows the event to rollover to the next interval.
