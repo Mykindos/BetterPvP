@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.framework.sidebar.protocol.PacketIds;
 import me.mykindos.betterpvp.core.framework.sidebar.text.TextProvider;
 import me.mykindos.betterpvp.core.framework.sidebar.util.buffer.ByteBufNetOutput;
 import me.mykindos.betterpvp.core.framework.sidebar.util.buffer.NetOutput;
+import net.kyori.adventure.text.TextComponent;
 import org.bukkit.entity.Player;
 
 import static me.mykindos.betterpvp.core.framework.sidebar.SidebarLine.sendPacket;
@@ -21,7 +22,7 @@ import static me.mykindos.betterpvp.core.framework.sidebar.SidebarLine.sendPacke
  * documentation</a>
  */
 @Getter
-public class ScoreboardObjective<R> {
+public class ScoreboardObjective {
 
     public static final int DISPLAY_SIDEBAR = 1;
     public static final int ADD_OBJECTIVE = 0;
@@ -29,10 +30,10 @@ public class ScoreboardObjective<R> {
     public static final int UPDATE_VALUE = 2;
 
     private final String name;
-    private final TextProvider<R> textProvider;
-    private R displayName;
+    private final TextProvider<TextComponent> textProvider;
+    private TextComponent displayName;
 
-    ScoreboardObjective(@NonNull String name, @NonNull R displayName, @NonNull TextProvider<R> textProvider) {
+    ScoreboardObjective(@NonNull String name, @NonNull TextComponent displayName, @NonNull TextProvider<TextComponent> textProvider) {
         Preconditions.checkArgument(
                 name.length() <= 16, "Objective name exceeds 16 symbols limit");
 
@@ -41,7 +42,7 @@ public class ScoreboardObjective<R> {
         this.displayName = displayName;
     }
 
-    void setDisplayName(@NonNull R displayName) {
+    void setDisplayName(@NonNull TextComponent displayName) {
         this.displayName = displayName;
     }
 
@@ -85,7 +86,8 @@ public class ScoreboardObjective<R> {
         output.writeByte(mode);
 
         if (mode == ADD_OBJECTIVE || mode == UPDATE_VALUE) {
-            output.writeString(textProvider.asJsonMessage(player, displayName));
+//            output.writeString(textProvider.asJsonMessage(player, displayName));
+            output.writeString("{\"text\":\"test\"}");
             output.writeVarInt(0); // Health display
 
         }

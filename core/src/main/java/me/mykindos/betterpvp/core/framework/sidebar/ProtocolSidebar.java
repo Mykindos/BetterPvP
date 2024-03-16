@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.framework.sidebar.text.provider.BungeeCordChat
 import me.mykindos.betterpvp.core.framework.sidebar.text.provider.MiniMessageTextProvider;
 import me.mykindos.betterpvp.core.framework.sidebar.text.provider.MiniPlaceholdersTextProvider;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.plugin.Plugin;
@@ -30,26 +31,26 @@ public class ProtocolSidebar {
      * @param title        - sidebar title
      * @param plugin       - plugin instance
      * @param textProvider - text provider
-     * @param <R>          - component entity type
+     * @param           - component entity type
      * @return new sidebar
      */
-    public <R> Sidebar<R> newSidebar(
-            @NonNull R title,
+    public Sidebar newSidebar(
+            @NonNull TextComponent title,
             @NonNull Plugin plugin,
-            @NonNull TextProvider<R> textProvider
+            @NonNull TextProvider<TextComponent> textProvider
     ) {
-        return new Sidebar<>(title, plugin, textProvider);
+        return new Sidebar(title, plugin, textProvider);
     }
 
     /**
      * {@inheritDoc}
      */
-    public <R> Sidebar<R> newSidebar(
+    public  Sidebar newSidebar(
             @NonNull TextIterator title,
             @NonNull Plugin plugin,
-            @NonNull TextProvider<R> textProvider
+            @NonNull TextProvider textProvider
     ) {
-        return new Sidebar<>(title, plugin, textProvider);
+        return new Sidebar(title, plugin, textProvider);
     }
 
 
@@ -62,7 +63,7 @@ public class ProtocolSidebar {
      * @param miniMessage - MiniMessage instance
      * @return new sidebar
      */
-    public Sidebar<String> newMiniMessageSidebar(
+    public Sidebar newMiniMessageSidebar(
             @NonNull String title,
             @NonNull Plugin plugin,
             @NonNull MiniMessage miniMessage
@@ -79,7 +80,7 @@ public class ProtocolSidebar {
      * @param miniMessage - MiniMessage instance
      * @return new sidebar
      */
-    public Sidebar<String> newMiniplaceholdersSidebar(
+    public Sidebar newMiniplaceholdersSidebar(
             @NonNull String title,
             @NonNull Plugin plugin,
             @NonNull MiniMessage miniMessage
@@ -90,7 +91,7 @@ public class ProtocolSidebar {
     /**
      * {@inheritDoc}
      */
-    public Sidebar<String> newMiniplaceholdersSidebar(
+    public Sidebar newMiniplaceholdersSidebar(
             @NonNull TextIterator title,
             @NonNull Plugin plugin,
             @NonNull MiniMessage miniMessage
@@ -101,7 +102,7 @@ public class ProtocolSidebar {
     /**
      * {@inheritDoc}
      */
-    public Sidebar<String> newMiniMessageSidebar(
+    public Sidebar newMiniMessageSidebar(
             @NonNull TextIterator title,
             @NonNull Plugin plugin,
             @NonNull MiniMessage miniMessage
@@ -109,73 +110,4 @@ public class ProtocolSidebar {
         return newSidebar(title, plugin, new MiniMessageTextProvider(miniMessage));
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public Sidebar<String> newMiniMessageSidebar(
-            @NonNull String title,
-            @NonNull Plugin plugin
-    ) {
-        return newSidebar(title, plugin, new MiniMessageTextProvider(MiniMessage.miniMessage()));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Sidebar<String> newMiniMessageSidebar(
-            @NonNull TextIterator title,
-            @NonNull Plugin plugin
-    ) {
-        return newSidebar(title, plugin, new MiniMessageTextProvider(MiniMessage.miniMessage()));
-    }
-
-    /**
-     * Creates new sidebar with {@see https://docs.advntr.dev/getting-started.html Adventure} text provider.
-     * Adventure are natively supported on Paper 1.16.5+.
-     *
-     * @param title  - sidebar title
-     * @param plugin - plugin instance
-     * @return new sidebar
-     */
-    public Sidebar<Component> newAdventureSidebar(
-            @NonNull Component title,
-            @NonNull Plugin plugin
-    ) {
-        return newSidebar(title, plugin, new AdventureTextProvider());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Sidebar<Component> newAdventureSidebar(
-            @NonNull TextIterator title,
-            @NonNull Plugin plugin
-    ) {
-        return newSidebar(title, plugin, new AdventureTextProvider());
-    }
-
-    /**
-     * Creates new sidebar with BungeeCord Chat API text provider.
-     * Use this method if you're running on Spigot.
-     *
-     * @param title  - sidebar title
-     * @param plugin - plugin instance
-     * @return new sidebar
-     */
-    public Sidebar<BaseComponent[]> newBungeeChatSidebar(
-            @NonNull BaseComponent[] title,
-            @NonNull Plugin plugin
-    ) {
-        return newSidebar(title, plugin, new BungeeCordChatTextProvider());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Sidebar<BaseComponent[]> newBungeeChatSidebar(
-            @NonNull TextIterator title,
-            @NonNull Plugin plugin
-    ) {
-        return newSidebar(title, plugin, new BungeeCordChatTextProvider());
-    }
 }

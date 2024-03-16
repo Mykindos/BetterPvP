@@ -14,13 +14,14 @@ import me.mykindos.betterpvp.core.framework.sidebar.text.TextProvider;
 import me.mykindos.betterpvp.core.framework.sidebar.util.lang.ThrowingFunction;
 import me.mykindos.betterpvp.core.framework.sidebar.util.lang.ThrowingPredicate;
 import me.mykindos.betterpvp.core.framework.sidebar.util.lang.ThrowingSupplier;
+import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
 @Getter
 @ToString
-public class SidebarLine<R> {
+public class SidebarLine {
 
     private final String teamName;
 
@@ -33,15 +34,15 @@ public class SidebarLine<R> {
     // for internal use
     BukkitTask updateTask;
 
-    private ThrowingFunction<Player, R, Throwable> updater;
+    private ThrowingFunction<Player, TextComponent, Throwable> updater;
     private ThrowingPredicate<Player, Throwable> displayCondition;
-    private final TextProvider<R> textProvider;
+    private final TextProvider<TextComponent> textProvider;
 
-    SidebarLine(@NonNull ThrowingFunction<Player, R, Throwable> updater,
+    SidebarLine(@NonNull ThrowingFunction<Player, TextComponent, Throwable> updater,
                 @NonNull String teamName,
                 boolean staticText,
                 int index,
-                @NonNull TextProvider<R> textProvider,
+                @NonNull TextProvider<TextComponent> textProvider,
                 @NonNull ThrowingPredicate<Player, Throwable> displayCondition) {
         this.updater = updater;
         this.teamName = teamName;
@@ -51,7 +52,7 @@ public class SidebarLine<R> {
         this.textProvider = textProvider;
     }
 
-    public BukkitTask updatePeriodically(long delay, long period, @NonNull Sidebar<R> sidebar) {
+    public BukkitTask updatePeriodically(long delay, long period, @NonNull Sidebar sidebar) {
         Preconditions.checkState(!isStaticText(), "Cannot set updater for static text line");
 
         if (updateTask != null) {
@@ -87,7 +88,7 @@ public class SidebarLine<R> {
      *
      * @param updater - updater function
      */
-    public void setUpdater(@NonNull ThrowingFunction<Player, R, Throwable> updater) {
+    public void setUpdater(@NonNull ThrowingFunction<Player, TextComponent, Throwable> updater) {
         Preconditions.checkState(!isStaticText(), "Cannot set updater for static text line");
         this.updater = updater;
     }
@@ -97,7 +98,7 @@ public class SidebarLine<R> {
      *
      * @param updater - updater function
      */
-    public void setUpdater(@NonNull ThrowingSupplier<R, Throwable> updater) {
+    public void setUpdater(@NonNull ThrowingSupplier<TextComponent, Throwable> updater) {
         Preconditions.checkState(!isStaticText(), "Cannot set updater for static text line");
         this.updater = player -> updater.get();
     }
@@ -106,7 +107,7 @@ public class SidebarLine<R> {
         boolean visible = displayCondition.test(player);
 
         if (!isStaticText() && visible) {
-            R text = updater.apply(player);
+            TextComponent text = updater.apply(player);
             sendPacket(player, ScoreboardPackets.createTeamPacket(ScoreboardPackets.TEAM_UPDATED, index, teamName,
                     player, text, textProvider));
         }
@@ -130,7 +131,7 @@ public class SidebarLine<R> {
     void createTeam(@NonNull Player player, @NonNull String objective) throws Throwable {
         boolean visible = displayCondition.test(player);
 
-        R text = visible ? updater.apply(player) : textProvider.emptyMessage();
+        TextComponent text = visible ? updater.apply(player) : textProvider.emptyMessage();
 
         sendPacket(player, ScoreboardPackets.createTeamPacket(ScoreboardPackets.TEAM_CREATED, index, teamName,
                 player, text, textProvider));

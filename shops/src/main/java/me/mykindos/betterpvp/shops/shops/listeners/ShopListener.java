@@ -114,9 +114,9 @@ public class ShopListener implements Listener {
         int amount = isShifting ? 64 : event.getShopItem().getAmount();
 
         if (event.getCurrency() == ShopCurrency.COINS) {
-            event.getGamer().saveProperty(GamerProperty.BALANCE.name(), event.getGamer().getIntProperty(GamerProperty.BALANCE) - cost, true);
+            event.getGamer().saveProperty(GamerProperty.BALANCE.name(), event.getGamer().getIntProperty(GamerProperty.BALANCE) - cost);
         } else if (event.getCurrency() == ShopCurrency.FRAGMENTS) {
-            event.getGamer().saveProperty(GamerProperty.FRAGMENTS.name(), event.getGamer().getIntProperty(GamerProperty.FRAGMENTS) - cost, true);
+            event.getGamer().saveProperty(GamerProperty.FRAGMENTS.name(), event.getGamer().getIntProperty(GamerProperty.FRAGMENTS) - cost);
         }
 
         if(event.getShopItem() instanceof DynamicShopItem dynamicShopItem) {
@@ -180,7 +180,7 @@ public class ShopListener implements Listener {
 
 
                         if (event.getCurrency() == ShopCurrency.COINS) {
-                            event.getGamer().saveProperty(GamerProperty.BALANCE.name(), event.getGamer().getIntProperty(GamerProperty.BALANCE) + cost, true);
+                            event.getGamer().saveProperty(GamerProperty.BALANCE.name(), event.getGamer().getIntProperty(GamerProperty.BALANCE) + cost);
                         }
 
                         if(event.getShopItem() instanceof DynamicShopItem dynamicShopItem) {

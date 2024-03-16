@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.framework.sidebar.util.lang.ThrowingConsumer;
 import me.mykindos.betterpvp.core.framework.sidebar.util.lang.ThrowingFunction;
 import me.mykindos.betterpvp.core.framework.sidebar.util.lang.ThrowingPredicate;
 import me.mykindos.betterpvp.core.framework.sidebar.util.lang.ThrowingSupplier;
+import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -38,20 +39,20 @@ import java.util.UUID;
  */
 
 @FieldDefaults(level = AccessLevel.PACKAGE)
-public class Sidebar<R> {
+public class Sidebar {
 
     private static final String OBJECTIVE_PREFIX = "PS-";
     private static final int MAX_LINES_COUNT = 15;
 
     private final Set<UUID> viewers = Collections.synchronizedSet(new HashSet<>());
-    private final List<SidebarLine<R>> lines = new ArrayList<>();
-    private final ScoreboardObjective<R> objective;
+    private final List<SidebarLine> lines = new ArrayList<>();
+    private final ScoreboardObjective objective;
 
     private TextIterator titleText;
     private BukkitTask titleUpdater;
 
     final Set<Integer> taskIds = new HashSet<>();
-    final TextProvider<R> textProvider;
+    final TextProvider<TextComponent> textProvider;
 
     @Getter
     private final Plugin plugin;
@@ -62,10 +63,10 @@ public class Sidebar<R> {
      * @param title  a title of sidebar
      * @param plugin plugin instance
      */
-    Sidebar(@NonNull R title, @NonNull Plugin plugin, @NonNull TextProvider<R> textProvider) {
+    Sidebar(@NonNull TextComponent title, @NonNull Plugin plugin, @NonNull TextProvider<TextComponent> textProvider) {
         this.plugin = plugin;
         this.textProvider = textProvider;
-        this.objective = new ScoreboardObjective<>(OBJECTIVE_PREFIX + RandomString.generate(3), title, textProvider);
+        this.objective = new ScoreboardObjective(OBJECTIVE_PREFIX + RandomString.generate(3), title, textProvider);
     }
 
     /**
@@ -74,11 +75,11 @@ public class Sidebar<R> {
      * @param titleIterator a title iterator of sidebar
      * @param plugin        plugin instance
      */
-    Sidebar(@NonNull TextIterator titleIterator, @NonNull Plugin plugin, @NonNull TextProvider<R> textProvider) {
+    Sidebar(@NonNull TextIterator titleIterator, @NonNull Plugin plugin, @NonNull TextProvider<TextComponent> textProvider) {
         this.plugin = plugin;
         this.textProvider = textProvider;
 
-        this.objective = new ScoreboardObjective<>(
+        this.objective = new ScoreboardObjective(
                 OBJECTIVE_PREFIX + RandomString.generate(3),
                 textProvider.fromLegacyMessage(titleIterator.next()),
                 textProvider);
@@ -92,7 +93,7 @@ public class Sidebar<R> {
      * @param iterator - iterator
      * @return line updater
      */
-    public ThrowingFunction<Player, R, Throwable> toLineUpdater(@NonNull TextIterator iterator) {
+    public ThrowingFunction<Player, TextComponent, Throwable> toLineUpdater(@NonNull TextIterator iterator) {
         return player -> textProvider.fromLegacyMessage(iterator.next());
     }
 
@@ -101,7 +102,7 @@ public class Sidebar<R> {
      *
      * @param title title to be updated
      */
-    public void setTitle(@NonNull R title) {
+    public void setTitle(@NonNull TextComponent title) {
         cancelTitleUpdater();
 
         objective.setDisplayName(title);
@@ -144,7 +145,7 @@ public class Sidebar<R> {
      * @param line   the line
      * @param offset the offset
      */
-    public void shiftLine(SidebarLine<R> line, int offset) {
+    public void shiftLine(SidebarLine line, int offset) {
         synchronized (lines) {
             lines.remove(line);
             lines.add(offset, line);
@@ -201,7 +202,7 @@ public class Sidebar<R> {
      * @param condition - the condition
      * @return SidebarLine instance
      */
-    public SidebarLine<R> addConditionalLine(@NonNull ThrowingFunction<Player, R, Throwable> updater,
+    public SidebarLine addConditionalLine(@NonNull ThrowingFunction<Player, TextComponent, Throwable> updater,
                                              @NonNull ThrowingPredicate<Player, Throwable> condition) {
         return addLine(updater, false, condition);
     }
@@ -212,7 +213,7 @@ public class Sidebar<R> {
      * @param text - the text
      * @return SidebarLine instance
      */
-    public SidebarLine<R> addTextLine(@NonNull String text) {
+    public SidebarLine addTextLine(@NonNull String text) {
         return addLine(textProvider.fromLegacyMessage(text));
     }
 
@@ -222,7 +223,7 @@ public class Sidebar<R> {
      * @param updater - the function that updates the text
      * @return SidebarLine instance
      */
-    public SidebarLine<R> addUpdatableLine(@NonNull ThrowingFunction<Player, R, Throwable> updater) {
+    public SidebarLine addUpdatableLine(@NonNull ThrowingFunction<Player, TextComponent, Throwable> updater) {
         return addLine(updater, false, x -> true);
     }
 
@@ -232,7 +233,7 @@ public class Sidebar<R> {
      * @param updater - the function that updates the text
      * @return SidebarLine instance
      */
-    public SidebarLine<R> addUpdatableLine(ThrowingSupplier<R, Throwable> updater) {
+    public SidebarLine addUpdatableLine(ThrowingSupplier<TextComponent, Throwable> updater) {
         return addUpdatableLine(player -> updater.get());
     }
 
@@ -242,7 +243,7 @@ public class Sidebar<R> {
      * @param text the text
      * @return SidebarLine instance
      */
-    public SidebarLine<R> addLine(@NonNull R text) {
+    public SidebarLine addLine(@NonNull TextComponent text) {
         return addLine(x -> text, true, x -> true);
     }
 
@@ -251,17 +252,17 @@ public class Sidebar<R> {
      *
      * @return SidebarLine instance
      */
-    public SidebarLine<R> addBlankLine() {
+    public SidebarLine addBlankLine() {
         return addTextLine("");
     }
 
-    private SidebarLine<R> addLine(@NonNull ThrowingFunction<Player, R, Throwable> updater, boolean staticText,
+    private SidebarLine addLine(@NonNull ThrowingFunction<Player, TextComponent, Throwable> updater, boolean staticText,
                                    @NonNull ThrowingPredicate<Player, Throwable> predicate) {
         synchronized (lines) {
             Preconditions.checkArgument(
                     lines.size() <= MAX_LINES_COUNT, "Cannot add more than %s lines to a sidebar", MAX_LINES_COUNT);
 
-            SidebarLine<R> line = new SidebarLine<>(
+            SidebarLine line = new SidebarLine(
                     updater, objective.getName() + lines.size(),
                     staticText, lines.size(), textProvider, predicate);
 
@@ -275,7 +276,7 @@ public class Sidebar<R> {
      *
      * @param line the line
      */
-    public void removeLine(@NonNull SidebarLine<R> line) {
+    public void removeLine(@NonNull SidebarLine line) {
         synchronized (lines) {
             if (lines.remove(line) && line.getScore() != -1) {
                 broadcast(p -> line.removeTeam(p, objective.getName()));
@@ -289,7 +290,7 @@ public class Sidebar<R> {
      *
      * @return SidebarLine
      */
-    public Optional<SidebarLine<R>> maxLine() {
+    public Optional<SidebarLine> maxLine() {
         synchronized (lines) {
             return lines.stream()
                     .filter(line -> line.getScore() != -1)
@@ -302,7 +303,7 @@ public class Sidebar<R> {
      *
      * @return SidebarLine
      */
-    public Optional<SidebarLine<R>> minLine() {
+    public Optional<SidebarLine> minLine() {
         synchronized (lines) {
             return lines.stream()
                     .filter(line -> line.getScore() != -1)
@@ -315,7 +316,7 @@ public class Sidebar<R> {
      *
      * @param line target line.
      */
-    public void updateLine(@NonNull SidebarLine<R> line) {
+    public void updateLine(@NonNull SidebarLine line) {
         synchronized (lines) {
             Preconditions.checkArgument(lines.contains(line), "Line %s is not a part of this sidebar", line);
 
@@ -325,13 +326,13 @@ public class Sidebar<R> {
 
     /**
      * Update all dynamic lines of the sidebar.
-     * Except lines with their own update task. (see {@link SidebarLine#updatePeriodically(long, long, Sidebar)})
+     * Except lines with their own update task.
      */
     public void updateAllLines() {
         synchronized (lines) {
             int index = lines.size();
 
-            for (SidebarLine<R> line : lines) {
+            for (SidebarLine line : lines) {
                 // if line is not created yet
                 if (line.getScore() == -1) {
                     line.setScore(index--);
@@ -405,7 +406,7 @@ public class Sidebar<R> {
             objective.create(player);
 
             synchronized (lines) {
-                for (SidebarLine<R> line : lines) {
+                for (SidebarLine line : lines) {
                     line.createTeam(player, objective.getName());
                 }
             }
@@ -448,7 +449,7 @@ public class Sidebar<R> {
      *
      * @return a list of lines
      */
-    public List<SidebarLine<R>> getLines() {
+    public List<SidebarLine> getLines() {
         synchronized (lines) {
             return Collections.unmodifiableList(lines);
         }

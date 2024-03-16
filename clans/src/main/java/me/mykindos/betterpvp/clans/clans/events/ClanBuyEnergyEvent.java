@@ -12,7 +12,7 @@ public class ClanBuyEnergyEvent extends ClanEvent<Clan> {
     private final int cost;
 
     public ClanBuyEnergyEvent(Player player, Clan clan, int amount, int cost) {
-        super(player, clan, false);
+        super(player, clan);
         this.amount = amount;
         this.cost = cost;
     }

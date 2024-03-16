@@ -86,8 +86,9 @@ dependencyResolutionManagement {
             library("okhttp", "com.squareup.okhttp3", "okhttp").version("4.10.0")
             library("prettytime", "org.ocpsoft.prettytime", "prettytime").version("5.0.4.Final")
 
-            // Library - InvUI (Inventory API)
+            // Library - UI
             library("invui", "xyz.xenondevs.invui", "invui").versionRef("invui")
+            library("sidebar", "me.catcoder", "bukkit-sidebar").version("6.2.5-SNAPSHOT")
 
             // Library - WorldEdit
             library("fawe", "com.fastasyncworldedit", "FastAsyncWorldEdit-Core").version("2.8.4")

@@ -55,9 +55,9 @@ clans:
   dominance:
     enabled: true
 server:
-  isHub: false
   sidebar:
-    title: Mineplex Clans
+    title: BetterPvP
+    enabled: true
   world:
     fastNightCycle: true
     mainWorld: world

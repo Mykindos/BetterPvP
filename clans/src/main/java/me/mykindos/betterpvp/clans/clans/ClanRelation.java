@@ -5,7 +5,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.minecraft.world.level.material.MapColor;
-import org.bukkit.ChatColor;
 
 @Getter
 public enum ClanRelation {
@@ -35,10 +34,6 @@ public enum ClanRelation {
             style = style.decorate(TextDecoration.BOLD);
         }
         return style;
-    }
-
-    public ChatColor getPrimaryAsChatColor(){
-        return ChatColor.valueOf(primary.toString().toUpperCase());
     }
 
     public String getPrimaryMiniColor() {

@@ -16,13 +16,13 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-public class SidebarPager<R> {
+public class SidebarPager {
 
-    private final List<Sidebar<R>> sidebars;
-    private final Iterator<Sidebar<R>> pageIterator;
+    private final List<Sidebar> sidebars;
+    private final Iterator<Sidebar> pageIterator;
     private final Set<UUID> viewers;
     private final BukkitTask switchTask;
-    private Sidebar<R> currentPage;
+    private Sidebar currentPage;
 
     /**
      * Creates a new sidebar pager.
@@ -31,7 +31,7 @@ public class SidebarPager<R> {
      * @param switchDelayTicks - delay between page switches in ticks (if value is 0, pages will not be switched automatically)
      * @param plugin           - plugin instance
      */
-    public SidebarPager(@NonNull List<Sidebar<R>> sidebars, long switchDelayTicks, @NonNull Plugin plugin) {
+    public SidebarPager(@NonNull List<Sidebar> sidebars, long switchDelayTicks, @NonNull Plugin plugin) {
         this.sidebars = sidebars;
         this.viewers = new HashSet<>();
         this.pageIterator = Iterators.cycle(sidebars);
@@ -44,7 +44,7 @@ public class SidebarPager<R> {
         }
     }
 
-    public void applyToAll(Consumer<Sidebar<R>> consumer) {
+    public void applyToAll(Consumer<Sidebar> consumer) {
         sidebars.forEach(consumer);
     }
 
@@ -65,7 +65,7 @@ public class SidebarPager<R> {
         }
     }
 
-    public Sidebar<R> getCurrentPage() {
+    public Sidebar getCurrentPage() {
         return currentPage;
     }
 
@@ -73,18 +73,18 @@ public class SidebarPager<R> {
         return Collections.unmodifiableSet(viewers);
     }
 
-    public List<Sidebar<R>> getSidebars() {
+    public List<Sidebar> getSidebars() {
         return Collections.unmodifiableList(sidebars);
     }
 
     /**
      * Adds a page status line to all sidebars in pager.
      */
-    public void addPageLine(PageConsumer<R> consumer) {
+    public void addPageLine(PageConsumer consumer) {
         int page = 1;
         int maxPage = sidebars.size();
 
-        for (Sidebar<R> sidebar : sidebars) {
+        for (Sidebar sidebar : sidebars) {
             consumer.accept(page, maxPage, sidebar);
             page++;
         }
@@ -98,7 +98,7 @@ public class SidebarPager<R> {
         if (switchTask != null) {
             switchTask.cancel();
         }
-        for (Sidebar<R> sidebar : sidebars) {
+        for (Sidebar sidebar : sidebars) {
             sidebar.destroy();
         }
         sidebars.clear();
