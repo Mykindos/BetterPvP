@@ -39,6 +39,8 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
     private double durationIncreasePerLevel;
     private double speed;
 
+    private double variance;
+
     @Inject
     public IcePrison(Champions champions, ChampionsManager championsManager, WorldBlockHandler blockHandler) {
         super(champions, championsManager);
@@ -108,7 +110,8 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
             if (loc.getBlock().getType() == Material.AIR || UtilBlock.airFoliage(loc.getBlock())) {
                 int level = getLevel((Player) throwableItem.getThrower());
                 if (throwableItem.getThrower() instanceof Player player) {
-                    blockHandler.addRestoreBlock(player, loc.getBlock(), Material.ICE, (long) (getDuration(level) * 1000), true);
+                    double duration = getDuration(level) + (((double) (center.getBlockY() - loc.getBlockY()) / sphereSize) * variance);
+                    blockHandler.addRestoreBlock(player, loc.getBlock(), Material.ICE, (long) (duration * 1000), true);
                 }
                 loc.getBlock().setType(Material.ICE);
                 loc.getWorld().playSound(loc, Sound.BLOCK_GLASS_STEP, 1f, 1f);
@@ -139,6 +142,7 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
         baseDuration = getConfig("baseDuration", 6.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
         speed = getConfig("speed", 1.5, Double.class);
+        variance = getConfig("variance", 0.5, Double.class);
     }
 
     @Override
