@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.utilities;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.utilities.model.WeighedList;
@@ -12,6 +13,7 @@ import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
@@ -26,6 +28,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -325,27 +328,55 @@ public class UtilItem {
     }
 
     public static WeighedList<ItemStack> getDropTable(BPvPPlugin plugin, String config, String configKey) {
-        WeighedList<ItemStack> droptable = new WeighedList<>();
+        return getDropTable(plugin.getConfig(config), configKey);
 
-        var configSection = plugin.getConfig(config).getConfigurationSection(configKey);
-        if (configSection == null) return droptable;
-
-        configSection.getKeys(false).forEach(key -> {
-            Material item = Material.getMaterial(key);
-            int amount = configSection.getInt(key + ".amount", 1);
-            int modelId = configSection.getInt(key + ".model-id", 0);
-            int weight = configSection.getInt(key + ".weight");
-            int categoryWeight = configSection.getInt(key + ".category-weight");
-
-            ItemStack itemStack = UtilItem.createItemStack(item, amount, modelId);
-            droptable.add(categoryWeight, weight, itemStack);
-        });
-
-        return droptable;
     }
 
     public static WeighedList<ItemStack> getDropTable(BPvPPlugin plugin, String configKey) {
         return getDropTable(plugin, "config", configKey);
+    }
+
+    public static WeighedList<ItemStack> getDropTable(ExtendedYamlConfiguration config, String configKey) {
+        WeighedList<ItemStack> droptable = new WeighedList<>();
+
+        var configSection = config.getConfigurationSection(configKey);
+        if (configSection == null) return droptable;
+
+        parseDropTable(configSection, droptable);
+
+        return droptable;
+    }
+
+    public static Map<String, WeighedList<ItemStack>> getDropTables(ExtendedYamlConfiguration config, String configKey) {
+        Map<String, WeighedList<ItemStack>> droptableMap = new HashMap<>();
+
+        var configSection = config.getConfigurationSection(configKey);
+        if (configSection == null) return droptableMap;
+
+        configSection.getKeys(false).forEach(key -> {
+            var droptableSection = configSection.getConfigurationSection(key);
+            if(droptableSection == null) return;
+            WeighedList<ItemStack> droptable = new WeighedList<>();
+            parseDropTable(droptableSection, droptable);
+
+            droptableMap.put(key, droptable);
+
+        });
+
+        return droptableMap;
+    }
+
+    private static void parseDropTable(ConfigurationSection droptableSection, WeighedList<ItemStack> droptable) {
+        droptableSection.getKeys(false).forEach(key -> {
+            Material item = Material.getMaterial(key);
+            int amount = droptableSection.getInt(key + ".amount", 1);
+            int modelId = droptableSection.getInt(key + ".model-id", 0);
+            int weight = droptableSection.getInt(key + ".weight");
+            int categoryWeight = droptableSection.getInt(key + ".category-weight");
+
+            ItemStack itemStack = UtilItem.createItemStack(item, amount, modelId);
+            droptable.add(categoryWeight, weight, itemStack);
+        });
     }
 
     public static void removeRecipe(Material material) {
