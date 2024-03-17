@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.mage.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -12,12 +13,14 @@ import me.mykindos.betterpvp.core.combat.throwables.ThrowableItem;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableListener;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -25,6 +28,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 
+@Slf4j
 @Singleton
 @BPvPListener
 public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Listener, ThrowableListener {
@@ -107,10 +111,18 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
                     blockHandler.addRestoreBlock(player, loc.getBlock(), Material.ICE, (long) (getDuration(level) * 1000), true);
                 }
                 loc.getBlock().setType(Material.ICE);
+                loc.getWorld().playSound(loc, Sound.BLOCK_GLASS_STEP, 1f, 1f);
+                loc.getWorld().playSound(loc, Sound.BLOCK_GLASS_BREAK, 1f, 0.8f);
             }
         }
     }
 
+    @UpdateEvent
+    public void doSound() {
+        for (ThrowableItem throwableItem : championsManager.getThrowables().getThrowablesOfName(getName())) {
+            throwableItem.getLastLocation().getWorld().playSound(throwableItem.getLastLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 0.6f, 1.6f);
+        }
+    }
 
     @Override
     public void activate(Player player, int level) {
@@ -119,8 +131,8 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
         ThrowableItem throwableItem = new ThrowableItem(this, item, player, getName(), 10000, true);
         throwableItem.setCollideGround(true);
         championsManager.getThrowables().addThrowable(throwableItem);
+        throwableItem.getLastLocation().getWorld().playSound(throwableItem.getLastLocation(), Sound.ENTITY_SILVERFISH_HURT, 2f, 1f);
     }
-
     @Override
     public void loadSkillConfig(){
         sphereSize = getConfig("sphereSize", 4, Integer.class);

@@ -34,6 +34,10 @@ public class ThrowableHandler {
         return throwables.stream().filter(throwable -> throwable.getItem().equals(item)).findFirst();
     }
 
+    public List<ThrowableItem> getThrowablesOfName(String name) {
+        return throwables.stream().filter(throwableItem -> throwableItem.getName().equals(name)).toList();
+    }
+
     public void processThrowableHitEntity(ThrowableItem throwableItem, ThrowableHitEntityEvent event) {
         ThrowableHitEntityEvent throwableHitEntityEvent = UtilServer.callEvent(event);
         if (!throwableHitEntityEvent.isCancelled()) {
