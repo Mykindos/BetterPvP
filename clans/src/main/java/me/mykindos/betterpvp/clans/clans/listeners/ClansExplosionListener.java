@@ -8,25 +8,28 @@ import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanProperty;
 import me.mykindos.betterpvp.clans.clans.insurance.InsuranceType;
-import me.mykindos.betterpvp.clans.weapons.impl.cannon.event.CannonShootEvent;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
 import me.mykindos.betterpvp.core.config.Config;
+import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
+import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateLoreEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
+import me.mykindos.betterpvp.core.items.BPvPItem;
+import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.utilities.model.data.CustomDataType;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
-import org.bukkit.block.Container;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
@@ -34,22 +37,19 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.block.TNTPrimeEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.WeakHashMap;
+import java.util.UUID;
 
 @Slf4j
 @BPvPListener
 public class ClansExplosionListener extends ClanListener {
-
-    private final WeakHashMap<Entity, Clan> tntMap = new WeakHashMap<>();
 
     private static final Set<Material> protectedBlocks = Set.of(
             Material.BEDROCK,
@@ -61,7 +61,7 @@ public class ClansExplosionListener extends ClanListener {
     private boolean tntEnabled;
 
     @Inject
-    @Config(path = "clans.tnt.cooldown.durationInMinutes", defaultValue = "5.0")
+    @Config(path = "clans.tnt.cooldown.durationInMinutes", defaultValue = "0.5")
     private double tntCooldownMinutes;
 
     @Inject
@@ -84,15 +84,16 @@ public class ClansExplosionListener extends ClanListener {
     @Config(path = "clans.tnt.regenerationTimeInMinutes", defaultValue = "5.0")
     private double regenerationTimeInMinutes;
 
-
-    private final WorldBlockHandler worldBlockHandler;
     private final Clans clans;
+    private final WorldBlockHandler worldBlockHandler;
+    private final ItemHandler itemHandler;
 
     @Inject
-    public ClansExplosionListener(ClanManager clanManager, ClientManager clientManager, WorldBlockHandler worldBlockHandler, Clans clans) {
+    public ClansExplosionListener(ClanManager clanManager, ClientManager clientManager, Clans clans, WorldBlockHandler worldBlockHandler, ItemHandler itemHandler) {
         super(clanManager, clientManager);
-        this.worldBlockHandler = worldBlockHandler;
         this.clans = clans;
+        this.worldBlockHandler = worldBlockHandler;
+        this.itemHandler = itemHandler;
     }
 
     @UpdateEvent(delay = 2000)
@@ -109,34 +110,6 @@ public class ClansExplosionListener extends ClanListener {
                     clan.putProperty(ClanProperty.TNT_PROTECTION, baseTime);
                 }
             }
-        }
-    }
-
-    //@EventHandler
-    //public void onTNTPlace(BlockPlaceEvent e) {
-    //    if (e.getBlock().getType() == Material.TNT) {
-    //        if (!tntEnabled) {
-    //            UtilMessage.message(e.getPlayer(), "TNT", "TNT is disabled for the first 3 days of each season.");
-    //            e.setCancelled(true);
-    //        }
-    //    }
-    //}
-
-    // TODO probably remove this when we add cannons
-    @EventHandler
-    public void onTNTPrime(TNTPrimeEvent event) {
-        event.getBlock().setType(Material.AIR);
-        if (!(event.getPrimingEntity() instanceof Player player)) return;
-        log.info("{} primed TNT", player.getName());
-
-        Optional<Clan> clanOptional = clanManager.getClanByPlayer(player);
-        if (clanOptional.isPresent()) {
-            TNTPrimed tnt = event.getBlock().getWorld().spawn(event.getBlock().getLocation(), TNTPrimed.class);
-            tntMap.put(tnt, clanOptional.get());
-            event.setCancelled(true);
-        } else {
-            UtilMessage.message(player, "TNT", "You must be in a clan to prime TNT.");
-            event.setCancelled(true);
         }
     }
 
@@ -181,46 +154,35 @@ public class ClansExplosionListener extends ClanListener {
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onCannon(CannonShootEvent event) {
-        clanManager.getClanByPlayer(event.getPlayer()).ifPresent(clan -> tntMap.put(event.getCannonball(), clan));
-    }
-
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onExplode(EntityExplodeEvent event) {
         if (event.isCancelled()) return;
         event.setCancelled(true);
 
-        if (!tntMap.containsKey(event.getEntity())) return;
-
-        if (event.getEntity().getType() != EntityType.PRIMED_TNT) return;
-        event.getEntity().getWorld().playSound(event.getEntity().getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 3.0f, 1.0f);
-        Particle.EXPLOSION_HUGE.builder().count(1).location(event.getEntity().getLocation()).spawn();
-        event.setYield(2.5f);
-        final Set<Block> blocks = UtilBlock.getInRadius(event.getLocation(), event.getYield()).keySet();
-        for (Block block : blocks) {
-            if (protectedBlocks.contains(block.getType())) continue;
-            if (block.getType().isAir()) continue;
-
-            if (block.isLiquid()) {
-                block.setType(Material.AIR);
-            } else {
-                if (!(block.getState() instanceof Container) && !block.getType().isInteractable()) {
-                    if (!event.blockList().contains(block)) {
-                        event.blockList().add(block);
-                    }
-                }
-            }
+        if (!(event.getEntity() instanceof TNTPrimed tnt)) {
+            return;
         }
 
-        Clan attackingClan = tntMap.get(event.getEntity());
-        Clan attackedClan = null;
+        UUID shooterUUID = tnt.getPersistentDataContainer().get(CoreNamespaceKeys.ORIGINAL_OWNER, CustomDataType.UUID);
+        if (shooterUUID == null) {
+            return;
+        }
 
+        Player shooter = Bukkit.getPlayer(shooterUUID);
+        if (shooter == null) {
+            return;
+        }
+
+        Clan attackingClan = clanManager.getClanByPlayer(shooter).orElse(null);
+        if (attackingClan == null) {
+            return; // Need to be in a clan to fire a cannon
+        }
+
+        Clan attackedClan = null;
         boolean schedulingRollback = false;
 
-        // todo: allow changing yield
-        final BlockExplodeEvent explodeEvent = new BlockExplodeEvent(event.getLocation().getBlock(), new ArrayList<>(blocks), 1.0f, null);
-        UtilServer.callEvent(explodeEvent);
+        processBlocksInRadius(event);
+        doExplosion(event);
 
         for (Block block : event.blockList()) {
             if (protectedBlocks.contains(block.getType())) continue;
@@ -235,11 +197,14 @@ public class ClansExplosionListener extends ClanListener {
 
             if (attackedClan != null) {
 
+                if (attackedClan.isAdmin() || attackedClan.isSafe()) break;
+
                 Optional<Long> tntProtectionOptional = attackedClan.getProperty(ClanProperty.TNT_PROTECTION);
                 if (tntProtectionOptional.isPresent()) {
                     long tntProtection = tntProtectionOptional.get();
                     if (System.currentTimeMillis() > tntProtection) {
-                        attackingClan.messageClan("You cannot TNT <red>" + attackedClan.getName() + "</red> because they have offline TNT protection.", null, true);
+                        attackingClan.messageClan("You cannot cannon <red>" + attackedClan.getName() + "</red> because they have offline raid protection.", null, true);
+                        refundCannonball(shooter);
                         break;
                     }
                 }
@@ -249,12 +214,14 @@ public class ClansExplosionListener extends ClanListener {
 
                     ClanEnemy enemy = enemyOptional.get();
                     if (enemy.getDominance() <= dominanceRequired) {
-                        attackingClan.messageClan("You cannot TNT <red>" + attackedClan.getName() + "</red> because you have less than <red>" + dominanceRequired + "%</red> dominance on them.", null, true);
+                        attackingClan.messageClan("You cannot cannon <red>" + attackedClan.getName() + "</red> because you have less than <red>" + dominanceRequired + "%</red> dominance on them.", null, true);
+                        refundCannonball(shooter);
                         break;
                     }
 
                     if (attackedClan.isNoDominanceCooldownActive()) {
-                        attackingClan.messageClan("You cannot TNT <red>" + attackedClan.getName() + "</red> because they are a new clan or were raided too recently.", null, true);
+                        attackingClan.messageClan("You cannot cannon <red>" + attackedClan.getName() + "</red> because they are a new clan or were raided too recently.", null, true);
+                        refundCannonball(shooter);
                         break;
                     }
 
@@ -263,11 +230,10 @@ public class ClansExplosionListener extends ClanListener {
                     }
 
                 } else {
-                    attackingClan.messageClan("You cannot TNT <yellow>" + attackedClan.getName() + "</yellow> because you are not enemies.", null, true);
+                    attackingClan.messageClan("You cannot cannon <yellow>" + attackedClan.getName() + "</yellow> because you are not enemies.", null, true);
+                    refundCannonball(shooter);
                     break;
                 }
-                if (attackedClan.isAdmin() || attackedClan.isSafe()) continue;
-
 
                 clanManager.addInsurance(attackedClan, block, InsuranceType.BREAK);
 
@@ -275,14 +241,13 @@ public class ClansExplosionListener extends ClanListener {
                     attackedClan.saveProperty(ClanProperty.LAST_TNTED.name(), (long) (System.currentTimeMillis() + (tntCooldownMinutes * 60_000)));
                 }
 
-
             }
 
             if (processTntTieredBlocks(block)) {
                 continue;
             }
 
-            if(!worldBlockHandler.isRestoreBlock(block)) {
+            if (!worldBlockHandler.isRestoreBlock(block)) {
                 block.breakNaturally();
             } else {
                 block.setType(Material.AIR);
@@ -291,26 +256,56 @@ public class ClansExplosionListener extends ClanListener {
         }
 
         if (schedulingRollback) {
-            if (attackedClan.getTntRecoveryRunnable() != null) {
-                attackedClan.getTntRecoveryRunnable().cancel();
-            }
-
-            attackedClan.messageClan("Your clan has been TNT'd by <red>" + attackingClan.getName()
-                    + "</red>! Your blocks will be restored in <green>" + regenerationTimeInMinutes + "</green> minutes.", null, true);
-
-            Clan finalAttackedClan = attackedClan;
-            attackedClan.setTntRecoveryRunnable(UtilServer.runTaskLater(clans, () -> {
-                clanManager.startInsuranceRollback(finalAttackedClan);
-                finalAttackedClan.messageClan("Commencing restore of blocks destroyed by TNT...", null, true);
-            }, (long) (1200L * (regenerationTimeInMinutes))));
+            scheduleRollback(attackingClan, attackedClan);
         }
 
-        tntMap.remove(event.getEntity());
     }
 
-    @EventHandler
-    public void onTNTPrimed(TNTPrimeEvent event) {
+    private void doExplosion(EntityExplodeEvent event) {
+        event.getEntity().getWorld().playSound(event.getEntity().getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 3.0f, 1.0f);
+        Particle.EXPLOSION_HUGE.builder().count(1).location(event.getEntity().getLocation()).spawn();
+        event.setYield(2.5f);
 
+        final BlockExplodeEvent explodeEvent = new BlockExplodeEvent(event.getLocation().getBlock(), event.blockList(), 1.0f, null);
+        UtilServer.callEvent(explodeEvent);
+    }
+
+    private void processBlocksInRadius(EntityExplodeEvent event) {
+        final Set<Block> blocks = UtilBlock.getInRadius(event.getLocation(), event.getYield()).keySet();
+        for (Block block : blocks) {
+            if (protectedBlocks.contains(block.getType())) continue;
+            if (block.getType().isAir()) continue;
+
+            if (block.isLiquid()) {
+                block.setType(Material.AIR);
+            } else {
+                if (!event.blockList().contains(block)) {
+                    event.blockList().add(block);
+                }
+            }
+        }
+    }
+
+   private void scheduleRollback(Clan attackingClan, Clan attackedClan) {
+       if (attackedClan.getTntRecoveryRunnable() != null) {
+           attackedClan.getTntRecoveryRunnable().cancel();
+       }
+
+       attackedClan.messageClan("Your clan has been cannoned by <red>" + attackingClan.getName()
+               + "</red>! Your blocks will be restored in <green>" + regenerationTimeInMinutes + "</green> minutes.", null, true);
+
+       attackedClan.setTntRecoveryRunnable(UtilServer.runTaskLater(clans, () -> {
+           clanManager.startInsuranceRollback(attackedClan);
+           attackedClan.messageClan("Commencing restore of blocks destroyed by TNT...", null, true);
+       }, (long) (1200L * (regenerationTimeInMinutes))));
+    }
+
+    private void refundCannonball(Player player) {
+        BPvPItem item = itemHandler.getItem("clans:cannonball");
+        if(item != null) {
+            ItemStack itemStack = itemHandler.updateNames(item.getItemStack(1));
+            UtilItem.insert(player, itemStack);
+        }
     }
 
     private boolean processTntTieredBlocks(Block block) {
@@ -330,6 +325,30 @@ public class ClansExplosionListener extends ClanListener {
         }
 
         return false;
+    }
+
+    @EventHandler
+    public void onUpdateLore(ItemUpdateLoreEvent event) {
+        Material material = event.getItemStack().getType();
+
+        for (TNTBlocks tntBlock : TNTBlocks.values()) {
+            if (tntBlock.getTiers().contains(material)) {
+                int resistance = tntBlock.getTiers().size() - tntBlock.getTiers().indexOf(material);
+                if(resistance > 1) {
+                    event.getItemLore().add(UtilMessage.deserialize("It takes <green>%d</green> cannonballs to destroy this block", resistance));
+                } else {
+                    event.getItemLore().add(UtilMessage.deserialize("It takes <green>1</green> cannonball to destroy this block"));
+                }
+
+                return;
+            }
+        }
+
+        if(material.isBlock()) {
+            if(event.getItem().getLore().isEmpty()) {
+                event.getItemLore().add(UtilMessage.deserialize("It takes <green>1</green> cannonball to destroy this block"));
+            }
+        }
     }
 
     @Getter
@@ -364,7 +383,6 @@ public class ClansExplosionListener extends ClanListener {
         */
         MUDBRICKS(Material.MUD_BRICKS, Material.MUD),
         DEEPSLATEBRICKS(Material.DEEPSLATE_BRICKS, Material.DEEPSLATE);
-
 
 
         private final List<Material> tiers;
