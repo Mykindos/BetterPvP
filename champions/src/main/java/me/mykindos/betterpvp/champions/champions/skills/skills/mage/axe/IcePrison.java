@@ -38,7 +38,6 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
     private double baseDuration;
     private double durationIncreasePerLevel;
     private double speed;
-
     private double variance;
 
     @Inject
