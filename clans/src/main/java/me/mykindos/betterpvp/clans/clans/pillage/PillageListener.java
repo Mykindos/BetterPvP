@@ -51,7 +51,7 @@ public class PillageListener implements Listener {
 
         pillageHandler.getActivePillages().forEach(pillage -> {
             if (pillage.getPillageFinishTime() - System.currentTimeMillis() <= 0) {
-                UtilServer.runTaskLater(clans, () ->UtilServer.callEvent(new PillageEndEvent(pillage)), 1);
+                UtilServer.runTaskLater(clans, () -> UtilServer.callEvent(new PillageEndEvent(pillage)), 1);
             }
         });
     }
