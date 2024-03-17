@@ -13,13 +13,13 @@ import me.mykindos.betterpvp.core.combat.throwables.ThrowableItem;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableListener;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
@@ -119,11 +119,10 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
         }
     }
 
-    @UpdateEvent
-    public void doSound() {
-        for (ThrowableItem throwableItem : championsManager.getThrowables().getThrowablesOfName(getName())) {
-            throwableItem.getLastLocation().getWorld().playSound(throwableItem.getLastLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 0.6f, 1.6f);
-        }
+    @Override
+    public void onTick(ThrowableItem throwableItem) {
+        throwableItem.getLastLocation().getWorld().playSound(throwableItem.getLastLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 0.6f, 1.6f);
+        throwableItem.getLastLocation().getWorld().spawnParticle(Particle.SNOW_SHOVEL, throwableItem.getLastLocation(), 1);
     }
 
     @Override
@@ -134,6 +133,7 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
         throwableItem.setCollideGround(true);
         championsManager.getThrowables().addThrowable(throwableItem);
         throwableItem.getLastLocation().getWorld().playSound(throwableItem.getLastLocation(), Sound.ENTITY_SILVERFISH_HURT, 2f, 1f);
+
     }
     @Override
     public void loadSkillConfig(){

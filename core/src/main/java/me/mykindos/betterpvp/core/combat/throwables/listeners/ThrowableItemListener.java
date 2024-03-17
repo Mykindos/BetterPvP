@@ -53,6 +53,7 @@ public class ThrowableItemListener implements Listener {
             checkGroundCollision(throwable);
             checkEntityCollision(throwable);
             throwable.setLastLocation(throwable.getItem().getLocation());
+            throwable.getListener().onTick(throwable);
         });
     }
 
