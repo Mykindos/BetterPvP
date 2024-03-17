@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import me.mykindos.betterpvp.clans.Clans;
+import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.core.components.clans.IClan;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.framework.events.scoreboard.ScoreboardUpdateEvent;
@@ -42,6 +43,9 @@ public class PillageHandler {
         activePillages.add(pillage);
         UtilMessage.simpleBroadcast("Clans", "<yellow>%s <gray>has pillaged <yellow>%s<gray>.",
                 pillage.getPillager().getName(), pillage.getPillaged().getName());
+
+        Clan clan = (Clan) pillage.getPillaged();
+        clan.setTntRecoveryRunnable(null);
 
     }
 

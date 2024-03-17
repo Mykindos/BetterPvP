@@ -109,7 +109,7 @@ public class ItemHandler {
             var nameUpdateEvent = UtilServer.callEvent(new ItemUpdateNameEvent(itemStack, itemMeta, item.getName()));
             itemMeta.displayName(nameUpdateEvent.getItemName().decoration(TextDecoration.ITALIC, false));
 
-            var loreUpdateEvent = UtilServer.callEvent(new ItemUpdateLoreEvent(itemStack, itemMeta, new ArrayList<>(item.getLore())));
+            var loreUpdateEvent = UtilServer.callEvent(new ItemUpdateLoreEvent(item, itemStack, itemMeta, new ArrayList<>(item.getLore())));
 
             item.applyLore(itemMeta, loreUpdateEvent.getItemLore());
 

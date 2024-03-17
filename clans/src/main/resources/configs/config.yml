@@ -3,6 +3,13 @@ clans:
     additional: 3
   tnt:
     enabled: true
+    dominanceRequired: 80
+    cooldown:
+      enabled: true
+      durationInMinutes: 0.5
+    protectionAdditionalMinutesPerMember: 2.5
+    protectionBaseTimeInMinutes: 5.0
+    regenerationTimeInMinutes: 5.0
   map:
     enabled: true
     maxMapDistance: 512
