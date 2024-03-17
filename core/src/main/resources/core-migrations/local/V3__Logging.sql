@@ -45,7 +45,7 @@ CREATE PROCEDURE GetUuidLogsByPlayer(PlayerUuid varchar(36), amount int)
 BEGIN
     SELECT DISTINCT Time, Message
     FROM logs
-        INNER JOIN uuidqqlogmeta ON logs.id = uuidlogmeta.LogUUID
+        INNER JOIN uuidlogmeta ON logs.id = uuidlogmeta.LogUUID
     WHERE UUID = PlayerUuid
       AND UUIDtype = 'PLAYER'
     ORDER BY Time DESC
