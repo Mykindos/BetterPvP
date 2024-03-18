@@ -23,6 +23,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilLocation;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -35,6 +36,7 @@ import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -165,7 +167,21 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
                     .spawn();
         }
 
-        location.getWorld().strikeLightningEffect(location.clone().add(0, -1, 0));
+        // Sphere
+        for (Location point : UtilLocation.getSphere(location, radius, 20)) {
+            final double random = Math.random();
+            final Color color = random > 0.5 ? Color.YELLOW : Color.ORANGE;
+            final Color toColor = random > 0.5 ? Color.ORANGE : Color.RED;
+
+            new ParticleBuilder(Particle.DUST_COLOR_TRANSITION)
+                    .location(point)
+                    .count(1)
+                    .extra(0)
+                    .data(new Particle.DustTransition(color, toColor, 1.5f))
+                    .source(caster)
+                    .receivers(receivers)
+                    .spawn();
+        }
 
         new ParticleBuilder(Particle.FLASH)
                 .location(location)
