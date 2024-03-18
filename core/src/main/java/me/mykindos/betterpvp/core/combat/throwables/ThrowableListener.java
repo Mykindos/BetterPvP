@@ -10,4 +10,8 @@ public interface ThrowableListener {
     default void onThrowableHitGround(ThrowableItem throwableItem, LivingEntity thrower, Location location) {
 
     }
+
+    default void onTick(ThrowableItem throwableItem) {
+
+    }
 }
