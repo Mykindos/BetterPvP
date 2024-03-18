@@ -20,6 +20,8 @@ import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -134,6 +136,11 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
         throwableItem.getItem().remove();
     }
 
+    @Override
+    public void onTick(ThrowableItem throwableItem) {
+        throwableItem.getLastLocation().getWorld().playSound(throwableItem.getLastLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 0.6f, 1.6f);
+        throwableItem.getLastLocation().getWorld().spawnParticle(Particle.FIREWORKS_SPARK, throwableItem.getLastLocation(), 1);
+    }
 
     @Override
     public void activate(Player player, int level) {
@@ -141,8 +148,9 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
         orb.setVelocity(player.getLocation().getDirection());
         orb.setCanPlayerPickup(false);
         orb.setCanMobPickup(false);
-        ThrowableItem throwableItem = new ThrowableItem(this, orb, player, "Lightning Orb", 10000, false);
+        ThrowableItem throwableItem = new ThrowableItem(this, orb, player, "Lightning Orb", 5000, false);
         championsManager.getThrowables().addThrowable(throwableItem);
+        throwableItem.getLastLocation().getWorld().playSound(throwableItem.getLastLocation(), Sound.ENTITY_SILVERFISH_HURT, 2f, 1f);
     }
 
     @Override
