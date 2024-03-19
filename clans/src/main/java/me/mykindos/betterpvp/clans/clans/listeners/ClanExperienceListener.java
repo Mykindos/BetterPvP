@@ -39,7 +39,7 @@ public class ClanExperienceListener extends ClanListener {
         clan.messageClan("Your clan earned <green>" + event.getExperience() + "<reset> experience.", null, true);
 
         if(clan.getLevel() > currentLevel){
-            clan.messageClan("Your clan have levelled up to level <green>" + clan.getLevel() + "<reset>!", null, true);
+            clan.messageClan("Your clan has levelled up to level <green>" + clan.getLevel() + "<reset>!", null, true);
         }
     }
 }
