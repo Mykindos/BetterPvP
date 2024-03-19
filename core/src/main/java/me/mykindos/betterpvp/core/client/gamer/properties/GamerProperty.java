@@ -27,4 +27,6 @@ public enum GamerProperty {
     DAMAGE_DEALT,
     DAMAGE_TAKEN,
 
+    TIME_PLAYED
+
 }

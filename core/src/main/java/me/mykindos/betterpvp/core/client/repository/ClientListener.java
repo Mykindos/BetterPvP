@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
 import me.mykindos.betterpvp.core.client.events.ClientQuitEvent;
+import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.client.properties.ClientPropertyUpdateEvent;
 import me.mykindos.betterpvp.core.config.Config;
@@ -165,6 +166,8 @@ public class ClientListener implements Listener {
     public void onClientQuit(ClientQuitEvent event) {
         Client client = event.getClient();
         client.putProperty(ClientProperty.TIME_PLAYED, (long) client.getProperty(ClientProperty.TIME_PLAYED).orElse(0L)
+                + (System.currentTimeMillis() - client.getConnectionTime()));
+        client.getGamer().putProperty(GamerProperty.TIME_PLAYED, (long) client.getGamer().getProperty(GamerProperty.TIME_PLAYED).orElse(0L)
                 + (System.currentTimeMillis() - client.getConnectionTime()));
         client.setConnectionTime(System.currentTimeMillis());
     }

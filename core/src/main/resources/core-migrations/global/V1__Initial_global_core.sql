@@ -54,6 +54,8 @@ create table if not exists client_properties
     primary key (Client, Property)
 );
 
+CREATE INDEX idx_client_properties_property ON client_properties (Property);
+
 create table if not exists property_map
 (
     Property varchar(255) not null,
