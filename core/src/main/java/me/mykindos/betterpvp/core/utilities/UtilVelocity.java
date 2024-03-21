@@ -31,35 +31,36 @@ public class UtilVelocity {
 
     public static void velocity(Entity target, LivingEntity source, VelocityData data, VelocityType velocityType) {
         Vector vec = data.getVector();
-        if (!Double.isNaN(vec.getX()) && !Double.isNaN(vec.getY()) && !Double.isNaN(data.getVector().getZ()) && data.getVector().length() != 0.0D) {
-
-            if (data.isSetY()) {
-                vec.setY(data.getBaseY());
-            }
-
-            vec.normalize();
-            vec.multiply(data.getStrength());
-
-            vec.setY(vec.getY() + data.getAddY());
-
-            if (vec.getY() > data.getMaxY()) {
-                vec.setY(data.getMaxY());
-            }
-
-            if (data.isGroundBoost() && UtilBlock.isGrounded(target)) {
-                vec.setY(vec.getY() + 0.2D);
-            }
-
-            if (data.isResetFallDistance()) {
-                target.setFallDistance(0.0F);
-            }
-
-            CustomEntityVelocityEvent customEntityVelocityEvent = UtilServer.callEvent(new CustomEntityVelocityEvent(target, source, velocityType, vec));
-            if(customEntityVelocityEvent.isCancelled()) return;
-
-            target.setVelocity(customEntityVelocityEvent.getVector());
-
+        if (Double.isNaN(vec.getX()) || Double.isNaN(vec.getY()) || Double.isNaN(data.getVector().getZ()) || data.getVector().length() == 0.0D) {
+            return;
         }
+
+        if (data.isSetY()) {
+            vec.setY(data.getBaseY());
+        }
+
+        vec.normalize();
+        vec.multiply(data.getStrength());
+
+        vec.setY(vec.getY() + data.getAddY());
+
+        if (vec.getY() > data.getMaxY()) {
+            vec.setY(data.getMaxY());
+        }
+
+        if (data.isGroundBoost() && UtilBlock.isGrounded(target)) {
+            vec.setY(vec.getY() + 0.2D);
+        }
+
+        if (data.isResetFallDistance()) {
+            target.setFallDistance(0.0F);
+        }
+
+        CustomEntityVelocityEvent customEntityVelocityEvent = UtilServer.callEvent(new CustomEntityVelocityEvent(target, source, velocityType, vec));
+        if (customEntityVelocityEvent.isCancelled()) return;
+
+        target.setVelocity(customEntityVelocityEvent.getVector());
+
     }
 
     public static Vector getTrajectory(Entity from, Entity to) {

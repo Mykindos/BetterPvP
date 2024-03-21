@@ -365,20 +365,6 @@ public class CombatListener implements Listener {
         }
     }
 
-    @EventHandler
-    public void onKnockbackSprintBonus(CustomKnockbackEvent event) {
-        double knockback = event.getDamage();
-        if (event.getDamager() instanceof Player player) {
-            if (player.isSprinting()) {
-                if (event.getCustomDamageEvent().getCause() == DamageCause.ENTITY_ATTACK) {
-                    knockback += 3;
-                }
-            }
-        }
-
-        event.setDamage(knockback);
-    }
-
     public void applyKB(CustomKnockbackEvent event) {
         double knockback = event.getDamage();
         if (knockback < 2.0D && !event.isCanBypassMinimum()) knockback = 2.0D;
