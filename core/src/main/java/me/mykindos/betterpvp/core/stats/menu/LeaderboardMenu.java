@@ -1,8 +1,8 @@
 package me.mykindos.betterpvp.core.stats.menu;
 
 import lombok.AccessLevel;
+import lombok.CustomLog;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.stats.Leaderboard;
@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
-@Slf4j
+@CustomLog
 @Getter
 public class LeaderboardMenu<E, T> extends AbstractGui implements Windowed {
 

@@ -1,6 +1,6 @@
 package me.mykindos.betterpvp.core.recipes;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 
-@Slf4j
+@CustomLog
 public class RecipeHandler {
     public void loadConfig(@NotNull ExtendedYamlConfiguration config, String namespace) {
         String path = "recipe.";

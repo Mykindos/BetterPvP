@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.core.items;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Singleton
-@Slf4j
+@CustomLog
 public class ItemRepository implements IRepository<BPvPItem> {
 
     private Database database;

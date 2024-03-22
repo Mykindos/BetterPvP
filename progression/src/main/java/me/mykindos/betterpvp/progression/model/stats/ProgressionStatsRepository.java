@@ -1,6 +1,6 @@
 package me.mykindos.betterpvp.progression.model.stats;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.LongStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
@@ -17,7 +17,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * Represents a manager for {@link ProgressionData} of a {@link ProgressionTree}.
  */
-@Slf4j
+@CustomLog
 public abstract class ProgressionStatsRepository<T extends ProgressionTree, K extends ProgressionData<T>> extends StatsRepository<K> {
 
     protected T tree;

@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.clans.clans.commands.subcommands;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
@@ -21,7 +21,7 @@ import org.slf4j.MDC;
 
 import java.util.Optional;
 
-@Slf4j
+@CustomLog
 @Singleton
 @SubCommand(ClanCommand.class)
 public class DisbandClanSubCommand extends ClanSubCommand {

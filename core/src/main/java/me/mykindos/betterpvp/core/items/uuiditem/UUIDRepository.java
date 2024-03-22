@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.core.items.uuiditem;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Singleton
-@Slf4j
+@CustomLog
 public class UUIDRepository implements IRepository<UUIDItem> {
 
     private final Database database;

@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.core.combat.weapon;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.components.champions.weapons.IWeapon;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
@@ -17,7 +17,7 @@ import java.lang.reflect.Modifier;
 import java.util.Optional;
 
 @Singleton
-@Slf4j
+@CustomLog
 public class WeaponManager extends Manager<IWeapon> {
 
     private final Core core;

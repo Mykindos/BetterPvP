@@ -3,7 +3,7 @@ package me.mykindos.betterpvp.clans.clans.map;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.map.data.ChunkData;
 import me.mykindos.betterpvp.clans.clans.map.data.MapPixel;
@@ -36,7 +36,7 @@ import java.util.UUID;
  * Map system by <a href="https://github.com/areeoh/">Areeoh</a>
  * Modified by Tom Hoogstra for 1.19
  */
-@Slf4j
+@CustomLog
 @Singleton
 public class MapHandler {
 

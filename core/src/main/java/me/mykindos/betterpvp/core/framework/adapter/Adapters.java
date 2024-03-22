@@ -1,6 +1,6 @@
 package me.mykindos.betterpvp.core.framework.adapter;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import org.bukkit.Bukkit;
 
@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-@Slf4j
+@CustomLog
 public final class Adapters {
 
     private final BPvPPlugin plugin;

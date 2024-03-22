@@ -1,13 +1,13 @@
 package me.mykindos.betterpvp.core.tips;
 
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 
 import java.util.Collection;
 
-@Slf4j
+@CustomLog
 @Singleton
 public class TipManager extends Manager<Tip> {
 

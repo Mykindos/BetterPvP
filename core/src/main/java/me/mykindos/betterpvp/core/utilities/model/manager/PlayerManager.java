@@ -1,6 +1,6 @@
 package me.mykindos.betterpvp.core.utilities.model.manager;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.utilities.model.Unique;
 import me.mykindos.betterpvp.core.utilities.search.SearchEngineBase;
@@ -18,7 +18,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-@Slf4j
+@CustomLog
 public abstract class PlayerManager<T extends Unique> {
 
     public static final String LOAD_ENTITY_FORMAT = "Loaded entity for {}";

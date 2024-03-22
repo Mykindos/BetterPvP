@@ -3,9 +3,9 @@ package me.mykindos.betterpvp.core;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import lombok.CustomLog;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.stats.impl.GlobalCombatStatsRepository;
 import me.mykindos.betterpvp.core.combat.weapon.WeaponManager;
@@ -24,7 +24,10 @@ import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDManager;
 import me.mykindos.betterpvp.core.listener.loader.CoreListenerLoader;
 import me.mykindos.betterpvp.core.logging.Logger;
+import me.mykindos.betterpvp.core.logging.LoggerFactory;
 import me.mykindos.betterpvp.core.logging.UUIDLogger;
+import me.mykindos.betterpvp.core.logging.appenders.DatabaseAppender;
+import me.mykindos.betterpvp.core.logging.appenders.LegacyAppender;
 import me.mykindos.betterpvp.core.recipes.RecipeHandler;
 import me.mykindos.betterpvp.core.redis.Redis;
 import org.reflections.Reflections;
@@ -34,7 +37,7 @@ import xyz.xenondevs.invui.InvUI;
 import java.lang.reflect.Field;
 import java.util.Set;
 
-@Slf4j
+@CustomLog
 public class Core extends BPvPPlugin {
 
     private final String PACKAGE = getClass().getPackageName();
@@ -61,11 +64,16 @@ public class Core extends BPvPPlugin {
     public void onEnable() {
         saveDefaultConfig();
 
+        // Add this appender first to ensure we still capture all logs before database is initialized
+        LoggerFactory.getInstance().addAppender(new LegacyAppender());
+
         Reflections reflections = new Reflections(PACKAGE, Scanners.FieldsAnnotated);
         Set<Field> fields = reflections.getFieldsAnnotatedWith(Config.class);
 
         injector = Guice.createInjector(new CoreInjectorModule(this), new ConfigInjectorModule(this, fields));
         injector.injectMembers(this);
+
+        LoggerFactory.getInstance().addAppender(new DatabaseAppender(database));
 
         database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:core-migrations/local", "local");
         sharedDatabase.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:core-migrations/global", "global");
@@ -113,6 +121,7 @@ public class Core extends BPvPPlugin {
         clientManager.shutdown();
         redis.shutdown();
         injector.getInstance(GlobalCombatStatsRepository.class).shutdown();
+        LoggerFactory.getInstance().close();
 
     }
 

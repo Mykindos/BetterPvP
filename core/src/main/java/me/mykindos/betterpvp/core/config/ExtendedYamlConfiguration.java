@@ -1,6 +1,6 @@
 package me.mykindos.betterpvp.core.config;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
-@Slf4j
+@CustomLog
 public class ExtendedYamlConfiguration extends YamlConfiguration {
 
     @NotNull

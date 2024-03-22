@@ -3,9 +3,9 @@ package me.mykindos.betterpvp.core.stats;
 import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.common.base.Preconditions;
+import lombok.CustomLog;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.stats.filter.FilterType;
@@ -47,7 +47,7 @@ import java.util.concurrent.TimeUnit;
  * Currently, Leaderboards only support up to min-max of 10 entries only.
  * @param <T> The type of object to be sorted in this leaderboard.
  */
-@Slf4j
+@CustomLog
 public abstract class Leaderboard<E, T> {
 
     private final ConcurrentHashMap<SearchOptions, TreeSet<LeaderboardEntry<E, T>>> topTen;

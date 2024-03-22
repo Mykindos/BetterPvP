@@ -1,6 +1,6 @@
 package me.mykindos.betterpvp.core.combat.stats.model;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
 import me.mykindos.betterpvp.core.combat.events.KillContributionEvent;
 import me.mykindos.betterpvp.core.stats.Leaderboard;
@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-@Slf4j
+@CustomLog
 public abstract class CombatStatsListener<T extends CombatData> implements Listener {
 
     private final DamageLogManager logManager;

@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.champions.stats.repository;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.champions.stats.impl.ChampionsFilter;
@@ -19,7 +19,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 @Singleton
-@Slf4j
+@CustomLog
 public class ChampionsStatsRepository extends StatsRepository<RoleStatistics> {
 
     private final RoleManager roleManager;

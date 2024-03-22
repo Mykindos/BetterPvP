@@ -2,8 +2,8 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.brute.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.CustomLog;
 import lombok.Value;
-import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
@@ -45,7 +45,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-@Slf4j
+@CustomLog
 public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSkill, ThrowableListener {
 
     private final WeakHashMap<Player, ChargeData> charging = new WeakHashMap<>();

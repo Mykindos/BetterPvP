@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.progression.progression.perks.fishing;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.progression.Progression;
@@ -20,7 +20,7 @@ import org.bukkit.event.Listener;
 
 @BPvPListener
 @Singleton
-@Slf4j
+@CustomLog
 public class IncreaseFishWeightFishingPerk implements Listener, ProgressionPerk, ChanceHandler {
     @Config(path = "fishing.perks.fish-weight.enabled", defaultValue = "true")
     @Inject

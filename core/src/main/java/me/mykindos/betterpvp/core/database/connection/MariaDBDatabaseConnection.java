@@ -1,7 +1,7 @@
 package me.mykindos.betterpvp.core.database.connection;
 
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import org.flywaydb.core.Flyway;
 
@@ -10,7 +10,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 @Singleton
-@Slf4j
+@CustomLog
 public class MariaDBDatabaseConnection implements IDatabaseConnection {
 
     private final String sqlServer;

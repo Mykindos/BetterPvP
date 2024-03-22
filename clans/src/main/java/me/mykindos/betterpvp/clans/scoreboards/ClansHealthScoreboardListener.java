@@ -1,6 +1,6 @@
 package me.mykindos.betterpvp.clans.scoreboards;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.framework.events.scoreboard.ScoreboardUpdateEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -18,7 +18,7 @@ import org.bukkit.scoreboard.Scoreboard;
 import java.util.ConcurrentModificationException;
 
 @BPvPListener
-@Slf4j
+@CustomLog
 public class ClansHealthScoreboardListener implements Listener {
 
     @EventHandler

@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.clans.progression.listener;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.fields.event.FieldsInteractableUseEvent;
 import me.mykindos.betterpvp.clans.fields.model.FieldsInteractable;
 import me.mykindos.betterpvp.clans.fields.model.FieldsOre;
@@ -16,7 +16,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
 
-@Slf4j
+@CustomLog
 @Singleton
 public class MiningListener implements Listener, ConfigAccessor {
 

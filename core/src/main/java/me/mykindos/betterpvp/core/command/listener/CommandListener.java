@@ -1,7 +1,7 @@
 package me.mykindos.betterpvp.core.command.listener;
 
 import com.google.inject.Inject;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -9,7 +9,6 @@ import me.mykindos.betterpvp.core.command.CommandManager;
 import me.mykindos.betterpvp.core.command.ICommand;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.logging.Logger;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -20,7 +19,7 @@ import org.bukkit.event.player.PlayerCommandSendEvent;
 import java.util.Arrays;
 import java.util.Optional;
 
-@Slf4j
+@CustomLog
 @BPvPListener
 public class CommandListener implements Listener {
 
@@ -38,7 +37,7 @@ public class CommandListener implements Listener {
         Client client = clientManager.search().online(event.getPlayer());
         String commandName = event.getMessage().substring(1).toLowerCase();
 
-        Logger.info("%s executed command: %s", event.getPlayer().getName(), event.getMessage());
+        log.info("%s executed command: %s", event.getPlayer().getName(), event.getMessage());
 
         if (commandName.contains(" ")) {
             commandName = commandName.split(" ")[0];

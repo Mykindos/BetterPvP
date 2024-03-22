@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.champions.weapons.impl.legendaries.scepter;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.combat.weapon.Weapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.CooldownWeapon;
@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.WeakHashMap;
 
 @Singleton
-@Slf4j
+@CustomLog
 public class Scepter extends Weapon implements InteractWeapon, CooldownWeapon, LegendaryWeapon {
 
     protected final WeakHashMap<Player, List<BlackHole>> blackHoles = new WeakHashMap<>();

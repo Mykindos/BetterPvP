@@ -1,8 +1,8 @@
 package me.mykindos.betterpvp.core.combat.weapon;
 
 import com.google.inject.Singleton;
+import lombok.CustomLog;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.combat.weapon.types.ChannelWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.CooldownWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
@@ -16,7 +16,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
-@Slf4j
+@CustomLog
 @Getter
 @Singleton
 public abstract class Weapon extends BPvPItem implements IWeapon {

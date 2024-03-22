@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.mage.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -28,7 +28,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 
-@Slf4j
+@CustomLog
 @Singleton
 @BPvPListener
 public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Listener, ThrowableListener {

@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.champions.weapons.impl.legendaries.scythe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -29,7 +29,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-@Slf4j
+@CustomLog
 public class Scythe extends ChannelWeapon implements LegendaryWeapon, Listener {
 
     protected final WeakHashMap<Player, ScytheData> tracked = new WeakHashMap<>();

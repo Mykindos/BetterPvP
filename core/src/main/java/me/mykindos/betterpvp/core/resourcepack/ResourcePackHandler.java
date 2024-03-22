@@ -2,8 +2,8 @@ package me.mykindos.betterpvp.core.resourcepack;
 
 import com.google.inject.Inject;
 import com.sun.net.httpserver.HttpServer;
+import lombok.CustomLog;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.config.Config;
 
 import javax.inject.Singleton;
@@ -17,7 +17,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 @Singleton
-@Slf4j
+@CustomLog
 @Getter
 public class ResourcePackHandler {
 

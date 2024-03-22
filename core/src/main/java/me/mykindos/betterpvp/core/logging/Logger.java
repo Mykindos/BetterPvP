@@ -1,6 +1,6 @@
 package me.mykindos.betterpvp.core.logging;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.LongStatementValue;
@@ -12,7 +12,8 @@ import javax.inject.Singleton;
 import java.util.UUID;
 
 @Singleton
-@Slf4j
+@CustomLog
+@Deprecated(forRemoval = true)
 public class Logger {
 
     private static Database database;

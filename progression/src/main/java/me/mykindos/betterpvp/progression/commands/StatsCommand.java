@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.progression.commands;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
@@ -21,7 +21,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 @Singleton
-@Slf4j
+@CustomLog
 public class StatsCommand extends Command {
 
     @Inject

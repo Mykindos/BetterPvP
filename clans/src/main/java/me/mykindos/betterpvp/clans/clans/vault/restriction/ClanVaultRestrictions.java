@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.clans.clans.vault.restriction;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.vault.ClanVault;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
@@ -16,7 +16,7 @@ import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
 
-@Slf4j
+@CustomLog
 @Singleton
 public class ClanVaultRestrictions {
 

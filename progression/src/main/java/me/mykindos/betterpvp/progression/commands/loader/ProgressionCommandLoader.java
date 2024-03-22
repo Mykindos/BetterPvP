@@ -1,7 +1,7 @@
 package me.mykindos.betterpvp.progression.commands.loader;
 
 import com.google.inject.Inject;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.CommandManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
@@ -11,7 +11,7 @@ import org.reflections.Reflections;
 
 import java.util.Set;
 
-@Slf4j
+@CustomLog
 public class ProgressionCommandLoader extends CommandLoader {
 
 
