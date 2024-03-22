@@ -28,11 +28,6 @@ public class DatabaseAppender implements LogAppender {
     @Override
     public void append(PendingLog pendingLog) {
 
-        // Skip if there is no database connection
-        if(database.getConnection().getDatabaseConnection().isClosed()){
-            return;
-        }
-
         StringBuilder message = new StringBuilder(pendingLog.getMessage());
         for(Object arg : pendingLog.getArgs()) {
             if(arg instanceof Throwable throwable) {

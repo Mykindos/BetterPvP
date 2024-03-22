@@ -55,14 +55,17 @@ public class Database {
      * @param statement The statement and values
      */
     public void executeUpdate(Statement statement) {
-        try (Connection connection = getConnection().getDatabaseConnection()){
-            @Cleanup
+
+        try (Connection connection = getConnection().getDatabaseConnection()) {
+
             PreparedStatement preparedStatement = connection.prepareStatement(statement.getQuery());
+
             for (int i = 1; i <= statement.getValues().length; i++) {
                 StatementValue<?> val = statement.getValues()[i - 1];
                 preparedStatement.setObject(i, val.getValue(), val.getType());
             }
             preparedStatement.executeUpdate();
+            preparedStatement.close();
 
         } catch (SQLException ex) {
             log.error("Error executing update: {}", statement.getQuery(), ex);
@@ -82,10 +85,10 @@ public class Database {
     }
 
     private void executeBatch(List<Statement> statements, Consumer<ResultSet> callback) {
-
-        if (statements.isEmpty()) {
+        if(statements.isEmpty()) {
             return;
         }
+
         try (Connection connection = getConnection().getDatabaseConnection()) {
             connection.setAutoCommit(false);
             try (PreparedStatement preparedStatement = connection.prepareStatement(statements.get(0).getQuery())) {
@@ -101,6 +104,7 @@ public class Database {
                 if (callback != null) {
                     callback.accept(preparedStatement.getGeneratedKeys());
                 }
+
             } catch (SQLException ex) {
                 log.error("Error executing batch", ex);
                 connection.rollback();
@@ -116,9 +120,10 @@ public class Database {
      * @param statement The statement and values
      */
     public CachedRowSet executeQuery(Statement statement) {
+
         CachedRowSet rowset = null;
 
-        try (Connection connection = getConnection().getDatabaseConnection()){
+        try (Connection connection = getConnection().getDatabaseConnection()) {
             RowSetFactory factory = RowSetProvider.newFactory();
             rowset = factory.createCachedRowSet();
             @Cleanup
@@ -128,6 +133,7 @@ public class Database {
                 preparedStatement.setObject(i, val.getValue(), val.getType());
             }
             rowset.populate(preparedStatement.executeQuery());
+            preparedStatement.close();
 
         } catch (SQLException ex) {
             log.error("Error executing query: {}", statement.getQuery(), ex);
@@ -138,9 +144,10 @@ public class Database {
 
     @SneakyThrows
     public void executeProcedure(Statement statement, int fetchSize, Consumer<CachedRowSet> consumer) {
+
         CachedRowSet result;
 
-        try (Connection connection = getConnection().getDatabaseConnection()){
+        try (Connection connection = getConnection().getDatabaseConnection()) {
             RowSetFactory factory = RowSetProvider.newFactory();
             result = factory.createCachedRowSet();
             if (fetchSize != -1) result.setFetchSize(fetchSize);
@@ -154,6 +161,7 @@ public class Database {
             result.populate(callable.getResultSet());
             consumer.accept(result);
             result.close();
+            callable.close();
         } catch (SQLException ex) {
             log.info("Error executing procedure: {}", statement.getQuery(), ex);
         }

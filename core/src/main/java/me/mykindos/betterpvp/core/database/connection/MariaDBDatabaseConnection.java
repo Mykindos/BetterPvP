@@ -3,9 +3,6 @@ package me.mykindos.betterpvp.core.database.connection;
 import com.google.inject.Singleton;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import com.zaxxer.hikari.metrics.IMetricsTracker;
-import com.zaxxer.hikari.metrics.MetricsTrackerFactory;
-import com.zaxxer.hikari.metrics.PoolStats;
 import lombok.CustomLog;
 import lombok.SneakyThrows;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
@@ -16,9 +13,6 @@ import java.sql.Connection;
 @Singleton
 @CustomLog
 public class MariaDBDatabaseConnection implements IDatabaseConnection {
-
-    // ThreadLocal to store the Connection
-    private final ThreadLocal<Connection> threadLocalConnection = new ThreadLocal<>();
 
     private final HikariConfig hikariConfig = new HikariConfig();
     private HikariDataSource dataSource;
@@ -51,24 +45,20 @@ public class MariaDBDatabaseConnection implements IDatabaseConnection {
         hikariConfig.setJdbcUrl("jdbc:mysql://" + sqlServer + "/" + sqlDatabaseName);
         hikariConfig.setUsername(sqlUsername);
         hikariConfig.setPassword(sqlPassword);
-        hikariConfig.setMaximumPoolSize(7);
+        hikariConfig.setMaximumPoolSize(5);
+        hikariConfig.setMinimumIdle(2);
         hikariConfig.setConnectionTimeout(5000);
         hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
         hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
         hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
 
-
         dataSource = new HikariDataSource(hikariConfig);
     }
 
+
     @SneakyThrows
     public Connection getDatabaseConnection() {
-        Connection conn = threadLocalConnection.get();
-        if (conn == null || conn.isClosed()) {
-            conn = dataSource.getConnection();
-            threadLocalConnection.set(conn);
-        }
-        return conn;
+        return dataSource.getConnection();
     }
 
     @Override

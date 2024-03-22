@@ -1,9 +1,11 @@
 package me.mykindos.betterpvp.core.database;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.database.connection.MariaDBDatabaseConnection;
 
+@Singleton
 public class SharedDatabase extends Database {
 
     @Inject
