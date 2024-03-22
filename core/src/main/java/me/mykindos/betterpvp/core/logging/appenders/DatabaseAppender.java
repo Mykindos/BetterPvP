@@ -43,7 +43,7 @@ public class DatabaseAppender implements LogAppender {
             }
         }
 
-        database.executeUpdateAsync(new Statement("INSERT INTO logs (id, Level, Message, Time) VALUES (?, ?, ?, ?)",
+        database.executeUpdate(new Statement("INSERT INTO logs (id, Level, Message, Time) VALUES (?, ?, ?, ?)",
                 new UuidStatementValue(UUID.randomUUID()),
                 new StringStatementValue(pendingLog.getLevel()),
                 new StringStatementValue(message.toString()),
