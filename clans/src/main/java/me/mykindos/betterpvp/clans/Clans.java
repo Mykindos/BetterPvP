@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.clans.clans.leveling.ClanPerkManager;
 import me.mykindos.betterpvp.clans.commands.ClansCommandLoader;
 import me.mykindos.betterpvp.clans.injector.ClansInjectorModule;
 import me.mykindos.betterpvp.clans.listener.ClansListenerLoader;
+import me.mykindos.betterpvp.clans.logging.ClansLogging;
 import me.mykindos.betterpvp.clans.tips.ClansTipLoader;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.Config;
@@ -62,6 +63,8 @@ public class Clans extends BPvPPlugin {
             injector.injectMembers(this);
 
             database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:clans-migrations", "clans");
+
+            injector.getInstance(ClansLogging.class);
 
             Bukkit.getPluginManager().callEvent(new ModuleLoadedEvent("Clans"));
 
