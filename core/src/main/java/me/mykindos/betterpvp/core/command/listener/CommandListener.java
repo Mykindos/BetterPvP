@@ -37,7 +37,7 @@ public class CommandListener implements Listener {
         Client client = clientManager.search().online(event.getPlayer());
         String commandName = event.getMessage().substring(1).toLowerCase();
 
-        log.info("%s executed command: %s", event.getPlayer().getName(), event.getMessage());
+        log.info("{} executed command: {}", event.getPlayer().getName(), event.getMessage());
 
         if (commandName.contains(" ")) {
             commandName = commandName.split(" ")[0];

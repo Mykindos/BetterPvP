@@ -72,6 +72,7 @@ dependencyResolutionManagement {
             library("jedis", "redis.clients:jedis:4.3.1")
             library("flyway-core", "org.flywaydb", "flyway-core").versionRef("flyway")
             library("flyway-mysql", "org.flywaydb", "flyway-mysql").versionRef("flyway")
+            library("hikari-cp", "com.zaxxer", "HikariCP").version("5.1.0")
 
             // Libraries - Utilities
             library("commons-text", "org.apache.commons", "commons-text").version("1.10.0")

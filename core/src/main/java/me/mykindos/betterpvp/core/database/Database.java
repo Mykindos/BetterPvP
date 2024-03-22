@@ -55,8 +55,7 @@ public class Database {
      * @param statement The statement and values
      */
     public void executeUpdate(Statement statement) {
-        Connection connection = getConnection().getDatabaseConnection();
-        try {
+        try (Connection connection = getConnection().getDatabaseConnection()){
             @Cleanup
             PreparedStatement preparedStatement = connection.prepareStatement(statement.getQuery());
             for (int i = 1; i <= statement.getValues().length; i++) {
@@ -83,40 +82,33 @@ public class Database {
     }
 
     private void executeBatch(List<Statement> statements, Consumer<ResultSet> callback) {
-        Connection connection = getConnection().getDatabaseConnection();
+
         if (statements.isEmpty()) {
             return;
         }
-        try {
-            // Assume all statement queries are the same
+        try (Connection connection = getConnection().getDatabaseConnection()) {
             connection.setAutoCommit(false);
-            @Cleanup
-            PreparedStatement preparedStatement = connection.prepareStatement(statements.get(0).getQuery());
-            for (Statement statement : statements) {
-                for (int i = 1; i <= statement.getValues().length; i++) {
-                    StatementValue<?> val = statement.getValues()[i - 1];
-                    preparedStatement.setObject(i, val.getValue(), val.getType());
+            try (PreparedStatement preparedStatement = connection.prepareStatement(statements.get(0).getQuery())) {
+                for (Statement statement : statements) {
+                    for (int i = 1; i <= statement.getValues().length; i++) {
+                        StatementValue<?> val = statement.getValues()[i - 1];
+                        preparedStatement.setObject(i, val.getValue(), val.getType());
+                    }
+                    preparedStatement.addBatch();
                 }
-                preparedStatement.addBatch();
-            }
-            preparedStatement.executeBatch();
+                preparedStatement.executeBatch();
 
-            if (callback != null) {
-                callback.accept(preparedStatement.getGeneratedKeys());
-            }
-        } catch (SQLException ex) {
-            log.error("Error executing batch", ex);
-            try {
+                if (callback != null) {
+                    callback.accept(preparedStatement.getGeneratedKeys());
+                }
+            } catch (SQLException ex) {
+                log.error("Error executing batch", ex);
                 connection.rollback();
-            } catch (SQLException rollbackException) {
-                log.error("Failed to rollback batch", rollbackException);
-            }
-        } finally {
-            try {
+            } finally {
                 connection.setAutoCommit(true);
-            } catch (SQLException e) {
-                log.error("Failed to enable autocommit after batch", e);
             }
+        } catch (SQLException e) {
+            log.error("Failed to manage transaction or close connection", e);
         }
     }
 
@@ -124,10 +116,9 @@ public class Database {
      * @param statement The statement and values
      */
     public CachedRowSet executeQuery(Statement statement) {
-        Connection connection = getConnection().getDatabaseConnection();
         CachedRowSet rowset = null;
 
-        try {
+        try (Connection connection = getConnection().getDatabaseConnection()){
             RowSetFactory factory = RowSetProvider.newFactory();
             rowset = factory.createCachedRowSet();
             @Cleanup
@@ -147,10 +138,9 @@ public class Database {
 
     @SneakyThrows
     public void executeProcedure(Statement statement, int fetchSize, Consumer<CachedRowSet> consumer) {
-        Connection connection = getConnection().getDatabaseConnection();
         CachedRowSet result;
 
-        try {
+        try (Connection connection = getConnection().getDatabaseConnection()){
             RowSetFactory factory = RowSetProvider.newFactory();
             result = factory.createCachedRowSet();
             if (fetchSize != -1) result.setFetchSize(fetchSize);

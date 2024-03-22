@@ -381,7 +381,7 @@ public class ClanRepository implements IRepository<Clan> {
         String query = "SELECT * FROM clans_dominance_scale;";
         CachedRowSet result = database.executeQuery(new Statement(query));
         try {
-            if (result.next()) {
+            while (result.next()) {
                 dominanceScale.put(result.getInt(1), result.getDouble(2));
             }
         } catch (SQLException ex) {

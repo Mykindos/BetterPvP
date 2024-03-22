@@ -26,6 +26,7 @@ dependencies {
     compileOnly(libs.bundles.paper)
     paperweight.paperDevBundle(libs.versions.paper)
     implementation(libs.reflections)
+    implementation(libs.hikari.cp)
 
     api(libs.prettytime)
     api(libs.bundles.data)
