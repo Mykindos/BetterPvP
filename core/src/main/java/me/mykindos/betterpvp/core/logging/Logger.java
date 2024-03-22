@@ -25,7 +25,7 @@ public class Logger {
     public static UUID log(String level, String message, Object... args) {
         assert database != null;
 
-        String logMessage = String.format(message, args).replaceAll("<.*>", "");
+        String logMessage = String.format(message, args);
         log.info(logMessage);
         UUID logID = UUID.randomUUID();
         database.executeUpdate(new Statement("INSERT INTO logs (id, Level, Message, Time) VALUES (?, ?, ?, ?)",

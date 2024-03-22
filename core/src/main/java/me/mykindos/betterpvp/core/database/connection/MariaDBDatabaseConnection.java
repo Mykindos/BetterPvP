@@ -37,7 +37,7 @@ public class MariaDBDatabaseConnection implements IDatabaseConnection {
     public Connection getDatabaseConnection() {
 
         try {
-            if (connection == null || connection.isClosed()) {
+            if (connection == null || connection.isClosed() || !connection.isValid(0)) {
                 var url = "jdbc:mysql://" + sqlServer + "/" + sqlDatabaseName + "?autoReconnect=true&characterEncoding=latin1&useConfigs=maxPerformance&autoReconnect=true";
                 try {
                     connection = DriverManager.getConnection(url, sqlUsername, sqlPassword);
