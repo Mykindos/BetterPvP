@@ -30,10 +30,9 @@ import java.util.UUID;
 
 public class CustomGiveCommand extends Command {
 
-
-    public final ItemHandler itemHandler;
-    public final ClientManager clientManager;
-    public final UUIDManager uuidManager;
+    private final ItemHandler itemHandler;
+    private final ClientManager clientManager;
+    private final UUIDManager uuidManager;
 
     @Inject
     public CustomGiveCommand(ItemHandler itemHandler, ClientManager clientManager, UUIDManager uuidManager) {
