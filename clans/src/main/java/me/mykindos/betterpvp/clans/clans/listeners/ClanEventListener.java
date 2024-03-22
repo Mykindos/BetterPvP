@@ -40,6 +40,7 @@ import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.events.scoreboard.ScoreboardUpdateEvent;
 import me.mykindos.betterpvp.core.framework.inviting.InviteHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.logging.Logger;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
@@ -108,6 +109,9 @@ public class ClanEventListener extends ClanListener {
                 UtilWorld.chunkToPrettyString(chunk)), player.getUniqueId(), true);
 
         blockHandler.outlineChunk(chunk);
+        Logger.info("%s (%s) claimed %s for %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
+                UtilWorld.chunkToPrettyString(chunk),
+                clan.getName(), clan.getId());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -126,6 +130,10 @@ public class ClanEventListener extends ClanListener {
                 UtilWorld.chunkToPrettyString(chunk)), player.getUniqueId(), true);
         clanManager.getRepository().deleteClanTerritory(targetClan, chunkString);
         targetClan.getTerritory().removeIf(territory -> territory.getChunk().equals(UtilWorld.chunkToFile(chunk)));
+
+        Logger.info("%s (%s) unclaimed %s from %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
+                UtilWorld.chunkToPrettyString(chunk),
+                targetClan.getName(), targetClan.getId());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -161,7 +169,13 @@ public class ClanEventListener extends ClanListener {
         UtilMessage.simpleMessage(event.getPlayer(), "Clans", "Successfully created clan <aqua>%s", clan.getName());
         if (clan.isAdmin()) {
             clientManager.sendMessageToRank("Clans", UtilMessage.deserialize("<yellow>%s<gray> created admin clan <yellow>%s", event.getPlayer().getName(), clan.getName()), Rank.HELPER);
+            Logger.info("%s (%s) created admin clan %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
+                    clan.getName(), clan.getId());
+        } else {
+            Logger.info("%s (%s) created %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
+                    clan.getName(), clan.getId());
         }
+
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -200,6 +214,9 @@ public class ClanEventListener extends ClanListener {
         clanManager.getObjects().remove(clan.getName().toLowerCase());
         clanManager.getLeaderboard().forceUpdate();
 
+        Logger.info("%s (%s) disbanded %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
+                clan.getName(), clan.getId());
+
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -224,6 +241,10 @@ public class ClanEventListener extends ClanListener {
 
         Gamer targetGamer = clientManager.search().online(target).getGamer();
         inviteHandler.createInvite(clan, targetGamer, "Invite", 20);
+
+        Logger.info("%s (%s) invited %s (%s) to %s (%s)", player.getName(), player.getUniqueId(),
+                target.getName(), target.getUniqueId(),
+                clan.getName(), clan.getId());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -262,6 +283,8 @@ public class ClanEventListener extends ClanListener {
         clan.messageClan(String.format("<yellow>%s<gray> has joined your Clan.", player.getName()), player.getUniqueId(), true);
         UtilMessage.simpleMessage(player, "Clans", "You joined <alt2>Clan " + clan.getName() + "</alt2>.");
 
+        Logger.info("%s (%s) joined %s (%s)", player.getName(), player.getUniqueId(),
+                clan.getName(), clan.getId());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -290,7 +313,8 @@ public class ClanEventListener extends ClanListener {
             }
             clan.setOnline(isOnline);
         }
-
+        Logger.info("%s (%s) left %s (%s)", player.getName(), player.getUniqueId(),
+                clan.getName(), clan.getId());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -316,7 +340,9 @@ public class ClanEventListener extends ClanListener {
                 UtilMessage.simpleMessage(targetPlayer, "Clans", "You were kicked from <alt2>" + clan.getName());
             }
         }
-
+        Logger.info("%s (%s) kicked %s (%s) from %s (%s)", player.getName(), player.getUniqueId(),
+                target.getName(), target.getUniqueId(),
+                clan.getName(), clan.getId());
     }
 
     @EventHandler
@@ -326,7 +352,7 @@ public class ClanEventListener extends ClanListener {
         Clan clan = event.getClan();
         Clan target = event.getTargetClan();
 
-        if(inviteHandler.isInvited(target, clan, "Alliance")){
+        if (inviteHandler.isInvited(target, clan, "Alliance")){
             UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You already have a pending alliance request with <yellow>%s<gray>.", target.getName());
             return;
         }
@@ -340,6 +366,10 @@ public class ClanEventListener extends ClanListener {
         inviteHandler.createInvite(clan, target, "Alliance", 10);
         UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You have requested an alliance with <yellow>%s<gray>.", target.getName());
         target.messageClan("<yellow>Clan " + clan.getName() + "<gray> has requested an alliance.", null, true);
+
+        Logger.info("%s (%s) of %s (%s) requested alliance with %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
+                clan.getName(), clan.getId(),
+                target.getName(), target.getId());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -361,6 +391,10 @@ public class ClanEventListener extends ClanListener {
 
         clanManager.getRepository().saveClanAlliance(clan, clanAlliance);
         clanManager.getRepository().saveClanAlliance(target, targetAlliance);
+
+        Logger.info("%s (%s) of %s (%s) accepted alliance with %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
+                clan.getName(), clan.getId(),
+                target.getName(), target.getId());
     }
 
     @EventHandler
@@ -384,6 +418,10 @@ public class ClanEventListener extends ClanListener {
         inviteHandler.createInvite(clan, target, "Trust", 10);
         UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You have requested to form a trust with <yellow>%s<gray>.", target.getName());
         target.messageClan("<yellow>Clan " + clan.getName() + "<gray> has requested to form a trust with your clan.", null, true);
+
+        Logger.info("%s (%s) of %s (%s) requested trust with %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
+                clan.getName(), clan.getId(),
+                target.getName(), target.getId());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -405,6 +443,10 @@ public class ClanEventListener extends ClanListener {
 
         clanManager.getRepository().saveTrust(clan, clanAlliance);
         clanManager.getRepository().saveTrust(target, targetAlliance);
+
+        Logger.info("%s (%s) of %s (%s) accepted trust with %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
+                clan.getName(), clan.getId(),
+                target.getName(), target.getId());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -423,6 +465,10 @@ public class ClanEventListener extends ClanListener {
 
         clanManager.getRepository().saveTrust(clan, clanAlliance);
         clanManager.getRepository().saveTrust(target, targetAlliance);
+
+        Logger.info("%s (%s) of %s (%s) removed trust with %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
+                clan.getName(), clan.getId(),
+                target.getName(), target.getId());
     }
 
     @EventHandler
@@ -448,9 +494,15 @@ public class ClanEventListener extends ClanListener {
             inviteHandler.createInvite(clan, target, "Neutral", 10);
             UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You have requested to neutral with <yellow>%s<gray>.", target.getName());
             target.messageClan("<yellow>Clan " + clan.getName() + "<gray> has requested to neutral with your clan.", null, true);
+            Logger.info("%s (%s) of %s (%s) requested neutral with %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
+                    clan.getName(), clan.getId(),
+                    target.getName(), target.getId());
         } else {
             UtilServer.callEvent(new ClanNeutralEvent(event.getPlayer(), clan, target));
+            return;
         }
+
+
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -464,12 +516,19 @@ public class ClanEventListener extends ClanListener {
 
         if (clan.isAllied(target)) {
             removeAlliance(clan, target);
+            Logger.info("%s (%s) of %s (%s) removed alliance with %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
+                    clan.getName(), clan.getId(),
+                    target.getName(), target.getId());
         } else if (clan.isEnemy(target)) {
             removeEnemy(clan, target);
+            Logger.info("%s (%s) of %s (%s) accepted neutral with %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
+                    clan.getName(), clan.getId(),
+                    target.getName(), target.getId());
         }
 
         clan.messageClan("<yellow>Clan " + target.getName() + "<gray> is now neutral to your Clan.", null, true);
         target.messageClan("<yellow>Clan " + clan.getName() + "<gray> is now neutral to your Clan.", null, true);
+
 
     }
 
@@ -503,6 +562,9 @@ public class ClanEventListener extends ClanListener {
 
         if (clan.isAllied(target)) {
             removeAlliance(clan, target);
+            Logger.info("%s (%s) of %s (%s) removed alliance with %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
+                    clan.getName(), clan.getId(),
+                    target.getName(), target.getId());
         }
 
         ClanEnemy clanEnemy = new ClanEnemy(target, 0);
@@ -516,6 +578,10 @@ public class ClanEventListener extends ClanListener {
 
         clan.messageClan("<yellow>Clan " + target.getName() + "<gray> is now your enemy.", null, true);
         target.messageClan("<yellow>Clan " + clan.getName() + "<gray> is now your enemy.", null, true);
+
+        Logger.info("%s (%s) of %s (%s) enemied with %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
+                clan.getName(), clan.getId(),
+                target.getName(), target.getId());
 
     }
 
@@ -550,7 +616,12 @@ public class ClanEventListener extends ClanListener {
         clanManager.getRepository().updateClanMemberRank(clan, member);
 
         clientManager.search().offline(UUID.fromString(member.getUuid()), result -> {
-            result.ifPresent(client -> UtilMessage.simpleMessage(player, "Clans", "You promoted <aqua>%s<gray> to <yellow>%s<gray>.", client.getName(), member.getRank().getName()));
+            result.ifPresent(client -> {
+                UtilMessage.simpleMessage(player, "Clans", "You promoted <aqua>%s<gray> to <yellow>%s<gray>.", client.getName(), member.getRank().getName());
+                Logger.info("%s (%s) promoted %s (%s) to %s in %s (%s)", player.getName(), player.getUniqueId(),
+                        client.getName(), member.getUuid(), member.getRank().getName(),
+                        clan.getName(), clan.getId());
+            });
         });
 
 
@@ -572,7 +643,12 @@ public class ClanEventListener extends ClanListener {
         clanManager.getRepository().updateClanMemberRank(clan, member);
 
         clientManager.search().offline(UUID.fromString(member.getUuid()), result -> {
-            result.ifPresent(client -> UtilMessage.simpleMessage(player, "Clans", "You demoted <aqua>%s<gray> to <yellow>%s<gray>.", client.getName(), member.getRank().getName()));
+            result.ifPresent(client -> {
+                UtilMessage.simpleMessage(player, "Clans", "You demoted <aqua>%s<gray> to <yellow>%s<gray>.", client.getName(), member.getRank().getName());
+                Logger.info("%s (%s) demoted %s (%s) to %s in %s (%s)", player.getName(), player.getUniqueId(),
+                        client.getName(), member.getUuid(), member.getRank().getName(),
+                        clan.getName(), clan.getId());
+            });
         });
 
         Player memberPlayer = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
