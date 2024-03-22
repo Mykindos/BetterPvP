@@ -499,7 +499,6 @@ public class ClanEventListener extends ClanListener {
                     target.getName(), target.getId());
         } else {
             UtilServer.callEvent(new ClanNeutralEvent(event.getPlayer(), clan, target));
-            return;
         }
 
 
