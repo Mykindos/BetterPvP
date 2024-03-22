@@ -1,6 +1,6 @@
 package me.mykindos.betterpvp.core.config.implementations;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import org.apache.commons.lang.ClassUtils;
 
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-@Slf4j
+@CustomLog
 public class ConfigProvider<T> implements Provider<T> {
 
     private final BPvPPlugin plugin;

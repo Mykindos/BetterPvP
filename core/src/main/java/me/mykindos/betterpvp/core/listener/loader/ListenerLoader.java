@@ -1,13 +1,13 @@
 package me.mykindos.betterpvp.core.listener.loader;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.Loader;
 import me.mykindos.betterpvp.core.framework.adapter.Adapters;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 
-@Slf4j
+@CustomLog
 public class ListenerLoader extends Loader {
 
     private final Adapters adapters;

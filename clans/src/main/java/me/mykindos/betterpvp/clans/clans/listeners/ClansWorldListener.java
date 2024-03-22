@@ -1,7 +1,7 @@
 package me.mykindos.betterpvp.clans.clans.listeners;
 
 import com.google.inject.Inject;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
@@ -64,7 +64,7 @@ import org.bukkit.util.Vector;
 import java.util.Optional;
 import java.util.UUID;
 
-@Slf4j
+@CustomLog
 @BPvPListener
 public class ClansWorldListener extends ClanListener {
 

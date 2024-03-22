@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.builds.BuildSkill;
@@ -21,7 +21,7 @@ import org.bukkit.entity.Player;
 import java.util.Optional;
 
 @Singleton
-@Slf4j
+@CustomLog
 public abstract class Skill implements ISkill {
 
     protected final Champions champions;

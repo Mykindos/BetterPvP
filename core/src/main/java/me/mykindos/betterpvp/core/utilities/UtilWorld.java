@@ -1,8 +1,8 @@
 package me.mykindos.betterpvp.core.utilities;
 
 import lombok.AccessLevel;
+import lombok.CustomLog;
 import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -13,7 +13,7 @@ import java.util.Collection;
 import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-@Slf4j
+@CustomLog
 public class UtilWorld {
 
     public static String chunkToPrettyString(Chunk chunk) {

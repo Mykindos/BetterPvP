@@ -1,14 +1,14 @@
 package me.mykindos.betterpvp.core.utilities;
 
+import lombok.CustomLog;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.Locale;
 
-@Slf4j
+@CustomLog
 public class UtilTime {
 
     /**

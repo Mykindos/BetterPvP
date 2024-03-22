@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.shops.shops.items;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.components.shops.IShopItem;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 
 @Singleton
-@Slf4j
+@CustomLog
 public class ShopItemRepository {
 
     private final Database database;

@@ -3,7 +3,7 @@ package me.mykindos.betterpvp.core.chat;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.papermc.paper.event.player.AsyncChatEvent;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.chat.events.ChatReceivedEvent;
 import me.mykindos.betterpvp.core.chat.events.ChatSentEvent;
 import me.mykindos.betterpvp.core.client.Client;
@@ -28,7 +28,7 @@ import org.bukkit.event.Listener;
 import java.util.Optional;
 import java.util.Set;
 
-@Slf4j
+@CustomLog
 @BPvPListener
 @Singleton
 public class ChatListener implements Listener {

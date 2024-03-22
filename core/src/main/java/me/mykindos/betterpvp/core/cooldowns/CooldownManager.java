@@ -3,8 +3,8 @@ package me.mykindos.betterpvp.core.cooldowns;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.CustomLog;
 import lombok.Synchronized;
-import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.cooldowns.events.CooldownEvent;
@@ -28,7 +28,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
-@Slf4j
+@CustomLog
 @Singleton
 public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>> {
 

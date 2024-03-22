@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.champions.crafting.imbuements;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.repository.IRepository;
@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Singleton
-@Slf4j
+@CustomLog
 public class ImbuementRepository implements IRepository<Imbuement> {
 
     private final Database database;

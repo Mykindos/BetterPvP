@@ -1,6 +1,6 @@
 package me.mykindos.betterpvp.core.combat.armour;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.database.SharedDatabase;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.repository.IRepository;
@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Singleton
-@Slf4j
+@CustomLog
 public class ArmourRepository implements IRepository<Armour> {
 
     private final SharedDatabase sharedDatabase;

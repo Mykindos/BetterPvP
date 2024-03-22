@@ -1,7 +1,7 @@
 package me.mykindos.betterpvp.core.listener.loader;
 
 import com.google.inject.Inject;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.event.Listener;
@@ -12,7 +12,7 @@ import java.util.Set;
 /**
  * Due to the way spigot loads plugins, this code needs to be duplicated in order to use reflection properly
  */
-@Slf4j
+@CustomLog
 public class CoreListenerLoader extends ListenerLoader{
 
     @Inject

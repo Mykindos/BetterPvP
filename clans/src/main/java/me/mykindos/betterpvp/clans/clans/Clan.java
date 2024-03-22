@@ -1,8 +1,8 @@
 package me.mykindos.betterpvp.clans.clans;
 
 import com.google.common.base.Preconditions;
+import lombok.CustomLog;
 import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.clans.clans.events.ClanPropertyUpdateEvent;
 import me.mykindos.betterpvp.clans.clans.insurance.Insurance;
 import me.mykindos.betterpvp.clans.clans.vault.ClanVault;
@@ -38,7 +38,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@Slf4j
+@CustomLog
 @Data
 public class Clan extends PropertyContainer implements IClan, Invitable, IMapListener {
 

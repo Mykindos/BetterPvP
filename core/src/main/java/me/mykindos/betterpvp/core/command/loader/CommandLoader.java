@@ -1,6 +1,6 @@
 package me.mykindos.betterpvp.core.command.loader;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.CommandManager;
@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-@Slf4j
+@CustomLog
 public class CommandLoader extends Loader {
 
     protected final CommandManager commandManager;

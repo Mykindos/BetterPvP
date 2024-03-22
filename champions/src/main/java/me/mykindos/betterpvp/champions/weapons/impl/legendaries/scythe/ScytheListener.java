@@ -3,7 +3,7 @@ package me.mykindos.betterpvp.champions.weapons.impl.legendaries.scythe;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.papermc.paper.event.player.PlayerInventorySlotChangeEvent;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -54,7 +54,7 @@ import java.util.Map;
 @SuppressWarnings("ALL")
 @BPvPListener
 @Singleton
-@Slf4j
+@CustomLog
 public class ScytheListener implements Listener {
 
     private final Scythe scythe;

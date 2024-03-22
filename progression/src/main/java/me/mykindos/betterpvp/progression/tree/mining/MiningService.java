@@ -2,9 +2,9 @@ package me.mykindos.betterpvp.progression.tree.mining;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.CustomLog;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.progression.tree.mining.data.MiningOresMinedLeaderboard;
@@ -16,7 +16,7 @@ import org.bukkit.persistence.PersistentDataContainer;
 
 import java.util.function.LongUnaryOperator;
 
-@Slf4j
+@CustomLog
 @Singleton
 public class MiningService {
 

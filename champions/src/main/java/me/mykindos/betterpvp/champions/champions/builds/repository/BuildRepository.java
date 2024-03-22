@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.champions.champions.builds.repository;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -27,7 +27,7 @@ import java.util.List;
 import static java.util.UUID.fromString;
 
 @Singleton
-@Slf4j
+@CustomLog
 public class BuildRepository implements IRepository<RoleBuild> {
 
     private final Database database;

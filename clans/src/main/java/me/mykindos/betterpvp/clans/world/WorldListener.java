@@ -1,7 +1,7 @@
 package me.mykindos.betterpvp.clans.world;
 
 import com.google.inject.Inject;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -64,7 +64,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-@Slf4j
+@CustomLog
 @BPvPListener
 public class WorldListener implements Listener {
 

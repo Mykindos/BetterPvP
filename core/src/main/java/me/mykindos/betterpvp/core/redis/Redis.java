@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.core.redis;
 
 import com.google.common.base.Preconditions;
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.jetbrains.annotations.NotNull;
@@ -12,7 +12,7 @@ import redis.clients.jedis.JedisPoolConfig;
 import java.time.Duration;
 
 @Singleton
-@Slf4j
+@CustomLog
 public class Redis {
 
     private JedisPool pool;

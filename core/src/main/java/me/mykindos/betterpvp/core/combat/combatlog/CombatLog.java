@@ -1,7 +1,7 @@
 package me.mykindos.betterpvp.core.combat.combatlog;
 
+import lombok.CustomLog;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.combat.combatlog.events.PlayerClickCombatLogEvent;
 import me.mykindos.betterpvp.core.combat.nms.CombatSheep;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@Slf4j
+@CustomLog
 @Getter
 public class CombatLog {
 

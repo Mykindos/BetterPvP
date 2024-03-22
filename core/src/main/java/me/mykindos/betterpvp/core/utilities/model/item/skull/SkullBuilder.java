@@ -1,7 +1,7 @@
 package me.mykindos.betterpvp.core.utilities.model.item.skull;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -12,7 +12,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Base64;
 
-@Slf4j
+@CustomLog
 public class SkullBuilder {
 
     private final ItemStack itemStack;

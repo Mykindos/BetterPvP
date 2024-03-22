@@ -1,7 +1,7 @@
 package me.mykindos.betterpvp.core.command.loader;
 
 import com.google.inject.Inject;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.CommandManager;
@@ -10,7 +10,7 @@ import org.reflections.Reflections;
 
 import java.util.Set;
 
-@Slf4j
+@CustomLog
 public class CoreCommandLoader extends CommandLoader{
 
     @Inject

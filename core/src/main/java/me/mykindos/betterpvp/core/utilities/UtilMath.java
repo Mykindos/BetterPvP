@@ -1,8 +1,8 @@
 package me.mykindos.betterpvp.core.utilities;
 
 import lombok.AccessLevel;
+import lombok.CustomLog;
 import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -18,7 +18,7 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-@Slf4j
+@CustomLog
 public class UtilMath {
 
     public static final Random RANDOM = new Random(System.nanoTime());

@@ -1,6 +1,6 @@
 package me.mykindos.betterpvp.core.database.mappers;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.database.SharedDatabase;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
@@ -12,7 +12,7 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Slf4j
+@CustomLog
 @Singleton
 public class PropertyMapper {
 

@@ -2,9 +2,9 @@ package me.mykindos.betterpvp.core.database;
 
 import com.google.inject.Singleton;
 import lombok.Cleanup;
+import lombok.CustomLog;
 import lombok.Getter;
 import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.database.connection.IDatabaseConnection;
 import me.mykindos.betterpvp.core.database.connection.MariaDBDatabaseConnection;
@@ -24,7 +24,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.function.Consumer;
 
-@Slf4j
+@CustomLog
 @Singleton
 public class Database {
 

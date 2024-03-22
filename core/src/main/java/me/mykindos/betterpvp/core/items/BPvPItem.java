@@ -1,8 +1,8 @@
 package me.mykindos.betterpvp.core.items;
 
+import lombok.CustomLog;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.items.type.IBPvPItem;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
@@ -33,7 +33,7 @@ import java.util.Objects;
 /**
  * Basic item data class, imported via database
  */
-@Slf4j
+@CustomLog
 @Getter
 @Setter
 public class BPvPItem implements IBPvPItem {

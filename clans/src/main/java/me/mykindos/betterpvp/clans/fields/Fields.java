@@ -5,7 +5,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.fields.model.FieldsBlock;
 import me.mykindos.betterpvp.clans.fields.model.FieldsInteractable;
@@ -31,7 +31,7 @@ import java.util.Set;
  * Stores all data for the Fields zone.
  */
 @Singleton
-@Slf4j
+@CustomLog
 public class Fields {
 
     private final SetMultimap<FieldsInteractable, FieldsBlock> blocks = HashMultimap.create();

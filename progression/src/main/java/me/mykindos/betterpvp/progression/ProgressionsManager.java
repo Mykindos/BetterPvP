@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.progression;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.progression.model.ProgressionPerk;
 import me.mykindos.betterpvp.progression.model.ProgressionTree;
 import org.reflections.Reflections;
@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 @Singleton
-@Slf4j
+@CustomLog
 public class ProgressionsManager {
 
     private final List<ProgressionTree> trees = new ArrayList<>();
