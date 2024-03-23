@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -20,22 +21,31 @@ import xyz.xenondevs.invui.item.impl.AbstractItem;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class CycleButton<T> extends AbstractItem implements CooldownButton {
 
     private final T[] pool;
     private int index;
-    private final Component name;
-    private final ItemStack itemStack;
+    private final Function<T, Component> name;
+    private final Function<T, Material> material;
     private final Consumer<T> callback;
 
-    public CycleButton(T[] pool, ItemStack item, Component name, Consumer<T> callback) {
+    public CycleButton(T[] pool, Function<T, Material> type, Function<T, Component> name, Consumer<T> callback) {
         this.callback = callback;
         Preconditions.checkArgument(pool.length > 0, "Pool must have at least one element");
-        this.itemStack = item;
+        this.material = type;
         this.pool = pool;
         this.name = name;
         this.index = 0;
+    }
+
+    public CycleButton(T[] pool, ItemStack item, Function<T, Component> name, Consumer<T> callback) {
+        this(pool, type -> item.getType(), name, callback);
+    }
+
+    public CycleButton(T[] pool, ItemStack item, Component name, Consumer<T> callback) {
+        this(pool, item, type -> name, callback);
     }
 
     private String getElementName(T element){
@@ -74,7 +84,10 @@ public class CycleButton<T> extends AbstractItem implements CooldownButton {
             sortTypeLore.add(Component.text(elemName, color));
         }
 
-        final ItemStack result = UtilItem.removeAttributes(UtilItem.setItemNameAndLore(this.itemStack, this.name, sortTypeLore));
+        final ItemStack result = UtilItem.removeAttributes(UtilItem.setItemNameAndLore(
+                new ItemStack(this.material.apply(getCurrent())),
+                this.name.apply(getCurrent()),
+                sortTypeLore));
         return ItemView.of(result);
     }
 

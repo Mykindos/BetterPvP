@@ -8,13 +8,42 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @CustomLog
 public class UtilWorld {
+
+    public static long parseSeed(@NotNull String s) {
+        try {
+            return Long.parseLong(s);
+        } catch (NumberFormatException ex) {
+            return s.hashCode();
+        }
+    }
+
+    public static Collection<File> getUnloadedWorlds() {
+        final File parent = Bukkit.getWorldContainer();
+        final List<File> files = new ArrayList<>();
+        for (File file : Objects.requireNonNull(parent.listFiles())) {
+            if (!file.isDirectory() || Bukkit.getWorld(file.getName()) != null) {
+                continue; // Skip non-directories and loaded worlds
+            }
+
+            if (new File(file, "level.dat").exists()) {
+                files.add(file); // Add world folder
+            }
+        }
+
+        return files;
+    }
 
     public static String chunkToPrettyString(Chunk chunk) {
         return "(" + chunk.getX() + ", " + chunk.getZ() + ")";
