@@ -151,17 +151,17 @@ public class Database {
             RowSetFactory factory = RowSetProvider.newFactory();
             result = factory.createCachedRowSet();
             if (fetchSize != -1) result.setFetchSize(fetchSize);
-            @Cleanup
-            CallableStatement callable = connection.prepareCall(statement.getQuery());
-            for (int i = 1; i <= statement.getValues().length; i++) {
-                StatementValue<?> val = statement.getValues()[i - 1];
-                callable.setObject(i, val.getValue(), val.getType());
+            try (CallableStatement callable = connection.prepareCall(statement.getQuery())) {
+                for (int i = 1; i <= statement.getValues().length; i++) {
+                    StatementValue<?> val = statement.getValues()[i - 1];
+                    callable.setObject(i, val.getValue(), val.getType());
+                }
+                callable.execute();
+                result.populate(callable.getResultSet());
+                consumer.accept(result);
+                result.close();
             }
-            callable.execute();
-            result.populate(callable.getResultSet());
-            consumer.accept(result);
-            result.close();
-            callable.close();
+
         } catch (SQLException ex) {
             log.info("Error executing procedure: {}", statement.getQuery(), ex);
         }

@@ -5,7 +5,6 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import lombok.Getter;
 import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
@@ -14,10 +13,13 @@ import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
-import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 @Singleton
 @CustomLog
@@ -35,10 +37,14 @@ public class WorldHandler {
     }
 
     public Set<BPvPWorld> getWorlds() {
-        final TreeSet<BPvPWorld> worlds = new TreeSet<>();
+        final Set<BPvPWorld> worlds = new HashSet<>();
         worlds.addAll(Bukkit.getWorlds().stream().map(BPvPWorld::new).toList());
         worlds.addAll(UtilWorld.getUnloadedWorlds().stream().map(BPvPWorld::new).toList());
-        return worlds;
+
+        return worlds.stream()
+                .sorted(Comparator.comparing(BPvPWorld::isLoaded).reversed()
+                        .thenComparing(BPvPWorld::getName))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public Location getSpawnLocation() {

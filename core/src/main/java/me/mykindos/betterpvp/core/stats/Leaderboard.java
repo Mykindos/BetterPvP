@@ -37,6 +37,7 @@ import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -49,6 +50,8 @@ import java.util.concurrent.TimeUnit;
  */
 @CustomLog
 public abstract class Leaderboard<E, T> {
+
+    private static final ExecutorService LEADERBOARD_UPDATER = Executors.newSingleThreadExecutor();
 
     private final ConcurrentHashMap<SearchOptions, TreeSet<LeaderboardEntry<E, T>>> topTen;
     private final AsyncLoadingCache<LeaderboardEntryKey<E>, T> entryCache;
@@ -103,7 +106,7 @@ public abstract class Leaderboard<E, T> {
 
     public void forceUpdate() {
         for (SearchOptions options : validSearchOptions) {
-            CompletableFuture.supplyAsync(() -> fetchAll(options, database)).thenApply(fetch -> {
+            CompletableFuture.supplyAsync(() -> fetchAll(options, database), LEADERBOARD_UPDATER).thenApply(fetch -> {
                 final LeaderboardEntryComparator<E, T> comparator = new LeaderboardEntryComparator<>(getSorter(options));
                 TreeSet<LeaderboardEntry<E, T>> set = new TreeSet<>(comparator);
                 set.addAll(fetch.entrySet().stream().map(entry -> LeaderboardEntry.of(entry.getKey(), entry.getValue())).toList());
