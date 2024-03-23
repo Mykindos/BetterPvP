@@ -47,6 +47,15 @@ public class ExtendedYamlConfiguration extends YamlConfiguration {
         }
     }
 
+    public List<Integer> getOrSaveIntegerList(@NotNull String path, List<Integer> defaultValue) {
+        if (isSet(path)) {
+            return getIntegerList(path);
+        } else {
+            set(path, defaultValue);
+            return defaultValue;
+        }
+    }
+
     public boolean getOrSaveBoolean(@NotNull String path, boolean defaultValue) {
         if (isSet(path)) {
             return getBoolean(path);

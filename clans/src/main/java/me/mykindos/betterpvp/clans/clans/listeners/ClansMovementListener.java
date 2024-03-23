@@ -5,6 +5,7 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
+import me.mykindos.betterpvp.clans.clans.events.ClanChangeTerritoryEvent;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -45,12 +46,9 @@ public class ClansMovementListener extends ClanListener {
     public void onPlayerMoveEvent(PlayerMoveEvent event) {
 
         if (event.getFrom().getBlockX() != event.getTo().getBlockX() || event.getFrom().getBlockZ() != event.getTo().getBlockZ()) {
-
-
             UtilServer.runTaskAsync(clans, () -> {
                 Optional<Clan> clanToOptional = clanManager.getClanByLocation(event.getTo());
                 Optional<Clan> clanFromOption = clanManager.getClanByLocation(event.getFrom());
-
 
                 if (clanToOptional.isEmpty() && clanFromOption.isEmpty()) {
                     return;
@@ -59,15 +57,16 @@ public class ClansMovementListener extends ClanListener {
 
                 if (clanFromOption.isEmpty() || clanToOptional.isEmpty()
                         || !clanFromOption.equals(clanToOptional)) {
-                    displayOwner(event.getPlayer(), clanToOptional.orElse(null));
-
-                    UtilServer.runTask(clans, () -> UtilServer.callEvent(new ScoreboardUpdateEvent(event.getPlayer())));
-
+                    UtilServer.runTask(clans, () -> UtilServer.callEvent(new ClanChangeTerritoryEvent(event.getPlayer(), clanFromOption.orElse(null), clanToOptional.orElse(null))));
                 }
             });
-
         }
+    }
 
+    @EventHandler
+    public void onChangeTerritory(ClanChangeTerritoryEvent event) {
+        displayOwner(event.getPlayer(), event.getToClan());
+        UtilServer.runTask(clans, () -> UtilServer.callEvent(new ScoreboardUpdateEvent(event.getPlayer())));
     }
 
     public void displayOwner(Player player, Clan locationClan) {

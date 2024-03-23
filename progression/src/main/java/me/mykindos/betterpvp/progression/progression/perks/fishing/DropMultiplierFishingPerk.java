@@ -20,6 +20,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @BPvPListener
 @Singleton
 @CustomLog
@@ -50,7 +53,18 @@ public class DropMultiplierFishingPerk implements Listener, ProgressionPerk, Cha
 
     @Override
     public String getName() {
-        return "Drop Multiplier Fishing";
+        return "Drop Chance Multiplier";
+    }
+
+    @Override
+    public List<String> getDescription(Player player, ProgressionData<?> data) {
+        List<String> description = new ArrayList<>(List.of(
+                "TODO"
+        ));
+        if (canUse(player, data)) {
+            description.add("Can Use");
+        }
+        return description;
     }
 
     @Override
@@ -92,8 +106,5 @@ public class DropMultiplierFishingPerk implements Listener, ProgressionPerk, Cha
                 return null;
             });
         }
-
-
-
     }
 }

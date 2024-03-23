@@ -18,6 +18,9 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockDropItemEvent;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @BPvPListener
 @Singleton
 @CustomLog
@@ -48,7 +51,21 @@ public class DropMultiplierMiningPerk implements Listener, ProgressionPerk, Chan
 
     @Override
     public String getName() {
-        return "Drop Multiplier Mining";
+        return "Drop Chance Multiplier";
+    }
+
+    @Override
+    public List<String> getDescription(Player player, ProgressionData<?> data) {
+        List<String> description = new ArrayList<>(List.of(
+                "Increase the amount of items dropped while mining by",
+                "<stat>" + increasePerLevel + "%</stat> per Mining Level.",
+                "Every <stat>100%</stat>, you have a guaranteed drop, with the remainder being",
+                "the chance to get another drop."
+        ));
+        if (canUse(player, data)) {
+            description.add("Currently increases your chances by <val>" + data.getLevel() * increasePerLevel + "%</val>");
+        }
+        return description;
     }
 
     @Override
@@ -74,7 +91,7 @@ public class DropMultiplierMiningPerk implements Listener, ProgressionPerk, Chan
                 mining.getLevel(player).whenComplete((level, throwable1) -> {
                     if (level > maxLevel) level = maxLevel;
                     level = level - minLevel;
-                    int drops = getChance (level * increasePerLevel);
+                    int drops = getChance(level * increasePerLevel);
                     if (drops == 0 || event.getItems().isEmpty()) return;
                     event.getItems().get(0).getItemStack().add(drops - 1);
                 }).exceptionally(throwable1 -> {

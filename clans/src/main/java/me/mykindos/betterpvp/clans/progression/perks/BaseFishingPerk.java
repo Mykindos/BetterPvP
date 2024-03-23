@@ -24,6 +24,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Singleton
@@ -47,6 +49,16 @@ public class BaseFishingPerk implements Listener, ConfigAccessor, ProgressionPer
     public String getName() {
         return "Base Fishing";
     }
+
+    @Override
+    public List<String> getDescription(Player player, ProgressionData<?> data) {
+        List<String> description = new ArrayList<>(List.of(
+                "Allows the act of fishing outside of Fields/Lake",
+                "At Fishing Level <stat>" + requiredLevel + "</stat"
+        ));
+        return description;
+    }
+
 
     @Override
     public Class<? extends ProgressionTree>[] acceptedTrees() {

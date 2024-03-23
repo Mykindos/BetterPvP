@@ -20,6 +20,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Singleton
@@ -41,6 +43,17 @@ public class FasterOresPerk implements Listener, ConfigAccessor, ProgressionPerk
     @Override
     public String getName() {
         return "Faster Ores";
+    }
+
+
+    @Override
+    public List<String> getDescription(Player player, ProgressionData<?> data) {
+        List<String> description = new ArrayList<>(List.of(
+                "Decreases the the time between ore spawns",
+                "in Lakes and Fields by <stat>" + speedMultiplier + "%</stat>",
+                "After Fishing level <stat>" + requiredLevel + "%</stat"
+        ));
+        return description;
     }
 
     @Override

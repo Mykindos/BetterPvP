@@ -17,6 +17,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @BPvPListener
 @Singleton
 @CustomLog
@@ -45,7 +48,19 @@ public class LongerBaitFishingPerk implements Listener, ProgressionPerk {
 
     @Override
     public String getName() {
-        return "Drop Multiplier Fishing";
+        return "Bait Duration Increase";
+    }
+
+    @Override
+    public List<String> getDescription(Player player, ProgressionData<?> data) {
+        List<String> description = new ArrayList<>(List.of(
+                "Increases the duration of baits you throw by",
+                "<stat>" + increasePerLevel * 100 + "%</stat> per Fishing level."
+                ));
+        if (canUse(player, data)) {
+            description.add("Currently increases duration of baits by <val>" + getPercentage(data.getLevel()) * 100 + "%</val>");
+        }
+        return description;
     }
 
     @Override
@@ -60,6 +75,10 @@ public class LongerBaitFishingPerk implements Listener, ProgressionPerk {
         return minLevel <= data.getLevel();
     }
 
+    private double getPercentage(int level) {
+        return (level * increasePerLevel / 100);
+    }
+
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBait(PlayerThrowBaitEvent event) {
         if (!enabled) return;
@@ -72,7 +91,7 @@ public class LongerBaitFishingPerk implements Listener, ProgressionPerk {
                     //make leveling more intuitive
                     level = level - minLevel;
                     Bait bait = event.getBait();
-                    double multiplier = (1f + (level * increasePerLevel / 100));
+                    double multiplier = (1f + getPercentage(level));
                     bait.setDurationTicks((long) (bait.getDurationTicks() * multiplier));
                 }).exceptionally(throwable1 -> {
                     log.error("Failed to check if player " + event.getPlayer().getName() + " has a level ", throwable);
