@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.clans.progression.perks;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.progression.ProgressionAdapter;
@@ -27,7 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Optional;
 
 @Singleton
-@Slf4j
+@CustomLog
 public class BaseFishingPerk implements Listener, ConfigAccessor, ProgressionPerk {
 
     private boolean enabled;

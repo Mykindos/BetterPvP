@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.core.stats.command;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.stats.Leaderboard;
@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Singleton
-@Slf4j
+@CustomLog
 public class LeaderboardCommand extends Command {
 
     private final LeaderboardManager leaderboards;

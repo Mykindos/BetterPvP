@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.progression.tree.fishing.listener;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.progression.tree.fishing.Fishing;
@@ -15,7 +15,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 @BPvPListener
-@Slf4j
+@CustomLog
 @Singleton
 public class FishingStatsListener implements Listener {
 

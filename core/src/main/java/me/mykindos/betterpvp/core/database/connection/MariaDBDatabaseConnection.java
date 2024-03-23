@@ -1,29 +1,35 @@
 package me.mykindos.betterpvp.core.database.connection;
 
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+import lombok.CustomLog;
+import lombok.SneakyThrows;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import org.flywaydb.core.Flyway;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 
 @Singleton
-@Slf4j
+@CustomLog
 public class MariaDBDatabaseConnection implements IDatabaseConnection {
+
+    private final HikariConfig hikariConfig = new HikariConfig();
+    private HikariDataSource dataSource;
 
     private final String sqlServer;
     private final String sqlUsername;
     private final String sqlPassword;
     private final String sqlDatabaseName;
-    private Connection connection;
 
     public MariaDBDatabaseConnection(String sqlServer, String sqlUsername, String sqlPassword, String sqlDatabaseName) {
         this.sqlServer = sqlServer;
         this.sqlUsername = sqlUsername;
         this.sqlPassword = sqlPassword;
         this.sqlDatabaseName = sqlDatabaseName;
+
+        configureHikari();
+
     }
 
     public MariaDBDatabaseConnection(ExtendedYamlConfiguration config) {
@@ -31,25 +37,28 @@ public class MariaDBDatabaseConnection implements IDatabaseConnection {
         this.sqlUsername = config.getString("core.database.local.username");
         this.sqlPassword = config.getString("core.database.local.password");
         this.sqlDatabaseName = config.getString("core.database.local.databaseName");
+
+        configureHikari();
     }
 
-    @Override
+    private void configureHikari() {
+        hikariConfig.setJdbcUrl("jdbc:mysql://" + sqlServer + "/" + sqlDatabaseName);
+        hikariConfig.setUsername(sqlUsername);
+        hikariConfig.setPassword(sqlPassword);
+        hikariConfig.setMaximumPoolSize(5);
+        hikariConfig.setMinimumIdle(2);
+        hikariConfig.setConnectionTimeout(5000);
+        hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
+        hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
+        hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+
+        dataSource = new HikariDataSource(hikariConfig);
+    }
+
+
+    @SneakyThrows
     public Connection getDatabaseConnection() {
-
-        try {
-            if (connection == null || connection.isClosed()) {
-                var url = "jdbc:mysql://" + sqlServer + "/" + sqlDatabaseName + "?autoReconnect=true&characterEncoding=latin1&useConfigs=maxPerformance&autoReconnect=true";
-                try {
-                    connection = DriverManager.getConnection(url, sqlUsername, sqlPassword);
-                } catch (SQLException ex) {
-                    log.error("Failed to connect to the MariaDB database. Please check your connection settings.", ex);
-                }
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-
-        return connection;
+        return dataSource.getConnection();
     }
 
     @Override

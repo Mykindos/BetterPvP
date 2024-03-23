@@ -2,9 +2,9 @@ package me.mykindos.betterpvp.core.framework;
 
 import com.google.common.base.Charsets;
 import com.google.inject.Injector;
+import lombok.CustomLog;
 import lombok.Getter;
 import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-@Slf4j
+@CustomLog
 public abstract class BPvPPlugin extends JavaPlugin {
 
     /**

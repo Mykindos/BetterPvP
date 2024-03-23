@@ -1,7 +1,7 @@
 package me.mykindos.betterpvp.core.client.repository;
 
 import com.google.inject.Inject;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
@@ -37,7 +37,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 @BPvPListener
-@Slf4j
+@CustomLog
 public class ClientListener implements Listener {
 
     private static final String LOADING_CLIENT_FORMAT = "Loading client... {}";

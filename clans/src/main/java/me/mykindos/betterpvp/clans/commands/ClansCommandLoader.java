@@ -1,7 +1,7 @@
 package me.mykindos.betterpvp.clans.commands;
 
 import com.google.inject.Inject;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.CommandManager;
@@ -11,7 +11,7 @@ import org.reflections.Reflections;
 
 import java.util.Set;
 
-@Slf4j
+@CustomLog
 public class ClansCommandLoader extends CommandLoader {
 
 

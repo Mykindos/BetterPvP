@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.core.items.listener;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
@@ -64,7 +64,7 @@ import java.util.UUID;
 
 @Singleton
 @BPvPListener
-@Slf4j
+@CustomLog
 public class UUIDListener implements Listener {
 
 

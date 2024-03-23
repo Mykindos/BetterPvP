@@ -2,8 +2,8 @@ package me.mykindos.betterpvp.progression.tree.fishing.repository;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.CustomLog;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
@@ -44,7 +44,7 @@ import java.util.concurrent.CompletableFuture;
 // All data for players should be loaded for as long as they are on, and saved when they log off
 // The data should be saved as a fallback to the database every 5 minutes
 // The data should be saved on shutdown
-@Slf4j
+@CustomLog
 @Singleton
 public class FishingRepository extends ProgressionStatsRepository<Fishing, FishingData> implements ConfigAccessor {
 

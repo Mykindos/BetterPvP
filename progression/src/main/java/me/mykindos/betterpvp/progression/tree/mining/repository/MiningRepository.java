@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.progression.tree.mining.repository;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
@@ -26,7 +26,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-@Slf4j
+@CustomLog
 @Singleton
 public class MiningRepository extends ProgressionStatsRepository<Mining, MiningData> implements ConfigAccessor {
 

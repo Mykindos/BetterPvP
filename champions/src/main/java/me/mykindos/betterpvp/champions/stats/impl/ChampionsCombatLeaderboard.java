@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.champions.stats.impl;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.stats.repository.ChampionsStatsRepository;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.combat.stats.impl.GlobalCombatLeaderboard;
@@ -34,7 +34,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 @Singleton
-@Slf4j
+@CustomLog
 public final class ChampionsCombatLeaderboard extends PlayerLeaderboard<CombatData> implements Sorted, Filtered {
 
     private final ChampionsStatsRepository repository;

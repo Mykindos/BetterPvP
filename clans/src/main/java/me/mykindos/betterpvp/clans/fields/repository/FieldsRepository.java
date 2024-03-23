@@ -2,9 +2,9 @@ package me.mykindos.betterpvp.clans.fields.repository;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.CustomLog;
 import lombok.Getter;
 import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.fields.Fields;
 import me.mykindos.betterpvp.clans.fields.block.SimpleOre;
@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Set;
 
 @Singleton
-@Slf4j
+@CustomLog
 public class FieldsRepository implements IRepository<FieldsBlockEntry> {
 
     @Getter

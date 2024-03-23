@@ -3,7 +3,7 @@ package me.mykindos.betterpvp.core.combat.stats.impl;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.combat.stats.model.CombatData;
 import me.mykindos.betterpvp.core.combat.stats.model.CombatSort;
@@ -32,7 +32,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 @Singleton
-@Slf4j
+@CustomLog
 public final class GlobalCombatLeaderboard extends PlayerLeaderboard<CombatData> implements Sorted {
 
     private static final Map<SortType, Statement> TOP_SORT_STATEMENTS = ImmutableMap.of(

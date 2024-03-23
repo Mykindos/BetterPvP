@@ -3,7 +3,7 @@ package me.mykindos.betterpvp.core.discord;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.discord.embeds.EmbedAuthor;
 import me.mykindos.betterpvp.core.discord.embeds.EmbedField;
 import me.mykindos.betterpvp.core.discord.embeds.EmbedFooter;
@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Slf4j
+@CustomLog
 public class DiscordWebhook {
 
     private final String webhookUrl;

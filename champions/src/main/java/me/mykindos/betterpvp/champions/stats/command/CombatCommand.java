@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.champions.stats.command;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.champions.stats.impl.ChampionsFilter;
 import me.mykindos.betterpvp.champions.stats.repository.ChampionsStatsRepository;
@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @Singleton
-@Slf4j
+@CustomLog
 public class CombatCommand extends Command {
 
     @Inject

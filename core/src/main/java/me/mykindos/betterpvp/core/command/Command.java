@@ -1,11 +1,8 @@
 package me.mykindos.betterpvp.core.command;
 
-import com.google.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.client.Rank;
-import me.mykindos.betterpvp.core.items.ItemHandler;
-import me.mykindos.betterpvp.core.items.uuiditem.UUIDManager;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -23,12 +20,6 @@ public abstract class Command implements ICommand {
 
     @Setter
     private Rank requiredRank;
-
-    @Inject
-    ItemHandler itemHandler;
-
-    @Inject
-    UUIDManager uuidManager;
 
     protected List<String> aliases;
     protected List<ICommand> subCommands;

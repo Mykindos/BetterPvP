@@ -2,8 +2,8 @@ package me.mykindos.betterpvp.progression.tree.fishing.data;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.CustomLog;
 import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.DoubleStatementValue;
@@ -25,7 +25,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
-@Slf4j
+@CustomLog
 @Singleton
 public class FishingWeightLeaderboard extends PlayerLeaderboard<Long> implements Sorted {
 

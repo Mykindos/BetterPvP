@@ -3,7 +3,7 @@ package me.mykindos.betterpvp.core.logging.commands;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -23,7 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-@Slf4j
+@CustomLog
 @Singleton
 @SubCommand(LogCommand.class)
 public class LegendLogSubcommand extends Command {

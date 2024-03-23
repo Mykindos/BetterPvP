@@ -1,8 +1,8 @@
 package me.mykindos.betterpvp.clans.progression;
 
 import com.google.inject.Inject;
+import lombok.CustomLog;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.listener.ClansListenerLoader;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
@@ -20,7 +20,7 @@ import java.util.Objects;
 import java.util.Set;
 
 @PluginAdapter("Progression")
-@Slf4j
+@CustomLog
 public class ProgressionAdapter {
 
     @Getter

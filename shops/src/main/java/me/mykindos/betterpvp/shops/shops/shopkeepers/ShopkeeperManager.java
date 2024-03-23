@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.shops.shops.shopkeepers;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.shops.Shops;
@@ -21,7 +21,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Singleton
-@Slf4j
+@CustomLog
 public class ShopkeeperManager extends Manager<IShopkeeper> {
 
     private final Shops shops;

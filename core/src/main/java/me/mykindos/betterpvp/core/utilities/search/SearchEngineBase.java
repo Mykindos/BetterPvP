@@ -1,6 +1,6 @@
 package me.mykindos.betterpvp.core.utilities.search;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.exception.ClientNotLoadedException;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
@@ -17,7 +17,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-@Slf4j
+@CustomLog
 public class SearchEngineBase<T> {
 
     private final Function<UUID, Optional<T>> onlineSearch;

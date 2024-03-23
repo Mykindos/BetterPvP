@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.clans.clans.repository;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanProperty;
@@ -47,7 +47,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Slf4j
+@CustomLog
 @Singleton
 public class ClanRepository implements IRepository<Clan> {
 
@@ -381,7 +381,7 @@ public class ClanRepository implements IRepository<Clan> {
         String query = "SELECT * FROM clans_dominance_scale;";
         CachedRowSet result = database.executeQuery(new Statement(query));
         try {
-            if (result.next()) {
+            while (result.next()) {
                 dominanceScale.put(result.getInt(1), result.getDouble(2));
             }
         } catch (SQLException ex) {

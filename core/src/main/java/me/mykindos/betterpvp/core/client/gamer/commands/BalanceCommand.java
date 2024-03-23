@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.core.client.gamer.commands;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
@@ -18,7 +18,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-@Slf4j
+@CustomLog
 @Singleton
 public class BalanceCommand extends Command {
 

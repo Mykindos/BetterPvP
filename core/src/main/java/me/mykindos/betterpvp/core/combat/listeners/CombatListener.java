@@ -1,6 +1,6 @@
 package me.mykindos.betterpvp.core.combat.listeners;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -54,7 +54,7 @@ import java.util.List;
 
 import static me.mykindos.betterpvp.core.utilities.UtilMessage.message;
 
-@Slf4j
+@CustomLog
 @BPvPListener
 public class CombatListener implements Listener {
 

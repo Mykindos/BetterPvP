@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -13,7 +13,7 @@ import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.Set;
 
-@Slf4j
+@CustomLog
 @Singleton
 public class SkillManager extends Manager<Skill> {
 

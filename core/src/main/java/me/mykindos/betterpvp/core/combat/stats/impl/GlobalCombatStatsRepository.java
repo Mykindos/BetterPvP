@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.core.combat.stats.impl;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.combat.stats.model.CombatStatsRepository;
 import me.mykindos.betterpvp.core.combat.stats.model.ICombatDataAttachment;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-@Slf4j
+@CustomLog
 @Singleton
 public class GlobalCombatStatsRepository extends CombatStatsRepository<GlobalCombatData> {
 

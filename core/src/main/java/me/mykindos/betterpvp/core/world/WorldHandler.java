@@ -2,8 +2,8 @@ package me.mykindos.betterpvp.core.world;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.CustomLog;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Objects;
 
 @Singleton
-@Slf4j
+@CustomLog
 public class WorldHandler {
 
     private final Core core;
