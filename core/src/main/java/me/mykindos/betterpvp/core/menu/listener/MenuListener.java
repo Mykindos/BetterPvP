@@ -45,6 +45,10 @@ public class MenuListener implements Listener {
             return;
         }
 
+        if (window.getInventories()[0] != event.getClickedInventory()) {
+            return;
+        }
+
         double cooldown = 0.05;
         final AbstractGui gui = window.getGui();
         final SlotElement slotElement = gui.getSlotElement(slot);

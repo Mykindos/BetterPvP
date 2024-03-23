@@ -4,14 +4,20 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import lombok.Getter;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
+import me.mykindos.betterpvp.core.world.model.BPvPWorld;
+import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
 import java.util.HashMap;
 import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
 
 @Singleton
 @CustomLog
@@ -26,6 +32,13 @@ public class WorldHandler {
     public WorldHandler(Core core) {
         this.core = core;
         this.spawnLocations = new HashMap<>();
+    }
+
+    public Set<BPvPWorld> getWorlds() {
+        final TreeSet<BPvPWorld> worlds = new TreeSet<>();
+        worlds.addAll(Bukkit.getWorlds().stream().map(BPvPWorld::new).toList());
+        worlds.addAll(UtilWorld.getUnloadedWorlds().stream().map(BPvPWorld::new).toList());
+        return worlds;
     }
 
     public Location getSpawnLocation() {
@@ -49,5 +62,13 @@ public class WorldHandler {
             spawnLocations.put(key, spawnPoint);
             log.info("Loaded spawn point {} at {}", key, spawnPoint);
         });
+    }
+
+    @SneakyThrows
+    public void deleteWorld(BPvPWorld world) {
+        world.unloadWorld();
+        if (world.getWorldFolder().exists()) {
+            FileUtils.forceDelete(world.getWorldFolder());
+        }
     }
 }

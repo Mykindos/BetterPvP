@@ -37,7 +37,7 @@ dependencyResolutionManagement {
             version("kotlin", "1.8.20")
             version("paper", "1.20.4-R0.1-SNAPSHOT")
             version("paperweight", "1.5.11")
-            version("invui", "1.24")
+            version("invui", "1.26")
             version("jackson", "2.15.3")
             version("lombok", "1.18.26")
             version("flyway", "9.0.4")
