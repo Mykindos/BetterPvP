@@ -14,7 +14,8 @@ public class SharedDatabase extends Database {
                 core.getConfig().getString("core.database.global.ip", "127.0.0.1"),
                 core.getConfig().getString("core.database.global.username"),
                 core.getConfig().getString("core.database.global.password"),
-                core.getConfig().getString("core.database.global.databaseName")
+                core.getConfig().getString("core.database.global.databaseName"),
+                core.getConfig().getInt("core.database.global.maxPoolSize", 5)
         ));
     }
 }
