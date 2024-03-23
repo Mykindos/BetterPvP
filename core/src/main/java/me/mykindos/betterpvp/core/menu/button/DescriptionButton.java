@@ -15,19 +15,27 @@ import xyz.xenondevs.invui.item.impl.AbstractItem;
 
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class DescriptionButton extends AbstractItem {
 
-    private final Description description;
-    private final ItemProvider itemProvider;
+    private final Supplier<Description> description;
 
     public DescriptionButton(Description description) {
-        this.description = description;
+        this.description = () -> description;
+    }
 
-        final ItemProvider icon = description.getIcon();
-        final Map<String, Component> properties = description.getProperties();
+    public DescriptionButton(Supplier<Description> description) {
+        this.description = description;
+    }
+
+    @Override
+    public ItemProvider getItemProvider() {
+        final Description desc = description.get();
+        final ItemProvider icon = desc.getIcon();
+        final Map<String, Component> properties = desc.getProperties();
         if (properties != null) {
-            this.itemProvider = ItemView.of(icon.get()).toBuilder()
+            return ItemView.of(icon.get()).toBuilder()
                     .lore(properties.entrySet().stream().map(entry -> {
                         final TextComponent key = Component.text(entry.getKey() + ": ", NamedTextColor.GRAY);
                         return key.append(entry.getValue());
@@ -35,18 +43,13 @@ public class DescriptionButton extends AbstractItem {
                     .frameLore(true)
                     .build();
         } else {
-            this.itemProvider = icon;
+            return icon;
         }
     }
 
     @Override
-    public ItemProvider getItemProvider() {
-        return itemProvider;
-    }
-
-    @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
-        final Consumer<Click> func = description.getClickFunction();
+        final Consumer<Click> func = description.get().getClickFunction();
         if (func != null) {
             func.accept(new Click(event));
         }
