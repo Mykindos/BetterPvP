@@ -21,12 +21,14 @@ public class MariaDBDatabaseConnection implements IDatabaseConnection {
     private final String sqlUsername;
     private final String sqlPassword;
     private final String sqlDatabaseName;
+    private final int maxPoolSize;
 
-    public MariaDBDatabaseConnection(String sqlServer, String sqlUsername, String sqlPassword, String sqlDatabaseName) {
+    public MariaDBDatabaseConnection(String sqlServer, String sqlUsername, String sqlPassword, String sqlDatabaseName, int maxPoolSize) {
         this.sqlServer = sqlServer;
         this.sqlUsername = sqlUsername;
         this.sqlPassword = sqlPassword;
         this.sqlDatabaseName = sqlDatabaseName;
+        this.maxPoolSize = maxPoolSize;
 
         configureHikari();
 
@@ -37,6 +39,7 @@ public class MariaDBDatabaseConnection implements IDatabaseConnection {
         this.sqlUsername = config.getString("core.database.local.username");
         this.sqlPassword = config.getString("core.database.local.password");
         this.sqlDatabaseName = config.getString("core.database.local.databaseName");
+        this.maxPoolSize = config.getInt("core.database.local.maxPoolSize");
 
         configureHikari();
     }
@@ -45,9 +48,8 @@ public class MariaDBDatabaseConnection implements IDatabaseConnection {
         hikariConfig.setJdbcUrl("jdbc:mysql://" + sqlServer + "/" + sqlDatabaseName);
         hikariConfig.setUsername(sqlUsername);
         hikariConfig.setPassword(sqlPassword);
-        hikariConfig.setMaximumPoolSize(5);
-        hikariConfig.setMinimumIdle(2);
-        hikariConfig.setConnectionTimeout(5000);
+        hikariConfig.setMaximumPoolSize(maxPoolSize);
+        hikariConfig.setConnectionTimeout(10000);
         hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
         hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
         hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");

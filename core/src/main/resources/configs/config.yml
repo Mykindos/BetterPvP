@@ -5,11 +5,13 @@ core:
       username: user
       password: BetterPvP123!
       ip: 127.0.0.1:27821
+      maxPoolSize: 7
     global:
       databaseName: betterpvp_global
       username: user
       password: BetterPvP123!
       ip: 127.0.0.1:27821
+      maxPoolSize: 2
   redis:
     enabled: false
     password: BetterPvPAdmin123!

@@ -67,7 +67,7 @@ public class CombatLogListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onCombatLogInCombat(PlayerCombatLogEvent event) {
-        Gamer gamer = clientManager.search().online(event.getPlayer()).getGamer();
+        Gamer gamer = event.getClient().getGamer();
         if (!UtilTime.elapsed(gamer.getLastDamaged(), 15000)) {
             event.setSafe(false);
         }

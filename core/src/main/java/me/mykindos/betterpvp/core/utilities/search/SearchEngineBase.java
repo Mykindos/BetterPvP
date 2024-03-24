@@ -4,6 +4,7 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.exception.ClientNotLoadedException;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.model.manager.PlayerManager;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -66,8 +67,8 @@ public class SearchEngineBase<T> {
         Optional<T> online = this.online(player.getUniqueId());
 
         return online.orElseThrow(() -> {
-            log.warn(ClientManager.RETRIEVE_ERROR_FORMAT_SERVER, player.getName());
-            player.kick(Component.text(ClientManager.LOAD_ERROR_FORMAT_ENTITY));
+            log.warn(PlayerManager.RETRIEVE_ERROR_FORMAT_SERVER, player.getName());
+            player.kick(Component.text(PlayerManager.LOAD_ERROR_FORMAT_ENTITY));
             return new ClientNotLoadedException(player);
         });
     }
