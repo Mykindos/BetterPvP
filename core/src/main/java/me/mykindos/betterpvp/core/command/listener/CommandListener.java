@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.CommandManager;
 import me.mykindos.betterpvp.core.command.ICommand;
+import me.mykindos.betterpvp.core.command.IConsoleCommand;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -15,6 +16,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerCommandSendEvent;
+import org.bukkit.event.server.ServerCommandEvent;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -30,6 +32,38 @@ public class CommandListener implements Listener {
     public CommandListener(ClientManager clientManager, CommandManager commandManager) {
         this.clientManager = clientManager;
         this.commandManager = commandManager;
+    }
+
+    @EventHandler
+    public void onServerCommand(ServerCommandEvent event) {
+        log.info("Server executed command: {}", event.getCommand());
+        String commandName = event.getCommand().toLowerCase();
+        if (commandName.contains(" ")) {
+            commandName = commandName.split(" ")[0];
+        }
+
+        String[] args = event.getCommand().substring(event.getCommand().indexOf(' ') + 1).split(" ");
+        if (args[0].equalsIgnoreCase(event.getCommand())) args = new String[]{};
+        String[] finalArgs = args;
+
+        Optional<ICommand> commandOptional = commandManager.getCommand(commandName, finalArgs);
+        if (commandOptional.isPresent()) {
+            ICommand command = commandOptional.get();
+            if(!(command instanceof IConsoleCommand consoleCommand)) return;
+            if (!command.isEnabled()) {
+                log.info("Console attempted to use " + command.getName() + " but it is disabled");
+                return;
+            }
+
+            if (command.getClass().isAnnotationPresent(SubCommand.class)) {
+                int subCommandIndex = commandManager.getSubCommandIndex(commandName, finalArgs);
+                finalArgs = finalArgs.length > 1 ? Arrays.copyOfRange(finalArgs, subCommandIndex + 1, finalArgs.length) : new String[]{};
+            }
+
+            consoleCommand.execute(event.getSender(), finalArgs);
+
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler
@@ -71,6 +105,7 @@ public class CommandListener implements Listener {
                 int subCommandIndex = commandManager.getSubCommandIndex(finalCommandName, finalArgs);
                 finalArgs = finalArgs.length > 1 ? Arrays.copyOfRange(finalArgs, subCommandIndex + 1, finalArgs.length) : new String[]{};
             }
+
 
             command.process(event.getPlayer(), client, finalArgs);
 
