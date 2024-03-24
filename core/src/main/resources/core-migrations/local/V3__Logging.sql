@@ -15,17 +15,6 @@ create table if not exists formattedlogs
         FOREIGN KEY (id) REFERENCES logs (id)
 );
 
-create table if not exists clientconnection
-(
-    logID   varchar(36)     PRIMARY KEY,
-    type    varchar(10)     not null,
-
-    CONSTRAINT clientconnection_formattedlogs_id_fk
-        FOREIGN KEY (logID) REFERENCES logs (id),
-    CONSTRAINT clientconnection_ck
-        CHECK
-);
-
 create table if not exists uuiditems
 (
     UUID        varchar(36)     PRIMARY KEY,

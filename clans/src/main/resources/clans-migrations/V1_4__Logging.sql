@@ -1,16 +1,11 @@
 
-create table if not exists clanmemberhistory
+create table if not exists clanlogmeta
 (
     logID       varchar(36)     PRIMARY KEY,
-    playerID    varchar(36)     not null,
-    clanID      varchar(36)     not null,
-    kickerID    varchar(36)     default null,
-    type        varchar(10)     not null,
+    UUID        varchar(36)     not null,
+    UUIDType    varchar(12)     not null,
+    type        varchar(12)     not null,
 
     CONSTRAINT clanmemberhistory_id_fk
         FOREIGN KEY (logID) REFERENCES logs (id),
-    CONSTRAINT clanmemberhistory_kickerID_ck
-        CHECK (kickerID is null OR type = 'KICK'),
-    CONSTRAINT clanmemberhistory_type_ck
-            CHECK (KICK IN ('JOIN', 'LEAVE', 'KICK'))
 );

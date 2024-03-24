@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.clans.clans.listeners;
 
 import com.google.inject.Inject;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
@@ -58,6 +59,7 @@ import org.bukkit.event.EventPriority;
 import java.util.Optional;
 import java.util.UUID;
 
+@CustomLog
 @BPvPListener
 public class ClanEventListener extends ClanListener {
 
@@ -283,7 +285,7 @@ public class ClanEventListener extends ClanListener {
         clan.messageClan(String.format("<yellow>%s<gray> has joined your Clan.", player.getName()), player.getUniqueId(), true);
         UtilMessage.simpleMessage(player, "Clans", "You joined <alt2>Clan " + clan.getName() + "</alt2>.");
 
-        Logger.info("%s (%s) joined %s (%s)", player.getName(), player.getUniqueId(),
+        log.info("%s (%s) joined %s (%s)", player.getName(), player.getUniqueId(),
                 clan.getName(), clan.getId());
     }
 
