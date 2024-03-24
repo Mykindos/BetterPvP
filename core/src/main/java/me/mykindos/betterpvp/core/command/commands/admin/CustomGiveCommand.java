@@ -11,7 +11,7 @@ import me.mykindos.betterpvp.core.items.BPvPItem;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDItem;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDManager;
-import me.mykindos.betterpvp.core.logging.Logger;
+import me.mykindos.betterpvp.core.logging.FormattedLogger;
 import me.mykindos.betterpvp.core.logging.UUIDLogger;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
@@ -101,7 +101,7 @@ public class CustomGiveCommand extends Command {
             }
         }
         if (uuidItem != null) {
-            UUID logID = Logger.info("<yellow>%s</yellow> <blue>spawned</blue> and gave <light_purple>e%s</light_purple> to <yellow>%s</yellow>", player.getName(), uuidItem.getUuid(), target.getName());
+            UUID logID = FormattedLogger.info("<yellow>%s</yellow> <blue>spawned</blue> and gave <light_purple>e%s</light_purple> to <yellow>%s</yellow>", player.getName(), uuidItem.getUuid(), target.getName());
             UUIDLogger.addItemUUIDMetaInfoPlayer(logID, uuidItem.getUuid(), UUIDLogger.UUIDLogType.SPAWN, player.getUniqueId());
             UUIDLogger.addItemUUIDMetaInfoPlayer(logID, uuidItem.getUuid(), UUIDLogger.UUIDLogType.PICKUP, target.getUniqueId());
         }

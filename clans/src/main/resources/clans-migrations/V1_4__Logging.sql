@@ -6,6 +6,6 @@ create table if not exists clanlogmeta
     UUIDType    varchar(12)     not null,
     type        varchar(12)     not null,
 
-    CONSTRAINT clanmemberhistory_id_fk
+    CONSTRAINT clanlogmeta_id_fk
         FOREIGN KEY (logID) REFERENCES logs (id),
 );

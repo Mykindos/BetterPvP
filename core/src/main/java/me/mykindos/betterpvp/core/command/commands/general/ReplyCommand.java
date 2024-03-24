@@ -4,7 +4,7 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
-import me.mykindos.betterpvp.core.logging.Logger;
+import me.mykindos.betterpvp.core.logging.FormattedLogger;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -67,6 +67,6 @@ public class ReplyCommand extends Command {
         client.putProperty(ClientProperty.LAST_MESSAGED.name(), target.getUniqueId(), true);
         targetClient.putProperty(ClientProperty.LAST_MESSAGED.name(), client.getUniqueId(), true);
 
-        Logger.info(player.getName() + " messaged " + target.getName() + ": " + message);
+        FormattedLogger.info(player.getName() + " messaged " + target.getName() + ": " + message);
     }
 }

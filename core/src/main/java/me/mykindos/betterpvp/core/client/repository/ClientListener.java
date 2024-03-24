@@ -13,7 +13,7 @@ import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.events.lunar.LunarClientEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.logging.Logger;
+import me.mykindos.betterpvp.core.logging.FormattedLogger;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -161,7 +161,7 @@ public class ClientListener implements Listener {
         }
 
         event.getClient().setConnectionTime(System.currentTimeMillis());
-        Logger.info("%s (%s) joined", event.getPlayer().getName(), event.getPlayer().getUniqueId());
+        FormattedLogger.info("%s (%s) joined", event.getPlayer().getName(), event.getPlayer().getUniqueId());
     }
 
     @EventHandler (priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -172,7 +172,7 @@ public class ClientListener implements Listener {
         client.getGamer().putProperty(GamerProperty.TIME_PLAYED, (long) client.getGamer().getProperty(GamerProperty.TIME_PLAYED).orElse(0L)
                 + (System.currentTimeMillis() - client.getConnectionTime()));
         client.setConnectionTime(System.currentTimeMillis());
-        Logger.info("%s (%s) quit", event.getPlayer().getName(), event.getPlayer().getUniqueId());
+        FormattedLogger.info("%s (%s) quit", event.getPlayer().getName(), event.getPlayer().getUniqueId());
     }
 
     @EventHandler (priority = EventPriority.MONITOR)

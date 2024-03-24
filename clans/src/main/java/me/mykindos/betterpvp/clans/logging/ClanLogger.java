@@ -21,22 +21,6 @@ public class ClanLogger {
     }
 
     /**
-     * @param formattedMessage the formatted message. Will log a message without
-     * @param args
-     */
-    public static UUID addClanLog(String formattedMessage, Object... args) {
-        //TODO de-format formattedMessage
-        String message = formattedMessage;
-        return addClanLog(message, formattedMessage, args);
-    }
-
-    public static UUID addClanLog(String message, String formattedMessage, Object... args) {
-        UUID id = log.info(message);
-        //TODO log formattedMessage to proper place
-        return id;
-    }
-
-    /**
      * Add a reference to the specified log id for a clan log
      * @param logUUID the ID of the log this information is about
      * @param uuid the UUID to reference

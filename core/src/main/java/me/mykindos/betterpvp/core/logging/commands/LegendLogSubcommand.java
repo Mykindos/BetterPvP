@@ -10,7 +10,7 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDManager;
-import me.mykindos.betterpvp.core.logging.Logger;
+import me.mykindos.betterpvp.core.logging.FormattedLogger;
 import me.mykindos.betterpvp.core.logging.UUIDLogger;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
@@ -87,7 +87,7 @@ public class LegendLogSubcommand extends Command {
 
     public void run(Player player, UUID uuid, @Nullable Client client, String message) {
         String finalMessage = "<light_purple>" + uuid.toString() + "</light_purple> " + message;
-        UUID logID = Logger.info(finalMessage);
+        UUID logID = FormattedLogger.info(finalMessage);
         UUIDLogger.addItemUUIDMetaInfoPlayer(logID, uuid, UUIDLogger.UUIDLogType.CUSTOM, player.getUniqueId());
         if (client != null) {
             UUIDLogger.addItemUUIDMetaInfoPlayer(logID, uuid, UUIDLogger.UUIDLogType.CUSTOM, client.getUniqueId());
