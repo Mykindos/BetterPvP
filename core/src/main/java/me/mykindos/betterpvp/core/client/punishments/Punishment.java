@@ -17,7 +17,7 @@ public class Punishment {
     private final IPunishmentType type;
     private final long expiryTime;
     private final String reason;
-    private final UUID punisher;
+    private final String punisher;
     private boolean revoked;
 
     public boolean hasExpired() {

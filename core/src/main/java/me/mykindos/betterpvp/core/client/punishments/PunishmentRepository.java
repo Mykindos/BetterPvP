@@ -45,7 +45,7 @@ public class PunishmentRepository implements IRepository<Punishment> {
                     new StringStatementValue(punishment.getType().getName()),
                     new LongStatementValue(punishment.getExpiryTime()),
                     new StringStatementValue(punishment.getReason()),
-                    new UuidStatementValue(punishment.getPunisher()));
+                    new StringStatementValue(punishment.getPunisher()));
 
             database.executeUpdate(statement);
             log.info("Saved punishment {} to database", punishment);
@@ -76,8 +76,8 @@ public class PunishmentRepository implements IRepository<Punishment> {
                         PunishmentTypes.getPunishmentType(result.getString(3)),
                         result.getLong(4),
                         result.getString(5),
-                        UUID.fromString(result.getString(6)),
-                        result.getBoolean(7)
+                        result.getString(6),
+                        result.getBoolean(8)
                 );
 
                 punishments.add(punishment);
