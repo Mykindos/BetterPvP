@@ -15,6 +15,7 @@ if (File("./private/").exists()) {
     include(":private:blocking-mixins")
     include(":private:blocking")
     include(":private:store")
+    include(":private:compatability")
 }
 
 pluginManagement {
@@ -27,6 +28,7 @@ pluginManagement {
         maven("https://mvn.lumine.io/repository/maven-public/")
         maven("https://repo.xenondevs.xyz/releases")
         maven("https://repo.dmulloy2.net/repository/public/")
+        maven("https://jitpack.io")
     }
 }
 
