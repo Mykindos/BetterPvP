@@ -36,6 +36,7 @@ public class CommandListener implements Listener {
 
     @EventHandler
     public void onServerCommand(ServerCommandEvent event) {
+        log.info("Server executed command: {}", event.getCommand());
         String commandName = event.getCommand().toLowerCase();
         if (commandName.contains(" ")) {
             commandName = commandName.split(" ")[0];
