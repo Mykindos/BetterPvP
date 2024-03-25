@@ -6,6 +6,7 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.client.punishments.PunishmentRepository;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.SharedDatabase;
 import me.mykindos.betterpvp.core.database.mappers.PropertyMapper;
@@ -26,15 +27,17 @@ public class ClientSQLLayer {
     private final Database database;
     private final SharedDatabase sharedDatabase;
     private final PropertyMapper propertyMapper;
+    private final PunishmentRepository punishmentRepository;
 
     private final ConcurrentHashMap<String, Statement> queuedStatUpdates;
     private final ConcurrentHashMap<String, Statement> queuedSharedStatUpdates;
 
     @Inject
-    public ClientSQLLayer(Database database, SharedDatabase sharedDatabase, PropertyMapper propertyMapper) {
+    public ClientSQLLayer(Database database, SharedDatabase sharedDatabase, PropertyMapper propertyMapper, PunishmentRepository punishmentRepository) {
         this.database = database;
         this.sharedDatabase = sharedDatabase;
         this.propertyMapper = propertyMapper;
+        this.punishmentRepository = punishmentRepository;
         this.queuedStatUpdates = new ConcurrentHashMap<>();
         this.queuedSharedStatUpdates = new ConcurrentHashMap<>();
     }
@@ -68,6 +71,7 @@ public class ClientSQLLayer {
 
                 Gamer gamer = new Gamer(uuid.toString());
                 Client client = new Client(gamer, uuid.toString(), name, rank);
+                client.getPunishments().addAll(punishmentRepository.getPunishmentsForClient(client));
                 loadClientProperties(client);
                 return Optional.of(client);
             }
@@ -88,6 +92,7 @@ public class ClientSQLLayer {
 
                 Gamer gamer = new Gamer(uuid);
                 Client client = new Client(gamer, uuid, name, rank);
+                client.getPunishments().addAll(punishmentRepository.getPunishmentsForClient(client));
                 loadClientProperties(client);
                 return Optional.of(client);
             }

@@ -1,10 +1,15 @@
 package me.mykindos.betterpvp.core.database.repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public interface IRepository<T> {
 
-    List<T> getAll();
+    default List<T> getAll() {
+        return new ArrayList<>();
+    }
 
-    void save(T object);
+    default void save(T object) {
+
+    }
 }
