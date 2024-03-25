@@ -51,7 +51,7 @@ public class ClanLogger {
             return logList;
         }
 
-        String query = "CALL GetClanLogsByClanUuid(?, ?)";
+        String query = "CALL GetClanLogsByClanUuidAmount(?, ?)";
         CachedRowSet result = database.executeQuery( new Statement(query,
                         new UuidStatementValue(clanUUID),
                         new IntegerStatementValue(amount)
@@ -65,6 +65,31 @@ public class ClanLogger {
             }
         } catch (SQLException ex) {
             log.error("Failed to get ClanUUID logs", ex);
+        }
+        return logList;
+    }
+
+    public static List<String> getJoinLeaveMessages(UUID clanUUID, int amount) {
+        List<String> logList = new ArrayList<>();
+
+        if (amount < 0) {
+            return logList;
+        }
+
+        String query = "CALL GetClanJoinLeaveMessagesByClanUUID(?, ?)";
+        CachedRowSet result = database.executeQuery( new Statement(query,
+                        new UuidStatementValue(clanUUID),
+                        new IntegerStatementValue(amount)
+                )
+        );
+
+        try {
+            while (result.next()) {
+                long time = result.getLong(1);
+                logList.add("<green>" + UtilTime.getTime((System.currentTimeMillis() - time), 2) + " ago</green> " + result.getString(2));
+            }
+        } catch (SQLException ex) {
+            log.error("Failed to get ClanJoinLeave messages", ex);
         }
         return logList;
     }
