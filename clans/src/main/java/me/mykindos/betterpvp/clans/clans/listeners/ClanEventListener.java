@@ -175,8 +175,10 @@ public class ClanEventListener extends ClanListener {
             FormattedLogger.info("%s (%s) created admin clan %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
                     clan.getName(), clan.getId());
         } else {
-            FormattedLogger.info("%s (%s) created %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
+            UUID id = FormattedLogger.info("<yellow>%s</yellow> (%s) <green>created</green> <aqua>%s</aqua> (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
                     clan.getName(), clan.getId());
+            ClanLogger.addClanLogMeta(id, event.getPlayer().getUniqueId(), ClanLogger.UUIDType.PLAYER, ClanLogger.ClanLogType.CREATE);
+            ClanLogger.addClanLogMeta(id, clan.getId(), ClanLogger.UUIDType.CLAN, ClanLogger.ClanLogType.CREATE);
         }
 
     }
@@ -217,8 +219,10 @@ public class ClanEventListener extends ClanListener {
         clanManager.getObjects().remove(clan.getName().toLowerCase());
         clanManager.getLeaderboard().forceUpdate();
 
-        FormattedLogger.info("%s (%s) disbanded %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
+        UUID id = FormattedLogger.info("<yellow>%s</yellow> (%s) <red>disbanded</red> <aqua>%s<aqua> (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
                 clan.getName(), clan.getId());
+        ClanLogger.addClanLogMeta(id, event.getPlayer().getUniqueId(), ClanLogger.UUIDType.PLAYER, ClanLogger.ClanLogType.DISBAND);
+        ClanLogger.addClanLogMeta(id, clan.getId(), ClanLogger.UUIDType.CLAN, ClanLogger.ClanLogType.DISBAND);
 
     }
 
@@ -286,7 +290,7 @@ public class ClanEventListener extends ClanListener {
         clan.messageClan(String.format("<yellow>%s<gray> has joined your Clan.", player.getName()), player.getUniqueId(), true);
         UtilMessage.simpleMessage(player, "Clans", "You joined <alt2>Clan " + clan.getName() + "</alt2>.");
 
-        UUID id = FormattedLogger.info("<green>%s</green> (%s) <green>joined</green> <aqua>%s</aqua> (%s)", player.getName(), player.getUniqueId(),
+        UUID id = FormattedLogger.info("<yellow>%s</yellow> (%s) <yellow>joined</yellow> <aqua>%s</aqua> (%s)", player.getName(), player.getUniqueId(),
                 clan.getName(), clan.getId());
         ClanLogger.addClanLogMeta(id, player.getUniqueId(), ClanLogger.UUIDType.PLAYER, ClanLogger.ClanLogType.JOIN);
         ClanLogger.addClanLogMeta(id, clan.getId(), ClanLogger.UUIDType.CLAN, ClanLogger.ClanLogType.JOIN);
@@ -318,7 +322,7 @@ public class ClanEventListener extends ClanListener {
             }
             clan.setOnline(isOnline);
         }
-        UUID id = FormattedLogger.info("<green>%s</green> (%s) <red>left</red> <aqua>%s</aqua> (%s)", player.getName(), player.getUniqueId(),
+        UUID id = FormattedLogger.info("<yellow>%s</yellow> (%s) <red>left</red> <aqua>%s</aqua> (%s)", player.getName(), player.getUniqueId(),
                 clan.getName(), clan.getId());
         ClanLogger.addClanLogMeta(id, player.getUniqueId(), ClanLogger.UUIDType.PLAYER, ClanLogger.ClanLogType.LEAVE);
         ClanLogger.addClanLogMeta(id, clan.getId(), ClanLogger.UUIDType.CLAN, ClanLogger.ClanLogType.LEAVE);
@@ -347,7 +351,7 @@ public class ClanEventListener extends ClanListener {
                 UtilMessage.simpleMessage(targetPlayer, "Clans", "You were kicked from <alt2>" + clan.getName());
             }
         }
-        UUID id = FormattedLogger.info("<green>%s</green> (%s) <red>kicked</red> <green>%s</green> (%s) from <aqua>%s</aqua> (%s)", player.getName(), player.getUniqueId(),
+        UUID id = FormattedLogger.info("<yellow>%s</yellow> (%s) <red>kicked</red> <yellow>%s</yellow> (%s) from <aqua>%s</aqua> (%s)", player.getName(), player.getUniqueId(),
                 target.getName(), target.getUniqueId(),
                 clan.getName(), clan.getId());
         ClanLogger.addClanLogMeta(id, player.getUniqueId(), ClanLogger.UUIDType.PLAYER, ClanLogger.ClanLogType.KICKER);

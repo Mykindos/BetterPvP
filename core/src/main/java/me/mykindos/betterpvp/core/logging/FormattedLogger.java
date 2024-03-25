@@ -33,9 +33,9 @@ public class FormattedLogger {
     public static UUID log(String level, String message, String formattedMessage, Object... args) {
         UUID id = log.log(level, message, args);
         assert database != null;
-
+        System.out.print(args);
         String logMessage = String.format(formattedMessage, args);
-        database.executeUpdate(new Statement("INSERT INTO formattedlogs (id, Message) VALUES (?, ?)",
+        database.executeUpdate(new Statement("INSERT INTO formattedlogs (id, FormattedMessage) VALUES (?, ?)",
                 new UuidStatementValue(id),
                 new StringStatementValue(logMessage)
         ));

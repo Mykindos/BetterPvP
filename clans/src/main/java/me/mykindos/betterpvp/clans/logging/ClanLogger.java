@@ -4,10 +4,16 @@ import com.google.inject.Inject;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
+import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
+import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.jetbrains.annotations.Nullable;
 
+import javax.sql.rowset.CachedRowSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @CustomLog
@@ -28,7 +34,7 @@ public class ClanLogger {
      * @param type the type of log this is
      */
     public static void addClanLogMeta(UUID logUUID, @Nullable UUID uuid, ClanLogger.UUIDType uuidType, ClanLogger.ClanLogType type) {
-        String query = "INSERT INTO clanlogmeta (logID, UUID, UUIDType, type) VALUES (?, ?, ?, ?)";
+        String query = "INSERT INTO clanlogmeta (LogUUID, UUID, UUIDType, type) VALUES (?, ?, ?, ?)";
         database.executeUpdate(new Statement(query,
                         new UuidStatementValue(logUUID),
                         new StringStatementValue(uuid == null ? null : uuid.toString()),
@@ -36,6 +42,31 @@ public class ClanLogger {
                         new StringStatementValue(type.name())
                 )
         );
+    }
+
+    public static List<String> getClanLogs(UUID clanUUID, int amount) {
+        List<String> logList = new ArrayList<>();
+
+        if (amount < 0) {
+            return logList;
+        }
+
+        String query = "CALL GetClanLogsByClanUuid(?, ?)";
+        CachedRowSet result = database.executeQuery( new Statement(query,
+                        new UuidStatementValue(clanUUID),
+                        new IntegerStatementValue(amount)
+                )
+        );
+
+        try {
+            while (result.next()) {
+                long time = result.getLong(1);
+                logList.add("<green>" + UtilTime.getTime((System.currentTimeMillis() - time), 2) + " ago</green> " + result.getString(2));
+            }
+        } catch (SQLException ex) {
+            log.error("Failed to get ClanUUID logs", ex);
+        }
+        return logList;
     }
 
     public enum UUIDType {
@@ -60,7 +91,16 @@ public class ClanLogger {
         /**
          * The player is kicked from a Clan
          */
-        KICKED
+        KICKED,
+        /**
+         *
+         */
+        CREATE,
+        /**
+         *
+         */
+        DISBAND
         //TODO more enums
+
     }
 }

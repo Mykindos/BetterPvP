@@ -8,11 +8,8 @@ create table if not exists logs
 
 create table if not exists formattedlogs
 (
-    id      varchar(36)     PRIMARY KEY,
-    Message text            not null
-
-    CONSTRAINT formattedlogs_id_fk
-        FOREIGN KEY (id) REFERENCES logs (id)
+    id                  varchar(36)     PRIMARY KEY,
+    FormattedMessage    text            not null
 );
 
 create table if not exists uuiditems
@@ -28,12 +25,12 @@ create table if not exists uuidlogmeta
     LogUUID     varchar(36)     not null,
     ItemUUID    varchar(36)     not null,
     Type        varchar(255)    not null,
-    UUID        varchar(36)    default null,
+    UUID        varchar(36)     default null,
     UUIDtype    varchar(255)    default null,
 
 
     CONSTRAINT uuidlogmeta_id_fk
-        FOREIGN KEY (LogUUID) REFERENCES logs (id),
+        FOREIGN KEY (LogUUID) REFERENCES formattedlogs (id),
     CONSTRAINT uuidlogmeta_uuid_fk
         FOREIGN KEY (ItemUUID) REFERENCES uuiditems (UUID)
 );
