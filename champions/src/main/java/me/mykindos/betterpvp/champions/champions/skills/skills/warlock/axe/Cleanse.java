@@ -105,7 +105,7 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
     public void activate(Player player, int level) {
         double healthReduction = 1.0 - getHealthReduction(level);
         double proposedHealth = player.getHealth() - (player.getHealth() * healthReduction);
-        UtilPlayer.slowDrainHealth(champions, player, proposedHealth, 5, false);
+        UtilPlayer.slowHealth(champions, player, -proposedHealth, 5, false);
 
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_EVOKER_PREPARE_WOLOLO, 1.0f, 0.9f);
         championsManager.getEffects().addEffect(player, EffectTypes.IMMUNE, (long) (getDuration(level) * 1000L));
