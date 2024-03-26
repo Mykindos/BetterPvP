@@ -40,7 +40,7 @@ public class EnergyHandler {
             return true;
         }
 
-        amount = 0.999 * (amount / 100);
+        amount = 0.99999999999 * (amount / 100);
 
         if (amount > getEnergy(player)) {
             if (inform) {
