@@ -5,10 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
-import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
-import org.jetbrains.annotations.Nullable;
 
 import javax.sql.rowset.CachedRowSet;
 import java.sql.SQLException;
@@ -27,21 +25,11 @@ public class ClanLogger {
     }
 
     /**
-     * Add a reference to the specified log id for a clan log
-     * @param logUUID the ID of the log this information is about
-     * @param uuid the UUID to reference
-     * @param uuidType the type of UUID this is
-     * @param type the type of log this is
+     * Add the logs related to the specified clan log
+     * @param clanLog the specified clan log
      */
-    public static void addClanLogMeta(UUID logUUID, @Nullable UUID uuid, ClanLogger.UUIDType uuidType, ClanLogger.ClanLogType type) {
-        String query = "INSERT INTO clanlogmeta (LogUUID, UUID, UUIDType, type) VALUES (?, ?, ?, ?)";
-        database.executeUpdate(new Statement(query,
-                        new UuidStatementValue(logUUID),
-                        new StringStatementValue(uuid == null ? null : uuid.toString()),
-                        new StringStatementValue(uuidType.name()),
-                        new StringStatementValue(type.name())
-                )
-        );
+    public static void addClanLog(ClanLog clanLog) {
+        database.executeBatch(clanLog.getStatements(), true);
     }
 
     public static List<String> getAllLogs() {
@@ -141,53 +129,5 @@ public class ClanLogger {
             log.error("Failed to get ClanJoinLeave messages", ex);
         }
         return logList;
-    }
-
-    public enum UUIDType {
-        /**
-         * Represents the primary player, generally the player doing the action
-         */
-        PLAYER1,
-        /**
-         * Represents a secondary player, general the player the action occurs to
-         */
-        PLAYER2,
-        /**
-         * The clan of PLAYER1
-         */
-        CLAN1,
-        /**
-         * The clan of PLAYER2
-         */
-        CLAN2,
-        /**
-         * The UUID is intentionally left null, and does not represent anything
-         */
-        NONE
-    }
-
-    public enum ClanLogType {
-        /**
-         * A player joins a Clan
-         */
-        JOIN,
-        /**
-         * A player leaves a Clan
-         */
-        LEAVE,
-        /**
-         * A player is kicked from a Clan
-         */
-        KICK,
-        /**
-         *
-         */
-        CREATE,
-        /**
-         *
-         */
-        DISBAND
-        //TODO more enums
-
     }
 }
