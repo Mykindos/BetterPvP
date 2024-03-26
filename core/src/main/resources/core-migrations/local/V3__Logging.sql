@@ -6,10 +6,10 @@ create table if not exists logs
     Time      bigint                                not null
 );
 
-create table if not exists formattedlogs
+create table if not exists logtimes
 (
-    id                  varchar(36)     PRIMARY KEY,
-    FormattedMessage    text            not null
+    id      varchar(36)     PRIMARY KEY,
+    Time    bigint          not null
 );
 
 create table if not exists uuiditems
@@ -30,7 +30,7 @@ create table if not exists uuidlogmeta
 
 
     CONSTRAINT uuidlogmeta_id_fk
-        FOREIGN KEY (LogUUID) REFERENCES formattedlogs (id),
+        FOREIGN KEY (LogUUID) REFERENCES logtimes (id),
     CONSTRAINT uuidlogmeta_uuid_fk
         FOREIGN KEY (ItemUUID) REFERENCES uuiditems (UUID)
 );
@@ -39,8 +39,8 @@ DROP PROCEDURE IF EXISTS GetUuidLogsByUuid;
 CREATE PROCEDURE GetUuidLogsByUuid(UniqueID varchar(36), amount int)
 BEGIN
     SELECT DISTINCT Time, Message
-    FROM logs
-        INNER JOIN uuidlogmeta ON logs.id = uuidlogmeta.LogUUID
+    FROM logtimes
+        INNER JOIN uuidlogmeta ON logtimes.id = uuidlogmeta.LogUUID
     WHERE ItemUUID = UniqueID
     ORDER BY Time DESC
     LIMIT amount;
@@ -50,8 +50,8 @@ DROP PROCEDURE IF EXISTS GetUuidLogsByPlayer;
 CREATE PROCEDURE GetUuidLogsByPlayer(PlayerUuid varchar(36), amount int)
 BEGIN
     SELECT DISTINCT Time, Message
-    FROM logs
-        INNER JOIN uuidlogmeta ON logs.id = uuidlogmeta.LogUUID
+    FROM logtimes
+        INNER JOIN uuidlogmeta ON logtimes.id = uuidlogmeta.LogUUID
     WHERE UUID = PlayerUuid
       AND UUIDtype = 'PLAYER'
     ORDER BY Time DESC

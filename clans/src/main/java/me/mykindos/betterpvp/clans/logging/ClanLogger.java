@@ -1,7 +1,7 @@
 package me.mykindos.betterpvp.clans.logging;
 
 import com.google.inject.Inject;
-import lombok.CustomLog;
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@CustomLog
+@Slf4j
 public class ClanLogger {
 
     private static Database database;
@@ -42,6 +42,30 @@ public class ClanLogger {
                         new StringStatementValue(type.name())
                 )
         );
+    }
+
+    public static List<String> getAllLogs() {
+        List<String> logList = new ArrayList<>();
+        String query = "SELECT * FROM clanlogs";
+        CachedRowSet result = database.executeQuery( new Statement(query)
+        );
+
+        try {
+            while (result.next()) {
+                String id = result.getString(1);
+                long time = result.getLong(2);
+                String type = result.getString(3);
+                String Player1 = result.getString(4);
+                String Clan1 = result.getString(5);
+                String Player2 = result.getString(6);
+                String Clan2 = result.getString(7);
+
+                logList.add(String.format("ID %s time %s type %s Player1 %s Clan1 %s Player2 %s Clan2 %s", id, time, type, Player1, Clan1, Player2, Clan2));
+            }
+        } catch (SQLException ex) {
+            log.error("Failed to get ClanUUID logs", ex);
+        }
+        return logList;
     }
 
     public static List<String> getClanLogs(UUID clanUUID, int amount) {
@@ -120,28 +144,41 @@ public class ClanLogger {
     }
 
     public enum UUIDType {
-        PLAYER,
-        CLAN,
+        /**
+         * Represents the primary player, generally the player doing the action
+         */
+        PLAYER1,
+        /**
+         * Represents a secondary player, general the player the action occurs to
+         */
+        PLAYER2,
+        /**
+         * The clan of PLAYER1
+         */
+        CLAN1,
+        /**
+         * The clan of PLAYER2
+         */
+        CLAN2,
+        /**
+         * The UUID is intentionally left null, and does not represent anything
+         */
         NONE
     }
 
     public enum ClanLogType {
         /**
-         * The player joins a Clan
+         * A player joins a Clan
          */
         JOIN,
         /**
-         * The player leaves a Clan
+         * A player leaves a Clan
          */
         LEAVE,
         /**
-         * The player kicks another player from a Clan
+         * A player is kicked from a Clan
          */
-        KICKER,
-        /**
-         * The player is kicked from a Clan
-         */
-        KICKED,
+        KICK,
         /**
          *
          */

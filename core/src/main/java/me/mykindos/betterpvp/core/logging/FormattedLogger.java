@@ -3,7 +3,7 @@ package me.mykindos.betterpvp.core.logging;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
-import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
+import me.mykindos.betterpvp.core.database.query.values.LongStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
 
 import javax.inject.Inject;
@@ -33,11 +33,10 @@ public class FormattedLogger {
     public static UUID log(String level, String message, String formattedMessage, Object... args) {
         UUID id = log.log(level, message, args);
         assert database != null;
-        System.out.print(args);
         String logMessage = String.format(formattedMessage, args);
-        database.executeUpdate(new Statement("INSERT INTO formattedlogs (id, FormattedMessage) VALUES (?, ?)",
+        database.executeUpdate(new Statement("INSERT INTO logtimes (id, Time) VALUES (?, ?)",
                 new UuidStatementValue(id),
-                new StringStatementValue(logMessage)
+                new LongStatementValue(System.currentTimeMillis())
         ));
         return id;
     }

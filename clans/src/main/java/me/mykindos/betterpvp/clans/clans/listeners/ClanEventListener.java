@@ -177,8 +177,8 @@ public class ClanEventListener extends ClanListener {
         } else {
             UUID id = FormattedLogger.info("<yellow>%s</yellow> (%s) <green>created</green> <aqua>%s</aqua> (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
                     clan.getName(), clan.getId());
-            ClanLogger.addClanLogMeta(id, event.getPlayer().getUniqueId(), ClanLogger.UUIDType.PLAYER, ClanLogger.ClanLogType.CREATE);
-            ClanLogger.addClanLogMeta(id, clan.getId(), ClanLogger.UUIDType.CLAN, ClanLogger.ClanLogType.CREATE);
+            ClanLogger.addClanLogMeta(id, event.getPlayer().getUniqueId(), ClanLogger.UUIDType.PLAYER1, ClanLogger.ClanLogType.CREATE);
+            ClanLogger.addClanLogMeta(id, clan.getId(), ClanLogger.UUIDType.CLAN1, ClanLogger.ClanLogType.CREATE);
         }
 
     }
@@ -221,8 +221,8 @@ public class ClanEventListener extends ClanListener {
 
         UUID id = FormattedLogger.info("<yellow>%s</yellow> (%s) <red>disbanded</red> <aqua>%s<aqua> (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
                 clan.getName(), clan.getId());
-        ClanLogger.addClanLogMeta(id, event.getPlayer().getUniqueId(), ClanLogger.UUIDType.PLAYER, ClanLogger.ClanLogType.DISBAND);
-        ClanLogger.addClanLogMeta(id, clan.getId(), ClanLogger.UUIDType.CLAN, ClanLogger.ClanLogType.DISBAND);
+        ClanLogger.addClanLogMeta(id, event.getPlayer().getUniqueId(), ClanLogger.UUIDType.PLAYER1, ClanLogger.ClanLogType.DISBAND);
+        ClanLogger.addClanLogMeta(id, clan.getId(), ClanLogger.UUIDType.CLAN1, ClanLogger.ClanLogType.DISBAND);
 
     }
 
@@ -292,8 +292,8 @@ public class ClanEventListener extends ClanListener {
 
         UUID id = FormattedLogger.info("<yellow>%s</yellow> (%s) <yellow>joined</yellow> <aqua>%s</aqua> (%s)", player.getName(), player.getUniqueId(),
                 clan.getName(), clan.getId());
-        ClanLogger.addClanLogMeta(id, player.getUniqueId(), ClanLogger.UUIDType.PLAYER, ClanLogger.ClanLogType.JOIN);
-        ClanLogger.addClanLogMeta(id, clan.getId(), ClanLogger.UUIDType.CLAN, ClanLogger.ClanLogType.JOIN);
+        ClanLogger.addClanLogMeta(id, player.getUniqueId(), ClanLogger.UUIDType.PLAYER1, ClanLogger.ClanLogType.JOIN);
+        ClanLogger.addClanLogMeta(id, clan.getId(), ClanLogger.UUIDType.CLAN1, ClanLogger.ClanLogType.JOIN);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -324,8 +324,8 @@ public class ClanEventListener extends ClanListener {
         }
         UUID id = FormattedLogger.info("<yellow>%s</yellow> (%s) <red>left</red> <aqua>%s</aqua> (%s)", player.getName(), player.getUniqueId(),
                 clan.getName(), clan.getId());
-        ClanLogger.addClanLogMeta(id, player.getUniqueId(), ClanLogger.UUIDType.PLAYER, ClanLogger.ClanLogType.LEAVE);
-        ClanLogger.addClanLogMeta(id, clan.getId(), ClanLogger.UUIDType.CLAN, ClanLogger.ClanLogType.LEAVE);
+        ClanLogger.addClanLogMeta(id, player.getUniqueId(), ClanLogger.UUIDType.PLAYER1, ClanLogger.ClanLogType.LEAVE);
+        ClanLogger.addClanLogMeta(id, clan.getId(), ClanLogger.UUIDType.CLAN1, ClanLogger.ClanLogType.LEAVE);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -354,9 +354,9 @@ public class ClanEventListener extends ClanListener {
         UUID id = FormattedLogger.info("<yellow>%s</yellow> (%s) <red>kicked</red> <yellow>%s</yellow> (%s) from <aqua>%s</aqua> (%s)", player.getName(), player.getUniqueId(),
                 target.getName(), target.getUniqueId(),
                 clan.getName(), clan.getId());
-        ClanLogger.addClanLogMeta(id, player.getUniqueId(), ClanLogger.UUIDType.PLAYER, ClanLogger.ClanLogType.KICKER);
-        ClanLogger.addClanLogMeta(id, clan.getId(), ClanLogger.UUIDType.CLAN, ClanLogger.ClanLogType.KICKER);
-        ClanLogger.addClanLogMeta(id, target.getUniqueId(), ClanLogger.UUIDType.PLAYER, ClanLogger.ClanLogType.KICKED);
+        ClanLogger.addClanLogMeta(id, player.getUniqueId(), ClanLogger.UUIDType.PLAYER1, ClanLogger.ClanLogType.KICK);
+        ClanLogger.addClanLogMeta(id, clan.getId(), ClanLogger.UUIDType.CLAN1, ClanLogger.ClanLogType.KICK);
+        ClanLogger.addClanLogMeta(id, target.getUniqueId(), ClanLogger.UUIDType.PLAYER2, ClanLogger.ClanLogType.KICK);
     }
 
     @EventHandler
