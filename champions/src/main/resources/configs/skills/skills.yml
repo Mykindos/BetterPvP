@@ -189,7 +189,7 @@ skills:
       enabled: true
       maxlevel: 3
       baseDamage: 1.0
-      damageIncreasePerLevel: 1.0
+      damageIncreasePerLevel: 0.0
       baseMaxDamage: 2.0
       baseMaxDamageIncreasePerLevel: 1.0
       expirationTime: 5.0
@@ -244,9 +244,10 @@ skills:
     thorns:
       enabled: true
       maxlevel: 3
-      internalCooldown: 2.0
-      baseDamage: 0.8
-      damageIncreasePerLevel: 0.8
+      baseDamage: 3.0
+      damageIncreasePerLevel: 1.0
+      reflectTime: 2.0
+      hitsToTrigger: 3
     sacrifice:
       enabled: true
       maxlevel: 3
