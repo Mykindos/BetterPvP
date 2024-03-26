@@ -149,6 +149,7 @@ public class ItemHandler {
         if (dataContainer.has(CoreNamespaceKeys.CUSTOM_ITEM_KEY)) {
             return getItem(dataContainer.get(CoreNamespaceKeys.CUSTOM_ITEM_KEY, PersistentDataType.STRING));
         }
+
         //do expensive lookup
         for (BPvPItem item : itemMap.values()) {
             if (item.matches(itemStack)) return item;
