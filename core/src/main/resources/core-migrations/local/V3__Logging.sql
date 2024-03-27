@@ -26,15 +26,15 @@ create table if not exists logmetauuid
 create table if not exists loglocations
 (
     LogUUID     varchar(36)     not null,
-    Name        varchar(255)            ,
-    WorldID     varchar(36)    not null,
+    Name        varchar(36)            ,
+    WorldID     varchar(36)     not null,
     X           int             not null,
     Y           int                     ,
     Z           int             not null,
 
     CONSTRAINT loglocations_id_fk
             FOREIGN KEY (LogUUID) REFERENCES logmeta (id)
-)
+);
 
 create table if not exists uuiditems
 (
@@ -44,21 +44,20 @@ create table if not exists uuiditems
 );
 
 CREATE VIEW IF NOT EXISTS itemlogs AS
-SELECT L1.id as ID, L1.Time, L1.Type, LMU1.Item LMU2.Player1, LMU2.Player2, LL1.Name, LL1.World, LL1.X, LL1.Y, LL1.Z
+SELECT L1.id as ID, L1.Time, L1.Type, LMU1.Item, LMU2.Player1, LMU3.Player2, LL1.Name, LL1.WorldID, LL1.X, LL1.Y, LL1.Z
 FROM logmeta L1
 LEFT JOIN (Select LogUUID, UUID as Item FROM logmetauuid WHERE UUIDType = 'ITEM') LMU1 ON LMU1.LogUUID = L1.id
 LEFT JOIN (Select LogUUID, UUID as Player1 FROM logmetauuid WHERE UUIDType = 'PLAYER1') LMU2 ON LMU2.LogUUID = L1.id
 LEFT JOIN (Select LogUUID, UUID as Player2 FROM logmetauuid WHERE UUIDType = 'PLAYER2') LMU3 ON LMU3.LogUUID = L1.id
-LEFT JOIN loglocations LL1 ON LL1.LogUUID = L1.id
+LEFT JOIN loglocations LL1 ON LL1.LogUUID = L1.id;
 
 
 DROP PROCEDURE IF EXISTS GetItemLogsByUuid;
 CREATE PROCEDURE GetUuidLogsByUuid(UniqueID varchar(36), amount int)
 BEGIN
-    SELECT DISTINCT Time, Type, Item, Player1, Player2, Name, World, X, Y, Z
+    SELECT DISTINCT Time, Type, Item, Player1, Player2, Name, WorldID, X, Y, Z
     FROM itemlogs
-    WHERE UUID = UniqueID
-    AND UUIDType = 'ITEM'
+    WHERE Item = UniqueID
     ORDER BY Time DESC
     LIMIT amount;
 END;
@@ -66,13 +65,12 @@ END;
 DROP PROCEDURE IF EXISTS GetUuidLogsByPlayer;
 CREATE PROCEDURE GetUuidLogsByPlayer(PlayerUuid varchar(36), amount int)
 BEGIN
-    SELECT DISTINCT Time, Type, Item, Player1, Player2, World, X, Y, Z, Name
-    FROM logtimes
-    WHERE UUID = PlayerUuid
-    AND UUIDtype = 'PLAYER1'
-    OR UUIDType = 'PLAYER2'
+    SELECT DISTINCT Time, Type, Item, Player1, Player2, Name, WorldID, X, Y, Z
+    FROM itemlogs
+    WHERE Player1 = PlayerUuid
+    OR Player2 = PlayerUuid
     ORDER BY Time DESC
     LIMIT amount;
 END;
 
-ALTER TABLE logmetauuuid ADD INDEX (UUID);
+ALTER TABLE logmetauuid ADD INDEX (UUID);

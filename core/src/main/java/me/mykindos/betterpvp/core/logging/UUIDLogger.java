@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.core.logging;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.CustomLog;
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Singleton
-@CustomLog
+@Slf4j
 public class UUIDLogger {
 
     private static Database database;
@@ -38,9 +38,10 @@ public class UUIDLogger {
     public static void addItemLog(ItemLog itemLog) {
         UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> {
             database.executeUpdate(itemLog.getLogTimeStatetment());
-            database.executeUpdate(itemLog.getItemLogStatement());
             database.executeBatch(itemLog.getStatements(), true);
-            database.executeBatch(itemLog.getLocationStatements(), true);
+            if (itemLog.getLocationStatement() != null) {
+                database.executeUpdate(itemLog.getLocationStatement());
+            }
         });
     }
 
@@ -67,14 +68,14 @@ public class UUIDLogger {
             while (result.next()) {
                 long time = result.getLong(1);
                 UUIDLogType type = UUIDLogType.valueOf(result.getString(2));
-                String itemID = result.getString(4);
-                String player1ID = result.getString(5);
-                String player2ID = result.getString(6);
-                String name = result.getString(7);
-                String worldID = result.getString(8);
-                int X = result.getInt(9);
-                int Y = result.getInt(10);
-                int Z = result.getInt(11);
+                String itemID = result.getString(3);
+                String player1ID = result.getString(4);
+                String player2ID = result.getString(5);
+                String name = result.getString(6);
+                String worldID = result.getString(7);
+                int X = result.getInt(8);
+                int Y = result.getInt(9);
+                int Z = result.getInt(10);
 
                 logList.add(formattedLogFromRow(time, type, itemID, player1ID, player2ID, name, worldID, X, Y, Z));
             }
@@ -107,14 +108,14 @@ public class UUIDLogger {
             while(result.next()) {
                 long time = result.getLong(1);
                 UUIDLogType type = UUIDLogType.valueOf(result.getString(2));
-                String itemID = result.getString(4);
-                String player1ID = result.getString(5);
-                String player2ID = result.getString(6);
-                String name = result.getString(7);
-                String worldID = result.getString(8);
-                int X = result.getInt(9);
-                int Y = result.getInt(10);
-                int Z = result.getInt(11);
+                String itemID = result.getString(3);
+                String player1ID = result.getString(4);
+                String player2ID = result.getString(5);
+                String name = result.getString(6);
+                String worldID = result.getString(7);
+                int X = result.getInt(8);
+                int Y = result.getInt(9);
+                int Z = result.getInt(10);
 
                 logList.add(formattedLogFromRow(time, type, itemID, player1ID, player2ID, name, worldID, X, Y, Z));
             }

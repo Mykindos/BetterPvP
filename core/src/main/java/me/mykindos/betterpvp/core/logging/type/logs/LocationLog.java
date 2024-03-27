@@ -18,10 +18,10 @@ public class LocationLog {
     }
 
     public Statement getStatement(UUID LogUUID) {
-        return new Statement("INSERT INTO loglocations (LogUUID, Name, World, X, Y, Z) VALUES (?, ?, ?, ?, ?, ?)",
+        return new Statement("INSERT INTO loglocations (LogUUID, Name, WorldID, X, Y, Z) VALUES (?, ?, ?, ?, ?, ?)",
                 new UuidStatementValue(LogUUID),
                 new StringStatementValue(this.name),
-                new StringStatementValue(this.location.getWorld().toString()),
+                new UuidStatementValue(this.location.getWorld().getUID()),
                 new IntegerStatementValue(this.location.getBlockX()),
                 new IntegerStatementValue(this.location.getBlockY()),
                 new IntegerStatementValue(this.location.getBlockZ()));

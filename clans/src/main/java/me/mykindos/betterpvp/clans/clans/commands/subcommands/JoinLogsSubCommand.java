@@ -2,21 +2,15 @@ package me.mykindos.betterpvp.clans.clans.commands.subcommands;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
 import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
-import me.mykindos.betterpvp.clans.logging.ClanLogger;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.List;
 
 @Singleton
 @SubCommand(ClanCommand.class)
@@ -60,13 +54,13 @@ public class JoinLogsSubCommand extends ClanSubCommand {
         }
 
         final int finalAmount = amount;
-        UtilServer.runTaskAsync(JavaPlugin.getPlugin(Clans.class), () -> {
+        /*UtilServer.runTaskAsync(JavaPlugin.getPlugin(Clans.class), () -> {
             List<String> logs = ClanLogger.getJoinLeaveMessages(clan.getId(), finalAmount);
             UtilMessage.message(player, "Clan", "Retrieving the last <green>%s</green> logs", finalAmount);
 
             for (String log : logs) {
                 UtilMessage.message(player, "Clan", UtilMessage.deserialize("<white>" + log + "</white>"));
             }
-        });
+        });*/
     }
 }

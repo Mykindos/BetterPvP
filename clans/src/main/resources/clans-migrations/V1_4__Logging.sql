@@ -1,16 +1,3 @@
-
-create table if not exists clanlogmeta
-(
-    LogUUID     varchar(36)     not null,
-    UUID        varchar(36)             ,
-    UUIDType    varchar(12)     not null,
-
-    CONSTRAINT logmetauuid_id_fk
-        FOREIGN KEY (LogUUID) REFERENCES logtimes (id)
-);
-
-
-
 CREATE VIEW IF NOT EXISTS clanlogs AS
 SELECT L1.id as ID, L1.Time, L1.type, C1.Player1, C2.Clan1, C3.Player2, C4.Clan2 FROM logmeta L1
 LEFT JOIN (Select LogUUID, UUID as Player1 FROM logmetauuid WHERE UUIDType = 'PLAYER1') C1 ON C1.LogUUID = L1.id
@@ -28,4 +15,3 @@ BEGIN
     ORDER BY CL.Time DESC
     LIMIT amount;
 END;
-

@@ -45,7 +45,6 @@ public class ClanLogger {
     public static void addClanLog(ClanLog clanLog) {
         UtilServer.runTaskAsync(JavaPlugin.getPlugin(Clans.class), () -> {
             database.executeUpdate(clanLog.getLogTimeStatetment());
-            database.executeUpdate(clanLog.getClanLogStatement());
             database.executeBatch(clanLog.getStatements(), true);
         });
 

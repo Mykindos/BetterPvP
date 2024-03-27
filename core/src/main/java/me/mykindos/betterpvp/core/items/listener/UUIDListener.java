@@ -16,7 +16,6 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDItem;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.logging.type.FormattedLogger;
 import me.mykindos.betterpvp.core.logging.UUIDLogger;
 import me.mykindos.betterpvp.core.logging.type.UUIDLogType;
 import me.mykindos.betterpvp.core.logging.type.UUIDType;
@@ -224,7 +223,7 @@ public class UUIDListener implements Listener {
         if (uuidItemsList.isEmpty()) return;
         Location location = player.getLocation();
         for (UUIDItem item : uuidItemsList) {
-            UUID logID = FormattedLogger.info("%s died with (%s) at (%s, %s, %s) in %s",
+            UUID logID = log.info("%s died with (%s) at (%s, %s, %s) in %s",
                     player.getName(), item.getUuid(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
             UUIDLogger.addItemLog((ItemLog) new ItemLog(logID, UUIDLogType.ITEM_DEATH, item.getUuid())
                     .addLocation(location, null)
@@ -606,7 +605,7 @@ public class UUIDListener implements Listener {
             itemHandler.getUUIDItem(itemStack).ifPresent(item -> {
                 Location location = inventory.getLocation();
                 assert location != null;
-                UUID logID = FormattedLogger.info("%s stored (%s) in %s at (%s, %s, %s) in %s",
+                UUID logID = log.info("%s stored (%s) in %s at (%s, %s, %s) in %s",
                         player.getName(), item.getUuid(), inventory.getType().name(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
                 UUIDLogger.addItemLog((ItemLog) new ItemLog(logID, UUIDLogType.ITEM_CONTAINER_STORE, item.getUuid())
                         .addLocation(location, Objects.requireNonNull(inventory).getType().name())
