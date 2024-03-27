@@ -130,8 +130,8 @@ public class BPvPItem implements IBPvPItem {
     }
 
     /**
-     * @param itemStack1
-     * @param itemStack2
+     * @param itemStack1 First ItemStack to campare
+     * @param itemStack2 Second ItemStack to compare
      * @return true if itemStack1 is most likely the same item as itemStack2, false otherwise
      */
     public boolean compareExactItem(ItemStack itemStack1, ItemStack itemStack2) {
@@ -262,6 +262,7 @@ public class BPvPItem implements IBPvPItem {
      */
     public void damageItem(Player player, ItemStack itemStack, int damage) {
         if (getMaxDurability() < 0) return;
+
         ItemMeta itemMeta = itemStack.getItemMeta();
         PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
         if (!dataContainer.has(CoreNamespaceKeys.DURABILITY_KEY)) {
