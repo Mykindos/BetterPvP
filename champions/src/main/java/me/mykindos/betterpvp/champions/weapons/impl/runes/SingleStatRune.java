@@ -22,6 +22,12 @@ public abstract class SingleStatRune extends Rune {
         return meta.getPersistentDataContainer().getOrDefault(getNamespacedKey(), PersistentDataType.DOUBLE, 0.0);
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T extends Number> T getRollFromItem(PersistentDataContainer pdc) {
+        return (T) pdc.getOrDefault(getAppliedNamespacedKey(), PersistentDataType.DOUBLE, 0.0);
+    }
+
     @Override
     public void onInitialize(ItemMeta meta) {
 

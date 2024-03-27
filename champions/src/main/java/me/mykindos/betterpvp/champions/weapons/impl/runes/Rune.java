@@ -18,7 +18,9 @@ import java.util.List;
 public abstract class Rune extends Weapon {
 
     protected static final String[] ARMOUR_FILTER = {"HELMET", "CHESTPLATE", "LEGGINGS", "BOOTS"};
-    protected static final String[] MELEE_WEAPON_FILTER = {"SWORD", "AXE"};
+    protected static final String[] MELEE_WEAPON_FILTER = {"SWORD", "_AXE"};
+
+    protected static final String[] ALL_FILTER = {"HELMET", "CHESTPLATE", "LEGGINGS", "BOOTS", "SWORD", "AXE", "BOW", "FISHING_ROD", "HOE", "SHEARS"};
 
     protected Rune(Champions plugin, String key) {
         super(plugin, key);
@@ -30,6 +32,7 @@ public abstract class Rune extends Weapon {
 
     public abstract Component getRuneLoreDescription(ItemMeta meta);
     public abstract Component getItemLoreDescription(PersistentDataContainer pdc);
+    public abstract <T extends Number> T getRollFromItem(PersistentDataContainer pdc);
 
     public abstract int getTier();
 
