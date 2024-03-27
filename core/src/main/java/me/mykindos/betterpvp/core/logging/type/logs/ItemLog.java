@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.logging.type.logs;
 
+import lombok.Getter;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Getter
 public class ItemLog extends SearchableLog {
     private final UUIDLogType type;
     private final List<Statement> locationStatements = new ArrayList<>();

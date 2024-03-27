@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDItem;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDManager;
 import me.mykindos.betterpvp.core.logging.UUIDLogger;
+import me.mykindos.betterpvp.core.logging.type.formatted.FormattedItemLog;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
@@ -107,11 +108,11 @@ public class SearchCommand extends Command {
 
             final int finalAmount = amount;
             UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> {
-                List<String> logs = UUIDLogger.getUuidLogs(uuid, finalAmount);
+                List<FormattedItemLog> logs = UUIDLogger.getUuidLogs(uuid, finalAmount);
                 UtilMessage.message(player, "Search", "Retrieving the last <green>%s</green> logs for <light_purple>%s</light_purple> (<green>%s</green>)", finalAmount, uuid.toString(), uuidItem.getIdentifier());
 
-                for (String log : logs) {
-                    UtilMessage.message(player, "Search", UtilMessage.deserialize("<white>" + log + "</white>"));
+                for (FormattedItemLog log : logs) {
+                    UtilMessage.message(player, "Search", log.getComponent());
                 }
             });
 
@@ -193,11 +194,11 @@ public class SearchCommand extends Command {
 
                 final int finalAmount = amount;
                 UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> {
-                    List<String> logs = UUIDLogger.getPlayerLogs(targetClient.getUniqueId(), finalAmount);
+                    List<FormattedItemLog> logs = UUIDLogger.getPlayerLogs(targetClient.getUniqueId(), finalAmount);
                     UtilMessage.message(player, "Search", "Retrieving the last <green>%s</green> logs for <yellow>%s</yellow>", finalAmount, targetClient.getName());
 
-                    for (String log : logs) {
-                        UtilMessage.message(player, "Search", UtilMessage.deserialize("<white>" + log + "</white>"));
+                    for (FormattedItemLog log : logs) {
+                        UtilMessage.message(player, "Search", log.getComponent());
                     }
                 });
 

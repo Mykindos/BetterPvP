@@ -27,7 +27,7 @@ create table if not exists loglocations
 (
     LogUUID     varchar(36)     not null,
     Name        varchar(255)            ,
-    World       varchar(255)    not null,
+    WorldID     varchar(36)    not null,
     X           int             not null,
     Y           int                     ,
     Z           int             not null,
@@ -55,7 +55,7 @@ LEFT JOIN loglocations LL1 ON LL1.LogUUID = L1.id
 DROP PROCEDURE IF EXISTS GetItemLogsByUuid;
 CREATE PROCEDURE GetUuidLogsByUuid(UniqueID varchar(36), amount int)
 BEGIN
-    SELECT DISTINCT Time, Type, Item, Player1, Player2, Name, X, Y, Z, Name
+    SELECT DISTINCT Time, Type, Item, Player1, Player2, Name, World, X, Y, Z
     FROM itemlogs
     WHERE UUID = UniqueID
     AND UUIDType = 'ITEM'

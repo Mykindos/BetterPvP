@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
-import me.mykindos.betterpvp.clans.logging.types.FormattedClanLog;
+import me.mykindos.betterpvp.clans.logging.types.formatted.FormattedClanLog;
 import me.mykindos.betterpvp.clans.logging.types.formatted.JoinClanLog;
 import me.mykindos.betterpvp.clans.logging.types.ClanLogType;
 import me.mykindos.betterpvp.clans.logging.types.log.ClanLog;

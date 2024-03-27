@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.clans.logging.types.formatted;
 
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.logging.types.ClanLogType;
-import me.mykindos.betterpvp.clans.logging.types.FormattedClanLog;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import org.bukkit.OfflinePlayer;

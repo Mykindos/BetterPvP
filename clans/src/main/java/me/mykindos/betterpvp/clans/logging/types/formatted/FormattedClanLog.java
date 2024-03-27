@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.clans.logging.types;
+package me.mykindos.betterpvp.clans.logging.types.formatted;
 
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.logging.types.ClanLogType;
@@ -19,6 +19,15 @@ public class FormattedClanLog extends FormattedLog {
     protected Clan clan2;
     protected ClanLogType type;
 
+    /**
+     *
+     * @param time
+     * @param offlinePlayer1
+     * @param clan1
+     * @param offlinePlayer2
+     * @param clan2
+     * @param type
+     */
     public FormattedClanLog(long time, @Nullable OfflinePlayer offlinePlayer1, @Nullable Clan clan1, @Nullable OfflinePlayer offlinePlayer2, @Nullable Clan clan2, ClanLogType type) {
         super(time);
         this.offlinePlayer1 = offlinePlayer1;
