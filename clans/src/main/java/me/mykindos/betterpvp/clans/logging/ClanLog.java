@@ -10,7 +10,7 @@ import java.util.UUID;
 public class ClanLog extends SearchableLog {
     private final ClanLogType type;
 
-    ClanLog(UUID LogUUID, ClanLogType type) {
+    public ClanLog(UUID LogUUID, ClanLogType type) {
         super(LogUUID);
         this.type = type;
         statements.add(getClanLogStatement());

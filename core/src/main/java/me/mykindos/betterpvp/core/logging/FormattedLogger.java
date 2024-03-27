@@ -17,6 +17,7 @@ public class FormattedLogger {
     private static Database database;
 
     @Inject
+    @Deprecated(forRemoval = true)
     public FormattedLogger(Database database) {
         FormattedLogger.database = database;
     }

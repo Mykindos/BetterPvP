@@ -127,7 +127,7 @@ public class UUIDLogger {
         try {
             while(result.next()) {
                 long time = result.getLong(1);
-                logList.add("<green>" + UtilTime.getTime((System.currentTimeMillis() - time), 2) + " ago</green>  " + result.getString(2));
+                logList.add("<green>" + UtilTime.getTime((System.currentTimeMillis() - time), 2) + " ago</green> " + result.getString(2));
             }
         } catch (SQLException ex) {
             log.error("Failed to get player logs", ex);
