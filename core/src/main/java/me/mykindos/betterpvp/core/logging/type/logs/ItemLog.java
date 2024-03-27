@@ -5,6 +5,7 @@ import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
 import me.mykindos.betterpvp.core.logging.type.UUIDLogType;
+import me.mykindos.betterpvp.core.logging.type.UUIDType;
 import org.bukkit.Location;
 
 import java.util.ArrayList;
@@ -16,9 +17,10 @@ public class ItemLog extends SearchableLog {
     private final UUIDLogType type;
     private final List<Statement> locationStatements = new ArrayList<>();
 
-    public ItemLog(UUID LogUUID, UUIDLogType type) {
+    public ItemLog(UUID LogUUID, UUIDLogType type, UUID item) {
         super(LogUUID);
         this.type = type;
+        addMeta(item, UUIDType.ITEM);
     }
 
     public ItemLog addLocation(Location location, String name) {
