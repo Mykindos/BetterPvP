@@ -26,10 +26,9 @@ import me.mykindos.betterpvp.clans.clans.events.MemberDemoteEvent;
 import me.mykindos.betterpvp.clans.clans.events.MemberJoinClanEvent;
 import me.mykindos.betterpvp.clans.clans.events.MemberLeaveClanEvent;
 import me.mykindos.betterpvp.clans.clans.events.MemberPromoteEvent;
-import me.mykindos.betterpvp.clans.logging.ClanLog;
-import me.mykindos.betterpvp.clans.logging.ClanLogMeta;
-import me.mykindos.betterpvp.clans.logging.ClanLogType;
 import me.mykindos.betterpvp.clans.logging.ClanLogger;
+import me.mykindos.betterpvp.clans.logging.types.ClanLogType;
+import me.mykindos.betterpvp.clans.logging.types.log.ClanLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
@@ -45,6 +44,7 @@ import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.events.scoreboard.ScoreboardUpdateEvent;
 import me.mykindos.betterpvp.core.framework.inviting.InviteHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.logging.type.UUIDType;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
@@ -179,9 +179,9 @@ public class ClanEventListener extends ClanListener {
         } else {
             UUID id = log.info("%s (%s) created %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
                     clan.getName(), clan.getId());
-            ClanLogger.addClanLog(new ClanLog(id, ClanLogType.CREATE)
-                    .addMeta(event.getPlayer().getUniqueId(), ClanLogMeta.UUIDType.PLAYER1)
-                    .addMeta(clan.getId(), ClanLogMeta.UUIDType.CLAN1)
+            ClanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_CREATE)
+                    .addMeta(event.getPlayer().getUniqueId(), UUIDType.PLAYER1)
+                    .addMeta(clan.getId(), UUIDType.CLAN1)
             );
         }
 
@@ -225,9 +225,9 @@ public class ClanEventListener extends ClanListener {
 
         UUID id = log.info("%s (%s) disbanded %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
                 clan.getName(), clan.getId());
-        ClanLogger.addClanLog(new ClanLog(id, ClanLogType.DISBAND)
-                .addMeta(event.getPlayer().getUniqueId(), ClanLogMeta.UUIDType.PLAYER1)
-                .addMeta(clan.getId(), ClanLogMeta.UUIDType.CLAN1)
+        ClanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_DISBAND)
+                .addMeta(event.getPlayer().getUniqueId(), UUIDType.PLAYER1)
+                .addMeta(clan.getId(), UUIDType.CLAN1)
         );
 
     }
@@ -297,9 +297,9 @@ public class ClanEventListener extends ClanListener {
 
         UUID id = log.info("%s (%s) joined %s (%s)", player.getName(), player.getUniqueId(),
                 clan.getName(), clan.getId());
-        ClanLogger.addClanLog(new ClanLog(id, ClanLogType.JOIN)
-                .addMeta(player.getUniqueId(), ClanLogMeta.UUIDType.PLAYER1)
-                .addMeta(clan.getId(), ClanLogMeta.UUIDType.CLAN1)
+        ClanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_JOIN)
+                .addMeta(player.getUniqueId(), UUIDType.PLAYER1)
+                .addMeta(clan.getId(), UUIDType.CLAN1)
         );
     }
 
@@ -331,9 +331,9 @@ public class ClanEventListener extends ClanListener {
         }
         UUID id = log.info("%s (%s) left %s (%s)", player.getName(), player.getUniqueId(),
                 clan.getName(), clan.getId());
-        ClanLogger.addClanLog(new ClanLog(id, ClanLogType.LEAVE)
-                .addMeta(player.getUniqueId(), ClanLogMeta.UUIDType.PLAYER1)
-                .addMeta(clan.getId(), ClanLogMeta.UUIDType.CLAN1)
+        ClanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_LEAVE)
+                .addMeta(player.getUniqueId(), UUIDType.PLAYER1)
+                .addMeta(clan.getId(), UUIDType.CLAN1)
         );
     }
 
@@ -363,10 +363,10 @@ public class ClanEventListener extends ClanListener {
         UUID id = log.info("<yellow>%s</yellow> (%s) <red>kicked</red> <yellow>%s</yellow> (%s) from <aqua>%s</aqua> (%s)", player.getName(), player.getUniqueId(),
                 target.getName(), target.getUniqueId(),
                 clan.getName(), clan.getId());
-        ClanLogger.addClanLog(new ClanLog(id, ClanLogType.KICK)
-                .addMeta(player.getUniqueId(), ClanLogMeta.UUIDType.PLAYER1)
-                .addMeta(clan.getId(), ClanLogMeta.UUIDType.CLAN1)
-                .addMeta(target.getUniqueId(), ClanLogMeta.UUIDType.PLAYER2)
+        ClanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_KICK)
+                .addMeta(player.getUniqueId(), UUIDType.PLAYER1)
+                .addMeta(clan.getId(), UUIDType.CLAN1)
+                .addMeta(target.getUniqueId(), UUIDType.PLAYER2)
         );
     }
 

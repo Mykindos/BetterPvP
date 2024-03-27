@@ -10,7 +10,7 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDManager;
-import me.mykindos.betterpvp.core.logging.FormattedLogger;
+import me.mykindos.betterpvp.core.logging.type.FormattedLogger;
 import me.mykindos.betterpvp.core.logging.UUIDLogger;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;

@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.logging;
+package me.mykindos.betterpvp.core.logging.type;
 
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.database.Database;

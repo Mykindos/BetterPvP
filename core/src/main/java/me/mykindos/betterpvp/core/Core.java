@@ -23,7 +23,7 @@ import me.mykindos.betterpvp.core.injector.CoreInjectorModule;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDManager;
 import me.mykindos.betterpvp.core.listener.loader.CoreListenerLoader;
-import me.mykindos.betterpvp.core.logging.FormattedLogger;
+import me.mykindos.betterpvp.core.logging.type.FormattedLogger;
 import me.mykindos.betterpvp.core.logging.LoggerFactory;
 import me.mykindos.betterpvp.core.logging.UUIDLogger;
 import me.mykindos.betterpvp.core.logging.appenders.DatabaseAppender;

@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.clans.logging;
+package me.mykindos.betterpvp.clans.logging.types;
 
 public enum ClanLogType {
     /**

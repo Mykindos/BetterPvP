@@ -1,9 +1,10 @@
-package me.mykindos.betterpvp.clans.logging;
+package me.mykindos.betterpvp.clans.logging.types.log;
 
+import me.mykindos.betterpvp.clans.logging.types.ClanLogType;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
-import me.mykindos.betterpvp.core.logging.SearchableLog;
+import me.mykindos.betterpvp.core.logging.type.logs.SearchableLog;
 
 import java.util.UUID;
 
@@ -13,12 +14,6 @@ public class ClanLog extends SearchableLog {
     public ClanLog(UUID LogUUID, ClanLogType type) {
         super(LogUUID);
         this.type = type;
-    }
-
-    public ClanLog addMeta(UUID uuid, ClanLogMeta.UUIDType uuidType) {
-        ClanLogMeta clanMetaLog = new ClanLogMeta(uuid, uuidType);
-        statements.add(clanMetaLog.getStatement(this.LogUUID));
-        return this;
     }
 
     public Statement getClanLogStatement() {

@@ -1,6 +1,7 @@
-package me.mykindos.betterpvp.clans.logging;
+package me.mykindos.betterpvp.clans.logging.types;
 
 import me.mykindos.betterpvp.clans.clans.Clan;
+import me.mykindos.betterpvp.clans.logging.types.ClanLogType;
 import me.mykindos.betterpvp.core.logging.FormattedLog;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;

@@ -1,9 +1,10 @@
-package me.mykindos.betterpvp.core.logging;
+package me.mykindos.betterpvp.core.logging.type.logs;
 
 import lombok.Getter;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.LongStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
+import me.mykindos.betterpvp.core.logging.type.UUIDType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +24,12 @@ public abstract class SearchableLog {
     protected SearchableLog(UUID LogUUID) {
         this.LogUUID = LogUUID;
         this.time = System.currentTimeMillis();
+    }
+
+    public SearchableLog addMeta(UUID uuid, UUIDType uuidType) {
+        MetaUuidLog clanMetaLog = new MetaUuidLog(uuid, uuidType);
+        statements.add(clanMetaLog.getStatement(this.LogUUID));
+        return this;
     }
 
     public Statement getLogTimeStatetment() {

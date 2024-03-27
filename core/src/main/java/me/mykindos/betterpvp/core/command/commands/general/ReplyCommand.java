@@ -4,7 +4,7 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
-import me.mykindos.betterpvp.core.logging.FormattedLogger;
+import me.mykindos.betterpvp.core.logging.type.FormattedLogger;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
