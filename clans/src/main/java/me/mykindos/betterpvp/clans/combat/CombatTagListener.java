@@ -1,7 +1,6 @@
 package me.mykindos.betterpvp.clans.combat;
 
 import com.google.inject.Inject;
-import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -21,15 +20,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 
 import java.time.Duration;
-import java.util.HashSet;
-import java.util.Optional;
 import java.util.Random;
-import java.util.Set;
-import java.util.UUID;
 
 @BPvPListener
 public class CombatTagListener implements Listener {
-    private final Set<UUID> playersShownSafeMessage = new HashSet<>();
     private final ClientManager clientManager;
     private final EffectManager effectManager;
     private final ClanManager clanManager;
@@ -69,11 +63,9 @@ public class CombatTagListener implements Listener {
     public void showSafetySubtitle() {
         for (final Player player : Bukkit.getOnlinePlayers()) {
             Gamer gamer = clientManager.search().online(player).getGamer();
-            UUID playerId = player.getUniqueId();
 
             if (!UtilTime.elapsed(gamer.getLastDamaged(), 15000)) {
                 if (clanManager.isInSafeZone(player)) {
-                    playersShownSafeMessage.remove(playerId);
 
                     long remainingMillis = 15000 - (System.currentTimeMillis() - gamer.getLastDamaged());
                     double remainingSeconds = remainingMillis / 1000.0;
@@ -83,21 +75,6 @@ public class CombatTagListener implements Listener {
                     player.sendTitlePart(TitlePart.TITLE, Component.text(""));
                     player.sendTitlePart(TitlePart.SUBTITLE, subtitleText);
                 }
-            } else if (clanManager.isInSafeZone(player) && !playersShownSafeMessage.contains(playerId)) {
-                playersShownSafeMessage.add(playerId);
-
-                Optional<Clan> chunkClanOpt = clanManager.getClanByLocation(player.getLocation());
-                String clanName = chunkClanOpt.isPresent() ? chunkClanOpt.get().getName() : "No Clan";
-                Component safeText = UtilMessage.deserialize("<white>" + clanName + " <white>(<aqua>Safe<white>)");
-
-                player.sendTitlePart(TitlePart.TIMES, Title.Times.times(Duration.ofMillis(0), Duration.ofMillis(1500), Duration.ofMillis(500)));
-                player.sendTitlePart(TitlePart.TITLE, Component.text(""));
-                player.sendTitlePart(TitlePart.SUBTITLE, safeText);
-            } else if (!clanManager.isInSafeZone(player) && playersShownSafeMessage.contains(playerId)) {
-                player.sendTitlePart(TitlePart.TIMES, Title.Times.times(Duration.ofMillis(0), Duration.ofMillis(1500), Duration.ofMillis(500)));
-                player.sendTitlePart(TitlePart.TITLE, Component.text(""));
-                player.sendTitlePart(TitlePart.SUBTITLE, Component.empty());
-                playersShownSafeMessage.remove(playerId);
             }
         }
     }

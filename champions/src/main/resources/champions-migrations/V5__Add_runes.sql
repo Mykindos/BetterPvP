@@ -1,0 +1,14 @@
+
+-- Add runes to items & item lore
+INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, hasUUID) VALUES ('RAISER_ARMOR_TRIM_SMITHING_TEMPLATE', 'champions', 'conquering_rune_t2', '<blue>Rune of Conquering (Tier II)', 2, 0, 0);
+INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, hasUUID) VALUES ('RAISER_ARMOR_TRIM_SMITHING_TEMPLATE', 'champions', 'conquering_rune_t3', '<yellow>Rune of Conquering (Tier III)', 3, 0, 0);
+INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, hasUUID) VALUES ('WAYFINDER_ARMOR_TRIM_SMITHING_TEMPLATE', 'champions', 'insight_rune_t1', '<green>Rune of Insight (Tier I)', 1, 0, 0);
+INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, hasUUID) VALUES ('WAYFINDER_ARMOR_TRIM_SMITHING_TEMPLATE', 'champions', 'insight_rune_t2', '<blue>Rune of Insight (Tier II)', 2, 0, 0);
+INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, hasUUID) VALUES ('WAYFINDER_ARMOR_TRIM_SMITHING_TEMPLATE', 'champions', 'insight_rune_t3', '<yellow>Rune of Insight (Tier III)', 3, 0, 0);
+INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, hasUUID) VALUES ('RIB_ARMOR_TRIM_SMITHING_TEMPLATE', 'champions', 'haste_rune_t4', '<orange>Rune of Haste (Tier IV)', 4, 0, 0);
+INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, hasUUID) VALUES ('RAISER_ARMOR_TRIM_SMITHING_TEMPLATE', 'champions', 'conquering_rune_t1', '<green>Rune of Conquering (Tier I)', 1, 0, 0);
+INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, hasUUID) VALUES ('WILD_ARMOR_TRIM_SMITHING_TEMPLATE', 'champions', 'unbreaking_rune_t1', '<green>Rune of Unbreaking (Tier I)', 1, 0, 0);
+INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, hasUUID) VALUES ('WILD_ARMOR_TRIM_SMITHING_TEMPLATE', 'champions', 'unbreaking_rune_t2', '<blue>Rune of Unbreaking (Tier II)', 2, 0, 0);
+INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, hasUUID) VALUES ('WILD_ARMOR_TRIM_SMITHING_TEMPLATE', 'champions', 'unbreaking_rune_t3', '<yellow>Rune of Unbreaking (Tier III)', 3, 0, 0);
+INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, hasUUID) VALUES ('WILD_ARMOR_TRIM_SMITHING_TEMPLATE', 'champions', 'unbreaking_rune_t4', '<orange>Rune of Unbreaking (Tier IV)', 4, 0, 0);
+INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, hasUUID) VALUES ('SHAPER_ARMOR_TRIM_SMITHING_TEMPLATE', 'champions', 'alacrity_rune_t4', '<orange>Rune of Alacrity (Tier IV)', 4, 0, 0);

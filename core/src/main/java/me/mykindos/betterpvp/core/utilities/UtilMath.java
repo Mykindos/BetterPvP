@@ -289,4 +289,22 @@ public class UtilMath {
         return (double) tmp / factor;
     }
 
+    public static <T extends Number> T getRandomNumber(T min, T max, Class<T> type) {
+        if (type == Byte.class) {
+            return type.cast((byte) (RANDOM.nextInt((max.byteValue() - min.byteValue()) + 1) + min.byteValue()));
+        } else if (type == Short.class) {
+            return type.cast((short) (RANDOM.nextInt((max.shortValue() - min.shortValue()) + 1) + min.shortValue()));
+        } else if (type == Integer.class) {
+            return type.cast(RANDOM.nextInt((max.intValue() - min.intValue()) + 1) + min.intValue());
+        } else if (type == Long.class) {
+            return type.cast((long) (RANDOM.nextLong() * (max.longValue() - min.longValue()) + min.longValue()));
+        } else if (type == Float.class) {
+            return type.cast(RANDOM.nextFloat() * (max.floatValue() - min.floatValue()) + min.floatValue());
+        } else if (type == Double.class) {
+            return type.cast(RANDOM.nextDouble() * (max.doubleValue() - min.doubleValue()) + min.doubleValue());
+        } else {
+            throw new IllegalArgumentException("Unsupported type: " + type);
+        }
+    }
+
 }

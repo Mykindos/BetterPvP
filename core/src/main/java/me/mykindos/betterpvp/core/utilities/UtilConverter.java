@@ -11,6 +11,9 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -92,4 +95,36 @@ public class UtilConverter {
     public static EquivalentConverter<Material> getMaterialConverter() {
         return MATERIAL_CONVERTER.get();
     }
+
+    public static <T extends Number> T getNumberFromContainer(PersistentDataContainer container, NamespacedKey key, Class<T> type) {
+        Object value = container.get(key, getDataType(type));
+        if (type.isInstance(value)) {
+            return type.cast(value);
+        } else {
+            throw new ClassCastException("The value is not of type " + type.getName());
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> PersistentDataType<T, T> getDataType(Class<T> type) {
+        if (type == Byte.class) {
+            return (PersistentDataType<T, T>) PersistentDataType.BYTE;
+        } else if (type == Short.class) {
+            return (PersistentDataType<T, T>) PersistentDataType.SHORT;
+        } else if (type == Integer.class) {
+            return (PersistentDataType<T, T>) PersistentDataType.INTEGER;
+        } else if (type == Long.class) {
+            return (PersistentDataType<T, T>) PersistentDataType.LONG;
+        } else if (type == Float.class) {
+            return (PersistentDataType<T, T>) PersistentDataType.FLOAT;
+        } else if (type == Double.class) {
+            return (PersistentDataType<T, T>) PersistentDataType.DOUBLE;
+        } else if (type == String.class) {
+            return (PersistentDataType<T, T>) PersistentDataType.STRING;
+        } else {
+            throw new IllegalArgumentException("Unsupported type: " + type);
+        }
+    }
+
+
 }

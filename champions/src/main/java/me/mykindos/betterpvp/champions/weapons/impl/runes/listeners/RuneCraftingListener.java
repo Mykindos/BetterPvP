@@ -53,6 +53,7 @@ public class RuneCraftingListener implements Listener {
         BPvPItem item = itemHandler.getItem(secondItem);
         if(!(item instanceof Rune rune)) return;
 
+        if(!rune.itemMatchesFilter(firstItem.getType())) return;
         if(!rune.canApplyToItem(secondItem.getItemMeta(), firstItem.getItemMeta())) return;
 
         ItemStack result = firstItem.clone();
