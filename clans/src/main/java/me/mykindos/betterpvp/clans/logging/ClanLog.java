@@ -13,7 +13,6 @@ public class ClanLog extends SearchableLog {
     public ClanLog(UUID LogUUID, ClanLogType type) {
         super(LogUUID);
         this.type = type;
-        statements.add(getClanLogStatement());
     }
 
     public ClanLog addMeta(UUID uuid, ClanLogMeta.UUIDType uuidType) {
@@ -22,8 +21,8 @@ public class ClanLog extends SearchableLog {
         return this;
     }
 
-    private Statement getClanLogStatement() {
-        return new Statement("INSERT INTO clanlogs (LogUUID, type) VALUES (?, ?)",
+    public Statement getClanLogStatement() {
+        return new Statement("INSERT INTO clanlogtype (LogUUID, type) VALUES (?, ?)",
                 new UuidStatementValue(this.LogUUID),
                 new StringStatementValue(this.type.name()));
     }

@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
 import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
 import me.mykindos.betterpvp.clans.logging.ClanLogger;
+import me.mykindos.betterpvp.clans.logging.FormattedClanLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
@@ -61,11 +62,11 @@ public class LogsSubCommand extends ClanSubCommand {
 
         final int finalAmount = amount;
         UtilServer.runTaskAsync(JavaPlugin.getPlugin(Clans.class), () -> {
-            List<String> logs = ClanLogger.getAllLogs();
+            List<FormattedClanLog> logs = ClanLogger.getAllLogs(clan.getId(), finalAmount);
             UtilMessage.message(player, "Clan", "Retrieving the last <green>%s</green> logs", finalAmount);
 
-            for (String log : logs) {
-                UtilMessage.message(player, "Clan", UtilMessage.deserialize("<white>" + log + "</white>"));
+            for (FormattedClanLog log : logs) {
+                UtilMessage.message(player, "Clan", log.getComponent());
             }
         });
     }

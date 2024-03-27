@@ -23,10 +23,9 @@ public abstract class SearchableLog {
     protected SearchableLog(UUID LogUUID) {
         this.LogUUID = LogUUID;
         this.time = System.currentTimeMillis();
-        statements.add(getLogTimeStatetment());
     }
 
-    private Statement getLogTimeStatetment() {
+    public Statement getLogTimeStatetment() {
         return new Statement("INSERT INTO logtimes (id, Time) VALUES (?, ?)",
                 new UuidStatementValue(this.LogUUID),
                 new LongStatementValue(this.time));

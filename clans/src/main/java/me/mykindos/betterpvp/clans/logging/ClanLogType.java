@@ -4,23 +4,23 @@ public enum ClanLogType {
     /**
      * A player joins a Clan
      */
-    JOIN,
+    CLAN_JOIN,
     /**
      * A player leaves a Clan
      */
-    LEAVE,
+    CLAN_LEAVE,
     /**
      * A player is kicked from a Clan
      */
-    KICK,
+    CLAN_KICK,
     /**
      *
      */
-    CREATE,
+    CLAN_CREATE,
     /**
      *
      */
-    DISBAND
+    CLAN_DISBAND
     //TODO more enums
 
 }

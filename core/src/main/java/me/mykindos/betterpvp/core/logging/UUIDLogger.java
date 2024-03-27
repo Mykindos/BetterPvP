@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
+import me.mykindos.betterpvp.core.logging.type.UUIDType;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -133,11 +134,6 @@ public class UUIDLogger {
             log.error("Failed to get player logs", ex);
         }
         return logList;
-    }
-
-    public enum UUIDType {
-        PLAYER,
-        NONE
     }
 
      public enum UUIDLogType {
