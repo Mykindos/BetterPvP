@@ -1,10 +1,7 @@
 package me.mykindos.betterpvp.champions.weapons.impl.runes;
 
 import me.mykindos.betterpvp.champions.Champions;
-import me.mykindos.betterpvp.champions.utilities.ChampionsNamespacedKeys;
-import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
-import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;

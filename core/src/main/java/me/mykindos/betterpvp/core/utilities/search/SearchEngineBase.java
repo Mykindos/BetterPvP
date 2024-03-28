@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.core.utilities.search;
 
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.exception.ClientNotLoadedException;
-import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.model.manager.PlayerManager;
 import net.kyori.adventure.text.Component;

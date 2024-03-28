@@ -4,7 +4,6 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.weapons.impl.runes.Rune;
 import me.mykindos.betterpvp.champions.weapons.impl.runes.RuneNamespacedKeys;
 import me.mykindos.betterpvp.champions.weapons.impl.runes.SingleStatRune;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import org.bukkit.NamespacedKey;
@@ -13,7 +12,6 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.List;
-
 
 public abstract class HasteBase extends SingleStatRune {
 
