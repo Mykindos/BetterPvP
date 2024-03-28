@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.clans.logging.types.log.ClanLog;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
+import me.mykindos.betterpvp.core.database.query.values.LongStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
@@ -76,31 +77,6 @@ public class ClanLogger {
         return logList;
     }
 
-    public List<String> getClanLogs(UUID clanUUID, int amount) {
-        List<String> logList = new ArrayList<>();
-
-        if (amount < 0) {
-            return logList;
-        }
-
-        String query = "CALL GetClanLogsByClanUuidAmount(?, ?)";
-        CachedRowSet result = database.executeQuery( new Statement(query,
-                        new UuidStatementValue(clanUUID),
-                        new IntegerStatementValue(amount)
-                )
-        );
-
-        try {
-            while (result.next()) {
-                long time = result.getLong(1);
-                logList.add("<green>" + UtilTime.getTime((System.currentTimeMillis() - time), 2) + " ago</green> " + result.getString(2));
-            }
-        } catch (SQLException ex) {
-            log.error("Failed to get ClanUUID logs", ex);
-        }
-        return logList;
-    }
-
     public List<String> getClanKillLogs(UUID clanUUID, int amount) {
         List<String> logList = new ArrayList<>();
 
@@ -124,6 +100,24 @@ public class ClanLogger {
             log.error("Failed to get ClanUUID logs", ex);
         }
         return logList;
+    }
+
+    public UUID getClanUUIDOfPlayerAtTime(UUID playerID, long time) {
+        String query = "CALL GetClanByPlayerAtTime(?, ?)";
+        CachedRowSet result = database.executeQuery(new Statement(query,
+                        new UuidStatementValue(playerID),
+                        new LongStatementValue(time)
+                )
+        );
+        try {
+            while (result.next()) {
+                String UUID = result.getString(1);
+                return java.util.UUID.fromString(UUID);
+            }
+        } catch (SQLException ex) {
+            log.error("Failed to get ClanUUID logs", ex);
+        }
+        return null;
     }
 
     public FormattedClanLog formattedLogFromRow(long time, String player1ID, String clan1ID, String player2ID, String clan2ID, ClanLogType type) {

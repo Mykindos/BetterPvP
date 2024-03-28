@@ -15,3 +15,33 @@ BEGIN
     ORDER BY CL.Time DESC
     LIMIT amount;
 END;
+
+DROP PROCEDURE IF EXISTS GetClanJoinLeaveLogsByClan;
+CREATE PROCEDURE GetClanJoinLeaveLogsByClan(ClanID varchar(36), amount int)
+BEGIN
+    SELECT DISTINCT CL.Time, CL.type, CL.Player1, CL.Clan1, CL.Player2, CL.Clan2
+    FROM clanlogs CL
+    WHERE CL.Clan1 = ClanID
+    AND CL.type in ('CLAN_CREATE', 'CLAN_JOIN', 'CLAN_LEAVE', 'CLAN_KICK')
+    ORDER BY CL.Time DESC
+    LIMIT amount;
+END;
+
+DROP PROCEDURE IF EXISTS GetClanByPlayerAtTime;
+CREATE PROCEDURE GetClanByPlayerAtTime(PlayerID varchar(36), time bigint)
+BEGIN
+    Select CL.Clan1 as ClanID FROM clanlogs CL
+    WHERE (Select Count(*) FROM clanlogs C1 WHERE CL.Clan1 = C1.Clan1
+        AND C1.type = 'CLAN_DISBAND'
+        AND C1.time < time) = 0
+    AND (Select Count(C2.type) FROM clanlogs C2 WHERE CL.Clan1 = C2.Clan1
+        AND C2.type in ('CLAN_CREATE', 'CLAN_JOIN')
+        AND C2.time < time
+        AND C2.Player1 = PlayerID) >
+        (Select Count(C3.type) FROM clanlogs C3 WHERE CL.Clan1 = C3.Clan1
+           AND C3.type in ('CLAN_LEAVE', 'CLAN_KICK')
+           AND C3.time < time
+           AND C3.Player1 = PlayerID)
+    GROUP BY CL.Clan1
+    ORDER BY CL.Time Desc;
+END;

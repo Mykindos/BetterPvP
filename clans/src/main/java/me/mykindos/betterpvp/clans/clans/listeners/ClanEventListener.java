@@ -362,13 +362,14 @@ public class ClanEventListener extends ClanListener {
                 UtilMessage.simpleMessage(targetPlayer, "Clans", "You were kicked from <alt2>" + clan.getName());
             }
         }
-        UUID id = log.info("<yellow>%s</yellow> (%s) <red>kicked</red> <yellow>%s</yellow> (%s) from <aqua>%s</aqua> (%s)", player.getName(), player.getUniqueId(),
+        UUID id = log.info(">%s (%s) was kicked by %s (%s) from %s (%s)", player.getName(), player.getUniqueId(),
                 target.getName(), target.getUniqueId(),
                 clan.getName(), clan.getId());
         clanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_KICK)
-                .addMeta(player.getUniqueId(), UUIDType.PLAYER1)
+                .addMeta(target.getUniqueId(), UUIDType.PLAYER1)
                 .addMeta(clan.getId(), UUIDType.CLAN1)
-                .addMeta(target.getUniqueId(), UUIDType.PLAYER2)
+                .addMeta(player.getUniqueId(), UUIDType.PLAYER2)
+                .addMeta(clan.getId(), UUIDType.CLAN2)
         );
     }
 
