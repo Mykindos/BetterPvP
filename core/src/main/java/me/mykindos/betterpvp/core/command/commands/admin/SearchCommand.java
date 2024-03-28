@@ -11,7 +11,6 @@ import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDItem;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDManager;
-import me.mykindos.betterpvp.core.logging.UUIDLogger;
 import me.mykindos.betterpvp.core.logging.type.formatted.FormattedItemLog;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -108,7 +107,7 @@ public class SearchCommand extends Command {
 
             final int finalAmount = amount;
             UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> {
-                List<FormattedItemLog> logs = UUIDLogger.getUuidLogs(uuid, finalAmount);
+                List<FormattedItemLog> logs = uuidManager.getUuidRepository().getUuidLogger().getUuidLogs(uuid, finalAmount);
                 UtilMessage.message(player, "Search", "Retrieving the last <green>%s</green> logs for <light_purple>%s</light_purple> (<green>%s</green>)", finalAmount, uuid.toString(), uuidItem.getIdentifier());
 
                 for (FormattedItemLog log : logs) {
@@ -148,6 +147,9 @@ public class SearchCommand extends Command {
 
         @Inject
         ClientManager clientManager;
+
+        @Inject
+        UUIDManager uuidManager;
 
         @Override
         public String getName() {
@@ -194,7 +196,7 @@ public class SearchCommand extends Command {
 
                 final int finalAmount = amount;
                 UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> {
-                    List<FormattedItemLog> logs = UUIDLogger.getPlayerLogs(targetClient.getUniqueId(), finalAmount);
+                    List<FormattedItemLog> logs = uuidManager.getUuidRepository().getUuidLogger().getPlayerLogs(targetClient.getUniqueId(), finalAmount);
                     UtilMessage.message(player, "Search", "Retrieving the last <green>%s</green> logs for <yellow>%s</yellow>", finalAmount, targetClient.getName());
 
                     for (FormattedItemLog log : logs) {

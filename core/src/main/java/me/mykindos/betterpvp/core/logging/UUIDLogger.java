@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.core.logging;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
@@ -25,17 +25,17 @@ import java.util.List;
 import java.util.UUID;
 
 @Singleton
-@Slf4j
+@CustomLog
 public class UUIDLogger {
 
-    private static Database database;
+    private Database database;
 
     @Inject
     public UUIDLogger(Database database) {
-        UUIDLogger.database = database;
+        this.database = database;
     }
 
-    public static void addItemLog(ItemLog itemLog) {
+    public void addItemLog(ItemLog itemLog) {
         UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> {
             database.executeUpdate(itemLog.getLogTimeStatetment());
             database.executeBatch(itemLog.getStatements(), true);
@@ -51,7 +51,7 @@ public class UUIDLogger {
      * @param amount the number of logs to retrieve
      * @return A list of the last amount of logs relating to this uiid
      */
-    public static List<FormattedItemLog> getUuidLogs(UUID itemUUID, int amount) {
+    public List<FormattedItemLog> getUuidLogs(UUID itemUUID, int amount) {
         List<FormattedItemLog> logList = new ArrayList<>();
         if (amount < 0) {
             return logList;
@@ -91,7 +91,7 @@ public class UUIDLogger {
      * @param amount the number of logs to retrieve
      * @return A list of the last amount of logs relating to this player
      */
-    public static List<FormattedItemLog> getPlayerLogs(UUID playerUuid, int amount) {
+    public List<FormattedItemLog> getPlayerLogs(UUID playerUuid, int amount) {
         List<FormattedItemLog> logList = new ArrayList<>();
         if (amount < 0) {
             return logList;
@@ -124,7 +124,7 @@ public class UUIDLogger {
         }
         return logList;
     }
-    public static FormattedItemLog formattedLogFromRow(long time, UUIDLogType type, String itemID, String player1ID, String player2ID, String name, String world, int x, int y, int z) {
+    public FormattedItemLog formattedLogFromRow(long time, UUIDLogType type, String itemID, String player1ID, String player2ID, String name, String world, int x, int y, int z) {
         UUID item = UUID.fromString(itemID);
 
         OfflinePlayer offlinePlayer1 = null;

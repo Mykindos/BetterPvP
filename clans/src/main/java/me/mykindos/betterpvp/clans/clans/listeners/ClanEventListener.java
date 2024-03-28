@@ -69,6 +69,7 @@ public class ClanEventListener extends ClanListener {
     private final InviteHandler inviteHandler;
     private final WorldBlockHandler blockHandler;
     private final Clans clans;
+    private final ClanLogger clanLogger;
 
     private final CommandManager commandManager;
 
@@ -78,11 +79,12 @@ public class ClanEventListener extends ClanListener {
 
     @Inject
     public ClanEventListener(Clans clans, ClanManager clanManager, ClientManager clientManager, InviteHandler inviteHandler,
-                             WorldBlockHandler blockHandler, CommandManager commandManager) {
+                             WorldBlockHandler blockHandler, ClanLogger clanLogger, CommandManager commandManager) {
         super(clanManager, clientManager);
         this.clans = clans;
         this.inviteHandler = inviteHandler;
         this.blockHandler = blockHandler;
+        this.clanLogger = clanLogger;
         this.commandManager = commandManager;
     }
 
@@ -179,7 +181,7 @@ public class ClanEventListener extends ClanListener {
         } else {
             UUID id = log.info("%s (%s) created %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
                     clan.getName(), clan.getId());
-            ClanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_CREATE)
+            clanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_CREATE)
                     .addMeta(event.getPlayer().getUniqueId(), UUIDType.PLAYER1)
                     .addMeta(clan.getId(), UUIDType.CLAN1)
             );
@@ -225,7 +227,7 @@ public class ClanEventListener extends ClanListener {
 
         UUID id = log.info("%s (%s) disbanded %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
                 clan.getName(), clan.getId());
-        ClanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_DISBAND)
+        clanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_DISBAND)
                 .addMeta(event.getPlayer().getUniqueId(), UUIDType.PLAYER1)
                 .addMeta(clan.getId(), UUIDType.CLAN1)
         );
@@ -297,7 +299,7 @@ public class ClanEventListener extends ClanListener {
 
         UUID id = log.info("%s (%s) joined %s (%s)", player.getName(), player.getUniqueId(),
                 clan.getName(), clan.getId());
-        ClanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_JOIN)
+        clanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_JOIN)
                 .addMeta(player.getUniqueId(), UUIDType.PLAYER1)
                 .addMeta(clan.getId(), UUIDType.CLAN1)
         );
@@ -331,7 +333,7 @@ public class ClanEventListener extends ClanListener {
         }
         UUID id = log.info("%s (%s) left %s (%s)", player.getName(), player.getUniqueId(),
                 clan.getName(), clan.getId());
-        ClanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_LEAVE)
+        clanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_LEAVE)
                 .addMeta(player.getUniqueId(), UUIDType.PLAYER1)
                 .addMeta(clan.getId(), UUIDType.CLAN1)
         );
@@ -363,7 +365,7 @@ public class ClanEventListener extends ClanListener {
         UUID id = log.info("<yellow>%s</yellow> (%s) <red>kicked</red> <yellow>%s</yellow> (%s) from <aqua>%s</aqua> (%s)", player.getName(), player.getUniqueId(),
                 target.getName(), target.getUniqueId(),
                 clan.getName(), clan.getId());
-        ClanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_KICK)
+        clanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_KICK)
                 .addMeta(player.getUniqueId(), UUIDType.PLAYER1)
                 .addMeta(clan.getId(), UUIDType.CLAN1)
                 .addMeta(target.getUniqueId(), UUIDType.PLAYER2)
@@ -524,7 +526,6 @@ public class ClanEventListener extends ClanListener {
                     target.getName(), target.getId());
         } else {
             UtilServer.callEvent(new ClanNeutralEvent(event.getPlayer(), clan, target));
-            return;
         }
 
 

@@ -23,9 +23,12 @@ import java.util.List;
 @SubCommand(ClanCommand.class)
 public class LogsSubCommand extends ClanSubCommand {
 
+    private final ClanLogger clanLogger;
+
     @Inject
-    public LogsSubCommand(ClanManager clanManager, ClientManager clientManager) {
+    public LogsSubCommand(ClanManager clanManager, ClientManager clientManager, ClanLogger clanLogger) {
         super(clanManager, clientManager);
+        this.clanLogger = clanLogger;
     }
 
     @Override
@@ -62,7 +65,7 @@ public class LogsSubCommand extends ClanSubCommand {
 
         final int finalAmount = amount;
         UtilServer.runTaskAsync(JavaPlugin.getPlugin(Clans.class), () -> {
-            List<FormattedClanLog> logs = ClanLogger.getAllLogs(clan.getId(), finalAmount);
+            List<FormattedClanLog> logs = clanLogger.getAllLogs(clan.getId(), finalAmount);
             UtilMessage.message(player, "Clan", "Retrieving the last <green>%s</green> logs", finalAmount);
 
             for (FormattedClanLog log : logs) {

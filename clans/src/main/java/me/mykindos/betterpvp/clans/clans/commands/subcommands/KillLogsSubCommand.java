@@ -21,10 +21,11 @@ import java.util.List;
 @Singleton
 @SubCommand(ClanCommand.class)
 public class KillLogsSubCommand extends ClanSubCommand {
-
+    private final ClanLogger clanLogger;
     @Inject
-    public KillLogsSubCommand(ClanManager clanManager, ClientManager clientManager) {
+    public KillLogsSubCommand(ClanManager clanManager, ClientManager clientManager, ClanLogger clanLogger) {
         super(clanManager, clientManager);
+        this.clanLogger = clanLogger;
     }
 
     @Override
@@ -61,7 +62,7 @@ public class KillLogsSubCommand extends ClanSubCommand {
 
         final int finalAmount = amount;
         UtilServer.runTaskAsync(JavaPlugin.getPlugin(Clans.class), () -> {
-            List<String> logs = ClanLogger.getClanKillLogs(clan.getId(), finalAmount);
+            List<String> logs = clanLogger.getClanKillLogs(clan.getId(), finalAmount);
             UtilMessage.message(player, "Clan", "Retrieving the last <green>%s</green> logs", finalAmount);
 
             for (String log : logs) {

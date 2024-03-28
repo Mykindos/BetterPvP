@@ -12,7 +12,6 @@ import me.mykindos.betterpvp.core.items.BPvPItem;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDItem;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDManager;
-import me.mykindos.betterpvp.core.logging.UUIDLogger;
 import me.mykindos.betterpvp.core.logging.type.UUIDLogType;
 import me.mykindos.betterpvp.core.logging.type.UUIDType;
 import me.mykindos.betterpvp.core.logging.type.logs.ItemLog;
@@ -106,7 +105,7 @@ public class CustomGiveCommand extends Command {
         }
         if (uuidItem != null) {
             UUID logID = log.info("%s spawned and gave (%s) to %s", player.getName(), uuidItem.getUuid(), target.getName());
-            UUIDLogger.addItemLog((ItemLog) new ItemLog(logID, UUIDLogType.ITEM_SPAWN, uuidItem.getUuid())
+            uuidManager.getUuidRepository().getUuidLogger().addItemLog((ItemLog) new ItemLog(logID, UUIDLogType.ITEM_SPAWN, uuidItem.getUuid())
                     .addMeta(player.getUniqueId(), UUIDType.PLAYER1)
                     .addMeta(target.getUniqueId(), UUIDType.PLAYER2)
             );

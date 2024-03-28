@@ -1,15 +1,15 @@
 package me.mykindos.betterpvp.clans.logging;
 
 import com.google.inject.Inject;
-import lombok.extern.slf4j.Slf4j;
+import com.google.inject.Singleton;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
+import me.mykindos.betterpvp.clans.logging.types.ClanLogType;
 import me.mykindos.betterpvp.clans.logging.types.formatted.FormattedClanLog;
 import me.mykindos.betterpvp.clans.logging.types.formatted.JoinClanLog;
-import me.mykindos.betterpvp.clans.logging.types.ClanLogType;
 import me.mykindos.betterpvp.clans.logging.types.log.ClanLog;
-import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
@@ -26,23 +26,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@Slf4j
+@CustomLog
+@Singleton
 public class ClanLogger {
 
-    private static Database database;
-    private static ClanManager clanManager;
+    private final Database database;
+    private final ClanManager clanManager;
 
     @Inject
-    public ClanLogger(Database database, ClanManager clanManager, ClientManager clientManager) {
-        ClanLogger.database = database;
-        ClanLogger.clanManager = clanManager;
+    public ClanLogger(Database database, ClanManager clanManager) {
+        this.database = database;
+        this.clanManager = clanManager;
     }
 
     /**
      * Add the logs related to the specified clan log
      * @param clanLog the specified clan log
      */
-    public static void addClanLog(ClanLog clanLog) {
+    public void addClanLog(ClanLog clanLog) {
         UtilServer.runTaskAsync(JavaPlugin.getPlugin(Clans.class), () -> {
             database.executeUpdate(clanLog.getLogTimeStatetment());
             database.executeBatch(clanLog.getStatements(), true);
@@ -50,7 +51,7 @@ public class ClanLogger {
 
     }
 
-    public static List<FormattedClanLog> getAllLogs(UUID ClanID, int amount) {
+    public List<FormattedClanLog> getAllLogs(UUID ClanID, int amount) {
         List<FormattedClanLog> logList = new ArrayList<>();
         String query = "Call GetClanLogsByClan(?, ?)";
         CachedRowSet result = database.executeQuery( new Statement(query,
@@ -75,7 +76,7 @@ public class ClanLogger {
         return logList;
     }
 
-    public static List<String> getClanLogs(UUID clanUUID, int amount) {
+    public List<String> getClanLogs(UUID clanUUID, int amount) {
         List<String> logList = new ArrayList<>();
 
         if (amount < 0) {
@@ -100,7 +101,7 @@ public class ClanLogger {
         return logList;
     }
 
-    public static List<String> getClanKillLogs(UUID clanUUID, int amount) {
+    public List<String> getClanKillLogs(UUID clanUUID, int amount) {
         List<String> logList = new ArrayList<>();
 
         if (amount < 0) {
@@ -125,7 +126,7 @@ public class ClanLogger {
         return logList;
     }
 
-    public static FormattedClanLog formattedLogFromRow(long time, String player1ID, String clan1ID, String player2ID, String clan2ID, ClanLogType type) {
+    public FormattedClanLog formattedLogFromRow(long time, String player1ID, String clan1ID, String player2ID, String clan2ID, ClanLogType type) {
         OfflinePlayer offlinePlayer1 = null;
         if (player1ID != null) {
             offlinePlayer1 = Bukkit.getOfflinePlayer(UUID.fromString(player1ID));

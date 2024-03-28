@@ -95,7 +95,7 @@ public class LegendLogSubcommand extends Command {
         if (client != null) {
             itemLog.addMeta(client.getUniqueId(), UUIDType.PLAYER2);
         }
-        UUIDLogger.addItemLog(itemLog);
+        uuidManager.getUuidRepository().getUuidLogger().addItemLog(itemLog);
         clientManager.sendMessageToRank("Log", UtilMessage.deserialize("<yellow>%s</yellow> Generated a custom legend log: " + finalMessage, player.getName()), Rank.HELPER);
     }
 
