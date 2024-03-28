@@ -12,3 +12,5 @@ INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, h
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, hasUUID) VALUES ('WILD_ARMOR_TRIM_SMITHING_TEMPLATE', 'champions', 'unbreaking_rune_t3', '<yellow>Rune of Unbreaking (Tier III)', 3, 0, 0);
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, hasUUID) VALUES ('WILD_ARMOR_TRIM_SMITHING_TEMPLATE', 'champions', 'unbreaking_rune_t4', '<orange>Rune of Unbreaking (Tier IV)', 4, 0, 0);
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, hasUUID) VALUES ('SHAPER_ARMOR_TRIM_SMITHING_TEMPLATE', 'champions', 'alacrity_rune_t4', '<orange>Rune of Alacrity (Tier IV)', 4, 0, 0);
+INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, hasUUID) VALUES ('SNOUT_ARMOR_TRIM_SMITHING_TEMPLATE', 'champions', 'frost_rune_t3', '<yellow>Rune of Frost (Tier III)', 3, 0, 0);
+INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, hasUUID) VALUES ('SNOUT_ARMOR_TRIM_SMITHING_TEMPLATE', 'champions', 'frost_rune_t4', '<orange>Rune of Frost (Tier IV)', 4, 0, 0);

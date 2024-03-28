@@ -1,0 +1,62 @@
+conquering_rune_t1:
+  enabled: true
+  minRoll: 0.5
+  maxRoll: 1.0
+conquering_rune_t2:
+  enabled: true
+  minRoll: 1.0
+  maxRoll: 1.5
+conquering_rune_t3:
+  enabled: true
+  minRoll: 1.5
+  maxRoll: 2.0
+insight_rune_t1:
+  enabled: true
+  minRoll: 1.0
+  maxRoll: 4.0
+insight_rune_t2:
+  enabled: true
+  minRoll: 4.0
+  maxRoll: 7.0
+insight_rune_t3:
+  enabled: true
+  minRoll: 7.0
+  maxRoll: 10.0
+haste_rune_t4:
+  enabled: true
+  minRoll: 10.0
+  maxRoll: 20.0
+unbreaking_rune_t1:
+  enabled: true
+  minRoll: 1.0
+  maxRoll: 10.0
+unbreaking_rune_t2:
+  enabled: true
+  minRoll: 10.0
+  maxRoll: 20.0
+unbreaking_rune_t3:
+  enabled: true
+  minRoll: 20.0
+  maxRoll: 30.0
+unbreaking_rune_t4:
+  enabled: true
+  minRoll: 30.0
+  maxRoll: 50.0
+alacrity_rune_t4:
+  enabled: true
+  minRoll: 5.0
+  maxRoll: 10.0
+frost_rune_t3:
+  enabled: true
+  chanceMinRoll: 1.0
+  chanceMaxRoll: 10.0
+  durationMinRoll: 1.0
+  durationMaxRoll: 3.0
+  slownessAmplifier: 1
+frost_rune_t4:
+  enabled: true
+  chanceMinRoll: 10.0
+  chanceMaxRoll: 15.0
+  durationMinRoll: 3.0
+  durationMaxRoll: 4.0
+  slownessAmplifier: 2

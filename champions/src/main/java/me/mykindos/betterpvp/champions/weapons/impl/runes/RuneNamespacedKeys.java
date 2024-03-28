@@ -13,7 +13,11 @@ public class RuneNamespacedKeys {
     public static final NamespacedKey INSIGHT = new NamespacedKey("champions", "rune-insight");
     public static final NamespacedKey HASTE = new NamespacedKey("champions", "rune-haste");
     public static final NamespacedKey UNBREAKING = new NamespacedKey("champions", "rune-unbreaking");
-    public static final NamespacedKey FROST = new NamespacedKey("champions", "rune-frost");
     public static final NamespacedKey ALACRITY = new NamespacedKey("champions", "rune-alacrity");
+
+    public static final NamespacedKey FROST = new NamespacedKey("champions", "rune-frost");
+    public static final NamespacedKey FROST_CHANCE = new NamespacedKey("champions", "rune-frost-chance");
+    public static final NamespacedKey FROST_DURATION = new NamespacedKey("champions", "rune-frost-duration");
+    public static final NamespacedKey FROST_AMPLIFIER = new NamespacedKey("champions", "rune-frost-amplifier");
 
 }

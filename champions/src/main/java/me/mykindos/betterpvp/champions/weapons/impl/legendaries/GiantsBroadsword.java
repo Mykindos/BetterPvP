@@ -32,7 +32,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -61,7 +61,7 @@ public class GiantsBroadsword extends ChannelWeapon implements InteractWeapon, L
     }
 
     @Override
-    public List<Component> getLore(ItemStack item) {
+    public List<Component> getLore(ItemMeta meta) {
         List<Component> lore = new ArrayList<>();
         lore.add(Component.text("Forged in the godly mines of Plagieus,", NamedTextColor.WHITE));
         lore.add(Component.text("this sword has endured thousands of", NamedTextColor.WHITE));
