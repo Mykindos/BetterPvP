@@ -960,6 +960,27 @@ skills:
       speedStrength: 2
       radius: 4
       energySiphoned: 1.0
+    bloodsphere:
+      enabled: true
+      maxlevel: 5
+      cooldown: 15.0
+      cooldownDecreasePerLevel: 0.5
+      growthPerSecond: 0.1
+      growthPerSecondIncreasePerLevel: 0.05
+      expireSeconds: 7.0
+      expireSecondsIncreasePerLevel: 0.0
+      applyRadius: 2.0
+      applyRadiusIncreasePerLevel: 1.0
+      passiveTravelSpeed: 0.8
+      applyTravelSpeed: 0.2
+      damagePerSecond: 10.0
+      damageIncreasePerLevel: 0.5
+      regenPerSecond: 5.0
+      regenIncreasePerLevel: 0.5
+      impactHealthMultiplier: 0.1
+      impactHealthMultiplierIncreasePerLevel: 0.05
+      healthSeconds: 0.5
+      mobHealthModifier: 0.25
   global:
     breakfall:
       enabled: true
