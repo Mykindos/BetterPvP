@@ -3,14 +3,20 @@ package me.mykindos.betterpvp.core.logging;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
-import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
-import me.mykindos.betterpvp.core.utilities.UtilTime;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import me.mykindos.betterpvp.core.logging.type.UUIDLogType;
+import me.mykindos.betterpvp.core.logging.type.formatted.FormattedItemLog;
+import me.mykindos.betterpvp.core.logging.type.formatted.PickupItemLog;
+import me.mykindos.betterpvp.core.logging.type.logs.ItemLog;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.sql.rowset.CachedRowSet;
 import java.sql.SQLException;
@@ -22,57 +28,21 @@ import java.util.UUID;
 @CustomLog
 public class UUIDLogger {
 
-    private static Database database;
+    private Database database;
 
     @Inject
     public UUIDLogger(Database database) {
-        UUIDLogger.database = database;
+        this.database = database;
     }
 
-    /**
-     *
-     * @param id - the UUID of the log this information is about
-     * @param itemUuid - the UUID of the item this information is about
-     * @param type - the type of log this is
-     * @param uuid - UUID of the player
-     */
-    public static void addItemUUIDMetaInfoPlayer(UUID id, UUID itemUuid, UUIDLogType type, @Nullable UUID uuid) {
-        addItemUUIDMetaInfo(id, itemUuid, type, uuid, UUIDType.PLAYER);
-    }
-
-    /**
-     *
-     * @param id - the UUID of the log this information is about
-     * @param itemUuid - the UUID of the item this information is about
-     * @param type - the type of log this is
-     */
-    public static void addItemUUIDMetaInfoNone(UUID id, UUID itemUuid, UUIDLogType type) {
-        addItemUUIDMetaInfo(id, itemUuid, type, null, UUIDType.NONE);
-    }
-
-
-    /**
-     *
-     * @param logUUID - the UUID of the log this information is about
-     * @param itemUuid - the UUID of the item this information is about
-     * @param type - the type of log this is
-     * @param uuid - UUID of type uuidType
-     * @param uuidType - the type of UUID uuid is.
-     */
-    public static void addItemUUIDMetaInfo(@NotNull UUID logUUID, @NotNull UUID itemUuid, @NotNull UUIDLogger.UUIDLogType type, @Nullable UUID uuid, @NotNull UUIDType uuidType) {
-        UUID metaUUID = UUID.randomUUID();
-
-
-        String query = "INSERT INTO uuidlogmeta (id, LogUUID, ItemUUID, Type, UUID, UUIDtype) VALUES (?, ?, ?, ?, ?, ?)";
-        database.executeUpdate(new Statement(query,
-                new UuidStatementValue(metaUUID),
-                new UuidStatementValue(logUUID),
-                new UuidStatementValue(itemUuid),
-                new StringStatementValue(type.name()),
-                new StringStatementValue(uuid == null ? null : uuid.toString()),
-                new StringStatementValue(uuidType.name())
-                )
-        );
+    public void addItemLog(ItemLog itemLog) {
+        UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> {
+            database.executeUpdate(itemLog.getLogTimeStatetment());
+            database.executeBatch(itemLog.getStatements(), true);
+            if (itemLog.getLocationStatement() != null) {
+                database.executeUpdate(itemLog.getLocationStatement());
+            }
+        });
     }
 
     /**
@@ -81,8 +51,8 @@ public class UUIDLogger {
      * @param amount the number of logs to retrieve
      * @return A list of the last amount of logs relating to this uiid
      */
-    public static List<String> getUuidLogs(UUID itemUUID, int amount) {
-        List<String> logList = new ArrayList<>();
+    public List<FormattedItemLog> getUuidLogs(UUID itemUUID, int amount) {
+        List<FormattedItemLog> logList = new ArrayList<>();
         if (amount < 0) {
             return logList;
         }
@@ -97,7 +67,17 @@ public class UUIDLogger {
         try {
             while (result.next()) {
                 long time = result.getLong(1);
-                logList.add("<green>" + UtilTime.getTime((System.currentTimeMillis() - time), 2) + " ago</green> " + result.getString(2));
+                UUIDLogType type = UUIDLogType.valueOf(result.getString(2));
+                String itemID = result.getString(3);
+                String player1ID = result.getString(4);
+                String player2ID = result.getString(5);
+                String name = result.getString(6);
+                String worldID = result.getString(7);
+                int X = result.getInt(8);
+                int Y = result.getInt(9);
+                int Z = result.getInt(10);
+
+                logList.add(formattedLogFromRow(time, type, itemID, player1ID, player2ID, name, worldID, X, Y, Z));
             }
         } catch (SQLException ex) {
             log.error("Failed to get UUID logs", ex);
@@ -111,8 +91,8 @@ public class UUIDLogger {
      * @param amount the number of logs to retrieve
      * @return A list of the last amount of logs relating to this player
      */
-    public static List<String> getPlayerLogs(UUID playerUuid, int amount) {
-        List<String> logList = new ArrayList<>();
+    public List<FormattedItemLog> getPlayerLogs(UUID playerUuid, int amount) {
+        List<FormattedItemLog> logList = new ArrayList<>();
         if (amount < 0) {
             return logList;
         }
@@ -127,88 +107,47 @@ public class UUIDLogger {
         try {
             while(result.next()) {
                 long time = result.getLong(1);
-                logList.add("<green>" + UtilTime.getTime((System.currentTimeMillis() - time), 2) + " ago</green>  " + result.getString(2));
+                UUIDLogType type = UUIDLogType.valueOf(result.getString(2));
+                String itemID = result.getString(3);
+                String player1ID = result.getString(4);
+                String player2ID = result.getString(5);
+                String name = result.getString(6);
+                String worldID = result.getString(7);
+                int X = result.getInt(8);
+                int Y = result.getInt(9);
+                int Z = result.getInt(10);
+
+                logList.add(formattedLogFromRow(time, type, itemID, player1ID, player2ID, name, worldID, X, Y, Z));
             }
         } catch (SQLException ex) {
             log.error("Failed to get player logs", ex);
         }
         return logList;
     }
+    public FormattedItemLog formattedLogFromRow(long time, UUIDLogType type, String itemID, String player1ID, String player2ID, String name, String world, int x, int y, int z) {
+        UUID item = UUID.fromString(itemID);
 
-    public enum UUIDType {
-        PLAYER,
-        NONE
-    }
+        OfflinePlayer offlinePlayer1 = null;
+        if (player1ID != null) {
+            offlinePlayer1 = Bukkit.getOfflinePlayer(UUID.fromString(player1ID));
+        }
+        OfflinePlayer offlinePlayer2 = null;
+        if (player2ID != null) {
+            offlinePlayer2 = Bukkit.getOfflinePlayer(UUID.fromString(player2ID));
+        }
+        Location location = null;
+        if (world != null) {
+            location = new Location(Bukkit.getWorld(UUID.fromString(world)), x, y, z);
+        }
 
-     public enum UUIDLogType {
-         /**
-          * An UUIDItem is spawned
-           */
-         SPAWN,
-        /**
-          * Someone kills  of the UUIDItem holder
-          */
-         KILL,
-         /**
-          * Someone participates in the kill of an UUIDItem holder
-          */
-         CONTRIBUTOR,
-         /**
-          * UUIDItem holder dies
-          */
-         DEATH,
-         /**
-          * UUIDItem holder dies to a player
-          */
-         DEATH_PLAYER,
-         /**
-          * An UUIDItem is picked up or moved from an inventory
-          */
-         RETREIVE,
-         /**
-          * An UUIDItem is stored in a container
-          */
-         CONTAINER_STORE,
-         /**
-          * An UUIDItem is dropped due to a container being destroyed
-          */
-         CONTAINER_BREAK,
-         /**
-          * An UUIDItem is picked up by an inventory
-          */
-         INVENTORY_PICKUP,
-         /**
-          * An UUIDItem is moved by one inventory to another
-          */
-         INVENTORY_MOVE,
-         /**
-          * An UUIDItem is dispensed from a block
-          */
-         BLOCK_DISPENSE,
-         /**
-          * An UUIDItem holder logs out
-          */
-         LOGOUT,
-         /**
-          * An UUIDItem holder logs in
-          */
-         LOGIN,
-         /**
-          * An UUIDItem holder drops their UUIDItem
-          */
-         DROP,
-         /**
-          * A player pick up an UUIDItem
-          */
-         PICKUP,
-         /**
-          * An UUIDItem despawns
-          */
-         DESPAWN,
-         /**
-          * A custom, manual generated log
-          */
-         CUSTOM
+        switch (type) {
+            case ITEM_PICKUP -> {
+                return new PickupItemLog(time, item, offlinePlayer1, location);
+            }
+            default -> {
+                return new FormattedItemLog(time, type, item, offlinePlayer1, offlinePlayer2, name, location);
+            }
+        }
 
     }
 }

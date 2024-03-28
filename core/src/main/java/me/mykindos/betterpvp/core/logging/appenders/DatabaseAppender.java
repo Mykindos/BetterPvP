@@ -13,7 +13,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.UUID;
 
 @CustomLog
 public class DatabaseAppender implements LogAppender {
@@ -39,7 +38,7 @@ public class DatabaseAppender implements LogAppender {
         }
 
         database.executeUpdate(new Statement("INSERT INTO logs (id, Level, Message, Time) VALUES (?, ?, ?, ?)",
-                new UuidStatementValue(UUID.randomUUID()),
+                new UuidStatementValue(pendingLog.getId()),
                 new StringStatementValue(pendingLog.getLevel()),
                 new StringStatementValue(message.toString()),
                 new LongStatementValue(pendingLog.getTime())

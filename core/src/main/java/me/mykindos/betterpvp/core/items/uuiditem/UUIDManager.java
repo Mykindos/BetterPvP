@@ -2,12 +2,14 @@ package me.mykindos.betterpvp.core.items.uuiditem;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 
 import java.util.List;
 
 @Singleton
 public class UUIDManager extends Manager<UUIDItem> {
+    @Getter
     private final UUIDRepository uuidRepository;
 
     @Inject

@@ -3,11 +3,13 @@ package me.mykindos.betterpvp.core.items.uuiditem;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import lombok.Getter;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
 import me.mykindos.betterpvp.core.database.repository.IRepository;
+import me.mykindos.betterpvp.core.logging.UUIDLogger;
 
 import javax.sql.rowset.CachedRowSet;
 import java.util.ArrayList;
@@ -19,10 +21,13 @@ import java.util.UUID;
 public class UUIDRepository implements IRepository<UUIDItem> {
 
     private final Database database;
+    @Getter
+    private final UUIDLogger uuidLogger;
 
     @Inject
-    public UUIDRepository(Database database) {
+    public UUIDRepository(Database database, UUIDLogger uuidLogger) {
         this.database = database;
+        this.uuidLogger = uuidLogger;
     }
 
     @Override
