@@ -3,7 +3,7 @@ package me.mykindos.betterpvp.champions.weapons.impl.legendaries.scepter;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
-import me.mykindos.betterpvp.core.utilities.math.VectorLine;
+import me.mykindos.betterpvp.core.utilities.model.RayProjectile;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -18,7 +18,7 @@ import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
 @Getter
-public class MeridianBeam extends ScepterProjectile {
+public class MeridianBeam extends RayProjectile {
 
     public static final String NAME = "Meridian Beam";
     private final double damage;
@@ -30,11 +30,7 @@ public class MeridianBeam extends ScepterProjectile {
 
     @Override
     protected void onTick() {
-        Location[] line = lastLocation == null  || lastLocation.equals(location)
-                ? new Location[] { location }
-                : VectorLine.withStepSize(lastLocation, location, 0.5).toLocations();
-
-        for (Location point : line) {
+        for (Location point : interpolateLine()) {
             // Play travel particles
             final Color color = Math.random() > 0.5 ? Color.fromRGB(184, 56, 207) : Color.fromRGB(174, 52, 179);
             Particle.REDSTONE.builder()
