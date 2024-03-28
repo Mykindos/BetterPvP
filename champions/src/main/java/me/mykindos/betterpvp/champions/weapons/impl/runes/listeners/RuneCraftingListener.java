@@ -6,6 +6,7 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.weapons.impl.runes.Rune;
 import me.mykindos.betterpvp.champions.weapons.impl.runes.RuneNamespacedKeys;
+import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateLoreEvent;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateNameEvent;
 import me.mykindos.betterpvp.core.items.BPvPItem;
@@ -25,6 +26,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 @Singleton
 @BPvPListener
@@ -75,6 +80,7 @@ public class RuneCraftingListener implements Listener {
         ItemMeta meta = event.getItemMeta();
         PersistentDataContainer pdc = meta.getPersistentDataContainer();
 
+        List<KeyValue<Rune, PersistentDataContainer>> runes = new ArrayList<>();
         boolean hasAddedImbuementSection = false;
         for(NamespacedKey key : pdc.getKeys()) {
             if(!pdc.has(key, PersistentDataType.TAG_CONTAINER)) continue;
@@ -93,9 +99,15 @@ public class RuneCraftingListener implements Listener {
                 hasAddedImbuementSection = true;
             }
 
-            event.getItemLore().add(rune.getItemLoreDescription(runePdc));
+            runes.add(new KeyValue<>(rune, runePdc));
+
         }
 
+        runes.sort(Comparator.comparingInt(o -> o.getKey().getTier()));
+
+        for(KeyValue<Rune, PersistentDataContainer> pair : runes) {
+            event.getItemLore().addAll(pair.getKey().getItemLoreDescription(pair.getValue()));
+        }
     }
 
     @EventHandler

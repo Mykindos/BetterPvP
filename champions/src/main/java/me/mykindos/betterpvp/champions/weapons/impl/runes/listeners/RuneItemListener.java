@@ -5,6 +5,8 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.weapons.impl.runes.Rune;
 import me.mykindos.betterpvp.champions.weapons.impl.runes.RuneNamespacedKeys;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.effects.EffectManager;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.energy.events.DegenerateEnergyEvent;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -26,10 +28,12 @@ import org.bukkit.persistence.PersistentDataType;
 public class RuneItemListener implements Listener {
 
     private final ItemHandler itemHandler;
+    private final EffectManager effectManager;
 
     @Inject
-    public RuneItemListener(ItemHandler itemHandler) {
+    public RuneItemListener(ItemHandler itemHandler, EffectManager effectManager) {
         this.itemHandler = itemHandler;
+        this.effectManager = effectManager;
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
@@ -44,7 +48,9 @@ public class RuneItemListener implements Listener {
         if (rune == null) return;
 
         PersistentDataContainer conqueringPdc = itemMeta.getPersistentDataContainer().get(rune.getAppliedNamespacedKey(), PersistentDataType.TAG_CONTAINER);
-        event.setDamage(event.getDamage() + rune.getRollFromItem(conqueringPdc).doubleValue());
+        if (conqueringPdc != null) {
+            event.setDamage(event.getDamage() + rune.getRollFromItem(conqueringPdc, rune.getAppliedNamespacedKey(), PersistentDataType.DOUBLE));
+        }
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
@@ -59,7 +65,32 @@ public class RuneItemListener implements Listener {
         if (rune == null) return;
 
         PersistentDataContainer hastePdc = itemMeta.getPersistentDataContainer().get(rune.getAppliedNamespacedKey(), PersistentDataType.TAG_CONTAINER);
-        event.setDamageDelay((long) (event.getDamageDelay() * (1 - rune.getRollFromItem(hastePdc).doubleValue() / 100)));
+        if (hastePdc != null) {
+            event.setDamageDelay((long) (event.getDamageDelay() * (1 - rune.getRollFromItem(hastePdc, rune.getAppliedNamespacedKey(), PersistentDataType.DOUBLE) / 100)));
+        }
+    }
+
+    @EventHandler (priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onFrost(CustomDamageEvent event) {
+        if (!(event.getDamager() instanceof Player damager)) return;
+        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
+
+        ItemStack mainHand = damager.getInventory().getItemInMainHand();
+        ItemMeta itemMeta = mainHand.getItemMeta();
+
+        Rune rune = getRuneFromNamespacedKey(RuneNamespacedKeys.FROST, itemMeta);
+        if (rune == null) return;
+
+        PersistentDataContainer frostPdc = itemMeta.getPersistentDataContainer().get(rune.getAppliedNamespacedKey(), PersistentDataType.TAG_CONTAINER);
+        if (frostPdc != null) {
+            double chance = rune.getRollFromItem(frostPdc, RuneNamespacedKeys.FROST_CHANCE, PersistentDataType.DOUBLE);
+            double duration = rune.getRollFromItem(frostPdc, RuneNamespacedKeys.FROST_DURATION, PersistentDataType.DOUBLE);
+            int amplifier = rune.getRollFromItem(frostPdc, RuneNamespacedKeys.FROST_AMPLIFIER, PersistentDataType.INTEGER);
+
+            if (UtilMath.randDouble(0, 100) <= chance) {
+                effectManager.addEffect(event.getDamagee(), damager, EffectTypes.SLOWNESS, amplifier, (long) duration * 1000L);
+            }
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -69,12 +100,15 @@ public class RuneItemListener implements Listener {
 
         double totalReduction = 0;
         for (ItemStack item : armour) {
+            if (item == null) continue;
             ItemMeta itemMeta = item.getItemMeta();
             Rune rune = getRuneFromNamespacedKey(RuneNamespacedKeys.INSIGHT, itemMeta);
             if (rune == null) continue;
 
             PersistentDataContainer insightPdc = itemMeta.getPersistentDataContainer().get(rune.getAppliedNamespacedKey(), PersistentDataType.TAG_CONTAINER);
-            totalReduction += rune.getRollFromItem(insightPdc).doubleValue();
+            if (insightPdc != null) {
+                totalReduction += rune.getRollFromItem(insightPdc, rune.getAppliedNamespacedKey(), PersistentDataType.DOUBLE);
+            }
 
         }
 
@@ -89,11 +123,12 @@ public class RuneItemListener implements Listener {
         Rune rune = getRuneFromNamespacedKey(RuneNamespacedKeys.UNBREAKING, itemMeta);
         if (rune == null) return;
 
-        PersistentDataContainer hastePdc = itemMeta.getPersistentDataContainer().get(rune.getAppliedNamespacedKey(), PersistentDataType.TAG_CONTAINER);
-        double ignoreChance = rune.getRollFromItem(hastePdc).doubleValue();
-
-        if (UtilMath.randDouble(0, 100) < ignoreChance) {
-            event.setCancelled(true);
+        PersistentDataContainer unbreakingPdc = itemMeta.getPersistentDataContainer().get(rune.getAppliedNamespacedKey(), PersistentDataType.TAG_CONTAINER);
+        if (unbreakingPdc != null) {
+            double ignoreChance = rune.getRollFromItem(unbreakingPdc, rune.getAppliedNamespacedKey(), PersistentDataType.DOUBLE);
+            if (UtilMath.randDouble(0, 100) < ignoreChance) {
+                event.setCancelled(true);
+            }
         }
     }
 

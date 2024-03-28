@@ -79,7 +79,7 @@ public class HyperAxe extends Weapon implements InteractWeapon, LegendaryWeapon,
     }
 
     @Override
-    public List<Component> getLore(ItemStack item) {
+    public List<Component> getLore(ItemMeta meta) {
         List<Component> lore = new ArrayList<>();
         lore.add(Component.text("Forged in the heart of a raging storm,", NamedTextColor.WHITE));
         lore.add(Component.text("this axe is known for its unparalleled speed.", NamedTextColor.WHITE));
@@ -91,16 +91,14 @@ public class HyperAxe extends Weapon implements InteractWeapon, LegendaryWeapon,
         lore.add(UtilMessage.deserialize("<white>Hit delay is reduced by <yellow>%.1f%%", ((damageDelay / 400.0) * 100.0)));
         lore.add(UtilMessage.deserialize("<white>Deals <yellow>%.1f Damage <white>per hit", baseDamage));
 
-        if (item.hasItemMeta()) {
-            ItemMeta meta = item.getItemMeta();
-            if (meta.getPersistentDataContainer().has(ChampionsNamespacedKeys.HYPER_AXE_SPEED) && meta.getPersistentDataContainer().has(ChampionsNamespacedKeys.HYPER_AXE_DURATION)) {
-                lore.add(Component.text(""));
-                int speedLevel = meta.getPersistentDataContainer().getOrDefault(ChampionsNamespacedKeys.HYPER_AXE_SPEED, PersistentDataType.INTEGER, 1);
-                int duration = meta.getPersistentDataContainer().getOrDefault(ChampionsNamespacedKeys.HYPER_AXE_DURATION, PersistentDataType.INTEGER, 80);
-                lore.add(UtilMessage.deserialize("<yellow>Right-Click <white>to use <green>Hyper Rush"));
-                lore.add(UtilMessage.deserialize("<white>Gain <light_purple>Speed %s <white>for <green>%.2f seconds", UtilFormat.getRomanNumeral(speedLevel), duration / 20.0));
-            }
+        if (meta.getPersistentDataContainer().has(ChampionsNamespacedKeys.HYPER_AXE_SPEED) && meta.getPersistentDataContainer().has(ChampionsNamespacedKeys.HYPER_AXE_DURATION)) {
+            lore.add(Component.text(""));
+            int speedLevel = meta.getPersistentDataContainer().getOrDefault(ChampionsNamespacedKeys.HYPER_AXE_SPEED, PersistentDataType.INTEGER, 1);
+            int duration = meta.getPersistentDataContainer().getOrDefault(ChampionsNamespacedKeys.HYPER_AXE_DURATION, PersistentDataType.INTEGER, 80);
+            lore.add(UtilMessage.deserialize("<yellow>Right-Click <white>to use <green>Hyper Rush"));
+            lore.add(UtilMessage.deserialize("<white>Gain <light_purple>Speed %s <white>for <green>%.2f seconds", UtilFormat.getRomanNumeral(speedLevel), duration / 20.0));
         }
+
 
         return lore;
     }
