@@ -447,7 +447,9 @@ public class CombatListener implements Listener {
 
     private void playDamageEffect(CustomDamageEvent event) {
         final LivingEntity damagee = event.getDamagee();
-        damagee.playHurtAnimation(270);
+        if (event.isHurtAnimation()) {
+            damagee.playHurtAnimation(270);
+        }
 
         final SoundProvider provider = event.getSoundProvider();
         final net.kyori.adventure.sound.Sound sound = provider.apply(event);

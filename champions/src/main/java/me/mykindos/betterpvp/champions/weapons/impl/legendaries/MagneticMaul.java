@@ -39,7 +39,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
@@ -63,7 +63,7 @@ public class MagneticMaul extends ChannelWeapon implements InteractWeapon, Legen
     }
 
     @Override
-    public List<Component> getLore(ItemStack item) {
+    public List<Component> getLore(ItemMeta meta) {
         List<Component> lore = new ArrayList<>();
         lore.add(Component.text("For centuries, warlords used", NamedTextColor.WHITE));
         lore.add(Component.text("this hammer to control their", NamedTextColor.WHITE));

@@ -10,7 +10,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerItemDamageEvent;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +33,7 @@ public class WingsOfZanzul extends Weapon implements LegendaryWeapon, Listener {
     }
 
     @Override
-    public List<Component> getLore(ItemStack item) {
+    public List<Component> getLore(ItemMeta meta) {
         return new ArrayList<>();
     }
 }

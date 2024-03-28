@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public interface IWeapon {
@@ -14,7 +15,9 @@ public interface IWeapon {
     Material getMaterial();
     Component getName();
     int getModel();
-    List<Component> getLore(ItemStack item);
+    default List<Component> getLore(ItemMeta meta) {
+        return new ArrayList<>();
+    }
     boolean isHoldingWeapon(Player player);
 
     boolean isEnabled();

@@ -166,7 +166,7 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
     public void activate(Player player, int level) {
         double healthReduction = 1.0 - getHealthReduction(level);
         double proposedHealth = player.getHealth() - (player.getHealth() * healthReduction);
-        UtilPlayer.slowDrainHealth(champions, player, proposedHealth, 5, false);
+        UtilPlayer.slowHealth(champions, player, -proposedHealth, 5, false);
 
         Location loc = player.getLocation().clone();
         if (!UtilBlock.solid(loc.getBlock())) {

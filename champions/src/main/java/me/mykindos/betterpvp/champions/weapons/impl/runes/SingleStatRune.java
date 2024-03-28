@@ -1,10 +1,7 @@
 package me.mykindos.betterpvp.champions.weapons.impl.runes;
 
 import me.mykindos.betterpvp.champions.Champions;
-import me.mykindos.betterpvp.champions.utilities.ChampionsNamespacedKeys;
-import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
-import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
@@ -19,13 +16,7 @@ public abstract class SingleStatRune extends Rune {
     }
 
     protected double getRollFromMeta(ItemMeta meta) {
-        return meta.getPersistentDataContainer().getOrDefault(getNamespacedKey(), PersistentDataType.DOUBLE, 0.0);
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T extends Number> T getRollFromItem(PersistentDataContainer pdc) {
-        return (T) pdc.getOrDefault(getAppliedNamespacedKey(), PersistentDataType.DOUBLE, 0.0);
+        return getRollFromMeta(meta, getNamespacedKey(), PersistentDataType.DOUBLE);
     }
 
     @Override
@@ -53,6 +44,8 @@ public abstract class SingleStatRune extends Rune {
 
     @Override
     public void applyToItem(ItemMeta runeMeta, ItemMeta itemMeta) {
+        super.applyToItem(runeMeta, itemMeta);
+
         double roll = getRollFromMeta(runeMeta);
 
         PersistentDataContainer pdc = itemMeta.getPersistentDataContainer();
@@ -63,8 +56,7 @@ public abstract class SingleStatRune extends Rune {
         newPdc.set(RuneNamespacedKeys.TIER, PersistentDataType.INTEGER, getTier());
 
         pdc.set(getAppliedNamespacedKey(), PersistentDataType.TAG_CONTAINER, newPdc);
-        pdc.set(CoreNamespaceKeys.GLOW_KEY, PersistentDataType.STRING, "true");
-        pdc.set(RuneNamespacedKeys.HAS_RUNE, PersistentDataType.BOOLEAN, true);
+
 
     }
 

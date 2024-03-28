@@ -157,13 +157,13 @@ public class UtilPlayer {
         return location.add(0.0, height / 2, 0.0);
     }
 
-    public static void slowDrainHealth(BPvPPlugin plugin, Player player, double amount, int ticks, boolean canKill) {
+    public static void slowHealth(BPvPPlugin plugin, Player player, double amount, int ticks, boolean canKill) {
         double amountPerTick = amount / ticks;
         for (int i = 0; i < ticks; i++) {
             UtilServer.runTaskLater(plugin, () -> {
                 if (player.isDead()) return;
                 if (!canKill && player.getHealth() <= 1) return;
-                UtilPlayer.health(player, -amountPerTick);
+                UtilPlayer.health(player, amountPerTick);
             }, i);
         }
     }

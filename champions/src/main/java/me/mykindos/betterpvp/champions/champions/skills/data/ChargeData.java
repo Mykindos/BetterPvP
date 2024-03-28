@@ -43,6 +43,17 @@ public class ChargeData {
         this.charge = Math.min(1, this.charge + (chargePerSecond / 20));
     }
 
+    public void tickSound(SoundEffect sound, Player player, boolean force) {
+        if (!UtilTime.elapsed(lastSound, soundInterval)) {
+            return;
+        }
+
+        if (force || charge < 1) {
+            sound.play(player);
+            lastSound = System.currentTimeMillis();
+        }
+    }
+
     public void tickSound(SoundEffect sound, Location location, boolean force) {
         if (!UtilTime.elapsed(lastSound, soundInterval)) {
             return;

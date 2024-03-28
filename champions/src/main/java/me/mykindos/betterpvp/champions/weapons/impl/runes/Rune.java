@@ -2,11 +2,11 @@ package me.mykindos.betterpvp.champions.weapons.impl.runes;
 
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.combat.weapon.Weapon;
+import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
@@ -30,9 +30,15 @@ public abstract class Rune extends Weapon {
 
     public abstract String getCategory();
 
-    public abstract Component getRuneLoreDescription(ItemMeta meta);
-    public abstract Component getItemLoreDescription(PersistentDataContainer pdc);
-    public abstract <T extends Number> T getRollFromItem(PersistentDataContainer pdc);
+    public abstract List<Component> getRuneLoreDescription(ItemMeta meta);
+    public abstract List<Component> getItemLoreDescription(PersistentDataContainer pdc);
+
+    public <T extends Number> T getRollFromItem(PersistentDataContainer pdc, NamespacedKey key, PersistentDataType<T, T> type) {
+        return pdc.get(key, type);
+    }
+    protected <T extends Number> T getRollFromMeta(ItemMeta meta, NamespacedKey key, PersistentDataType<T, T> type) {
+        return meta.getPersistentDataContainer().get(key, type);
+    }
 
     public abstract int getTier();
 
@@ -43,7 +49,11 @@ public abstract class Rune extends Weapon {
 
     public abstract boolean canApplyToItem(ItemMeta runeMeta, ItemMeta itemMeta);
 
-    public abstract void applyToItem(ItemMeta runeMeta, ItemMeta itemMeta);
+    public void applyToItem(ItemMeta runeMeta, ItemMeta itemMeta) {
+        PersistentDataContainer pdc = itemMeta.getPersistentDataContainer();
+        pdc.set(CoreNamespaceKeys.GLOW_KEY, PersistentDataType.STRING, "true");
+        pdc.set(RuneNamespacedKeys.HAS_RUNE, PersistentDataType.BOOLEAN, true);
+    }
 
     public boolean itemMatchesFilter(Material material) {
         for (String filter : getItemFilter()) {
@@ -75,12 +85,25 @@ public abstract class Rune extends Weapon {
     }
 
     @Override
-    public List<Component> getLore(ItemStack item) {
+    public List<Component> getLore(ItemMeta meta) {
         List<Component> lore = new ArrayList<>();
         lore.add(Component.text("Can only be applied to " + getCategory(), NamedTextColor.DARK_GRAY));
         lore.add(Component.text(""));
-        lore.add(getRuneLoreDescription(item.getItemMeta()));
+        lore.addAll(getRuneLoreDescription(meta));
         return lore;
+    }
+
+    protected String getStarPrefix(int tier) {
+        String star = "\u2726";
+        String colour = switch (tier) {
+            case 1 -> "<green>";
+            case 2 -> "<blue>";
+            case 3 -> "<yellow>";
+            case 4 -> "<orange>";
+            default -> "<white>";
+        };
+
+        return colour + star;
     }
 
     @Override

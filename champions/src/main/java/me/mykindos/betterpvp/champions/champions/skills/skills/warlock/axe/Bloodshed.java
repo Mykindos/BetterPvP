@@ -88,7 +88,7 @@ public class Bloodshed extends Skill implements InteractSkill, CooldownSkill {
     public void activate(Player player,int level) {
         double healthReduction = 1.0 - getHealthReduction(level);
         double proposedHealth = player.getHealth() - (player.getHealth() * healthReduction);
-        UtilPlayer.slowDrainHealth(champions, player, proposedHealth, 5, false);
+        UtilPlayer.slowHealth(champions, player, -proposedHealth, 5, false);
 
         championsManager.getEffects().addEffect(player, EffectTypes.SPEED, speedStrength, (long) (duration * 1000));
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_RAVAGER_ROAR, 2.0f, 0.3f);
