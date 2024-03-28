@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.logging.types.ClanLogType;
 import me.mykindos.betterpvp.clans.logging.types.formatted.FormattedClanLog;
 import me.mykindos.betterpvp.clans.logging.types.formatted.JoinClanLog;
+import me.mykindos.betterpvp.clans.logging.types.formatted.KillClanLog;
 import me.mykindos.betterpvp.clans.logging.types.log.ClanLog;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
@@ -16,7 +17,6 @@ import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.LongStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -77,14 +77,14 @@ public class ClanLogger {
         return logList;
     }
 
-    public List<String> getClanKillLogs(UUID clanUUID, int amount) {
-        List<String> logList = new ArrayList<>();
+    public List<FormattedClanLog> getClanKillLogs(UUID clanUUID, int amount) {
+        List<FormattedClanLog> logList = new ArrayList<>();
 
         if (amount < 0) {
             return logList;
         }
 
-        String query = "CALL GetWPLogs(?, ?)";
+        String query = "CALL GetClanKillLogs(?, ?)";
         CachedRowSet result = database.executeQuery(new Statement(query,
                         new UuidStatementValue(clanUUID),
                         new IntegerStatementValue(amount)
@@ -94,7 +94,11 @@ public class ClanLogger {
         try {
             while (result.next()) {
                 long time = result.getLong(1);
-                logList.add("<green>" + UtilTime.getTime((System.currentTimeMillis() - time), 2) + " ago</green> " + result.getString(2));
+                String killerID = result.getString(2);
+                String killerClanID = result.getString(3);
+                String victimID = result.getString(4);
+                String victimClanID = result.getString(6);
+                logList.add(formattedLogFromRow(time, killerID, killerClanID, victimID, victimClanID, ClanLogType.CLAN_KILL));
             }
         } catch (SQLException ex) {
             log.error("Failed to get ClanUUID logs", ex);
@@ -141,6 +145,9 @@ public class ClanLogger {
         switch (type) {
             case CLAN_JOIN -> {
                 return new JoinClanLog(time, offlinePlayer1, clan2);
+            }
+            case CLAN_KILL -> {
+                return new KillClanLog(time, offlinePlayer1, clan1, offlinePlayer2, clan2);
             }
             default -> {
                 return new FormattedClanLog(time, offlinePlayer1, clan1, offlinePlayer2, clan2, type);
