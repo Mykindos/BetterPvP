@@ -176,8 +176,12 @@ public class ClanEventListener extends ClanListener {
         UtilMessage.simpleMessage(event.getPlayer(), "Clans", "Successfully created clan <aqua>%s", clan.getName());
         if (clan.isAdmin()) {
             clientManager.sendMessageToRank("Clans", UtilMessage.deserialize("<yellow>%s<gray> created admin clan <yellow>%s", event.getPlayer().getName(), clan.getName()), Rank.HELPER);
-            log.info("%s (%s) created admin clan %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
+            UUID id = log.info("%s (%s) created admin clan %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
                     clan.getName(), clan.getId());
+            clanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_CREATE)
+                    .addMeta(event.getPlayer().getUniqueId(), UUIDType.PLAYER1)
+                    .addMeta(clan.getId(), UUIDType.CLAN1)
+            );
         } else {
             UUID id = log.info("%s (%s) created %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
                     clan.getName(), clan.getId());

@@ -49,7 +49,8 @@ FROM logmeta L1
 LEFT JOIN (Select LogUUID, UUID as Item FROM logmetauuid WHERE UUIDType = 'ITEM') LMU1 ON LMU1.LogUUID = L1.id
 LEFT JOIN (Select LogUUID, UUID as Player1 FROM logmetauuid WHERE UUIDType = 'PLAYER1') LMU2 ON LMU2.LogUUID = L1.id
 LEFT JOIN (Select LogUUID, UUID as Player2 FROM logmetauuid WHERE UUIDType = 'PLAYER2') LMU3 ON LMU3.LogUUID = L1.id
-LEFT JOIN loglocations LL1 ON LL1.LogUUID = L1.id;
+LEFT JOIN loglocations LL1 ON LL1.LogUUID = L1.id
+WHERE L1.Type LIKE 'ITEM_%';
 
 
 DROP PROCEDURE IF EXISTS GetItemLogsByUuid;

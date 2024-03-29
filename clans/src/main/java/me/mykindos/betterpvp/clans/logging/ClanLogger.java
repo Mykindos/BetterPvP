@@ -144,7 +144,7 @@ public class ClanLogger {
 
         switch (type) {
             case CLAN_JOIN -> {
-                return new JoinClanLog(time, offlinePlayer1, clan2);
+                return new JoinClanLog(time, offlinePlayer1, clan1);
             }
             case CLAN_KILL -> {
                 return new KillClanLog(time, offlinePlayer1, clan1, offlinePlayer2, clan2);
