@@ -11,7 +11,9 @@ import me.mykindos.betterpvp.core.energy.events.DegenerateEnergyEvent;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -70,7 +72,7 @@ public class RuneItemListener implements Listener {
         }
     }
 
-    @EventHandler (priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onFrost(CustomDamageEvent event) {
         if (!(event.getDamager() instanceof Player damager)) return;
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
@@ -90,6 +92,53 @@ public class RuneItemListener implements Listener {
             if (UtilMath.randDouble(0, 100) <= chance) {
                 effectManager.addEffect(event.getDamagee(), damager, EffectTypes.SLOWNESS, amplifier, (long) duration * 1000L);
             }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onReinforced(CustomDamageEvent event) {
+        if (!(event.getDamagee() instanceof Player player)) return;
+        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK
+                && event.getCause() != EntityDamageEvent.DamageCause.PROJECTILE
+                && event.getCause() != EntityDamageEvent.DamageCause.CUSTOM) {
+            return;
+        }
+
+        ItemStack[] armour = player.getInventory().getArmorContents();
+
+        double totalReduction = 0;
+        for (ItemStack item : armour) {
+            if (item == null) continue;
+            ItemMeta itemMeta = item.getItemMeta();
+            Rune rune = getRuneFromNamespacedKey(RuneNamespacedKeys.REINFORCING, itemMeta);
+            if (rune == null) continue;
+
+            PersistentDataContainer reinforcedPdc = itemMeta.getPersistentDataContainer().get(rune.getAppliedNamespacedKey(), PersistentDataType.TAG_CONTAINER);
+            if (reinforcedPdc != null) {
+                totalReduction += rune.getRollFromItem(reinforcedPdc, rune.getAppliedNamespacedKey(), PersistentDataType.DOUBLE);
+            }
+
+        }
+
+        event.setDamage(event.getDamage() * (1 - totalReduction / 100));
+    }
+
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+    public void onPowerDamage(CustomDamageEvent event) {
+        if (!(event.getDamager() instanceof Player damager)) return;
+        if (!(event.getProjectile() instanceof Arrow)) return;
+
+        ItemStack mainHand = damager.getInventory().getItemInMainHand();
+        if (mainHand.getType() != Material.BOW && mainHand.getType() != Material.CROSSBOW) return;
+
+        ItemMeta itemMeta = mainHand.getItemMeta();
+
+        Rune rune = getRuneFromNamespacedKey(RuneNamespacedKeys.POWER, itemMeta);
+        if (rune == null) return;
+
+        PersistentDataContainer powerPdc = itemMeta.getPersistentDataContainer().get(rune.getAppliedNamespacedKey(), PersistentDataType.TAG_CONTAINER);
+        if (powerPdc != null) {
+            event.setDamage(event.getDamage() + rune.getRollFromItem(powerPdc, rune.getAppliedNamespacedKey(), PersistentDataType.DOUBLE));
         }
     }
 
