@@ -16,6 +16,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.RayTraceResult;
 
@@ -126,7 +127,7 @@ public class Scythe extends ChannelWeapon implements LegendaryWeapon, Listener {
     }
 
     @Override
-    public List<Component> getLore() {
+    public List<Component> getLore(ItemMeta itemMeta) {
         List<Component> lore = new ArrayList<>();
         lore.add(Component.text("An old blade fashioned of nothing more", NamedTextColor.WHITE));
         lore.add(Component.text("stray bones, brave adventurers have", NamedTextColor.WHITE));
