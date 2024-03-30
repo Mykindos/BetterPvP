@@ -6,6 +6,7 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
+import me.mykindos.betterpvp.clans.clans.ClanRelation;
 import me.mykindos.betterpvp.clans.logging.types.ClanLogType;
 import me.mykindos.betterpvp.clans.logging.types.formatted.FormattedClanLog;
 import me.mykindos.betterpvp.clans.logging.types.formatted.JoinClanLog;
@@ -13,12 +14,15 @@ import me.mykindos.betterpvp.clans.logging.types.formatted.KillClanLog;
 import me.mykindos.betterpvp.clans.logging.types.log.ClanLog;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
+import me.mykindos.betterpvp.core.database.query.values.DoubleStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.LongStatementValue;
+import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.sql.rowset.CachedRowSet;
@@ -49,7 +53,27 @@ public class ClanLogger {
             database.executeUpdate(clanLog.getLogTimeStatetment());
             database.executeBatch(clanLog.getStatements(), true);
         });
+    }
 
+    public void addClanKill(UUID KillID, Player killer, Player victim) {
+        UtilServer.runTaskAsync(JavaPlugin.getPlugin(Clans.class), () -> {
+            String query = "INSERT INTO clans_kills (KillId, KillerClan, VictimClan, Dominance) VALUES (?, ?, ?, ?)";
+            Clan killerClan = clanManager.getClanByPlayer(killer).orElse(null);
+            Clan victimClan = clanManager.getClanByPlayer(victim).orElse(null);
+            double dominance = 0;
+            if (clanManager.getRelation(killerClan, victimClan).equals(ClanRelation.ENEMY)) {
+                assert killerClan != null;
+                assert victimClan != null;
+                dominance = clanManager.getDominanceForKill(killerClan.getSquadCount(), victimClan.getSquadCount());
+            }
+
+            database.executeUpdate(new Statement(query,
+                    new UuidStatementValue(KillID),
+                    new StringStatementValue(killerClan == null ? null : String.valueOf(killerClan.getId())),
+                    new StringStatementValue(victimClan == null ? null : String.valueOf(victimClan.getId())),
+                    new DoubleStatementValue(dominance)
+                    ));
+        });
     }
 
     public List<FormattedClanLog> getAllLogs(UUID ClanID, int amount) {
@@ -77,16 +101,16 @@ public class ClanLogger {
         return logList;
     }
 
-    public List<FormattedClanLog> getClanKillLogs(UUID clanUUID, int amount) {
-        List<FormattedClanLog> logList = new ArrayList<>();
+    public List<KillClanLog> getClanKillLogs(Clan clan, int amount) {
+        List<KillClanLog> logList = new ArrayList<>();
 
         if (amount < 0) {
             return logList;
         }
 
-        String query = "CALL GetClanKillLogs(?, ?)";
+        String query = "CALL GetClanKillLogsByClan(?, ?)";
         CachedRowSet result = database.executeQuery(new Statement(query,
-                        new UuidStatementValue(clanUUID),
+                        new UuidStatementValue(clan.getId()),
                         new IntegerStatementValue(amount)
                 )
         );
@@ -97,8 +121,24 @@ public class ClanLogger {
                 String killerID = result.getString(2);
                 String killerClanID = result.getString(3);
                 String victimID = result.getString(4);
-                String victimClanID = result.getString(6);
-                logList.add(formattedLogFromRow(time, killerID, killerClanID, victimID, victimClanID, ClanLogType.CLAN_KILL));
+                String victimClanID = result.getString(5);
+                double dominance = result.getDouble(6);
+
+                OfflinePlayer killer =  Bukkit.getOfflinePlayer(UUID.fromString(killerID));;
+
+                Clan killerClan = null;
+                if (killerClanID != null) {
+                    killerClan = clanManager.getClanById(UUID.fromString(killerClanID)).orElse(null);
+                }
+                OfflinePlayer victim = Bukkit.getOfflinePlayer(UUID.fromString(victimID));;
+
+                Clan victimClan = null;
+                if (victimClanID != null) {
+                    victimClan = clanManager.getClanById(UUID.fromString(victimClanID)).orElse(null);
+                }
+
+
+                logList.add(new KillClanLog(clan, time, killer, killerClan, victim, victimClan, dominance));
             }
         } catch (SQLException ex) {
             log.error("Failed to get ClanUUID logs", ex);
@@ -145,9 +185,6 @@ public class ClanLogger {
         switch (type) {
             case CLAN_JOIN -> {
                 return new JoinClanLog(time, offlinePlayer1, clan1);
-            }
-            case CLAN_KILL -> {
-                return new KillClanLog(time, offlinePlayer1, clan1, offlinePlayer2, clan2);
             }
             default -> {
                 return new FormattedClanLog(time, offlinePlayer1, clan1, offlinePlayer2, clan2, type);
