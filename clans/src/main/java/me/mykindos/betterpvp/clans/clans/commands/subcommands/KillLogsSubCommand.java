@@ -51,7 +51,7 @@ public class KillLogsSubCommand extends ClanSubCommand {
 
         if (args.length > 0) {
             try {
-                amount = Integer.parseInt(args[1]);
+                amount = Integer.parseInt(args[0]);
                 if (amount < 1) {
                     throw new NumberFormatException();
                 }

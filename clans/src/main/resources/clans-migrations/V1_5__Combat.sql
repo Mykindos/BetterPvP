@@ -9,9 +9,10 @@ CREATE TABLE IF NOT EXISTS clans_kills
 DROP PROCEDURE IF EXISTS GetClanKillLogsByClan;
 CREATE PROCEDURE GetClanKillLogsByClan(ClanID varchar(36), amount int)
 BEGIN
-    SELECT UNIX_TIMESTAMP(K.Timestamp) as LogTime, K.Killer, CK.KillerClan, K.Victim, CK.VictimClan, CK.Dominance FROM kills K
+    SELECT K.Time, K.Killer, CK.KillerClan, K.Victim, CK.VictimClan, CK.Dominance FROM kills K
     INNER JOIN clans_kills CK ON CK.KillId = K.Id
     WHERE CK.KillerClan = ClanID
     OR CK.VictimClan = ClanID
+    ORDER BY K.Time DESC
     LIMIT amount;
 END;

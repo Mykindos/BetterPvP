@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.clans.logging.types.formatted;
 
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -11,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
-
+@Slf4j
 public class KillClanLog {
     @NotNull
     private final Clan callerClan;
@@ -37,7 +38,9 @@ public class KillClanLog {
     }
 
     public Component getTimeComponent() {
-        return UtilMessage.deserialize("<green>" + UtilTime.getTime((System.currentTimeMillis() - time), 2) + " ago</green> ");
+        log.info("Current time " + System.currentTimeMillis());
+        log.info("Time         " + this.time);
+        return UtilMessage.deserialize("<green>" + UtilTime.getTime((System.currentTimeMillis() - this.time), 2) + " ago</green> ");
     }
 
     private Component getKillerPlayerClanFormat() {
@@ -66,9 +69,9 @@ public class KillClanLog {
 
     //todo show clan relations
     public Component getComponent() {
-        Component component = getTimeComponent().append(getKillerPlayerClanFormat()).appendSpace()
-                .append(Component.text("killed", NamedTextColor.GRAY)).append(getVictimPlayerClanFormat()).appendSpace()
-                .append(UtilMessage.deserialize("(<yellow>%d</yellow>)", dominance));
-        return component;
+        return getTimeComponent().append(getKillerPlayerClanFormat()).appendSpace()
+                .append(Component.text("killed", NamedTextColor.GRAY)).appendSpace()
+                .append(getVictimPlayerClanFormat()).appendSpace()
+                .append(UtilMessage.deserialize("(<yellow>%s</yellow>)", dominance));
     }
 }

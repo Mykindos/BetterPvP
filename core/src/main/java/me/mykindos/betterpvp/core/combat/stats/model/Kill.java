@@ -3,7 +3,6 @@ package me.mykindos.betterpvp.core.combat.stats.model;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,6 +15,6 @@ public class Kill {
     private final UUID victim;
     private final int ratingDelta;
     private final List<Contribution> contributions;
-    private final Instant timestamp = Instant.now();
+    private final long time = System.currentTimeMillis();
 
 }

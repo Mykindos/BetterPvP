@@ -56,7 +56,9 @@ public class ClanLogger {
     }
 
     public void addClanKill(UUID KillID, Player killer, Player victim) {
+        log.info("1");
         UtilServer.runTaskAsync(JavaPlugin.getPlugin(Clans.class), () -> {
+            log.info("here");
             String query = "INSERT INTO clans_kills (KillId, KillerClan, VictimClan, Dominance) VALUES (?, ?, ?, ?)";
             Clan killerClan = clanManager.getClanByPlayer(killer).orElse(null);
             Clan victimClan = clanManager.getClanByPlayer(victim).orElse(null);
