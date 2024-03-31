@@ -10,6 +10,8 @@ public class RuneNamespacedKeys {
     public static final NamespacedKey OWNING_RUNE = new NamespacedKey("champions", "owning-rune");
     public static final NamespacedKey TIER = new NamespacedKey("champions", "rune-tier");
     public static final NamespacedKey CONQUERING = new NamespacedKey("champions", "rune-conquering");
+    public static final NamespacedKey REINFORCING = new NamespacedKey("champions", "rune-reinforcing");
+    public static final NamespacedKey POWER = new NamespacedKey("champions", "rune-power");
     public static final NamespacedKey INSIGHT = new NamespacedKey("champions", "rune-insight");
     public static final NamespacedKey HASTE = new NamespacedKey("champions", "rune-haste");
     public static final NamespacedKey UNBREAKING = new NamespacedKey("champions", "rune-unbreaking");

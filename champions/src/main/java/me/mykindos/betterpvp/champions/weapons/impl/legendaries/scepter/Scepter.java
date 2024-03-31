@@ -14,6 +14,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +50,7 @@ public class Scepter extends Weapon implements InteractWeapon, CooldownWeapon, L
     }
 
     @Override
-    public List<Component> getLore() {
+    public List<Component> getLore(ItemMeta itemMeta) {
         List<Component> lore = new ArrayList<>();
         lore.add(Component.text("Legend says that this scepter was", NamedTextColor.WHITE));
         lore.add(Component.text("retrieved from the deepest trench in", NamedTextColor.WHITE));
