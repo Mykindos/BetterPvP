@@ -11,6 +11,12 @@ create table if not exists clans
         primary key (id)
 );
 
+create table if not exists old_clans
+(
+    id   varchar(36) not null,
+    Name varchar(32) not null
+);
+
 create unique index clans_Name_uindex
     on clans (Name);
 

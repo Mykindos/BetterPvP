@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.clans.clans.insurance.Insurance;
 import me.mykindos.betterpvp.clans.clans.vault.ClanVault;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.components.clans.IClan;
+import me.mykindos.betterpvp.core.components.clans.IOldClan;
 import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
@@ -40,7 +41,7 @@ import java.util.stream.Collectors;
 
 @CustomLog
 @Data
-public class Clan extends PropertyContainer implements IClan, Invitable, IMapListener {
+public class Clan extends PropertyContainer implements IClan, IOldClan, Invitable, IMapListener {
 
     public static long getExperienceForLevel(long level) {
         return (long) Math.pow(level, 2) - 1;

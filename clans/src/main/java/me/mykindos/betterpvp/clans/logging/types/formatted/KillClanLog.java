@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.clans.logging.types.formatted;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
+import me.mykindos.betterpvp.core.components.clans.IOldClan;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import net.kyori.adventure.text.Component;
@@ -20,14 +21,14 @@ public class KillClanLog {
     @NotNull
     private final OfflinePlayer killer;
     @Nullable
-    private final Clan killerClan;
+    private final IOldClan killerClan;
     @NotNull
     private final OfflinePlayer victim;
     @Nullable
-    private final Clan victimClan;
+    private final IOldClan victimClan;
     private final double dominance;
 
-    public KillClanLog(@NotNull Clan callerClan, long time, @NotNull OfflinePlayer killer, @Nullable Clan killerClan, @NotNull OfflinePlayer victim, @Nullable Clan victimClan, double dominance) {
+    public KillClanLog(@NotNull Clan callerClan, long time, @NotNull OfflinePlayer killer, @Nullable IOldClan killerClan, @NotNull OfflinePlayer victim, @Nullable IOldClan victimClan, double dominance) {
         this.callerClan = callerClan;
         this.time = time;
         this.killer = killer;
@@ -51,8 +52,8 @@ public class KillClanLog {
         return getPlayerClanFormatting(victim, victimClan);
     }
 
-    private Component getPlayerClanFormatting(OfflinePlayer player, Clan clan) {
-        if (callerClan.equals(clan)) {
+    private Component getPlayerClanFormatting(OfflinePlayer player, IOldClan clan) {
+        if (clan != null && callerClan.getId() == clan.getId()) {
             return Component.text(clan.getName(), ClanRelation.SELF.getSecondary()).appendSpace().append(Component.text(Objects.requireNonNull(player.getName()), ClanRelation.SELF.getPrimary()));
         }
 

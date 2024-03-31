@@ -7,11 +7,13 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
+import me.mykindos.betterpvp.clans.clans.OldClanManager;
 import me.mykindos.betterpvp.clans.logging.types.ClanLogType;
 import me.mykindos.betterpvp.clans.logging.types.formatted.FormattedClanLog;
 import me.mykindos.betterpvp.clans.logging.types.formatted.JoinClanLog;
 import me.mykindos.betterpvp.clans.logging.types.formatted.KillClanLog;
 import me.mykindos.betterpvp.clans.logging.types.log.ClanLog;
+import me.mykindos.betterpvp.core.components.clans.IOldClan;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.DoubleStatementValue;
@@ -37,11 +39,13 @@ public class ClanLogger {
 
     private final Database database;
     private final ClanManager clanManager;
+    private final OldClanManager oldClanManager;
 
     @Inject
-    public ClanLogger(Database database, ClanManager clanManager) {
+    public ClanLogger(Database database, ClanManager clanManager, OldClanManager oldClanManager) {
         this.database = database;
         this.clanManager = clanManager;
+        this.oldClanManager = oldClanManager;
     }
 
     /**
@@ -127,18 +131,10 @@ public class ClanLogger {
                 double dominance = result.getDouble(6);
 
                 OfflinePlayer killer =  Bukkit.getOfflinePlayer(UUID.fromString(killerID));;
+                IOldClan killerClan = oldClanManager.getOldClan(killerClanID);
 
-                Clan killerClan = null;
-                if (killerClanID != null) {
-                    killerClan = clanManager.getClanById(UUID.fromString(killerClanID)).orElse(null);
-                }
                 OfflinePlayer victim = Bukkit.getOfflinePlayer(UUID.fromString(victimID));;
-
-                Clan victimClan = null;
-                if (victimClanID != null) {
-                    victimClan = clanManager.getClanById(UUID.fromString(victimClanID)).orElse(null);
-                }
-
+                IOldClan victimClan = oldClanManager.getOldClan(victimClanID);
 
                 logList.add(new KillClanLog(clan, time, killer, killerClan, victim, victimClan, dominance));
             }

@@ -54,12 +54,15 @@ public class ClanRepository implements IRepository<Clan> {
     private final Database database;
     private final PropertyMapper propertyMapper;
 
+    private final OldClanRepository oldClanRepository;
+
     private final ConcurrentHashMap<String, Statement> queuedPropertyUpdates;
 
     @Inject
-    public ClanRepository(Database database, PropertyMapper propertyMapper) {
+    public ClanRepository(Database database, PropertyMapper propertyMapper, OldClanRepository oldClanRepository) {
         this.database = database;
         this.propertyMapper = propertyMapper;
+        this.oldClanRepository = oldClanRepository;
         this.queuedPropertyUpdates = new ConcurrentHashMap<>();
     }
 
@@ -160,6 +163,8 @@ public class ClanRepository implements IRepository<Clan> {
     }
 
     public void delete(Clan clan) {
+        oldClanRepository.save(clan);
+        
         String deleteMembersQuery = "DELETE FROM clan_members WHERE Clan = ?;";
         database.executeUpdateAsync(new Statement(deleteMembersQuery, new UuidStatementValue(clan.getId())));
 
