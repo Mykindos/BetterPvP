@@ -23,12 +23,14 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +51,7 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
     }
 
     @Override
-    public List<Component> getLore() {
+    public List<Component> getLore(ItemMeta itemMeta) {
         List<Component> lore = new ArrayList<>();
         lore.add(Component.text("Long ago, a race of cloud dwellers", NamedTextColor.WHITE));
         lore.add(Component.text("terrorized the skies. A remnant of", NamedTextColor.WHITE));
@@ -102,6 +104,7 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
 
             VelocityData velocityData = new VelocityData(player.getLocation().getDirection(), velocityStrength, false, 0, 0, 1, false);
             UtilVelocity.velocity(player, null, velocityData);
+            Particle.EXPLOSION_NORMAL.builder().location(player.getLocation()).extra(0).count(3).spawn();
             player.getWorld().playSound(player.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 0.2F, 1.5F);
             return false;
         });

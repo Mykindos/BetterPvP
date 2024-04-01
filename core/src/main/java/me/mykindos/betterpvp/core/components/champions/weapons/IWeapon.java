@@ -15,9 +15,6 @@ public interface IWeapon {
     Material getMaterial();
     Component getName();
     int getModel();
-    default List<Component> getLore(ItemMeta meta) {
-        return new ArrayList<>();
-    }
     boolean isHoldingWeapon(Player player);
 
     boolean isEnabled();

@@ -519,6 +519,7 @@ public class SkillListener implements Listener {
 
     private int getLevel(Player player, BuildSkill buildSkill) {
         int level = buildSkill.getLevel();
+        if (level == 0) return 0;
 
         SkillType skillType = buildSkill.getSkill().getType();
         if ((skillType == SkillType.AXE || skillType == SkillType.SWORD || skillType == SkillType.BOW)

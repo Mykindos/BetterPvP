@@ -8,6 +8,7 @@ import org.bukkit.inventory.ShapelessRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public interface IBPvPItem {
@@ -16,6 +17,9 @@ public interface IBPvPItem {
     ItemStack itemify(ItemStack itemStack);
     String getIdentifier();
     @NotNull Component getName();
+    default List<Component> getLore(ItemMeta meta) {
+        return new ArrayList<>();
+    }
     String getSimpleName();
     default boolean isEnabled() {
         return true;
