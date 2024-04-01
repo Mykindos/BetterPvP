@@ -116,9 +116,13 @@ public class ClanEventListener extends ClanListener {
                 UtilWorld.chunkToPrettyString(chunk)), player.getUniqueId(), true);
 
         blockHandler.outlineChunk(chunk);
-        log.info("%s (%s) claimed %s for %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
+        UUID id = log.info("%s (%s) claimed %s for %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
                 UtilWorld.chunkToPrettyString(chunk),
                 clan.getName(), clan.getId());
+        clanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_CLAIM)
+                .addMeta(event.getPlayer().getUniqueId(), UUIDType.PLAYER1)
+                .addMeta(clan.getId(), UUIDType.CLAN1)
+        );
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -138,9 +142,16 @@ public class ClanEventListener extends ClanListener {
         clanManager.getRepository().deleteClanTerritory(targetClan, chunkString);
         targetClan.getTerritory().removeIf(territory -> territory.getChunk().equals(UtilWorld.chunkToFile(chunk)));
 
-        log.info("%s (%s) unclaimed %s from %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
+        UUID id = log.info("%s (%s) unclaimed %s from %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
                 UtilWorld.chunkToPrettyString(chunk),
                 targetClan.getName(), targetClan.getId());
+        Clan clan = clanManager.getClanByPlayer(event.getPlayer()).orElse(null);
+        UUID clan1 = clan == null ? null : clan.getId();
+        clanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_UNCLAIM)
+                .addMeta(event.getPlayer().getUniqueId(), UUIDType.PLAYER1)
+                .addMeta(clan1, UUIDType.CLAN1)
+                .addMeta(targetClan.getId(), UUIDType.CLAN2)
+        );
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -260,9 +271,14 @@ public class ClanEventListener extends ClanListener {
 
         Gamer targetGamer = clientManager.search().online(target).getGamer();
         inviteHandler.createInvite(clan, targetGamer, "Invite", 20);
-        log.info("%s (%s) invited %s (%s) to %s (%s)", player.getName(), player.getUniqueId(),
+        UUID id = log.info("%s (%s) invited %s (%s) to %s (%s)", player.getName(), player.getUniqueId(),
                 target.getName(), target.getUniqueId(),
                 clan.getName(), clan.getId());
+        clanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_INVITE)
+                .addMeta(player.getUniqueId(), UUIDType.PLAYER1)
+                .addMeta(clan.getId(), UUIDType.CLAN1)
+                .addMeta(target.getUniqueId(), UUIDType.PLAYER2)
+        );
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -399,9 +415,14 @@ public class ClanEventListener extends ClanListener {
         UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You have requested an alliance with <yellow>%s<gray>.", target.getName());
         target.messageClan("<yellow>Clan " + clan.getName() + "<gray> has requested an alliance.", null, true);
 
-        log.info("%s (%s) of %s (%s) requested alliance with %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
+        UUID id = log.info("%s (%s) of %s (%s) requested alliance with %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
                 clan.getName(), clan.getId(),
                 target.getName(), target.getId());
+        clanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_ALLIANCE_REQUEST)
+                .addMeta(event.getPlayer().getUniqueId(), UUIDType.PLAYER1)
+                .addMeta(clan.getId(), UUIDType.CLAN1)
+                .addMeta(target.getId(), UUIDType.CLAN2)
+        );
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -424,9 +445,14 @@ public class ClanEventListener extends ClanListener {
         clanManager.getRepository().saveClanAlliance(clan, clanAlliance);
         clanManager.getRepository().saveClanAlliance(target, targetAlliance);
 
-        log.info("%s (%s) of %s (%s) accepted alliance with %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
+        UUID id = log.info("%s (%s) of %s (%s) accepted alliance with %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
                 clan.getName(), clan.getId(),
                 target.getName(), target.getId());
+        clanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_ALLIANCE_ACCEPT)
+                .addMeta(event.getPlayer().getUniqueId(), UUIDType.PLAYER1)
+                .addMeta(clan.getId(), UUIDType.CLAN1)
+                .addMeta(target.getId(), UUIDType.CLAN2)
+        );
     }
 
     @EventHandler
@@ -451,9 +477,14 @@ public class ClanEventListener extends ClanListener {
         UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You have requested to form a trust with <yellow>%s<gray>.", target.getName());
         target.messageClan("<yellow>Clan " + clan.getName() + "<gray> has requested to form a trust with your clan.", null, true);
 
-        log.info("%s (%s) of %s (%s) requested trust with %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
+        UUID id = log.info("%s (%s) of %s (%s) requested trust with %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
                 clan.getName(), clan.getId(),
                 target.getName(), target.getId());
+        clanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_TRUST_REQUEST)
+                .addMeta(event.getPlayer().getUniqueId(), UUIDType.PLAYER1)
+                .addMeta(clan.getId(), UUIDType.CLAN1)
+                .addMeta(target.getId(), UUIDType.CLAN2)
+        );
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -476,9 +507,14 @@ public class ClanEventListener extends ClanListener {
         clanManager.getRepository().saveTrust(clan, clanAlliance);
         clanManager.getRepository().saveTrust(target, targetAlliance);
 
-        log.info("%s (%s) of %s (%s) accepted trust with %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
+        UUID id = log.info("%s (%s) of %s (%s) accepted trust with %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
                 clan.getName(), clan.getId(),
                 target.getName(), target.getId());
+        clanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_ALLIANCE_ACCEPT)
+                .addMeta(event.getPlayer().getUniqueId(), UUIDType.PLAYER1)
+                .addMeta(clan.getId(), UUIDType.CLAN1)
+                .addMeta(target.getId(), UUIDType.CLAN2)
+        );
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -498,9 +534,14 @@ public class ClanEventListener extends ClanListener {
         clanManager.getRepository().saveTrust(clan, clanAlliance);
         clanManager.getRepository().saveTrust(target, targetAlliance);
 
-        log.info("%s (%s) of %s (%s) removed trust with %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
+        UUID id = log.info("%s (%s) of %s (%s) removed trust with %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
                 clan.getName(), clan.getId(),
                 target.getName(), target.getId());
+        clanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_TRUST_REMOVE)
+                .addMeta(event.getPlayer().getUniqueId(), UUIDType.PLAYER1)
+                .addMeta(clan.getId(), UUIDType.CLAN1)
+                .addMeta(target.getId(), UUIDType.CLAN2)
+        );
     }
 
     @EventHandler
@@ -526,13 +567,17 @@ public class ClanEventListener extends ClanListener {
             inviteHandler.createInvite(clan, target, "Neutral", 10);
             UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You have requested to neutral with <yellow>%s<gray>.", target.getName());
             target.messageClan("<yellow>Clan " + clan.getName() + "<gray> has requested to neutral with your clan.", null, true);
-            log.info("%s (%s) of %s (%s) requested neutral with %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
+            UUID id = log.info("%s (%s) of %s (%s) requested neutral with %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
                     clan.getName(), clan.getId(),
                     target.getName(), target.getId());
+            clanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_NEUTRAL_REQUEST)
+                    .addMeta(event.getPlayer().getUniqueId(), UUIDType.PLAYER1)
+                    .addMeta(clan.getId(), UUIDType.CLAN1)
+                    .addMeta(target.getId(), UUIDType.CLAN2)
+            );
         } else {
             UtilServer.callEvent(new ClanNeutralEvent(event.getPlayer(), clan, target));
         }
-
 
     }
 
@@ -547,19 +592,28 @@ public class ClanEventListener extends ClanListener {
 
         if (clan.isAllied(target)) {
             removeAlliance(clan, target);
-            log.info("%s (%s) of %s (%s) removed alliance with %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
+            UUID id = log.info("%s (%s) of %s (%s) removed alliance with %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
                     clan.getName(), clan.getId(),
                     target.getName(), target.getId());
+            clanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_ALLIANCE_REMOVE)
+                    .addMeta(event.getPlayer().getUniqueId(), UUIDType.PLAYER1)
+                    .addMeta(clan.getId(), UUIDType.CLAN1)
+                    .addMeta(target.getId(), UUIDType.CLAN2)
+            );
         } else if (clan.isEnemy(target)) {
             removeEnemy(clan, target);
-            log.info("%s (%s) of %s (%s) accepted neutral with %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
+            UUID id = log.info("%s (%s) of %s (%s) accepted neutral with %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
                     clan.getName(), clan.getId(),
                     target.getName(), target.getId());
+            clanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_NEUTRAL_ACCEPT)
+                    .addMeta(event.getPlayer().getUniqueId(), UUIDType.PLAYER1)
+                    .addMeta(clan.getId(), UUIDType.CLAN1)
+                    .addMeta(target.getId(), UUIDType.CLAN2)
+            );
         }
 
         clan.messageClan("<yellow>Clan " + target.getName() + "<gray> is now neutral to your Clan.", null, true);
         target.messageClan("<yellow>Clan " + clan.getName() + "<gray> is now neutral to your Clan.", null, true);
-
 
     }
 
@@ -593,9 +647,14 @@ public class ClanEventListener extends ClanListener {
 
         if (clan.isAllied(target)) {
             removeAlliance(clan, target);
-            log.info("%s (%s) of %s (%s) removed alliance with %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
+            UUID allianceRemoveId = log.info("%s (%s) of %s (%s) removed alliance with %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
                     clan.getName(), clan.getId(),
                     target.getName(), target.getId());
+            clanLogger.addClanLog((ClanLog) new ClanLog(allianceRemoveId, ClanLogType.CLAN_ALLIANCE_REMOVE)
+                    .addMeta(event.getPlayer().getUniqueId(), UUIDType.PLAYER1)
+                    .addMeta(clan.getId(), UUIDType.CLAN1)
+                    .addMeta(target.getId(), UUIDType.CLAN2)
+            );
         }
 
         ClanEnemy clanEnemy = new ClanEnemy(target, 0);
@@ -610,9 +669,14 @@ public class ClanEventListener extends ClanListener {
         clan.messageClan("<yellow>Clan " + target.getName() + "<gray> is now your enemy.", null, true);
         target.messageClan("<yellow>Clan " + clan.getName() + "<gray> is now your enemy.", null, true);
 
-        log.info("%s (%s) of %s (%s) enemied with %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
+        UUID id = log.info("%s (%s) of %s (%s) enemied with %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
                 clan.getName(), clan.getId(),
                 target.getName(), target.getId());
+        clanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_ENEMY)
+                .addMeta(event.getPlayer().getUniqueId(), UUIDType.PLAYER1)
+                .addMeta(clan.getId(), UUIDType.CLAN1)
+                .addMeta(target.getId(), UUIDType.CLAN2)
+        );
 
     }
 
@@ -632,7 +696,11 @@ public class ClanEventListener extends ClanListener {
         clan.setHome(player.getLocation());
         UtilMessage.simpleMessage(player, "Clans", "You set the clan home to <yellow>%s<gray>.",
                 UtilWorld.locationToString(player.getLocation()));
-
+        UUID id = log.info("%s (%s) of %s (%s) set their clan home to %s", player.getName(), player.getUniqueId(), clan.getName(), clan.getName(), UtilWorld.locationToString(player.getLocation(), true));
+        clanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_SETHOME)
+                .addMeta(event.getPlayer().getUniqueId(), UUIDType.PLAYER1)
+                .addMeta(clan.getId(), UUIDType.CLAN1)
+        );
         clanManager.getRepository().updateClanHome(clan);
     }
 
@@ -649,9 +717,15 @@ public class ClanEventListener extends ClanListener {
         clientManager.search().offline(UUID.fromString(member.getUuid()), result -> {
             result.ifPresent(client -> {
                 UtilMessage.simpleMessage(player, "Clans", "You promoted <aqua>%s<gray> to <yellow>%s<gray>.", client.getName(), member.getRank().getName());
-                log.info("%s (%s) promoted %s (%s) to %s in %s (%s)", player.getName(), player.getUniqueId(),
-                        client.getName(), member.getUuid(), member.getRank().getName(),
+                UUID id = log.info("%s (%s) was promoted by %s (%s) to %s in %s (%s)", client.getName(), member.getUuid(),
+                        player.getName(), player.getUniqueId(), member.getRank().getName(),
                         clan.getName(), clan.getId());
+                clanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_PROMOTE)
+                        .addMeta(UUID.fromString(member.getUuid()), UUIDType.PLAYER1)
+                        .addMeta(clan.getId(), UUIDType.CLAN1)
+                        .addMeta(player.getUniqueId(), UUIDType.PLAYER2)
+                        .addMeta(clan.getId(), UUIDType.CLAN2)
+                );
             });
         });
 
@@ -676,9 +750,15 @@ public class ClanEventListener extends ClanListener {
         clientManager.search().offline(UUID.fromString(member.getUuid()), result -> {
             result.ifPresent(client -> {
                 UtilMessage.simpleMessage(player, "Clans", "You demoted <aqua>%s<gray> to <yellow>%s<gray>.", client.getName(), member.getRank().getName());
-                log.info("%s (%s) demoted %s (%s) to %s in %s (%s)", player.getName(), player.getUniqueId(),
-                        client.getName(), member.getUuid(), member.getRank().getName(),
+                UUID id = log.info("%s (%s) was demoted by %s (%s) to %s in %s (%s)", client.getName(), member.getUuid(),
+                        player.getName(), player.getUniqueId(), member.getRank().getName(),
                         clan.getName(), clan.getId());
+                clanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_PROMOTE)
+                        .addMeta(UUID.fromString(member.getUuid()), UUIDType.PLAYER1)
+                        .addMeta(clan.getId(), UUIDType.CLAN1)
+                        .addMeta(player.getUniqueId(), UUIDType.PLAYER2)
+                        .addMeta(clan.getId(), UUIDType.CLAN2)
+                );
             });
         });
 
