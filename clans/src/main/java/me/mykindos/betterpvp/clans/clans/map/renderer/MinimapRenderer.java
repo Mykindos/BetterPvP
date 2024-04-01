@@ -115,7 +115,7 @@ public class MinimapRenderer extends MapRenderer implements Listener {
     public void render(@NotNull MapView map, @NotNull MapCanvas canvas, @NotNull Player player) {
         if (!mapHandler.enabled) return;
         currentInterval++;
-        if(currentInterval < mapHandler.updateInterval){
+        if (currentInterval < mapHandler.updateInterval) {
             return;
         }
         currentInterval = 0;
@@ -290,7 +290,9 @@ public class MinimapRenderer extends MapRenderer implements Listener {
     }
 
     private void handleBlockEvent(Block block) {
-        addToQueue(new Coords(block.getX(), block.getZ(), block.getWorld().getName()));
+        if (block.getWorld().getName().equals("world")) {
+            addToQueue(new Coords(block.getX(), block.getZ(), block.getWorld().getName()));
+        }
     }
 
 
