@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.items;
 
+import lombok.AccessLevel;
 import lombok.CustomLog;
 import lombok.Getter;
 import lombok.Setter;
@@ -42,7 +43,10 @@ public class BPvPItem implements IBPvPItem {
     private NamespacedKey namespacedKey;
     private Material material;
     private Component name;
+
+    @Getter(AccessLevel.NONE)
     private List<Component> lore;
+
     private int customModelData;
     private int maxDurability;
     private boolean glowing;
@@ -310,8 +314,13 @@ public class BPvPItem implements IBPvPItem {
 
     }
 
+    @Override
+    public List<Component> getLore(ItemMeta meta) {
+        return lore;
+    }
+
     public ItemMeta applyLore(ItemMeta itemMeta) {
-        return applyLore(itemMeta, getLore());
+        return applyLore(itemMeta, getLore(itemMeta));
     }
 
     public ItemMeta applyLore(ItemMeta itemMeta, List<Component> lore) {

@@ -345,7 +345,7 @@ public class ClansExplosionListener extends ClanListener {
         }
 
         if(material.isBlock()) {
-            if(event.getItem().getLore().isEmpty()) {
+            if(event.getItem().getLore(null).isEmpty()) {
                 event.getItemLore().add(UtilMessage.deserialize("It takes <green>1</green> cannonball to destroy this block"));
             }
         }
