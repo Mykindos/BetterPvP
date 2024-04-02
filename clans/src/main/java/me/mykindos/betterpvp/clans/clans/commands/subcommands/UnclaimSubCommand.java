@@ -25,10 +25,6 @@ import java.util.UUID;
 public class UnclaimSubCommand extends ClanSubCommand {
 
     @Inject
-    @Config(path = "clans.claims.additional", defaultValue = "3")
-    private int additionalClaims;
-
-    @Inject
     public UnclaimSubCommand(ClanManager clanManager, ClientManager clientManager) {
         super(clanManager, clientManager);
     }
@@ -67,7 +63,7 @@ public class UnclaimSubCommand extends ClanSubCommand {
                 return;
             }
 
-            if(locationClan.getTerritory().size() <= locationClan.getMembers().size() + additionalClaims) {
+            if(locationClan.getTerritory().size() <= clanManager.getMaximumClaimsForClan(locationClan)) {
                 UtilMessage.simpleMessage(player, "Clans", "<yellow>%s<gray> has enough members to keep this territory.",
                         locationClan.getName());
                 return;

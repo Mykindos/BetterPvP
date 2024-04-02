@@ -72,6 +72,8 @@ public class ClansWorldListener extends ClanListener {
     @Config(path = "clans.claims.allow-gravity-blocks", defaultValue = "true")
     private boolean allowGravityBlocks;
 
+
+
     private final Clans clans;
     private final EffectManager effectManager;
     private final EnergyHandler energyHandler;
