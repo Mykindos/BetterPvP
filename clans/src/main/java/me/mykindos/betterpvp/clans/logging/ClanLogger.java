@@ -9,9 +9,27 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
 import me.mykindos.betterpvp.clans.clans.OldClanManager;
 import me.mykindos.betterpvp.clans.logging.types.ClanLogType;
+import me.mykindos.betterpvp.clans.logging.types.formatted.AllianceAcceptClanLog;
+import me.mykindos.betterpvp.clans.logging.types.formatted.AllianceRemoveClanLog;
+import me.mykindos.betterpvp.clans.logging.types.formatted.AllianceRequestClanLog;
+import me.mykindos.betterpvp.clans.logging.types.formatted.ClaimClanLog;
+import me.mykindos.betterpvp.clans.logging.types.formatted.CreateClanLog;
+import me.mykindos.betterpvp.clans.logging.types.formatted.DemoteClanLog;
+import me.mykindos.betterpvp.clans.logging.types.formatted.EnemyClanLog;
 import me.mykindos.betterpvp.clans.logging.types.formatted.FormattedClanLog;
+import me.mykindos.betterpvp.clans.logging.types.formatted.InviteClanLog;
 import me.mykindos.betterpvp.clans.logging.types.formatted.JoinClanLog;
+import me.mykindos.betterpvp.clans.logging.types.formatted.KickClanLog;
 import me.mykindos.betterpvp.clans.logging.types.formatted.KillClanLog;
+import me.mykindos.betterpvp.clans.logging.types.formatted.LeaveClanLog;
+import me.mykindos.betterpvp.clans.logging.types.formatted.NeutralAcceptClanLog;
+import me.mykindos.betterpvp.clans.logging.types.formatted.NeutralRequestClanLog;
+import me.mykindos.betterpvp.clans.logging.types.formatted.PromoteClanLog;
+import me.mykindos.betterpvp.clans.logging.types.formatted.SetHomeClanLog;
+import me.mykindos.betterpvp.clans.logging.types.formatted.TrustAcceptLog;
+import me.mykindos.betterpvp.clans.logging.types.formatted.TrustRemoveLog;
+import me.mykindos.betterpvp.clans.logging.types.formatted.TrustRequestClanLog;
+import me.mykindos.betterpvp.clans.logging.types.formatted.UnclaimClanLog;
 import me.mykindos.betterpvp.clans.logging.types.log.ClanLog;
 import me.mykindos.betterpvp.core.components.clans.IOldClan;
 import me.mykindos.betterpvp.core.database.Database;
@@ -207,22 +225,73 @@ public class ClanLogger {
         if (player1ID != null) {
             offlinePlayer1 = Bukkit.getOfflinePlayer(UUID.fromString(player1ID));
         }
-        Clan clan1 = null;
-        if (clan1ID != null) {
-            clan1 = clanManager.getClanById(UUID.fromString(clan1ID)).orElse(null);
-        }
+
+        IOldClan clan1 = oldClanManager.getOldClan(clan1ID);
+
         OfflinePlayer offlinePlayer2 = null;
         if (player2ID != null) {
             offlinePlayer2 = Bukkit.getOfflinePlayer(UUID.fromString(player2ID));
         }
-        Clan clan2 = null;
-        if (clan2ID != null) {
-            clan2 = clanManager.getClanById(UUID.fromString(clan2ID)).orElse(null);
-        }
+
+        IOldClan clan2 = oldClanManager.getOldClan(clan2ID);
 
         switch (type) {
             case CLAN_JOIN -> {
                 return new JoinClanLog(time, offlinePlayer1, clan1);
+            }
+            case CLAN_KICK -> {
+                return new KickClanLog(time, offlinePlayer1, clan1, offlinePlayer2);
+            }
+            case CLAN_CLAIM -> {
+                return new ClaimClanLog(time, offlinePlayer1, clan1);
+            }
+            case CLAN_ENEMY -> {
+                return new EnemyClanLog(time, offlinePlayer1, clan1, clan2);
+            }
+            case CLAN_LEAVE -> {
+                return new LeaveClanLog(time, offlinePlayer1, clan1);
+            }
+            case CLAN_CREATE -> {
+                return new CreateClanLog(time, offlinePlayer1, clan1);
+            }
+            case CLAN_DEMOTE -> {
+                return new DemoteClanLog(time, offlinePlayer1, clan1, offlinePlayer2, clan2);
+            }
+            case CLAN_INVITE -> {
+                return new InviteClanLog(time, offlinePlayer1, clan1, offlinePlayer2);
+            }
+            case CLAN_PROMOTE -> {
+                return new PromoteClanLog(time, offlinePlayer1, clan1, offlinePlayer2, clan2);
+            }
+            case CLAN_SETHOME -> {
+                return new SetHomeClanLog(time, offlinePlayer1, clan1);
+            }
+            case CLAN_UNCLAIM -> {
+                return new UnclaimClanLog(time, offlinePlayer1, clan1, clan2);
+            }
+            case CLAN_TRUST_ACCEPT -> {
+                return new TrustAcceptLog(time, offlinePlayer1, clan1, clan2);
+            }
+            case CLAN_ALLIANCE_ACCEPT -> {
+                return new AllianceAcceptClanLog(time, offlinePlayer1, clan1, clan2);
+            }
+            case CLAN_TRUST_REMOVE -> {
+                return new TrustRemoveLog(time, offlinePlayer1, clan1, clan2);
+            }
+            case CLAN_TRUST_REQUEST -> {
+                return new TrustRequestClanLog(time, offlinePlayer1, clan1, clan2);
+            }
+            case CLAN_NEUTRAL_ACCEPT -> {
+                return new NeutralAcceptClanLog(time, offlinePlayer1, clan1, clan2);
+            }
+            case CLAN_ALLIANCE_REMOVE -> {
+                return new AllianceRemoveClanLog(time, offlinePlayer1, clan1, clan2);
+            }
+            case CLAN_NEUTRAL_REQUEST -> {
+                return new NeutralRequestClanLog(time, offlinePlayer1, clan1, clan2);
+            }
+            case CLAN_ALLIANCE_REQUEST -> {
+                return new AllianceRequestClanLog(time, offlinePlayer1, clan1, clan2);
             }
             default -> {
                 return new FormattedClanLog(time, offlinePlayer1, clan1, offlinePlayer2, clan2, type);

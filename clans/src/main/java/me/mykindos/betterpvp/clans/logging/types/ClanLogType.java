@@ -22,10 +22,6 @@ public enum ClanLogType {
      */
     CLAN_DISBAND,
     /**
-     * Represents a clan kill. Not used to put data in the database, only on retrieval
-     */
-    CLAN_KILL,
-    /**
      * Player 1 claims territory for Clan2
      */
     CLAN_CLAIM,
@@ -84,7 +80,6 @@ public enum ClanLogType {
     /**
      * Player1 of Clan1 is demoted by Player2 of Clan2
      */
-
-    //TODO more enums
+    CLAN_DEMOTE
 
 }

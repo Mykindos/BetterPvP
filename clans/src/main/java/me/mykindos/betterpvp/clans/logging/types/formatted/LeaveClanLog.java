@@ -7,9 +7,9 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.OfflinePlayer;
 
-public class JoinClanLog extends FormattedClanLog {
-    public JoinClanLog(long time, OfflinePlayer offlinePlayer1, IOldClan clan1) {
-        super(time, offlinePlayer1, clan1, null, null, ClanLogType.CLAN_JOIN);
+public class LeaveClanLog extends FormattedClanLog {
+    public LeaveClanLog(long time, OfflinePlayer offlinePlayer1, IOldClan clan1) {
+        super(time, offlinePlayer1, clan1, null, null, ClanLogType.CLAN_LEAVE);
     }
 
     @Override
@@ -17,8 +17,8 @@ public class JoinClanLog extends FormattedClanLog {
         assert offlinePlayer1 != null;
         assert clan1 != null;
         return getTimeComponent()
-                .append(getPlayerComponent(offlinePlayer1, ClanRelation.SELF)).appendSpace()
-                .append(Component.text("joined", NamedTextColor.GREEN)).appendSpace()
+                .append(getPlayerComponent(offlinePlayer1, ClanRelation.NEUTRAL)).appendSpace()
+                .append(Component.text("left", NamedTextColor.RED)).appendSpace()
                 .append(getClanComponent(clan1, ClanRelation.SELF));
     }
 }

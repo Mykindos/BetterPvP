@@ -68,7 +68,6 @@ public class KillClanLog {
         return Component.text(Objects.requireNonNull(player.getName()), ClanRelation.NEUTRAL.getPrimary());
     }
 
-    //todo show clan relations
     public Component getComponent() {
         return getTimeComponent().append(getKillerPlayerClanFormat()).appendSpace()
                 .append(Component.text("killed", NamedTextColor.GRAY)).appendSpace()

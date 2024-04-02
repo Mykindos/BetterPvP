@@ -758,7 +758,7 @@ public class ClanEventListener extends ClanListener {
                 UUID id = log.info("%s (%s) was demoted by %s (%s) to %s in %s (%s)", client.getName(), member.getUuid(),
                         player.getName(), player.getUniqueId(), member.getRank().getName(),
                         clan.getName(), clan.getId());
-                clanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_PROMOTE)
+                clanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_DEMOTE)
                         .addMeta(UUID.fromString(member.getUuid()), UUIDType.PLAYER1)
                         .addMeta(clan.getId(), UUIDType.CLAN1)
                         .addMeta(player.getUniqueId(), UUIDType.PLAYER2)
