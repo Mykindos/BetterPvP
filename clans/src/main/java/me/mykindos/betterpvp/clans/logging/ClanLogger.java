@@ -162,6 +162,46 @@ public class ClanLogger {
         return null;
     }
 
+    public List<OfflinePlayer> getPlayersByClan(UUID clanID) {
+        List<OfflinePlayer> offlinePlayers = new ArrayList<>();
+        String query = "Call GetPlayersByClan(?)";
+        CachedRowSet result = database.executeQuery( new Statement(query,
+                new UuidStatementValue(clanID)
+                )
+        );
+
+        try {
+            while (result.next()) {
+                String playerID = result.getString(1);
+
+                offlinePlayers.add(Bukkit.getOfflinePlayer(UUID.fromString(playerID)));
+            }
+        } catch (SQLException ex) {
+            log.error("Failed to get playerID from Clan logs", ex);
+        }
+
+        return offlinePlayers;
+    }
+
+    public List<IOldClan> getClansByPlayer(UUID playerID) {
+        List<IOldClan> clans = new ArrayList<>();
+        String query = "Call GetClansByPlayer(?)";
+        CachedRowSet result = database.executeQuery( new Statement(query,
+                        new UuidStatementValue(playerID)
+                )
+        );
+
+        try {
+            while (result.next()) {
+                String clanID = result.getString(1);
+                clans.add(oldClanManager.getOldClan(clanID));
+            }
+        } catch (SQLException ex) {
+            log.error("Failed to get clanIDs from Clan logs", ex);
+        }
+        return clans;
+    }
+
     public FormattedClanLog formattedLogFromRow(long time, String player1ID, String clan1ID, String player2ID, String clan2ID, ClanLogType type) {
         OfflinePlayer offlinePlayer1 = null;
         if (player1ID != null) {

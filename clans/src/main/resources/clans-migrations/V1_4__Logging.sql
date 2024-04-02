@@ -46,3 +46,21 @@ BEGIN
     GROUP BY CL.Clan1
     ORDER BY CL.Time Desc;
 END;
+
+DROP PROCEDURE IF EXISTS GetPlayersByClan;
+CREATE PROCEDURE GetPlayersByClan(ClanID varchar(36))
+BEGIN
+    SELECT DISTINCT CL.Player1 as Player FROM clanlogs CL
+    WHERE CL.Clan1 = ClanID
+    AND CL.type in ('CLAN_JOIN', 'CLAN_CREATE')
+    ORDER BY CL.Time DESC;
+END;
+
+DROP PROCEDURE IF EXISTS GetClansByPlayer;
+CREATE PROCEDURE GetClansByPlayer(PlayerID varchar(36))
+BEGIN
+    SELECT DISTINCT CL.Clan1 as Clan FROM clanlogs CL
+    WHERE CL.Player1 = PlayerID
+    AND CL.type in ('CLAN_JOIN', 'CLAN_CREATE')
+    ORDER BY CL.Time DESC;
+END;
