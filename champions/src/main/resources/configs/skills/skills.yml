@@ -973,7 +973,7 @@ skills:
       applyRadiusIncreasePerLevel: 1.0
       passiveTravelSpeed: 0.8
       applyTravelSpeed: 0.2
-      damagePerSecond: 10.0
+      damagePerSecond: 0.5
       damageIncreasePerLevel: 0.5
       regenPerSecond: 5.0
       regenIncreasePerLevel: 0.5
