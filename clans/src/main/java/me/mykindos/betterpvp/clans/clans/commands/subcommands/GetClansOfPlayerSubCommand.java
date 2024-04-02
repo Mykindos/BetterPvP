@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.clans.clans.commands.subcommands;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
@@ -18,6 +19,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;
 
+@CustomLog
 @Singleton
 @SubCommand(ClanCommand.class)
 public class GetClansOfPlayerSubCommand extends ClanSubCommand {
@@ -66,7 +68,11 @@ public class GetClansOfPlayerSubCommand extends ClanSubCommand {
                 UtilMessage.message(player, "Clan", "Retrieving past and present Clans of <yellow>%s</yellow>", client1.getName());
 
                 for (IOldClan iOldClan : iOldClans) {
-                    UtilMessage.message(player, "Clan", "<white>%s</white>", iOldClan.getName());
+                    try {
+                        UtilMessage.message(player, "Clan", "<white>%s</white>", iOldClan.getName());
+                    } catch (NullPointerException npe) {
+                        log.warn(npe.toString());
+                    }
                 }
             });
         });

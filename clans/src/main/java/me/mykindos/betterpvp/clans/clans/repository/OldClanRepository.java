@@ -38,6 +38,7 @@ public class OldClanRepository implements IRepository<OldClan> {
                 String name = result.getString(2);
                 OldClan oldClan = new OldClan(clanId);
                 oldClan.setName(name);
+                clanList.add(oldClan);
             }
         } catch (SQLException ex) {
             log.error("Failed to load clans", ex);
