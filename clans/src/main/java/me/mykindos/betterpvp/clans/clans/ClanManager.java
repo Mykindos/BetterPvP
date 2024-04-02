@@ -67,8 +67,16 @@ public class ClanManager extends Manager<Clan> {
     private final ConcurrentLinkedQueue<Insurance> insuranceQueue;
 
     @Inject
-    @Config(path = "clans.claims.additional", defaultValue = "3")
-    private int additionalClaims;
+    @Config(path = "clans.claims.baseAmountOfClaims", defaultValue = "3")
+    private int baseAmountOfClaims;
+
+    @Inject
+    @Config(path = "clans.claims.bonusClaimsPerMember", defaultValue = "1")
+    private int bonusClaimsPerMember;
+
+    @Inject
+    @Config(path = "clans.claims.maxAmountOfClaims", defaultValue = "9")
+    private int maxAmountOfClaims;
 
     @Inject
     @Config(path = "clans.pillage.enabled", defaultValue = "true")
@@ -249,9 +257,13 @@ public class ClanManager extends Manager<Clan> {
 
     }
 
+    public int getMaximumClaimsForClan(Clan clan) {
+        return Math.min(maxAmountOfClaims, baseAmountOfClaims + (clan.getMembers().size() * bonusClaimsPerMember));
+    }
+
     public Component getClanTooltip(Player player, Clan target) {
         Clan clan = getClanByPlayer(player).orElse(null);
-        var territoryString = target.getTerritory().size() + "/" + (target.getMembers().size() + additionalClaims);
+        var territoryString = target.getTerritory().size() + "/" + getMaximumClaimsForClan(target);
 
         return Component.text(target.getName() + " Information").color(getRelation(clan, target).getPrimary())
                 .appendNewline()

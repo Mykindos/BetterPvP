@@ -5,8 +5,8 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
+import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.tips.ClanTip;
-import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.tips.types.ISuggestCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -16,13 +16,12 @@ import org.bukkit.entity.Player;
 @Singleton
 public class ClanClaimTip extends ClanTip implements ISuggestCommand {
 
-    @Inject
-    @Config(path = "clans.claims.additional", defaultValue = "3")
-    private int additionalClaims;
+    private final ClanManager clanManager;
 
     @Inject
-    public ClanClaimTip(Clans clans) {
+    public ClanClaimTip(Clans clans, ClanManager clanManager) {
         super(clans, 1, 2);
+        this.clanManager = clanManager;
         setComponent(generateComponent());
     }
 
@@ -42,6 +41,6 @@ public class ClanClaimTip extends ClanTip implements ISuggestCommand {
         if (clan == null) {
             return false;
         }
-        return clan.getAdminsAsPlayers().contains(player) && (clan.getTerritory().size() < (clan.getMembers().size() + additionalClaims));
+        return clan.getAdminsAsPlayers().contains(player) && (clan.getTerritory().size() < clanManager.getMaximumClaimsForClan(clan));
     }
 }

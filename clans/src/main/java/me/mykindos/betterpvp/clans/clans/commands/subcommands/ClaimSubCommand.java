@@ -27,10 +27,6 @@ import java.util.Optional;
 public class ClaimSubCommand extends ClanSubCommand {
 
     @Inject
-    @Config(path = "clans.claims.additional", defaultValue = "3")
-    private int additionalClaims;
-
-    @Inject
     public ClaimSubCommand(ClanManager clanManager, ClientManager clientManager) {
         super(clanManager, clientManager);
     }
@@ -61,7 +57,7 @@ public class ClaimSubCommand extends ClanSubCommand {
             return;
         }
 
-        if (clan.getTerritory().size() >= clan.getMembers().size() + additionalClaims ) {
+        if (clan.getTerritory().size() >= clanManager.getMaximumClaimsForClan(clan)) {
             if(!(clan.isAdmin() || client.isAdministrating())) {
                 UtilMessage.message(player, "Clans", "Your Clan cannot claim more Territory.");
                 return;
