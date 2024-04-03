@@ -18,28 +18,28 @@ import java.util.UUID;
 @Getter
 public abstract class SearchableLog {
 
-    protected UUID LogUUID;
+    protected UUID logUUID;
     protected final long time;
     protected String logType;
     protected final List<Statement> statements = new ArrayList<>();
     protected final List<MetaUuidLog> metaUuidLogList = new ArrayList<>();
 
     protected SearchableLog(UUID LogUUID, String type) {
-        this.LogUUID = LogUUID;
+        this.logUUID = LogUUID;
         this.time = System.currentTimeMillis();
         this.logType = type;
     }
 
     public SearchableLog addMeta(UUID uuid, UUIDType uuidType) {
         MetaUuidLog metaUuidLog = new MetaUuidLog(uuid, uuidType);
-        statements.add(metaUuidLog.getStatement(this.LogUUID));
+        statements.add(metaUuidLog.getStatement(this.logUUID));
         metaUuidLogList.add(metaUuidLog);
         return this;
     }
 
     public Statement getLogTimeStatetment() {
         return new Statement("INSERT INTO logmeta (id, Time, Type) VALUES (?, ?, ?)",
-                new UuidStatementValue(this.LogUUID),
+                new UuidStatementValue(this.logUUID),
                 new LongStatementValue(this.time),
                 new StringStatementValue(logType));
     }

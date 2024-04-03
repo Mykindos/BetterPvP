@@ -8,8 +8,8 @@ import java.util.UUID;
 public class ClanLog extends SearchableLog {
     private final ClanLogType type;
 
-    public ClanLog(UUID LogUUID, ClanLogType type) {
-        super(LogUUID, type.name());
+    public ClanLog(UUID logUUID, ClanLogType type) {
+        super(logUUID, type.name());
         this.type = type;
     }
 }

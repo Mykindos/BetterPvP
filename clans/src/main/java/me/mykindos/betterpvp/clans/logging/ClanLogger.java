@@ -79,8 +79,8 @@ public class ClanLogger {
         );
         try {
             while (result.next()) {
-                String UUID = result.getString(1);
-                return java.util.UUID.fromString(UUID);
+                String uuid = result.getString(1);
+                return java.util.UUID.fromString(uuid);
             }
         } catch (SQLException ex) {
             log.error("Failed to get ClanUUID logs", ex);

@@ -15,12 +15,12 @@ public class PromoteClanLog extends FormattedClanLog{
      * @param clan1          clan1 of the log
      * @param offlinePlayer2 player2 of the log
      * @param clan2          clan2 of the log
-     * @param type           the type of log
      */
     public PromoteClanLog(long time, @Nullable OfflinePlayer offlinePlayer1, @Nullable IOldClan clan1, @Nullable OfflinePlayer offlinePlayer2, @Nullable IOldClan clan2) {
         super(time, offlinePlayer1, clan1, offlinePlayer2, clan2, ClanLogType.CLAN_PROMOTE);
     }
 
+    @Override
     public Component getComponent() {
         return getTimeComponent()
                 .append(getPlayerClan2(ClanRelation.SELF)).appendSpace()

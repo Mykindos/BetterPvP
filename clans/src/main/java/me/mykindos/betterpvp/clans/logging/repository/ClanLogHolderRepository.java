@@ -73,11 +73,11 @@ public class ClanLogHolderRepository implements IRepository<ClanLogHolder> {
         });
     }
 
-    public void addClanKill(UUID KillID, Clan killerClan, Clan victimClan, double dominance) {
+    public void addClanKill(UUID killID, Clan killerClan, Clan victimClan, double dominance) {
         UtilServer.runTaskAsync(JavaPlugin.getPlugin(Clans.class), () -> {
             String query = "INSERT INTO clans_kills (KillId, KillerClan, VictimClan, Dominance) VALUES (?, ?, ?, ?)";
             database.executeUpdate(new Statement(query,
-                    new UuidStatementValue(KillID),
+                    new UuidStatementValue(killID),
                     new StringStatementValue(killerClan == null ? null : String.valueOf(killerClan.getId())),
                     new StringStatementValue(victimClan == null ? null : String.valueOf(victimClan.getId())),
                     new DoubleStatementValue(dominance)
@@ -106,12 +106,12 @@ public class ClanLogHolderRepository implements IRepository<ClanLogHolder> {
             while (result.next()) {
                 long time = result.getLong(1);
                 String type = result.getString(2);
-                String Player1 = result.getString(3);
-                String Clan1 = result.getString(4);
-                String Player2 = result.getString(5);
-                String Clan2 = result.getString(6);
+                String player1 = result.getString(3);
+                String clan1 = result.getString(4);
+                String player2 = result.getString(5);
+                String clan2 = result.getString(6);
 
-                logList.add(formattedLogFromRow(time, Player1, Clan1, Player2, Clan2, ClanLogType.valueOf(type)));
+                logList.add(formattedLogFromRow(time, player1, clan1, player2, clan2, ClanLogType.valueOf(type)));
             }
         } catch (SQLException ex) {
             log.error("Failed to get ClanUUID logs", ex);
@@ -137,10 +137,10 @@ public class ClanLogHolderRepository implements IRepository<ClanLogHolder> {
                 String victimClanID = result.getString(5);
                 double dominance = result.getDouble(6);
 
-                OfflinePlayer killer =  Bukkit.getOfflinePlayer(UUID.fromString(killerID));;
+                OfflinePlayer killer =  Bukkit.getOfflinePlayer(UUID.fromString(killerID));
                 IOldClan killerClan = oldClanManager.getOldClan(killerClanID);
 
-                OfflinePlayer victim = Bukkit.getOfflinePlayer(UUID.fromString(victimID));;
+                OfflinePlayer victim = Bukkit.getOfflinePlayer(UUID.fromString(victimID));
                 IOldClan victimClan = oldClanManager.getOldClan(victimClanID);
 
                 logList.add(new KillClanLog(clan, time, killer, killerClan, victim, victimClan, dominance));

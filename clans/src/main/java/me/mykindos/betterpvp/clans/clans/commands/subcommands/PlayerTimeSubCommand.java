@@ -62,7 +62,7 @@ public class PlayerTimeSubCommand extends ClanSubCommand {
             try {
                 time = Long.parseLong(args[1]);
             } catch (NumberFormatException ignored) {
-
+                //pass
             }
         }
         long finalTime = time;
@@ -73,8 +73,8 @@ public class PlayerTimeSubCommand extends ClanSubCommand {
             }
             long newTime = System.currentTimeMillis() - finalTime;
             UtilServer.runTaskAsync(JavaPlugin.getPlugin(Clans.class), () -> {
-                UUID ClanID = clanLogger.getClanUUIDOfPlayerAtTime(UUID.fromString(client1.get().getUuid()), newTime);
-                Clan clan = clanManager.getClanById(ClanID).orElse(null);
+                UUID clanID = clanLogger.getClanUUIDOfPlayerAtTime(UUID.fromString(client1.get().getUuid()), newTime);
+                Clan clan = clanManager.getClanById(clanID).orElse(null);
                 UtilMessage.message(player, "Clans", "<yellow>%s</yellow> was in <aqua>%s</aqua> <green>%s</green> ago.", client1.get().getName(), clan == null ? null : clan.getName(), UtilTime.getTime(System.currentTimeMillis() - newTime, 2));
             });
         });

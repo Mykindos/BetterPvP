@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.clans.logging.types.formatted;
 
-import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
 import me.mykindos.betterpvp.clans.logging.types.ClanLogType;
 import me.mykindos.betterpvp.core.components.clans.IOldClan;
@@ -13,6 +12,7 @@ public class UnclaimClanLog extends FormattedClanLog {
         super(time, offlinePlayer1, clan1, null, clan2, ClanLogType.CLAN_UNCLAIM);
     }
 
+    @Override
     public Component getComponent() {
         return getTimeComponent()
                 .append(getPlayerClan1(ClanRelation.NEUTRAL)).appendSpace()

@@ -18,6 +18,7 @@ public class SetHomeClanLog extends FormattedClanLog {
         super(time, offlinePlayer1, clan1, null, null, ClanLogType.CLAN_SETHOME);
     }
 
+    @Override
     public Component getComponent() {
         return getTimeComponent()
                 .append(getPlayerClan1(ClanRelation.SELF)).appendSpace()
