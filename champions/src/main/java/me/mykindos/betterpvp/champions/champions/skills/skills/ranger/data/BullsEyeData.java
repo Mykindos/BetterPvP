@@ -1,7 +1,9 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.data;
 
 import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
-import org.bukkit.*;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -78,30 +80,9 @@ public class BullsEyeData {
 
     public Color getColor() {
         float targetFocusedAmount = targetFocused.getCharge();
-
-        if (targetFocusedAmount <= 0.09) {
-            return Color.fromRGB(250, 50, 50);
-        } else if (targetFocusedAmount <= 0.18) {
-            return Color.fromRGB(240, 65, 40);
-        } else if (targetFocusedAmount <= 0.27) {
-            return Color.fromRGB(240, 100, 40);
-        } else if (targetFocusedAmount <= 0.36) {
-            return Color.fromRGB(240, 130, 40);
-        } else if (targetFocusedAmount <= 0.45) {
-            return Color.fromRGB(240, 165, 40);
-        } else if (targetFocusedAmount <= 0.54) {
-            return Color.fromRGB(240, 200, 40);
-        } else if (targetFocusedAmount <= 0.63) {
-            return Color.fromRGB(235, 235, 40);
-        } else if (targetFocusedAmount <= 0.72) {
-            return Color.fromRGB(205, 240, 40);
-        } else if (targetFocusedAmount <= 0.81) {
-            return Color.fromRGB(170, 240, 40);
-        } else if (targetFocusedAmount <= 0.9) {
-            return Color.fromRGB(110, 240, 40);
-        } else if (targetFocusedAmount <= 1.0) {
-            return Color.fromRGB(70, 240, 40);
-        }
-        return null;
+        int red = (int) Math.min(255, (targetFocusedAmount * Color.GREEN.getRed() + (1 - targetFocusedAmount) * Color.RED.getRed()) * 1.5);
+        int green = (int) Math.min(255, (targetFocusedAmount * Color.GREEN.getGreen() + (1 - targetFocusedAmount) * Color.RED.getGreen()) * 1.5);
+        int blue = (int) Math.min(255, targetFocusedAmount * Color.GREEN.getBlue() + (1 - targetFocusedAmount) * Color.RED.getBlue());
+        return Color.fromRGB(red, green, blue);
     }
 }
