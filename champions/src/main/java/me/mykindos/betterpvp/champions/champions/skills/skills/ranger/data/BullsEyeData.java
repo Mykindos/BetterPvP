@@ -1,11 +1,9 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.data;
 
-import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
 import org.bukkit.*;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
 public class BullsEyeData {
