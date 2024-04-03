@@ -1,0 +1,235 @@
+package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.sword;
+
+import com.destroystokyo.paper.ParticleBuilder;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import me.mykindos.betterpvp.champions.Champions;
+import me.mykindos.betterpvp.champions.champions.ChampionsManager;
+import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
+import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.skills.ranger.data.BullsEyeData;
+import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.components.champions.Role;
+import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
+import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilMath;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import org.bukkit.*;
+import org.bukkit.entity.*;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityShootBowEvent;
+import org.bukkit.util.RayTraceResult;
+import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.*;
+
+@Singleton
+@BPvPListener
+public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSkill {
+
+    private final WeakHashMap<UUID, BullsEyeData> bullsEyeData = new WeakHashMap<>();
+
+    private double baseCurveDistance;
+
+    private double curveDistanceIncreasePerLevel;
+
+    private double baseBonusDamage;
+
+    private double bonusDamageIncreasePerLevel;
+
+    @Inject
+    public Bullseye(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
+    }
+
+    @Override
+    public String getName() {
+        return "Bulls Eye";
+    }
+
+    @Override
+    public String[] getDescription(int level) {
+        return new String[]{
+                "Hold right click with a Sword to channel",
+                "",
+                "While looking at an enemy you will gain charge",
+                "on them, when you next shoot an arrow towards",
+                "that enemy it will curve towards them from a",
+                "distance of up to <val>" + getCurveDistance(level) + "</val> blocks and also deal",
+                "<val>" + getBonusDamage(level) + "</val> bonus damage",
+                "",
+                "Cooldown: <val>" + getCooldown(level)};
+    }
+
+    @Override
+    public Role getClassType() {
+        return Role.RANGER;
+    }
+
+    @Override
+    public SkillType getType() {
+        return SkillType.SWORD;
+    }
+
+    @Override
+    public Action[] getActions() {
+        return SkillActions.RIGHT_CLICK;
+    }
+
+    public double getCurveDistance(int level) {
+        return baseCurveDistance + ((level - 1) * curveDistanceIncreasePerLevel);
+    }
+
+    public double getBonusDamage(int level) {
+        return baseBonusDamage + ((level - 1) * bonusDamageIncreasePerLevel);
+    }
+
+    @Override
+    public double getCooldown(int level) {
+        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
+    }
+
+    @Override
+    public boolean shouldDisplayActionBar(Gamer gamer) {
+        return !bullsEyeData.containsKey(Objects.requireNonNull(gamer.getPlayer()).getUniqueId()) && isHolding(gamer.getPlayer());
+    }
+
+    @Override
+    public void activate(Player player, int level) {
+        UUID playerUUID = player.getUniqueId();
+        active.add(playerUUID);
+        BullsEyeData playerBullsEyeData = new BullsEyeData(player, new ChargeData((float) (0.01)), null, null);
+        bullsEyeData.put(playerUUID, playerBullsEyeData);
+    }
+
+    @UpdateEvent
+    public void updateCharge() {
+        // Charge check
+        Iterator<UUID> iterator = bullsEyeData.keySet().iterator();
+        while (iterator.hasNext()) {
+            UUID playerUUID = iterator.next();
+            if (playerUUID == null || Bukkit.getPlayer(playerUUID) == null || !Objects.requireNonNull(Bukkit.getPlayer(playerUUID)).isOnline()) {
+                iterator.remove();
+                continue;
+            }
+            Player player = Bukkit.getPlayer(playerUUID);
+            BullsEyeData playerBullsEyeData = bullsEyeData.get(playerUUID);
+            // Remove if they no longer have the skill
+            int level = getLevel(player);
+            if (level <= 0) {
+                iterator.remove();
+                continue;
+            }
+            // Spawn particles
+            if (playerBullsEyeData.getTargetFocused() != null) {
+                playerBullsEyeData.spawnFocusingParticles();
+            }
+            // Check if they still are blocking and charge
+            Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
+            if (isHolding(player) && gamer.isHoldingRightClick()) {
+                playerBullsEyeData.getCasterCharge().tick();
+                championsManager.getCooldowns().removeCooldown(player, getName(), true);
+                focusTarget(playerBullsEyeData);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onBowShoot(EntityShootBowEvent event) {
+        if (event.getEntity() instanceof Player player) {
+            if (bullsEyeData.get(player.getUniqueId()) == null) return;
+            BullsEyeData playerBullsEyeData = bullsEyeData.get(player.getUniqueId());
+            if (playerBullsEyeData.getTarget() == null || playerBullsEyeData.getTargetFocused() == null) return;
+            Entity arrow =  event.getProjectile();
+            if (!(arrow instanceof Arrow)) return;
+            Bukkit.getServer().getScheduler().runTaskTimer(champions, new Runnable() {
+                @Override
+                public void run() {
+                    Collection<LivingEntity> nearbyEntities = arrow.getLocation().getNearbyLivingEntities(getCurveDistance(getLevel(player)) * playerBullsEyeData.getTargetFocused().getCharge());
+                    if (!arrow.isValid() || playerBullsEyeData.getTarget() == null || !playerBullsEyeData.getTarget().isValid()) {
+                        Bukkit.getScheduler().cancelTasks(champions);
+                        return;
+                    }
+                    if (nearbyEntities.contains(playerBullsEyeData.getTarget())) {
+
+                        Particle.DustOptions dustOptions = new Particle.DustOptions(playerBullsEyeData.getColor(), 1);
+                        new ParticleBuilder(Particle.REDSTONE)
+                                .location(arrow.getLocation())
+                                .count(1)
+                                .offset(0.1, 0.1, 0.1)
+                                .extra(0)
+                                .receivers(60)
+                                .data(dustOptions)
+                                .spawn();
+
+                        Vector direction = playerBullsEyeData.getTarget().getLocation().add(0, playerBullsEyeData.getTarget().getHeight() / 2 ,0).toVector().subtract(arrow.getLocation().toVector()).normalize();
+                        arrow.setVelocity(direction);
+                    }
+                }
+            }, 0, 2);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOW)
+    public void onDamage(CustomDamageEvent event) {
+        if (!(event.getProjectile() instanceof Arrow)) return;
+        if (!(event.getDamager() instanceof Player damager)) return;
+        LivingEntity damagee = event.getDamagee();
+        if (bullsEyeData.get(damager.getUniqueId()) == null) return;
+        if (damagee == bullsEyeData.get(damager.getUniqueId()).getTarget()) {
+            bullsEyeData.keySet().removeIf(playerUUID -> damager == Bukkit.getPlayer(playerUUID));
+            event.setDamage(getBonusDamage(getLevel(damager)) + (event.getDamage()));
+            damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_VILLAGER_WORK_FLETCHER, 2f, 1.2f);
+            if (damagee instanceof Player) {
+                UtilMessage.simpleMessage(damagee, getName(), "<alt>" + damager.getName() + "</alt> hit you with <alt>" + getName());
+            }
+
+            //apply cooldown
+            championsManager.getCooldowns().removeCooldown(damager, getName(), true);
+            championsManager.getCooldowns().use(damager,
+                    getName(),
+                    getCooldown(getLevel(damager)),
+                    true,
+                    true,
+                    isCancellable(),
+                    this::shouldDisplayActionBar);
+        }
+    }
+
+    private void focusTarget(BullsEyeData playerBullsEyeData) {
+        Player caster = playerBullsEyeData.getCaster();
+        RayTraceResult result = caster.rayTraceEntities(64);
+        if (result == null || result.getHitEntity() == null) return;
+        if (!(result.getHitEntity() instanceof LivingEntity)) return;
+
+        if (!playerBullsEyeData.hasTarget()) {
+            playerBullsEyeData.setTarget((LivingEntity) result.getHitEntity());
+            playerBullsEyeData.setTargetFocused(new ChargeData((float)(0.35)));
+            bullsEyeData.put(caster.getUniqueId(), playerBullsEyeData);
+        }
+
+        if (playerBullsEyeData.getTarget() == null || playerBullsEyeData.getTargetFocused() == null) return;
+        if (result.getHitEntity() == playerBullsEyeData.getTarget()) {
+            playerBullsEyeData.getTargetFocused().tick();
+            playerBullsEyeData.getTargetFocused().tickSound(caster);
+        }
+    }
+
+    @Override
+    public void loadSkillConfig() {
+        baseCurveDistance = getConfig("baseCurveDistance", 2.5, Double.class);
+        curveDistanceIncreasePerLevel = getConfig("curveDistanceIncreasePerLevel", 0.5, Double.class);
+
+        baseBonusDamage = getConfig("baseBonusDamage", 2.0, Double.class);
+        bonusDamageIncreasePerLevel = getConfig("bonusDamageIncreasePerLevel", 1.0, Double.class);
+    }
+}
