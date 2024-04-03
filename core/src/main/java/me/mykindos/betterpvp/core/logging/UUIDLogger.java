@@ -28,7 +28,7 @@ import java.util.UUID;
 @CustomLog
 public class UUIDLogger {
 
-    private Database database;
+    private final Database database;
 
     @Inject
     public UUIDLogger(Database database) {
@@ -73,11 +73,11 @@ public class UUIDLogger {
                 String player2ID = result.getString(5);
                 String name = result.getString(6);
                 String worldID = result.getString(7);
-                int X = result.getInt(8);
-                int Y = result.getInt(9);
-                int Z = result.getInt(10);
+                int x = result.getInt(8);
+                int y = result.getInt(9);
+                int z = result.getInt(10);
 
-                logList.add(formattedLogFromRow(time, type, itemID, player1ID, player2ID, name, worldID, X, Y, Z));
+                logList.add(formattedLogFromRow(time, type, itemID, player1ID, player2ID, name, worldID, x, y, z));
             }
         } catch (SQLException ex) {
             log.error("Failed to get UUID logs", ex);
@@ -113,11 +113,11 @@ public class UUIDLogger {
                 String player2ID = result.getString(5);
                 String name = result.getString(6);
                 String worldID = result.getString(7);
-                int X = result.getInt(8);
-                int Y = result.getInt(9);
-                int Z = result.getInt(10);
+                int x = result.getInt(8);
+                int y = result.getInt(9);
+                int z = result.getInt(10);
 
-                logList.add(formattedLogFromRow(time, type, itemID, player1ID, player2ID, name, worldID, X, Y, Z));
+                logList.add(formattedLogFromRow(time, type, itemID, player1ID, player2ID, name, worldID, x, y, z));
             }
         } catch (SQLException ex) {
             log.error("Failed to get player logs", ex);

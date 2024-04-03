@@ -19,9 +19,9 @@ public class MetaUuidLog {
         this.uuidtype = uuidType;
     }
 
-    public Statement getStatement(UUID LogUUID) {
+    public Statement getStatement(UUID logUUID) {
         return new Statement("INSERT INTO logmetauuid (LogUUID, UUID, UUIDType) VALUES (?, ?, ?)",
-                new UuidStatementValue(LogUUID),
+                new UuidStatementValue(logUUID),
                 new UuidStatementValue(uuid),
                 new StringStatementValue(uuidtype.name()));
     }

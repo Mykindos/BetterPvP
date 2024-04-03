@@ -13,15 +13,15 @@ public class ItemLog extends SearchableLog {
     private final UUIDLogType type;
     private Statement locationStatement = null;
 
-    public ItemLog(UUID LogUUID, UUIDLogType type, UUID item) {
-        super(LogUUID, type.name());
+    public ItemLog(UUID logUUID, UUIDLogType type, UUID item) {
+        super(logUUID, type.name());
         this.type = type;
         addMeta(item, UUIDType.ITEM);
     }
 
     public ItemLog addLocation(Location location, String name) {
         LocationLog locationLog = new LocationLog(location, name);
-        locationStatement = locationLog.getStatement(this.LogUUID);
+        locationStatement = locationLog.getStatement(this.logUUID);
         return this;
     }
 }

@@ -17,9 +17,9 @@ public class LocationLog {
         this.name = name;
     }
 
-    public Statement getStatement(UUID LogUUID) {
+    public Statement getStatement(UUID logUUID) {
         return new Statement("INSERT INTO loglocations (LogUUID, Name, WorldID, X, Y, Z) VALUES (?, ?, ?, ?, ?, ?)",
-                new UuidStatementValue(LogUUID),
+                new UuidStatementValue(logUUID),
                 new StringStatementValue(this.name),
                 new UuidStatementValue(this.location.getWorld().getUID()),
                 new IntegerStatementValue(this.location.getBlockX()),

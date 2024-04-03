@@ -71,7 +71,7 @@ public class OldClanManager extends Manager<OldClan> {
     public void reload() {
         UtilServer.runTaskLaterAsync(JavaPlugin.getPlugin(Clans.class), () -> {
             loadFromList(repository.getAll());
-        }, 5*20);
+        }, 3*20L);
     }
 
 

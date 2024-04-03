@@ -9,7 +9,7 @@ import net.kyori.adventure.text.Component;
  */
 public abstract class FormattedLog {
     long time;
-    public FormattedLog(long time) {
+    protected FormattedLog(long time) {
         this.time = time;
     }
 
