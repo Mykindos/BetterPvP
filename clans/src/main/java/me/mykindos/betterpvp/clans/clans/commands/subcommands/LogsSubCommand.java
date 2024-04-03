@@ -43,7 +43,16 @@ public class LogsSubCommand extends ClanSubCommand {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        int amount = 5;
+        int numPerPage = 10;
+        int pageNumber = 1;
+
+        if (args.length >= 1) {
+            try {
+                pageNumber = Integer.parseInt(args[0]);
+            } catch (NumberFormatException e) {
+                //pass
+            }
+        }
 
         Clan clan = clanManager.getClanByPlayer(player).orElse(null);
         if (clan == null) {
@@ -51,25 +60,28 @@ public class LogsSubCommand extends ClanSubCommand {
             return;
         }
 
-        if (args.length > 0) {
-            try {
-                amount = Integer.parseInt(args[0]);
-                if (amount < 1) {
-                    throw new NumberFormatException();
-                }
-            } catch (NumberFormatException e) {
-                UtilMessage.message(player, "Clans", UtilMessage.deserialize("<green>%s</green> is not a valid integer. Integer must be >= 1.", args[1]));
-                return;
-            }
-        }
-
-        final int finalAmount = amount;
+        int finalPageNumber = pageNumber;
         UtilServer.runTaskAsync(JavaPlugin.getPlugin(Clans.class), () -> {
             List<FormattedClanLog> logs = clanLogger.getAllLogs(clan);
-            UtilMessage.message(player, "Clan", "Retrieving the last <green>%s</green> logs", finalAmount);
 
-            for (FormattedClanLog log : logs) {
-                UtilMessage.message(player, "Clan", log.getComponent());
+            int count = 0;
+            int start = (finalPageNumber - 1) * numPerPage;
+            int end = start + numPerPage;
+            int size = logs.size();
+            int totalPages = size /numPerPage;
+            if (size % numPerPage > 0) {
+                totalPages++;
+            }
+            UtilMessage.message(player, "Clans",
+                    UtilMessage.deserialize("<dark_aqua>" + clan.getName() + "</dark_aqua>'s clan logs: <white>"
+                            + finalPageNumber + "<gray> / <white>" + totalPages));
+            if (start <= size) {
+                if (end > size) end = size;
+                for (FormattedClanLog log : logs.subList(start, end)) {
+                    if (count == numPerPage) break;
+                    UtilMessage.message(player, log.getComponent());
+                    count++;
+                }
             }
         });
     }
