@@ -163,7 +163,7 @@ public class InventorySkillListener implements Listener {
                 return;
             }
             ItemMeta itemMeta = itemStack.getItemMeta();
-            ItemUpdateLoreEvent itemUpdateLoreEvent = new ItemUpdateLoreEvent(item, itemStack, itemMeta, new ArrayList<>(item.getLore()));
+            ItemUpdateLoreEvent itemUpdateLoreEvent = new ItemUpdateLoreEvent(item, itemStack, itemMeta, new ArrayList<>(item.getLore(itemMeta)));
             UtilServer.callEvent(itemUpdateLoreEvent);
 
             itemUpdateLoreEvent.getItemLore().addAll(getSkillComponent(buildSkill, itemStack));

@@ -1,6 +1,10 @@
 clans:
   claims:
+    baseAmountOfClaims: 3
+    bonusClaimsPerMember: 1
+    maxAmountOfClaims: 9
     additional: 3
+    allow-gravity-blocks: true
   tnt:
     enabled: true
     dominanceRequired: 80
@@ -11,32 +15,49 @@ clans:
     protectionBaseTimeInMinutes: 5.0
     regenerationTimeInMinutes: 5.0
   map:
-    enabled: true
-    maxMapDistance: 512
+    enabled: false
+    maxMapDistance: 640
     maxProcess: 64
+    update-interval: 1
   members:
-    max: 6
+    max: 8
   insurance:
     durationInHours: 24
+    enabled: true
+    nonRestorableBlocks:
+      - TNT
+      - ENCHANTING_TABLE
+      - IRON_BLOCK
+      - GOLD_BLOCK
+      - DIAMOND_BLOCK
+      - NETHERITE_BLOCK
+      - EMERALD_BLOCK
+      - REDSTONE_BLOCK
+      - BEEHIVE
+      - WATER
+      - ICE
+      - LAVA
   pillage:
-    duration: 10
+    duration: 15
     noDominanceCooldown: 4
+    enabled: true
   bank:
     interestIntervalDeviation: 6
     interestIntervalInHours: 24
     interestRate: 2.5
   clan:
-    vault:
-      max-size: 28
-      base-size: 9
     default:
       energy: 2400
       level: 1
       points: 0
+  energy:
+    energyWarnLevel: 1.0
+  dominance:
+    enabled: true
 server:
   isHub: false
   sidebar:
-    title: BetterPvP
+    title: Mineplex Clans
   world:
     fastNightCycle: true
     mainWorld: world
@@ -55,7 +76,7 @@ command:
       requiredRank: ADMIN
   clan:
     enabled: true
-    requiredRank: ADMIN
+    requiredRank: PLAYER
     info:
       enabled: true
       requiredRank: ADMIN
@@ -67,7 +88,7 @@ command:
       requiredRank: ADMIN
     create:
       enabled: true
-      requiredRank: ADMIN
+      requiredRank: PLAYER
       maxCharactersInClanName: 13
       minCharactersInClanName: 3
     disband:
@@ -130,106 +151,192 @@ command:
     deposit:
       enabled: true
       requiredRank: ADMIN
+    help:
+      enabled: true
+      requiredRank: ADMIN
+    stuck:
+      enabled: true
+      requiredRank: ADMIN
+    list:
+      enabled: true
+      requiredRank: ADMIN
+    setenergy:
+      enabled: true
+      requiredRank: ADMIN
+    setsafe:
+      enabled: true
+      requiredRank: ADMIN
+    Untrust:
+      enabled: true
+      requiredRank: ADMIN
+    trust:
+      enabled: true
+      requiredRank: ADMIN
+    banner:
+      enabled: true
+      requiredRank: ADMIN
+    setbanner:
+      enabled: true
+      requiredRank: ADMIN
+    setexp:
+      enabled: true
+      requiredRank: ADMIN
+    rename:
+      enabled: true
+      requiredRank: ADMIN
+    untrust:
+      enabled: true
+      requiredRank: ADMIN
+    tutorial:
+      enabled: true
+      requiredRank: ADMIN
+    vault:
+      enabled: true
+      requiredRank: ADMIN
   clans:
     enabled: true
     requiredRank: ADMIN
     reload:
       enabled: true
       requiredRank: ADMIN
-fishing:
-  base-fishing-perk:
-    level: 10
+  fields:
     enabled: true
-mining:
-  faster-ores-perk:
-    level: 10
+    requiredRank: ADMIN
+    claim:
+      enabled: true
+      requiredRank: ADMIN
+    info:
+      enabled: true
+      requiredRank: ADMIN
+    respawn:
+      enabled: true
+      requiredRank: ADMIN
+  banner:
     enabled: true
-    speed-multiplier: 2.0
+    requiredRank: ADMIN
 fields:
   blocks:
     goldchunk:
       maxCoins: 150
       minCoins: 50
-      respawn: 1800.0
-    condensedgoldore:
-      respawn: 1800.0
-      min: 1
-      max: 1
-    condensedironore:
-      respawn: 1800.0
-      min: 1
-      max: 1
-    emeraldore:
-      respawn: 1800.0
-      min: 1
-      max: 1
+      respawn: 60.0
+    quartzore:
+      respawn: 60.0
+      min: 0
+      max: 5
+    condensedemeraldore:
+      respawn: 60.0
+      min: 0
+      max: 2
+    ironore:
+      respawn: 60.0
+      min: 0
+      max: 3
     lootchest:
-      respawn: 1800.0
+      respawn: 60.0
       dropCount: 1
-      drops:
-        DIAMOND:
-          categoryWeight: 1
-          weight: 1
-          min: 1
-          max: 5
+      drops: {}
+    coalore:
+      respawn: 60.0
+      min: 0
+      max: 4
+    condensedleatherore:
+      respawn: 60.0
+      min: 0
+      max: 3
     diamondore:
-      respawn: 1800.0
-      min: 1
-      max: 1
-    condensedcoalore:
-      respawn: 1800.0
-      min: 1
-      max: 1
+      respawn: 60.0
+      min: 0
+      max: 3
+    leatherore:
+      respawn: 60.0
+      min: 0
+      max: 3
+    emeraldore:
+      respawn: 60.0
+      min: 0
+      max: 2
+    lapisore:
+      respawn: 60.0
+      min: 0
+      max: 5
+    condensedgoldore:
+      respawn: 60.0
+      min: 0
+      max: 3
     goldore:
-      respawn: 1800.0
-      min: 1
+      respawn: 60.0
+      min: 0
+      max: 3
+    condensedironore:
+      respawn: 60.0
+      min: 0
+      max: 3
+    condensedcoalore:
+      respawn: 60.0
+      min: 0
+      max: 4
+    condensedlapisore:
+      respawn: 60.0
+      min: 0
+      max: 5
+    condensedredstoneore:
+      respawn: 60.0
+      min: 0
       max: 1
     redstoneore:
-      respawn: 1800.0
-      min: 1
-      max: 1
-    coalore:
-      respawn: 1800.0
-      min: 1
+      respawn: 60.0
+      min: 0
       max: 1
     condenseddiamondore:
-      respawn: 1800.0
-      min: 1
-      max: 1
-    condensedredstoneore:
-      respawn: 1800.0
-      min: 1
-      max: 1
-    lapisore:
-      respawn: 1800.0
-      min: 1
-      max: 1
-    quartzore:
-      respawn: 1800.0
-      min: 1
-      max: 1
-    condensedlapisore:
-      respawn: 1800.0
-      min: 1
-      max: 1
-    condensedemeraldore:
-      respawn: 1800.0
-      min: 1
-      max: 1
-    ironore:
-      respawn: 1800.0
-      min: 1
-      max: 1
-    leatherore:
-      respawn: 1800.0
-      min: 1
-      max: 1
-    condensedleatherore:
-      respawn: 1800.0
-      min: 1
-      max: 1
-  playerCountSpeeds:
-    '25': 1.5
-    '50': 2
-    '75': 2.5
-    '100': 3
+      respawn: 60.0
+      min: 0
+      max: 3
+  playerCountSpeeds: {}
+  fieldsXpMultiplier: 5.0
+fishing:
+  base-fishing-perk:
+    level: 500
+    enabled: true
+tips:
+  clanhome:
+    enabled: true
+    categoryWeight: 2
+    weight: 1
+  clancreate:
+    enabled: true
+    categoryWeight: 10
+    weight: 1
+  clanhelp:
+    enabled: true
+    categoryWeight: 1
+    weight: 1
+  claninvite:
+    enabled: true
+    categoryWeight: 2
+    weight: 1
+  clanenergy:
+    enabled: true
+    categoryWeight: 2
+    weight: 1
+  clanunclaim:
+    enabled: true
+    categoryWeight: 1
+    weight: 1
+  clanclaim:
+    enabled: true
+    categoryWeight: 1
+    weight: 2
+  clanstuck:
+    enabled: true
+    categoryWeight: 1
+    weight: 2
+  clansethome:
+    enabled: true
+    categoryWeight: 2
+    weight: 1
+mining:
+  faster-ores-perk:
+    level: 250
+    speed-multiplier: 2.0
+    enabled: true

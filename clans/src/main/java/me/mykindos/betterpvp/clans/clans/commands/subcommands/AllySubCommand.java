@@ -23,7 +23,7 @@ import java.util.Optional;
 public class AllySubCommand extends ClanSubCommand {
 
     @Inject
-    @Config(path = "clans.members.max", defaultValue = "6")
+    @Config(path = "clans.members.max", defaultValue = "8")
     private int maxClanMembers;
 
     @Inject

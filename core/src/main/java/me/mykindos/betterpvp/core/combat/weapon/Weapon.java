@@ -49,7 +49,7 @@ public abstract class Weapon extends BPvPItem implements IWeapon {
     public void loadWeapon(BPvPItem item) {
         setMaterial(item.getMaterial());
         setName(item.getName());
-        setLore(item.getLore());
+        setLore(item.getLore(null));
         setMaxDurability(item.getMaxDurability());
         setCustomModelData(item.getCustomModelData());
         setGlowing(item.isGlowing());
