@@ -5,14 +5,19 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.listeners.ClanListener;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.config.Config;
+import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateLoreEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 
-import java.util.Set;
+import java.util.List;
 
 @BPvPListener
 public class InsuranceListener extends ClanListener {
@@ -24,10 +29,10 @@ public class InsuranceListener extends ClanListener {
     @Inject
     @Config(path = "clans.insurance.enabled", defaultValue = "true")
     private boolean enabled;
-    private final Set<Material> nonRestorables = Set.of(Material.IRON_BLOCK, Material.DIAMOND_BLOCK, Material.NETHERITE_BLOCK,
-            Material.GOLD_BLOCK, Material.EMERALD_BLOCK, Material.ENCHANTING_TABLE, Material.BEEHIVE,
-            Material.TNT, Material.REDSTONE_BLOCK, Material.WATER, Material.LAVA, Material.ICE
-    );
+
+    @Inject
+    @Config(path = "clans.insurance.nonRestorableBlocks", defaultValue = "TNT,ENCHANTING_TABLE")
+    private List<String> nonRestorableBlocks;
 
     @Inject
     public InsuranceListener(ClanManager clanManager, ClientManager clientManager) {
@@ -61,7 +66,7 @@ public class InsuranceListener extends ClanListener {
                 blockLocation.getBlock().setType(Material.AIR);
             } else {
                 if (blockLocation.getBlock().getType() == insurance.getBlockMaterial()) continue;
-                if (!shouldRestoreBlock(insurance.getBlockMaterial())) continue;
+                if (shouldNotRestoreBlock(insurance.getBlockMaterial())) continue;
 
                 blockLocation.getBlock().setType(insurance.getBlockMaterial());
                 blockLocation.getBlock().setBlockData(Bukkit.createBlockData(insurance.getBlockData()));
@@ -72,9 +77,23 @@ public class InsuranceListener extends ClanListener {
 
     }
 
-    private boolean shouldRestoreBlock(Material material) {
-        if (nonRestorables.contains(material)) return false;
-        return !material.isAir();
+    private boolean shouldNotRestoreBlock(Material material) {
+        for(String nonRestorable : nonRestorableBlocks){
+            if(material.name().equalsIgnoreCase(nonRestorable)){
+                return true;
+            }
+        }
+
+        return material.isAir();
+    }
+
+    @EventHandler (priority = EventPriority.HIGHEST)
+    public void onUpdateLore(ItemUpdateLoreEvent event) {
+
+        Material material = event.getItem().getMaterial();
+        if(shouldNotRestoreBlock(material)){
+            event.getItemLore().add(Component.text("This block will not be restored after a siege.", NamedTextColor.DARK_GRAY));
+        }
     }
 
 }

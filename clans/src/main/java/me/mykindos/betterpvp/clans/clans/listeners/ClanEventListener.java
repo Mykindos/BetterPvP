@@ -77,7 +77,7 @@ public class ClanEventListener extends ClanListener {
     private final OldClanManager oldClanManager;
 
     @Inject
-    @Config(path = "clans.members.max", defaultValue = "6")
+    @Config(path = "clans.members.max", defaultValue = "8")
     private int maxClanMembers;
 
     @Inject
