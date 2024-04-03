@@ -22,6 +22,7 @@ public abstract class SearchableLog {
     protected final long time;
     protected String logType;
     protected final List<Statement> statements = new ArrayList<>();
+    protected final List<MetaUuidLog> metaUuidLogList = new ArrayList<>();
 
     protected SearchableLog(UUID LogUUID, String type) {
         this.LogUUID = LogUUID;
@@ -32,6 +33,7 @@ public abstract class SearchableLog {
     public SearchableLog addMeta(UUID uuid, UUIDType uuidType) {
         MetaUuidLog metaUuidLog = new MetaUuidLog(uuid, uuidType);
         statements.add(metaUuidLog.getStatement(this.LogUUID));
+        metaUuidLogList.add(metaUuidLog);
         return this;
     }
 

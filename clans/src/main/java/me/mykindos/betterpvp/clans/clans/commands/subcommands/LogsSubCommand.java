@@ -65,7 +65,7 @@ public class LogsSubCommand extends ClanSubCommand {
 
         final int finalAmount = amount;
         UtilServer.runTaskAsync(JavaPlugin.getPlugin(Clans.class), () -> {
-            List<FormattedClanLog> logs = clanLogger.getAllLogs(clan.getId(), finalAmount);
+            List<FormattedClanLog> logs = clanLogger.getAllLogs(clan);
             UtilMessage.message(player, "Clan", "Retrieving the last <green>%s</green> logs", finalAmount);
 
             for (FormattedClanLog log : logs) {

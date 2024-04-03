@@ -7,25 +7,13 @@ SELECT L1.id as ID, L1.Time, L1.type, C1.Player1, C2.Clan1, C3.Player2, C4.Clan2
     WHERE L1.type LIKE 'CLAN_%';
 
 DROP PROCEDURE IF EXISTS GetClanLogsByClan;
-CREATE PROCEDURE GetClanLogsByClan(ClanID varchar(36), amount int)
+CREATE PROCEDURE GetClanLogsByClan(ClanID varchar(36))
 BEGIN
     SELECT DISTINCT CL.Time, CL.type, CL.Player1, CL.Clan1, CL.Player2, CL.Clan2
     FROM clanlogs CL
     WHERE CL.Clan1 = ClanID
     OR CL.Clan2 = ClanID
-    ORDER BY CL.Time DESC
-    LIMIT amount;
-END;
-
-DROP PROCEDURE IF EXISTS GetClanJoinLeaveLogsByClan;
-CREATE PROCEDURE GetClanJoinLeaveLogsByClan(ClanID varchar(36), amount int)
-BEGIN
-    SELECT DISTINCT CL.Time, CL.type, CL.Player1, CL.Clan1, CL.Player2, CL.Clan2
-    FROM clanlogs CL
-    WHERE CL.Clan1 = ClanID
-    AND CL.type in ('CLAN_CREATE', 'CLAN_JOIN', 'CLAN_LEAVE', 'CLAN_KICK')
-    ORDER BY CL.Time DESC
-    LIMIT amount;
+    ORDER BY CL.Time DESC;
 END;
 
 DROP PROCEDURE IF EXISTS GetClanByPlayerAtTime;
