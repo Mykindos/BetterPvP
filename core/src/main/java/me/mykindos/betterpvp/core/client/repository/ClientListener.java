@@ -160,7 +160,7 @@ public class ClientListener implements Listener {
         }
 
         event.getClient().setConnectionTime(System.currentTimeMillis());
-        log.info("%s (%s) joined", event.getPlayer().getName(), event.getPlayer().getUniqueId());
+        log.info("{} ({}) joined", event.getPlayer().getName(), event.getPlayer().getUniqueId());
     }
 
     @EventHandler (priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -171,7 +171,7 @@ public class ClientListener implements Listener {
         client.getGamer().putProperty(GamerProperty.TIME_PLAYED, (long) client.getGamer().getProperty(GamerProperty.TIME_PLAYED).orElse(0L)
                 + (System.currentTimeMillis() - client.getConnectionTime()));
         client.setConnectionTime(System.currentTimeMillis());
-        log.info("%s (%s) quit", event.getPlayer().getName(), event.getPlayer().getUniqueId());
+        log.info("{} ({}) quit", event.getPlayer().getName(), event.getPlayer().getUniqueId());
     }
 
     @EventHandler (priority = EventPriority.MONITOR)
