@@ -698,7 +698,7 @@ public class ClanEventListener extends ClanListener {
             return;
         }
 
-        clan.setHome(player.getLocation());
+        clan.setHome(player.getLocation().toCenterLocation());
         UtilMessage.simpleMessage(player, "Clans", "You set the clan home to <yellow>%s<gray>.",
                 UtilWorld.locationToString(player.getLocation()));
         UUID id = log.info("%s (%s) of %s (%s) set their clan home to %s", player.getName(), player.getUniqueId(), clan.getName(), clan.getName(), UtilWorld.locationToString(player.getLocation(), true));
