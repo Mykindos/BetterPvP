@@ -24,8 +24,8 @@ public abstract class SearchableLog {
     protected final List<Statement> statements = new ArrayList<>();
     protected final List<MetaUuidLog> metaUuidLogList = new ArrayList<>();
 
-    protected SearchableLog(UUID LogUUID, String type) {
-        this.logUUID = LogUUID;
+    protected SearchableLog(UUID logUUID, String type) {
+        this.logUUID = logUUID;
         this.time = System.currentTimeMillis();
         this.logType = type;
     }
