@@ -54,24 +54,22 @@ WHERE L1.Type LIKE 'ITEM_%';
 
 
 DROP PROCEDURE IF EXISTS GetItemLogsByUuid;
-CREATE PROCEDURE GetUuidLogsByUuid(UniqueID varchar(36), amount int)
+CREATE PROCEDURE GetUuidLogsByUuid(UniqueID varchar(36))
 BEGIN
     SELECT DISTINCT Time, Type, Item, Player1, Player2, Name, WorldID, X, Y, Z
     FROM itemlogs
     WHERE Item = UniqueID
-    ORDER BY Time DESC
-    LIMIT amount;
+    ORDER BY Time DESC;
 END;
 
 DROP PROCEDURE IF EXISTS GetUuidLogsByPlayer;
-CREATE PROCEDURE GetUuidLogsByPlayer(PlayerUuid varchar(36), amount int)
+CREATE PROCEDURE GetUuidLogsByPlayer(PlayerUuid varchar(36))
 BEGIN
     SELECT DISTINCT Time, Type, Item, Player1, Player2, Name, WorldID, X, Y, Z
     FROM itemlogs
     WHERE Player1 = PlayerUuid
     OR Player2 = PlayerUuid
-    ORDER BY Time DESC
-    LIMIT amount;
+    ORDER BY Time DESC;
 END;
 
 ALTER TABLE logmetauuid ADD INDEX (UUID);

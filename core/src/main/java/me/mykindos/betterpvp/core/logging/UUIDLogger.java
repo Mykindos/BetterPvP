@@ -6,7 +6,6 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
-import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
 import me.mykindos.betterpvp.core.logging.type.UUIDLogType;
 import me.mykindos.betterpvp.core.logging.type.formatted.item.BlockDispenseItemLog;
@@ -62,19 +61,14 @@ public class UUIDLogger {
     /**
      *
      * @param itemUUID the uuid of the item
-     * @param amount the number of logs to retrieve
      * @return A list of the last amount of logs relating to this uiid
      */
-    public List<FormattedItemLog> getUuidLogs(UUID itemUUID, int amount) {
+    public List<FormattedItemLog> getUuidLogs(UUID itemUUID) {
         List<FormattedItemLog> logList = new ArrayList<>();
-        if (amount < 0) {
-            return logList;
-        }
 
-        String query = "CALL GetUuidLogsByUuid(?, ?)";
+        String query = "CALL GetUuidLogsByUuid(?)";
         CachedRowSet result = database.executeQuery( new Statement(query,
-                new UuidStatementValue(itemUUID),
-                new IntegerStatementValue(amount)
+                new UuidStatementValue(itemUUID)
                 )
         );
 
@@ -102,19 +96,14 @@ public class UUIDLogger {
     /**
      *
      * @param playerUuid the uuid of the player
-     * @param amount the number of logs to retrieve
      * @return A list of the last amount of logs relating to this player
      */
-    public List<FormattedItemLog> getPlayerLogs(UUID playerUuid, int amount) {
+    public List<FormattedItemLog> getPlayerLogs(UUID playerUuid) {
         List<FormattedItemLog> logList = new ArrayList<>();
-        if (amount < 0) {
-            return logList;
-        }
 
-        String query = "CALL GetUuidLogsByPlayer(?, ?)";
+        String query = "CALL GetUuidLogsByPlayer(?)";
         CachedRowSet result = database.executeQuery( new Statement(query,
-                        new UuidStatementValue(playerUuid),
-                        new IntegerStatementValue(amount)
+                        new UuidStatementValue(playerUuid)
                 )
         );
 
