@@ -532,7 +532,7 @@ public class ClanEventListener extends ClanListener {
             return;
         }
 
-        clan.setHome(player.getLocation());
+        clan.setHome(player.getLocation().toCenterLocation());
         UtilMessage.simpleMessage(player, "Clans", "You set the clan home to <yellow>%s<gray>.",
                 UtilWorld.locationToString(player.getLocation()));
 
