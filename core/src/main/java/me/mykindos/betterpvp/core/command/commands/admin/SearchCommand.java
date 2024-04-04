@@ -11,7 +11,7 @@ import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDItem;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDManager;
-import me.mykindos.betterpvp.core.logging.type.formatted.FormattedItemLog;
+import me.mykindos.betterpvp.core.logging.type.formatted.item.FormattedItemLog;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;

@@ -34,6 +34,10 @@ public enum UUIDLogType {
      */
     ITEM_CONTAINER_BREAK,
     /**
+     * An UUIDItem is dropped to a container being blown up
+     */
+    ITEM_CONTAINER_EXPLODE,
+    /**
      * An UUIDItem is picked up by an inventory
      */
     ITEM_INVENTORY_PICKUP,

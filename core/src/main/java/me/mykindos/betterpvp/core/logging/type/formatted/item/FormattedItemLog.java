@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.logging.type.formatted;
+package me.mykindos.betterpvp.core.logging.type.formatted.item;
 
 import lombok.Getter;
 import me.mykindos.betterpvp.core.database.query.Statement;
@@ -6,12 +6,14 @@ import me.mykindos.betterpvp.core.logging.FormattedLog;
 import me.mykindos.betterpvp.core.logging.type.UUIDLogType;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Getter
@@ -46,6 +48,30 @@ public class FormattedItemLog extends FormattedLog {
         this.offlinePlayer2 = offlinePlayer2;
         this.name = name;
         this.location = location;
+    }
+
+    protected Component getLocation() {
+        assert location != null;
+        return UtilMessage.deserialize("at (<green>%s</green>, <green>%s</green>, <green>%s</green>) in <green>%s</green>"
+                , location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
+    }
+    protected Component getItem() {
+        return Component.text(String.valueOf(item), NamedTextColor.LIGHT_PURPLE);
+    }
+    protected Component getName() {
+        assert name != null;
+        return Component.text(name, NamedTextColor.AQUA);
+    }
+    protected Component getPlayer1() {
+        assert offlinePlayer1 != null;
+        return getPlayer(offlinePlayer1);
+    }
+    protected Component getPlayer2() {
+        assert offlinePlayer2 != null;
+        return getPlayer(offlinePlayer2);
+    }
+    protected Component getPlayer(OfflinePlayer player) {
+        return Component.text(Objects.requireNonNull(player.getName()), NamedTextColor.YELLOW);
     }
 
     @Override

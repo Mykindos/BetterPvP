@@ -9,8 +9,22 @@ import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
 import me.mykindos.betterpvp.core.logging.type.UUIDLogType;
-import me.mykindos.betterpvp.core.logging.type.formatted.FormattedItemLog;
-import me.mykindos.betterpvp.core.logging.type.formatted.PickupItemLog;
+import me.mykindos.betterpvp.core.logging.type.formatted.item.BlockDispenseItemLog;
+import me.mykindos.betterpvp.core.logging.type.formatted.item.ContainerBreakItemLog;
+import me.mykindos.betterpvp.core.logging.type.formatted.item.ContainerExplodeItemLog;
+import me.mykindos.betterpvp.core.logging.type.formatted.item.ContainerStoreItemLog;
+import me.mykindos.betterpvp.core.logging.type.formatted.item.DeathItemLog;
+import me.mykindos.betterpvp.core.logging.type.formatted.item.DeathPlayerItemLog;
+import me.mykindos.betterpvp.core.logging.type.formatted.item.DespawnItemLog;
+import me.mykindos.betterpvp.core.logging.type.formatted.item.DropItemLog;
+import me.mykindos.betterpvp.core.logging.type.formatted.item.FormattedItemLog;
+import me.mykindos.betterpvp.core.logging.type.formatted.item.InventoryMoveItemLog;
+import me.mykindos.betterpvp.core.logging.type.formatted.item.InventoryPickupItemLog;
+import me.mykindos.betterpvp.core.logging.type.formatted.item.LoginItemLog;
+import me.mykindos.betterpvp.core.logging.type.formatted.item.LogoutItemLog;
+import me.mykindos.betterpvp.core.logging.type.formatted.item.PickupItemLog;
+import me.mykindos.betterpvp.core.logging.type.formatted.item.RetrieveItemLog;
+import me.mykindos.betterpvp.core.logging.type.formatted.item.SpawnItemLog;
 import me.mykindos.betterpvp.core.logging.type.logs.ItemLog;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
@@ -144,10 +158,51 @@ public class UUIDLogger {
             case ITEM_PICKUP -> {
                 return new PickupItemLog(time, item, offlinePlayer1, location);
             }
+            case ITEM_DROP -> {
+                return new DropItemLog(time, item, offlinePlayer1, location);
+            }
+            case ITEM_DEATH -> {
+                return new DeathItemLog(time, item, offlinePlayer1, location);
+            }
+            case ITEM_LOGIN -> {
+                return new LoginItemLog(time, item, offlinePlayer1, location);
+            }
+            case ITEM_SPAWN -> {
+                return new SpawnItemLog(time, item, offlinePlayer1, offlinePlayer2);
+            }
+            case ITEM_LOGOUT -> {
+                return new LogoutItemLog(time, item, offlinePlayer1, location);
+            }
+            case ITEM_CONTAINER_EXPLODE -> {
+                return new ContainerExplodeItemLog(time, item, name, location);
+            }
+            case ITEM_DESPAWN -> {
+                return new DespawnItemLog(time, item, location);
+            }
+            case ITEM_RETREIVE -> {
+                return new RetrieveItemLog(time, item, offlinePlayer1, name, location);
+            }
+            case ITEM_CONTAINER_STORE -> {
+                return new ContainerStoreItemLog(time, item, offlinePlayer1, name, location);
+            }
+            case ITEM_DEATH_PLAYER -> {
+                return new DeathPlayerItemLog(time, item, offlinePlayer1, offlinePlayer2, location);
+            }
+            case ITEM_BLOCK_DISPENSE -> {
+                return new BlockDispenseItemLog(time, item, name, location);
+            }
+            case ITEM_INVENTORY_MOVE -> {
+                return new InventoryMoveItemLog(time, item, name, location);
+            }
+            case ITEM_CONTAINER_BREAK -> {
+                return new ContainerBreakItemLog(time, item, offlinePlayer1, name, location);
+            }
+            case ITEM_INVENTORY_PICKUP -> {
+                return new InventoryPickupItemLog(time, item, name, location);
+            }
             default -> {
                 return new FormattedItemLog(time, type, item, offlinePlayer1, offlinePlayer2, name, location);
             }
         }
-
     }
 }
