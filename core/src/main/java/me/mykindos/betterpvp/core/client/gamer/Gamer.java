@@ -10,7 +10,7 @@ import me.mykindos.betterpvp.core.framework.adapter.Compatibility;
 import me.mykindos.betterpvp.core.framework.customtypes.IMapListener;
 import me.mykindos.betterpvp.core.framework.inviting.Invitable;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
-import me.mykindos.betterpvp.core.framework.sidebar.impl.Sidebar;
+import me.mykindos.betterpvp.core.framework.sidebar.Sidebar;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.Unique;

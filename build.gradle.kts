@@ -33,7 +33,7 @@ subprojects {
         maven("https://repo.dmulloy2.net/repository/public/")
         maven("https://repo.spongepowered.org/maven/")
         maven("https://maven.aestrus.io/releases")
-
+        maven("https://repo.opencollab.dev/maven-releases/")
     }
 
     // Set java language version

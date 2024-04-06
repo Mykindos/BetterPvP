@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.framework.sidebar.impl;
+package me.mykindos.betterpvp.core.framework.sidebar;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -37,10 +37,13 @@ public class SidebarController implements Listener {
         this.defaultProvider = provider;
     }
 
+    public void resetSidebar(@NotNull Gamer gamer) {
+        gamer.setSidebar(this.defaultProvider.apply(gamer));
+    }
+
     @EventHandler(priority = EventPriority.MONITOR)
     public void onJoin(PlayerJoinEvent event) {
-        final Gamer gamer = this.clientManager.search().online(event.getPlayer()).getGamer();
-        gamer.setSidebar(this.defaultProvider.apply(gamer));
+        resetSidebar(this.clientManager.search().online(event.getPlayer()).getGamer());
     }
 
     // Client property because it's a global setting, but the sidebar is attached to the gamer

@@ -88,7 +88,7 @@ dependencyResolutionManagement {
 
             // Library - UI
             library("invui", "xyz.xenondevs.invui", "invui").versionRef("invui")
-            library("sidebar", "me.catcoder", "bukkit-sidebar").version("6.2.5-SNAPSHOT")
+            library("sidebar", "me.catcoder", "bukkit-sidebar").version("6.2.6-SNAPSHOT")
 
             // Library - WorldEdit
             library("fawe", "com.fastasyncworldedit", "FastAsyncWorldEdit-Core").version("2.8.4")

@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.clans.display;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
@@ -15,13 +16,17 @@ import me.mykindos.betterpvp.clans.clans.events.ClanTrustEvent;
 import me.mykindos.betterpvp.clans.clans.events.ClanUntrustEvent;
 import me.mykindos.betterpvp.clans.clans.events.MemberJoinClanEvent;
 import me.mykindos.betterpvp.clans.clans.events.MemberLeaveClanEvent;
+import me.mykindos.betterpvp.clans.clans.pillage.events.PillageEndEvent;
+import me.mykindos.betterpvp.clans.clans.pillage.events.PillageStartEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
@@ -45,9 +50,11 @@ public class PlayerName implements Listener {
     }
 
     public void broadcastChange(@NotNull Player player) {
-//        for (Player onlinePlayer : player.getServer().getOnlinePlayers()) {
-//            this.sendChange(player, onlinePlayer);
-//        }
+        Bukkit.getScheduler().runTaskLater(JavaPlugin.getPlugin(Clans.class), () -> {
+            for (Player onlinePlayer : player.getServer().getOnlinePlayers()) {
+                this.sendChange(player, onlinePlayer);
+            }
+        }, 2L);
     }
 
     public void sendChange(@NotNull Player player, @NotNull Player receiver) {
@@ -56,6 +63,12 @@ public class PlayerName implements Listener {
         final Optional<Clan> playerClan = this.clanManager.getClanByPlayer(player);
         final Optional<Clan> receiverClan = this.clanManager.getClanByPlayer(receiver);
         final ClanRelation relation = clanManager.getRelation(playerClan.orElse(null), receiverClan.orElse(null));
+
+        for (Team active : scoreboard.getTeams()) {
+            if (active.hasPlayer(player)) {
+                active.removePlayer(player);
+            }
+        }
 
         final String teamName = playerClan.map(Clan::getName).orElse("Wilderness");
         Team team = scoreboard.getTeam(teamName);
@@ -69,7 +82,7 @@ public class PlayerName implements Listener {
 
         team.color(relation.getPrimary());
         if (playerClan.isPresent()) {
-            team.prefix(Component.text(playerClan.get().getName(), relation.getSecondary()));
+            team.prefix(Component.text(playerClan.get().getName(), relation.getSecondary()).appendSpace());
         } else {
             team.prefix(Component.empty().color(relation.getSecondary()));
         }
@@ -79,7 +92,12 @@ public class PlayerName implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     private void onJoin(final PlayerJoinEvent event) {
+        event.getPlayer().setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
         this.broadcastChange(event.getPlayer());
+
+        for (Player onlinePlayer : event.getPlayer().getServer().getOnlinePlayers()) {
+            this.sendChange(onlinePlayer, event.getPlayer());
+        }
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
@@ -92,7 +110,7 @@ public class PlayerName implements Listener {
         this.broadcastChange(event.getPlayer());
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.NORMAL)
     private void onClanDisband(final ClanDisbandEvent event) {
         this.broadcastChange(event.getClan());
     }
@@ -109,29 +127,46 @@ public class PlayerName implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     private void onTrust(final ClanTrustEvent event) {
-        this.broadcastChange(event.getClan()); // We only have to do one clan
+        this.broadcastChange(event.getClan());
+        this.broadcastChange(event.getTargetClan());
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     private void onNeutral(final ClanNeutralEvent event) {
-        this.broadcastChange(event.getClan()); // We only have to do one clan
+        this.broadcastChange(event.getClan());
+        this.broadcastChange(event.getTargetClan());
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     private void onUntrust(final ClanUntrustEvent event) {
-        this.broadcastChange(event.getClan()); // We only have to do one clan
+        this.broadcastChange(event.getClan());
+        this.broadcastChange(event.getTargetClan());
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     private void onEnemy(final ClanEnemyEvent event) {
         this.broadcastChange(event.getClan());
+        this.broadcastChange(event.getTargetClan());
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     private void onAlliance(final ClanAllianceEvent event) {
         this.broadcastChange(event.getClan());
+        this.broadcastChange(event.getTargetClan());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    private void onPillageStart(final PillageStartEvent event) {
+        this.broadcastChange(this.clanManager.getClanById(event.getPillage().getPillaged().getId()).orElseThrow());
+        this.broadcastChange(this.clanManager.getClanById(event.getPillage().getPillager().getId()).orElseThrow());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    private void onPillageEnd(final PillageEndEvent event) {
+        this.broadcastChange(this.clanManager.getClanById(event.getPillage().getPillaged().getId()).orElseThrow());
+        this.broadcastChange(this.clanManager.getClanById(event.getPillage().getPillager().getId()).orElseThrow());
     }
 
 }
