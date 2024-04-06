@@ -310,7 +310,7 @@ INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, H
     ('MUSIC_DISC_BLOCKS', 'champions', 'hyper_axe', '<orange>Hyper Axe', 1, 0, 1);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
-    ('MUSIC_DISC_WAIT', 'champions', 'knights_greatlance', '<orange>Knight''s Greatlance', 1, 0, 1);
+    ('SHIELD', 'champions', 'thunderclap_aegis', '<orange>Thunderclap Aegis', 99, 0, 1);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
     ('MUSIC_DISC_STAL', 'champions', 'scythe', '<orange>Scythe of the Fallen Lord', 1, 0, 1);
