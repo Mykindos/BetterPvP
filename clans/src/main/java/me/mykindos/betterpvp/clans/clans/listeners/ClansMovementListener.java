@@ -11,7 +11,6 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.components.clans.data.ClanTerritory;
 import me.mykindos.betterpvp.core.framework.delayedactions.events.ClanHomeTeleportEvent;
 import me.mykindos.betterpvp.core.framework.delayedactions.events.ClanStuckTeleportEvent;
-import me.mykindos.betterpvp.core.framework.events.scoreboard.ScoreboardUpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -60,9 +59,6 @@ public class ClansMovementListener extends ClanListener {
                 if (clanFromOption.isEmpty() || clanToOptional.isEmpty()
                         || !clanFromOption.equals(clanToOptional)) {
                     displayOwner(event.getPlayer(), clanToOptional.orElse(null));
-
-                    UtilServer.runTask(clans, () -> UtilServer.callEvent(new ScoreboardUpdateEvent(event.getPlayer())));
-
                 }
             });
 

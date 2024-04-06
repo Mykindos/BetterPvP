@@ -35,9 +35,7 @@ import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.components.clans.data.ClanTerritory;
-import me.mykindos.betterpvp.core.components.clans.events.ClanEvent;
 import me.mykindos.betterpvp.core.config.Config;
-import me.mykindos.betterpvp.core.framework.events.scoreboard.ScoreboardUpdateEvent;
 import me.mykindos.betterpvp.core.framework.inviting.InviteHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -78,16 +76,6 @@ public class ClanEventListener extends ClanListener {
         this.inviteHandler = inviteHandler;
         this.blockHandler = blockHandler;
         this.commandManager = commandManager;
-    }
-
-    @EventHandler
-    public void onClanEvent(ClanEvent<Clan> event) {
-        if (event.isGlobalScoreboardUpdate()) {
-            Bukkit.getOnlinePlayers().forEach(player -> UtilServer.runTaskLater(clans,
-                    () -> UtilServer.callEvent(new ScoreboardUpdateEvent(player)), 5));
-        } else {
-            UtilServer.runTaskLater(clans, () -> event.getClan().updateScoreboards(), 5);
-        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
