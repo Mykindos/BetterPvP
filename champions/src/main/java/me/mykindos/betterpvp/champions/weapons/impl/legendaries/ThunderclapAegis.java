@@ -47,7 +47,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
@@ -105,7 +105,7 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
     }
 
     @Override
-    public List<Component> getLore(ItemStack item) {
+    public List<Component> getLore(ItemMeta meta) {
         List<Component> lore = new ArrayList<>();
         lore.add(Component.text("Forged amidst celestial tempests", NamedTextColor.WHITE));
         lore.add(Component.text("by the divine blacksmiths, this", NamedTextColor.WHITE));
