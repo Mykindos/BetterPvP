@@ -54,3 +54,18 @@ scythe:
   blackHolePullRadius: 5.0
   blackHoleAliveSeconds: 1.5
   blackHoleExpandSeconds: 0.75
+thunderclap_aegis:
+  enabled: true
+  baseDamage: 1.0
+  energyPerTick: 1.0
+  initialEnergyCost: 10.0
+  baseVelocity: 0.5
+  maxVelocity: 0.8
+  maxChargeTicks: 60
+  pulseIntervalSeconds: 1.0
+  pulseDamage: 5.0
+  pulseShockSeconds: 0.5
+  pulseRadius: 6.0
+  collidePulseRadius: 7.0
+  energyOnCollide: 25.0
+  chargeDamage: 7.0
