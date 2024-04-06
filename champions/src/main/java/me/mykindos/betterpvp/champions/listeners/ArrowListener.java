@@ -83,7 +83,10 @@ public class ArrowListener implements Listener {
     @EventHandler
     public void onArrowHit(ProjectileHitEvent event) {
         if (event.getEntity() instanceof Arrow arrow) {
-            UtilServer.runTaskLater(champions, arrow::remove, 5L);
+            UtilServer.runTaskLater(champions, () -> {
+                arrow.remove();
+                arrows.remove(arrow);
+            }, 5L);
         }
     }
 

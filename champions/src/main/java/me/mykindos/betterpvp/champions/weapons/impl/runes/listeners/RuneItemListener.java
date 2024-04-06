@@ -123,7 +123,7 @@ public class RuneItemListener implements Listener {
         event.setDamage(event.getDamage() * (1 - totalReduction / 100));
     }
 
-    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+    @EventHandler(ignoreCancelled = true)
     public void onPowerDamage(CustomDamageEvent event) {
         if (!(event.getDamager() instanceof Player damager)) return;
         if (!(event.getProjectile() instanceof Arrow)) return;

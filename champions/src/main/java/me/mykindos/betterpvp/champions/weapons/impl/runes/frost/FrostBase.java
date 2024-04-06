@@ -50,8 +50,8 @@ public abstract class FrostBase extends Rune {
 
     @Override
     public List<Component> getRuneLoreDescription(ItemMeta itemMeta) {
-        double chanceRoll = getRollFromMeta(itemMeta, RuneNamespacedKeys.FROST_CHANCE, PersistentDataType.DOUBLE);
-        double durationRoll = getRollFromMeta(itemMeta, RuneNamespacedKeys.FROST_DURATION, PersistentDataType.DOUBLE);
+        double chanceRoll = getRollFromMeta(itemMeta, RuneNamespacedKeys.FROST_CHANCE, PersistentDataType.DOUBLE, 0d);
+        double durationRoll = getRollFromMeta(itemMeta, RuneNamespacedKeys.FROST_DURATION, PersistentDataType.DOUBLE, 0d);
 
         return List.of(UtilMessage.deserialize("When hitting an enemy, you have a <green>%.1f%% <reset>chance", chanceRoll),
                 UtilMessage.deserialize("to apply <green>Slowness %s<reset> for <green>%.1f<reset> seconds",
@@ -70,8 +70,8 @@ public abstract class FrostBase extends Rune {
     @Override
     public boolean canApplyToItem(ItemMeta runeMeta, ItemMeta itemMeta) {
 
-        double chanceRoll = getRollFromMeta(runeMeta, RuneNamespacedKeys.FROST_CHANCE, PersistentDataType.DOUBLE);
-        double durationRoll = getRollFromMeta(runeMeta, RuneNamespacedKeys.FROST_DURATION, PersistentDataType.DOUBLE);
+        double chanceRoll = getRollFromMeta(runeMeta, RuneNamespacedKeys.FROST_CHANCE, PersistentDataType.DOUBLE, 0d);
+        double durationRoll = getRollFromMeta(runeMeta, RuneNamespacedKeys.FROST_DURATION, PersistentDataType.DOUBLE, 0d);
 
         PersistentDataContainer pdc = itemMeta.getPersistentDataContainer().get(getAppliedNamespacedKey(), PersistentDataType.TAG_CONTAINER);
         if (pdc != null) {
@@ -98,9 +98,9 @@ public abstract class FrostBase extends Rune {
     public void applyToItem(ItemMeta runeMeta, ItemMeta itemMeta) {
         super.applyToItem(runeMeta, itemMeta);
 
-        double frostChance = getRollFromMeta(runeMeta, RuneNamespacedKeys.FROST_CHANCE, PersistentDataType.DOUBLE);
-        double frostDuration = getRollFromMeta(runeMeta, RuneNamespacedKeys.FROST_DURATION, PersistentDataType.DOUBLE);
-        int slowness = getRollFromMeta(runeMeta, RuneNamespacedKeys.FROST_AMPLIFIER, PersistentDataType.INTEGER);
+        double frostChance = getRollFromMeta(runeMeta, RuneNamespacedKeys.FROST_CHANCE, PersistentDataType.DOUBLE, 0d);
+        double frostDuration = getRollFromMeta(runeMeta, RuneNamespacedKeys.FROST_DURATION, PersistentDataType.DOUBLE, 0d);
+        int slowness = getRollFromMeta(runeMeta, RuneNamespacedKeys.FROST_AMPLIFIER, PersistentDataType.INTEGER, 1);
 
         PersistentDataContainer pdc = itemMeta.getPersistentDataContainer();
         PersistentDataContainer newPdc = pdc.getAdapterContext().newPersistentDataContainer();
