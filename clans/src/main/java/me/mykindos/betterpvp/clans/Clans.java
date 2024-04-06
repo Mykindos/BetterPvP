@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.clans.clans.leveling.ClanPerkManager;
 import me.mykindos.betterpvp.clans.commands.ClansCommandLoader;
 import me.mykindos.betterpvp.clans.injector.ClansInjectorModule;
 import me.mykindos.betterpvp.clans.listener.ClansListenerLoader;
+import me.mykindos.betterpvp.clans.display.ClansSidebar;
 import me.mykindos.betterpvp.clans.tips.ClansTipLoader;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.Config;
@@ -23,6 +24,7 @@ import me.mykindos.betterpvp.core.framework.adapter.PluginAdapters;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDManager;
+import me.mykindos.betterpvp.core.framework.sidebar.SidebarController;
 import org.bukkit.Bukkit;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
@@ -85,6 +87,12 @@ public class Clans extends BPvPPlugin {
 
             var uuidManager = injector.getInstance(UUIDManager.class);
             uuidManager.loadObjectsFromNamespace("clans");
+
+            var clansSidebar = injector.getInstance(ClansSidebar.class);
+            var sidebarController = injector.getInstance(SidebarController.class);
+            if (clansSidebar.isEnabled()) {
+                sidebarController.setDefaultProvider(gamer -> clansSidebar);
+            }
 
             updateEventExecutor.loadPlugin(this);
 

@@ -9,6 +9,6 @@ import org.bukkit.entity.Player;
 public class ClanDisbandEvent extends ClanEvent<Clan> {
 
     public ClanDisbandEvent(Player player, Clan clan) {
-        super(player, clan, true);
+        super(player, clan);
     }
 }

@@ -12,7 +12,5 @@ public abstract class ClanEvent<T extends IClan> extends CustomCancellableEvent 
 
     private final Player player;
     private final T clan;
-    private final boolean globalScoreboardUpdate;
-
 
 }

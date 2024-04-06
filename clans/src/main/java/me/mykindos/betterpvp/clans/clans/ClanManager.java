@@ -20,7 +20,6 @@ import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.config.Config;
-import me.mykindos.betterpvp.core.framework.events.scoreboard.ScoreboardUpdateEvent;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -29,7 +28,6 @@ import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -430,20 +428,6 @@ public class ClanManager extends Manager<Clan> {
         if (killerEnemy.getDominance() == 100) {
             UtilServer.callEvent(new PillageStartEvent(new Pillage(killer, killed)));
         }
-
-        killed.getMembers().forEach(member -> {
-            Player player = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
-            if (player != null) {
-                UtilServer.callEvent(new ScoreboardUpdateEvent(player));
-            }
-        });
-
-        killer.getMembers().forEach(member -> {
-            Player player = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
-            if (player != null) {
-                UtilServer.callEvent(new ScoreboardUpdateEvent(player));
-            }
-        });
     }
 
     public String getDominanceString(IClan clan, IClan enemyClan) {
