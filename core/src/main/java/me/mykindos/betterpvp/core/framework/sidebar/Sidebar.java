@@ -2,22 +2,19 @@ package me.mykindos.betterpvp.core.framework.sidebar;
 
 import lombok.experimental.Delegate;
 import me.catcoder.sidebar.ProtocolSidebar;
-import me.catcoder.sidebar.text.TextIterator;
 import me.mykindos.betterpvp.core.Core;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 public class Sidebar {
 
-    public static final TextIterator DEFAULT_TITLE = defaultTitle("BetterPvP");
+    public static final Component DEFAULT_TITLE = defaultTitle("BetterPvP");
 
-    public static TextIterator defaultTitle(@NotNull String title) {
-        return new DelayedTextIterator(title,
-                NamedTextColor.GOLD,
-                NamedTextColor.WHITE,
-                NamedTextColor.YELLOW);
+    public static Component defaultTitle(@NotNull String title) {
+        return Component.text(title, NamedTextColor.GOLD, TextDecoration.BOLD);
     }
 
     @Delegate
