@@ -381,16 +381,16 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
 
     @Override
     public void loadWeaponConfig() {
-        baseVelocity = getConfig("baseVelocity", 1.0, Double.class);
-        maxVelocity = getConfig("maxVelocity", 1.5, Double.class);
+        baseVelocity = getConfig("baseVelocity", 0.5, Double.class);
+        maxVelocity = getConfig("maxVelocity", 0.8, Double.class);
         maxChargeTicks = getConfig("maxChargeTicks", 60, Integer.class);
         pulseIntervalSeconds = getConfig("pulseIntervalSeconds", 1.0, Double.class);
-        pulseDamage = getConfig("pulseDamage", 4.0, Double.class);
-        pulseShockSeconds = getConfig("pulseShockSeconds", 2.0, Double.class);
-        pulseRadius = getConfig("pulseRadius", 5.0, Double.class);
+        pulseDamage = getConfig("pulseDamage", 5.0, Double.class);
+        pulseShockSeconds = getConfig("pulseShockSeconds", 0.5, Double.class);
+        pulseRadius = getConfig("pulseRadius", 6.0, Double.class);
         collidePulseRadius = getConfig("collidePulseRadius", 7.0, Double.class);
-        energyOnCollide = getConfig("energyOnCollide", 20.0, Double.class);
-        chargeDamage = getConfig("chargeDamage", 12.0, Double.class);
+        energyOnCollide = getConfig("energyOnCollide", 25.0, Double.class);
+        chargeDamage = getConfig("chargeDamage", 7.0, Double.class);
     }
 
     @Getter
