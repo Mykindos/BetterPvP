@@ -65,7 +65,7 @@ public class RightClickListener implements Listener {
         // Refund items from offhand to all players
         for (Player player : Bukkit.getOnlinePlayers()) {
             ItemStack offhand = player.getInventory().getItemInOffHand();
-            if (offhand.getType() != Material.SHIELD && offhand.getType() != Material.AIR) {
+            if (offhand.getType() != Material.AIR && !UtilItem.isCosmeticShield(offhand)) {
                 ItemStack temp = player.getInventory().getItemInOffHand().clone();
                 player.getInventory().setItemInOffHand(null);
                 UtilItem.insert(player, temp);

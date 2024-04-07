@@ -14,7 +14,6 @@ import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
-import me.mykindos.betterpvp.core.framework.events.scoreboard.ScoreboardUpdateEvent;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.entity.Player;
 
@@ -130,8 +129,6 @@ public class BankSubCommand extends ClanSubCommand {
 
                 clan.messageClan("<yellow>" + player.getName() + " <gray>withdrew <green>$" + amountToWithdraw + " <gray>from the clan bank.", null, true);
                 log.info("{} withdrew ${} from clan {}", player.getName(), amountToWithdraw, clan.getId().toString());
-                new ScoreboardUpdateEvent(player).callEvent();
-
             }catch(NumberFormatException ex) {
                 UtilMessage.message(player, "Clans", "Value provided is not a valid number.");
             }
@@ -201,8 +198,6 @@ public class BankSubCommand extends ClanSubCommand {
 
                 clan.messageClan("<yellow>" + player.getName() + " <gray>deposited <green>$" + amountToWithdraw + " <gray>into the clan bank.", null, true);
                 log.info("{} deposited ${} into clan {}", player.getName(), amountToWithdraw, clan.getId().toString());
-                new ScoreboardUpdateEvent(player).callEvent();
-
             }catch(NumberFormatException ex) {
                 UtilMessage.message(player, "Clans", "Value provided is not a valid number.");
             }

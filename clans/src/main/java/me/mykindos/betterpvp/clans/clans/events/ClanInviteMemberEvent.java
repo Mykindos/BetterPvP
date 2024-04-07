@@ -12,7 +12,7 @@ public class ClanInviteMemberEvent extends ClanEvent<Clan> {
     private final Player target;
 
     public ClanInviteMemberEvent(Player player, Clan clan, Player target) {
-        super(player, clan, false);
+        super(player, clan);
         this.target = target;
     }
 }
