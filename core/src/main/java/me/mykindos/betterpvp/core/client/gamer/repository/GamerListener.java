@@ -2,22 +2,18 @@ package me.mykindos.betterpvp.core.client.gamer.repository;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.events.AsyncClientLoadEvent;
 import me.mykindos.betterpvp.core.client.events.AsyncClientPreLoadEvent;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.config.Config;
-import me.mykindos.betterpvp.core.framework.events.scoreboard.ScoreboardUpdateEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
 import me.mykindos.betterpvp.core.utilities.model.display.PlayerListType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -49,12 +45,10 @@ public class GamerListener implements Listener {
     @Config(path = "tab.server", defaultValue = "Clans-1")
     private String server;
 
-    private final Core core;
     private final ClientManager manager;
 
     @Inject
-    public GamerListener(Core core, ClientManager manager) {
-        this.core = core;
+    public GamerListener(ClientManager manager) {
         this.manager = manager;
 
         this.header = new PermanentComponent(gamer -> Component.text("Mineplex ", NamedTextColor.GOLD)
@@ -90,8 +84,6 @@ public class GamerListener implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         final Gamer gamer = this.manager.search().online(event.getPlayer()).getGamer();
-        Bukkit.getOnlinePlayers().forEach(player ->
-                UtilServer.runTaskLater(core, () -> UtilServer.callEvent(new ScoreboardUpdateEvent(player)), 1));
 
         gamer.getPlayerList().clear();
         gamer.getPlayerList().add(PlayerListType.FOOTER, footer);
