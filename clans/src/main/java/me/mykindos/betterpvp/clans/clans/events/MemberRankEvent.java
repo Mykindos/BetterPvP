@@ -12,7 +12,7 @@ public class MemberRankEvent extends ClanEvent<Clan> {
     private final ClanMember clanMember;
 
     public MemberRankEvent(Player player, Clan clan, ClanMember clanMember) {
-        super(player, clan, false);
+        super(player, clan);
         this.clanMember = clanMember;
     }
 

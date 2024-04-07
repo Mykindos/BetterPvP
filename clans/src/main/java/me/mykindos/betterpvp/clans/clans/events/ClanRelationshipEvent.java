@@ -11,7 +11,7 @@ public class ClanRelationshipEvent extends ClanEvent<Clan> {
     private final Clan targetClan;
 
     public ClanRelationshipEvent(Player player, Clan clan, Clan targetClan) {
-        super(player, clan, true);
+        super(player, clan);
         this.targetClan = targetClan;
     }
 }

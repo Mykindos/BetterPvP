@@ -8,9 +8,9 @@ import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerPropertyUpdateEvent;
 import me.mykindos.betterpvp.core.framework.adapter.Compatibility;
 import me.mykindos.betterpvp.core.framework.customtypes.IMapListener;
-import me.mykindos.betterpvp.core.framework.events.scoreboard.ScoreboardUpdateEvent;
 import me.mykindos.betterpvp.core.framework.inviting.Invitable;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
+import me.mykindos.betterpvp.core.framework.sidebar.Sidebar;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.Unique;
@@ -24,6 +24,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -39,6 +40,7 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
     private ActionBar actionBar = new ActionBar();
     private TitleQueue titleQueue = new TitleQueue();
     private PlayerList playerList = new PlayerList();
+    private Sidebar sidebar = new Sidebar();
 
     private long lastDamaged;
     private long lastTip;
@@ -108,16 +110,19 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
         return (int) getProperty(key).orElse(0);
     }
 
-    @Override
-    public void saveProperty(String key, Object object, boolean updateScoreboard) {
-        properties.put(key, object);
-        if (updateScoreboard) {
-            Player player = Bukkit.getPlayer(UUID.fromString(getUuid()));
-            if (player != null) {
-                UtilServer.callEvent(new ScoreboardUpdateEvent(player));
-            }
+    public void setSidebar(@Nullable Sidebar sidebar) {
+        if (this.sidebar != null && this.isOnline()) {
+            this.sidebar.removeViewer(Objects.requireNonNull(getPlayer()));
         }
+        if (sidebar != null && this.isOnline()) {
+            sidebar.addViewer(Objects.requireNonNull(getPlayer()));
+        }
+        this.sidebar = sidebar;
+    }
 
+    @Override
+    public void saveProperty(String key, Object object) {
+        properties.put(key, object);
     }
 
     @Override

@@ -12,7 +12,7 @@ public class ClanKickMemberEvent extends ClanEvent<Clan> {
     private final Client target;
 
     public ClanKickMemberEvent(Player player, Clan clan, Client target) {
-        super(player, clan, true);
+        super(player, clan);
         this.target = target;
     }
 }
