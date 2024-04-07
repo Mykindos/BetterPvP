@@ -83,7 +83,7 @@ public class ClansSidebar extends Sidebar {
 
     public void reload() {
         final String title = this.clans.getConfig().getOrSaveString("server.sidebar.title", "BetterPvP");
-        this.setTitle(Sidebar.defaultTitle(title));
+        this.setTitle(Sidebar.defaultTitle("   " + title + "   "));
     }
 
 }
