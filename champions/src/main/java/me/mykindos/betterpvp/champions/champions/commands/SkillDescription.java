@@ -3,14 +3,12 @@ package me.mykindos.betterpvp.champions.champions.commands;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.champions.champions.builds.menus.SkillMenu;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.SkillManager;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -29,7 +27,7 @@ public class SkillDescription extends Command {
 
     @Override
     public String getName() {
-        return "SkillDescription";
+        return "skilldescription";
     }
 
     @Override
@@ -40,7 +38,7 @@ public class SkillDescription extends Command {
     @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length < 1) {
-            UtilMessage.message(player, "Skills", UtilMessage.deserialize("<green>Usage: /GetSkillDescription <skill> [level]"));
+            UtilMessage.message(player, "Skills", UtilMessage.deserialize("<green>Usage: /skilldescription <skill> [level]"));
             return;
         }
 
@@ -66,9 +64,8 @@ public class SkillDescription extends Command {
         }
 
         Component component = UtilMessage.deserialize("<yellow>%s</yellow> (<green>%s</green>)", skill.getName(), level);
-
-        for (String str : skill.getDescription(level)) {
-            component = component.appendNewline().append(MiniMessage.miniMessage().deserialize("<gray>" + str, SkillMenu.TAG_RESOLVER));
+        for (Component line : skill.parseDescription(level)) {
+            component = component.appendNewline().append(line);
         }
 
         UtilMessage.message(player, "Skill", component);

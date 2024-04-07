@@ -16,7 +16,6 @@ import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -26,6 +25,8 @@ import org.bukkit.inventory.ItemFlag;
 import org.jetbrains.annotations.NotNull;
 import xyz.xenondevs.invui.item.ItemProvider;
 import xyz.xenondevs.invui.item.impl.controlitem.ControlItem;
+
+import java.util.Arrays;
 
 public class SkillButton extends ControlItem<SkillMenu> {
 
@@ -44,9 +45,7 @@ public class SkillButton extends ControlItem<SkillMenu> {
         int displayLevel = Math.max(1, level);
 
         final ItemView.ItemViewBuilder builder = ItemView.builder();
-        for (String str : skill.getDescription(displayLevel)) {
-            builder.lore(MiniMessage.miniMessage().deserialize("<gray>" + str, SkillMenu.TAG_RESOLVER));
-        }
+        builder.lore(Arrays.stream(skill.parseDescription(displayLevel)).toList());
 
         boolean active = roleBuild.getActiveSkills().stream().anyMatch(s -> s != null && s.equals(this.skill));
         if (active) {
