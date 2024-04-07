@@ -32,6 +32,7 @@ dependencies {
     api(libs.bundles.data)
     api(libs.bundles.utils)
     api(libs.invui)
+    api(libs.sidebar)
     api(libs.mini.placeholders)
 
     compileOnly(libs.lombok)

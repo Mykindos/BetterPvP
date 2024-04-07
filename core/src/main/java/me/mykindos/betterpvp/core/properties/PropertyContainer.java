@@ -88,18 +88,7 @@ public abstract class PropertyContainer {
      * @param key    The key of the property.
      * @param object The value of the property.
      */
-    public void saveProperty(String key, Object object) {
-        saveProperty(key, object, false);
-    }
-
-    /**
-     * Save a property.
-     *
-     * @param key              The key of the property.
-     * @param object           The value of the property.
-     * @param updateScoreboard Whether to update the property holders scoreboard.
-     */
-    public abstract void saveProperty(String key, Object object, boolean updateScoreboard);
+    public abstract void saveProperty(String key, Object object);
 
     /**
      * Delete a property from the property map
