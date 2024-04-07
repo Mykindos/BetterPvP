@@ -19,20 +19,23 @@ import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
-import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
+import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
 import java.util.Iterator;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.WeakHashMap;
 
 @Singleton
@@ -116,40 +119,30 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
                 continue;
             }
 
-            if (isCollision(player)) {
+            final Location midpoint = UtilPlayer.getMidpoint(player).clone();
+
+            final Optional<LivingEntity> hit = UtilEntity.interpolateCollision(midpoint,
+                            midpoint.clone().add(player.getVelocity().normalize().multiply(0.5)),
+                            (float) 0.6,
+                            ent -> UtilEntity.IS_ENEMY.test(player, ent))
+                    .map(RayTraceResult::getHitEntity).map(LivingEntity.class::cast);
+
+            if (hit.isPresent()) {
                 it.remove();
+                doTakedown(player, hit.get());
                 continue;
             }
 
 
-            if (UtilBlock.isGrounded(player)) {
-                if (UtilTime.elapsed(next.getValue(), 750L)) {
-                    it.remove();
-                }
+            if (UtilBlock.isGrounded(player) && UtilTime.elapsed(next.getValue(), 750L)) {
+                it.remove();
             }
         }
 
-    }
-
-    public boolean isCollision(Player player) {
-        for (LivingEntity other : UtilEntity.getNearbyEnemies(player, player.getLocation(), 1.5)) {
-            if (other.isDead()) continue;
-
-            if (UtilMath.offset(player, other) < 1.5) {
-
-                doTakedown(player, other);
-                return true;
-
-            }
-        }
-
-        return false;
     }
 
     public void doTakedown(Player player, LivingEntity target) {
         int level = getLevel(player);
-
-        UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <alt>" + target.getName() + "</alt> with <alt>" + getName() + " " + level);
 
         UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <alt>" + target.getName() + "</alt> with <alt>" + getName() + " " + level);
         UtilDamage.doCustomDamage(new CustomDamageEvent(target, player, null, DamageCause.CUSTOM, getDamage(level), false, "Takedown"));
