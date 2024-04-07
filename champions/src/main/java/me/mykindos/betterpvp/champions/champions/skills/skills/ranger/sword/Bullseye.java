@@ -29,6 +29,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityShootBowEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
@@ -158,12 +159,13 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
             if (playerBullsEyeData.getTarget() == null || playerBullsEyeData.getTargetFocused() == null) return;
             Entity arrow =  event.getProjectile();
             if (!(arrow instanceof Arrow)) return;
-            Bukkit.getServer().getScheduler().runTaskTimer(champions, new Runnable() {
+
+            new BukkitRunnable() {
                 @Override
                 public void run() {
                     Collection<LivingEntity> nearbyEntities = arrow.getLocation().getNearbyLivingEntities(getCurveDistance(getLevel(player)) * playerBullsEyeData.getTargetFocused().getCharge());
                     if (!arrow.isValid() || playerBullsEyeData.getTarget() == null || !playerBullsEyeData.getTarget().isValid()) {
-                        Bukkit.getScheduler().cancelTasks(champions);
+                        this.cancel();
                         return;
                     }
                     if (nearbyEntities.contains(playerBullsEyeData.getTarget())) {
@@ -178,13 +180,13 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
                                 .data(dustOptions)
                                 .spawn();
 
-                        Vector direction = playerBullsEyeData.getTarget().getLocation().add(0, playerBullsEyeData.getTarget().getHeight() / 2 ,0).toVector().subtract(arrow.getLocation().toVector()).normalize();
+                        Vector direction = playerBullsEyeData.getTarget().getLocation().add(0, playerBullsEyeData.getTarget().getHeight() / 2, 0).toVector().subtract(arrow.getLocation().toVector()).normalize();
                         arrow.setVelocity(direction);
                     }
                 }
-            }, 0, 2);
+            }.runTaskTimer(champions, 0, 2);
+            }
         }
-    }
 
     @EventHandler(priority = EventPriority.LOW)
     public void onDamage(CustomDamageEvent event) {
@@ -193,18 +195,17 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
         LivingEntity damagee = event.getDamagee();
         if (bullsEyeData.get(damager.getUniqueId()) == null) return;
         if (damagee == bullsEyeData.get(damager.getUniqueId()).getTarget()) {
+            int playerLevel = getLevel(damager);
             bullsEyeData.keySet().removeIf(playerUUID -> damager == Bukkit.getPlayer(playerUUID));
-            event.setDamage(getBonusDamage(getLevel(damager)) + (event.getDamage()));
+            event.setDamage(getBonusDamage(playerLevel) + (event.getDamage()));
             damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_VILLAGER_WORK_FLETCHER, 2f, 1.2f);
-            if (damagee instanceof Player) {
-                UtilMessage.simpleMessage(damagee, getName(), "<alt>" + damager.getName() + "</alt> hit you with <alt>" + getName());
-            }
+            UtilMessage.simpleMessage(damagee, getName(), "<alt>" + damager.getName() + "</alt> hit you with <alt>" + getName());
 
             //apply cooldown
             championsManager.getCooldowns().removeCooldown(damager, getName(), true);
             championsManager.getCooldowns().use(damager,
                     getName(),
-                    getCooldown(getLevel(damager)),
+                    getCooldown(playerLevel),
                     true,
                     true,
                     isCancellable(),
