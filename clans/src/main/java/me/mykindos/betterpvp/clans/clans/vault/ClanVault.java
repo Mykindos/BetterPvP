@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.leveling.ClanPerkManager;
 import me.mykindos.betterpvp.clans.clans.leveling.perk.model.ClanVaultSlot;
+import me.mykindos.betterpvp.clans.clans.menus.ClanMenu;
 import me.mykindos.betterpvp.clans.clans.repository.ClanRepository;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.menu.Windowed;
@@ -115,6 +116,6 @@ public final class ClanVault {
     }
 
     public void show(Player player) throws IllegalStateException {
-        show(player, null);
+        show(player, new ClanMenu(player, clan, clan));
     }
 }

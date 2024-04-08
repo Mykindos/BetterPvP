@@ -302,6 +302,7 @@ public class ClanEventListener extends ClanListener {
             Player targetPlayer = Bukkit.getPlayer(target.getName());
             if (targetPlayer != null) {
                 UtilMessage.simpleMessage(targetPlayer, "Clans", "You were kicked from <alt2>" + clan.getName());
+                targetPlayer.closeInventory();
             }
         }
 
