@@ -34,7 +34,7 @@ public abstract class ActiveToggleSkill extends Skill implements ToggleSkill, Li
 
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
-        if(active.contains(event.getPlayer().getUniqueId())) {
+        if (active.contains(event.getPlayer().getUniqueId())) {
             cancel(event.getPlayer(), null);
         }
     }
@@ -57,10 +57,11 @@ public abstract class ActiveToggleSkill extends Skill implements ToggleSkill, Li
         }
     }
 
-    @EventHandler (priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onCustomEffect(EffectReceiveEvent event) {
-        if(event.isCancelled()) return;
+        if (event.isCancelled()) return;
         if (!(event.getTarget() instanceof Player player)) return;
+        if (!event.getEffect().getEffectType().isNegative()) return;
         if (!active.contains(player.getUniqueId())) return;
         if (!hasSkill(player)) return;
 

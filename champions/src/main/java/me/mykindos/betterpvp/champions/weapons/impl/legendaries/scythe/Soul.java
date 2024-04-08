@@ -73,7 +73,7 @@ public class Soul {
         final WrapperPlayServerEntityMetadata packet = new WrapperPlayServerEntityMetadata();
         List<WrappedDataValue> items = List.of(
                 new WrappedDataValue(22, WrappedDataWatcher.Registry.get(Integer.class), color.asRGB()),
-                new WrappedDataValue(13, WrappedDataWatcher.Registry.get(Vector3f.class), scale)
+               new WrappedDataValue(12, WrappedDataWatcher.Registry.get(Vector3f.class), scale)
         );
         packet.setId(display.getEntityId());
         packet.setPackedItems(items);
