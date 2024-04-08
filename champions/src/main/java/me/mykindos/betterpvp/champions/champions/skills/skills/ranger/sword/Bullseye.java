@@ -115,7 +115,7 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
     public void activate(Player player, int level) {
         UUID playerUUID = player.getUniqueId();
         active.add(playerUUID);
-        BullsEyeData playerBullsEyeData = new BullsEyeData(player, new ChargeData((float) (0.01)), null, null);
+        BullsEyeData playerBullsEyeData = new BullsEyeData(player, new ChargeData((float) (0.01)), null, null, null);
         bullsEyeData.put(playerUUID, playerBullsEyeData);
     }
 
@@ -138,7 +138,7 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
                 continue;
             }
             // Spawn particles
-            if (playerBullsEyeData.getTargetFocused() != null) {
+            if (playerBullsEyeData.getTargetFocused() != null && playerBullsEyeData.getTarget().isValid()) {
                 playerBullsEyeData.spawnFocusingParticles();
             }
             // Check if they still are blocking and charge
@@ -229,6 +229,7 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
         if (result.getHitEntity() == playerBullsEyeData.getTarget()) {
             playerBullsEyeData.getTargetFocused().tick();
             playerBullsEyeData.getTargetFocused().tickSound(caster);
+            playerBullsEyeData.updateColor();
         }
     }
 

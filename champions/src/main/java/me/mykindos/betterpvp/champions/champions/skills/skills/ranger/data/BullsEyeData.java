@@ -14,12 +14,14 @@ public class BullsEyeData {
     private final ChargeData casterCharge;
     private LivingEntity target;
     private ChargeData targetFocused;
+    private Color color;
 
-    public BullsEyeData(Player caster, ChargeData casterCharge, LivingEntity target, ChargeData targetFocused) {
+    public BullsEyeData(Player caster, ChargeData casterCharge, LivingEntity target, ChargeData targetFocused, Color color) {
         this.caster = caster;
         this.casterCharge = casterCharge;
         this.target = target;
         this.targetFocused = targetFocused;
+        this.color = color;
     }
 
     public Player getCaster() {
@@ -50,6 +52,10 @@ public class BullsEyeData {
         targetFocused = newTargetFocused;
     }
 
+    public Color getColor() {
+        return color;
+    }
+
     public void spawnFocusingParticles() {
         float targetFocusedAmount = getTargetFocused().getCharge();
 
@@ -70,7 +76,7 @@ public class BullsEyeData {
             Vector offset = rotatedDirection.clone().multiply(circleRadius * Math.cos(angle));
             offset.setY(Math.sin(angle) * circleRadius);
             particleLocation.add(offset);
-            caster.spawnParticle(Particle.REDSTONE, particleLocation, 1, new Particle.DustOptions(getColor(), 1));
+            caster.spawnParticle(Particle.REDSTONE, particleLocation, 1, new Particle.DustOptions(color, 1));
         }
     }
 
@@ -78,11 +84,14 @@ public class BullsEyeData {
         return 0.5 - (targetFocusedAmount / 5);
     }
 
-    public Color getColor() {
-        float targetFocusedAmount = targetFocused.getCharge();
-        int red = (int) Math.min(255, (targetFocusedAmount * Color.GREEN.getRed() + (1 - targetFocusedAmount) * Color.RED.getRed()) * 1.5);
-        int green = (int) Math.min(255, (targetFocusedAmount * Color.GREEN.getGreen() + (1 - targetFocusedAmount) * Color.RED.getGreen()) * 1.5);
-        int blue = (int) Math.min(255, targetFocusedAmount * Color.GREEN.getBlue() + (1 - targetFocusedAmount) * Color.RED.getBlue());
-        return Color.fromRGB(red, green, blue);
+    public void updateColor() {
+        if (color == null) {
+            color = Color.fromRGB(255, 0, 0);
+        }
+        if (color.getRed() == 255 && color.getGreen() < 255) {
+            color = Color.fromRGB(color.getRed(), Math.min(255, color.getGreen() + 6), 0);
+        } else if (color.getRed() > 0 && color.getGreen() == 255) {
+            color = Color.fromRGB(Math.max(0, color.getRed() - 6), color.getGreen(), 0);
+        }
     }
 }
