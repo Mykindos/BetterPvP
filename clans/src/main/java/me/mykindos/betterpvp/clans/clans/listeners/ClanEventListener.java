@@ -6,7 +6,6 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanProperty;
-import me.mykindos.betterpvp.clans.clans.OldClanManager;
 import me.mykindos.betterpvp.clans.clans.data.ClanDefaultValues;
 import me.mykindos.betterpvp.clans.clans.events.ChunkClaimEvent;
 import me.mykindos.betterpvp.clans.clans.events.ChunkUnclaimEvent;
@@ -71,10 +70,8 @@ public class ClanEventListener extends ClanListener {
     private final WorldBlockHandler blockHandler;
     private final Clans clans;
     private final ClanLogger clanLogger;
-
     private final CommandManager commandManager;
 
-    private final OldClanManager oldClanManager;
 
     @Inject
     @Config(path = "clans.members.max", defaultValue = "8")
@@ -82,14 +79,13 @@ public class ClanEventListener extends ClanListener {
 
     @Inject
     public ClanEventListener(Clans clans, ClanManager clanManager, ClientManager clientManager, InviteHandler inviteHandler,
-                             WorldBlockHandler blockHandler, ClanLogger clanLogger, CommandManager commandManager, OldClanManager oldClanManager) {
+                             WorldBlockHandler blockHandler, ClanLogger clanLogger, CommandManager commandManager) {
         super(clanManager, clientManager);
         this.clans = clans;
         this.inviteHandler = inviteHandler;
         this.blockHandler = blockHandler;
         this.clanLogger = clanLogger;
         this.commandManager = commandManager;
-        this.oldClanManager = oldClanManager;
     }
 
     @EventHandler
@@ -242,7 +238,6 @@ public class ClanEventListener extends ClanListener {
 
         clanManager.getRepository().delete(clan);
         clanManager.getObjects().remove(clan.getName().toLowerCase());
-        oldClanManager.reload();
         clanManager.getLeaderboard().forceUpdate();
 
         UUID id = log.info("{} ({}) disbanded {} ({})", event.getPlayer().getName(), event.getPlayer().getUniqueId(),

@@ -2,22 +2,25 @@ package me.mykindos.betterpvp.clans.logging.types.formatted;
 
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
 import me.mykindos.betterpvp.clans.logging.types.ClanLogType;
-import me.mykindos.betterpvp.core.components.clans.IOldClan;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.UUID;
 
 public class PromoteClanLog extends FormattedClanLog{
     /**
      * @param time           the time this log was generated
      * @param offlinePlayer1 player1 of the log
      * @param clan1          clan1 of the log
+     * @param clan1Name
      * @param offlinePlayer2 player2 of the log
      * @param clan2          clan2 of the log
+     * @param clan2Name
      */
-    public PromoteClanLog(long time, @Nullable OfflinePlayer offlinePlayer1, @Nullable IOldClan clan1, @Nullable OfflinePlayer offlinePlayer2, @Nullable IOldClan clan2) {
-        super(time, offlinePlayer1, clan1, offlinePlayer2, clan2, ClanLogType.CLAN_PROMOTE);
+    public PromoteClanLog(long time, @Nullable OfflinePlayer offlinePlayer1, @Nullable UUID clan1, String clan1Name, @Nullable OfflinePlayer offlinePlayer2, @Nullable UUID clan2, String clan2Name) {
+        super(time, offlinePlayer1, clan1, clan1Name, offlinePlayer2, clan2, clan2Name, ClanLogType.CLAN_PROMOTE);
     }
 
     @Override

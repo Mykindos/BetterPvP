@@ -62,7 +62,7 @@ public class LogsSubCommand extends ClanSubCommand {
 
         int finalPageNumber = pageNumber;
         UtilServer.runTaskAsync(JavaPlugin.getPlugin(Clans.class), () -> {
-            List<FormattedClanLog> logs = clanLogger.getAllLogs(clan);
+            List<FormattedClanLog> logs = clanLogger.getClanLogs(clan.getId());
 
             int count = 0;
             int start = (finalPageNumber - 1) * numPerPage;

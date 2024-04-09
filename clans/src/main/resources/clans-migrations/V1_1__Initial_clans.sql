@@ -20,6 +20,11 @@ create table if not exists old_clans
 create unique index clans_Name_uindex
     on clans (Name);
 
+CREATE VIEW IF NOT EXISTS clans_names AS
+SELECT id, Name FROM clans
+UNION
+SELECT id, Name FROM old_clans;
+
 create table if not exists clan_territory
 (
     id        int         auto_increment not null,

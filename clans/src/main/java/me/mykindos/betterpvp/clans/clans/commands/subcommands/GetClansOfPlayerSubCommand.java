@@ -11,9 +11,9 @@ import me.mykindos.betterpvp.clans.logging.ClanLogger;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
-import me.mykindos.betterpvp.core.components.clans.IOldClan;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -64,15 +64,11 @@ public class GetClansOfPlayerSubCommand extends ClanSubCommand {
 
 
             UtilServer.runTaskAsync(JavaPlugin.getPlugin(Clans.class), () -> {
-                List<IOldClan> iOldClans = clanLogger.getClansByPlayer(client1.getUniqueId());
+                List<Component> components = clanLogger.getClansByPlayer(client1.getUniqueId());
                 UtilMessage.message(player, "Clan", "Retrieving past and present Clans of <yellow>%s</yellow>", client1.getName());
 
-                for (IOldClan iOldClan : iOldClans) {
-                    try {
-                        UtilMessage.message(player, "Clan", "<white>%s</white>", iOldClan.getName());
-                    } catch (NullPointerException npe) {
-                        log.warn(npe.toString());
-                    }
+                for (Component component : components) {
+                    UtilMessage.message(player, "Clan", component);
                 }
             });
         });

@@ -3,7 +3,6 @@ package me.mykindos.betterpvp.clans.clans.commands.subcommands;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.Clans;
-import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
 import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
@@ -14,6 +13,7 @@ import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -73,9 +73,11 @@ public class PlayerTimeSubCommand extends ClanSubCommand {
             }
             long newTime = System.currentTimeMillis() - finalTime;
             UtilServer.runTaskAsync(JavaPlugin.getPlugin(Clans.class), () -> {
-                UUID clanID = clanLogger.getClanUUIDOfPlayerAtTime(UUID.fromString(client1.get().getUuid()), newTime);
-                Clan clan = clanManager.getClanById(clanID).orElse(null);
-                UtilMessage.message(player, "Clans", "<yellow>%s</yellow> was in <aqua>%s</aqua> <green>%s</green> ago.", client1.get().getName(), clan == null ? null : clan.getName(), UtilTime.getTime(System.currentTimeMillis() - newTime, 2));
+                Component clanComponent = clanLogger.getClanUUIDOfPlayerAtTime(UUID.fromString(client1.get().getUuid()), newTime);
+                Component component = UtilMessage.deserialize("<yellow>%s</yellow> was in ", client1.get().getName())
+                        .append(clanComponent).appendSpace()
+                        .append(UtilMessage.deserialize("<green>%s</green> ago.", UtilTime.getTime(System.currentTimeMillis() - newTime, 2)));
+                UtilMessage.message(player, "Clans", component);
             });
         });
     }
