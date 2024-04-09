@@ -17,7 +17,7 @@ public class NeutralRequestClanLog extends FormattedClanLog{
      * @param clan2          clan2 of the log
      */
     public NeutralRequestClanLog(long time, @Nullable OfflinePlayer offlinePlayer1, @Nullable UUID clan1, String clan1Name, @Nullable UUID clan2, String clan2Name) {
-        super(time, offlinePlayer1, clan1, clan2Name, null, clan2, clan2Name, ClanLogType.CLAN_NEUTRAL_REQUEST);
+        super(time, offlinePlayer1, clan1, clan1Name, null, clan2, clan2Name, ClanLogType.CLAN_NEUTRAL_REQUEST);
     }
 
     @Override
