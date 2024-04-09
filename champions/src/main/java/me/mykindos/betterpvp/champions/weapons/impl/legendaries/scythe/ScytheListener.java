@@ -6,12 +6,9 @@ import io.papermc.paper.event.player.PlayerInventorySlotChangeEvent;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
-import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseItemEvent;
-import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
@@ -58,17 +55,11 @@ import java.util.Map;
 public class ScytheListener implements Listener {
 
     private final Scythe scythe;
-    private final ClientManager clientManager;
-    private final DamageLogManager damageLogManager;
-    private final CooldownManager cooldownManager;
     private final EffectManager effectManager;
 
     @Inject
-    public ScytheListener(Scythe scythe, ClientManager clientManager, DamageLogManager damageLogManager, CooldownManager cooldownManager, EffectManager effectManager) {
+    public ScytheListener(Scythe scythe, EffectManager effectManager) {
         this.scythe = scythe;
-        this.clientManager = clientManager;
-        this.damageLogManager = damageLogManager;
-        this.cooldownManager = cooldownManager;
         this.effectManager = effectManager;
     }
 
@@ -240,7 +231,7 @@ public class ScytheListener implements Listener {
             // Effects
             data.playPassive();
             final int speedLevel = (int) (scythe.speedAmplifierPerSoul * (data.getSoulCount()));
-            if (speedLevel >= 0) {
+            if (speedLevel > 0) {
                 effectManager.addEffect(player, EffectTypes.SPEED, "Scythe", speedLevel, 150, true);
             }
 

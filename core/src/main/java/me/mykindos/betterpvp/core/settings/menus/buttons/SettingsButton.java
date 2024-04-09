@@ -51,7 +51,7 @@ public class SettingsButton extends AbstractItem implements CooldownButton {
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
         final boolean current = (boolean) this.container.getProperty(setting).orElse(false);
-        this.container.saveProperty(setting, !current, true);
+        this.container.saveProperty(setting, !current);
 
         notifyWindows();
         SoundEffect.HIGH_PITCH_PLING.play(player);

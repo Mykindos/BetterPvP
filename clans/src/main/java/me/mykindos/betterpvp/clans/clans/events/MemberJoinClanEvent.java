@@ -6,6 +6,6 @@ import org.bukkit.entity.Player;
 
 public class MemberJoinClanEvent extends ClanEvent<Clan> {
     public MemberJoinClanEvent(Player player, Clan clan) {
-        super(player, clan, true);
+        super(player, clan);
     }
 }

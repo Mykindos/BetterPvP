@@ -32,13 +32,19 @@ public abstract class Rune extends Weapon {
     public abstract String getCategory();
 
     public abstract List<Component> getRuneLoreDescription(ItemMeta meta);
+
     public abstract List<Component> getItemLoreDescription(PersistentDataContainer pdc);
 
     public <T extends Number> T getRollFromItem(PersistentDataContainer pdc, NamespacedKey key, PersistentDataType<T, T> type) {
         return pdc.get(key, type);
     }
-    protected <T extends Number> T getRollFromMeta(ItemMeta meta, NamespacedKey key, PersistentDataType<T, T> type) {
-        return meta.getPersistentDataContainer().get(key, type);
+
+    protected <T extends Number> T getRollFromMeta(ItemMeta meta, NamespacedKey key, PersistentDataType<T, T> type, T defaultValue) {
+        PersistentDataContainer pdc = meta.getPersistentDataContainer();
+
+        T value = pdc.get(key, type);
+        return value != null ? value : defaultValue;
+
     }
 
     public abstract int getTier();

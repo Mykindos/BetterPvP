@@ -86,7 +86,7 @@ public class ClanEnergyListener extends ClanListener {
         if (event.isCancelled()) return;
 
         final Gamer gamer = clientManager.search().online(event.getPlayer()).getGamer();
-        gamer.saveProperty(GamerProperty.BALANCE.name(), gamer.getBalance() - event.getCost(), true);
+        gamer.saveProperty(GamerProperty.BALANCE.name(), gamer.getBalance() - event.getCost());
         event.getClan().setEnergy(event.getClan().getEnergy() + event.getAmount());
 
         UtilSound.playSound(event.getPlayer(), Sound.BLOCK_NOTE_BLOCK_PLING, 1.0F, 1.0F, false);

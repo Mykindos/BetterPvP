@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
@@ -71,7 +72,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
                 "",
                 "If a player hits you while Evading, you",
                 "will teleport behind the attacker and your",
-                "cooldown will be set to a minimum of <val>" + getInternalCooldown(level) + "</val> seconds ",
+                "cooldown will be set to a minimum of <val>" + UtilFormat.formatNumber(getInternalCooldown(level), 1) + "</val> seconds ",
                 "",
                 "Hold crouch while Evading to teleport backwards",
                 "",

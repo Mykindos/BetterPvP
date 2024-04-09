@@ -8,6 +8,6 @@ import org.bukkit.entity.Player;
 @Getter
 public class EnergyCheckEvent extends ClanEvent<Clan> {
     public EnergyCheckEvent(Player player, Clan clan) {
-        super(player, clan, false);
+        super(player, clan);
     }
 }

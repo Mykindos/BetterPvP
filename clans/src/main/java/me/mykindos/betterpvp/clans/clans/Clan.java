@@ -14,7 +14,6 @@ import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.components.clans.data.ClanTerritory;
 import me.mykindos.betterpvp.core.framework.customtypes.IMapListener;
-import me.mykindos.betterpvp.core.framework.events.scoreboard.ScoreboardUpdateEvent;
 import me.mykindos.betterpvp.core.framework.inviting.Invitable;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
@@ -110,7 +109,7 @@ public class Clan extends PropertyContainer implements IClan, IOldClan, Invitabl
     }
 
     public void setEnergy(int energy) {
-        saveProperty(ClanProperty.ENERGY.name(), energy, true);
+        saveProperty(ClanProperty.ENERGY.name(), energy);
     }
 
     public Optional<ClanMember> getLeader() {
@@ -138,12 +137,6 @@ public class Clan extends PropertyContainer implements IClan, IOldClan, Invitabl
 
     public Optional<ClanMember> getMemberByUUID(String uuid) {
         return members.stream().filter(clanMember -> clanMember.getUuid().equalsIgnoreCase(uuid)).findFirst();
-    }
-
-
-
-    public void updateScoreboards() {
-        getMembersAsPlayers().forEach(player -> UtilServer.callEvent(new ScoreboardUpdateEvent(player)));
     }
 
     public List<Player> getAdminsAsPlayers() {
@@ -175,11 +168,11 @@ public class Clan extends PropertyContainer implements IClan, IOldClan, Invitabl
 
     public void grantExperience(long experience) {
         Preconditions.checkArgument(experience > 0, "Experience must be greater than 0");
-        saveProperty(ClanProperty.EXPERIENCE.name(), getExperience() + experience, false);
+        saveProperty(ClanProperty.EXPERIENCE.name(), getExperience() + experience);
     }
 
     public void setExperience(long experience) {
-        saveProperty(ClanProperty.EXPERIENCE.name(), experience, false);
+        saveProperty(ClanProperty.EXPERIENCE.name(), experience);
     }
 
     public long getLevel() {
@@ -304,11 +297,8 @@ public class Clan extends PropertyContainer implements IClan, IOldClan, Invitabl
     }
 
     @Override
-    public void saveProperty(String key, Object object, boolean updateScoreboard) {
+    public void saveProperty(String key, Object object) {
         properties.put(key, object);
-        if (updateScoreboard) {
-            getMembersAsPlayers().forEach(player -> UtilServer.callEvent(new ScoreboardUpdateEvent(player)));
-        }
     }
 
     @Override

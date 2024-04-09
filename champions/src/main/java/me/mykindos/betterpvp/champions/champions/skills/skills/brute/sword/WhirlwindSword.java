@@ -14,13 +14,13 @@ import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 @Singleton
@@ -111,12 +111,12 @@ public class WhirlwindSword extends Skill implements InteractSkill, CooldownSkil
         double increment = points / spiralDurationTicks;
         int particlesPerTick = 10;
 
-        Bukkit.getServer().getScheduler().runTaskTimer(champions, new Runnable() {
+        new BukkitRunnable() {
             double i = 0;
             @Override
             public void run() {
                 if (i >= points) {
-                    Bukkit.getScheduler().cancelTasks(champions);
+                    this.cancel();
                     return;
                 }
 
@@ -138,7 +138,8 @@ public class WhirlwindSword extends Skill implements InteractSkill, CooldownSkil
                 center.getWorld().playSound(center, Sound.BLOCK_WOOL_STEP, 2f, 1f);
                 i += increment;
             }
-        }, 0, 1);
+        }.runTaskTimer(champions, 0, 1);
+
     }
 
     @Override

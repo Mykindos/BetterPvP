@@ -1,7 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.builds;
 
 import lombok.Data;
-import me.mykindos.betterpvp.champions.champions.builds.menus.SkillMenu;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -10,7 +9,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 
 import java.util.ArrayList;
 
@@ -119,8 +117,8 @@ public class RoleBuild {
         skill = buildSkill.getSkill();
         Component descriptionComponent = UtilMessage.deserialize("<yellow>%s</yellow> (<green>%s</green>)", skill.getName(), buildSkill.getLevel());
 
-        for (String str : skill.getDescription(buildSkill.getLevel())) {
-            descriptionComponent = descriptionComponent.appendNewline().append(MiniMessage.miniMessage().deserialize("<gray>" + str, SkillMenu.TAG_RESOLVER));
+        for (Component component : skill.parseDescription(buildSkill.getLevel())) {
+            descriptionComponent = descriptionComponent.appendNewline().append(component);
         }
         return buildSkill.getComponent()
                 .clickEvent(ClickEvent.runCommand("/skilldescription " + skill.getName().replace(" ", "_") + " " + buildSkill.getLevel()))

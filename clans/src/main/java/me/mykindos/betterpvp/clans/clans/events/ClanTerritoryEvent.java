@@ -12,7 +12,7 @@ public class ClanTerritoryEvent extends ClanEvent<Clan> {
     private final Chunk chunk;
 
     public ClanTerritoryEvent(Player player, Clan clan, Chunk chunk) {
-        super(player, clan, false);
+        super(player, clan);
         this.chunk = chunk;
     }
 }

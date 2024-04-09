@@ -23,12 +23,11 @@ public class ImmuneListener implements Listener {
         this.effectManager = effectManager;
     }
 
-    @EventHandler (priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onImmuneToNegativity(EffectReceiveEvent event) {
-        if (effectManager.hasEffect(event.getTarget(), EffectTypes.IMMUNE)) {
-            EffectType type = event.getEffect().getEffectType();
-
-            if (type.isNegative()) {
+        EffectType type = event.getEffect().getEffectType();
+        if (type.isNegative()) {
+            if (effectManager.hasEffect(event.getTarget(), EffectTypes.IMMUNE)) {
                 event.setCancelled(true);
             }
         }
@@ -36,7 +35,7 @@ public class ImmuneListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onReceiveImmuneToEffect(EffectReceiveEvent event) {
-        if(event.isCancelled()) return;
+        if (event.isCancelled()) return;
         if (event.getEffect().getEffectType() == EffectTypes.IMMUNE) {
             effectManager.removeNegativeEffects(event.getTarget());
         }
