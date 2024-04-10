@@ -36,6 +36,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -70,6 +71,9 @@ public class InventorySkillListener extends PacketAdapter implements Listener {
     public void onPacketSending(PacketEvent event) {
         final PacketType type = event.getPacketType();
         final Player receiver = event.getPlayer();
+
+        if(receiver.getOpenInventory().getType() != InventoryType.CRAFTING) return;
+
         if (type == PacketType.Play.Server.WINDOW_ITEMS) {
             final WrapperPlayServerWindowItems packet = new WrapperPlayServerWindowItems(event.getPacket());
             packet.setCarriedItem(addLore(packet.getCarriedItem(), receiver));
