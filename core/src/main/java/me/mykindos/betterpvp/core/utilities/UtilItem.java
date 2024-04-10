@@ -5,6 +5,8 @@ import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
+import me.mykindos.betterpvp.core.items.BPvPItem;
+import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.utilities.model.WeighedList;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -327,27 +329,27 @@ public class UtilItem {
         return newComponents;
     }
 
-    public static WeighedList<ItemStack> getDropTable(BPvPPlugin plugin, String config, String configKey) {
-        return getDropTable(plugin.getConfig(config), configKey);
+    public static WeighedList<ItemStack> getDropTable(ItemHandler itemHandler, BPvPPlugin plugin, String config, String configKey) {
+        return getDropTable(itemHandler, plugin.getConfig(config), configKey);
 
     }
 
-    public static WeighedList<ItemStack> getDropTable(BPvPPlugin plugin, String configKey) {
-        return getDropTable(plugin, "config", configKey);
+    public static WeighedList<ItemStack> getDropTable(ItemHandler itemHandler, BPvPPlugin plugin, String configKey) {
+        return getDropTable(itemHandler, plugin, "config", configKey);
     }
 
-    public static WeighedList<ItemStack> getDropTable(ExtendedYamlConfiguration config, String configKey) {
+    public static WeighedList<ItemStack> getDropTable(ItemHandler itemHandler, ExtendedYamlConfiguration config, String configKey) {
         WeighedList<ItemStack> droptable = new WeighedList<>();
 
         var configSection = config.getConfigurationSection(configKey);
         if (configSection == null) return droptable;
 
-        parseDropTable(configSection, droptable);
+        parseDropTable(itemHandler, configSection, droptable);
 
         return droptable;
     }
 
-    public static Map<String, WeighedList<ItemStack>> getDropTables(ExtendedYamlConfiguration config, String configKey) {
+    public static Map<String, WeighedList<ItemStack>> getDropTables(ItemHandler itemHandler, ExtendedYamlConfiguration config, String configKey) {
         Map<String, WeighedList<ItemStack>> droptableMap = new HashMap<>();
 
         var configSection = config.getConfigurationSection(configKey);
@@ -357,7 +359,7 @@ public class UtilItem {
             var droptableSection = configSection.getConfigurationSection(key);
             if(droptableSection == null) return;
             WeighedList<ItemStack> droptable = new WeighedList<>();
-            parseDropTable(droptableSection, droptable);
+            parseDropTable(itemHandler, droptableSection, droptable);
 
             droptableMap.put(key, droptable);
 
@@ -366,15 +368,24 @@ public class UtilItem {
         return droptableMap;
     }
 
-    private static void parseDropTable(ConfigurationSection droptableSection, WeighedList<ItemStack> droptable) {
+    private static void parseDropTable(ItemHandler itemHandler, ConfigurationSection droptableSection, WeighedList<ItemStack> droptable) {
         droptableSection.getKeys(false).forEach(key -> {
-            Material item = Material.getMaterial(key);
-            int amount = droptableSection.getInt(key + ".amount", 1);
-            int modelId = droptableSection.getInt(key + ".model-id", 0);
+            ItemStack itemStack = null;
             int weight = droptableSection.getInt(key + ".weight");
             int categoryWeight = droptableSection.getInt(key + ".category-weight");
+            int amount = droptableSection.getInt(key + ".amount", 1);
 
-            ItemStack itemStack = UtilItem.createItemStack(item, amount, modelId);
+            if(key.contains(":")) {
+                BPvPItem item = itemHandler.getItem(key);
+                if(item != null) {
+                    itemStack = item.getItemStack(amount);
+                }
+            }else {
+                Material item = Material.getMaterial(key);
+                int modelId = droptableSection.getInt(key + ".model-id", 0);
+                itemStack = UtilItem.createItemStack(item, amount, modelId);
+            }
+
             droptable.add(categoryWeight, weight, itemStack);
         });
     }
