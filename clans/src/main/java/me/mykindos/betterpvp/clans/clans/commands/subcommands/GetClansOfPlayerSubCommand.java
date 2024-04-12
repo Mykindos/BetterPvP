@@ -68,7 +68,7 @@ public class GetClansOfPlayerSubCommand extends ClanSubCommand {
                 UtilMessage.message(player, "Clan", "Retrieving past and present Clans of <yellow>%s</yellow>", client1.getName());
 
                 for (Component component : components) {
-                    UtilMessage.message(player, "Clan", component);
+                    UtilMessage.message(player, component);
                 }
             });
         });

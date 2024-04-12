@@ -70,7 +70,7 @@ public class FormattedClanLog extends FormattedLog {
             return Component.empty();
         }
         assert clanName != null;
-        return Component.text(clanName, clanRelation.getSecondary()).hoverEvent(HoverEvent.showText(Component.text(String.valueOf(clan))));
+        return Component.empty().append(Component.text(clanName, clanRelation.getSecondary()).hoverEvent(HoverEvent.showText(Component.text(String.valueOf(clan)))));
     }
 
     @Override

@@ -36,7 +36,7 @@ public class GetPlayersOfClanSubCommand extends ClanSubCommand {
 
     @Override
     public String getName() {
-        return "clanmembers";
+        return "clanplayers";
     }
 
     @Override
@@ -73,10 +73,10 @@ public class GetPlayersOfClanSubCommand extends ClanSubCommand {
             for (OfflinePlayer offlinePlayer : offlinePlayers) {
 
                 if (clanMembers.contains(offlinePlayer.getUniqueId())) {
-                    UtilMessage.message(player, "Clan", UtilMessage.deserialize(UtilFormat.getOnlineStatus(offlinePlayer.getUniqueId()) + offlinePlayer.getName()));
+                    UtilMessage.message(player, UtilMessage.deserialize(UtilFormat.getOnlineStatus(offlinePlayer.getUniqueId()) + offlinePlayer.getName()));
                     continue;
                 }
-                UtilMessage.message(player, "Clan", "<white>%s</white>", offlinePlayer.getName());
+                UtilMessage.message(player, offlinePlayer.getName());
             }
         });
     }

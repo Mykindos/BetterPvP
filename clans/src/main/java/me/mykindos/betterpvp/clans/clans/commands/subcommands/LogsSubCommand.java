@@ -22,7 +22,6 @@ import java.util.List;
 @Singleton
 @SubCommand(ClanCommand.class)
 public class LogsSubCommand extends ClanSubCommand {
-
     private final ClanLogger clanLogger;
 
     @Inject
@@ -42,7 +41,7 @@ public class LogsSubCommand extends ClanSubCommand {
     }
 
     @Override
-    public void execute(Player player, Client client, String... args) {
+    public void execute (Player player, Client client, String... args) {
         int numPerPage = 10;
         int pageNumber = 1;
 
