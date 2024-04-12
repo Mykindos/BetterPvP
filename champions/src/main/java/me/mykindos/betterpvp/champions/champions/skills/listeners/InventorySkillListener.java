@@ -29,13 +29,16 @@ import me.mykindos.betterpvp.core.packet.play.clientbound.WrapperPlayServerEntit
 import me.mykindos.betterpvp.core.packet.play.clientbound.WrapperPlayServerSetSlot;
 import me.mykindos.betterpvp.core.packet.play.clientbound.WrapperPlayServerWindowItems;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -70,6 +73,9 @@ public class InventorySkillListener extends PacketAdapter implements Listener {
     public void onPacketSending(PacketEvent event) {
         final PacketType type = event.getPacketType();
         final Player receiver = event.getPlayer();
+
+        if(receiver.getOpenInventory().getType() != InventoryType.CRAFTING) return;
+
         if (type == PacketType.Play.Server.WINDOW_ITEMS) {
             final WrapperPlayServerWindowItems packet = new WrapperPlayServerWindowItems(event.getPacket());
             packet.setCarriedItem(addLore(packet.getCarriedItem(), receiver));
@@ -83,28 +89,37 @@ public class InventorySkillListener extends PacketAdapter implements Listener {
             for (Pair<EnumWrappers.ItemSlot, ItemStack> slot : slots) {
                 slot.setSecond(addLore(slot.getSecond(), receiver));
             }
+
             packet.setSlots(slots);
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onRoleChange(RoleChangeEvent event) {
-        Bukkit.getScheduler().runTaskLater(champions, () -> event.getPlayer().updateInventory(), 2L);
+        UtilServer.runTaskLater(champions, () -> {
+            Player player = event.getPlayer();
+            if(player.getItemOnCursor().getType() == Material.AIR) {
+                player.updateInventory();
+            }
+        }, 2L);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onSkillEquip(SkillEquipEvent event) {
         Bukkit.getScheduler().runTaskLater(champions, () -> event.getPlayer().updateInventory(), 2L);
+
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onSkillUpdate(SkillUpdateEvent event) {
         Bukkit.getScheduler().runTaskLater(champions, () -> event.getPlayer().updateInventory(), 2L);
+
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onBuildApply(ApplyBuildEvent event) {
         Bukkit.getScheduler().runTaskLater(champions, () -> event.getPlayer().updateInventory(), 2L);
+
     }
 
     private List<ItemStack> addLore(Collection<ItemStack> items, Player player) {
