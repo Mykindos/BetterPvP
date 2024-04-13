@@ -54,7 +54,6 @@ public class ClanRepository implements IRepository<Clan> {
     private final Database database;
     private final PropertyMapper propertyMapper;
 
-
     private final ConcurrentHashMap<String, Statement> queuedPropertyUpdates;
 
     @Inject
