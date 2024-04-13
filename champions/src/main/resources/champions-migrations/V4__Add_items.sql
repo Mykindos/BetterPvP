@@ -293,6 +293,9 @@ INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, H
     ('APPLE', 'champions', 'energy_apple', '<light_purple>Energy Apple', 0, 0, 0);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
+    ('HONEY_BOTTLE', 'champions', 'energy_elixir', '<light_purple>Energy Elixir', 0, 0, 0);
+
+INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
     ('PUMPKIN_PIE', 'champions', 'mushroom_stew', '<light_purple>Mushroom Stew', 0, 0, 0);
 
 INSERT IGNORE INTO itemlore
