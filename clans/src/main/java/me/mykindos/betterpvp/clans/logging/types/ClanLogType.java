@@ -14,11 +14,11 @@ public enum ClanLogType {
      */
     CLAN_KICK,
     /**
-     *
+     * Player 1 creates Clan1
      */
     CLAN_CREATE,
     /**
-     *
+     * Player1 disbands Clan1
      */
     CLAN_DISBAND,
     /**
