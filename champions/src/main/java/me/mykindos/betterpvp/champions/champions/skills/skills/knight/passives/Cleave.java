@@ -45,7 +45,7 @@ public class Cleave extends Skill implements PassiveSkill, Listener {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Your attacks deal <val>" + UtilFormat.formatNumber((getPercentageOfDamage(level) * 100), 2) + "%</val> of your damage to",
+                "Your attacks deal <stat>" + UtilFormat.formatNumber((getPercentageOfDamage(level) * 100), 2) + "%</stat> of your damage to",
                 "all enemies within <val>" + getDistance(level) + "</val> blocks of your target enemy.",
                 "",
                 "Max Enemies Hit: <val>" + getMaxEnemiesHit(level) + "</val>",
@@ -63,7 +63,7 @@ public class Cleave extends Skill implements PassiveSkill, Listener {
     }
 
     public double getDistance(int level) {
-        return baseDistance + ((level - 1) * distanceIncreasePerLevel);
+        return baseDistance + ((level -1) * distanceIncreasePerLevel);
     }
 
     @Override
