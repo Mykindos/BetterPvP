@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.core.items.listener;
 
 import com.google.inject.Inject;
 import lombok.CustomLog;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageDurabilityEvent;
 import me.mykindos.betterpvp.core.items.BPvPItem;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -10,7 +9,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -44,27 +42,6 @@ public class ItemListener implements Listener {
             return true;
         }
         return false;
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onCustomDamageDurability(CustomDamageDurabilityEvent event) {
-        if (event.isDamagerTakeDurability() && event.getCustomDamageEvent().getDamager() instanceof Player damager) {
-            if (event.getCustomDamageEvent().getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
-                if (damageCustomItem(damager, damager.getInventory().getItemInMainHand(), 1)) {
-                    //durability was handled, cancel it
-                    event.setDamagerTakeDurability(false);
-                }
-            }
-        }
-        if (event.isDamageeTakeDurability() && event.getCustomDamageEvent().getDamagee() instanceof Player damagee) {
-            for (ItemStack armour : damagee.getEquipment().getArmorContents()) {
-                if (armour == null) continue;
-                if (damageCustomItem(damagee, armour, 1)) {
-                    //durability was handled at least once, so cancel it (not perfect)
-                    event.setDamageeTakeDurability(false);
-                }
-            }
-        }
     }
 
 
