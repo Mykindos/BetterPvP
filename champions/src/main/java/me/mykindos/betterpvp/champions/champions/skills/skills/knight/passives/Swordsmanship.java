@@ -57,7 +57,7 @@ public class Swordsmanship extends Skill implements PassiveSkill {
                 "storing up to a maximum of <val>" + (level) + "</val> charges",
                 "",
                 "When you attack, your damage is increased",
-                "by <val>" + getDamage(1, level) + "</val> for each charge you have",
+                "by <stat>" + getDamage(1, level) + "</stat> for each charge you have",
                 "",
                 "This only applies to swords"
         };

@@ -22,7 +22,7 @@ skills:
     shockingstrikes:
       enabled: true
       maxlevel: 3
-      baseDuration: 0.0
+      baseDuration: 1.0
       durationIncreasePerLevel: 1.0
       slownessDuration: 1.0
       slownessStrength: 1
@@ -735,9 +735,12 @@ skills:
     overcharge:
       enabled: true
       maxlevel: 5
+      baseDamage: 1.0
+      damageIncreasePerLevel: 0.0
+      baseDuration: 2.0
+      durationDecreasePerLevel: 0.4
       baseMaxDamage: 2.0
       maxDamageIncreasePerLevel: 1.0
-      chargeSeconds: 3.0
     huntersthrill:
       enabled: true
       maxlevel: 3
