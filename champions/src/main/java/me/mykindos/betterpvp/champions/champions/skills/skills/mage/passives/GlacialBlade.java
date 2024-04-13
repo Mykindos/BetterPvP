@@ -68,8 +68,7 @@ public class GlacialBlade extends Skill implements PassiveSkill, CooldownSkill, 
                 "",
                 "Will not work within melee range",
                 "",
-                "Internal Cooldown: <val>" + getCooldown(level),
-                "Energy: <val>" + getEnergy(level)
+                "Internal Cooldown: <val>" + getCooldown(level)
         };
     }
 
@@ -78,7 +77,7 @@ public class GlacialBlade extends Skill implements PassiveSkill, CooldownSkill, 
     }
     @Override
     public float getEnergy(int level) {
-        return (float) (energy - (level - 1) * energyDecreasePerLevel);
+        return (float) (energy + (level - 1) * energyDecreasePerLevel);
     }
 
     @EventHandler
@@ -182,4 +181,5 @@ public class GlacialBlade extends Skill implements PassiveSkill, CooldownSkill, 
         damage = getConfig("damage", 1.5, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
     }
+
 }

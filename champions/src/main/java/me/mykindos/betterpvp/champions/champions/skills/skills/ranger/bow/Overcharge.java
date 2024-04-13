@@ -15,7 +15,6 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
@@ -51,11 +50,11 @@ public class Overcharge extends Skill implements InteractSkill, Listener {
     private final List<Arrow> arrows = new ArrayList<>();
     private final Set<UUID> charging = new HashSet<>();
 
-    private double baseDamage;
+    private double baseDamageIncrement;
 
-    private double damageIncreasePerLevel;
+    private double damageIncrementPerLevel;
 
-    private double baseDuration;
+    private double baseDurationIncrement;
     
     private double durationDecreasePerLevel;
 
@@ -81,22 +80,22 @@ public class Overcharge extends Skill implements InteractSkill, Listener {
                 "Hold right click with a Bow to use",
                 "",
                 "Draw back harder on your bow, giving",
-                "<stat>" + getDamage(level) + "</stat> bonus damage per <val>" + UtilFormat.formatNumber(getDuration(level)) + "</val> seconds",
+                "<stat>" + getDamageIncrement(level) + "</stat> bonus damage per <stat>" + getDurationIncrement(level) + "</stat> seconds",
                 "",
                 "Maximum Damage: <val>" + getMaxDamage(level)
         };
     }
 
-    public double getDamage(int level) {
-        return baseDamage + ((level - 1) * damageIncreasePerLevel);
+    public double getDamageIncrement(int level) {
+        return baseDamageIncrement + ((level-1) * damageIncrementPerLevel);
     }
 
     public double getMaxDamage(int level) {
-        return baseMaxDamage + ((level - 1) * maxDamageIncreasePerLevel);
+        return baseMaxDamage + ((level-1) * maxDamageIncreasePerLevel);
     }
 
-    private double getDuration(int level) {
-        return baseDuration - ((level - 1) * durationDecreasePerLevel);
+    private double getDurationIncrement(int level) {
+        return baseDurationIncrement + ((level - 1) * durationDecreasePerLevel);
     }
 
     @Override
@@ -199,7 +198,7 @@ public class Overcharge extends Skill implements InteractSkill, Listener {
                     continue;
                 }
 
-                if (UtilTime.elapsed(data.getLastCharge(), (long) (getDuration(level) * 1000))) {
+                if (UtilTime.elapsed(data.getLastCharge(), (long) (getDurationIncrement(level) * 1000))) {
                     if (data.getCharge() < data.getMaxCharge()) {
                         data.addCharge();
                         UtilMessage.simpleMessage(player, getClassType().getName(), "%s: <yellow>+%d<gray> Bonus Damage", getName(), data.getCharge());
@@ -222,7 +221,7 @@ public class Overcharge extends Skill implements InteractSkill, Listener {
     @Override
     public void activate(Player player, int level) {
         if (!data.containsKey(player)) {
-            data.put(player, new OverchargeData(player.getUniqueId(), (int) getDamage(level), (int) getMaxDamage(level)));
+            data.put(player, new OverchargeData(player.getUniqueId(), (int) getDamageIncrement(level), (int) getMaxDamage(level)));
             charging.add(player.getUniqueId());
         }
     }
@@ -261,13 +260,14 @@ public class Overcharge extends Skill implements InteractSkill, Listener {
                 lastCharge = System.currentTimeMillis();
             }
         }
+
     }
 
     public void loadSkillConfig() {
-        baseDamage = getConfig("baseDamage", 1.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
-        baseDuration = getConfig("baseDuration", 2.0, Double.class);
-        durationDecreasePerLevel = getConfig("durationDecreasePerLevel", 0.4, Double.class);
+        baseDamageIncrement = getConfig("baseDamageIncrement", 1.0, Double.class);
+        damageIncrementPerLevel = getConfig("damageIncrementPerLevel", 0.0 , Double.class);
+        baseDurationIncrement = getConfig("baseDurationIncrement", 0.4, Double.class);
+        durationDecreasePerLevel = getConfig("baseDurationIncrement", 0.0, Double.class);
 
         baseMaxDamage = getConfig("baseMaxDamage", 2.0, Double.class);
         maxDamageIncreasePerLevel = getConfig("maxDamageIncreasePerLevel", 1.0, Double.class);
