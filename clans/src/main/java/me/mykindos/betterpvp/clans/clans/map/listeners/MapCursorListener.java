@@ -74,13 +74,14 @@ public class MapCursorListener implements Listener {
                     Bukkit.getPluginManager().callEvent(cursorEvent);
                     event.getCursors().add(new ExtraCursor(x, z, (player == otherPlayer) || (cursorEvent.isDisplay()),
                             cursorEvent.getType(), direction, otherPlayer.getWorld().getName(), false));
+
+                    if (aClan != null && aClan.getHome() != null) {
+                        Location aClanHomeLocation = aClan.getHome();
+                        event.getCursors().add(new ExtraCursor(aClanHomeLocation.getBlockX(), aClanHomeLocation.getBlockZ(), (player == otherPlayer),
+                                MapCursor.Type.MANSION, (byte) 8, otherPlayer.getWorld().getName(), false));
+                    }
                 }
             }
-        }
-        if (aClan != null && aClan.getHome() != null) {
-            Location aClanHomeLocation = aClan.getHome();
-            event.getCursors().add(new ExtraCursor(aClanHomeLocation.getBlockX(), aClanHomeLocation.getBlockZ(), true,
-                    MapCursor.Type.MANSION, (byte) 8, player.getWorld().getName(), false));
         }
     }
 }
