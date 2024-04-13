@@ -10,7 +10,6 @@ import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
 import me.mykindos.betterpvp.core.combat.data.DamageData;
 import me.mykindos.betterpvp.core.combat.data.SoundProvider;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageDurabilityEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageReductionEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomKnockbackEvent;
@@ -175,8 +174,6 @@ public class CombatListener implements Listener {
 
     private void finalizeDamage(CustomDamageEvent event, CustomDamageReductionEvent reductionEvent) {
 
-        updateDurability(event);
-
         if (event.getProjectile() instanceof Arrow) {
             if (event.getDamager() instanceof Player player) {
                 player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.5f, 0.7f);
@@ -217,18 +214,6 @@ public class CombatListener implements Listener {
 
         }
     }
-
-    private void updateDurability(CustomDamageEvent event) {
-
-        CustomDamageDurabilityEvent cdde = new CustomDamageDurabilityEvent(event);
-        if (!event.isDoDurability()) {
-            cdde.setDamagerTakeDurability(false);
-        }
-
-        UtilServer.callEvent(cdde);
-
-    }
-
 
     private void processDamageData(CustomDamageEvent event) {
         if (event.getDamagee() instanceof Player damagee) {
