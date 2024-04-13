@@ -79,6 +79,11 @@ public class MushroomStew extends Weapon implements InteractWeapon, CooldownWeap
     }
 
     @Override
+    public boolean showCooldownOnItem() {
+        return true;
+    }
+
+    @Override
     public void loadWeaponConfig() {
         duration = getConfig("duration", 4.0, Double.class);
         level = getConfig("level", 2, Integer.class);
