@@ -29,7 +29,7 @@ public class DeathPlayerItemLog extends FormattedItemLog{
                 .append(Component.text("while holding")).appendSpace()
                 .append(getItem()).appendSpace()
                 .append(Component.text("by")).appendSpace()
-                .append(getPlayer2())
+                .append(getPlayer2()).appendSpace()
                 .append(getLocation());
     }
 }

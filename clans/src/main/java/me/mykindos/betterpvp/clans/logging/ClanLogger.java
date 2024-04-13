@@ -83,7 +83,9 @@ public class ClanLogger {
             if (clanManager.getRelation(killerClan, victimClan).equals(ClanRelation.ENEMY)) {
                 assert killerClan != null;
                 assert victimClan != null;
-                dominance = clanManager.getDominanceForKill(killerClan.getSquadCount(), victimClan.getSquadCount());
+                if (!killerClan.isNoDominanceCooldownActive() && !victimClan.isNoDominanceCooldownActive()) {
+                    dominance = clanManager.getDominanceForKill(killerClan.getSquadCount(), victimClan.getSquadCount());
+                }
             }
             String query = "INSERT INTO clans_kills (KillId, KillerClan, VictimClan, Dominance) VALUES (?, ?, ?, ?)";
             database.executeUpdate(new Statement(query,

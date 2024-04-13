@@ -58,17 +58,17 @@ public class KillClanLog {
 
     private Component getPlayerClanFormatting(OfflinePlayer player, UUID clanID, String clanName) {
         if (clanID != null && callerClan.getId() == clanID) {
-            return Component.text(clanName, ClanRelation.SELF.getSecondary()).hoverEvent(HoverEvent.showText(Component.text(String.valueOf(clanID))))
+            return Component.empty().append(Component.text(clanName, ClanRelation.SELF.getSecondary()).hoverEvent(HoverEvent.showText(Component.text(String.valueOf(clanID)))))
                     .appendSpace().append(Component.text(Objects.requireNonNull(player.getName()), ClanRelation.SELF.getPrimary()));
         }
 
         if (dominance > 0 && clanID != null) {
-            return Component.text(clanName, ClanRelation.ENEMY.getSecondary()).hoverEvent(HoverEvent.showText(Component.text(String.valueOf(clanID))))
+            return Component.empty().append(Component.text(clanName, ClanRelation.ENEMY.getSecondary()).hoverEvent(HoverEvent.showText(Component.text(String.valueOf(clanID)))))
                     .appendSpace().append(Component.text(Objects.requireNonNull(player.getName()), ClanRelation.ENEMY.getPrimary()));
         }
 
         if (clanID != null) {
-            return Component.text(clanName, ClanRelation.NEUTRAL.getSecondary()).hoverEvent(HoverEvent.showText(Component.text(String.valueOf(clanID))))
+            return Component.empty().append(Component.text(clanName, ClanRelation.NEUTRAL.getSecondary()).hoverEvent(HoverEvent.showText(Component.text(String.valueOf(clanID)))))
                     .appendSpace().append(Component.text(Objects.requireNonNull(player.getName()), ClanRelation.NEUTRAL.getPrimary()));
         }
 

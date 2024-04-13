@@ -463,7 +463,7 @@ public class ClanEventListener extends ClanListener {
         }
 
         inviteHandler.createInvite(clan, target, "Trust", 10);
-        UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You have requested to form a trust with <yellow>{}<gray>.", target.getName());
+        UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You have requested to form a trust with <yellow>%s<gray>.", target.getName());
         target.messageClan("<yellow>Clan " + clan.getName() + "<gray> has requested to form a trust with your clan.", null, true);
 
         UUID id = log.info("{} ({}) of {} ({}) requested trust with {} ({})", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
@@ -543,7 +543,7 @@ public class ClanEventListener extends ClanListener {
         if (clan.isEnemy(target)) {
 
             if(inviteHandler.isInvited(target, clan, "Neutral")){
-                UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You already have a pending neutral request with <red>{}<gray>.", target.getName());
+                UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You already have a pending neutral request with <red>%s<gray>.", target.getName());
                 return;
             }
 
