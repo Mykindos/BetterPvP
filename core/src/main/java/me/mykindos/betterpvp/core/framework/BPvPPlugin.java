@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.framework;
 
+import com.google.common.base.Charsets;
 import com.google.inject.Injector;
 import lombok.CustomLog;
 import lombok.Getter;
@@ -11,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.FileSystem;
@@ -68,6 +70,7 @@ public abstract class BPvPPlugin extends JavaPlugin {
     public void reloadConfig() {
         configs.forEach((key, value) -> {
             File configFile = new File(getDataFolder(), key + ".yml");
+
             ExtendedYamlConfiguration config = ExtendedYamlConfiguration.loadConfiguration(configFile);
 
             final InputStream defConfigStream = getResource("configs/" + key + ".yml");
@@ -75,7 +78,9 @@ public abstract class BPvPPlugin extends JavaPlugin {
                 return;
             }
 
+            config.setDefaults(ExtendedYamlConfiguration.loadConfiguration(new InputStreamReader(defConfigStream, Charsets.UTF_8)));
             configs.put(key, config);
+
         });
 
     }

@@ -31,6 +31,10 @@ hunger:
   enabled: false
 discord:
   chatWebhook: ''
+resourcepack:
+  force: false
+  sha: dc1e31891324d735202029a646d2e29592d13061
+  url: https://betterpvp.net/betterpvptextures.zip
 weather:
   enabled: false
 items:
