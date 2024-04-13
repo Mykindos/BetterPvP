@@ -305,7 +305,7 @@ public class WorldListener implements Listener {
      */
     @EventHandler
     public void disableBeds(PlayerInteractEvent event) {
-        if (event.getClickedBlock() != null) {
+        if (event.getClickedBlock() != null && event.getAction().isRightClick()) {
             if (event.getClickedBlock().getType().name().contains("_BED")) {
                 event.setCancelled(true);
             }

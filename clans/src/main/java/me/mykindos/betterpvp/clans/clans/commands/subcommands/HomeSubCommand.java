@@ -35,9 +35,9 @@ public class HomeSubCommand extends ClanSubCommand {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        Clan playerClan = clanManager.getClanByPlayer(player).orElseThrow();;
+        Clan playerClan = clanManager.getClanByPlayer(player).orElseThrow();
         if (playerClan.getHome() == null) {
-            UtilMessage.message(player, "Clans", "Your clan has not set a home");
+            UtilMessage.simpleMessage(player, "Clans", "Your clan home has not been set yet. Use <yellow>/clan sethome</yellow> to set it.");
             return;
         }
 
