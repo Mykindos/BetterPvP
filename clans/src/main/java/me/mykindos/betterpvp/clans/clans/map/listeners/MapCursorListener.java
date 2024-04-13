@@ -7,11 +7,8 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.map.data.ExtraCursor;
 import me.mykindos.betterpvp.clans.clans.map.events.MinimapExtraCursorEvent;
 import me.mykindos.betterpvp.clans.clans.map.events.MinimapPlayerCursorEvent;
-import me.mykindos.betterpvp.clans.clans.map.renderer.MinimapRenderer;
-import me.mykindos.betterpvp.clans.clans.pillage.PillageHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -24,13 +21,11 @@ public class MapCursorListener implements Listener {
 
     private final Clans clans;
     private final ClanManager clanManager;
-    private final PillageHandler pillageHandler;
 
     @Inject
-    public MapCursorListener(Clans clans, ClanManager clanManager, PillageHandler pillageHandler) {
+    public MapCursorListener(Clans clans, ClanManager clanManager) {
         this.clans = clans;
         this.clanManager = clanManager;
-        this.pillageHandler = pillageHandler;
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -65,8 +60,6 @@ public class MapCursorListener implements Listener {
                             cursorEvent = new MinimapPlayerCursorEvent(player, otherPlayer, true, MapCursor.Type.BLUE_POINTER);
                         } else if (aClan.isAllied(bClan)) {
                             cursorEvent = new MinimapPlayerCursorEvent(player, otherPlayer, true, MapCursor.Type.GREEN_POINTER);
-                        } else if (pillageHandler.isPillaging(aClan, bClan) || pillageHandler.isPillaging(bClan, aClan)) {
-                            cursorEvent = new MinimapPlayerCursorEvent(player, otherPlayer, true, MapCursor.Type.RED_POINTER);
                         }
                     }
                 }
@@ -74,12 +67,6 @@ public class MapCursorListener implements Listener {
                     Bukkit.getPluginManager().callEvent(cursorEvent);
                     event.getCursors().add(new ExtraCursor(x, z, (player == otherPlayer) || (cursorEvent.isDisplay()),
                             cursorEvent.getType(), direction, otherPlayer.getWorld().getName(), false));
-
-                    if (aClan != null && aClan.getHome() != null) {
-                        Location aClanHomeLocation = aClan.getHome();
-                        event.getCursors().add(new ExtraCursor(aClanHomeLocation.getBlockX(), aClanHomeLocation.getBlockZ(), (player == otherPlayer),
-                                MapCursor.Type.MANSION, (byte) 8, otherPlayer.getWorld().getName(), false));
-                    }
                 }
             }
         }
