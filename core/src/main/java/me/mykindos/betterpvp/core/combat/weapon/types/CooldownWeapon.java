@@ -10,4 +10,8 @@ public interface CooldownWeapon extends IWeapon {
         return true;
     }
 
+    default boolean showCooldownOnItem() {
+        return false;
+    }
+
 }

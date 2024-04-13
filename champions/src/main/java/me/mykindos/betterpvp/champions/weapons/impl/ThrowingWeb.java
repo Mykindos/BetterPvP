@@ -125,6 +125,11 @@ public class ThrowingWeb extends Weapon implements Listener, InteractWeapon, Coo
     }
 
     @Override
+    public boolean showCooldownOnItem() {
+        return true;
+    }
+
+    @Override
     public void loadWeaponConfig() {
         duration = getConfig("duration", 2.5, Double.class);
         throwableExpiry = getConfig("throwableExpiry", 10.0, Double.class);

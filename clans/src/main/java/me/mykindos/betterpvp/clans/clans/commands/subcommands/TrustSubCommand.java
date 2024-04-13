@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.clans.clans.events.ClanRequestTrustEvent;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
+import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -66,11 +67,17 @@ public class TrustSubCommand extends ClanSubCommand {
             return;
         }
 
-        if (!clan.isAllied(targetClan)) {
+        Optional<ClanAlliance> allianceOptional = clan.getAlliance(targetClan);
+        if (allianceOptional.isEmpty()) {
             UtilMessage.message(player, "Clans", "You cannot request a trust with a clan you are not allied with.");
             return;
         }
 
+        ClanAlliance alliance = allianceOptional.get();
+        if(alliance.isTrusted()) {
+            UtilMessage.message(player, "Clans", "You are already trusted with this clan.");
+            return;
+        }
 
         UtilServer.callEvent(new ClanRequestTrustEvent(player, clan, targetClan));
 

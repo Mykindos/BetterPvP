@@ -25,6 +25,10 @@ ranger_leggings:
 energy_apple:
   enabled: true
   cooldown: 10.0
+  energyRegen: 0.25
+energy_elixir:
+  enabled: true
+  cooldown: 12.0
   energyRegen: 0.5
 ranger_boots:
   enabled: true

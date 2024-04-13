@@ -51,6 +51,7 @@ import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
+import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
@@ -71,7 +72,6 @@ public class ClansWorldListener extends ClanListener {
     @Inject
     @Config(path = "clans.claims.allow-gravity-blocks", defaultValue = "true")
     private boolean allowGravityBlocks;
-
 
 
     private final Clans clans;
@@ -763,6 +763,30 @@ public class ClansWorldListener extends ClanListener {
             if (clanOptional.isPresent()) {
                 event.setCancelled(true);
             }
+        }
+    }
+
+    @EventHandler
+    public void onBreakBed(BlockBreakEvent event) {
+        if (event.getBlock().getType() == Material.RED_BED) {
+            Optional<Clan> clanOptional = clanManager.getClanByLocation(event.getBlock().getLocation());
+            if (clanOptional.isPresent()) {
+
+                Clan clan = clanOptional.get();
+                event.setCancelled(true);
+                event.getBlock().setType(Material.AIR);
+
+
+                clan.setHome(null);
+                clan.messageClan("Your clan home has been destroyed!", null, true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onBedDrop(ItemSpawnEvent event) {
+        if(event.getEntity().getItemStack().getType() == Material.RED_BED) {
+            event.setCancelled(true);
         }
     }
 }

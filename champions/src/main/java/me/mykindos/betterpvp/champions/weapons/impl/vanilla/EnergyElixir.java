@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.champions.weapons.impl;
+package me.mykindos.betterpvp.champions.weapons.impl.vanilla;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -20,14 +20,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Singleton
-public class EnergyApple extends Weapon implements InteractWeapon, CooldownWeapon {
+public class EnergyElixir extends Weapon implements InteractWeapon, CooldownWeapon {
 
     private final EnergyHandler energyHandler;
     private double energyRegen;
 
     @Inject
-    public EnergyApple(Champions champions, EnergyHandler energyHandler) {
-        super(champions, "energy_apple");
+    public EnergyElixir(Champions champions, EnergyHandler energyHandler) {
+        super(champions, "energy_elixir");
         this.energyHandler = energyHandler;
     }
 
@@ -36,14 +36,14 @@ public class EnergyApple extends Weapon implements InteractWeapon, CooldownWeapo
         energyHandler.regenerateEnergy(player, energyRegen);
         UtilMessage.message(player, "Item",
                 Component.text("You consumed an ", NamedTextColor.GRAY).append(getName().color(NamedTextColor.YELLOW)));
-        UtilSound.playSound(player, Sound.ENTITY_PLAYER_BURP, 1f, 1f, false);
+        UtilSound.playSound(player, Sound.ITEM_HONEY_BOTTLE_DRINK, 1.2f, 1f, false);
         UtilInventory.remove(player, getMaterial(), 1);
     }
 
     @Override
     public List<Component> getLore(ItemMeta itemMeta) {
         List<Component> lore = new ArrayList<>();
-        lore.add(UtilMessage.deserialize("<gray>Energy: <yellow>25.0", baseDamage));
+        lore.add(UtilMessage.deserialize("<gray>Energy: <yellow>50.0", baseDamage));
         return lore;
     }
 
@@ -59,7 +59,7 @@ public class EnergyApple extends Weapon implements InteractWeapon, CooldownWeapo
 
     @Override
     public void loadWeaponConfig() {
-        energyRegen = getConfig("energyRegen", 0.25, Double.class);
+        energyRegen = getConfig("energyRegen", 0.50, Double.class);
     }
 
     @Override
@@ -67,3 +67,4 @@ public class EnergyApple extends Weapon implements InteractWeapon, CooldownWeapo
         return true;
     }
 }
+
