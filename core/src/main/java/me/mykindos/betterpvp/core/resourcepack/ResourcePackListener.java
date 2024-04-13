@@ -14,6 +14,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 
 @Singleton
@@ -58,6 +59,13 @@ public class ResourcePackListener implements Listener {
             }
         }
 
+    }
+
+    @EventHandler
+    public void onMoveWhileLoading(PlayerMoveEvent event) {
+        if (event.getPlayer().getResourcePackStatus() != PlayerResourcePackStatusEvent.Status.SUCCESSFULLY_LOADED) {
+            event.setCancelled(true);
+        }
     }
 
 
