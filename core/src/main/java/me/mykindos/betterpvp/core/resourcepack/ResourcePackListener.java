@@ -68,8 +68,6 @@ public class ResourcePackListener implements Listener {
         }
     }
 
-
-
     @UpdateEvent(delay = 300)
     public void sendResourcePackTitle() {
         for (Player player : Bukkit.getOnlinePlayers()) {
