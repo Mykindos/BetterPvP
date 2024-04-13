@@ -3,12 +3,14 @@ package me.mykindos.betterpvp.core.utilities;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.type.Bed;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -545,5 +547,16 @@ public class UtilBlock {
         final int y = block.getY();
         final int z = block.getZ() % 16;
         return y & 0xFFFF | (x & 0xFF) << 16 | (z & 0xFF) << 24;
+    }
+
+    public static void placeBed(Location location, BlockFace facing) {
+        Block block = location.getBlock();
+        for (Bed.Part part : Bed.Part.values()) {
+            block.setBlockData(Bukkit.createBlockData(Material.RED_BED, (data) -> {
+                ((Bed) data).setPart(part);
+                ((Bed) data).setFacing(facing.getOppositeFace());
+            }));
+            block = block.getRelative(facing);
+        }
     }
 }

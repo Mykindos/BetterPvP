@@ -13,6 +13,8 @@ import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 @Singleton
@@ -39,6 +41,13 @@ public class SetHomeSubCommand extends ClanSubCommand {
         Clan playerClan = clanManager.getClanByPlayer(player).orElseThrow();
         if (!playerClan.getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.ADMIN)) {
             UtilMessage.message(player, "Clans", "You must be a clan admin or above to use this command");
+            return;
+        }
+
+        Location bedLocation = player.getLocation();
+        Block block = bedLocation.getBlock();
+        if (!block.getType().isAir() || !block.getRelative(player.getFacing()).getType().isAir()) {
+            UtilMessage.message(player, "Clans", "You must have a clear space to set your home");
             return;
         }
 

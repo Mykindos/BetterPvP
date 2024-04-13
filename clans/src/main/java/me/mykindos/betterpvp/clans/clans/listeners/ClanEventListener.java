@@ -38,6 +38,7 @@ import me.mykindos.betterpvp.core.components.clans.data.ClanTerritory;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.inviting.InviteHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
@@ -48,6 +49,8 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -521,11 +524,22 @@ public class ClanEventListener extends ClanListener {
             return;
         }
 
-        clan.setHome(player.getLocation().toCenterLocation());
+        if(clan.getHome() != null) {
+            Block block = clan.getHome().clone().subtract(0, 0.6, 0).getBlock();
+            if(block.getType() == Material.RED_BED) {
+                block.setType(Material.AIR);
+            }
+        }
+
+        UtilBlock.placeBed(player.getLocation().toCenterLocation(), player.getFacing());
+
+        clan.setHome(player.getLocation().toCenterLocation().add(0, 0.6, 0));
         UtilMessage.simpleMessage(player, "Clans", "You set the clan home to <yellow>%s<gray>.",
                 UtilWorld.locationToString(player.getLocation()));
 
         clanManager.getRepository().updateClanHome(clan);
+
+
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
