@@ -65,7 +65,7 @@ public class PlayerTimeSubCommand extends ClanSubCommand {
                 //pass
             }
         }
-        long finalTime = time;
+        long finalTime = time / (60L * 60L * 1000L);
         clientManager.search().offline(args[0], client1 -> {
             if (client1.isEmpty()) {
                 UtilMessage.message(player, "<yellow>%s</yellow> is not a valid username");
@@ -76,7 +76,7 @@ public class PlayerTimeSubCommand extends ClanSubCommand {
                 Component clanComponent = clanLogger.getClanUUIDOfPlayerAtTime(UUID.fromString(client1.get().getUuid()), newTime);
                 Component component = UtilMessage.deserialize("<yellow>%s</yellow> was in ", client1.get().getName())
                         .append(clanComponent).appendSpace()
-                        .append(UtilMessage.deserialize("<green>%s</green> ago.", UtilTime.getTime(System.currentTimeMillis() - newTime, 2)));
+                        .append(UtilMessage.deserialize("<green>%s</green> ago.", UtilTime.getTime(System.currentTimeMillis() - (double) newTime, 2)));
                 UtilMessage.message(player, "Clans", component);
             });
         });
