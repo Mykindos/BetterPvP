@@ -37,6 +37,7 @@ clans:
       - WATER
       - ICE
       - LAVA
+      - RED_BED
   pillage:
     duration: 15
     noDominanceCooldown: 4
