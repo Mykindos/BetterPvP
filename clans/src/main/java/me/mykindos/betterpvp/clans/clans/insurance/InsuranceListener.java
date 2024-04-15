@@ -31,7 +31,7 @@ public class InsuranceListener extends ClanListener {
     private boolean enabled;
 
     @Inject
-    @Config(path = "clans.insurance.nonRestorableBlocks", defaultValue = "TNT,ENCHANTING_TABLE")
+    @Config(path = "clans.insurance.nonRestorableBlocks", defaultValue = "TNT,ENCHANTING_TABLE,RED_BED")
     private List<String> nonRestorableBlocks;
 
     @Inject
