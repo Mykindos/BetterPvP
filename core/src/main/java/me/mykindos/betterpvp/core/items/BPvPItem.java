@@ -5,9 +5,11 @@ import lombok.CustomLog;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
+import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateLoreEvent;
 import me.mykindos.betterpvp.core.items.type.IBPvPItem;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -95,7 +97,7 @@ public class BPvPItem implements IBPvPItem {
         if (getMaxDurability() >= 0) {
             UtilItem.getOrSaveCustomDurability(itemMeta, getMaxDurability());
         }
-        applyLore(itemMeta);
+        applyLore(itemStack, itemMeta);
         itemStack.setItemMeta(itemMeta);
         return itemStack;
     }
@@ -238,7 +240,7 @@ public class BPvPItem implements IBPvPItem {
         List<Character> chars = new ArrayList<>();
         for (String s : layout) {
             for (char c : s.toCharArray()) {
-                if(c == ' ') continue;
+                if (c == ' ') continue;
                 if (!chars.contains(c)) {
                     chars.add(c);
                 }
@@ -308,7 +310,7 @@ public class BPvPItem implements IBPvPItem {
                 return;
             }
         }
-        applyLore(itemMeta);
+        applyLore(itemStack, itemMeta);
         setDurabilityDisplayPercentage(itemMeta);
         itemStack.setItemMeta(itemMeta);
 
@@ -319,22 +321,22 @@ public class BPvPItem implements IBPvPItem {
         return lore;
     }
 
-    public ItemMeta applyLore(ItemMeta itemMeta) {
-        return applyLore(itemMeta, getLore(itemMeta));
-    }
+    public ItemMeta applyLore(ItemStack itemStack, ItemMeta itemMeta) {
 
-    public ItemMeta applyLore(ItemMeta itemMeta, List<Component> lore) {
-
-        List<Component> newLore = UtilItem.removeItalic(lore);
+        List<Component> newLore = new ArrayList<>(this.getLore(itemMeta));
         PersistentDataContainer pdc = itemMeta.getPersistentDataContainer();
         if (pdc.has(CoreNamespaceKeys.DURABILITY_KEY)) {
             newLore.add(0, UtilMessage.deserialize("<grey>Durability: %s</grey>", pdc.get(CoreNamespaceKeys.DURABILITY_KEY, PersistentDataType.INTEGER)).decoration(TextDecoration.ITALIC, false));
         }
+
+        ItemUpdateLoreEvent event = UtilServer.callEvent(new ItemUpdateLoreEvent(this, itemStack, itemMeta, newLore));
+
+        newLore = event.getItemLore();
         if (pdc.has(CoreNamespaceKeys.UUID_KEY)) {
-            newLore.add(UtilMessage.deserialize("<yellow>%s</yellow>", pdc.get(CoreNamespaceKeys.UUID_KEY, PersistentDataType.STRING)).decoration(TextDecoration.ITALIC, false));
+            newLore.add(UtilMessage.deserialize("<dark_gray>%s</dark_gray>", pdc.get(CoreNamespaceKeys.UUID_KEY, PersistentDataType.STRING)).decoration(TextDecoration.ITALIC, false));
         }
 
-        itemMeta.lore(newLore);
+        itemMeta.lore(UtilItem.removeItalic(newLore));
         return itemMeta;
     }
 

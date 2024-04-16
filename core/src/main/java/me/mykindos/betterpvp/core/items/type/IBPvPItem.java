@@ -32,6 +32,5 @@ public interface IBPvPItem {
     ShapedRecipe getShapedRecipe(int count, String key_suffix, String... shape);
     ShapelessRecipe getShapelessRecipe(int count, String key_suffix, ItemStack... ingredients);
     void damageItem(Player player, ItemStack itemStack, int damage);
-    ItemMeta applyLore(ItemMeta itemMeta);
-    ItemMeta applyLore(ItemMeta itemMeta, List<Component> lore);
+    ItemMeta applyLore(ItemStack itemStack, ItemMeta itemMeta);
 }

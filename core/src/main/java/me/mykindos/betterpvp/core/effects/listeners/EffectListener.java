@@ -110,7 +110,7 @@ public class EffectListener implements Listener {
 
         if(effectManager.hasEffect(event.getDamagee(), EffectTypes.PROTECTION)
                 || effectManager.hasEffect(event.getDamagee(), EffectTypes.INVISIBILITY)) {
-            event.setResult(EntityCanHurtEntityEvent.Result.DENY);
+            event.setResult(Event.Result.DENY);
         }
     }
 

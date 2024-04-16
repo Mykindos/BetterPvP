@@ -167,15 +167,13 @@ public class WeaponListener implements Listener {
             weapon.onInitialize(event.getItemMeta());
 
             event.getItemMeta().getPersistentDataContainer().set(CoreNamespaceKeys.CUSTOM_ITEM_KEY, PersistentDataType.STRING, item.getIdentifier());
-            var lore = new ArrayList<>(item.getLore(event.getItemMeta()));
 
             var originalOwner = event.getItemMeta().getPersistentDataContainer().getOrDefault(CoreNamespaceKeys.ORIGINAL_OWNER, PersistentDataType.STRING, "");
             if (!originalOwner.isEmpty()) {
-                lore.add(Component.text(""));
-                lore.add(Component.text("Original Owner: ", NamedTextColor.WHITE).append(Component.text(originalOwner, NamedTextColor.YELLOW)));
+                event.getItemLore().add(Component.text(""));
+                event.getItemLore().add(Component.text("Original Owner: ", NamedTextColor.WHITE).append(Component.text(originalOwner, NamedTextColor.YELLOW)));
             }
 
-            event.setItemLore(lore);
         }
     }
 
