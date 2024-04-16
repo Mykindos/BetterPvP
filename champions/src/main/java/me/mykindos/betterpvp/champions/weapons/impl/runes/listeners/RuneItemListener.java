@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.weapons.impl.runes.Rune;
 import me.mykindos.betterpvp.champions.weapons.impl.runes.RuneNamespacedKeys;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.cooldowns.events.CooldownEvent;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.effects.events.EffectReceiveEvent;
@@ -182,6 +183,29 @@ public class RuneItemListener implements Listener {
         }
 
         event.setEnergy(event.getEnergy() * (1 - totalReduction / 100));
+
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onAlacrityCooldown(CooldownEvent event) {
+        Player player = event.getPlayer();
+        ItemStack[] armour = player.getInventory().getArmorContents();
+
+        double totalReduction = 0;
+        for (ItemStack item : armour) {
+            if (item == null) continue;
+            ItemMeta itemMeta = item.getItemMeta();
+            Rune rune = getRuneFromNamespacedKey(RuneNamespacedKeys.ALACRITY, itemMeta);
+            if (rune == null) continue;
+
+            PersistentDataContainer alacrityPdc = itemMeta.getPersistentDataContainer().get(rune.getAppliedNamespacedKey(), PersistentDataType.TAG_CONTAINER);
+            if (alacrityPdc != null) {
+                totalReduction += rune.getRollFromItem(alacrityPdc, rune.getAppliedNamespacedKey(), PersistentDataType.DOUBLE);
+            }
+
+        }
+
+        event.getCooldown().setSeconds(event.getCooldown().getSeconds() * (1 - totalReduction / 100));
 
     }
 

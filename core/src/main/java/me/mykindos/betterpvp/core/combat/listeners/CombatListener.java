@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageDurabilityEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageReductionEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomKnockbackEvent;
+import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
 import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.effects.EffectManager;
@@ -27,6 +28,7 @@ import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.ArmorStand;
@@ -482,6 +484,21 @@ public class CombatListener implements Listener {
         if (TRUE_DAMAGE_SOURCES.contains(event.getCause())) {
             event.setIgnoreArmour(true);
         }
+    }
+
+    @EventHandler
+    public void onCanHurt(EntityCanHurtEntityEvent event) {
+        if(!event.isAllowed()) {
+            return;
+        }
+
+        if(event.getDamagee() instanceof Player damagee) {
+            if(damagee.getGameMode() == GameMode.CREATIVE || damagee.getGameMode() == GameMode.SPECTATOR) {
+                event.setResult(EntityCanHurtEntityEvent.Result.DENY);
+                return;
+            }
+        }
+
     }
 
 }

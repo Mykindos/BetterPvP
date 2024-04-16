@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.combatlog.events.PlayerCombatLogEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
 import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -77,6 +78,20 @@ public class ClansCombatListener implements Listener {
                 } else {
                     event.setCancelled(true);
                 }
+            }
+        }
+
+    }
+
+    @EventHandler
+    public void onCanHurt(EntityCanHurtEntityEvent event) {
+        if(!event.isAllowed()) {
+            return;
+        }
+
+        if(event.getDamagee() instanceof Player damagee && event.getDamager() instanceof Player damager){
+            if(!clanManager.canHurt(damager, damagee)) {
+                event.setResult(EntityCanHurtEntityEvent.Result.DENY);
             }
         }
 

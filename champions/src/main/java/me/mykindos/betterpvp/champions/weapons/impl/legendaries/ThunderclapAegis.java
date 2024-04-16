@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
 import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.weapon.types.ChannelWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.InteractWeapon;
@@ -42,6 +43,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -224,7 +226,7 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
 
         // Velocity
         final Vector vec = caster.getLocation().getDirection();
-        VelocityData velocityData = new VelocityData(vec, 1.5 * charge + 1.1, true, 0, 0.2, 1.4, true);
+        VelocityData velocityData = new VelocityData(vec, 1.5 * charge + 1.1, true, 0, 0.2, 1.4, true, false);
         UtilVelocity.velocity(hit, caster, velocityData);
     }
 
@@ -289,7 +291,14 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
             final List<LivingEntity> collisions = UtilEntity.interpolateMultiCollision(data.getLastLocation(),
                             newLocation,
                             0.6f,
-                            ent -> UtilEntity.IS_ENEMY.test(player, ent))
+                            ent -> {
+                                if (ent instanceof LivingEntity livingEntity) {
+                                    EntityCanHurtEntityEvent entityCanHurtEntityEvent = UtilServer.callEvent(new EntityCanHurtEntityEvent(player, livingEntity));
+                                    return entityCanHurtEntityEvent.isAllowed();
+                                }
+
+                                return false;
+                            })
                     .stream()
                     .flatMap(MultiRayTraceResult::stream)
                     .map(RayTraceResult::getHitEntity)
