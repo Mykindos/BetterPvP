@@ -40,6 +40,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.TNTPrimed;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -494,8 +495,7 @@ public class CombatListener implements Listener {
 
         if(event.getDamagee() instanceof Player damagee) {
             if(damagee.getGameMode() == GameMode.CREATIVE || damagee.getGameMode() == GameMode.SPECTATOR) {
-                event.setResult(EntityCanHurtEntityEvent.Result.DENY);
-                return;
+                event.setResult(Event.Result.DENY);
             }
         }
 

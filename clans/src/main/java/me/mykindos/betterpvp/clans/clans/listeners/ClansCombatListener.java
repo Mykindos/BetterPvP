@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -91,7 +92,7 @@ public class ClansCombatListener implements Listener {
 
         if(event.getDamagee() instanceof Player damagee && event.getDamager() instanceof Player damager){
             if(!clanManager.canHurt(damager, damagee)) {
-                event.setResult(EntityCanHurtEntityEvent.Result.DENY);
+                event.setResult(Event.Result.DENY);
             }
         }
 
