@@ -326,7 +326,7 @@ public class BPvPItem implements IBPvPItem {
         List<Component> newLore = new ArrayList<>(this.getLore(itemMeta));
         PersistentDataContainer pdc = itemMeta.getPersistentDataContainer();
         if (pdc.has(CoreNamespaceKeys.DURABILITY_KEY)) {
-            newLore.add(0, UtilMessage.deserialize("<grey>Durability: %s</grey>", pdc.get(CoreNamespaceKeys.DURABILITY_KEY, PersistentDataType.INTEGER)).decoration(TextDecoration.ITALIC, false));
+            newLore.add(0, UtilMessage.deserialize("<gray>Durability: %s</gray>", pdc.get(CoreNamespaceKeys.DURABILITY_KEY, PersistentDataType.INTEGER)).decoration(TextDecoration.ITALIC, false));
         }
 
         ItemUpdateLoreEvent event = UtilServer.callEvent(new ItemUpdateLoreEvent(this, itemStack, itemMeta, newLore));

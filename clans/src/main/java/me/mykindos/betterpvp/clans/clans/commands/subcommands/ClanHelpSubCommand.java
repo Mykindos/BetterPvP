@@ -63,12 +63,9 @@ public class ClanHelpSubCommand extends ClanSubCommand {
         }
 
         List<ICommand> clanSubCommands = clanCommand.getSubCommands();
+        clanSubCommands.sort(Comparator.comparing(ICommand::getName));
 
-        Collections.sort(clanSubCommands, Comparator.comparing(ICommand::getName));
-
-
-
-        Component component = UtilMessage.deserialize("<yellow>Help<grey>: ");
+        Component component = UtilMessage.deserialize("<yellow>Help<gray>: ");
 
         if (!commandName.isEmpty()){
             Optional<ICommand> subCommandOptional = clanCommand.getSubCommand(commandName);
