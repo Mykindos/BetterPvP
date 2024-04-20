@@ -23,7 +23,7 @@ hyper_axe:
   enabled: true
   baseDamage: 4.0
   damageDelay: 200
-  dealsKnockback: false
+  dealsKnockback: true
   usesEnergy: false
   energyPerHit: 10
   hyperRushCooldown: 16.0
