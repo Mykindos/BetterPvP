@@ -14,10 +14,13 @@ import org.bukkit.block.Block;
 import org.bukkit.block.Container;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.LivingEntity;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 @Singleton
@@ -42,7 +45,7 @@ public class WorldBlockHandler {
      * @param expiry Time in milliseconds to restore
      * @param force Whether to override an existing restore block's expiry or choose the higher value
      */
-    public void addRestoreBlock(@Nullable LivingEntity entity, Block block, Material newMaterial, long expiry, boolean force) {
+    public void addRestoreBlock(@Nullable LivingEntity entity, Block block, Material newMaterial, long expiry, boolean force, @Nullable String label) {
         Optional<RestoreBlock> restoreBlockOptional = getRestoreBlock(block);
         if (restoreBlockOptional.isPresent()) {
             final long newExpiry = System.currentTimeMillis() + expiry;
@@ -52,9 +55,13 @@ public class WorldBlockHandler {
             }
             restoreBlock.setExpire(force ? newExpiry : Math.max(restoreBlock.getExpire(), newExpiry));
         } else {
-            RestoreBlock newRestoreBlock = new RestoreBlock(block, newMaterial, expiry, entity);
+            RestoreBlock newRestoreBlock = new RestoreBlock(block, newMaterial, expiry, entity, label);
             restoreBlocks.put(block, newRestoreBlock);
         }
+    }
+
+    public void addRestoreBlock(@Nullable LivingEntity entity, Block block, Material newMaterial, long expiry, boolean force) {
+        addRestoreBlock(entity, block, newMaterial, expiry, force, null);
     }
 
     public void scheduleRestoreBlock(Block block, Material newMaterial, long delay, long expiry) {
@@ -80,6 +87,10 @@ public class WorldBlockHandler {
 
     public Optional<RestoreBlock> getRestoreBlock(Block block) {
         return Optional.ofNullable(restoreBlocks.get(block));
+    }
+
+    public List<RestoreBlock> getRestoreBlocks(@NotNull LivingEntity summoner, @NotNull String label) {
+        return restoreBlocks.values().stream().filter(restoreBlock -> restoreBlock.getSummoner() == summoner && Objects.equals(restoreBlock.getLabel(), label)).toList();
     }
 
     public void outlineChunk(Chunk chunk) {
