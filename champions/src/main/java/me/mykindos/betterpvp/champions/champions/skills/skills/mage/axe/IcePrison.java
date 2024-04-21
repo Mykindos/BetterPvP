@@ -16,6 +16,8 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.world.blocks.RestoreBlock;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -27,6 +29,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.List;
 
 @CustomLog
 @Singleton
@@ -53,12 +57,13 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
 
     @Override
     public String[] getDescription(int level) {
-
-        return new String[]{
+        return new String[] {
                 "Right click with an Axe to activate",
                 "",
                 "Launches an icy orb, trapping any players within <stat>" + sphereSize  + "</stat>",
                 "blocks of it in a prison of ice for <val>" + getDuration(level) + "</val> seconds",
+                "",
+                "Shift-click to destroy the prison early.",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -78,10 +83,8 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
         return SkillType.AXE;
     }
 
-
     @Override
     public double getCooldown(int level) {
-
         return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
@@ -95,13 +98,24 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
         handleIcePrisonCollision(throwableItem);
     }
 
+    private boolean hasActivePrison(Player player) {
+        return !blockHandler.getRestoreBlocks(player, getName()).isEmpty();
+    }
+
+    public void despawn(Player player) {
+        final List<RestoreBlock> blocks = blockHandler.getRestoreBlocks(player, getName());
+        final Location loc = blocks.get(0).getBlock().getLocation();
+        loc.getWorld().playSound(loc, Sound.BLOCK_GLASS_STEP, 1f, 1f);
+        loc.getWorld().playSound(loc, Sound.BLOCK_GLASS_BREAK, 1f, 0.8f);
+        blocks.forEach(RestoreBlock::restore);
+        UtilMessage.message(player, getClassType().getName(), "You destroyed your <alt>" + getName() + "</alt>.");
+    }
+
     private void handleIcePrisonCollision(ThrowableItem throwableItem) {
         Location center = throwableItem.getItem().getLocation();
 
         for (Location loc : UtilMath.sphere(center, sphereSize, true)) {
-            if (loc.getBlockX() == center.getBlockX() &&
-                    loc.getBlockZ() == center.getBlockZ() &&
-                    loc.getBlockY() == center.getBlockY() + sphereSize) {
+            if (loc.getBlockX() == center.getBlockX() && loc.getBlockZ() == center.getBlockZ()) {
                 continue;
             }
 
@@ -110,7 +124,7 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
                 int level = getLevel((Player) throwableItem.getThrower());
                 if (throwableItem.getThrower() instanceof Player player) {
                     double duration = getDuration(level) + (((double) (center.getBlockY() - loc.getBlockY()) / sphereSize) * variance);
-                    blockHandler.addRestoreBlock(player, loc.getBlock(), Material.ICE, (long) (duration * 1000), true);
+                    blockHandler.addRestoreBlock(player, loc.getBlock(), Material.ICE, (long) (duration * 1000), true, getName());
                 }
                 loc.getBlock().setType(Material.ICE);
                 loc.getWorld().playSound(loc, Sound.BLOCK_GLASS_STEP, 1f, 1f);
@@ -133,8 +147,8 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
         throwableItem.setCollideGround(true);
         championsManager.getThrowables().addThrowable(throwableItem);
         throwableItem.getLastLocation().getWorld().playSound(throwableItem.getLastLocation(), Sound.ENTITY_SILVERFISH_HURT, 2f, 1f);
-
     }
+
     @Override
     public void loadSkillConfig(){
         sphereSize = getConfig("sphereSize", 4, Integer.class);
@@ -142,6 +156,18 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
         speed = getConfig("speed", 1.5, Double.class);
         variance = getConfig("variance", 0.5, Double.class);
+    }
+
+    @Override
+    public boolean canUse(Player player) {
+        if (player.isSneaking() && hasActivePrison(player)) {
+            if (championsManager.getCooldowns().use(player, getName() + "Despawn", 0.2, false)) {
+                despawn(player);
+            }
+            return false;
+        }
+
+        return true;
     }
 
     @Override

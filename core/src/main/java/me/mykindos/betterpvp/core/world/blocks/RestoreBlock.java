@@ -23,19 +23,29 @@ public class RestoreBlock {
 
     @Nullable
     private LivingEntity summoner;
+    @Nullable
+    private final String label;
 
-    public RestoreBlock(Block block, Material newMaterial, long expire, @Nullable LivingEntity summoner) {
+    private boolean restored;
+
+    public RestoreBlock(Block block, Material newMaterial, long expire, @Nullable LivingEntity summoner, @Nullable String label) {
         this.block = block;
         this.newMaterial = newMaterial;
         this.expire = System.currentTimeMillis() + expire;
         this.blockData = block.getBlockData().clone();
         this.summoner = summoner;
+        this.label = label;
 
         block.setType(newMaterial);
     }
 
+    public RestoreBlock(Block block, Material newMaterial, long expire, @Nullable LivingEntity summoner) {
+        this(block, newMaterial, expire, summoner, null);
+    }
+
     public void restore() {
         block.setBlockData(blockData);
+        restored = true;
         // Update nearby blocks
         UtilServer.runTaskLater(JavaPlugin.getPlugin(Core.class), () -> block.getState().update(false, true), 1L);
     }
