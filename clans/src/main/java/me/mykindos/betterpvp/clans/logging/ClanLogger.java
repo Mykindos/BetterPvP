@@ -87,6 +87,7 @@ public class ClanLogger {
                     dominance = clanManager.getDominanceForKill(killerClan.getSquadCount(), victimClan.getSquadCount());
                 }
             }
+            
             String query = "INSERT INTO clans_kills (KillId, KillerClan, VictimClan, Dominance) VALUES (?, ?, ?, ?)";
             database.executeUpdate(new Statement(query,
                     new UuidStatementValue(killID),
