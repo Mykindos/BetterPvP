@@ -4,9 +4,9 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -36,7 +36,7 @@ public class WeighedList<T> implements Iterable<T>{
         return map;
     }
 
-    public Collection<T> getElements() {
+    public List<T> getElements() {
         return map.values().stream().flatMap(m -> m.values().stream()).toList();
     }
 

@@ -20,6 +20,8 @@ public abstract class Rune extends Weapon {
     protected static final String[] ARMOUR_FILTER = {"HELMET", "CHESTPLATE", "LEGGINGS", "BOOTS"};
     protected static final String[] MELEE_WEAPON_FILTER = {"SWORD", "_AXE"};
     protected static final String[] BOW_FILTER = {"BOW"};
+    protected static final String[] TOOL_FILTER = {"PICKAXE", "AXE", "SHOVEL", "HOE", "SHEARS", "FISHING_ROD"};
+    protected static final String[] ROD_FILTER = {"FISHING_ROD"};
 
     protected static final String[] ALL_FILTER = {"HELMET", "CHESTPLATE", "LEGGINGS", "BOOTS", "SWORD", "AXE", "BOW", "FISHING_ROD", "HOE", "SHEARS"};
 

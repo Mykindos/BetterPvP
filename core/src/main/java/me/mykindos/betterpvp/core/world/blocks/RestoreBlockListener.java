@@ -74,6 +74,11 @@ public class RestoreBlockListener implements Listener {
         Iterator<RestoreBlock> restoreBlockListIterator = blockHandler.getRestoreBlocks().values().iterator();
         while (restoreBlockListIterator.hasNext()) {
             RestoreBlock next = restoreBlockListIterator.next();
+            if (next.isRestored()) {
+                restoreBlockListIterator.remove();
+                continue;
+            }
+
             if (System.currentTimeMillis() >= next.getExpire()) {
                 restoreBlockListIterator.remove();
                 next.restore();

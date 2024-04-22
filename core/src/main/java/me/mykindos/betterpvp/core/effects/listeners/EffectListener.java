@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.effects.listeners;
 
 import com.google.inject.Inject;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
 import me.mykindos.betterpvp.core.effects.Effect;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
@@ -15,6 +16,7 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -99,6 +101,16 @@ public class EffectListener implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         for(PotionEffect potionEffect : event.getPlayer().getActivePotionEffects()) {
             event.getPlayer().removePotionEffect(potionEffect.getType());
+        }
+    }
+
+    @EventHandler
+    public void onCanHurt(EntityCanHurtEntityEvent event) {
+        if(!event.isAllowed()) return;
+
+        if(effectManager.hasEffect(event.getDamagee(), EffectTypes.PROTECTION)
+                || effectManager.hasEffect(event.getDamagee(), EffectTypes.INVISIBILITY)) {
+            event.setResult(Event.Result.DENY);
         }
     }
 

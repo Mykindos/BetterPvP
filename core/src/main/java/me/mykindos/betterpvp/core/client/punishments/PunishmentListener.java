@@ -6,11 +6,13 @@ import me.mykindos.betterpvp.core.chat.events.ChatSentEvent;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -33,18 +35,18 @@ public class PunishmentListener implements Listener {
         this.clientManager = clientManager;
     }
 
-    @EventHandler (priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onLogin(PlayerLoginEvent event) {
         final Client client = clientManager.search().online(event.getPlayer());
 
         Optional<Punishment> ban = client.getPunishment(PunishmentTypes.BAN);
-        if(ban.isPresent()){
+        if (ban.isPresent()) {
             Punishment punishment = ban.get();
 
             Component banMessage = Component.text("You are banned from the server!", NamedTextColor.RED).append(Component.newline())
                     .append(Component.text("Reason: ", NamedTextColor.YELLOW).append(Component.text(punishment.getReason(), NamedTextColor.WHITE))).appendNewline().appendNewline();
 
-            if(punishment.getExpiryTime() == -1) {
+            if (punishment.getExpiryTime() == -1) {
                 banMessage = banMessage.append(Component.text("This ban is permanent.", NamedTextColor.RED));
             } else {
                 banMessage = banMessage.append(Component.text("This ban will expire ", NamedTextColor.RED).append(Component.text(new PrettyTime().format(new Date(punishment.getExpiryTime())), NamedTextColor.GREEN)));
@@ -54,13 +56,13 @@ public class PunishmentListener implements Listener {
         }
     }
 
-    @EventHandler (priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onChat(ChatSentEvent event) {
-        if(event.isCancelled()) return;
+        if (event.isCancelled()) return;
         final Client client = clientManager.search().online(event.getPlayer());
 
-        Optional<Punishment> ban = client.getPunishment(PunishmentTypes.MUTE);
-        if(ban.isPresent()) {
+        Optional<Punishment> mute = client.getPunishment(PunishmentTypes.MUTE);
+        if (mute.isPresent()) {
             UtilMessage.simpleMessage(event.getPlayer(), "Punish", "You are currently muted and cannot send messages!");
             event.setCancelled(true);
         }
@@ -68,13 +70,13 @@ public class PunishmentListener implements Listener {
 
     @EventHandler
     public void onDamage(CustomDamageEvent event) {
-        if(!(event.getDamager() instanceof Player damager)) return;
-        if(!(event.getDamagee() instanceof Player)) return;
+        if (!(event.getDamager() instanceof Player damager)) return;
+        if (!(event.getDamagee() instanceof Player)) return;
 
         final Client client = clientManager.search().online(damager);
 
-        Optional<Punishment> ban = client.getPunishment(PunishmentTypes.PVP_LOCK);
-        if(ban.isPresent()) {
+        Optional<Punishment> pvpLock = client.getPunishment(PunishmentTypes.PVP_LOCK);
+        if (pvpLock.isPresent()) {
             UtilMessage.simpleMessage(damager, "Punish", "You are currently PvP Locked and cannot deal damage to other players!");
             event.setCancelled(true);
         }
@@ -84,8 +86,8 @@ public class PunishmentListener implements Listener {
     public void onPlace(BlockPlaceEvent event) {
         final Client client = clientManager.search().online(event.getPlayer());
 
-        Optional<Punishment> ban = client.getPunishment(PunishmentTypes.BUILD_LOCK);
-        if(ban.isPresent()) {
+        Optional<Punishment> buildLock = client.getPunishment(PunishmentTypes.BUILD_LOCK);
+        if (buildLock.isPresent()) {
             UtilMessage.simpleMessage(event.getPlayer(), "Punish", "You are currently Build Locked and cannot place blocks!");
             event.setCancelled(true);
         }
@@ -95,12 +97,25 @@ public class PunishmentListener implements Listener {
     public void onBreak(BlockBreakEvent event) {
         final Client client = clientManager.search().online(event.getPlayer());
 
-        Optional<Punishment> ban = client.getPunishment(PunishmentTypes.BUILD_LOCK);
-        if(ban.isPresent()) {
+        Optional<Punishment> buildLock = client.getPunishment(PunishmentTypes.BUILD_LOCK);
+        if (buildLock.isPresent()) {
             UtilMessage.simpleMessage(event.getPlayer(), "Punish", "You are currently Build Locked and cannot break blocks!");
             event.setCancelled(true);
         }
     }
 
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onCanHurt(EntityCanHurtEntityEvent event) {
+        if(!event.isAllowed()) return;
+
+        if (event.getDamager() instanceof Player damager) {
+            final Client client = clientManager.search().online(damager);
+
+            Optional<Punishment> pvpLock = client.getPunishment(PunishmentTypes.PVP_LOCK);
+            if (pvpLock.isPresent()) {
+                event.setResult(Event.Result.DENY);
+            }
+        }
+    }
 
 }

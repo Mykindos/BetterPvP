@@ -109,9 +109,7 @@ public class ItemHandler {
             var nameUpdateEvent = UtilServer.callEvent(new ItemUpdateNameEvent(itemStack, itemMeta, item.getName()));
             itemMeta.displayName(nameUpdateEvent.getItemName().decoration(TextDecoration.ITALIC, false));
 
-            var loreUpdateEvent = UtilServer.callEvent(new ItemUpdateLoreEvent(item, itemStack, itemMeta, new ArrayList<>(item.getLore(itemMeta))));
-
-            item.applyLore(itemMeta, loreUpdateEvent.getItemLore());
+            item.applyLore(itemStack, itemMeta);
 
             if (item.isGlowing() || dataContainer.has(CoreNamespaceKeys.GLOW_KEY)) {
                 UtilItem.addGlow(itemMeta);

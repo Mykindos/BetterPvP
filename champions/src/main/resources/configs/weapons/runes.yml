@@ -4,11 +4,11 @@ conquering_rune_t1:
   maxRoll: 1.0
 conquering_rune_t2:
   enabled: true
-  minRoll: 1.0
+  minRoll: 1.1
   maxRoll: 1.5
 conquering_rune_t3:
   enabled: true
-  minRoll: 1.5
+  minRoll: 1.6
   maxRoll: 2.0
 insight_rune_t1:
   enabled: true
@@ -16,11 +16,11 @@ insight_rune_t1:
   maxRoll: 4.0
 insight_rune_t2:
   enabled: true
-  minRoll: 4.0
+  minRoll: 4.1
   maxRoll: 7.0
 insight_rune_t3:
   enabled: true
-  minRoll: 7.0
+  minRoll: 7.1
   maxRoll: 10.0
 haste_rune_t4:
   enabled: true
@@ -32,15 +32,15 @@ unbreaking_rune_t1:
   maxRoll: 10.0
 unbreaking_rune_t2:
   enabled: true
-  minRoll: 10.0
+  minRoll: 10.1
   maxRoll: 20.0
 unbreaking_rune_t3:
   enabled: true
-  minRoll: 20.0
+  minRoll: 20.1
   maxRoll: 30.0
 unbreaking_rune_t4:
   enabled: true
-  minRoll: 30.0
+  minRoll: 30.1
   maxRoll: 50.0
 alacrity_rune_t4:
   enabled: true
@@ -48,15 +48,75 @@ alacrity_rune_t4:
   maxRoll: 10.0
 frost_rune_t3:
   enabled: true
-  chanceMinRoll: 1.0
-  chanceMaxRoll: 10.0
+  chanceMinRoll: 7.0
+  chanceMaxRoll: 15.0
   durationMinRoll: 1.0
   durationMaxRoll: 3.0
   slownessAmplifier: 1
 frost_rune_t4:
   enabled: true
-  chanceMinRoll: 10.0
-  chanceMaxRoll: 15.0
+  chanceMinRoll: 15.1
+  chanceMaxRoll: 25.0
   durationMinRoll: 3.0
   durationMaxRoll: 4.0
   slownessAmplifier: 2
+power_rune_t1:
+  enabled: true
+  minRoll: 0.5
+  maxRoll: 1.5
+power_rune_t2:
+  enabled: true
+  minRoll: 1.6
+  maxRoll: 2.5
+power_rune_t3:
+  enabled: true
+  minRoll: 2.6
+  maxRoll: 3.5
+reinforcing_rune_t1:
+  enabled: true
+  minRoll: 2.0
+  maxRoll: 3.0
+reinforcing_rune_t2:
+  enabled: true
+  minRoll: 3.1
+  maxRoll: 4.0
+reinforcing_rune_t3:
+  enabled: true
+  minRoll: 4.1
+  maxRoll: 5.0
+resistance_rune_t1:
+  enabled: true
+  minRoll: 2.0
+  maxRoll: 4.0
+resistance_rune_t2:
+  enabled: true
+  minRoll: 4.1
+  maxRoll: 6.0
+resistance_rune_t3:
+  enabled: true
+  minRoll: 6.1
+  maxRoll: 8.0
+fortune_rune_t1:
+  enabled: true
+  minRoll: 5.0
+  maxRoll: 10.0
+fortune_rune_t2:
+  enabled: true
+  minRoll: 10.1
+  maxRoll: 15.0
+fortune_rune_t3:
+  enabled: true
+  minRoll: 15.1
+  maxRoll: 20.0
+scorching_rune_t3:
+  enabled: true
+  chanceMinRoll: 20.0
+  chanceMaxRoll: 30.0
+  durationMinRoll: 2.0
+  durationMaxRoll: 3.0
+scorching_rune_t4:
+  enabled: true
+  chanceMinRoll: 30.1
+  chanceMaxRoll: 40.0
+  durationMinRoll: 3.1
+  durationMaxRoll: 4.0

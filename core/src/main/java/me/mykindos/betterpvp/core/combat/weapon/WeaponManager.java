@@ -63,7 +63,12 @@ public class WeaponManager extends Manager<IWeapon> {
     public void reload(BPvPPlugin plugin) {
 
         getObjects().values().forEach(iWeapon -> {
+            if (iWeapon instanceof Weapon weapon) {
+                itemHandler.replaceItem(weapon.getIdentifier(), weapon);
+            }
+
             iWeapon.loadConfig(plugin);
+
         });
     }
 
