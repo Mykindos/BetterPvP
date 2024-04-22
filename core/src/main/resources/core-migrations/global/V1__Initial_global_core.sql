@@ -1,8 +1,8 @@
 create table if not exists clients
 (
     id   int auto_increment,
-    UUID varchar(255) not null,
-    Name varchar(255) not null,
+    UUID varchar(36) not null,
+    Name varchar(16) not null,
     `Rank` varchar(64) not null default 'PLAYER',
     constraint clients_pk
         primary key (id)

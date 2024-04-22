@@ -10,7 +10,6 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDManager;
-import me.mykindos.betterpvp.core.logging.UUIDLogger;
 import me.mykindos.betterpvp.core.logging.type.UUIDLogType;
 import me.mykindos.betterpvp.core.logging.type.UUIDType;
 import me.mykindos.betterpvp.core.logging.type.logs.ItemLog;
@@ -91,9 +90,9 @@ public class LegendLogSubcommand extends Command {
         String finalMessage = "(" + uuid.toString() + ") " + message;
         UUID logID = log.info(finalMessage);
         ItemLog itemLog = (ItemLog) new ItemLog(logID, UUIDLogType.ITEM_CUSTOM, uuid)
-                .addMeta(player.getUniqueId(), UUIDType.PLAYER1);
+                .addMeta(player.getUniqueId(), UUIDType.MAINPLAYER);
         if (client != null) {
-            itemLog.addMeta(client.getUniqueId(), UUIDType.PLAYER2);
+            itemLog.addMeta(client.getUniqueId(), UUIDType.OTHERPLAYER);
         }
         uuidManager.getUuidRepository().getUuidLogger().addItemLog(itemLog);
         clientManager.sendMessageToRank("Log", UtilMessage.deserialize("<yellow>%s</yellow> Generated a custom legend log: " + finalMessage, player.getName()), Rank.HELPER);

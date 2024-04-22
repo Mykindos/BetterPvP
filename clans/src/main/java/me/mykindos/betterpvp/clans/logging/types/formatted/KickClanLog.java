@@ -4,27 +4,26 @@ import me.mykindos.betterpvp.clans.clans.ClanRelation;
 import me.mykindos.betterpvp.clans.logging.types.ClanLogType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.OfflinePlayer;
 
 import java.util.UUID;
 
 public class KickClanLog extends FormattedClanLog {
-    public KickClanLog(long time, OfflinePlayer offlinePlayer1, UUID clan1, String clan1Name, OfflinePlayer offlinePlayer2) {
-        super(time, offlinePlayer1, clan1, clan1Name, offlinePlayer2, null, null, ClanLogType.CLAN_KICK);
+    public KickClanLog(long time, String mainPlayerName, UUID mainClan, String mainClanName, String otherPlayerName) {
+        super(time, mainPlayerName, mainClan, mainClanName, otherPlayerName, null, null, ClanLogType.CLAN_KICK);
     }
 
     @Override
     public Component getComponent() {
-        assert offlinePlayer1 != null;
-        assert clan1 != null;
-        assert offlinePlayer2 != null;
+        assert mainPlayerName != null;
+        assert mainClan != null;
+        assert otherPlayerName != null;
         return getTimeComponent()
-                .append(getPlayerComponent(offlinePlayer1, ClanRelation.NEUTRAL)).appendSpace()
+                .append(getPlayerComponent(mainPlayerName, ClanRelation.NEUTRAL)).appendSpace()
                 .append(Component.text("was")).appendSpace()
                 .append(Component.text("kicked", NamedTextColor.RED)).appendSpace()
                 .append(Component.text("by")).appendSpace()
-                .append(getPlayerComponent(offlinePlayer2, ClanRelation.SELF)).appendSpace()
+                .append(getPlayerComponent(otherPlayerName, ClanRelation.SELF)).appendSpace()
                 .append(Component.text("from")).appendSpace()
-                .append(getClanComponent(clan1, clan1Name, ClanRelation.SELF));
+                .append(getClanComponent(mainClan, mainClanName, ClanRelation.SELF));
     }
 }

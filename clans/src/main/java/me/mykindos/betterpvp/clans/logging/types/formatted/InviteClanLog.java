@@ -4,19 +4,17 @@ import me.mykindos.betterpvp.clans.clans.ClanRelation;
 import me.mykindos.betterpvp.clans.logging.types.ClanLogType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.OfflinePlayer;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 public class InviteClanLog extends FormattedClanLog {
     /**
      * @param time           the time this log was generated
-     * @param offlinePlayer1 player1 of the log
+     * @param player1Name player1 of the log
      * @param clan1          clan1 of the log
-     * @param offlinePlayer2 player2 of the log
+     * @param player2Name player2 of the log
      */
-    public InviteClanLog(long time, @Nullable OfflinePlayer offlinePlayer1, UUID clan1, String clan1Name, OfflinePlayer offlinePlayer2) {
-        super(time, offlinePlayer1, clan1, clan1Name, offlinePlayer2, null, null, ClanLogType.CLAN_INVITE);
+    public InviteClanLog(long time, String mainPlayerName, UUID mainClan, String mainClanName, String otherPlayerName) {
+        super(time, mainPlayerName, mainClan, mainClanName, otherPlayerName, null, null, ClanLogType.CLAN_INVITE);
     }
 
     @Override
@@ -24,6 +22,6 @@ public class InviteClanLog extends FormattedClanLog {
         return getTimeComponent()
                 .append(getPlayerClan1(ClanRelation.SELF)).appendSpace()
                 .append(Component.text("invited", NamedTextColor.GREEN)).appendSpace()
-                .append(getPlayerComponent(offlinePlayer2, ClanRelation.NEUTRAL));
+                .append(getPlayerComponent(otherPlayerName, ClanRelation.NEUTRAL));
     }
 }

@@ -106,8 +106,8 @@ public class CustomGiveCommand extends Command {
         if (uuidItem != null) {
             UUID logID = log.info("{} spawned and gave ({}) to {}", player.getName(), uuidItem.getUuid(), target.getName());
             uuidManager.getUuidRepository().getUuidLogger().addItemLog((ItemLog) new ItemLog(logID, UUIDLogType.ITEM_SPAWN, uuidItem.getUuid())
-                    .addMeta(player.getUniqueId(), UUIDType.PLAYER1)
-                    .addMeta(target.getUniqueId(), UUIDType.PLAYER2)
+                    .addMeta(player.getUniqueId(), UUIDType.MAINPLAYER)
+                    .addMeta(target.getUniqueId(), UUIDType.OTHERPLAYER)
             );
         }
         target.getInventory().addItem(itemStack);

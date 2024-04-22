@@ -4,7 +4,6 @@ import me.mykindos.betterpvp.clans.clans.ClanRelation;
 import me.mykindos.betterpvp.clans.logging.types.ClanLogType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
@@ -12,12 +11,12 @@ import java.util.UUID;
 public class AllianceRequestClanLog extends FormattedClanLog{
     /**
      * @param time           the time this log was generated
-     * @param offlinePlayer1 player1 of the log
+     * @param player1Name player1 of the log
      * @param clan1          clan1 of the log
      * @param clan2          clan2 of the log
      */
-    public AllianceRequestClanLog(long time, @Nullable OfflinePlayer offlinePlayer1, @Nullable UUID clan1, @Nullable String clan1Name, @Nullable UUID clan2, @Nullable String clan2Name) {
-        super(time, offlinePlayer1, clan1, clan1Name, null, clan2, clan2Name, ClanLogType.CLAN_ALLIANCE_REQUEST);
+    public AllianceRequestClanLog(long time, String mainPlayerName, @Nullable UUID mainClan, @Nullable String mainClanName, @Nullable UUID otherClan, @Nullable String otherClanName) {
+        super(time, mainPlayerName, mainClan, mainClanName, null, otherClan, otherClanName, ClanLogType.CLAN_ALLIANCE_REQUEST);
     }
 
     @Override
@@ -27,6 +26,6 @@ public class AllianceRequestClanLog extends FormattedClanLog{
                 .append(Component.text("requested", NamedTextColor.DARK_GREEN)).appendSpace()
                 .append(Component.text("alliance", ClanRelation.ALLY.getSecondary())).appendSpace()
                 .append(Component.text("with")).appendSpace()
-                .append(getClanComponent(clan2, clan2Name, ClanRelation.NEUTRAL));
+                .append(getClanComponent(otherClan, otherClanName, ClanRelation.NEUTRAL));
     }
 }

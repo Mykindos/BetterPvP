@@ -4,19 +4,19 @@ public enum UUIDType {
     /**
      * Represents the primary player, generally the player doing the action
      */
-    PLAYER1,
+    MAINPLAYER,
     /**
      * Represents a secondary player, general the player the action occurs to
      */
-    PLAYER2,
+    OTHERPLAYER,
     /**
      * The clan of PLAYER1
      */
-    CLAN1,
+    MAINCLAN,
     /**
      * The clan of PLAYER2
      */
-    CLAN2,
+    OTHERCLAN,
     ITEM,
     NONE
 }

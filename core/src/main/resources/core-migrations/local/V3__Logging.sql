@@ -44,11 +44,11 @@ create table if not exists uuiditems
 );
 
 CREATE VIEW IF NOT EXISTS itemlogs AS
-SELECT L1.id as ID, L1.Time, L1.Type, LMU1.Item, LMU2.Player1, LMU3.Player2, LL1.Name, LL1.WorldID, LL1.X, LL1.Y, LL1.Z
+SELECT L1.id as ID, L1.Time, L1.Type, LMU1.Item, LMU2.MainPlayer, LMU3.OtherPlayer, LL1.Name, LL1.WorldID, LL1.X, LL1.Y, LL1.Z
 FROM logmeta L1
 LEFT JOIN (Select LogUUID, UUID as Item FROM logmetauuid WHERE UUIDType = 'ITEM') LMU1 ON LMU1.LogUUID = L1.id
-LEFT JOIN (Select LogUUID, UUID as Player1 FROM logmetauuid WHERE UUIDType = 'PLAYER1') LMU2 ON LMU2.LogUUID = L1.id
-LEFT JOIN (Select LogUUID, UUID as Player2 FROM logmetauuid WHERE UUIDType = 'PLAYER2') LMU3 ON LMU3.LogUUID = L1.id
+LEFT JOIN (Select LogUUID, UUID as MainPlayer FROM logmetauuid WHERE UUIDType = 'MAINPLAYER') LMU2 ON LMU2.LogUUID = L1.id
+LEFT JOIN (Select LogUUID, UUID as OtherPlayer FROM logmetauuid WHERE UUIDType = 'OTHERPLAYER') LMU3 ON LMU3.LogUUID = L1.id
 LEFT JOIN loglocations LL1 ON LL1.LogUUID = L1.id
 WHERE L1.Type LIKE 'ITEM_%';
 
@@ -56,7 +56,7 @@ WHERE L1.Type LIKE 'ITEM_%';
 DROP PROCEDURE IF EXISTS GetItemLogsByUuid;
 CREATE PROCEDURE GetUuidLogsByUuid(UniqueID varchar(36))
 BEGIN
-    SELECT DISTINCT Time, Type, Item, Player1, Player2, Name, WorldID, X, Y, Z
+    SELECT DISTINCT Time, Type, Item, MainPlayer, OtherPlayer, Name, WorldID, X, Y, Z
     FROM itemlogs
     WHERE Item = UniqueID
     ORDER BY Time DESC;
@@ -65,10 +65,10 @@ END;
 DROP PROCEDURE IF EXISTS GetUuidLogsByPlayer;
 CREATE PROCEDURE GetUuidLogsByPlayer(PlayerUuid varchar(36))
 BEGIN
-    SELECT DISTINCT Time, Type, Item, Player1, Player2, Name, WorldID, X, Y, Z
+    SELECT DISTINCT Time, Type, Item, MainPlayer, OtherPlayer, Name, WorldID, X, Y, Z
     FROM itemlogs
-    WHERE Player1 = PlayerUuid
-    OR Player2 = PlayerUuid
+    WHERE MainPlayer = PlayerUuid
+    OR OtherPlayer = PlayerUuid
     ORDER BY Time DESC;
 END;
 

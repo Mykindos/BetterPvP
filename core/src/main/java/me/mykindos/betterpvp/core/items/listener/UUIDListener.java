@@ -166,7 +166,7 @@ public class UUIDListener implements Listener {
         if (event.getEntity() instanceof Player player) {
             uuidManager.getUuidRepository().getUuidLogger().addItemLog((ItemLog) new ItemLog(logID, UUIDLogType.ITEM_PICKUP, uuidItem.getUuid())
                     .addLocation(location, null)
-                    .addMeta(player.getUniqueId(), UUIDType.PLAYER1)
+                    .addMeta(player.getUniqueId(), UUIDType.MAINPLAYER)
             );
         } else {
             uuidManager.getUuidRepository().getUuidLogger().addItemLog((ItemLog) new ItemLog(logID, UUIDLogType.ITEM_PICKUP, uuidItem.getUuid())
@@ -189,7 +189,7 @@ public class UUIDListener implements Listener {
                 event.getPlayer().getName(), uuidItem.getUuid(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
         uuidManager.getUuidRepository().getUuidLogger().addItemLog((ItemLog) new ItemLog(logID, UUIDLogType.ITEM_DROP, uuidItem.getUuid())
                 .addLocation(location, null)
-                .addMeta(event.getPlayer().getUniqueId(), UUIDType.PLAYER1)
+                .addMeta(event.getPlayer().getUniqueId(), UUIDType.MAINPLAYER)
         );
     }
 
@@ -213,8 +213,8 @@ public class UUIDListener implements Listener {
                     victim.getName(), item.getUuid(), killer.getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName(), contributors);
             uuidManager.getUuidRepository().getUuidLogger().addItemLog((ItemLog) new ItemLog(logID, UUIDLogType.ITEM_DEATH_PLAYER, item.getUuid())
                     .addLocation(location, null)
-                    .addMeta(victim.getUniqueId(), UUIDType.PLAYER1)
-                    .addMeta(killer.getUniqueId(), UUIDType.PLAYER2)
+                    .addMeta(victim.getUniqueId(), UUIDType.MAINPLAYER)
+                    .addMeta(killer.getUniqueId(), UUIDType.OTHERPLAYER)
             );
         }
     }
@@ -231,7 +231,7 @@ public class UUIDListener implements Listener {
                     player.getName(), item.getUuid(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
             uuidManager.getUuidRepository().getUuidLogger().addItemLog((ItemLog) new ItemLog(logID, UUIDLogType.ITEM_DEATH, item.getUuid())
                     .addLocation(location, null)
-                    .addMeta(event.getPlayer().getUniqueId(), UUIDType.PLAYER1)
+                    .addMeta(event.getPlayer().getUniqueId(), UUIDType.MAINPLAYER)
             );
         }
     }
@@ -342,7 +342,7 @@ public class UUIDListener implements Listener {
                         player.getName(), item.getUuid(), Objects.requireNonNull(inventory).getType().name(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
                 uuidManager.getUuidRepository().getUuidLogger().addItemLog((ItemLog) new ItemLog(logID, UUIDLogType.ITEM_RETREIVE, item.getUuid())
                         .addLocation(location, Objects.requireNonNull(inventory).getType().name())
-                        .addMeta(event.getPlayer().getUniqueId(), UUIDType.PLAYER1)
+                        .addMeta(event.getPlayer().getUniqueId(), UUIDType.MAINPLAYER)
                 );
 
                 lastHeldUUIDItem.remove(player);
@@ -359,7 +359,7 @@ public class UUIDListener implements Listener {
                     event.getPlayer().getName(), uuidItem.getUuid(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
             uuidManager.getUuidRepository().getUuidLogger().addItemLog((ItemLog) new ItemLog(logUUID, UUIDLogType.ITEM_LOGIN, uuidItem.getUuid())
                     .addLocation(location, null)
-                    .addMeta(event.getPlayer().getUniqueId(), UUIDType.PLAYER1)
+                    .addMeta(event.getPlayer().getUniqueId(), UUIDType.MAINPLAYER)
             );
         });
     }
@@ -472,7 +472,7 @@ public class UUIDListener implements Listener {
                 );
                 uuidManager.getUuidRepository().getUuidLogger().addItemLog((ItemLog) new ItemLog(logUUID, UUIDLogType.ITEM_CONTAINER_BREAK, uuidItem.getUuid())
                         .addLocation(location, event.getBlockState().getType().name())
-                        .addMeta(event.getPlayer().getUniqueId(), UUIDType.PLAYER1)
+                        .addMeta(event.getPlayer().getUniqueId(), UUIDType.MAINPLAYER)
                 );
             });
         });
@@ -554,7 +554,7 @@ public class UUIDListener implements Listener {
                     player.getName(), item.getUuid(), Objects.requireNonNull(inventory).getType().name(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
             uuidManager.getUuidRepository().getUuidLogger().addItemLog((ItemLog) new ItemLog(logID, UUIDLogType.ITEM_DROP, item.getUuid())
                     .addLocation(location, Objects.requireNonNull(inventory).getType().name())
-                    .addMeta(player.getUniqueId(), UUIDType.PLAYER1)
+                    .addMeta(player.getUniqueId(), UUIDType.MAINPLAYER)
             );
 
             lastHeldUUIDItem.remove(player);
@@ -566,7 +566,7 @@ public class UUIDListener implements Listener {
                     player.getName(), uuidItem.getUuid(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
             uuidManager.getUuidRepository().getUuidLogger().addItemLog((ItemLog) new ItemLog(logUUID, UUIDLogType.ITEM_LOGOUT, uuidItem.getUuid())
                     .addLocation(location, null)
-                    .addMeta(player.getUniqueId(), UUIDType.PLAYER1)
+                    .addMeta(player.getUniqueId(), UUIDType.MAINPLAYER)
             );
         });
     }
@@ -599,7 +599,7 @@ public class UUIDListener implements Listener {
                         player.getName(), item.getUuid(), Objects.requireNonNull(inventory).getType().name(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
                 uuidManager.getUuidRepository().getUuidLogger().addItemLog((ItemLog) new ItemLog(logID, UUIDLogType.ITEM_RETREIVE, item.getUuid())
                         .addLocation(location, Objects.requireNonNull(inventory).getType().name())
-                        .addMeta(player.getUniqueId(), UUIDType.PLAYER1)
+                        .addMeta(player.getUniqueId(), UUIDType.MAINPLAYER)
                 );
             });
 
@@ -616,7 +616,7 @@ public class UUIDListener implements Listener {
                         player.getName(), item.getUuid(), inventory.getType().name(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
                 uuidManager.getUuidRepository().getUuidLogger().addItemLog((ItemLog) new ItemLog(logID, UUIDLogType.ITEM_CONTAINER_STORE, item.getUuid())
                         .addLocation(location, Objects.requireNonNull(inventory).getType().name())
-                        .addMeta(player.getUniqueId(), UUIDType.PLAYER1)
+                        .addMeta(player.getUniqueId(), UUIDType.MAINPLAYER)
                 );
             });
         }

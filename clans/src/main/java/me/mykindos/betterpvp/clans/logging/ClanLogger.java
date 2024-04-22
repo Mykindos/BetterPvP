@@ -109,20 +109,20 @@ public class ClanLogger {
             while (result.next()) {
                 long time = result.getLong(1);
                 String type = result.getString(2);
-                String player1 = result.getString(3);
+                String player1Name = result.getString(3);
                 String clan1 = result.getString(4);
-                String clan1name = result.getString(5);
-                String player2 = result.getString(6);
+                String clan1Name = result.getString(5);
+                String player2Name = result.getString(6);
                 String clan2 = result.getString(7);
-                String clan2name = result.getString(8);
+                String clan2Name = result.getString(8);
 
                 logList.add(formattedLogFromRow(time,
-                        player1,
+                        player1Name,
                         clan1,
-                        clan1name,
-                        player2,
+                        clan1Name,
+                        player2Name,
                         clan2,
-                        clan2name,
+                        clan2Name,
                         ClanLogType.valueOf(type)));
             }
         } catch (SQLException ex) {
@@ -224,87 +224,78 @@ public class ClanLogger {
         return clans;
     }
     public FormattedClanLog formattedLogFromRow(long time,
-                                                String player1ID,
+                                                String player1Name,
                                                 String clan1ID,
                                                 String clan1Name,
-                                                String player2ID,
+                                                String player2Name,
                                                 String clan2ID,
                                                 String clan2Name,
                                                 ClanLogType type) {
-        OfflinePlayer offlinePlayer1 = null;
-        if (player1ID != null) {
-            offlinePlayer1 = Bukkit.getOfflinePlayer(UUID.fromString(player1ID));
-        }
 
         UUID clan1 = UtilUUID.fromString(clan1ID);
-
-        OfflinePlayer offlinePlayer2 = null;
-        if (player2ID != null) {
-            offlinePlayer2 = Bukkit.getOfflinePlayer(UUID.fromString(player2ID));
-        }
 
         UUID clan2 = UtilUUID.fromString(clan2ID);
 
         switch (type) {
             case CLAN_JOIN -> {
-                return new JoinClanLog(time, offlinePlayer1, clan1, clan1Name);
+                return new JoinClanLog(time, player1Name, clan1, clan1Name);
             }
             case CLAN_KICK -> {
-                return new KickClanLog(time, offlinePlayer1, clan1, clan1Name, offlinePlayer2);
+                return new KickClanLog(time, player1Name, clan1, clan1Name, player2Name);
             }
             case CLAN_CLAIM -> {
-                return new ClaimClanLog(time, offlinePlayer1, clan1, clan1Name);
+                return new ClaimClanLog(time, player1Name, clan1, clan1Name);
             }
             case CLAN_ENEMY -> {
-                return new EnemyClanLog(time, offlinePlayer1, clan1, clan1Name, clan2, clan2Name);
+                return new EnemyClanLog(time, player1Name, clan1, clan1Name, clan2, clan2Name);
             }
             case CLAN_LEAVE -> {
-                return new LeaveClanLog(time, offlinePlayer1, clan1, clan1Name);
+                return new LeaveClanLog(time, player1Name, clan1, clan1Name);
             }
             case CLAN_CREATE -> {
-                return new CreateClanLog(time, offlinePlayer1, clan1, clan1Name);
+                return new CreateClanLog(time, player1Name, clan1, clan1Name);
             }
             case CLAN_DEMOTE -> {
-                return new DemoteClanLog(time, offlinePlayer1, clan1, clan1Name, offlinePlayer2, clan2, clan2Name);
+                return new DemoteClanLog(time, player1Name, clan1, clan1Name, player2Name, clan2, clan2Name);
             }
             case CLAN_INVITE -> {
-                return new InviteClanLog(time, offlinePlayer1, clan1, clan1Name, offlinePlayer2);
+                return new InviteClanLog(time, player1Name, clan1, clan1Name, player2Name);
             }
             case CLAN_PROMOTE -> {
-                return new PromoteClanLog(time, offlinePlayer1, clan1, clan1Name, offlinePlayer2, clan2, clan2Name);
+                return new PromoteClanLog(time, player1Name, clan1, clan1Name, player2Name, clan2, clan2Name);
             }
             case CLAN_SETHOME -> {
-                return new SetHomeClanLog(time, offlinePlayer1, clan1, clan1Name);
+                return new SetHomeClanLog(time, player1Name, clan1, clan1Name);
             }
             case CLAN_UNCLAIM -> {
-                return new UnclaimClanLog(time, offlinePlayer1, clan1, clan1Name, clan2, clan2Name);
+                return new UnclaimClanLog(time, player1Name, clan1, clan1Name, clan2, clan2Name);
             }
             case CLAN_TRUST_ACCEPT -> {
-                return new TrustAcceptLog(time, offlinePlayer1, clan1, clan1Name, clan2, clan2Name);
+                return new TrustAcceptLog(time, player1Name, clan1, clan1Name, clan2, clan2Name);
             }
             case CLAN_ALLIANCE_ACCEPT -> {
-                return new AllianceAcceptClanLog(time, offlinePlayer1, clan1, clan1Name, clan2, clan2Name);
+                return new AllianceAcceptClanLog(time, player1Name, clan1, clan1Name, clan2, clan2Name);
             }
             case CLAN_TRUST_REMOVE -> {
-                return new TrustRemoveLog(time, offlinePlayer1, clan1, clan1Name, clan2, clan1Name);
+                return new TrustRemoveLog(time, player1Name, clan1, clan1Name, clan2, clan1Name);
             }
             case CLAN_TRUST_REQUEST -> {
-                return new TrustRequestClanLog(time, offlinePlayer1, clan1, clan1Name, clan2, clan2Name);
+                return new TrustRequestClanLog(time, player1Name, clan1, clan1Name, clan2, clan2Name);
             }
             case CLAN_NEUTRAL_ACCEPT -> {
-                return new NeutralAcceptClanLog(time, offlinePlayer1, clan1, clan1Name, clan2, clan2Name);
+                return new NeutralAcceptClanLog(time, player1Name, clan1, clan1Name, clan2, clan2Name);
             }
             case CLAN_ALLIANCE_REMOVE -> {
-                return new AllianceRemoveClanLog(time, offlinePlayer1, clan1, clan1Name, clan2, clan2Name);
+                return new AllianceRemoveClanLog(time, player1Name, clan1, clan1Name, clan2, clan2Name);
             }
             case CLAN_NEUTRAL_REQUEST -> {
-                return new NeutralRequestClanLog(time, offlinePlayer1, clan1, clan1Name, clan2, clan2Name);
+                return new NeutralRequestClanLog(time, player1Name, clan1, clan1Name, clan2, clan2Name);
             }
             case CLAN_ALLIANCE_REQUEST -> {
-                return new AllianceRequestClanLog(time, offlinePlayer1, clan1, clan1Name, clan2, clan2Name);
+                return new AllianceRequestClanLog(time, player1Name, clan1, clan1Name, clan2, clan2Name);
             }
             default -> {
-                return new FormattedClanLog(time, offlinePlayer1, clan1, clan1Name, offlinePlayer2, clan2, clan2Name, type);
+                return new FormattedClanLog(time, player1Name, clan1, clan1Name, player2Name, clan2, clan2Name, type);
             }
         }
     }
