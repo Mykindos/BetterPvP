@@ -56,7 +56,7 @@ public class ClansDeathListener implements Listener {
             Clan killedClan = clanManager.getClanByPlayer(killed).orElse(null);
             Clan killerClan = clanManager.getClanByPlayer(killer).orElse(null);
 
-            if(killedClan != null & killerClan != null) {
+            if(killedClan != null && killerClan != null) {
                 if (killerClan.isNoDominanceCooldownActive()) {
                     killerClan.messageClan("You did not gain any dominance as your clan is a new clan or was recently pillaged.", null, true);
                     killedClan.messageClan("You did not lose any dominance as <yellow>" + killedClan.getName() + "<gray> is a new clan or was recently pillaged.", null, true);
