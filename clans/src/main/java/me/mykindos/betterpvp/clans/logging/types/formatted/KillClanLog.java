@@ -7,7 +7,6 @@ import me.mykindos.betterpvp.core.utilities.UtilTime;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,20 +18,20 @@ public class KillClanLog {
     private final Clan callerClan;
     private final long time;
     @NotNull
-    private final OfflinePlayer killer;
+    private final String killer;
     @Nullable
     private final UUID killerClan;
     @Nullable
     private final String killerClanName;
     @NotNull
-    private final OfflinePlayer victim;
+    private final String victim;
     @Nullable
     private final UUID victimClan;
     @Nullable
     private final String victimClanName;
     private final double dominance;
 
-    public KillClanLog(@NotNull Clan callerClan, long time, @NotNull OfflinePlayer killer, @Nullable UUID killerClan, @Nullable String killerClanName, @NotNull OfflinePlayer victim, @Nullable UUID victimClan, @Nullable String victimClanName, double dominance) {
+    public KillClanLog(@NotNull Clan callerClan, long time, @NotNull String killer, @Nullable UUID killerClan, @Nullable String killerClanName, @NotNull String victim, @Nullable UUID victimClan, @Nullable String victimClanName, double dominance) {
         this.callerClan = callerClan;
         this.time = time;
         this.killer = killer;
@@ -56,23 +55,23 @@ public class KillClanLog {
         return getPlayerClanFormatting(victim, victimClan, victimClanName);
     }
 
-    private Component getPlayerClanFormatting(OfflinePlayer player, UUID clanID, String clanName) {
+    private Component getPlayerClanFormatting(String player, UUID clanID, String clanName) {
         if (clanID != null && callerClan.getId() == clanID) {
             return Component.empty().append(Component.text(clanName, ClanRelation.SELF.getSecondary()).hoverEvent(HoverEvent.showText(Component.text(String.valueOf(clanID)))))
-                    .appendSpace().append(Component.text(Objects.requireNonNull(player.getName()), ClanRelation.SELF.getPrimary()));
+                    .appendSpace().append(Component.text(Objects.requireNonNull(player), ClanRelation.SELF.getPrimary()));
         }
 
         if (dominance > 0 && clanID != null) {
             return Component.empty().append(Component.text(clanName, ClanRelation.ENEMY.getSecondary()).hoverEvent(HoverEvent.showText(Component.text(String.valueOf(clanID)))))
-                    .appendSpace().append(Component.text(Objects.requireNonNull(player.getName()), ClanRelation.ENEMY.getPrimary()));
+                    .appendSpace().append(Component.text(Objects.requireNonNull(player), ClanRelation.ENEMY.getPrimary()));
         }
 
         if (clanID != null) {
             return Component.empty().append(Component.text(clanName, ClanRelation.NEUTRAL.getSecondary()).hoverEvent(HoverEvent.showText(Component.text(String.valueOf(clanID)))))
-                    .appendSpace().append(Component.text(Objects.requireNonNull(player.getName()), ClanRelation.NEUTRAL.getPrimary()));
+                    .appendSpace().append(Component.text(Objects.requireNonNull(player), ClanRelation.NEUTRAL.getPrimary()));
         }
 
-        return Component.text(Objects.requireNonNull(player.getName()), ClanRelation.NEUTRAL.getPrimary());
+        return Component.text(Objects.requireNonNull(player), ClanRelation.NEUTRAL.getPrimary());
     }
 
     public Component getComponent() {

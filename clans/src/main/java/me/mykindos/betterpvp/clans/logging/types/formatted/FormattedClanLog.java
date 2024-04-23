@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.clans.logging.types.formatted;
 
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
 import me.mykindos.betterpvp.clans.logging.types.ClanLogType;
-import me.mykindos.betterpvp.core.logging.FormattedLog;
+import me.mykindos.betterpvp.core.logging.type.formatted.FormattedLog;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import org.jetbrains.annotations.NotNull;

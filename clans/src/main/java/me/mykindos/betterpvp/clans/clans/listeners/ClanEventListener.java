@@ -112,7 +112,7 @@ public class ClanEventListener extends ClanListener {
                 clan.getName(), clan.getId());
         clanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_CLAIM)
                 .addMeta(event.getPlayer().getUniqueId(), UUIDType.MAINPLAYER)
-                .addMeta(clan.getId(), UUIDType.CLAN1)
+                .addMeta(clan.getId(), UUIDType.MAINCLAN)
         );
     }
 
@@ -137,11 +137,11 @@ public class ClanEventListener extends ClanListener {
                 UtilWorld.chunkToPrettyString(chunk),
                 targetClan.getName(), targetClan.getId());
         Clan clan = clanManager.getClanByPlayer(event.getPlayer()).orElse(null);
-        UUID clan1 = clan == null ? null : clan.getId();
+        UUID MAINCLAN = clan == null ? null : clan.getId();
         clanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_UNCLAIM)
                 .addMeta(event.getPlayer().getUniqueId(), UUIDType.MAINPLAYER)
-                .addMeta(clan1, UUIDType.CLAN1)
-                .addMeta(targetClan.getId(), UUIDType.CLAN2)
+                .addMeta(MAINCLAN, UUIDType.MAINCLAN)
+                .addMeta(targetClan.getId(), UUIDType.OTHERCLAN)
         );
     }
 
@@ -182,14 +182,14 @@ public class ClanEventListener extends ClanListener {
                     clan.getName(), clan.getId());
             clanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_CREATE)
                     .addMeta(event.getPlayer().getUniqueId(), UUIDType.MAINPLAYER)
-                    .addMeta(clan.getId(), UUIDType.CLAN1)
+                    .addMeta(clan.getId(), UUIDType.MAINCLAN)
             );
         } else {
             UUID id = log.info("{} ({}) created {} ({})", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
                     clan.getName(), clan.getId());
             clanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_CREATE)
                     .addMeta(event.getPlayer().getUniqueId(), UUIDType.MAINPLAYER)
-                    .addMeta(clan.getId(), UUIDType.CLAN1)
+                    .addMeta(clan.getId(), UUIDType.MAINCLAN)
             );
         }
 
@@ -235,7 +235,7 @@ public class ClanEventListener extends ClanListener {
                 clan.getName(), clan.getId());
         clanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_DISBAND)
                 .addMeta(event.getPlayer().getUniqueId(), UUIDType.MAINPLAYER)
-                .addMeta(clan.getId(), UUIDType.CLAN1)
+                .addMeta(clan.getId(), UUIDType.MAINCLAN)
         );
 
     }
@@ -267,7 +267,7 @@ public class ClanEventListener extends ClanListener {
                 clan.getName(), clan.getId());
         clanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_INVITE)
                 .addMeta(player.getUniqueId(), UUIDType.MAINPLAYER)
-                .addMeta(clan.getId(), UUIDType.CLAN1)
+                .addMeta(clan.getId(), UUIDType.MAINCLAN)
                 .addMeta(target.getUniqueId(), UUIDType.OTHERPLAYER)
         );
     }
@@ -312,7 +312,7 @@ public class ClanEventListener extends ClanListener {
                 clan.getName(), clan.getId());
         clanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_JOIN)
                 .addMeta(player.getUniqueId(), UUIDType.MAINPLAYER)
-                .addMeta(clan.getId(), UUIDType.CLAN1)
+                .addMeta(clan.getId(), UUIDType.MAINCLAN)
         );
     }
 
@@ -346,7 +346,7 @@ public class ClanEventListener extends ClanListener {
                 clan.getName(), clan.getId());
         clanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_LEAVE)
                 .addMeta(player.getUniqueId(), UUIDType.MAINPLAYER)
-                .addMeta(clan.getId(), UUIDType.CLAN1)
+                .addMeta(clan.getId(), UUIDType.MAINCLAN)
         );
     }
 
@@ -379,9 +379,9 @@ public class ClanEventListener extends ClanListener {
                 clan.getName(), clan.getId());
         clanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_KICK)
                 .addMeta(target.getUniqueId(), UUIDType.MAINPLAYER)
-                .addMeta(clan.getId(), UUIDType.CLAN1)
+                .addMeta(clan.getId(), UUIDType.MAINCLAN)
                 .addMeta(player.getUniqueId(), UUIDType.OTHERPLAYER)
-                .addMeta(clan.getId(), UUIDType.CLAN2)
+                .addMeta(clan.getId(), UUIDType.OTHERCLAN)
         );
     }
 
@@ -412,8 +412,8 @@ public class ClanEventListener extends ClanListener {
                 target.getName(), target.getId());
         clanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_ALLIANCE_REQUEST)
                 .addMeta(event.getPlayer().getUniqueId(), UUIDType.MAINPLAYER)
-                .addMeta(clan.getId(), UUIDType.CLAN1)
-                .addMeta(target.getId(), UUIDType.CLAN2)
+                .addMeta(clan.getId(), UUIDType.MAINCLAN)
+                .addMeta(target.getId(), UUIDType.OTHERCLAN)
         );
     }
 
@@ -442,8 +442,8 @@ public class ClanEventListener extends ClanListener {
                 target.getName(), target.getId());
         clanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_ALLIANCE_ACCEPT)
                 .addMeta(event.getPlayer().getUniqueId(), UUIDType.MAINPLAYER)
-                .addMeta(clan.getId(), UUIDType.CLAN1)
-                .addMeta(target.getId(), UUIDType.CLAN2)
+                .addMeta(clan.getId(), UUIDType.MAINCLAN)
+                .addMeta(target.getId(), UUIDType.OTHERCLAN)
         );
     }
 
@@ -474,8 +474,8 @@ public class ClanEventListener extends ClanListener {
                 target.getName(), target.getId());
         clanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_TRUST_REQUEST)
                 .addMeta(event.getPlayer().getUniqueId(), UUIDType.MAINPLAYER)
-                .addMeta(clan.getId(), UUIDType.CLAN1)
-                .addMeta(target.getId(), UUIDType.CLAN2)
+                .addMeta(clan.getId(), UUIDType.MAINCLAN)
+                .addMeta(target.getId(), UUIDType.OTHERCLAN)
         );
     }
 
@@ -504,8 +504,8 @@ public class ClanEventListener extends ClanListener {
                 target.getName(), target.getId());
         clanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_ALLIANCE_ACCEPT)
                 .addMeta(event.getPlayer().getUniqueId(), UUIDType.MAINPLAYER)
-                .addMeta(clan.getId(), UUIDType.CLAN1)
-                .addMeta(target.getId(), UUIDType.CLAN2)
+                .addMeta(clan.getId(), UUIDType.MAINCLAN)
+                .addMeta(target.getId(), UUIDType.OTHERCLAN)
         );
     }
 
@@ -531,8 +531,8 @@ public class ClanEventListener extends ClanListener {
                 target.getName(), target.getId());
         clanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_TRUST_REMOVE)
                 .addMeta(event.getPlayer().getUniqueId(), UUIDType.MAINPLAYER)
-                .addMeta(clan.getId(), UUIDType.CLAN1)
-                .addMeta(target.getId(), UUIDType.CLAN2)
+                .addMeta(clan.getId(), UUIDType.MAINCLAN)
+                .addMeta(target.getId(), UUIDType.OTHERCLAN)
         );
     }
 
@@ -564,8 +564,8 @@ public class ClanEventListener extends ClanListener {
                     target.getName(), target.getId());
             clanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_NEUTRAL_REQUEST)
                     .addMeta(event.getPlayer().getUniqueId(), UUIDType.MAINPLAYER)
-                    .addMeta(clan.getId(), UUIDType.CLAN1)
-                    .addMeta(target.getId(), UUIDType.CLAN2)
+                    .addMeta(clan.getId(), UUIDType.MAINCLAN)
+                    .addMeta(target.getId(), UUIDType.OTHERCLAN)
             );
         } else {
             UtilServer.callEvent(new ClanNeutralEvent(event.getPlayer(), clan, target));
@@ -589,8 +589,8 @@ public class ClanEventListener extends ClanListener {
                     target.getName(), target.getId());
             clanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_ALLIANCE_REMOVE)
                     .addMeta(event.getPlayer().getUniqueId(), UUIDType.MAINPLAYER)
-                    .addMeta(clan.getId(), UUIDType.CLAN1)
-                    .addMeta(target.getId(), UUIDType.CLAN2)
+                    .addMeta(clan.getId(), UUIDType.MAINCLAN)
+                    .addMeta(target.getId(), UUIDType.OTHERCLAN)
             );
         } else if (clan.isEnemy(target)) {
             removeEnemy(clan, target);
@@ -599,8 +599,8 @@ public class ClanEventListener extends ClanListener {
                     target.getName(), target.getId());
             clanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_NEUTRAL_ACCEPT)
                     .addMeta(event.getPlayer().getUniqueId(), UUIDType.MAINPLAYER)
-                    .addMeta(clan.getId(), UUIDType.CLAN1)
-                    .addMeta(target.getId(), UUIDType.CLAN2)
+                    .addMeta(clan.getId(), UUIDType.MAINCLAN)
+                    .addMeta(target.getId(), UUIDType.OTHERCLAN)
             );
         }
 
@@ -644,8 +644,8 @@ public class ClanEventListener extends ClanListener {
                     target.getName(), target.getId());
             clanLogger.addClanLog((ClanLog) new ClanLog(allianceRemoveId, ClanLogType.CLAN_ALLIANCE_REMOVE)
                     .addMeta(event.getPlayer().getUniqueId(), UUIDType.MAINPLAYER)
-                    .addMeta(clan.getId(), UUIDType.CLAN1)
-                    .addMeta(target.getId(), UUIDType.CLAN2)
+                    .addMeta(clan.getId(), UUIDType.MAINCLAN)
+                    .addMeta(target.getId(), UUIDType.OTHERCLAN)
             );
         }
 
@@ -666,8 +666,8 @@ public class ClanEventListener extends ClanListener {
                 target.getName(), target.getId());
         clanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_ENEMY)
                 .addMeta(event.getPlayer().getUniqueId(), UUIDType.MAINPLAYER)
-                .addMeta(clan.getId(), UUIDType.CLAN1)
-                .addMeta(target.getId(), UUIDType.CLAN2)
+                .addMeta(clan.getId(), UUIDType.MAINCLAN)
+                .addMeta(target.getId(), UUIDType.OTHERCLAN)
         );
 
     }
@@ -700,7 +700,7 @@ public class ClanEventListener extends ClanListener {
         UUID id = log.info("{} ({}) of {} ({}) set their clan home to {}", player.getName(), player.getUniqueId(), clan.getName(), clan.getName(), UtilWorld.locationToString(player.getLocation(), true));
         clanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_SETHOME)
                 .addMeta(event.getPlayer().getUniqueId(), UUIDType.MAINPLAYER)
-                .addMeta(clan.getId(), UUIDType.CLAN1)
+                .addMeta(clan.getId(), UUIDType.MAINCLAN)
         );
         clanManager.getRepository().updateClanHome(clan);
 
@@ -725,9 +725,9 @@ public class ClanEventListener extends ClanListener {
                         clan.getName(), clan.getId());
                 clanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_PROMOTE)
                         .addMeta(UUID.fromString(member.getUuid()), UUIDType.MAINPLAYER)
-                        .addMeta(clan.getId(), UUIDType.CLAN1)
+                        .addMeta(clan.getId(), UUIDType.MAINCLAN)
                         .addMeta(player.getUniqueId(), UUIDType.OTHERPLAYER)
-                        .addMeta(clan.getId(), UUIDType.CLAN2)
+                        .addMeta(clan.getId(), UUIDType.OTHERCLAN)
                 );
             });
         });
@@ -758,9 +758,9 @@ public class ClanEventListener extends ClanListener {
                         clan.getName(), clan.getId());
                 clanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_DEMOTE)
                         .addMeta(UUID.fromString(member.getUuid()), UUIDType.MAINPLAYER)
-                        .addMeta(clan.getId(), UUIDType.CLAN1)
+                        .addMeta(clan.getId(), UUIDType.MAINCLAN)
                         .addMeta(player.getUniqueId(), UUIDType.OTHERPLAYER)
-                        .addMeta(clan.getId(), UUIDType.CLAN2)
+                        .addMeta(clan.getId(), UUIDType.OTHERCLAN)
                 );
             });
         });

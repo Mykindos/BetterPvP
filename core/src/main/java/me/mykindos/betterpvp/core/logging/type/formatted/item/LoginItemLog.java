@@ -4,7 +4,6 @@ import me.mykindos.betterpvp.core.logging.type.UUIDLogType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
-import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
@@ -13,11 +12,11 @@ public class LoginItemLog extends FormattedItemLog {
     /**
      * @param time
      * @param item
-     * @param offlinePlayer1
+     * @param mainPlayerName
      * @param location
      */
-    public LoginItemLog(long time, UUID item, @Nullable OfflinePlayer offlinePlayer1, @Nullable Location location) {
-        super(time, UUIDLogType.ITEM_LOGIN, item, offlinePlayer1, null, null, location);
+    public LoginItemLog(long time, UUID item, @Nullable String mainPlayerName, @Nullable Location location) {
+        super(time, UUIDLogType.ITEM_LOGIN, item, mainPlayerName, null, null, location);
     }
 
     @Override

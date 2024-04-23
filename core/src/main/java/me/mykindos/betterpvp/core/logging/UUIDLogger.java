@@ -77,15 +77,15 @@ public class UUIDLogger {
                 long time = result.getLong(1);
                 UUIDLogType type = UUIDLogType.valueOf(result.getString(2));
                 String itemID = result.getString(3);
-                String player1ID = result.getString(4);
-                String player2ID = result.getString(5);
+                String mainPlayerName = result.getString(4);
+                String otherPlayerName = result.getString(5);
                 String name = result.getString(6);
                 String worldID = result.getString(7);
                 int x = result.getInt(8);
                 int y = result.getInt(9);
                 int z = result.getInt(10);
 
-                logList.add(formattedLogFromRow(time, type, itemID, player1ID, player2ID, name, worldID, x, y, z));
+                logList.add(formattedLogFromRow(time, type, itemID, mainPlayerName, otherPlayerName, name, worldID, x, y, z));
             }
         } catch (SQLException ex) {
             log.error("Failed to get UUID logs", ex);
@@ -127,17 +127,11 @@ public class UUIDLogger {
         }
         return logList;
     }
-    public FormattedItemLog formattedLogFromRow(long time, UUIDLogType type, String itemID, String player1ID, String player2ID, String name, String world, int x, int y, int z) {
+    public FormattedItemLog formattedLogFromRow(long time, UUIDLogType type, String itemID, String mainPlayerName, String otherPlayerName, String name, String world, int x, int y, int z) {
         UUID item = UUID.fromString(itemID);
 
         OfflinePlayer offlinePlayer1 = null;
-        if (player1ID != null) {
-            offlinePlayer1 = Bukkit.getOfflinePlayer(UUID.fromString(player1ID));
-        }
-        OfflinePlayer offlinePlayer2 = null;
-        if (player2ID != null) {
-            offlinePlayer2 = Bukkit.getOfflinePlayer(UUID.fromString(player2ID));
-        }
+
         Location location = null;
         if (world != null) {
             location = new Location(Bukkit.getWorld(UUID.fromString(world)), x, y, z);
@@ -145,22 +139,22 @@ public class UUIDLogger {
 
         switch (type) {
             case ITEM_PICKUP -> {
-                return new PickupItemLog(time, item, offlinePlayer1, location);
+                return new PickupItemLog(time, item, mainPlayerName, location);
             }
             case ITEM_DROP -> {
-                return new DropItemLog(time, item, offlinePlayer1, location);
+                return new DropItemLog(time, item, mainPlayerName, location);
             }
             case ITEM_DEATH -> {
-                return new DeathItemLog(time, item, offlinePlayer1, location);
+                return new DeathItemLog(time, item, mainPlayerName, location);
             }
             case ITEM_LOGIN -> {
-                return new LoginItemLog(time, item, offlinePlayer1, location);
+                return new LoginItemLog(time, item, mainPlayerName, location);
             }
             case ITEM_SPAWN -> {
-                return new SpawnItemLog(time, item, offlinePlayer1, offlinePlayer2);
+                return new SpawnItemLog(time, item, mainPlayerName, otherPlayerName);
             }
             case ITEM_LOGOUT -> {
-                return new LogoutItemLog(time, item, offlinePlayer1, location);
+                return new LogoutItemLog(time, item, mainPlayerName, location);
             }
             case ITEM_CONTAINER_EXPLODE -> {
                 return new ContainerExplodeItemLog(time, item, name, location);
@@ -169,13 +163,13 @@ public class UUIDLogger {
                 return new DespawnItemLog(time, item, location);
             }
             case ITEM_RETREIVE -> {
-                return new RetrieveItemLog(time, item, offlinePlayer1, name, location);
+                return new RetrieveItemLog(time, item, mainPlayerName, name, location);
             }
             case ITEM_CONTAINER_STORE -> {
-                return new ContainerStoreItemLog(time, item, offlinePlayer1, name, location);
+                return new ContainerStoreItemLog(time, item, mainPlayerName, name, location);
             }
             case ITEM_DEATH_PLAYER -> {
-                return new DeathPlayerItemLog(time, item, offlinePlayer1, offlinePlayer2, location);
+                return new DeathPlayerItemLog(time, item, mainPlayerName, otherPlayerName, location);
             }
             case ITEM_BLOCK_DISPENSE -> {
                 return new BlockDispenseItemLog(time, item, name, location);
@@ -184,13 +178,13 @@ public class UUIDLogger {
                 return new InventoryMoveItemLog(time, item, name, location);
             }
             case ITEM_CONTAINER_BREAK -> {
-                return new ContainerBreakItemLog(time, item, offlinePlayer1, name, location);
+                return new ContainerBreakItemLog(time, item, mainPlayerName, name, location);
             }
             case ITEM_INVENTORY_PICKUP -> {
                 return new InventoryPickupItemLog(time, item, name, location);
             }
             default -> {
-                return new FormattedItemLog(time, type, item, offlinePlayer1, offlinePlayer2, name, location);
+                return new FormattedItemLog(time, type, item, mainPlayerName, otherPlayerName, name, location);
             }
         }
     }

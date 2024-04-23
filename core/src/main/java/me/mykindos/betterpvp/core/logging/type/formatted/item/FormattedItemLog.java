@@ -2,13 +2,12 @@ package me.mykindos.betterpvp.core.logging.type.formatted.item;
 
 import lombok.Getter;
 import me.mykindos.betterpvp.core.database.query.Statement;
-import me.mykindos.betterpvp.core.logging.FormattedLog;
 import me.mykindos.betterpvp.core.logging.type.UUIDLogType;
+import me.mykindos.betterpvp.core.logging.type.formatted.FormattedLog;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
-import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -22,9 +21,9 @@ public class FormattedItemLog extends FormattedLog {
     protected final UUIDLogType type;
     protected final UUID item;
     @Nullable
-    protected final OfflinePlayer offlinePlayer1;
+    protected final String mainPlayerName;
     @Nullable
-    protected final OfflinePlayer offlinePlayer2;
+    protected final String otherPlayerName;
     @Nullable
     protected final String name;
     @Nullable
@@ -35,17 +34,17 @@ public class FormattedItemLog extends FormattedLog {
      * @param time
      * @param type
      * @param item
-     * @param offlinePlayer1
-     * @param offlinePlayer2
+     * @param mainPlayerName
+     * @param otherPlayerName
      * @param name
      * @param location
      */
-    public FormattedItemLog(long time, UUIDLogType type, UUID item, @Nullable OfflinePlayer offlinePlayer1, @Nullable OfflinePlayer offlinePlayer2, @Nullable String name, @Nullable Location location) {
+    public FormattedItemLog(long time, UUIDLogType type, UUID item, @Nullable String mainPlayerName, @Nullable String otherPlayerName, @Nullable String name, @Nullable Location location) {
         super(time);
         this.type = type;
         this.item = item;
-        this.offlinePlayer1 = offlinePlayer1;
-        this.offlinePlayer2 = offlinePlayer2;
+        this.mainPlayerName = mainPlayerName;
+        this.otherPlayerName = otherPlayerName;
         this.name = name;
         this.location = location;
     }
@@ -63,15 +62,15 @@ public class FormattedItemLog extends FormattedLog {
         return Component.text(name, NamedTextColor.AQUA);
     }
     protected Component getPlayer1() {
-        assert offlinePlayer1 != null;
-        return getPlayer(offlinePlayer1);
+        assert mainPlayerName != null;
+        return getPlayer(mainPlayerName);
     }
     protected Component getPlayer2() {
-        assert offlinePlayer2 != null;
-        return getPlayer(offlinePlayer2);
+        assert otherPlayerName != null;
+        return getPlayer(otherPlayerName);
     }
-    protected Component getPlayer(OfflinePlayer player) {
-        return Component.text(Objects.requireNonNull(player.getName()), NamedTextColor.YELLOW);
+    protected Component getPlayer(String player) {
+        return Component.text(Objects.requireNonNull(player), NamedTextColor.YELLOW);
     }
 
     @Override
@@ -79,9 +78,9 @@ public class FormattedItemLog extends FormattedLog {
         return super.getComponent().append(
                 UtilMessage.deserialize("<light_purple>%s</light_purple> <yellow>%s</yellow> <white>%s</white> <yellow>%s</yellow> at <aqua>%s</aqua> (<green>%s</green>, <green>%s</green>, <green>%s</green>) in <green>%s</green>",
                         item,
-                        offlinePlayer1 == null ? null : offlinePlayer1.getName(),
+                        mainPlayerName,
                         type.name(),
-                        offlinePlayer2 == null ? null : offlinePlayer2.getName(),
+                        otherPlayerName,
                         name,
                         location == null ? null : location.getBlockX(),
                         location == null ? null : location.getBlockY(),

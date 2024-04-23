@@ -4,13 +4,12 @@ import me.mykindos.betterpvp.core.logging.type.UUIDLogType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
-import org.bukkit.OfflinePlayer;
 
 import java.util.UUID;
 
 public class PickupItemLog extends FormattedItemLog {
-    public PickupItemLog(long time, UUID item, OfflinePlayer offlinePlayer1, Location location) {
-        super(time, UUIDLogType.ITEM_PICKUP, item, offlinePlayer1, null, null, location);
+    public PickupItemLog(long time, UUID item, String mainPlayerName, Location location) {
+        super(time, UUIDLogType.ITEM_PICKUP, item, mainPlayerName, null, null, location);
     }
 
     @Override
