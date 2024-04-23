@@ -11,16 +11,13 @@ import me.mykindos.betterpvp.clans.logging.ClanLogger;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Singleton
 @SubCommand(ClanCommand.class)
@@ -66,17 +63,11 @@ public class GetPlayersOfClanSubCommand extends ClanSubCommand {
 
 
         UtilServer.runTaskAsync(JavaPlugin.getPlugin(Clans.class), () -> {
-            List<UUID> clanMembers = clan.getMembers().stream().map(clanMember -> UUID.fromString(clanMember.getUuid())).toList();
-            List<OfflinePlayer> offlinePlayers = clanLogger.getPlayersByClan(clan.getId());
+            List<String> playerNames = clanLogger.getPlayersByClan(clan.getId());
             UtilMessage.message(player, "Clan", "Retrieving past and present Clan members of <aqua>%s</aqua>", clan.getName());
 
-            for (OfflinePlayer offlinePlayer : offlinePlayers) {
-
-                if (clanMembers.contains(offlinePlayer.getUniqueId())) {
-                    UtilMessage.message(player, UtilMessage.deserialize(UtilFormat.getOnlineStatus(offlinePlayer.getUniqueId()) + offlinePlayer.getName()));
-                    continue;
-                }
-                UtilMessage.message(player, offlinePlayer.getName());
+            for (String name : playerNames) {
+                UtilMessage.message(player, name);
             }
         });
     }

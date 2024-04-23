@@ -42,7 +42,7 @@ END;
 DROP PROCEDURE IF EXISTS GetPlayersByClan;
 CREATE PROCEDURE GetPlayersByClan(ClanID varchar(36))
 BEGIN
-    SELECT DISTINCT CL.MainPlayerID as Player FROM clanlogs CL
+    SELECT DISTINCT CLIENTS1.Name as PlayerName FROM clanlogs CL
     LEFT JOIN betterpvp_global.clients as CLIENTS1 ON CLIENTS1.UUID = C1.MainPlayerID
     WHERE CL.MainClan = ClanID
     AND CL.type in ('CLAN_JOIN', 'CLAN_CREATE')

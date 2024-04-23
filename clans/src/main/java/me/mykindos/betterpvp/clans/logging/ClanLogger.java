@@ -40,8 +40,6 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilUUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -183,8 +181,8 @@ public class ClanLogger {
         return null;
     }
 
-    public List<OfflinePlayer> getPlayersByClan(UUID clanID) {
-        List<OfflinePlayer> offlinePlayers = new ArrayList<>();
+    public List<String> getPlayersByClan(UUID clanID) {
+        List<String> playerNames = new ArrayList<>();
         String query = "Call GetPlayersByClan(?)";
         CachedRowSet result = database.executeQuery( new Statement(query,
                 new UuidStatementValue(clanID)
@@ -193,15 +191,15 @@ public class ClanLogger {
 
         try {
             while (result.next()) {
-                String playerID = result.getString(1);
+                String playerName = result.getString(1);
 
-                offlinePlayers.add(Bukkit.getOfflinePlayer(UUID.fromString(playerID)));
+                playerNames.add(playerName);
             }
         } catch (SQLException ex) {
             log.error("Failed to get playerID from Clan logs", ex);
         }
 
-        return offlinePlayers;
+        return playerNames;
     }
 
     public List<Component> getClansByPlayer(UUID playerID) {
