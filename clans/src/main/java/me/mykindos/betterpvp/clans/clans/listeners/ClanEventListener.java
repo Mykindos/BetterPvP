@@ -137,10 +137,10 @@ public class ClanEventListener extends ClanListener {
                 UtilWorld.chunkToPrettyString(chunk),
                 targetClan.getName(), targetClan.getId());
         Clan clan = clanManager.getClanByPlayer(event.getPlayer()).orElse(null);
-        UUID MAINCLAN = clan == null ? null : clan.getId();
+        UUID mainClan = clan == null ? null : clan.getId();
         clanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_UNCLAIM)
                 .addMeta(event.getPlayer().getUniqueId(), UUIDType.MAINPLAYER)
-                .addMeta(MAINCLAN, UUIDType.MAINCLAN)
+                .addMeta(mainClan, UUIDType.MAINCLAN)
                 .addMeta(targetClan.getId(), UUIDType.OTHERCLAN)
         );
     }

@@ -28,7 +28,6 @@ import me.mykindos.betterpvp.core.logging.type.logs.ItemLog;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.sql.rowset.CachedRowSet;
@@ -129,8 +128,6 @@ public class UUIDLogger {
     }
     public FormattedItemLog formattedLogFromRow(long time, UUIDLogType type, String itemID, String mainPlayerName, String otherPlayerName, String name, String world, int x, int y, int z) {
         UUID item = UUID.fromString(itemID);
-
-        OfflinePlayer offlinePlayer1 = null;
 
         Location location = null;
         if (world != null) {
