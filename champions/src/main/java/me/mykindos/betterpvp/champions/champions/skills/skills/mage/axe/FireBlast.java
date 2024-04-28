@@ -125,12 +125,12 @@ public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Li
 
     // If damaged by entity do nothing
     @EventHandler
-    public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
-        if (event.getEntity() instanceof LargeFireball) {
-            LargeFireball fireball = (LargeFireball) event.getEntity();
-            if (event.getDamager() instanceof Player) {
-                Player player = (Player) event.getDamager();
-                event.setCancelled(true);
+    public void onDeflect(EntityDamageByEntityEvent event) {
+        if (event.getEntity() instanceof Projectile && event.getEntity() instanceof LargeFireball ) {
+            if (((LargeFireball) event.getEntity()).getShooter() instanceof Player){
+                if (event.getDamager() instanceof Player  || event.getDamager() instanceof Projectile) {
+                    event.setCancelled(true);
+                }
             }
         }
     }
