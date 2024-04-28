@@ -217,9 +217,7 @@ public class MinimapRenderer extends MapRenderer implements Listener {
             if (!block.getChunk().isLoaded()) {
                 return;
             }
-            while (block.getY() > 0 && UtilMapMaterial.getBlockColor(block) == UtilMapMaterial.getColorNeutral()) {
-                block = player.getWorld().getBlockAt(block.getX(), block.getY() - 1, block.getZ());
-            }
+
             short avgY = 0;
             avgY += block.getY();
 
