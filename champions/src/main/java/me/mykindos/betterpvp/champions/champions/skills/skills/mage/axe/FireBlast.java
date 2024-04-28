@@ -32,6 +32,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
@@ -118,6 +119,18 @@ public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Li
                 Particle.LAVA.builder().location(fireball.getLocation()).receivers(30).count(1).spawn();
             } else {
                 it.remove();
+            }
+        }
+    }
+
+    // If damaged by entity do nothing
+    @EventHandler
+    public void onDeflect(EntityDamageByEntityEvent event) {
+        if (event.getEntity() instanceof LargeFireball fireball) {
+            if (fireball.getShooter() instanceof Player){
+                if (event.getDamager() instanceof Player || event.getDamager() instanceof Projectile) {
+                    event.setCancelled(true);
+                }
             }
         }
     }
