@@ -1,7 +1,9 @@
 package me.mykindos.betterpvp.clans.clans.map.data;
 
+import lombok.Data;
 import org.bukkit.map.MapCursor;
 
+@Data
 public class ExtraCursor {
     private int x;
     private int z;
@@ -23,98 +25,13 @@ public class ExtraCursor {
      * @param outside   - whether the cursor is shown at the edge of the map, if it isn't within the bounds of the map
      */
     public ExtraCursor(int x, int z, boolean visible, MapCursor.Type type, byte direction, String world, boolean outside) {
-        setX(x);
-        setZ(z);
-        setVisible(visible);
-        setType(type);
-        setDirection(direction);
-        setWorld(world);
-        setShowOutside(outside);
-    }
-
-    /**
-     * Get the x coordinate of the marker.
-     *
-     * @return the x coordinate using the MC coordinate system.
-     */
-    public int getX() {
-        return x;
-    }
-
-    /**
-     * Set the x coordinate of the marker.
-     *
-     * @param x the x coordinate in the MC coordinate system.
-     */
-    public void setX(int x) {
-        this.x = x;
-    }
-
-    /**
-     * Get the z coordinate of the marker.
-     *
-     * @return the z coordinate using the MC coordinate system.
-     */
-    public int getZ() {
-        return z;
-    }
-
-    /**
-     * Set the z coordinate of the marker.
-     *
-     * @param z the z coordinate in the MC coordinate system.
-     */
-    public void setZ(int z) {
-        this.z = z;
-    }
-
-    /**
-     * Get if the marker is visible.
-     *
-     * @return true if the marker is visible, false if not
-     */
-    public boolean isVisible() {
-        return visible;
-    }
-
-    /**
-     * Set the visibility of the marker.
-     *
-     * @param visible true for a visible marker, false for invisible
-     */
-    public void setVisible(boolean visible) {
-        this.visible = visible;
-    }
-
-    /**
-     * Get the shape of the cursor.
-     * See MapCursor.Type for available types.
-     *
-     * @return the shape type of the cursor
-     */
-    public MapCursor.Type getType() {
-        return type;
-    }
-
-    /**
-     * Set the shape of the cursor.
-     * See MapCursor.Type for available types.
-     *
-     * @param type the type of the cursor
-     */
-    public void setType(MapCursor.Type type) {
-        this.type = type;
-    }
-
-    /**
-     * Get the direction the cursor is looking.
-     * There are 16 possible directions where between them lays a difference of
-     * 22,5 degree.
-     *
-     * @return the byte value of the direction, between 0 and 15
-     */
-    public byte getDirection() {
-        return direction;
+       this.x = x;
+       this.z = z;
+       this.visible = visible;
+       this.type = type;
+       this.direction = direction;
+       this.world = world;
+       this.outside = outside;
     }
 
     /**
@@ -127,24 +44,6 @@ public class ExtraCursor {
      */
     public void setDirection(byte direction) {
         this.direction = (byte) (direction % 16);
-    }
-
-    /**
-     * Get the world the cursor is shown in.
-     *
-     * @return the name of the world (World#getName())
-     */
-    public String getWorld() {
-        return world;
-    }
-
-    /**
-     * Set the world the cursor is shown in.
-     *
-     * @param world the name of the world (World#getName())
-     */
-    public void setWorld(String world) {
-        this.world = world;
     }
 
     @Override

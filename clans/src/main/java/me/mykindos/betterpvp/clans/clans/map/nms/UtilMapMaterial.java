@@ -7,6 +7,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MapColor;
+import org.bukkit.block.BlockFace;
 import org.bukkit.craftbukkit.v1_20_R3.util.CraftMagicNumbers;
 
 import java.lang.reflect.Field;
@@ -47,6 +48,14 @@ public class UtilMapMaterial {
 
             Function<BlockState, MapColor> function = (Function<BlockState, MapColor>) PROPERTIES_FUNCTION.get(properties);
             int colour = function.apply(craftBlock.defaultBlockState()).id;
+
+            if(colour == 0) {
+                org.bukkit.block.Block nextBlockDown = block.getRelative(BlockFace.DOWN);
+                if(nextBlockDown.getLocation().getBlockY() >= 0) {
+                    return getBlockColor(nextBlockDown);
+                }
+
+            }
 
             return MapColor.byId(colour);
         } catch (IllegalAccessException e) {

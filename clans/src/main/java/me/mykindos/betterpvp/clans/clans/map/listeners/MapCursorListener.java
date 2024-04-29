@@ -80,7 +80,7 @@ public class MapCursorListener implements Listener {
         if (aClan != null && aClan.getHome() != null) {
             Location aClanHomeLocation = aClan.getHome();
             event.getCursors().add(new ExtraCursor(aClanHomeLocation.getBlockX(), aClanHomeLocation.getBlockZ(), true,
-                    MapCursor.Type.MANSION, (byte) 8, player.getWorld().getName(), false));
+                    MapCursor.Type.MANSION, (byte) 8, player.getWorld().getName(), true));
         }
     }
 }
