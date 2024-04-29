@@ -34,7 +34,7 @@ public class RunedPickaxe extends ChannelWeapon implements InteractWeapon, Legen
     private double velocityStrength;
     private final EnergyHandler energyHandler;
     private final ClientManager clientManager;
-    private boolean cooldown;
+    private boolean cooldownActive;
 
     @Inject
     public RunedPickaxe(Champions champions, EnergyHandler energyHandler, ClientManager clientManager) {
@@ -83,7 +83,7 @@ public class RunedPickaxe extends ChannelWeapon implements InteractWeapon, Legen
         Block block = event.getClickedBlock();
 
         if (!energyHandler.use(player, "Runed Pickaxe", energyPerTick, true)) {
-            cooldown = true;
+            cooldownActive = true;
             block.getWorld().playSound(block.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1.0F, 1.0F);
             return;
         }
@@ -109,10 +109,10 @@ public class RunedPickaxe extends ChannelWeapon implements InteractWeapon, Legen
 
     @Override
     public boolean canUse(Player player) {
-        if (energyHandler.getEnergy(player) > .5 && cooldown){
-            cooldown = false;
+        if (energyHandler.getEnergy(player) > .5 && cooldownActive){
+            cooldownActive = false;
         }
-        return !cooldown;
+        return !cooldownActive;
     }
 
 
