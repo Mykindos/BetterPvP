@@ -60,12 +60,12 @@ public class GetClansOfPlayerSubCommand extends ClanSubCommand {
                 UtilMessage.message(player, "Clan", "<green>%s</green> is not a valid player", args[0]);
                 return;
             }
-            Client client1 = clientOptional.get();
+            Client targetClient = clientOptional.get();
 
 
             UtilServer.runTaskAsync(JavaPlugin.getPlugin(Clans.class), () -> {
-                List<Component> components = clanLogger.getClansByPlayer(client1.getUniqueId());
-                UtilMessage.message(player, "Clan", "Retrieving past and present Clans of <yellow>%s</yellow>", client1.getName());
+                List<Component> components = clanLogger.getClansByPlayer(targetClient.getUniqueId());
+                UtilMessage.message(player, "Clan", "Retrieving past and present Clans of <yellow>%s</yellow>", targetClient.getName());
 
                 for (Component component : components) {
                     UtilMessage.message(player, component);

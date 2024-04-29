@@ -374,7 +374,7 @@ public class ClanEventListener extends ClanListener {
                 targetPlayer.closeInventory();
             }
         }
-        UUID id = log.info(">{} ({}) was kicked by {} ({}) from {} ({})", player.getName(), player.getUniqueId(),
+        UUID id = log.info("{} ({}) was kicked by {} ({}) from {} ({})", player.getName(), player.getUniqueId(),
                 target.getName(), target.getUniqueId(),
                 clan.getName(), clan.getId());
         clanLogger.addClanLog((ClanLog) new ClanLog(id, ClanLogType.CLAN_KICK)
