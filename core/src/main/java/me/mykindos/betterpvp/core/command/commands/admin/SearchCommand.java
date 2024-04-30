@@ -11,7 +11,7 @@ import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDItem;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDManager;
-import me.mykindos.betterpvp.core.logging.UUIDLogger;
+import me.mykindos.betterpvp.core.logging.type.formatted.item.FormattedItemLog;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
@@ -81,17 +81,14 @@ public class SearchCommand extends Command {
                 return;
             }
 
-            int amount = 5;
+            int numPerPage = 10;
+            int pageNumber = 1;
 
-            if (args.length > 1) {
+            if (args.length >= 2) {
                 try {
-                    amount = Integer.parseInt(args[1]);
-                    if (amount < 1) {
-                        throw new NumberFormatException();
-                    }
+                    pageNumber = Integer.parseInt(args[1]);
                 } catch (NumberFormatException e) {
-                    UtilMessage.message(player, "Search", UtilMessage.deserialize("<green>%s</green> is not a valid integer. Integer must be >= 1.", args[1]));
-                    return;
+                    //pass
                 }
             }
 
@@ -103,15 +100,28 @@ public class SearchCommand extends Command {
             }
 
             UUIDItem uuidItem = uuidItemOptional.get();
-            clientManager.sendMessageToRank("Search", UtilMessage.deserialize("<yellow>%s</yellow> is retrieving logs for <light_purple>%s</light_purple> (<green>%s</green>)", player.getName(), uuid.toString(), uuidItem.getIdentifier()), Rank.HELPER);
 
-            final int finalAmount = amount;
+            int finalPageNumber = pageNumber;
             UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> {
-                List<String> logs = UUIDLogger.getUuidLogs(uuid, finalAmount);
-                UtilMessage.message(player, "Search", "Retrieving the last <green>%s</green> logs for <light_purple>%s</light_purple> (<green>%s</green>)", finalAmount, uuid.toString(), uuidItem.getIdentifier());
-
-                for (String log : logs) {
-                    UtilMessage.message(player, "Search", UtilMessage.deserialize("<white>" + log + "</white>"));
+                List<FormattedItemLog> logs = uuidManager.getUuidRepository().getUuidLogger().getUuidLogs(uuid);
+                int count = 0;
+                int start = (finalPageNumber - 1) * numPerPage;
+                int end = start + numPerPage;
+                int size = logs.size();
+                int totalPages = size /numPerPage;
+                if (size % numPerPage > 0) {
+                    totalPages++;
+                }
+                UtilMessage.message(player, "Search",
+                        UtilMessage.deserialize("<light_purple>" + uuid + "</light_purple>'s (<green>" + uuidItem.getIdentifier() +  "</green>) logs: <white>"
+                                + finalPageNumber + "<gray> / <white>" + totalPages));
+                if (start <= size) {
+                    if (end > size) end = size;
+                    for (FormattedItemLog log : logs.subList(start, end)) {
+                        if (count == numPerPage) break;
+                        UtilMessage.message(player, log.getComponent());
+                        count++;
+                    }
                 }
             });
 
@@ -148,6 +158,9 @@ public class SearchCommand extends Command {
         @Inject
         ClientManager clientManager;
 
+        @Inject
+        UUIDManager uuidManager;
+
         @Override
         public String getName() {
             return "player";
@@ -174,34 +187,43 @@ public class SearchCommand extends Command {
                     UtilMessage.message(player, "Search", UtilMessage.deserialize("<yellow>%s</yellow> is not a valid Player.", args[0]));
                     return;
                 }
-                int amount = 5;
 
-                if (args.length > 1) {
+                int numPerPage = 10;
+                int pageNumber = 1;
+
+                if (args.length >= 2) {
                     try {
-                        amount = Integer.parseInt(args[1]);
-                        if (amount < 1) {
-                            throw new NumberFormatException();
-                        }
+                        pageNumber = Integer.parseInt(args[1]);
                     } catch (NumberFormatException e) {
-                        UtilMessage.message(player, "Search", UtilMessage.deserialize("<green>%s</green> is not a valid integer. Integer must be >= 1.", args[1]));
-                        return;
+                        //pass
                     }
                 }
 
                 Client targetClient = clientOptional.get();
-                clientManager.sendMessageToRank("Search", UtilMessage.deserialize("<yellow>%s</yellow> is retrieving logs for <yellow>%s</yellow>", player.getName(), targetClient.getName()), Rank.HELPER);
 
-                final int finalAmount = amount;
+                int finalPageNumber = pageNumber;
                 UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> {
-                    List<String> logs = UUIDLogger.getPlayerLogs(targetClient.getUniqueId(), finalAmount);
-                    UtilMessage.message(player, "Search", "Retrieving the last <green>%s</green> logs for <yellow>%s</yellow>", finalAmount, targetClient.getName());
-
-                    for (String log : logs) {
-                        UtilMessage.message(player, "Search", UtilMessage.deserialize("<white>" + log + "</white>"));
+                    List<FormattedItemLog> logs = uuidManager.getUuidRepository().getUuidLogger().getPlayerLogs(targetClient.getUniqueId());
+                    int count = 0;
+                    int start = (finalPageNumber - 1) * numPerPage;
+                    int end = start + numPerPage;
+                    int size = logs.size();
+                    int totalPages = size /numPerPage;
+                    if (size % numPerPage > 0) {
+                        totalPages++;
+                    }
+                    UtilMessage.message(player, "Search",
+                            UtilMessage.deserialize("<yellow>" + targetClient.getName() + "</yellow>'s UUIDItem logs: <white>"
+                                    + finalPageNumber + "<gray> / <white>" + totalPages));
+                    if (start <= size) {
+                        if (end > size) end = size;
+                        for (FormattedItemLog log : logs.subList(start, end)) {
+                            if (count == numPerPage) break;
+                            UtilMessage.message(player, log.getComponent());
+                            count++;
+                        }
                     }
                 });
-
-
             });
         }
 
