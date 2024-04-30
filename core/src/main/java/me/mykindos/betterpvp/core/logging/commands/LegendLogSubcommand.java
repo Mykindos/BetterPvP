@@ -10,8 +10,9 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDManager;
-import me.mykindos.betterpvp.core.logging.Logger;
-import me.mykindos.betterpvp.core.logging.UUIDLogger;
+import me.mykindos.betterpvp.core.logging.type.UUIDLogType;
+import me.mykindos.betterpvp.core.logging.type.UUIDType;
+import me.mykindos.betterpvp.core.logging.type.logs.ItemLog;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import org.bukkit.command.CommandSender;
@@ -86,12 +87,14 @@ public class LegendLogSubcommand extends Command {
     }
 
     public void run(Player player, UUID uuid, @Nullable Client client, String message) {
-        String finalMessage = "<light_purple>" + uuid.toString() + "</light_purple> " + message;
-        UUID logID = Logger.info(finalMessage);
-        UUIDLogger.addItemUUIDMetaInfoPlayer(logID, uuid, UUIDLogger.UUIDLogType.CUSTOM, player.getUniqueId());
+        String finalMessage = "(" + uuid.toString() + ") " + message;
+        UUID logID = log.info(finalMessage);
+        ItemLog itemLog = (ItemLog) new ItemLog(logID, UUIDLogType.ITEM_CUSTOM, uuid)
+                .addMeta(player.getUniqueId(), UUIDType.MAINPLAYER);
         if (client != null) {
-            UUIDLogger.addItemUUIDMetaInfoPlayer(logID, uuid, UUIDLogger.UUIDLogType.CUSTOM, client.getUniqueId());
+            itemLog.addMeta(client.getUniqueId(), UUIDType.OTHERPLAYER);
         }
+        uuidManager.getUuidRepository().getUuidLogger().addItemLog(itemLog);
         clientManager.sendMessageToRank("Log", UtilMessage.deserialize("<yellow>%s</yellow> Generated a custom legend log: " + finalMessage, player.getName()), Rank.HELPER);
     }
 

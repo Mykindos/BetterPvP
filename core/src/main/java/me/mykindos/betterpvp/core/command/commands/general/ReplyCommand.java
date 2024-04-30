@@ -1,10 +1,10 @@
 package me.mykindos.betterpvp.core.command.commands.general;
 
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
-import me.mykindos.betterpvp.core.logging.Logger;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -14,6 +14,7 @@ import javax.inject.Singleton;
 import java.util.Optional;
 import java.util.UUID;
 
+@CustomLog
 @Singleton
 public class ReplyCommand extends Command {
 
@@ -67,6 +68,6 @@ public class ReplyCommand extends Command {
         client.putProperty(ClientProperty.LAST_MESSAGED.name(), target.getUniqueId(), true);
         targetClient.putProperty(ClientProperty.LAST_MESSAGED.name(), client.getUniqueId(), true);
 
-        Logger.info(player.getName() + " messaged " + target.getName() + ": " + message);
+        log.info(player.getName() + " messaged " + target.getName() + ": " + message);
     }
 }

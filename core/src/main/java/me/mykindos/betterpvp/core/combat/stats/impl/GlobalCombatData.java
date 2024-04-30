@@ -8,7 +8,7 @@ import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.FloatStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
-import me.mykindos.betterpvp.core.database.query.values.TimestampStatementValue;
+import me.mykindos.betterpvp.core.database.query.values.LongStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,7 +26,7 @@ public class GlobalCombatData extends CombatData {
     protected void prepareUpdates(@NotNull UUID uuid, @NotNull Database database) {
         List<Statement> killStatements = new ArrayList<>();
         List<Statement> contributionStatements = new ArrayList<>();
-        final String killStmt = "INSERT INTO kills (Id, Killer, Victim, Contribution, Damage, RatingDelta, Timestamp) VALUES (?, ?, ?, ?, ?, ?, ?);";
+        final String killStmt = "INSERT INTO kills (Id, Killer, Victim, Contribution, Damage, RatingDelta, Time) VALUES (?, ?, ?, ?, ?, ?, ?);";
         final String assistStmt = "INSERT INTO kill_contributions (KillId, Id, Contributor, Contribution, Damage) VALUES (?, ?, ?, ?, ?);";
 
         // Add kills - This is done first because it if it breaks it will stop the rating update
@@ -43,7 +43,7 @@ public class GlobalCombatData extends CombatData {
                     new FloatStatementValue(killerContribution.getPercentage()),
                     new FloatStatementValue(killerContribution.getDamage()),
                     new IntegerStatementValue(kill.getRatingDelta()),
-                    new TimestampStatementValue(kill.getTimestamp()));
+                    new LongStatementValue(kill.getTime()));
             killStatements.add(killStatement);
 
             contributions.remove(killerContribution);
