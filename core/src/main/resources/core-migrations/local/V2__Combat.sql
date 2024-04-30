@@ -1,12 +1,12 @@
 create table if not exists kills
 (
     Id           varchar(36) primary key,
-    Killer       varchar(36)                           not null,
-    Victim       varchar(36)                           not null,
-    Contribution float                                 not null,
-    Damage       float                                 not null,
-    RatingDelta  int                                   not null,
-    Timestamp    timestamp default current_timestamp() not null
+    Killer       varchar(36)    not null,
+    Victim       varchar(36)    not null,
+    Contribution float          not null,
+    Damage       float          not null,
+    RatingDelta  int            not null,
+    Time         bigint         not null
 );
 
 create table if not exists kill_contributions

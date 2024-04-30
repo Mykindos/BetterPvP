@@ -160,6 +160,11 @@ public class ClanRepository implements IRepository<Clan> {
     }
 
     public void delete(Clan clan) {
+        String oldClanQuery = "INSERT INTO old_clans (id, Name) VALUE (?, ?)";
+        database.executeUpdateAsync(new Statement(oldClanQuery,
+                new UuidStatementValue(clan.getId()),
+                new StringStatementValue(clan.getName())));
+        
         String deleteMembersQuery = "DELETE FROM clan_members WHERE Clan = ?;";
         database.executeUpdateAsync(new Statement(deleteMembersQuery, new UuidStatementValue(clan.getId())));
 
