@@ -113,7 +113,7 @@ public class RunedPickaxe extends ChannelWeapon implements InteractWeapon, Legen
 
     @Override
     public boolean canUse(Player player) {
-        if (energyHandler.getEnergy(player) > 0.5){
+        if (energyHandler.getEnergy(player) >= 0.5){
             cooldownPlayers.remove(player.getUniqueId());
             return true;
         } else return !(energyHandler.getEnergy(player) < 0.5) || !cooldownPlayers.contains(player.getUniqueId());
