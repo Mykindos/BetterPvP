@@ -24,8 +24,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Singleton
 @BPvPListener
@@ -34,22 +33,25 @@ public class RunedPickaxe extends ChannelWeapon implements InteractWeapon, Legen
     private double velocityStrength;
     private final EnergyHandler energyHandler;
     private final ClientManager clientManager;
-    private boolean cooldownActive;
+    private  Set<UUID> cooldownPlayers;
 
     @Inject
     public RunedPickaxe(Champions champions, EnergyHandler energyHandler, ClientManager clientManager) {
         super(champions, "runed_pickaxe");
         this.energyHandler = energyHandler;
         this.clientManager = clientManager;
+        this.cooldownPlayers = new HashSet<>();
     }
 
+    //TODO add better lore lol / make the utilmessage more "clear" to users
     @Override
     public List<Component> getLore(ItemMeta itemMeta) {
         List<Component> lore = new ArrayList<>();
         lore.add(Component.text("What an interesting design this", NamedTextColor.WHITE));
         lore.add(Component.text("pickaxe seems to have!", NamedTextColor.WHITE));
         lore.add(Component.text(""));
-        lore.add(UtilMessage.deserialize("<yellow>Use Energy <white>to instant <green>Mine"));
+        lore.add(UtilMessage.deserialize("<yellow>Minimum Energy <white>must be <green>50%"));
+        lore.add(UtilMessage.deserialize("<white>to use instant <green>Mine"));
         return lore;
     }
 
@@ -82,8 +84,9 @@ public class RunedPickaxe extends ChannelWeapon implements InteractWeapon, Legen
 
         Block block = event.getClickedBlock();
 
+
         if (!energyHandler.use(player, "Runed Pickaxe", energyPerTick, true)) {
-            cooldownActive = true;
+            cooldownPlayers.add(player.getUniqueId());
             block.getWorld().playSound(block.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1.0F, 1.0F);
             return;
         }
@@ -100,6 +103,7 @@ public class RunedPickaxe extends ChannelWeapon implements InteractWeapon, Legen
             }
             block.breakNaturally();
             block.getWorld().playSound(block.getLocation(), Sound.BLOCK_LAVA_POP, 1.0F, 1.0F);
+            //TODO balance energy decrements (current value is just random)
             energyHandler.degenerateEnergy(player, 0.0075);
 
         }
@@ -109,10 +113,10 @@ public class RunedPickaxe extends ChannelWeapon implements InteractWeapon, Legen
 
     @Override
     public boolean canUse(Player player) {
-        if (energyHandler.getEnergy(player) > .5 && cooldownActive){
-            cooldownActive = false;
-        }
-        return !cooldownActive;
+        if (energyHandler.getEnergy(player) > 0.5){
+            cooldownPlayers.remove(player.getUniqueId());
+            return true;
+        } else return !(energyHandler.getEnergy(player) < 0.5) || !cooldownPlayers.contains(player.getUniqueId());
     }
 
 
