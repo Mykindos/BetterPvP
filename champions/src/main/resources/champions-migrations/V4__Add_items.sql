@@ -329,3 +329,6 @@ INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, H
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
     ('ELYTRA', 'champions', 'wings_of_zanzul', '<orange>Wings of Zanzul', 1, 0, 1);
+
+INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
+    ('FIREWORK_STAR', 'champions', 'runed_pickaxe', '<orange>Runed Pickaxe', 1, 0, 1);
