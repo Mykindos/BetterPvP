@@ -74,8 +74,9 @@ public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Li
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Launch a fireball which explodes on impact,",
-                "knocking back any players within <val>" + getRadius(level) + "</val> blocks",
+                "Launch a fireball which explodes",
+                "on impact dealing <stat>" + getDamage(level) + "</stat> damage,",
+                "knocking back any players within <val>" + getRadius(level) + "</val> blocks,",
                 "and igniting them for up to <val>" + getFireDuration(level) + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
