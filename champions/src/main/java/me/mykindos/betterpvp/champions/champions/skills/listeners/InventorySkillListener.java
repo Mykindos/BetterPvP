@@ -96,30 +96,30 @@ public class InventorySkillListener extends PacketAdapter implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onRoleChange(RoleChangeEvent event) {
-        UtilServer.runTaskLater(champions, () -> {
-            Player player = event.getPlayer();
-            if(player.getItemOnCursor().getType() == Material.AIR) {
-                player.updateInventory();
-            }
-        }, 2L);
+        updateInventory(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onSkillEquip(SkillEquipEvent event) {
-        Bukkit.getScheduler().runTaskLater(champions, () -> event.getPlayer().updateInventory(), 2L);
-
+        updateInventory(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onSkillUpdate(SkillUpdateEvent event) {
-        Bukkit.getScheduler().runTaskLater(champions, () -> event.getPlayer().updateInventory(), 2L);
-
+        updateInventory(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onBuildApply(ApplyBuildEvent event) {
-        Bukkit.getScheduler().runTaskLater(champions, () -> event.getPlayer().updateInventory(), 2L);
-
+        updateInventory(event.getPlayer());
+    }
+    
+    private void updateInventory(Player player) {
+        UtilServer.runTaskLater(champions, () -> {
+            if(player.getItemOnCursor().getType() == Material.AIR) {
+                player.updateInventory();
+            }
+        }, 2L);
     }
 
     private List<ItemStack> addLore(Collection<ItemStack> items, Player player) {
