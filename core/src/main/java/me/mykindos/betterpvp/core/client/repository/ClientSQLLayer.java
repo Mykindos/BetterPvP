@@ -76,7 +76,7 @@ public class ClientSQLLayer {
                 return Optional.of(client);
             }
         } catch (SQLException ex) {
-            log.error("Error loading client", ex);
+            log.error("Error loading client", ex).submit();
         }
 
         return Optional.empty();
@@ -97,7 +97,7 @@ public class ClientSQLLayer {
                 return Optional.of(client);
             }
         } catch (SQLException ex) {
-            log.error("Error loading client", ex);
+            log.error("Error loading client", ex).submit();
         }
 
         return Optional.empty();
@@ -111,7 +111,7 @@ public class ClientSQLLayer {
         try {
             propertyMapper.parseProperties(result, gamer);
         } catch (SQLException | ClassNotFoundException ex) {
-            log.error("Failed to load gamer properties for {}", gamer.getUuid(), ex);
+            log.error("Failed to load gamer properties for {}", gamer.getUuid(), ex).submit();
         }
     }
 
@@ -122,7 +122,7 @@ public class ClientSQLLayer {
         try {
             propertyMapper.parseProperties(result, client);
         } catch (SQLException | ClassNotFoundException ex) {
-            log.error("Error loading client properties for " + client.getName(), ex);
+            log.error("Error loading client properties for " + client.getName(), ex).submit();
         }
     }
 
@@ -172,13 +172,13 @@ public class ClientSQLLayer {
         ConcurrentHashMap<String, Statement> statements = new ConcurrentHashMap<>(queuedSharedStatUpdates);
         queuedSharedStatUpdates.clear();
         sharedDatabase.executeBatch(statements.values().stream().toList(), async);
-        log.info("Updated client stats with {} queries", statements.size());
+        log.info("Updated client stats with {} queries", statements.size()).submit();
 
         // Gamer
         statements = new ConcurrentHashMap<>(queuedStatUpdates);
         queuedStatUpdates.clear();
         database.executeBatch(statements.values().stream().toList(), async);
-        log.info("Updated gamer stats with {} queries", statements.size());
+        log.info("Updated gamer stats with {} queries", statements.size()).submit();
     }
 
 

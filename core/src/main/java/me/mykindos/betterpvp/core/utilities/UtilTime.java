@@ -38,7 +38,7 @@ public class UtilTime {
             // Parse the formatted value back to a double
             return numberFormat.parse(formattedValue).doubleValue();
         } catch (Exception e) {
-            log.warn("Failed to parse value: " + formattedValue, e);
+            log.warn("Failed to parse value: " + formattedValue, e).submit();
         }
 
         // Handle parsing errors gracefully

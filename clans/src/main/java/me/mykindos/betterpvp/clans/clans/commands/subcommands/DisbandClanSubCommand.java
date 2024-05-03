@@ -73,7 +73,7 @@ public class DisbandClanSubCommand extends ClanSubCommand {
         } else {
             MDC.put("clanId", clan.getId() + "");
             MDC.put("clanName", clan.getName());
-            log.warn("Clan does not have a leader?");
+            log.warn("Clan does not have a leader?").submit();
             MDC.clear();
         }
 

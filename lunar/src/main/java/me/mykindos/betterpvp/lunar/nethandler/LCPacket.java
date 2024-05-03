@@ -3,30 +3,7 @@ package me.mykindos.betterpvp.lunar.nethandler;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import lombok.CustomLog;
-import me.mykindos.betterpvp.lunar.nethandler.client.LCPacketBossBar;
-import me.mykindos.betterpvp.lunar.nethandler.client.LCPacketClientVoice;
-import me.mykindos.betterpvp.lunar.nethandler.client.LCPacketCooldown;
-import me.mykindos.betterpvp.lunar.nethandler.client.LCPacketGhost;
-import me.mykindos.betterpvp.lunar.nethandler.client.LCPacketHologram;
-import me.mykindos.betterpvp.lunar.nethandler.client.LCPacketHologramRemove;
-import me.mykindos.betterpvp.lunar.nethandler.client.LCPacketHologramUpdate;
-import me.mykindos.betterpvp.lunar.nethandler.client.LCPacketModSettings;
-import me.mykindos.betterpvp.lunar.nethandler.client.LCPacketNametagsOverride;
-import me.mykindos.betterpvp.lunar.nethandler.client.LCPacketNametagsUpdate;
-import me.mykindos.betterpvp.lunar.nethandler.client.LCPacketNotification;
-import me.mykindos.betterpvp.lunar.nethandler.client.LCPacketServerRule;
-import me.mykindos.betterpvp.lunar.nethandler.client.LCPacketServerUpdate;
-import me.mykindos.betterpvp.lunar.nethandler.client.LCPacketStaffModState;
-import me.mykindos.betterpvp.lunar.nethandler.client.LCPacketTeammates;
-import me.mykindos.betterpvp.lunar.nethandler.client.LCPacketTitle;
-import me.mykindos.betterpvp.lunar.nethandler.client.LCPacketUpdateWorld;
-import me.mykindos.betterpvp.lunar.nethandler.client.LCPacketVoiceChannelSwitch;
-import me.mykindos.betterpvp.lunar.nethandler.client.LCPacketVoiceMute;
-import me.mykindos.betterpvp.lunar.nethandler.client.LCPacketWorldBorder;
-import me.mykindos.betterpvp.lunar.nethandler.client.LCPacketWorldBorderCreateNew;
-import me.mykindos.betterpvp.lunar.nethandler.client.LCPacketWorldBorderRemove;
-import me.mykindos.betterpvp.lunar.nethandler.client.LCPacketWorldBorderUpdate;
-import me.mykindos.betterpvp.lunar.nethandler.client.LCPacketWorldBorderUpdateNew;
+import me.mykindos.betterpvp.lunar.nethandler.client.*;
 import me.mykindos.betterpvp.lunar.nethandler.server.LCPacketVoice;
 import me.mykindos.betterpvp.lunar.nethandler.server.LCPacketVoiceChannel;
 import me.mykindos.betterpvp.lunar.nethandler.server.LCPacketVoiceChannelRemove;
@@ -107,7 +84,7 @@ public abstract class LCPacket {
 
                 return packet;
             } catch (IOException | InstantiationException | IllegalAccessException ex) {
-                log.error("Failed to handle lunar packet", ex);
+                log.error("Failed to handle lunar packet", ex).submit();
             }
         }
 
@@ -125,7 +102,7 @@ public abstract class LCPacket {
         try {
             packet.write(wrappedBuffer);
         } catch (IOException ex) {
-            log.error("Failed to write lunar packet", ex);
+            log.error("Failed to write lunar packet", ex).submit();
         }
 
         return wrappedBuffer.buf();

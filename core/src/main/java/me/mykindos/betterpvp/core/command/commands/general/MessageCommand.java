@@ -63,7 +63,7 @@ public class MessageCommand extends Command {
             client.putProperty(ClientProperty.LAST_MESSAGED.name(), target.getUniqueId(), true);
             targetClient.putProperty(ClientProperty.LAST_MESSAGED.name(), client.getUniqueId(), true);
 
-            log.info("{} messaged {}: {}", player.getName(), target.getName(), message);
+            log.info("{} messaged {}: {}", player.getName(), target.getName(), message).submit();
 
         } else {
             UtilMessage.simpleMessage(player, "Command", "Usage: /message <player> <message>");

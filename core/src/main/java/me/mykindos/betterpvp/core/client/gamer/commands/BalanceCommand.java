@@ -107,7 +107,7 @@ public class BalanceCommand extends Command {
                     UtilMessage.simpleMessage(targetPlayer, "Economy", "You received <green>$%,d <gray>from <yellow>%s<gray>.", amountToPay, player.getName());
                 }
 
-                log.info("{} paid {} ${}", player.getName(), targetClient.getName(), amountToPay);
+                log.info("{} paid {} ${}", player.getName(), targetClient.getName(), amountToPay).submit();
 
             } catch (NumberFormatException ex) {
                 UtilMessage.message(player, "Economy", "Value provided is not a valid number.");
@@ -167,7 +167,7 @@ public class BalanceCommand extends Command {
                     UtilMessage.simpleMessage(targetPlayer, "Economy", "You received <green>$%d <gray>from <yellow>%s<gray>.", amountToPay, player.getName());
                 }
 
-                log.info("{} gave {} ${}", player, targetClient.getName(), amountToPay);
+                log.info("{} gave {} ${}", player, targetClient.getName(), amountToPay).submit();
 
             } catch (NumberFormatException ex) {
                 UtilMessage.message(player, "Economy", "Value provided is not a valid number.");

@@ -2,11 +2,7 @@ package me.mykindos.betterpvp.core.command.loader;
 
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Rank;
-import me.mykindos.betterpvp.core.command.Command;
-import me.mykindos.betterpvp.core.command.CommandManager;
-import me.mykindos.betterpvp.core.command.ICommand;
-import me.mykindos.betterpvp.core.command.SpigotCommandWrapper;
-import me.mykindos.betterpvp.core.command.SubCommand;
+import me.mykindos.betterpvp.core.command.*;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.Loader;
 import org.bukkit.Bukkit;
@@ -44,7 +40,7 @@ public class CommandLoader extends Loader {
             ICommand command = plugin.getInjector().getInstance(subCommandAnnotation.value());
             ICommand subCommand = (ICommand) plugin.getInjector().getInstance(clazz);
             plugin.getInjector().injectMembers(subCommand);
-            log.info("Added {} to {} sub commands", subCommand.getName(), command.getName());
+            log.info("Added {} to {} sub commands", subCommand.getName(), command.getName()).submit();
             command.getSubCommands().add(subCommand);
 
         }

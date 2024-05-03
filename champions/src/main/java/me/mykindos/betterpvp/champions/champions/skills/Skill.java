@@ -104,7 +104,7 @@ public abstract class Skill implements ISkill {
         try {
             loadConfig();
         } catch (Exception ex) {
-            log.error("Something went wrong loading the skill configuration for {}", getName(), ex);
+            log.error("Something went wrong loading the skill configuration for {}", getName(), ex).submit();
         }
     }
 

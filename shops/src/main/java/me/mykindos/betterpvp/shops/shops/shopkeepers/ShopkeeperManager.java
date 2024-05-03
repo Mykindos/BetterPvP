@@ -6,11 +6,7 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.shops.Shops;
-import me.mykindos.betterpvp.shops.shops.shopkeepers.types.IShopkeeper;
-import me.mykindos.betterpvp.shops.shops.shopkeepers.types.ParrotShopkeeper;
-import me.mykindos.betterpvp.shops.shops.shopkeepers.types.SkeletonShopkeeper;
-import me.mykindos.betterpvp.shops.shops.shopkeepers.types.VillagerShopkeeper;
-import me.mykindos.betterpvp.shops.shops.shopkeepers.types.ZombieShopkeeper;
+import me.mykindos.betterpvp.shops.shops.shopkeepers.types.*;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -45,7 +41,7 @@ public class ShopkeeperManager extends Manager<IShopkeeper> {
             Component name = UtilMessage.getMiniMessage(rawName);
             World world = Bukkit.getWorld(Objects.requireNonNull(shops.getConfig().getString("shopkeepers." + key + ".world")));
             if(world == null) {
-                log.warn("Could not load shopkeeper {} because the world was null", key);
+                log.warn("Could not load shopkeeper {} because the world was null", key).submit();
                 return;
             }
 

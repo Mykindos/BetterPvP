@@ -20,11 +20,7 @@ import org.reflections.Reflections;
 import java.lang.reflect.Modifier;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Singleton
 @CustomLog
@@ -48,7 +44,7 @@ public class FieldsRepository implements IRepository<FieldsBlockEntry> {
             types.add(interactable);
         }
         types.addAll(List.of(SimpleOre.values()));
-        log.info("Loaded " + types.size() + " ore types");
+        log.info("Loaded " + types.size() + " ore types").submit();
     }
 
     @Override
@@ -71,7 +67,7 @@ public class FieldsRepository implements IRepository<FieldsBlockEntry> {
                 ores.add(new FieldsBlockEntry(type, world, x, y, z));
             }
         } catch (SQLException ex) {
-            log.error("Failed to load fields ores", ex);
+            log.error("Failed to load fields ores", ex).submit();
         }
 
         return ores;

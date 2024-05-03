@@ -92,7 +92,7 @@ public class CombatCommand extends Command {
         loaded.whenComplete((data, throwable) -> {
             if (throwable != null) {
                 UtilMessage.message(caster, "Combat", "There was an error retrieving this player data.");
-                log.error("There was an error retrieving player data for {}", targetName, throwable);
+                log.error("There was an error retrieving player data for {}", targetName, throwable).submit();
                 return;
             }
 

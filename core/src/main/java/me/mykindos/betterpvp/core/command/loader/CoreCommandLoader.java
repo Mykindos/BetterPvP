@@ -27,7 +27,7 @@ public class CoreCommandLoader extends CommandLoader{
         loadSubCommands(subCommandClasses);
 
         plugin.saveConfig();
-        log.info("Loaded {} commands for Core", count);
+        log.info("Loaded {} commands for Core", count).submit();
     }
 
 }

@@ -41,7 +41,7 @@ public class Redis {
             );
         }
 
-        log.info("Redis has been enabled.");
+        log.info("Redis has been enabled.").submit();
     }
 
     @NotNull
@@ -67,7 +67,7 @@ public class Redis {
         }
 
         if (!section.getBoolean("enabled")) {
-            log.warn("Redis has been disabled in the configuration file. Cross-server functionality will not work.");
+            log.warn("Redis has been disabled in the configuration file. Cross-server functionality will not work.").submit();
             return;
         }
 

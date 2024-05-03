@@ -18,11 +18,7 @@ import me.mykindos.betterpvp.progression.Progression;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.SQLException;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 @CustomLog
@@ -68,7 +64,7 @@ public class FishingWeightLeaderboard extends PlayerLeaderboard<Long> implements
                     weight.set(result.getLong(1));
                 }
             } catch (SQLException e) {
-                log.error("Error fetching leaderboard data", e);
+                log.error("Error fetching leaderboard data", e).submit();
             }
         });
 
@@ -92,7 +88,7 @@ public class FishingWeightLeaderboard extends PlayerLeaderboard<Long> implements
                     leaderboard.put(UUID.fromString(gamer), weight);
                 }
             } catch (SQLException e) {
-                log.error("Error fetching leaderboard data", e);
+                log.error("Error fetching leaderboard data", e).submit();
             }
         });
 

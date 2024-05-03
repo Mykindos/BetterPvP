@@ -20,20 +20,19 @@ public class CustomLogger {
      * @param args args the message specifies
      * @return the UUID of the log
      */
-    public UUID log(String level, String message, Object... args) {
+    public PendingLog log(String level, String message, Object... args) {
         Message test = ReusableMessageFactory.INSTANCE.newMessage(message, args);
-        UUID id = UUID.randomUUID();
-        LoggerFactory.getInstance().addLog(new PendingLog(id, name, level, test.getFormattedMessage(), System.currentTimeMillis(), args));
-        return id;
+        return new PendingLog(UUID.randomUUID(), name, level, test.getFormattedMessage(), System.currentTimeMillis(), args);
     }
 
     /**
      * logs an INFO level message to the database
+     *
      * @param message the message
-     * @param args args the message specifies
+     * @param args    args the message specifies
      * @return the UUID of the log
      */
-    public UUID info(String message, Object... args) {
+    public PendingLog info(String message, Object... args) {
         return log("INFO", message, args);
     }
 
@@ -43,7 +42,7 @@ public class CustomLogger {
      * @param args args the message specifies
      * @return the UUID of the log
      */
-    public UUID error(String message, Object... args) {
+    public PendingLog error(String message, Object... args) {
         return log("ERROR", message, args);
     }
 
@@ -53,7 +52,7 @@ public class CustomLogger {
      * @param args args the message specifies
      * @return the UUID of the log
      */
-    public UUID warn(String message, Object... args) {
+    public PendingLog warn(String message, Object... args) {
         return log("WARN", message, args);
     }
 
@@ -63,7 +62,7 @@ public class CustomLogger {
      * @param args args the message specifies
      * @return the UUID of the log
      */
-    public UUID trace(String message, Object... args) {
+    public PendingLog trace(String message, Object... args) {
         return log("TRACE", message, args);
     }
 }

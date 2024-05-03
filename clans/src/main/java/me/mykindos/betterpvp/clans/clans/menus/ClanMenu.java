@@ -3,16 +3,7 @@ package me.mykindos.betterpvp.clans.clans.menus;
 
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
-import me.mykindos.betterpvp.clans.clans.menus.buttons.ClanDetailsButton;
-import me.mykindos.betterpvp.clans.clans.menus.buttons.ClanHomeButton;
-import me.mykindos.betterpvp.clans.clans.menus.buttons.ClanMemberButton;
-import me.mykindos.betterpvp.clans.clans.menus.buttons.ClanProgressionButton;
-import me.mykindos.betterpvp.clans.clans.menus.buttons.ClanVaultButton;
-import me.mykindos.betterpvp.clans.clans.menus.buttons.EnergyButton;
-import me.mykindos.betterpvp.clans.clans.menus.buttons.LeaveClanButton;
-import me.mykindos.betterpvp.clans.clans.menus.buttons.TerritoryButton;
-import me.mykindos.betterpvp.clans.clans.menus.buttons.ViewAlliancesButton;
-import me.mykindos.betterpvp.clans.clans.menus.buttons.ViewEnemiesButton;
+import me.mykindos.betterpvp.clans.clans.menus.buttons.*;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.menu.Menu;
@@ -29,11 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import xyz.xenondevs.invui.gui.AbstractGui;
 import xyz.xenondevs.invui.item.impl.SimpleItem;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 

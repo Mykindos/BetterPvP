@@ -48,7 +48,7 @@ public class MiningService {
         final long finalExperience = experienceModifier.applyAsLong(experience);
         repository.getDataAsync(player).whenComplete((miningData, throwable) -> {
             if (throwable != null) {
-                log.error("Failed to update mining data for " + player.getName(), throwable);
+                log.error("Failed to update mining data for " + player.getName(), throwable).submit();
                 return;
             }
 
@@ -72,7 +72,7 @@ public class MiningService {
             miningData.increaseMinedStat(block); // Only give the stat if it's in the threshold
             leaderboard.add(player.getUniqueId(), 1L).whenComplete((result, throwable2) -> {
                 if (throwable2 != null) {
-                    log.error("Failed to add ore count to leaderboard for player " + player.getName(), throwable2);
+                    log.error("Failed to add ore count to leaderboard for player " + player.getName(), throwable2).submit();
                     return;
                 }
 
@@ -80,7 +80,7 @@ public class MiningService {
             });
 
         }).exceptionally(throwable -> {
-            log.error("Failed to update mining data for " + player.getName(), throwable);
+            log.error("Failed to update mining data for " + player.getName(), throwable).submit();
             return null;
         }).thenRun(() -> repository.saveAsync(player));
     }

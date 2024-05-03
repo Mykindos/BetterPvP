@@ -47,7 +47,7 @@ public class PunishmentRepository implements IRepository<Punishment> {
                     new StringStatementValue(punishment.getPunisher()));
 
             database.executeUpdate(statement);
-            log.info("Saved punishment {} to database", punishment);
+            log.info("Saved punishment {} to database", punishment).submit();
         });
     }
 
@@ -56,7 +56,7 @@ public class PunishmentRepository implements IRepository<Punishment> {
         UtilServer.runTaskAsync(core, () -> {
             Statement statement = new Statement(query, new TimestampStatementValue(new Timestamp(System.currentTimeMillis())), new UuidStatementValue(punishment.getId()));
             database.executeUpdate(statement);
-            log.info("Marked punishment as revoked in database - {}", punishment);
+            log.info("Marked punishment as revoked in database - {}", punishment).submit();
         });
     }
 
@@ -82,7 +82,7 @@ public class PunishmentRepository implements IRepository<Punishment> {
                 punishments.add(punishment);
             }
         } catch (SQLException e) {
-            log.error("Error while retrieving punishments for client {}", client.getUniqueId(), e);
+            log.error("Error while retrieving punishments for client {}", client.getUniqueId(), e).submit();
         }
         return punishments;
     }

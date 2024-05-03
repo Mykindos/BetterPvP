@@ -16,11 +16,7 @@ import javax.inject.Inject;
 import javax.sql.rowset.CachedRowSet;
 import javax.sql.rowset.RowSetFactory;
 import javax.sql.rowset.RowSetProvider;
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -68,7 +64,7 @@ public class Database {
             preparedStatement.close();
 
         } catch (SQLException ex) {
-            log.error("Error executing update: {}", statement.getQuery(), ex);
+            log.error("Error executing update: {}", statement.getQuery(), ex).submit();
         }
     }
 
@@ -106,13 +102,13 @@ public class Database {
                 }
 
             } catch (SQLException ex) {
-                log.error("Error executing batch", ex);
+                log.error("Error executing batch", ex).submit();
                 connection.rollback();
             } finally {
                 connection.setAutoCommit(true);
             }
         } catch (SQLException e) {
-            log.error("Failed to manage transaction or close connection", e);
+            log.error("Failed to manage transaction or close connection", e).submit();
         }
     }
 
@@ -136,7 +132,7 @@ public class Database {
             preparedStatement.close();
 
         } catch (SQLException ex) {
-            log.error("Error executing query: {}", statement.getQuery(), ex);
+            log.error("Error executing query: {}", statement.getQuery(), ex).submit();
         }
 
         return rowset;
@@ -163,7 +159,7 @@ public class Database {
             }
 
         } catch (SQLException ex) {
-            log.info("Error executing procedure: {}", statement.getQuery(), ex);
+            log.info("Error executing procedure: {}", statement.getQuery(), ex).submit();
         }
     }
 

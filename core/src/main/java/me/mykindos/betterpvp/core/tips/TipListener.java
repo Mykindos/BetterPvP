@@ -81,7 +81,7 @@ public class TipListener implements Listener {
             UtilMessage.message(player, "Tips", tip.getComponent());
             event.getGamer().setLastTipNow();
         } else {
-            log.error("No valid tips for " + player.getName());
+            log.error("No valid tips for " + player.getName()).submit();
         }
 
     }
