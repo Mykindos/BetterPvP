@@ -41,7 +41,7 @@ public abstract class StatsRepository<T extends StatHolder> {
             saveQueue.forEach((uuid, data) -> data.prepareUpdates(uuid, database));
             // Save extra
             postSaveAll(async);
-            log.info("[{}] Saving {} players.", getClass().getSimpleName(), saveQueue.size());
+            log.info("[{}] Saving {} players.", getClass().getSimpleName(), saveQueue.size()).submit();
             // Clear the save queue
             saveQueue.clear();
         });
@@ -113,7 +113,7 @@ public abstract class StatsRepository<T extends StatHolder> {
             return saved;
         }
         return fetchDataAsync(player).exceptionally(throwable -> {
-            log.error("Error loading data for " + player, throwable);
+            log.error("Error loading data for " + player, throwable).submit();
             return null;
         });
     }

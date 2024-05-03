@@ -78,12 +78,12 @@ public class DropMultiplierMiningPerk implements Listener, ProgressionPerk, Chan
                     if (drops == 0 || event.getItems().isEmpty()) return;
                     event.getItems().get(0).getItemStack().add(drops - 1);
                 }).exceptionally(throwable1 -> {
-                    log.error("Failed to check if player " + event.getPlayer().getName() + " has a level ", throwable);
+                    log.error("Failed to check if player " + event.getPlayer().getName() + " has a level ", throwable).submit();
                     return null;
                 });
             }
         }).exceptionally(throwable -> {
-            log.error("Failed to check if player " + event.getPlayer().getName() + " has perk " + getName(), throwable);
+            log.error("Failed to check if player " + event.getPlayer().getName() + " has perk " + getName(), throwable).submit();
             return null;
         });
 

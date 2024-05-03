@@ -85,7 +85,7 @@ public class BaseFishingPerk implements Listener, ConfigAccessor, ProgressionPer
             UtilServer.runTask(progression, hook::remove);
             UtilMessage.message(player, "Fishing", "<red>You cannot fish in this area!");
         }).exceptionally(throwable -> {
-            log.error("Failed to check if player " + player.getName() + " has perk " + getName(), throwable);
+            log.error("Failed to check if player " + player.getName() + " has perk " + getName(), throwable).submit();
             return null;
         });
     }

@@ -89,12 +89,12 @@ public class IncreaseFishWeightFishingPerk implements Listener, ProgressionPerk,
                             event.setLoot(new Fish(fish.getType(), weight));
                         }
                     }).exceptionally(throwable1 -> {
-                        log.error("Failed to check if player " + event.getPlayer().getName() + " has a level ", throwable1);
+                        log.error("Failed to check if player " + event.getPlayer().getName() + " has a level ", throwable1).submit();
                         return null;
                     });
                 }
             }).exceptionally(throwable -> {
-                log.error("Failed to check if player " + event.getPlayer().getName() + " has perk " + getName(), throwable);
+                log.error("Failed to check if player " + event.getPlayer().getName() + " has perk " + getName(), throwable).submit();
                 return null;
             });
         }

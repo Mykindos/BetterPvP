@@ -36,7 +36,7 @@ public class CommandListener implements Listener {
 
     @EventHandler
     public void onServerCommand(ServerCommandEvent event) {
-        log.info("Server executed command: {}", event.getCommand());
+        log.info("Server executed command: {}", event.getCommand()).submit();
         String commandName = event.getCommand().toLowerCase();
         if (commandName.contains(" ")) {
             commandName = commandName.split(" ")[0];
@@ -51,7 +51,7 @@ public class CommandListener implements Listener {
             ICommand command = commandOptional.get();
             if(!(command instanceof IConsoleCommand consoleCommand)) return;
             if (!command.isEnabled()) {
-                log.info("Console attempted to use " + command.getName() + " but it is disabled");
+                log.info("Console attempted to use " + command.getName() + " but it is disabled").submit();
                 return;
             }
 

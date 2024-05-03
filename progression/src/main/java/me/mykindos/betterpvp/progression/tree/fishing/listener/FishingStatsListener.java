@@ -41,7 +41,7 @@ public class FishingStatsListener implements Listener {
         final FishingRepository repository = fishing.getStatsRepository();
         repository.getDataAsync(event.getPlayer()).whenComplete((data, throwable) -> {
             if (throwable != null) {
-                log.error("Failed to get progression data for player " + event.getPlayer().getName(), throwable);
+                log.error("Failed to get progression data for player " + event.getPlayer().getName(), throwable).submit();
                 return;
             }
 
@@ -57,7 +57,7 @@ public class FishingStatsListener implements Listener {
             // Leaderboard
             fishing.getWeightLeaderboard().add(event.getPlayer().getUniqueId(), (long) fish.getWeight()).whenComplete((result, throwable3) -> {
                 if (throwable3 != null) {
-                    log.error("Failed to add weight to leaderboard for player " + event.getPlayer().getName(), throwable3);
+                    log.error("Failed to add weight to leaderboard for player " + event.getPlayer().getName(), throwable3).submit();
                     return;
                 }
 
@@ -66,14 +66,14 @@ public class FishingStatsListener implements Listener {
 
             fishing.getCountLeaderboard().add(event.getPlayer().getUniqueId(), 1L).whenComplete((result, throwable2) -> {
                 if (throwable2 != null) {
-                    log.error("Failed to add count to leaderboard for player " + event.getPlayer().getName(), throwable2);
+                    log.error("Failed to add count to leaderboard for player " + event.getPlayer().getName(), throwable2).submit();
                     return;
                 }
 
                 fishing.getCountLeaderboard().attemptAnnounce(event.getPlayer(), result);
             });
         }).exceptionally(throwable -> {
-            log.error("Failed to get progression data for player " + event.getPlayer().getName(), throwable);
+            log.error("Failed to get progression data for player " + event.getPlayer().getName(), throwable).submit();
             return null;
         }).thenRun(() -> repository.saveAsync(event.getPlayer()));
     }

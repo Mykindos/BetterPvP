@@ -53,7 +53,7 @@ public class ChatListener implements Listener {
         ChatSentEvent chatSent = new ChatSentEvent(player, Bukkit.getOnlinePlayers(), Component.text(UtilFormat.spoofNameForLunar(player.getName()) + ": "), message);
         Bukkit.getPluginManager().callEvent(chatSent);
         if (chatSent.isCancelled()) {
-            log.info("ChatSentEvent cancelled for {} - {}", chatSent.getPlayer().getName(), chatSent.getCancelReason());
+            log.info("ChatSentEvent cancelled for {} - {}", chatSent.getPlayer().getName(), chatSent.getCancelReason()).submit();
         }
 
         logChatToDiscord(event.getPlayer(), message);
@@ -92,7 +92,7 @@ public class ChatListener implements Listener {
             ChatReceivedEvent chatReceived = new ChatReceivedEvent(player, client, onlinePlayer, event.getPrefix(), event.getMessage());
             Bukkit.getPluginManager().callEvent(chatReceived);
             if (chatReceived.isCancelled()) {
-                log.info("ChatReceivedEvent cancelled for {} - {}", onlinePlayer.getName(), event.getCancelReason());
+                log.info("ChatReceivedEvent cancelled for {} - {}", onlinePlayer.getName(), event.getCancelReason()).submit();
             }
         }
     }

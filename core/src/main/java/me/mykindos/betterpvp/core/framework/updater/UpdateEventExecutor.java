@@ -11,11 +11,7 @@ import org.bukkit.Bukkit;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @CustomLog
 @Singleton
@@ -99,7 +95,7 @@ public class UpdateEventExecutor {
         try {
             method.invoke(obj);
         } catch (InvocationTargetException | IllegalAccessException | IllegalArgumentException e) {
-            log.error("Could not execute updater {} in {}", method.getName(), method.getDeclaringClass().getName(), e);
+            log.error("Could not execute updater {} in {}", method.getName(), method.getDeclaringClass().getName(), e).submit();
         }
     }
 }

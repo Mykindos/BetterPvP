@@ -85,13 +85,13 @@ public class MapHandler {
             File file = new File("./world/data/map_0.dat");
             if (!file.exists()) {
                 if (!file.createNewFile()) {
-                    log.error("Failed to create blank map file");
+                    log.error("Failed to create blank map file").submit();
                 }
             }
 
             World world = Bukkit.getWorld("world");
             if (world == null) {
-                log.error("Could not load map as main world does not exist");
+                log.error("Could not load map as main world does not exist").submit();
                 return;
             }
 
@@ -118,7 +118,7 @@ public class MapHandler {
             }
             loadMapData((MinimapRenderer) map.getRenderers().get(0));
         } catch (Exception ex) {
-            log.error("Failed to load map", ex);
+            log.error("Failed to load map", ex).submit();
         }
     }
 
@@ -150,9 +150,9 @@ public class MapHandler {
                     });
                 });
             } catch (IOException | ParseException e) {
-                log.error("Failed to load map data", e);
+                log.error("Failed to load map data", e).submit();
             }
-            log.info("Loaded map data in {}", UtilTime.getTime((System.currentTimeMillis() - l), 2));
+            log.info("Loaded map data in {}", UtilTime.getTime((System.currentTimeMillis() - l), 2)).submit();
         });
     }
 
@@ -176,16 +176,16 @@ public class MapHandler {
                     final File file = new File("world/data/map.json");
                     if (!file.exists()) {
                         if(!file.createNewFile())  {
-                            log.error("Failed to create blank map file");
+                            log.error("Failed to create blank map file").submit();
                         }
                     }
 
                     ObjectMapper mapper = new ObjectMapper();
                     mapper.writeValue(file, minimapRenderer.getWorldCacheMap());
                 } catch (IOException e) {
-                    log.error("Failed to save map data", e);
+                    log.error("Failed to save map data", e).submit();
                 }
-                log.info("Saved map data in {}", UtilTime.getTime((System.currentTimeMillis() - l), 2));
+                log.info("Saved map data in {}", UtilTime.getTime((System.currentTimeMillis() - l), 2)).submit();
             }
         }.runTaskAsynchronously(clans);
     }

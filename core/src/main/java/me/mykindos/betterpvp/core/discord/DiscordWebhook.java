@@ -49,12 +49,12 @@ public class DiscordWebhook {
             try (var response = httpClient.newCall(request).execute()) {
                 if (!response.isSuccessful()) {
                     if (response.body() != null) {
-                        log.warn("Failed to submit message to discord webhook: " + response.body().string());
+                        log.warn("Failed to submit message to discord webhook: " + response.body().string()).submit();
                     }
                 }
 
             } catch (IOException e) {
-                log.warn("Failed to submit message to discord webhook", e);
+                log.warn("Failed to submit message to discord webhook", e).submit();
             }
 
 

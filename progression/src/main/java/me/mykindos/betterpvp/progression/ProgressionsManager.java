@@ -34,7 +34,7 @@ public class ProgressionsManager {
             trees.add(tree);
         }
 
-        log.info("Loaded " + trees.size() + " skills");
+        log.info("Loaded " + trees.size() + " skills").submit();
         progression.saveConfig();
     }
 
@@ -62,7 +62,7 @@ public class ProgressionsManager {
                 fromClass(tree).addPerk(perk);
             }
         }
-        log.info("Loaded " + perkClasses.size() + " general progression perks");
+        log.info("Loaded " + perkClasses.size() + " general progression perks").submit();
     }
 
 }

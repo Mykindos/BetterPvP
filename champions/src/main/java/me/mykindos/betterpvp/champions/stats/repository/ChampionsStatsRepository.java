@@ -63,12 +63,12 @@ public class ChampionsStatsRepository extends StatsRepository<RoleStatistics> {
                     }
 
                 } catch (SQLException e) {
-                    log.error("Failed to load combat data for " + player, e);
+                    log.error("Failed to load combat data for " + player, e).submit();
                 }
             });
             return roleStatistics;
         }).exceptionally(throwable -> {
-            log.error("Failed to load combat data for " + player, throwable);
+            log.error("Failed to load combat data for " + player, throwable).submit();
             return null;
         });
     }

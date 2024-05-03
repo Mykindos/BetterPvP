@@ -83,7 +83,7 @@ public class BuildRepository implements IRepository<RoleBuild> {
 
             }
         } catch (SQLException ex) {
-            log.error("Failed to load builds", ex);
+            log.error("Failed to load builds", ex).submit();
         }
 
     }

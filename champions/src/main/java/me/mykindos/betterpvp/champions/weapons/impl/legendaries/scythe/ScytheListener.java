@@ -20,12 +20,7 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Display;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.ItemDisplay;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -354,7 +349,7 @@ public class ScytheListener implements Listener {
                     spawned.setItemStack(item);
                 } catch (MojangApiUtils.MojangApiException | IOException e) {
                     spawned.setItemStack(new ItemStack(Material.SKELETON_SKULL));
-                    log.error("Failed to bind head texture for soul (" + ent.getName() + ")", e);
+                    log.error("Failed to bind head texture for soul (" + ent.getName() + ")", e).submit();
                 }
             } else {
                 spawned.setItemStack(new ItemStack(Material.SKELETON_SKULL));

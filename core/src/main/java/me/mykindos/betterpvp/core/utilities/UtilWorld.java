@@ -11,11 +11,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @CustomLog
@@ -115,12 +111,20 @@ public class UtilWorld {
      * @return Returns a string of a locations coordinates
      */
     public static String locationToString(Location location) {
-        return locationToString(location, true);
+        return locationToString(location, true, false);
     }
 
     public static String locationToString(Location location, boolean display) {
+        return locationToString(location, display, false);
+    }
+
+    public static String locationToString(Location location, boolean display, boolean includeWorld) {
         if (display) {
-            return "(" + Math.round(location.getX()) + ", " + Math.round(location.getY()) + ", " + Math.round(location.getZ()) + ")";
+            if(includeWorld) {
+                return "(" + location.getWorld().getName() + ", " + Math.round(location.getX()) + ", " + Math.round(location.getY()) + ", " + Math.round(location.getZ()) + ")";
+            } else {
+                return "(" + Math.round(location.getX()) + ", " + Math.round(location.getY()) + ", " + Math.round(location.getZ()) + ")";
+            }
         }
 
         return location.getWorld().getName() + ", " + location.getX() + ", " + location.getY() + ", " + location.getZ()

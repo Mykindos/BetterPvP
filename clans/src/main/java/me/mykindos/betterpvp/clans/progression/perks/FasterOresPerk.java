@@ -78,7 +78,7 @@ public class FasterOresPerk implements Listener, ConfigAccessor, ProgressionPerk
             final long half = (long) (event.getType().getRespawnDelay() * (1 - 1 / this.speedMultiplier) * 1000);
             event.getBlock().setLastUsed(event.getBlock().getLastUsed() - half);
         }).exceptionally(throwable -> {
-            log.error("Failed to check if player " + player.getName() + " has perk " + getName(), throwable);
+            log.error("Failed to check if player " + player.getName() + " has perk " + getName(), throwable).submit();
             return null;
         });
     }

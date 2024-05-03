@@ -51,14 +51,14 @@ public class ItemRepository implements IRepository<BPvPItem> {
                 int maxDurability = getMaxDurabilityForItem(id);
 
                 if (material == null) {
-                    log.info("Material is null for item {}", id);
+                    log.info("Material is null for item {}", id).submit();
                     continue;
                 }
 
                 items.add(new BPvPItem(namespace, key, material, name, lore, maxDurability, customModelData, glowing, uuid));
             }
         } catch (Exception ex) {
-            log.error("Failed to load items for module {}", namespace, ex);
+            log.error("Failed to load items for module {}", namespace, ex).submit();
         }
         return items;
     }
@@ -73,7 +73,7 @@ public class ItemRepository implements IRepository<BPvPItem> {
                 lore.add(UtilMessage.deserialize(result.getString(3)).decoration(TextDecoration.ITALIC, false));
             }
         } catch (Exception ex) {
-            log.error("Failed to load lore for item {}", id, ex);
+            log.error("Failed to load lore for item {}", id, ex).submit();
         }
         return lore;
     }
@@ -87,7 +87,7 @@ public class ItemRepository implements IRepository<BPvPItem> {
                 return result.getInt(2);
             }
         } catch (Exception ex) {
-            log.error("Failed to load max durability for item {}", id, ex);
+            log.error("Failed to load max durability for item {}", id, ex).submit();
         }
         return -1;
     }

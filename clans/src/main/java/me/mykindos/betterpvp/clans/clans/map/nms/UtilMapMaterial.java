@@ -30,7 +30,7 @@ public class UtilMapMaterial {
             PROPERTIES_FUNCTION = BlockBehaviour.Properties.class.getDeclaredField("b");
             PROPERTIES_FUNCTION.setAccessible(true);
         } catch (NoSuchFieldException ex) {
-            log.error("Failed to access NMS field", ex);
+            log.error("Failed to access NMS field", ex).submit();
         }
     }
 

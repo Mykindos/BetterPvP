@@ -29,12 +29,7 @@ import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @CustomLog
@@ -308,7 +303,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
                 UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> UtilServer.callEvent(new ClanPropertyUpdateEvent(this, key, value)));
             }
         } catch (IllegalArgumentException ex) {
-            log.error("Could not find a ClanProperty named {}", key, ex);
+            log.error("Could not find a ClanProperty named {}", key, ex).submit();
         }
     }
 }

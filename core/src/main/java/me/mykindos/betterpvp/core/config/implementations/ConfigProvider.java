@@ -48,7 +48,7 @@ public class ConfigProvider<T> implements Provider<T> {
                 castedDefault = parsers.get(type).apply(defaultValue);
                 type = (Class<T>) ClassUtils.primitiveToWrapper(type);
             } catch (Exception ex) {
-                log.error("Failed to parse default value for {} ({})", configPath, type.getSimpleName(), ex);
+                log.error("Failed to parse default value for {} ({})", configPath, type.getSimpleName(), ex).submit();
             }
         }
 

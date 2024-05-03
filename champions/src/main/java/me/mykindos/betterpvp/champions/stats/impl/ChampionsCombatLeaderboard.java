@@ -152,7 +152,7 @@ public final class ChampionsCombatLeaderboard extends PlayerLeaderboard<CombatDa
                     map.put(gamer, data);
                 }
             } catch (SQLException e) {
-                log.error("Failed to load combat rating leaderboard for type " + sortType, e);
+                log.error("Failed to load combat rating leaderboard for type " + sortType, e).submit();
             }
         });
         return map;

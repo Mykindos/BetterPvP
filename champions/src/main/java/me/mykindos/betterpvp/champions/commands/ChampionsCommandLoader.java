@@ -29,6 +29,6 @@ public class ChampionsCommandLoader extends CommandLoader {
         loadSubCommands(subCommandClasses);
 
         plugin.saveConfig();
-        log.info("Loaded {} commands for Champions", count);
+        log.info("Loaded {} commands for Champions", count).submit();
     }
 }

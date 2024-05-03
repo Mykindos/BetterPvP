@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.clans.clans.commands.subcommands;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
@@ -16,6 +17,7 @@ import org.bukkit.entity.Player;
 import java.util.Optional;
 
 @Singleton
+@CustomLog
 @SubCommand(ClanCommand.class)
 public class RenameSubCommand extends ClanSubCommand {
 
@@ -67,6 +69,9 @@ public class RenameSubCommand extends ClanSubCommand {
             clientManager.sendMessageToRank("Clans", UtilMessage.deserialize("<yellow>%s<gray> has renamed a clan from <yellow>%s<gray> to <yellow>%s<gray>!",
                     client.getName(), oldName, clanName), Rank.ADMIN);
             clanManager.getRepository().updateClanName(clan);
+
+            log.info("{} has renamed a clan from {} to {}!", client.getName(), oldName, clanName)
+                    .setAction("CLAN_RENAME").addClientContext(client, false).addClanContext(clan).submit();
         } else {
             UtilMessage.message(player, "Command", "A clan with that name already exists.");
         }

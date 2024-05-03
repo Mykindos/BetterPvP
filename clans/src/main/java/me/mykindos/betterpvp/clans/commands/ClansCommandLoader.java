@@ -31,7 +31,7 @@ public class ClansCommandLoader extends CommandLoader {
         loadSubCommands(subCommandClasses);
 
         plugin.saveConfig();
-        log.info("Loaded {} commands for Clans", count);
+        log.info("Loaded {} commands for Clans", count).submit();
     }
 
 }

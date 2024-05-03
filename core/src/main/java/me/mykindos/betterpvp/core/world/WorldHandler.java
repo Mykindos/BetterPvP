@@ -13,12 +13,7 @@ import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Singleton
@@ -66,7 +61,7 @@ public class WorldHandler {
         configSection.getKeys(false).forEach(key -> {
             Location spawnPoint = UtilWorld.stringToLocation(configSection.getString(key));
             spawnLocations.put(key, spawnPoint);
-            log.info("Loaded spawn point {} at {}", key, spawnPoint);
+            log.info("Loaded spawn point {} at {}", key, spawnPoint).submit();
         });
     }
 
