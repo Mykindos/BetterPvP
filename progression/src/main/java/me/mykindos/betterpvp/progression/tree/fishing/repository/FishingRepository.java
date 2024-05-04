@@ -34,11 +34,7 @@ import org.reflections.Reflections;
 import javax.sql.rowset.CachedRowSet;
 import java.lang.reflect.Modifier;
 import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 // All data for players should be loaded for as long as they are on, and saved when they log off
@@ -82,11 +78,11 @@ public class FishingRepository extends ProgressionStatsRepository<Fishing, Fishi
                 }
                 return data;
             } catch (SQLException e) {
-                log.error("Failed to get fishing data for player " + player, e);
+                log.error("Failed to get fishing data for player " + player, e).submit();
             }
             return new FishingData();
         }).exceptionally(throwable -> {
-            log.error("Failed to get fishing data for player " + player, throwable);
+            log.error("Failed to get fishing data for player " + player, throwable).submit();
             return null;
         });
     }
@@ -115,7 +111,7 @@ public class FishingRepository extends ProgressionStatsRepository<Fishing, Fishi
             rodTypes.add(type);
         }
         rodTypes.addAll(List.of(SimpleFishingRod.values()));
-        log.info("Loaded " + rodTypes.size() + " rod types");
+        log.info("Loaded " + rodTypes.size() + " rod types").submit();
     }
 
     private void loadBaitTypes(Reflections reflections, ExtendedYamlConfiguration config) {
@@ -155,7 +151,7 @@ public class FishingRepository extends ProgressionStatsRepository<Fishing, Fishi
                 throw new IllegalArgumentException("Unknown bait type: " + type);
             }
         }
-        log.info("Loaded " + baitTypes.size() + " bait types");
+        log.info("Loaded " + baitTypes.size() + " bait types").submit();
     }
 
     private void loadLootTypes(Reflections reflections, ExtendedYamlConfiguration config) {
@@ -197,7 +193,7 @@ public class FishingRepository extends ProgressionStatsRepository<Fishing, Fishi
                 throw new IllegalArgumentException("Unknown loot type: " + type);
             }
         }
-        log.info("Loaded " + lootTypes.size() + " loot types");
+        log.info("Loaded " + lootTypes.size() + " loot types").submit();
     }
 
     @Override

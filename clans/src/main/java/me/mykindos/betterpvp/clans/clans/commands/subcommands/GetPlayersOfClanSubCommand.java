@@ -7,7 +7,6 @@ import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
 import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
-import me.mykindos.betterpvp.clans.logging.ClanLogger;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
@@ -23,12 +22,10 @@ import java.util.Optional;
 @SubCommand(ClanCommand.class)
 public class GetPlayersOfClanSubCommand extends ClanSubCommand {
 
-    private final ClanLogger clanLogger;
 
     @Inject
-    public GetPlayersOfClanSubCommand(ClanManager clanManager, ClientManager clientManager, ClanLogger clanLogger) {
+    public GetPlayersOfClanSubCommand(ClanManager clanManager, ClientManager clientManager) {
         super(clanManager, clientManager);
-        this.clanLogger = clanLogger;
     }
 
     @Override
@@ -63,7 +60,7 @@ public class GetPlayersOfClanSubCommand extends ClanSubCommand {
 
 
         UtilServer.runTaskAsync(JavaPlugin.getPlugin(Clans.class), () -> {
-            List<String> playerNames = clanLogger.getPlayersByClan(clan.getId());
+            List<String> playerNames = clanManager.getRepository().getPlayersByClan(clan.getId());
             UtilMessage.message(player, "Clan", "Retrieving past and present Clan members of <aqua>%s</aqua>", clan.getName());
 
             for (String name : playerNames) {

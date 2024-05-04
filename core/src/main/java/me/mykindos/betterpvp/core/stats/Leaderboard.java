@@ -112,11 +112,11 @@ public abstract class Leaderboard<E, T> {
                 set.addAll(fetch.entrySet().stream().map(entry -> LeaderboardEntry.of(entry.getKey(), entry.getValue())).toList());
                 return set;
             }).exceptionally(ex -> {
-                log.error("Failed to fetch leaderboard data for " + options + "!", ex);
+                log.error("Failed to fetch leaderboard data for " + options + "!", ex).submit();
                 return null;
             }).whenComplete((set, ex) -> {
                 if (ex != null) {
-                    log.error("Failed to fetch leaderboard data for " + options + "!", ex);
+                    log.error("Failed to fetch leaderboard data for " + options + "!", ex).submit();
                     return;
                 }
                 topTen.put(options, set);

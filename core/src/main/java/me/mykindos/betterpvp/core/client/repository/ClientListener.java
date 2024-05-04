@@ -104,7 +104,7 @@ public class ClientListener implements Listener {
 
         this.usersLoading.add(event.getUniqueId());
 
-        log.info(LOADING_CLIENT_FORMAT, event.getName());
+        log.info(LOADING_CLIENT_FORMAT, event.getName()).submit();
         this.repository.loadOnline(
                 event.getUniqueId(),
                 event.getName(),
@@ -124,7 +124,7 @@ public class ClientListener implements Listener {
 
         if (this.usersLoading.contains(event.getUniqueId())) {
             this.usersLoading.remove(event.getUniqueId());
-            log.warn(ClientManager.LOAD_ERROR_FORMAT_SERVER, event.getName());
+            log.warn(ClientManager.LOAD_ERROR_FORMAT_SERVER, event.getName()).submit();
             event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, Component.text(ClientManager.LOAD_ERROR_FORMAT_ENTITY));
         }
     }
@@ -160,7 +160,7 @@ public class ClientListener implements Listener {
         }
 
         event.getClient().setConnectionTime(System.currentTimeMillis());
-        log.info("{} ({}) joined", event.getPlayer().getName(), event.getPlayer().getUniqueId());
+        log.info("{} ({}) joined", event.getPlayer().getName(), event.getPlayer().getUniqueId()).submit();
     }
 
     @EventHandler (priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -171,7 +171,7 @@ public class ClientListener implements Listener {
         client.getGamer().putProperty(GamerProperty.TIME_PLAYED, (long) client.getGamer().getProperty(GamerProperty.TIME_PLAYED).orElse(0L)
                 + (System.currentTimeMillis() - client.getConnectionTime()));
         client.setConnectionTime(System.currentTimeMillis());
-        log.info("{} ({}) quit", event.getPlayer().getName(), event.getPlayer().getUniqueId());
+        log.info("{} ({}) quit", event.getPlayer().getName(), event.getPlayer().getUniqueId()).submit();
     }
 
     @EventHandler (priority = EventPriority.MONITOR)

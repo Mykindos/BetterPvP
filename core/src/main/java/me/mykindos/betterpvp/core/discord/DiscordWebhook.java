@@ -11,7 +11,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 
-import java.awt.*;
+import java.awt.Color;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,12 +49,12 @@ public class DiscordWebhook {
             try (var response = httpClient.newCall(request).execute()) {
                 if (!response.isSuccessful()) {
                     if (response.body() != null) {
-                        log.warn("Failed to submit message to discord webhook: " + response.body().string());
+                        log.warn("Failed to submit message to discord webhook: " + response.body().string()).submit();
                     }
                 }
 
             } catch (IOException e) {
-                log.warn("Failed to submit message to discord webhook", e);
+                log.warn("Failed to submit message to discord webhook", e).submit();
             }
 
 

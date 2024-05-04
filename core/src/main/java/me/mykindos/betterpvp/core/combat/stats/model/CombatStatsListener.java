@@ -77,7 +77,7 @@ public abstract class CombatStatsListener<T extends CombatData> implements Liste
             // Only announce for killer since he's the one that gained rating
             leaderboard.attemptAnnounce(killer, killerUpdate);
         }).exceptionally(throwable -> {
-            log.error("Failed to save combat data for " + victim.getName(), throwable);
+            log.error("Failed to save combat data for " + victim.getName(), throwable).submit();
             return null;
         });
     }

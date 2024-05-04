@@ -123,7 +123,7 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
            return false;
         }
 
-        log.error("Could not find cooldown entry for {}", player.getName());
+        log.error("Could not find cooldown entry for {}", player.getName()).submit();
         return false;
     }
 

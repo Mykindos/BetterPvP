@@ -14,7 +14,7 @@ public class TipManager extends Manager<Tip> {
     public void registerTip(BPvPPlugin plugin, Tip tip) {
         addObject(tip.getName(), tip);
         plugin.saveConfig();
-        log.info("Loaded Tip " + tip.getName());
+        log.info("Loaded Tip " + tip.getName()).submit();
     }
 
     public void reloadTips(BPvPPlugin plugin) {

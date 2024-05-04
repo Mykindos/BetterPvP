@@ -4,7 +4,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
-import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.throwables.events.ThrowableHitEntityEvent;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerCanUseSkillEvent;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseItemEvent;
@@ -30,12 +29,10 @@ import java.util.Optional;
 public class ClansSkillListener implements Listener {
 
     private final ClanManager clanManager;
-    private final ClientManager clientManager;
 
     @Inject
-    public ClansSkillListener(ClanManager clanManager, ClientManager clientManager) {
+    public ClansSkillListener(ClanManager clanManager) {
         this.clanManager = clanManager;
-        this.clientManager = clientManager;
     }
 
     @EventHandler(priority = EventPriority.HIGH)

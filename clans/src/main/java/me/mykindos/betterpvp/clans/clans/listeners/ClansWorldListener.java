@@ -518,7 +518,7 @@ public class ClansWorldListener extends ClanListener {
             int x = (int) event.getClickedBlock().getLocation().getX();
             int y = (int) event.getClickedBlock().getLocation().getY();
             int z = (int) event.getClickedBlock().getLocation().getZ();
-            log.info("{} opened a chest at {}, {}, {}, {}", event.getPlayer().getName(), event.getPlayer().getWorld().getName(), x, y, z);
+            log.info("{} opened a chest at {}, {}, {}, {}", event.getPlayer().getName(), event.getPlayer().getWorld().getName(), x, y, z).submit();
         }
 
     }

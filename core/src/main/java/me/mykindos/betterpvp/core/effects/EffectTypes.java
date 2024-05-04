@@ -76,7 +76,7 @@ public class EffectTypes {
     // </editor-fold>
 
     public static EffectType createEffectType(EffectType effectType) {
-        log.info("Added effect: {}", effectType.getName());
+        log.info("Added effect: {}", effectType.getName()).submit();
         effectTypes.add(effectType);
         return effectType;
     }

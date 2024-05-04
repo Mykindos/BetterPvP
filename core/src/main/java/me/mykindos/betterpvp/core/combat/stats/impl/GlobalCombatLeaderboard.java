@@ -122,7 +122,7 @@ public final class GlobalCombatLeaderboard extends PlayerLeaderboard<CombatData>
                     map.put(gamer, data);
                 }
             } catch (SQLException e) {
-                log.error("Failed to load combat rating leaderboard for type " + sortType, e);
+                log.error("Failed to load combat rating leaderboard for type " + sortType, e).submit();
             }
         });
         return map;

@@ -101,7 +101,7 @@ public class CombatListener implements Listener {
                 customDamageAdapters.add((CustomDamageAdapter) Class.forName("me.mykindos.betterpvp.core.combat.listeners.mythicmobs.MythicMobsAdapter").getDeclaredConstructor().newInstance());
             }
         } catch (Exception ex) {
-            log.warn("Could not find MythicMobs plugin, adapter not loaded");
+            log.warn("Could not find MythicMobs plugin, adapter not loaded").submit();
         }
     }
 

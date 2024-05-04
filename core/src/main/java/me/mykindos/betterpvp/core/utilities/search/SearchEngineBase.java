@@ -66,7 +66,7 @@ public class SearchEngineBase<T> {
         Optional<T> online = this.online(player.getUniqueId());
 
         return online.orElseThrow(() -> {
-            log.warn(PlayerManager.RETRIEVE_ERROR_FORMAT_SERVER, player.getName());
+            log.warn(PlayerManager.RETRIEVE_ERROR_FORMAT_SERVER, player.getName()).submit();
             player.kick(Component.text(PlayerManager.LOAD_ERROR_FORMAT_ENTITY));
             return new ClientNotLoadedException(player);
         });

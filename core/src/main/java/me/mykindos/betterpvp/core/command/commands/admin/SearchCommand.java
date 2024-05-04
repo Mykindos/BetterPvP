@@ -11,7 +11,10 @@ import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDItem;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDManager;
-import me.mykindos.betterpvp.core.logging.type.formatted.item.FormattedItemLog;
+import me.mykindos.betterpvp.core.logging.CachedLog;
+import me.mykindos.betterpvp.core.logging.LogContext;
+import me.mykindos.betterpvp.core.logging.LoggerFactory;
+import me.mykindos.betterpvp.core.logging.repository.LogRepository;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
@@ -46,11 +49,16 @@ public class SearchCommand extends Command {
     @SubCommand(SearchCommand.class)
     public static class SearchItemSubCommand extends Command {
 
-        @Inject
-        UUIDManager uuidManager;
+        private final ClientManager clientManager;
+        private final UUIDManager uuidManager;
+        private final LogRepository logRepository;
 
         @Inject
-        ClientManager clientManager;
+        public SearchItemSubCommand(ClientManager clientManager, UUIDManager uuidManager, LogRepository logRepository) {
+            this.clientManager = clientManager;
+            this.uuidManager = uuidManager;
+            this.logRepository = logRepository;
+        }
 
         @Override
         public String getName() {
@@ -103,23 +111,23 @@ public class SearchCommand extends Command {
 
             int finalPageNumber = pageNumber;
             UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> {
-                List<FormattedItemLog> logs = uuidManager.getUuidRepository().getUuidLogger().getUuidLogs(uuid);
+                List<CachedLog> logs = logRepository.getLogsWithContext(LogContext.ITEM, uuid.toString());
                 int count = 0;
                 int start = (finalPageNumber - 1) * numPerPage;
                 int end = start + numPerPage;
                 int size = logs.size();
-                int totalPages = size /numPerPage;
+                int totalPages = size / numPerPage;
                 if (size % numPerPage > 0) {
                     totalPages++;
                 }
                 UtilMessage.message(player, "Search",
-                        UtilMessage.deserialize("<light_purple>" + uuid + "</light_purple>'s (<green>" + uuidItem.getIdentifier() +  "</green>) logs: <white>"
+                        UtilMessage.deserialize("<light_purple>" + uuid + "</light_purple>'s (<green>" + uuidItem.getIdentifier() + "</green>) logs: <white>"
                                 + finalPageNumber + "<gray> / <white>" + totalPages));
                 if (start <= size) {
                     if (end > size) end = size;
-                    for (FormattedItemLog log : logs.subList(start, end)) {
+                    for (CachedLog log : logs.subList(start, end)) {
                         if (count == numPerPage) break;
-                        UtilMessage.message(player, log.getComponent());
+                        UtilMessage.message(player, log.getTimeComponent().append(Component.text("- ")).append(LoggerFactory.getInstance().formatLog(log)));
                         count++;
                     }
                 }
@@ -155,11 +163,16 @@ public class SearchCommand extends Command {
     @SubCommand(SearchCommand.class)
     public static class SearchPlayerSubCommand extends Command {
 
-        @Inject
-        ClientManager clientManager;
+        private final ClientManager clientManager;
+        private final UUIDManager uuidManager;
+        private final LogRepository logRepository;
 
         @Inject
-        UUIDManager uuidManager;
+        public SearchPlayerSubCommand(ClientManager clientManager, UUIDManager uuidManager, LogRepository logRepository) {
+            this.clientManager = clientManager;
+            this.uuidManager = uuidManager;
+            this.logRepository = logRepository;
+        }
 
         @Override
         public String getName() {
@@ -203,12 +216,12 @@ public class SearchCommand extends Command {
 
                 int finalPageNumber = pageNumber;
                 UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> {
-                    List<FormattedItemLog> logs = uuidManager.getUuidRepository().getUuidLogger().getPlayerLogs(targetClient.getUniqueId());
+                    List<CachedLog> logs = logRepository.getLogsWithContext(LogContext.CLIENT, targetClient.getUniqueId().toString());
                     int count = 0;
                     int start = (finalPageNumber - 1) * numPerPage;
                     int end = start + numPerPage;
                     int size = logs.size();
-                    int totalPages = size /numPerPage;
+                    int totalPages = size / numPerPage;
                     if (size % numPerPage > 0) {
                         totalPages++;
                     }
@@ -217,9 +230,9 @@ public class SearchCommand extends Command {
                                     + finalPageNumber + "<gray> / <white>" + totalPages));
                     if (start <= size) {
                         if (end > size) end = size;
-                        for (FormattedItemLog log : logs.subList(start, end)) {
+                        for (CachedLog log : logs.subList(start, end)) {
                             if (count == numPerPage) break;
-                            UtilMessage.message(player, log.getComponent());
+                            UtilMessage.message(player, log.getTimeComponent().append(Component.text("- ")).append(LoggerFactory.getInstance().formatLog(log)));
                             count++;
                         }
                     }

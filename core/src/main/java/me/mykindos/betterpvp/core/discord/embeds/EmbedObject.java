@@ -4,7 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Singular;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.List;
 
 @Builder

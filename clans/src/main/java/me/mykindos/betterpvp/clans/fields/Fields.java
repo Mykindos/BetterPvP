@@ -56,7 +56,7 @@ public class Fields {
                 ore.getX(),
                 ore.getY(),
                 ore.getZ())));
-        log.info("Loaded {} fields blocks", blocks.size());
+        log.info("Loaded {} fields blocks", blocks.size()).submit();
         reload(clans);
     }
 

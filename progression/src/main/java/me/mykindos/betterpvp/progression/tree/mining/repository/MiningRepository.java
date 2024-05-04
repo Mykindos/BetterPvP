@@ -67,12 +67,12 @@ public class MiningRepository extends ProgressionStatsRepository<Mining, MiningD
                         data.setOresMined(result.getLong(1));
                     }
                 } catch (SQLException e) {
-                    log.error("Failed to load mining data for " + player, e);
+                    log.error("Failed to load mining data for " + player, e).submit();
                 }
             });
             return data;
         }).exceptionally(throwable -> {
-            log.error("Failed to load mining data for " + player, throwable);
+            log.error("Failed to load mining data for " + player, throwable).submit();
             return null;
         });
     }
@@ -93,7 +93,7 @@ public class MiningRepository extends ProgressionStatsRepository<Mining, MiningD
 
             experiencePerBlock.put(material, config.getLong("mining.xpPerBlock." + key));
         }
-        log.info("Loaded " + experiencePerBlock.size() + " mining blocks");
+        log.info("Loaded " + experiencePerBlock.size() + " mining blocks").submit();
 
         final int minXpThreshold = config.getInt("mining.minLeaderboardBlockXp");
         leaderboardBlocks.clear();

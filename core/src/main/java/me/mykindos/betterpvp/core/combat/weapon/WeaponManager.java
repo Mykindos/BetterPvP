@@ -33,13 +33,13 @@ public class WeaponManager extends Manager<IWeapon> {
         Reflections reflections = new Reflections(getClass().getPackageName());
         Adapters adapters = new Adapters(core);
         reflections.getSubTypesOf(Weapon.class).forEach(clazz -> load(core, adapters, clazz));
-        log.info("Loaded " + objects.size() + " weapons");
+        log.info("Loaded " + objects.size() + " weapons").submit();
     }
 
     public boolean load(Weapon weapon) {
         BPvPItem item = itemHandler.getItem(weapon.getIdentifier());
         if (item == null) {
-            log.error(weapon.getIdentifier() + " does not exist in itemRepository");
+            log.error(weapon.getIdentifier() + " does not exist in itemRepository").submit();
             return false;
         }
         weapon.loadWeapon(item);

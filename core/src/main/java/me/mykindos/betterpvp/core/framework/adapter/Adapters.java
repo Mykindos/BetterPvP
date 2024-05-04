@@ -37,7 +37,7 @@ public final class Adapters {
     public void loadAdapters(Collection<Class<?>> adapters) {
         for (Class<?> clazz : adapters) {
             if (!canLoad(clazz)) {
-                log.warn("Could not load adapter " + clazz.getSimpleName() + "! Dependencies not found!");
+                log.warn("Could not load adapter " + clazz.getSimpleName() + "! Dependencies not found!").submit();
                 continue;
             }
 
@@ -54,15 +54,15 @@ public final class Adapters {
             try {
                 clazz.getMethod(adapterAnnotation[0].loadMethodName()).invoke(adapter);
             } catch (IllegalAccessException e) {
-                log.warn("Could not invoke load method for adapter " + clazz.getSimpleName() + " for " + pluginName + "!");
+                log.warn("Could not invoke load method for adapter " + clazz.getSimpleName() + " for " + pluginName + "!").submit();
             } catch (NoSuchMethodException ignored) {
                 // Ignored because this is not required
             } catch (InvocationTargetException e) {
-                log.error("Could not invoke load method for adapter " + clazz.getSimpleName() + " for " + pluginName + "!", e);
+                log.error("Could not invoke load method for adapter " + clazz.getSimpleName() + " for " + pluginName + "!", e).submit();
                 continue;
             }
 
-            log.info("Loaded adapter " + clazz.getSimpleName() + " for " + pluginName + "!");
+            log.info("Loaded adapter " + clazz.getSimpleName() + " for " + pluginName + "!").submit();
         }
     }
 

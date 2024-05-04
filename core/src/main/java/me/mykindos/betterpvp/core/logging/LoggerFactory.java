@@ -1,5 +1,13 @@
 package me.mykindos.betterpvp.core.logging;
 
+import lombok.CustomLog;
+import lombok.SneakyThrows;
+import me.mykindos.betterpvp.core.logging.formatters.ILogFormatter;
+import net.kyori.adventure.text.Component;
+import org.reflections.Reflections;
+
+import javax.inject.Singleton;
+import java.lang.reflect.Modifier;
 import java.util.HashSet;
 import java.util.Queue;
 import java.util.Set;
@@ -8,11 +16,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+@Singleton
+@CustomLog
 public class LoggerFactory {
 
     private static final LoggerFactory INSTANCE = new LoggerFactory();
 
     private final Set<LogAppender> appenders = new HashSet<>();
+    private final Set<ILogFormatter> formatters = new HashSet<>();
     private final Queue<PendingLog> logs = new ConcurrentLinkedQueue<>();
     private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
 
@@ -25,6 +36,20 @@ public class LoggerFactory {
             appenders.forEach(appender -> appender.append(log));
 
         }, 0, 25, TimeUnit.MILLISECONDS);
+
+        loadFormatters();
+    }
+
+    @SneakyThrows
+    private void loadFormatters() {
+        Reflections reflections = new Reflections(getClass().getPackageName());
+        Set<Class<? extends ILogFormatter>> classes = reflections.getSubTypesOf(ILogFormatter.class);
+        for (var clazz : classes) {
+            if (clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers()) || clazz.isEnum() || clazz.isAnnotationPresent(Deprecated.class))
+                continue;
+            formatters.add(clazz.getConstructor().newInstance());
+        }
+
     }
 
     public static LoggerFactory getInstance() {
@@ -49,6 +74,20 @@ public class LoggerFactory {
 
     public void addLog(PendingLog log) {
         logs.add(log);
+    }
+
+    public Component formatLog(CachedLog cachedLog) {
+        if (cachedLog.getAction() != null && cachedLog.getContext() != null) {
+            for (ILogFormatter formatter : formatters) {
+                if (formatter.getAction().equals(cachedLog.getAction())) {
+                    return formatter.formatLog(cachedLog.getContext());
+                }
+            }
+
+            log.warn("No formatter found for action: " + cachedLog.getAction()).submit();
+        }
+
+        return Component.empty();
     }
 
 }

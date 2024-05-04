@@ -31,7 +31,7 @@ public class ListenerLoader extends Loader {
     @Override
     public void load(Class<?> clazz) {
         if (!adapters.canLoad(clazz)) {
-            log.warn("Could not load listener " + clazz.getSimpleName() + "! Dependencies not found!");
+            log.warn("Could not load listener " + clazz.getSimpleName() + "! Dependencies not found!").submit();
             return;
         }
 
@@ -39,7 +39,7 @@ public class ListenerLoader extends Loader {
             Listener listener = (Listener) plugin.getInjector().getInstance(clazz);
             load(listener);
         } catch (Exception ex) {
-            log.error("Failed to load listener", ex);
+            log.error("Failed to load listener", ex).submit();
         }
     }
 

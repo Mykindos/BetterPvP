@@ -107,7 +107,7 @@ public abstract class LCPacket {
 
                 return packet;
             } catch (IOException | InstantiationException | IllegalAccessException ex) {
-                log.error("Failed to handle lunar packet", ex);
+                log.error("Failed to handle lunar packet", ex).submit();
             }
         }
 
@@ -125,7 +125,7 @@ public abstract class LCPacket {
         try {
             packet.write(wrappedBuffer);
         } catch (IOException ex) {
-            log.error("Failed to write lunar packet", ex);
+            log.error("Failed to write lunar packet", ex).submit();
         }
 
         return wrappedBuffer.buf();

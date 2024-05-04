@@ -13,6 +13,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 @CustomLog
 public class DatabaseAppender implements LogAppender {
@@ -37,12 +39,27 @@ public class DatabaseAppender implements LogAppender {
             }
         }
 
-        database.executeUpdate(new Statement("INSERT INTO logs (id, Level, Message, Time) VALUES (?, ?, ?, ?)",
+        database.executeUpdate(new Statement("INSERT INTO logs (id, Level, Action, Message, Time) VALUES (?, ?, ?, ?, ?)",
                 new UuidStatementValue(pendingLog.getId()),
                 new StringStatementValue(pendingLog.getLevel()),
+                new StringStatementValue(pendingLog.getAction()),
                 new StringStatementValue(message.toString()),
                 new LongStatementValue(pendingLog.getTime())
         ));
+
+        if(!pendingLog.getContext().isEmpty()) {
+            List<Statement> contextBatch = new ArrayList<>();
+            pendingLog.getContext().forEach((key, value) -> {
+                contextBatch.add(new Statement("INSERT INTO logs_context (LogID, Context, Value) VALUES (?, ?, ?)",
+                        new UuidStatementValue(pendingLog.getId()),
+                        new StringStatementValue(key),
+                        new StringStatementValue(value)
+                ));
+            });
+            database.executeBatch(contextBatch, false);
+        }
+
+
     }
 
 }

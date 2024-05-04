@@ -41,7 +41,7 @@ import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;

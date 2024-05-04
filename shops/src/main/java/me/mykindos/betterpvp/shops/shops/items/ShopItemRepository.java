@@ -81,7 +81,7 @@ public class ShopItemRepository {
 
             }
         } catch (Exception ex) {
-            log.error("Failed to load shop items", ex);
+            log.error("Failed to load shop items", ex).submit();
         }
 
         return shopItems;

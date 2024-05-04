@@ -354,7 +354,7 @@ public class ScytheListener implements Listener {
                     spawned.setItemStack(item);
                 } catch (MojangApiUtils.MojangApiException | IOException e) {
                     spawned.setItemStack(new ItemStack(Material.SKELETON_SKULL));
-                    log.error("Failed to bind head texture for soul (" + ent.getName() + ")", e);
+                    log.error("Failed to bind head texture for soul (" + ent.getName() + ")", e).submit();
                 }
             } else {
                 spawned.setItemStack(new ItemStack(Material.SKELETON_SKULL));

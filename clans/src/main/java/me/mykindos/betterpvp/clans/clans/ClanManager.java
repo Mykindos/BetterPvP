@@ -515,7 +515,7 @@ public class ClanManager extends Manager<Clan> {
             clan.setInsurance(repository.getInsurance(clan));
         });
 
-        log.info("Loaded {} clans", objects.size());
+        log.info("Loaded {} clans", objects.size()).submit();
         leaderboard.forceUpdate();
     }
 

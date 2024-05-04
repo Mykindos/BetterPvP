@@ -45,7 +45,7 @@ public class ShopkeeperManager extends Manager<IShopkeeper> {
             Component name = UtilMessage.getMiniMessage(rawName);
             World world = Bukkit.getWorld(Objects.requireNonNull(shops.getConfig().getString("shopkeepers." + key + ".world")));
             if(world == null) {
-                log.warn("Could not load shopkeeper {} because the world was null", key);
+                log.warn("Could not load shopkeeper {} because the world was null", key).submit();
                 return;
             }
 

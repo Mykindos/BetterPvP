@@ -54,7 +54,7 @@ public class ProgressionAdapter {
 
             listenerLoader.load(clazz);
         }
-        log.info("Loaded " + listenerClasses.size() + " clans progression listeners");
+        log.info("Loaded " + listenerClasses.size() + " clans progression listeners").submit();
     }
 
     private void loadPerks() {
@@ -73,7 +73,7 @@ public class ProgressionAdapter {
                 progressionsManager.fromClass(tree).addPerk(perk);
             }
         }
-        log.info("Loaded " + perkClasses.size() + " clans progression perks");
+        log.info("Loaded " + perkClasses.size() + " clans progression perks").submit();
     }
 
 }

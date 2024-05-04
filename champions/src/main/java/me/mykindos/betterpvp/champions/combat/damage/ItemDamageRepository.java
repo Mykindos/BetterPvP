@@ -36,7 +36,7 @@ public class ItemDamageRepository implements IRepository<ItemDamageValue> {
                 itemDamageValues.add(new ItemDamageValue(item, damage));
             }
         } catch (SQLException ex) {
-            log.error("Failed to load damage values", ex);
+            log.error("Failed to load damage values", ex).submit();
         }
 
         return itemDamageValues;

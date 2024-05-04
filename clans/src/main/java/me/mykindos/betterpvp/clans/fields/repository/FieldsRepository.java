@@ -48,7 +48,7 @@ public class FieldsRepository implements IRepository<FieldsBlockEntry> {
             types.add(interactable);
         }
         types.addAll(List.of(SimpleOre.values()));
-        log.info("Loaded " + types.size() + " ore types");
+        log.info("Loaded " + types.size() + " ore types").submit();
     }
 
     @Override
@@ -71,7 +71,7 @@ public class FieldsRepository implements IRepository<FieldsBlockEntry> {
                 ores.add(new FieldsBlockEntry(type, world, x, y, z));
             }
         } catch (SQLException ex) {
-            log.error("Failed to load fields ores", ex);
+            log.error("Failed to load fields ores", ex).submit();
         }
 
         return ores;

@@ -41,7 +41,7 @@ public class SkillManager extends Manager<Skill> {
 
         }
 
-        log.info("Loaded " + objects.size() + " skills");
+        log.info("Loaded " + objects.size() + " skills").submit();
         champions.saveConfig();
     }
 

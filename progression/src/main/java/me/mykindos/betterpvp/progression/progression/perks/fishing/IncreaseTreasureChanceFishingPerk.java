@@ -94,12 +94,12 @@ public class IncreaseTreasureChanceFishingPerk implements Listener, ProgressionP
                     FishingLootType potentialType = lootTypes.random();
                     event.setLoot(potentialType.generateLoot());
                 }).exceptionally(throwable1 -> {
-                    log.error("Failed to check if player " + event.getPlayer().getName() + " has a level ", throwable1);
+                    log.error("Failed to check if player " + event.getPlayer().getName() + " has a level ", throwable1).submit();
                     return null;
                 });
             }
         }).exceptionally(throwable -> {
-            log.error("Failed to check if player " + event.getPlayer().getName() + " has perk " + getName(), throwable);
+            log.error("Failed to check if player " + event.getPlayer().getName() + " has perk " + getName(), throwable).submit();
             return null;
         });
     }

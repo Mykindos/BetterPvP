@@ -308,7 +308,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
                 UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> UtilServer.callEvent(new ClanPropertyUpdateEvent(this, key, value)));
             }
         } catch (IllegalArgumentException ex) {
-            log.error("Could not find a ClanProperty named {}", key, ex);
+            log.error("Could not find a ClanProperty named {}", key, ex).submit();
         }
     }
 }

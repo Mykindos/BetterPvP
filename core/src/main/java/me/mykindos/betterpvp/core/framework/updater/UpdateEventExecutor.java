@@ -99,7 +99,7 @@ public class UpdateEventExecutor {
         try {
             method.invoke(obj);
         } catch (InvocationTargetException | IllegalAccessException | IllegalArgumentException e) {
-            log.error("Could not execute updater {} in {}", method.getName(), method.getDeclaringClass().getName(), e);
+            log.error("Could not execute updater {} in {}", method.getName(), method.getDeclaringClass().getName(), e).submit();
         }
     }
 }

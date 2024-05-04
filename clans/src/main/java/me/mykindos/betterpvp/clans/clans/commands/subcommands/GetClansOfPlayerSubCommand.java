@@ -7,7 +7,6 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
 import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
-import me.mykindos.betterpvp.clans.logging.ClanLogger;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
@@ -24,12 +23,9 @@ import java.util.List;
 @SubCommand(ClanCommand.class)
 public class GetClansOfPlayerSubCommand extends ClanSubCommand {
 
-    private final ClanLogger clanLogger;
-
     @Inject
-    public GetClansOfPlayerSubCommand(ClanManager clanManager, ClientManager clientManager, ClanLogger clanLogger) {
+    public GetClansOfPlayerSubCommand(ClanManager clanManager, ClientManager clientManager) {
         super(clanManager, clientManager);
-        this.clanLogger = clanLogger;
     }
 
     @Override
@@ -64,7 +60,7 @@ public class GetClansOfPlayerSubCommand extends ClanSubCommand {
 
 
             UtilServer.runTaskAsync(JavaPlugin.getPlugin(Clans.class), () -> {
-                List<Component> components = clanLogger.getClansByPlayer(targetClient.getUniqueId());
+                List<Component> components = clanManager.getRepository().getClansByPlayer(targetClient.getUniqueId());
                 UtilMessage.message(player, "Clan", "Retrieving past and present Clans of <yellow>%s</yellow>", targetClient.getName());
 
                 for (Component component : components) {
