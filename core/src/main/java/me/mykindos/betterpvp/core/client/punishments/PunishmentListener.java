@@ -33,8 +33,6 @@ public class PunishmentListener implements Listener {
 
     private final long CHECKDELAY = 10_000;
 
-    private final PrettyTime prettyTime = new PrettyTime();
-
     @Inject
     public PunishmentListener(ClientManager clientManager) {
         this.clientManager = clientManager;
