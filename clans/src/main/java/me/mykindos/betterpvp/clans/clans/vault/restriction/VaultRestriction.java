@@ -7,7 +7,11 @@ import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.OptionalInt;
 
 /**
  * Represents an item restriction that can be applied to a vault
