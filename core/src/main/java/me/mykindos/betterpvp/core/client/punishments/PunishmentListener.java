@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
+import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
@@ -29,6 +30,10 @@ import java.util.Optional;
 public class PunishmentListener implements Listener {
 
     private final ClientManager clientManager;
+
+    private final long CHECKDELAY = 10_000;
+
+    private final PrettyTime prettyTime = new PrettyTime();
 
     @Inject
     public PunishmentListener(ClientManager clientManager) {
@@ -61,11 +66,12 @@ public class PunishmentListener implements Listener {
         if (event.isCancelled()) return;
         final Client client = clientManager.search().online(event.getPlayer());
 
-        Optional<Punishment> mute = client.getPunishment(PunishmentTypes.MUTE);
-        if (mute.isPresent()) {
+        client.getPunishment(PunishmentTypes.MUTE).ifPresent(mute -> {
             UtilMessage.simpleMessage(event.getPlayer(), "Punish", "You are currently muted and cannot send messages!");
-            event.setCancelled(true);
-        }
+            String formattedTime = prettyTime.format(new Date(mute.getExpiryTime())).replace(" from now", "");
+            UtilMessage.message(event.getPlayer(), "Punish", "You are muted for <green>%s</green> for <yellow>%s</yellow>", formattedTime, mute.getReason());
+            event.cancel("Player is muted");
+        });
     }
 
     @EventHandler
@@ -116,6 +122,19 @@ public class PunishmentListener implements Listener {
                 event.setResult(Event.Result.DENY);
             }
         }
+    }
+
+    @UpdateEvent(delay = CHECKDELAY, isAsync = true)
+    public void onExpiration() {
+        long timeStart = System.currentTimeMillis();
+        clientManager.getOnline().forEach(client -> {
+            client.getPunishments().forEach(punishment -> {
+                if (punishment.isRevoked()) return;
+                if (punishment.hasExpired() && timeStart - punishment.getExpiryTime() <= CHECKDELAY) {
+                    punishment.getType().onExpire(client, punishment);
+                }
+            });
+        });
     }
 
 }

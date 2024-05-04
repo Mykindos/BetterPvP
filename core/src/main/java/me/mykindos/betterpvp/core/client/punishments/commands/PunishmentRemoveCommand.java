@@ -69,6 +69,7 @@ public class PunishmentRemoveCommand extends Command implements IConsoleCommand 
 
                 punishmentList.forEach(punishment -> {
                     punishment.setRevoked(true);
+                    punishment.getType().onExpire(target, punishment);
                     punishmentRepository.revokePunishment(punishment);
                 });
             } else {
