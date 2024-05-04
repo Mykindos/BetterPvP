@@ -31,7 +31,7 @@ public class PunishmentListener implements Listener {
 
     private final ClientManager clientManager;
 
-    private final long CHECKDELAY = 10_000;
+    private static final long CHECKDELAY = 10_000;
 
     @Inject
     public PunishmentListener(ClientManager clientManager) {
