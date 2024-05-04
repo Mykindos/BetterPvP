@@ -1,6 +1,10 @@
 package me.mykindos.betterpvp.core.serialization.impl;
 
-import com.google.gson.*;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.framework.customtypes.MyConcurrentHashMap;
 import me.mykindos.betterpvp.core.serialization.Serialization;

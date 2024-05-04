@@ -13,7 +13,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
 import javax.inject.Inject;
-import java.awt.*;
+import java.awt.Color;
 
 @BPvPListener
 public class ExceptionListener implements Listener {
