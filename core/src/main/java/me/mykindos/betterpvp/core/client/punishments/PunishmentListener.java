@@ -68,8 +68,7 @@ public class PunishmentListener implements Listener {
 
         client.getPunishment(PunishmentTypes.MUTE).ifPresent(mute -> {
             UtilMessage.simpleMessage(event.getPlayer(), "Punish", "You are currently muted and cannot send messages!");
-            String formattedTime = prettyTime.format(new Date(mute.getExpiryTime())).replace(" from now", "");
-            UtilMessage.message(event.getPlayer(), "Punish", "You are muted for <green>%s</green> for <yellow>%s</yellow>", formattedTime, mute.getReason());
+            UtilMessage.message(event.getPlayer(), "Punish", mute.getInformation());
             event.cancel("Player is muted");
         });
     }
@@ -81,33 +80,34 @@ public class PunishmentListener implements Listener {
 
         final Client client = clientManager.search().online(damager);
 
-        Optional<Punishment> pvpLock = client.getPunishment(PunishmentTypes.PVP_LOCK);
-        if (pvpLock.isPresent()) {
+        client.getPunishment(PunishmentTypes.PVP_LOCK).ifPresent(pvpLock -> {
             UtilMessage.simpleMessage(damager, "Punish", "You are currently PvP Locked and cannot deal damage to other players!");
+            UtilMessage.message(damager, "Punish", pvpLock.getInformation());
             event.setCancelled(true);
-        }
+        });
+
     }
 
     @EventHandler
     public void onPlace(BlockPlaceEvent event) {
         final Client client = clientManager.search().online(event.getPlayer());
 
-        Optional<Punishment> buildLock = client.getPunishment(PunishmentTypes.BUILD_LOCK);
-        if (buildLock.isPresent()) {
+        client.getPunishment(PunishmentTypes.BUILD_LOCK).ifPresent(buildLock -> {
             UtilMessage.simpleMessage(event.getPlayer(), "Punish", "You are currently Build Locked and cannot place blocks!");
+            UtilMessage.message(event.getPlayer(), "Punish", buildLock.getInformation());
             event.setCancelled(true);
-        }
+        });
     }
 
     @EventHandler
     public void onBreak(BlockBreakEvent event) {
         final Client client = clientManager.search().online(event.getPlayer());
 
-        Optional<Punishment> buildLock = client.getPunishment(PunishmentTypes.BUILD_LOCK);
-        if (buildLock.isPresent()) {
-            UtilMessage.simpleMessage(event.getPlayer(), "Punish", "You are currently Build Locked and cannot break blocks!");
+        client.getPunishment(PunishmentTypes.BUILD_LOCK).ifPresent(buildLock -> {
+            UtilMessage.simpleMessage(event.getPlayer(), "Punish", "You are currently Build Locked and cannot place blocks!");
+            UtilMessage.message(event.getPlayer(), "Punish", buildLock.getInformation());
             event.setCancelled(true);
-        }
+        });
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
