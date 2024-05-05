@@ -7,10 +7,12 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
+import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -29,6 +31,8 @@ import java.util.Optional;
 public class PunishmentListener implements Listener {
 
     private final ClientManager clientManager;
+
+    private static final long CHECKDELAY = 10_000;
 
     @Inject
     public PunishmentListener(ClientManager clientManager) {
@@ -61,11 +65,11 @@ public class PunishmentListener implements Listener {
         if (event.isCancelled()) return;
         final Client client = clientManager.search().online(event.getPlayer());
 
-        Optional<Punishment> mute = client.getPunishment(PunishmentTypes.MUTE);
-        if (mute.isPresent()) {
+        client.getPunishment(PunishmentTypes.MUTE).ifPresent(mute -> {
             UtilMessage.simpleMessage(event.getPlayer(), "Punish", "You are currently muted and cannot send messages!");
-            event.setCancelled(true);
-        }
+            UtilMessage.message(event.getPlayer(), "Punish", mute.getInformation());
+            event.cancel("Player is muted");
+        });
     }
 
     @EventHandler
@@ -75,33 +79,34 @@ public class PunishmentListener implements Listener {
 
         final Client client = clientManager.search().online(damager);
 
-        Optional<Punishment> pvpLock = client.getPunishment(PunishmentTypes.PVP_LOCK);
-        if (pvpLock.isPresent()) {
+        client.getPunishment(PunishmentTypes.PVP_LOCK).ifPresent(pvpLock -> {
             UtilMessage.simpleMessage(damager, "Punish", "You are currently PvP Locked and cannot deal damage to other players!");
+            UtilMessage.message(damager, "Punish", pvpLock.getInformation());
             event.setCancelled(true);
-        }
+        });
+
     }
 
     @EventHandler
     public void onPlace(BlockPlaceEvent event) {
         final Client client = clientManager.search().online(event.getPlayer());
 
-        Optional<Punishment> buildLock = client.getPunishment(PunishmentTypes.BUILD_LOCK);
-        if (buildLock.isPresent()) {
+        client.getPunishment(PunishmentTypes.BUILD_LOCK).ifPresent(buildLock -> {
             UtilMessage.simpleMessage(event.getPlayer(), "Punish", "You are currently Build Locked and cannot place blocks!");
+            UtilMessage.message(event.getPlayer(), "Punish", buildLock.getInformation());
             event.setCancelled(true);
-        }
+        });
     }
 
     @EventHandler
     public void onBreak(BlockBreakEvent event) {
         final Client client = clientManager.search().online(event.getPlayer());
 
-        Optional<Punishment> buildLock = client.getPunishment(PunishmentTypes.BUILD_LOCK);
-        if (buildLock.isPresent()) {
-            UtilMessage.simpleMessage(event.getPlayer(), "Punish", "You are currently Build Locked and cannot break blocks!");
+        client.getPunishment(PunishmentTypes.BUILD_LOCK).ifPresent(buildLock -> {
+            UtilMessage.simpleMessage(event.getPlayer(), "Punish", "You are currently Build Locked and cannot place blocks!");
+            UtilMessage.message(event.getPlayer(), "Punish", buildLock.getInformation());
             event.setCancelled(true);
-        }
+        });
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -116,6 +121,20 @@ public class PunishmentListener implements Listener {
                 event.setResult(Event.Result.DENY);
             }
         }
+    }
+
+    @UpdateEvent(delay = CHECKDELAY, isAsync = true)
+    public void onExpiration() {
+        long timeStart = System.currentTimeMillis();
+        Bukkit.getOnlinePlayers().forEach(player -> {
+            Client client = clientManager.search().online(player);
+            client.getPunishments().forEach(punishment -> {
+                if (punishment.isRevoked()) return;
+                if (punishment.hasExpired() && timeStart - punishment.getExpiryTime() <= CHECKDELAY) {
+                    punishment.getType().onExpire(client, punishment);
+                }
+            });
+        });
     }
 
 }

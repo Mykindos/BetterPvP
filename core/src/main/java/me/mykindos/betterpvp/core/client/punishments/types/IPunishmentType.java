@@ -10,4 +10,6 @@ public interface IPunishmentType {
 
     default void onReceive(Client client, Punishment punishment) {}
 
+    default void onExpire(Client client, Punishment punishment) {}
+
 }
