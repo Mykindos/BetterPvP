@@ -5,6 +5,7 @@ import lombok.Getter;
 import me.mykindos.betterpvp.core.effects.types.negative.BleedEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.BlindnessEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.DarknessEffect;
+import me.mykindos.betterpvp.core.effects.types.negative.FrozenEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.LevitationEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.NoJumpEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.NoSprintEffect;
@@ -54,6 +55,7 @@ public class EffectTypes {
     public static final EffectType SHOCK = createEffectType(new ShockEffect());
     public static final EffectType WITHER = createEffectType(new WitherEffect());
     public static final EffectType DARKNESS = createEffectType(new DarknessEffect());
+    public static final EffectType FROZEN = createEffectType(new FrozenEffect());
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="Positive Effect Types">
