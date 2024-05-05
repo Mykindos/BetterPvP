@@ -21,7 +21,10 @@ import me.mykindos.betterpvp.progression.tree.fishing.event.PlayerStartFishingEv
 import me.mykindos.betterpvp.progression.tree.fishing.event.PlayerStopFishingEvent;
 import me.mykindos.betterpvp.progression.tree.fishing.event.PlayerThrowBaitEvent;
 import me.mykindos.betterpvp.progression.tree.fishing.fish.Fish;
-import me.mykindos.betterpvp.progression.tree.fishing.model.*;
+import me.mykindos.betterpvp.progression.tree.fishing.model.Bait;
+import me.mykindos.betterpvp.progression.tree.fishing.model.BaitType;
+import me.mykindos.betterpvp.progression.tree.fishing.model.FishingLoot;
+import me.mykindos.betterpvp.progression.tree.fishing.model.FishingLootType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -37,10 +40,13 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.util.Vector;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Random;
+import java.util.WeakHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -189,7 +195,7 @@ public class FishingListener implements Listener {
             }
             case REEL_IN -> {
                 // They reeled in before
-                UtilServer.callEvent(new PlayerStopFishingEvent(player, null, fish.getIfPresent(player), PlayerStopFishingEvent.FishingResult.EARLY_REEL));
+                UtilServer.callEvent(new PlayerStopFishingEvent(player, fish.getIfPresent(player), PlayerStopFishingEvent.FishingResult.EARLY_REEL));
                 fish.invalidate(player);
             }
             case FAILED_ATTEMPT -> {
@@ -217,26 +223,11 @@ public class FishingListener implements Listener {
 
         splash(hook.getLocation());
 
-        final PlayerInventory inventory = player.getInventory();
-        final Optional<FishingRodType> main = fishing.getRodType(inventory.getItemInMainHand());
-        final Optional<FishingRodType> off = fishing.getRodType(inventory.getItemInOffHand());
-
-        boolean canMainReel = main.map(rod -> rod.canReel(caught)).orElse(false);
-        boolean canOffReel = off.map(rod -> rod.canReel(caught)).orElse(false);
-        if (!canMainReel && !canOffReel && !event.isIgnoresWeight()) {
-            FishingRodType rod = main.orElse(off.orElse(null));
-            UtilServer.callEvent(new PlayerStopFishingEvent(player, rod, caught, PlayerStopFishingEvent.FishingResult.BAD_ROD));
-            UtilMessage.message(event.getPlayer(), "Fishing", "<red>Your rod couldn't reel this <dark_red>%s</dark_red>!", caught.getType().getName());
-            entity.remove();
-            return; // Cancel if neither of the rods in your hand can reel
-        }
-
         entity.setCanMobPickup(false);
         caught.processCatch(event);
         player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 5f, 0F);
 
-        FishingRodType rod = canMainReel ? main.get() : off.get();
-        UtilServer.callEvent(new PlayerStopFishingEvent(player, rod, caught, PlayerStopFishingEvent.FishingResult.CATCH));
+        UtilServer.callEvent(new PlayerStopFishingEvent(player, caught, PlayerStopFishingEvent.FishingResult.CATCH));
     }
 
     @EventHandler

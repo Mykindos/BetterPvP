@@ -91,6 +91,7 @@ public class GamerListener implements Listener {
     }
 
     private void checkUnsetProperties(Gamer gamer) {
+
         Optional<Integer> coinsOptional = gamer.getProperty(GamerProperty.BALANCE);
         if(coinsOptional.isEmpty()){
             gamer.saveProperty(GamerProperty.BALANCE, defaultCoins);
@@ -101,10 +102,6 @@ public class GamerListener implements Listener {
             gamer.saveProperty(GamerProperty.FRAGMENTS, defaultFragments);
         }
 
-        Optional<Boolean> clanMenuOptional = gamer.getProperty(GamerProperty.CLAN_MENU_ENABLED);
-        if(clanMenuOptional.isEmpty()){
-            gamer.saveProperty(GamerProperty.CLAN_MENU_ENABLED, true);
-        }
     }
 
 }

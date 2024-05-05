@@ -15,10 +15,12 @@ import me.mykindos.betterpvp.progression.tree.fishing.Fishing;
 import me.mykindos.betterpvp.progression.tree.fishing.event.PlayerStopFishingEvent;
 import me.mykindos.betterpvp.progression.tree.fishing.fish.Fish;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.ItemStack;
 
 @BPvPListener
 @Singleton
@@ -80,7 +82,9 @@ public class DropMultiplierFishingPerk implements Listener, ProgressionPerk, Cha
                         int extraDrops = getChance((level - minLevel) * increasePerLevel);
                         Location playerLocation = player.getLocation();
                         for (int i = 0; i < extraDrops; i++) {
-                            playerLocation.getWorld().dropItemNaturally(playerLocation, loot.getFishBucket());
+                            ItemStack item = new ItemStack(Material.COD, loot.getWeight());
+                            //item.editMeta(meta -> meta.setCustomModelData(loot.modelData()))
+                            playerLocation.getWorld().dropItemNaturally(playerLocation, item);
                         }
                     }).exceptionally(throwable1 -> {
                         log.error("Failed to check if player " + event.getPlayer().getName() + " has a level ", throwable).submit();

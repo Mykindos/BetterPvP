@@ -26,7 +26,6 @@ import me.mykindos.betterpvp.progression.tree.fishing.model.BaitType;
 import me.mykindos.betterpvp.progression.tree.fishing.model.FishingConfigLoader;
 import me.mykindos.betterpvp.progression.tree.fishing.model.FishingLootType;
 import me.mykindos.betterpvp.progression.tree.fishing.model.FishingRodType;
-import me.mykindos.betterpvp.progression.tree.fishing.rod.SimpleFishingRod;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;
 import org.reflections.Reflections;
@@ -97,22 +96,9 @@ public class FishingRepository extends ProgressionStatsRepository<Fishing, Fishi
         Reflections classScan = new Reflections(Fishing.class.getPackageName());
         loadLootTypes(classScan, config);
         loadBaitTypes(classScan, config);
-        loadRodTypes(classScan, config);
+
     }
 
-    private void loadRodTypes(Reflections reflections, ExtendedYamlConfiguration config) {
-        Set<Class<? extends FishingRodType>> rodClasses = reflections.getSubTypesOf(FishingRodType.class);
-        rodClasses.removeIf(clazz -> clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers()) || clazz.isEnum());
-        rodClasses.removeIf(clazz -> clazz.isAnnotationPresent(Deprecated.class));
-        for (var clazz : rodClasses) {
-            FishingRodType type = plugin.getInjector().getInstance(clazz);
-            plugin.getInjector().injectMembers(type);
-            type.loadConfig(config);
-            rodTypes.add(type);
-        }
-        rodTypes.addAll(List.of(SimpleFishingRod.values()));
-        log.info("Loaded " + rodTypes.size() + " rod types").submit();
-    }
 
     private void loadBaitTypes(Reflections reflections, ExtendedYamlConfiguration config) {
         Set<Class<? extends BaitType>> baitClasses = reflections.getSubTypesOf(BaitType.class);

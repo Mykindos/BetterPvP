@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.progression.tree.fishing.fish;
 import lombok.Data;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.progression.tree.fishing.model.FishingLoot;
+import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Random;
@@ -20,6 +21,8 @@ public class SimpleFishType implements FishType {
     private int minWeight;
     private int maxWeight;
     private int frequency;
+    private int modelData;
+    private Material material;
 
     @Override
     public void loadConfig(@NotNull ExtendedYamlConfiguration config) {
@@ -27,6 +30,8 @@ public class SimpleFishType implements FishType {
         this.frequency = config.getOrSaveInt("fishing.loot." + key + ".frequency", 1);
         this.minWeight = config.getOrSaveInt("fishing.loot." + key + ".minWeight", 1);
         this.maxWeight = config.getOrSaveInt("fishing.loot." + key + ".maxWeight", 1);
+        this.modelData = config.getOrSaveInt("fishing.loot." + key + ".modelData", 0);
+        this.material = Material.valueOf(config.getString("fishing.loot." + key + ".material", "COD"));
     }
 
     @Override

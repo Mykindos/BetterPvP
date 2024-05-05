@@ -17,6 +17,7 @@ import net.minecraft.world.phys.Vec3;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_20_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_20_R3.entity.CraftEntity;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.jetbrains.annotations.NotNull;
@@ -26,7 +27,7 @@ import java.util.Objects;
 public class ParrotShopkeeper extends Parrot implements IShopkeeper {
 
     @Getter
-    private final CraftEntity entity;
+    private final Entity entity;
 
     private String shopkeeperName;
 
@@ -45,6 +46,7 @@ public class ParrotShopkeeper extends Parrot implements IShopkeeper {
 
         entity.customName(name);
         entity.setCustomNameVisible(true);
+        entity.setPersistent(false);
 
         if(entity instanceof LivingEntity livingEntity) {
             livingEntity.setRemoveWhenFarAway(false);

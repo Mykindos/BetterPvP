@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.components.shops.events.PlayerSellItemEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -18,6 +19,7 @@ import me.mykindos.betterpvp.core.utilities.UtilSound;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
 import me.mykindos.betterpvp.shops.shops.ShopManager;
 import me.mykindos.betterpvp.shops.shops.items.DynamicShopItem;
+import me.mykindos.betterpvp.shops.shops.items.ShopItem;
 import me.mykindos.betterpvp.shops.shops.menus.ShopMenu;
 import me.mykindos.betterpvp.shops.shops.shopkeepers.ShopkeeperManager;
 import me.mykindos.betterpvp.shops.shops.shopkeepers.types.IShopkeeper;
@@ -35,8 +37,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -69,7 +73,7 @@ public class ShopListener implements Listener {
         Optional<IShopkeeper> shopkeeperOptional = shopkeeperManager.getObject(target.getUniqueId());
         shopkeeperOptional.ifPresent(shopkeeper -> {
             var shopkeeperItems = shopManager.getShopItems(shopkeeper.getShopkeeperName());
-            if(shopkeeperItems == null || shopkeeperItems.isEmpty()) return;
+            if (shopkeeperItems == null || shopkeeperItems.isEmpty()) return;
 
             var menu = new ShopMenu(Component.text(shopkeeper.getShopkeeperName()), shopkeeperItems, itemHandler, clientManager);
             menu.show(event.getPlayer());
@@ -119,7 +123,7 @@ public class ShopListener implements Listener {
             event.getGamer().saveProperty(GamerProperty.FRAGMENTS.name(), event.getGamer().getIntProperty(GamerProperty.FRAGMENTS) - cost);
         }
 
-        if(event.getShopItem() instanceof DynamicShopItem dynamicShopItem) {
+        if (event.getShopItem() instanceof DynamicShopItem dynamicShopItem) {
             dynamicShopItem.setCurrentStock(Math.max(0, dynamicShopItem.getCurrentStock() - amount));
         }
 
@@ -150,6 +154,8 @@ public class ShopListener implements Listener {
             return;
         }
 
+        ShopItem shopItem = (ShopItem) event.getShopItem();
+
 
         boolean isShifting = event.getClickType().name().contains("SHIFT");
         int cost;
@@ -159,11 +165,18 @@ public class ShopListener implements Listener {
             for (int i = 0; i < player.getInventory().getSize(); i++) {
                 ItemStack item = player.getInventory().getItem(i);
                 if (item == null) continue;
+                ItemMeta itemMeta = item.getItemMeta();
 
                 amount = isShifting ? item.getAmount() : event.getItem().getAmount();
                 cost = amount * event.getShopItem().getSellPrice();
 
                 if (item.getType() == event.getItem().getType()) {
+
+                    if (!shopItem.getItemFlags().containsKey("IGNORE_MODELDATA")) {
+                        if (itemMeta.hasCustomModelData() && itemMeta.getCustomModelData() != shopItem.getModelData()) {
+                            continue;
+                        }
+                    }
 
                     // Some items, such as imbued weapons, cannot be sold despite being the same type
                     if (item.getItemMeta().getPersistentDataContainer().has(ShopsNamespacedKeys.SHOP_NOT_SELLABLE)) {
@@ -175,7 +188,9 @@ public class ShopListener implements Listener {
                         if (item.getAmount() - amount < 1) {
                             player.getInventory().setItem(i, new ItemStack(Material.AIR));
                         } else {
-                            player.getInventory().setItem(i, new ItemStack(item.getType(), item.getAmount() - amount));
+                            ItemStack newStack = item.clone();
+                            newStack.setAmount(item.getAmount() - amount);
+                            player.getInventory().setItem(i, newStack);
                         }
 
 
@@ -183,13 +198,13 @@ public class ShopListener implements Listener {
                             event.getGamer().saveProperty(GamerProperty.BALANCE.name(), event.getGamer().getIntProperty(GamerProperty.BALANCE) + cost);
                         }
 
-                        if(event.getShopItem() instanceof DynamicShopItem dynamicShopItem) {
+                        if (event.getShopItem() instanceof DynamicShopItem dynamicShopItem) {
                             dynamicShopItem.setCurrentStock(Math.min(dynamicShopItem.getMaxStock(), dynamicShopItem.getCurrentStock() + amount));
                         }
 
                         UtilSound.playSound(event.getPlayer(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 2f, false);
                         UtilMessage.simpleMessage(event.getPlayer(), "Shop", "You have sold <alt2>%d %s</alt2> for <alt2>%s %s</alt2>.",
-                                amount, event.getShopItem().getItemName(), cost, event.getCurrency().name().toLowerCase());
+                                amount, event.getShopItem().getItemName(), UtilFormat.formatNumber(cost), event.getCurrency().name().toLowerCase());
 
                         return;
                     }
@@ -266,6 +281,21 @@ public class ShopListener implements Listener {
             }
         }
 
+    }
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        if (shopkeeperManager.getObjects().isEmpty()) {
+            shopkeeperManager.loadShopsFromConfig();
+        }
+    }
+
+    @UpdateEvent(delay = 10000)
+    public void checkShopkeepers() {
+        if (shopkeeperManager.getObjects().values().stream().anyMatch(shopkeeper -> shopkeeper.getEntity() == null
+                || shopkeeper.getEntity().isDead() || !shopkeeper.getEntity().isValid())) {
+            shopkeeperManager.loadShopsFromConfig();
+        }
     }
 
 

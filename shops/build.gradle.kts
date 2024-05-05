@@ -14,6 +14,7 @@ dependencies {
 
     compileOnly(project(":core"))
     compileOnly(libs.libsdisguises)
+    compileOnly(libs.mythic)
 
     annotationProcessor(libs.lombok)
     compileOnly(libs.lombok)

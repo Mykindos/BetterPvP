@@ -26,6 +26,8 @@ import xyz.xenondevs.invui.item.ItemProvider;
 import xyz.xenondevs.invui.item.impl.AbstractItem;
 
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ShopItemButton extends AbstractItem implements CooldownButton {
 
@@ -42,20 +44,32 @@ public class ShopItemButton extends AbstractItem implements CooldownButton {
     @Override
     public ItemProvider getItemProvider() {
         boolean canSell = shopItem.getSellPrice() > 0;
-        final ItemView.ItemViewBuilder builder = ItemView.builder()
-                .material(shopItem.getMaterial())
-                .amount(shopItem.getAmount())
-                .lore(Component.empty())
-                .lore(Component.text("Buy: ", NamedTextColor.GRAY).append(Component.text("$" + NumberFormat.getInstance().format(shopItem.getBuyPrice()), NamedTextColor.YELLOW)))
-                .lore(Component.text("Shift Left Click: ", NamedTextColor.GRAY).append(Component.text("Buy 64", NamedTextColor.YELLOW)));
+        ItemStack item = new ItemStack(shopItem.getMaterial(), shopItem.getAmount());
+        item.getItemMeta().setCustomModelData(shopItem.getModelData());
+        item = itemHandler.updateNames(item);
 
-        if (canSell) {
-            builder.lore(Component.empty());
-            builder.lore(Component.text("Sell: ", NamedTextColor.GRAY).append(Component.text("$" + NumberFormat.getInstance().format(shopItem.getSellPrice()), NamedTextColor.YELLOW)));
-            builder.lore(Component.text("Shift Right Click: ", NamedTextColor.GRAY).append(Component.text("Sell 64", NamedTextColor.YELLOW)));
-        }
+        item.editMeta(itemMeta -> {
+            if(!itemMeta.hasLore()) {
+                itemMeta.lore(new ArrayList<>());
+            }
 
-        final ItemStack item = itemHandler.updateNames(builder.build().get());
+            List<Component> lore = itemMeta.lore();
+            if(lore != null){
+                lore.add(Component.empty());
+                lore.add(Component.text("Buy: ", NamedTextColor.GRAY).append(Component.text("$" + NumberFormat.getInstance().format(shopItem.getBuyPrice()), NamedTextColor.GREEN)));
+                lore.add(Component.text("Shift Left Click: ", NamedTextColor.GRAY).append(Component.text("Buy 64", NamedTextColor.GREEN)));
+
+                if (canSell) {
+                    lore.add(Component.empty());
+                    lore.add(Component.text("Sell: ", NamedTextColor.GRAY).append(Component.text("$" + NumberFormat.getInstance().format(shopItem.getSellPrice()), NamedTextColor.GREEN)));
+                    lore.add(Component.text("Shift Right Click: ", NamedTextColor.GRAY).append(Component.text("Sell 64", NamedTextColor.GREEN)));
+                }
+            }
+
+            itemMeta.lore(lore);
+
+        });
+
         return ItemView.of(item);
     }
 

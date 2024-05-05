@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.clans.settings.menus;
 
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
-import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.settings.menus.SettingCategory;
 import me.mykindos.betterpvp.core.settings.menus.buttons.SettingsButton;
@@ -34,21 +33,9 @@ public class ClansSettingsMenu extends AbstractGui implements SettingCategory {
                     .get();
         }).build();
 
-        final Description clanMenuDescription = Description.builder().icon(lang -> {
-            final boolean setting = (boolean) gamer.getProperty(GamerProperty.CLAN_MENU_ENABLED).orElse(false);
-            final NamedTextColor color = setting ? NamedTextColor.GREEN : NamedTextColor.RED;
-            return ItemView.builder()
-                    .material(Material.BAMBOO_HANGING_SIGN)
-                    .displayName(Component.text("Clan Menu", color))
-                    .lore(Component.text("Whether to display a menu or chat message when doing /clan", NamedTextColor.GRAY))
-                    .frameLore(true)
-                    .build()
-                    .get();
-        }).build();
 
         addItems(
-                new SettingsButton(client, ClientProperty.SIDEBAR_ENABLED, sidebarDescription),
-                new SettingsButton(gamer, GamerProperty.CLAN_MENU_ENABLED, clanMenuDescription)
+                new SettingsButton(client, ClientProperty.SIDEBAR_ENABLED, sidebarDescription)
         );
     }
 

@@ -164,7 +164,7 @@ public class MapHandler {
             public void run() {
                 final long l = System.currentTimeMillis();
 
-                log.info("Saving map data...");
+                log.info("Saving map data...").submit();
 
                 MapView map = Bukkit.getMap(0);
                 if (map == null) {

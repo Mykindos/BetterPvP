@@ -71,7 +71,7 @@ public class CommandListener implements Listener {
         Client client = clientManager.search().online(event.getPlayer());
         String commandName = event.getMessage().substring(1).toLowerCase();
 
-        log.info("{} executed command: {}", event.getPlayer().getName(), event.getMessage());
+        log.info("{} executed command: {}", event.getPlayer().getName(), event.getMessage()).submit();
 
         if (commandName.contains(" ")) {
             commandName = commandName.split(" ")[0];
@@ -92,7 +92,7 @@ public class CommandListener implements Listener {
             ICommand command = commandOptional.get();
 
             if (!command.isEnabled()) {
-                log.info(event.getPlayer().getName() + " attempted to use " + command.getName() + " but it is disabled");
+                log.info(event.getPlayer().getName() + " attempted to use " + command.getName() + " but it is disabled").submit();
                 return;
             }
 
