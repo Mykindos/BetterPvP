@@ -19,14 +19,6 @@ public class BuildLockPunishmentType implements IPunishmentType {
     }
 
     @Override
-    public void onReceive(Client client, Punishment punishment) {
-        Player player = Bukkit.getPlayer(client.getUniqueId());
-        if (player != null) {
-            UtilMessage.message(player, "Punish", "You have been build locked for");
-        }
-    }
-
-    @Override
     public void onExpire(Client client, Punishment punishment) {
         Player player = Bukkit.getPlayer(client.getUniqueId());
         if (player != null) {

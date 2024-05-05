@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -125,7 +126,8 @@ public class PunishmentListener implements Listener {
     @UpdateEvent(delay = CHECKDELAY, isAsync = true)
     public void onExpiration() {
         long timeStart = System.currentTimeMillis();
-        clientManager.getOnline().forEach(client -> {
+        Bukkit.getOnlinePlayers().forEach(player -> {
+            Client client = clientManager.search().online(player);
             client.getPunishments().forEach(punishment -> {
                 if (punishment.isRevoked()) return;
                 if (punishment.hasExpired() && timeStart - punishment.getExpiryTime() <= CHECKDELAY) {
