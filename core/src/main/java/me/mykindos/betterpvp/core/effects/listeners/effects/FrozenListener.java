@@ -58,6 +58,11 @@ public class FrozenListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOW)
     public void onInteractEvent(PlayerInteractEvent event) {
+        if (event.useInteractedBlock() == Event.Result.DENY
+                && event.useItemInHand() == Event.Result.DENY) {
+            //Both events are denied, this is a cancelled event
+            return;
+        }
         if (effectManager.hasEffect(event.getPlayer(), EffectTypes.FROZEN)) {
             event.setCancelled(true);
             event.setUseInteractedBlock(Event.Result.DENY);
