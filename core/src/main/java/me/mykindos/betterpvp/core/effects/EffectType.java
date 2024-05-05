@@ -38,4 +38,8 @@ public abstract class EffectType {
         return "";
     }
 
+    public boolean mustBeManuallyRemoved() {
+        return false;
+    }
+
 }

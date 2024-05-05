@@ -47,4 +47,9 @@ public class FrozenEffect extends EffectType {
             UtilMessage.message(player, "Frozen", "You are unfrozen");
         }
     }
+
+    @Override
+    public boolean mustBeManuallyRemoved() {
+        return true;
+    }
 }

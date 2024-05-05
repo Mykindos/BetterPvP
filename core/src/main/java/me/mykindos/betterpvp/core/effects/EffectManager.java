@@ -218,6 +218,7 @@ public class EffectManager extends Manager<List<Effect>> {
 
         for (EffectType effect : EffectTypes.getEffectTypes()) {
             if (!effect.isNegative()) continue;
+            if (effect.mustBeManuallyRemoved()) continue;
             removeEffect(target, effect);
         }
 
