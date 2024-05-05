@@ -667,7 +667,9 @@ public class ClansWorldListener extends ClanListener {
     @UpdateEvent(delay = 250)
     public void checkGamemode() {
         for (Player player : Bukkit.getOnlinePlayers()) {
-            if (player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR) {
+            if (player.getGameMode() == GameMode.CREATIVE
+                    || player.getGameMode() == GameMode.SPECTATOR
+                    || effectManager.hasEffect(player, EffectTypes.FROZEN)) {
                 continue;
             }
 
