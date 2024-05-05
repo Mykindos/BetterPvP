@@ -481,16 +481,16 @@ public class UUIDListener implements Listener {
             itemHandler.getUUIDItems(player).forEach(uuidItem -> {
                 if (!uuidSet.add(uuidItem.getUuid())) {
                     Component component = UtilMessage.deserialize("<red>WARNING</red> Potential duplicate UUID found in ")
-                            .append(UtilMessage.deserialize("<yellow>{}</yellow>", player.getName())
+                            .append(UtilMessage.deserialize("<yellow>%s</yellow>", player.getName())
                                     .clickEvent(ClickEvent.runCommand("/search player " + player.getName()))
                                     .hoverEvent(HoverEvent.showText(UtilMessage.deserialize("<white>Click</white> to search by Player"))))
                             .appendSpace()
-                            .append(UtilMessage.deserialize("<light_purple>{}</light_purple>", uuidItem.getUuid().toString())
+                            .append(UtilMessage.deserialize("<light_purple>%s</light_purple>", uuidItem.getUuid().toString())
                                     .clickEvent(ClickEvent.runCommand("/search item " + uuidItem.getUuid().toString()))
                                     .hoverEvent(HoverEvent.showText(UtilMessage.deserialize("<white>Click</white> to search by UUID"))))
-                            .append(UtilMessage.deserialize(" (<green>{}</green>)", uuidItem.getIdentifier()));
+                            .append(UtilMessage.deserialize(" (<green>%s</green>)", uuidItem.getIdentifier()));
                     clientManager.sendMessageToRank("Core", component, Rank.HELPER);
-                    log.info("Potential duplicate ({}) found in player {}", uuidItem.getUuid(), player.getUniqueId());
+                    log.info("Potential duplicate ({}) found in player {}", uuidItem.getUuid(), player.getUniqueId()).submit();
                     duplicates.getAndIncrement();
                 }
             });

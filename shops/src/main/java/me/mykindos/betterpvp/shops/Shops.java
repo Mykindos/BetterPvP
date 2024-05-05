@@ -11,6 +11,9 @@ import me.mykindos.betterpvp.core.config.ConfigInjectorModule;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.ModuleLoadedEvent;
+import me.mykindos.betterpvp.core.framework.adapter.Adapters;
+import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
+import me.mykindos.betterpvp.core.framework.adapter.PluginAdapters;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
 import me.mykindos.betterpvp.shops.commands.loader.ShopsCommandLoader;
 import me.mykindos.betterpvp.shops.injector.ShopsInjectorModule;
@@ -61,9 +64,12 @@ public class Shops extends BPvPPlugin {
             var shopsCommandLoader = injector.getInstance(ShopsCommandLoader.class);
             shopsCommandLoader.loadCommands(PACKAGE);
 
-
-
             updateEventExecutor.loadPlugin(this);
+
+            final Adapters adapters = new Adapters(this);
+            final Reflections reflectionAdapters = new Reflections(PACKAGE);
+            adapters.loadAdapters(reflectionAdapters.getTypesAnnotatedWith(PluginAdapter.class));
+            adapters.loadAdapters(reflectionAdapters.getTypesAnnotatedWith(PluginAdapters.class));
         }
     }
 }

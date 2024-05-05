@@ -13,7 +13,7 @@ public abstract class ShopItem implements IShopItem {
     private final String store;
     private final String itemName;
     private final Material material;
-    private final byte data;
+    private final int modelData;
     private final int slot;
     private final int page;
     private final int amount;

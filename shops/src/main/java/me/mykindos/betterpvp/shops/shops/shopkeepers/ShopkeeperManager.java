@@ -5,7 +5,9 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.shops.Shops;
+import me.mykindos.betterpvp.shops.shops.events.ShopKeeperSpawnEvent;
 import me.mykindos.betterpvp.shops.shops.shopkeepers.types.IShopkeeper;
 import me.mykindos.betterpvp.shops.shops.shopkeepers.types.ParrotShopkeeper;
 import me.mykindos.betterpvp.shops.shops.shopkeepers.types.SkeletonShopkeeper;
@@ -15,7 +17,6 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.entity.LivingEntity;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -33,7 +34,7 @@ public class ShopkeeperManager extends Manager<IShopkeeper> {
 
     public void loadShopsFromConfig() {
 
-        objects.values().forEach(shopkeeper -> ((LivingEntity) shopkeeper.getEntity()).remove());
+        objects.values().forEach(shopkeeper -> shopkeeper.getEntity().remove());
         objects.clear();
 
         var configSection = shops.getConfig().getConfigurationSection("shopkeepers");
@@ -54,6 +55,11 @@ public class ShopkeeperManager extends Manager<IShopkeeper> {
             double z = shops.getConfig().getDouble("shopkeepers." + key + ".z");
             
             if(type == null) return;
+
+            if(type.startsWith("mm:")) {
+                UtilServer.callEvent(new ShopKeeperSpawnEvent(type.split(":")[1], name, new Location(world, x, y, z)));
+                return;
+            }
 
             switch (type.toUpperCase()) {
                 case "ZOMBIE" -> {

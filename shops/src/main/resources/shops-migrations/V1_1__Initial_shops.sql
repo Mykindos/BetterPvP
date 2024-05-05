@@ -4,7 +4,7 @@ create table if not exists shopitems
     Shopkeeper varchar(255) not null,
     Material   varchar(255) not null,
     ItemName   varchar(255) null,
-    Data       int          null,
+    ModelData  int          null,
     MenuSlot   int          not null,
     MenuPage   int          null,
     Amount     int          not null,

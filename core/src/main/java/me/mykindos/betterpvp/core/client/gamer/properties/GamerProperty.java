@@ -8,9 +8,6 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum GamerProperty {
 
-    // Misc
-    CLAN_MENU_ENABLED,
-
     // Chat modes
     CLAN_CHAT,
     ALLY_CHAT,
