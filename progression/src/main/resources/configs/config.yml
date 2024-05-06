@@ -1,3 +1,7 @@
+progression:
+  database:
+    prefix: progression_
+
 mining:
   minLeaderboardBlockXp: 45
   xpPerBlock:
@@ -21,6 +25,13 @@ mining:
     DEEPSLATE_COAL_ORE: 50
     DEEPSLATE_LAPIS_ORE: 50
     DEEPSLATE_EMERALD_ORE: 50
+  perks:
+    drop-multiplier:
+      enabled: true
+      increasePerLevel: 0.25
+      maxLevel: 1000
+      minLevel: 0
+  enabled: false
 
 
 fishing:
@@ -52,26 +63,163 @@ fishing:
       type: treasure
       material: DIAMOND
       customModelData: 70
-      frequency: 100
+      frequency: 1
       minAmount: 1
       maxAmount: 10
     zombie:
       type: entity
-      entity: DROWNED
+      entity: ZOMBIE
       frequency: 100
+    trout:
+      type: fish
+      name: Trout
+      maxWeight: 50
+      minWeight: 1
+      frequency: 1000
+      modelData: 1
+    salmon:
+      type: fish
+      name: Salmon
+      maxWeight: 50
+      minWeight: 1
+      frequency: 1000
+      modelData: 2
+    bluegill:
+      type: fish
+      name: Bluegill
+      maxWeight: 50
+      minWeight: 1
+      frequency: 1000
+      modelData: 3
+    gar:
+      type: fish
+      name: Gar
+      maxWeight: 50
+      minWeight: 1
+      frequency: 1000
+      modelData: 4
+    carp:
+      type: fish
+      name: Carp
+      maxWeight: 150
+      minWeight: 1
+      frequency: 500
+      modelData: 5
+    catfish:
+      type: fish
+      name: Catfish
+      maxWeight: 150
+      minWeight: 1
+      frequency: 500
+      modelData: 6
+    cod:
+      type: fish
+      name: Cod
+      maxWeight: 150
+      minWeight: 1
+      frequency: 500
+      modelData: 7
+    drum:
+      type: fish
+      name: Drum
+      maxWeight: 150
+      minWeight: 1
+      frequency: 500
+      modelData: 8
+    sablefish:
+      type: fish
+      name: Sablefish
+      maxWeight: 150
+      minWeight: 1
+      frequency: 500
+      modelData: 9
+    kingfish:
+      type: fish
+      name: Kingfish
+      maxWeight: 250
+      minWeight: 100
+      frequency: 250
+      modelData: 10
+    cobia:
+      type: fish
+      name: Cobia
+      maxWeight: 250
+      minWeight: 100
+      frequency: 250
+      modelData: 11
+    sea_bass:
+      type: fish
+      name: Sea Bass
+      maxWeight: 250
+      minWeight: 100
+      frequency: 250
+      modelData: 12
     tuna:
       type: fish
       name: Tuna
-      maxWeight: 400
-      minWeight: 1
+      maxWeight: 500
+      minWeight: 200
       frequency: 50
-    barracuda:
+      modelData: 13
+    swordfish:
       type: fish
-      name: Barracuda
-      maxWeight: 401
-      minWeight: 401
-      frequency: 10000
+      name: Swordfish
+      maxWeight: 500
+      minWeight: 200
+      frequency: 50
+      modelData: 14
+    grouper:
+      type: fish
+      name: Grouper
+      maxWeight: 700
+      minWeight: 400
+      frequency: 30
+      modelData: 16
+    marlin:
+      type: fish
+      name: Marlin
+      maxWeight: 1500
+      minWeight: 500
+      frequency: 15
+      modelData: 15
+    sturgeon:
+      type: fish
+      name: Sturgeon
+      maxWeight: 3000
+      minWeight: 500
+      frequency: 4
+      modelData: 17
+    sunfish:
+      type: fish
+      name: sunfish
+      maxWeight: 6000
+      minWeight: 1000
+      frequency: 2
+      modelData: 18
   xpPerPound: 0.05
+  perks:
+    treasure-chance:
+      enabled: true
+      increasePerLevel: 0.25
+      maxLevel: 1000
+      minLevel: 750
+    longer-bait:
+      enabled: true
+      increasePerLevel: 0.0025
+      maxLevel: 1000
+      minLevel: 0
+    fish-weight:
+      enabled: true
+      increasePerLevel: 0.001
+      increaseWeight: 0.2
+      maxLevel: 1000
+      minLevel: 0
+    drop-multiplier:
+      enabled: true
+      increasePerLevel: 0.25
+      maxLevel: 1000
+      minLevel: 0
+  enabled: true
 command:
   progression:
     enabled: true
@@ -90,4 +238,4 @@ command:
       requiredRank: ADMIN
   stats:
     enabled: true
-    requiredRank: ADMIN
+    requiredRank: PLAYER

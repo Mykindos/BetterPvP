@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.ModuleLoadedEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
+import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.progression.commands.loader.ProgressionCommandLoader;
 import me.mykindos.betterpvp.progression.injector.ProgressionInjectorModule;
 import me.mykindos.betterpvp.progression.listener.ProgressionListenerLoader;
@@ -55,6 +56,9 @@ public class Progression extends BPvPPlugin {
             database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:progression-migrations", "progression");
 
             Bukkit.getPluginManager().callEvent(new ModuleLoadedEvent("Progression"));
+
+            var itemHandler = injector.getInstance(ItemHandler.class);
+            itemHandler.loadItemData("progression");
 
             var listenerLoader = injector.getInstance(ProgressionListenerLoader.class);
             listenerLoader.registerListeners(PACKAGE);
