@@ -175,5 +175,6 @@ INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlo
 INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Fisherman', 'COD', 'Fish', 0, 53, 1, 1, 40, 20);
 SELECT id INTO @shopItemId FROM shopitems WHERE Shopkeeper = 'Fisherman' AND Material = 'COD';
 INSERT IGNORE INTO shopitems_dynamic_pricing VALUES (@shopItemId, 10, 25, 35, 35, 40, 45, 50000, 200000, 50000);
+INSERT IGNORE INTO shopitems_flags (shopItemId, PersistentKey, PersistentValue) VALUES (@shopItemId, 'IGNORE_MODELDATA', 'true');
 
 INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Fisherman', 'FISHING_ROD', 'Fishing Rod', 0, 21, 1, 1, 500, 0);
