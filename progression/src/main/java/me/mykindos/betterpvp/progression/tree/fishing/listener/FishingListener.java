@@ -45,7 +45,6 @@ import org.bukkit.util.Vector;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Random;
 import java.util.WeakHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -54,16 +53,9 @@ import java.util.stream.Collectors;
 @Singleton
 public class FishingListener implements Listener {
 
-    private static final Random RANDOM = new Random();
-
-    @Inject
-    private Progression progression;
-
-    @Inject
-    private Fishing fishing;
-
-    @Inject
-    private ClientManager clientManager;
+    private final Progression progression;
+    private final Fishing fishing;
+    private final ClientManager clientManager;
 
     @Inject
     @Config(path = "fishing.minWaitTime", defaultValue = "5.0")
@@ -84,6 +76,13 @@ public class FishingListener implements Listener {
     private final LoadingCache<Player, FishingLoot> fish = Caffeine.newBuilder()
             .weakKeys()
             .build(key -> getRandomLoot());
+
+    @Inject
+    public FishingListener(Progression progression, Fishing fishing, ClientManager clientManager) {
+        this.progression = progression;
+        this.fishing = fishing;
+        this.clientManager = clientManager;
+    }
 
     // Title display
     @UpdateEvent(delay = 500)

@@ -62,6 +62,26 @@ BEGIN
     WHERE Gamer = gamerName AND timestamp > NOW() - INTERVAL days DAY;
 END;
 
+DROP PROCEDURE IF EXISTS GetBiggestFishCaught;
+CREATE PROCEDURE GetBiggestFishCaught(IN days DOUBLE, IN maxResults INT)
+BEGIN
+SELECT Gamer, Type, Weight
+FROM progression_fishing
+WHERE timestamp > NOW() - INTERVAL days DAY
+ORDER BY Weight DESC
+    LIMIT maxResults;
+END;
+
+DROP PROCEDURE IF EXISTS GetBiggestFishCaughtByGamer;
+CREATE PROCEDURE GetBiggestFishCaughtByGamer(IN gamer VARCHAR(36), IN days DOUBLE, IN maxResults INT)
+BEGIN
+SELECT Gamer, Type, Weight
+FROM progression_fishing
+WHERE timestamp > NOW() - INTERVAL days DAY AND Gamer = gamer
+ORDER BY Weight DESC
+    LIMIT maxResults;
+END;
+
 DROP PROCEDURE IF EXISTS GetTopMiningByOre;
 CREATE PROCEDURE GetTopMiningByOre(IN maxResults INT, IN blocks TEXT)
 BEGIN
