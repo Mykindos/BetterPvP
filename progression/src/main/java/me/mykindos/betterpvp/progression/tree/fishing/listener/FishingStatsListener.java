@@ -6,6 +6,7 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.progression.tree.fishing.Fishing;
+import me.mykindos.betterpvp.progression.tree.fishing.data.CaughtFish;
 import me.mykindos.betterpvp.progression.tree.fishing.event.PlayerStopFishingEvent;
 import me.mykindos.betterpvp.progression.tree.fishing.fish.Fish;
 import me.mykindos.betterpvp.progression.tree.fishing.model.FishingLoot;
@@ -72,6 +73,18 @@ public class FishingStatsListener implements Listener {
 
                 fishing.getCountLeaderboard().attemptAnnounce(event.getPlayer(), result);
             });
+
+            if(event.getLoot() instanceof Fish fishLoot) {
+                fishing.getBiggestFishLeaderboard().add(event.getPlayer().getUniqueId(), new CaughtFish(fishLoot.getType().getName(), fishLoot.getWeight()))
+                        .whenComplete((result, throwable2) -> {
+                    if (throwable2 != null) {
+                        log.error("Failed to add biggest fish to leaderboard for player " + event.getPlayer().getName(), throwable2).submit();
+                        return;
+                    }
+
+                    fishing.getBiggestFishLeaderboard().attemptAnnounce(event.getPlayer(), result);
+                });
+            }
         }).exceptionally(throwable -> {
             log.error("Failed to get progression data for player " + event.getPlayer().getName(), throwable).submit();
             return null;

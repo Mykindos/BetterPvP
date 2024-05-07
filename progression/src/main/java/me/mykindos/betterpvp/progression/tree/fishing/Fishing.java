@@ -6,6 +6,7 @@ import lombok.Getter;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.utilities.model.WeighedList;
 import me.mykindos.betterpvp.progression.model.ProgressionTree;
+import me.mykindos.betterpvp.progression.tree.fishing.data.BiggestFishLeaderboard;
 import me.mykindos.betterpvp.progression.tree.fishing.data.FishingCountLeaderboard;
 import me.mykindos.betterpvp.progression.tree.fishing.data.FishingWeightLeaderboard;
 import me.mykindos.betterpvp.progression.tree.fishing.model.BaitType;
@@ -34,6 +35,9 @@ public class Fishing extends ProgressionTree {
 
     @Inject
     private FishingCountLeaderboard countLeaderboard;
+
+    @Inject
+    private BiggestFishLeaderboard biggestFishLeaderboard;
 
     @Override
     public @NotNull String getName() {
