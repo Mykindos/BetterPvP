@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.progression.tree.fishing.fish;
 
-import lombok.Value;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -16,23 +17,15 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.Random;
+import java.util.UUID;
 
-@Value
+@Data
+@AllArgsConstructor
 public class Fish implements FishingLoot {
 
-    public static final Material[] fishBuckets = new Material[]{
-            Material.COD_BUCKET,
-            Material.SALMON_BUCKET,
-            Material.TROPICAL_FISH_BUCKET,
-            Material.PUFFERFISH_BUCKET,
-            Material.AXOLOTL_BUCKET
-    };
-
-    private static final Random RANDOM = new Random();
-
-    FishType type;
-    int weight;
+    private UUID uuid;
+    private FishType type;
+    private int weight;
 
     public static boolean isFishItem(ItemStack itemStack) {
         if (itemStack == null || itemStack.getType() == Material.AIR) {

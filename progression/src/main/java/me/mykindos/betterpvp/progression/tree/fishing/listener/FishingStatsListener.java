@@ -62,7 +62,7 @@ public class FishingStatsListener implements Listener {
                     return;
                 }
 
-                fishing.getWeightLeaderboard().attemptAnnounce(event.getPlayer(),  result);
+                fishing.getWeightLeaderboard().attemptAnnounce(event.getPlayer(), result);
             });
 
             fishing.getCountLeaderboard().add(event.getPlayer().getUniqueId(), 1L).whenComplete((result, throwable2) -> {
@@ -74,16 +74,16 @@ public class FishingStatsListener implements Listener {
                 fishing.getCountLeaderboard().attemptAnnounce(event.getPlayer(), result);
             });
 
-            if(event.getLoot() instanceof Fish fishLoot) {
-                fishing.getBiggestFishLeaderboard().add(event.getPlayer().getUniqueId(), new CaughtFish(fishLoot.getType().getName(), fishLoot.getWeight()))
+            if (event.getLoot() instanceof Fish fishLoot) {
+                fishing.getBiggestFishLeaderboard().add(fishLoot.getUuid(), new CaughtFish(event.getPlayer().getUniqueId(), fishLoot.getType().getName(), fishLoot.getWeight()))
                         .whenComplete((result, throwable2) -> {
-                    if (throwable2 != null) {
-                        log.error("Failed to add biggest fish to leaderboard for player " + event.getPlayer().getName(), throwable2).submit();
-                        return;
-                    }
+                            if (throwable2 != null) {
+                                log.error("Failed to add biggest fish to leaderboard for player " + event.getPlayer().getName(), throwable2).submit();
+                                return;
+                            }
 
-                    fishing.getBiggestFishLeaderboard().attemptAnnounce(event.getPlayer(), result);
-                });
+                            fishing.getBiggestFishLeaderboard().attemptAnnounce(event.getPlayer(), result);
+                        });
             }
         }).exceptionally(throwable -> {
             log.error("Failed to get progression data for player " + event.getPlayer().getName(), throwable).submit();

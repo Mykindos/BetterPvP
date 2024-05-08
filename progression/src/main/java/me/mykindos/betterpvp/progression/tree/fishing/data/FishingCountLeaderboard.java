@@ -89,7 +89,7 @@ public class FishingCountLeaderboard extends PlayerLeaderboard<Long> implements 
                     leaderboard.put(UUID.fromString(gamer), count);
                 }
             } catch (SQLException e) {
-                log.error("Error fetching leaderboard data", e);
+                log.error("Error fetching leaderboard data", e).submit();
             }
         });
 

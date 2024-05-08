@@ -71,6 +71,10 @@ public class LeaderboardEntryButton<E, T> extends ControlItem<LeaderboardMenu<E,
         }
 
         final Description description = descriptionFuture.get();
+        if(description == null) {
+            return failed;
+        }
+
         final ItemStack itemStack = description.getIcon().get();
         final ItemMeta meta = itemStack.getItemMeta();
 
@@ -105,6 +109,10 @@ public class LeaderboardEntryButton<E, T> extends ControlItem<LeaderboardMenu<E,
         }
 
         final LeaderboardEntry<E, T> currentEntry = future.get();
+        if(currentEntry == null) {
+            return;
+        }
+
         final CompletableFuture<Description> descriptionFuture = getGui().getLeaderboard().getDescription(getGui().getSearchOptions(), currentEntry);
         if (!descriptionFuture.isDone()) {
             return; // Do nothing if the description hasn't loaded

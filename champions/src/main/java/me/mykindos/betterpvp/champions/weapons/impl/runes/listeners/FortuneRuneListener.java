@@ -48,7 +48,7 @@ public class FortuneRuneListener implements Listener {
 
         event.setIgnoresWeight(true);
         if (event.getLoot() instanceof Fish fish) {
-            event.setLoot(new Fish(fish.getType(), (int) (fish.getWeight() * increasedWeight)));
+            fish.setWeight((int) (fish.getWeight() * increasedWeight));
         }
     }
 }

@@ -7,6 +7,7 @@ import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Random;
+import java.util.UUID;
 
 /**
  * Represents a fish that has a minimum and maximum weight with no
@@ -39,6 +40,7 @@ public class SimpleFishType implements FishType {
         final int weight = RANDOM.ints(minWeight, maxWeight + 1)
                 .findFirst()
                 .orElse(minWeight);
-        return new Fish(this, weight);
+        UUID uuid = UUID.randomUUID();
+        return new Fish(uuid, this, weight);
     }
 }

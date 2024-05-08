@@ -55,7 +55,7 @@ public abstract class CombatStatsListener<T extends CombatData> implements Liste
             }
 
             if (killerData == null) {
-                log.error("Failed to find killer combat data for " + killer + ". Maybe they killed the player but dealt no damage?");
+                log.error("Failed to find killer combat data for " + killer + ". Maybe they killed the player but dealt no damage?").submit();
                 return;
             }
 

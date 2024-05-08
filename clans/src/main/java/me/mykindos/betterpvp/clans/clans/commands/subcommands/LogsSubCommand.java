@@ -67,7 +67,6 @@ public class LogsSubCommand extends ClanSubCommand {
         UtilServer.runTaskAsync(JavaPlugin.getPlugin(Clans.class), () -> {
             List<CachedLog> logs = logRepository.getLogsWithContext(LogContext.CLAN, clan.getId().toString());
 
-            System.out.println(clan.getId().toString());
             int count = 0;
             int start = (finalPageNumber - 1) * numPerPage;
             int end = start + numPerPage;

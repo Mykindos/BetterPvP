@@ -5,12 +5,13 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import lombok.SneakyThrows;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.DoubleStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
-import me.mykindos.betterpvp.core.stats.PlayerLeaderboard;
+import me.mykindos.betterpvp.core.stats.Leaderboard;
 import me.mykindos.betterpvp.core.stats.SearchOptions;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardEntry;
 import me.mykindos.betterpvp.core.stats.sort.SortType;
@@ -39,11 +40,14 @@ import java.util.concurrent.atomic.AtomicReference;
 
 @CustomLog
 @Singleton
-public class BiggestFishLeaderboard extends PlayerLeaderboard<CaughtFish> implements Sorted {
+public class BiggestFishLeaderboard extends Leaderboard<UUID, CaughtFish> implements Sorted {
+
+    private final ClientManager clientManager;
 
     @Inject
-    public BiggestFishLeaderboard(Progression progression) {
+    public BiggestFishLeaderboard(Progression progression, ClientManager clientManager) {
         super(progression);
+        this.clientManager = clientManager;
         init();
     }
 
@@ -60,6 +64,11 @@ public class BiggestFishLeaderboard extends PlayerLeaderboard<CaughtFish> implem
     @Override
     protected CaughtFish join(CaughtFish value, CaughtFish add) {
         return value.getWeight() > add.getWeight() ? value : add;
+    }
+
+    @Override
+    protected LeaderboardEntry<UUID, CaughtFish> fetchPlayerData(@NotNull UUID player, @NotNull SearchOptions options, @NotNull Database database) throws UnsupportedOperationException {
+        return LeaderboardEntry.of(player, fetch(options, database, player));
     }
 
 
@@ -80,7 +89,10 @@ public class BiggestFishLeaderboard extends PlayerLeaderboard<CaughtFish> implem
         database.executeProcedure(statement, -1, result -> {
             try {
                 if (result.next()) {
-                    caughtFish.set(new CaughtFish(result.getString(2), result.getInt(3)));
+                    UUID gamer = UUID.fromString(result.getString(2));
+                    String fishType = result.getString(3);
+                    int fishWeight = result.getInt(4);
+                    caughtFish.set(new CaughtFish(gamer, fishType, fishWeight));
                 }
             } catch (SQLException e) {
                 log.error("Error fetching leaderboard data", e).submit();
@@ -102,12 +114,11 @@ public class BiggestFishLeaderboard extends PlayerLeaderboard<CaughtFish> implem
         database.executeProcedure(statement, -1, result -> {
             try {
                 while (result.next()) {
-                    final UUID gamer = UUID.fromString(result.getString(1));
-                    final String fishType = result.getString(2);
-                    final int weight = result.getInt(3);
-
-                    if (leaderboard.containsKey(gamer)) break;
-                    leaderboard.put(gamer, new CaughtFish(fishType, weight));
+                    final UUID fishId = UUID.fromString(result.getString(1));
+                    final UUID gamer = UUID.fromString(result.getString(2));
+                    final String fishType = result.getString(3);
+                    final int weight = result.getInt(4);
+                    leaderboard.put(fishId, new CaughtFish(gamer, fishType, weight));
 
                 }
             } catch (SQLException e) {
@@ -122,8 +133,13 @@ public class BiggestFishLeaderboard extends PlayerLeaderboard<CaughtFish> implem
     protected CompletableFuture<Description> describe(SearchOptions searchOptions, LeaderboardEntry<UUID, CaughtFish> value) {
 
         final CompletableFuture<Description> future = new CompletableFuture<>();
+        if (value.getValue() == null) {
+            future.complete(null);
+            return future;
+        }
 
-        final OfflinePlayer player = Bukkit.getOfflinePlayer(value.getKey());
+
+        final OfflinePlayer player = Bukkit.getOfflinePlayer(value.getValue().getGamer());
 
         ItemStack itemStack = new ItemStack(Material.PLAYER_HEAD);
         final SkullMeta meta = (SkullMeta) itemStack.getItemMeta();
@@ -133,7 +149,7 @@ public class BiggestFishLeaderboard extends PlayerLeaderboard<CaughtFish> implem
         // Update name when loaded
         this.clientManager.search().offline(player.getUniqueId(), clientOpt -> {
             final Map<String, Component> result = new LinkedHashMap<>();
-            result.put("Player", Component.text(clientOpt.map(Client::getName).orElse("Unknown")));
+            result.put("Player", Component.text(clientOpt.map(Client::getName).orElse(player.getUniqueId().toString())));
             CaughtFish caughtFish = value.getValue();
             result.put("Biggest Fish Caught", Component.text(UtilFormat.formatNumber(caughtFish.getWeight()) + "lb " + caughtFish.getType()));
 
@@ -147,4 +163,5 @@ public class BiggestFishLeaderboard extends PlayerLeaderboard<CaughtFish> implem
 
         return future;
     }
+
 }

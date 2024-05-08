@@ -10,6 +10,7 @@ create table if not exists progression_exp
 
 create table if not exists progression_fishing
 (
+    id        varchar(36)             not null primary key,
     Gamer     varchar(36)             not null,
     Type      varchar(36)             not null,
     Weight    int                     not null,
@@ -65,7 +66,7 @@ END;
 DROP PROCEDURE IF EXISTS GetBiggestFishCaught;
 CREATE PROCEDURE GetBiggestFishCaught(IN days DOUBLE, IN maxResults INT)
 BEGIN
-SELECT Gamer, Type, Weight
+SELECT id, Gamer, Type, Weight
 FROM progression_fishing
 WHERE timestamp > NOW() - INTERVAL days DAY
 ORDER BY Weight DESC
@@ -75,9 +76,9 @@ END;
 DROP PROCEDURE IF EXISTS GetBiggestFishCaughtByGamer;
 CREATE PROCEDURE GetBiggestFishCaughtByGamer(IN gamer VARCHAR(36), IN days DOUBLE, IN maxResults INT)
 BEGIN
-SELECT Gamer, Type, Weight
+SELECT id, Gamer, Type, Weight
 FROM progression_fishing
-WHERE timestamp > NOW() - INTERVAL days DAY AND Gamer = gamer
+WHERE timestamp > NOW() - INTERVAL days DAY AND progression_fishing.Gamer = gamer
 ORDER BY Weight DESC
     LIMIT maxResults;
 END;
