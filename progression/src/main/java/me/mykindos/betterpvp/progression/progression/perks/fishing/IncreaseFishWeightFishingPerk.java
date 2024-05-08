@@ -86,7 +86,7 @@ public class IncreaseFishWeightFishingPerk implements Listener, ProgressionPerk,
                         int weight = (int) (fish.getWeight() + (fish.getWeight() * chanceMultiplier * increaseWeight));
                         //make a new fish if weight is > than old weight
                         if (weight >= fish.getWeight()) {
-                            event.setLoot(new Fish(fish.getType(), weight));
+                            fish.setWeight(weight);
                         }
                     }).exceptionally(throwable1 -> {
                         log.error("Failed to check if player " + event.getPlayer().getName() + " has a level ", throwable1).submit();

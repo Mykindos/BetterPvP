@@ -45,10 +45,11 @@ public final class FishingData extends ProgressionData<Fishing> {
 
     @Override
     protected void prepareUpdates(@NotNull UUID uuid, @NotNull Database database) {
-        final String stmt = "INSERT INTO progression_fishing (Gamer, Type, Weight) VALUES (?, ?, ?);";
+        final String stmt = "INSERT INTO progression_fishing (id, Gamer, Type, Weight) VALUES (?, ?, ?, ?);";
         List<Statement> statements = new ArrayList<>();
         for (Fish fish : catchesToSave) {
             Statement statement = new Statement(stmt,
+                    new UuidStatementValue(fish.getUuid()),
                     new UuidStatementValue(uuid),
                     new StringStatementValue(fish.getType().getName()),
                     new IntegerStatementValue(fish.getWeight()));

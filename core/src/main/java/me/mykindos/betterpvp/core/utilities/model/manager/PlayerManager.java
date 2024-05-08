@@ -109,7 +109,7 @@ public abstract class PlayerManager<T extends Unique> {
                 }
             }
         })).exceptionally(throwable -> {
-            log.error(LOAD_ERROR_FORMAT_SERVER, name, throwable);
+            log.error(LOAD_ERROR_FORMAT_SERVER, name, throwable).submit();
             if (failure != null) {
                 failure.run();
             }

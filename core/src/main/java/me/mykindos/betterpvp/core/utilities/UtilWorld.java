@@ -61,7 +61,7 @@ public class UtilWorld {
                 return world.getChunkAt(Integer.parseInt(tokens[1]), Integer.parseInt(tokens[2]));
             }
         } catch (Exception ex) {
-            log.error("Error parsing chunk from string: " + string);
+            log.error("Error parsing chunk from string: " + string).submit();
         }
 
         return null;

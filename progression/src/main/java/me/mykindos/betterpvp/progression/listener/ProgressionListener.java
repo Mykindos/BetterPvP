@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.progression.listener;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -8,7 +9,6 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.model.display.TimedComponent;
 import me.mykindos.betterpvp.core.utilities.model.display.TitleComponent;
-import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.ProgressionsManager;
 import me.mykindos.betterpvp.progression.event.PlayerProgressionExperienceEvent;
 import net.kyori.adventure.text.Component;
@@ -24,18 +24,20 @@ import org.bukkit.event.Listener;
 import java.util.function.Function;
 
 @BPvPListener
+@Singleton
 public class ProgressionListener implements Listener {
 
-    @Inject
-    private ClientManager clientManager;
+
+    private final ClientManager clientManager;
+    private final ProgressionsManager progressionsManager;
 
     @Inject
-    private ProgressionsManager progressionsManager;
+    public ProgressionListener(ClientManager clientManager, ProgressionsManager progressionsManager) {
+        this.clientManager = clientManager;
+        this.progressionsManager = progressionsManager;
+    }
 
-    @Inject
-    private Progression progression;
-
-//    @UpdateEvent(delay = 5_000, isAsync = true)
+    //    @UpdateEvent(delay = 5_000, isAsync = true)
     @UpdateEvent(delay = 60 * 5 * 1000, isAsync = true)
     public void cycleSave() {
         progressionsManager.getTrees().forEach(tree -> tree.getStatsRepository().saveAll(true));
@@ -75,7 +77,7 @@ public class ProgressionListener implements Listener {
         Function<Gamer, Component> title = gmr -> Component.text(tree + " Level Up!", NamedTextColor.GREEN, TextDecoration.BOLD);
         Function<Gamer, Component> subtitle = gmr -> Component.text("Level " + previous + " \u279C " + level, NamedTextColor.DARK_GREEN);
         final TitleComponent titleCmpt = new TitleComponent(0, 2.5, 1, true, title, subtitle);
-        gamer.getTitleQueue().add(250, titleCmpt);
+        gamer.getTitleQueue().add(501, titleCmpt);
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 0f);
     }
 

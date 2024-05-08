@@ -1,7 +1,3 @@
-progression:
-  database:
-    prefix: progression_
-
 mining:
   minLeaderboardBlockXp: 45
   xpPerBlock:
@@ -75,128 +71,128 @@ fishing:
       name: Trout
       maxWeight: 50
       minWeight: 1
-      frequency: 1000
+      frequency: 10000
       modelData: 1
     salmon:
       type: fish
       name: Salmon
       maxWeight: 50
       minWeight: 1
-      frequency: 1000
+      frequency: 10000
       modelData: 2
     bluegill:
       type: fish
       name: Bluegill
       maxWeight: 50
       minWeight: 1
-      frequency: 1000
+      frequency: 10000
       modelData: 3
     gar:
       type: fish
       name: Gar
       maxWeight: 50
       minWeight: 1
-      frequency: 1000
+      frequency: 10000
       modelData: 4
     carp:
       type: fish
       name: Carp
       maxWeight: 150
       minWeight: 1
-      frequency: 500
+      frequency: 5000
       modelData: 5
     catfish:
       type: fish
       name: Catfish
       maxWeight: 150
       minWeight: 1
-      frequency: 500
+      frequency: 5000
       modelData: 6
     cod:
       type: fish
       name: Cod
       maxWeight: 150
       minWeight: 1
-      frequency: 500
+      frequency: 5000
       modelData: 7
     drum:
       type: fish
       name: Drum
       maxWeight: 150
       minWeight: 1
-      frequency: 500
+      frequency: 5000
       modelData: 8
     sablefish:
       type: fish
       name: Sablefish
       maxWeight: 150
       minWeight: 1
-      frequency: 500
+      frequency: 5000
       modelData: 9
     kingfish:
       type: fish
       name: Kingfish
       maxWeight: 250
       minWeight: 100
-      frequency: 250
+      frequency: 2500
       modelData: 10
     cobia:
       type: fish
       name: Cobia
       maxWeight: 250
       minWeight: 100
-      frequency: 250
+      frequency: 2500
       modelData: 11
     sea_bass:
       type: fish
       name: Sea Bass
       maxWeight: 250
       minWeight: 100
-      frequency: 250
+      frequency: 2500
       modelData: 12
     tuna:
       type: fish
       name: Tuna
       maxWeight: 500
       minWeight: 200
-      frequency: 50
+      frequency: 500
       modelData: 13
     swordfish:
       type: fish
       name: Swordfish
       maxWeight: 500
       minWeight: 200
-      frequency: 50
+      frequency: 500
       modelData: 14
     grouper:
       type: fish
       name: Grouper
       maxWeight: 700
       minWeight: 400
-      frequency: 30
+      frequency: 300
       modelData: 16
     marlin:
       type: fish
       name: Marlin
       maxWeight: 1500
       minWeight: 500
-      frequency: 15
+      frequency: 150
       modelData: 15
     sturgeon:
       type: fish
       name: Sturgeon
-      maxWeight: 3000
+      maxWeight: 1000
       minWeight: 500
-      frequency: 4
+      frequency: 40
       modelData: 17
     sunfish:
       type: fish
-      name: sunfish
-      maxWeight: 6000
+      name: Sunfish
+      maxWeight: 2000
       minWeight: 1000
-      frequency: 2
+      frequency: 20
       modelData: 18
-  xpPerPound: 0.05
+  xpPerPound: 0.3
   perks:
     treasure-chance:
       enabled: true
@@ -212,11 +208,6 @@ fishing:
       enabled: true
       increasePerLevel: 0.001
       increaseWeight: 0.2
-      maxLevel: 1000
-      minLevel: 0
-    drop-multiplier:
-      enabled: true
-      increasePerLevel: 0.25
       maxLevel: 1000
       minLevel: 0
   enabled: true

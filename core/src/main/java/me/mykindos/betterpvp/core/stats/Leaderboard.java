@@ -193,7 +193,10 @@ public abstract class Leaderboard<E, T> {
                     existingData = entryCache.get(LeaderboardEntryKey.of(options, entryName)).join(); // Reason for this to be async
                 }
 
-                entry.setValue(join(existingData, add));
+                if(existingData != null) {
+                    entry.setValue(join(existingData, add));
+                }
+
                 int indexBefore = list.contains(entry) ? list.indexOf(entry) + 1 : -1;
                 set.removeIf(existing -> existing.getKey().equals(entry.getKey())); // Remove entry if cloned
                 set.add(entry);
@@ -211,7 +214,7 @@ public abstract class Leaderboard<E, T> {
             }
             return types;
         }).exceptionally(ex -> {
-            log.error("Failed to add " + entryName + " to leaderboard!", ex);
+            log.error("Failed to add " + entryName + " to leaderboard!", ex).submit();
             return null;
         });
     }
@@ -289,7 +292,7 @@ public abstract class Leaderboard<E, T> {
         // Fetch the player data
         CompletableFuture<Optional<LeaderboardEntry<E, T>>> future = CompletableFuture.supplyAsync(() -> Optional.ofNullable(fetchPlayerData(player, options, database))).exceptionally(ex -> {
             if (!(ex instanceof UnsupportedOperationException)) {
-                log.error("Failed to fetch leaderboard data for " + player + "!", ex);
+                log.error("Failed to fetch leaderboard data for " + player + "!", ex).submit();
             }
             return Optional.empty();
         });
