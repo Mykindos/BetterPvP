@@ -19,6 +19,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.logging.LogContext;
 import me.mykindos.betterpvp.core.logging.PendingLog;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
@@ -112,6 +113,8 @@ public class UUIDListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onUUIDItemDrop(PlayerDropItemEvent event) {
         if (event.isCancelled()) return;
+        if (UtilPlayer.isDead(event.getPlayer())) return;
+
         Client client = clientManager.search().online(event.getPlayer());
 
         if (!(boolean) client.getProperty(ClientProperty.DROP_PROTECTION_ENABLED).orElse(false)) {
