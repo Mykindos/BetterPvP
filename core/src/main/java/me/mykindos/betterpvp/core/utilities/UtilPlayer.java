@@ -167,4 +167,8 @@ public class UtilPlayer {
             }, i);
         }
     }
+
+    public static boolean isDead(Player player) {
+        return player.getHealth() <= 0 || player.isDead();
+    }
 }
