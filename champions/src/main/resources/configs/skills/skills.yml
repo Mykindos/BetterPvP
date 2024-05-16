@@ -233,7 +233,8 @@ skills:
       baseDuration: 5.0
       slowDuration: 0.5
       slownessStrength: 4
-      resistanceStrength: 4
+      resistanceStrength: 3
+      durationIncreasePerLevel: 0.5
     swordsmanship:
       enabled: true
       maxlevel: 3
