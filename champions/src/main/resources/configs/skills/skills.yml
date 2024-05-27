@@ -670,6 +670,7 @@ skills:
       curveDistanceIncreasePerLevel: 0.5
       baseBonusDamage: 2.0
       bonusDamageIncreasePerLevel: 1.0
+      bonusCurveDistance: 0.5
     wolfspounce:
       enabled: true
       maxlevel: 5
