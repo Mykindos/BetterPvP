@@ -84,6 +84,10 @@ public class ClansExplosionListener extends ClanListener {
     @Config(path = "clans.tnt.regenerationTimeInMinutes", defaultValue = "5.0")
     private double regenerationTimeInMinutes;
 
+    @Inject
+    @Config(path = "clans.pillage.protection", defaultValue = "true")
+    private boolean pillageProtection;
+
     private final Clans clans;
     private final WorldBlockHandler worldBlockHandler;
     private final ItemHandler itemHandler;
@@ -219,7 +223,7 @@ public class ClansExplosionListener extends ClanListener {
                         break;
                     }
 
-                    if (attackedClan.isNoDominanceCooldownActive()) {
+                    if (attackedClan.isNoDominanceCooldownActive() && pillageProtection) {
                         attackingClan.messageClan("You cannot cannon <red>" + attackedClan.getName() + "</red> because they are a new clan or were raided too recently.", null, true);
                         refundCannonball(shooter);
                         break;
