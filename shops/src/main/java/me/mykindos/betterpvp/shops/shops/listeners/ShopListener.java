@@ -293,10 +293,9 @@ public class ShopListener implements Listener {
     @UpdateEvent(delay = 10000)
     public void checkShopkeepers() {
         if (shopkeeperManager.getObjects().values().stream().anyMatch(shopkeeper -> shopkeeper.getEntity() == null
-                || shopkeeper.getEntity().isDead() || !shopkeeper.getEntity().isValid())) {
+                || shopkeeper.getEntity().isDead())) {
             shopkeeperManager.loadShopsFromConfig();
         }
     }
-
 
 }
