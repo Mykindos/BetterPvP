@@ -52,7 +52,7 @@ public class SendSkillsCommand extends Command {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        if(!cooldownManager.use(player, getName(), 1000d * 15d, false, true)){
+        if(!cooldownManager.use(player, getName(), 15d, false, true)){
             UtilMessage.message(player, "Skills", "You must wait some time between using this command again");
             return;
         }
