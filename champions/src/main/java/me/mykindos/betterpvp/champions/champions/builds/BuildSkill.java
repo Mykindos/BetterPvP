@@ -19,9 +19,17 @@ public class BuildSkill {
     }
 
     public Component getComponent() {
+        return getComponent(false);
+    }
+
+    public Component getComponent(boolean boosted) {
         if (skill == null) {
             return Component.empty();
         }
-        return UtilMessage.deserialize("<yellow>%s</yellow> (<green>%s</green>)", skill.getName(), getLevel());
+        int displayLevel = getLevel();
+        if (boosted) {
+            displayLevel++;
+        }
+        return UtilMessage.deserialize("<yellow>%s</yellow> (<green>%s</green>)", skill.getName(), displayLevel);
     }
 }

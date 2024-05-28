@@ -155,15 +155,20 @@ public class InventorySkillListener extends PacketAdapter implements Listener {
             return itemStack; // No skill
         }
 
-        final int level = buildSkill.getLevel();
+        int level = buildSkill.getLevel();
         final Skill skill = buildSkill.getSkill();
+
+        boolean boosted = SkillWeapons.isBooster(itemStack.getType());
+        if (boosted) {
+            level++;
+        }
 
         final ItemStack clone = itemStack.clone();
         final ItemMeta meta = clone.getItemMeta();
         final List<Component> lore = Objects.requireNonNullElse(meta.lore(), new ArrayList<>());
         lore.add(Component.empty());
         lore.add(UtilMessage.DIVIDER);
-        lore.add(buildSkill.getComponent().decoration(TextDecoration.ITALIC, false));
+        lore.add(buildSkill.getComponent(boosted).decoration(TextDecoration.ITALIC, false));
         lore.addAll(Arrays.stream(skill.parseDescription(level)).toList());
         lore.add(UtilMessage.DIVIDER);
         meta.lore(lore);

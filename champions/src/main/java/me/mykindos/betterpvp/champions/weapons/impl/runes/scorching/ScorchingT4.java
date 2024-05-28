@@ -14,7 +14,7 @@ public class ScorchingT4 extends ScorchingBase {
 
     @Override
     public int getTier() {
-        return 3;
+        return 4;
     }
 
 
