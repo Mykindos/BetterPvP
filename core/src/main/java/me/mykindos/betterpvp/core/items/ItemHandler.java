@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateNameEvent;
@@ -26,6 +27,7 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -181,5 +183,13 @@ public class ItemHandler {
             }
         }
         return Optional.empty();
+    }
+
+    public List<BPvPItem> getLegends() {
+        return getItems().stream().filter(LegendaryWeapon.class::isInstance).toList();
+    }
+
+    public Collection<BPvPItem> getItems() {
+        return itemMap.values();
     }
 }

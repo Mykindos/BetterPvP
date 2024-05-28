@@ -14,7 +14,7 @@ public class FortuneT3 extends FortuneBase {
 
     @Override
     public int getTier() {
-        return 1;
+        return 3;
     }
 
 
