@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.chat.events.ChatSentEvent;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.components.champions.Role;
+import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
@@ -18,6 +19,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.util.List;
 import java.util.Optional;
 
 @Singleton
@@ -27,12 +29,15 @@ public class SendSkillsCommand extends Command {
     private final RoleManager roleManager;
     private final BuildManager buildManager;
 
+    private final CooldownManager cooldownManager;
+
     @Inject
-    public SendSkillsCommand(Champions champions, RoleManager roleManager, BuildManager buildManager) {
+    public SendSkillsCommand(Champions champions, RoleManager roleManager, BuildManager buildManager, CooldownManager cooldownManager) {
         this.champions = champions;
         this.roleManager = roleManager;
         this.buildManager = buildManager;
-        this.aliases.add("sendskill");
+        this.cooldownManager = cooldownManager;
+        this.aliases.addAll(List.of("sendskill", "sendbuild"));
     }
 
     @Override
@@ -47,6 +52,10 @@ public class SendSkillsCommand extends Command {
 
     @Override
     public void execute(Player player, Client client, String... args) {
+        if(!cooldownManager.use(player, getName(), 1000d * 15d, false, true)){
+            UtilMessage.message(player, "Skills", "You must wait some time between using this command again");
+            return;
+        }
         Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(player.getUniqueId().toString());
         if (gamerBuildsOptional.isPresent()) {
             GamerBuilds builds = gamerBuildsOptional.get();
