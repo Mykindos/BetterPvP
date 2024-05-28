@@ -21,14 +21,14 @@ import org.bukkit.entity.Player;
 import java.util.Optional;
 
 @Singleton
-public class SendSkills extends Command {
+public class SendSkillsCommand extends Command {
 
     private final Champions champions;
     private final RoleManager roleManager;
     private final BuildManager buildManager;
 
     @Inject
-    public SendSkills(Champions champions, RoleManager roleManager, BuildManager buildManager) {
+    public SendSkillsCommand(Champions champions, RoleManager roleManager, BuildManager buildManager) {
         this.champions = champions;
         this.roleManager = roleManager;
         this.buildManager = buildManager;
