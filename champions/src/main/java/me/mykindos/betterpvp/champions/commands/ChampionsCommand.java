@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
-import me.mykindos.betterpvp.champions.champions.skills.SkillManager;
+import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
 import me.mykindos.betterpvp.champions.listeners.ChampionsListenerLoader;
 import me.mykindos.betterpvp.champions.weapons.ChampionsWeaponManager;
 import me.mykindos.betterpvp.core.client.Client;
@@ -61,7 +61,7 @@ public class ChampionsCommand extends Command implements IConsoleCommand {
         private ChampionsListenerLoader listenerLoader;
 
         @Inject
-        private SkillManager skillManager;
+        private ChampionsSkillManager skillManager;
 
         @Inject
         private ItemHandler itemHandler;

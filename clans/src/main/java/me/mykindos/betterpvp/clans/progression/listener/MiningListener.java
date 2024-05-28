@@ -9,7 +9,7 @@ import me.mykindos.betterpvp.clans.fields.model.FieldsOre;
 import me.mykindos.betterpvp.clans.progression.ProgressionAdapter;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.utilities.model.ConfigAccessor;
-import me.mykindos.betterpvp.progression.tree.mining.Mining;
+import me.mykindos.betterpvp.progression.profession.mining.MiningHandler;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -21,11 +21,11 @@ import org.jetbrains.annotations.NotNull;
 public class MiningListener implements Listener, ConfigAccessor {
 
     private double xpMultiplier;
-    private final Mining mining;
+    private final MiningHandler miningHandler;
 
     @Inject
     public MiningListener(ProgressionAdapter adapter) {
-        this.mining = adapter.getProgression().getInjector().getInstance(Mining.class);
+        this.miningHandler = adapter.getProgression().getInjector().getInstance(MiningHandler.class);
     }
 
     @EventHandler
@@ -37,7 +37,7 @@ public class MiningListener implements Listener, ConfigAccessor {
 
         final Player player = event.getPlayer();
         final Block block = event.getBlock().getBlock();
-        mining.getMiningService().attemptMineOre(player, block, experience -> (long) (experience * xpMultiplier));
+        miningHandler.attemptMineOre(player, block, experience -> (long) (experience * xpMultiplier));
     }
 
     @Override

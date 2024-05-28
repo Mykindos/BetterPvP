@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
 import me.mykindos.betterpvp.champions.champions.builds.menus.buttons.ClassSelectionButton;
-import me.mykindos.betterpvp.champions.champions.skills.SkillManager;
+import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
 import me.mykindos.betterpvp.core.combat.armour.ArmourManager;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.menu.Menu;
@@ -20,7 +20,7 @@ import java.util.Iterator;
 public class ClassSelectionMenu extends AbstractGui implements Windowed {
 
     @Inject
-    public ClassSelectionMenu(BuildManager buildManager, SkillManager skillManager, ArmourManager armourManager) {
+    public ClassSelectionMenu(BuildManager buildManager, ChampionsSkillManager skillManager, ArmourManager armourManager) {
         super(9, 3);
 
         int[] slots = new int[] {10, 11, 12, 14, 15, 16};

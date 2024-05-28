@@ -14,7 +14,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
 import me.mykindos.betterpvp.champions.effects.types.SkillBoostEffect;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
-import me.mykindos.betterpvp.core.components.champions.ISkill;
+import me.mykindos.betterpvp.core.components.champions.IChampionsSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.effects.Effect;
 import net.kyori.adventure.text.Component;
@@ -26,7 +26,7 @@ import java.util.Optional;
 
 @Singleton
 @CustomLog
-public abstract class Skill implements ISkill {
+public abstract class Skill implements IChampionsSkill {
 
     protected final Champions champions;
     protected final ChampionsManager championsManager;

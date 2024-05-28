@@ -27,7 +27,7 @@ mining:
       increasePerLevel: 0.25
       maxLevel: 1000
       minLevel: 0
-  enabled: false
+  enabled: true
 
 
 fishing:
@@ -36,24 +36,11 @@ fishing:
   bait:
     speedy:
       type: speed
-      seconds: 200.0
+      seconds: 180.0
       name: Speedy Bait
       radius: 5.0
-      multiplier: 10.0
+      multiplier: 3.0
       texture: http://textures.minecraft.net/texture/eb7a8d0d7365de95f23ac375498024cb31ae4e8d6d06d12a621e43cf1b7667d6
-    test:
-      type: speed
-      seconds: 200.0
-      name: Test Bait
-      radius: 5.0
-      multiplier: 20.0
-      texture: http://textures.minecraft.net/texture/1713f2a526e9e681092dd09e2180fcc00fc9fc33d288954c52fea6b959bc4e6e
-  #    meaty:
-  #      type: weight
-  #      name: Fat Bait
-  #      seconds: 5.0
-  #      radius: 2.5
-  #      weightAdd: 100
   loot:
     scepter:
       type: treasure
@@ -65,7 +52,7 @@ fishing:
     zombie:
       type: entity
       entity: ZOMBIE
-      frequency: 100
+      frequency: 500
     trout:
       type: fish
       name: Trout
@@ -192,7 +179,7 @@ fishing:
       minWeight: 1000
       frequency: 20
       modelData: 18
-  xpPerPound: 0.3
+  xpPerPound: 0.1
   perks:
     treasure-chance:
       enabled: true

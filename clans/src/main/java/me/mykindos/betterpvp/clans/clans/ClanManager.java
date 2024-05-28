@@ -21,6 +21,8 @@ import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
+import me.mykindos.betterpvp.core.stats.Leaderboard;
+import me.mykindos.betterpvp.core.stats.repository.LeaderboardManager;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -56,8 +58,7 @@ public class ClanManager extends Manager<Clan> {
     @Getter
     private final PillageHandler pillageHandler;
 
-    @Getter
-    private final ClanLeaderboard leaderboard;
+    private final LeaderboardManager leaderboardManager;
 
     private Map<Integer, Double> dominanceScale;
 
@@ -85,13 +86,13 @@ public class ClanManager extends Manager<Clan> {
     private boolean dominanceEnabled;
 
     @Inject
-    public ClanManager(Clans clans, ClanRepository repository, ClientManager clientManager, PillageHandler pillageHandler) {
+    public ClanManager(Clans clans, ClanRepository repository, ClientManager clientManager, PillageHandler pillageHandler, LeaderboardManager leaderboardManager) {
         this.repository = repository;
         this.clientManager = clientManager;
         this.pillageHandler = pillageHandler;
+        this.leaderboardManager = leaderboardManager;
         this.dominanceScale = new HashMap<>();
         this.insuranceQueue = new ConcurrentLinkedQueue<>();
-        this.leaderboard = new ClanLeaderboard(clans, this);
 
         dominanceScale = repository.getDominanceScale();
     }
@@ -516,7 +517,7 @@ public class ClanManager extends Manager<Clan> {
         });
 
         log.info("Loaded {} clans", objects.size()).submit();
-        leaderboard.forceUpdate();
+        leaderboardManager.getObject("Clans").ifPresent(Leaderboard::forceUpdate);
     }
 
     public boolean isInSafeZone(Player player) {
@@ -544,5 +545,10 @@ public class ClanManager extends Manager<Clan> {
 
     public boolean isLake(Clan clan) {
         return (clan.getName().equalsIgnoreCase("Lake"));
+    }
+
+    public ClanLeaderboard getLeaderboard() {
+        Optional<Leaderboard<?, ?>> clans = leaderboardManager.getObject("Clans");
+        return (ClanLeaderboard) clans.orElse(null);
     }
 }

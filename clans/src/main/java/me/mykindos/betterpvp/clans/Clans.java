@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.clans.clans.leveling.ClanPerkManager;
 import me.mykindos.betterpvp.clans.commands.ClansCommandLoader;
 import me.mykindos.betterpvp.clans.display.ClansSidebar;
 import me.mykindos.betterpvp.clans.injector.ClansInjectorModule;
+import me.mykindos.betterpvp.clans.leaderboards.ClansLeaderboardLoader;
 import me.mykindos.betterpvp.clans.listener.ClansListenerLoader;
 import me.mykindos.betterpvp.clans.tips.ClansTipLoader;
 import me.mykindos.betterpvp.core.Core;
@@ -93,6 +94,9 @@ public class Clans extends BPvPPlugin {
             if (clansSidebar.isEnabled()) {
                 sidebarController.setDefaultProvider(gamer -> clansSidebar);
             }
+
+            var leaderboardLoader = injector.getInstance(ClansLeaderboardLoader.class);
+            leaderboardLoader.registerLeaderboards(PACKAGE);
 
             updateEventExecutor.loadPlugin(this);
 
