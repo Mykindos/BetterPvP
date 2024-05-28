@@ -53,11 +53,15 @@ public class ShopkeeperManager extends Manager<IShopkeeper> {
             double x = shops.getConfig().getDouble("shopkeepers." + key + ".x");
             double y = shops.getConfig().getDouble("shopkeepers." + key + ".y");
             double z = shops.getConfig().getDouble("shopkeepers." + key + ".z");
+            float yaw = (float) shops.getConfig().getDouble("shopkeepers." + key + ".yaw");
+            float pitch = (float) shops.getConfig().getDouble("shopkeepers." + key + ".pitch");
             
             if(type == null) return;
 
             if(type.startsWith("mm:")) {
-                UtilServer.callEvent(new ShopKeeperSpawnEvent(type.split(":")[1], name, new Location(world, x, y, z)));
+                Location location = new Location(world, x, y, z, yaw, pitch);
+                UtilServer.callEvent(new ShopKeeperSpawnEvent(type.split(":")[1], name, location));
+                location.getChunk().setForceLoaded(true);
                 return;
             }
 
@@ -90,6 +94,8 @@ public class ShopkeeperManager extends Manager<IShopkeeper> {
         shops.getConfig().set("shopkeepers." + tag + ".x", location.getX());
         shops.getConfig().set("shopkeepers." + tag + ".y", location.getY());
         shops.getConfig().set("shopkeepers." + tag + ".z", location.getZ());
+        shops.getConfig().set("shopkeepers." + tag + ".yaw", location.getYaw());
+        shops.getConfig().set("shopkeepers." + tag + ".pitch", location.getPitch());
 
         shops.saveConfig();
     }

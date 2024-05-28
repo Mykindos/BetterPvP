@@ -48,6 +48,7 @@ import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
@@ -789,6 +790,16 @@ public class ClansWorldListener extends ClanListener {
     public void onBedDrop(ItemSpawnEvent event) {
         if(event.getEntity().getItemStack().getType() == Material.RED_BED) {
             event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onMobSpawnInClaim(CreatureSpawnEvent event) {
+        if (event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.NATURAL) {
+            Optional<Clan> clanOptional = clanManager.getClanByLocation(event.getLocation());
+            if (clanOptional.isPresent()) {
+                event.setCancelled(true);
+            }
         }
     }
 }
