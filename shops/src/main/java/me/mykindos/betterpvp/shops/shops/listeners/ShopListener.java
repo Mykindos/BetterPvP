@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.shops.shops.listeners;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -49,6 +50,7 @@ import java.util.Optional;
 
 @Singleton
 @BPvPListener
+@CustomLog
 public class ShopListener implements Listener {
 
     private final ShopkeeperManager shopkeeperManager;
@@ -132,6 +134,11 @@ public class ShopListener implements Listener {
         UtilMessage.simpleMessage(event.getPlayer(), "Shop", "You have purchased <alt2>%d %s</alt2> for <alt2>%s %s</alt2>.",
                 amount, event.getShopItem().getItemName(), NumberFormat.getInstance().format(cost), event.getCurrency().name().toLowerCase());
         UtilSound.playSound(event.getPlayer(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 2f, false);
+        log.info("{} purchased {}x {} for {} {}",
+                event.getPlayer().getName(), amount, event.getShopItem().getItemName(), cost, event.getCurrency().name().toLowerCase())
+                .setAction("SHOP_BUY").addClientContext(event.getPlayer())
+                .addContext("ShopItem", event.getShopItem().getItemName()).addContext("Amount", amount + "")
+                .addContext("Price", cost + "").submit();
 
     }
 
@@ -205,6 +212,10 @@ public class ShopListener implements Listener {
                         UtilSound.playSound(event.getPlayer(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 2f, false);
                         UtilMessage.simpleMessage(event.getPlayer(), "Shop", "You have sold <alt2>%d %s</alt2> for <alt2>%s %s</alt2>.",
                                 amount, event.getShopItem().getItemName(), UtilFormat.formatNumber(cost), event.getCurrency().name().toLowerCase());
+                        log.info("{} sold {}x {} for {} {}", event.getPlayer().getName(), amount, event.getShopItem().getItemName(), cost, event.getCurrency().name().toLowerCase())
+                                .setAction("SHOP_SELL").addClientContext(event.getPlayer())
+                                .addContext("ShopItem", event.getShopItem().getItemName()).addContext("Amount", amount + "")
+                                .addContext("Price", cost + "").submit();
 
                         return;
                     }
