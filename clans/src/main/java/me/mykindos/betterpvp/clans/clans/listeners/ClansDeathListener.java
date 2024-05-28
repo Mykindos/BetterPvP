@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.clans.clans.ClanRelation;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
 import me.mykindos.betterpvp.core.combat.death.events.CustomDeathEvent;
+import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.LivingEntity;
@@ -23,6 +24,10 @@ public class ClansDeathListener implements Listener {
 
     private final ClanManager clanManager;
     private final DamageLogManager damageLogManager;
+
+    @Inject
+    @Config(path = "clans.pillage.protection", defaultValue = "true")
+    private boolean pillageProtection;
 
     @Inject
     public ClansDeathListener(ClanManager clanManager, DamageLogManager damageLogManager) {
@@ -57,13 +62,13 @@ public class ClansDeathListener implements Listener {
             Clan killerClan = clanManager.getClanByPlayer(killer).orElse(null);
 
             if(killedClan != null && killerClan != null) {
-                if (killerClan.isNoDominanceCooldownActive()) {
+                if (killerClan.isNoDominanceCooldownActive() && pillageProtection) {
                     killerClan.messageClan("You did not gain any dominance as your clan is a new clan or was recently pillaged.", null, true);
                     killedClan.messageClan("You did not lose any dominance as <yellow>" + killedClan.getName() + "<gray> is a new clan or was recently pillaged.", null, true);
                     return;
                 }
 
-                if (killedClan.isNoDominanceCooldownActive()) {
+                if (killedClan.isNoDominanceCooldownActive() && pillageProtection) {
                     killedClan.messageClan("You did not lose any dominance as your clan is a new clan or was recently pillaged.", null, true);
                     killerClan.messageClan("You did not gain any dominance as <yellow>" + killedClan.getName() + "<gray> is a new clan or was recently pillaged.", null, true);
                     return;
@@ -88,13 +93,13 @@ public class ClansDeathListener implements Listener {
             if (killerClan != null && killerClan.isOnline()) {
 
                 if(killedClan != null) {
-                    if (killerClan.isNoDominanceCooldownActive()) {
+                    if (killerClan.isNoDominanceCooldownActive() && pillageProtection) {
                         killerClan.messageClan("You did not gain any dominance as your clan is a new clan or was recently pillaged.", null, true);
                         killedClan.messageClan("You did not lose any dominance as <yellow>" + killedClan.getName() + "<gray> is a new clan or was recently pillaged.", null, true);
                         return;
                     }
 
-                    if (killedClan.isNoDominanceCooldownActive()) {
+                    if (killedClan.isNoDominanceCooldownActive() && pillageProtection) {
                         killerClan.messageClan("You did not gain any dominance as <yellow>" + killedClan.getName() + "<gray> is a new clan or was recently pillaged.", null, true);
                         killedClan.messageClan("You did not lose any dominance as your clan is a new clan or was recently pillaged.", null, true);
                         return;

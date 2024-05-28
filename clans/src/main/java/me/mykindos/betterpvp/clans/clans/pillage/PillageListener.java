@@ -72,10 +72,10 @@ public class PillageListener implements Listener {
         clanManager.getRepository().deleteClanEnemy(pillage.getPillager(), pillagerEnemy);
         clanManager.getRepository().deleteClanEnemy(pillage.getPillaged(), pillagedEnemy);
 
-        if(pillage.getPillaged() instanceof Clan pillagedClan) {
+        if (pillage.getPillaged() instanceof Clan pillagedClan) {
             pillagedClan.putProperty(ClanProperty.NO_DOMINANCE_COOLDOWN, (System.currentTimeMillis() + (3_600_000L * noDominanceCooldownHours)));
 
-            if(pillagedClan.getTntRecoveryRunnable() != null) {
+            if (pillagedClan.getTntRecoveryRunnable() != null) {
                 pillagedClan.getTntRecoveryRunnable().cancel();
                 pillagedClan.setTntRecoveryRunnable(null);
             }
