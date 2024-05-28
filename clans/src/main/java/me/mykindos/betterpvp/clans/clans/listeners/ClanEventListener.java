@@ -620,7 +620,9 @@ public class ClanEventListener extends ClanListener {
             }
         }
 
-        UtilBlock.placeBed(player.getLocation().toCenterLocation(), player.getFacing());
+        if(!clan.isAdmin()) {
+            UtilBlock.placeBed(player.getLocation().toCenterLocation(), player.getFacing());
+        }
 
         clan.setHome(player.getLocation().toCenterLocation().add(0, 0.6, 0));
         UtilMessage.simpleMessage(player, "Clans", "You set the clan home to <yellow>%s<gray>.",
