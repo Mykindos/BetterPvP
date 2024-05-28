@@ -1,15 +1,18 @@
 package me.mykindos.betterpvp.champions.champions.builds.menus.buttons;
 
+import me.mykindos.betterpvp.champions.champions.builds.BuildSkill;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.champions.champions.builds.menus.BuildMenu;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.ApplyBuildEvent;
+import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -18,6 +21,9 @@ import org.jetbrains.annotations.NotNull;
 import xyz.xenondevs.invui.item.ItemProvider;
 import xyz.xenondevs.invui.item.impl.controlitem.ControlItem;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 public class ApplyBuildButton extends ControlItem<BuildMenu> {
@@ -43,16 +49,64 @@ public class ApplyBuildButton extends ControlItem<BuildMenu> {
         };
 
         boolean selected = builds.getActiveBuilds().get(role.getName()).getId() == build;
-        Component buildName = Component.text("Build " + build, NamedTextColor.GRAY);
+        Component buildName = Component.text("Apply Build " + build, NamedTextColor.GRAY);
         if (selected) {
             buildName = Component.text("\u00BB Build " + build + " \u00AB", NamedTextColor.GREEN);
         }
 
-        if (selected) {
-            return ItemView.builder().displayName(buildName).material(type).glow(true).build();
+
+        BuildSkill sword = null;
+        BuildSkill axe = null;
+        BuildSkill bow = null;
+        BuildSkill passiveA = null;
+        BuildSkill passiveB = null;
+        BuildSkill global = null;
+
+        Optional<RoleBuild> roleBuildOptional = builds.getBuild(role, build);
+        if (roleBuildOptional.isPresent()) {
+            RoleBuild activeBuilds = roleBuildOptional.get();
+            sword = activeBuilds.getSwordSkill();
+            axe = activeBuilds.getAxeSkill();
+            bow = activeBuilds.getBow();
+            passiveA = activeBuilds.getPassiveA();
+            passiveB = activeBuilds.getPassiveB();
+            global = activeBuilds.getGlobal();
         }
 
-        return ItemView.builder().displayName(buildName).material(type).build();
+        List<Component> lore = Arrays.asList(
+                Component.text()
+                        .append(Component.text("Sword: ", NamedTextColor.YELLOW))
+                        .append(Component.text((sword != null ? sword.getString() : ""), NamedTextColor.WHITE))
+                        .build(),
+                Component.text()
+                        .append(Component.text("Axe: ", NamedTextColor.YELLOW))
+                        .append(Component.text((axe != null ? axe.getString() : ""), NamedTextColor.WHITE))
+                        .build(),
+                Component.text()
+                        .append(Component.text("Bow: ", NamedTextColor.YELLOW))
+                        .append(Component.text((bow != null ? bow.getString() : ""), NamedTextColor.WHITE))
+                        .build(),
+                Component.text()
+                        .append(Component.text("Passive A: ", NamedTextColor.YELLOW))
+                        .append(Component.text((passiveA != null ? passiveA.getString() : ""), NamedTextColor.WHITE))
+                        .build(),
+                Component.text()
+                        .append(Component.text("Passive B: ", NamedTextColor.YELLOW))
+                        .append(Component.text((passiveB != null ? passiveB.getString() : ""), NamedTextColor.WHITE))
+                        .build(),
+                Component.text()
+                        .append(Component.text("Global: ", NamedTextColor.YELLOW))
+                        .append(Component.text((global != null ? global.getString() : ""), NamedTextColor.WHITE))
+                        .build()
+        );
+
+
+
+        if (selected) {
+            return ItemView.builder().displayName(buildName).material(type).lore(lore).glow(true).build();
+        }
+
+        return ItemView.builder().displayName(buildName).material(type).lore(lore).build();
     }
 
     @Override
