@@ -54,7 +54,7 @@ public class PropertyMapper {
             String type = propertyMap.get(property);
 
             if(type == null){
-                log.error("Property type not found for property: " + property);
+                log.error("Property type not found for property: " + property).submit();
                 continue;
             }
 
@@ -70,5 +70,26 @@ public class PropertyMapper {
             container.putProperty(property, value, true);
         }
 
+    }
+
+    public void parseProperty(String property, String value, PropertyContainer container) throws ClassNotFoundException {
+
+        String type = propertyMap.get(property);
+
+        if(type == null){
+            log.error("Property type not found for property: " + property).submit();
+            return;
+        }
+
+        Object convertedValue = switch (type.toLowerCase()) {
+            case "int" -> Integer.valueOf(value);
+            case "boolean" -> Boolean.parseBoolean(value);
+            case "double" -> Double.parseDouble(value);
+            case "long" -> Long.parseLong(value);
+            case "string" -> value;
+            default -> Class.forName(type).cast(value);
+        };
+
+        container.putProperty(property, convertedValue, true);
     }
 }

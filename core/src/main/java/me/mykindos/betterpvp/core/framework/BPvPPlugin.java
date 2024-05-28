@@ -35,8 +35,7 @@ public abstract class BPvPPlugin extends JavaPlugin {
 
     private final HashMap<String, ExtendedYamlConfiguration> configs;
 
-
-    public BPvPPlugin() {
+    protected BPvPPlugin() {
         this.listeners = new ArrayList<>();
         this.configs = new HashMap<>();
     }

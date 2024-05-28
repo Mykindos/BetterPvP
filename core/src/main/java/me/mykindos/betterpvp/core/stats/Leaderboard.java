@@ -13,7 +13,6 @@ import me.mykindos.betterpvp.core.stats.filter.Filtered;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardEntry;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardEntryComparator;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardEntryKey;
-import me.mykindos.betterpvp.core.stats.repository.LeaderboardManager;
 import me.mykindos.betterpvp.core.stats.sort.SortType;
 import me.mykindos.betterpvp.core.stats.sort.Sorted;
 import me.mykindos.betterpvp.core.stats.sort.TemporalSort;
@@ -57,14 +56,12 @@ public abstract class Leaderboard<E, T> {
     private final AsyncLoadingCache<LeaderboardEntryKey<E>, T> entryCache;
     private final Database database;
     private final Collection<SearchOptions> validSearchOptions = new ArrayList<>();
-    private final BPvPPlugin plugin;
 
     @Getter
     @Setter
     private boolean viewable = true;
 
     protected Leaderboard(BPvPPlugin plugin) {
-        this.plugin = plugin;
         this.database = plugin.getInjector().getInstance(Database.class);
         this.topTen = new ConcurrentHashMap<>();
         this.entryCache = Caffeine.newBuilder()
@@ -100,8 +97,6 @@ public abstract class Leaderboard<E, T> {
 
         // Schedule updates and register with manager
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(this::forceUpdate, 0L, 10L, TimeUnit.MINUTES);
-        final LeaderboardManager manager = plugin.getInjector().getInstance(LeaderboardManager.class);
-        manager.addObject(UUID.randomUUID(), this);
     }
 
     public void forceUpdate() {

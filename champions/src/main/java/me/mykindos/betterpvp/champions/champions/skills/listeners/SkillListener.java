@@ -7,13 +7,13 @@ import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
 import me.mykindos.betterpvp.champions.champions.builds.BuildSkill;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
-import me.mykindos.betterpvp.champions.champions.builds.event.LoadBuildsEvent;
+import me.mykindos.betterpvp.champions.champions.builds.event.ChampionsBuildLoadedEvent;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillDequipEvent;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillEquipEvent;
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.champions.champions.roles.events.RoleChangeEvent;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
-import me.mykindos.betterpvp.champions.champions.skills.SkillManager;
+import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.champions.champions.skills.types.ActiveToggleSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
@@ -29,7 +29,7 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.click.events.RightClickEvent;
 import me.mykindos.betterpvp.core.combat.weapon.WeaponManager;
 import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
-import me.mykindos.betterpvp.core.components.champions.ISkill;
+import me.mykindos.betterpvp.core.components.champions.IChampionsSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerCanUseSkillEvent;
@@ -84,14 +84,14 @@ public class SkillListener implements Listener {
     private final EnergyHandler energyHandler;
     private final EffectManager effectManager;
     private final ClientManager clientManager;
-    private final SkillManager skillManager;
+    private final ChampionsSkillManager skillManager;
     private final WeaponManager weaponManager;
 
     private final HashSet<UUID> InventoryDrop = new HashSet<>();
 
     @Inject
     public SkillListener(BuildManager buildManager, RoleManager roleManager, CooldownManager cooldownManager,
-                         EnergyHandler energyHandler, EffectManager effectManager, ClientManager clientManager, SkillManager skillManager, WeaponManager weaponManager) {
+                         EnergyHandler energyHandler, EffectManager effectManager, ClientManager clientManager, ChampionsSkillManager skillManager, WeaponManager weaponManager) {
         this.buildManager = buildManager;
         this.roleManager = roleManager;
         this.cooldownManager = cooldownManager;
@@ -108,7 +108,7 @@ public class SkillListener implements Listener {
         if (event.isCancelled()) return;
 
         Player player = event.getPlayer();
-        ISkill skill = event.getSkill();
+        IChampionsSkill skill = event.getSkill();
         int level = event.getLevel();
 
         if (!skill.canUse(player)) {
@@ -158,7 +158,7 @@ public class SkillListener implements Listener {
         if (event.isCancelled()) return;
 
         Player player = event.getPlayer();
-        ISkill skill = event.getSkill();
+        IChampionsSkill skill = event.getSkill();
         int level = event.getLevel();
 
         if (skill instanceof InteractSkill interactSkill) {
@@ -337,7 +337,7 @@ public class SkillListener implements Listener {
 
     }
 
-    private void sendSkillUsed(Player player, ISkill skill, int level) {
+    private void sendSkillUsed(Player player, IChampionsSkill skill, int level) {
         if (skill instanceof PrepareSkill) {
             UtilMessage.simpleMessage(player, skill.getClassType().getName(), "You prepared <green>%s %d<gray>.", skill.getName(), level);
 
@@ -351,7 +351,7 @@ public class SkillListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onUseSkillDisabled(PlayerUseSkillEvent event) {
         Player player = event.getPlayer();
-        ISkill skill = event.getSkill();
+        IChampionsSkill skill = event.getSkill();
 
         if (!skill.isEnabled()) {
             UtilMessage.simpleMessage(player, skill.getClassType().getName(), "<alt>%s</alt> has been disabled by the server.", skill.getName());
@@ -364,7 +364,7 @@ public class SkillListener implements Listener {
     public void onUseSkillWhileSlowed(PlayerUseSkillEvent event) {
         if (event.isCancelled()) return;
 
-        ISkill skill = event.getSkill();
+        IChampionsSkill skill = event.getSkill();
         Player player = event.getPlayer();
 
         if (skill.canUseWhileSlowed()) return;
@@ -379,7 +379,7 @@ public class SkillListener implements Listener {
     @EventHandler
     public void onUseSkillWhileLevitating(PlayerUseSkillEvent event) {
         if (event.isCancelled()) return;
-        ISkill skill = event.getSkill();
+        IChampionsSkill skill = event.getSkill();
         Player player = event.getPlayer();
 
         if (skill.canUseWhileLevitating()) return;
@@ -396,7 +396,7 @@ public class SkillListener implements Listener {
         if (event.isCancelled()) return;
 
         Player player = event.getPlayer();
-        ISkill skill = event.getSkill();
+        IChampionsSkill skill = event.getSkill();
 
         if (skill.canUseInLiquid()) return;
 
@@ -410,7 +410,7 @@ public class SkillListener implements Listener {
     public void onUseSkillWhileSilenced(PlayerUseSkillEvent event) {
         if (event.isCancelled()) return;
         Player player = event.getPlayer();
-        ISkill skill = event.getSkill();
+        IChampionsSkill skill = event.getSkill();
         if (skill.ignoreNegativeEffects()) return;
         if (skill.canUseWhileSilenced()) return;
         if (effectManager.hasEffect(player, EffectTypes.SILENCE)) {
@@ -433,7 +433,7 @@ public class SkillListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onLoadBuilds(LoadBuildsEvent event) {
+    public void onLoadBuilds(ChampionsBuildLoadedEvent event) {
         final Player player = event.getPlayer();
 
         Role role = roleManager.getObject(player.getUniqueId().toString()).orElse(null);
@@ -479,7 +479,7 @@ public class SkillListener implements Listener {
     public void onUseSkillWhileStunned(PlayerUseSkillEvent event) {
         if (event.isCancelled()) return;
         Player player = event.getPlayer();
-        ISkill skill = event.getSkill();
+        IChampionsSkill skill = event.getSkill();
         if (skill.ignoreNegativeEffects()) return;
         if (skill.canUseWhileStunned()) return;
         if (effectManager.hasEffect(player, EffectTypes.STUN)) {

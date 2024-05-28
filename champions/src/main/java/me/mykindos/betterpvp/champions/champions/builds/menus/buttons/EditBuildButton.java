@@ -3,7 +3,7 @@ package me.mykindos.betterpvp.champions.champions.builds.menus.buttons;
 import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.menus.SkillMenu;
-import me.mykindos.betterpvp.champions.champions.skills.SkillManager;
+import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
@@ -22,11 +22,11 @@ public class EditBuildButton extends SimpleItem {
     private final Role role;
     private final int build;
     private final GamerBuilds builds;
-    private final SkillManager skillManager;
+    private final ChampionsSkillManager skillManager;
     private final Windowed previous;
     private final BuildManager buildManager;
 
-    public EditBuildButton(GamerBuilds builds, Role role, int build, BuildManager buildManager, SkillManager skillManager, Windowed previous) {
+    public EditBuildButton(GamerBuilds builds, Role role, int build, BuildManager buildManager, ChampionsSkillManager skillManager, Windowed previous) {
         super(ItemView.builder().material(Material.ANVIL)
                 .displayName(Component.text("Edit Build " + build, NamedTextColor.GRAY))
                 .build());

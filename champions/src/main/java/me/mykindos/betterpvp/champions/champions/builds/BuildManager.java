@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
-import me.mykindos.betterpvp.champions.champions.builds.event.LoadBuildsEvent;
+import me.mykindos.betterpvp.champions.champions.builds.event.ChampionsBuildLoadedEvent;
 import me.mykindos.betterpvp.champions.champions.builds.repository.BuildRepository;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -31,7 +31,7 @@ public class BuildManager extends Manager<GamerBuilds> {
         getBuildRepository().loadDefaultBuilds(builds);
         addObject(player.getUniqueId().toString(), builds);
         UtilServer.runTask(champions, () -> {
-            UtilServer.callEvent(new LoadBuildsEvent(player, builds));
+            UtilServer.callEvent(new ChampionsBuildLoadedEvent(player, builds));
         });
     }
 

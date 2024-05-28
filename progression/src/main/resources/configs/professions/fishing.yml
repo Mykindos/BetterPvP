@@ -1,0 +1,19 @@
+skills:
+  base_fishing:
+    enabled: true
+    maxlevel: 1
+  no_more_mobs:
+    enabled: true
+    maxlevel: 1
+  thicker_lines:
+    enabled: true
+    maxlevel: 250
+  feeling_lucky:
+    enabled: true
+    maxlevel: 250
+  expert_baiter:
+    enabled: true
+    maxlevel: 250
+  swiftness:
+    enabled: true
+    maxlevel: 250

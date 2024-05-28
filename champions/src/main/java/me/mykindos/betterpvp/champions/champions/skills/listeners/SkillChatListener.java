@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.listeners;
 
 import com.google.inject.Inject;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
-import me.mykindos.betterpvp.champions.champions.skills.SkillManager;
+import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
 import me.mykindos.betterpvp.champions.properties.ChampionsProperty;
 import me.mykindos.betterpvp.core.chat.events.ChatReceivedEvent;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
@@ -29,11 +29,11 @@ public class SkillChatListener implements Listener {
     @Config(path = "chat.skill.preview", defaultValue = "true")
     private boolean chatSkillPreview;
 
-    private final SkillManager skillManager;
+    private final ChampionsSkillManager skillManager;
     private final ClientManager clientManager;
 
     @Inject
-    public SkillChatListener(SkillManager skillManager, ClientManager clientManager) {
+    public SkillChatListener(ChampionsSkillManager skillManager, ClientManager clientManager) {
         this.skillManager = skillManager;
         this.clientManager = clientManager;
     }

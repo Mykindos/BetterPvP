@@ -8,9 +8,6 @@ import me.mykindos.betterpvp.clans.listener.ClansListenerLoader;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.utilities.model.ConfigAccessor;
 import me.mykindos.betterpvp.progression.Progression;
-import me.mykindos.betterpvp.progression.ProgressionsManager;
-import me.mykindos.betterpvp.progression.model.ProgressionPerk;
-import me.mykindos.betterpvp.progression.model.ProgressionTree;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 import org.reflections.Reflections;
@@ -26,7 +23,6 @@ public class ProgressionAdapter {
     @Getter
     private final Progression progression;
     private final Clans clans;
-    private final ProgressionsManager progressionsManager;
     private final ClansListenerLoader listenerLoader;
 
     @Inject
@@ -34,12 +30,11 @@ public class ProgressionAdapter {
         this.clans = clans;
         this.listenerLoader = listenerLoader;
         this.progression = Objects.requireNonNull((Progression) Bukkit.getPluginManager().getPlugin("Progression"));
-        this.progressionsManager = progression.getProgressionsManager();
+
     }
 
     public void load() {
         loadListeners();
-        loadPerks();
     }
 
     private void loadListeners() {
@@ -57,23 +52,5 @@ public class ProgressionAdapter {
         log.info("Loaded " + listenerClasses.size() + " clans progression listeners").submit();
     }
 
-    private void loadPerks() {
-        Reflections reflections = new Reflections(getClass().getPackageName());
-        final Set<Class<? extends ProgressionPerk>> perkClasses = reflections.getSubTypesOf(ProgressionPerk.class);
-        for (Class<? extends ProgressionPerk> clazz : perkClasses) {
-            if (clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers())) continue;
-            final ProgressionPerk perk = clans.getInjector().getInstance(clazz);
-            if (perk instanceof ConfigAccessor accessor) {
-                accessor.loadConfig(clans.getConfig());
-            }
-
-            clans.getInjector().injectMembers(perk);
-            final Class<? extends ProgressionTree>[] trees = perk.acceptedTrees();
-            for (Class<? extends ProgressionTree> tree : trees) {
-                progressionsManager.fromClass(tree).addPerk(perk);
-            }
-        }
-        log.info("Loaded " + perkClasses.size() + " clans progression perks").submit();
-    }
 
 }

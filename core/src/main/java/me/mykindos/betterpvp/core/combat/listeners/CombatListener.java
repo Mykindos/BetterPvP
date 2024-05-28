@@ -493,6 +493,11 @@ public class CombatListener implements Listener {
             return;
         }
 
+        if(event.getDamagee().equals(event.getDamager())) {
+            event.setResult(Event.Result.DENY);
+            return;
+        }
+
         if(event.getDamagee() instanceof Player damagee) {
             if(damagee.getGameMode() == GameMode.CREATIVE || damagee.getGameMode() == GameMode.SPECTATOR) {
                 event.setResult(Event.Result.DENY);

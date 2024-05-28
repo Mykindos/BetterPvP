@@ -26,7 +26,18 @@ import java.util.Random;
 public class WeighedList<T> implements Iterable<T>{
 
     private final Random rnd = new Random();
-    private final Map<Integer, Multimap<Integer, T>> map = new HashMap<>();
+    private final Map<Integer, Multimap<Integer, T>> map;
+
+    public WeighedList() {
+        this.map = new HashMap<>();
+    }
+
+    public WeighedList(WeighedList<T> other) {
+        this.map = new HashMap<>();
+        for (Map.Entry<Integer, Multimap<Integer, T>> entry : other.map.entrySet()) {
+            this.map.put(entry.getKey(), ArrayListMultimap.create(entry.getValue()));
+        }
+    }
 
     public void add(int categoryWeight, int weight, T element) {
         map.computeIfAbsent(categoryWeight, k -> ArrayListMultimap.create()).put(weight, element);
@@ -72,6 +83,7 @@ public class WeighedList<T> implements Iterable<T>{
      */
     public T random(int weight) {
         Multimap<Integer, T> multimap = map.get(weight);
+
         int totalWeight = multimap.keySet().stream().mapToInt(Integer::intValue).sum();
         int random = rnd.nextInt(totalWeight);
         for (int key : multimap.keySet()) {
