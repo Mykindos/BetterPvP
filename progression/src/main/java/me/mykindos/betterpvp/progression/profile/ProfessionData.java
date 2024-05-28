@@ -36,8 +36,7 @@ public final class ProfessionData extends PropertyContainer implements IMapListe
 
     public void grantExperience(double amount, @Nullable Player player) {
         int previousLevel = getLevelFromExperience(experience);
-        this.experience += amount;
-        int newLevel = getLevelFromExperience((int) experience);
+        int newLevel = getLevelFromExperience(experience + amount);
         if (player != null) {
             UtilServer.callEvent(new PlayerProgressionExperienceEvent(player, profession, amount, newLevel, previousLevel, newLevel > previousLevel));
         }
@@ -47,9 +46,11 @@ public final class ProfessionData extends PropertyContainer implements IMapListe
         int level = 1;
         double expForNextLevel = 25;
 
-        while (experience >= expForNextLevel) {
+        double experienceCopy = experience;
+
+        while (experienceCopy >= expForNextLevel) {
             level++;
-            experience -= expForNextLevel;
+            experienceCopy -= expForNextLevel;
             expForNextLevel *= 1.01;
         }
 
