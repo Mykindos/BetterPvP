@@ -61,7 +61,7 @@ public class Pestilence extends PrepareSkill implements CooldownSkill {
         return new String[]{
                 "Right click with a Sword to prepare",
                 "",
-                "Your next hit will apply <effect>Pestilence</effect> to the target,",
+                "Your next sword strike will inflict <effect>Pestilence</effect> on the target,",
                 "<effect>Poisoning</effect> them, and spreading to nearby enemies",
                 "",
                 "While enemies are infected, they",
