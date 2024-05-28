@@ -10,27 +10,27 @@ public class FishingProfessionMenu extends ProfessionMenu {
         super("Fishing", professionProfile, progressionSkillManager);
 
         progressionSkillManager.getSkill("Thicker Lines").ifPresent(skill -> {
-            setItem(10, new ProgressionSkillButton(skill, professionData, progressionSkillManager));
+            setItem(11, new ProgressionSkillButton(skill, professionData, progressionSkillManager));
         });
 
         progressionSkillManager.getSkill("Feeling Lucky").ifPresent(skill -> {
-            setItem(28, new ProgressionSkillButton(skill, professionData, progressionSkillManager));
+            setItem(13, new ProgressionSkillButton(skill, professionData, progressionSkillManager));
         });
 
         progressionSkillManager.getSkill("Expert Baiter").ifPresent(skill -> {
-            setItem(46, new ProgressionSkillButton(skill, professionData, progressionSkillManager));
+            setItem(15, new ProgressionSkillButton(skill, professionData, progressionSkillManager));
         });
 
         progressionSkillManager.getSkill("Base Fishing").ifPresent(skill -> {
-            setItem(22, new ProgressionSkillButton(skill, professionData, progressionSkillManager));
+            setItem(30, new ProgressionSkillButton(skill, professionData, progressionSkillManager));
         });
 
         progressionSkillManager.getSkill("No More Mobs").ifPresent(skill -> {
-            setItem(40, new ProgressionSkillButton(skill, professionData, progressionSkillManager));
+            setItem(32, new ProgressionSkillButton(skill, professionData, progressionSkillManager));
         });
 
         progressionSkillManager.getSkill("Swiftness").ifPresent(skill -> {
-            setItem(34, new ProgressionSkillButton(skill, professionData, progressionSkillManager));
+            setItem(49, new ProgressionSkillButton(skill, professionData, progressionSkillManager));
         });
     }
 
