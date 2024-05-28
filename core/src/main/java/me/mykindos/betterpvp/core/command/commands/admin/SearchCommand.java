@@ -127,7 +127,9 @@ public class SearchCommand extends Command {
                     if (end > size) end = size;
                     for (CachedLog log : logs.subList(start, end)) {
                         if (count == numPerPage) break;
-                        UtilMessage.message(player, log.getTimeComponent().append(Component.text("- ")).append(LoggerFactory.getInstance().formatLog(log)));
+                        Component component = LoggerFactory.getInstance().formatLog(log);
+                        if (component == null) continue;
+                        UtilMessage.message(player, log.getTimeComponent().append(Component.text("- ")).append(component));
                         count++;
                     }
                 }
@@ -216,7 +218,7 @@ public class SearchCommand extends Command {
 
                 int finalPageNumber = pageNumber;
                 UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> {
-                    List<CachedLog> logs = logRepository.getLogsWithContext(LogContext.CLIENT, targetClient.getUniqueId().toString());
+                    List<CachedLog> logs = logRepository.getLogsWithContextAndAction(LogContext.CLIENT, targetClient.getUniqueId().toString(), "ITEM_");
                     int count = 0;
                     int start = (finalPageNumber - 1) * numPerPage;
                     int end = start + numPerPage;
@@ -232,7 +234,9 @@ public class SearchCommand extends Command {
                         if (end > size) end = size;
                         for (CachedLog log : logs.subList(start, end)) {
                             if (count == numPerPage) break;
-                            UtilMessage.message(player, log.getTimeComponent().append(Component.text("- ")).append(LoggerFactory.getInstance().formatLog(log)));
+                            Component component = LoggerFactory.getInstance().formatLog(log);
+                            if (component == null) continue;
+                            UtilMessage.message(player, log.getTimeComponent().append(Component.text("- ")).append(component));
                             count++;
                         }
                     }
