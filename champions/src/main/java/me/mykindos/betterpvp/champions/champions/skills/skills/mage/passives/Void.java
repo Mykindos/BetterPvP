@@ -91,11 +91,6 @@ public class Void extends ActiveToggleSkill implements EnergySkill {
     }
 
     @Override
-    public float getEnergyStartCost(int level) {
-        return (float) (energyStartCost - ((level - 1) * energyStartCostDecreasePerLevel));
-    }
-
-    @Override
     public void cancel(Player player, String reason) {
         super.cancel(player, reason);
         championsManager.getEffects().removeEffect(player, EffectTypes.INVISIBILITY, getName());

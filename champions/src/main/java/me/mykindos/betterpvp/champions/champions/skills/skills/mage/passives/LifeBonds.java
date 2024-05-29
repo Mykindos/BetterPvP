@@ -103,11 +103,6 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
         }
     }
 
-    @Override
-    public float getEnergyStartCost(int level) {
-        return (float) (energyStartCost - ((level - 1) * energyStartCostDecreasePerLevel));
-    }
-
     private void audio(Player player) {
         player.getWorld().playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 0.3F, 0.0F);
     }

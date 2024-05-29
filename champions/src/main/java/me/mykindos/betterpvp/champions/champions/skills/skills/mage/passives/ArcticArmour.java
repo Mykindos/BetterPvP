@@ -202,11 +202,6 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill {
     }
 
     @Override
-    public float getEnergyStartCost(int level) {
-        return (float) (energyStartCost - ((level - 1) * energyStartCostDecreasePerLevel));
-    }
-
-    @Override
     public void toggleActive(Player player) {
         if (championsManager.getEnergy().use(player, getName(), getEnergyStartCost(getLevel(player)), false)) {
             UtilMessage.message(player, getClassType().getName(), "Arctic Armour: <green>On");

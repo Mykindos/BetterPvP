@@ -110,11 +110,6 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
     }
 
     @Override
-    public float getEnergyStartCost(int level) {
-        return (float) (energyStartCost - ((level - 1) * energyStartCostDecreasePerLevel));
-    }
-
-    @Override
     public void cancel(Player player, String reason) {
         super.cancel(player, reason);
 
