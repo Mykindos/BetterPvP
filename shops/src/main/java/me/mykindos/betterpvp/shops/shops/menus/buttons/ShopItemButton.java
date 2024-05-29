@@ -45,8 +45,8 @@ public class ShopItemButton extends AbstractItem implements CooldownButton {
     public ItemProvider getItemProvider() {
         boolean canSell = shopItem.getSellPrice() > 0;
         ItemStack item = new ItemStack(shopItem.getMaterial(), shopItem.getAmount());
-        item.getItemMeta().setCustomModelData(shopItem.getModelData());
-        item = itemHandler.updateNames(item);
+        item.editMeta(meta -> meta.setCustomModelData(shopItem.getModelData()));
+        item = itemHandler.updateNames(item, false);
 
         item.editMeta(itemMeta -> {
             if(!itemMeta.hasLore()) {

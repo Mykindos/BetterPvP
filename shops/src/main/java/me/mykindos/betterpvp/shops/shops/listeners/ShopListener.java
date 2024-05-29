@@ -130,6 +130,8 @@ public class ShopListener implements Listener {
         }
 
         ItemStack boughtItem = new ItemStack(event.getShopItem().getMaterial(), amount);
+        boughtItem.editMeta(meta -> meta.setCustomModelData(event.getShopItem().getModelData()));
+
         UtilItem.insert(event.getPlayer(), itemHandler.updateNames(boughtItem));
         UtilMessage.simpleMessage(event.getPlayer(), "Shop", "You have purchased <alt2>%d %s</alt2> for <alt2>%s %s</alt2>.",
                 amount, event.getShopItem().getItemName(), NumberFormat.getInstance().format(cost), event.getCurrency().name().toLowerCase());
