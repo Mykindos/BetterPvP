@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.insurance.Insurance;
 import me.mykindos.betterpvp.clans.clans.insurance.InsuranceType;
 import me.mykindos.betterpvp.clans.clans.leaderboard.ClanLeaderboard;
+import me.mykindos.betterpvp.clans.clans.leveling.ClanPerkManager;
 import me.mykindos.betterpvp.clans.clans.pillage.Pillage;
 import me.mykindos.betterpvp.clans.clans.pillage.PillageHandler;
 import me.mykindos.betterpvp.clans.clans.pillage.events.PillageStartEvent;
@@ -95,6 +96,8 @@ public class ClanManager extends Manager<Clan> {
         this.insuranceQueue = new ConcurrentLinkedQueue<>();
 
         dominanceScale = repository.getDominanceScale();
+
+        ClanPerkManager.getInstance().init();
     }
 
     public Optional<Clan> getClanById(UUID id) {
@@ -551,4 +554,5 @@ public class ClanManager extends Manager<Clan> {
         Optional<Leaderboard<?, ?>> clans = leaderboardManager.getObject("Clans");
         return (ClanLeaderboard) clans.orElse(null);
     }
+
 }

@@ -31,11 +31,11 @@ public class ClanTravelHubMenu extends AbstractGui implements Windowed {
 
         // Spawns
         clanManager.getClanByName("North Spawn").ifPresent(clan -> {
-            setItem(4, new SpawnTransportButton(clan, Material.SPAWNER, NamedTextColor.WHITE));
+            setItem(4, new SpawnTransportButton(clan, Material.END_CRYSTAL, NamedTextColor.WHITE));
         });
 
         clanManager.getClanByName("South Spawn").ifPresent(clan -> {
-            setItem(40, new SpawnTransportButton(clan, Material.SPAWNER, NamedTextColor.WHITE));
+            setItem(40, new SpawnTransportButton(clan, Material.END_CRYSTAL, NamedTextColor.WHITE));
         });
 
         // Shops

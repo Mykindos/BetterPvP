@@ -38,5 +38,5 @@ INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, H
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
     ('DIAMOND_BLOCK', 'clans', 'diamond_block', '<yellow>Diamond Block', 0, 0, 0), ('IRON_BLOCK', 'clans', 'iron_block', '<yellow>Iron Block', 0, 0, 0),
     ('NETHERITE_BLOCK', 'clans', 'netherite_block', '<yellow>Netherite Block', 0, 0, 0), ('EMERALD_BLOCK', 'clans', 'emerald_block', '<yellow>Emerald Block', 0, 0, 0),
-    ('GOLD_BLOCK', 'clans', 'gold_block', '<yellow>Gold BLock', 0, 0, 0), ('ENCHANTING_TABLE', 'clans', 'enchanting_table', '<yellow>Enchanting Table', 0, 0, 0),
+    ('GOLD_BLOCK', 'clans', 'gold_block', '<yellow>Gold Block', 0, 0, 0), ('ENCHANTING_TABLE', 'clans', 'enchanting_table', '<yellow>Enchanting Table', 0, 0, 0),
     ('BEEHIVE', 'clans', 'beehive', '<yellow>Bee Hive', 0, 0, 0), ('REDSTONE_BLOCK', 'clans', 'redstone_block', '<yellow>Redstone Block', 0, 0, 0);

@@ -13,7 +13,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.ItemFlag;
 import org.jetbrains.annotations.NotNull;
 import xyz.xenondevs.invui.gui.TabGui;
 import xyz.xenondevs.invui.gui.structure.Markers;
@@ -30,12 +29,8 @@ public class ViewEnemiesButton extends ViewClanCollectionButton {
     private final Clan viewerClan;
 
     public ViewEnemiesButton(Clan clan, Windowed parent, Clan viewerClan) {
-        super(ItemView.builder()
-                        .material(Material.IRON_SWORD)
-                        .flag(ItemFlag.HIDE_ATTRIBUTES)
-                        .build(),
-                "Enemies",
-                parent);
+        super(ItemView.builder().material(Material.PAPER).customModelData(7).build(),
+                "Enemies", parent);
         this.clan = clan;
         this.viewerClan = viewerClan;
     }

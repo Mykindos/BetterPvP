@@ -7,20 +7,24 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 
-@Getter
-public class ClanVaultLegend implements ClanPerk {
+import java.util.UUID;
 
-    private final int count;
+@Getter
+public class ClanFarmingLevels implements ClanPerk {
+
+    private final UUID perkUUID;
+    private final int levels;
     private final int minReq;
 
-    public ClanVaultLegend(int count, int minReq) {
-        this.count = count;
+    public ClanFarmingLevels(int levels, int minReq) {
+        this.levels = levels;
         this.minReq = minReq;
+        this.perkUUID = UUID.randomUUID();
     }
 
     @Override
     public String getName() {
-        return count + " Vault Legends";
+        return "+" + levels + " Base Farming Levels";
     }
 
     @Override
@@ -31,13 +35,13 @@ public class ClanVaultLegend implements ClanPerk {
     @Override
     public Component[] getDescription() {
         return new Component[] {
-                Component.text(count + " legendaries are allowed in your clan vault.", NamedTextColor.GRAY)
+                Component.text("Allows your clan to make their farm " + levels + " levels deeper.", NamedTextColor.GRAY)
         };
     }
 
     @Override
     public ItemView getIcon() {
-        return ItemView.builder().material(Material.NETHER_STAR).build();
+        return ItemView.builder().material(Material.DIAMOND_HOE).build();
     }
 
 }

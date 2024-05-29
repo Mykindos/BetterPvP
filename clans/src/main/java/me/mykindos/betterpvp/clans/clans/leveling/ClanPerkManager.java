@@ -1,44 +1,52 @@
 package me.mykindos.betterpvp.clans.clans.leveling;
 
-import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.Getter;
-import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
+import me.mykindos.betterpvp.clans.clans.leveling.perk.model.ClanFarmingLevels;
+import me.mykindos.betterpvp.clans.clans.leveling.perk.model.ClanVaultLegend;
+import me.mykindos.betterpvp.clans.clans.leveling.perk.model.ClanVaultSlot;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
-import org.reflections.Reflections;
 
-import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 
 @Singleton
 public class ClanPerkManager extends Manager<ClanPerk> {
 
-    @Getter
     private static ClanPerkManager instance;
-    private final Clans clans;
 
-    @Inject
-    public ClanPerkManager(Clans clans) {
-        this.clans = clans;
-        if (instance == null) {
-            instance = this;
-        }
+    private ClanPerkManager() {
     }
 
-    public void scan() {
-        Reflections reflections = new Reflections(getClass().getPackageName());
-        Set<Class<? extends ClanPerk>> classes = reflections.getSubTypesOf(ClanPerk.class);
-        for (Class<? extends ClanPerk> perkClass : classes) {
-            if (Modifier.isAbstract(perkClass.getModifiers()) || Modifier.isInterface(perkClass.getModifiers())) continue;
-            // Filter out anonymous classes
-            if (perkClass.isAnonymousClass()) continue;
-            final ClanPerk perk = clans.getInjector().getInstance(perkClass);
-            addObject(perk.getName(), perk);
+    public static ClanPerkManager getInstance() {
+        if (instance == null) {
+            instance = new ClanPerkManager();
         }
+        return instance;
+    }
+
+    public void init() {
+        registerPerks();
+    }
+
+    private void registerPerks() {
+        registerSlots(1, 5);
+        registerSlots(2, 15);
+        registerSlots(3, 25);
+        registerSlots(4, 35);
+
+        registerLegends(1, 15);
+        registerLegends(2, 35);
+        registerLegends(3, 55);
+        registerLegends(4, 75);
+        registerLegends(5, 95);
+
+        registerFarmingLevels(5, 10);
+        registerFarmingLevels(5, 30);
+        registerFarmingLevels(5, 50);
+        registerFarmingLevels(5, 70);
+        registerFarmingLevels(5, 90);
     }
 
     public Collection<ClanPerk> getPerks(Clan clan) {
@@ -57,4 +65,22 @@ public class ClanPerkManager extends Manager<ClanPerk> {
         return getPerks(clan).stream().anyMatch(perk::isInstance);
     }
 
+    private void registerLegends(int legends, int minReq) {
+        final ClanVaultLegend perk = new ClanVaultLegend(legends, minReq);
+        addObject(perk.getName(), perk);
+    }
+
+    private void registerSlots(int slots, int minReq) {
+        final ClanVaultSlot perk = new ClanVaultSlot(slots, minReq);
+        addObject(perk.getName(), perk);
+    }
+
+    private void registerFarmingLevels(int levels, int minReq) {
+        final ClanFarmingLevels perk = new ClanFarmingLevels(levels, minReq);
+        addObject(perk.getPerkUUID(), perk);
+    }
+
+    public int getTotalFarmingLevels(Clan clan) {
+        return getPerks(clan).stream().filter(ClanFarmingLevels.class::isInstance).mapToInt(perk -> ((ClanFarmingLevels) perk).getLevels()).sum();
+    }
 }
