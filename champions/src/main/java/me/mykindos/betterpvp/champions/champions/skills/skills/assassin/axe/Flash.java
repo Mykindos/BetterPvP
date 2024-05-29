@@ -148,7 +148,6 @@ public class Flash extends Skill implements InteractSkill, Listener {
 
     @Override
     public void trackPlayer(Player player, Gamer gamer) {
-        log.info("equiped flash");
         charges.computeIfAbsent(player, k -> new FlashData());
         gamer.getActionBar().add(900, actionBarComponent);
     }
