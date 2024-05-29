@@ -15,7 +15,7 @@ clans:
     protectionBaseTimeInMinutes: 5.0
     regenerationTimeInMinutes: 5.0
   map:
-    enabled: false
+    enabled: true
     maxMapDistance: 640
     maxProcess: 64
     update-interval: 1
@@ -37,11 +37,11 @@ clans:
       - WATER
       - ICE
       - LAVA
-      - RED_BED
   pillage:
     duration: 15
     noDominanceCooldown: 4
     enabled: true
+    protection: true
   bank:
     interestIntervalDeviation: 6
     interestIntervalInHours: 24
@@ -55,6 +55,10 @@ clans:
     energyWarnLevel: 1.0
   dominance:
     enabled: true
+  farming:
+    baseY: 60
+    allowOfflineGrowing: false
+    baseFarmingLevels: 5
 server:
   sidebar:
     title: BetterPvP
