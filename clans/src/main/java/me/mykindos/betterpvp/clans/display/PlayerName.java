@@ -32,6 +32,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -47,7 +48,8 @@ public class PlayerName implements Listener {
         this.clanManager = clanManager;
     }
 
-    public void broadcastChange(@NotNull Clan clan) {
+    public void broadcastChange(@Nullable Clan clan) {
+        if (clan == null) return;
         clan.getMembersAsPlayers().forEach(this::broadcastChange);
     }
 
@@ -175,14 +177,14 @@ public class PlayerName implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     private void onPillageStart(final PillageStartEvent event) {
-        this.broadcastChange(this.clanManager.getClanById(event.getPillage().getPillaged().getId()).orElseThrow());
-        this.broadcastChange(this.clanManager.getClanById(event.getPillage().getPillager().getId()).orElseThrow());
+        this.broadcastChange(this.clanManager.getClanById(event.getPillage().getPillaged().getId()).orElse(null));
+        this.broadcastChange(this.clanManager.getClanById(event.getPillage().getPillager().getId()).orElse(null));
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     private void onPillageEnd(final PillageEndEvent event) {
-        this.broadcastChange(this.clanManager.getClanById(event.getPillage().getPillaged().getId()).orElseThrow());
-        this.broadcastChange(this.clanManager.getClanById(event.getPillage().getPillager().getId()).orElseThrow());
+        this.broadcastChange(this.clanManager.getClanById(event.getPillage().getPillaged().getId()).orElse(null));
+        this.broadcastChange(this.clanManager.getClanById(event.getPillage().getPillager().getId()).orElse(null));
     }
 
     @EventHandler
