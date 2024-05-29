@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -33,6 +34,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
+@Slf4j
 public class Flash extends Skill implements InteractSkill, Listener {
 
     private final WeakHashMap<Player, FlashData> charges = new WeakHashMap<>();
@@ -146,6 +148,7 @@ public class Flash extends Skill implements InteractSkill, Listener {
 
     @Override
     public void trackPlayer(Player player, Gamer gamer) {
+        log.info("equiped flash");
         charges.computeIfAbsent(player, k -> new FlashData());
         gamer.getActionBar().add(900, actionBarComponent);
     }

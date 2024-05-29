@@ -286,8 +286,9 @@ public class ClanEventListener extends ClanListener {
         UtilMessage.simpleMessage(player, "Clans", "You joined <alt2>Clan " + clan.getName() + "</alt2>.");
 
         log.info("{} ({}) joined {} ({})", player.getName(), player.getUniqueId(), clan.getName(), clan.getId()).setAction("CLAN_JOIN")
-                .addContext("client", player.getUniqueId().toString()).addContext("clientName", player.getName())
-                .addContext("clan", clan.getId().toString()).addContext("clanName", clan.getName()).submit();
+                .addClientContext(player)
+                .addClanContext(clan)
+                .submit();
 
     }
 
