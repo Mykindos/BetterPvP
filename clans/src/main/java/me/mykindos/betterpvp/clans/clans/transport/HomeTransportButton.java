@@ -27,7 +27,7 @@ public class HomeTransportButton extends ControlItem<ClanTravelHubMenu> {
     @Override
     public ItemProvider getItemProvider(ClanTravelHubMenu clanTravelHubMenu) {
         ItemView.ItemViewBuilder provider = ItemView.builder().material(Material.RED_BED)
-                .displayName(Component.text(clan.getName(), NamedTextColor.AQUA, TextDecoration.BOLD))
+                .displayName(Component.text("Clan Home - ", NamedTextColor.GOLD).append(Component.text(clan.getName(), NamedTextColor.AQUA, TextDecoration.BOLD)))
                 .action(ClickActions.LEFT, Component.text("Teleport"));
         return provider.build();
     }

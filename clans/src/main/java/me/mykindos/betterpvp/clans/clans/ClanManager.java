@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.clans.Clans;
+import me.mykindos.betterpvp.clans.clans.events.ClanDominanceChangeEvent;
 import me.mykindos.betterpvp.clans.clans.insurance.Insurance;
 import me.mykindos.betterpvp.clans.clans.insurance.InsuranceType;
 import me.mykindos.betterpvp.clans.clans.leaderboard.ClanLeaderboard;
@@ -420,8 +421,10 @@ public class ClanManager extends Manager<Clan> {
         // If the killed players clan has no dominance on the killer players clan, then give dominance to the killer
         if (killedEnemy.getDominance() == 0) {
             killerEnemy.addDominance(dominance);
+            UtilServer.callEvent(new ClanDominanceChangeEvent(null, killer));
         }
         killedEnemy.takeDominance(dominance);
+        UtilServer.callEvent(new ClanDominanceChangeEvent(null, killed));
 
         killed.messageClan("You lost <red>" + dominance + "%<gray> dominance to <red>" + killer.getName(), null, true);
         killer.messageClan("You gained <green>" + dominance + "%<gray> dominance on <red>" + killed.getName(), null, true);

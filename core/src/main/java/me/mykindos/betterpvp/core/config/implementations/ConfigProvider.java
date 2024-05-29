@@ -52,9 +52,10 @@ public class ConfigProvider<T> implements Provider<T> {
             }
         }
 
+
         T value = plugin.getConfig(configName).getOrSaveObject(configPath, castedDefault, type);
         plugin.saveConfig();
-
+        System.out.println("ConfigProvider: " + configPath + " = " + value);
         return value;
     }
 

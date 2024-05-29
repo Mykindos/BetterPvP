@@ -65,6 +65,7 @@ public abstract class BPvPPlugin extends JavaPlugin {
 
     @Override
     public void reloadConfig() {
+
         configs.forEach((key, value) -> {
             File configFile = new File(getDataFolder(), key + ".yml");
             ExtendedYamlConfiguration config = ExtendedYamlConfiguration.loadConfiguration(configFile);
@@ -131,7 +132,9 @@ public abstract class BPvPPlugin extends JavaPlugin {
 
     public void reload() {
         reloadConfig();
-        getInjector().getAllBindings().forEach((key, value) -> getInjector().injectMembers(value.getProvider().get()));
+        getInjector().getAllBindings().forEach((key, value) -> {
+            getInjector().injectMembers(value.getProvider().get());
+        });
     }
 
 }
