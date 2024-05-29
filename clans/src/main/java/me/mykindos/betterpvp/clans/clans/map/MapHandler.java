@@ -34,7 +34,7 @@ import java.util.UUID;
 
 /**
  * Map system by <a href="https://github.com/areeoh/">Areeoh</a>
- * Modified by Tom Hoogstra for 1.19
+ * Modified by Mykindos for 1.19+
  */
 @CustomLog
 @Singleton

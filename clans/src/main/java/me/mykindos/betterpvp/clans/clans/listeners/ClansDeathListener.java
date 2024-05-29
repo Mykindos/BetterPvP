@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.clans.clans.listeners;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
@@ -20,6 +21,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import java.util.function.Function;
 
 @BPvPListener
+@Singleton
 public class ClansDeathListener implements Listener {
 
     private final ClanManager clanManager;

@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.clans.clans.ClanRelation;
 import me.mykindos.betterpvp.clans.clans.events.ClanAllianceEvent;
 import me.mykindos.betterpvp.clans.clans.events.ClanCreateEvent;
 import me.mykindos.betterpvp.clans.clans.events.ClanDisbandEvent;
+import me.mykindos.betterpvp.clans.clans.events.ClanDominanceChangeEvent;
 import me.mykindos.betterpvp.clans.clans.events.ClanEnemyEvent;
 import me.mykindos.betterpvp.clans.clans.events.ClanKickMemberEvent;
 import me.mykindos.betterpvp.clans.clans.events.ClanNeutralEvent;
@@ -18,6 +19,7 @@ import me.mykindos.betterpvp.clans.clans.events.MemberJoinClanEvent;
 import me.mykindos.betterpvp.clans.clans.events.MemberLeaveClanEvent;
 import me.mykindos.betterpvp.clans.clans.pillage.events.PillageEndEvent;
 import me.mykindos.betterpvp.clans.clans.pillage.events.PillageStartEvent;
+import me.mykindos.betterpvp.core.combat.death.events.CustomDeathEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -82,10 +84,21 @@ public class PlayerName implements Listener {
 
         team.color(relation.getPrimary());
         if (playerClan.isPresent()) {
-            team.prefix(Component.text(playerClan.get().getName(), relation.getSecondary()).appendSpace());
+            Clan clan = playerClan.get();
+            team.prefix(Component.text(clan.getName(), relation.getSecondary()).appendSpace());
+            team.suffix(Component.text(""));
+
+            if (receiverClan.isPresent()) {
+                if (relation == ClanRelation.ENEMY) {
+                    team.suffix(clanManager.getSimpleDominanceString(clan, receiverClan.get()));
+                }
+            }
+
         } else {
             team.prefix(Component.empty().color(relation.getSecondary()));
+            team.suffix(Component.empty());
         }
+
 
         receiver.setScoreboard(scoreboard);
     }
@@ -112,7 +125,10 @@ public class PlayerName implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.NORMAL)
     private void onClanDisband(final ClanDisbandEvent event) {
-        this.broadcastChange(event.getClan());
+        ;
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            broadcastChange(player);
+        }
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
@@ -167,6 +183,25 @@ public class PlayerName implements Listener {
     private void onPillageEnd(final PillageEndEvent event) {
         this.broadcastChange(this.clanManager.getClanById(event.getPillage().getPillaged().getId()).orElseThrow());
         this.broadcastChange(this.clanManager.getClanById(event.getPillage().getPillager().getId()).orElseThrow());
+    }
+
+    @EventHandler
+    public void onDeath(CustomDeathEvent event) {
+        if (event.getKilled() instanceof Player player) {
+            clanManager.getClanByPlayer(player).ifPresent(this::broadcastChange);
+        }
+
+        if (event.getKiller() instanceof Player killer) {
+            clanManager.getClanByPlayer(killer).ifPresent(this::broadcastChange);
+        }
+
+    }
+
+    @EventHandler
+    public void onDominanceChange(ClanDominanceChangeEvent event) {
+        if (event.getClan() instanceof Clan clan) {
+            this.broadcastChange(clan);
+        }
     }
 
 }
