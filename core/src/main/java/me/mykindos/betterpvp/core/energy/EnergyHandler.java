@@ -20,8 +20,11 @@ public class EnergyHandler {
     @Config(path = "energy.nerf-energy-regen", defaultValue = "false")
     private boolean nerfEnergyRegen;
 
-    public static double baseEnergy = 150.0D;
-    public static double playerEnergy = 0.0D;
+    public static final double BASE_ENERGY = 150.0D;
+    public static final double PLAYER_ENERGY = 0.0D;
+    public static final double BASE_ENERGY_REGEN = 0.006D;
+    public static final double NERFED_ENERGY_REGEN = 0.0008D;
+    public static final long UPDATE_RATE = 50L;
 
     public double getEnergy(Player player) {
         return player.getExp();
@@ -32,7 +35,7 @@ public class EnergyHandler {
     }
 
     public double getMax(Player player) {
-        return baseEnergy;
+        return BASE_ENERGY;
     }
 
     public boolean use(Player player, String ability, double amount, boolean inform) {
@@ -83,11 +86,11 @@ public class EnergyHandler {
             return;
         }
 
-        double energy = 0.006D;
+        double energy = BASE_ENERGY_REGEN;
 
         if (nerfEnergyRegen) {
             if (cur.isSprinting() || UtilBlock.isInLiquid(cur) || cur.isGliding()) {
-                energy = 0.0008D;
+                energy = NERFED_ENERGY_REGEN;
             }
         }
 
