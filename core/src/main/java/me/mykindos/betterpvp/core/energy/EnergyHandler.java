@@ -20,10 +20,11 @@ public class EnergyHandler {
     @Config(path = "energy.nerf-energy-regen", defaultValue = "false")
     private boolean nerfEnergyRegen;
 
-    public static double baseEnergy = 150.0D;
-    public static double playerEnergy = 0.0D;
-    public static double baseEnergyRegen = 0.006D;
-    public static double nerfedEnergyRegen = 0.0008D;
+    final public static double baseEnergy = 150.0D;
+    final public static double playerEnergy = 0.0D;
+    final public static double baseEnergyRegen = 0.006D;
+    final public static double nerfedEnergyRegen = 0.0008D;
+    final public static long updateRate = 50L;
 
     public double getEnergy(Player player) {
         return player.getExp();
