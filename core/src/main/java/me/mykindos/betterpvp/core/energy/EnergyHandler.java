@@ -22,6 +22,8 @@ public class EnergyHandler {
 
     public static double baseEnergy = 150.0D;
     public static double playerEnergy = 0.0D;
+    public static double baseEnergyRegen = 0.006D;
+    public static double nerfedEnergyRegen = 0.0008D;
 
     public double getEnergy(Player player) {
         return player.getExp();
@@ -83,11 +85,11 @@ public class EnergyHandler {
             return;
         }
 
-        double energy = 0.006D;
+        double energy = baseEnergyRegen;
 
         if (nerfEnergyRegen) {
             if (cur.isSprinting() || UtilBlock.isInLiquid(cur) || cur.isGliding()) {
-                energy = 0.0008D;
+                energy = nerfedEnergyRegen;
             }
         }
 
