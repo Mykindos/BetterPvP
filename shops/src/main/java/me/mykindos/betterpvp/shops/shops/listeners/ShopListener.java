@@ -16,8 +16,10 @@ import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
+import me.mykindos.betterpvp.shops.Shops;
 import me.mykindos.betterpvp.shops.shops.ShopManager;
 import me.mykindos.betterpvp.shops.shops.items.DynamicShopItem;
 import me.mykindos.betterpvp.shops.shops.items.ShopItem;
@@ -42,6 +44,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -137,7 +140,7 @@ public class ShopListener implements Listener {
                 amount, event.getShopItem().getItemName(), NumberFormat.getInstance().format(cost), event.getCurrency().name().toLowerCase());
         UtilSound.playSound(event.getPlayer(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 2f, false);
         log.info("{} purchased {}x {} for {} {}",
-                event.getPlayer().getName(), amount, event.getShopItem().getItemName(), cost, event.getCurrency().name().toLowerCase())
+                        event.getPlayer().getName(), amount, event.getShopItem().getItemName(), cost, event.getCurrency().name().toLowerCase())
                 .setAction("SHOP_BUY").addClientContext(event.getPlayer())
                 .addContext("ShopItem", event.getShopItem().getItemName()).addContext("Amount", amount + "")
                 .addContext("Price", cost + "").submit();
@@ -296,10 +299,15 @@ public class ShopListener implements Listener {
 
     }
 
+    private boolean loaded;
+
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         if (shopkeeperManager.getObjects().isEmpty()) {
-            shopkeeperManager.loadShopsFromConfig();
+            if (!loaded) {
+                UtilServer.runTaskLater(JavaPlugin.getPlugin(Shops.class), shopkeeperManager::loadShopsFromConfig, 100L);
+                loaded = true;
+            }
         }
     }
 

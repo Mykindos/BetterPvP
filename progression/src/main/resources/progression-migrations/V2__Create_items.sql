@@ -16,3 +16,6 @@ INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, h
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, hasUUID) VALUES ('COD', 'progression', 'grouper', '<yellow>Grouper', 16, 0, 0);
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, hasUUID) VALUES ('COD', 'progression', 'sturgeon', '<yellow>Sturgeon', 17, 0, 0);
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, hasUUID) VALUES ('COD', 'progression', 'sunfish', '<yellow>Sunfish', 18, 0, 0);
+
+-- Baits
+INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, hasUUID) VALUES ('ORANGE_GLAZED_TERRACOTTA', 'progression', 'speedy_bait', '<light_purple>Speedy Bait', 1, 0, 0);

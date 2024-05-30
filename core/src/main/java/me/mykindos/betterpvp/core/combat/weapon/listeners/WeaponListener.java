@@ -32,6 +32,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -100,6 +101,14 @@ public class WeaponListener implements Listener {
             UtilMessage.simpleMessage(player, weapon.getSimpleName(), "This weapon is not enabled.");
             return;
         }
+
+        if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+            if (weapon.preventPlace()) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+
         if (weapon instanceof InteractWeapon interactWeapon) {
             if (!interactWeapon.canUse(player)) {
                 return;
@@ -119,7 +128,7 @@ public class WeaponListener implements Listener {
                 return;
             }
 
-            if(cooldownWeapon.showCooldownOnItem()) {
+            if (cooldownWeapon.showCooldownOnItem()) {
                 player.setCooldown(weapon.getMaterial(), (int) (cooldownWeapon.getCooldown() * 20L));
             }
         }
@@ -149,7 +158,7 @@ public class WeaponListener implements Listener {
         Optional<IWeapon> weaponOptional = weaponManager.getWeaponByItemStack(event.getItemStack());
         if (weaponOptional.isPresent()) {
             IWeapon weapon = weaponOptional.get();
-            if(!(weapon instanceof BPvPItem item)) return;
+            if (!(weapon instanceof BPvPItem item)) return;
 
             event.getItemMeta().getPersistentDataContainer().set(CoreNamespaceKeys.CUSTOM_ITEM_KEY, PersistentDataType.STRING, item.getIdentifier());
             event.setItemName(weapon.getName());
@@ -161,7 +170,7 @@ public class WeaponListener implements Listener {
         Optional<IWeapon> weaponOptional = weaponManager.getWeaponByItemStack(event.getItemStack());
         if (weaponOptional.isPresent()) {
             IWeapon weapon = weaponOptional.get();
-            if(!(weapon instanceof BPvPItem item)) return;
+            if (!(weapon instanceof BPvPItem item)) return;
 
             weapon.onInitialize(event.getItemMeta());
 

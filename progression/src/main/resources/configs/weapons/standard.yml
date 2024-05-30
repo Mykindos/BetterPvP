@@ -1,0 +1,5 @@
+speedy_bait:
+  enabled: true
+  radius: 5.0
+  multiplier: 3.0
+  duration: 180

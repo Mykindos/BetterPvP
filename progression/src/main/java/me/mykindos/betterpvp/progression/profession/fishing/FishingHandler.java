@@ -10,9 +10,6 @@ import me.mykindos.betterpvp.core.stats.repository.LeaderboardManager;
 import me.mykindos.betterpvp.core.utilities.model.WeighedList;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.ProfessionHandler;
-import me.mykindos.betterpvp.progression.profession.fishing.bait.SimpleBaitType;
-import me.mykindos.betterpvp.progression.profession.fishing.bait.speed.SpeedBaitLoader;
-import me.mykindos.betterpvp.progression.profession.fishing.bait.speed.SpeedBaitType;
 import me.mykindos.betterpvp.progression.profession.fishing.data.CaughtFish;
 import me.mykindos.betterpvp.progression.profession.fishing.fish.Fish;
 import me.mykindos.betterpvp.progression.profession.fishing.fish.FishTypeLoader;
@@ -24,25 +21,19 @@ import me.mykindos.betterpvp.progression.profession.fishing.loot.SwimmerLoader;
 import me.mykindos.betterpvp.progression.profession.fishing.loot.SwimmerType;
 import me.mykindos.betterpvp.progression.profession.fishing.loot.TreasureLoader;
 import me.mykindos.betterpvp.progression.profession.fishing.loot.TreasureType;
-import me.mykindos.betterpvp.progression.profession.fishing.model.BaitType;
 import me.mykindos.betterpvp.progression.profession.fishing.model.FishingConfigLoader;
 import me.mykindos.betterpvp.progression.profession.fishing.model.FishingLootType;
 import me.mykindos.betterpvp.progression.profession.fishing.model.FishingRodType;
 import me.mykindos.betterpvp.progression.profession.fishing.repository.FishingRepository;
 import me.mykindos.betterpvp.progression.profile.ProfessionData;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
-import me.mykindos.betterpvp.progression.utility.ProgressionNamespacedKeys;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
 import org.reflections.Reflections;
 
 import java.lang.reflect.Modifier;
 import java.util.HashSet;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 
 @Singleton
@@ -63,12 +54,6 @@ public class FishingHandler extends ProfessionHandler {
     @Getter
     private final Set<FishingRodType> rodTypes = new HashSet<>();
 
-    @Getter
-    private final Set<BaitType> baitTypes = new HashSet<>();
-
-    private final FishingConfigLoader<?>[] baitLoaders = new FishingConfigLoader<?>[]{
-            new SpeedBaitLoader()
-    };
     private final FishingConfigLoader<?>[] lootLoaders = new FishingConfigLoader<?>[]{
             new SwimmerLoader(),
             new FishTypeLoader(),
@@ -144,63 +129,6 @@ public class FishingHandler extends ProfessionHandler {
 
     }
 
-    public Optional<BaitType> getBaitType(ItemStack itemStack) {
-        if (itemStack == null) {
-            return Optional.empty();
-        }
-
-        final PersistentDataContainer pdc = itemStack.getItemMeta().getPersistentDataContainer();
-        if (!pdc.has(ProgressionNamespacedKeys.FISHING_BAIT_TYPE)) {
-            return Optional.empty(); // Default is wooden
-        }
-
-        final String type = pdc.get(ProgressionNamespacedKeys.FISHING_BAIT_TYPE, PersistentDataType.STRING);
-        return getBaitTypes().stream()
-                .filter(baitType -> baitType.getName().equalsIgnoreCase(type))
-                .findFirst();
-    }
-
-
-    private void loadBaitTypes(Reflections reflections, ExtendedYamlConfiguration config) {
-        Set<Class<? extends BaitType>> baitClasses = reflections.getSubTypesOf(BaitType.class);
-        baitClasses.removeIf(clazz -> clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers()) || clazz.isEnum());
-        baitClasses.removeIf(clazz -> clazz.isAnnotationPresent(Deprecated.class));
-        baitClasses.removeIf(clazz -> clazz == SimpleBaitType.class); // Skip config fish type
-        baitClasses.removeIf(clazz -> clazz == SpeedBaitType.class); // Skip config fish type
-        for (var clazz : baitClasses) {
-            BaitType type = progression.getInjector().getInstance(clazz);
-            progression.getInjector().injectMembers(type);
-
-            type.loadConfig(config);
-            baitTypes.add(type);
-        }
-
-        ConfigurationSection customBaitSection = config.getConfigurationSection("fishing.bait");
-        if (customBaitSection == null) {
-            customBaitSection = config.createSection("fishing.bait");
-        }
-
-        for (String key : customBaitSection.getKeys(false)) {
-            final ConfigurationSection section = customBaitSection.getConfigurationSection(key);
-            final String type = Objects.requireNonNull(section).getString("type");
-
-            boolean found = false;
-            for (FishingConfigLoader<?> loader : baitLoaders) {
-                if (loader.getTypeKey().equalsIgnoreCase(type)) {
-                    final BaitType loaded = (BaitType) loader.read(section);
-                    loaded.loadConfig(config);
-                    baitTypes.add(loaded);
-                    found = true;
-                }
-            }
-
-            if (!found) {
-                throw new IllegalArgumentException("Unknown bait type: " + type);
-            }
-        }
-        log.info("Loaded " + baitTypes.size() + " bait types").submit();
-    }
-
     private void loadLootTypes(Reflections reflections, ExtendedYamlConfiguration config) {
         Set<Class<? extends FishingLootType>> classes = reflections.getSubTypesOf(FishingLootType.class);
         classes.removeIf(clazz -> clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers()) || clazz.isEnum());
@@ -254,11 +182,9 @@ public class FishingHandler extends ProfessionHandler {
 
         lootTypes.clear();
         rodTypes.clear();
-        baitTypes.clear();
 
         Reflections classScan = new Reflections(this.getClass().getPackageName());
         loadLootTypes(classScan, progression.getConfig());
-        loadBaitTypes(classScan, progression.getConfig());
 
     }
 }

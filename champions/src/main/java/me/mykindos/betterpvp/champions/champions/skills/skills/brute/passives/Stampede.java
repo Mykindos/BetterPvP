@@ -95,7 +95,7 @@ public class Stampede extends Skill implements PassiveSkill {
         return SkillType.PASSIVE_A;
     }
 
-    @UpdateEvent (delay = 200)
+    @UpdateEvent(delay = 200)
     public void updateSpeed() {
         for (Map.Entry<Player, StampedeData> entry : playerData.entrySet()) {
             Player player = entry.getKey();
@@ -110,7 +110,7 @@ public class Stampede extends Skill implements PassiveSkill {
                 playerData.put(player, data);
             } else if (isSprintingNow) {
                 if (UtilTime.elapsed(data.getSprintTime(), (long) ((getDurationPerStack(level)) * 1000L))) {
-                    if (data.getSprintStrength() < maxSpeedStrength ) {
+                    if (data.getSprintStrength() < maxSpeedStrength) {
                         data.setSprintTime(System.currentTimeMillis());
                         data.setSprintStrength(data.getSprintStrength() + 1);
 
@@ -143,13 +143,17 @@ public class Stampede extends Skill implements PassiveSkill {
 
         if (event.isSprinting()) {
             if (getLevel(player) > 0) {
-                StampedeData data = playerData.getOrDefault(player, new StampedeData(System.currentTimeMillis(), 0));
-                data.setSprintTime(System.currentTimeMillis());
-                playerData.put(player, data);
+                startStampede(player);
             }
         } else {
             removeSpeed(player);
         }
+    }
+
+    private void startStampede(Player player) {
+        StampedeData data = playerData.getOrDefault(player, new StampedeData(System.currentTimeMillis(), 0));
+        data.setSprintTime(System.currentTimeMillis());
+        playerData.put(player, data);
     }
 
 
@@ -157,6 +161,7 @@ public class Stampede extends Skill implements PassiveSkill {
     public void onDamage(CustomDamageEvent event) {
         if (!(event.getDamagee() instanceof Player damagee)) return;
         removeSpeed(damagee);
+        startStampede(damagee);
     }
 
 
@@ -179,6 +184,7 @@ public class Stampede extends Skill implements PassiveSkill {
         event.setDamage(event.getDamage() + additionalDamage);
 
         removeSpeed(damager);
+        startStampede(damager);
     }
 
 
