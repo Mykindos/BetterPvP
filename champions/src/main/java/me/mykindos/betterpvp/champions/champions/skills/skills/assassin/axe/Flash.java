@@ -83,6 +83,8 @@ public class Flash extends Skill implements InteractSkill, Listener {
                 "",
                 "Store up to <stat>" + getMaxCharges(level) + "</stat> charges",
                 "",
+                "Cannot be used while <effect>Slowed</effect>",
+                "",
                 "Gain a charge every: <val>" + getRechargeSeconds(level) + "</val> seconds"
         };
     }
