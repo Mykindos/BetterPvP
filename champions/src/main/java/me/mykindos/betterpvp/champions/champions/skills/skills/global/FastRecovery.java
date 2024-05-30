@@ -41,9 +41,9 @@ public class FastRecovery extends Skill implements PassiveSkill {
                 "",
                 "Energy Information:",
                 "<white>Always Active</white>",
-                "Base Energy: <stat>" + EnergyHandler.baseEnergy,
+                "Base Energy: <stat>" + EnergyHandler.BASE_ENERGY,
                 //Energy is updated every 50ms. Energy is represented in 0-1
-                "Energy Regeneration / Second: <stat>" + (EnergyHandler.baseEnergyRegen * (1000/EnergyHandler.updateRate) * 100),
+                "Energy Regeneration / Second: <stat>" + (EnergyHandler.BASE_ENERGY_REGEN * (1000d/EnergyHandler.UPDATE_RATE) * 100),
                 //"regeneration / second while sprinting ",
                 //"or in liquid: <stat>" + (EnergyHandler.nerfedEnergyRegen * (1000/EnergyHandler.updateRate) * 100)
 
