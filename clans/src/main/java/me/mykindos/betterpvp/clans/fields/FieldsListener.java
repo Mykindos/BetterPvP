@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.events.ClientAdministrateEvent;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.components.clans.events.ClanAddExperienceEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
@@ -113,6 +114,7 @@ public class FieldsListener extends ClanListener {
             UtilServer.callEvent(new FieldsInteractableUseEvent(fields, type, block, event.getPlayer()));
             event.getBlock().setType(type.getReplacement().getMaterial()); // Then replace the block
             event.getBlock().setBlockData(type.getReplacement());
+            UtilServer.callEvent(new ClanAddExperienceEvent(event.getPlayer(), 0.1));
         }
     }
 
@@ -185,6 +187,8 @@ public class FieldsListener extends ClanListener {
             if(UtilMath.randomInt(10) < 2) {
                 UtilMessage.simpleMessage(event.getPlayer(), "Fishing", "Fish caught outside of Fields are half their normal size.");
             }
+        } else {
+            UtilServer.callEvent(new ClanAddExperienceEvent(event.getPlayer(), 0.1));
         }
     }
 

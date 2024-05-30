@@ -41,11 +41,11 @@ import java.util.stream.Collectors;
 @Data
 public class Clan extends PropertyContainer implements IClan, Invitable, IMapListener {
 
-    public static long getExperienceForLevel(long level) {
-        return (long) Math.pow(level, 2) - 1;
+    public static double getExperienceForLevel(long level) {
+        return Math.pow(level, 2) - 1;
     }
 
-    public static long getLevelFromExperience(long experience) {
+    public static long getLevelFromExperience(double experience) {
         return (long) Math.sqrt(experience + 1d);
     }
 
@@ -161,16 +161,16 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
         return count;
     }
 
-    public long getExperience() {
-        return (long) getProperty(ClanProperty.EXPERIENCE).orElse(0L);
+    public double getExperience() {
+        return (double) getProperty(ClanProperty.EXPERIENCE).orElse(0d);
     }
 
-    public void grantExperience(long experience) {
+    public void grantExperience(double experience) {
         Preconditions.checkArgument(experience > 0, "Experience must be greater than 0");
         saveProperty(ClanProperty.EXPERIENCE.name(), getExperience() + experience);
     }
 
-    public void setExperience(long experience) {
+    public void setExperience(double experience) {
         saveProperty(ClanProperty.EXPERIENCE.name(), experience);
     }
 

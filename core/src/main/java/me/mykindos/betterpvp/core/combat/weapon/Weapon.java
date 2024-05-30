@@ -33,7 +33,7 @@ public abstract class Weapon extends BPvPItem implements IWeapon {
     }
 
     protected Weapon(String key, BPvPPlugin plugin, List<Component> lore) {
-        this(plugin, key, lore, "champions");
+        this(plugin, key, lore, plugin.getName().toLowerCase());
     }
 
     protected Weapon(BPvPPlugin plugin, String key, String namespace) {

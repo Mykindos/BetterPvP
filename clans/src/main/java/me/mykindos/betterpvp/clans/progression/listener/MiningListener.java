@@ -38,6 +38,7 @@ public class MiningListener implements Listener, ConfigAccessor {
         final Player player = event.getPlayer();
         final Block block = event.getBlock().getBlock();
         miningHandler.attemptMineOre(player, block, experience -> (long) (experience * xpMultiplier));
+
     }
 
     @Override

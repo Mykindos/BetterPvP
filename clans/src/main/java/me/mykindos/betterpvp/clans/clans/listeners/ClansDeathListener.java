@@ -8,8 +8,10 @@ import me.mykindos.betterpvp.clans.clans.ClanRelation;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
 import me.mykindos.betterpvp.core.combat.death.events.CustomDeathEvent;
+import me.mykindos.betterpvp.core.components.clans.events.ClanAddExperienceEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -62,6 +64,8 @@ public class ClansDeathListener implements Listener {
         if (lastDamage.getDamager() instanceof Player killer) {
             Clan killedClan = clanManager.getClanByPlayer(killed).orElse(null);
             Clan killerClan = clanManager.getClanByPlayer(killer).orElse(null);
+
+            UtilServer.callEvent(new ClanAddExperienceEvent(killer, 0.1));
 
             if(killedClan != null && killerClan != null) {
                 if (killerClan.isNoDominanceCooldownActive() && pillageProtection) {

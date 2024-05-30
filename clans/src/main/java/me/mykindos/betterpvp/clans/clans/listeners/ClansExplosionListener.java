@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.clans.clans.ClanProperty;
 import me.mykindos.betterpvp.clans.clans.insurance.InsuranceType;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.combat.weapon.Weapon;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
@@ -348,7 +349,7 @@ public class ClansExplosionListener extends ClanListener {
             }
         }
 
-        if(material.isBlock()) {
+        if(material.isBlock() && !(event.getItem() instanceof Weapon)) {
             if(event.getItem().getLore(null).isEmpty()) {
                 event.getItemLore().add(UtilMessage.deserialize("It takes <green>1</green> cannonball to destroy this block"));
             }

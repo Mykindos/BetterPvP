@@ -22,7 +22,6 @@ import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerStopFish
 import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerThrowBaitEvent;
 import me.mykindos.betterpvp.progression.profession.fishing.fish.Fish;
 import me.mykindos.betterpvp.progression.profession.fishing.model.Bait;
-import me.mykindos.betterpvp.progression.profession.fishing.model.BaitType;
 import me.mykindos.betterpvp.progression.profession.fishing.model.FishingLoot;
 import me.mykindos.betterpvp.progression.profession.fishing.model.FishingLootType;
 import net.kyori.adventure.text.Component;
@@ -39,12 +38,10 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.util.Vector;
 
 import java.util.Iterator;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.WeakHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -265,30 +262,6 @@ public class FishingListener implements Listener {
         }
 
         event.setCancelled(true);
-    }
-
-    @EventHandler
-    public void onBaitThrow(PlayerInteractEvent event) {
-        if (!fishingHandler.isEnabled()) return;
-        if (event.getHand() != EquipmentSlot.HAND || event.getItem() == null) {
-            return; // Return if they don't interact with the main hand, or they don't have an item on it
-        }
-
-        if (!event.getAction().isLeftClick()) {
-            return; // Return if they don't left-click
-        }
-
-        final Optional<BaitType> typeOpt = fishingHandler.getBaitType(event.getItem());
-        if (typeOpt.isEmpty()) {
-            return; // Return if they don't have a bait item
-        }
-
-        event.setCancelled(true);
-        event.getItem().subtract();
-
-        final BaitType baitType = typeOpt.get();
-        final Bait bait = baitType.generateBait();
-        UtilServer.callEvent(new PlayerThrowBaitEvent(event.getPlayer(), bait));
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

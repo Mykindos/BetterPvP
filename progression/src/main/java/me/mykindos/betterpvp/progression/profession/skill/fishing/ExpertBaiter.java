@@ -51,7 +51,7 @@ public class ExpertBaiter extends FishingProgressionSkill implements Listener {
                 int skillLevel = profession.getBuild().getSkillLevel(this);
                 if (skillLevel <= 0) return;
 
-                event.getBait().setDurationTicks((long) (event.getBait().getDurationTicks() * (1 + getBonusDuration(skillLevel) / 100)));
+                event.getBait().setDurationInTicks((long) (event.getBait().getDurationInTicks() * (1 + getBonusDuration(skillLevel) / 100)));
             }
         });
 

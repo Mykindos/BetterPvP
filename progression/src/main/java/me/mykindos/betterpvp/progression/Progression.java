@@ -11,6 +11,9 @@ import me.mykindos.betterpvp.core.config.ConfigInjectorModule;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.ModuleLoadedEvent;
+import me.mykindos.betterpvp.core.framework.adapter.Adapters;
+import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
+import me.mykindos.betterpvp.core.framework.adapter.PluginAdapters;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.progression.commands.loader.ProgressionCommandLoader;
@@ -20,6 +23,7 @@ import me.mykindos.betterpvp.progression.listener.ProgressionListenerLoader;
 import me.mykindos.betterpvp.progression.profile.repository.ProfessionProfileRepository;
 import me.mykindos.betterpvp.progression.profession.fishing.repository.FishingRepository;
 import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillManager;
+import me.mykindos.betterpvp.progression.weapons.ProgressionWeaponManager;
 import org.bukkit.Bukkit;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
@@ -74,6 +78,14 @@ public class Progression extends BPvPPlugin {
             leaderboardLoader.registerLeaderboards(PACKAGE);
 
             updateEventExecutor.loadPlugin(this);
+
+            injector.getInstance(ProgressionWeaponManager.class).load();
+
+            final Adapters adapters = new Adapters(this);
+            final Reflections reflectionAdapters = new Reflections(PACKAGE);
+            adapters.loadAdapters(reflectionAdapters.getTypesAnnotatedWith(PluginAdapter.class));
+            adapters.loadAdapters(reflectionAdapters.getTypesAnnotatedWith(PluginAdapters.class));
+
         }
     }
 

@@ -161,7 +161,7 @@ public class ClanEventListener extends ClanListener {
         clan.saveProperty(ClanProperty.POINTS, defaultValues.getDefaultPoints());
         clan.saveProperty(ClanProperty.ENERGY, defaultValues.getDefaultEnergy());
         clan.saveProperty(ClanProperty.LAST_TNTED, 0L);
-        clan.saveProperty(ClanProperty.EXPERIENCE, 0L);
+        clan.saveProperty(ClanProperty.EXPERIENCE, 0d);
         clan.saveProperty(ClanProperty.BALANCE, 0);
         clan.saveProperty(ClanProperty.NO_DOMINANCE_COOLDOWN, (System.currentTimeMillis() + (3_600_000L * 24)));
 
