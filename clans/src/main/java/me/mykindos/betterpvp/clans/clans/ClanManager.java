@@ -101,6 +101,12 @@ public class ClanManager extends Manager<Clan> {
         ClanPerkManager.getInstance().init();
     }
 
+    public void updateClanName(String oldClan, Clan clan) {
+        getRepository().updateClanName(clan);
+        objects.remove(oldClan);
+        addObject(clan.getName(), clan);
+    }
+
     public Optional<Clan> getClanById(UUID id) {
         return objects.values().stream().filter(clan -> clan.getId().equals(id)).findFirst();
     }
