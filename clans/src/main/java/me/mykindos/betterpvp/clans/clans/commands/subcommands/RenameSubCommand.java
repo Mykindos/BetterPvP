@@ -68,7 +68,7 @@ public class RenameSubCommand extends ClanSubCommand {
             clan.setName(clanName);
             clientManager.sendMessageToRank("Clans", UtilMessage.deserialize("<yellow>%s<gray> has renamed a clan from <yellow>%s<gray> to <yellow>%s<gray>!",
                     client.getName(), oldName, clanName), Rank.ADMIN);
-            clanManager.getRepository().updateClanName(clan);
+            clanManager.updateClanName(oldName, clan);
 
             log.info("{} has renamed a clan from {} to {}!", client.getName(), oldName, clanName)
                     .setAction("CLAN_RENAME").addClientContext(client, false).addClanContext(clan).submit();
