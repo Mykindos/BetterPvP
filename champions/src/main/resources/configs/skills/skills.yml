@@ -38,6 +38,7 @@ skills:
       maxlevel: 3
       damageIncreasePerLevel: 1.5
       baseDamage: 1.5
+      increasePerLevel: 1.5
     smokebomb:
       enabled: true
       cooldown: 50.0
@@ -74,6 +75,7 @@ skills:
       maxlevel: 3
       damageIncrement: 1.0
       duration: 2.0
+      baseDamageIncrement: 1.0
     concussion:
       enabled: true
       cooldown: 16.0
@@ -178,6 +180,8 @@ skills:
       speedDuration: 3.0
       slownessStrength: 3
       speedStrength: 3
+      speedDurationIncreasePerLevel: 0.0
+      slowDurationIncreasePerLevel: 0.0
     fortitude:
       enabled: true
       maxlevel: 3
@@ -193,6 +197,7 @@ skills:
       baseMaxDamage: 2.0
       baseMaxDamageIncreasePerLevel: 1.0
       expirationTime: 5.0
+      maxDamageIncreasePerLevel: 1.0
     levelfield:
       enabled: true
       maxlevel: 3
@@ -266,6 +271,8 @@ skills:
       blocksArrow: false
       energyDecreasePerLevel: 1.0
       internalCooldown: 2.0
+      cooldown: 1.0
+      cooldownDecreasePerLevel: 1.0
     powerchop:
       enabled: true
       maxlevel: 5
@@ -339,7 +346,7 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 23.0
-      speed: .15
+      speed: 0.15
       damage: 6.0
       fireDurationIncreasePerLevel: 2.0
       cooldownDecreasePerLevel: 2.0
@@ -348,6 +355,8 @@ skills:
       minFireDuration: 4.0
       radius: 6.0
       radiusIncreasePerLevel: 0.5
+      baseFireDuration: 2.0
+      minFireDurationIncreasePerLevel: 0.5
     iceprison:
       enabled: true
       maxlevel: 5
@@ -357,6 +366,7 @@ skills:
       cooldownDecreasePerLevel: 2.0
       baseDuration: 6.0
       durationIncreasePerLevel: 0.5
+      variance: 0.5
     lightningorb:
       enabled: true
       maxlevel: 5
@@ -384,14 +394,16 @@ skills:
     immolate:
       enabled: true
       maxlevel: 5
-      energy: 11
+      energy: 44
       baseFireTickDuration: 4.0
       fireTickDurationIncreasePerLevel: 0.0
       baseFireTrailDuration: 2.0
       fireTrailDurationIncreasePerLevel: 0.0
       speedStrength: 1
       strengthLevel: 1
-      energyDecreasePerLevel: 1.0
+      energyDecreasePerLevel: 4.0
+      energyStartCost: 10.0
+      energyStartCostDecreasePerLevel: 0.0
     lifebonds:
       enabled: true
       maxlevel: 5
@@ -405,6 +417,8 @@ skills:
       healSpeedIncreasePerLevel: 0.0
       baseHealMultiplier: 0.25
       healMultiplierIncreasePerLevel: 0.0
+      energyStartCost: 10.0
+      energyStartCostDecreasePerLevel: 0.0
     magmablade:
       enabled: true
       maxlevel: 3
@@ -454,6 +468,8 @@ skills:
       damageReduction: 5
       energyReduction: 20
       energyDecreasePerLevel: 2.0
+      energyStartCost: 10.0
+      energyStartCostDecreasePerLevel: 0.0
     fissure:
       enabled: true
       maxLevel: 5
@@ -472,6 +488,8 @@ skills:
       doorCheckEnabled: true
       fissureForbiddenBlocks:
         - TNT
+      maxlevel: 5
+      cooldownDecreasePerLevel: 1.0
     nullblade:
       enabled: true
       maxlevel: 5
@@ -494,7 +512,7 @@ skills:
     arcticarmour:
       enabled: true
       maxlevel: 5
-      energy: 6
+      energy: 24
       canUseInLiquid: true
       baseRadius: 2
       radiusIncreasePerLevel: 1
@@ -504,7 +522,9 @@ skills:
       slownessStrength: 1
       minRadius: 2
       duration: 2.0
-      energyDecreasePerLevel: 0.5
+      energyDecreasePerLevel: 2.0
+      energyStartCost: 10.0
+      energyStartCostDecreasePerLevel: 0.0
     pestilence:
       enabled: true
       maxlevel: 3
@@ -557,6 +577,7 @@ skills:
       cooldownDecreasePerLevel: 2.0
       slamDelay: 500
       fallDamageLimit: 20.0
+      baseRadius: 5.5
     whirlwindsword:
       enabled: true
       maxlevel: 5
@@ -566,6 +587,7 @@ skills:
       distanceIncreasePerLevel: 0.0
       baseDamage: 3.0
       damageIncreasePerLevel: 1.0
+      damage: 3.0
     cripplingblow:
       enabled: true
       maxlevel: 3
@@ -598,7 +620,7 @@ skills:
     colossus:
       enabled: true
       maxlevel: 3
-      reductionPerLevel: 0.20
+      reductionPerLevel: 0.2
     takedown:
       enabled: true
       maxlevel: 5
@@ -653,6 +675,7 @@ skills:
       enabled: true
       maxlevel: 3
       increasePerLevel: 10
+      base: 10
     overwhelm:
       enabled: true
       maxlevel: 3
@@ -769,6 +792,8 @@ skills:
       baseNumArrows: 10
       numArrowsIncreasePerLevel: 0
       damage: 8.0
+      baseDamage: 8.0
+      damageIncreasePerLevel: 0.0
     vitalityspores:
       enabled: true
       maxlevel: 3
@@ -783,6 +808,10 @@ skills:
       maxConsecuteiveHitsIncreasePerLevel: 2
       baseDamage: 1.0
       damageIncreasePerLevel: 0.0
+      baseMaxTimeBetweenShots: 5.0
+      maxTimeBetweenShotsIncreasePerLevel: 0.0
+      maxConsecutiveHits: 2
+      maxConsecutiveHitsIncreasePerLevel: 2
     agility:
       enabled: true
       maxlevel: 5
@@ -856,7 +885,7 @@ skills:
     bloodthirst:
       enabled: true
       maxlevel: 3
-      baseHealthPercent: 0.30
+      baseHealthPercent: 0.3
       healthPercentIncreasePerLevel: 0.05
       speedStrength: 1
     soulharvest:
@@ -956,6 +985,7 @@ skills:
       maxChargesIncreasePerLevel: 0
       rechargeSeconds: 10.0
       rechargeSecondsDecreasePerLevel: 1.0
+      healthPerEnemyHitIncreasePerLevel: 0.0
     frailty:
       enabled: true
       maxlevel: 3
@@ -1004,6 +1034,7 @@ skills:
       enabled: true
       maxlevel: 3
       percentagePerLevel: 0.15
+      basePercentage: 0.2
     resistance:
       enabled: true
       maxlevel: 3
