@@ -47,13 +47,22 @@ scythe:
   enabled: true
   baseDamage: 8.0
   cooldown: 12.0
-  blackHoleRadius: 0.8
-  blackHoleSpeed: 3.0
-  blackHoleHitbox: 0.5
-  blackHolePullStrength: 0.12
-  blackHolePullRadius: 5.0
-  blackHoleAliveSeconds: 1.5
-  blackHoleExpandSeconds: 0.75
+  energyPerTick: 1.0
+  initialEnergyCost: 10.0
+  maxSoulsDamage: 4.0
+  maxSouls: 3
+  soulHarvestSeconds: 1.5
+  soulExpirySeconds: 10.0
+  soulExpiryPerSecond: 0.3
+  soulDespawnSeconds: 7.5
+  soulViewDistanceBlocks: 60
+  soulsPerPlayer: 1.0
+  soulsPerMob: 1.0
+  summonPlayerSoulChance: 1.0
+  summonMobSoulChance: 0.4
+  speedAmplifierPerSoul: 1.0
+  baseHeal: 0.25
+  healPerSoul: 0.1
 thunderclap_aegis:
   enabled: true
   baseDamage: 1.0
