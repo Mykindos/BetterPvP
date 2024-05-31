@@ -95,7 +95,7 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
             }
 
             if (!canUse(player)) {
-                return true;
+                return false;
             }
 
             if (!energyHandler.use(player, "Wind Blade", energyPerTick, true)) {

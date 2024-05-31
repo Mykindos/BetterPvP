@@ -272,7 +272,6 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
             }
 
             if (!canUse(player)) {
-                iterator.remove();
                 deactivate(data);
                 continue;
             }

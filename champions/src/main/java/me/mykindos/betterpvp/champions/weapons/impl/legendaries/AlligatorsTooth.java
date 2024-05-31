@@ -98,7 +98,6 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
             }
 
             if (!canUse(player)) {
-                iterator.remove();
                 continue;
             }
 
