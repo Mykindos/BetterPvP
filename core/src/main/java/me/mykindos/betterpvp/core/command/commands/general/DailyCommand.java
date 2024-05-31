@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.entity.Player;
 
@@ -42,7 +43,7 @@ public class DailyCommand extends Command {
 
             gamer.saveProperty(GamerProperty.BALANCE, (int) gamer.getProperty(GamerProperty.BALANCE).orElse(0) + coinsAmount);
 
-            UtilMessage.simpleMessage(player, "Daily", "You have claimed your daily reward of $<green>%d</green>", coinsAmount);
+            UtilMessage.simpleMessage(player, "Daily", "You have claimed your daily reward of $<green>%s</green>", UtilFormat.formatNumber(coinsAmount));
 
         } else {
             UtilMessage.simpleMessage(player, "Daily", "You have already claimed your daily reward!");

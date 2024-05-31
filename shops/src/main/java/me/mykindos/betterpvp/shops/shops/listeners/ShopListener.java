@@ -7,6 +7,8 @@ import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.weapon.WeaponManager;
+import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
+import me.mykindos.betterpvp.core.components.champions.weapons.IWeapon;
 import me.mykindos.betterpvp.core.components.shops.ShopCurrency;
 import me.mykindos.betterpvp.core.components.shops.events.PlayerBuyItemEvent;
 import me.mykindos.betterpvp.core.components.shops.events.PlayerSellItemEvent;
@@ -95,7 +97,9 @@ public class ShopListener implements Listener {
     public void onBuyItem(PlayerBuyItemEvent event) {
         boolean isShifting = event.getClickType().name().contains("SHIFT");
 
-        if(isShifting && (weaponManager.getWeaponByItemStack(event.getItem()).isPresent() || event.getItem().getItemMeta() instanceof Damageable)) {
+        Optional<IWeapon> weaponByItemStack = weaponManager.getWeaponByItemStack(event.getItem());
+        if(isShifting && ((weaponByItemStack.isPresent() && weaponByItemStack.get() instanceof LegendaryWeapon)
+                || event.getItem().getItemMeta() instanceof Damageable)) {
             isShifting = false;
         }
 
@@ -129,7 +133,10 @@ public class ShopListener implements Listener {
         }
 
         boolean isShifting = event.getClickType().name().contains("SHIFT");
-        if(isShifting && (weaponManager.getWeaponByItemStack(event.getItem()).isPresent() || event.getItem().getItemMeta() instanceof Damageable)) {
+
+        Optional<IWeapon> weaponByItemStack = weaponManager.getWeaponByItemStack(event.getItem());
+        if(isShifting && ((weaponByItemStack.isPresent() && weaponByItemStack.get() instanceof LegendaryWeapon)
+                || event.getItem().getItemMeta() instanceof Damageable)) {
             isShifting = false;
         }
 
