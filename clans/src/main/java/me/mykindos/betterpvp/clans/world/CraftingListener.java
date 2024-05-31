@@ -49,7 +49,7 @@ public class CraftingListener implements Listener {
                     || itemType == Material.PISTON || itemType == Material.PISTON_HEAD || itemType == Material.ENCHANTING_TABLE
                     || itemType.name().contains("_PANE")
                     || itemType == Material.BREWING_STAND || itemType == Material.GOLDEN_APPLE || itemType == Material.GOLDEN_CARROT
-                    || itemType == Material.MAGMA_BLOCK || itemType == Material.CROSSBOW
+                    || itemType == Material.ANVIL || itemType == Material.MAGMA_BLOCK || itemType == Material.CROSSBOW
                     || itemType.name().toLowerCase().contains("boat")
                     || itemType.name().contains("CAMPFIRE")
                     || itemType == Material.COOKIE || itemType == Material.BEEHIVE) {
