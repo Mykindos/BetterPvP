@@ -51,6 +51,11 @@ public class ClientListener implements Listener {
     public boolean unlimitedPlayers;
 
     @Inject
+    @Config(path = "server.maxPlayers", defaultValue = "100")
+    public int maxPlayers;
+
+
+    @Inject
     private ClientManager repository;
 
     private boolean serverLoaded;
@@ -140,6 +145,13 @@ public class ClientListener implements Listener {
             final Client client = repository.search().online(event.getPlayer());
             if (client.hasRank(Rank.TRIAL_MOD)) {
                 event.allow();
+                return;
+            }
+        }
+
+        if(event.getResult() == PlayerLoginEvent.Result.ALLOWED) {
+            if (Bukkit.getOnlinePlayers().size() >= maxPlayers) {
+                event.disallow(PlayerLoginEvent.Result.KICK_FULL, Component.text("The server is full!"));
             }
         }
     }

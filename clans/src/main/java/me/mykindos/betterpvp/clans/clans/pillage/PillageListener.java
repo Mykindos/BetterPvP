@@ -155,10 +155,12 @@ public class PillageListener implements Listener {
     }
 
     private void notifyPillageTime(Pillage pillage) {
-        String minutesRemaining = df.format((double) (pillage.getPillageFinishTime() - System.currentTimeMillis()) / 60000);
-        pillage.getPillaged().messageClan("<gray>The pillage on your clan ends in <green>"
-                + minutesRemaining + " <gray>minutes.", null, true);
-        pillage.getPillager().messageClan("<gray>The pillage on <red>" + pillage.getPillaged().getName()
-                + "<gray> ends in <green>" + minutesRemaining + " <gray>minutes.", null, true);
+        if (pillage.getPillageFinishTime() > System.currentTimeMillis()) {
+            String minutesRemaining = df.format((double) (pillage.getPillageFinishTime() - System.currentTimeMillis()) / 60000);
+            pillage.getPillaged().messageClan("<gray>The pillage on your clan ends in <green>"
+                    + minutesRemaining + " <gray>minutes.", null, true);
+            pillage.getPillager().messageClan("<gray>The pillage on <red>" + pillage.getPillaged().getName()
+                    + "<gray> ends in <green>" + minutesRemaining + " <gray>minutes.", null, true);
+        }
     }
 }
