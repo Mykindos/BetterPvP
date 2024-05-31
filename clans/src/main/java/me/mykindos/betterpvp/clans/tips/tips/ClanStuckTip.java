@@ -26,13 +26,13 @@ public class ClanStuckTip extends ClanTip implements IRunCommand {
 
     @Override
     public Component generateComponent() {
-        Component runComponent = runCommand("/c unstuck");
+        Component runComponent = runCommand("/c stuck");
         return Component.text("If you ever get stuck in another clans territory, you can run ", NamedTextColor.GRAY)
                 .append(runComponent).append(Component.text(" to be teleported to the nearest wilderness."));
     }
 
     @Override
     public  boolean isValid(Player player, Clan clan) {
-        return clan != null && clan.getAdminsAsPlayers().contains(player);
+        return true;
     }
 }
