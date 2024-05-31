@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.champions.champions.builds.BuildSkill;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.champions.champions.builds.event.ChampionsBuildLoadedEvent;
+import me.mykindos.betterpvp.champions.champions.builds.menus.events.ApplyBuildEvent;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillDequipEvent;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillEquipEvent;
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
@@ -446,6 +447,13 @@ public class SkillListener implements Listener {
             final Gamer gamer = this.clientManager.search().online(player).getGamer();
             build.getActiveSkills().forEach(skill -> skill.trackPlayer(player, gamer));
         }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onApplyBuild(ApplyBuildEvent event) {
+        final Player player = event.getPlayer();
+        final Gamer gamer = this.clientManager.search().online(player).getGamer();
+        event.getNewBuild().getActiveSkills().forEach(skill -> skill.trackPlayer(player, gamer));
     }
 
     @EventHandler
