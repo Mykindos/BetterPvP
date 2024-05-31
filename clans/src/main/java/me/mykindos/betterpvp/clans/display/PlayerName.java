@@ -117,17 +117,20 @@ public class PlayerName implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     private void onClanLeave(final MemberLeaveClanEvent event) {
-        this.broadcastChange(event.getPlayer());
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            broadcastChange(player);
+        }
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     private void onClanJoin(final MemberJoinClanEvent event) {
-        this.broadcastChange(event.getPlayer());
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            broadcastChange(player);
+        }
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.NORMAL)
     private void onClanDisband(final ClanDisbandEvent event) {
-        ;
         for (Player player : Bukkit.getOnlinePlayers()) {
             broadcastChange(player);
         }
@@ -135,7 +138,9 @@ public class PlayerName implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     private void onClanCreate(final ClanCreateEvent event) {
-        this.broadcastChange(event.getClan());
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            broadcastChange(player);
+        }
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)

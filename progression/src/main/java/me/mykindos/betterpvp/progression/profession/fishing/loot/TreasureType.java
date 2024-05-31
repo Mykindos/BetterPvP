@@ -5,6 +5,8 @@ import lombok.CustomLog;
 import lombok.Data;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
+import me.mykindos.betterpvp.core.framework.events.items.SpecialItemDropEvent;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerCaughtFishEvent;
 import me.mykindos.betterpvp.progression.profession.fishing.model.FishingLoot;
 import me.mykindos.betterpvp.progression.profession.fishing.model.FishingLootType;
@@ -55,6 +57,8 @@ public class TreasureType implements FishingLootType {
 
                 final Item item = (Item) Objects.requireNonNull(event.getCaught());
                 item.setItemStack(itemStack);
+
+                UtilServer.callEvent(new SpecialItemDropEvent(item, "Fishing"));
 
                 log.info("{} caught {}x {}.", event.getPlayer().getName(), count, material.name().toLowerCase())
                         .addClientContext(event.getPlayer()).addLocationContext(item.getLocation()).submit();

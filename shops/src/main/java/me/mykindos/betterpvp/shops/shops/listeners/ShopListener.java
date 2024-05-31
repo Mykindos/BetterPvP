@@ -7,6 +7,8 @@ import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.weapon.WeaponManager;
+import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
+import me.mykindos.betterpvp.core.components.champions.weapons.IWeapon;
 import me.mykindos.betterpvp.core.components.shops.ShopCurrency;
 import me.mykindos.betterpvp.core.components.shops.events.PlayerBuyItemEvent;
 import me.mykindos.betterpvp.core.components.shops.events.PlayerSellItemEvent;
@@ -19,6 +21,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
+import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
 import me.mykindos.betterpvp.shops.Shops;
 import me.mykindos.betterpvp.shops.shops.ShopManager;
@@ -31,6 +34,7 @@ import me.mykindos.betterpvp.shops.shops.shopkeepers.types.ParrotShopkeeper;
 import me.mykindos.betterpvp.shops.shops.utilities.ShopsNamespacedKeys;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
@@ -93,7 +97,9 @@ public class ShopListener implements Listener {
     public void onBuyItem(PlayerBuyItemEvent event) {
         boolean isShifting = event.getClickType().name().contains("SHIFT");
 
-        if(isShifting && (weaponManager.getWeaponByItemStack(event.getItem()).isPresent() || event.getItem().getItemMeta() instanceof Damageable)) {
+        Optional<IWeapon> weaponByItemStack = weaponManager.getWeaponByItemStack(event.getItem());
+        if(isShifting && ((weaponByItemStack.isPresent() && weaponByItemStack.get() instanceof LegendaryWeapon)
+                || event.getItem().getItemMeta() instanceof Damageable)) {
             isShifting = false;
         }
 
@@ -127,7 +133,10 @@ public class ShopListener implements Listener {
         }
 
         boolean isShifting = event.getClickType().name().contains("SHIFT");
-        if(isShifting && (weaponManager.getWeaponByItemStack(event.getItem()).isPresent() || event.getItem().getItemMeta() instanceof Damageable)) {
+
+        Optional<IWeapon> weaponByItemStack = weaponManager.getWeaponByItemStack(event.getItem());
+        if(isShifting && ((weaponByItemStack.isPresent() && weaponByItemStack.get() instanceof LegendaryWeapon)
+                || event.getItem().getItemMeta() instanceof Damageable)) {
             isShifting = false;
         }
 
@@ -156,6 +165,13 @@ public class ShopListener implements Listener {
                 .setAction("SHOP_BUY").addClientContext(event.getPlayer())
                 .addContext("ShopItem", event.getShopItem().getItemName()).addContext("Amount", amount + "")
                 .addContext("Price", cost + "").submit();
+        itemHandler.getUUIDItem(boughtItem).ifPresent(uuidItem -> {
+            Player player = event.getPlayer();
+            Location location = player.getLocation();
+            log.info("{} purchased ({}) at {}", player.getName(), uuidItem.getUuid(),
+                            UtilWorld.locationToString((location))).setAction("ITEM_BUY")
+                    .addClientContext(player).addItemContext(uuidItem).addLocationContext(location).submit();
+        });
 
     }
 
@@ -233,6 +249,12 @@ public class ShopListener implements Listener {
                                 .setAction("SHOP_SELL").addClientContext(event.getPlayer())
                                 .addContext("ShopItem", event.getShopItem().getItemName()).addContext("Amount", amount + "")
                                 .addContext("Price", cost + "").submit();
+                        itemHandler.getUUIDItem(item).ifPresent(uuidItem -> {
+                            Location location = player.getLocation();
+                            log.info("{} sold ({}) at {}", player.getName(), uuidItem.getUuid(),
+                                            UtilWorld.locationToString((location))).setAction("ITEM_SELL")
+                                    .addClientContext(player).addItemContext(uuidItem).addLocationContext(location).submit();
+                        });
 
                         return;
                     }

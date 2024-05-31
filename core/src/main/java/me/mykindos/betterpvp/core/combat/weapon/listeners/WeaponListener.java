@@ -23,10 +23,13 @@ import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.UtilSound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -213,9 +216,22 @@ public class WeaponListener implements Listener {
         if (weaponOptional.isPresent()) {
             IWeapon weapon = weaponOptional.get();
             if (!(weapon instanceof LegendaryWeapon)) return;
-            UtilMessage.broadcast(Component.text(event.getSource(), NamedTextColor.RED)
-                    .append(Component.text(" dropped a legendary ", NamedTextColor.GRAY))
-                    .append(weapon.getName().hoverEvent(itemStack)));
+
+            if (event.getSource().equalsIgnoreCase("Fishing")) {
+
+                UtilMessage.broadcast(Component.text("A ", NamedTextColor.YELLOW).append(weapon.getName().hoverEvent(itemStack))
+                        .append(Component.text(" was caught by a fisherman!", NamedTextColor.YELLOW)));
+
+                for(Player player : Bukkit.getOnlinePlayers()) {
+                    UtilSound.playSound(player, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 1.0f, 1.0f, false);
+                }
+
+
+            } else {
+                UtilMessage.broadcast(Component.text(event.getSource(), NamedTextColor.RED)
+                        .append(Component.text(" dropped a legendary ", NamedTextColor.GRAY))
+                        .append(weapon.getName().hoverEvent(itemStack)));
+            }
         }
     }
 
