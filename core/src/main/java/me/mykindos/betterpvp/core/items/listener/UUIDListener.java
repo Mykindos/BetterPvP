@@ -88,7 +88,8 @@ public class UUIDListener implements Listener {
      */
     private static final List<InventoryType> INVENTORY_NO_STORE_TYPES = new ArrayList<>(List.of(
             InventoryType.ANVIL,
-            InventoryType.WORKBENCH
+            InventoryType.WORKBENCH,
+            InventoryType.CRAFTING
     ));
 
     private static final List<InventoryType> INVENTORY_FURNACE_TYPES = new ArrayList<>(List.of(
