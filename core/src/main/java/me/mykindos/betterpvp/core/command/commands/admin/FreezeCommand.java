@@ -24,6 +24,7 @@ public class FreezeCommand extends Command implements IConsoleCommand {
     public FreezeCommand(ClientManager clientManager, EffectManager effectManager) {
         this.clientManager = clientManager;
         this.effectManager = effectManager;
+        this.aliases.add("unfreeze");
     }
 
     @Override
@@ -33,7 +34,7 @@ public class FreezeCommand extends Command implements IConsoleCommand {
 
     @Override
     public String getDescription() {
-        return "Freeze another player";
+        return "Freeze/unfreeze another player";
     }
 
     @Override
@@ -54,10 +55,18 @@ public class FreezeCommand extends Command implements IConsoleCommand {
             return;
         }
 
-        UtilMessage.message(target, "Freeze", "You have been frozen by a staff member");
+        if (effectManager.hasEffect(target, EffectTypes.FROZEN)) {
+            UtilMessage.message(target, "Freeze", "You have been unfrozen by a staff member");
 
-        effectManager.addEffect(target, null, EffectTypes.FROZEN, "Freeze", 1, 1000, true, true);
-        clientManager.sendMessageToRank("Freeze", UtilMessage.deserialize("<yellow>%s</yellow> froze <yellow>%s</yellow>", sender.getName(), target.getName()), Rank.HELPER);
+            effectManager.removeEffect(target, EffectTypes.FROZEN);
+            clientManager.sendMessageToRank("Freeze", UtilMessage.deserialize("<yellow>%s</yellow> unfroze <yellow>%s</yellow>", sender.getName(), target.getName()), Rank.HELPER);
+        } else {
+            UtilMessage.message(target, "Freeze", "You have been frozen by a staff member");
+
+            effectManager.addEffect(target, null, EffectTypes.FROZEN, "Freeze", 1, 1000, true, true);
+            clientManager.sendMessageToRank("Freeze", UtilMessage.deserialize("<yellow>%s</yellow> froze <yellow>%s</yellow>", sender.getName(), target.getName()), Rank.HELPER);
+        }
+
     }
 
     @Override
@@ -67,7 +76,5 @@ public class FreezeCommand extends Command implements IConsoleCommand {
         }
         return ArgumentType.NONE.name();
     }
-
-
 
 }
