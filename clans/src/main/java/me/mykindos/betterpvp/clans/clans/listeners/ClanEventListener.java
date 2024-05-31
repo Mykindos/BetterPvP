@@ -129,7 +129,12 @@ public class ClanEventListener extends ClanListener {
         targetClan.getTerritory().removeIf(territory -> territory.getChunk().equals(UtilWorld.chunkToFile(chunk)));
 
         if (targetClan.getHome().getChunk().equals(chunk)) {
+            Block block = targetClan.getHome().clone().subtract(0, 0.6, 0).getBlock();
+            if (block.getType() == Material.RED_BED) {
+                block.setType(Material.AIR);
+            }
             targetClan.setHome(null);
+
             targetClan.messageClan("Your clan home was destroyed!", null, true);
         }
 
