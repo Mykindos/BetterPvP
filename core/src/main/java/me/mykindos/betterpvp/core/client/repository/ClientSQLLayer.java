@@ -13,9 +13,12 @@ import me.mykindos.betterpvp.core.database.mappers.PropertyMapper;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
+import org.bukkit.entity.Player;
 
 import javax.sql.rowset.CachedRowSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -181,5 +184,25 @@ public class ClientSQLLayer {
         log.info("Updated gamer stats with {} queries", statements.size()).submit();
     }
 
+    public List<String> getAlts(Player player, String address) {
+        List<String> alts = new ArrayList<>();
+        String query = "SELECT DISTINCT l1.Value FROM logs_context l1 " +
+                "INNER JOIN logs_context l2 ON l1.LogId = l2.LogId " +
+                "WHERE l1.Context = 'ClientName' AND l2.Context = 'Address' AND l2.Value = ?";
+
+        Statement statement = new Statement(query, new StringStatementValue(address));
+        try (CachedRowSet result = database.executeQuery(statement)) {
+            while (result.next()) {
+                String name = result.getString(1);
+                if (!name.equals(player.getName())) {
+                    alts.add(name);
+                }
+            }
+        } catch (SQLException ex) {
+            log.error("Error getting alts for " + player.getName(), ex).submit();
+        }
+
+        return alts;
+    }
 
 }

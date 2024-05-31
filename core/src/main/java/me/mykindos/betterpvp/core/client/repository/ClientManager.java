@@ -7,6 +7,7 @@ import com.github.benmanes.caffeine.cache.Scheduler;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
@@ -41,7 +42,10 @@ public class ClientManager extends PlayerManager<Client> {
     public static final long TIME_TO_LIVE = TimeUnit.MINUTES.toMillis(5);
 
     private final Cache<UUID, Client> store; // supposedly thread-safe?
+
+    @Getter
     private final ClientSQLLayer sqlLayer;
+
     private final ClientRedisLayer redisLayer;
     private final Redis redis;
 
@@ -298,5 +302,6 @@ public class ClientManager extends PlayerManager<Client> {
         final Client stored = client.get();
         this.redisLayer.getClient(uuid).ifPresent(stored::copy);
     }
+
 }
 

@@ -23,6 +23,7 @@ public enum SimpleOre implements FieldsOre {
     EMERALD("Emerald Ore", Material.EMERALD_ORE, Material.STONE, Material.EMERALD, 2),
     LAPIS("Lapis Ore", Material.LAPIS_ORE, Material.STONE, Material.LAPIS_LAZULI, 5),
     REDSTONE("Redstone Ore", Material.REDSTONE_ORE, Material.STONE, Material.REDSTONE, 1),
+    GILDED_BLACKSTONE("Netherite Ore", Material.GILDED_BLACKSTONE, Material.STONE, Material.NETHERITE_INGOT, 3),
 
     // Deepslate
     GOLD_DEEPSLATE("Condensed Gold Ore", Material.DEEPSLATE_GOLD_ORE, Material.DEEPSLATE, Material.GOLD_INGOT, 3),
