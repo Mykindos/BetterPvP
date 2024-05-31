@@ -128,6 +128,11 @@ public class ClanEventListener extends ClanListener {
         clanManager.getRepository().deleteClanTerritory(targetClan, chunkString);
         targetClan.getTerritory().removeIf(territory -> territory.getChunk().equals(UtilWorld.chunkToFile(chunk)));
 
+        if (targetClan.getHome().getChunk().equals(chunk)) {
+            targetClan.setHome(null);
+            targetClan.messageClan("Your clan home was destroyed!", null, true);
+        }
+
         log.info("{} ({}) unclaimed {} from {} ({})", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
                         chunkToPrettyString, targetClan.getName(), targetClan.getId())
                 .setAction("CLAN_UNCLAIM").addClientContext(event.getPlayer()).addClanContext(targetClan).
