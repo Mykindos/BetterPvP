@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.events.KillContributionEvent;
 import me.mykindos.betterpvp.core.combat.stats.model.Contribution;
+import me.mykindos.betterpvp.core.components.shops.events.PlayerSellItemEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDItem;
@@ -460,7 +461,7 @@ public class UUIDListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onBlockExplore(BlockExplodeEvent event) {
+    public void onBlockExplode(BlockExplodeEvent event) {
         event.blockList().forEach(block -> {
             if (block.getState() instanceof Container container) {
                 container.getInventory().forEach(itemStack -> {
@@ -474,6 +475,22 @@ public class UUIDListener implements Listener {
             }
         });
     }
+
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onSellItem(PlayerSellItemEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
+        itemHandler.getUUIDItem(event.getItem()).ifPresent(uuidItem -> {
+            Player player = event.getPlayer();
+            Location location = player.getLocation();
+            log.info("{} sold ({}) at ({})", player.getName(), uuidItem.getUuid(),
+                            UtilWorld.locationToString((location))).setAction("ITEM_SELL")
+                    .addClientContext(player).addItemContext(uuidItem).addLocationContext(location).submit();
+        });
+    }
+
 
     @UpdateEvent(delay = (long) (1 * 1000 * UUID_CHECK_TIME_SECONDS))
     public void checkPlayers() {
