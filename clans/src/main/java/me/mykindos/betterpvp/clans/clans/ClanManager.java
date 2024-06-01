@@ -40,6 +40,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -55,6 +56,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 @CustomLog
 @Singleton
 public class ClanManager extends Manager<Clan> {
+
+    private final Clans clans;
 
     @Getter
     private final ClanRepository repository;
@@ -96,6 +99,7 @@ public class ClanManager extends Manager<Clan> {
 
     @Inject
     public ClanManager(Clans clans, ClanRepository repository, ClientManager clientManager, PillageHandler pillageHandler, LeaderboardManager leaderboardManager) {
+        this.clans = clans;
         this.repository = repository;
         this.clientManager = clientManager;
         this.pillageHandler = pillageHandler;
@@ -121,10 +125,20 @@ public class ClanManager extends Manager<Clan> {
     }
 
     public Optional<Clan> getClanByPlayer(Player player) {
-        if(player.hasMetadata("clan")) {
+        if (player.hasMetadata("clan")) {
             return Optional.ofNullable(player.getMetadata("clan").get(0).value())
                     .map(UUID.class::cast)
                     .flatMap(this::getClanById);
+        } else {
+            Optional<Clan> fallbackOpt = objects.values().stream()
+                    .filter(clan -> clan.getMemberByUUID(player.getUniqueId()).isPresent()).findFirst();
+
+            if (fallbackOpt.isPresent()) {
+                Clan fallback = fallbackOpt.get();
+                player.setMetadata("clan", new FixedMetadataValue(clans, fallback.getId()));
+
+                return Optional.of(fallback);
+            }
         }
 
         return Optional.empty();
@@ -506,7 +520,6 @@ public class ClanManager extends Manager<Clan> {
 
             ClanEnemy enemy = enemyOptional.get();
             ClanEnemy theirEnemy = theirEnemyOptional.get();
-
 
 
             if (theirEnemy.getDominance() == 0 && enemy.getDominance() == 0) {
