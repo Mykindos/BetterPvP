@@ -153,6 +153,7 @@ public class Stampede extends Skill implements PassiveSkill {
         if (data == null || data.getSprintStrength() < 1) return;
 
         championsManager.getEffects().removeEffect(player, EffectTypes.SPEED, getName());
+
     }
 
     private void startStampede(Player player) {
@@ -165,6 +166,7 @@ public class Stampede extends Skill implements PassiveSkill {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onDamage(CustomDamageEvent event) {
         if (!(event.getDamagee() instanceof Player damagee)) return;
+        playerData.remove(damagee);
         removeSpeed(damagee);
         startStampede(damagee);
     }
@@ -188,6 +190,7 @@ public class Stampede extends Skill implements PassiveSkill {
         double additionalDamage = getDamage(level) * str;
         event.setDamage(event.getDamage() + additionalDamage);
 
+        playerData.remove(damager);
         removeSpeed(damager);
         startStampede(damager);
     }
