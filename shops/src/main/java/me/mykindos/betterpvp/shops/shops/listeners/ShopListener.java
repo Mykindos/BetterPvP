@@ -7,8 +7,6 @@ import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.weapon.WeaponManager;
-import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
-import me.mykindos.betterpvp.core.components.champions.weapons.IWeapon;
 import me.mykindos.betterpvp.core.components.shops.ShopCurrency;
 import me.mykindos.betterpvp.core.components.shops.events.PlayerBuyItemEvent;
 import me.mykindos.betterpvp.core.components.shops.events.PlayerSellItemEvent;
@@ -48,7 +46,6 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -97,11 +94,11 @@ public class ShopListener implements Listener {
     public void onBuyItem(PlayerBuyItemEvent event) {
         boolean isShifting = event.getClickType().name().contains("SHIFT");
 
-        Optional<IWeapon> weaponByItemStack = weaponManager.getWeaponByItemStack(event.getItem());
-        if(isShifting && ((weaponByItemStack.isPresent() && weaponByItemStack.get() instanceof LegendaryWeapon)
-                || event.getItem().getItemMeta() instanceof Damageable)) {
-            isShifting = false;
-        }
+        //Optional<IWeapon> weaponByItemStack = weaponManager.getWeaponByItemStack(event.getItem());
+        //if(isShifting && ((weaponByItemStack.isPresent() && weaponByItemStack.get() instanceof LegendaryWeapon)
+        //        || event.getItem().getItemMeta() instanceof Damageable)) {
+        //    isShifting = false;
+        //}
 
         int cost = isShifting ? event.getShopItem().getBuyPrice() * 64 : event.getShopItem().getBuyPrice();
 
@@ -134,11 +131,10 @@ public class ShopListener implements Listener {
 
         boolean isShifting = event.getClickType().name().contains("SHIFT");
 
-        Optional<IWeapon> weaponByItemStack = weaponManager.getWeaponByItemStack(event.getItem());
-        if(isShifting && ((weaponByItemStack.isPresent() && weaponByItemStack.get() instanceof LegendaryWeapon)
-                || event.getItem().getItemMeta() instanceof Damageable)) {
-            isShifting = false;
-        }
+        //Optional<IWeapon> weaponByItemStack = weaponManager.getWeaponByItemStack(event.getItem());
+        //if(isShifting && (weaponByItemStack.isPresent() && weaponByItemStack.get() instanceof LegendaryWeapon)) {
+        //    isShifting = false;
+        //}
 
         int cost = isShifting ? event.getShopItem().getBuyPrice() * 64 : event.getShopItem().getBuyPrice();
         int amount = isShifting ? 64 : event.getShopItem().getAmount();

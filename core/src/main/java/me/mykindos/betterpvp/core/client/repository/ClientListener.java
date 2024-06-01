@@ -151,9 +151,9 @@ public class ClientListener implements Listener {
             event.allow();
             return;
         }
-
+        final Client client = clientManager.search().online(event.getPlayer());
         if (event.getResult() == PlayerLoginEvent.Result.KICK_FULL || event.getResult() == PlayerLoginEvent.Result.KICK_WHITELIST) {
-            final Client client = clientManager.search().online(event.getPlayer());
+
             if (client.hasRank(Rank.TRIAL_MOD)) {
                 event.allow();
                 return;
@@ -161,8 +161,8 @@ public class ClientListener implements Listener {
         }
 
         if(event.getResult() == PlayerLoginEvent.Result.ALLOWED) {
-            if (Bukkit.getOnlinePlayers().size() >= maxPlayers) {
-                event.disallow(PlayerLoginEvent.Result.KICK_FULL, Component.text("The server is full!"));
+            if (Bukkit.getOnlinePlayers().size() >= maxPlayers && !client.hasRank(Rank.TRIAL_MOD)) {
+                event.disallow(PlayerLoginEvent.Result.KICK_FULL, Component.text("The server is full!!"));
                 return;
             }
         }
