@@ -114,72 +114,72 @@ public class PlayerName implements Listener {
         }
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     private void onClanLeave(final MemberLeaveClanEvent event) {
             broadcastChange(event.getPlayer());
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     private void onClanJoin(final MemberJoinClanEvent event) {
             broadcastChange(event.getPlayer());
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.NORMAL)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     private void onClanDisband(final ClanDisbandEvent event) {
         for (Player player : Bukkit.getOnlinePlayers()) {
             broadcastChange(player);
         }
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     private void onClanCreate(final ClanCreateEvent event) {
             broadcastChange(event.getPlayer());
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     private void onKick(final ClanKickMemberEvent event) {
         if (event.getTarget().getGamer().isOnline()) {
             this.broadcastChange(Objects.requireNonNull(event.getTarget().getGamer().getPlayer()));
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.HIGHEST)
     private void onTrust(final ClanTrustEvent event) {
         this.broadcastChange(event.getClan());
         this.broadcastChange(event.getTargetClan());
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.HIGHEST)
     private void onNeutral(final ClanNeutralEvent event) {
         this.broadcastChange(event.getClan());
         this.broadcastChange(event.getTargetClan());
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.HIGHEST)
     private void onUntrust(final ClanUntrustEvent event) {
         this.broadcastChange(event.getClan());
         this.broadcastChange(event.getTargetClan());
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.HIGHEST)
     private void onEnemy(final ClanEnemyEvent event) {
         this.broadcastChange(event.getClan());
         this.broadcastChange(event.getTargetClan());
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.HIGHEST)
     private void onAlliance(final ClanAllianceEvent event) {
         this.broadcastChange(event.getClan());
         this.broadcastChange(event.getTargetClan());
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.HIGHEST)
     private void onPillageStart(final PillageStartEvent event) {
         this.broadcastChange(this.clanManager.getClanById(event.getPillage().getPillaged().getId()).orElse(null));
         this.broadcastChange(this.clanManager.getClanById(event.getPillage().getPillager().getId()).orElse(null));
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.HIGHEST)
     private void onPillageEnd(final PillageEndEvent event) {
         this.broadcastChange(this.clanManager.getClanById(event.getPillage().getPillaged().getId()).orElse(null));
         this.broadcastChange(this.clanManager.getClanById(event.getPillage().getPillager().getId()).orElse(null));

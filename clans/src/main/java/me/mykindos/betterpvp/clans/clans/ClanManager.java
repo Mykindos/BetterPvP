@@ -108,14 +108,12 @@ public class ClanManager extends Manager<Clan> {
         ClanPerkManager.getInstance().init();
     }
 
-    public void updateClanName(String oldClan, Clan clan) {
+    public void updateClanName(Clan clan) {
         getRepository().updateClanName(clan);
-        objects.remove(oldClan);
-        addObject(clan.getName(), clan);
     }
 
     public Optional<Clan> getClanById(UUID id) {
-        return objects.values().stream().filter(clan -> clan.getId().equals(id)).findFirst();
+        return Optional.ofNullable(objects.get(id.toString()));
     }
 
     public Optional<Clan> getClanByClient(Client client) {
@@ -123,9 +121,13 @@ public class ClanManager extends Manager<Clan> {
     }
 
     public Optional<Clan> getClanByPlayer(Player player) {
-        return Optional.ofNullable(player.getMetadata("clan").get(0).value())
-                .map(UUID.class::cast)
-                .flatMap(this::getClanById);
+        if(player.hasMetadata("clan")) {
+            return Optional.ofNullable(player.getMetadata("clan").get(0).value())
+                    .map(UUID.class::cast)
+                    .flatMap(this::getClanById);
+        }
+
+        return Optional.empty();
     }
 
     public Optional<Clan> getClanByPlayer(UUID uuid) {
@@ -139,7 +141,7 @@ public class ClanManager extends Manager<Clan> {
     }
 
     public Optional<Clan> getClanByName(String name) {
-        return Optional.ofNullable(objects.get(name.toLowerCase()));
+        return objects.values().stream().filter(clan -> clan.getName().equalsIgnoreCase(name)).findFirst();
     }
 
     /**
@@ -548,7 +550,7 @@ public class ClanManager extends Manager<Clan> {
     @Override
     public void loadFromList(List<Clan> objects) {
         // Load the base clan objects first so they can be referenced in the loop below
-        objects.forEach(clan -> addObject(clan.getName().toLowerCase(), clan));
+        objects.forEach(clan -> addObject(clan.getId().toString(), clan));
 
         objects.forEach(clan -> {
             clan.setTerritory(repository.getTerritory(clan));

@@ -694,12 +694,12 @@ public class ClansWorldListener extends ClanListener {
         });
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onMemberCreate(ClanCreateEvent event) {
         event.getPlayer().setMetadata("clan", new FixedMetadataValue(clans, event.getClan().getId()));
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onMemberDisband(ClanDisbandEvent event) {
         event.getClan().getMembers().forEach(member -> {
             Player player = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
