@@ -444,7 +444,7 @@ public class UUIDListener implements Listener {
                 log.info("{} caused ({}) to be dropped from block {} at ({})", event.getPlayer().getName(),
                                 uuidItem.getUuid(), event.getBlockState().getType().name(), UtilWorld.locationToString(location))
                         .setAction("ITEM_CONTAINER_BREAK").addItemContext(uuidItem).addLocationContext(location)
-                        .addBlockContext(event.getBlock()).submit();
+                        .addBlockContext(event.getBlockState()).addClientContext(event.getPlayer()).submit();
             });
         });
     }
