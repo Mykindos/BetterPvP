@@ -19,7 +19,6 @@ import me.mykindos.betterpvp.clans.clans.events.MemberJoinClanEvent;
 import me.mykindos.betterpvp.clans.clans.events.MemberLeaveClanEvent;
 import me.mykindos.betterpvp.clans.clans.pillage.events.PillageEndEvent;
 import me.mykindos.betterpvp.clans.clans.pillage.events.PillageStartEvent;
-import me.mykindos.betterpvp.core.combat.death.events.CustomDeathEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -117,16 +116,12 @@ public class PlayerName implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     private void onClanLeave(final MemberLeaveClanEvent event) {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            broadcastChange(player);
-        }
+            broadcastChange(event.getPlayer());
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     private void onClanJoin(final MemberJoinClanEvent event) {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            broadcastChange(player);
-        }
+            broadcastChange(event.getPlayer());
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.NORMAL)
@@ -138,9 +133,7 @@ public class PlayerName implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     private void onClanCreate(final ClanCreateEvent event) {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            broadcastChange(player);
-        }
+            broadcastChange(event.getPlayer());
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
@@ -190,18 +183,6 @@ public class PlayerName implements Listener {
     private void onPillageEnd(final PillageEndEvent event) {
         this.broadcastChange(this.clanManager.getClanById(event.getPillage().getPillaged().getId()).orElse(null));
         this.broadcastChange(this.clanManager.getClanById(event.getPillage().getPillager().getId()).orElse(null));
-    }
-
-    @EventHandler
-    public void onDeath(CustomDeathEvent event) {
-        if (event.getKilled() instanceof Player player) {
-            clanManager.getClanByPlayer(player).ifPresent(this::broadcastChange);
-        }
-
-        if (event.getKiller() instanceof Player killer) {
-            clanManager.getClanByPlayer(killer).ifPresent(this::broadcastChange);
-        }
-
     }
 
     @EventHandler
