@@ -128,14 +128,16 @@ public class ClanEventListener extends ClanListener {
         clanManager.getRepository().deleteClanTerritory(targetClan, chunkString);
         targetClan.getTerritory().removeIf(territory -> territory.getChunk().equals(UtilWorld.chunkToFile(chunk)));
 
-        if (targetClan.getHome().getChunk().equals(chunk)) {
-            Block block = targetClan.getHome().clone().subtract(0, 0.6, 0).getBlock();
-            if (block.getType() == Material.RED_BED) {
-                block.setType(Material.AIR);
-            }
-            targetClan.setHome(null);
+        if(targetClan.getHome() != null) {
+            if (targetClan.getHome().getChunk().equals(chunk)) {
+                Block block = targetClan.getHome().clone().subtract(0, 0.6, 0).getBlock();
+                if (block.getType() == Material.RED_BED) {
+                    block.setType(Material.AIR);
+                }
+                targetClan.setHome(null);
 
-            targetClan.messageClan("Your clan home was destroyed!", null, true);
+                targetClan.messageClan("Your clan home was destroyed!", null, true);
+            }
         }
 
         log.info("{} ({}) unclaimed {} from {} ({})", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
