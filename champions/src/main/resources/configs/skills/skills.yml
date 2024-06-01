@@ -303,11 +303,11 @@ skills:
     staticlazer:
       enabled: true
       maxlevel: 5
-      cooldown: 9.0
+      cooldown: 10.0
       baseCharge: 40.0
       chargeIncreasePerLevel: 10.0
       baseDamage: 2.0
-      damageIncreasePerLevel: 2.0
+      damageIncreasePerLevel: 1.0
       baseRange: 20.0
       rangeIncreasePerLevel: 10.0
       energy: 30

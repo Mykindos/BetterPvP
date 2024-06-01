@@ -8,11 +8,7 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
 import me.mykindos.betterpvp.clans.clans.events.ChunkClaimEvent;
 import me.mykindos.betterpvp.clans.clans.events.ChunkUnclaimEvent;
-import me.mykindos.betterpvp.clans.clans.events.ClanCreateEvent;
-import me.mykindos.betterpvp.clans.clans.events.ClanDisbandEvent;
-import me.mykindos.betterpvp.clans.clans.events.ClanKickMemberEvent;
 import me.mykindos.betterpvp.clans.clans.events.MemberJoinClanEvent;
-import me.mykindos.betterpvp.clans.clans.events.MemberLeaveClanEvent;
 import me.mykindos.betterpvp.clans.clans.events.TerritoryInteractEvent;
 import me.mykindos.betterpvp.clans.clans.insurance.InsuranceType;
 import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
@@ -696,37 +692,10 @@ public class ClansWorldListener extends ClanListener {
         });
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onMemberCreate(ClanCreateEvent event) {
-        event.getPlayer().setMetadata("clan", new FixedMetadataValue(clans, event.getClan().getId()));
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onMemberDisband(ClanDisbandEvent event) {
-        event.getClan().getMembers().forEach(member -> {
-            Player player = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
-            if (player != null) {
-                event.getPlayer().removeMetadata("clan", clans);
-            }
-        });
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onMemberKick(ClanKickMemberEvent event) {
-        final Player player = Bukkit.getPlayer(event.getTarget().getUuid());
-        if (player != null) {
-            player.removeMetadata("clan", clans);
-        }
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onMemberLeave(MemberLeaveClanEvent event) {
-        event.getPlayer().removeMetadata("clan", clans);
-    }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onMemberJoin(MemberJoinClanEvent event) {
-        event.getPlayer().setMetadata("clan", new FixedMetadataValue(clans, event.getClan().getId()));
+
     }
 
     @UpdateEvent(delay = 250)

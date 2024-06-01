@@ -190,13 +190,13 @@ public class PlayerName implements Listener {
 
     @EventHandler
     public void onDeath(CustomDeathEvent event) {
-       if(event.getKiller() instanceof Player killer) {
-           clanManager.getClanByPlayer(killer).ifPresent(this::broadcastChange);
-       }
-
-       if(event.getKilled() instanceof Player killed) {
-           clanManager.getClanByPlayer(killed).ifPresent(this::broadcastChange);
-       }
+       //if(event.getKiller() instanceof Player killer) {
+       //    clanManager.getClanByPlayer(killer).ifPresent(this::broadcastChange);
+       //}
+//
+       //if(event.getKilled() instanceof Player killed) {
+       //    clanManager.getClanByPlayer(killed).ifPresent(this::broadcastChange);
+       //}
     }
 
     @EventHandler

@@ -139,8 +139,8 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
         baseCharge = getConfig("baseCharge", 40.0, Double.class);
         chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 10.0, Double.class);
 
-        baseDamage = getConfig("baseDamage", 6.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 2.0, Double.class);
+        baseDamage = getConfig("baseDamage", 2.0, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
 
         baseRange = getConfig("baseRange", 20.0, Double.class);
         rangeIncreasePerLevel = getConfig("rangeIncreasePerLevel", 10.0, Double.class);
