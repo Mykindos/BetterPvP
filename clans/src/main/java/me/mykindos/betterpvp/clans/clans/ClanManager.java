@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.clans.clans.pillage.Pillage;
 import me.mykindos.betterpvp.clans.clans.pillage.PillageHandler;
 import me.mykindos.betterpvp.clans.clans.pillage.events.PillageStartEvent;
 import me.mykindos.betterpvp.clans.clans.repository.ClanRepository;
+import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -30,8 +31,10 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
+import me.mykindos.betterpvp.core.utilities.model.data.CustomDataType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -116,18 +119,23 @@ public class ClanManager extends Manager<Clan> {
     }
 
     public Optional<Clan> getClanByClient(Client client) {
-        return objects.values().stream()
-                .filter(clan -> clan.getMemberByUUID(client.getUuid()).isPresent()).findFirst();
+        return getClanByPlayer(client.getUniqueId());
     }
 
     public Optional<Clan> getClanByPlayer(Player player) {
-        return objects.values().stream()
-                .filter(clan -> clan.getMemberByUUID(player.getUniqueId().toString()).isPresent()).findFirst();
+        return Optional.ofNullable(player.getMetadata("clan").get(0).value())
+                .map(UUID.class::cast)
+                .flatMap(this::getClanById);
     }
 
     public Optional<Clan> getClanByPlayer(UUID uuid) {
-        return objects.values().stream()
-                .filter(clan -> clan.getMemberByUUID(uuid).isPresent()).findFirst();
+        final Player player = Bukkit.getPlayer(uuid);
+        if (player == null) {
+            return objects.values().stream()
+                    .filter(clan -> clan.getMemberByUUID(uuid).isPresent()).findFirst();
+        }
+
+        return getClanByPlayer(player);
     }
 
     public Optional<Clan> getClanByName(String name) {
@@ -145,15 +153,34 @@ public class ClanManager extends Manager<Clan> {
     }
 
     public Optional<Clan> getClanByChunk(Chunk chunk) {
-        return objects.values().stream()
-                .filter(clan -> clan.getTerritory().stream()
-                        .anyMatch(territory -> territory.getChunk().equalsIgnoreCase(UtilWorld.chunkToFile(chunk)))).findFirst();
+        final UUID uuid = chunk.getPersistentDataContainer().get(ClansNamespacedKeys.CLAN, CustomDataType.UUID);
+        if (uuid == null) {
+            // todo: remove me later
+//            return Optional.empty();
+            final Optional<Clan> found = objects.values().stream()
+                    .filter(clan -> clan.getTerritory().stream().anyMatch(territory -> territory.getChunk().equalsIgnoreCase(UtilWorld.chunkToFile(chunk))))
+                    .findFirst();
+
+            if (found.isPresent()) {
+                chunk.getPersistentDataContainer().set(ClansNamespacedKeys.CLAN, CustomDataType.UUID, found.get().getId());
+                return found;
+            }
+
+            return Optional.empty();
+        }
+
+        return getClanById(uuid);
     }
 
-    public Optional<Clan> getClanByChunkString(String chunk) {
-        return objects.values().stream()
-                .filter(clan -> clan.getTerritory().stream()
-                        .anyMatch(territory -> territory.getChunk().equalsIgnoreCase(chunk))).findFirst();
+    public Optional<Clan> getClanByChunkString(String serialized) {
+        final Chunk chunk = UtilWorld.stringToChunk(serialized, false);
+        if (chunk == null) {
+            return objects.values().stream()
+                    .filter(clan -> clan.getTerritory().stream()
+                            .anyMatch(territory -> territory.getChunk().equalsIgnoreCase(serialized))).findFirst();
+        } else {
+            return getClanByChunk(chunk);
+        }
     }
 
     public boolean isClanMember(Player player, Player target) {
