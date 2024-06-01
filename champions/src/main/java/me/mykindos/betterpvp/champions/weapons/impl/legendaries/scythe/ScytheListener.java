@@ -40,10 +40,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Transformation;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
-import xyz.xenondevs.invui.item.builder.SkullBuilder;
-import xyz.xenondevs.invui.util.MojangApiUtils;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
@@ -349,13 +346,14 @@ public class ScytheListener implements Listener {
             spawned.setTransformation(transformation);
 
             if (entity instanceof Player) {
-                try {
-                    final ItemStack item = new SkullBuilder(entity.getUniqueId()).get();
-                    spawned.setItemStack(item);
-                } catch (MojangApiUtils.MojangApiException | IOException e) {
-                    spawned.setItemStack(new ItemStack(Material.SKELETON_SKULL));
-                    log.error("Failed to bind head texture for soul (" + ent.getName() + ")", e).submit();
-                }
+//                try {
+//                    final ItemStack item = new SkullBuilder(entity.getUniqueId()).get();
+//                    spawned.setItemStack(new ItemStack(Material.SKELETON_SKULL));
+//                } catch (MojangApiUtils.MojangApiException | IOException e) {
+//                    spawned.setItemStack(new ItemStack(Material.SKELETON_SKULL));
+//                    log.error("Failed to bind head texture for soul (" + ent.getName() + ")", e).submit();
+//                }
+                spawned.setItemStack(new ItemStack(Material.SKELETON_SKULL));
             } else {
                 spawned.setItemStack(new ItemStack(Material.SKELETON_SKULL));
             }
