@@ -66,8 +66,8 @@ public abstract class ClanSubCommand extends Command {
                     tabCompletions.add(sender instanceof Player player ? player.getLocation().getZ() + "" : "0");
             case "BOOLEAN" -> tabCompletions.addAll(List.of("true", "false"));
             case "CLAN" -> clanManager.getObjects().forEach((key, value) -> {
-                if (key.toLowerCase().startsWith(lowercaseArg)) {
-                    tabCompletions.add(key);
+                if (value.getName().toLowerCase().startsWith(lowercaseArg)) {
+                    tabCompletions.add(value.getName());
                 }
             });
             case "CLAN_MEMBER" -> {
