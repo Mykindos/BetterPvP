@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.client.repository;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
@@ -41,6 +42,7 @@ import java.util.concurrent.CompletableFuture;
 
 @BPvPListener
 @CustomLog
+@Singleton
 public class ClientListener implements Listener {
 
     private static final String LOADING_CLIENT_FORMAT = "Loading client... {}";
@@ -145,7 +147,7 @@ public class ClientListener implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerLogin(PlayerLoginEvent event) {
         if (unlimitedPlayers && event.getResult() == PlayerLoginEvent.Result.KICK_FULL){
             event.allow();
