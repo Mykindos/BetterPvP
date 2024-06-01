@@ -4,10 +4,10 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
-import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.punishments.PunishmentTypes;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
+import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
@@ -19,10 +19,12 @@ import org.bukkit.entity.Player;
 public class PlayerAdminCommand extends Command {
 
     private final ClientManager clientManager;
+    private final CooldownManager cooldownManager;
 
     @Inject
-    public PlayerAdminCommand(ClientManager clientManager){
+    public PlayerAdminCommand(ClientManager clientManager, CooldownManager cooldownManager){
         this.clientManager = clientManager;
+        this.cooldownManager = cooldownManager;
 
         aliases.add("a");
     }
@@ -39,15 +41,16 @@ public class PlayerAdminCommand extends Command {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        Gamer gamer = client.getGamer();
         if(args.length == 0) {
             UtilMessage.message(player, "Core", "You must specify a message");
             return;
         }
 
         if (client.hasPunishment(PunishmentTypes.MUTE)) {
-            UtilMessage.message(player, "Punish", "You cannot use this command while muted");
-            return;
+            if (!cooldownManager.use(player, getName(), 120, false, false)) {
+                UtilMessage.message(player, "Core", "You must wait 2 minutes between using this command.");
+                return;
+            }
         }
 
         String playerName = UtilFormat.spoofNameForLunar(player.getName());
