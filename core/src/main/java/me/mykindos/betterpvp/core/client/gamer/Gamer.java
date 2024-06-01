@@ -112,10 +112,10 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
 
     public void setSidebar(@Nullable Sidebar sidebar) {
         if (this.sidebar != null && this.isOnline()) {
-            this.sidebar.removeViewer(Objects.requireNonNull(getPlayer()));
+            UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> this.sidebar.removeViewer(Objects.requireNonNull(getPlayer())));
         }
         if (sidebar != null && this.isOnline()) {
-            sidebar.addViewer(Objects.requireNonNull(getPlayer()));
+            UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> sidebar.addViewer(Objects.requireNonNull(getPlayer())));
         }
         this.sidebar = sidebar;
     }

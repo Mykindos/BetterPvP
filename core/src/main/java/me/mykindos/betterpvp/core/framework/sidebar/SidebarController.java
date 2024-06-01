@@ -3,12 +3,14 @@ package me.mykindos.betterpvp.core.framework.sidebar;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.client.properties.ClientPropertyUpdateEvent;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -25,12 +27,14 @@ import java.util.function.Function;
 public class SidebarController implements Listener {
 
     private final @NotNull ClientManager clientManager;
+    private final @NotNull Core core;
     @Getter
     private @NotNull Function<Gamer, Sidebar> defaultProvider = gamer -> null;
 
     @Inject
-    private SidebarController(@NotNull ClientManager clientManager) {
+    private SidebarController(@NotNull ClientManager clientManager, @NotNull Core core) {
         this.clientManager = clientManager;
+        this.core = core;
     }
 
     public void setDefaultProvider(@NotNull Function<@NotNull Gamer, @Nullable Sidebar> provider) {
@@ -38,7 +42,7 @@ public class SidebarController implements Listener {
     }
 
     public void resetSidebar(@NotNull Gamer gamer) {
-        //gamer.setSidebar(this.defaultProvider.apply(gamer));
+        gamer.setSidebar(this.defaultProvider.apply(gamer));
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -62,9 +66,9 @@ public class SidebarController implements Listener {
 
         final Player player = Objects.requireNonNull(gamer.getPlayer());
         if ((boolean) event.getValue()) {
-            sidebar.addViewer(player);
+            UtilServer.runTaskAsync(core, () -> sidebar.addViewer(player));
         } else {
-            sidebar.removeViewer(player);
+            UtilServer.runTaskAsync(core, () -> sidebar.removeViewer(player));
         }
     }
 
