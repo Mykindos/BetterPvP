@@ -93,8 +93,6 @@ public class AllySubCommand extends ClanSubCommand {
             return;
         }
 
-
-
         UtilServer.callEvent(new ClanRequestAllianceEvent(player, clan, targetClan));
 
     }
