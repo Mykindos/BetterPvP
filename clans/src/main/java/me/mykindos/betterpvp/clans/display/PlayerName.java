@@ -20,7 +20,6 @@ import me.mykindos.betterpvp.clans.clans.events.MemberLeaveClanEvent;
 import me.mykindos.betterpvp.clans.clans.pillage.events.PillageEndEvent;
 import me.mykindos.betterpvp.clans.clans.pillage.events.PillageStartEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -54,7 +53,7 @@ public class PlayerName implements Listener {
     }
 
     public void broadcastChange(@NotNull Player player) {
-        Bukkit.getScheduler().runTaskLaterAsynchronously(JavaPlugin.getPlugin(Clans.class), () -> {
+        Bukkit.getScheduler().runTaskLater(JavaPlugin.getPlugin(Clans.class), () -> {
             for (Player onlinePlayer : player.getServer().getOnlinePlayers()) {
                 this.sendChange(player, onlinePlayer);
             }
@@ -108,14 +107,11 @@ public class PlayerName implements Listener {
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     private void onJoin(final PlayerJoinEvent event) {
         event.getPlayer().setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
+        this.broadcastChange(event.getPlayer());
 
-        UtilServer.runTaskLaterAsync(JavaPlugin.getPlugin(Clans.class), () -> {
-            this.broadcastChange(event.getPlayer());
-
-            for (Player onlinePlayer : event.getPlayer().getServer().getOnlinePlayers()) {
-                this.sendChange(onlinePlayer, event.getPlayer());
-            }
-        }, 2L);
+        for (Player onlinePlayer : event.getPlayer().getServer().getOnlinePlayers()) {
+            this.sendChange(onlinePlayer, event.getPlayer());
+        }
 
     }
 
@@ -128,17 +124,23 @@ public class PlayerName implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     private void onClanJoin(final MemberJoinClanEvent event) {
-        broadcastChange(event.getPlayer());
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            broadcastChange(player);
+        }
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     private void onClanDisband(final ClanDisbandEvent event) {
-        broadcastChange(event.getPlayer());
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            broadcastChange(player);
+        }
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     private void onClanCreate(final ClanCreateEvent event) {
-        broadcastChange(event.getPlayer());
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            broadcastChange(player);
+        }
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
