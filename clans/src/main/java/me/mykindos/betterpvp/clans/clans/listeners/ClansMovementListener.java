@@ -162,9 +162,9 @@ public class ClansMovementListener extends ClanListener {
                 }
 
                 if (clanManager.getRelation(playerClan, clan) == ClanRelation.ENEMY) {
-                    event.setDelayInSeconds(120);
-                } else {
                     event.setDelayInSeconds(60);
+                } else {
+                    event.setDelayInSeconds(30);
                 }
 
             } else {

@@ -55,7 +55,7 @@ public class TrustSubCommand extends ClanSubCommand {
             return;
         }
 
-        Optional<Clan> targetClanOptional = clanManager.getObject(args[0]);
+        Optional<Clan> targetClanOptional = clanManager.getClanByName(args[0]);
         if (targetClanOptional.isEmpty()) {
             UtilMessage.message(player, "Clans", "The clan you want to trust with does not exist.");
             return;

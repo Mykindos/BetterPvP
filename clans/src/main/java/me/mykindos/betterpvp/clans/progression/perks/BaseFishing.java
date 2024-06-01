@@ -58,7 +58,7 @@ public class BaseFishing implements Listener {
                 if(locationClanOptional.isPresent()) {
                     Clan locationClan = locationClanOptional.get();
 
-                    Optional<Clan> playerClanOptional = clanManager.getClanByPlayer(player.getUniqueId());
+                    Optional<Clan> playerClanOptional = clanManager.getClanByPlayer(player);
                     if(playerClanOptional.isPresent()) {
                         Clan playerClan = playerClanOptional.get();
                         if(playerClan.equals(locationClan)) {

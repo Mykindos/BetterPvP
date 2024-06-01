@@ -6,8 +6,16 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
+import me.mykindos.betterpvp.clans.clans.events.ChunkClaimEvent;
+import me.mykindos.betterpvp.clans.clans.events.ChunkUnclaimEvent;
+import me.mykindos.betterpvp.clans.clans.events.ClanCreateEvent;
+import me.mykindos.betterpvp.clans.clans.events.ClanDisbandEvent;
+import me.mykindos.betterpvp.clans.clans.events.ClanKickMemberEvent;
+import me.mykindos.betterpvp.clans.clans.events.MemberJoinClanEvent;
+import me.mykindos.betterpvp.clans.clans.events.MemberLeaveClanEvent;
 import me.mykindos.betterpvp.clans.clans.events.TerritoryInteractEvent;
 import me.mykindos.betterpvp.clans.clans.insurance.InsuranceType;
+import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
@@ -26,12 +34,14 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
+import me.mykindos.betterpvp.core.utilities.model.data.CustomDataType;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.Container;
+import org.bukkit.block.data.Openable;
 import org.bukkit.block.data.type.Gate;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
@@ -59,8 +69,10 @@ import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
 import java.util.Optional;
@@ -310,7 +322,7 @@ public class ClansWorldListener extends ClanListener {
 
                 if (locationClan.isAdmin() && material == Material.ENCHANTING_TABLE) return;
                 if (material == Material.REDSTONE_ORE || material == Material.DEEPSLATE_REDSTONE_ORE) return;
-                if (relation == ClanRelation.ALLY_TRUST && material.isInteractable()) {
+                if (relation == ClanRelation.ALLY_TRUST && block.getBlockData() instanceof Openable) {
                     final TerritoryInteractEvent tie = new TerritoryInteractEvent(player, locationClan, block, Event.Result.DEFAULT, TerritoryInteractEvent.InteractionType.INTERACT);
                     tie.callEvent();
                     if (tie.getResult() == Event.Result.DENY) {
@@ -663,6 +675,58 @@ public class ClansWorldListener extends ClanListener {
                 }
             }
         });
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onChunkClaim(ChunkClaimEvent event) {
+        event.getChunk().getPersistentDataContainer().set(ClansNamespacedKeys.CLAN,
+                CustomDataType.UUID,
+                event.getClan().getId());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onChunkUnclaim(ChunkUnclaimEvent event) {
+        event.getChunk().getPersistentDataContainer().remove(ClansNamespacedKeys.CLAN);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onJoin(PlayerJoinEvent event) {
+        clanManager.getClanByPlayer(event.getPlayer()).ifPresent(clan -> {
+            event.getPlayer().setMetadata("clan", new FixedMetadataValue(clans, clan.getId()));
+        });
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onMemberCreate(ClanCreateEvent event) {
+        event.getPlayer().setMetadata("clan", new FixedMetadataValue(clans, event.getClan().getId()));
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onMemberDisband(ClanDisbandEvent event) {
+        event.getClan().getMembers().forEach(member -> {
+            Player player = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
+            if (player != null) {
+                event.getPlayer().removeMetadata("clan", clans);
+            }
+        });
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onMemberKick(ClanKickMemberEvent event) {
+        final Player player = Bukkit.getPlayer(event.getTarget().getUuid());
+        if (player != null) {
+            player.removeMetadata("clan", clans);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onMemberLeave(MemberLeaveClanEvent event) {
+        event.getPlayer().removeMetadata("clan", clans);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onMemberJoin(MemberJoinClanEvent event) {
+        event.getPlayer().setMetadata("clan", new FixedMetadataValue(clans, event.getClan().getId()));
     }
 
     @UpdateEvent(delay = 250)
