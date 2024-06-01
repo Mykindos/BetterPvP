@@ -56,6 +56,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -128,7 +129,7 @@ public class ClanEventListener extends ClanListener {
         clanManager.getRepository().deleteClanTerritory(targetClan, chunkString);
         targetClan.getTerritory().removeIf(territory -> territory.getChunk().equals(UtilWorld.chunkToFile(chunk)));
 
-        if(targetClan.getHome() != null) {
+        if (targetClan.getHome() != null) {
             if (targetClan.getHome().getChunk().equals(chunk)) {
                 Block block = targetClan.getHome().clone().subtract(0, 0.6, 0).getBlock();
                 if (block.getType() == Material.RED_BED) {
@@ -162,6 +163,7 @@ public class ClanEventListener extends ClanListener {
         }
 
         clan.getMembers().add(new ClanMember(event.getPlayer().getUniqueId().toString(), ClanMember.MemberRank.LEADER));
+        event.getPlayer().setMetadata("clan", new FixedMetadataValue(clans, clan.getId()));
 
         clanManager.addObject(clan.getId().toString(), clan);
         clanManager.getRepository().save(clan);
@@ -217,6 +219,13 @@ public class ClanEventListener extends ClanListener {
                         (chunk.getX() * 16) + "<gray>,</gray> " + (chunk.getZ() * 16));
             }
         }
+
+        event.getClan().getMembers().forEach(member -> {
+            Player player = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
+            if (player != null) {
+                player.removeMetadata("clan", clans);
+            }
+        });
 
         clan.getMembers().clear();
         clan.getTerritory().clear();
@@ -287,6 +296,8 @@ public class ClanEventListener extends ClanListener {
         ClanMember member = new ClanMember(player.getUniqueId().toString(),
                 client.isAdministrating() ? ClanMember.MemberRank.LEADER : ClanMember.MemberRank.RECRUIT);
         clan.getMembers().add(member);
+        player.setMetadata("clan", new FixedMetadataValue(clans, clan.getId()));
+
         clanManager.getRepository().saveClanMember(clan, member);
 
 
@@ -319,6 +330,7 @@ public class ClanEventListener extends ClanListener {
             clan.getMembers().remove(clanMember);
 
             UtilMessage.simpleMessage(player, "Clans", "You left <alt2>Clan " + clan.getName() + "</alt2>.");
+            player.removeMetadata("clan", clans);
 
             boolean isOnline = false;
             for (ClanMember member : clan.getMembers()) {
@@ -358,8 +370,13 @@ public class ClanEventListener extends ClanListener {
             if (targetPlayer != null) {
                 UtilMessage.simpleMessage(targetPlayer, "Clans", "You were kicked from <alt2>" + clan.getName());
                 targetPlayer.closeInventory();
+
+
+                targetPlayer.removeMetadata("clan", clans);
+
             }
         }
+
         log.info("{} ({}) was kicked by {} ({}) from {} ({})", target.getName(), target.getUuid(),
                         player.getName(), player.getUniqueId(), clan.getName(), clan.getId()).
                 setAction("CLAN_KICK").addClientContext(player).addClientContext(target, true).addClanContext(clan).submit();
@@ -633,7 +650,7 @@ public class ClanEventListener extends ClanListener {
             }
         }
 
-        if(!clan.isAdmin()) {
+        if (!clan.isAdmin()) {
             UtilBlock.placeBed(player.getLocation().toCenterLocation(), player.getFacing());
         }
 

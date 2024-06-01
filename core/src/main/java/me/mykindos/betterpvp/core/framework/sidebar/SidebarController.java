@@ -38,7 +38,7 @@ public class SidebarController implements Listener {
     }
 
     public void resetSidebar(@NotNull Gamer gamer) {
-        gamer.setSidebar(this.defaultProvider.apply(gamer));
+        //gamer.setSidebar(this.defaultProvider.apply(gamer));
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
