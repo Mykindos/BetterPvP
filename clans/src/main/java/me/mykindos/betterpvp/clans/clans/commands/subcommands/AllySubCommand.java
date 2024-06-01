@@ -59,7 +59,7 @@ public class AllySubCommand extends ClanSubCommand {
             return;
         }
 
-        Optional<Clan> targetClanOptional = clanManager.getObject(args[0]);
+        Optional<Clan> targetClanOptional = clanManager.getClanByName(args[0]);
         if (targetClanOptional.isEmpty()) {
             UtilMessage.message(player, "Clans", "The clan you want to ally with does not exist.");
             return;

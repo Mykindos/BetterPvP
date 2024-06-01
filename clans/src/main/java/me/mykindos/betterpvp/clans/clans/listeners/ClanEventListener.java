@@ -163,7 +163,7 @@ public class ClanEventListener extends ClanListener {
 
         clan.getMembers().add(new ClanMember(event.getPlayer().getUniqueId().toString(), ClanMember.MemberRank.LEADER));
 
-        clanManager.addObject(clan.getName().toLowerCase(), clan);
+        clanManager.addObject(clan.getId().toString(), clan);
         clanManager.getRepository().save(clan);
         clanManager.getLeaderboard().forceUpdate();
 
@@ -224,7 +224,7 @@ public class ClanEventListener extends ClanListener {
         clan.getAlliances().clear();
 
         clanManager.getRepository().delete(clan);
-        clanManager.getObjects().remove(clan.getName().toLowerCase());
+        clanManager.getObjects().remove(clan.getId().toString());
         clanManager.getLeaderboard().forceUpdate();
 
         log.info("{} ({}) disbanded {} ({})", event.getPlayer().getName(), event.getPlayer().getUniqueId(), clan.getName(), clan.getId())

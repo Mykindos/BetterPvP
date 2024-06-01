@@ -79,7 +79,7 @@ public class CreateClanSubCommand extends ClanSubCommand {
             return;
         }
 
-        Optional<Clan> clanOptional = clanManager.getObject(clanName.toLowerCase());
+        Optional<Clan> clanOptional = clanManager.getClanByName(clanName.toLowerCase());
         if (clanOptional.isEmpty()) {
             Clan clan = new Clan(UUID.randomUUID());
             clan.setName(clanName);
