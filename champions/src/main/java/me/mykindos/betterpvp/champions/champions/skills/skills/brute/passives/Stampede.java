@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.brute.passives;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -20,18 +21,20 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
+import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.event.player.PlayerToggleSprintEvent;
 
+import java.util.Iterator;
 import java.util.Map;
 import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
+@CustomLog
 public class Stampede extends Skill implements PassiveSkill {
 
     private final WeakHashMap<Player, StampedeData> playerData = new WeakHashMap<>();
@@ -97,11 +100,26 @@ public class Stampede extends Skill implements PassiveSkill {
 
     @UpdateEvent(delay = 200)
     public void updateSpeed() {
-        for (Map.Entry<Player, StampedeData> entry : playerData.entrySet()) {
+        for(Player player : Bukkit.getOnlinePlayers()) {
+            if(player.isSprinting() && !playerData.containsKey(player)) {
+                if(getLevel(player) > 0) {
+                    startStampede(player);
+                }
+            }
+        }
+
+        Iterator<Map.Entry<Player, StampedeData>> iterator = playerData.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<Player, StampedeData> entry = iterator.next();
             Player player = entry.getKey();
             StampedeData data = entry.getValue();
             int level = getLevel(player);
-            if (level < 1) return;
+
+            if (level < 1) {
+                removeSpeed(player);
+                iterator.remove();
+                continue;
+            }
 
             boolean isSprintingNow = player.isSprinting() && !player.isInWater();
 
@@ -124,30 +142,17 @@ public class Stampede extends Skill implements PassiveSkill {
                 }
             } else {
                 removeSpeed(player);
+                iterator.remove();
             }
         }
+
     }
 
     public void removeSpeed(Player player) {
         StampedeData data = playerData.get(player);
         if (data == null || data.getSprintStrength() < 1) return;
 
-        playerData.remove(player);
-
         championsManager.getEffects().removeEffect(player, EffectTypes.SPEED, getName());
-    }
-
-    @EventHandler
-    public void onPlayerToggleSprint(PlayerToggleSprintEvent event) {
-        Player player = event.getPlayer();
-
-        if (event.isSprinting()) {
-            if (getLevel(player) > 0) {
-                startStampede(player);
-            }
-        } else {
-            removeSpeed(player);
-        }
     }
 
     private void startStampede(Player player) {

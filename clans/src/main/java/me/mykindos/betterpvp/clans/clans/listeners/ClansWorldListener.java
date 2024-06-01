@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
 import me.mykindos.betterpvp.clans.clans.events.ChunkClaimEvent;
+import me.mykindos.betterpvp.clans.clans.events.ChunkUnclaimEvent;
 import me.mykindos.betterpvp.clans.clans.events.ClanCreateEvent;
 import me.mykindos.betterpvp.clans.clans.events.ClanDisbandEvent;
 import me.mykindos.betterpvp.clans.clans.events.ClanKickMemberEvent;
@@ -40,6 +41,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.Container;
+import org.bukkit.block.data.Openable;
 import org.bukkit.block.data.type.Gate;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
@@ -320,7 +322,7 @@ public class ClansWorldListener extends ClanListener {
 
                 if (locationClan.isAdmin() && material == Material.ENCHANTING_TABLE) return;
                 if (material == Material.REDSTONE_ORE || material == Material.DEEPSLATE_REDSTONE_ORE) return;
-                if (relation == ClanRelation.ALLY_TRUST && material.isInteractable()) {
+                if (relation == ClanRelation.ALLY_TRUST && block.getBlockData() instanceof Openable) {
                     final TerritoryInteractEvent tie = new TerritoryInteractEvent(player, locationClan, block, Event.Result.DEFAULT, TerritoryInteractEvent.InteractionType.INTERACT);
                     tie.callEvent();
                     if (tie.getResult() == Event.Result.DENY) {
@@ -683,7 +685,7 @@ public class ClansWorldListener extends ClanListener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onChunkUnclaim(ChunkClaimEvent event) {
+    public void onChunkUnclaim(ChunkUnclaimEvent event) {
         event.getChunk().getPersistentDataContainer().remove(ClansNamespacedKeys.CLAN);
     }
 

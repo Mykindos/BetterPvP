@@ -171,17 +171,6 @@ public class ClanManager extends Manager<Clan> {
     public Optional<Clan> getClanByChunk(Chunk chunk) {
         final UUID uuid = chunk.getPersistentDataContainer().get(ClansNamespacedKeys.CLAN, CustomDataType.UUID);
         if (uuid == null) {
-            // todo: remove me later
-//            return Optional.empty();
-            final Optional<Clan> found = objects.values().stream()
-                    .filter(clan -> clan.getTerritory().stream().anyMatch(territory -> territory.getChunk().equalsIgnoreCase(UtilWorld.chunkToFile(chunk))))
-                    .findFirst();
-
-            if (found.isPresent()) {
-                chunk.getPersistentDataContainer().set(ClansNamespacedKeys.CLAN, CustomDataType.UUID, found.get().getId());
-                return found;
-            }
-
             return Optional.empty();
         }
 
@@ -189,14 +178,9 @@ public class ClanManager extends Manager<Clan> {
     }
 
     public Optional<Clan> getClanByChunkString(String serialized) {
-        final Chunk chunk = UtilWorld.stringToChunk(serialized, false);
-        if (chunk == null) {
-            return objects.values().stream()
-                    .filter(clan -> clan.getTerritory().stream()
-                            .anyMatch(territory -> territory.getChunk().equalsIgnoreCase(serialized))).findFirst();
-        } else {
-            return getClanByChunk(chunk);
-        }
+        return objects.values().stream()
+                .filter(clan -> clan.getTerritory().stream()
+                        .anyMatch(territory -> territory.getChunk().equalsIgnoreCase(serialized))).findFirst();
     }
 
     public boolean isClanMember(Player player, Player target) {
@@ -460,8 +444,8 @@ public class ClanManager extends Manager<Clan> {
         ClanEnemy killedEnemy = killed.getEnemy(killer).orElseThrow();
         ClanEnemy killerEnemy = killer.getEnemy(killed).orElseThrow();
 
-        int killerSize = killer.getSquadCount();
-        int killedSize = killed.getSquadCount();
+        int killerSize = killer.getMembers().size();
+        int killedSize = killed.getMembers().size();
 
         double dominance = getDominanceForKill(killedSize, killerSize);
 

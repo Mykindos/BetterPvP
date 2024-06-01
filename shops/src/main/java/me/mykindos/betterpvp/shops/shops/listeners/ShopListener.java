@@ -42,6 +42,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -295,6 +296,15 @@ public class ShopListener implements Listener {
     public void onDamage(CustomDamageEvent event) {
         if (shopkeeperManager.getObject(event.getDamagee().getUniqueId()).isPresent()) {
             event.cancel("Cannot damage shopkeepers");
+        }
+    }
+
+    @EventHandler
+    public void onCatch(PlayerFishEvent event) {
+        if(event.getState() == PlayerFishEvent.State.CAUGHT_ENTITY) {
+            if (shopkeeperManager.getObject(event.getCaught().getUniqueId()).isPresent()) {
+                event.setCancelled(true);
+            }
         }
     }
 
