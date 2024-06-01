@@ -8,7 +8,6 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
 import me.mykindos.betterpvp.clans.clans.events.ChunkClaimEvent;
 import me.mykindos.betterpvp.clans.clans.events.ChunkUnclaimEvent;
-import me.mykindos.betterpvp.clans.clans.events.MemberJoinClanEvent;
 import me.mykindos.betterpvp.clans.clans.events.TerritoryInteractEvent;
 import me.mykindos.betterpvp.clans.clans.insurance.InsuranceType;
 import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
@@ -687,15 +686,9 @@ public class ClansWorldListener extends ClanListener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onJoin(PlayerJoinEvent event) {
-        clanManager.getClanByPlayer(event.getPlayer()).ifPresent(clan -> {
+        clanManager.expensiveGetClanByPlayer(event.getPlayer()).ifPresent(clan -> {
             event.getPlayer().setMetadata("clan", new FixedMetadataValue(clans, clan.getId()));
         });
-    }
-
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onMemberJoin(MemberJoinClanEvent event) {
-
     }
 
     @UpdateEvent(delay = 250)

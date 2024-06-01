@@ -40,7 +40,6 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -124,21 +123,17 @@ public class ClanManager extends Manager<Clan> {
         return getClanByPlayer(client.getUniqueId());
     }
 
+    public Optional<Clan> expensiveGetClanByPlayer(Player player) {
+        return objects.values().stream()
+                .filter(clan -> clan.getMemberByUUID(player.getUniqueId()).isPresent()).findFirst();
+
+    }
+
     public Optional<Clan> getClanByPlayer(Player player) {
         if (player.hasMetadata("clan")) {
             return Optional.ofNullable(player.getMetadata("clan").get(0).value())
                     .map(UUID.class::cast)
                     .flatMap(this::getClanById);
-        } else {
-            Optional<Clan> fallbackOpt = objects.values().stream()
-                    .filter(clan -> clan.getMemberByUUID(player.getUniqueId()).isPresent()).findFirst();
-
-            if (fallbackOpt.isPresent()) {
-                Clan fallback = fallbackOpt.get();
-                player.setMetadata("clan", new FixedMetadataValue(clans, fallback.getId()));
-
-                return Optional.of(fallback);
-            }
         }
 
         return Optional.empty();
