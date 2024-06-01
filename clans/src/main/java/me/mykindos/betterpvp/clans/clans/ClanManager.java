@@ -88,6 +88,10 @@ public class ClanManager extends Manager<Clan> {
     private boolean dominanceEnabled;
 
     @Inject
+    @Config(path = "clans.members.max", defaultValue = "8")
+    private int maxClanMembers;
+
+    @Inject
     public ClanManager(Clans clans, ClanRepository repository, ClientManager clientManager, PillageHandler pillageHandler, LeaderboardManager leaderboardManager) {
         this.repository = repository;
         this.clientManager = clientManager;
@@ -399,8 +403,7 @@ public class ClanManager extends Manager<Clan> {
 
     public double getDominanceForKill(int killedSquadSize, int killerSquadSize) {
 
-        int sizeOffset = Math.min(6, 6 - Math.min(killerSquadSize - killedSquadSize, 6));
-
+        int sizeOffset = Math.min(maxClanMembers, maxClanMembers - Math.min(killerSquadSize - killedSquadSize, maxClanMembers));
         return dominanceScale.getOrDefault(sizeOffset, 6D);
 
     }
