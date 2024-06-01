@@ -66,7 +66,7 @@ public class Stampede extends Skill implements PassiveSkill {
                 "of <effect>Speed " + UtilFormat.getRomanNumeral(maxSpeedStrength) + "</effect>",
                 "",
                 "Attacking during stampede deals <val>" + getDamage(level) + "</val> bonus",
-                "bonus damage and <val>" + getBonusKnockback(level) + "x</val> extra knockback",
+                "bonus damage and <val>" + UtilFormat.formatNumber(getBonusKnockback(level), 2) + "x</val> extra knockback",
                 "per speed level"
         };
     }
