@@ -149,11 +149,7 @@ public class Stampede extends Skill implements PassiveSkill {
     }
 
     public void removeSpeed(Player player) {
-        StampedeData data = playerData.get(player);
-        if (data == null || data.getSprintStrength() < 1) return;
-
         championsManager.getEffects().removeEffect(player, EffectTypes.SPEED, getName());
-
     }
 
     private void startStampede(Player player) {
@@ -202,7 +198,7 @@ public class Stampede extends Skill implements PassiveSkill {
         durationPerStackDecreasePerLevel = getConfig("durationPerStackDecreasePerLevel", 1.0, Double.class);
         damage = getConfig("damage", 0.5, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.5, Double.class);
-        maxSpeedStrength = getConfig("maxSpeedStrength", 3, Integer.class);
+        maxSpeedStrength = getConfig("maxSpeedStrength", 2, Integer.class);
         knockbackIncreasePerLevel = getConfig("knockbackIncreasePerLevel", 0.5, Double.class);
         knockback = getConfig("knockback", 0.5, Double.class);
     }

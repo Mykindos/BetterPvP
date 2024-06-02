@@ -12,11 +12,11 @@ import me.mykindos.betterpvp.clans.clans.events.TerritoryInteractEvent;
 import me.mykindos.betterpvp.clans.clans.insurance.InsuranceType;
 import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
 import me.mykindos.betterpvp.core.client.Client;
-import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.config.Config;
+import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.energy.EnergyHandler;
@@ -49,7 +49,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
@@ -81,22 +80,28 @@ public class ClansWorldListener extends ClanListener {
     @Config(path = "clans.claims.allow-gravity-blocks", defaultValue = "true")
     private boolean allowGravityBlocks;
 
+    @Inject
+    @Config(path = "clans.pillage.container-break-cooldown", defaultValue = "30.0")
+    private double containerBreakCooldown;
+
 
     private final Clans clans;
     private final EffectManager effectManager;
     private final EnergyHandler energyHandler;
+    private final CooldownManager cooldownManager;
 
     @Inject
-    public ClansWorldListener(ClanManager clanManager, ClientManager clientManager, Clans clans, EffectManager effectManager, EnergyHandler energyHandler) {
+    public ClansWorldListener(ClanManager clanManager, ClientManager clientManager, Clans clans, EffectManager effectManager, EnergyHandler energyHandler, CooldownManager cooldownManager) {
         super(clanManager, clientManager);
         this.clans = clans;
         this.effectManager = effectManager;
         this.energyHandler = energyHandler;
+        this.cooldownManager = cooldownManager;
     }
 
     @EventHandler
-    public void onLogin(ClientJoinEvent event) {
-        Optional<Clan> clanOptional = clanManager.getClanByClient(event.getClient());
+    public void onLogin(PlayerJoinEvent event) {
+        Optional<Clan> clanOptional = clanManager.getClanByPlayer(event.getPlayer());
         clanOptional.ifPresent(clan -> clan.setOnline(true));
     }
 
@@ -163,12 +168,19 @@ public class ClansWorldListener extends ClanListener {
                 //}
 
                 if (clanManager.getPillageHandler().isPillaging(clan, locationClan)) {
-                    final TerritoryInteractEvent tie = new TerritoryInteractEvent(player, locationClan, block, Event.Result.DEFAULT, TerritoryInteractEvent.InteractionType.BREAK);
-                    tie.callEvent();
+                    final TerritoryInteractEvent tie = UtilServer.callEvent(new TerritoryInteractEvent(player, locationClan, block, Event.Result.DEFAULT, TerritoryInteractEvent.InteractionType.BREAK));
                     if (tie.getResult() == Event.Result.DENY) {
                         event.setCancelled(true);
                         return;
                     }
+
+                    if (block.getState() instanceof Container) {
+                        if (!cooldownManager.use(player, "Break Container", containerBreakCooldown, true)) {
+                            event.setCancelled(true);
+                            return;
+                        }
+                    }
+
                     clanManager.addInsurance(locationClan, block, InsuranceType.BREAK);
                     return;
                 }
@@ -382,16 +394,18 @@ public class ClansWorldListener extends ClanListener {
      * Stops players from breaking other clans bases with pistons on the outside
      */
     @EventHandler
-    public void onPistonEvent(BlockPistonExtendEvent event) {
-        for (Block block : event.getBlocks()) {
-            Optional<Clan> blockClanOptional = clanManager.getClanByLocation(block.getLocation());
-            Optional<Clan> locationClanOptional = clanManager.getClanByLocation(event.getBlock().getLocation());
+    public void onPlacePistonWilderness(BlockPlaceEvent event) {
+        if (event.isCancelled()) return;
+        if (!event.getBlock().getType().name().contains("PISTON")) return;
 
-            blockClanOptional.ifPresent(blockClan -> {
-                if (!blockClanOptional.equals(locationClanOptional)) {
-                    event.setCancelled(true);
-                }
-            });
+        if (clanManager.getClanByLocation(event.getBlock().getLocation()).isEmpty()) {
+            Client client = clientManager.search().online(event.getPlayer());
+            if (client.isAdministrating()) {
+                return;
+            }
+
+            event.setCancelled(true);
+            UtilMessage.simpleMessage(event.getPlayer(), "Restriction", "You cannot place pistons in the wilderness");
         }
     }
 
@@ -400,10 +414,10 @@ public class ClansWorldListener extends ClanListener {
      */
     @EventHandler
     public void onPistonEvent(BlockPistonRetractEvent event) {
+        Optional<Clan> locationClanOptional = clanManager.getClanByLocation(event.getBlock().getLocation());
+
         for (Block block : event.getBlocks()) {
             Optional<Clan> blockClanOptional = clanManager.getClanByLocation(block.getLocation());
-            Optional<Clan> locationClanOptional = clanManager.getClanByLocation(event.getBlock().getLocation());
-
             blockClanOptional.ifPresent(blockClan -> {
                 if (!blockClanOptional.equals(locationClanOptional)) {
                     event.setCancelled(true);
@@ -821,7 +835,7 @@ public class ClansWorldListener extends ClanListener {
 
     @EventHandler
     public void onBedDrop(ItemSpawnEvent event) {
-        if(event.getEntity().getItemStack().getType() == Material.RED_BED) {
+        if (event.getEntity().getItemStack().getType() == Material.RED_BED) {
             event.setCancelled(true);
         }
     }
