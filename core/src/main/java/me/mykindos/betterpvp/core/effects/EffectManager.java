@@ -75,6 +75,9 @@ public class EffectManager extends Manager<List<Effect>> {
         EffectReceiveEvent event = UtilServer.callEvent(new EffectReceiveEvent(target, effect));
         EffectType type = effect.getEffectType();
         if (!event.isCancelled()) {
+            if (target.isDead()) {
+                return;
+            }
 
             if (!type.canStack()) {
                 if (hasEffect(target, effect.getEffectType())) {
