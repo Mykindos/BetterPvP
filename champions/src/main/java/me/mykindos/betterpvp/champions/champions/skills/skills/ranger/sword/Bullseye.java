@@ -146,15 +146,14 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
             }
             // Spawn particles
             if (player == null) return;
+            Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
             if (playerBullsEyeData.getTargetFocused() != null && playerBullsEyeData.getTarget().isValid()) {
-                Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
                 if (player.getInventory().getItemInMainHand().getType().equals(Material.BOW) || (isHolding(player) && gamer.isHoldingRightClick())) {
                     playerBullsEyeData.spawnFocusingParticles();
                 }
             }
 
             // Check if they still are blocking and charge
-            Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
             if (isHolding(player) && gamer.isHoldingRightClick()) {
                 playerBullsEyeData.getCasterCharge().tick();
                 championsManager.getCooldowns().removeCooldown(player, getName(), true);
