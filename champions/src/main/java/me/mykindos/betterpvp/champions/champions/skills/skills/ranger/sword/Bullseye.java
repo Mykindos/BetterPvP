@@ -49,11 +49,11 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
 
     private double baseCurveDistance;
 
-    private double curveDistanceIncreasePerLevel;
+    private double bonusCurveDistanceIncreasePerLevel;
 
     private double baseBonusDamage;
 
-    private double bonusDamageIncreasePerLevel;
+    private double baseBonusDamageIncreasePerLevel;
 
     private double bonusCurveDistance;
 
@@ -97,11 +97,11 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
     }
 
     public double getCurveDistance(int level) {
-        return baseCurveDistance + ((level - 1) * curveDistanceIncreasePerLevel);
+        return baseCurveDistance + ((level - 1) * bonusCurveDistanceIncreasePerLevel);
     }
 
     public double getBonusDamage(int level) {
-        return baseBonusDamage + ((level - 1) * bonusDamageIncreasePerLevel);
+        return baseBonusDamage + ((level - 1) * baseBonusDamageIncreasePerLevel);
     }
 
     public double getBonusCurveDistance(int level) {
@@ -246,12 +246,12 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
 
     @Override
     public void loadSkillConfig() {
-        baseCurveDistance = getConfig("baseCurveDistance", 2.5, Double.class);
-        curveDistanceIncreasePerLevel = getConfig("curveDistanceIncreasePerLevel", 0.5, Double.class);
+        bonusCurveDistance = getConfig("bonusCurveDistance", 2.5, Double.class);
+        bonusCurveDistanceIncreasePerLevel = getConfig("bonusCurveDistanceIncreasePerLevel", 0.5, Double.class);
 
         baseBonusDamage = getConfig("baseBonusDamage", 2.0, Double.class);
-        bonusDamageIncreasePerLevel = getConfig("bonusDamageIncreasePerLevel", 1.0, Double.class);
+        baseBonusDamageIncreasePerLevel = getConfig("baseBonusDamageIncreasePerLevel", 1.0, Double.class);
 
-        bonusCurveDistance = getConfig("bonusCurveDistance", 0.5, Double.class);
+        baseCurveDistance = getConfig("baseCurveDistance", 0.5, Double.class);
     }
 }

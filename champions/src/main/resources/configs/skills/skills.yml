@@ -666,11 +666,11 @@ skills:
       maxlevel: 5
       cooldown: 9.0
       cooldownDecreasePerLevel: 0.5
-      baseCurveDistance: 2.5
-      curveDistanceIncreasePerLevel: 0.5
+      bonusCurveDistance: 2.5
+      bonusCurveDistanceIncreasePerLevel: 0.5
       baseBonusDamage: 2.0
-      bonusDamageIncreasePerLevel: 1.0
-      bonusCurveDistance: 0.5
+      baseBonusDamageIncreasePerLevel: 1.0
+      baseCurveDistance: 0.5
     wolfspounce:
       enabled: true
       maxlevel: 5
