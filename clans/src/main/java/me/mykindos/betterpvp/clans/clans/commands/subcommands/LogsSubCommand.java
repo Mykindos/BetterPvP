@@ -82,7 +82,9 @@ public class LogsSubCommand extends ClanSubCommand {
                 if (end > size) end = size;
                 for (CachedLog log : logs.subList(start, end)) {
                     if (count == numPerPage) break;
-                    UtilMessage.message(player, log.getTimeComponent().append(Component.text("- ")).append(LoggerFactory.getInstance().formatLog(log)));
+                    Component component = LoggerFactory.getInstance().formatLog(log);
+                    if (component == null) continue;
+                    UtilMessage.message(player, log.getTimeComponent().append(Component.text("- ")).append(component));
                     count++;
                 }
             }

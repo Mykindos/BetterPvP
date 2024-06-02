@@ -8,6 +8,8 @@ import me.mykindos.betterpvp.clans.clans.map.data.ExtraCursor;
 import me.mykindos.betterpvp.clans.clans.map.events.MinimapExtraCursorEvent;
 import me.mykindos.betterpvp.clans.clans.map.events.MinimapPlayerCursorEvent;
 import me.mykindos.betterpvp.clans.clans.pillage.PillageHandler;
+import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -22,12 +24,14 @@ import org.bukkit.map.MapCursor;
 public class MapCursorListener implements Listener {
 
     private final Clans clans;
+    private final ClientManager clientManager;
     private final ClanManager clanManager;
     private final PillageHandler pillageHandler;
 
     @Inject
-    public MapCursorListener(Clans clans, ClanManager clanManager, PillageHandler pillageHandler) {
+    public MapCursorListener(Clans clans, ClientManager clientManager, ClanManager clanManager, PillageHandler pillageHandler) {
         this.clans = clans;
+        this.clientManager = clientManager;
         this.clanManager = clanManager;
         this.pillageHandler = pillageHandler;
     }
@@ -36,6 +40,8 @@ public class MapCursorListener implements Listener {
     public void onCursor(MinimapExtraCursorEvent event) {
         Player player = event.getPlayer();
         Clan aClan = clanManager.getClanByPlayer(player).orElse(null);
+
+        Client client = clientManager.search().online(player);
 
         for (Player otherPlayer : Bukkit.getOnlinePlayers()) {
             if (otherPlayer.getWorld().equals(player.getWorld())) {
@@ -50,29 +56,32 @@ public class MapCursorListener implements Listener {
                 int x = otherPlayer.getLocation().getBlockX();
                 int z = otherPlayer.getLocation().getBlockZ();
 
-
-                Clan bClan = clanManager.getClanByPlayer(otherPlayer).orElse(null);
-
                 MinimapPlayerCursorEvent cursorEvent = null;
-                if (aClan == null) {
-                    if (player == otherPlayer) {
-                        cursorEvent = new MinimapPlayerCursorEvent(player, otherPlayer, true, MapCursor.Type.WHITE_POINTER);
-                    }
+                if(client.isAdministrating()) {
+                    cursorEvent = new MinimapPlayerCursorEvent(player, otherPlayer, true, MapCursor.Type.WHITE_POINTER);
                 } else {
-                    if (bClan != null) {
-                        if (aClan == bClan) {
-                            cursorEvent = new MinimapPlayerCursorEvent(player, otherPlayer, true, MapCursor.Type.BLUE_POINTER);
-                        } else if (aClan.isAllied(bClan)) {
-                            cursorEvent = new MinimapPlayerCursorEvent(player, otherPlayer, true, MapCursor.Type.GREEN_POINTER);
-                        } else if (pillageHandler.isPillaging(aClan, bClan) || pillageHandler.isPillaging(bClan, aClan)) {
-                            cursorEvent = new MinimapPlayerCursorEvent(player, otherPlayer, true, MapCursor.Type.RED_POINTER);
+                    Clan bClan = clanManager.getClanByPlayer(otherPlayer).orElse(null);
+
+                    if (aClan == null) {
+                        if (player == otherPlayer) {
+                            cursorEvent = new MinimapPlayerCursorEvent(player, otherPlayer, true, MapCursor.Type.WHITE_POINTER);
+                        }
+                    } else {
+                        if (bClan != null) {
+                            if (aClan == bClan) {
+                                cursorEvent = new MinimapPlayerCursorEvent(player, otherPlayer, true, MapCursor.Type.BLUE_POINTER);
+                            } else if (aClan.isAllied(bClan)) {
+                                cursorEvent = new MinimapPlayerCursorEvent(player, otherPlayer, true, MapCursor.Type.GREEN_POINTER);
+                            } else if (pillageHandler.isPillaging(aClan, bClan) || pillageHandler.isPillaging(bClan, aClan)) {
+                                cursorEvent = new MinimapPlayerCursorEvent(player, otherPlayer, true, MapCursor.Type.RED_POINTER);
+                            }
                         }
                     }
                 }
                 if (cursorEvent != null) {
                     Bukkit.getPluginManager().callEvent(cursorEvent);
                     event.getCursors().add(new ExtraCursor(x, z, (player == otherPlayer) || (cursorEvent.isDisplay()),
-                            cursorEvent.getType(), direction, otherPlayer.getWorld().getName(), false));
+                            cursorEvent.getType(), direction, otherPlayer.getWorld().getName(), true));
                 }
             }
         }

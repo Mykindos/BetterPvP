@@ -56,6 +56,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -128,6 +129,18 @@ public class ClanEventListener extends ClanListener {
         clanManager.getRepository().deleteClanTerritory(targetClan, chunkString);
         targetClan.getTerritory().removeIf(territory -> territory.getChunk().equals(UtilWorld.chunkToFile(chunk)));
 
+        if (targetClan.getHome() != null) {
+            if (targetClan.getHome().getChunk().equals(chunk)) {
+                Block block = targetClan.getHome().clone().subtract(0, 0.6, 0).getBlock();
+                if (block.getType() == Material.RED_BED) {
+                    block.setType(Material.AIR);
+                }
+                targetClan.setHome(null);
+
+                targetClan.messageClan("Your clan home was destroyed!", null, true);
+            }
+        }
+
         log.info("{} ({}) unclaimed {} from {} ({})", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
                         chunkToPrettyString, targetClan.getName(), targetClan.getId())
                 .setAction("CLAN_UNCLAIM").addClientContext(event.getPlayer()).addClanContext(targetClan).
@@ -150,8 +163,9 @@ public class ClanEventListener extends ClanListener {
         }
 
         clan.getMembers().add(new ClanMember(event.getPlayer().getUniqueId().toString(), ClanMember.MemberRank.LEADER));
+        event.getPlayer().setMetadata("clan", new FixedMetadataValue(clans, clan.getId()));
 
-        clanManager.addObject(clan.getName().toLowerCase(), clan);
+        clanManager.addObject(clan.getId().toString(), clan);
         clanManager.getRepository().save(clan);
         clanManager.getLeaderboard().forceUpdate();
 
@@ -160,10 +174,10 @@ public class ClanEventListener extends ClanListener {
         clan.saveProperty(ClanProperty.LAST_LOGIN, System.currentTimeMillis());
         clan.saveProperty(ClanProperty.POINTS, defaultValues.getDefaultPoints());
         clan.saveProperty(ClanProperty.ENERGY, defaultValues.getDefaultEnergy());
-        clan.saveProperty(ClanProperty.NO_DOMINANCE_COOLDOWN, (System.currentTimeMillis() + (3_600_000L * 24)));
         clan.saveProperty(ClanProperty.LAST_TNTED, 0L);
-        clan.saveProperty(ClanProperty.EXPERIENCE, 0L);
+        clan.saveProperty(ClanProperty.EXPERIENCE, 0d);
         clan.saveProperty(ClanProperty.BALANCE, 0);
+        clan.saveProperty(ClanProperty.NO_DOMINANCE_COOLDOWN, (System.currentTimeMillis() + (3_600_000L * 24)));
 
         UtilMessage.simpleMessage(event.getPlayer(), "Clans", "Successfully created clan <aqua>%s", clan.getName());
         if (clan.isAdmin()) {
@@ -206,13 +220,20 @@ public class ClanEventListener extends ClanListener {
             }
         }
 
+        event.getClan().getMembers().forEach(member -> {
+            Player player = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
+            if (player != null) {
+                player.removeMetadata("clan", clans);
+            }
+        });
+
         clan.getMembers().clear();
         clan.getTerritory().clear();
         clan.getEnemies().clear();
         clan.getAlliances().clear();
 
         clanManager.getRepository().delete(clan);
-        clanManager.getObjects().remove(clan.getName().toLowerCase());
+        clanManager.getObjects().remove(clan.getId().toString());
         clanManager.getLeaderboard().forceUpdate();
 
         log.info("{} ({}) disbanded {} ({})", event.getPlayer().getName(), event.getPlayer().getUniqueId(), clan.getName(), clan.getId())
@@ -275,6 +296,8 @@ public class ClanEventListener extends ClanListener {
         ClanMember member = new ClanMember(player.getUniqueId().toString(),
                 client.isAdministrating() ? ClanMember.MemberRank.LEADER : ClanMember.MemberRank.RECRUIT);
         clan.getMembers().add(member);
+        player.setMetadata("clan", new FixedMetadataValue(clans, clan.getId()));
+
         clanManager.getRepository().saveClanMember(clan, member);
 
 
@@ -286,8 +309,9 @@ public class ClanEventListener extends ClanListener {
         UtilMessage.simpleMessage(player, "Clans", "You joined <alt2>Clan " + clan.getName() + "</alt2>.");
 
         log.info("{} ({}) joined {} ({})", player.getName(), player.getUniqueId(), clan.getName(), clan.getId()).setAction("CLAN_JOIN")
-                .addContext("client", player.getUniqueId().toString()).addContext("clientName", player.getName())
-                .addContext("clan", clan.getId().toString()).addContext("clanName", clan.getName()).submit();
+                .addClientContext(player)
+                .addClanContext(clan)
+                .submit();
 
     }
 
@@ -306,6 +330,7 @@ public class ClanEventListener extends ClanListener {
             clan.getMembers().remove(clanMember);
 
             UtilMessage.simpleMessage(player, "Clans", "You left <alt2>Clan " + clan.getName() + "</alt2>.");
+            player.removeMetadata("clan", clans);
 
             boolean isOnline = false;
             for (ClanMember member : clan.getMembers()) {
@@ -345,8 +370,13 @@ public class ClanEventListener extends ClanListener {
             if (targetPlayer != null) {
                 UtilMessage.simpleMessage(targetPlayer, "Clans", "You were kicked from <alt2>" + clan.getName());
                 targetPlayer.closeInventory();
+
+
+                targetPlayer.removeMetadata("clan", clans);
+
             }
         }
+
         log.info("{} ({}) was kicked by {} ({}) from {} ({})", target.getName(), target.getUuid(),
                         player.getName(), player.getUniqueId(), clan.getName(), clan.getId()).
                 setAction("CLAN_KICK").addClientContext(player).addClientContext(target, true).addClanContext(clan).submit();
@@ -620,7 +650,9 @@ public class ClanEventListener extends ClanListener {
             }
         }
 
-        UtilBlock.placeBed(player.getLocation().toCenterLocation(), player.getFacing());
+        if (!clan.isAdmin()) {
+            UtilBlock.placeBed(player.getLocation().toCenterLocation(), player.getFacing());
+        }
 
         clan.setHome(player.getLocation().toCenterLocation().add(0, 0.6, 0));
         UtilMessage.simpleMessage(player, "Clans", "You set the clan home to <yellow>%s<gray>.",

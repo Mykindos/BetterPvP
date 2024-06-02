@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.clans.clans.leaderboard;
 
+import com.google.inject.Inject;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
@@ -37,6 +38,7 @@ public class ClanLeaderboard extends Leaderboard<UUID, Clan> implements Sorted {
 
     private final ClanManager clanManager;
 
+    @Inject
     public ClanLeaderboard(Clans clans, ClanManager clanManager) {
         super(clans);
         this.clanManager = clanManager;

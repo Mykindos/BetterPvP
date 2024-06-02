@@ -99,4 +99,8 @@ public abstract class ActiveToggleSkill extends Skill implements ToggleSkill, Li
 
     public abstract void toggleActive(Player player);
 
+    public float getEnergyStartCost(int level) {
+        return (float) (energyStartCost - ((level - 1) * energyStartCostDecreasePerLevel));
+    }
+
 }

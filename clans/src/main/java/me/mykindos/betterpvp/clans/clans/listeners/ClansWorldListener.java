@@ -6,14 +6,17 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
+import me.mykindos.betterpvp.clans.clans.events.ChunkClaimEvent;
+import me.mykindos.betterpvp.clans.clans.events.ChunkUnclaimEvent;
 import me.mykindos.betterpvp.clans.clans.events.TerritoryInteractEvent;
 import me.mykindos.betterpvp.clans.clans.insurance.InsuranceType;
+import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
 import me.mykindos.betterpvp.core.client.Client;
-import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.config.Config;
+import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.energy.EnergyHandler;
@@ -26,12 +29,14 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
+import me.mykindos.betterpvp.core.utilities.model.data.CustomDataType;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.Container;
+import org.bukkit.block.data.Openable;
 import org.bukkit.block.data.type.Gate;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
@@ -44,10 +49,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
@@ -58,8 +63,10 @@ import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
 import java.util.Optional;
@@ -73,22 +80,28 @@ public class ClansWorldListener extends ClanListener {
     @Config(path = "clans.claims.allow-gravity-blocks", defaultValue = "true")
     private boolean allowGravityBlocks;
 
+    @Inject
+    @Config(path = "clans.pillage.container-break-cooldown", defaultValue = "30.0")
+    private double containerBreakCooldown;
+
 
     private final Clans clans;
     private final EffectManager effectManager;
     private final EnergyHandler energyHandler;
+    private final CooldownManager cooldownManager;
 
     @Inject
-    public ClansWorldListener(ClanManager clanManager, ClientManager clientManager, Clans clans, EffectManager effectManager, EnergyHandler energyHandler) {
+    public ClansWorldListener(ClanManager clanManager, ClientManager clientManager, Clans clans, EffectManager effectManager, EnergyHandler energyHandler, CooldownManager cooldownManager) {
         super(clanManager, clientManager);
         this.clans = clans;
         this.effectManager = effectManager;
         this.energyHandler = energyHandler;
+        this.cooldownManager = cooldownManager;
     }
 
     @EventHandler
-    public void onLogin(ClientJoinEvent event) {
-        Optional<Clan> clanOptional = clanManager.getClanByClient(event.getClient());
+    public void onLogin(PlayerJoinEvent event) {
+        Optional<Clan> clanOptional = clanManager.getClanByPlayer(event.getPlayer());
         clanOptional.ifPresent(clan -> clan.setOnline(true));
     }
 
@@ -155,12 +168,19 @@ public class ClansWorldListener extends ClanListener {
                 //}
 
                 if (clanManager.getPillageHandler().isPillaging(clan, locationClan)) {
-                    final TerritoryInteractEvent tie = new TerritoryInteractEvent(player, locationClan, block, Event.Result.DEFAULT, TerritoryInteractEvent.InteractionType.BREAK);
-                    tie.callEvent();
+                    final TerritoryInteractEvent tie = UtilServer.callEvent(new TerritoryInteractEvent(player, locationClan, block, Event.Result.DEFAULT, TerritoryInteractEvent.InteractionType.BREAK));
                     if (tie.getResult() == Event.Result.DENY) {
                         event.setCancelled(true);
                         return;
                     }
+
+                    if (block.getState() instanceof Container) {
+                        if (!cooldownManager.use(player, "Break Container", containerBreakCooldown, true)) {
+                            event.setCancelled(true);
+                            return;
+                        }
+                    }
+
                     clanManager.addInsurance(locationClan, block, InsuranceType.BREAK);
                     return;
                 }
@@ -309,7 +329,7 @@ public class ClansWorldListener extends ClanListener {
 
                 if (locationClan.isAdmin() && material == Material.ENCHANTING_TABLE) return;
                 if (material == Material.REDSTONE_ORE || material == Material.DEEPSLATE_REDSTONE_ORE) return;
-                if (relation == ClanRelation.ALLY_TRUST && material.isInteractable()) {
+                if (relation == ClanRelation.ALLY_TRUST && block.getBlockData() instanceof Openable) {
                     final TerritoryInteractEvent tie = new TerritoryInteractEvent(player, locationClan, block, Event.Result.DEFAULT, TerritoryInteractEvent.InteractionType.INTERACT);
                     tie.callEvent();
                     if (tie.getResult() == Event.Result.DENY) {
@@ -374,16 +394,18 @@ public class ClansWorldListener extends ClanListener {
      * Stops players from breaking other clans bases with pistons on the outside
      */
     @EventHandler
-    public void onPistonEvent(BlockPistonExtendEvent event) {
-        for (Block block : event.getBlocks()) {
-            Optional<Clan> blockClanOptional = clanManager.getClanByLocation(block.getLocation());
-            Optional<Clan> locationClanOptional = clanManager.getClanByLocation(event.getBlock().getLocation());
+    public void onPlacePistonWilderness(BlockPlaceEvent event) {
+        if (event.isCancelled()) return;
+        if (!event.getBlock().getType().name().contains("PISTON")) return;
 
-            blockClanOptional.ifPresent(blockClan -> {
-                if (!blockClanOptional.equals(locationClanOptional)) {
-                    event.setCancelled(true);
-                }
-            });
+        if (clanManager.getClanByLocation(event.getBlock().getLocation()).isEmpty()) {
+            Client client = clientManager.search().online(event.getPlayer());
+            if (client.isAdministrating()) {
+                return;
+            }
+
+            event.setCancelled(true);
+            UtilMessage.simpleMessage(event.getPlayer(), "Restriction", "You cannot place pistons in the wilderness");
         }
     }
 
@@ -392,10 +414,10 @@ public class ClansWorldListener extends ClanListener {
      */
     @EventHandler
     public void onPistonEvent(BlockPistonRetractEvent event) {
+        Optional<Clan> locationClanOptional = clanManager.getClanByLocation(event.getBlock().getLocation());
+
         for (Block block : event.getBlocks()) {
             Optional<Clan> blockClanOptional = clanManager.getClanByLocation(block.getLocation());
-            Optional<Clan> locationClanOptional = clanManager.getClanByLocation(event.getBlock().getLocation());
-
             blockClanOptional.ifPresent(blockClan -> {
                 if (!blockClanOptional.equals(locationClanOptional)) {
                     event.setCancelled(true);
@@ -664,6 +686,32 @@ public class ClansWorldListener extends ClanListener {
         });
     }
 
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onChunkClaim(ChunkClaimEvent event) {
+        event.getChunk().getPersistentDataContainer().set(ClansNamespacedKeys.CLAN,
+                CustomDataType.UUID,
+                event.getClan().getId());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onChunkUnclaim(ChunkUnclaimEvent event) {
+        event.getChunk().getPersistentDataContainer().remove(ClansNamespacedKeys.CLAN);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void onJoin(PlayerJoinEvent event) {
+        clanManager.expensiveGetClanByPlayer(event.getPlayer()).ifPresentOrElse(clan -> {
+            event.getPlayer().setMetadata("clan", new FixedMetadataValue(clans, clan.getId()));
+        }, () -> {
+            event.getPlayer().removeMetadata("clan", clans);
+        });
+    }
+
+    @EventHandler
+    public void onQuit(PlayerQuitEvent event) {
+        event.getPlayer().removeMetadata("clan", clans);
+    }
+
     @UpdateEvent(delay = 250)
     public void checkGamemode() {
         for (Player player : Bukkit.getOnlinePlayers()) {
@@ -787,8 +835,18 @@ public class ClansWorldListener extends ClanListener {
 
     @EventHandler
     public void onBedDrop(ItemSpawnEvent event) {
-        if(event.getEntity().getItemStack().getType() == Material.RED_BED) {
+        if (event.getEntity().getItemStack().getType() == Material.RED_BED) {
             event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onMobSpawnInClaim(CreatureSpawnEvent event) {
+        if (event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.NATURAL) {
+            Optional<Clan> clanOptional = clanManager.getClanByLocation(event.getLocation());
+            if (clanOptional.isPresent()) {
+                event.setCancelled(true);
+            }
         }
     }
 }

@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.shops.Shops;
 import me.mykindos.betterpvp.shops.commands.loader.ShopsCommandLoader;
 import me.mykindos.betterpvp.shops.listener.ShopsListenerLoader;
+import me.mykindos.betterpvp.shops.shops.ShopManager;
 import me.mykindos.betterpvp.shops.shops.shopkeepers.ShopkeeperManager;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -97,6 +98,9 @@ public class ShopsCommand extends Command implements IConsoleCommand {
         @Inject
         private ShopkeeperManager shopkeeperManager;
 
+        @Inject
+        private ShopManager shopManager;
+
 
         @Override
         public String getName() {
@@ -117,6 +121,7 @@ public class ShopsCommand extends Command implements IConsoleCommand {
         public void execute(CommandSender sender, String[] args) {
             shops.reload();
 
+            shopManager.loadShopItems();
             commandLoader.reload(shops.getClass().getPackageName());
             shopkeeperManager.loadShopsFromConfig();
 

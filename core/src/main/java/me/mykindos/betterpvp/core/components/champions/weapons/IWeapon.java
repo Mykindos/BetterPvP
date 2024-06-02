@@ -28,4 +28,8 @@ public interface IWeapon {
 
     default void onInitialize(ItemMeta meta) {};
 
+    default boolean preventPlace() {
+        return false;
+    }
+
 }

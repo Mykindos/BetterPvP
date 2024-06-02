@@ -11,7 +11,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.ItemFlag;
 import org.jetbrains.annotations.NotNull;
 import xyz.xenondevs.invui.item.ItemProvider;
 import xyz.xenondevs.invui.item.impl.AbstractItem;
@@ -29,9 +28,7 @@ public class TerritoryButton extends AbstractItem {
 
     @Override
     public ItemProvider getItemProvider() {
-        final ItemView.ItemViewBuilder builder = ItemView.builder()
-                .material(Material.CREEPER_BANNER_PATTERN)
-                .flag(ItemFlag.HIDE_ITEM_SPECIFICS)
+        final ItemView.ItemViewBuilder builder = ItemView.builder().material(Material.PAPER).customModelData(3)
                 .displayName(Component.text("Territory", NamedTextColor.DARK_GREEN))
                 .lore(UtilMessage.deserialize("<white>%d</white>/%d claimed", clan.getTerritory().size(), Math.min(clan.getMembers().size() + 3, 9)))
                 .frameLore(true);

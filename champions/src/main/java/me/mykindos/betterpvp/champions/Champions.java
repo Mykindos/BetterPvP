@@ -6,7 +6,8 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
-import me.mykindos.betterpvp.champions.champions.skills.SkillManager;
+import me.mykindos.betterpvp.champions.champions.leaderboards.ChampionsLeaderboardLoader;
+import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
 import me.mykindos.betterpvp.champions.champions.skills.injector.SkillInjectorModule;
 import me.mykindos.betterpvp.champions.commands.ChampionsCommandLoader;
 import me.mykindos.betterpvp.champions.injector.ChampionsInjectorModule;
@@ -75,7 +76,7 @@ public class Champions extends BPvPPlugin {
             var championsCommandLoader = injector.getInstance(ChampionsCommandLoader.class);
             championsCommandLoader.loadCommands(PACKAGE);
 
-            var skillManager = injector.getInstance(SkillManager.class);
+            var skillManager = injector.getInstance(ChampionsSkillManager.class);
             skillManager.loadSkills();
 
             var itemHandler = injector.getInstance(ItemHandler.class);
@@ -89,6 +90,9 @@ public class Champions extends BPvPPlugin {
 
             var uuidManager = injector.getInstance(UUIDManager.class);
             uuidManager.loadObjectsFromNamespace("champions");
+
+            var leaderboardLoader = injector.getInstance(ChampionsLeaderboardLoader.class);
+            leaderboardLoader.registerLeaderboards(PACKAGE);
 
             updateEventExecutor.loadPlugin(this);
 

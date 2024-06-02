@@ -40,8 +40,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.WeakHashMap;
 
 @Singleton
@@ -171,9 +174,9 @@ public class Wreath extends Skill implements InteractSkill, Listener {
         final Vector vector = player.getLocation().clone().getDirection().normalize().multiply(1);
         vector.setY(0);
         final Location loc = player.getLocation().subtract(0, 1, 0).add(vector);
+        final Set<LivingEntity> targets = new HashSet<>();
 
         final BukkitTask runnable = new BukkitRunnable() {
-
             @Override
             public void run() {
                 loc.add(vector);
@@ -204,20 +207,23 @@ public class Wreath extends Skill implements InteractSkill, Listener {
                 }
 
                 EvokerFangs fangs = (EvokerFangs) player.getWorld().spawnEntity(loc, EntityType.EVOKER_FANGS);
-                for (LivingEntity target : UtilEntity.getNearbyEnemies(player, fangs.getLocation(), 1.5)) {
+                final List<LivingEntity> hit = UtilEntity.getNearbyEnemies(player, fangs.getLocation(), 1.5);
+                for (LivingEntity target : hit) {
+                    if (targets.contains(target)) {
+                        continue;
+                    }
+
                     CustomDamageEvent dmg = new CustomDamageEvent(target, player, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, getName());
                     UtilDamage.doCustomDamage(dmg);
                     championsManager.getEffects().addEffect(target, player, EffectTypes.SLOWNESS, slowStrength, (long) (getSlowDuration(level) * 1000));
                     UtilPlayer.health(player, getHealthPerEnemyHit(level));
                 }
+                targets.addAll(hit);
 
             }
 
         }.runTaskTimer(champions, 0, 1);
-
         UtilServer.runTaskLater(champions, runnable::cancel, 60);
-
-
     }
 
     @UpdateEvent(delay = 100)

@@ -3,7 +3,7 @@ package me.mykindos.betterpvp.champions.champions.builds.menus.buttons;
 import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.menus.BuildMenu;
-import me.mykindos.betterpvp.champions.champions.skills.SkillManager;
+import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
 import me.mykindos.betterpvp.core.combat.armour.ArmourManager;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.menu.Windowed;
@@ -25,10 +25,10 @@ public class ClassSelectionButton extends SimpleItem {
 
     private final BuildManager buildManager;
     private final Role role;
-    private final SkillManager skillManager;
+    private final ChampionsSkillManager skillManager;
     private final Windowed parent;
 
-    public ClassSelectionButton(BuildManager buildManager, SkillManager skillManager, Role role, ArmourManager armorManager, Windowed parent) {
+    public ClassSelectionButton(BuildManager buildManager, ChampionsSkillManager skillManager, Role role, ArmourManager armorManager, Windowed parent) {
         super(ItemView.builder().material(role.getChestplate())
                 .displayName(Component.text(role.getName(), role.getColor(), TextDecoration.BOLD))
                 .lore(List.of(UtilMessage.deserialize("Class Damage Reduction: <yellow>" + armorManager.getReductionForArmourSet(role.getChestplate().name().replace("_CHESTPLATE", "")) + "%"),

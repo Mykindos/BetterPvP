@@ -65,6 +65,10 @@ public class ItemHandler {
         items.forEach(item -> itemMap.put(item.getIdentifier(), item));
     }
 
+    public ItemStack updateNames(ItemStack itemStack) {
+        return updateNames(itemStack, true);
+    }
+
     /**
      * General method that updates the name of almost every item that is picked up by players
      * E.g. Names leather armour after assassins
@@ -73,7 +77,7 @@ public class ItemHandler {
      * @param itemStack ItemStack to update
      * @return An ItemStack with an updated name
      */
-    public ItemStack updateNames(ItemStack itemStack) {
+    public ItemStack updateNames(ItemStack itemStack, boolean giveUUID) {
         Material material = itemStack.getType();
         if (material == Material.AIR) {
             return itemStack;
@@ -99,7 +103,7 @@ public class ItemHandler {
 
             PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
 
-            if (item.isGiveUUID()) {
+            if (item.isGiveUUID() && giveUUID) {
                 if (!dataContainer.has(CoreNamespaceKeys.UUID_KEY)) {
                     UUID newUuid = UUID.randomUUID();
                     dataContainer.set(CoreNamespaceKeys.UUID_KEY, PersistentDataType.STRING, newUuid.toString());

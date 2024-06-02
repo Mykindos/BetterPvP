@@ -7,10 +7,12 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.shops.shops.events.ShopKeeperSpawnEvent;
 import me.mykindos.betterpvp.shops.shops.shopkeepers.ShopkeeperManager;
 import me.mykindos.betterpvp.shops.shops.shopkeepers.types.IShopkeeper;
+import me.mykindos.betterpvp.shops.shops.utilities.ShopsNamespacedKeys;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.persistence.PersistentDataType;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -32,6 +34,8 @@ public class MythicMobShopkeeperListener implements Listener {
         String mythicMob = event.getShopkeeperType();
 
         ActiveMob activeMob = MythicBukkit.inst().getMobManager().spawnMob(mythicMob, event.getLocation());
+
+        activeMob.getEntity().getBukkitEntity().getPersistentDataContainer().set(ShopsNamespacedKeys.SHOPKEEPER,  PersistentDataType.BOOLEAN,true);
         shopkeeperManager.addObject(activeMob.getEntity().getUniqueId(), new IShopkeeper() {
             @Override
             public Entity getEntity() {
@@ -44,4 +48,6 @@ public class MythicMobShopkeeperListener implements Listener {
             }
         });
     }
+
+
 }

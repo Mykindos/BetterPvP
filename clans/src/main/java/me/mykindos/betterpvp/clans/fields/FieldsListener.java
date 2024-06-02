@@ -11,11 +11,15 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.events.ClientAdministrateEvent;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.components.clans.events.ClanAddExperienceEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerCaughtFishEvent;
+import me.mykindos.betterpvp.progression.profession.fishing.fish.Fish;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.block.Block;
@@ -70,7 +74,7 @@ public class FieldsListener extends ClanListener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onAdminBreak(BlockBreakEvent event) {
-         processBlockEvent(event.getPlayer(), event, event.getBlock());
+        processBlockEvent(event.getPlayer(), event, event.getBlock());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -78,7 +82,7 @@ public class FieldsListener extends ClanListener {
         processBlockEvent(event.getPlayer(), event, event.getBlockPlaced());
     }
 
-    @EventHandler (priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onOreMine(TerritoryInteractEvent event) {
         if (event.getResult() != TerritoryInteractEvent.Result.DENY) {
             return; // If they're allowed to edit the claim, this means we should not interfere with that
@@ -110,6 +114,7 @@ public class FieldsListener extends ClanListener {
             UtilServer.callEvent(new FieldsInteractableUseEvent(fields, type, block, event.getPlayer()));
             event.getBlock().setType(type.getReplacement().getMaterial()); // Then replace the block
             event.getBlock().setBlockData(type.getReplacement());
+            UtilServer.callEvent(new ClanAddExperienceEvent(event.getPlayer(), 0.1));
         }
     }
 
@@ -171,6 +176,20 @@ public class FieldsListener extends ClanListener {
                     block.setBlockData(type.getType());
                     interactable.setActive(true);
                 });
+    }
+
+    @EventHandler (priority = EventPriority.HIGHEST)
+    public void onCatchFish(PlayerCaughtFishEvent event) {
+        if(!(event.getLoot() instanceof Fish fish)) return;
+        if (!isFields(event.getHook().getLocation().getBlock())) {
+
+            fish.setWeight((int) (fish.getWeight() * 0.50));
+            if(UtilMath.randomInt(10) < 2) {
+                UtilMessage.simpleMessage(event.getPlayer(), "Fishing", "Fish caught outside of Fields are half their normal size.");
+            }
+        } else {
+            UtilServer.callEvent(new ClanAddExperienceEvent(event.getPlayer(), 0.1));
+        }
     }
 
 }

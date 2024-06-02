@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.items.uuiditem.UUIDItem;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -85,6 +86,12 @@ public class PendingLog {
     public PendingLog addBlockContext(Block block) {
         context.put(LogContext.BLOCK, block.getType().name());
         context.put(LogContext.LOCATION, UtilWorld.locationToString(block.getLocation(), true, true));
+        return this;
+    }
+
+    public PendingLog addBlockContext(BlockState blockState) {
+        context.put(LogContext.BLOCK, blockState.getType().name());
+        context.put(LogContext.LOCATION, UtilWorld.locationToString(blockState.getLocation(), true, true));
         return this;
     }
 
