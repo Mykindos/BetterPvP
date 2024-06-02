@@ -96,6 +96,7 @@ public class ClientCommand extends Command {
                 // Todo: prettify and populate
                 List<Component> result = new ArrayList<>();
                 result.add(UtilMessage.deserialize("<alt2>%s</alt2> Client Details", target.getName()));
+
                 result.forEach(message -> UtilMessage.message(player, message));
             }, () -> UtilMessage.message(player, "Command", "Could not find a client with this name")));
         }

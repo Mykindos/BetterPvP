@@ -452,9 +452,10 @@ public class ClanManager extends Manager<Clan> {
         // If the killed players clan has no dominance on the killer players clan, then give dominance to the killer
         if (killedEnemy.getDominance() == 0) {
             killerEnemy.addDominance(dominance);
-            UtilServer.callEvent(new ClanDominanceChangeEvent(null, killer));
         }
         killedEnemy.takeDominance(dominance);
+
+        UtilServer.callEvent(new ClanDominanceChangeEvent(null, killer));
         UtilServer.callEvent(new ClanDominanceChangeEvent(null, killed));
 
         killed.messageClan("You lost <red>" + dominance + "%<gray> dominance to <red>" + killer.getName(), null, true);
