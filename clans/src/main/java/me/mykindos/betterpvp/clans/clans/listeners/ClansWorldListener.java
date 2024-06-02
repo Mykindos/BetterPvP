@@ -686,7 +686,6 @@ public class ClansWorldListener extends ClanListener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onJoin(PlayerJoinEvent event) {
-        System.out.println(event.getPlayer().hasMetadata("clan"));
         clanManager.expensiveGetClanByPlayer(event.getPlayer()).ifPresentOrElse(clan -> {
             event.getPlayer().setMetadata("clan", new FixedMetadataValue(clans, clan.getId()));
         }, () -> {
@@ -696,7 +695,7 @@ public class ClansWorldListener extends ClanListener {
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
-        //event.getPlayer().removeMetadata("clan", clans);
+        event.getPlayer().removeMetadata("clan", clans);
     }
 
     @UpdateEvent(delay = 250)
