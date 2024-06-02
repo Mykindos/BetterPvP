@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.combat.weapon.listeners;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.combat.click.events.RightClickEndEvent;
 import me.mykindos.betterpvp.core.combat.click.events.RightClickEvent;
 import me.mykindos.betterpvp.core.combat.combatlog.events.PlayerCombatLogEvent;
@@ -51,6 +52,7 @@ import java.util.UUID;
 
 @Singleton
 @BPvPListener
+@CustomLog
 public class WeaponListener implements Listener {
 
     private final WeaponManager weaponManager;
@@ -221,8 +223,11 @@ public class WeaponListener implements Listener {
 
                 UtilMessage.broadcast(Component.text("A ", NamedTextColor.YELLOW).append(weapon.getName().hoverEvent(itemStack))
                         .append(Component.text(" was caught by a fisherman!", NamedTextColor.YELLOW)));
+                log.info("A legendary weapon was caught by a fisherman! ({})", weapon.getName())
+                        .addLocationContext(event.getItem().getLocation())
+                        .addContext("Source", event.getSource()).submit();
 
-                for(Player player : Bukkit.getOnlinePlayers()) {
+                for (Player player : Bukkit.getOnlinePlayers()) {
                     UtilSound.playSound(player, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 1.0f, 1.0f, false);
                 }
 
@@ -231,6 +236,9 @@ public class WeaponListener implements Listener {
                 UtilMessage.broadcast(Component.text(event.getSource(), NamedTextColor.RED)
                         .append(Component.text(" dropped a legendary ", NamedTextColor.GRAY))
                         .append(weapon.getName().hoverEvent(itemStack)));
+                log.info("A legendary weapon was dropped by {}! ({})", event.getSource(), weapon.getName())
+                        .addLocationContext(event.getItem().getLocation())
+                        .addContext("Source", event.getSource()).submit();
             }
         }
     }
