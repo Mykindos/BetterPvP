@@ -281,6 +281,10 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
         return ClanRelation.NEUTRAL;
     }
 
+    public boolean isChunkOwnedByClan(String chunkString) {
+        return getTerritory().stream().anyMatch(claim -> claim.getChunk().equalsIgnoreCase(chunkString));
+    }
+
     @Override
     public boolean equals(Object other) {
         if (other instanceof Clan otherClan) {
