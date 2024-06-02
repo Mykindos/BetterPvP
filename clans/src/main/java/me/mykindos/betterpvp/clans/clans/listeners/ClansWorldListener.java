@@ -684,7 +684,7 @@ public class ClansWorldListener extends ClanListener {
         event.getChunk().getPersistentDataContainer().remove(ClansNamespacedKeys.CLAN);
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onJoin(PlayerJoinEvent event) {
         clanManager.expensiveGetClanByPlayer(event.getPlayer()).ifPresentOrElse(clan -> {
             event.getPlayer().setMetadata("clan", new FixedMetadataValue(clans, clan.getId()));
