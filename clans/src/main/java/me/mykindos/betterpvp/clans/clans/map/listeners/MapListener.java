@@ -287,8 +287,7 @@ public class MapListener implements Listener {
                 for (int i = 0; i < 4; i++) {
                     BlockFace blockFace = BlockFace.values()[i];
                     String targetChunkString = "world/ " + (chunkX + blockFace.getModX()) + "/ " + (chunkZ + blockFace.getModZ());
-                    Clan other = clanManager.getClanByChunkString(targetChunkString).orElse(null);
-                    if (chunkData.getClan().equals(other)) {
+                    if (clan.isChunkOwnedByClan(targetChunkString)) {
                         chunkData.getBlockFaceSet().add(blockFace);
                     }
                 }
