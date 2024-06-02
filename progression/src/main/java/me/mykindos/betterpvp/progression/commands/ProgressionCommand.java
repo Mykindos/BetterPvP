@@ -9,9 +9,12 @@ import me.mykindos.betterpvp.core.command.IConsoleCommand;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.progression.Progression;
-import me.mykindos.betterpvp.progression.ProgressionsManager;
 import me.mykindos.betterpvp.progression.commands.loader.ProgressionCommandLoader;
 import me.mykindos.betterpvp.progression.listener.ProgressionListenerLoader;
+import me.mykindos.betterpvp.progression.profession.fishing.FishingHandler;
+import me.mykindos.betterpvp.progression.profession.mining.MiningHandler;
+import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillManager;
+import me.mykindos.betterpvp.progression.weapons.ProgressionWeaponManager;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -39,11 +42,6 @@ public class ProgressionCommand extends Command implements IConsoleCommand {
     public void execute(CommandSender sender, String[] args) {}
 
     @Override
-    public boolean informInsufficientRank() {
-        return true;
-    }
-
-    @Override
     public Rank getRequiredRank() {
         return Rank.ADMIN;
     }
@@ -62,7 +60,16 @@ public class ProgressionCommand extends Command implements IConsoleCommand {
         private ProgressionListenerLoader listenerLoader;
 
         @Inject
-        private ProgressionsManager progressionsManager;
+        private ProgressionSkillManager progressionSkillManager;
+
+        @Inject
+        private ProgressionWeaponManager progressionWeaponManager;
+
+        @Inject
+        private FishingHandler fishingHandler;
+
+        @Inject
+        private MiningHandler miningHandler;
 
         @Override
         public String getName() {
@@ -84,7 +91,10 @@ public class ProgressionCommand extends Command implements IConsoleCommand {
             progression.reload();
 
             commandLoader.reload(progression.getClass().getPackageName());
-            progressionsManager.loadTrees();
+            progressionSkillManager.reloadSkills();
+            fishingHandler.loadConfig();
+            miningHandler.loadConfig();
+            progressionWeaponManager.reload();
 
             UtilMessage.message(sender, "Progression", "Successfully reloaded progression");
         }

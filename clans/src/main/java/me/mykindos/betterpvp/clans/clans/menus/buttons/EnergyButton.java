@@ -34,7 +34,8 @@ public class EnergyButton extends AbstractItem {
                 .append(Component.text(NumberFormat.getInstance().format(clan.getEnergy()), NamedTextColor.YELLOW));
 
         final ItemView.ItemViewBuilder builder = ItemView.builder()
-                .material(Material.NETHER_STAR)
+                .material(Material.PAPER)
+                .customModelData(4)
                 .displayName(Component.text("Energy", NamedTextColor.YELLOW))
                 .frameLore(true)
                 .lore(currentEnergy);

@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.core.components.champions.events;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import me.mykindos.betterpvp.core.components.champions.ISkill;
+import me.mykindos.betterpvp.core.components.champions.IChampionsSkill;
 import me.mykindos.betterpvp.core.framework.events.CustomCancellableEvent;
 import org.bukkit.entity.Player;
 
@@ -11,5 +11,5 @@ import org.bukkit.entity.Player;
 public class PlayerCanUseSkillEvent extends CustomCancellableEvent {
 
     private final Player player;
-    private final ISkill skill;
+    private final IChampionsSkill skill;
 }

@@ -163,8 +163,14 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener {
             reappear(player);
         }
         if (event.getDamagee() instanceof Player player && smoked.containsKey(player.getUniqueId())) {
-            smoked.remove(player.getUniqueId());
-            reappear(player);
+            if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
+                // While smoke bombed, cancel melee damage from enemies
+                event.setCancelled(true);
+            } else {
+                smoked.remove(player.getUniqueId());
+                reappear(player);
+            }
+
         }
     }
 
@@ -205,6 +211,7 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener {
 
     }
 
+    @Override
     public void loadSkillConfig() {
         baseDuration = getConfig("baseDuration", 3.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);

@@ -15,7 +15,7 @@ clans:
     protectionBaseTimeInMinutes: 5.0
     regenerationTimeInMinutes: 5.0
   map:
-    enabled: false
+    enabled: true
     maxMapDistance: 640
     maxProcess: 64
     update-interval: 1
@@ -37,11 +37,11 @@ clans:
       - WATER
       - ICE
       - LAVA
-      - RED_BED
   pillage:
     duration: 15
     noDominanceCooldown: 4
     enabled: true
+    protection: true
   bank:
     interestIntervalDeviation: 6
     interestIntervalInHours: 24
@@ -55,6 +55,10 @@ clans:
     energyWarnLevel: 1.0
   dominance:
     enabled: true
+  farming:
+    baseY: 60
+    allowOfflineGrowing: false
+    baseFarmingLevels: 5
 server:
   sidebar:
     title: BetterPvP
@@ -223,15 +227,15 @@ fields:
       respawn: 60.0
     quartzore:
       respawn: 60.0
-      min: 0
+      min: 1
       max: 5
     condensedemeraldore:
       respawn: 60.0
-      min: 0
+      min: 1
       max: 2
     ironore:
       respawn: 60.0
-      min: 0
+      min: 1
       max: 3
     lootchest:
       respawn: 60.0
@@ -239,66 +243,66 @@ fields:
       drops: {}
     coalore:
       respawn: 60.0
-      min: 0
+      min: 1
       max: 4
     condensedleatherore:
       respawn: 60.0
-      min: 0
+      min: 1
       max: 3
     diamondore:
       respawn: 60.0
-      min: 0
+      min: 1
       max: 3
     leatherore:
       respawn: 60.0
-      min: 0
+      min: 1
+      max: 3
+    gildedblackstone:
+      respawn: 60.0
+      min: 1
       max: 3
     emeraldore:
       respawn: 60.0
-      min: 0
+      min: 1
       max: 2
     lapisore:
       respawn: 60.0
-      min: 0
+      min: 1
       max: 5
     condensedgoldore:
       respawn: 60.0
-      min: 0
+      min: 1
       max: 3
     goldore:
       respawn: 60.0
-      min: 0
+      min: 1
       max: 3
     condensedironore:
       respawn: 60.0
-      min: 0
+      min: 1
       max: 3
     condensedcoalore:
       respawn: 60.0
-      min: 0
+      min: 1
       max: 4
     condensedlapisore:
       respawn: 60.0
-      min: 0
+      min: 1
       max: 5
     condensedredstoneore:
       respawn: 60.0
-      min: 0
+      min: 1
       max: 1
     redstoneore:
       respawn: 60.0
-      min: 0
-      max: 1
+      min: 1
+      max: 2
     condenseddiamondore:
       respawn: 60.0
-      min: 0
+      min: 1
       max: 3
   playerCountSpeeds: {}
   fieldsXpMultiplier: 5.0
-fishing:
-  base-fishing-perk:
-    level: 500
-    enabled: true
 tips:
   clanhome:
     enabled: true

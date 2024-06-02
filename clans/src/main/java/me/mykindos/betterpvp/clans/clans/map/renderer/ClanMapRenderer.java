@@ -65,7 +65,7 @@ public class ClanMapRenderer extends MapRenderer {
             }
         }
 
-        if (s == MapSettings.Scale.FAR) {
+        if (s == MapSettings.Scale.FARTHEST) {
             centerX = 0;
             centerZ = 0;
         }

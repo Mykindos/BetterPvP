@@ -24,8 +24,7 @@ public class LeaveClanButton extends AbstractItem {
     public ItemProvider getItemProvider() {
         final ItemView.ItemViewBuilder provider = ItemView.builder()
                 .material(Material.PAPER)
-                .customModelData(10003)
-                .fallbackMaterial(Material.RED_CONCRETE)
+                .customModelData(5)
                 .displayName(Component.text("Leave", NamedTextColor.RED))
                 .action(ClickActions.ALL, Component.text("Leave Clan"));
         if (leader) {

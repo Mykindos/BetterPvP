@@ -559,4 +559,5 @@ public class UtilBlock {
             block = block.getRelative(facing);
         }
     }
+
 }

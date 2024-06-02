@@ -127,7 +127,8 @@ public class ItemView implements ItemProvider {
         }
 
         if (customModelData != null) {
-            if (Compatibility.ITEMS_ADDER) {
+
+            if (Compatibility.ITEMS_ADDER || fallbackMaterial == null) {
                 meta.setCustomModelData(customModelData);
             } else {
                 meta.setCustomModelData(null);

@@ -27,7 +27,7 @@ public class ItemRetrieveLogFormatter implements ILogFormatter {
                 .append(Component.text(" from ", NamedTextColor.GRAY))
                 .append(Component.text(context.get(LogContext.BLOCK), NamedTextColor.GREEN))
                 .append(Component.text(" at ", NamedTextColor.GRAY))
-                .append(Component.text(context.get(LogContext.BLOCK), NamedTextColor.YELLOW));
+                .append(Component.text(context.get(LogContext.LOCATION), NamedTextColor.YELLOW));
 
     }
 }

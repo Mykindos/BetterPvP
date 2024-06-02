@@ -113,6 +113,10 @@ public class CombatListener implements Listener {
             damageDataList.add(new DamageData(event.getDamagee().getUniqueId().toString(), event.getCause(), damagerUuid, event.getForceDamageDelay()));
         }
 
+        if (event.getDamagee().getHealth() <= 0) {
+            return;
+        }
+
         if (event.isCancelled()) {
             return;
         }
@@ -489,12 +493,17 @@ public class CombatListener implements Listener {
 
     @EventHandler
     public void onCanHurt(EntityCanHurtEntityEvent event) {
-        if(!event.isAllowed()) {
+        if (!event.isAllowed()) {
             return;
         }
 
-        if(event.getDamagee() instanceof Player damagee) {
-            if(damagee.getGameMode() == GameMode.CREATIVE || damagee.getGameMode() == GameMode.SPECTATOR) {
+        if (event.getDamagee().equals(event.getDamager())) {
+            event.setResult(Event.Result.DENY);
+            return;
+        }
+
+        if (event.getDamagee() instanceof Player damagee) {
+            if (damagee.getGameMode() == GameMode.CREATIVE || damagee.getGameMode() == GameMode.SPECTATOR) {
                 event.setResult(Event.Result.DENY);
             }
         }

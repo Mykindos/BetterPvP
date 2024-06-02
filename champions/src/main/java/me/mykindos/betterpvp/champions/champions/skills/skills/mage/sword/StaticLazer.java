@@ -28,6 +28,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.Openable;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -72,7 +73,7 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
 
     @Override
     public String[] getDescription(int level) {
-        return new String[] {
+        return new String[]{
                 "Hold right click with a Sword to channel",
                 "",
                 "Charge static electricity and",
@@ -134,18 +135,15 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
     }
 
     @Override
-    public void loadSkillConfig(){
+    public void loadSkillConfig() {
         baseCharge = getConfig("baseCharge", 40.0, Double.class);
         chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 10.0, Double.class);
-
-        baseDamage = getConfig("baseDamage", 6.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 2.0, Double.class);
-
-        baseRange = getConfig("baseRange", 20.0, Double.class);
-        rangeIncreasePerLevel = getConfig("rangeIncreasePerLevel", 10.0, Double.class);
-
+        baseDamage = getConfig("baseDamage", 2.0, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.75, Double.class);
+        baseRange = getConfig("baseRange", 15.0, Double.class);
+        rangeIncreasePerLevel = getConfig("rangeIncreasePerLevel", 4.5, Double.class);
         collisionRadius = getConfig("collisionRadius", 1.8, Double.class);
-        explosionRadius = getConfig("explosionRadius", 4.0, Double.class);
+        explosionRadius = getConfig("explosionRadius", 3.5, Double.class);
     }
 
     @Override
@@ -199,7 +197,13 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
             final List<LivingEntity> nearby = UtilEntity.getNearbyEnemies(player, point, collisionRadius);
             final boolean collideEnt = !nearby.isEmpty();
             final boolean collideBlock = UtilBlock.solid(block) && UtilBlock.doesBoundingBoxCollide(hitbox, block);
-            if (collideEnt || collideBlock) {
+
+            // Cheap fix
+            if(block.getBlockData() instanceof Openable openable && !openable.isOpen()) {
+                return;
+            }
+
+            if (collideEnt || collideBlock ) {
                 impact(player, point, level, charge);
                 return;
             }
@@ -234,7 +238,9 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
         final double damage = getDamage(level) * charge;
         final List<LivingEntity> enemies = UtilEntity.getNearbyEnemies(player, point, explosionRadius);
         for (LivingEntity enemy : enemies) {
-            UtilDamage.doCustomDamage(new CustomDamageEvent(enemy, player, null, EntityDamageEvent.DamageCause.CUSTOM, damage, true, getName()));
+            if (enemy.hasLineOfSight(point)) {
+                UtilDamage.doCustomDamage(new CustomDamageEvent(enemy, player, null, EntityDamageEvent.DamageCause.CUSTOM, damage, true, getName()));
+            }
         }
 
         // Cues

@@ -24,7 +24,7 @@ public class ContainerBreakLogFormatter implements ILogFormatter {
                 .append(Component.text(" caused ", NamedTextColor.GRAY))
                 .append(Component.text(context.get(LogContext.ITEM_NAME), NamedTextColor.GREEN)
                         .hoverEvent(HoverEvent.showText(Component.text(context.get(LogContext.ITEM)))))
-                .append(Component.text("to be dropped from a ", NamedTextColor.GRAY))
+                .append(Component.text(" to be dropped from ", NamedTextColor.GRAY))
                 .append(Component.text(context.get(LogContext.BLOCK), NamedTextColor.YELLOW))
                 .append(Component.text(" at ", NamedTextColor.GRAY))
                 .append(Component.text(context.get(LogContext.LOCATION), NamedTextColor.YELLOW));

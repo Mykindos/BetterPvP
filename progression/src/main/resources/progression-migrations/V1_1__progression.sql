@@ -1,12 +1,11 @@
 create table if not exists progression_exp
 (
-    Gamer varchar(36) not null
-        primary key,
-    Fishing bigint default 0 not null,
-    Mining bigint default 0 not null,
-    Woodcutting bigint default 0 not null,
-    Farming bigint default 0 not null
+    Gamer      varchar(36)              not null,
+    Profession varchar(255)             not null,
+    Experience bigint       default 0   not null,
+    primary key (Gamer, Profession)
 );
+
 
 create table if not exists progression_fishing
 (
@@ -24,6 +23,26 @@ create table if not exists progression_mining
     AmountMined bigint not null,
     primary key (Gamer, Material)
 );
+
+create table if not exists progression_properties
+(
+    Gamer      varchar(36)  not null,
+    Profession varchar(255) not null,
+    Property   varchar(255) not null,
+    Value      varchar(255) not null,
+    primary key (Gamer, Profession, Property)
+);
+
+create table if not exists progression_builds
+(
+    Gamer      varchar(36)   not null,
+    Profession varchar(255)  not null,
+    Skill      varchar(255)  not null,
+    Level      int default 0 null,
+    constraint progression_builds_pk
+        primary key (Gamer, Profession, Skill)
+);
+
 
 DROP PROCEDURE IF EXISTS GetTopFishingByWeight;
 CREATE PROCEDURE GetTopFishingByWeight(IN days DOUBLE, IN maxResults INT)

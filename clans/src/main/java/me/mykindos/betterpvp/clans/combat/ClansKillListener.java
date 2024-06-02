@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
 import me.mykindos.betterpvp.core.combat.events.KillContributionEvent;
+import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -18,6 +19,10 @@ import java.util.Optional;
 public class ClansKillListener implements Listener {
 
     private final ClanManager clanManager;
+
+    @Inject
+    @Config(path = "clans.pillage.protection", defaultValue = "true")
+    private boolean pillageProtection;
 
     @Inject
     public ClansKillListener(ClanManager clanManager) {
@@ -44,7 +49,8 @@ public class ClansKillListener implements Listener {
 
         if (clanManager.getRelation(killerClan, victimClan).equals(ClanRelation.ENEMY)) {
 
-            if (!killerClan.isNoDominanceCooldownActive() && !victimClan.isNoDominanceCooldownActive()) {
+
+            if ((!killerClan.isNoDominanceCooldownActive() && !victimClan.isNoDominanceCooldownActive()) || !pillageProtection) {
                 dominance = clanManager.getDominanceForKill(killerClan.getSquadCount(), victimClan.getSquadCount());
             }
         }

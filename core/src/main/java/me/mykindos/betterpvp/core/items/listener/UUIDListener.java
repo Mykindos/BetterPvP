@@ -87,7 +87,8 @@ public class UUIDListener implements Listener {
      */
     private static final List<InventoryType> INVENTORY_NO_STORE_TYPES = new ArrayList<>(List.of(
             InventoryType.ANVIL,
-            InventoryType.WORKBENCH
+            InventoryType.WORKBENCH,
+            InventoryType.CRAFTING
     ));
 
     private static final List<InventoryType> INVENTORY_FURNACE_TYPES = new ArrayList<>(List.of(
@@ -443,7 +444,7 @@ public class UUIDListener implements Listener {
                 log.info("{} caused ({}) to be dropped from block {} at ({})", event.getPlayer().getName(),
                                 uuidItem.getUuid(), event.getBlockState().getType().name(), UtilWorld.locationToString(location))
                         .setAction("ITEM_CONTAINER_BREAK").addItemContext(uuidItem).addLocationContext(location)
-                        .addBlockContext(event.getBlock()).submit();
+                        .addBlockContext(event.getBlockState()).addClientContext(event.getPlayer()).submit();
             });
         });
     }
@@ -460,7 +461,7 @@ public class UUIDListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onBlockExplore(BlockExplodeEvent event) {
+    public void onBlockExplode(BlockExplodeEvent event) {
         event.blockList().forEach(block -> {
             if (block.getState() instanceof Container container) {
                 container.getInventory().forEach(itemStack -> {

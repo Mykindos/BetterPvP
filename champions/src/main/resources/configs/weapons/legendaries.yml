@@ -1,7 +1,7 @@
 alligators_tooth:
   enabled: true
   baseDamage: 8.0
-  energyPerTick: 1.0
+  energyPerTick: 1.5
   initialEnergyCost: 10.0
   bonusDamage: 4.0
   velocityStrength: 1.0
@@ -14,7 +14,7 @@ wind_blade:
 knights_greatlance:
   enabled: true
   baseDamage: 8.0
-  energyPerTick: 1.0
+  energyPerTick: 1.5
   initialEnergyCost: 10.0
   attackCooldown: 5.0
   maxChargeTicks: 60
@@ -29,14 +29,14 @@ hyper_axe:
   hyperRushCooldown: 16.0
 giants_broadsword:
   enabled: true
-  baseDamage: 9.0
-  energyPerTick: 1.5
+  baseDamage: 10.0
+  energyPerTick: 1.2
   initialEnergyCost: 10.0
-  regenAmplifier: 3
+  regenAmplifier: 4
 magnetic_maul:
   enabled: true
   baseDamage: 8.0
-  energyPerTick: 1.0
+  energyPerTick: 1.9
   initialEnergyCost: 10.0
   pullRange: 10.0
   pullFov: 80.3
@@ -47,6 +47,26 @@ scythe:
   enabled: true
   baseDamage: 8.0
   cooldown: 12.0
+  energyPerTick: 1.0
+  initialEnergyCost: 10.0
+  maxSoulsDamage: 4.0
+  maxSouls: 3
+  soulHarvestSeconds: 1.5
+  soulExpirySeconds: 10.0
+  soulExpiryPerSecond: 0.3
+  soulDespawnSeconds: 7.5
+  soulViewDistanceBlocks: 60
+  soulsPerPlayer: 1.0
+  soulsPerMob: 1.0
+  summonPlayerSoulChance: 1.0
+  summonMobSoulChance: 0.4
+  speedAmplifierPerSoul: 1.0
+  baseHeal: 0.25
+  healPerSoul: 0.1
+scepter:
+  enabled: true
+  baseDamage: 8.0
+  cooldown: 10.0
   blackHoleRadius: 0.8
   blackHoleSpeed: 3.0
   blackHoleHitbox: 0.5
@@ -54,10 +74,16 @@ scythe:
   blackHolePullRadius: 5.0
   blackHoleAliveSeconds: 1.5
   blackHoleExpandSeconds: 0.75
+  blackHoleTravelSeconds: 2.0
+  beamCooldown: 1.0
+  beamDamage: 4.0
+  beamSpeed: 4.0
+  beamHitbox: 0.5
+  beamTravelSeconds: 0.3
 thunderclap_aegis:
   enabled: true
-  baseDamage: 1.0
-  energyPerTick: 1.0
+  baseDamage: 8.0
+  energyPerTick: 1.1
   initialEnergyCost: 10.0
   baseVelocity: 0.5
   maxVelocity: 0.8
@@ -67,5 +93,5 @@ thunderclap_aegis:
   pulseShockSeconds: 0.5
   pulseRadius: 6.0
   collidePulseRadius: 7.0
-  energyOnCollide: 25.0
+  energyOnCollide: 12.5
   chargeDamage: 7.0

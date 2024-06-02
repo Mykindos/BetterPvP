@@ -75,17 +75,6 @@ public class MapListener implements Listener {
         mapHandler.loadMap();
     }
 
-    //@EventHandler
-    //public void onWorldLoad(WorldLoadEvent event) {
-    //    if (event.getWorld().getName().equals("world")) {
-    //        try {
-    //            mapHandler.loadMap();
-    //        } catch (Exception ex) {
-    //            ex.printStackTrace();
-    //        }
-    //    }
-    //}
-
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerQuit(PlayerQuitEvent event) {
         final Player player = event.getPlayer();
@@ -149,90 +138,6 @@ public class MapListener implements Listener {
         }, 1);
     }
 
-    //@EventHandler(priority = EventPriority.HIGHEST)
-    //public void onClanEnemy(ClanEnemyEvent event) {
-    //    updateClanRelation(event.getClan(), event.getOther());
-    //}
-//
-    //@EventHandler(priority = EventPriority.HIGHEST)
-    //public void onClanTrust(ClanTrustEvent event) {
-    //    updateClanRelation(event.getClan(), event.getOther());
-    //}
-//
-    //@EventHandler(priority = EventPriority.HIGHEST)
-    //public void onClanNeutral(ClanNeutralEvent event) {
-    //    updateClanRelation(event.getClan(), event.getOther());
-    //}
-//
-    //@EventHandler(priority = EventPriority.HIGHEST)
-    //public void onClanRevokeTrust(ClanRevokeTrustEvent event) {
-    //    updateClanRelation(event.getClan(), event.getOther());
-    //}
-//
-    //@EventHandler(priority = EventPriority.HIGHEST)
-    //public void onClanPillageStart(ClanPillageStartEvent event) { updateClanRelation(event.getPillager(), event.getPillagee()); }
-//
-    //@EventHandler(priority = EventPriority.HIGHEST)
-    //public void onClanPillageEnd(ClanPillageEndEvent event) { updateClanRelation(event.getPillager(), event.getPillagee()); }
-//
-    ////TODO ADD PILLAGE EVENT
-    //private void updateClanRelation(Clan clan, Clan other) {
-    //    ClanManager.ClanRelation clanRelation = getManager(ClanManager.class).getClanRelation(clan, other);
-    //    byte color;
-    //    color = clanRelation.getMapColor();
-    //    if (clan.getName().equals("Fields")) {
-    //        color = 62;
-    //    }
-    //    if (clan.getName().equals("Red Shops") || clan.getName().equals("Red Spawn")) {
-    //        color = 114;
-    //    }
-    //    if (clan.getName().equals("Blue Shops") || clan.getName().equals("Blue Spawn")) {
-    //        color = (byte) 129;
-    //    }
-    //    if (clan.getName().equals("Outskirts")) {
-    //        color = 74;
-    //    }
-    //    for (UUID uuid : other.getMemberMap().keySet()) {
-    //        Player member = Bukkit.getPlayer(uuid);
-    //        if (member == null) {
-    //            continue;
-    //        }
-    //        if (!mapHandler.clanMapData.containsKey(uuid)) {
-    //            mapHandler.clanMapData.put(uuid, new HashSet<>());
-    //        }
-    //        final Set<ChunkData> clanMapData = mapHandler.clanMapData.get(uuid);
-    //        clanMapData.stream().filter(chunkData -> chunkData.getClan().equals(clan.getName())).forEach(chunkData -> chunkData.setColor(clanRelation.getMapColor()));
-    //        if (clanMapData.stream().noneMatch(chunkData -> chunkData.getClan().equals(clan.getName()))) {
-    //            for (String claim : clan.getClaims()) {
-    //                final String[] split = claim.split(":");
-    //                clanMapData.add(new ChunkData(split[0], color, Integer.parseInt(split[1]), Integer.parseInt(split[2]), clan.getName()));
-    //            }
-    //        }
-    //        updateStatus(member);
-    //    }
-    //    for (UUID uuid : clan.getMemberMap().keySet()) {
-    //        Player member = Bukkit.getPlayer(uuid);
-    //        if (member == null) {
-    //            continue;
-    //        }
-    //        if (!mapHandler.clanMapData.containsKey(uuid)) {
-    //            mapHandler.clanMapData.put(uuid, new HashSet<>());
-    //        }
-//
-    //        final Set<ChunkData> clanMapData = mapHandler.clanMapData.get(uuid);
-    //        clanMapData.stream().filter(chunkData -> chunkData.getClan().equals(other.getName())).forEach(chunkData -> chunkData.setColor(clanRelation.getMapColor()));
-    //        if (clanMapData.stream().noneMatch(chunkData -> chunkData.getClan().equals(other.getName()))) {
-    //            for (String claim : other.getClaims()) {
-    //                final String[] split = claim.split(":");
-    //                clanMapData.add(new ChunkData(split[0], color, Integer.parseInt(split[1]), Integer.parseInt(split[2]), other.getName()));
-    //            }
-    //        }
-    //        updateStatus(member);
-    //    }
-    //}
-//
-
-
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onClaim(ClanTerritoryEvent event) {
         if (event.isCancelled()) return;
@@ -262,8 +167,7 @@ public class MapListener implements Listener {
                     for (int i = 0; i < 4; i++) {
                         BlockFace blockFace = BlockFace.values()[i];
                         String targetChunkString = "world/ " + (chunkX + blockFace.getModX()) + "/ " + (chunkZ + blockFace.getModZ());
-                        Clan other = clanManager.getClanByChunkString(targetChunkString).orElse(null);
-                        if (chunkData.getClan().equals(other)) {
+                        if (clan.isChunkOwnedByClan(targetChunkString)) {
                             chunkData.getBlockFaceSet().add(blockFace);
                         }
                     }
@@ -383,8 +287,7 @@ public class MapListener implements Listener {
                 for (int i = 0; i < 4; i++) {
                     BlockFace blockFace = BlockFace.values()[i];
                     String targetChunkString = "world/ " + (chunkX + blockFace.getModX()) + "/ " + (chunkZ + blockFace.getModZ());
-                    Clan other = clanManager.getClanByChunkString(targetChunkString).orElse(null);
-                    if (chunkData.getClan().equals(other)) {
+                    if (clan.isChunkOwnedByClan(targetChunkString)) {
                         chunkData.getBlockFaceSet().add(blockFace);
                     }
                 }
@@ -428,9 +331,9 @@ public class MapListener implements Listener {
         if (event.getAction().name().contains("RIGHT")) {
             MapSettings.Scale curScale = mapSettings.getScale();
 
-            if (curScale == MapSettings.Scale.NORMAL && !client.isAdministrating()) {
+            if (curScale == MapSettings.Scale.FAR && !client.isAdministrating()) {
                 return;
-            } else if (curScale == MapSettings.Scale.FAR) {
+            } else if (curScale == MapSettings.Scale.FARTHEST) {
                 return;
             }
 

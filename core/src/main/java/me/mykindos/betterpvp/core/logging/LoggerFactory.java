@@ -87,7 +87,7 @@ public class LoggerFactory {
             log.warn("No formatter found for action: " + cachedLog.getAction()).submit();
         }
 
-        return Component.empty();
+        return null;
     }
 
 }

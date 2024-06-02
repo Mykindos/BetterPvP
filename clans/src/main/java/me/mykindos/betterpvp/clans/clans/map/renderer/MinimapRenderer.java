@@ -137,7 +137,7 @@ public class MinimapRenderer extends MapRenderer implements Listener {
 
         int scale = 1 << mapSettings.getScale().getValue();
 
-        if (mapSettings.getScale() == MapSettings.Scale.FAR) {
+        if (mapSettings.getScale() == MapSettings.Scale.FARTHEST) {
             centerX = 0;
             centerZ = 0;
         }

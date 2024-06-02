@@ -45,9 +45,9 @@ public class SetExpSubCommand extends ClanSubCommand {
             return;
         }
 
-        long experience;
+        double experience;
         try {
-            experience = Integer.parseInt(args[0]);
+            experience = Double.parseDouble(args[0]);
         } catch (NumberFormatException e) {
             UtilMessage.message(player, "Clans", "Invalid number!");
             return;
@@ -60,15 +60,15 @@ public class SetExpSubCommand extends ClanSubCommand {
 
         Clan playerClan = clanManager.getClanByPlayer(player).orElseThrow();
 
-        long prevExperience = playerClan.getExperience();
+        double prevExperience = playerClan.getExperience();
         long prevLevel = playerClan.getLevel();
         playerClan.setExperience(experience);
-        long newExperience = playerClan.getExperience();
+        double newExperience = playerClan.getExperience();
         long newLevel = playerClan.getLevel();
 
         UtilMessage.message(player,
                 "Clans",
-                "Set clan <alt>%s</alt>'s experience from <alt2>%,d (level %,d)</alt2> to <alt2>%,d (level %,d)</alt2>.",
+                "Set clan <alt>%s</alt>'s experience from <alt2>%,.1f (level %,d)</alt2> to <alt2>%,.1f (level %,d)</alt2>.",
                 playerClan.getName(),
                 prevExperience,
                 prevLevel,
@@ -76,7 +76,7 @@ public class SetExpSubCommand extends ClanSubCommand {
                 newLevel);
 
 
-        final Component alert = UtilMessage.deserialize("%s set clan <alt>%s</alt>'s experience from <alt2>%,d (level %,d)</alt2> to <alt2>%,d (level %,d)</alt2>.",
+        final Component alert = UtilMessage.deserialize("%s set clan <alt>%s</alt>'s experience from <alt2>%,.1f (level %,d)</alt2> to <alt2>%,.1f (level %,d)</alt2>.",
                 client.getName(),
                 playerClan.getName(),
                 prevExperience,

@@ -25,7 +25,7 @@ public class ContainerStoreItemLogFormatter implements ILogFormatter {
                 .append(Component.text(context.get(LogContext.ITEM_NAME), NamedTextColor.GREEN)
                         .hoverEvent(HoverEvent.showText(Component.text(context.get(LogContext.ITEM)))))
                 .append(Component.text(" in ", NamedTextColor.GRAY))
-                .append(Component.text(context.get(LogContext.BLOCK), NamedTextColor.GREEN))
+                .append(Component.text(context.get(LogContext.BLOCK), NamedTextColor.YELLOW))
                 .append(Component.text(" at ", NamedTextColor.GRAY))
                 .append(Component.text(context.get(LogContext.LOCATION), NamedTextColor.YELLOW));
 

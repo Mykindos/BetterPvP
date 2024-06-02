@@ -64,6 +64,7 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
                 "radius to transfer their health to the",
                 "lowest health player every <stat>" + getHealCooldown(level) + "</stat> seconds",
                 "",
+                "Uses <stat>" + getEnergyStartCost(level) + "</stat> energy on activation",
                 "Energy / Second: <val>" + getEnergy(level)
 
         };
@@ -97,7 +98,7 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
 
     @Override
     public void toggleActive(Player player) {
-        if (championsManager.getEnergy().use(player, getName(), 10, false)) {
+        if (championsManager.getEnergy().use(player, getName(), getEnergyStartCost(getLevel(player)), false)) {
             UtilMessage.simpleMessage(player, getClassType().getName(), "Life Bonds: <green>On");
         }
     }

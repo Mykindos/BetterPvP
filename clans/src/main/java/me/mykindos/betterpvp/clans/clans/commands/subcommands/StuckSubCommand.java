@@ -44,8 +44,8 @@ public class StuckSubCommand extends ClanSubCommand {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        if(!cooldownManager.use(player, getName(), 1000, false, true)){
-            UtilMessage.message(player, "Clans", "Try again in a second");
+        if(!cooldownManager.use(player, getName(), 5, false, true)){
+            UtilMessage.message(player, "Clans", "Try again in a few seconds");
             return;
         }
         

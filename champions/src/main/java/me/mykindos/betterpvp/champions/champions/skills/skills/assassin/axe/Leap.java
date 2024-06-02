@@ -55,6 +55,8 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
                 "Activate while your back is to a wall to perform",
                 "a wall-kick, which will not affect the cooldown",
                 "",
+                "Cannot be used while <effect>Slowed</effect>",
+                "",
                 "Cooldown: <val>" + getCooldown(level)
         };
     }
