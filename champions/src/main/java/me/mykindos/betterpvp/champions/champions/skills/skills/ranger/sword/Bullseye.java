@@ -227,17 +227,35 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
     private void focusTarget(BullsEyeData playerBullsEyeData) {
         Player caster = playerBullsEyeData.getCaster();
         RayTraceResult result = caster.rayTraceEntities(64);
-        if (result == null || result.getHitEntity() == null) return;
-        if (!(result.getHitEntity() instanceof LivingEntity)) return;
+        if (result != null && result.getHitEntity() != null) {
+            if (!(result.getHitEntity() instanceof LivingEntity)) return;
 
-        if (!playerBullsEyeData.hasTarget()) {
-            playerBullsEyeData.setTarget((LivingEntity) result.getHitEntity());
-            playerBullsEyeData.setTargetFocused(new ChargeData((float)(0.5)));
-            bullsEyeData.put(caster.getUniqueId(), playerBullsEyeData);
+            if (!playerBullsEyeData.hasTarget()) {
+                playerBullsEyeData.setTarget((LivingEntity) result.getHitEntity());
+                playerBullsEyeData.setTargetFocused(new ChargeData((float) (0.5)));
+                bullsEyeData.put(caster.getUniqueId(), playerBullsEyeData);
+                playerBullsEyeData.getTargetFocused().tick();
+                playerBullsEyeData.getTargetFocused().tickSound(caster);
+                playerBullsEyeData.updateColor();
+            }
         }
 
         if (playerBullsEyeData.getTarget() == null || playerBullsEyeData.getTargetFocused() == null) return;
-        if (result.getHitEntity() == playerBullsEyeData.getTarget()) {
+
+        int degrees = 10;
+
+        Vector casterToEntity = playerBullsEyeData.getTarget().getLocation().toVector().subtract(caster.getLocation().toVector()).normalize();
+        Vector playerDirection = caster.getLocation().getDirection().normalize();
+
+        double dotProduct = playerDirection.dot(casterToEntity);
+        double angle = Math.acos(dotProduct);
+
+        // Convert radians to degrees
+        double angleDegrees = Math.toDegrees(angle);
+
+        // Check if angle is within the specified degrees
+        if (angleDegrees <= degrees) {
+            caster.sendMessage("You are looking towards the target");
             playerBullsEyeData.getTargetFocused().tick();
             playerBullsEyeData.getTargetFocused().tickSound(caster);
             playerBullsEyeData.updateColor();
