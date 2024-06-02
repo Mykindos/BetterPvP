@@ -88,13 +88,13 @@ public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill
 
         AttributeInstance playerMaxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
         if (playerMaxHealth != null) {
-            player.setHealth(Math.min(player.getHealth() + 4 * (healthBoostStrength + 1), playerMaxHealth.getValue()));
+            UtilPlayer.health(player, 4d * healthBoostStrength);
             for (Player target : UtilPlayer.getNearbyAllies(player, player.getLocation(), getRadius(level))) {
 
                 championsManager.getEffects().addEffect(target, player, EffectTypes.HEALTH_BOOST, healthBoostStrength, (long) (getDuration(level) * 1000L));
                 AttributeInstance targetMaxHealth = target.getAttribute(Attribute.GENERIC_MAX_HEALTH);
                 if (targetMaxHealth != null) {
-                    target.setHealth(Math.min(target.getHealth() + 4 * (healthBoostStrength + 1), targetMaxHealth.getValue()));
+                    UtilPlayer.health(target, 4d * healthBoostStrength);
                 }
             }
         }
