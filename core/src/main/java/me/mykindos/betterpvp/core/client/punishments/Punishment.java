@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import me.mykindos.betterpvp.core.client.punishments.types.IPunishmentType;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.ocpsoft.prettytime.PrettyTime;
 
 import java.util.Date;
@@ -33,7 +34,6 @@ public class Punishment {
     }
 
     /**
-     *
      * @return The formatted information about the punishment
      */
     public Component getInformation() {
@@ -44,4 +44,23 @@ public class Punishment {
         return UtilMessage.deserialize("You are <red>%s</red> for <green>%s</green> for <yellow>%s</yellow>", this.type.getChatLabel(), formattedTime, this.getReason());
     }
 
+    /**
+     * @return the formatted punishment information
+     */
+    public Component getPunishmentInformation() {
+        Component currentComp;
+        if (this.isActive()) {
+            currentComp = Component.text("ACTIVE", NamedTextColor.GREEN);
+        } else if (revoked) {
+            currentComp = Component.text("REVOKED", NamedTextColor.LIGHT_PURPLE);
+        } else {
+            currentComp = Component.text("INACTIVE", NamedTextColor.RED);
+        }
+
+        Component component = Component.empty().append(currentComp).appendSpace()
+                .append(Component.text(this.type.getName(), NamedTextColor.WHITE)).appendSpace()
+                .append(Component.text(reason == null ? "No Reason" : reason, NamedTextColor.GRAY)).appendSpace()
+                .append(Component.text(punisher == null ? "SERVER" : punisher, NamedTextColor.AQUA));
+        return component;
+    }
 }
