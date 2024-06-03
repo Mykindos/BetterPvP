@@ -126,7 +126,7 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
     }
 
     @UpdateEvent
-    public void updateParticles() {
+    public void update() {
         if (shieldDataMap.isEmpty()) return;
         shieldDataMap.entrySet().removeIf(entry -> {
             if (entry.getValue().count <= 0) {
@@ -138,6 +138,11 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
 
             if (entry.getValue().getEndTime() - System.currentTimeMillis() <= 0) {
                 UtilMessage.message(player, getClassType().getName(), "Your blood barrier has expired.");
+                return true;
+            }
+
+            boolean hasRole = championsManager.getRoles().hasRole(player);
+            if((entry.getValue().hasRole && !hasRole) || (!entry.getValue().hasRole && hasRole)) {
                 return true;
             }
 
@@ -189,9 +194,11 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
 
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_EVOKER_PREPARE_ATTACK, 2.0f, 1.0f);
 
-        shieldDataMap.put(player.getUniqueId(), new ShieldData((long) (getDuration(level) * 1000), numAttacksToReduce(level), getDamageReduction(level)));
+        boolean playerHasRole = championsManager.getRoles().hasRole(player);
+        shieldDataMap.put(player.getUniqueId(), new ShieldData((long) (getDuration(level) * 1000), numAttacksToReduce(level), getDamageReduction(level), playerHasRole));
         for (Player ally : UtilPlayer.getNearbyAllies(player, player.getLocation(), getRange(level))) {
-            shieldDataMap.put(ally.getUniqueId(), new ShieldData((long) (getDuration(level) * 1000), numAttacksToReduce(level), getDamageReduction(level)));
+            boolean allyHasRole = championsManager.getRoles().hasRole(ally);
+            shieldDataMap.put(ally.getUniqueId(), new ShieldData((long) (getDuration(level) * 1000), numAttacksToReduce(level), getDamageReduction(level), allyHasRole));
         }
     }
 
@@ -228,10 +235,13 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
 
         public double damageReduction;
 
-        public ShieldData(long length, int count, double damageReduction) {
+        public boolean hasRole;
+
+        public ShieldData(long length, int count, double damageReduction, boolean hasRole) {
             this.endTime = System.currentTimeMillis() + length;
             this.count = count;
             this.damageReduction = damageReduction;
+            this.hasRole = hasRole;
         }
 
     }
