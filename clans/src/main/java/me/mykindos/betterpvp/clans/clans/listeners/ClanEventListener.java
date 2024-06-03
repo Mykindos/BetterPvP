@@ -227,6 +227,13 @@ public class ClanEventListener extends ClanListener {
             }
         });
 
+        if (clan.getHome() != null) {
+            Block block = clan.getHome().clone().subtract(0, 0.6, 0).getBlock();
+            if (block.getType() == Material.RED_BED) {
+                block.setType(Material.AIR);
+            }
+        }
+
         clan.getMembers().clear();
         clan.getTerritory().clear();
         clan.getEnemies().clear();
