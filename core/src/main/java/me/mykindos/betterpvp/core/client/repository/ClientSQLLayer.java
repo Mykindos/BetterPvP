@@ -156,9 +156,9 @@ public class ClientSQLLayer {
                 new StringStatementValue(value.toString()),
                 new StringStatementValue(value.toString()));
 
-        HashMap<String, Statement> statementHashMap = queuedSharedStatUpdates.computeIfAbsent(client.getUuid(), k -> new HashMap<>());
-        statementHashMap.put(property, statement);
-        queuedSharedStatUpdates.put(client.getUuid(), statementHashMap);
+        HashMap<String, Statement> propertyUpdates = queuedSharedStatUpdates.computeIfAbsent(client.getUuid(), k -> new HashMap<>());
+        propertyUpdates.put(property, statement);
+        queuedSharedStatUpdates.put(client.getUuid(), propertyUpdates);
     }
 
     public void saveGamerProperty(Gamer gamer, String property, Object value) {
@@ -194,20 +194,20 @@ public class ClientSQLLayer {
 
     public void processStatUpdates(boolean async) {
         // Client
-        ConcurrentHashMap<String, HashMap<String, Statement>> statements = new ConcurrentHashMap<>(queuedSharedStatUpdates);
-        List<Statement> statementsToRun = new ArrayList<>();
-        statements.forEach((key, value) -> statementsToRun.addAll(value.values()));
+        var sharedStatements = new ConcurrentHashMap<>(queuedSharedStatUpdates);
+        List<Statement> sharedStatementsToRun = new ArrayList<>();
+        sharedStatements.forEach((key, value) -> sharedStatementsToRun.addAll(value.values()));
         queuedSharedStatUpdates.clear();
-        sharedDatabase.executeBatch(statementsToRun, async);
-        log.info("Updated client stats with {} queries", statements.size()).submit();
+        sharedDatabase.executeBatch(sharedStatementsToRun, async);
+        log.info("Updated client stats with {} queries", sharedStatementsToRun.size()).submit();
 
         // Gamer
-        statements = new ConcurrentHashMap<>(queuedStatUpdates);
-        statementsToRun.clear();
+        var statements = new ConcurrentHashMap<>(queuedStatUpdates);
+        List<Statement> statementsToRun = new ArrayList<>();
         statements.forEach((key, value) -> statementsToRun.addAll(value.values()));
         queuedStatUpdates.clear();
         database.executeBatch(statementsToRun, async);
-        log.info("Updated gamer stats with {} queries", statements.size()).submit();
+        log.info("Updated gamer stats with {} queries", statementsToRun.size()).submit();
     }
 
     public List<String> getAlts(Player player, String address) {
