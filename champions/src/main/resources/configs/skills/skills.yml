@@ -41,7 +41,7 @@ skills:
       increasePerLevel: 1.5
     smokebomb:
       enabled: true
-      cooldown: 50.0
+      cooldown: 40.0
       maxlevel: 5
       baseDuration: 3.0
       blindDuration: 1.75
@@ -111,7 +111,7 @@ skills:
       canUseWhileSlowed: false
       cooldownDecreasePerLevel: 1.0
       distanceIncreasePerLevel: 3
-      deblinkTime: 6
+      deblinkTime: 4
       deblinkTimeIncreasePerLevel: 0
     flash:
       enabled: true
