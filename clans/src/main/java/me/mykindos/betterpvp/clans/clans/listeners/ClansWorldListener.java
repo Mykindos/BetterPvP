@@ -30,6 +30,7 @@ import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.data.CustomDataType;
+import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -64,6 +65,7 @@ import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -84,19 +86,25 @@ public class ClansWorldListener extends ClanListener {
     @Config(path = "clans.pillage.container-break-cooldown", defaultValue = "30.0")
     private double containerBreakCooldown;
 
+    @Inject
+    @Config(path = "clans.claims.allow-bubble-columns", defaultValue = "false")
+    private boolean allowBubbleColumns;
+
 
     private final Clans clans;
     private final EffectManager effectManager;
     private final EnergyHandler energyHandler;
     private final CooldownManager cooldownManager;
+    private final WorldBlockHandler worldBlockHandler;
 
     @Inject
-    public ClansWorldListener(ClanManager clanManager, ClientManager clientManager, Clans clans, EffectManager effectManager, EnergyHandler energyHandler, CooldownManager cooldownManager) {
+    public ClansWorldListener(ClanManager clanManager, ClientManager clientManager, Clans clans, EffectManager effectManager, EnergyHandler energyHandler, CooldownManager cooldownManager, WorldBlockHandler worldBlockHandler) {
         super(clanManager, clientManager);
         this.clans = clans;
         this.effectManager = effectManager;
         this.energyHandler = energyHandler;
         this.cooldownManager = cooldownManager;
+        this.worldBlockHandler = worldBlockHandler;
     }
 
     @EventHandler
@@ -847,6 +855,26 @@ public class ClansWorldListener extends ClanListener {
             if (clanOptional.isPresent()) {
                 event.setCancelled(true);
             }
+        }
+    }
+
+    @EventHandler
+    public void onMoveBubbleColumn(PlayerMoveEvent event) {
+        if(allowBubbleColumns) return;
+
+        Block block = event.getPlayer().getLocation().getBlock();
+        if (block.getType() != Material.BUBBLE_COLUMN) return;
+        Clan clan = clanManager.getClanByLocation(event.getPlayer().getLocation()).orElse(null);
+        Clan playerClan = clanManager.getClanByPlayer(event.getPlayer()).orElse(null);
+        if (clan == null || (playerClan != null && !clan.equals(playerClan))) {
+            for (int i = 0; i < 100; i++) {
+                Block newBlock = block.getLocation().add(0, block.getY() - i, 0).getBlock();
+                if (newBlock.getType() == Material.SOUL_SAND || newBlock.getType() == Material.MAGMA_BLOCK) {
+                    worldBlockHandler.addRestoreBlock(newBlock, Material.STONE, 15_000);
+                    break;
+                }
+            }
+
         }
     }
 }
