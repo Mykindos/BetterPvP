@@ -111,7 +111,7 @@ skills:
       canUseWhileSlowed: false
       cooldownDecreasePerLevel: 1.0
       distanceIncreasePerLevel: 3
-      deblinkTime: 6
+      deblinkTime: 4
       deblinkTimeIncreasePerLevel: 0
     flash:
       enabled: true

@@ -234,7 +234,7 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
     public void loadSkillConfig(){
         maxTravelDistance = getConfig("maxTravelDistance", 9, Integer.class);
         distanceIncreasePerLevel = getConfig("distanceIncreasePerLevel", 3, Integer.class);
-        deblinkTime = getConfig("deblinkTime", 6, Integer.class);
+        deblinkTime = getConfig("deblinkTime", 4, Integer.class);
         deblinkTimeIncreasePerLevel = getConfig("deblinkTimeIncreasePerLevel", 0, Integer.class);
     }
 
