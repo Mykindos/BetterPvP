@@ -52,7 +52,7 @@ public class Sever extends Skill implements CooldownSkill, Listener {
                 "Right click with a Sword to activate",
                 "",
                 "Inflict a <val>" + getDuration(level) + "</val> second <effect>Bleed</effect>",
-                "dealing <stat>1</stat> heart per second",
+                "dealing <stat>0.75</stat> hearts per second",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -136,7 +136,7 @@ public class Sever extends Skill implements CooldownSkill, Listener {
 
     @Override
     public void loadSkillConfig() {
-        baseDuration = getConfig("baseDuration", 1.0, Double.class);
+        baseDuration = getConfig("baseDuration", 2.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
         hitDistance = getConfig("hitDistance", 4.0, Double.class);
     }
