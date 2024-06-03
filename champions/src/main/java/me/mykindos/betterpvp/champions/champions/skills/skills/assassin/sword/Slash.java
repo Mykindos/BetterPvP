@@ -158,10 +158,10 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
     @Override
     public void loadSkillConfig() {
         damage = getConfig("damage", 2.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 2.0, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.5, Double.class);
         distance = getConfig("distance", 5.0, Double.class);
         distanceIncreasePerLevel = getConfig("distanceIncreasePerLevel", 0.0, Double.class);
-        cooldownReduction = getConfig("cooldownReduction", 4.0, Double.class);
+        cooldownReduction = getConfig("cooldownReduction", 3.0, Double.class);
         cooldownReductionPerLevel = getConfig("cooldownReductionPerLevel", 0.0, Double.class);
     }
 }
