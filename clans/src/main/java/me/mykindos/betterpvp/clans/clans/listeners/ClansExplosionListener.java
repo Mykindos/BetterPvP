@@ -218,7 +218,7 @@ public class ClansExplosionListener extends ClanListener {
                 if (enemyOptional.isPresent()) {
 
                     ClanEnemy enemy = enemyOptional.get();
-                    if (enemy.getDominance() <= dominanceRequired) {
+                    if (enemy.getDominance() < dominanceRequired) {
                         attackingClan.messageClan("You cannot cannon <red>" + attackedClan.getName() + "</red> because you have less than <red>" + dominanceRequired + "%</red> dominance on them.", null, true);
                         refundCannonball(shooter);
                         break;

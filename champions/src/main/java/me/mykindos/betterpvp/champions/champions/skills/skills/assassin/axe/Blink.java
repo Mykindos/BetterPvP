@@ -144,6 +144,8 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
                 }
 
                 Location target = this.loc.remove(player);
+                if(target == null) return;
+
                 float currentYaw = player.getLocation().getYaw();
                 float currentPitch = player.getLocation().getPitch();
 

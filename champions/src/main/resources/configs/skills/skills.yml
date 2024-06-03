@@ -90,9 +90,9 @@ skills:
       cooldown: 17.0
       cooldownDecreasePerLevel: 1.0
       damage: 2.0
-      damageIncreasePerLevel: 2.0
+      damageIncreasePerLevel: 1.5
       distance: 5.0
-      cooldownReductionPerHit: 4.0
+      cooldownReductionPerHit: 3.0
       distanceIncreasePerLevel: 1.0
       cooldownReduction: 4.0
       cooldownReductionPerLevel: 1.0
@@ -652,7 +652,7 @@ skills:
       durationPerStackDecreasePerLevel: 1.0
       knockbackIncreasePerLevel: 0.5
       knockback: 0.5
-      maxSpeedStrength: 3
+      maxSpeedStrength: 2
     threateningshout:
       enabled: true
       maxlevel: 5

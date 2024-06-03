@@ -185,4 +185,69 @@ public class BalanceCommand extends Command {
         }
     }
 
+    @Singleton
+    @SubCommand(BalanceCommand.class)
+    private static class SetBalanceSubCommand extends Command {
+
+        private final ClientManager clientManager;
+
+        @Inject
+        public SetBalanceSubCommand(ClientManager clientManager) {
+            this.clientManager = clientManager;
+        }
+
+        @Override
+        public String getName() {
+            return "set";
+        }
+
+        @Override
+        public String getDescription() {
+            return "Set a player's balance";
+        }
+
+        @Override
+        public void execute(Player player, Client client, String... args) {
+            if (args.length != 2) {
+                UtilMessage.message(player, "Economy", "Correct usage /balance set <player> <amount>");
+                return;
+            }
+
+            Collection<Client> matches = clientManager.search(player).advancedOnline(args[0]);
+            if (matches.size() != 1) {
+                return; // no matches or too many matches - inform is done by the search
+            }
+
+            try {
+                int amount = Integer.parseInt(args[1]);
+
+                final Client targetClient = matches.iterator().next();
+                final Gamer targetGamer = targetClient.getGamer();
+                targetGamer.saveProperty(GamerProperty.BALANCE, amount);
+
+                UtilMessage.simpleMessage(player, "Economy", "You gave <yellow>%s <green>$%d<gray>.", targetClient.getName(), amount);
+
+                Player targetPlayer = Bukkit.getPlayer(UUID.fromString(targetGamer.getUuid()));
+                if(targetPlayer != null) {
+                    UtilMessage.simpleMessage(targetPlayer, "Economy", "You received <green>$%d <gray>from <yellow>%s<gray>.", amount, player.getName());
+                }
+
+                log.info("{} set {}'s balance to ${}", player, targetClient.getName(), amount).submit();
+
+            } catch (NumberFormatException ex) {
+                UtilMessage.message(player, "Economy", "Value provided is not a valid number.");
+            }
+        }
+
+        @Override
+        public String getArgumentType(int arg) {
+            return arg == 1 ? ArgumentType.PLAYER.name() : ArgumentType.NONE.name();
+        }
+
+        @Override
+        public Rank getRequiredRank() {
+            return Rank.ADMIN;
+        }
+    }
+
 }

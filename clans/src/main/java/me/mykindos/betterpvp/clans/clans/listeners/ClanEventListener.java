@@ -236,9 +236,13 @@ public class ClanEventListener extends ClanListener {
         clanManager.getObjects().remove(clan.getId().toString());
         clanManager.getLeaderboard().forceUpdate();
 
-        log.info("{} ({}) disbanded {} ({})", event.getPlayer().getName(), event.getPlayer().getUniqueId(), clan.getName(), clan.getId())
-                .setAction("CLAN_DISBAND").addClientContext(event.getPlayer()).addClanContext(clan).submit();
-
+        if(event.getPlayer() != null) {
+            log.info("{} ({}) disbanded {} ({})", event.getPlayer().getName(), event.getPlayer().getUniqueId(), clan.getName(), clan.getId())
+                    .setAction("CLAN_DISBAND").addClientContext(event.getPlayer()).addClanContext(clan).submit();
+        }else {
+            log.info("System disbanded {} ({}) for running out of energy", clan.getName(), clan.getId())
+                    .setAction("CLAN_DISBAND").addClanContext(clan).submit();
+        }
 
     }
 
