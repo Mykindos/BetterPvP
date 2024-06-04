@@ -148,8 +148,10 @@ public class PlayerName implements Listener {
         UtilServer.runTaskLater(clans, () -> {
             this.broadcastChange(event.getPlayer());
 
-            for (Player onlinePlayer : event.getPlayer().getServer().getOnlinePlayers()) {
-                this.sendChange(onlinePlayer, event.getPlayer());
+            if(event.getPlayer() != null) {
+                for (Player onlinePlayer : event.getPlayer().getServer().getOnlinePlayers()) {
+                    this.sendChange(onlinePlayer, event.getPlayer());
+                }
             }
         }, 2L);
     }
