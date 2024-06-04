@@ -388,7 +388,7 @@ public class ClansWorldListener extends ClanListener {
                         event.setCancelled(true);
 
                         if (tie.isInform()) {
-                            UtilMessage.simpleMessage(player, "Clans", "Clan Recruits cannot access <green%s<gray>.",
+                            UtilMessage.simpleMessage(player, "Clans", "Clan Recruits cannot access <green>%s<gray>.",
                                     UtilFormat.cleanString(material.toString()));
                         }
                     }

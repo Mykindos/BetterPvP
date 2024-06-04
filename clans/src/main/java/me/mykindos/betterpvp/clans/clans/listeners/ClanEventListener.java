@@ -58,6 +58,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.metadata.FixedMetadataValue;
 
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -220,13 +221,6 @@ public class ClanEventListener extends ClanListener {
             }
         }
 
-        event.getClan().getMembers().forEach(member -> {
-            Player player = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
-            if (player != null) {
-                player.removeMetadata("clan", clans);
-            }
-        });
-
         if (clan.getHome() != null) {
             Block block = clan.getHome().clone().subtract(0, 0.6, 0).getBlock();
             if (block.getType() == Material.RED_BED) {
@@ -250,6 +244,14 @@ public class ClanEventListener extends ClanListener {
             log.info("System disbanded {} ({}) for running out of energy", clan.getName(), clan.getId())
                     .setAction("CLAN_DISBAND").addClanContext(clan).submit();
         }
+
+        var memberCache = new ArrayList<>(event.getClan().getMembers());
+        memberCache.forEach(member -> {
+            Player player = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
+            if (player != null) {
+                player.removeMetadata("clan", clans);
+            }
+        });
 
     }
 

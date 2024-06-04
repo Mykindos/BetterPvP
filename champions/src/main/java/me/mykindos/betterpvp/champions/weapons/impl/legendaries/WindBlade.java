@@ -70,7 +70,7 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
         active.add(player.getUniqueId());
     }
 
-    @UpdateEvent
+    @UpdateEvent (priority = 99)
     public void doWindBlade() {
         if (!enabled) {
             return;

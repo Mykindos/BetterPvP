@@ -14,7 +14,11 @@ import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.UtilSound;
+import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -92,6 +96,9 @@ public class PillageListener implements Listener {
                 pillagedClan.setTntRecoveryRunnable(null);
             }
         }
+
+        UtilMessage.broadcast(UtilMessage.deserialize("<blue>Clans> <red>%s <gray>has started a pillage on <red>%s<gray>!", pillage.getPillager().getName(), pillage.getPillaged().getName()));
+        Bukkit.getOnlinePlayers().forEach(player -> UtilSound.playSound(player, Sound.ITEM_GOAT_HORN_SOUND_1, 1f, 0.8f, true));
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

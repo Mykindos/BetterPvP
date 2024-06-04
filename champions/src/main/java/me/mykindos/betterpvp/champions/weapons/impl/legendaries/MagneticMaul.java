@@ -86,7 +86,7 @@ public class MagneticMaul extends ChannelWeapon implements InteractWeapon, Legen
         return true;
     }
 
-    @UpdateEvent
+    @UpdateEvent (priority = 100)
     public void doMaul() {
         if (!enabled) {
            return;

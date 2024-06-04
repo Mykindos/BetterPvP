@@ -976,7 +976,7 @@ skills:
       maxlevel: 5
       baseSlowDuration: 2.0
       slowDurationIncreasePerLevel: 0.0
-      baseDamage: 4.0
+      baseDamage: 2.0
       damageIncreasePerLevel: 0.66
       slowStrength: 2
       slowDuration: 2.0
