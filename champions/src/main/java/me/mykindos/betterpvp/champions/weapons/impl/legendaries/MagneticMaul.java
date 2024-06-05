@@ -191,6 +191,10 @@ public class MagneticMaul extends ChannelWeapon implements InteractWeapon, Legen
                 continue; // Skip self
             }
 
+            if (!wielder.hasLineOfSight(entity.getLocation()) && !wielder.hasLineOfSight(entity.getEyeLocation())) {
+                continue; // Skip entities not in line of sight
+            }
+
             // Get angle from player to entity
             final double angle = Math.toDegrees(wielder.getLocation().getDirection()
                     .angle(entity.getLocation().toVector().subtract(wielder.getLocation().toVector())));
