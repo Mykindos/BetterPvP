@@ -163,7 +163,7 @@ public class Scythe extends ChannelWeapon implements LegendaryWeapon, Listener {
         summonPlayerSoulChance = getConfig("summonPlayerSoulChance", 1.0, Double.class);
         summonMobSoulChance = getConfig("summonMobSoulChance", 0.4, Double.class);
         speedAmplifierPerSoul = getConfig("speedAmplifierPerSoul", 1.0, Double.class);
-        baseHeal = getConfig("baseHeal", 0.25, Double.class);
+        baseHeal = getConfig("baseHeal", 0.7, Double.class);
         healPerSoul = getConfig("healPerSoul", 0.1, Double.class);
     }
 }
