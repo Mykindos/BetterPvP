@@ -726,6 +726,7 @@ skills:
       cooldown: 8.0
       cooldownDecreasePerLevel: 1.0
       fallDamageLimit: 8.0
+      velocityStrength: 2.0
     levitatingshot:
       enabled: true
       maxlevel: 5
@@ -1017,8 +1018,8 @@ skills:
       applyRadiusIncreasePerLevel: 1.0
       passiveTravelSpeed: 0.8
       applyTravelSpeed: 0.2
-      damagePerSecond: 2.0
-      damageIncreasePerLevel: 0.5
+      damagePerSecond: 5.0
+      damageIncreasePerLevel: 1.0
       regenPerSecond: 5.0
       regenIncreasePerLevel: 0.5
       impactHealthMultiplier: 0.1
