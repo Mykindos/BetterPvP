@@ -50,6 +50,7 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
     private double recoilDamage;
     private double recoilDamageIncreasePerLevel;
     private double damageIncreasePerLevel;
+    private double velocityStrength;
 
     @Inject
     public Takedown(Champions champions, ChampionsManager championsManager) {
@@ -171,7 +172,7 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
     @Override
     public void activate(Player player, int leel) {
         Vector vec = player.getLocation().getDirection();
-        VelocityData velocityData = new VelocityData(vec, 1.8D, false, 0.0D, 0.4D, 0.6D, false);
+        VelocityData velocityData = new VelocityData(vec, velocityStrength, false, 0.0D, 0.4D, 0.6D, false);
         UtilVelocity.velocity(player, null, velocityData, VelocityType.CUSTOM);
         active.put(player, System.currentTimeMillis());
     }
@@ -191,5 +192,6 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
         slownessStrength = getConfig("slownessStrength", 4, Integer.class);
         recoilDamage = getConfig("recoilDamage", 1.5, Double.class);
         recoilDamageIncreasePerLevel = getConfig("recoilDamageIncreasePerLevel", 0.5, Double.class);
+        velocityStrength = getConfig("velocityStrength", 1.5, Double.class);
     }
 }

@@ -30,6 +30,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
@@ -132,6 +133,7 @@ public class Swarm extends ChannelSkill implements InteractSkill, EnergySkill, L
 
                     Bat bat = cur.getWorld().spawn(cur.getLocation().add(0, 0.5, 0), Bat.class);
                     bat.setHealth(1);
+                    bat.setMetadata("PlayerSpawned", new FixedMetadataValue(champions, true));
                     bat.setVelocity(cur.getLocation().getDirection().multiply(2));
                     batData.get(cur).add(new BatData(bat, System.currentTimeMillis(), cur.getLocation()));
 

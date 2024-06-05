@@ -30,7 +30,9 @@ import org.bukkit.util.Vector;
 @Singleton
 @BPvPListener
 public class RopedArrow extends PrepareArrowSkill {
+
     private double fallDamageLimit;
+    private double velocityStrength;
 
     @Inject
     public RopedArrow(Champions champions, ChampionsManager championsManager) {
@@ -79,7 +81,7 @@ public class RopedArrow extends PrepareArrowSkill {
 
         Vector vec = UtilVelocity.getTrajectory(player, arrow);
 
-        VelocityData velocityData = new VelocityData(vec, 1.8D, false, 0.8D, 0.3D, 1.5D, true);
+        VelocityData velocityData = new VelocityData(vec, velocityStrength, false, 0.8D, 0.3D, 1.5D, true);
         UtilVelocity.velocity(player, null, velocityData);
 
         arrow.getWorld().playSound(arrow.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
@@ -122,6 +124,7 @@ public class RopedArrow extends PrepareArrowSkill {
     @Override
     public void loadSkillConfig(){
         fallDamageLimit = getConfig("fallDamageLimit", 8.0, Double.class);
+        velocityStrength = getConfig("velocityStrength", 2.0, Double.class);
     }
 
 }

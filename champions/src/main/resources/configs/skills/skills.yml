@@ -134,7 +134,7 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 14.0
-      baseDuration: 6.0
+      baseDuration: 4.0
       cooldownDecreasePerLevel: 1.0
       durationIncreasePerLevel: 1.0
       poisonStrength: 2
@@ -238,7 +238,7 @@ skills:
       baseDuration: 5.0
       slowDuration: 0.5
       slownessStrength: 4
-      resistanceStrength: 3
+      resistanceStrength: 2
       durationIncreasePerLevel: 0.5
     swordsmanship:
       enabled: true
@@ -270,7 +270,7 @@ skills:
       blocksMelee: true
       blocksArrow: false
       energyDecreasePerLevel: 1.0
-      internalCooldown: 2.0
+      internalCooldown: 1.25
       cooldown: 1.0
       cooldownDecreasePerLevel: 1.0
     powerchop:
@@ -301,7 +301,7 @@ skills:
       hitDistance: 4.0
   mage:
     staticlazer:
-      enabled: true
+      enabled: false
       maxlevel: 5
       cooldown: 10.0
       baseCharge: 40.0
@@ -394,7 +394,7 @@ skills:
     immolate:
       enabled: true
       maxlevel: 5
-      energy: 44
+      energy: 33
       baseFireTickDuration: 4.0
       fireTickDurationIncreasePerLevel: 0.0
       baseFireTrailDuration: 2.0
@@ -504,7 +504,7 @@ skills:
       durationIncreasePerLevel: 0.0
       regenerationStrength: 1
     polymorph:
-      enabled: true
+      enabled: false
       maxlevel: 3
       cooldown: 45.0
       duration: 8.0
@@ -633,6 +633,7 @@ skills:
       recoilDamage: 1.5
       recoilDamageIncreasePerLevel: 0.5
       damageIncreasePerLevel: 1.0
+      velocityStrength: 1.5
     unstoppableforce:
       enabled: true
       maxlevel: 5
@@ -1016,7 +1017,7 @@ skills:
       applyRadiusIncreasePerLevel: 1.0
       passiveTravelSpeed: 0.8
       applyTravelSpeed: 0.2
-      damagePerSecond: 0.5
+      damagePerSecond: 2.0
       damageIncreasePerLevel: 0.5
       regenPerSecond: 5.0
       regenIncreasePerLevel: 0.5
@@ -1041,7 +1042,7 @@ skills:
       baseDurationReduction: 20.0
       durationReductionPerLevel: 10.0
     swim:
-      enabled: true
+      enabled: false
       maxlevel: 5
       energy: 10
       cooldown: 0.35

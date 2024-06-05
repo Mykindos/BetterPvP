@@ -46,6 +46,7 @@ public class NullBlade extends Skill implements PassiveSkill, EnergySkill {
     @EventHandler
     public void onDamage(CustomDamageEvent event) {
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
+        if (event.getDamagee().hasMetadata("PlayerSpawned")) return;
 
         if (!(event.getDamager() instanceof Player dam)) return;
 

@@ -8,7 +8,6 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownToggleSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -68,7 +67,7 @@ public class BloodCompass extends Skill implements CooldownToggleSkill, Listener
                 "towards the nearest enemies within <stat>" + maxDistance + "</stat> blocks",
                 "",
                 "Players hit with these blood lines will receive",
-                "<effect>Glowing</effect> and <effect>Darkness</effect> for <val>" + getEffectDuration(level) + "</val> seconds",
+                "<effect>Glowing</effect> for <val>" + getEffectDuration(level) + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(level)
         };
@@ -239,7 +238,6 @@ public class BloodCompass extends Skill implements CooldownToggleSkill, Listener
                 if (target != null) {
                     UtilPlayer.setGlowing(player, target, true);
                     player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1.0f, 1.0f);
-                    championsManager.getEffects().addEffect(target, player, EffectTypes.DARKNESS, (getEffectDuration(level) * 1000L));
 
                     UtilMessage.message(player, getClassType().getName(), "You hit <alt2>" + target.getName() + "</alt2> with <alt>Blood Compass");
 
