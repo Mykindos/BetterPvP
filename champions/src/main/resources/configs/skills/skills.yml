@@ -42,11 +42,11 @@ skills:
     smokebomb:
       enabled: true
       cooldown: 40.0
-      maxlevel: 5
-      baseDuration: 3.0
+      maxlevel: 3
+      baseDuration: 4.0
       blindDuration: 1.75
       blindRadius: 4.0
-      cooldownDecreasePerLevel: 2.5
+      cooldownDecreasePerLevel: 5.0
       durationIncreasePerLevel: 1.0
     silencingarrow:
       enabled: true
@@ -140,10 +140,10 @@ skills:
       poisonStrength: 2
     recall:
       enabled: true
-      maxlevel: 5
-      cooldown: 30.0
+      maxlevel: 3
+      cooldown: 28.0
       percentHealthRecovered: 0.25
-      duration: 2.5
+      duration: 4
       canUseWhileSlowed: false
       cooldownDecreasePerLevel: 2.0
       durationIncreasePerLevel: 1.0
