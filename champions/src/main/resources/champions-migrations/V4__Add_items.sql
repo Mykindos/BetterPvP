@@ -253,9 +253,6 @@ INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, H
 INSERT IGNORE INTO itemdurability
     VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'crossbow'), 1000);
 
-INSERT IGNORE INTO itemlore
-    VALUES ((SELECT id FROM items WHERE Material = 'CROSSBOW' AND Namespace = 'champions'), 0, '<gray>+1 Level to Bow Skills');
-
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
     ('BOW', 'champions', 'bow', '<yellow>Bow', 0, 0, 0);
 
