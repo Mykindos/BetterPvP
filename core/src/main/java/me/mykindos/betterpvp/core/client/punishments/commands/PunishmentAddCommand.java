@@ -129,7 +129,7 @@ public class PunishmentAddCommand extends Command implements IConsoleCommand {
             reason = String.join(" ", Arrays.copyOfRange(args, 4, args.length));
         }
 
-        if (reason.equals("")) {
+        if (reason.isEmpty()) {
             UtilMessage.message(sender, "Punish", "You must include a reason for a punishment");
             return;
         }
