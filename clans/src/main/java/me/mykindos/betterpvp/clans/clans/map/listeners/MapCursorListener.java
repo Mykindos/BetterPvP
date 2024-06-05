@@ -44,6 +44,7 @@ public class MapCursorListener implements Listener {
         Client client = clientManager.search().online(player);
 
         for (Player otherPlayer : Bukkit.getOnlinePlayers()) {
+            if(otherPlayer.isDead()) continue;
             if (otherPlayer.getWorld().equals(player.getWorld())) {
                 float yaw = otherPlayer.getLocation().getYaw();
                 if (yaw < 0.0F) {

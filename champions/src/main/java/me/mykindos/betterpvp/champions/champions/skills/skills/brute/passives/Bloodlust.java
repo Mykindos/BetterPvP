@@ -75,6 +75,8 @@ public class Bloodlust extends Skill implements PassiveSkill {
 
     @EventHandler
     public void onDeath(EntityDeathEvent event) {
+        if(event.getEntity().hasMetadata("PlayerSpawned")) return;
+
         DamageLog lastDamager = damageLogManager.getLastDamager(event.getEntity());
         if (lastDamager == null) return;
         if (!(lastDamager.getDamager() instanceof Player player)) return;

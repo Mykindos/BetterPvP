@@ -24,6 +24,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.player.PlayerDropItemEvent;
 
 import java.text.DecimalFormat;
 import java.util.Collections;
@@ -168,6 +170,25 @@ public class PillageListener implements Listener {
                     + minutesRemaining + " <gray>minutes.", null, true);
             pillage.getPillager().messageClan("<gray>The pillage on <red>" + pillage.getPillaged().getName()
                     + "<gray> ends in <green>" + minutesRemaining + " <gray>minutes.", null, true);
+        }
+    }
+
+    @EventHandler
+    public void onDropLoot(PlayerDropItemEvent event) {
+        if(event.getPlayer().getOpenInventory().getType() == InventoryType.CRAFTING) return;
+
+        Optional<Clan> plyerClanOptional = clanManager.getClanByPlayer(event.getPlayer());
+        if(plyerClanOptional.isEmpty()) return;
+
+        Optional<Clan> locationClanOptional = clanManager.getClanByLocation(event.getPlayer().getLocation());
+        if(locationClanOptional.isEmpty()) return;
+
+        Clan playerClan = plyerClanOptional.get();
+        Clan locationClan = locationClanOptional.get();
+
+        if(pillageHandler.isPillaging(playerClan, locationClan)){
+            UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You cannot drop items directly from storage during a pillage!");
+            event.setCancelled(true);
         }
     }
 }

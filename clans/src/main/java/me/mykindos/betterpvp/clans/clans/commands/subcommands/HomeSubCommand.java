@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.clans.clans.commands.subcommands;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
 import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
@@ -35,12 +34,13 @@ public class HomeSubCommand extends ClanSubCommand {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        Clan playerClan = clanManager.getClanByPlayer(player).orElseThrow();
-        if (playerClan.getHome() == null) {
-            UtilMessage.simpleMessage(player, "Clans", "Your clan home has not been set yet. Use <yellow>/clan sethome</yellow> to set it.");
-            return;
-        }
+        clanManager.getClanByPlayer(player).ifPresent(playerClan -> {
+            if (playerClan.getHome() == null) {
+                UtilMessage.simpleMessage(player, "Clans", "Your clan home has not been set yet. Use <yellow>/clan sethome</yellow> to set it.");
+                return;
+            }
 
-        UtilServer.callEvent(new ClanHomeTeleportEvent(player, () -> player.teleport(playerClan.getHome())));
+            UtilServer.callEvent(new ClanHomeTeleportEvent(player, () -> player.teleport(playerClan.getHome())));
+        });
     }
 }

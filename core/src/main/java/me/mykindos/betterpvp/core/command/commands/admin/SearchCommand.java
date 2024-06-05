@@ -111,7 +111,7 @@ public class SearchCommand extends Command {
 
             int finalPageNumber = pageNumber;
             UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> {
-                List<CachedLog> logs = logRepository.getLogsWithContext(LogContext.ITEM, uuid.toString());
+                List<CachedLog> logs = logRepository.getLogsWithContextAndAction(LogContext.ITEM, uuid.toString(), "ITEM_");
                 int count = 0;
                 int start = (finalPageNumber - 1) * numPerPage;
                 int end = start + numPerPage;

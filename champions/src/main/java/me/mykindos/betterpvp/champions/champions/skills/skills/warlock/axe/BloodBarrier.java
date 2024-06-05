@@ -119,7 +119,7 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
 
             ShieldData shieldData = shieldDataMap.get(player.getUniqueId());
             if (shieldData != null) {
-                event.setDamage(event.getDamage() * shieldData.getDamageReduction());
+                event.setDamage(event.getDamage() * (1 - shieldData.getDamageReduction()));
                 shieldData.count--;
             }
         }

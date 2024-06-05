@@ -96,7 +96,7 @@ public class Scepter extends Weapon implements InteractWeapon, CooldownWeapon, L
         blackHoleRadius = getConfig("blackHoleRadius", 0.8, Double.class);
         blackHoleSpeed = getConfig("blackHoleSpeed", 3.0, Double.class);
         blackHoleHitbox = getConfig("blackHoleHitbox", 0.5, Double.class);
-        blackHolePullStrength = getConfig("blackHolePullStrength", 0.12, Double.class);
+        blackHolePullStrength = getConfig("blackHolePullStrength", 0.08, Double.class);
         blackHolePullRadius = getConfig("blackHolePullRadius", 5.0, Double.class);
         blackHoleAliveSeconds = getConfig("blackHoleAliveSeconds", 1.5, Double.class);
         blackHoleExpandSeconds = getConfig("blackHoleExpandSeconds", 0.75, Double.class);
