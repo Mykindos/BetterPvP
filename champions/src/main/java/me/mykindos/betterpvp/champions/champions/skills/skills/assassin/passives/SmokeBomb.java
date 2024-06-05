@@ -166,7 +166,10 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener {
             if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
                 // While smoke bombed, cancel melee damage from enemies
                 event.setCancelled(true);
-            } else {
+            } else if (event.getCause() != EntityDamageEvent.DamageCause.POISON
+                    && !event.hasReason("Bleed")
+                    && event.getCause() != EntityDamageEvent.DamageCause.FIRE
+                    && event.getCause() != EntityDamageEvent.DamageCause.FIRE_TICK) {
                 smoked.remove(player.getUniqueId());
                 reappear(player);
             }
