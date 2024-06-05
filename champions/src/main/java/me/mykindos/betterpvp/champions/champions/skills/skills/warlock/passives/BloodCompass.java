@@ -218,6 +218,10 @@ public class BloodCompass extends Skill implements CooldownToggleSkill, Listener
     public void createLine(Player player, Location start, Location end) {
         World world = start.getWorld();
         double distance = start.distance(end);
+        if (distance <= 0) {
+            return;
+        }
+
         int points = (int) (distance * 10);
         Random random = UtilMath.RANDOM;
         int level = getLevel(player);
@@ -236,19 +240,35 @@ public class BloodCompass extends Skill implements CooldownToggleSkill, Listener
             if (i == points) {
                 Player target = world.getPlayers().stream().filter(p -> p.getLocation().equals(end)).findFirst().orElse(null);
                 if (target != null) {
-                    UtilPlayer.setGlowing(player, target, true);
-                    player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1.0f, 1.0f);
+                    final List<Player> nearbyAllies = UtilPlayer.getNearbyAllies(player, player.getLocation(), maxDistance + maxDistanceIncreasePerLevel);
+                    show(player, nearbyAllies, target);
 
-                    UtilMessage.message(player, getClassType().getName(), "You hit <alt2>" + target.getName() + "</alt2> with <alt>Blood Compass");
+                    player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1.0f, 1.0f);
+                    UtilMessage.message(target, getClassType().getName(), "<alt2>" + player.getName() + "</alt2> hit you with <alt>" + getName() + "</alt>.");
+                    UtilMessage.message(player, getClassType().getName(), "You hit <alt2>" + target.getName() + "</alt2> with <alt>" + getName() + "</alt>.");
 
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                            UtilPlayer.setGlowing(player, target, false);
+                            hide(player, nearbyAllies, target);
                         }
                     }.runTaskLater(champions, 20L * getEffectDuration(level));
                 }
             }
+        }
+    }
+
+    private void show(Player player, List<Player> allies, Player target) {
+        UtilPlayer.setGlowing(player, target, true);
+        for (Player ally : allies) {
+            UtilPlayer.setGlowing(ally, target, true);
+        }
+    }
+
+    private void hide(Player player, List<Player> allies, Player target) {
+        UtilPlayer.setGlowing(player, target, false);
+        for (Player ally : allies) {
+            UtilPlayer.setGlowing(ally, target, false);
         }
     }
 
