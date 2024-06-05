@@ -21,6 +21,7 @@ import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
@@ -51,6 +52,7 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
     private double recoilDamageIncreasePerLevel;
     private double damageIncreasePerLevel;
     private double velocityStrength;
+    private double fallDamageLimit;
 
     @Inject
     public Takedown(Champions champions, ChampionsManager championsManager) {
@@ -174,6 +176,10 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
         Vector vec = player.getLocation().getDirection();
         VelocityData velocityData = new VelocityData(vec, velocityStrength, false, 0.0D, 0.4D, 0.6D, false);
         UtilVelocity.velocity(player, null, velocityData, VelocityType.CUSTOM);
+        UtilServer.runTaskLater(champions, () -> {
+            championsManager.getEffects().addEffect(player, player, EffectTypes.NO_FALL,getName(), (int) fallDamageLimit,
+                    50L, true, true, UtilBlock::isGrounded);
+        }, 3L);
         active.put(player, System.currentTimeMillis());
     }
 
@@ -193,5 +199,6 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
         recoilDamage = getConfig("recoilDamage", 1.5, Double.class);
         recoilDamageIncreasePerLevel = getConfig("recoilDamageIncreasePerLevel", 0.5, Double.class);
         velocityStrength = getConfig("velocityStrength", 1.5, Double.class);
+        fallDamageLimit = getConfig("fallDamageLimit", 4.0, Double.class);
     }
 }
