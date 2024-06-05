@@ -646,7 +646,7 @@ skills:
     stampede:
       enabled: true
       maxlevel: 3
-      durationPerStack: 7.0
+      durationPerStack: 6.0
       damage: 0.5
       damageIncreasePerLevel: 0.5
       durationPerStackDecreasePerLevel: 1.0
