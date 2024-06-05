@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.IConsoleCommand;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -47,13 +48,13 @@ public class PunishmentAddCommand extends Command implements IConsoleCommand {
 
     @Override
     public String getDescription() {
-        return "Base punishment command";
+        return "Add a punishment to a player";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length < 3) {
-            UtilMessage.message(player, "Command", "Usage: /punish add <type> <player> <time> [unit] [reason...]");
+            UtilMessage.message(player, "Command", "Usage: /punish add <type> <player> [<time> <unit> | perm] <reason...>");
             return;
         }
 
@@ -128,6 +129,11 @@ public class PunishmentAddCommand extends Command implements IConsoleCommand {
             reason = String.join(" ", Arrays.copyOfRange(args, 4, args.length));
         }
 
+        if (reason.equals("")) {
+            UtilMessage.message(sender, "Punish", "You must include a reason for a punishment");
+            return;
+        }
+
         String formattedTime = new PrettyTime().format(new Date(time)).replace(" from now", "");
 
         Punishment punishment = new Punishment(UUID.randomUUID(), target.getUniqueId(), type, time, reason, punisher != null ? punisher.getUniqueId().toString() : null);
@@ -159,7 +165,15 @@ public class PunishmentAddCommand extends Command implements IConsoleCommand {
         }
 
         if (!reason.isEmpty()) {
-            UtilMessage.broadcast("Punish", "<red>Reason<reset>: <reset>%s", reason);
+            Player targetPlayer = Bukkit.getPlayer(target.getUniqueId());
+            Component reasonComponent = UtilMessage.deserialize("<red>Reason<reset>: <reset>%s", reason);
+
+            if (targetPlayer != null) {
+                UtilMessage.message(targetPlayer, "Punish", reasonComponent);
+            }
+
+            clientManager.sendMessageToRank("Punish", reasonComponent, Rank.HELPER);
+
         }
 
     }
