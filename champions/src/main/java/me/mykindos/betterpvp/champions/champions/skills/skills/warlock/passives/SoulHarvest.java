@@ -78,6 +78,7 @@ public class SoulHarvest extends Skill implements PassiveSkill {
 
     @EventHandler
     public void onDeath(EntityDeathEvent event) {
+        if (event.getEntity() instanceof Bat) return;
         souls.add(new SoulData(event.getEntity().getUniqueId(), event.getEntity().getLocation(), System.currentTimeMillis() + 120_000));
     }
 
