@@ -856,20 +856,17 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 30.0
-      damageReduction: 0.3
-      numAttacksToReduce: 3
+      damageReduction: 0.9
       cooldownDecreasePerLevel: 2.0
       baseRange: 8.0
       rangeIncreasePerLevel: 1.0
-      baseHealthReduction: 0.5
+      baseHealthReduction: 0.4
       healthReductionDecreasePerLevel: 0.05
-      baseDuration: 60.0
+      baseDuration: 30.0
       durationIncreasePerLevel: 0.0
       damageReductionPerLevel: 0.0
-      baseNumAttacksToReduce: 3
+      baseNumAttacksToReduce: 1
       numAttacksToReducePerLevel: 0
-      range: 8
-      duration: 60.0
     bloodshed:
       enabled: true
       maxlevel: 5
