@@ -131,14 +131,16 @@ public class ClanManager extends Manager<Clan> {
     }
 
     public Optional<Clan> getClanByPlayer(Player player) {
-        if (player.hasMetadata("clan")) {
+
+        if (player != null && player.hasMetadata("clan")) {
             List<MetadataValue> clan = player.getMetadata("clan");
-            if(!clan.isEmpty()) {
+            if (!clan.isEmpty()) {
                 return Optional.ofNullable(clan.get(0).value())
                         .map(UUID.class::cast)
                         .flatMap(this::getClanById);
             }
         }
+
 
         return Optional.empty();
     }
