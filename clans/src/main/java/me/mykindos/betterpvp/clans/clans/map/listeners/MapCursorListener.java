@@ -9,7 +9,9 @@ import me.mykindos.betterpvp.clans.clans.map.events.MinimapExtraCursorEvent;
 import me.mykindos.betterpvp.clans.clans.map.events.MinimapPlayerCursorEvent;
 import me.mykindos.betterpvp.clans.clans.pillage.PillageHandler;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -19,6 +21,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.map.MapCursor;
 
+import java.util.HashMap;
+
 
 @BPvPListener
 public class MapCursorListener implements Listener {
@@ -27,6 +31,17 @@ public class MapCursorListener implements Listener {
     private final ClientManager clientManager;
     private final ClanManager clanManager;
     private final PillageHandler pillageHandler;
+
+    private final HashMap<String, Clan> clanCache = new HashMap<>();
+
+    @Inject
+    @Config(path = "clans.map.player-captions", defaultValue = "true")
+    private boolean playerCaptions;
+
+    @Inject
+    @Config(path = "clans.map.location-captions", defaultValue = "true")
+    private boolean locationCaptions;
+
 
     @Inject
     public MapCursorListener(Clans clans, ClientManager clientManager, ClanManager clanManager, PillageHandler pillageHandler) {
@@ -43,8 +58,14 @@ public class MapCursorListener implements Listener {
 
         Client client = clientManager.search().online(player);
 
+        if(locationCaptions && (boolean) client.getProperty(ClientProperty.MAP_POINTS_OF_INTEREST).orElse(false)) {
+            adminClanLocations(event);
+        }
+
+        boolean playerNames = (boolean) client.getProperty(ClientProperty.MAP_PLAYER_NAMES).orElse(false);
+
         for (Player otherPlayer : Bukkit.getOnlinePlayers()) {
-            if(otherPlayer.isDead()) continue;
+            if (otherPlayer.isDead()) continue;
             if (otherPlayer.getWorld().equals(player.getWorld())) {
                 float yaw = otherPlayer.getLocation().getYaw();
                 if (yaw < 0.0F) {
@@ -58,23 +79,27 @@ public class MapCursorListener implements Listener {
                 int z = otherPlayer.getLocation().getBlockZ();
 
                 MinimapPlayerCursorEvent cursorEvent = null;
-                if(client.isAdministrating()) {
-                    cursorEvent = new MinimapPlayerCursorEvent(player, otherPlayer, true, MapCursor.Type.WHITE_POINTER);
+                if (client.isAdministrating()) {
+                    cursorEvent = new MinimapPlayerCursorEvent(player, otherPlayer, true, MapCursor.Type.WHITE_POINTER, null);
                 } else {
                     Clan bClan = clanManager.getClanByPlayer(otherPlayer).orElse(null);
 
                     if (aClan == null) {
                         if (player == otherPlayer) {
-                            cursorEvent = new MinimapPlayerCursorEvent(player, otherPlayer, true, MapCursor.Type.WHITE_POINTER);
+                            cursorEvent = new MinimapPlayerCursorEvent(player, otherPlayer, true, MapCursor.Type.WHITE_POINTER, null);
                         }
                     } else {
                         if (bClan != null) {
                             if (aClan == bClan) {
-                                cursorEvent = new MinimapPlayerCursorEvent(player, otherPlayer, true, MapCursor.Type.BLUE_POINTER);
+                                if (player == otherPlayer) {
+                                    cursorEvent = new MinimapPlayerCursorEvent(player, otherPlayer, true, MapCursor.Type.WHITE_POINTER, null);
+                                } else {
+                                    cursorEvent = new MinimapPlayerCursorEvent(player, otherPlayer, true, MapCursor.Type.BLUE_POINTER, (playerCaptions && playerNames) ? otherPlayer.getName() : null);
+                                }
                             } else if (aClan.isAllied(bClan)) {
-                                cursorEvent = new MinimapPlayerCursorEvent(player, otherPlayer, true, MapCursor.Type.GREEN_POINTER);
+                                cursorEvent = new MinimapPlayerCursorEvent(player, otherPlayer, true, MapCursor.Type.GREEN_POINTER,  (playerCaptions && playerNames) ? otherPlayer.getName() : null);
                             } else if (pillageHandler.isPillaging(aClan, bClan) || pillageHandler.isPillaging(bClan, aClan)) {
-                                cursorEvent = new MinimapPlayerCursorEvent(player, otherPlayer, true, MapCursor.Type.RED_POINTER);
+                                cursorEvent = new MinimapPlayerCursorEvent(player, otherPlayer, true, MapCursor.Type.RED_POINTER, null);
                             }
                         }
                     }
@@ -82,14 +107,36 @@ public class MapCursorListener implements Listener {
                 if (cursorEvent != null) {
                     Bukkit.getPluginManager().callEvent(cursorEvent);
                     event.getCursors().add(new ExtraCursor(x, z, (player == otherPlayer) || (cursorEvent.isDisplay()),
-                            cursorEvent.getType(), direction, otherPlayer.getWorld().getName(), true));
+                            cursorEvent.getType(), direction, otherPlayer.getWorld().getName(), true, cursorEvent.getCaption()));
                 }
             }
         }
         if (aClan != null && aClan.getHome() != null) {
             Location aClanHomeLocation = aClan.getHome();
             event.getCursors().add(new ExtraCursor(aClanHomeLocation.getBlockX(), aClanHomeLocation.getBlockZ(), true,
-                    MapCursor.Type.MANSION, (byte) 8, player.getWorld().getName(), true));
+                    MapCursor.Type.MANSION, (byte) 8, player.getWorld().getName(), true, null));
+        }
+
+
+
+    }
+
+    private void adminClanLocations(MinimapExtraCursorEvent event) {
+        addAdminClan(event, "Fields", MapCursor.Type.RED_MARKER, "Fields");
+        addAdminClan(event, "Red Shops", MapCursor.Type.BANNER_RED, "Red Shops");
+        addAdminClan(event, "Blue Shops", MapCursor.Type.BANNER_BLUE, "Blue Shops");
+        addAdminClan(event, "Green Shops", MapCursor.Type.BANNER_LIME, "Green Shops");
+        addAdminClan(event, "Yellow Shops", MapCursor.Type.BANNER_YELLOW, "Yellow Shops");
+    }
+
+    private void addAdminClan(MinimapExtraCursorEvent event, String clanName, MapCursor.Type cursor, String caption) {
+        Clan clan = clanCache.computeIfAbsent(clanName, c -> clanManager.getClanByName(clanName).orElse(null));
+        if(clan != null) {
+            Location homeLoc = clan.getHome();
+            if (homeLoc != null) {
+                event.getCursors().add(new ExtraCursor(homeLoc.getBlockX(), homeLoc.getBlockZ(), true,
+                        cursor, (byte) 8, homeLoc.getWorld().getName(), true, caption));
+            }
         }
     }
 }
