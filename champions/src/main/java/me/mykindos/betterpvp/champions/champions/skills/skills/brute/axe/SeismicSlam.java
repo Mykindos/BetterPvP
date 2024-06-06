@@ -131,9 +131,9 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
             }
             double percentageMultiplier = 1 - (UtilMath.offset(player, target) / getRadius(level));
 
-            double scaledVelocity = 0.6 + (2 * percentageMultiplier);
+            double scaledVelocity = 0.6 + percentageMultiplier * 0.4;
             Vector trajectory = UtilVelocity.getTrajectory2d(player.getLocation().toVector(), target.getLocation().toVector());
-            VelocityData velocityData = new VelocityData(trajectory, scaledVelocity, true, 0, 0.2 + percentageMultiplier, 1.4, true);
+            VelocityData velocityData = new VelocityData(trajectory, scaledVelocity, true, 0, 0.2 + percentageMultiplier / 1.2, 1, true);
             UtilVelocity.velocity(target, player, velocityData);
 
             double damage = calculateDamage(player, target);

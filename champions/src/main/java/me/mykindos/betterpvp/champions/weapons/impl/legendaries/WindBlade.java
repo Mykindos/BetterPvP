@@ -155,6 +155,6 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
 
     @Override
     public void loadWeaponConfig() {
-        velocityStrength = getConfig("velocityStrength", 0.7, Double.class);
+        velocityStrength = getConfig("velocityStrength", 0.5, Double.class);
     }
 }

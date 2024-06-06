@@ -634,6 +634,7 @@ skills:
       recoilDamageIncreasePerLevel: 0.5
       damageIncreasePerLevel: 1.0
       velocityStrength: 1.5
+      fallDamageLimit: 4.0
     unstoppableforce:
       enabled: true
       maxlevel: 5

@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import org.bukkit.Sound;
@@ -107,26 +108,22 @@ public class Sever extends Skill implements CooldownSkill, Listener {
         }
 
         if (ent == null) {
-            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SPIDER_HURT, 1.0F, 1.5F);
+            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SPIDER_HURT, 1.0F, 0.5F);
             UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s %s", getName(), level);
             return;
         }
 
         boolean withinRange = UtilMath.offset(player, ent) <= hitDistance;
-        boolean isFriendly = false;
-        if (ent instanceof Player damagee) {
-            isFriendly = UtilEntity.getRelation(player, damagee) == EntityProperty.FRIENDLY;
-        }
-
-        if (!withinRange || isFriendly) {
+        if (UtilPlayer.isCreativeOrSpectator(ent) || UtilEntity.getRelation(player, ent) != EntityProperty.ENEMY || !withinRange) {
             UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s %s", getName(), level);
+            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SPIDER_HURT, 1.0F, 0.5F);
         } else {
             championsManager.getEffects().addEffect(ent, player, EffectTypes.BLEED, 1, (long) (getDuration(level) * 1000L));
             UtilMessage.simpleMessage(player, getClassType().getName(), "You severed <alt>" + ent.getName() + "</alt>.");
             UtilMessage.simpleMessage(ent, getClassType().getName(), "You have been severed by <alt>" + player.getName() + "</alt>.");
+            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SPIDER_HURT, 1.0F, 1.5F);
         }
 
-        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SPIDER_HURT, 1.0F, 1.5F);
     }
 
     @Override

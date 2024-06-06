@@ -33,6 +33,7 @@ energy_elixir:
 water_bottle:
   enabled: true
   cooldown: 10.0
+  duration: 1.5
 ranger_boots:
   enabled: true
 power_sword:
