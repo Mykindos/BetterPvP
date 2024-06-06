@@ -16,6 +16,7 @@ import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageEvent;
 
 @Singleton
@@ -57,7 +58,7 @@ public class CripplingBlow extends Skill implements PassiveSkill {
     }
 
 
-    @EventHandler
+    @EventHandler (priority = EventPriority.HIGHEST)
     public void onDamage(CustomDamageEvent event) {
         if (!(event.getDamager() instanceof Player player)) return;
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;

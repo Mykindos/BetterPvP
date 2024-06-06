@@ -12,7 +12,6 @@ import me.mykindos.betterpvp.core.framework.annotations.WithReflection;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.entity.Player;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -66,17 +65,19 @@ public class ClanCommand extends Command {
             return;
         }
 
-        // If the clan was not found by name, try to get the clan by player name
-        final Collection<Client> matches = clientManager.search(player).inform(false).advancedOnline(args[0]);
-        if (matches.size() == 1) {
-            final Client found = matches.iterator().next();
-            final Optional<Clan> foundClan = clanManager.getClanByPlayer(found.getUniqueId());
-            foundClan.ifPresentOrElse(clan -> openClanMenu(player, playerClan, clan), () -> {
-                UtilMessage.message(player, "Clans", "That player is not in a clan.");
-            });
-        } else {
-            UtilMessage.message(player, "Clans", "Cannot find the specified clan or player.");
-        }
+        clientManager.search(player).inform(false).advancedOffline(args[0], found -> {
+            if(found.size() == 1) {
+                final Client targetClient = found.iterator().next();
+                final Optional<Clan> foundClan = clanManager.getClanByPlayer(targetClient.getUniqueId());
+                foundClan.ifPresentOrElse(clan -> openClanMenu(player, playerClan, clan), () -> {
+                    UtilMessage.message(player, "Clans", "That player is not in a clan.");
+                });
+            } else {
+                UtilMessage.message(player, "Clans", "Cannot find the specified clan or player.");
+            }
+        });
+
+
     }
 
     private void openClanMenu(Player player, Clan playerClan, Clan clan) {
