@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
 import me.mykindos.betterpvp.core.utilities.events.GetEntityRelationshipEvent;
 import me.mykindos.betterpvp.core.utilities.model.EntityRemovalReason;
 import me.mykindos.betterpvp.core.utilities.model.MultiRayTraceResult;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
@@ -128,6 +129,11 @@ public class UtilEntity {
                 .filter(livingEntity -> {
                     if (livingEntity.equals(source)) return false;
                     if (livingEntity.getLocation().distance(location) > radius) return false;
+                    if(livingEntity instanceof Player player) {
+                        if(player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR) {
+                            return false;
+                        }
+                    }
                     return !(livingEntity instanceof ArmorStand);
                 })
                 .forEach(ent -> livingEntities.add(new KeyValue<>(ent, entityProperty)));

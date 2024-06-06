@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
+import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -19,6 +20,10 @@ import java.util.Optional;
 public class DamageListener implements Listener {
 
     private final ItemDamageManager itemDamageManager;
+
+    @Inject
+    @Config(path = "damage.multiplier.fall", defaultValue = "0.8")
+    private double fallDamageMultiplier;
 
     @Inject
     public DamageListener(ItemDamageManager itemDamageManager) {
@@ -39,6 +44,18 @@ public class DamageListener implements Listener {
         final double damage = damageValue.map(ItemDamageValue::getDamage).orElse(0.5 * event.getDamage());
         event.setDamage(damage);
         event.setRawDamage(damage);
+    }
+
+    @EventHandler (priority = EventPriority.LOWEST)
+    public void onFallDamage(PreCustomDamageEvent event) {
+        if(event.isCancelled()) return;
+        CustomDamageEvent customDamageEvent = event.getCustomDamageEvent();
+
+        if(customDamageEvent.getCause() != EntityDamageEvent.DamageCause.FALL) return;
+        if(customDamageEvent.getDamagee() instanceof Player) return;
+
+        customDamageEvent.setDamage(customDamageEvent.getDamage() * fallDamageMultiplier);
+
     }
 
 }

@@ -11,10 +11,12 @@ import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Singleton
 public class ClientCommand extends Command {
@@ -97,6 +99,11 @@ public class ClientCommand extends Command {
                 List<Component> result = new ArrayList<>();
                 result.add(UtilMessage.deserialize("<alt2>%s</alt2> Client Details", target.getName()));
 
+                Player targetPlayer = Bukkit.getPlayer(target.getUniqueId());
+                if(targetPlayer != null) {
+                    List<String> alts = clientManager.getSqlLayer().getAlts(targetPlayer, Objects.requireNonNull(targetPlayer.getAddress()).getHostName());
+                    result.add(UtilMessage.deserialize("<green>Alts: <white>%s", String.join("<gray>, <white>", alts)));
+                }
                 result.forEach(message -> UtilMessage.message(player, message));
             }, () -> UtilMessage.message(player, "Command", "Could not find a client with this name")));
         }
