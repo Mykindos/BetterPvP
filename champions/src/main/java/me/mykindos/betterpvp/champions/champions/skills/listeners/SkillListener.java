@@ -62,6 +62,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
@@ -88,7 +89,7 @@ public class SkillListener implements Listener {
     private final ChampionsSkillManager skillManager;
     private final WeaponManager weaponManager;
 
-    private final HashSet<UUID> InventoryDrop = new HashSet<>();
+    private final HashSet<UUID> inventoryDrop = new HashSet<>();
 
     @Inject
     public SkillListener(BuildManager buildManager, RoleManager roleManager, CooldownManager cooldownManager,
@@ -173,20 +174,25 @@ public class SkillListener implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler (priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onInventoryDrop(InventoryClickEvent event) {
         if (event.getAction().name().contains("DROP")) {
             if (event.getWhoClicked() instanceof Player player) {
-                InventoryDrop.add(player.getUniqueId());
+                inventoryDrop.add(player.getUniqueId());
             }
         }
     }
 
     @EventHandler
+    public void onQuit(PlayerQuitEvent event) {
+        inventoryDrop.remove(event.getPlayer().getUniqueId());
+    }
+
+    @EventHandler
     public void onDrop(PlayerDropItemEvent event) {
         Player player = event.getPlayer();
-        if (InventoryDrop.contains(player.getUniqueId())) {
-            InventoryDrop.remove(player.getUniqueId());
+        if (inventoryDrop.contains(player.getUniqueId())) {
+            inventoryDrop.remove(player.getUniqueId());
             return;
         }
         ItemStack droppedItem = event.getItemDrop().getItemStack();
