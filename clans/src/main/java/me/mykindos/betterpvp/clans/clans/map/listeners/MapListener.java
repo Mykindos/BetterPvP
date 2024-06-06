@@ -356,7 +356,7 @@ public class MapListener implements Listener {
 
     private Component createZoomBar(MapSettings.Scale scale) {
         return Component.text("Zoom: ", NamedTextColor.WHITE)
-                .append(Component.text((1 << scale.getValue()) + "x", NamedTextColor.GREEN));
+                .append(Component.text((scale.getValue()) + "x", NamedTextColor.GREEN));
     }
 
     private MapColor getColourForClan(Clan playerClan, Clan otherClan) {

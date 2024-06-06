@@ -65,7 +65,7 @@ public class MapHandler {
 
         int distX = Math.abs(mapData.getMapX() - player.getLocation().getBlockX());
         int distZ = Math.abs(mapData.getMapZ() - player.getLocation().getBlockZ());
-        final int scale = 1 << mapData.getScale().getValue();
+        final int scale = mapData.getScale().getValue();
         return (distX >= scale) || (distZ >= scale);
     }
 

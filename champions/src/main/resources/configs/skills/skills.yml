@@ -654,7 +654,7 @@ skills:
       durationPerStackDecreasePerLevel: 1.0
       knockbackIncreasePerLevel: 0.5
       knockback: 0.5
-      maxSpeedStrength: 2
+      maxSpeedStrength: 3
     threateningshout:
       enabled: true
       maxlevel: 5
