@@ -93,12 +93,12 @@ public class Scepter extends Weapon implements InteractWeapon, CooldownWeapon, L
 
     @Override
     public void loadWeaponConfig() {
-        blackHoleRadius = getConfig("blackHoleRadius", 0.8, Double.class);
+        blackHoleRadius = getConfig("blackHoleRadius", 0.5, Double.class);
         blackHoleSpeed = getConfig("blackHoleSpeed", 3.0, Double.class);
         blackHoleHitbox = getConfig("blackHoleHitbox", 0.5, Double.class);
-        blackHolePullStrength = getConfig("blackHolePullStrength", 0.08, Double.class);
-        blackHolePullRadius = getConfig("blackHolePullRadius", 5.0, Double.class);
-        blackHoleAliveSeconds = getConfig("blackHoleAliveSeconds", 1.5, Double.class);
+        blackHolePullStrength = getConfig("blackHolePullStrength", 0.12, Double.class);
+        blackHolePullRadius = getConfig("blackHolePullRadius", 3.5, Double.class);
+        blackHoleAliveSeconds = getConfig("blackHoleAliveSeconds", 1.3, Double.class);
         blackHoleExpandSeconds = getConfig("blackHoleExpandSeconds", 0.75, Double.class);
         blackHoleTravelSeconds = getConfig("blackHoleTravelSeconds", 2.0, Double.class);
         beamCooldown = getConfig("beamCooldown", 1.0, Double.class);
