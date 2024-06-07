@@ -72,7 +72,6 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
     private static final String COLLISION_NAME = "Voltic Bash";
     private static final String ABILITY_NAME = "Charge";
 
-    private final Set<UUID> activeUsageNotifications = new HashSet<>();
     private final WeakHashMap<Player, AegisData> cache = new WeakHashMap<>();
     private final Champions champions;
     private final ClientManager clientManager;
@@ -366,13 +365,6 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
         if (remove != null) {
             deactivate(remove);
         }
-        activeUsageNotifications.remove(event.getPlayer().getUniqueId());
-    }
-
-    @Override
-    @EventHandler
-    public void onDeath(PlayerDeathEvent event) {
-        activeUsageNotifications.remove(event.getPlayer().getUniqueId());
     }
 
     @EventHandler(priority = EventPriority.LOW)

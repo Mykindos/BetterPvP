@@ -47,8 +47,6 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
 
     private static final String ABILITY_NAME = "Gator Stroke";
 
-    private final Set<UUID> activeUsageNotifications = new HashSet<>();
-
     private double bonusDamage;
     private double velocityStrength;
 
@@ -79,20 +77,6 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
     @Override
     public void activate(Player player) {
         active.add(player.getUniqueId());
-    }
-
-    @Override
-    @EventHandler
-    public void onDeath(PlayerDeathEvent event) {
-        activeUsageNotifications.remove(event.getPlayer().getUniqueId());
-        active.remove(event.getPlayer().getUniqueId());
-    }
-
-    @Override
-    @EventHandler
-    public void onQuit(PlayerQuitEvent event) {
-        activeUsageNotifications.remove(event.getPlayer().getUniqueId());
-        active.remove(event.getPlayer().getUniqueId());
     }
 
     @UpdateEvent

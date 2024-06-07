@@ -45,8 +45,6 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
 
     private static final String ABILITY_NAME = "Flight";
 
-    private final Set<UUID> activeUsageNotifications = new HashSet<>();
-
     private double velocityStrength;
     private final EnergyHandler energyHandler;
     private final ClientManager clientManager;
@@ -75,20 +73,6 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
     @Override
     public void activate(Player player) {
         active.add(player.getUniqueId());
-    }
-
-    @Override
-    @EventHandler
-    public void onDeath(PlayerDeathEvent event) {
-        activeUsageNotifications.remove(event.getPlayer().getUniqueId());
-        active.remove(event.getPlayer().getUniqueId());
-    }
-
-    @Override
-    @EventHandler
-    public void onQuit(PlayerQuitEvent event) {
-        activeUsageNotifications.remove(event.getPlayer().getUniqueId());
-        active.remove(event.getPlayer().getUniqueId());
     }
 
     @UpdateEvent (priority = 99)
