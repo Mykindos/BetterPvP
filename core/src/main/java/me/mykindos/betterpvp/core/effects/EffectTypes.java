@@ -48,6 +48,7 @@ public class EffectTypes {
     public static final EffectType POISON = createEffectType(new PoisonEffect());
     public static final EffectType NO_JUMP = createEffectType(new NoJumpEffect());
     public static final EffectType NO_SPRINT = createEffectType(new NoSprintEffect());
+    public static final EffectType CONCUSS = createEffectType(new ConcussedEffect());
     public static final EffectType BLINDNESS = createEffectType(new BlindnessEffect());
     public static final EffectType LEVITATION = createEffectType(new LevitationEffect());
     public static final EffectType BLEED = createEffectType(new BleedEffect());
