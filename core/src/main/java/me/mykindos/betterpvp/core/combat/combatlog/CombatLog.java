@@ -27,11 +27,12 @@ public class CombatLog {
     private final List<ItemStack> items;
     private final long expiryTime;
     private final LivingEntity combatLogSheep;
+    private final String playerName;
 
     public CombatLog(Player player, long expiryTime) {
         this.owner = player.getUniqueId();
         this.expiryTime = expiryTime;
-
+        this.playerName = player.getName();
         items = new ArrayList<>();
         for(ItemStack itemStack : player.getInventory().getContents()) {
             if(itemStack == null || itemStack.getType() == Material.AIR) continue;
@@ -70,7 +71,7 @@ public class CombatLog {
 
         UtilServer.callEvent(new PlayerClickCombatLogEvent(player, this));
 
-        File file = new File("world/playerdata", owner.toString() + ".dat");
+        File file = new File("world/playerdata", owner + ".dat");
         if (file.exists()) {
             if(!file.delete()) {
                 log.error("Failed to delete dat file for player {}", owner);

@@ -250,7 +250,7 @@ public class WeaponListener implements Listener {
             Optional<IWeapon> weaponOptional = weaponManager.getWeaponByItemStack(itemStack);
             if (weaponOptional.isPresent()) {
                 IWeapon weapon = weaponOptional.get();
-                if (!(weapon instanceof LegendaryWeapon)) return;
+                if (!(weapon instanceof LegendaryWeapon)) continue;
 
                 event.setSafe(false);
                 event.setDuration(System.currentTimeMillis()); // Permanent combat log
