@@ -6,9 +6,11 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.champions.stats.impl.ChampionsFilter;
+import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.combat.stats.impl.GlobalCombatStatsRepository;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.database.query.Statement;
+import me.mykindos.betterpvp.core.database.query.values.BooleanStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
 import me.mykindos.betterpvp.core.stats.repository.StatsRepository;
 
@@ -71,5 +73,19 @@ public class ChampionsStatsRepository extends StatsRepository<RoleStatistics> {
             log.error("Failed to load combat data for " + player, throwable).submit();
             return null;
         });
+    }
+
+    public void validate(Client client, boolean isValid) {
+        String updateKills = "UPDATE kills SET Valid = ? WHERE Killer = ?";
+        Statement updateKillsStatement = new Statement(updateKills,
+                new BooleanStatementValue(isValid),
+                new UuidStatementValue(client.getUniqueId()));
+        database.executeUpdate(updateKillsStatement);
+
+        String updateCombatData = "UPDATE champions_combat_stats SET Valid = ? WHERE Gamer = ?";
+        Statement updateCombatDataStatement = new Statement(updateCombatData,
+                new BooleanStatementValue(isValid),
+                new UuidStatementValue(client.getUniqueId()));
+        database.executeUpdate(updateCombatDataStatement);
     }
 }
