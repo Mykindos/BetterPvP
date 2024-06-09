@@ -48,6 +48,7 @@ skills:
       blindRadius: 4.0
       cooldownDecreasePerLevel: 2.5
       durationIncreasePerLevel: 1.0
+      allowPickupItems: false
     silencingarrow:
       enabled: true
       maxlevel: 5
