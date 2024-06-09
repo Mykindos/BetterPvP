@@ -25,7 +25,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
@@ -37,7 +36,7 @@ public class RightClickListener implements Listener {
 
     private final ClientManager clientManager;
     private final Core core;
-    private final Map<Player, RightClickContext> rightClickCache = new HashMap<>();
+    private final WeakHashMap<Player, RightClickContext> rightClickCache = new WeakHashMap<>();
     private final WeakHashMap<Player, Long> lastDrop = new WeakHashMap<>();
 
     @Inject
@@ -54,7 +53,8 @@ public class RightClickListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onInteract(PlayerInteractEvent event) {
-        if (this.lastDrop.containsKey(event.getPlayer()) && System.currentTimeMillis() - this.lastDrop.get(event.getPlayer()) <= 20L) {
+        if(!event.getAction().isLeftClick()) return;
+        if (this.lastDrop.containsKey(event.getPlayer()) && System.currentTimeMillis() - this.lastDrop.get(event.getPlayer()) <= 50L) {
             event.setCancelled(true);
             this.lastDrop.remove(event.getPlayer());
         }
