@@ -67,7 +67,9 @@ public class PlayerName implements Listener {
         }, 2L);
     }
 
-    public void sendChange(@NotNull Player player, @NotNull Player receiver) {
+    public void sendChange(Player player, @NotNull Player receiver) {
+        if(player == null) return;
+
         final Scoreboard scoreboard = receiver.getScoreboard();
 
         final Optional<Clan> playerClan = this.clanManager.getClanByPlayer(player);
