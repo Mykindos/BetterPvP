@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.client.punishments.types.IPunishmentType;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.ocpsoft.prettytime.PrettyTime;
 
 import java.util.Date;
@@ -60,7 +61,7 @@ public class Punishment {
         Component component = Component.empty().append(currentComp).appendSpace()
                 .append(Component.text(this.type.getName(), NamedTextColor.WHITE)).appendSpace()
                 .append(Component.text(reason == null ? "No Reason" : reason, NamedTextColor.GRAY)).appendSpace()
-                .append(Component.text(punisher == null ? "SERVER" : punisher, NamedTextColor.AQUA));
+                .append(Component.text(punisher == null ? "SERVER" : Bukkit.getOfflinePlayer(UUID.fromString(punisher)).getName(), NamedTextColor.AQUA));
         return component;
     }
 }
