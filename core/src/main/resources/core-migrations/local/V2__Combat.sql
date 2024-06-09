@@ -6,7 +6,8 @@ create table if not exists kills
     Contribution float          not null,
     Damage       float          not null,
     RatingDelta  int            not null,
-    Time         bigint         not null
+    Time         bigint         not null,
+    Valid        tinyint        not null default 1
 );
 
 create table if not exists kill_contributions
