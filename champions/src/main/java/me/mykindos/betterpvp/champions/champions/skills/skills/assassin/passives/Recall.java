@@ -162,7 +162,7 @@ public class Recall extends Skill implements CooldownToggleSkill, Listener {
     @Override
     public void loadSkillConfig(){
         percentHealthRecovered = getConfig("percentHealthRecovered", 0.25, Double.class);
-        duration = getConfig("duration", 2.5, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
+        duration = getConfig("duration", 2.0, Double.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.5, Double.class);
     }
 }
