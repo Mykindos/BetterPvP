@@ -38,7 +38,14 @@ public class ClanDetailsButton extends ControlItem<ClanMenu> {
 
     @Override
     public ItemProvider getItemProvider(ClanMenu gui) {
-        final double netDominance = clan.getEnemies().stream().mapToDouble(ClanEnemy::getDominance).sum();
+        double netDominance = clan.getEnemies().stream().mapToDouble(ClanEnemy::getDominance).sum();
+        for (ClanEnemy enemy : clan.getEnemies()) {
+            Optional<ClanEnemy> theirEnemyOptional = enemy.getClan().getEnemy(clan);
+            if (theirEnemyOptional.isPresent()) {
+                netDominance -= theirEnemyOptional.get().getDominance();
+            }
+        }
+
         String netDominanceText = String.format("%.1f%%", netDominance);
 
         Component tntProtectionCmpt;
