@@ -75,7 +75,7 @@ public class ClanMenu extends AbstractGui implements Windowed {
         setItem(8, new ViewAlliancesButton(clan, this, viewerClan));
 
         // Middle row - member and clan information
-        setItem(18, new ClanDetailsButton(admin, clan, clan.getRelation(viewerClan)));
+        setItem(18, new ClanDetailsButton(admin, clan, viewerClan, clan.getRelation(viewerClan)));
         addMemberButtons(ownClan);
 
         // Bottom row buttons (only viewable by clan members)
