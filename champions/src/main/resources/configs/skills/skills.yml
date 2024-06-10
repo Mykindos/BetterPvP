@@ -143,10 +143,10 @@ skills:
       maxlevel: 3
       cooldown: 28.0
       percentHealthRecovered: 0.25
-      duration: 4.0
+      duration: 2.0
       canUseWhileSlowed: false
       cooldownDecreasePerLevel: 2.0
-      durationIncreasePerLevel: 1.0
+      durationIncreasePerLevel: 1.5
     evade:
       enabled: true
       maxlevel: 3
