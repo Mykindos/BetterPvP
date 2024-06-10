@@ -134,9 +134,10 @@ public class ClientSQLLayer {
 
     public void save(Client object) {
         // Client
-        String query = "INSERT INTO clients (UUID, Name) VALUES(?, ?) ON DUPLICATE KEY UPDATE `Rank` = ?;";
+        String query = "INSERT INTO clients (UUID, Name) VALUES(?, ?) ON DUPLICATE KEY UPDATE Name = ?, `Rank` = ?;";
         sharedDatabase.executeUpdateAsync(new Statement(query,
                 new StringStatementValue(object.getUuid()),
+                new StringStatementValue(object.getName()),
                 new StringStatementValue(object.getName()),
                 new StringStatementValue(object.getRank().name())
         ));

@@ -8,6 +8,8 @@ import me.mykindos.betterpvp.core.client.events.ClientAdministrateEvent;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.SubCommand;
+import me.mykindos.betterpvp.core.config.Config;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -75,6 +77,10 @@ public class ClientCommand extends Command {
     private static class SearchSubCommand extends Command {
 
         @Inject
+        @Config(path = "core.salt", defaultValue = "")
+        private String salt;
+
+        @Inject
         private ClientManager clientManager;
 
         @Override
@@ -101,7 +107,7 @@ public class ClientCommand extends Command {
 
                 Player targetPlayer = Bukkit.getPlayer(target.getUniqueId());
                 if(targetPlayer != null) {
-                    List<String> alts = clientManager.getSqlLayer().getAlts(targetPlayer, Objects.requireNonNull(targetPlayer.getAddress()).getHostName());
+                    List<String> alts = clientManager.getSqlLayer().getAlts(targetPlayer, UtilFormat.hashWithSalt(Objects.requireNonNull(targetPlayer.getAddress()).getHostName(), salt));
                     result.add(UtilMessage.deserialize("<green>Alts: <white>%s", String.join("<gray>, <white>", alts)));
                 }
                 result.forEach(message -> UtilMessage.message(player, message));

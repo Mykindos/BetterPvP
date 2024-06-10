@@ -82,6 +82,12 @@ public class ChampionsStatsRepository extends StatsRepository<RoleStatistics> {
                 new UuidStatementValue(client.getUniqueId()));
         database.executeUpdate(updateKillsStatement);
 
+        String updateStats = "UPDATE combat_stats SET Valid = ? WHERE Gamer = ?";
+        Statement updateStatsStatement = new Statement(updateStats,
+                new BooleanStatementValue(isValid),
+                new UuidStatementValue(client.getUniqueId()));
+        database.executeUpdate(updateStatsStatement);
+
         String updateCombatData = "UPDATE champions_combat_stats SET Valid = ? WHERE Gamer = ?";
         Statement updateCombatDataStatement = new Statement(updateCombatData,
                 new BooleanStatementValue(isValid),
