@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.progression.profession.fishing.model;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
+import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilLocation;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
@@ -213,7 +214,7 @@ public abstract class Bait {
     }
 
     private boolean isInWater(Location location) {
-        return location.getBlock().getType().equals(Material.WATER);
+        return UtilBlock.isWater(location.getBlock()) || location.getBlock().getType().name().endsWith("ICE");
     }
 
 
