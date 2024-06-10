@@ -153,6 +153,10 @@ public class ChampionsCommand extends Command implements IConsoleCommand {
 
     @Override
     public String getArgumentType(int arg) {
-        return arg == 1 ? ArgumentType.PLAYER.name() : ArgumentType.NONE.name();
+        return switch (arg) {
+            case 1 -> ArgumentType.SUBCOMMAND.name();
+            case 2 -> ArgumentType.PLAYER.name();
+            default -> ArgumentType.BOOLEAN.name();
+        };
     }
 }

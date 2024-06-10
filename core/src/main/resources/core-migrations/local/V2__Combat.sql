@@ -28,25 +28,26 @@ create table if not exists combat_stats
     Gamer             varchar(36) primary key,
     Rating            int not null,
     Killstreak        int not null default 0,
-    HighestKillstreak int not null default 0
+    HighestKillstreak int not null default 0,
+    Valid             tinyint not null default 1
 );
 
 DROP PROCEDURE IF EXISTS GetTopRating;
 CREATE PROCEDURE GetTopRating(top int)
 BEGIN
-    SELECT Gamer, Rating FROM combat_stats ORDER BY Rating DESC LIMIT top;
+    SELECT Gamer, Rating FROM combat_stats WHERE Valid = 1 ORDER BY Rating DESC LIMIT top;
 END;
 
 DROP PROCEDURE IF EXISTS GetTopKills;
 CREATE PROCEDURE GetTopKills(top int)
 BEGIN
-    SELECT Killer as Gamer, COUNT(*) AS Kills FROM kills GROUP BY Gamer ORDER BY Kills DESC LIMIT top;
+    SELECT Killer as Gamer, COUNT(*) AS Kills FROM kills WHERE Valid = 1 GROUP BY Gamer ORDER BY Kills DESC LIMIT top;
 END;
 
 DROP PROCEDURE IF EXISTS GetTopDeaths;
 CREATE PROCEDURE GetTopDeaths(top int)
 BEGIN
-    SELECT Victim as Gamer, COUNT(*) AS Deaths FROM kills GROUP BY Gamer ORDER BY Deaths DESC LIMIT top;
+    SELECT Victim as Gamer, COUNT(*) AS Deaths FROM kills WHERE Valid = 1 GROUP BY Gamer ORDER BY Deaths DESC LIMIT top;
 END;
 
 DROP PROCEDURE IF EXISTS GetTopKDR;
@@ -54,9 +55,11 @@ CREATE PROCEDURE GetTopKDR(top int)
 BEGIN
     WITH KillCount AS (SELECT Killer AS Gamer, COUNT(*) AS Kills
                        FROM kills
+                       WHERE Valid = 1
                        GROUP BY Killer),
          Deaths AS (SELECT Victim AS Gamer, COUNT(*) AS Deaths
                     FROM kills
+                    WHERE Valid = 1
                     GROUP BY Victim)
 
     SELECT KillCount.Gamer AS Gamer, IFNULL(Kills / Deaths, Kills) AS KDR
@@ -69,13 +72,13 @@ END;
 DROP PROCEDURE IF EXISTS GetTopKillstreak;
 CREATE PROCEDURE GetTopKillstreak(top int)
 BEGIN
-    SELECT Gamer, Killstreak FROM combat_stats ORDER BY Killstreak DESC LIMIT top;
+    SELECT Gamer, Killstreak FROM combat_stats WHERE Valid = 1 ORDER BY Killstreak DESC LIMIT top;
 END;
 
 DROP PROCEDURE IF EXISTS GetTopHighestKillstreak;
 CREATE PROCEDURE GetTopHighestKillstreak(top INT)
 BEGIN
-    SELECT Gamer, HighestKillstreak FROM combat_stats ORDER BY HighestKillstreak DESC LIMIT top;
+    SELECT Gamer, HighestKillstreak FROM combat_stats WHERE Valid = 1 ORDER BY HighestKillstreak DESC LIMIT top;
 END;
 
 DROP PROCEDURE IF EXISTS GetCombatData;
@@ -104,6 +107,6 @@ BEGIN
         FROM kill_contributions
         GROUP BY Contributor
     ) AS ac ON cs.Gamer = ac.Contributor
-    WHERE cs.Gamer = player;
+    WHERE cs.Gamer = player AND cs.Valid = 1;
 END;
 
