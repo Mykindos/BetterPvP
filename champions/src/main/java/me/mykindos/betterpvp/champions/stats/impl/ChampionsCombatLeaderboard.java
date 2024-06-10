@@ -132,16 +132,7 @@ public final class ChampionsCombatLeaderboard extends PlayerLeaderboard<CombatDa
         }
 
         final String className = Optional.ofNullable(filter.getRole()).map(Role::getName).orElse("");
-        final IntegerStatementValue top = new IntegerStatementValue(10);
-        final StringStatementValue classNameStmt = new StringStatementValue(className);
-        Statement stmt = switch (sortType) {
-            case RATING -> new Statement("CALL GetTopRatingByClass(?, ?);", top, classNameStmt);
-            case KILLS -> new Statement("CALL GetTopKillsByClass(?, ?);", top, classNameStmt);
-            case KDR -> new Statement("CALL GetTopKDRByClass(?, ?);", top, classNameStmt);
-            case KILLSTREAK -> new Statement("CALL GetTopKillstreakByClass(?, ?);", top, classNameStmt);
-            case HIGHEST_KILLSTREAK -> new Statement("CALL GetTopHighestKillstreakByClass(?, ?);", top, classNameStmt);
-            case DEATHS -> new Statement("CALL GetTopDeathsByClass(?, ?);", top, classNameStmt);
-        };
+        Statement stmt = getStatement(className, sortType);
 
         database.executeProcedure(stmt, -1, result -> {
             try {
@@ -156,5 +147,18 @@ public final class ChampionsCombatLeaderboard extends PlayerLeaderboard<CombatDa
             }
         });
         return map;
+    }
+
+    private static @NotNull Statement getStatement(String className, CombatSort sortType) {
+        final IntegerStatementValue top = new IntegerStatementValue(10);
+        final StringStatementValue classNameStmt = new StringStatementValue(className);
+        return switch (sortType) {
+            case RATING -> new Statement("CALL GetTopRatingByClass(?, ?);", top, classNameStmt);
+            case KILLS -> new Statement("CALL GetTopKillsByClass(?, ?);", top, classNameStmt);
+            case KDR -> new Statement("CALL GetTopKDRByClass(?, ?);", top, classNameStmt);
+            case KILLSTREAK -> new Statement("CALL GetTopKillstreakByClass(?, ?);", top, classNameStmt);
+            case HIGHEST_KILLSTREAK -> new Statement("CALL GetTopHighestKillstreakByClass(?, ?);", top, classNameStmt);
+            case DEATHS -> new Statement("CALL GetTopDeathsByClass(?, ?);", top, classNameStmt);
+        };
     }
 }

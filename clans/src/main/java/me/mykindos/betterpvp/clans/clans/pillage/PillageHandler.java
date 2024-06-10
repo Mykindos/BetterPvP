@@ -35,12 +35,8 @@ public class PillageHandler {
 
     public void startPillage(Pillage pillage) {
         activePillages.add(pillage);
-        UtilMessage.simpleBroadcast("Clans", "<yellow>%s <gray>has pillaged <yellow>%s<gray>.",
-                pillage.getPillager().getName(), pillage.getPillaged().getName());
-
         Clan clan = (Clan) pillage.getPillaged();
         clan.setTntRecoveryRunnable(null);
-
     }
 
     public void endPillage(Pillage pillage) {

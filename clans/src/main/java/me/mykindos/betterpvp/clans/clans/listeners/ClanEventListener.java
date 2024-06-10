@@ -37,6 +37,7 @@ import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.components.clans.data.ClanTerritory;
 import me.mykindos.betterpvp.core.config.Config;
+import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.framework.inviting.InviteHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.logging.LogContext;
@@ -70,6 +71,7 @@ public class ClanEventListener extends ClanListener {
     private final WorldBlockHandler blockHandler;
     private final Clans clans;
     private final CommandManager commandManager;
+    private final CooldownManager cooldownManager;
 
 
     @Inject
@@ -78,12 +80,13 @@ public class ClanEventListener extends ClanListener {
 
     @Inject
     public ClanEventListener(Clans clans, ClanManager clanManager, ClientManager clientManager, InviteHandler inviteHandler,
-                             WorldBlockHandler blockHandler, CommandManager commandManager) {
+                             WorldBlockHandler blockHandler, CommandManager commandManager, CooldownManager cooldownManager) {
         super(clanManager, clientManager);
         this.clans = clans;
         this.inviteHandler = inviteHandler;
         this.blockHandler = blockHandler;
         this.commandManager = commandManager;
+        this.cooldownManager = cooldownManager;
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -161,6 +164,10 @@ public class ClanEventListener extends ClanListener {
                 UtilMessage.message(event.getPlayer(), "Command", "Clan name cannot be a clan's subcommand name or alias");
                 return;
             }
+        }
+
+        if(!cooldownManager.use(event.getPlayer(), "Create Clan", 300, true)) {
+            return;
         }
 
         clan.getMembers().add(new ClanMember(event.getPlayer().getUniqueId().toString(), ClanMember.MemberRank.LEADER));

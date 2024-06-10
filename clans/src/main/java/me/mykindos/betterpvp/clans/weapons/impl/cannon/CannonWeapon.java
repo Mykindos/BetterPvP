@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.framework.adapter.Compatibility;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
@@ -41,8 +42,7 @@ public class CannonWeapon extends Weapon implements InteractWeapon, CooldownWeap
     public void activate(Player player) {
         final Location cannonLocation = cannonLocations.remove(player.getUniqueId());
         final Cannon cannon = this.cannonManager.spawn(player.getUniqueId(), cannonLocation);
-        final CannonPlaceEvent event = new CannonPlaceEvent(cannon, cannonLocation, player);
-        event.callEvent();
+        UtilServer.callEvent(new CannonPlaceEvent(cannon, cannonLocation, player));
 
         UtilInventory.remove(player, getMaterial(), 1);
 

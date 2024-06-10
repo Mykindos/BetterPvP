@@ -329,7 +329,7 @@ public class UUIDListener implements Listener {
                 assert location != null;
                 log.info("{} retrieved ({}) from {} at ({})", player.getName(), item.getUuid(),
                                 Objects.requireNonNull(inventory).getType().name(), UtilWorld.locationToString(location))
-                        .setAction("ITEM_RETRIEVE").addClientContext(player).addLocationContext(location).addItemContext(item).submit();
+                        .setAction("ITEM_RETRIEVE").addClientContext(player).addLocationContext(location).addItemContext(item).addBlockContext(location.getBlock()).submit();
 
                 lastHeldUUIDItem.remove(player);
                 lastInventory.remove(player);

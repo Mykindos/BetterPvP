@@ -22,6 +22,7 @@ import me.mykindos.betterpvp.core.framework.events.items.SpecialItemDropEvent;
 import me.mykindos.betterpvp.core.items.BPvPItem;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
@@ -87,10 +88,13 @@ public class WeaponListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onWeaponActivate(PlayerInteractEvent event) {
-        if (event.getHand() == EquipmentSlot.OFF_HAND || !event.getAction().isRightClick() || event.useItemInHand() == Event.Result
-                .DENY) {
+        if (event.getHand() == EquipmentSlot.OFF_HAND
+                || !event.getAction().isRightClick()
+                || event.useItemInHand() == Event.Result.DENY) {
             return; // Only main hand and right click
         }
+
+        if (cooldownManager.hasCooldown(event.getPlayer(), "DoorAccess")) return;
 
         Player player = event.getPlayer();
         ItemStack item = player.getInventory().getItemInMainHand();
@@ -108,6 +112,7 @@ public class WeaponListener implements Listener {
         }
 
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+            if (UtilBlock.usable(event.getClickedBlock())) return;
             if (weapon.preventPlace()) {
                 event.setCancelled(true);
                 return;
@@ -250,7 +255,7 @@ public class WeaponListener implements Listener {
             Optional<IWeapon> weaponOptional = weaponManager.getWeaponByItemStack(itemStack);
             if (weaponOptional.isPresent()) {
                 IWeapon weapon = weaponOptional.get();
-                if (!(weapon instanceof LegendaryWeapon)) return;
+                if (!(weapon instanceof LegendaryWeapon)) continue;
 
                 event.setSafe(false);
                 event.setDuration(System.currentTimeMillis()); // Permanent combat log

@@ -184,7 +184,7 @@ public class LevelField extends Skill implements Listener {
 
     @Override
     public void trackPlayer(Player player, Gamer gamer) {
-        gamer.getActionBar().add(900, actionBarComponent);
+        gamer.getActionBar().add(300, actionBarComponent);
         playerNearbyDifferenceMap.put(player.getUniqueId(), 0);
 
     }

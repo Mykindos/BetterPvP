@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEvent;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -88,7 +89,9 @@ public class Sever extends Skill implements CooldownSkill, Listener {
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
         if (event.getHand() == EquipmentSlot.OFF_HAND || !event.getAction().isRightClick()) return;
+        if (UtilBlock.usable(event.getClickedBlock())) return;
         if (!rightClicked.getOrDefault(event.getPlayer(), false)) { // This means onInteract wasn't called through onEntityInteract
+            if (championsManager.getCooldowns().hasCooldown(event.getPlayer(), "DoorAccess")) return;
             onInteract(event.getPlayer(), null);
         }
         rightClicked.remove(event.getPlayer()); // Reset the flag for next interactions

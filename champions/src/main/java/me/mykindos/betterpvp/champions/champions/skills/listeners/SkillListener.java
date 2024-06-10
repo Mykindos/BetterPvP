@@ -13,8 +13,8 @@ import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillDequip
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillEquipEvent;
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.champions.champions.roles.events.RoleChangeEvent;
-import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
+import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.champions.champions.skills.types.ActiveToggleSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
@@ -273,10 +273,37 @@ public class SkillListener implements Listener {
         }
     }
 
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void onRightClickCancellations(PlayerInteractEvent event) {
+        if(!event.getAction().isRightClick()) return;
+
+        Player player = event.getPlayer();
+
+        if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+            Block block = event.getClickedBlock();
+            if (block != null) {
+                if (block.getType().name().contains("SPONGE")) {
+                    // Only cancel if the sponge is below the player
+                    if (block.getLocation().getY() < player.getLocation().getY()) {
+                        event.setUseItemInHand(Event.Result.DENY);
+                        return;
+                    }
+                } else if (block.getType().name().contains("DOOR")) {
+                    cooldownManager.use(event.getPlayer(), "DoorAccess", 0.01, false);
+                    event.setUseItemInHand(Event.Result.DENY);
+                    return;
+                }
+            }
+        }
+
+    }
+
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onSkillActivate(PlayerInteractEvent event) {
         if (event.getAction() == Action.PHYSICAL) return;
         if (event.getHand() == EquipmentSlot.OFF_HAND) return;
+        if (event.useItemInHand() == Event.Result.DENY) return;
+        if (UtilBlock.usable(event.getClickedBlock())) return;
         if (cooldownManager.hasCooldown(event.getPlayer(), "DoorAccess")) return;
 
         Player player = event.getPlayer();
@@ -290,25 +317,6 @@ public class SkillListener implements Listener {
         if (skillType != SkillType.BOW && (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK)) {
             return;
         }
-
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            Block block = event.getClickedBlock();
-            if (block != null) {
-                if (block.getType().name().contains("SPONGE")) {
-                    // Only cancel if the sponge is below the player
-                    if (block.getLocation().getY() < player.getLocation().getY()) {
-                        return;
-                    }
-                } else if (block.getType().name().contains("DOOR")) {
-                    cooldownManager.use(event.getPlayer(), "DoorAccess", 0.01, false);
-                    return;
-                }
-            }
-        }
-
-        if (event.useItemInHand() == Event.Result.DENY) return;
-
-        if (UtilBlock.usable(event.getClickedBlock())) return;
 
         Optional<Role> roleOptional = roleManager.getObject(player.getUniqueId().toString());
         if (roleOptional.isPresent()) {

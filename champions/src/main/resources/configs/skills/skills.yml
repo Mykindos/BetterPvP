@@ -48,6 +48,7 @@ skills:
       blindRadius: 4.0
       cooldownDecreasePerLevel: 5.0
       durationIncreasePerLevel: 1.0
+      allowPickupItems: false
     silencingarrow:
       enabled: true
       maxlevel: 5
@@ -92,7 +93,7 @@ skills:
       damage: 2.0
       damageIncreasePerLevel: 1.5
       distance: 5.0
-      cooldownReductionPerHit: 4.0
+      cooldownReductionPerHit: 3.0
       distanceIncreasePerLevel: 0.0
       cooldownReduction: 4.0
       cooldownReductionPerLevel: 0.0
@@ -764,7 +765,7 @@ skills:
       maxlevel: 5
       baseDamage: 1.0
       damageIncreasePerLevel: 0.0
-      baseDuration: 2.0
+      baseDuration: 2.4
       durationDecreasePerLevel: 0.4
       baseMaxDamage: 2.0
       maxDamageIncreasePerLevel: 1.0
