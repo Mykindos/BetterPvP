@@ -5,7 +5,9 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import lombok.Synchronized;
+import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.cooldowns.events.CooldownEvent;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
@@ -209,7 +211,13 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
                     if (cd.isInform()) {
                         Player player = Bukkit.getPlayer(UUID.fromString(key));
                         if (player != null) {
-                            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.5f, 1.0f);
+
+                            Client client = clientManager.search().online(player);
+                            final boolean soundSetting = (boolean) client.getProperty(ClientProperty.COOLDOWN_SOUNDS_ENABLED).orElse(false);
+                            if(soundSetting){
+                                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.4f, 3.0f);
+                            }
+
                             UtilMessage.simpleMessage(player, "Cooldown", "<alt>%s</alt> has been recharged.", entry.getKey());
                         }
                     }
