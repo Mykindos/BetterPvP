@@ -32,6 +32,7 @@ public class SkillsCommand extends Command {
         this.roleManager = roleManager;
         this.buildManager = buildManager;
         this.aliases.add("skill");
+        this.aliases.add("class");
     }
 
     @Override

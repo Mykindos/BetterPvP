@@ -97,7 +97,8 @@ INSERT IGNORE INTO property_map VALUES ("TIME_CREATED", "long");
 INSERT IGNORE INTO property_map VALUES ("EXPERIENCE", "double");
 INSERT IGNORE INTO property_map VALUES ("LUNAR", "boolean");
 INSERT IGNORE INTO property_map VALUES ("TIME_PLAYED", "long");
-
+INSERT IGNORE INTO property_map VALUES ("MAP_POINTS_OF_INTEREST", "boolean");
+INSERT IGNORE INTO property_map VALUES ("MAP_PLAYER_NAMES", "boolean");
 -- Profession properties
 INSERT IGNORE INTO property_map VALUES ("TOTAL_ORES_MINED", "long");
 INSERT IGNORE INTO property_map VALUES ("TOTAL_FISH_CAUGHT", "long");

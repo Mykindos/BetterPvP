@@ -9,19 +9,11 @@ wind_blade:
   enabled: true
   baseDamage: 7.0
   energyPerTick: 1.5
-  initialEnergyCost: 10.0
-  velocityStrength: 0.7
-knights_greatlance:
-  enabled: true
-  baseDamage: 8.0
-  energyPerTick: 1.5
-  initialEnergyCost: 10.0
-  attackCooldown: 5.0
-  maxChargeTicks: 60
-  chargeVelocity: 1.5
+  initialEnergyCost: 12.5
+  velocityStrength: 0.5
 hyper_axe:
   enabled: true
-  baseDamage: 4.0
+  baseDamage: 5.0
   damageDelay: 200
   dealsKnockback: true
   usesEnergy: false
@@ -30,13 +22,13 @@ hyper_axe:
 giants_broadsword:
   enabled: true
   baseDamage: 10.0
-  energyPerTick: 1.2
+  energyPerTick: 1.0
   initialEnergyCost: 10.0
   regenAmplifier: 4
 magnetic_maul:
   enabled: true
   baseDamage: 8.0
-  energyPerTick: 1.9
+  energyPerTick: 2.1
   initialEnergyCost: 10.0
   pullRange: 10.0
   pullFov: 80.3
@@ -61,18 +53,18 @@ scythe:
   summonPlayerSoulChance: 1.0
   summonMobSoulChance: 0.4
   speedAmplifierPerSoul: 1.0
-  baseHeal: 0.25
+  baseHeal: 0.7
   healPerSoul: 0.1
 scepter:
   enabled: true
   baseDamage: 8.0
   cooldown: 10.0
-  blackHoleRadius: 0.8
+  blackHoleRadius: 0.5
   blackHoleSpeed: 3.0
   blackHoleHitbox: 0.5
   blackHolePullStrength: 0.12
-  blackHolePullRadius: 5.0
-  blackHoleAliveSeconds: 1.5
+  blackHolePullRadius: 3.5
+  blackHoleAliveSeconds: 1.3
   blackHoleExpandSeconds: 0.75
   blackHoleTravelSeconds: 2.0
   beamCooldown: 1.0
@@ -85,8 +77,8 @@ thunderclap_aegis:
   baseDamage: 8.0
   energyPerTick: 1.1
   initialEnergyCost: 10.0
-  baseVelocity: 0.5
-  maxVelocity: 0.8
+  baseVelocity: 0.6
+  maxVelocity: 0.9
   maxChargeTicks: 60
   pulseIntervalSeconds: 1.0
   pulseDamage: 5.0

@@ -9,9 +9,11 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEvent;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import org.bukkit.Sound;
@@ -87,7 +89,9 @@ public class Sever extends Skill implements CooldownSkill, Listener {
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
         if (event.getHand() == EquipmentSlot.OFF_HAND || !event.getAction().isRightClick()) return;
+        if (UtilBlock.usable(event.getClickedBlock())) return;
         if (!rightClicked.getOrDefault(event.getPlayer(), false)) { // This means onInteract wasn't called through onEntityInteract
+            if (championsManager.getCooldowns().hasCooldown(event.getPlayer(), "DoorAccess")) return;
             onInteract(event.getPlayer(), null);
         }
         rightClicked.remove(event.getPlayer()); // Reset the flag for next interactions
@@ -107,26 +111,22 @@ public class Sever extends Skill implements CooldownSkill, Listener {
         }
 
         if (ent == null) {
-            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SPIDER_HURT, 1.0F, 1.5F);
+            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SPIDER_HURT, 1.0F, 0.5F);
             UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s %s", getName(), level);
             return;
         }
 
         boolean withinRange = UtilMath.offset(player, ent) <= hitDistance;
-        boolean isFriendly = false;
-        if (ent instanceof Player damagee) {
-            isFriendly = UtilEntity.getRelation(player, damagee) == EntityProperty.FRIENDLY;
-        }
-
-        if (!withinRange || isFriendly) {
+        if (UtilPlayer.isCreativeOrSpectator(ent) || UtilEntity.getRelation(player, ent) != EntityProperty.ENEMY || !withinRange) {
             UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s %s", getName(), level);
+            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SPIDER_HURT, 1.0F, 0.5F);
         } else {
             championsManager.getEffects().addEffect(ent, player, EffectTypes.BLEED, 1, (long) (getDuration(level) * 1000L));
             UtilMessage.simpleMessage(player, getClassType().getName(), "You severed <alt>" + ent.getName() + "</alt>.");
             UtilMessage.simpleMessage(ent, getClassType().getName(), "You have been severed by <alt>" + player.getName() + "</alt>.");
+            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SPIDER_HURT, 1.0F, 1.5F);
         }
 
-        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SPIDER_HURT, 1.0F, 1.5F);
     }
 
     @Override

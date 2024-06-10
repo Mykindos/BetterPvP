@@ -26,7 +26,8 @@ create table if not exists champions_combat_stats
     Class             varchar(20) default '',
     Rating            int         not null,
     Killstreak        int         not null default 0,
-    HighestKillstreak int         not null default 0
+    HighestKillstreak int         not null default 0,
+    Valid             tinyint     not null default 1
 );
 
 alter table champions_combat_stats
@@ -38,7 +39,7 @@ CREATE PROCEDURE GetTopRatingByClass(top int, class varchar(20))
 BEGIN
     SELECT r.Gamer, r.Rating
     FROM champions_combat_stats as r
-    WHERE r.Class = class
+    WHERE r.Class = class AND r.Valid = 1
     ORDER BY Rating DESC
     LIMIT top;
 END;
@@ -49,7 +50,7 @@ BEGIN
     SELECT Killer as Gamer, COUNT(*) AS Kills
     FROM kills
              INNER JOIN champions_kills ON kills.Id = champions_kills.KillId
-    WHERE KillerClass = class
+    WHERE KillerClass = class AND kills.Valid = 1
     GROUP BY Gamer
     ORDER BY Kills DESC
     LIMIT top;
@@ -61,7 +62,7 @@ BEGIN
     SELECT Victim as Gamer, COUNT(*) AS Deaths
     FROM kills
              INNER JOIN champions_kills ON kills.Id = champions_kills.KillId
-    WHERE VictimClass = class
+    WHERE VictimClass = class AND kills.Valid = 1
     GROUP BY Gamer
     ORDER BY Deaths DESC
     LIMIT top;
@@ -74,14 +75,14 @@ BEGIN
         SELECT Killer AS Gamer, COUNT(*) AS Kills
         FROM kills
                  LEFT JOIN champions_kills ON kills.Id = champions_kills.KillId
-        WHERE KillerClass = class
+        WHERE KillerClass = class AND kills.Valid = 1
         GROUP BY Gamer
     ),
          Deaths AS (
              SELECT Victim AS Gamer, COUNT(*) AS Deaths
              FROM kills
                       LEFT JOIN champions_kills ON kills.Id = champions_kills.KillId
-             WHERE VictimClass = class
+             WHERE VictimClass = class AND kills.Valid = 1
              GROUP BY Gamer
          )
 
@@ -97,7 +98,7 @@ CREATE PROCEDURE GetTopKillstreakByClass(top int, class varchar(20))
 BEGIN
     SELECT Gamer, Killstreak
     FROM champions_combat_stats AS k
-    WHERE k.Class = class
+    WHERE k.Class = class AND k.Valid = 1
     ORDER BY Killstreak DESC
     LIMIT top;
 END;
@@ -107,7 +108,7 @@ CREATE PROCEDURE GetTopHighestKillstreakByClass(top INT, class VARCHAR(20))
 BEGIN
     SELECT Gamer, HighestKillstreak AS HighestKillstreak
     FROM champions_combat_stats AS k
-    WHERE k.Class = class
+    WHERE k.Class = class AND k.Valid = 1
     ORDER BY HighestKillstreak DESC
     LIMIT top;
 END;
@@ -145,6 +146,6 @@ BEGIN
         WHERE Contributor = player
         GROUP BY ContributorClass
     ) AS ac ON cs.Class = ac.ContributorClass
-    WHERE cs.Gamer = player
+    WHERE cs.Gamer = player AND cs.Valid = 1
     GROUP BY cs.Class;
 END;

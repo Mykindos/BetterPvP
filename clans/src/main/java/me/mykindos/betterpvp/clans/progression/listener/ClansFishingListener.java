@@ -71,7 +71,7 @@ public class ClansFishingListener implements Listener {
 
                     UtilMessage.simpleMessage(event.getPlayer(), "Fishing", "You would have caught a Legendary, but you were not at Fields!");
                     UtilMessage.simpleMessage(event.getPlayer(), "Fishing", "Have this instead...");
-                    log.info("{} ({}) would have caught a legendary while fishing, but they were not at fields!", event.getPlayer().getName(), event.getPlayer().getUniqueId());
+                    log.info("{} ({}) would have caught a legendary while fishing, but they were not at fields!", event.getPlayer().getName(), event.getPlayer().getUniqueId()).submit();
                 }
             }
         }

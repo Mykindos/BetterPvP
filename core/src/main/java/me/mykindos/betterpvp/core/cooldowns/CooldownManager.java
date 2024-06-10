@@ -27,6 +27,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 @CustomLog
@@ -57,6 +58,10 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
     }
 
     public boolean use(Player player, String ability, double duration, boolean inform, boolean removeOnDeath, boolean cancellable, @Nullable Predicate<Gamer> actionBarCondition, int actionBarPriority) {
+        return use(player, ability, duration, inform, removeOnDeath, cancellable, actionBarCondition, actionBarPriority, null);
+    }
+
+    public boolean use(Player player, String ability, double duration, boolean inform, boolean removeOnDeath, boolean cancellable, @Nullable Predicate<Gamer> actionBarCondition, int actionBarPriority, Consumer<Cooldown> onExpire) {
         final Gamer gamer = clientManager.search().online(player).getGamer();
 
         // We add 1.5f to the duration in seconds, so they can see that it expired, and it doesn't instantly disappear
@@ -114,14 +119,18 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
             }
 
             Cooldown cooldown = new Cooldown(duration, System.currentTimeMillis(), removeOnDeath, inform, cancellable);
+            if (onExpire != null) {
+                cooldown.setOnExpire(onExpire);
+            }
+
             CooldownEvent event = UtilServer.callEvent(new CooldownEvent(player, cooldown));
-            if(!event.isCancelled()) {
+            if (!event.isCancelled()) {
                 cooldowns.put(ability, cooldown);
                 gamer.getActionBar().add(actionBarPriority, actionBarComponent);
                 return true;
             }
 
-           return false;
+            return false;
         }
 
         log.error("Could not find cooldown entry for {}", player.getName()).submit();
@@ -178,7 +187,11 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
         if (cooldownOptional.isPresent()) {
             var cooldowns = cooldownOptional.get();
             if (cooldowns.containsKey(ability)) {
-                cooldowns.remove(ability);
+                Cooldown cooldown = cooldowns.remove(ability);
+                if(cooldown.getOnExpire() != null) {
+                    cooldown.getOnExpire().accept(cooldown);
+                }
+
                 if (!silent) {
                     UtilMessage.simpleMessage(player, "Recharge", "<alt>%s</alt> has been recharged.", ability);
                 }
@@ -199,6 +212,10 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
                             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.5f, 1.0f);
                             UtilMessage.simpleMessage(player, "Cooldown", "<alt>%s</alt> has been recharged.", entry.getKey());
                         }
+                    }
+
+                    if(cd.getOnExpire() != null) {
+                        cd.getOnExpire().accept(cd);
                     }
                     return true;
                 }

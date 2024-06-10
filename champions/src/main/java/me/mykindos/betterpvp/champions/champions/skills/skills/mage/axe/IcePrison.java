@@ -30,6 +30,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Collection;
 import java.util.List;
 
 @CustomLog
@@ -104,15 +105,21 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
 
     public void despawn(Player player) {
         final List<RestoreBlock> blocks = blockHandler.getRestoreBlocks(player, getName());
-        final Location loc = blocks.get(0).getBlock().getLocation();
-        loc.getWorld().playSound(loc, Sound.BLOCK_GLASS_STEP, 1f, 1f);
-        loc.getWorld().playSound(loc, Sound.BLOCK_GLASS_BREAK, 1f, 0.8f);
-        blocks.forEach(RestoreBlock::restore);
+        final Collection<Player> receivers = player.getWorld().getNearbyPlayers(blocks.get(0).getBlock().getLocation(), 60);
+        for (RestoreBlock block : blocks) {
+            final Location loc = block.getBlock().getLocation();
+            loc.getWorld().playSound(loc, Sound.BLOCK_GLASS_STEP, 0.4f, 1.8f);
+            loc.getWorld().playSound(loc, Sound.BLOCK_GLASS_BREAK, 0.3f, 1.9f);
+            Particle.CLOUD.builder().location(loc).receivers(receivers).extra(0).spawn();
+            block.restore();
+        }
         UtilMessage.message(player, getClassType().getName(), "You destroyed your <alt>" + getName() + "</alt>.");
     }
 
     private void handleIcePrisonCollision(ThrowableItem throwableItem) {
         Location center = throwableItem.getItem().getLocation();
+        center.getWorld().playSound(center, Sound.BLOCK_GLASS_STEP, 1f, 1f);
+        center.getWorld().playSound(center, Sound.BLOCK_GLASS_BREAK, 1f, 0.8f);
 
         for (Location loc : UtilMath.sphere(center, sphereSize, true)) {
             if (loc.getBlockX() == center.getBlockX() && loc.getBlockZ() == center.getBlockZ()) {
@@ -145,6 +152,7 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
         item.setVelocity(player.getLocation().getDirection().multiply(speed));
         ThrowableItem throwableItem = new ThrowableItem(this, item, player, getName(), 10000, true);
         throwableItem.setCollideGround(true);
+        throwableItem.setCanHitFriendlies(true);
         championsManager.getThrowables().addThrowable(throwableItem);
         throwableItem.getLastLocation().getWorld().playSound(throwableItem.getLastLocation(), Sound.ENTITY_SILVERFISH_HURT, 2f, 1f);
     }

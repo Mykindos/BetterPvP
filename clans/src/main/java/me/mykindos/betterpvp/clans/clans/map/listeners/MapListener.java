@@ -22,6 +22,7 @@ import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.components.clans.data.ClanTerritory;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
+import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.display.TimedComponent;
@@ -38,15 +39,18 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.MapMeta;
 
 import java.util.HashSet;
 import java.util.Optional;
@@ -62,15 +66,17 @@ public class MapListener implements Listener {
     private final ClanManager clanManager;
     private final CooldownManager cooldownManager;
     private final ClientManager clientManager;
+    private final ItemHandler itemHandler;
 
     @Inject
     public MapListener(Clans clans, MapHandler mapHandler, ClanManager clanManager,
-                       CooldownManager cooldownManager, ClientManager clientManager) {
+                       CooldownManager cooldownManager, ClientManager clientManager, ItemHandler itemHandler) {
         this.clans = clans;
         this.mapHandler = mapHandler;
         this.clanManager = clanManager;
         this.cooldownManager = cooldownManager;
         this.clientManager = clientManager;
+        this.itemHandler = itemHandler;
 
         mapHandler.loadMap();
     }
@@ -102,6 +108,7 @@ public class MapListener implements Listener {
         if (event.getCurrentItem() == null)
             return;
 
+
         if (event.getCurrentItem().getType() == Material.FILLED_MAP) {
             final Inventory topInventory = event.getWhoClicked().getOpenInventory().getTopInventory();
             if (topInventory.getType() != InventoryType.CRAFTING) {
@@ -111,6 +118,22 @@ public class MapListener implements Listener {
                 event.setCancelled(true);
             }
         }
+    }
+
+    @EventHandler
+    public void onMapChangeInventory(InventoryMoveItemEvent event) {
+        if(event.getItem().getType() == Material.FILLED_MAP) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onSpawn(PlayerRespawnEvent event) {
+        ItemStack itemStack = new ItemStack(Material.FILLED_MAP);
+        MapMeta meta = (MapMeta) itemStack.getItemMeta();
+        meta.setMapView(Bukkit.getMap(0));
+        itemStack.setItemMeta(meta);
+        event.getPlayer().getInventory().setItem(8, itemHandler.updateNames(itemStack));
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -356,7 +379,7 @@ public class MapListener implements Listener {
 
     private Component createZoomBar(MapSettings.Scale scale) {
         return Component.text("Zoom: ", NamedTextColor.WHITE)
-                .append(Component.text((1 << scale.getValue()) + "x", NamedTextColor.GREEN));
+                .append(Component.text((scale.getValue()) + "x", NamedTextColor.GREEN));
     }
 
     private MapColor getColourForClan(Clan playerClan, Clan otherClan) {

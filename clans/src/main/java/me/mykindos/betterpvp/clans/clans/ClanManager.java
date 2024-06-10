@@ -40,6 +40,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.metadata.MetadataValue;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -130,11 +131,16 @@ public class ClanManager extends Manager<Clan> {
     }
 
     public Optional<Clan> getClanByPlayer(Player player) {
-        if (player.hasMetadata("clan")) {
-            return Optional.ofNullable(player.getMetadata("clan").get(0).value())
-                    .map(UUID.class::cast)
-                    .flatMap(this::getClanById);
+
+        if (player != null && player.hasMetadata("clan")) {
+            List<MetadataValue> clan = player.getMetadata("clan");
+            if (!clan.isEmpty()) {
+                return Optional.ofNullable(clan.get(0).value())
+                        .map(UUID.class::cast)
+                        .flatMap(this::getClanById);
+            }
         }
+
 
         return Optional.empty();
     }
@@ -308,8 +314,8 @@ public class ClanManager extends Manager<Clan> {
                 .appendNewline()
                 .append(Component.text(" Allies: ").color(NamedTextColor.WHITE).append(UtilMessage.getMiniMessage(getAllianceList(player, target))))
                 .appendNewline()
-                .append(Component.text(" Enemies: ").color(NamedTextColor.WHITE).append(UtilMessage.getMiniMessage(getEnemyList(player, target))))
-                .appendNewline()
+                //.append(Component.text(" Enemies: ").color(NamedTextColor.WHITE).append(UtilMessage.getMiniMessage(getEnemyList(player, target))))
+                //.appendNewline()
                 .append(Component.text(" Members: ").color(NamedTextColor.WHITE).append(UtilMessage.getMiniMessage("%s", getMembersList(target))));
     }
 

@@ -42,7 +42,7 @@ BEGIN
     SELECT l.Message, l.action, l.time, GROUP_CONCAT(CONCAT(lc.context, '::', lc.value) SEPARATOR '|') as context_values
     FROM logs_context lc
              INNER JOIN logs l ON lc.LogId = l.id
-    WHERE l.Action LIKE CONCAT('%', action_param, '%')
+    WHERE l.Action LIKE CONCAT(action_param, '%')
     GROUP BY lc.LogId, l.Message, l.action, l.time
     HAVING COUNT(CASE WHEN lc.context = context_param AND lc.value = value_param THEN 1 END) > 0
     ORDER BY l.time DESC;

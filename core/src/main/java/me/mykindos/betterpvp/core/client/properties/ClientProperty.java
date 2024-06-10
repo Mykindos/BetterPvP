@@ -15,6 +15,8 @@ public enum ClientProperty {
     CHAT_ENABLED,
     LUNAR,
     LAST_MESSAGED,
-    TIME_PLAYED
+    TIME_PLAYED,
+    MAP_POINTS_OF_INTEREST,
+    MAP_PLAYER_NAMES
 
 }

@@ -86,7 +86,7 @@ public class MagneticMaul extends ChannelWeapon implements InteractWeapon, Legen
         return true;
     }
 
-    @UpdateEvent (priority = 100)
+    @UpdateEvent (priority = 99)
     public void doMaul() {
         if (!enabled) {
            return;
@@ -189,6 +189,10 @@ public class MagneticMaul extends ChannelWeapon implements InteractWeapon, Legen
             final LivingEntity entity = entry.get();
             if (entity == wielder) {
                 continue; // Skip self
+            }
+
+            if (!wielder.hasLineOfSight(entity.getLocation()) && !wielder.hasLineOfSight(entity.getEyeLocation())) {
+                continue; // Skip entities not in line of sight
             }
 
             // Get angle from player to entity
