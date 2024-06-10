@@ -11,7 +11,7 @@ public class ConcussedEffect extends VanillaEffectType {
 
     @Override
     public String getName() {
-        return "Concuss";
+        return "Concussed";
     }
 
     @Override
