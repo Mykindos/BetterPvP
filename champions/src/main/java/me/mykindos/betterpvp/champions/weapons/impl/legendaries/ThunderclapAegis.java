@@ -229,7 +229,7 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
         UtilVelocity.velocity(hit, caster, velocityData);
     }
 
-    @UpdateEvent
+    @UpdateEvent (priority = 100)
     public void doCharge() {
         if (!enabled) {
             return;
