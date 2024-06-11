@@ -66,6 +66,7 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
 
     private static final String PULSE_NAME = "Pulsating Surge";
     private static final String COLLISION_NAME = "Voltic Bash";
+    private static final String ABILITY_NAME = "Charge";
 
     private final WeakHashMap<Player, AegisData> cache = new WeakHashMap<>();
     private final Champions champions;
@@ -115,7 +116,7 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
         lore.add(Component.text("their fury, rends adversaries with", NamedTextColor.WHITE));
         lore.add(Component.text("divine energy.", NamedTextColor.WHITE));
         lore.add(Component.text(""));
-        lore.add(UtilMessage.deserialize("<yellow>Right-Click <white>to use <green>Charge"));
+        lore.add(UtilMessage.deserialize("<yellow>Right-Click <white>to use <green>%s", ABILITY_NAME));
         return lore;
     }
 
@@ -230,7 +231,7 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
     }
 
     @UpdateEvent (priority = 100)
-    public void doCharge() {
+    public void doThunderclapAegis() {
         if (!enabled) {
             return;
         }
@@ -245,9 +246,10 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
                 continue;
             }
 
-            if (!matches(player.getInventory().getItemInMainHand())) {
+            if (!isHoldingWeapon(player)) {
                 iterator.remove();
                 deactivate(data);
+                activeUsageNotifications.remove(player.getUniqueId());
                 continue;
             }
 
@@ -255,6 +257,7 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
             if (!gamer.isHoldingRightClick()) {
                 iterator.remove();
                 deactivate(data);
+                activeUsageNotifications.remove(player.getUniqueId());
                 continue;
             }
 
@@ -262,6 +265,7 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
             if (checkUsageEvent.isCancelled()) {
                 iterator.remove();
                 deactivate(data);
+                activeUsageNotifications.remove(player.getUniqueId());
                 UtilMessage.simpleMessage(player, "Restriction", "You cannot use this weapon here.");
                 continue;
             }
@@ -272,14 +276,14 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
             }
 
             if (!canUse(player)) {
-                iterator.remove();
                 deactivate(data);
                 continue;
             }
 
-            if (!energyHandler.use(player, "Charge", energyPerTick, true)) {
+            if (!energyHandler.use(player, ABILITY_NAME, energyPerTick, true)) {
                 iterator.remove();
                 deactivate(data);
+                activeUsageNotifications.remove(player.getUniqueId());
                 return;
             }
 
@@ -288,16 +292,16 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
             // Get all enemies that collide with the player from the last location to the new location
             final Location newLocation = UtilPlayer.getMidpoint(player);
             final List<LivingEntity> collisions = UtilEntity.interpolateMultiCollision(data.getLastLocation(),
-                            newLocation,
-                            0.6f,
-                            ent -> {
-                                if (ent instanceof LivingEntity livingEntity) {
-                                    EntityCanHurtEntityEvent entityCanHurtEntityEvent = UtilServer.callEvent(new EntityCanHurtEntityEvent(player, livingEntity));
-                                    return entityCanHurtEntityEvent.isAllowed();
-                                }
+                    newLocation,
+                    0.6f,
+                    ent -> {
+                        if (ent instanceof LivingEntity livingEntity) {
+                            EntityCanHurtEntityEvent entityCanHurtEntityEvent = UtilServer.callEvent(new EntityCanHurtEntityEvent(player, livingEntity));
+                            return entityCanHurtEntityEvent.isAllowed();
+                        }
 
-                                return false;
-                            })
+                        return false;
+                    })
                     .stream()
                     .flatMap(MultiRayTraceResult::stream)
                     .map(RayTraceResult::getHitEntity)
@@ -376,9 +380,13 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
     @Override
     public boolean canUse(Player player) {
         if (UtilBlock.isInLiquid(player)) {
-            UtilMessage.simpleMessage(player, "Thunderclap Aegis", "You cannot use this weapon while in water!");
+            if (!activeUsageNotifications.contains(player.getUniqueId())) {
+                UtilMessage.simpleMessage(player, getSimpleName(), String.format("You cannot use <green>%s <gray>while in water", ABILITY_NAME));
+                activeUsageNotifications.add(player.getUniqueId());
+            }
             return false;
         }
+        activeUsageNotifications.remove(player.getUniqueId());
         return true;
     }
 
@@ -389,15 +397,15 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
 
     @Override
     public void loadWeaponConfig() {
-        baseVelocity = getConfig("baseVelocity", 0.6, Double.class);
-        maxVelocity = getConfig("maxVelocity", 0.9, Double.class);
+        baseVelocity = getConfig("baseVelocity", 0.5, Double.class);
+        maxVelocity = getConfig("maxVelocity", 0.8, Double.class);
         maxChargeTicks = getConfig("maxChargeTicks", 60, Integer.class);
         pulseIntervalSeconds = getConfig("pulseIntervalSeconds", 1.0, Double.class);
         pulseDamage = getConfig("pulseDamage", 5.0, Double.class);
         pulseShockSeconds = getConfig("pulseShockSeconds", 0.5, Double.class);
         pulseRadius = getConfig("pulseRadius", 6.0, Double.class);
         collidePulseRadius = getConfig("collidePulseRadius", 7.0, Double.class);
-        energyOnCollide = getConfig("energyOnCollide", 12.5, Double.class);
+        energyOnCollide = getConfig("energyOnCollide", 25.0, Double.class);
         chargeDamage = getConfig("chargeDamage", 7.0, Double.class);
     }
 

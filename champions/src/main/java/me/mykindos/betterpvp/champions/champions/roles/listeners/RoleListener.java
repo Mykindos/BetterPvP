@@ -31,6 +31,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -257,7 +258,7 @@ public class RoleListener implements Listener {
         Gamer gamer = clientManager.search().online(player).getGamer();
         if (UtilItem.isArmour(mainhand.getType()) && !UtilTime.elapsed(gamer.getLastDamaged(), 15000)) {
             UtilMessage.message(player, "Class", "You cannot remove your class while in combat.");
-            event.setCancelled(true);
+            event.setUseItemInHand(Event.Result.DENY);
         }
     }
 }

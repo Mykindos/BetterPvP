@@ -21,6 +21,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
@@ -43,8 +44,6 @@ public class DeathListener implements Listener {
         event.deathMessage(null);
         DamageLog lastDamage = damageLogManager.getLastDamager(event.getPlayer());
 
-        clientManager.search().online(event.getEntity()).getGamer().setLastDamaged(0);
-
         Bukkit.getOnlinePlayers().forEach(onlinePlayer -> {
             CustomDeathEvent customDeathEvent = new CustomDeathEvent(onlinePlayer, event.getPlayer());
             if (lastDamage != null) {
@@ -54,6 +53,11 @@ public class DeathListener implements Listener {
             UtilServer.callEvent(customDeathEvent);
         });
 
+    }
+
+    @EventHandler
+    public void onRespawn(PlayerRespawnEvent event) {
+        clientManager.search().online(event.getPlayer()).getGamer().setLastDamaged(0);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
