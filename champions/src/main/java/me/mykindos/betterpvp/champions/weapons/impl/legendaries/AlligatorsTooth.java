@@ -30,16 +30,25 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
+import java.util.HashSet;
+import java.util.Set;
 
 @Singleton
 @BPvPListener
 public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, LegendaryWeapon, Listener {
+
+    private static final String ABILITY_NAME = "Gator Stroke";
+
+    private final Set<UUID> activeUsageNotifications = new HashSet<>();
+
     private double bonusDamage;
     private double velocityStrength;
 
@@ -63,7 +72,7 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
         lore.add(Component.text(""));
         lore.add(UtilMessage.deserialize("<white>Deals <yellow>%.1f</yellow> Damage with attack on land", baseDamage));
         lore.add(UtilMessage.deserialize("<white>Deals <yellow>%.1f</yellow> Damage with attack in water", (baseDamage + bonusDamage)));
-        lore.add(UtilMessage.deserialize("<yellow>Right-Click <white>to use <green>Gator Stroke"));
+        lore.add(UtilMessage.deserialize("<yellow>Right-Click <white>to use <green>%s", ABILITY_NAME));
         return lore;
     }
 
@@ -72,45 +81,63 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
         active.add(player.getUniqueId());
     }
 
+    @Override
+    @EventHandler
+    public void onDeath(PlayerDeathEvent event) {
+        activeUsageNotifications.remove(event.getPlayer().getUniqueId());
+        active.remove(event.getPlayer().getUniqueId());
+    }
+
+    @Override
+    @EventHandler
+    public void onQuit(PlayerQuitEvent event) {
+        activeUsageNotifications.remove(event.getPlayer().getUniqueId());
+        active.remove(event.getPlayer().getUniqueId());
+    }
+
     @UpdateEvent
     public void doAlligatorsTooth() {
         if (!enabled) {
             return;
         }
-        final Iterator<UUID> iterator = active.iterator();
-        while (iterator.hasNext()) {
-            final Player player = Bukkit.getPlayer(iterator.next());
-            if (player == null || !player.isOnline()) {
-                iterator.remove();
-                continue;
+
+        active.removeIf(uuid -> {
+            Player player = Bukkit.getPlayer(uuid);
+            if (player == null) return true;
+
+            if (!isHoldingWeapon(player)) {
+                activeUsageNotifications.remove(player.getUniqueId());
+                return true;
             }
 
             final Gamer gamer = clientManager.search().online(player).getGamer();
-            if (!gamer.isHoldingRightClick() || player.getInventory().getItemInMainHand().getType() != getMaterial()) {
-                iterator.remove();
-                continue;
+            if (!gamer.isHoldingRightClick()) {
+                activeUsageNotifications.remove(player.getUniqueId());
+                return true;
             }
 
             var checkUsageEvent = UtilServer.callEvent(new PlayerUseItemEvent(player, this, true));
             if (checkUsageEvent.isCancelled()) {
                 UtilMessage.simpleMessage(player, "Restriction", "You cannot use this weapon here.");
-                continue;
+                activeUsageNotifications.remove(player.getUniqueId());
+                return true;
             }
 
             if (!canUse(player)) {
-                continue;
+                return false;
             }
 
-            if (!energyHandler.use(player, "Gator Stroke", energyPerTick, true)) {
-                iterator.remove();
-                continue;
+            if (!energyHandler.use(player, ABILITY_NAME, energyPerTick, true)) {
+                activeUsageNotifications.remove(player.getUniqueId());
+                return true;
             }
 
             VelocityData velocityData = new VelocityData(player.getLocation().getDirection(), velocityStrength, false, 0, 0.11, 1.0, true);
             UtilVelocity.velocity(player, null, velocityData);
             player.getWorld().playEffect(player.getLocation(), Effect.STEP_SOUND, Material.LAPIS_BLOCK);
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_FISH_SWIM, 0.8F, 1.5F);
-        }
+            return false;
+        });
     }
 
     @EventHandler(priority = EventPriority.LOW)
@@ -147,9 +174,13 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
     @Override
     public boolean canUse(Player player) {
         if (!UtilBlock.isInWater(player)) {
-            UtilMessage.simpleMessage(player, "Gator Stroke", "You can only use this ability in water!");
+            if (!activeUsageNotifications.contains(player.getUniqueId())) {
+                UtilMessage.simpleMessage(player, getSimpleName(), String.format("You cannot use <green>%s <gray>out of water", ABILITY_NAME));
+                activeUsageNotifications.add(player.getUniqueId());
+            }
             return false;
         }
+        activeUsageNotifications.remove(player.getUniqueId());
         return true;
     }
 

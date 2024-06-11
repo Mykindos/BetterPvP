@@ -22,7 +22,6 @@ import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -30,14 +29,23 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 @Singleton
 @BPvPListener
 public class WindBlade extends ChannelWeapon implements InteractWeapon, LegendaryWeapon, Listener {
+
+    private static final String ABILITY_NAME = "Flight";
+
+    private final Set<UUID> activeUsageNotifications = new HashSet<>();
 
     private double velocityStrength;
     private final EnergyHandler energyHandler;
@@ -60,17 +68,30 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
         lore.add(Component.text("their final battle against the Titans.", NamedTextColor.WHITE));
         lore.add(Component.text(""));
         lore.add(UtilMessage.deserialize("<white>Deals <yellow>%.1f Damage <white>with attack", baseDamage));
-        lore.add(UtilMessage.deserialize("<yellow>Right-Click <white>to use <green>Flight"));
+        lore.add(UtilMessage.deserialize("<yellow>Right-Click <white>to use <green>%s", ABILITY_NAME));
         return lore;
     }
-
 
     @Override
     public void activate(Player player) {
         active.add(player.getUniqueId());
     }
 
-    @UpdateEvent (priority = 100)
+    @Override
+    @EventHandler
+    public void onDeath(PlayerDeathEvent event) {
+        activeUsageNotifications.remove(event.getPlayer().getUniqueId());
+        active.remove(event.getPlayer().getUniqueId());
+    }
+
+    @Override
+    @EventHandler
+    public void onQuit(PlayerQuitEvent event) {
+        activeUsageNotifications.remove(event.getPlayer().getUniqueId());
+        active.remove(event.getPlayer().getUniqueId());
+    }
+
+    @UpdateEvent (priority = 99)
     public void doWindBlade() {
         if (!enabled) {
             return;
@@ -79,18 +100,21 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
             Player player = Bukkit.getPlayer(uuid);
             if (player == null) return true;
 
-            if (player.getInventory().getItemInMainHand().getType() != Material.MUSIC_DISC_MELLOHI) {
+            if (!isHoldingWeapon(player)) {
+                activeUsageNotifications.remove(player.getUniqueId());
                 return true;
             }
 
             final Gamer gamer = clientManager.search().online(player).getGamer();
             if (!gamer.isHoldingRightClick()) {
+                activeUsageNotifications.remove(player.getUniqueId());
                 return true;
             }
 
             var checkUsageEvent = UtilServer.callEvent(new PlayerUseItemEvent(player, this, true));
             if (checkUsageEvent.isCancelled()) {
                 UtilMessage.simpleMessage(player, "Restriction", "You cannot use this weapon here.");
+                activeUsageNotifications.remove(player.getUniqueId());
                 return true;
             }
 
@@ -98,7 +122,8 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
                 return false;
             }
 
-            if (!energyHandler.use(player, "Wind Blade", energyPerTick, true)) {
+            if (!energyHandler.use(player, ABILITY_NAME, energyPerTick, true)) {
+                activeUsageNotifications.remove(player.getUniqueId());
                 return true;
             }
 
@@ -141,9 +166,13 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
     @Override
     public boolean canUse(Player player) {
         if (UtilBlock.isInLiquid(player)) {
-            UtilMessage.simpleMessage(player, "Wind Blade", "You cannot use this weapon while in water!");
+            if (!activeUsageNotifications.contains(player.getUniqueId())) {
+                UtilMessage.simpleMessage(player, getSimpleName(), String.format("You cannot use <green>%s <gray>while in water", ABILITY_NAME));
+                activeUsageNotifications.add(player.getUniqueId());
+            }
             return false;
         }
+        activeUsageNotifications.remove(player.getUniqueId());
         return true;
     }
 
