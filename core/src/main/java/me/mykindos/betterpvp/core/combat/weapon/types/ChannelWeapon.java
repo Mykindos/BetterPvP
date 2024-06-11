@@ -17,6 +17,7 @@ import java.util.UUID;
 
 public abstract class ChannelWeapon extends Weapon implements IWeapon, Listener {
 
+    protected final Set<UUID> activeUsageNotifications = new HashSet<>();
     protected final Set<UUID> active = new HashSet<>();
 
     public ChannelWeapon(BPvPPlugin plugin, String key) {
@@ -36,11 +37,13 @@ public abstract class ChannelWeapon extends Weapon implements IWeapon, Listener 
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
         active.remove(event.getEntity().getUniqueId());
+        activeUsageNotifications.remove(event.getPlayer().getUniqueId());
     }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         active.remove(event.getPlayer().getUniqueId());
+        activeUsageNotifications.remove(event.getPlayer().getUniqueId());
     }
 
 }
