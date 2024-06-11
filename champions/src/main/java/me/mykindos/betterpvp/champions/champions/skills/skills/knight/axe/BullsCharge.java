@@ -63,12 +63,12 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Enter a rage, gaining <effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect> for <stat>" + getSpeedDuration(level) + "</stat> seconds",
-                "and giving <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> to anything you hit for <stat>" + getSlowDuration(level) + "</stat> seconds",
+                "Enter a rage, gaining <effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect> for " + UtilFormat.getDescriptionValueString(this::getSpeedDuration, level) + " seconds",
+                "and giving <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> to anything you hit for " + UtilFormat.getDescriptionValueString(this::getSlowDuration, level) + " seconds",
                 "",
                 "While charging, you take no knockback",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + UtilFormat.getDescriptionValueString(this::getCooldown, level)
         };
     }
 

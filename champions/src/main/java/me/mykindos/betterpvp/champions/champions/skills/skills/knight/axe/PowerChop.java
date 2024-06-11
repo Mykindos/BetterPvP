@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Sound;
@@ -56,17 +57,21 @@ public class PowerChop extends PrepareSkill implements CooldownSkill {
                 "",
 
                 "Your next axe attack will",
-                "deal <val>" + getBonusDamage(level) + "</val> bonus damage.",
+                "deal " + UtilFormat.getDescriptionValueString(this::getBonusDamage, level) + " bonus damage.",
                 "",
                 "The attack must be made within",
-                "<stat>" + timeToHit + "</stat> seconds of being used",
+                UtilFormat.getDescriptionValueString(this::getTimeToHit, level) + " seconds of being used",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + UtilFormat.getDescriptionValueString(this::getCooldown, level)
         };
     }
 
     public double getBonusDamage(int level) {
         return (Math.max(minBonusDamage, baseBonusDamage + ((level-1) * bonusDamageIncreasePerLevel)));
+    }
+
+    public double getTimeToHit(int level) {
+        return timeToHit;
     }
 
     @Override
