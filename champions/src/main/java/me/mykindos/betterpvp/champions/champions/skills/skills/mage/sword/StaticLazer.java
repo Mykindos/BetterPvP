@@ -32,9 +32,7 @@ import org.bukkit.block.data.Openable;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.persistence.PersistentDataType;
@@ -161,15 +159,16 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
         charging.put(player, new ChargeData(getChargePerSecond(level) / 100));
     }
 
-    @EventHandler
-    public void onDamage(EntityDamageByEntityEvent event) {
-        if (event.getDamager() instanceof Firework firework) {
-            final Boolean key = firework.getPersistentDataContainer().get(new NamespacedKey(champions, "no-damage"), PersistentDataType.BOOLEAN);
-            if (key != null && key) {
-                event.setCancelled(true);
-            }
-        }
-    }
+    // This doesnt work anyway
+    //@EventHandler
+    //public void onDamage(CustomDamageEvent event) {
+    //    if (event.getDamager() instanceof Firework firework) {
+    //        final Boolean key = firework.getPersistentDataContainer().get(new NamespacedKey(champions, "no-damage"), PersistentDataType.BOOLEAN);
+    //        if (key != null && key) {
+    //            event.setCancelled(true);
+    //        }
+    //    }
+    //}
 
     private void shoot(Player player, float charge, int level) {
         // Cooldown
@@ -232,12 +231,13 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
         meta.addEffect(effect);
         firework.setFireworkMeta(meta);
         firework.getPersistentDataContainer().set(new NamespacedKey(champions, "no-damage"), PersistentDataType.BOOLEAN, true);
-        firework.detonate();
+        firework.detonate(); // Triggers an EntityDamageEvent, not an EntityDamageByEntityEvent
 
         // Damage people
         final double damage = getDamage(level) * charge;
         final List<LivingEntity> enemies = UtilEntity.getNearbyEnemies(player, point, explosionRadius);
         for (LivingEntity enemy : enemies) {
+            System.out.println(enemy.getName());
             if (enemy.hasLineOfSight(point)) {
                 UtilDamage.doCustomDamage(new CustomDamageEvent(enemy, player, null, EntityDamageEvent.DamageCause.CUSTOM, damage, true, getName()));
             }
