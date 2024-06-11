@@ -29,15 +29,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 
 @Singleton
 @BPvPListener
@@ -75,7 +70,7 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
         active.add(player.getUniqueId());
     }
 
-    @UpdateEvent (priority = 99)
+    @UpdateEvent (priority = 100)
     public void doWindBlade() {
         if (!enabled) {
             return;

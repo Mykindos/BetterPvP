@@ -47,7 +47,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.RayTraceResult;
@@ -58,9 +57,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.UUID;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -234,7 +230,7 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
         UtilVelocity.velocity(hit, caster, velocityData);
     }
 
-    @UpdateEvent
+    @UpdateEvent (priority = 100)
     public void doThunderclapAegis() {
         if (!enabled) {
             return;

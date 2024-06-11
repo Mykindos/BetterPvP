@@ -25,21 +25,16 @@ import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.UUID;
-import java.util.HashSet;
-import java.util.Set;
 
 @Singleton
 @BPvPListener
@@ -49,6 +44,7 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
 
     private double bonusDamage;
     private double velocityStrength;
+    private double skimmingEnergyMultiplier;
 
     private final EnergyHandler energyHandler;
     private final ClientManager clientManager;
@@ -111,7 +107,12 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
                 return false;
             }
 
-            if (!energyHandler.use(player, ABILITY_NAME, energyPerTick, true)) {
+            var energyToUse = energyPerTick;
+            if(!UtilBlock.isWater(player.getEyeLocation().getBlock().getRelative(BlockFace.DOWN))) {
+                energyToUse *= skimmingEnergyMultiplier;
+            }
+
+            if (!energyHandler.use(player, ABILITY_NAME, energyToUse, true)) {
                 activeUsageNotifications.remove(player.getUniqueId());
                 return true;
             }
@@ -178,5 +179,6 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
     public void loadWeaponConfig() {
         bonusDamage = getConfig("bonusDamage", 4.0, Double.class);
         velocityStrength = getConfig("velocityStrength", 1.0, Double.class);
+        skimmingEnergyMultiplier = getConfig("skimmingEnergyMultiplier", 3.0, Double.class);
     }
 }
