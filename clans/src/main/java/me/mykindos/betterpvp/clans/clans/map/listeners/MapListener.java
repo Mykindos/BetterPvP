@@ -37,10 +37,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.inventory.InventoryAction;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryMoveItemEvent;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -48,7 +44,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
 
@@ -94,37 +89,11 @@ public class MapListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerJoin(PlayerJoinEvent event) {
         loadChunks(event.getPlayer());
-
-
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerDeath(PlayerDeathEvent event) {
         event.getDrops().removeIf(itemStack -> itemStack.getType() == Material.FILLED_MAP);
-    }
-
-    @EventHandler
-    public void onMapTransfer(InventoryClickEvent event) {
-        if (event.getCurrentItem() == null)
-            return;
-
-
-        if (event.getCurrentItem().getType() == Material.FILLED_MAP) {
-            final Inventory topInventory = event.getWhoClicked().getOpenInventory().getTopInventory();
-            if (topInventory.getType() != InventoryType.CRAFTING) {
-                event.setCancelled(true);
-            }
-            if (event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
-                event.setCancelled(true);
-            }
-        }
-    }
-
-    @EventHandler
-    public void onMapChangeInventory(InventoryMoveItemEvent event) {
-        if(event.getItem().getType() == Material.FILLED_MAP) {
-            event.setCancelled(true);
-        }
     }
 
     @EventHandler
@@ -139,7 +108,7 @@ public class MapListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     private void onEvent(PrepareItemCraftEvent event) {
         for (ItemStack item : event.getInventory().getMatrix()) {
-            if (item != null && item.getType() == Material.FILLED_MAP) {
+            if (item != null && item.getType() == Material.MAP) {
                 event.getInventory().setResult(new ItemStack(Material.AIR));
             }
         }
