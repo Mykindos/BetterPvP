@@ -28,7 +28,11 @@ public class PoisonListener implements Listener {
     public void poisonDamageMultiplier(CustomDamageEvent event) {
         if (event.getCause() != EntityDamageEvent.DamageCause.POISON) return;
         Optional<Effect> effectOptional = effectManager.getEffect(event.getDamagee(), EffectTypes.POISON);
-        effectOptional.ifPresent(effect -> event.setDamage(event.getDamage() * effect.getAmplifier()));
+        effectOptional.ifPresent(effect -> {
+            if (event.getDamage() * effect.getAmplifier() < event.getDamagee().getHealth()) {
+                event.setDamage(Math.min(event.getDamagee().getHealth(), event.getDamage() * effect.getAmplifier()));
+            }
+        });
     }
 
 }
