@@ -58,6 +58,8 @@ public class ClientSQLLayer {
         final Optional<Client> client = getClient(uuid);
         client.ifPresent(loaded -> {
             if (!loaded.getName().equals(name)) {
+                log.info("Updating name for {} from {} to {}", uuid, loaded.getName(), name)
+                        .addClientContext(loaded, false).submit();
                 loaded.setName(name);
                 save(loaded);
             }
