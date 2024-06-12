@@ -115,6 +115,7 @@ public class UUIDListener implements Listener {
     public void onUUIDItemDrop(PlayerDropItemEvent event) {
         if (event.isCancelled()) return;
         if (UtilPlayer.isDead(event.getPlayer())) return;
+        if(event.getPlayer().getInventory().firstEmpty() == -1) return;
 
         Client client = clientManager.search().online(event.getPlayer());
 
