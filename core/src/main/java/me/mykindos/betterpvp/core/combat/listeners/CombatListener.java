@@ -134,7 +134,10 @@ public class CombatListener implements Listener {
                 event.setDamageDelay((long) (event.getDamageDelay() * (1 - (effect.getAmplifier() / 100d))));
             });
             effectManager.getEffect(event.getDamager(), EffectTypes.CONCUSSED).ifPresent(effect -> {
-                event.setDamageDelay(600);
+                LivingEntity concussedPlayer = effect.getApplier();
+                concussedPlayer.getWorld().playSound(concussedPlayer.getLocation(), Sound.ENTITY_GOAT_LONG_JUMP, 2.0F, 1.0F);
+
+                event.setDamageDelay((long) (event.getDamageDelay() * (1 + (effect.getAmplifier() * 0.25))));
             });
         }
 
