@@ -23,16 +23,4 @@ public class ConcussedEffect extends VanillaEffectType {
     public PotionEffectType getVanillaPotionType() {
         return PotionEffectType.SLOW_DIGGING;
     }
-
-    @Override
-    public void onReceive(LivingEntity livingEntity, Effect effect) {
-        super.onReceive(livingEntity, effect);
-        UtilMessage.simpleMessage(livingEntity, "Have fun - CTE");
-    }
-
-    @Override
-    public void onExpire(LivingEntity livingEntity, Effect effect) {
-        super.onExpire(livingEntity, effect);
-        UtilMessage.simpleMessage(livingEntity, "Bai Bai");
-    }
 }

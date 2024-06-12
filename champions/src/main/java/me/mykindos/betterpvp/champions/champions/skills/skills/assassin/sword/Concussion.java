@@ -92,7 +92,7 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener 
             e.addReason("Concussion");
 
             // you'll also need to check if they're already concussed but do later
-            championsManager.getEffects().addEffect(damagee, damager, EffectTypes.CONCUSS, 1, (long) (getDuration(level) * 1000L));
+            championsManager.getEffects().addEffect(damagee, damager, EffectTypes.CONCUSSED, 1, (long) (getDuration(level) * 1000L));
 
             UtilMessage.simpleMessage(damager, getName(), "You gave <alt>" + damagee.getName() + "</alt> a concussion.");
             UtilMessage.simpleMessage(damagee, getName(), "<alt>" + damager.getName() + "</alt> gave you a concussion.");
@@ -104,9 +104,7 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener 
     public void hittingWhileConcussed(CustomDamageEvent e) {
         if (e.getCause() != DamageCause.ENTITY_ATTACK) return;
         if (!(e.getDamager() instanceof Player damager)) return;
-        if (!championsManager.getEffects().hasEffect(damager, EffectTypes.CONCUSS)) return;
-
-        UtilMessage.simpleMessage(damager, "You're hitting while concussed");
+        if (!championsManager.getEffects().hasEffect(damager, EffectTypes.CONCUSSED)) return;
     }
 
 
