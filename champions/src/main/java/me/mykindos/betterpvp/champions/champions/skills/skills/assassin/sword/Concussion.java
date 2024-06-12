@@ -82,8 +82,11 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener 
 
         if (active.contains(damager.getUniqueId())) {
             e.addReason("Concussion");
+            if (championsManager.getEffects().hasEffect(damagee, EffectTypes.CONCUSSED)) {
+                UtilMessage.simpleMessage(damager, "<alt>" + damagee.getName() + "</alt> is already concussed.");
+                return;
+            }
 
-            // you'll also need to check if they're already concussed but do later
             championsManager.getEffects().addEffect(damagee, damager, EffectTypes.CONCUSSED, 1, (long) (getDuration(level) * 1000L));
 
             UtilMessage.simpleMessage(damager, getName(), "You gave <alt>" + damagee.getName() + "</alt> a concussion.");
