@@ -20,6 +20,7 @@ import me.mykindos.betterpvp.core.components.champions.IChampionsSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.effects.Effect;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
@@ -97,6 +98,20 @@ public abstract class Skill implements IChampionsSkill {
                     .decoration(TextDecoration.ITALIC, false);
         }
         return components;
+    }
+
+    @Override
+    public Component getTags() {
+        Component component = Component.empty();
+        if (this instanceof EnergyChannelSkill) {
+            component = component.append(Component.text("Energy Channel", NamedTextColor.YELLOW).appendSpace());
+        }
+
+        if (component.equals(Component.empty())) {
+            return null;
+        }
+
+        return component;
     }
 
     @Override

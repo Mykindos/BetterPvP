@@ -8,7 +8,7 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.EnergyChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -44,7 +44,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class Swarm extends ChannelSkill implements InteractSkill, EnergySkill, Listener {
+public class Swarm extends ChannelSkill implements InteractSkill, EnergyChannelSkill, Listener {
 
     private final WeakHashMap<Player, Long> batCD = new WeakHashMap<>();
     private final WeakHashMap<Player, ArrayList<BatData>> batData = new WeakHashMap<>();

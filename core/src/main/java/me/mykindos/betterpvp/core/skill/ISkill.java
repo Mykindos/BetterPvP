@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.core.skill;
 
+import net.kyori.adventure.text.Component;
+
 public interface ISkill {
 
     String getName();
@@ -13,5 +15,9 @@ public interface ISkill {
     boolean isEnabled();
 
     void loadConfig();
+
+    default Component getTags() {
+        return null;
+    }
 
 }

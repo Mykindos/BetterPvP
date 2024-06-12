@@ -130,7 +130,7 @@ public class UtilFormat {
      * @return A mini-message formatted string with the value to 2 decimal places
      */
     public static String getDescriptionValueString(IntToDoubleFunction method, int level) {
-        return getDescriptionValueString(method, level, 2);
+        return getDescriptionValueString(method, level, 1);
     }
 
     /**
@@ -145,17 +145,16 @@ public class UtilFormat {
         double nextValue = method.applyAsDouble(level + 1);
         //if level is the same, it's a static value
         if (currentValue == nextValue) {
-            return "<yellow>" + UtilFormat.formatNumber(currentValue, decimalPlaces) + "</yellow>";
+            return "<yellow>" + UtilFormat.formatNumber(currentValue, decimalPlaces, true) + "</yellow>";
         }
         //it is a varying value, needs to be green
         double difference = nextValue - currentValue;
         if (difference > 0) {
-            return "<green>" + UtilFormat.formatNumber(currentValue, decimalPlaces) + "</green>+<green>" + UtilFormat.formatNumber(difference, decimalPlaces) + "</green>";
+            return "<green>" + UtilFormat.formatNumber(currentValue, decimalPlaces, true) + "</green>+(<green>" + UtilFormat.formatNumber(difference, decimalPlaces, true) + "</green>)";
         } else {
             difference = Math.abs(difference);
-            return "<green>" + UtilFormat.formatNumber(currentValue, decimalPlaces) + "</green>-<green>" + UtilFormat.formatNumber(difference, decimalPlaces) + "</green>";
+            return "<green>" + UtilFormat.formatNumber(currentValue, decimalPlaces, true) + "</green>-(<green>" + UtilFormat.formatNumber(difference, decimalPlaces, true) + "</green>)";
         }
-
 
     }
 

@@ -12,7 +12,7 @@ import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.EnergyChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -48,7 +48,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkill, EnergySkill, ThrowableListener {
+public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkill, EnergyChannelSkill, ThrowableListener {
     private final WeakHashMap<Player, ChargeData> charging = new WeakHashMap<>();
     private List<Item> blazePowders = new ArrayList<>();
     private final HashMap<Player, Shotgun> shotguns = new HashMap<>();
