@@ -133,6 +133,9 @@ public class CombatListener implements Listener {
             effectManager.getEffect(event.getDamager(), EffectTypes.ATTACK_SPEED).ifPresent(effect -> {
                 event.setDamageDelay((long) (event.getDamageDelay() * (1 - (effect.getAmplifier() / 100d))));
             });
+            effectManager.getEffect(event.getDamager(), EffectTypes.CONCUSSED).ifPresent(effect -> {
+                event.setDamageDelay(600);
+            });
         }
 
         damage(event);

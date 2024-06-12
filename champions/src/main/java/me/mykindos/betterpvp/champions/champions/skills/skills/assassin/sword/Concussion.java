@@ -66,14 +66,6 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener 
         return SkillType.SWORD;
     }
 
-    @EventHandler
-    public void onDequip(SkillDequipEvent event) {
-        if (event.getSkill() == this) {
-            active.remove(event.getPlayer().getUniqueId());
-        }
-    }
-
-
     @Override
     public double getCooldown(int level) {
 
@@ -99,14 +91,6 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener 
             active.remove(damager.getUniqueId());
         }
     }
-
-    @EventHandler
-    public void hittingWhileConcussed(CustomDamageEvent e) {
-        if (e.getCause() != DamageCause.ENTITY_ATTACK) return;
-        if (!(e.getDamager() instanceof Player damager)) return;
-        if (!championsManager.getEffects().hasEffect(damager, EffectTypes.CONCUSSED)) return;
-    }
-
 
     @Override
     public boolean canUse(Player player) {
