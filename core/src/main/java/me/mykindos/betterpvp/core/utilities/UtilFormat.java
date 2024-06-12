@@ -150,10 +150,10 @@ public class UtilFormat {
         //it is a varying value, needs to be green
         double difference = nextValue - currentValue;
         if (difference > 0) {
-            return "<green>" + UtilFormat.formatNumber(currentValue, decimalPlaces, true) + "</green>+(<green>" + UtilFormat.formatNumber(difference, decimalPlaces, true) + "</green>)";
+            return "<green>" + UtilFormat.formatNumber(currentValue, decimalPlaces, true) + "</green>(+<green>" + UtilFormat.formatNumber(difference, decimalPlaces, true) + "</green>)";
         } else {
             difference = Math.abs(difference);
-            return "<green>" + UtilFormat.formatNumber(currentValue, decimalPlaces, true) + "</green>-(<green>" + UtilFormat.formatNumber(difference, decimalPlaces, true) + "</green>)";
+            return "<green>" + UtilFormat.formatNumber(currentValue, decimalPlaces, true) + "</green>(-<green>" + UtilFormat.formatNumber(difference, decimalPlaces, true) + "</green>)";
         }
 
     }

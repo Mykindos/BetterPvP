@@ -12,8 +12,12 @@ import me.mykindos.betterpvp.champions.champions.builds.menus.SkillMenu;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.champions.champions.skills.types.ActiveToggleSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.CrowdControlSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergyChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.ToggleSkill;
 import me.mykindos.betterpvp.champions.effects.types.SkillBoostEffect;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.components.champions.IChampionsSkill;
@@ -103,8 +107,24 @@ public abstract class Skill implements IChampionsSkill {
     @Override
     public Component getTags() {
         Component component = Component.empty();
-        if (this instanceof EnergyChannelSkill) {
-            component = component.append(Component.text("Energy Channel", NamedTextColor.YELLOW).appendSpace());
+        if (this instanceof EnergyChannelSkill || this instanceof EnergySkill) {
+            component = component.append(Component.text("Energy", NamedTextColor.YELLOW).appendSpace());
+        }
+
+        if (this instanceof ToggleSkill) {
+            component = component.append(Component.text("Toggle", NamedTextColor.GRAY).appendSpace());
+        }
+
+        if (this instanceof CrowdControlSkill) {
+            component = component.append(Component.text("Crowd Control", NamedTextColor.GOLD).appendSpace());
+        }
+
+        if (this instanceof DamageSkill) {
+            component = component.append(Component.text("Damage", NamedTextColor.DARK_RED).appendSpace());
+        }
+
+        if (this instanceof MovementSkill) {
+            component = component.append(Component.text("Movement", NamedTextColor.WHITE).appendSpace());
         }
 
         if (component.equals(Component.empty())) {
