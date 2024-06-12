@@ -54,16 +54,30 @@ public class BaseFishing implements Listener {
                 int skillLevel = profession.getBuild().getSkillLevel(skill);
                 if (skillLevel >= 1) return;
 
+                Optional<Clan> playerClanOptional = clanManager.getClanByPlayer(player);
+
+                Optional<Clan> playerLocationClanOptional = clanManager.getClanByLocation(player.getLocation());
+                if(playerLocationClanOptional.isPresent()) {
+                    Clan playerLocationClan = playerLocationClanOptional.get();
+
+                    if(playerClanOptional.isPresent()) {
+                        Clan playerClan = playerClanOptional.get();
+                        if(playerClan.equals(playerLocationClan)) {
+                            cancelFishing(event, player);
+                            return;
+                        }
+                    }
+                }
+
                 Optional<Clan> locationClanOptional = clanManager.getClanByLocation(event.getHook().getLocation());
                 if(locationClanOptional.isPresent()) {
                     Clan locationClan = locationClanOptional.get();
 
-                    Optional<Clan> playerClanOptional = clanManager.getClanByPlayer(player);
+
                     if(playerClanOptional.isPresent()) {
                         Clan playerClan = playerClanOptional.get();
                         if(playerClan.equals(locationClan)) {
-                            event.getHook().remove();
-                            UtilMessage.simpleMessage(player, "Fishing", "You must unlock <green>Base Fishing</green> to fish in your own territory");
+                            cancelFishing(event, player);
                             return;
                         }
                     }
@@ -75,6 +89,12 @@ public class BaseFishing implements Listener {
                 }
             }
         });
+    }
+
+    private void cancelFishing(PlayerStartFishingEvent event, Player player) {
+        event.getHook().remove();
+        UtilMessage.simpleMessage(player, "Fishing", "You must unlock <green>Base Fishing</green> to fish in your own territory");
+
     }
 
 }
