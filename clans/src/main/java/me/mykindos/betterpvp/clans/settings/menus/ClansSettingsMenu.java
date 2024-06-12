@@ -76,7 +76,7 @@ public class ClansSettingsMenu extends AbstractGui implements SettingCategory {
     public Description getDescription() {
         return Description.builder()
                 .icon(ItemView.builder()
-                        .material(Material.DIAMOND_HELMET)
+                        .material(Material.IRON_DOOR)
                         .displayName(Component.text("Clans Settings", NamedTextColor.GREEN, TextDecoration.BOLD))
                         .lore(Component.text("View generic settings related to the clans gamemode", NamedTextColor.GRAY))
                         .flag(ItemFlag.HIDE_ATTRIBUTES)
