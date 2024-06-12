@@ -124,22 +124,6 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
         }
     }
 
-    @UpdateEvent(delay = 100)
-    public void onUpdateEffect() {
-        Iterator<UUID> it = active.iterator();
-        while (it.hasNext()) {
-            Player player = Bukkit.getPlayer(it.next());
-            if (player != null) {
-                Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
-                if (gamer.isHoldingRightClick()) {
-                    player.getWorld().playEffect(player.getLocation(), Effect.STEP_SOUND, Material.IRON_BLOCK);
-                }
-            } else {
-                it.remove();
-            }
-        }
-    }
-
     @UpdateEvent
     public void onUpdate() {
         Iterator<UUID> it = active.iterator();
