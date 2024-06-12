@@ -30,7 +30,7 @@ energy_elixir:
   enabled: true
   cooldown: 12.0
   energyRegen: 0.5
-water_bottle:
+purification_potion:
   enabled: true
   cooldown: 10.0
   duration: 1.5

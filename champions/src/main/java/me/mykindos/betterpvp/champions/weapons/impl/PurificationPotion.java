@@ -23,21 +23,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Singleton
-public class WaterBottle extends Weapon implements InteractWeapon, CooldownWeapon {
+public class PurificationPotion extends Weapon implements InteractWeapon, CooldownWeapon {
 
     private final EffectManager effectManager;
     private double duration;
 
     @Inject
-    public WaterBottle(Champions champions, EffectManager effectManager) {
-        super(champions, "water_bottle");
+    public PurificationPotion(Champions champions, EffectManager effectManager) {
+        super(champions, "purification_potion");
         this.effectManager = effectManager;
     }
 
     @Override
     public void activate(Player player) {
         UtilMessage.message(player, "Item",
-                Component.text("You consumed an ", NamedTextColor.GRAY).append(getName().color(NamedTextColor.YELLOW)));
+                Component.text("You consumed a ", NamedTextColor.GRAY).append(getName().color(NamedTextColor.YELLOW)));
         UtilSound.playSound(player, Sound.ENTITY_GENERIC_DRINK, 1f, 1f, false);
         UtilSound.playSound(player.getWorld(), player.getLocation(), Sound.ENTITY_GENERIC_DRINK, 0.8f, 1.2f);
         UtilInventory.remove(player, getMaterial(), 1);
