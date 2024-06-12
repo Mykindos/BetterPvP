@@ -296,14 +296,10 @@ INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, H
     ('HONEY_BOTTLE', 'champions', 'energy_elixir', '<light_purple>Energy Elixir', 0, 0, 0);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
-    ('POTION', 'champions', 'water_bottle', '<light_purple>Water Bottle', 0, 0, 0);
+    ('PUMPKIN_PIE', 'champions', 'purification_potion', '<light_purple>Purification Potion', 2, 0, 0);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
-    ('PUMPKIN_PIE', 'champions', 'mushroom_stew', '<light_purple>Mushroom Stew', 0, 0, 0);
-
-INSERT IGNORE INTO itemlore
-    VALUES (
-       (SELECT id FROM items WHERE Material = 'PUMPKIN_PIE' AND Namespace = 'champions'), 0, '<gray>Grants <white>Regeneration II <gray>for <yellow>4 seconds<gray>.');
+    ('PUMPKIN_PIE', 'champions', 'mushroom_stew', '<light_purple>Mushroom Stew', 1, 0, 0);
 
 -- Legendaries
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
