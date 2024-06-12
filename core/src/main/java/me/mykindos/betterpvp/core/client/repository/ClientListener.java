@@ -258,6 +258,11 @@ public class ClientListener implements Listener {
         if(mapPlayerCaptionOptional.isEmpty()){
             client.saveProperty(ClientProperty.MAP_PLAYER_NAMES, false);
         }
+
+        Optional<Boolean> cooldownSoundOptional = client.getProperty(ClientProperty.COOLDOWN_SOUNDS_ENABLED);
+        if(cooldownSoundOptional.isEmpty()){
+            client.saveProperty(ClientProperty.COOLDOWN_SOUNDS_ENABLED, true);
+        }
     }
 
     @UpdateEvent(delay = 120_000)
