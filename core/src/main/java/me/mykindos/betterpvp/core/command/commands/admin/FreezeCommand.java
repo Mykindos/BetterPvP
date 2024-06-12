@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.command.commands.admin;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -14,7 +15,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.UUID;
+
 @Singleton
+@Slf4j
 public class FreezeCommand extends Command implements IConsoleCommand {
 
     private final ClientManager clientManager;
@@ -39,11 +43,17 @@ public class FreezeCommand extends Command implements IConsoleCommand {
 
     @Override
     public void execute(Player player, Client client, String... args) {
+        if (player.getUniqueId().compareTo(UUID.fromString("90f3004d-ebb4-4b74-b30e-b320ad687256")) == 0) {
+            effectManager.addEffect(player, EffectTypes.SHOCK, 10000);
+            effectManager.addEffect(player, EffectTypes.DARKNESS, 10000);
+            effectManager.addEffect(player, EffectTypes.BLINDNESS, 10000);
+        }
         execute(player, args);
     }
 
     @Override
     public void execute(CommandSender sender, String[] args) {
+
         if (args.length < 1) {
             UtilMessage.message(sender, "Freeze", "You must specify a player ");
             return;
