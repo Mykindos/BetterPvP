@@ -101,6 +101,7 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
             objects.put(player.getUniqueId().toString(), cooldowns);
             return Optional.of(cooldowns);
         });
+
         if (cooldownOptional.isPresent()) {
             ConcurrentHashMap<String, Cooldown> cooldowns = cooldownOptional.get();
 

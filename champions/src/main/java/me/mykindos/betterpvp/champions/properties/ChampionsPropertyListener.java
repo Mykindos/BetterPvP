@@ -36,5 +36,10 @@ public class ChampionsPropertyListener implements Listener {
         if (skillChatPreviewOptional.isEmpty()) {
             gamer.saveProperty(skillChatPreview, true);
         }
+
+        Optional<Boolean> skillWeaponTooltip = gamer.getProperty(ChampionsProperty.SKILL_WEAPON_TOOLTIP);
+        if (skillWeaponTooltip.isEmpty()) {
+            gamer.saveProperty(ChampionsProperty.SKILL_WEAPON_TOOLTIP, true);
+        }
     }
 }

@@ -385,6 +385,7 @@ skills:
       baseShockDuration: 2.0
       maxTarget: 3
       shockDuration: 2.0
+      velocityStrength: 3.0
     swarm:
       enabled: true
       maxlevel: 5

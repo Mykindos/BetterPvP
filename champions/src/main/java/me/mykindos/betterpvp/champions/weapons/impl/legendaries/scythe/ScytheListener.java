@@ -156,6 +156,10 @@ public class ScytheListener implements Listener {
             return;
         }
 
+        if(event.getDamagee().hasMetadata("PlayerSpawned")) {
+            return;
+        }
+
         if (!event.getDamagee().isDead()) {
             return; // Entity didn't die
         }
