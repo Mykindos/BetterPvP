@@ -23,6 +23,7 @@ import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.components.champions.IChampionsSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.effects.Effect;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -30,6 +31,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 
 import java.util.Optional;
+import java.util.function.IntToDoubleFunction;
 
 @Singleton
 @CustomLog
@@ -200,6 +202,46 @@ public abstract class Skill implements IChampionsSkill {
         canUseInLiquid = getConfigObject("canUseInLiquid", false, Boolean.class);
 
         loadSkillConfig();
+    }
+
+    /**
+     *
+     * @param method a method that takes the level
+     * @param level the level of the skill
+     * @return A mini-message formatted string with the value to 2 decimal places
+     */
+    public String getValueString(IntToDoubleFunction method, int level) {
+        return getValueString(method, level, 1);
+    }
+
+    /**
+     *
+     * @param method a method that takes the level
+     * @param level the level of the skill
+     * @param decimalPlaces number of decimal places to use
+     * @return A mini-message formatted string with the value
+     */
+    public String getValueString(IntToDoubleFunction method, int level, int decimalPlaces) {
+        double currentValue = method.applyAsDouble(level);
+        double nextValue = method.applyAsDouble(level + 1);
+        //if level is the same, it's a static value
+        if (currentValue == nextValue) {
+            return "<yellow>" + UtilFormat.formatNumber(currentValue, decimalPlaces, true) + "</yellow>";
+        }
+
+        //it is a varying value, needs to be green
+        String valueString = "<green>" + UtilFormat.formatNumber(currentValue, decimalPlaces, true) + "</green>";
+
+        if (level < getMaxLevel()) {
+            double difference = nextValue - currentValue;
+            if (difference > 0) {
+                return valueString + " (+<green>" + UtilFormat.formatNumber(difference, decimalPlaces, true) + "</green>)";
+            } else {
+                difference = Math.abs(difference);
+                return valueString + " (-<green>" + UtilFormat.formatNumber(difference, decimalPlaces, true) + "</green>)";
+            }
+        }
+        return valueString;
     }
 
     /**
