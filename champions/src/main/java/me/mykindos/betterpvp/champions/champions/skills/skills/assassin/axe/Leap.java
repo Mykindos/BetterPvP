@@ -174,11 +174,6 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
     }
 
     @Override
-    public boolean canUseSlowed() {
-        return false;
-    }
-
-    @Override
     public void loadSkillConfig() {
         leapStrength = getConfig("leapStrength", 1.3, Double.class);
         wallKickStrength = getConfig("wallKickStrength", 0.9, Double.class);

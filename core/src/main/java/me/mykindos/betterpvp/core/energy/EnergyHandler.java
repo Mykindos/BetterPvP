@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.energy;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.energy.events.DegenerateEnergyEvent;
 import me.mykindos.betterpvp.core.energy.events.RegenerateEnergyEvent;
@@ -14,6 +15,7 @@ import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 
 @Singleton
+@Slf4j
 public class EnergyHandler {
 
     @Inject

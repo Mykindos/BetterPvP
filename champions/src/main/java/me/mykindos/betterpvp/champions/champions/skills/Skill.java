@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.champions.champions.builds.menus.SkillMenu;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.champions.champions.skills.types.ActiveToggleSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.EnergyChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
 import me.mykindos.betterpvp.champions.effects.types.SkillBoostEffect;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
@@ -147,7 +148,7 @@ public abstract class Skill implements IChampionsSkill {
             cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 1.0, Double.class);
         }
 
-        if (this instanceof EnergySkill) {
+        if (this instanceof EnergySkill || this instanceof EnergyChannelSkill) {
             energy = getConfig("energy", 0, Integer.class);
             energyDecreasePerLevel = getConfig("energyDecreasePerLevel", 1.0, Double.class);
         }
