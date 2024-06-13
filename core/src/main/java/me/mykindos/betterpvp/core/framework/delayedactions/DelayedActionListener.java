@@ -131,7 +131,7 @@ public class DelayedActionListener implements Listener {
 
         Gamer gamer = client.getGamer();
 
-        if (!UtilTime.elapsed(gamer.getLastDamaged(), 15000)) {
+        if (gamer.isInCombat()) {
             event.setCancelled(true);
             UtilMessage.message(event.getPlayer(), "Combat", "You cannot do this while in combat!");
         }

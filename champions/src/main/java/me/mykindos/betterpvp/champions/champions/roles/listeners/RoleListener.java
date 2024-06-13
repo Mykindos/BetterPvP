@@ -21,7 +21,6 @@ import me.mykindos.betterpvp.core.utilities.UtilEffect;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import me.mykindos.betterpvp.core.utilities.UtilTime;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.TextComponent;
@@ -239,7 +238,7 @@ public class RoleListener implements Listener {
         if (!(event.getWhoClicked() instanceof Player player)) return;
 
         Gamer gamer = clientManager.search().online(player).getGamer();
-        if (!UtilTime.elapsed(gamer.getLastDamaged(), 15000)) {
+        if (gamer.isInCombat()) {
             final Optional<Role> role = roleManager.getObject(player.getUniqueId());
             if (role.isPresent()) {
                 UtilMessage.message(player, "Class", "You cannot remove your class while in combat.");
@@ -256,7 +255,7 @@ public class RoleListener implements Listener {
         ItemStack mainhand = event.getPlayer().getInventory().getItemInMainHand();
         Player player = event.getPlayer();
         Gamer gamer = clientManager.search().online(player).getGamer();
-        if (UtilItem.isArmour(mainhand.getType()) && !UtilTime.elapsed(gamer.getLastDamaged(), 15000)) {
+        if (UtilItem.isArmour(mainhand.getType()) && gamer.isInCombat()) {
             UtilMessage.message(player, "Class", "You cannot remove your class while in combat.");
             event.setUseItemInHand(Event.Result.DENY);
         }

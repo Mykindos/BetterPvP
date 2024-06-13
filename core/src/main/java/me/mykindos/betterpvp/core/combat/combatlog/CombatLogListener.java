@@ -13,7 +13,6 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
@@ -70,7 +69,7 @@ public class CombatLogListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onCombatLogInCombat(PlayerCombatLogEvent event) {
         Gamer gamer = event.getClient().getGamer();
-        if (!UtilTime.elapsed(gamer.getLastDamaged(), 15000)) {
+        if (!gamer.isInCombat()) {
             event.setSafe(false);
         }
     }
