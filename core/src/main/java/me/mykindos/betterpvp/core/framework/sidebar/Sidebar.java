@@ -21,7 +21,7 @@ public class Sidebar {
     private final me.catcoder.sidebar.Sidebar<Component> wrapped = ProtocolSidebar.newAdventureSidebar(DEFAULT_TITLE, JavaPlugin.getPlugin(Core.class));
 
     public Sidebar() {
-        wrapped.updateLinesPeriodically(5L, 0L);
+        wrapped.updateLinesPeriodically(5L, 10L);
     }
 
 }

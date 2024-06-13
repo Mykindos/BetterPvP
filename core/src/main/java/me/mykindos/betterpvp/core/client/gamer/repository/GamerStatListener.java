@@ -13,6 +13,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 @BPvPListener
 public class GamerStatListener implements Listener {
@@ -51,6 +52,11 @@ public class GamerStatListener implements Listener {
 
         int blocksBroken = (int) (gamer.getProperty(GamerProperty.BLOCKS_BROKEN).orElse(0)) + 1;
         gamer.saveProperty(GamerProperty.BLOCKS_BROKEN, blocksBroken);
+    }
+
+    @EventHandler
+    public void onQuit(PlayerQuitEvent event) {
+        clientManager.getSqlLayer().processStatUpdates(event.getPlayer().getUniqueId(), true);
     }
 
 

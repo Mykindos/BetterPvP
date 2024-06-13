@@ -37,6 +37,13 @@ clans:
       - WATER
       - ICE
       - LAVA
+      - ANVIL
+      - CHIPPED_ANVIL
+      - DAMAGED_ANVIL
+      - RAW_GOLD_BLOCK
+      - RAW_IRON_BLOCK
+      - BEE_NEST
+      - RED_BED
   pillage:
     duration: 15
     noDominanceCooldown: 4
@@ -254,6 +261,10 @@ fields:
       min: 1
       max: 3
     leatherore:
+      respawn: 60.0
+      min: 1
+      max: 3
+    gildedblackstone:
       respawn: 60.0
       min: 1
       max: 3

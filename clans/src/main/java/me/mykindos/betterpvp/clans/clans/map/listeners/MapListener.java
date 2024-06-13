@@ -22,6 +22,7 @@ import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.components.clans.data.ClanTerritory;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
+import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.display.TimedComponent;
@@ -36,17 +37,15 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.inventory.InventoryAction;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.MapMeta;
 
 import java.util.HashSet;
 import java.util.Optional;
@@ -62,15 +61,17 @@ public class MapListener implements Listener {
     private final ClanManager clanManager;
     private final CooldownManager cooldownManager;
     private final ClientManager clientManager;
+    private final ItemHandler itemHandler;
 
     @Inject
     public MapListener(Clans clans, MapHandler mapHandler, ClanManager clanManager,
-                       CooldownManager cooldownManager, ClientManager clientManager) {
+                       CooldownManager cooldownManager, ClientManager clientManager, ItemHandler itemHandler) {
         this.clans = clans;
         this.mapHandler = mapHandler;
         this.clanManager = clanManager;
         this.cooldownManager = cooldownManager;
         this.clientManager = clientManager;
+        this.itemHandler = itemHandler;
 
         mapHandler.loadMap();
     }
@@ -88,8 +89,6 @@ public class MapListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerJoin(PlayerJoinEvent event) {
         loadChunks(event.getPlayer());
-
-
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -98,25 +97,18 @@ public class MapListener implements Listener {
     }
 
     @EventHandler
-    public void onMapTransfer(InventoryClickEvent event) {
-        if (event.getCurrentItem() == null)
-            return;
-
-        if (event.getCurrentItem().getType() == Material.FILLED_MAP) {
-            final Inventory topInventory = event.getWhoClicked().getOpenInventory().getTopInventory();
-            if (topInventory.getType() != InventoryType.CRAFTING) {
-                event.setCancelled(true);
-            }
-            if (event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
-                event.setCancelled(true);
-            }
-        }
+    public void onSpawn(PlayerRespawnEvent event) {
+        ItemStack itemStack = new ItemStack(Material.FILLED_MAP);
+        MapMeta meta = (MapMeta) itemStack.getItemMeta();
+        meta.setMapView(Bukkit.getMap(0));
+        itemStack.setItemMeta(meta);
+        event.getPlayer().getInventory().setItem(8, itemHandler.updateNames(itemStack));
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     private void onEvent(PrepareItemCraftEvent event) {
         for (ItemStack item : event.getInventory().getMatrix()) {
-            if (item != null && item.getType() == Material.FILLED_MAP) {
+            if (item != null && item.getType() == Material.MAP) {
                 event.getInventory().setResult(new ItemStack(Material.AIR));
             }
         }
@@ -167,8 +159,7 @@ public class MapListener implements Listener {
                     for (int i = 0; i < 4; i++) {
                         BlockFace blockFace = BlockFace.values()[i];
                         String targetChunkString = "world/ " + (chunkX + blockFace.getModX()) + "/ " + (chunkZ + blockFace.getModZ());
-                        Clan other = clanManager.getClanByChunkString(targetChunkString).orElse(null);
-                        if (chunkData.getClan().equals(other)) {
+                        if (clan.isChunkOwnedByClan(targetChunkString)) {
                             chunkData.getBlockFaceSet().add(blockFace);
                         }
                     }
@@ -288,8 +279,7 @@ public class MapListener implements Listener {
                 for (int i = 0; i < 4; i++) {
                     BlockFace blockFace = BlockFace.values()[i];
                     String targetChunkString = "world/ " + (chunkX + blockFace.getModX()) + "/ " + (chunkZ + blockFace.getModZ());
-                    Clan other = clanManager.getClanByChunkString(targetChunkString).orElse(null);
-                    if (chunkData.getClan().equals(other)) {
+                    if (clan.isChunkOwnedByClan(targetChunkString)) {
                         chunkData.getBlockFaceSet().add(blockFace);
                     }
                 }
@@ -358,7 +348,7 @@ public class MapListener implements Listener {
 
     private Component createZoomBar(MapSettings.Scale scale) {
         return Component.text("Zoom: ", NamedTextColor.WHITE)
-                .append(Component.text((1 << scale.getValue()) + "x", NamedTextColor.GREEN));
+                .append(Component.text((scale.getValue()) + "x", NamedTextColor.GREEN));
     }
 
     private MapColor getColourForClan(Clan playerClan, Clan otherClan) {

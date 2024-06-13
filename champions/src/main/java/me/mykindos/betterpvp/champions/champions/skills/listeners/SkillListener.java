@@ -8,12 +8,13 @@ import me.mykindos.betterpvp.champions.champions.builds.BuildSkill;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.champions.champions.builds.event.ChampionsBuildLoadedEvent;
+import me.mykindos.betterpvp.champions.champions.builds.menus.events.ApplyBuildEvent;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillDequipEvent;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillEquipEvent;
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.champions.champions.roles.events.RoleChangeEvent;
-import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
+import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.champions.champions.skills.types.ActiveToggleSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
@@ -61,6 +62,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
@@ -87,7 +89,7 @@ public class SkillListener implements Listener {
     private final ChampionsSkillManager skillManager;
     private final WeaponManager weaponManager;
 
-    private final HashSet<UUID> InventoryDrop = new HashSet<>();
+    private final HashSet<UUID> inventoryDrop = new HashSet<>();
 
     @Inject
     public SkillListener(BuildManager buildManager, RoleManager roleManager, CooldownManager cooldownManager,
@@ -172,20 +174,25 @@ public class SkillListener implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler (priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onInventoryDrop(InventoryClickEvent event) {
         if (event.getAction().name().contains("DROP")) {
             if (event.getWhoClicked() instanceof Player player) {
-                InventoryDrop.add(player.getUniqueId());
+                inventoryDrop.add(player.getUniqueId());
             }
         }
     }
 
     @EventHandler
+    public void onQuit(PlayerQuitEvent event) {
+        inventoryDrop.remove(event.getPlayer().getUniqueId());
+    }
+
+    @EventHandler
     public void onDrop(PlayerDropItemEvent event) {
         Player player = event.getPlayer();
-        if (InventoryDrop.contains(player.getUniqueId())) {
-            InventoryDrop.remove(player.getUniqueId());
+        if (inventoryDrop.contains(player.getUniqueId())) {
+            inventoryDrop.remove(player.getUniqueId());
             return;
         }
         ItemStack droppedItem = event.getItemDrop().getItemStack();
@@ -266,10 +273,37 @@ public class SkillListener implements Listener {
         }
     }
 
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void onRightClickCancellations(PlayerInteractEvent event) {
+        if(!event.getAction().isRightClick()) return;
+
+        Player player = event.getPlayer();
+
+        if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+            Block block = event.getClickedBlock();
+            if (block != null) {
+                if (block.getType().name().contains("SPONGE")) {
+                    // Only cancel if the sponge is below the player
+                    if (block.getLocation().getY() < player.getLocation().getY()) {
+                        event.setUseItemInHand(Event.Result.DENY);
+                        return;
+                    }
+                } else if (block.getType().name().contains("DOOR")) {
+                    cooldownManager.use(event.getPlayer(), "DoorAccess", 0.01, false);
+                    event.setUseItemInHand(Event.Result.DENY);
+                    return;
+                }
+            }
+        }
+
+    }
+
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onSkillActivate(PlayerInteractEvent event) {
         if (event.getAction() == Action.PHYSICAL) return;
         if (event.getHand() == EquipmentSlot.OFF_HAND) return;
+        if (event.useItemInHand() == Event.Result.DENY) return;
+        if (UtilBlock.usable(event.getClickedBlock())) return;
         if (cooldownManager.hasCooldown(event.getPlayer(), "DoorAccess")) return;
 
         Player player = event.getPlayer();
@@ -283,25 +317,6 @@ public class SkillListener implements Listener {
         if (skillType != SkillType.BOW && (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK)) {
             return;
         }
-
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            Block block = event.getClickedBlock();
-            if (block != null) {
-                if (block.getType().name().contains("SPONGE")) {
-                    // Only cancel if the sponge is below the player
-                    if (block.getLocation().getY() < player.getLocation().getY()) {
-                        return;
-                    }
-                } else if (block.getType().name().contains("DOOR")) {
-                    cooldownManager.use(event.getPlayer(), "DoorAccess", 0.01, false);
-                    return;
-                }
-            }
-        }
-
-        if (event.useItemInHand() == Event.Result.DENY) return;
-
-        if (UtilBlock.usable(event.getClickedBlock())) return;
 
         Optional<Role> roleOptional = roleManager.getObject(player.getUniqueId().toString());
         if (roleOptional.isPresent()) {
@@ -446,6 +461,13 @@ public class SkillListener implements Listener {
             final Gamer gamer = this.clientManager.search().online(player).getGamer();
             build.getActiveSkills().forEach(skill -> skill.trackPlayer(player, gamer));
         }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onApplyBuild(ApplyBuildEvent event) {
+        final Player player = event.getPlayer();
+        final Gamer gamer = this.clientManager.search().online(player).getGamer();
+        event.getNewBuild().getActiveSkills().forEach(skill -> skill.trackPlayer(player, gamer));
     }
 
     @EventHandler

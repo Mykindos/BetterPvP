@@ -78,6 +78,7 @@ public class UtilBlock {
      */
     public static boolean isInWater(Player player) {
         Block block = player.getLocation().getBlock();
+
         return isWater(block)  || player.isSwimming();
     }
 

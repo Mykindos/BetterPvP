@@ -102,6 +102,6 @@ public class ShopItemButton extends AbstractItem implements CooldownButton {
 
     @Override
     public double getCooldown() {
-        return 0.2;
+        return 0.1;
     }
 }

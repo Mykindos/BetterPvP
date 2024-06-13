@@ -23,7 +23,7 @@ public class RecipeHandler {
                 if (!key.namespace().equalsIgnoreCase(namespace)) continue;
                 if (!config.getBoolean(path + key.namespace() + '.' + key.value(), true)) {
                     Bukkit.removeRecipe((NamespacedKey) key);
-                    log.info("Disabling recipe: " + key.asString());
+                    log.info("Disabling recipe: " + key.asString()).submit();
                 }
             }
         }

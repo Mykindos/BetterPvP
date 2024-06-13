@@ -37,10 +37,13 @@ public class DoorListener implements Listener {
         Block block = event.getClickedBlock();
         if (block == null) return;
 
+        // Different to DoorAccess cooldown
+        if(!cooldownManager.use(event.getPlayer(), "DoorOpen", 0.05, false)) return;
+
         if (block.getType() == Material.IRON_DOOR || block.getType() == Material.IRON_TRAPDOOR) {
 
             if (!clanManager.hasAccess(event.getPlayer(), block.getLocation())) {
-                if (cooldownManager.use(event.getPlayer(), "Door", 250, false)) {
+                if (cooldownManager.use(event.getPlayer(), "Door", 2.5, false)) {
                     block.getWorld().playEffect(block.getLocation(), Effect.ZOMBIE_CHEW_WOODEN_DOOR, 0);
                 }
 

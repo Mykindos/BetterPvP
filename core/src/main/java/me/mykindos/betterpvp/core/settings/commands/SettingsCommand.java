@@ -11,8 +11,13 @@ import org.bukkit.entity.Player;
 @Singleton
 public class SettingsCommand extends Command {
 
+    private final ClientManager clientManager;
+
     @Inject
-    private ClientManager clientManager;
+    public SettingsCommand(ClientManager clientManager) {
+        this.clientManager = clientManager;
+        this.aliases.add("prefs");
+    }
 
     @Override
     public String getName() {

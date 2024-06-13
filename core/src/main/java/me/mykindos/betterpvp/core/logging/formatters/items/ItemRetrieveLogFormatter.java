@@ -17,17 +17,17 @@ public class ItemRetrieveLogFormatter implements ILogFormatter {
         return "ITEM_RETRIEVE";
     }
 
-
     @Override
     public Component formatLog(HashMap<String, String> context) {
+
         return Component.text(context.get(LogContext.CLIENT_NAME), NamedTextColor.YELLOW)
                 .append(Component.text(" retrieved ", NamedTextColor.GRAY))
                 .append(Component.text(context.get(LogContext.ITEM_NAME), NamedTextColor.GREEN)
                         .hoverEvent(HoverEvent.showText(Component.text(context.get(LogContext.ITEM)))))
                 .append(Component.text(" from ", NamedTextColor.GRAY))
-                .append(Component.text(context.get(LogContext.BLOCK), NamedTextColor.GREEN))
+                .append(Component.text(context.get(LogContext.BLOCK) == null ? "NULL" : context.get(LogContext.BLOCK), NamedTextColor.GREEN))
                 .append(Component.text(" at ", NamedTextColor.GRAY))
-                .append(Component.text(context.get(LogContext.BLOCK), NamedTextColor.YELLOW));
+                .append(Component.text(context.get(LogContext.LOCATION), NamedTextColor.YELLOW));
 
     }
 }

@@ -19,9 +19,15 @@ import xyz.xenondevs.invui.gui.structure.Markers;
 import xyz.xenondevs.invui.item.Item;
 import xyz.xenondevs.invui.window.Window;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class ViewEnemiesButton extends ViewClanCollectionButton {
 
@@ -37,18 +43,41 @@ public class ViewEnemiesButton extends ViewClanCollectionButton {
 
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
-        // Sort negative from smallest to biggest
-        Comparator<ClanEnemy> negativeComparator = Comparator.comparingDouble(ClanEnemy::getDominance);
-        final List<Item> negativeEnemies = clan.getEnemies().stream().sorted(negativeComparator).filter(enemy -> enemy.getDominance() < 0).map(enemy -> {
-            final Clan enemyClan = (Clan) enemy.getClan();
+
+        HashMap<Clan, ClanEnemy> enemies = new HashMap<>();
+        for(ClanEnemy enemy : clan.getEnemies()){
+            Clan enemyClan = (Clan) enemy.getClan();
+            Optional<ClanEnemy> clanEnemyOptional = enemyClan.getEnemy(clan);
+            if(clanEnemyOptional.isPresent()) {
+                ClanEnemy clanEnemy = clanEnemyOptional.get();
+                if(clanEnemy.getDominance() > 0) {
+                    enemies.put((Clan) enemy.getClan(), clanEnemy);
+                }
+            }
+        }
+
+        final List<Item> negativeEnemies = new ArrayList<>();
+
+        // Sort hashmap by comparator
+        LinkedHashMap<Clan, ClanEnemy> sortedMap = enemies.entrySet().stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.comparingDouble(ClanEnemy::getDominance).reversed()))
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (oldValue, newValue) -> oldValue,
+                        LinkedHashMap::new
+                ));
+
+        sortedMap.forEach((key, value) -> {
             final List<Component> lore = List.of(Component.text("Dominance: ", NamedTextColor.GRAY)
-                    .append(Component.text(enemy.getDominance(), NamedTextColor.RED)));
-            return (Item) new ViewClanButton(viewerClan, enemyClan, lore);
-        }).toList();
+                    .append(Component.text("-" + value.getDominance(), NamedTextColor.RED)));
+            negativeEnemies.add(new ViewClanButton(viewerClan, key, lore));
+        });
+
 
         // Sort positive from biggest to smallest
-        Comparator<ClanEnemy> positiveComparator = negativeComparator.reversed();
-        final List<Item> positiveEnemies = clan.getEnemies().stream().sorted(positiveComparator).filter(enemy -> enemy.getDominance() >= 0).map(enemy -> {
+        Comparator<ClanEnemy> positiveComparator = Comparator.comparingDouble(ClanEnemy::getDominance).reversed();
+        final List<Item> positiveEnemies = clan.getEnemies().stream().sorted(positiveComparator).filter(enemy -> enemy.getDominance() > 0).map(enemy -> {
             final Clan enemyClan = (Clan) enemy.getClan();
             final List<Component> lore = List.of(Component.text("Dominance: ", NamedTextColor.GRAY)
                     .append(Component.text("+" + enemy.getDominance(), NamedTextColor.GREEN)));

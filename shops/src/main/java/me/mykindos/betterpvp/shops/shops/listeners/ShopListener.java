@@ -6,6 +6,8 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.throwables.events.ThrowableHitEntityEvent;
+import me.mykindos.betterpvp.core.combat.weapon.WeaponManager;
 import me.mykindos.betterpvp.core.components.shops.ShopCurrency;
 import me.mykindos.betterpvp.core.components.shops.events.PlayerBuyItemEvent;
 import me.mykindos.betterpvp.core.components.shops.events.PlayerSellItemEvent;
@@ -18,6 +20,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
+import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
 import me.mykindos.betterpvp.shops.Shops;
 import me.mykindos.betterpvp.shops.shops.ShopManager;
@@ -30,6 +33,7 @@ import me.mykindos.betterpvp.shops.shops.shopkeepers.types.ParrotShopkeeper;
 import me.mykindos.betterpvp.shops.shops.utilities.ShopsNamespacedKeys;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
@@ -39,6 +43,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -60,13 +65,15 @@ public class ShopListener implements Listener {
     private final ShopManager shopManager;
     private final ItemHandler itemHandler;
     private final ClientManager clientManager;
+    private final WeaponManager weaponManager;
 
     @Inject
-    public ShopListener(ShopkeeperManager shopkeeperManager, ShopManager shopManager, ItemHandler itemHandler, ClientManager clientManager) {
+    public ShopListener(ShopkeeperManager shopkeeperManager, ShopManager shopManager, ItemHandler itemHandler, ClientManager clientManager, WeaponManager weaponManager) {
         this.shopkeeperManager = shopkeeperManager;
         this.shopManager = shopManager;
         this.itemHandler = itemHandler;
         this.clientManager = clientManager;
+        this.weaponManager = weaponManager;
     }
 
     @EventHandler
@@ -88,6 +95,12 @@ public class ShopListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onBuyItem(PlayerBuyItemEvent event) {
         boolean isShifting = event.getClickType().name().contains("SHIFT");
+
+        //Optional<IWeapon> weaponByItemStack = weaponManager.getWeaponByItemStack(event.getItem());
+        //if(isShifting && ((weaponByItemStack.isPresent() && weaponByItemStack.get() instanceof LegendaryWeapon)
+        //        || event.getItem().getItemMeta() instanceof Damageable)) {
+        //    isShifting = false;
+        //}
 
         int cost = isShifting ? event.getShopItem().getBuyPrice() * 64 : event.getShopItem().getBuyPrice();
 
@@ -119,6 +132,12 @@ public class ShopListener implements Listener {
         }
 
         boolean isShifting = event.getClickType().name().contains("SHIFT");
+
+        //Optional<IWeapon> weaponByItemStack = weaponManager.getWeaponByItemStack(event.getItem());
+        //if(isShifting && (weaponByItemStack.isPresent() && weaponByItemStack.get() instanceof LegendaryWeapon)) {
+        //    isShifting = false;
+        //}
+
         int cost = isShifting ? event.getShopItem().getBuyPrice() * 64 : event.getShopItem().getBuyPrice();
         int amount = isShifting ? 64 : event.getShopItem().getAmount();
 
@@ -144,6 +163,13 @@ public class ShopListener implements Listener {
                 .setAction("SHOP_BUY").addClientContext(event.getPlayer())
                 .addContext("ShopItem", event.getShopItem().getItemName()).addContext("Amount", amount + "")
                 .addContext("Price", cost + "").submit();
+        itemHandler.getUUIDItem(boughtItem).ifPresent(uuidItem -> {
+            Player player = event.getPlayer();
+            Location location = player.getLocation();
+            log.info("{} purchased ({}) at {}", player.getName(), uuidItem.getUuid(),
+                            UtilWorld.locationToString((location))).setAction("ITEM_BUY")
+                    .addClientContext(player).addItemContext(uuidItem).addLocationContext(location).submit();
+        });
 
     }
 
@@ -221,6 +247,12 @@ public class ShopListener implements Listener {
                                 .setAction("SHOP_SELL").addClientContext(event.getPlayer())
                                 .addContext("ShopItem", event.getShopItem().getItemName()).addContext("Amount", amount + "")
                                 .addContext("Price", cost + "").submit();
+                        itemHandler.getUUIDItem(item).ifPresent(uuidItem -> {
+                            Location location = player.getLocation();
+                            log.info("{} sold ({}) at {}", player.getName(), uuidItem.getUuid(),
+                                            UtilWorld.locationToString((location))).setAction("ITEM_SELL")
+                                    .addClientContext(player).addItemContext(uuidItem).addLocationContext(location).submit();
+                        });
 
                         return;
                     }
@@ -266,6 +298,28 @@ public class ShopListener implements Listener {
         if (shopkeeperManager.getObject(event.getDamagee().getUniqueId()).isPresent()) {
             event.cancel("Cannot damage shopkeepers");
         }
+    }
+
+    @EventHandler
+    public void onCollide(ThrowableHitEntityEvent event) {
+        if (shopkeeperManager.getObject(event.getCollision().getUniqueId()).isPresent()) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onCatch(PlayerFishEvent event) {
+        if(event.getState() == PlayerFishEvent.State.CAUGHT_ENTITY) {
+            if(event.getCaught() == null) return;
+            if (shopkeeperManager.getObject(event.getCaught().getUniqueId()).isPresent()) {
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onFetchEntity(FetchNearbyEntityEvent<?> event) {
+        event.getEntities().removeIf(entity -> shopkeeperManager.getObject(entity.getKey().getUniqueId()).isPresent());
     }
 
     @EventHandler

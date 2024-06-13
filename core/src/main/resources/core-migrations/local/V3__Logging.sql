@@ -16,7 +16,7 @@ create table logs_context
 );
 
 ALTER TABLE logs_context ADD INDEX (LogId);
-ALTER TABLE logs_context ADD INDEX (Context);
+ALTER TABLE logs_context ADD INDEX (Context, Value);
 
 create table if not exists uuiditems
 (
@@ -28,22 +28,43 @@ create table if not exists uuiditems
 DROP PROCEDURE IF EXISTS GetLogMessagesByContextAndValue;
 CREATE PROCEDURE GetLogMessagesByContextAndValue(IN context_param VARCHAR(255), IN value_param VARCHAR(255))
 BEGIN
-    SELECT l.Message, l.action, l.time, GROUP_CONCAT(CONCAT(lc.context, '::', lc.value) SEPARATOR '|') as context_values
-    FROM logs_context lc
-             INNER JOIN logs l ON lc.LogId = l.id
-    GROUP BY lc.LogId, l.Message, l.action, l.time
-    HAVING COUNT(CASE WHEN lc.context = context_param AND lc.value = value_param THEN 1 END) > 0
-    ORDER BY l.time DESC;
+    SELECT
+        l.Message,
+        l.action,
+        l.time,
+        GROUP_CONCAT(CONCAT(lc.context, '::', lc.value) SEPARATOR '|') as context_values
+    FROM
+        logs_context lc
+            INNER JOIN
+        logs l ON lc.LogId = l.id
+    WHERE
+        lc.LogId IN (
+            SELECT LogId FROM logs_context WHERE Context = context_param AND Value = value_param
+        )
+    GROUP BY
+        lc.LogId, l.time
+    ORDER BY
+        l.time DESC;
 END;
 
 DROP PROCEDURE IF EXISTS GetLogMessagesByContextAndAction;
 CREATE PROCEDURE GetLogMessagesByContextAndAction(IN context_param VARCHAR(255), IN value_param VARCHAR(255), IN action_param VARCHAR(255))
 BEGIN
-    SELECT l.Message, l.action, l.time, GROUP_CONCAT(CONCAT(lc.context, '::', lc.value) SEPARATOR '|') as context_values
-    FROM logs_context lc
-             INNER JOIN logs l ON lc.LogId = l.id
-    WHERE l.Action LIKE CONCAT('%', action_param, '%')
-    GROUP BY lc.LogId, l.Message, l.action, l.time
-    HAVING COUNT(CASE WHEN lc.context = context_param AND lc.value = value_param THEN 1 END) > 0
-    ORDER BY l.time DESC;
+    SELECT
+        l.Message,
+        l.action,
+        l.time,
+        GROUP_CONCAT(CONCAT(lc.context, '::', lc.value) SEPARATOR '|') as context_values
+    FROM
+        logs_context lc
+            INNER JOIN
+        logs l ON lc.LogId = l.id
+    WHERE
+        lc.LogId IN (
+            SELECT LogId FROM logs_context WHERE Context = context_param AND Value = value_param
+        ) AND l.Action LIKE CONCAT(action_param, '%')
+    GROUP BY
+        lc.LogId, l.time
+    ORDER BY
+        l.time DESC;
 END

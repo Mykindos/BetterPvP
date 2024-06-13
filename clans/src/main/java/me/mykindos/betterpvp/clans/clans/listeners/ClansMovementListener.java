@@ -124,7 +124,11 @@ public class ClansMovementListener extends ClanListener {
 
         clanManager.getClanByLocation(player.getLocation()).ifPresentOrElse(clan -> {
             if (clan.isAdmin() && clan.isSafe()) {
-                event.setDelayInSeconds(0);
+                if (clan.getName().toLowerCase().contains("spawn")) {
+                    event.setDelayInSeconds(0);
+                } else {
+                    event.setDelayInSeconds(20);
+                }
                 return;
             }
 
@@ -158,9 +162,9 @@ public class ClansMovementListener extends ClanListener {
                 }
 
                 if (clanManager.getRelation(playerClan, clan) == ClanRelation.ENEMY) {
-                    event.setDelayInSeconds(120);
-                } else {
                     event.setDelayInSeconds(60);
+                } else {
+                    event.setDelayInSeconds(30);
                 }
 
             } else {
@@ -170,6 +174,10 @@ public class ClansMovementListener extends ClanListener {
         }, () -> {
             event.setDelayInSeconds(20);
         });
+
+        if (event.getDelayInSeconds() > 0) {
+            UtilMessage.simpleMessage(player, "Clans", "Teleporting to clan home in <green>%d</green> seconds, don't move!", event.getDelayInSeconds());
+        }
     }
 
 

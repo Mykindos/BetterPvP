@@ -87,7 +87,8 @@ public class UUIDListener implements Listener {
      */
     private static final List<InventoryType> INVENTORY_NO_STORE_TYPES = new ArrayList<>(List.of(
             InventoryType.ANVIL,
-            InventoryType.WORKBENCH
+            InventoryType.WORKBENCH,
+            InventoryType.CRAFTING
     ));
 
     private static final List<InventoryType> INVENTORY_FURNACE_TYPES = new ArrayList<>(List.of(
@@ -114,6 +115,7 @@ public class UUIDListener implements Listener {
     public void onUUIDItemDrop(PlayerDropItemEvent event) {
         if (event.isCancelled()) return;
         if (UtilPlayer.isDead(event.getPlayer())) return;
+        if(event.getPlayer().getInventory().firstEmpty() == -1) return;
 
         Client client = clientManager.search().online(event.getPlayer());
 
@@ -328,7 +330,7 @@ public class UUIDListener implements Listener {
                 assert location != null;
                 log.info("{} retrieved ({}) from {} at ({})", player.getName(), item.getUuid(),
                                 Objects.requireNonNull(inventory).getType().name(), UtilWorld.locationToString(location))
-                        .setAction("ITEM_RETRIEVE").addClientContext(player).addLocationContext(location).addItemContext(item).submit();
+                        .setAction("ITEM_RETRIEVE").addClientContext(player).addLocationContext(location).addItemContext(item).addBlockContext(location.getBlock()).submit();
 
                 lastHeldUUIDItem.remove(player);
                 lastInventory.remove(player);
@@ -443,7 +445,7 @@ public class UUIDListener implements Listener {
                 log.info("{} caused ({}) to be dropped from block {} at ({})", event.getPlayer().getName(),
                                 uuidItem.getUuid(), event.getBlockState().getType().name(), UtilWorld.locationToString(location))
                         .setAction("ITEM_CONTAINER_BREAK").addItemContext(uuidItem).addLocationContext(location)
-                        .addBlockContext(event.getBlock()).submit();
+                        .addBlockContext(event.getBlockState()).addClientContext(event.getPlayer()).submit();
             });
         });
     }
@@ -460,7 +462,7 @@ public class UUIDListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onBlockExplore(BlockExplodeEvent event) {
+    public void onBlockExplode(BlockExplodeEvent event) {
         event.blockList().forEach(block -> {
             if (block.getState() instanceof Container container) {
                 container.getInventory().forEach(itemStack -> {

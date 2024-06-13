@@ -13,7 +13,9 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
+import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
@@ -85,16 +87,18 @@ public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill
     @Override
     public void activate(Player player, int level) {
         championsManager.getEffects().addEffect(player, player, EffectTypes.HEALTH_BOOST, healthBoostStrength, (long) (getDuration(level) * 1000L));
-
         AttributeInstance playerMaxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+        player.playSound(player, Sound.ENTITY_VILLAGER_WORK_CLERIC, 1f, 0.8f);
         if (playerMaxHealth != null) {
-            player.setHealth(Math.min(player.getHealth() + 4 * (healthBoostStrength + 1), playerMaxHealth.getValue()));
+            UtilPlayer.health(player, 4d * healthBoostStrength);
             for (Player target : UtilPlayer.getNearbyAllies(player, player.getLocation(), getRadius(level))) {
 
                 championsManager.getEffects().addEffect(target, player, EffectTypes.HEALTH_BOOST, healthBoostStrength, (long) (getDuration(level) * 1000L));
                 AttributeInstance targetMaxHealth = target.getAttribute(Attribute.GENERIC_MAX_HEALTH);
                 if (targetMaxHealth != null) {
-                    target.setHealth(Math.min(target.getHealth() + 4 * (healthBoostStrength + 1), targetMaxHealth.getValue()));
+                    UtilPlayer.health(target, 4d * healthBoostStrength);
+                    UtilMessage.simpleMessage(target, getClassType().getPrefix(), "<yellow>%s</yellow> cast <green>%s</green> on you!", player.getName(), getName());
+                    target.playSound(target, Sound.ENTITY_VILLAGER_WORK_CLERIC, 1f, 0.8f);
                 }
             }
         }

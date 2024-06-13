@@ -97,6 +97,18 @@ public class ChatListener implements Listener {
         }
     }
 
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onChatDisabled(ChatReceivedEvent event) {
+        if (event.isCancelled()) return;
+        Client client = clientManager.search().online(event.getTarget());
+        if (!((boolean) client.getProperty(ClientProperty.CHAT_ENABLED).orElse(false))) {
+            if (!event.getClient().hasRank(Rank.HELPER)) {
+                event.setCancelled(true);
+                event.setCancelReason("Player has chat disabled");
+            }
+        }
+    }
+
     @EventHandler(priority = EventPriority.MONITOR)
     public void onChatReceived(ChatReceivedEvent event) {
         if (event.isCancelled()) return;
@@ -118,7 +130,7 @@ public class ChatListener implements Listener {
     }
 
     private void logChatToDiscord(Player player, Component message) {
-        if(!discordChatWebhook.isEmpty()){
+        if (!discordChatWebhook.isEmpty()) {
             DiscordWebhook webhook = new DiscordWebhook(discordChatWebhook);
             webhook.send(DiscordMessage.builder()
                     .username(player.getName())

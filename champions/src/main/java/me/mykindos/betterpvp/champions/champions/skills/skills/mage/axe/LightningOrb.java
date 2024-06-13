@@ -51,6 +51,7 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
     private double baseDamage;
 
     private double damageIncreasePerLevel;
+    private double velocityStrength;
 
     @Inject
     public LightningOrb(Champions champions, ChampionsManager championsManager) {
@@ -144,7 +145,7 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
 
     @Override
     public void activate(Player player, int level) {
-        Item orb = player.getWorld().dropItem(player.getEyeLocation().add(player.getLocation().getDirection()), new ItemStack(Material.DIAMOND_BLOCK));
+        Item orb = player.getWorld().dropItem(player.getEyeLocation().add(player.getLocation().getDirection().multiply(velocityStrength)), new ItemStack(Material.DIAMOND_BLOCK));
         orb.setVelocity(player.getLocation().getDirection());
         orb.setCanPlayerPickup(false);
         orb.setCanMobPickup(false);
@@ -168,6 +169,8 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
 
         baseDamage = getConfig("baseDamage", 11.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
+
+        velocityStrength = getConfig("velocityStrength", 3.0, Double.class);
     }
 
     @Override

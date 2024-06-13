@@ -72,6 +72,7 @@ create table if not exists clans_dominance_scale
         primary key (ClanSize)
 );
 
+INSERT IGNORE INTO clans_dominance_scale VALUES (0, 3.5);
 INSERT IGNORE INTO clans_dominance_scale VALUES (1, 3.5);
 INSERT IGNORE INTO clans_dominance_scale VALUES (2, 3.5);
 INSERT IGNORE INTO clans_dominance_scale VALUES (3, 4);

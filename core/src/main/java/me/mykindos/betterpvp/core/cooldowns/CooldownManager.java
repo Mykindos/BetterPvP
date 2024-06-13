@@ -5,7 +5,9 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import lombok.Synchronized;
+import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.cooldowns.events.CooldownEvent;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
@@ -20,12 +22,14 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 @CustomLog
@@ -56,6 +60,10 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
     }
 
     public boolean use(Player player, String ability, double duration, boolean inform, boolean removeOnDeath, boolean cancellable, @Nullable Predicate<Gamer> actionBarCondition, int actionBarPriority) {
+        return use(player, ability, duration, inform, removeOnDeath, cancellable, actionBarCondition, actionBarPriority, null);
+    }
+
+    public boolean use(Player player, String ability, double duration, boolean inform, boolean removeOnDeath, boolean cancellable, @Nullable Predicate<Gamer> actionBarCondition, int actionBarPriority, Consumer<Cooldown> onExpire) {
         final Gamer gamer = clientManager.search().online(player).getGamer();
 
         // We add 1.5f to the duration in seconds, so they can see that it expired, and it doesn't instantly disappear
@@ -93,6 +101,7 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
             objects.put(player.getUniqueId().toString(), cooldowns);
             return Optional.of(cooldowns);
         });
+
         if (cooldownOptional.isPresent()) {
             ConcurrentHashMap<String, Cooldown> cooldowns = cooldownOptional.get();
 
@@ -113,14 +122,18 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
             }
 
             Cooldown cooldown = new Cooldown(duration, System.currentTimeMillis(), removeOnDeath, inform, cancellable);
+            if (onExpire != null) {
+                cooldown.setOnExpire(onExpire);
+            }
+
             CooldownEvent event = UtilServer.callEvent(new CooldownEvent(player, cooldown));
-            if(!event.isCancelled()) {
+            if (!event.isCancelled()) {
                 cooldowns.put(ability, cooldown);
                 gamer.getActionBar().add(actionBarPriority, actionBarComponent);
                 return true;
             }
 
-           return false;
+            return false;
         }
 
         log.error("Could not find cooldown entry for {}", player.getName()).submit();
@@ -177,7 +190,11 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
         if (cooldownOptional.isPresent()) {
             var cooldowns = cooldownOptional.get();
             if (cooldowns.containsKey(ability)) {
-                cooldowns.remove(ability);
+                Cooldown cooldown = cooldowns.remove(ability);
+                if(cooldown.getOnExpire() != null) {
+                    cooldown.getOnExpire().accept(cooldown);
+                }
+
                 if (!silent) {
                     UtilMessage.simpleMessage(player, "Recharge", "<alt>%s</alt> has been recharged.", ability);
                 }
@@ -195,8 +212,19 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
                     if (cd.isInform()) {
                         Player player = Bukkit.getPlayer(UUID.fromString(key));
                         if (player != null) {
+
+                            Client client = clientManager.search().online(player);
+                            final boolean soundSetting = (boolean) client.getProperty(ClientProperty.COOLDOWN_SOUNDS_ENABLED).orElse(false);
+                            if(soundSetting){
+                                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.4f, 3.0f);
+                            }
+
                             UtilMessage.simpleMessage(player, "Cooldown", "<alt>%s</alt> has been recharged.", entry.getKey());
                         }
+                    }
+
+                    if(cd.getOnExpire() != null) {
+                        cd.getOnExpire().accept(cd);
                     }
                     return true;
                 }

@@ -58,10 +58,23 @@ public class GeneralSettingsMenu extends AbstractGui implements SettingCategory 
                     .get();
         }).build();
 
+        final Description cooldownSoundsDescription = Description.builder().icon(lang -> {
+            final boolean setting = (boolean) client.getProperty(ClientProperty.COOLDOWN_SOUNDS_ENABLED).orElse(false);
+            final NamedTextColor color = setting ? NamedTextColor.GREEN : NamedTextColor.RED;
+            return ItemView.builder()
+                    .material(Material.JUKEBOX)
+                    .displayName(Component.text("Sounds", color))
+                    .lore(Component.text("Whether to play a sound when a cooldown has expired or not", NamedTextColor.GRAY))
+                    .frameLore(true)
+                    .build()
+                    .get();
+        }).build();
+
         addItems(
                 new SettingsButton(client, ClientProperty.TIPS_ENABLED, tipDescription),
                 new SettingsButton(client, ClientProperty.CHAT_ENABLED, chatDescription),
-                new SettingsButton(client, ClientProperty.DROP_PROTECTION_ENABLED, dropDescription)
+                new SettingsButton(client, ClientProperty.DROP_PROTECTION_ENABLED, dropDescription),
+                new SettingsButton(client, ClientProperty.COOLDOWN_SOUNDS_ENABLED, cooldownSoundsDescription)
         );
     }
 

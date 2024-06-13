@@ -152,23 +152,6 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
         }
     }
 
-    @UpdateEvent(delay = 100)
-    public void onUpdateEffect() {
-        Iterator<UUID> it = active.iterator();
-        while (it.hasNext()) {
-            Player player = Bukkit.getPlayer(it.next());
-            if (player != null) {
-                Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
-                if (gamer.isHoldingRightClick()) {
-                    player.getWorld().playEffect(player.getLocation(), Effect.STEP_SOUND, 7);
-                }
-            } else {
-                it.remove();
-            }
-        }
-
-    }
-
     @UpdateEvent
     public void onUpdate() {
         Iterator<UUID> it = active.iterator();

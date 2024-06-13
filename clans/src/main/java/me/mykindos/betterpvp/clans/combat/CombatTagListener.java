@@ -10,7 +10,6 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilTime;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
 import net.kyori.adventure.title.TitlePart;
@@ -39,7 +38,7 @@ public class CombatTagListener implements Listener {
     public void showTag() {
         for (final Player player : Bukkit.getOnlinePlayers()) {
             final Gamer gamer = clientManager.search().online(player).getGamer();
-            if (!UtilTime.elapsed(gamer.getLastDamaged(), 15000)) {
+            if (gamer.isInCombat()) {
                 if (effectManager.hasEffect(player, EffectTypes.VANISH)) return;
 
                 if (!clanManager.isInSafeZone(player)) return; // don't do this if player isn't in a safe zone
@@ -64,7 +63,7 @@ public class CombatTagListener implements Listener {
         for (final Player player : Bukkit.getOnlinePlayers()) {
             Gamer gamer = clientManager.search().online(player).getGamer();
 
-            if (!UtilTime.elapsed(gamer.getLastDamaged(), 15000)) {
+            if (gamer.isInCombat()) {
                 if (clanManager.isInSafeZone(player)) {
 
                     long remainingMillis = 15000 - (System.currentTimeMillis() - gamer.getLastDamaged());

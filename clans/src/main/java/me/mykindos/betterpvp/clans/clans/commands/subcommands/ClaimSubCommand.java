@@ -28,6 +28,7 @@ public class ClaimSubCommand extends ClanSubCommand {
     @Inject
     public ClaimSubCommand(ClanManager clanManager, ClientManager clientManager) {
         super(clanManager, clientManager);
+        aliases.add("c");
     }
 
     @Override

@@ -46,7 +46,7 @@ public class Cleave extends Skill implements PassiveSkill, Listener {
 
         return new String[]{
                 "Your attacks deal <val>" + UtilFormat.formatNumber((getPercentageOfDamage(level) * 100), 2) + "%</val> of your damage to",
-                "all enemies within <val>" + getDistance(level) + "</val> blocks of your target enemy.",
+                "all enemies within <stat>" + getDistance(level) + "</stat> blocks of your target enemy.",
                 "",
                 "Max Enemies Hit: <val>" + getMaxEnemiesHit(level) + "</val>",
                 "",
@@ -83,6 +83,7 @@ public class Cleave extends Skill implements PassiveSkill, Listener {
         if (!(event.getDamager() instanceof Player damager)) return;
         if (!SkillWeapons.isHolding(damager, SkillType.AXE)) return;
         if (event.hasReason(getName())) return; // Don't get stuck in an endless damage loop
+        if (event.getDamagee().hasMetadata("PlayerSpawned")) return;
 
         int level = getLevel(damager);
         int enemiesHit = 0;
@@ -102,7 +103,7 @@ public class Cleave extends Skill implements PassiveSkill, Listener {
     @Override
     public void loadSkillConfig() {
         baseDistance = getConfig("baseDistance", 3.0, Double.class);
-        distanceIncreasePerLevel = getConfig("distanceIncreasePerLevel", 1.0, Double.class);
+        distanceIncreasePerLevel = getConfig("distanceIncreasePerLevel", 0.0, Double.class);
         percentageOfDamage = getConfig("percentageOfDamage", 0.45, Double.class);
         percentageOfDamageIncreasePerLevel = getConfig("percentageOfDamageIncreasePerLevel", 0.15, Double.class);
         maxEnemiesHit = getConfig("maxEnemiesHit", 2, Integer.class);

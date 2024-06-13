@@ -9,5 +9,6 @@ public class ClansNamespacedKeys {
     public static final NamespacedKey CANNON_CLAN = new NamespacedKey("clans", "cannon_clan");
     public static final NamespacedKey CANNON_HEALTHBAR = new NamespacedKey("clans", "cannon_healthbar");
     public static final NamespacedKey CANNON_LEGEND = new NamespacedKey("clans", "cannon_legend");
+    public static final NamespacedKey CLAN = new NamespacedKey("clans", "clan");
 
 }

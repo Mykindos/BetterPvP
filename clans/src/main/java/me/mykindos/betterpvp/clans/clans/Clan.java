@@ -67,11 +67,11 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
     private BukkitTask tntRecoveryRunnable = null;
 
     public long getTimeCreated() {
-        return (long) getProperty(ClanProperty.TIME_CREATED).orElse(0);
+        return (long) getProperty(ClanProperty.TIME_CREATED).orElse(0L);
     }
 
     public long getLastLogin() {
-        return (long) getProperty(ClanProperty.LAST_LOGIN).orElse(0);
+        return (long) getProperty(ClanProperty.LAST_LOGIN).orElse(0L);
     }
 
     public int getEnergy() {
@@ -88,7 +88,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
      * @return The time the cooldown expires (epoch)
      */
     public long getNoDominanceCooldown() {
-        return (long) getProperty(ClanProperty.NO_DOMINANCE_COOLDOWN).orElse(0);
+        return (long) getProperty(ClanProperty.NO_DOMINANCE_COOLDOWN).orElse(0L);
     }
 
     public boolean isNoDominanceCooldownActive() {
@@ -96,7 +96,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
     }
 
     public long getLastTntedTime() {
-        return (long) getProperty(ClanProperty.LAST_TNTED).orElse(0);
+        return (long) getProperty(ClanProperty.LAST_TNTED).orElse(0L);
     }
 
     public int getBalance() {
@@ -279,6 +279,10 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
         }
 
         return ClanRelation.NEUTRAL;
+    }
+
+    public boolean isChunkOwnedByClan(String chunkString) {
+        return getTerritory().stream().anyMatch(claim -> claim.getChunk().equalsIgnoreCase(chunkString));
     }
 
     @Override

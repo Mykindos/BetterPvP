@@ -113,6 +113,10 @@ public class CombatListener implements Listener {
             damageDataList.add(new DamageData(event.getDamagee().getUniqueId().toString(), event.getCause(), damagerUuid, event.getForceDamageDelay()));
         }
 
+        if (event.getDamagee().getHealth() <= 0) {
+            return;
+        }
+
         if (event.isCancelled()) {
             return;
         }
@@ -128,6 +132,12 @@ public class CombatListener implements Listener {
         if (event.getDamageDelay() > 0 && event.getDamager() != null) {
             effectManager.getEffect(event.getDamager(), EffectTypes.ATTACK_SPEED).ifPresent(effect -> {
                 event.setDamageDelay((long) (event.getDamageDelay() * (1 - (effect.getAmplifier() / 100d))));
+            });
+            effectManager.getEffect(event.getDamager(), EffectTypes.CONCUSSED).ifPresent(effect -> {
+                LivingEntity concussedPlayer = effect.getApplier();
+                concussedPlayer.getWorld().playSound(concussedPlayer.getLocation(), Sound.ENTITY_GOAT_LONG_JUMP, 2.0F, 1.0F);
+
+                event.setDamageDelay((long) (event.getDamageDelay() * (1 + (effect.getAmplifier() * 0.25))));
             });
         }
 
@@ -489,17 +499,17 @@ public class CombatListener implements Listener {
 
     @EventHandler
     public void onCanHurt(EntityCanHurtEntityEvent event) {
-        if(!event.isAllowed()) {
+        if (!event.isAllowed()) {
             return;
         }
 
-        if(event.getDamagee().equals(event.getDamager())) {
+        if (event.getDamagee().equals(event.getDamager())) {
             event.setResult(Event.Result.DENY);
             return;
         }
 
-        if(event.getDamagee() instanceof Player damagee) {
-            if(damagee.getGameMode() == GameMode.CREATIVE || damagee.getGameMode() == GameMode.SPECTATOR) {
+        if (event.getDamagee() instanceof Player damagee) {
+            if (damagee.getGameMode() == GameMode.CREATIVE || damagee.getGameMode() == GameMode.SPECTATOR) {
                 event.setResult(Event.Result.DENY);
             }
         }
