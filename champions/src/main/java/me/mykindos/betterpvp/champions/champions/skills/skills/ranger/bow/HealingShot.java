@@ -92,6 +92,7 @@ public class HealingShot extends PrepareArrowSkill {
     public void onPreDamageEvent(PreCustomDamageEvent event) {
         CustomDamageEvent cde = event.getCustomDamageEvent();
         if (!(cde.getProjectile() instanceof Arrow arrow)) return;
+        upwardsArrows.remove(arrow.getUniqueId());
         if (!(cde.getDamager() instanceof Player damager)) return;
         if (!arrows.contains(arrow)) return;
         int level = getLevel(damager);
@@ -105,9 +106,10 @@ public class HealingShot extends PrepareArrowSkill {
     //event to capture the initial velocity of the arrow (ensure it is going up)
     @EventHandler
     public void onProjectileLaunch(ProjectileLaunchEvent event) {
-        if (event.getEntity() instanceof Arrow arrow) {
+        if (event.getEntity() instanceof Arrow arrow && arrow.getShooter() instanceof Player shooter) {
             Vector initialVelocity = arrow.getVelocity();
-            if (initialVelocity.getY() > 0) {
+            int level = getLevel(shooter);
+            if (level > 0 && initialVelocity.getY() > 0) {
                 upwardsArrows.add(arrow.getUniqueId());
             }
         }
@@ -117,20 +119,20 @@ public class HealingShot extends PrepareArrowSkill {
     @EventHandler
     public void onProjectileHit(ProjectileHitEvent event) {
         if (event.getEntity() instanceof Arrow arrow && arrow.getShooter() instanceof Player shooter) {
+            if (!upwardsArrows.remove(arrow.getUniqueId())) return;
             if (!arrows.contains(arrow)) return;
-            if (!upwardsArrows.contains(arrow.getUniqueId())) return;
-            upwardsArrows.remove(arrow.getUniqueId());
 
             Location arrowLocation = arrow.getLocation();
             for (Entity entity : arrowLocation.getWorld().getNearbyEntities(arrowLocation, 0.5, 0.5, 0.5)) {
                 if (entity instanceof Player && entity.getUniqueId().equals(shooter.getUniqueId())) {
                     Location playerLocation = entity.getLocation();
                     double distanceSquared = arrowLocation.distanceSquared(playerLocation);
-                    double radiusSquared = 0.5 * 0.5;
+                    double radiusSquared = 0.4 * 0.4;
                     if (distanceSquared <= radiusSquared) {
                         int level = getLevel(shooter);
                         if (level > 0){
                             onHit(shooter, shooter,level , event);
+                            return;
                         }
                     }
                 }
