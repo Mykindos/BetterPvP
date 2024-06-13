@@ -79,12 +79,13 @@ skills:
       baseDamageIncrement: 1.0
     concussion:
       enabled: true
-      cooldown: 10.0
+      cooldown: 14.0
       maxlevel: 3
       durationPerLevel: 1.5
       cooldownDecreasePerLevel: 1.0
       baseDuration: 2.0
       durationIncreasePerLevel: 1.5
+      concussionStrength: 1
     slash:
       enabled: true
       maxlevel: 3
