@@ -27,7 +27,6 @@ import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.data.CustomDataType;
@@ -689,7 +688,7 @@ public class ClansWorldListener extends ClanListener {
         clanManager.getClanByLocation(player.getLocation()).ifPresent(clan -> {
             if (clan.isSafe()) {
                 final Gamer gamer = clientManager.search().online(player).getGamer();
-                if (UtilTime.elapsed(gamer.getLastDamaged(), 15000)) {
+                if (!gamer.isInCombat()) {
                     event.setCancelled(true);
                 }
             }

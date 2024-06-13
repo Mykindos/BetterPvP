@@ -11,7 +11,6 @@ import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
 import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -73,7 +72,7 @@ public class ClansCombatListener implements Listener {
             if (locationClan.isAdmin() && locationClan.isSafe()) {
                 if (damagee instanceof Player player) {
                     Gamer gamer = clientManager.search().online(player).getGamer();
-                    if (UtilTime.elapsed(gamer.getLastDamaged(), 15000)) {
+                    if (!gamer.isInCombat()) {
                         event.setCancelled(true);
                     }
                 } else {
