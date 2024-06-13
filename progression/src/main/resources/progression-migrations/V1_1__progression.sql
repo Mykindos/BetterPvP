@@ -24,6 +24,14 @@ create table if not exists progression_mining
     primary key (Gamer, Material)
 );
 
+
+create table if not exists progression_woodcutting
+(
+    Gamer varchar(36) not null,
+    Material varchar(36) not null,
+    primary key (Gamer, Material)
+);
+
 create table if not exists progression_properties
 (
     Gamer      varchar(36)  not null,
