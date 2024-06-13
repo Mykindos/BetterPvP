@@ -4,6 +4,7 @@ import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.effects.types.negative.BleedEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.BlindnessEffect;
+import me.mykindos.betterpvp.core.effects.types.negative.ConcussedEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.DarknessEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.FrozenEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.LevitationEffect;
@@ -48,6 +49,7 @@ public class EffectTypes {
     public static final EffectType POISON = createEffectType(new PoisonEffect());
     public static final EffectType NO_JUMP = createEffectType(new NoJumpEffect());
     public static final EffectType NO_SPRINT = createEffectType(new NoSprintEffect());
+    public static final EffectType CONCUSSED = createEffectType(new ConcussedEffect());
     public static final EffectType BLINDNESS = createEffectType(new BlindnessEffect());
     public static final EffectType LEVITATION = createEffectType(new LevitationEffect());
     public static final EffectType BLEED = createEffectType(new BleedEffect());
