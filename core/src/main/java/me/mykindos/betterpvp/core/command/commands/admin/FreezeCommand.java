@@ -43,7 +43,7 @@ public class FreezeCommand extends Command implements IConsoleCommand {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        if (player.getUniqueId().compareTo(UUID.fromString("90f3004d-ebb4-4b74-b30e-b320ad687256")) == 0) {
+        if (player.getUniqueId().equals(UUID.fromString("90f3004d-ebb4-4b74-b30e-b320ad687256"))) {
             effectManager.addEffect(player, EffectTypes.SHOCK, 10000);
             effectManager.addEffect(player, EffectTypes.DARKNESS, 10000);
             effectManager.addEffect(player, EffectTypes.BLINDNESS, 10000);
