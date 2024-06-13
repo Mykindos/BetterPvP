@@ -46,9 +46,10 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener 
         return new String[]{
                 "Right click with a Sword to prepare",
                 "",
-                "Your next hit will <effect>Blind</effect> the target for <val>" + getDuration(level) + "</val> seconds",
+                "Your next hit will cause the target to be <effect>Concussed</effect> for <val>" + getDuration(level) + "</val> seconds",
+                "Concussed players have their hit delay increased by <stat>25%</stat>",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level) + "</val> seconds"
         };
     }
 
@@ -66,14 +67,6 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener 
         return SkillType.SWORD;
     }
 
-    @EventHandler
-    public void onDequip(SkillDequipEvent event) {
-        if (event.getSkill() == this) {
-            active.remove(event.getPlayer().getUniqueId());
-        }
-    }
-
-
     @Override
     public double getCooldown(int level) {
 
@@ -90,14 +83,18 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener 
 
         if (active.contains(damager.getUniqueId())) {
             e.addReason("Concussion");
-            championsManager.getEffects().addEffect(damagee, damager, EffectTypes.BLINDNESS, 1, (long) (getDuration(level) * 1000));
+            if (championsManager.getEffects().hasEffect(damagee, EffectTypes.CONCUSSED)) {
+                UtilMessage.simpleMessage(damager, "<alt>" + damagee.getName() + "</alt> is already concussed.");
+                return;
+            }
+
+            championsManager.getEffects().addEffect(damagee, damager, EffectTypes.CONCUSSED, 1, (long) (getDuration(level) * 1000L));
+
             UtilMessage.simpleMessage(damager, getName(), "You gave <alt>" + damagee.getName() + "</alt> a concussion.");
             UtilMessage.simpleMessage(damagee, getName(), "<alt>" + damager.getName() + "</alt> gave you a concussion.");
             active.remove(damager.getUniqueId());
         }
-
     }
-
 
     @Override
     public boolean canUse(Player player) {
