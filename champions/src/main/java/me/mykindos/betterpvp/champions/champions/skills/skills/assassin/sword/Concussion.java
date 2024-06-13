@@ -3,7 +3,6 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.sword;
 
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
-import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillDequipEvent;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareSkill;
@@ -29,6 +28,7 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener 
     private double baseDuration;
 
     private double durationIncreasePerLevel;
+    private int concussionStrength;
 
     @Inject
     public Concussion(Champions champions, ChampionsManager championsManager) {
@@ -70,25 +70,25 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener 
     @Override
     public double getCooldown(int level) {
 
-        return cooldown - ((level - 1) * 3);
+        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
     @EventHandler
-    public void onDamage(CustomDamageEvent e) {
-        if (e.getCause() != DamageCause.ENTITY_ATTACK) return;
-        if (!(e.getDamager() instanceof Player damager)) return;
-        if (!(e.getDamagee() instanceof Player damagee)) return;
+    public void onDamage(CustomDamageEvent event) {
+        if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
+        if (!(event.getDamager() instanceof Player damager)) return;
+        if (!(event.getDamagee() instanceof Player damagee)) return;
         int level = getLevel(damager);
         if (level <= 0) return;
 
         if (active.contains(damager.getUniqueId())) {
-            e.addReason("Concussion");
+            event.addReason("Concussion");
             if (championsManager.getEffects().hasEffect(damagee, EffectTypes.CONCUSSED)) {
-                UtilMessage.simpleMessage(damager, "<alt>" + damagee.getName() + "</alt> is already concussed.");
+                UtilMessage.simpleMessage(damager, getName(), "<alt>%s</alt> is already concussed.", damagee.getName());
                 return;
             }
 
-            championsManager.getEffects().addEffect(damagee, damager, EffectTypes.CONCUSSED, 1, (long) (getDuration(level) * 1000L));
+            championsManager.getEffects().addEffect(damagee, damager, EffectTypes.CONCUSSED, concussionStrength, (long) (getDuration(level) * 1000L));
 
             UtilMessage.simpleMessage(damager, getName(), "You gave <alt>" + damagee.getName() + "</alt> a concussion.");
             UtilMessage.simpleMessage(damagee, getName(), "<alt>" + damager.getName() + "</alt> gave you a concussion.");
@@ -121,5 +121,6 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener 
     public void loadSkillConfig() {
         baseDuration = getConfig("baseDuration", 1.5, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.5, Double.class);
+        concussionStrength = getConfig("concussionStrength", 1, Integer.class);
     }
 }
