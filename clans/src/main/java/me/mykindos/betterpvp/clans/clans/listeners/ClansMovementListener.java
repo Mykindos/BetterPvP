@@ -176,7 +176,7 @@ public class ClansMovementListener extends ClanListener {
         });
 
         if (event.getDelayInSeconds() > 0) {
-            UtilMessage.simpleMessage(player, "Clans", "Teleporting to clan home in <green>%s</green> seconds, don't move!", event.getDelayInSeconds());
+            UtilMessage.simpleMessage(player, "Clans", "Teleporting to clan home in <green>%.1f</green> seconds, don't move!", event.getDelayInSeconds());
         }
     }
 
@@ -217,7 +217,7 @@ public class ClansMovementListener extends ClanListener {
             event.setDelayInSeconds(60);
         }
         if (event.getDelayInSeconds() > 0) {
-            UtilMessage.simpleMessage(player, "Clans", "Teleporting to nearest wilderness in <green>%s</green> seconds, don't move!", event.getDelayInSeconds());
+            UtilMessage.simpleMessage(player, "Clans", "Teleporting to nearest wilderness in <green>%.1f</green> seconds, don't move!", event.getDelayInSeconds());
         }
     }
 

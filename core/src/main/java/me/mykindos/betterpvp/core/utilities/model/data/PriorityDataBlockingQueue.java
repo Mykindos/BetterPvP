@@ -30,24 +30,4 @@ public class PriorityDataBlockingQueue<T> extends PriorityBlockingQueue<Pair<Pri
         PriorityData newPriorityData = new PriorityData(priority, instance.get());
         super.put(Pair.of(newPriorityData, element));
     }
-
-    /**
-     * Put a new element with a priority, assigning it the correct instance
-     * Time complexity: O(n)
-     * @param priority the priority
-     * @param element the element
-     */
-    public void add(int priority, T element) {
-        AtomicLong instance = new AtomicLong();
-        forEach(priorityDataTPair -> {
-            PriorityData priorityData = priorityDataTPair.getKey();
-            if (priorityData.getPriority() == priority) {
-                if (priorityData.getInstance() >= instance.get()) {
-                    instance.set(priorityData.getInstance() + 1);
-                }
-            }
-        });
-        PriorityData newPriorityData = new PriorityData(priority, instance.get());
-        super.add(Pair.of(newPriorityData, element));
-    }
 }
