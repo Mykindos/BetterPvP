@@ -27,6 +27,7 @@ create table if not exists progression_mining
 
 create table if not exists progression_woodcutting
 (
+    id varchar(36) not null primary key,
     Gamer varchar(36) not null,
     Material varchar(50) not null,
     Location varchar(285) not null,
