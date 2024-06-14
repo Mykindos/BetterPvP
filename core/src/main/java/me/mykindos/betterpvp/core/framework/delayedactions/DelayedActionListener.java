@@ -13,16 +13,15 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.utilities.model.display.TitleComponent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.title.Title;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
-import java.time.Duration;
 import java.util.WeakHashMap;
 
 @BPvPListener
@@ -76,15 +75,14 @@ public class DelayedActionListener implements Listener {
 
         delayedActionMap.forEach((player, delayedAction) -> {
             if (delayedAction.isCountdown() && delayedAction.getCountdownText() != null) {
-
                 Component remainingTime = UtilMessage.deserialize("<alt2>%s</alt2> <alt>%.1f</alt> <alt2>%s</alt2>",
                         delayedAction.getCountdownText(),
                         UtilTime.convert((delayedAction.getTime() - System.currentTimeMillis()), UtilTime.TimeUnit.BEST, 1),
-                        UtilTime.getTimeUnit2(delayedAction.getTime() - System.currentTimeMillis()).toLowerCase()
+                        UtilTime.getTimeUnit2((double) delayedAction.getTime() - System.currentTimeMillis()).toLowerCase()
                 );
 
-                var times = Title.Times.times(Duration.ofMillis(0), Duration.ofMillis(1000), Duration.ofMillis(1000));
-                player.showTitle(Title.title(remainingTime, Component.empty(), times));
+                final TitleComponent titleComponent = TitleComponent.title(0, 0.5, 0, false, gamer -> remainingTime);
+                clientManager.search().online(player).getGamer().getTitleQueue().add(10, titleComponent);
             }
 
         });
@@ -96,11 +94,10 @@ public class DelayedActionListener implements Listener {
             if (delayedActionMap.containsKey(player)) {
                 DelayedAction delayedAction = delayedActionMap.remove(player);
 
-                var times = Title.Times.times(Duration.ofMillis(0), Duration.ofMillis(1000), Duration.ofMillis(1000));
-                player.showTitle(Title.title(
-                        Component.text(delayedAction.getTitleText() + " cancelled", NamedTextColor.RED),
-                        Component.text("You took damage while " + delayedAction.getSubtitleText(), NamedTextColor.GRAY),
-                        times));
+                TitleComponent titleComponent = new TitleComponent(0, 1, 1, true,
+                        gamer -> Component.text(delayedAction.getTitleText() + " cancelled", NamedTextColor.RED),
+                        gamer -> Component.text("You took damage while " + delayedAction.getSubtitleText(), NamedTextColor.GRAY));
+                clientManager.search().online(player).getGamer().getTitleQueue().add(9, titleComponent);
             }
         }
     }
@@ -112,11 +109,10 @@ public class DelayedActionListener implements Listener {
                     || event.getFrom().getBlockZ() != event.getTo().getBlockZ()) {
                 DelayedAction delayedAction = delayedActionMap.remove(event.getPlayer());
 
-                var times = Title.Times.times(Duration.ofMillis(0), Duration.ofMillis(1000), Duration.ofMillis(1000));
-                event.getPlayer().showTitle(Title.title(
-                        Component.text(delayedAction.getTitleText() + " cancelled", NamedTextColor.RED),
-                        Component.text("You moved while " + delayedAction.getSubtitleText(), NamedTextColor.GRAY),
-                        times));
+                TitleComponent titleComponent = new TitleComponent(0, 1, 1, true,
+                        gamer -> Component.text(delayedAction.getTitleText() + " cancelled", NamedTextColor.RED),
+                        gamer -> Component.text("You moved while " + delayedAction.getSubtitleText(), NamedTextColor.GRAY));
+                clientManager.search().online(event.getPlayer()).getGamer().getTitleQueue().add(9, titleComponent);
             }
         }
     }
