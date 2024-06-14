@@ -49,8 +49,8 @@ public class WoodcuttingHandler extends ProfessionHandler {
      * is calling this method doesn't know in what manor it needs to modify the xp),
      * it will get passed here
      */
-    public void attemptToMineWood(Player player, Block block) {
-        attemptToMineWood(player, block, LongUnaryOperator.identity());
+    public void attemptToChopLog(Player player, Block block) {
+        attemptToChopLog(player, block, LongUnaryOperator.identity());
     }
 
     /**
@@ -59,7 +59,7 @@ public class WoodcuttingHandler extends ProfessionHandler {
      * @param experienceModifier represents a higher order function that modifies
      *                           the experience gained by the player here.
      */
-    public void attemptToMineWood(Player player, Block block, LongUnaryOperator experienceModifier) {
+    public void attemptToChopLog(Player player, Block block, LongUnaryOperator experienceModifier) {
         ProfessionData professionData = getProfessionData(player.getUniqueId());
         if (professionData == null) {
             return;
@@ -87,8 +87,8 @@ public class WoodcuttingHandler extends ProfessionHandler {
                 .addClientContext(player).addBlockContext(block).addLocationContext(block.getLocation())
                 .addContext("Experience", finalExperience + "").submit();
 
-        long treesChopped = (long) professionData.getProperties().getOrDefault("TOTAL_TREES_CHOPPED", 0);
-        professionData.getProperties().put("TOTAL_TREES_CHOPPED", treesChopped + 1);
+        long logsChopped = (long) professionData.getProperties().getOrDefault("TOTAL_LOGS_CHOPPED", 0L);
+        professionData.getProperties().put("TOTAL_LOGS_CHOPPED", logsChopped + 1L);
     }
 
     @Override
