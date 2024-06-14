@@ -20,6 +20,11 @@ import java.util.EnumMap;
 import java.util.Map;
 import java.util.function.LongUnaryOperator;
 
+
+/**
+ * This class's purpose is to listen for whenever a block is broken
+ * and notify the WoodcuttingHandler appropriately.
+ */
 @Singleton
 @CustomLog
 @Getter

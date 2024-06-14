@@ -10,6 +10,11 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 
+
+/**
+ * This class's purpose is to listen for whenever a block is broken
+ * and notify the WoodcuttingHandler appropriately.
+ */
 @BPvPListener
 @CustomLog
 @Singleton
