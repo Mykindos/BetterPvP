@@ -33,6 +33,6 @@ public class WoodcuttingStatsListener implements Listener {
      */
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBreak(BlockBreakEvent event) {
-        woodcuttingHandler.attemptToMineWood(event.getPlayer(), event.getBlock());
+        woodcuttingHandler.attemptToChopLog(event.getPlayer(), event.getBlock());
     }
 }
