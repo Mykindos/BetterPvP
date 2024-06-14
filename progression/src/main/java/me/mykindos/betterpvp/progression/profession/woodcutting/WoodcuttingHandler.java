@@ -87,7 +87,7 @@ public class WoodcuttingHandler extends ProfessionHandler {
                 .addClientContext(player).addBlockContext(block).addLocationContext(block.getLocation())
                 .addContext("Experience", finalExperience + "").submit();
 
-        int treesChopped = (int) professionData.getProperties().getOrDefault("TOTAL_TREES_CHOPPED", 0);
+        long treesChopped = (long) professionData.getProperties().getOrDefault("TOTAL_TREES_CHOPPED", 0);
         professionData.getProperties().put("TOTAL_TREES_CHOPPED", treesChopped + 1);
     }
 
