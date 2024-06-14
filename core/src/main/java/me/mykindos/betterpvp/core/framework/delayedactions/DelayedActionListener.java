@@ -75,7 +75,6 @@ public class DelayedActionListener implements Listener {
 
         delayedActionMap.forEach((player, delayedAction) -> {
             if (delayedAction.isCountdown() && delayedAction.getCountdownText() != null) {
-                ;
                 Component remainingTime = UtilMessage.deserialize("<alt2>%s</alt2> <alt>%.1f</alt> <alt2>%s</alt2>",
                         delayedAction.getCountdownText(),
                         UtilTime.convert((delayedAction.getTime() - System.currentTimeMillis()), UtilTime.TimeUnit.BEST, 1),
