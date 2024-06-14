@@ -228,3 +228,6 @@ command:
   mining:
     enabled: true
     requiredRank: ADMIN
+  woodcutting:
+    enabled: true
+    requiredRank: ADMIN
