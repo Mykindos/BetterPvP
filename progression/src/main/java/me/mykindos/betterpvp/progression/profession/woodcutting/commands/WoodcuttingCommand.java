@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillManager;
+import me.mykindos.betterpvp.progression.profession.skill.builds.menu.WoodcuttingProfessionMenu;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.entity.Player;
 
@@ -33,6 +34,10 @@ public class WoodcuttingCommand extends Command {
     public void execute(Player player, Client client, String... args) {
         if (args.length != 0) return;
 
-        player.sendMessage("wow woodcutting!!!");
+        professionProfileManager.getObject(player.getUniqueId().toString()).ifPresent(professionProfile -> {
+            new WoodcuttingProfessionMenu(professionProfile, progressionSkillManager).show(player).addCloseHandler(() -> {
+                professionProfileManager.getRepository().updateBuildForGamer(player.getUniqueId(), professionProfile.getProfessionDataMap().get("Woodcutting").getBuild());
+            });
+        });
     }
 }
