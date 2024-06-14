@@ -6,10 +6,9 @@ import me.mykindos.betterpvp.core.components.clans.events.ClanEvent;
 import org.bukkit.entity.Player;
 
 @EqualsAndHashCode(callSuper = true)
+public class ClanSetCoreEvent extends ClanEvent<Clan> {
 
-public class ClanSetHomeEvent extends ClanEvent<Clan> {
-
-    public ClanSetHomeEvent(Player player, Clan clan) {
+    public ClanSetCoreEvent(Player player, Clan clan) {
         super(player, clan);
     }
 

@@ -2,7 +2,7 @@ create table if not exists clans
 (
     id        varchar(36) not null,
     Name      varchar(32) not null,
-    Home      varchar(64) null,
+    Core      varchar(64) null,
     Admin     tinyint     null default 0,
     Safe      tinyint     null default 0,
     Banner    TEXT        null,

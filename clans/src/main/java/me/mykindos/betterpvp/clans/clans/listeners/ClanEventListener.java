@@ -19,7 +19,7 @@ import me.mykindos.betterpvp.clans.clans.events.ClanNeutralEvent;
 import me.mykindos.betterpvp.clans.clans.events.ClanRequestAllianceEvent;
 import me.mykindos.betterpvp.clans.clans.events.ClanRequestNeutralEvent;
 import me.mykindos.betterpvp.clans.clans.events.ClanRequestTrustEvent;
-import me.mykindos.betterpvp.clans.clans.events.ClanSetHomeEvent;
+import me.mykindos.betterpvp.clans.clans.events.ClanSetCoreEvent;
 import me.mykindos.betterpvp.clans.clans.events.ClanTrustEvent;
 import me.mykindos.betterpvp.clans.clans.events.ClanUntrustEvent;
 import me.mykindos.betterpvp.clans.clans.events.MemberDemoteEvent;
@@ -41,7 +41,6 @@ import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.framework.inviting.InviteHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.logging.LogContext;
-import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
@@ -52,6 +51,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -133,13 +133,13 @@ public class ClanEventListener extends ClanListener {
         clanManager.getRepository().deleteClanTerritory(targetClan, chunkString);
         targetClan.getTerritory().removeIf(territory -> territory.getChunk().equals(UtilWorld.chunkToFile(chunk)));
 
-        if (targetClan.getHome() != null) {
-            if (targetClan.getHome().getChunk().equals(chunk)) {
-                Block block = targetClan.getHome().clone().subtract(0, 0.6, 0).getBlock();
+        if (targetClan.getCore() != null) {
+            if (targetClan.getCore().getChunk().equals(chunk)) {
+                Block block = targetClan.getCore().clone().subtract(0, 0.6, 0).getBlock();
                 if (block.getType() == Material.RED_BED) {
                     block.setType(Material.AIR);
                 }
-                targetClan.setHome(null);
+                targetClan.setCore(null);
 
                 targetClan.messageClan("Your clan home was destroyed!", null, true);
             }
@@ -228,8 +228,8 @@ public class ClanEventListener extends ClanListener {
             }
         }
 
-        if (clan.getHome() != null) {
-            Block block = clan.getHome().clone().subtract(0, 0.6, 0).getBlock();
+        if (clan.getCore() != null) {
+            Block block = clan.getCore().clone().subtract(0, 0.6, 0).getBlock();
             if (block.getType() == Material.RED_BED) {
                 block.setType(Material.AIR);
             }
@@ -651,7 +651,7 @@ public class ClanEventListener extends ClanListener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onClanSetHome(ClanSetHomeEvent event) {
+    public void onClanSetCore(ClanSetCoreEvent event) {
         if (event.isCancelled()) return;
 
         Clan clan = event.getClan();
@@ -659,29 +659,28 @@ public class ClanEventListener extends ClanListener {
 
         Optional<Clan> clanOptional = clanManager.getClanByLocation(player.getLocation());
         if (clanOptional.isEmpty() || !clanOptional.get().equals(clan)) {
-            UtilMessage.simpleMessage(player, "Clans", "You can only set the clan home in your own territory.");
+            UtilMessage.simpleMessage(player, "Clans", "You can only set the clan core in your own territory.");
             return;
         }
 
-        if (clan.getHome() != null) {
-            Block block = clan.getHome().clone().subtract(0, 0.6, 0).getBlock();
-            if (block.getType() == Material.RED_BED) {
-                block.setType(Material.AIR);
-            }
+        final Location oldCore = clan.getCore();
+        if (oldCore != null) {
+            oldCore.getBlock().setType(Material.AIR, true);
         }
 
+        // If the clan isn't admin clan, place a core
         if (!clan.isAdmin()) {
-            UtilBlock.placeBed(player.getLocation().toCenterLocation(), player.getFacing());
+
         }
 
-        clan.setHome(player.getLocation().toCenterLocation().add(0, 0.6, 0));
-        UtilMessage.simpleMessage(player, "Clans", "You set the clan home to <yellow>%s<gray>.",
+        clan.setCore(player.getLocation().toCenterLocation().add(0, 0.6, 0));
+        UtilMessage.simpleMessage(player, "Clans", "You set the clan core to <alt2>%s</alt2>.",
                 UtilWorld.locationToString(player.getLocation()));
-        log.info("{} ({}) of {} ({}) set their clan home to {}", player.getName(), player.getUniqueId(), clan.getName(), clan.getName(),
-                        UtilWorld.locationToString(player.getLocation(), true)).setAction("CLAN_SETHOME")
+        log.info("{} ({}) of {} ({}) set their clan core to {}", player.getName(), player.getUniqueId(), clan.getName(), clan.getName(),
+                        UtilWorld.locationToString(player.getLocation(), true)).setAction("CLAN_SETCORE")
                 .addClientContext(player).addClanContext(clan).addLocationContext(player.getLocation()).submit();
 
-        clanManager.getRepository().updateClanHome(clan);
+        clanManager.getRepository().updateClanCore(clan);
 
 
     }

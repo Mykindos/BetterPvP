@@ -37,8 +37,8 @@ public class SpawnTransportButton extends ControlItem<ClanTravelHubMenu> {
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent inventoryClickEvent) {
         if(clickType.isLeftClick()) {
-            if(clan.getHome() != null) {
-                player.teleport(clan.getHome());
+            if(clan.getCore() != null) {
+                player.teleport(clan.getCore());
             }
         }
     }

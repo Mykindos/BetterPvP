@@ -111,9 +111,9 @@ public class MapCursorListener implements Listener {
                 }
             }
         }
-        if (aClan != null && aClan.getHome() != null) {
-            Location aClanHomeLocation = aClan.getHome();
-            event.getCursors().add(new ExtraCursor(aClanHomeLocation.getBlockX(), aClanHomeLocation.getBlockZ(), true,
+        if (aClan != null && aClan.getCore() != null) {
+            Location aClanCoreLoc = aClan.getCore();
+            event.getCursors().add(new ExtraCursor(aClanCoreLoc.getBlockX(), aClanCoreLoc.getBlockZ(), true,
                     MapCursor.Type.MANSION, (byte) 8, player.getWorld().getName(), true, null));
         }
 
@@ -132,7 +132,7 @@ public class MapCursorListener implements Listener {
     private void addAdminClan(MinimapExtraCursorEvent event, String clanName, MapCursor.Type cursor, String caption) {
         Clan clan = clanCache.computeIfAbsent(clanName, c -> clanManager.getClanByName(clanName).orElse(null));
         if(clan != null) {
-            Location homeLoc = clan.getHome();
+            Location homeLoc = clan.getCore();
             if (homeLoc != null) {
                 event.getCursors().add(new ExtraCursor(homeLoc.getBlockX(), homeLoc.getBlockZ(), true,
                         cursor, (byte) 8, homeLoc.getWorld().getName(), true, caption));

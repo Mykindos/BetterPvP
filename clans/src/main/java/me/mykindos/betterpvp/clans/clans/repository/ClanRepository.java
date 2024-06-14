@@ -83,7 +83,7 @@ public class ClanRepository implements IRepository<Clan> {
             while (result.next()) {
                 UUID clanId = UUID.fromString(result.getString(1));
                 String name = result.getString(2);
-                Location home = UtilWorld.stringToLocation(result.getString(3));
+                Location coreLoc = UtilWorld.stringToLocation(result.getString(3));
                 boolean admin = result.getBoolean(4);
                 boolean safe = result.getBoolean(5);
                 String banner = result.getString(6);
@@ -91,7 +91,7 @@ public class ClanRepository implements IRepository<Clan> {
 
                 Clan clan = new Clan(clanId);
                 clan.setName(name);
-                clan.setHome(home);
+                clan.setCore(coreLoc);
                 clan.setAdmin(admin);
                 clan.setSafe(safe);
 
@@ -193,10 +193,10 @@ public class ClanRepository implements IRepository<Clan> {
         database.executeUpdateAsync(new Statement(deleteClanQuery, new UuidStatementValue(clan.getId())));
     }
 
-    public void updateClanHome(Clan clan) {
-        String query = "UPDATE clans SET Home = ? WHERE id = ?;";
+    public void updateClanCore(Clan clan) {
+        String query = "UPDATE clans SET Core = ? WHERE id = ?;";
         database.executeUpdateAsync(new Statement(query,
-                new StringStatementValue(UtilWorld.locationToString(clan.getHome(), false)),
+                new StringStatementValue(UtilWorld.locationToString(clan.getCore(), false)),
                 new UuidStatementValue(clan.getId())));
     }
 

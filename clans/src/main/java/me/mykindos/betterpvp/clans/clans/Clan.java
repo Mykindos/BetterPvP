@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.clans.clans;
 import com.google.common.base.Preconditions;
 import lombok.CustomLog;
 import lombok.Data;
+import me.mykindos.betterpvp.clans.clans.core.ClanCore;
 import me.mykindos.betterpvp.clans.clans.events.ClanPropertyUpdateEvent;
 import me.mykindos.betterpvp.clans.clans.insurance.Insurance;
 import me.mykindos.betterpvp.clans.clans.vault.ClanVault;
@@ -22,7 +23,6 @@ import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.item.banner.BannerColor;
 import me.mykindos.betterpvp.core.utilities.model.item.banner.BannerWrapper;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
@@ -51,7 +51,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
 
     private final UUID id;
     private String name;
-    private Location home;
+    private final ClanCore core;
     private boolean admin;
     private boolean safe;
     private boolean online;

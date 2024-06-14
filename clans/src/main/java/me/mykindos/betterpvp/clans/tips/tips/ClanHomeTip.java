@@ -32,6 +32,6 @@ public class ClanHomeTip extends ClanTip implements IRunCommand {
 
     @Override
     public  boolean isValid(Player player, Clan clan) {
-        return clan != null && clan.getHome() != null;
+        return clan != null && clan.getCore() != null;
     }
 }
