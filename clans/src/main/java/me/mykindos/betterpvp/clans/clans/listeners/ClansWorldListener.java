@@ -786,23 +786,6 @@ public class ClansWorldListener extends ClanListener {
     }
 
     @EventHandler
-    public void onBreakBed(BlockBreakEvent event) {
-        if (event.getBlock().getType() == Material.RED_BED) {
-            Optional<Clan> clanOptional = clanManager.getClanByLocation(event.getBlock().getLocation());
-            if (clanOptional.isPresent()) {
-
-                Clan clan = clanOptional.get();
-                event.setCancelled(true);
-                event.getBlock().setType(Material.AIR);
-
-
-                clan.setHome(null);
-                clan.messageClan("Your clan home has been destroyed!", null, true);
-            }
-        }
-    }
-
-    @EventHandler
     public void onBedDrop(ItemSpawnEvent event) {
         if (event.getEntity().getItemStack().getType() == Material.RED_BED) {
             event.setCancelled(true);

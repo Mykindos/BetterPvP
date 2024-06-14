@@ -614,15 +614,4 @@ public class UtilBlock {
         return y & 0xFFFF | (x & 0xFF) << 16 | (z & 0xFF) << 24;
     }
 
-    public static void placeBed(Location location, BlockFace facing) {
-        Block block = location.getBlock();
-        for (Bed.Part part : Bed.Part.values()) {
-            block.setBlockData(Bukkit.createBlockData(Material.RED_BED, (data) -> {
-                ((Bed) data).setPart(part);
-                ((Bed) data).setFacing(facing.getOppositeFace());
-            }));
-            block = block.getRelative(facing);
-        }
-    }
-
 }

@@ -99,7 +99,7 @@ public class ScepterListener implements Listener {
         }
     }
 
-    @UpdateEvent
+    @UpdateEvent(priority = 100)
     public void doBlackHole() {
         if (!scepter.isEnabled()) {
             return;
