@@ -8,7 +8,6 @@ import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.ProfessionHandler;
-import me.mykindos.betterpvp.progression.profession.woodcutting.repository.WoodcuttingRepository;
 import me.mykindos.betterpvp.progression.profile.ProfessionData;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.Material;
@@ -25,13 +24,11 @@ import java.util.function.LongUnaryOperator;
 @CustomLog
 @Getter
 public class WoodcuttingHandler extends ProfessionHandler {
-    private final WoodcuttingRepository woodcuttingRepository;
     private Map<Material, Long> experiencePerWood = new EnumMap<>(Material.class);
 
     @Inject
-    public WoodcuttingHandler(Progression progression, ProfessionProfileManager professionProfileManager, WoodcuttingRepository woodcuttingRepository) {
+    public WoodcuttingHandler(Progression progression, ProfessionProfileManager professionProfileManager) {
         super(progression, professionProfileManager, "Woodcutting");
-        this.woodcuttingRepository = woodcuttingRepository;
     }
 
     /**
