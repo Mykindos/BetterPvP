@@ -1,13 +1,11 @@
 package me.mykindos.betterpvp.core.utilities.model.display;
 
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.utilities.model.data.PriorityDataBlockingQueue;
 import net.kyori.adventure.text.Component;
-import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.util.Iterator;
-import java.util.PriorityQueue;
 import java.util.UUID;
 
 public class ActionBar {
@@ -20,14 +18,14 @@ public class ActionBar {
      * These take priority over static components.
      * Higher priority components are shown first.
      */
-    private final PriorityQueue<Pair<Integer, DisplayComponent>> components = new PriorityQueue<>((o1, o2) -> Integer.compare(o1.getLeft(), o2.getLeft()) * -1);
+    private final PriorityDataBlockingQueue<DisplayComponent> components = new PriorityDataBlockingQueue<>(5);
 
     // Use a lock to synchronize access to the components PriorityQueue
     private final Object lock = new Object();
 
     public void add(int priority, DisplayComponent component) {
         synchronized (lock) {
-            components.add(Pair.of(priority, component));
+            components.put(priority, component);
             if (component instanceof TimedComponent timed && !timed.isWaitToExpire()) {
                 timed.startTime();
             }
@@ -79,16 +77,8 @@ public class ActionBar {
                 return EMPTY;
             }
 
-            final Iterator<Pair<Integer, DisplayComponent>> iterator = components.iterator();
-            DisplayComponent display;
-            Component advComponent;
-
-            // Loop through the components until we find one that is not null
-            // If we find one that is null, skip it and move on to the next one
-            do {
-                display = iterator.next().getRight();
-                advComponent = display.getProvider().apply(gamer);
-            } while (iterator.hasNext() && advComponent == null);
+            DisplayComponent display = components.peek().getRight();
+            Component advComponent = display.getProvider().apply(gamer);
 
             // At this point, the `component` will not be null because we know that there is at least one element in the queue
             if (display instanceof TimedComponent timed) {
