@@ -100,6 +100,8 @@ public class WoodcuttingHandler extends ProfessionHandler {
 
         leaderboardManager.getObject("Total Logs Chopped").ifPresent(leaderboard -> {
             TotalLogsChoppedLeaderboard totalLogsChoppedLeaderboard = (TotalLogsChoppedLeaderboard) leaderboard;
+
+            // the purpose of this line is increment the value on the leaderboard
             totalLogsChoppedLeaderboard.add(player.getUniqueId(), 1L).whenComplete((result, throwable) -> {
                 if (throwable != null) {
                     log.error("Failed to add chopped logs to leaderboard for player " + player.getName(), throwable).submit();

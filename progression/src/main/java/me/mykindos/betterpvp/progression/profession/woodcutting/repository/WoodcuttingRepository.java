@@ -6,7 +6,6 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.DoubleStatementValue;
-import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
@@ -17,9 +16,9 @@ import me.mykindos.betterpvp.progression.profile.ProfessionProfile;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import javax.sql.rowset.CachedRowSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Optional;
@@ -75,20 +74,19 @@ public class WoodcuttingRepository {
     public CompletableFuture<HashMap<UUID, Long>> getTopLogsChoppedByCount(double days) {
         return CompletableFuture.supplyAsync(() -> {
             HashMap<UUID, Long> leaderboard = new HashMap<>();
-            Statement statement = new Statement("CALL GetTopLogsChoppedByCount(?, ?)",
-                    new DoubleStatementValue(days),
-                    new IntegerStatementValue(10));
-            database.executeProcedure(statement, -1, result -> {
-                try {
-                    while (result.next()) {
-                        final String gamer = result.getString(1);
-                        final long count = result.getLong(2);
-                        leaderboard.put(UUID.fromString(gamer), count);
-                    }
-                } catch (SQLException e) {
-                    log.error("Error fetching woodcutting leaderboard data", e).submit();
+            String query = "SELECT Gamer, COUNT(*) FROM progression_woodcutting WHERE timestamp > NOW() - INTERVAL ? DAY GROUP BY Gamer ORDER BY COUNT(*) DESC LIMIT 10";
+            Statement statement = new Statement(query, new DoubleStatementValue(days));
+
+            try (CachedRowSet result = database.executeQuery(statement)) {
+
+                while (result.next()) {
+                    final String gamer = result.getString(1);
+                    final long count = result.getLong(2);
+                    leaderboard.put(UUID.fromString(gamer), count);
                 }
-            });
+            } catch (SQLException e) {
+                log.error("Error fetching woodcutting leaderboard data", e).submit();
+            }
 
             return leaderboard;
 
