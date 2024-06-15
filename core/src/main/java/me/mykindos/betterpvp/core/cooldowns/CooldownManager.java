@@ -121,7 +121,7 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
                 return false;
             }
 
-            Cooldown cooldown = new Cooldown(duration, System.currentTimeMillis(), removeOnDeath, inform, cancellable);
+            Cooldown cooldown = new Cooldown(ability, duration, System.currentTimeMillis(), removeOnDeath, inform, cancellable);
             if (onExpire != null) {
                 cooldown.setOnExpire(onExpire);
             }
@@ -168,7 +168,7 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
                     newSystemTime = cooldown.getSystemTime();
                 }
 
-                Cooldown newCooldown = new Cooldown(cooldown.getSeconds() / 1000.0, newSystemTime, cooldown.isRemoveOnDeath(), cooldown.isInform(), cooldown.isCancellable());
+                Cooldown newCooldown = new Cooldown(ability, cooldown.getSeconds() / 1000.0, newSystemTime, cooldown.isRemoveOnDeath(), cooldown.isInform(), cooldown.isCancellable());
 
                 cooldowns.put(ability, newCooldown);
             }
