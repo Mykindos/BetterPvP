@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import me.mykindos.betterpvp.progression.Progression;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -32,7 +33,7 @@ public class WoodcuttingRepository {
                 new UuidStatementValue(UUID.randomUUID()),
                 new UuidStatementValue(playerUUID),
                 new StringStatementValue(material.name()),
-                new StringStatementValue(location.toString()));
+                new StringStatementValue(UtilWorld.locationToString(location)));
 
         UtilServer.runTaskAsync(JavaPlugin.getPlugin(Progression.class), () -> database.executeUpdate(statement));
     }
