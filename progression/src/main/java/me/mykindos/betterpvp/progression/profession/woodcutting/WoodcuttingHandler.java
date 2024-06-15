@@ -9,7 +9,6 @@ import me.mykindos.betterpvp.core.stats.repository.LeaderboardManager;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.ProfessionHandler;
-import me.mykindos.betterpvp.progression.profession.fishing.leaderboards.FishingWeightLeaderboard;
 import me.mykindos.betterpvp.progression.profession.woodcutting.leaderboards.TotalLogsChoppedLeaderboard;
 import me.mykindos.betterpvp.progression.profession.woodcutting.repository.WoodcuttingRepository;
 import me.mykindos.betterpvp.progression.profile.ProfessionData;
@@ -99,10 +98,9 @@ public class WoodcuttingHandler extends ProfessionHandler {
         long logsChopped = (long) professionData.getProperties().getOrDefault("TOTAL_LOGS_CHOPPED", 0L);
         professionData.getProperties().put("TOTAL_LOGS_CHOPPED", logsChopped + 1L);
 
-        // functional programming overlords get mad when you try to increment logsChopped instead of doing it this way
         leaderboardManager.getObject("Total Logs Chopped").ifPresent(leaderboard -> {
             TotalLogsChoppedLeaderboard totalLogsChoppedLeaderboard = (TotalLogsChoppedLeaderboard) leaderboard;
-            totalLogsChoppedLeaderboard.add(player.getUniqueId(), logsChopped + 1L).whenComplete((result, throwable) -> {
+            totalLogsChoppedLeaderboard.add(player.getUniqueId(), 1L).whenComplete((result, throwable) -> {
                 if (throwable != null) {
                     log.error("Failed to add chopped logs to leaderboard for player " + player.getName(), throwable).submit();
                 }
