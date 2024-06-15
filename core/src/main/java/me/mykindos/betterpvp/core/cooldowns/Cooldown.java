@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 @Data
 public class Cooldown {
 
+    private final String name;
     private double seconds;
     private final long systemTime;
     private final boolean removeOnDeath;
@@ -16,15 +17,16 @@ public class Cooldown {
     private boolean cancellable;
     private Consumer<Cooldown> onExpire;
 
-    public Cooldown(double d, long systime, boolean removeOnDeath, boolean inform) {
-        this(d, systime, removeOnDeath, inform, false, null);
+    public Cooldown(String name, double d, long systime, boolean removeOnDeath, boolean inform) {
+        this(name, d, systime, removeOnDeath, inform, false, null);
     }
 
-    public Cooldown(double d, long systime, boolean removeOnDeath, boolean inform, boolean cancellable) {
-        this(d, systime, removeOnDeath, inform, cancellable, null);
+    public Cooldown(String name, double d, long systime, boolean removeOnDeath, boolean inform, boolean cancellable) {
+        this(name, d, systime, removeOnDeath, inform, cancellable, null);
     }
 
-    public Cooldown(double d, long systime, boolean removeOnDeath, boolean inform, boolean cancellable, Consumer<Cooldown> onExpire) {
+    public Cooldown(String name, double d, long systime, boolean removeOnDeath, boolean inform, boolean cancellable, Consumer<Cooldown> onExpire) {
+        this.name = name;
         this.seconds = d * 1000.0; // Convert to milliseconds
         this.systemTime = systime;
         this.removeOnDeath = removeOnDeath;

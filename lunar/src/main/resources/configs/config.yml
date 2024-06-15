@@ -1,0 +1,10 @@
+lunar:
+  database:
+    prefix: lunar_
+command:
+  lunar:
+    enabled: true
+    requiredRank: ADMIN
+    reload:
+      enabled: true
+      requiredRank: ADMIN

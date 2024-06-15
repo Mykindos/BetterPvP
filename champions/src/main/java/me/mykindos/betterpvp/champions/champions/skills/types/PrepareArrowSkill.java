@@ -54,7 +54,7 @@ public abstract class PrepareArrowSkill extends PrepareSkill implements Cooldown
 
         int level = getLevel(player);
         if (level > 0) {
-            if(championsManager.getCooldowns().use(player, getName(), getCooldown(level), showCooldownFinished(), false, isCancellable(), this::shouldDisplayActionBar)) {
+            if(championsManager.getCooldowns().use(player, getName(), getCooldown(level), showCooldownFinished(), true, isCancellable(), this::shouldDisplayActionBar)) {
                 processEntityShootBowEvent(event, player, level, arrow);
                 active.remove(player.getUniqueId());
                 onFire(player);
