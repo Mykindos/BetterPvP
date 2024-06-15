@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.database.query.values.DoubleStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
+import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import me.mykindos.betterpvp.progression.Progression;
@@ -54,8 +55,15 @@ public class WoodcuttingRepository {
     public Long getTotalChoppedLogsForPlayer(UUID playerUUID) {
         Optional<ProfessionProfile> professionProfileOptional = profileManager.getObject(playerUUID.toString());
         if (professionProfileOptional.isPresent()) {
+
             ProfessionProfile professionProfile = professionProfileOptional.get();
-            return (long) professionProfile.getProfessionDataMap().get("Woodcutting").getProperty("TOTAL_LOGS_CHOPPED").orElse(0L);
+
+            PropertyContainer properties = professionProfile.getProfessionDataMap().get("Woodcutting");
+            if (properties == null ) {
+                return 0L;
+            }
+
+            return (long) properties.getProperty("TOTAL_LOGS_CHOPPED").orElse(0L);
         }
 
         return 0L;
