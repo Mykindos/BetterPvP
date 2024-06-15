@@ -12,11 +12,14 @@ import me.mykindos.betterpvp.core.config.ConfigInjectorModule;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.ModuleLoadedEvent;
+import me.mykindos.betterpvp.core.framework.adapter.Adapters;
+import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
+import me.mykindos.betterpvp.core.framework.adapter.PluginAdapters;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
 import me.mykindos.betterpvp.lunar.commands.loader.LunarCommandLoader;
 import me.mykindos.betterpvp.lunar.injector.LunarInjectorModule;
 import me.mykindos.betterpvp.lunar.listener.LunarListenerLoader;
-import me.mykindos.betterpvp.lunar.listener.impl.LunarClientLoginListener;
+import me.mykindos.betterpvp.lunar.listener.impl.LunarLoginListener;
 import org.bukkit.Bukkit;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
@@ -67,8 +70,13 @@ public final class Lunar extends BPvPPlugin {
             var shopsCommandLoader = injector.getInstance(LunarCommandLoader.class);
             shopsCommandLoader.loadCommands(PACKAGE);
 
-            final LunarClientLoginListener loginListener = injector.getInstance(LunarClientLoginListener.class);
+            final LunarLoginListener loginListener = injector.getInstance(LunarLoginListener.class);
             EventBus.getBus().register(loginListener);
+
+            final Adapters adapters = new Adapters(this);
+            final Reflections reflectionAdapters = new Reflections(PACKAGE);
+            adapters.loadAdapters(reflectionAdapters.getTypesAnnotatedWith(PluginAdapter.class));
+            adapters.loadAdapters(reflectionAdapters.getTypesAnnotatedWith(PluginAdapters.class));
 
             updateEventExecutor.loadPlugin(this);
         }

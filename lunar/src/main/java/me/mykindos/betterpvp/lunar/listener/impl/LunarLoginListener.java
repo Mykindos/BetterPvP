@@ -12,11 +12,13 @@ import com.lunarclient.apollo.module.notification.NotificationModule;
 import com.lunarclient.apollo.module.staffmod.StaffModModule;
 import com.lunarclient.apollo.player.ApolloPlayer;
 import me.mykindos.betterpvp.core.client.Client;
-import me.mykindos.betterpvp.core.client.ClientManager;
 import me.mykindos.betterpvp.core.client.Rank;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.framework.events.lunar.LunarClientEvent;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.lunar.Lunar;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -25,7 +27,7 @@ import java.time.Duration;
 import java.util.Objects;
 
 @Singleton
-public class LunarClientLoginListener implements ApolloListener {
+public class LunarLoginListener implements ApolloListener {
 
     @Inject
     private ClientManager clientManager;
@@ -38,10 +40,9 @@ public class LunarClientLoginListener implements ApolloListener {
 
         // Notify them that they are using Lunar Client
         final Notification notification = Notification.builder()
-                .title("Lunar Client Support")
-                .description("You are using Lunar Client! Enhanced features are now available.")
-                .resourceLocation("")
-                .displayTime(Duration.ofSeconds(10L))
+                .titleComponent(Component.text("Lunar Client Support", NamedTextColor.GREEN))
+                .descriptionComponent(Component.text("You are using Lunar Client! Enhanced features are now available."))
+                .displayTime(Duration.ofSeconds(30L))
                 .build();
 
         UtilServer.runTaskLater(JavaPlugin.getPlugin(Lunar.class), () -> {
@@ -49,7 +50,7 @@ public class LunarClientLoginListener implements ApolloListener {
             module.displayNotification(apolloPlayer, notification);
 
             // Enable staff module if admin
-            final Client client = clientManager.getObject(player.getUniqueId()).orElseThrow();
+            final Client client = clientManager.search().online(player);
             if (client.hasRank(Rank.ADMIN)) {
                 Apollo.getModuleManager().getModule(StaffModModule.class).enableAllStaffMods(apolloPlayer);
             }
