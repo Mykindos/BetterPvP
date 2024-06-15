@@ -153,9 +153,9 @@ public class PillageListener implements Listener {
         if (pillage != null) {
             pillage.setPillageFinishTime(pillage.getPillageFinishTime() - (timeRemoveOnKill * 1000L));
 
-            killerClan.messageClan("As you killed an attacker, the remaining pillage time has been reduced by <green>"
+            killerClan.messageClan("As your clan killed an attacker, the remaining pillage time has been reduced by <green>"
                     + timeRemoveOnKill + " <gray>seconds.", null, true);
-            killedClan.messageClan("As you were killed by a defender, the remaining pillage time has been reduced by <green>"
+            killedClan.messageClan("As your clan was killed by a defender, the remaining pillage time has been reduced by <green>"
                     + timeRemoveOnKill + " <gray>seconds.", null, true);
             notifyPillageTime(pillage);
             checkActivePillages();
