@@ -1,3 +1,10 @@
+woodcutting:
+  experiencePerWood:
+    DARK_OAK_LOG: 10
+    ACACIA_LOG: 10
+    BIRCH_LOG: 10
+  enabled: true
+
 mining:
   minLeaderboardBlockXp: 45
   xpPerBlock:
@@ -219,5 +226,8 @@ command:
     enabled: true
     requiredRank: PLAYER
   mining:
+    enabled: true
+    requiredRank: ADMIN
+  woodcutting:
     enabled: true
     requiredRank: ADMIN
