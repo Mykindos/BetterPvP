@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateLoreEvent;
+import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateNameEvent;
 import me.mykindos.betterpvp.core.items.type.IBPvPItem;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -277,6 +278,9 @@ public class BPvPItem implements IBPvPItem {
             itemMeta = itemStack.getItemMeta();
             dataContainer = itemMeta.getPersistentDataContainer();
         }
+
+        var nameUpdateEvent = UtilServer.callEvent(new ItemUpdateNameEvent(itemStack, itemMeta, getName()));
+        itemMeta.displayName(nameUpdateEvent.getItemName().decoration(TextDecoration.ITALIC, false));
 
         int newDurability = dataContainer.getOrDefault(CoreNamespaceKeys.DURABILITY_KEY, PersistentDataType.INTEGER, getMaxDurability()) - damage;
         dataContainer.set(CoreNamespaceKeys.DURABILITY_KEY, PersistentDataType.INTEGER, newDurability);

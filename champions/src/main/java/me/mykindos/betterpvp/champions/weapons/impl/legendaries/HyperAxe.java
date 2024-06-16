@@ -88,7 +88,7 @@ public class HyperAxe extends Weapon implements InteractWeapon, LegendaryWeapon,
         lore.add(Component.text("any wielder will tear through their opponents", NamedTextColor.WHITE));
         lore.add(Component.text("with unfathomable speed.", NamedTextColor.WHITE));
         lore.add(Component.text(""));
-        lore.add(UtilMessage.deserialize("<white>Hit delay is reduced by <yellow>%.1f%%", ((damageDelay / 400.0) * 100.0)));
+        lore.add(UtilMessage.deserialize("<white>Hit delay is reduced by <yellow>%.1f%%",  (100 - ((damageDelay / 400.0) * 100.0))));
         lore.add(UtilMessage.deserialize("<white>Deals <yellow>%.1f Damage <white>per hit", baseDamage));
 
         if (meta.getPersistentDataContainer().has(ChampionsNamespacedKeys.HYPER_AXE_SPEED) && meta.getPersistentDataContainer().has(ChampionsNamespacedKeys.HYPER_AXE_DURATION)) {
@@ -147,7 +147,7 @@ public class HyperAxe extends Weapon implements InteractWeapon, LegendaryWeapon,
 
     @Override
     public void loadWeaponConfig() {
-        damageDelay = getConfig("damageDelay", 200, Integer.class);
+        damageDelay = getConfig("damageDelay", 150, Integer.class);
         dealsKnockback = getConfig("dealsKnockback", true, Boolean.class);
         usesEnergy = getConfig("usesEnergy", false, Boolean.class);
         energyPerHit = getConfig("energyPerHit", 10, Integer.class);
