@@ -136,4 +136,17 @@ public class UtilFormat {
             throw new RuntimeException(e);
         }
     }
+
+    public static String getIndefiniteArticle(String word) {
+        if (word == null || word.isEmpty()) {
+            return "";
+        }
+
+        char firstChar = Character.toLowerCase(word.charAt(0));
+        if (firstChar == 'a' || firstChar == 'e' || firstChar == 'i' || firstChar == 'o' || firstChar == 'u') {
+            return "an";
+        } else {
+            return "a";
+        }
+    }
 }
