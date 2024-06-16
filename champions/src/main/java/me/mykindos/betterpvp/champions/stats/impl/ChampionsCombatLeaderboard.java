@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
+import me.mykindos.betterpvp.core.stats.LeaderboardCategory;
 import me.mykindos.betterpvp.core.stats.PlayerLeaderboard;
 import me.mykindos.betterpvp.core.stats.SearchOptions;
 import me.mykindos.betterpvp.core.stats.filter.FilterType;
@@ -20,7 +21,11 @@ import me.mykindos.betterpvp.core.stats.filter.Filtered;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardEntry;
 import me.mykindos.betterpvp.core.stats.sort.SortType;
 import me.mykindos.betterpvp.core.stats.sort.Sorted;
+import me.mykindos.betterpvp.core.utilities.model.description.Description;
+import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.SQLException;
@@ -52,6 +57,21 @@ public final class ChampionsCombatLeaderboard extends PlayerLeaderboard<CombatDa
     @Override
     public String getName() {
         return "Combat";
+    }
+
+    @Override
+    public LeaderboardCategory getCategory() {
+        return LeaderboardCategory.CHAMPIONS;
+    }
+
+    @Override
+    public Description getDescription() {
+        return Description.builder()
+                .icon(ItemView.builder()
+                        .material(Material.DIAMOND_SWORD)
+                        .displayName(Component.text("Combat", NamedTextColor.RED))
+                        .build())
+                .build();
     }
 
     @Override

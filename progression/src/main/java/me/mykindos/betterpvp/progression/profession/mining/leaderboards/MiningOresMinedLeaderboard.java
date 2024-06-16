@@ -8,10 +8,17 @@ import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
+import me.mykindos.betterpvp.core.stats.LeaderboardCategory;
 import me.mykindos.betterpvp.core.stats.PlayerLeaderboard;
 import me.mykindos.betterpvp.core.stats.SearchOptions;
+import me.mykindos.betterpvp.core.utilities.model.description.Description;
+import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.mining.MiningHandler;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemFlag;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.SQLException;
@@ -36,6 +43,22 @@ public class MiningOresMinedLeaderboard extends PlayerLeaderboard<Long> {
     @Override
     public String getName() {
         return "Total Ores Mined";
+    }
+
+    @Override
+    public LeaderboardCategory getCategory() {
+        return LeaderboardCategory.PROFESSION;
+    }
+
+    @Override
+    public Description getDescription() {
+        return Description.builder()
+                .icon(ItemView.builder()
+                        .material(Material.IRON_PICKAXE)
+                        .flag(ItemFlag.HIDE_ATTRIBUTES)
+                        .displayName(Component.text("Total Ores Mined", NamedTextColor.AQUA))
+                        .build())
+                .build();
     }
 
     @Override
