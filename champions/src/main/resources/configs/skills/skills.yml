@@ -396,8 +396,8 @@ skills:
       energyDecreasePerLevel: 1.0
     immolate:
       enabled: true
-      maxlevel: 5
-      energy: 33
+      maxlevel: 3
+      energy: 28
       baseFireTickDuration: 4.0
       fireTickDurationIncreasePerLevel: 0.0
       baseFireTrailDuration: 2.0
@@ -462,9 +462,9 @@ skills:
     void:
       enabled: true
       maxlevel: 3
-      energy: 40
+      energy: 28
       baseDamageReduction: 2.0
-      damageReductionIncreasePerLevel: 0.2
+      damageReductionIncreasePerLevel: 0.5
       baseEnergyReduction: 3.0
       energyReductionDecreasePerLevel: 0.5
       slownessStrength: 3
@@ -514,10 +514,10 @@ skills:
       cooldownDecreasePerLevel: 7.0
     arcticarmour:
       enabled: true
-      maxlevel: 5
-      energy: 24
+      maxlevel: 3
+      energy: 26
       canUseInLiquid: true
-      baseRadius: 2
+      baseRadius: 4
       radiusIncreasePerLevel: 1
       baseDuration: 2.0
       durationIncreasePerLevel: 0.0
@@ -525,7 +525,7 @@ skills:
       slownessStrength: 1
       minRadius: 2
       duration: 2.0
-      energyDecreasePerLevel: 2.0
+      energyDecreasePerLevel: 4.0
       energyStartCost: 10.0
       energyStartCostDecreasePerLevel: 0.0
     pestilence:
@@ -1039,8 +1039,8 @@ skills:
     fastrecovery:
       enabled: true
       maxlevel: 3
-      percentagePerLevel: 0.15
-      basePercentage: 0.2
+      percentagePerLevel: 0.1
+      basePercentage: 0.15
     resistance:
       enabled: true
       maxlevel: 3
