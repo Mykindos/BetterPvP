@@ -134,8 +134,7 @@ public class WorldListener implements Listener {
     public void onSafeFall(EntityDamageEvent event) {
         if (event.getEntity() instanceof Player player) {
             if (event.getCause() == EntityDamageEvent.DamageCause.FALL) {
-                if (UtilBlock.getBlockUnder(player.getLocation()).getType().name().contains("SPONGE")
-                        || UtilBlock.getBlockUnder(player.getLocation()).getType().name().contains("WOOL")) {
+                if (UtilBlock.isStandingOn(player, "WOOL") || UtilBlock.isStandingOn(player, "SPONGE")) {
                     event.setCancelled(true);
                 }
             }
