@@ -3,9 +3,10 @@ package me.mykindos.betterpvp.clans.world;
 import com.google.inject.Inject;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilMath;
+import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import org.bukkit.Effect;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -49,14 +50,14 @@ public class SpongeListener implements Listener {
 
         final Player player = event.getPlayer();
 
-        if (UtilMath.offset(player.getLocation(), event.getClickedBlock().getLocation().add(0.5D, 1.5D, 0.5D)) > 0.6D) {
+        if (!UtilBlock.isStandingOn(event.getPlayer(), event.getClickedBlock().getType())) {
             return;
         }
 
         if (cooldownManager.use(player, "Sponge", 0.8, false)) {
 
             player.setVelocity(new Vector(0.0D, 1.8D, 0.0D));
-            player.getWorld().playEffect(player.getLocation(), Effect.BLAZE_SHOOT, 0, 15);
+            player.getWorld().playSound(event.getClickedBlock().getLocation(), Sound.ENTITY_BAT_TAKEOFF, 2f, 1.7f);
             player.getWorld().playEffect(player.getLocation(), Effect.STEP_SOUND, Material.SPONGE, 15);
             player.getWorld().playEffect(player.getLocation(), Effect.STEP_SOUND, Material.SPONGE, 15);
             player.getWorld().playEffect(player.getLocation(), Effect.STEP_SOUND, Material.SPONGE, 15);
