@@ -5,13 +5,20 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import lombok.SneakyThrows;
 import me.mykindos.betterpvp.core.database.Database;
+import me.mykindos.betterpvp.core.stats.LeaderboardCategory;
 import me.mykindos.betterpvp.core.stats.PlayerLeaderboard;
 import me.mykindos.betterpvp.core.stats.SearchOptions;
 import me.mykindos.betterpvp.core.stats.sort.SortType;
 import me.mykindos.betterpvp.core.stats.sort.Sorted;
 import me.mykindos.betterpvp.core.stats.sort.TemporalSort;
+import me.mykindos.betterpvp.core.utilities.model.description.Description;
+import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.woodcutting.WoodcuttingHandler;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemFlag;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
@@ -34,6 +41,11 @@ public class TotalLogsChoppedLeaderboard extends PlayerLeaderboard<Long> impleme
     @Override
     public String getName() {
         return "Total Logs Chopped";
+    }
+
+    @Override
+    public LeaderboardCategory getCategory() {
+        return LeaderboardCategory.PROFESSION;
     }
 
     @Override
@@ -70,5 +82,16 @@ public class TotalLogsChoppedLeaderboard extends PlayerLeaderboard<Long> impleme
     protected Map<UUID, Long> fetchAll(@NotNull SearchOptions options, @NotNull Database database) {
         final TemporalSort type = (TemporalSort) Objects.requireNonNull(options.getSort());
         return woodcuttingHandler.getWoodcuttingRepository().getTopLogsChoppedByCount(type.getDays()).join();
+    }
+
+    @Override
+    public Description getDescription() {
+        return Description.builder()
+                .icon(ItemView.builder()
+                        .material(Material.IRON_AXE)
+                        .flag(ItemFlag.HIDE_ATTRIBUTES)
+                        .displayName(Component.text("Total Chopped Logs", NamedTextColor.LIGHT_PURPLE))
+                        .build())
+                .build();
     }
 }
