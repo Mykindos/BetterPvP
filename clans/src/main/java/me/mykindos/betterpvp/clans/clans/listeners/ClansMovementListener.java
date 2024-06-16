@@ -122,6 +122,12 @@ public class ClansMovementListener extends ClanListener {
             return;
         }
 
+        if (!event.getPlayer().getWorld().getName().equalsIgnoreCase("world")) {
+            UtilMessage.message(player, "Clans", "You cannot teleport to your clan home from this world.");
+            event.setCancelled(true);
+            return;
+        }
+
         clanManager.getClanByLocation(player.getLocation()).ifPresentOrElse(clan -> {
             if (clan.isAdmin() && clan.isSafe()) {
                 if (clan.getName().toLowerCase().contains("spawn")) {
