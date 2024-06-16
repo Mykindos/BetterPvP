@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
+import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.components.clans.data.ClanTerritory;
 import me.mykindos.betterpvp.core.framework.delayedactions.events.ClanHomeTeleportEvent;
@@ -15,11 +16,13 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
+import me.mykindos.betterpvp.core.utilities.model.display.TitleComponent;
 import me.mykindos.betterpvp.core.world.events.SpawnTeleportEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -98,13 +101,33 @@ public class ClansMovementListener extends ClanListener {
             append = Component.text("Wilderness", NamedTextColor.GRAY);
         }
 
+        Client client = clientManager.search().online(player);
+        final boolean popupSetting = (boolean) client.getProperty(ClientProperty.TERRITORY_POPUPS_ENABLED).orElse(false);
+
         if (locationClan != null) {
             if (locationClan.getName().equalsIgnoreCase("Fields") || locationClan.getName().equalsIgnoreCase("Lake")) {
                 append = UtilMessage.deserialize("<red><bold>                    Warning! <gray> PvP Hotspot</gray></bold></red>");
             }
 
+            if(popupSetting){
+                ClanRelation relation = clanManager.getRelation(clan, locationClan);
+                TitleComponent titleComponent = new TitleComponent(0, .75, .1, true,
+                        gamer -> Component.text(locationClan.getName(), relation.getPrimary()),
+                        gamer -> Component.text("", NamedTextColor.GRAY));
+                client.getGamer().getTitleQueue().add(9, titleComponent);
+            }
+
             UtilMessage.simpleMessage(player, "Territory", component.append(append), clanManager.getClanTooltip(player, locationClan));
+
         } else {
+
+            if(popupSetting){
+                TitleComponent titleComponent = new TitleComponent(0, .75, .25, true,
+                        gamer -> Component.text("Wilderness", NamedTextColor.GRAY),
+                        gamer -> Component.text("", NamedTextColor.GRAY));
+                client.getGamer().getTitleQueue().add(9, titleComponent);
+            }
+
             UtilMessage.message(player, "Territory", component.append(append));
         }
 
