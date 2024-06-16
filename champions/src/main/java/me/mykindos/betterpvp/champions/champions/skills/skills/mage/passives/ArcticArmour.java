@@ -215,7 +215,7 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill {
 
     @Override
     public void loadSkillConfig() {
-        baseRadius = getConfig("baseRadius", 2, Integer.class);
+        baseRadius = getConfig("baseRadius", 4, Integer.class);
         radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 1, Integer.class);
         baseDuration = getConfig("baseDuration", 2.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.0, Double.class);
