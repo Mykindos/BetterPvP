@@ -6,6 +6,7 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.stats.Leaderboard;
+import me.mykindos.betterpvp.core.stats.menu.LeaderboardCategoryMenu;
 import me.mykindos.betterpvp.core.stats.menu.LeaderboardMenu;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -43,7 +44,7 @@ public class LeaderboardCommand extends Command {
     @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length < 1) {
-            UtilMessage.message(player, "Leaderboard", "Usage: <alt2>/leaderboard <name>");
+            new LeaderboardCategoryMenu(leaderboards).show(player);
             return;
         }
 
@@ -55,7 +56,7 @@ public class LeaderboardCommand extends Command {
         }
 
         final Leaderboard<?, ?> leaderboard = leaderboardOpt.get();
-        new LeaderboardMenu<>(player, leaderboard).show(player);
+        new LeaderboardMenu<>(player, leaderboard, null).show(player);
     }
 
     @Override
