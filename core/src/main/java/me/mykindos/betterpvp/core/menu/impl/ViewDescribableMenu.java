@@ -11,7 +11,7 @@ import java.util.List;
 
 public class ViewDescribableMenu extends ViewCollectionMenu {
 
-    public ViewDescribableMenu(@NotNull String title, @NotNull List<Describable> pool, @NotNull Windowed previous) {
+    public ViewDescribableMenu(@NotNull String title, @NotNull List<Describable> pool, Windowed previous) {
         super(title, pool.stream().map(describable -> {
             final Description description = describable.getDescription();
             return (Item) new SimpleItem(description.getIcon(), description.getClickFunction());

@@ -15,7 +15,7 @@ wind_blade:
 hyper_axe:
   enabled: true
   baseDamage: 5.0
-  damageDelay: 200
+  damageDelay: 150
   dealsKnockback: true
   usesEnergy: false
   energyPerHit: 10
