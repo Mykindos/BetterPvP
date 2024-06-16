@@ -133,7 +133,7 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener {
         reappear(player);
     }
 
-    @EventHandler (priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @EventHandler (priority = EventPriority.MONITOR)
     public void onInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         if (smoked.containsKey(player.getUniqueId())) {

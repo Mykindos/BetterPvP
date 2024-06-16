@@ -19,11 +19,21 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Cancellable;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.util.Vector;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 @Singleton
 @BPvPListener
@@ -34,6 +44,8 @@ public class HealingShot extends PrepareArrowSkill {
     double increaseDurationPerLevel;
 
     int regenerationStrength;
+
+    private final Set<UUID> upwardsArrows = new HashSet<>();
 
     @Inject
     public HealingShot(Champions champions, ChampionsManager championsManager) {
@@ -76,10 +88,11 @@ public class HealingShot extends PrepareArrowSkill {
     }
 
     //Code from PrepareArrowSkill. For this skill, we need to use PreCustomDamageEvent as it effects targets we cannot damage
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPreDamageEvent(PreCustomDamageEvent event) {
         CustomDamageEvent cde = event.getCustomDamageEvent();
         if (!(cde.getProjectile() instanceof Arrow arrow)) return;
+        upwardsArrows.remove(arrow.getUniqueId());
         if (!(cde.getDamager() instanceof Player damager)) return;
         if (!arrows.contains(arrow)) return;
         int level = getLevel(damager);
@@ -90,11 +103,49 @@ public class HealingShot extends PrepareArrowSkill {
         }
     }
 
+    //event to capture the initial velocity of the arrow (ensure it is going up)
+    @EventHandler
+    public void onProjectileLaunch(ProjectileLaunchEvent event) {
+        if (event.getEntity() instanceof Arrow arrow && arrow.getShooter() instanceof Player shooter) {
+            Vector initialVelocity = arrow.getVelocity();
+            int level = getLevel(shooter);
+            if (level > 0 && initialVelocity.getY() > 0) {
+                upwardsArrows.add(arrow.getUniqueId());
+            }
+        }
+    }
+
+
+    @EventHandler
+    public void onProjectileHit(ProjectileHitEvent event) {
+        if (event.getEntity() instanceof Arrow arrow && arrow.getShooter() instanceof Player shooter) {
+            if (!upwardsArrows.remove(arrow.getUniqueId())) return;
+            if (!arrows.contains(arrow)) return;
+
+            Location arrowLocation = arrow.getLocation();
+            for (Entity entity : arrowLocation.getWorld().getNearbyEntities(arrowLocation, 0.5, 0.5, 0.5)) {
+                if (entity instanceof Player && entity.getUniqueId().equals(shooter.getUniqueId())) {
+                    Location playerLocation = entity.getLocation();
+                    double distanceSquared = arrowLocation.distanceSquared(playerLocation);
+                    double radiusSquared = 0.4 * 0.4;
+                    if (distanceSquared <= radiusSquared) {
+                        int level = getLevel(shooter);
+                        if (level > 0){
+                            onHit(shooter, shooter,level , event);
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
     public void onHit(Player damager, LivingEntity target, int level) {
         return;
     }
 
-    public void onHit(Player damager, LivingEntity target, int level, PreCustomDamageEvent event) {
+    public void onHit(Player damager, LivingEntity target, int level, Event event) {
         if (target instanceof Player damagee) {
             if (UtilEntity.isEntityFriendly(damager, damagee)) {
 
@@ -108,7 +159,9 @@ public class HealingShot extends PrepareArrowSkill {
                 if (!damager.equals(damagee)) {
                     UtilMessage.message(damagee, getClassType().getName(), UtilMessage.deserialize("You were hit by <yellow>%s</yellow> with <green>%s %s</green>", damager.getName(), getName(), level));
                 }
-                event.setCancelled(true);
+                if (event instanceof Cancellable) {
+                    ((Cancellable) event).setCancelled(true);
+                }
             }
         }
     }

@@ -231,7 +231,7 @@ public class ClansExplosionListener extends ClanListener {
                         break;
                     }
 
-                    if (!clanManager.getPillageHandler().isPillaging(enemy.getClan(), attackedClan)) {
+                    if (!clanManager.getPillageHandler().isPillaging(attackingClan, attackedClan)) {
                         schedulingRollback = true;
                     }
 

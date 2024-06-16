@@ -237,7 +237,6 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
         final double damage = getDamage(level) * charge;
         final List<LivingEntity> enemies = UtilEntity.getNearbyEnemies(player, point, explosionRadius);
         for (LivingEntity enemy : enemies) {
-            System.out.println(enemy.getName());
             if (enemy.hasLineOfSight(point)) {
                 UtilDamage.doCustomDamage(new CustomDamageEvent(enemy, player, null, EntityDamageEvent.DamageCause.CUSTOM, damage, true, getName()));
             }

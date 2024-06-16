@@ -4,7 +4,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import me.mykindos.betterpvp.clans.Clans;
-import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.core.components.clans.IClan;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 
@@ -35,8 +34,6 @@ public class PillageHandler {
 
     public void startPillage(Pillage pillage) {
         activePillages.add(pillage);
-        Clan clan = (Clan) pillage.getPillaged();
-        clan.setTntRecoveryRunnable(null);
     }
 
     public void endPillage(Pillage pillage) {
