@@ -5,9 +5,11 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
+import me.mykindos.betterpvp.core.stats.repository.LeaderboardManager;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.ProfessionHandler;
+import me.mykindos.betterpvp.progression.profession.woodcutting.leaderboards.TotalLogsChoppedLeaderboard;
 import me.mykindos.betterpvp.progression.profession.woodcutting.repository.WoodcuttingRepository;
 import me.mykindos.betterpvp.progression.profile.ProfessionData;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
@@ -32,11 +34,13 @@ import java.util.function.LongUnaryOperator;
 public class WoodcuttingHandler extends ProfessionHandler {
     private final WoodcuttingRepository woodcuttingRepository;
     private Map<Material, Long> experiencePerWood = new EnumMap<>(Material.class);
+    private final LeaderboardManager leaderboardManager;
 
     @Inject
-    public WoodcuttingHandler(Progression progression, ProfessionProfileManager professionProfileManager, WoodcuttingRepository woodcuttingRepository) {
+    public WoodcuttingHandler(Progression progression, ProfessionProfileManager professionProfileManager, WoodcuttingRepository woodcuttingRepository, LeaderboardManager leaderboardManager) {
         super(progression, professionProfileManager, "Woodcutting");
         this.woodcuttingRepository = woodcuttingRepository;
+        this.leaderboardManager = leaderboardManager;
     }
 
     /**
@@ -93,6 +97,19 @@ public class WoodcuttingHandler extends ProfessionHandler {
 
         long logsChopped = (long) professionData.getProperties().getOrDefault("TOTAL_LOGS_CHOPPED", 0L);
         professionData.getProperties().put("TOTAL_LOGS_CHOPPED", logsChopped + 1L);
+
+        leaderboardManager.getObject("Total Logs Chopped").ifPresent(leaderboard -> {
+            TotalLogsChoppedLeaderboard totalLogsChoppedLeaderboard = (TotalLogsChoppedLeaderboard) leaderboard;
+
+            // the purpose of this line is increment the value on the leaderboard
+            totalLogsChoppedLeaderboard.add(player.getUniqueId(), 1L).whenComplete((result, throwable) -> {
+                if (throwable != null) {
+                    log.error("Failed to add chopped logs to leaderboard for player " + player.getName(), throwable).submit();
+                }
+
+                totalLogsChoppedLeaderboard.attemptAnnounce(player, result);
+            });
+        });
     }
 
     @Override
