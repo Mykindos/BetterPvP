@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.stats.repository;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 import me.mykindos.betterpvp.core.stats.Leaderboard;
+import me.mykindos.betterpvp.core.stats.LeaderboardCategory;
 
 import java.util.Map;
 import java.util.Optional;
@@ -29,6 +30,12 @@ public final class LeaderboardManager extends Manager<Leaderboard<?, ?>> {
     public Map<String, ? extends Leaderboard<?, ?>> getViewable() {
         return getObjects().entrySet().stream()
                 .filter(e -> e.getValue().isViewable())
+                .collect(Collectors.toMap(entry -> entry.getValue().getName(), Map.Entry::getValue));
+    }
+
+    public Map<String, ? extends Leaderboard<?, ?>> getViewable(LeaderboardCategory category) {
+        return getObjects().entrySet().stream()
+                .filter(e -> e.getValue().isViewable() && e.getValue().getCategory() == category)
                 .collect(Collectors.toMap(entry -> entry.getValue().getName(), Map.Entry::getValue));
     }
 }
