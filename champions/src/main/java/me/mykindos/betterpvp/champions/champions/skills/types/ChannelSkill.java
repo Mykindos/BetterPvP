@@ -38,6 +38,7 @@ public abstract class ChannelSkill extends Skill implements Listener {
     public void cancel(Player player) {
         active.remove(player.getUniqueId());
     }
+
     @EventHandler (priority = EventPriority.MONITOR)
     public void onCustomEffect(EffectReceiveEvent event) {
         if(event.isCancelled()) return;
