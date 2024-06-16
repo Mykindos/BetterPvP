@@ -263,6 +263,11 @@ public class ClientListener implements Listener {
         if(cooldownSoundOptional.isEmpty()){
             client.saveProperty(ClientProperty.COOLDOWN_SOUNDS_ENABLED, true);
         }
+
+        Optional<Boolean> territoryPopupOptional = client.getProperty(ClientProperty.TERRITORY_POPUPS_ENABLED);
+        if(territoryPopupOptional.isEmpty()){
+            client.saveProperty(ClientProperty.TERRITORY_POPUPS_ENABLED, true);
+        }
     }
 
     @UpdateEvent(delay = 120_000)

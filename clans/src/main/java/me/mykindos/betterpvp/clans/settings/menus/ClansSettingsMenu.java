@@ -64,6 +64,21 @@ public class ClansSettingsMenu extends AbstractGui implements SettingCategory {
 
 
         addItems(new SettingsButton(client, ClientProperty.MAP_PLAYER_NAMES, mapPlayerNamesDescription));
+
+        final Description territoryPopup = Description.builder().icon(lang -> {
+            final boolean setting = (boolean) client.getProperty(ClientProperty.TERRITORY_POPUPS_ENABLED).orElse(false);
+            final NamedTextColor color = setting ? NamedTextColor.GREEN : NamedTextColor.RED;
+            return ItemView.builder()
+                    .material(Material.WRITABLE_BOOK)
+                    .displayName(Component.text("Territory Popups", color))
+                    .lore(Component.text("Whether or not to display territory popups", NamedTextColor.GRAY))
+                    .flag(ItemFlag.HIDE_ITEM_SPECIFICS)
+                    .frameLore(true)
+                    .build()
+                    .get();
+        }).build();
+
+        addItems(new SettingsButton(client, ClientProperty.TERRITORY_POPUPS_ENABLED, territoryPopup));
     }
 
     @NotNull
