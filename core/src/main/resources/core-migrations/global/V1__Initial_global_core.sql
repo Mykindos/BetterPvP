@@ -84,6 +84,7 @@ INSERT IGNORE INTO property_map VALUES ("TIME_PLAYED", "long");
 INSERT IGNORE INTO property_map VALUES ("COOLDOWN_SOUNDS_ENABLED", "boolean");
 
 -- Profession properties
+INSERT IGNORE INTO property_map VALUES ("TOTAL_LOGS_CHOPPED", "long");
 INSERT IGNORE INTO property_map VALUES ("TOTAL_ORES_MINED", "long");
 INSERT IGNORE INTO property_map VALUES ("TOTAL_FISH_CAUGHT", "long");
 INSERT IGNORE INTO property_map VALUES ("TOTAL_WEIGHT_CAUGHT", "long");
