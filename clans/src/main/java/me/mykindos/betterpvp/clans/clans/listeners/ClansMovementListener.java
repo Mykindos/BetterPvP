@@ -112,8 +112,8 @@ public class ClansMovementListener extends ClanListener {
             if(popupSetting){
                 ClanRelation relation = clanManager.getRelation(clan, locationClan);
                 TitleComponent titleComponent = new TitleComponent(0, .75, .1, true,
-                        gamer -> Component.text(locationClan.getName(), relation.getPrimary()),
-                        gamer -> Component.text("", NamedTextColor.GRAY));
+                        gamer -> Component.text("", NamedTextColor.GRAY),
+                        gamer -> Component.text(locationClan.getName(), relation.getPrimary()));
                 client.getGamer().getTitleQueue().add(9, titleComponent);
             }
 
@@ -123,8 +123,8 @@ public class ClansMovementListener extends ClanListener {
 
             if(popupSetting){
                 TitleComponent titleComponent = new TitleComponent(0, .75, .25, true,
-                        gamer -> Component.text("Wilderness", NamedTextColor.GRAY),
-                        gamer -> Component.text("", NamedTextColor.GRAY));
+                        gamer -> Component.text("", NamedTextColor.GRAY),
+                        gamer -> Component.text("Wilderness", NamedTextColor.GRAY));
                 client.getGamer().getTitleQueue().add(9, titleComponent);
             }
 
