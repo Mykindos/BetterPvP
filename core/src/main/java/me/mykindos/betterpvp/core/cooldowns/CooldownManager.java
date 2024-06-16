@@ -66,35 +66,38 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
     public boolean use(Player player, String ability, double duration, boolean inform, boolean removeOnDeath, boolean cancellable, @Nullable Predicate<Gamer> actionBarCondition, int actionBarPriority, Consumer<Cooldown> onExpire) {
         final Gamer gamer = clientManager.search().online(player).getGamer();
 
-        // We add 1.5f to the duration in seconds, so they can see that it expired, and it doesn't instantly disappear
-        final TimedComponent actionBarComponent = new TimedComponent(duration + 1.5, false, g -> {
-            if (actionBarCondition == null || !actionBarCondition.test(gamer)) {
-                return null; // Skip if we should not send the action bar message;
-            }
 
-            final TextComponent cooldownName = Component.text(ability).decorate(TextDecoration.BOLD).color(NamedTextColor.WHITE);
-            final Optional<ConcurrentHashMap<String, Cooldown>> cooldowns = getObject(player.getUniqueId());
-            if (cooldowns.isEmpty()) {
-                return null; // Skip
-            }
+        TimedComponent actionBarComponent = null;
 
-            final Cooldown cooldown = cooldowns.get().get(ability);
+        if (actionBarCondition != null && actionBarCondition.test(gamer)) {
+            // We add 1.5f to the duration in seconds, so they can see that it expired, and it doesn't instantly disappear
+            actionBarComponent = new TimedComponent(duration + 1.5, false, g -> {
 
-            // Show READY after cooldown has been removed, not expired.
-            // If it has expired that means that the cooldown remaining time is 0 or -1, and we want to show full bar for that
-            if (cooldown == null || cooldown.getRemaining() <= 0) {
-                return Component.join(JoinConfiguration.separator(Component.space()), cooldownName.decorate(TextDecoration.BOLD).color(NamedTextColor.GREEN), Component.text("Recharged").decorate(TextDecoration.BOLD).color(NamedTextColor.GREEN));
-            }
+                final TextComponent cooldownName = Component.text(ability).decorate(TextDecoration.BOLD).color(NamedTextColor.WHITE);
+                final Optional<ConcurrentHashMap<String, Cooldown>> cooldowns = getObject(player.getUniqueId());
+                if (cooldowns.isEmpty()) {
+                    return null; // Skip
+                }
 
-            final double max = cooldown.getSeconds() / 1000;
-            final double progress = Math.min(1f, Math.max(0, (max - cooldown.getRemaining()) / max));
-            final ProgressBar progressBar = ProgressBar.withProgress((float) progress);
+                final Cooldown cooldown = cooldowns.get().get(ability);
 
-            final TextComponent bar = progressBar.build();
-            final double remainingSeconds = Math.max(0.0, cooldown.getRemaining());
-            final TextComponent cooldownRemaining = Component.text(String.format("%.1fs", remainingSeconds)).color(NamedTextColor.WHITE);
-            return Component.join(JoinConfiguration.separator(Component.space()), cooldownName, bar, cooldownRemaining);
-        });
+                // Show READY after cooldown has been removed, not expired.
+                // If it has expired that means that the cooldown remaining time is 0 or -1, and we want to show full bar for that
+                if (cooldown == null || cooldown.getRemaining() <= 0) {
+                    return Component.join(JoinConfiguration.separator(Component.space()), cooldownName.decorate(TextDecoration.BOLD).color(NamedTextColor.GREEN), Component.text("Recharged").decorate(TextDecoration.BOLD).color(NamedTextColor.GREEN));
+                }
+
+                final double max = cooldown.getSeconds() / 1000;
+                final double progress = Math.min(1f, Math.max(0, (max - cooldown.getRemaining()) / max));
+                final ProgressBar progressBar = ProgressBar.withProgress((float) progress);
+
+                final TextComponent bar = progressBar.build();
+                final double remainingSeconds = Math.max(0.0, cooldown.getRemaining());
+                final TextComponent cooldownRemaining = Component.text(String.format("%.1fs", remainingSeconds)).color(NamedTextColor.WHITE);
+                return Component.join(JoinConfiguration.separator(Component.space()), cooldownName, bar, cooldownRemaining);
+            });
+        }
+
 
         var cooldownOptional = getObject(player.getUniqueId().toString()).or(() -> {
             ConcurrentHashMap<String, Cooldown> cooldowns = new ConcurrentHashMap<>();
@@ -129,7 +132,10 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
             CooldownEvent event = UtilServer.callEvent(new CooldownEvent(player, cooldown));
             if (!event.isCancelled()) {
                 cooldowns.put(ability, cooldown);
-                gamer.getActionBar().add(actionBarPriority, actionBarComponent);
+
+                if(actionBarComponent != null) {
+                    gamer.getActionBar().add(actionBarPriority, actionBarComponent);
+                }
                 return true;
             }
 
