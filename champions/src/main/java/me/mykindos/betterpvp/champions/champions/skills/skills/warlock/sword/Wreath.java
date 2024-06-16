@@ -170,9 +170,9 @@ public class Wreath extends Skill implements InteractSkill, Listener {
 
     private void processPlayerAction(Player player, int level) {
 
-        final Location startPos = player.getLocation().clone();
+        final Location startPos = player.getLocation().clone().subtract(player.getLocation().clone().getDirection());
         startPos.setY(Math.ceil(startPos.getY()));
-        final Vector vector = startPos.clone().getDirection().normalize().multiply(1);
+        final Vector vector = startPos.clone().getDirection();
         vector.setY(0);
         final Location loc = startPos.clone().subtract(0, 1, 0).add(vector);
         final Set<LivingEntity> targets = new HashSet<>();
@@ -181,6 +181,7 @@ public class Wreath extends Skill implements InteractSkill, Listener {
             @Override
             public void run() {
                 loc.add(vector);
+
                 if ((!UtilBlock.airFoliage(loc.getBlock())) && UtilBlock.solid(loc.getBlock())) {
 
                     loc.add(0.0D, 1.0D, 0.0D);
