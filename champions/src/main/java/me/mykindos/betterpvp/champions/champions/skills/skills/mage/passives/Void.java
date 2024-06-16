@@ -147,7 +147,7 @@ public class Void extends ActiveToggleSkill implements EnergySkill {
     @Override
     public void loadSkillConfig() {
         baseDamageReduction = getConfig("baseDamageReduction", 2.0, Double.class);
-        damageReductionIncreasePerLevel = getConfig("damageReductionIncreasePerLevel", 0.2, Double.class);
+        damageReductionIncreasePerLevel = getConfig("damageReductionIncreasePerLevel", 0.5, Double.class);
 
         baseEnergyReduction = getConfig("baseEnergyReduction", 3.0, Double.class);
         energyReductionDecreasePerLevel = getConfig("energyReductionDecreasePerLevel", 0.5, Double.class);
