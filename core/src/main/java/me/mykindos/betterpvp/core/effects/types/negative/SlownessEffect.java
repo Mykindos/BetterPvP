@@ -20,5 +20,9 @@ public class SlownessEffect extends VanillaEffectType {
         return PotionEffectType.SLOW;
     }
 
+    @Override
+    public String getDescription(int level) {
+        return "<white>" + getName() + "</white> reduces player movement by <val>" + 15 * level + "</val>% and prevents the use of movement abilities";
+    }
 }
 

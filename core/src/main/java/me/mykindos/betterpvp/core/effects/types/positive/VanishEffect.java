@@ -48,4 +48,9 @@ public class VanishEffect extends VanillaEffectType {
             }
         }
     }
+
+    @Override
+    public String getDescription(int level) {
+        return "<white>" + getName() + "</white> prevents being seen or receiving melee attacks from other players";
+    }
 }

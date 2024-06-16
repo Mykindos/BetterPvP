@@ -6,14 +6,16 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilLocation;
 import me.mykindos.betterpvp.core.utilities.math.VectorLine;
 import me.mykindos.betterpvp.core.utilities.model.MultiRayTraceResult;
@@ -34,7 +36,7 @@ import javax.inject.Singleton;
 
 @Singleton
 @BPvPListener
-public class Slash extends Skill implements InteractSkill, CooldownSkill, Listener {
+public class Slash extends Skill implements InteractSkill, CooldownSkill, Listener, MovementSkill, OffensiveSkill, DamageSkill {
 
     private double distance;
     private double distanceIncreasePerLevel;
@@ -58,12 +60,12 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
         return new String[]{
                 "Right click with a Sword to activate",
                 "",
-                "Dash forwards <stat>" + UtilFormat.formatNumber(getDistance(level), 1) + "</stat> blocks, dealing <val>" + UtilFormat.formatNumber(getDamage(level), 1) + "</val>",
+                "Dash forwards " + getValueString(this::getDistance, level) + " blocks, dealing " + getValueString(this::getDamage, level),
                 "damage to anything you pass through",
                 "",
-                "Every hit will reduce the cooldown by <stat>" + UtilFormat.formatNumber(getCooldownDecrease(level), 1) + "</stat> seconds",
+                "Every hit will reduce the cooldown by " + getValueString(this::getCooldownDecrease, level) + " seconds",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level)
         };
     }
 

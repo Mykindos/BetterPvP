@@ -9,6 +9,8 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.skills.assassin.data.RecallData;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownToggleSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -30,7 +32,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class Recall extends Skill implements CooldownToggleSkill, Listener {
+public class Recall extends Skill implements CooldownToggleSkill, Listener, MovementSkill, HealthSkill {
 
     public static final long MARKER_MILLIS = 200;
 
@@ -59,11 +61,15 @@ public class Recall extends Skill implements CooldownToggleSkill, Listener {
         return new String[] {
                 "Drop your Sword / Axe to activate",
                 "",
-                "Teleports you back in time <val>" + getDuration(level) + "</val> seconds, increasing",
-                "your health by <stat>" + (percentHealthRecovered * 100) + "%</stat> of the health you had",
+                "Teleports you back in time " + getValueString(this::getDuration, level) + " seconds, increasing",
+                "your health by " + getValueString(this::getPercentHealthRecovered, level, 100, 0) + "% of the health you had",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level)
         };
+    }
+
+    private double getPercentHealthRecovered(int level) {
+        return percentHealthRecovered;
     }
 
     @Override
@@ -130,7 +136,7 @@ public class Recall extends Skill implements CooldownToggleSkill, Listener {
         player.teleportAsync(teleportLocation).thenAccept(result -> player.setFallDistance(0));
 
         // Heal Logic
-        double heal = UtilPlayer.getMaxHealth(player) * percentHealthRecovered;
+        double heal = UtilPlayer.getMaxHealth(player) * getPercentHealthRecovered(level);
         UtilPlayer.health(player, heal);
 
         // Cues

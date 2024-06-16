@@ -58,7 +58,9 @@ public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill
                 "Gives you, and all allies within " + getValueString(this::getRadius, level) + " blocks",
                 "<effect>Health Boost " + UtilFormat.getRomanNumeral(healthBoostStrength) + "</effect> for " + getValueString(this::getDuration, level) + " seconds",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
+                "Cooldown: " + getValueString(this::getCooldown, level),
+                "",
+                EffectTypes.HEALTH_BOOST.getDescription(level)
         };
     }
 

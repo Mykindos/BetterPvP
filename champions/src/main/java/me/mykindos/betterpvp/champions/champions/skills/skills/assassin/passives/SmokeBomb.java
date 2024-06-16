@@ -4,6 +4,8 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownToggleSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -34,7 +36,7 @@ import java.util.UUID;
 
 @Singleton
 @BPvPListener
-public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener {
+public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, DebuffSkill, DefensiveSkill {
 
     private final Map<UUID, Long> smoked = new HashMap<>();
 
@@ -60,15 +62,27 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener {
                 "Drop your Sword / Axe to activate",
                 "",
                 "Instantly <effect>Vanish</effect> before your foes",
-                "for a maximum of <val>" + getDuration(level) + "</val> seconds,",
+                "for a maximum of " + getValueString(this::getDuration, level) + " seconds,",
                 "inflicting <effect>Blindness</effect> to enemies",
-                "within <stat>" + blindRadius + "</stat> blocks for <stat>" + blindDuration + "</stat> seconds",
+                "within " + getValueString(this::getBlindRadius, level) + " blocks for <stat>" + getValueString(this::getBlindDuration, level) + " seconds",
                 "",
                 "Interacting with your surroundings",
+                "or taking damage",
                 "will cause you to reappear",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level),
+                "",
+                EffectTypes.BLINDNESS.getDescription(0),
+                EffectTypes.VANISH.getDescription(0)
         };
+    }
+
+    public double getBlindRadius(int level) {
+        return blindRadius;
+    }
+
+    public double getBlindDuration(int level) {
+        return blindDuration;
     }
 
     @Override

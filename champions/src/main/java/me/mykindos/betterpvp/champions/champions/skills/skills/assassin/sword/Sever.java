@@ -4,6 +4,8 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEvent;
@@ -31,7 +33,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class Sever extends Skill implements CooldownSkill, Listener {
+public class Sever extends Skill implements CooldownSkill, Listener, OffensiveSkill, DebuffSkill {
     private double baseDuration;
     private double durationIncreasePerLevel;
     private double hitDistance;
@@ -53,10 +55,11 @@ public class Sever extends Skill implements CooldownSkill, Listener {
         return new String[]{
                 "Right click with a Sword to activate",
                 "",
-                "Inflict a <val>" + getDuration(level) + "</val> second <effect>Bleed</effect>",
-                "dealing <stat>0.75</stat> hearts per second",
+                "Inflict <effect>Bleed</effect> for " + getValueString(this::getDuration, level) + " seconds",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level),
+                "",
+                EffectTypes.BLEED.getDescription(0)
         };
     }
 

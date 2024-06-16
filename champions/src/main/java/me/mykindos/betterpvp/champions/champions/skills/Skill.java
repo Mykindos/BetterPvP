@@ -145,9 +145,6 @@ public abstract class Skill implements IChampionsSkill {
         if (this instanceof AreaOfEffectSkill) {
             component = component.append(Component.text("AoE", NamedTextColor.GOLD).appendSpace());
         }
-        if (this instanceof HealthSkill) {
-            component = component.append(Component.text("Health", NamedTextColor.RED).appendSpace());
-        }
 
         if (this instanceof BuffSkill) {
             component = component.append(Component.text("Buff", NamedTextColor.GREEN).appendSpace());
@@ -163,6 +160,10 @@ public abstract class Skill implements IChampionsSkill {
 
         if (this instanceof DefensiveSkill) {
             component = component.append(Component.text("Defensive", NamedTextColor.GRAY).appendSpace());
+        }
+
+        if (this instanceof HealthSkill) {
+            component = component.append(Component.text("Health", NamedTextColor.RED).appendSpace());
         }
 
         if (this instanceof FireSkill) {

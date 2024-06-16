@@ -5,6 +5,8 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.skills.assassin.data.SilencingStrikesData;
+import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -25,7 +27,7 @@ import java.util.List;
 
 @Singleton
 @BPvPListener
-public class SilencingStrikes extends Skill implements PassiveSkill, Listener {
+public class SilencingStrikes extends Skill implements PassiveSkill, Listener, DebuffSkill, OffensiveSkill {
 
     public List<SilencingStrikesData> data = new ArrayList<>();
 
@@ -50,13 +52,23 @@ public class SilencingStrikes extends Skill implements PassiveSkill, Listener {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Hit a player <stat>" + hitsNeeded + "</stat> consecutive times without letting",
-                "<stat>" + timeSpan + "</stat> seconds pass to <effect>Silence</effect> them for <val>" + getDuration(level) + "</val> seconds"
+                "Hit a player " + getValueString(this::getHitsNeeded, level, 0) + " consecutive times without letting",
+                getValueString(this::getTimeSpan, level) + " seconds pass to <effect>Silence</effect> them for " + getValueString(this::getDuration, level) + " seconds",
+                "",
+                EffectTypes.SILENCE.getDescription(0)
         };
     }
 
     public double getDuration(int level) {
         return baseDuration + ((level - 1) * durationIncreasePerLevel);
+    }
+
+    public int getHitsNeeded(int level) {
+        return hitsNeeded;
+    }
+
+    public double getTimeSpan(int level) {
+        return timeSpan;
     }
 
     @Override
@@ -87,7 +99,7 @@ public class SilencingStrikes extends Skill implements PassiveSkill, Listener {
             silenceData.addCount();
             silenceData.setLastHit(System.currentTimeMillis());
             event.addReason(getName());
-            if (silenceData.getCount() == hitsNeeded) {
+            if (silenceData.getCount() == getHitsNeeded(level)) {
                 championsManager.getEffects().addEffect(damagee, EffectTypes.SILENCE, (long) ((getDuration(level) * 1000L)));
                 data.remove(silenceData);
             }
@@ -98,7 +110,7 @@ public class SilencingStrikes extends Skill implements PassiveSkill, Listener {
 
     @UpdateEvent
     public void onUpdate() {
-        data.removeIf(silenceData -> UtilTime.elapsed(silenceData.getLastHit(), (long) (timeSpan * 1000L)));
+        data.removeIf(silenceData -> UtilTime.elapsed(silenceData.getLastHit(), (long) (getTimeSpan(0) * 1000L)));
     }
 
     public SilencingStrikesData getSilencingStrikesData(Player damager, Player damagee) {
