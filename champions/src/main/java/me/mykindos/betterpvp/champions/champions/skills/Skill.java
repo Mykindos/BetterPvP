@@ -260,7 +260,7 @@ public abstract class Skill implements IChampionsSkill {
     }
 
     public String getValueString(IntToDoubleFunction method, int level, int decimalPlaces) {
-        return getValueString(method, level, 1, decimalPlaces);
+        return getValueString(method, level, 1, "", decimalPlaces);
     }
 
     /**
@@ -271,7 +271,7 @@ public abstract class Skill implements IChampionsSkill {
      * @param decimalPlaces number of decimal places to use
      * @return A mini-message formatted string with the value
      */
-    public String getValueString(IntToDoubleFunction method, int level, double multiplier, int decimalPlaces) {
+    public String getValueString(IntToDoubleFunction method, int level, double multiplier, String suffix, int decimalPlaces) {
         double currentValue = method.applyAsDouble(level) * multiplier;
         double nextValue = method.applyAsDouble(level + 1) * multiplier;
         //if level is the same, it's a static value
@@ -280,15 +280,15 @@ public abstract class Skill implements IChampionsSkill {
         }
 
         //it is a varying value, needs to be green
-        String valueString = "<green>" + UtilFormat.formatNumber(currentValue, decimalPlaces, true) + "</green>";
+        String valueString = "<green>" + UtilFormat.formatNumber(currentValue, decimalPlaces, true) + "</green>" + suffix;
 
         if (level < getMaxLevel()) {
             double difference = nextValue - currentValue;
             if (difference > 0) {
-                return valueString + " (+<green>" + UtilFormat.formatNumber(difference, decimalPlaces, true) + "</green>)";
+                return valueString + " (+<green>" + UtilFormat.formatNumber(difference, decimalPlaces, true) + "</green>" + suffix + ")";
             } else {
                 difference = Math.abs(difference);
-                return valueString + " (-<green>" + UtilFormat.formatNumber(difference, decimalPlaces, true) + "</green>)";
+                return valueString + " (-<green>" + UtilFormat.formatNumber(difference, decimalPlaces, true) + "</green>" + suffix + ")";
             }
         }
         return valueString;
