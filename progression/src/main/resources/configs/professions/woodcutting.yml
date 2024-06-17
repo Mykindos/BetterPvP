@@ -1,0 +1,4 @@
+skills:
+  tree_tactician:
+    enabled: true
+    maxlevel: 10
