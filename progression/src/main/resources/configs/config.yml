@@ -29,12 +29,6 @@ mining:
     DEEPSLATE_COAL_ORE: 10
     DEEPSLATE_LAPIS_ORE: 10
     DEEPSLATE_EMERALD_ORE: 10
-  perks:
-    drop-multiplier:
-      enabled: true
-      increasePerLevel: 0.25
-      maxLevel: 1000
-      minLevel: 0
   enabled: true
 
 
@@ -188,23 +182,6 @@ fishing:
       frequency: 20
       modelData: 18
   xpPerPound: 0.1
-  perks:
-    treasure-chance:
-      enabled: true
-      increasePerLevel: 0.25
-      maxLevel: 1000
-      minLevel: 750
-    longer-bait:
-      enabled: true
-      increasePerLevel: 0.0025
-      maxLevel: 1000
-      minLevel: 0
-    fish-weight:
-      enabled: true
-      increasePerLevel: 0.001
-      increaseWeight: 0.2
-      maxLevel: 1000
-      minLevel: 0
   enabled: true
 command:
   progression:
