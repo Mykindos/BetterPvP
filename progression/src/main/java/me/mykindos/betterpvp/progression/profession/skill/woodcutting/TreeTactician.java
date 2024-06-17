@@ -16,6 +16,7 @@ import org.bukkit.event.Listener;
 @BPvPListener
 public class TreeTactician extends WoodcuttingProgressionSkill implements Listener {
     private final ProfessionProfileManager professionProfileManager;
+    private double xpBonusPerLvl;
 
     @Inject
     public TreeTactician(Progression progression, ProfessionProfileManager professionProfileManager) {
@@ -28,10 +29,13 @@ public class TreeTactician extends WoodcuttingProgressionSkill implements Listen
         return "Tree Tactician";
     }
 
+
+    // percentages not right here
     @Override
     public String[] getDescription(int level) {
+        double numberInPercentage = getExperienceBonusForDescription(level) * 100;
         return new String[] {
-                "Increases experience gained per chopped log by <green>" + UtilFormat.formatNumber(getExperienceBonus(level), 2) + "%"
+                "Increases experience gained per chopped log by <green>" + numberInPercentage + "%"
         };
     }
 
@@ -40,8 +44,8 @@ public class TreeTactician extends WoodcuttingProgressionSkill implements Listen
         return Material.EXPERIENCE_BOTTLE;
     }
 
-    public double getExperienceBonus(int level) {
-        return 1.0 + level*0.05;
+    public double getExperienceBonusForDescription(int level) {
+        return level*xpBonusPerLvl;
     }
 
     @EventHandler
@@ -53,11 +57,14 @@ public class TreeTactician extends WoodcuttingProgressionSkill implements Listen
                 int skillLevel = profession.getBuild().getSkillLevel(this);
                 if (skillLevel <= 0) return;
 
-                // 0.05 will need to be put in config file
-                // u can access through woodcuttingHandler
-                // woodcuttingHandler will need to be passed to Event or some other way
-                event.setExperienceBonusModifier(getExperienceBonus(skillLevel));
+                event.setExperienceBonusModifier(1.0 + getExperienceBonusForDescription(skillLevel));
             }
         });
+    }
+
+    @Override
+    public void loadConfig() {
+        super.loadConfig();
+        xpBonusPerLvl = getConfig("xpBonusPerLvl", 0.03, Double.class);
     }
 }
