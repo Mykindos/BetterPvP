@@ -53,17 +53,8 @@ public class WoodcuttingHandler extends ProfessionHandler {
     }
 
     /**
-     * Whenever a player mines a block but there is no experience modifier (or whatever
-     * is calling this method doesn't know in what manor it needs to modify the xp),
-     * it will get passed here
-     */
-    public void attemptToChopLog(Player player, Block block) {
-        attemptToChopLog(player, block, DoubleUnaryOperator.identity());
-    }
-
-    /**
-     * Just like the other declaration but this one will take in LongUnaryOperator
-     * (which is just a higher order function that returns a long primitive type).
+     * This handles all the experience gaining and logging that happens when a
+     * player chops a log (`block`)
      * @param experienceModifier represents a higher order function that modifies
      *                           the experience gained by the player here.
      */
@@ -81,7 +72,7 @@ public class WoodcuttingHandler extends ProfessionHandler {
         // if this is identity, it will just return 'experience'
         final double finalExperience = experienceModifier.applyAsDouble(experience);
 
-        // no xp if a player placed
+        // no xp if a player placed this block
         final PersistentDataContainer persistentDataContainer = UtilBlock.getPersistentDataContainer(block);
         boolean playerPlaced = persistentDataContainer.has(CoreNamespaceKeys.PLAYER_PLACED_KEY);
         if (playerPlaced) {
