@@ -10,6 +10,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.Waterlogged;
 import org.bukkit.block.data.type.Bed;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -79,7 +80,7 @@ public class UtilBlock {
     public static boolean isInWater(Player player) {
         Block block = player.getLocation().getBlock();
 
-        return isWater(block) || player.isSwimming();
+        return isWater(block) || player.isSwimming() || (block.getBlockData() instanceof Waterlogged wl && wl.isWaterlogged());
     }
 
     public static boolean isWater(Block block) {
