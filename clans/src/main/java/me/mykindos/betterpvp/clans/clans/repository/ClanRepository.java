@@ -9,7 +9,6 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanProperty;
 import me.mykindos.betterpvp.clans.clans.insurance.Insurance;
 import me.mykindos.betterpvp.clans.clans.insurance.InsuranceType;
-import me.mykindos.betterpvp.clans.clans.vault.ClanVault;
 import me.mykindos.betterpvp.clans.logging.KillClanLog;
 import me.mykindos.betterpvp.core.components.clans.IClan;
 import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
@@ -91,12 +90,12 @@ public class ClanRepository implements IRepository<Clan> {
 
                 Clan clan = new Clan(clanId);
                 clan.setName(name);
-                clan.setCore(coreLoc);
+                clan.getCore().setPosition(coreLoc);
                 clan.setAdmin(admin);
                 clan.setSafe(safe);
 
                 if (vault != null) {
-                    clan.setVault(ClanVault.of(clan, vault));
+                    clan.getCore().getVault().read(vault);
                 }
 
                 if (banner != null && !banner.isEmpty()) {
@@ -196,7 +195,7 @@ public class ClanRepository implements IRepository<Clan> {
     public void updateClanCore(Clan clan) {
         String query = "UPDATE clans SET Core = ? WHERE id = ?;";
         database.executeUpdateAsync(new Statement(query,
-                new StringStatementValue(UtilWorld.locationToString(clan.getCore(), false)),
+                new StringStatementValue(UtilWorld.locationToString(clan.getCore().getPosition(), false)),
                 new UuidStatementValue(clan.getId())));
     }
 
@@ -224,7 +223,7 @@ public class ClanRepository implements IRepository<Clan> {
     public void updateClanVault(Clan clan) {
         String query = "UPDATE clans SET Vault = ? WHERE id = ?;";
         database.executeUpdateAsync(new Statement(query,
-                new StringStatementValue(clan.getVault().serialize()),
+                new StringStatementValue(clan.getCore().getVault().serialize()),
                 new UuidStatementValue(clan.getId())));
     }
 

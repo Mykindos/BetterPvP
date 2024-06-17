@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.utilities;
 
+import com.google.common.base.Preconditions;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
@@ -19,6 +20,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,9 +28,28 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Predicate;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UtilBlock {
+
+    public static Optional<Block> scanCube(@NotNull final Location center, int radiusX, int radiusY, int radiusZ, Predicate<Block> predicate) {
+        Preconditions.checkArgument(radiusX > 0, "Radius must be greater than 0");
+        Preconditions.checkArgument(radiusY > 0, "Radius must be greater than 0");
+        Preconditions.checkArgument(radiusZ > 0, "Radius must be greater than 0");
+        for (int x = -radiusX; x <= radiusX; x++) {
+            for (int y = -radiusY; y <= radiusY; y++) {
+                for (int z = -radiusZ; z <= radiusZ; z++) {
+                    final Location location = center.clone().add(x, y, z);
+                    if (predicate.test(location.getBlock())) {
+                        return Optional.of(location.getBlock());
+                    }
+                }
+            }
+        }
+        return Optional.empty();
+    }
 
     public static Collection<BoundingBox> getBoundingBoxes(final Block block) {
         return block.getCollisionShape().getBoundingBoxes().stream().map(boundingBox -> {

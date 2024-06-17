@@ -9,7 +9,7 @@ import net.kyori.adventure.text.Component;
 import java.util.HashMap;
 
 @WithReflection
-public class ClanSetHomeLogFormatter implements ILogFormatter {
+public class ClanSetCoreLogFormatter implements ILogFormatter {
 
     @Override
     public String getAction() {

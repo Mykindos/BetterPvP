@@ -6,7 +6,6 @@ import lombok.Data;
 import me.mykindos.betterpvp.clans.clans.core.ClanCore;
 import me.mykindos.betterpvp.clans.clans.events.ClanPropertyUpdateEvent;
 import me.mykindos.betterpvp.clans.clans.insurance.Insurance;
-import me.mykindos.betterpvp.clans.clans.vault.ClanVault;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.components.clans.IClan;
 import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
@@ -51,12 +50,11 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
 
     private final UUID id;
     private String name;
-    private final ClanCore core;
+    private final ClanCore core = new ClanCore(this);
     private boolean admin;
     private boolean safe;
     private boolean online;
     private BannerWrapper banner = BannerWrapper.builder().baseColor(BannerColor.WHITE).build();
-    private ClanVault vault = ClanVault.create(this);
 
     private List<ClanMember> members = new ArrayList<>();
     private List<ClanAlliance> alliances = new ArrayList<>();
