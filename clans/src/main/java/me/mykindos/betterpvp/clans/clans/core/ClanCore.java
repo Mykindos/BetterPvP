@@ -46,6 +46,7 @@ public final class ClanCore {
         return UtilBlock.getPersistentDataContainer(block).has(ClansNamespacedKeys.CLAN_CORE);
     }
 
+    private double health;
     private boolean visible;
     private EnderCrystal crystal;
     private BukkitTask teleportTask;
@@ -202,7 +203,6 @@ public final class ClanCore {
 
             Preconditions.checkNotNull(position, "Core location is not set");
             crystal = position.getWorld().spawn(position.clone().add(0, 0.5, 0), EnderCrystal.class, entity -> {
-                entity.setInvulnerable(true);
                 entity.setShowingBottom(false);
                 entity.setGravity(false);
                 entity.setVisualFire(false);
