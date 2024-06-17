@@ -14,7 +14,6 @@ import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.IConsoleCommand;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -136,16 +135,11 @@ public class PunishmentAddCommand extends Command implements IConsoleCommand {
         punishmentRepository.save(punishment);
 
         type.onReceive(target, punishment);
-
-        Component component = null;
         if (punisher != null) {
             if (time == -1) {
-                component = UtilMessage.deserialize("<yellow>%s<reset> has <green>permanently <reset>%s <yellow>%s<reset>.", punisher.getName(), type.getChatLabel(), target.getName())
-                        .hoverEvent(Component.text(reason));
-
+                UtilMessage.broadcast("Punish", "<yellow>%s<reset> has <green>permanently <reset>%s <yellow>%s<reset>.", punisher.getName(), type.getChatLabel(), target.getName());
             } else {
-                component = UtilMessage.deserialize("<yellow>%s<reset> has %s <yellow>%s<reset> for <green>%s<reset>.", punisher.getName(), type.getChatLabel(), target.getName(), formattedTime)
-                        .hoverEvent(Component.text(reason));
+                UtilMessage.broadcast("Punish", "<yellow>%s<reset> has %s <yellow>%s<reset> for <green>%s<reset>.", punisher.getName(), type.getChatLabel(), target.getName(), formattedTime);
             }
             log.info("{} was {} by {} for {} reason {}", target.getName(), punisher.getName(), type.getChatLabel(), formattedTime, reason)
                     .setAction("PUNISH_ADD")
@@ -154,25 +148,18 @@ public class PunishmentAddCommand extends Command implements IConsoleCommand {
                     .submit();
         } else {
             if (time == -1) {
-                component = UtilMessage.deserialize("<yellow>%s<reset> was <green>permanently <reset>%s.", target.getName(), type.getChatLabel())
-                        .hoverEvent(Component.text(reason));
+                UtilMessage.broadcast("Punish", "<yellow>%s<reset> was <green>permanently <reset>%s.", target.getName(), type.getChatLabel());
             } else {
-                component = UtilMessage.deserialize("<yellow>%s<reset> was %s for <green>%s<reset>.", target.getName(), type.getChatLabel(), formattedTime)
-                        .hoverEvent(Component.text(reason));
-
+                UtilMessage.broadcast("Punish", "<yellow>%s<reset> was %s for <green>%s<reset>.", target.getName(), type.getChatLabel(), formattedTime);
             }
-
             log.info("{} was {} for {} reason {}", target.getName(), type.getChatLabel(), formattedTime, reason)
                     .setAction("PUNISH_ADD")
                     .addClientContext(target, true)
                     .submit();
         }
 
-        clientManager.sendMessageToRank("Punish", component, Rank.TRIAL_MOD);
-
-        Player targetPlayer = Bukkit.getPlayer(target.getUniqueId());
-        if(targetPlayer != null){
-            UtilMessage.message(targetPlayer, "Punish", component);
+        if (!reason.isEmpty()) {
+            clientManager.sendMessageToRank("Punish", UtilMessage.deserialize("<red>Reason<reset>: <reset>%s", reason), Rank.TRIAL_MOD);
         }
 
     }
