@@ -21,6 +21,7 @@ import org.bukkit.persistence.PersistentDataContainer;
 
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.function.DoubleUnaryOperator;
 import java.util.function.LongUnaryOperator;
 
 
@@ -57,7 +58,7 @@ public class WoodcuttingHandler extends ProfessionHandler {
      * it will get passed here
      */
     public void attemptToChopLog(Player player, Block block) {
-        attemptToChopLog(player, block, LongUnaryOperator.identity());
+        attemptToChopLog(player, block, DoubleUnaryOperator.identity());
     }
 
     /**
@@ -66,7 +67,7 @@ public class WoodcuttingHandler extends ProfessionHandler {
      * @param experienceModifier represents a higher order function that modifies
      *                           the experience gained by the player here.
      */
-    public void attemptToChopLog(Player player, Block block, LongUnaryOperator experienceModifier) {
+    public void attemptToChopLog(Player player, Block block, DoubleUnaryOperator experienceModifier) {
         ProfessionData professionData = getProfessionData(player.getUniqueId());
         if (professionData == null) {
             return;
@@ -78,7 +79,7 @@ public class WoodcuttingHandler extends ProfessionHandler {
         }
 
         // if this is identity, it will just return 'experience'
-        final long finalExperience = experienceModifier.applyAsLong(experience);
+        final double finalExperience = experienceModifier.applyAsDouble(experience);
 
         // no xp if a player placed
         final PersistentDataContainer persistentDataContainer = UtilBlock.getPersistentDataContainer(block);

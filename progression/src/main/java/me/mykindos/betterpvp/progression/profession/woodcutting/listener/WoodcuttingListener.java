@@ -4,11 +4,16 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.progression.profession.woodcutting.WoodcuttingHandler;
+import me.mykindos.betterpvp.progression.profession.woodcutting.event.PlayerChopLogEvent;
+import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+
+import java.util.function.DoubleUnaryOperator;
 
 
 /**
@@ -18,11 +23,11 @@ import org.bukkit.event.block.BlockBreakEvent;
 @BPvPListener
 @CustomLog
 @Singleton
-public class WoodcuttingStatsListener implements Listener {
+public class WoodcuttingListener implements Listener {
     private final WoodcuttingHandler woodcuttingHandler;
 
     @Inject
-    public WoodcuttingStatsListener(WoodcuttingHandler woodcuttingHandler) {
+    public WoodcuttingListener(WoodcuttingHandler woodcuttingHandler) {
         this.woodcuttingHandler = woodcuttingHandler;
     }
 
@@ -33,6 +38,13 @@ public class WoodcuttingStatsListener implements Listener {
      */
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBreak(BlockBreakEvent event) {
-        woodcuttingHandler.attemptToChopLog(event.getPlayer(), event.getBlock());
+        Material blockType = event.getBlock().getType();
+
+        if (!woodcuttingHandler.getExperiencePerWood().containsKey(blockType)) return;
+
+        PlayerChopLogEvent chopLogEvent = UtilServer.callEvent(new PlayerChopLogEvent(event.getPlayer(), blockType));
+
+        DoubleUnaryOperator experienceModifier = (xp) -> xp * chopLogEvent.getExperienceBonusModifier();
+        woodcuttingHandler.attemptToChopLog(event.getPlayer(), event.getBlock(), experienceModifier);
     }
 }
