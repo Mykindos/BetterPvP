@@ -34,9 +34,9 @@ public class HomeTransportButton extends ControlItem<ClanTravelHubMenu> {
 
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent inventoryClickEvent) {
-        if(clickType.isLeftClick()) {
-            if(clan.getCore() != null) {
-                player.teleport(clan.getCore());
+        if (clickType.isLeftClick()) {
+            if (clan.getCore().isSet()) {
+                clan.getCore().teleport(player, true);
             } else {
                 UtilMessage.simpleMessage(player, "Clans", "Your clan does not have a core set!");
             }

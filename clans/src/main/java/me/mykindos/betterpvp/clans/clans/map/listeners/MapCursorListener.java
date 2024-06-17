@@ -22,6 +22,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.map.MapCursor;
 
 import java.util.HashMap;
+import java.util.Objects;
 
 
 @BPvPListener
@@ -111,14 +112,12 @@ public class MapCursorListener implements Listener {
                 }
             }
         }
-        if (aClan != null && aClan.getCore() != null) {
-            Location aClanCoreLoc = aClan.getCore();
-            event.getCursors().add(new ExtraCursor(aClanCoreLoc.getBlockX(), aClanCoreLoc.getBlockZ(), true,
+
+        if (aClan != null && aClan.getCore().isSet()) {
+            Location coreLoc = Objects.requireNonNull(aClan.getCore().getPosition());
+            event.getCursors().add(new ExtraCursor(coreLoc.getBlockX(), coreLoc.getBlockZ(), true,
                     MapCursor.Type.MANSION, (byte) 8, player.getWorld().getName(), true, null));
         }
-
-
-
     }
 
     private void adminClanLocations(MinimapExtraCursorEvent event) {
@@ -131,12 +130,10 @@ public class MapCursorListener implements Listener {
 
     private void addAdminClan(MinimapExtraCursorEvent event, String clanName, MapCursor.Type cursor, String caption) {
         Clan clan = clanCache.computeIfAbsent(clanName, c -> clanManager.getClanByName(clanName).orElse(null));
-        if(clan != null) {
-            Location homeLoc = clan.getCore();
-            if (homeLoc != null) {
-                event.getCursors().add(new ExtraCursor(homeLoc.getBlockX(), homeLoc.getBlockZ(), true,
-                        cursor, (byte) 8, homeLoc.getWorld().getName(), true, caption));
-            }
+        if (clan != null && clan.getCore().isSet()) {
+            Location loc = Objects.requireNonNull(clan.getCore().getPosition());
+            event.getCursors().add(new ExtraCursor(loc.getBlockX(), loc.getBlockZ(), true,
+                    cursor, (byte) 8, loc.getWorld().getName(), true, caption));
         }
     }
 }

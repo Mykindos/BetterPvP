@@ -36,12 +36,12 @@ public class CoreSubCommand extends ClanSubCommand {
     @Override
     public void execute(Player player, Client client, String... args) {
         clanManager.getClanByPlayer(player).ifPresent(playerClan -> {
-            if (playerClan.getCore() == null) {
+            if (!playerClan.getCore().isSet()) {
                 UtilMessage.simpleMessage(player, "Clans", "Your clan core has not been set yet. Use <yellow>/clan setcore</yellow> to set it.");
                 return;
             }
 
-            UtilServer.callEvent(new ClanCoreTeleportEvent(player, () -> player.teleport(playerClan.getCore())));
+            UtilServer.callEvent(new ClanCoreTeleportEvent(player, () -> playerClan.getCore().teleport(player, true)));
         });
     }
 }

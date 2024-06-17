@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanProperty;
+import me.mykindos.betterpvp.clans.clans.core.ClanCore;
 import me.mykindos.betterpvp.clans.clans.data.ClanDefaultValues;
 import me.mykindos.betterpvp.clans.clans.events.ChunkClaimEvent;
 import me.mykindos.betterpvp.clans.clans.events.ChunkUnclaimEvent;
@@ -19,7 +20,7 @@ import me.mykindos.betterpvp.clans.clans.events.ClanNeutralEvent;
 import me.mykindos.betterpvp.clans.clans.events.ClanRequestAllianceEvent;
 import me.mykindos.betterpvp.clans.clans.events.ClanRequestNeutralEvent;
 import me.mykindos.betterpvp.clans.clans.events.ClanRequestTrustEvent;
-import me.mykindos.betterpvp.clans.clans.events.ClanSetCoreEvent;
+import me.mykindos.betterpvp.clans.clans.events.ClanSetCoreLocationEvent;
 import me.mykindos.betterpvp.clans.clans.events.ClanTrustEvent;
 import me.mykindos.betterpvp.clans.clans.events.ClanUntrustEvent;
 import me.mykindos.betterpvp.clans.clans.events.MemberDemoteEvent;
@@ -51,12 +52,19 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
+import org.bukkit.HeightMap;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockExplodeEvent;
+import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.block.BlockPistonRetractEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.ArrayList;
@@ -72,7 +80,6 @@ public class ClanEventListener extends ClanListener {
     private final Clans clans;
     private final CommandManager commandManager;
     private final CooldownManager cooldownManager;
-
 
     @Inject
     @Config(path = "clans.members.max", defaultValue = "8")
@@ -101,6 +108,11 @@ public class ClanEventListener extends ClanListener {
         clan.getTerritory().add(new ClanTerritory(chunkString));
         clanManager.getRepository().saveClanTerritory(clan, chunkString);
 
+        // If the clan has no territory, set the core position
+        if (clan.getTerritory().size() == 1) {
+            UtilServer.callEvent(new ClanSetCoreLocationEvent(player, clan, true));
+        }
+
         String stringChunk = UtilWorld.chunkToPrettyString(chunk);
         UtilMessage.simpleMessage(player, "Clans", "You claimed Territory <yellow>" + stringChunk + "</yellow>.");
 
@@ -112,7 +124,66 @@ public class ClanEventListener extends ClanListener {
                         stringChunk, clan.getName(), clan.getId())
                 .setAction("CLAN_CLAIM").addClientContext(event.getPlayer()).addClanContext(clan)
                 .addContext(LogContext.CHUNK, stringChunk).submit();
+    }
 
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onChunkUnclaimCore(ChunkUnclaimEvent event) {
+        final Player player = event.getPlayer();
+        final Clan targetClan = event.getClan();
+        final Chunk chunk = event.getChunk();
+        final boolean selfClan = clanManager.getClanByPlayer(player).orElse(null) == targetClan;
+
+        if (targetClan.getCore().getPosition() != null && targetClan.getCore().getPosition().getChunk().equals(chunk)) {
+            if (selfClan && targetClan.getTerritory().size() == 1) {
+                targetClan.getCore().removeBlock(); // Remove the core block if it exists
+                targetClan.getCore().setPosition(null);
+                return; // Allow the core to be unclaimed if it is the only territory and the player is in the clan
+            }
+
+            UtilMessage.simpleMessage(player, "Clans", "<red>You cannot unclaim <alt2>%s</alt2> as it contains a clan core.", UtilWorld.chunkToPrettyString(chunk));
+
+            if (selfClan) {
+                UtilMessage.simpleMessage(player, "Clans", "To unclaim the core, you must unclaim all other territories first.");
+            }
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onPistonCoreExtend(BlockPistonExtendEvent event) {
+        for (Block block : event.getBlocks()) {
+            if (ClanCore.isCore(block)) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+    }
+
+    @EventHandler
+    public void onPistonCoreRetract(BlockPistonRetractEvent event) {
+        for (Block block : event.getBlocks()) {
+            if (ClanCore.isCore(block)) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+    }
+
+    @EventHandler
+    public void onExplodeCore(BlockExplodeEvent event) {
+        for (Block block : event.blockList()) {
+            if (ClanCore.isCore(block)) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+    }
+
+    @EventHandler
+    public void onCoreInteract(PlayerInteractEvent event) {
+        if (ClanCore.isCore(event.getClickedBlock())) {
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -122,28 +193,15 @@ public class ClanEventListener extends ClanListener {
         Player player = event.getPlayer();
         Clan targetClan = event.getClan();
         Chunk chunk = event.getChunk();
-
         String chunkString = UtilWorld.chunkToFile(chunk);
-
         String chunkToPrettyString = UtilWorld.chunkToPrettyString(chunk);
+
         UtilMessage.simpleMessage(player, "Clans", "You unclaimed territory <alt2>" + chunkToPrettyString + "</alt2>.");
 
         targetClan.messageClan(String.format("<yellow>%s<gray> unclaimed territory <yellow>%s<gray>.", player.getName(),
                 chunkToPrettyString), player.getUniqueId(), true);
         clanManager.getRepository().deleteClanTerritory(targetClan, chunkString);
         targetClan.getTerritory().removeIf(territory -> territory.getChunk().equals(UtilWorld.chunkToFile(chunk)));
-
-        if (targetClan.getCore() != null) {
-            if (targetClan.getCore().getChunk().equals(chunk)) {
-                Block block = targetClan.getCore().clone().subtract(0, 0.6, 0).getBlock();
-                if (block.getType() == Material.RED_BED) {
-                    block.setType(Material.AIR);
-                }
-                targetClan.setCore(null);
-
-                targetClan.messageClan("Your clan home was destroyed!", null, true);
-            }
-        }
 
         log.info("{} ({}) unclaimed {} from {} ({})", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
                         chunkToPrettyString, targetClan.getName(), targetClan.getId())
@@ -228,12 +286,8 @@ public class ClanEventListener extends ClanListener {
             }
         }
 
-        if (clan.getCore() != null) {
-            Block block = clan.getCore().clone().subtract(0, 0.6, 0).getBlock();
-            if (block.getType() == Material.RED_BED) {
-                block.setType(Material.AIR);
-            }
-        }
+        clan.getCore().removeBlock(); // Remove the core block if it exists
+        clan.getCore().setPosition(null);
 
         clan.getMembers().clear();
         clan.getTerritory().clear();
@@ -650,30 +704,53 @@ public class ClanEventListener extends ClanListener {
 
     }
 
+    @EventHandler
+    public void onBlockCore(BlockPlaceEvent event) {
+        if (!event.getBlockReplacedState().getType().isSolid()) {
+            return; // Skip non-solids
+        }
+
+        if (ClanCore.isCore(event.getBlock().getRelative(BlockFace.DOWN)) || ClanCore.isCore(event.getBlock().getRelative(BlockFace.DOWN, 2))) {
+            event.setCancelled(true);
+            UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You cannot place a block on top of a clan core.");
+        }
+    }
+
+    @EventHandler
+    public void onBreakCore(BlockBreakEvent event) {
+        if (ClanCore.isCore(event.getBlock())) {
+            event.setCancelled(true);
+            UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You cannot break a clan core.");
+        }
+    }
+
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onClanSetCore(ClanSetCoreEvent event) {
+    public void onClanSetCore(ClanSetCoreLocationEvent event) {
         if (event.isCancelled()) return;
 
         Clan clan = event.getClan();
         Player player = event.getPlayer();
 
-        Optional<Clan> clanOptional = clanManager.getClanByLocation(player.getLocation());
-        if (clanOptional.isEmpty() || !clanOptional.get().equals(clan)) {
-            UtilMessage.simpleMessage(player, "Clans", "You can only set the clan core in your own territory.");
-            return;
-        }
-
-        final Location oldCore = clan.getCore();
-        if (oldCore != null) {
-            oldCore.getBlock().setType(Material.AIR, true);
-        }
-
-        // If the clan isn't admin clan, place a core
-        if (!clan.isAdmin()) {
+        if (!event.isIgnoreClaims()) {
+            Optional<Clan> clanOptional = clanManager.getClanByLocation(player.getLocation());
+            if (clanOptional.isEmpty() || !clanOptional.get().equals(clan)) {
+                UtilMessage.simpleMessage(player, "Clans", "You can only set the clan core in your own territory.");
+                return;
+            }
 
         }
 
-        clan.setCore(player.getLocation().toCenterLocation().add(0, 0.6, 0));
+        final ClanCore core = clan.getCore();
+        final Location highest = player.getWorld().getHighestBlockAt(player.getLocation(), HeightMap.OCEAN_FLOOR).getLocation().add(0, 1, 0);
+        if (highest.getBlock() != player.getLocation().getBlock()) {
+            UtilMessage.simpleMessage(player, "Clans", "Your clan core was moved to the ground.");
+        }
+
+        final Block block = core.getSafest(highest).getBlock();
+        core.removeBlock(); // Remove old core
+        core.setPosition(block.getLocation().toCenterLocation()); // Set new core location
+        core.placeBlock(); // Place new core
+
         UtilMessage.simpleMessage(player, "Clans", "You set the clan core to <alt2>%s</alt2>.",
                 UtilWorld.locationToString(player.getLocation()));
         log.info("{} ({}) of {} ({}) set their clan core to {}", player.getName(), player.getUniqueId(), clan.getName(), clan.getName(),
@@ -681,8 +758,6 @@ public class ClanEventListener extends ClanListener {
                 .addClientContext(player).addClanContext(clan).addLocationContext(player.getLocation()).submit();
 
         clanManager.getRepository().updateClanCore(clan);
-
-
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

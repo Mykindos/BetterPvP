@@ -9,7 +9,6 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.leveling.ClanPerkManager;
 import me.mykindos.betterpvp.clans.clans.leveling.perk.model.ClanVaultSlot;
-import me.mykindos.betterpvp.clans.clans.menus.ClanMenu;
 import me.mykindos.betterpvp.clans.clans.repository.ClanRepository;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.menu.Windowed;
@@ -36,9 +35,9 @@ public final class ClanVault {
     private final @NotNull Map<Integer, @NotNull ItemStack> contents;
     private String lockedBy;
 
-    public ClanVault(Clan clan, @NotNull Map<Integer, @NotNull ItemStack> contents) {
+    public ClanVault(Clan clan) {
         this.clan = clan;
-        this.contents = contents;
+        this.contents = new Int2ObjectOpenHashMap<>();
     }
 
     public boolean hasPermission(Player player) {
@@ -60,8 +59,8 @@ public final class ClanVault {
     }
 
     @SneakyThrows
-    public static @NotNull ClanVault of(Clan clan, String data) {
-        final Int2ObjectOpenHashMap<ItemStack> map = new Int2ObjectOpenHashMap<>();
+    public void read(String data) {
+        contents.clear();
         ByteArrayInputStream inputStream = new ByteArrayInputStream(Base64Coder.decodeLines(data));
         BukkitObjectInputStream dataInput = new BukkitObjectInputStream(inputStream);
         ItemStack[] items = new ItemStack[dataInput.readInt()];
@@ -74,10 +73,9 @@ public final class ClanVault {
         dataInput.close();
         for (int i = 0; i < items.length; i++) {
             if (items[i] != null) {
-                map.put(i, items[i]);
+                contents.put(i, items[i]);
             }
         }
-        return new ClanVault(clan, map);
     }
 
     @SneakyThrows
@@ -102,10 +100,6 @@ public final class ClanVault {
         return Base64Coder.encodeLines(outputStream.toByteArray());
     }
 
-    public static @NotNull ClanVault create(Clan clan) {
-        return new ClanVault(clan, new Int2ObjectOpenHashMap<>());
-    }
-
     public void show(Player player, Windowed previous) throws IllegalStateException {
         Preconditions.checkState(!isLocked(), "Clan vault is locked");
         lockedBy = player.getName();
@@ -116,6 +110,6 @@ public final class ClanVault {
     }
 
     public void show(Player player) throws IllegalStateException {
-        show(player, new ClanMenu(player, clan, clan));
+        show(player, null);
     }
 }

@@ -1,15 +1,20 @@
 package me.mykindos.betterpvp.clans.clans.events;
 
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.core.components.clans.events.ClanEvent;
 import org.bukkit.entity.Player;
 
 @EqualsAndHashCode(callSuper = true)
-public class ClanSetCoreEvent extends ClanEvent<Clan> {
+@Getter
+public class ClanSetCoreLocationEvent extends ClanEvent<Clan> {
 
-    public ClanSetCoreEvent(Player player, Clan clan) {
+    private final boolean ignoreClaims;
+
+    public ClanSetCoreLocationEvent(Player player, Clan clan, boolean ignoreClaims) {
         super(player, clan);
+        this.ignoreClaims = ignoreClaims;
     }
 
 }
