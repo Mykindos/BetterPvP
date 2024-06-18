@@ -661,13 +661,16 @@ skills:
     threateningshout:
       enabled: true
       maxlevel: 5
-      cooldown: 20.0
-      radius: 4.0
-      duration: 3.0
-      cooldownDecreasePerLevel: 1.0
+      cooldown: 8.0
+      radius: 3.0
+      cooldownDecreasePerLevel: 0.5
       baseDuration: 3.0
-      durationIncreasePerLevel: 2.0
-      vulnerabilityStrength: 2
+      durationIncreasePerLevel: 0.5
+      vulnerabilityStrength: 3
+      tickDelay: 12
+      damage: 5.0
+      damageIncreasePerLevel: 1.0
+      startDistance: 1.0
     bloodlust:
       enabled: true
       maxlevel: 3
