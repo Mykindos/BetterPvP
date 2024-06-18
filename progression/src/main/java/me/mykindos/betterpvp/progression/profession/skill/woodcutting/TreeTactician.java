@@ -50,13 +50,10 @@ public class TreeTactician extends WoodcuttingProgressionSkill implements Listen
     public void onPlayerChopsLog(PlayerChopLogEvent event) {
         Player player = event.getPlayer();
         professionProfileManager.getObject(player.getUniqueId().toString()).ifPresent(profile -> {
-            var profession = profile.getProfessionDataMap().get("Woodcutting");
-            if (profession != null) {
-                int skillLevel = profession.getBuild().getSkillLevel(this);
-                if (skillLevel <= 0) return;
+            int skillLevel = getPlayerSkillLevel(profile);
+            if (skillLevel <= 0) return;
 
-                event.setExperienceBonusModifier(1.0 + getExperienceBonusForDescription(skillLevel));
-            }
+            event.setExperienceBonusModifier(1.0 + getExperienceBonusForDescription(skillLevel));
         });
     }
 

@@ -32,12 +32,10 @@ public class TreeFeller extends WoodcuttingProgressionSkill implements Listener 
         return "Tree Feller";
     }
 
-    // add cooldown calculation in here!
     @Override
     public String[] getDescription(int level) {
         return new String[]{
                 "Cut down an entire tree by chopping a single log",
-                "Cooldown tbd"
         };
     }
 
@@ -53,22 +51,17 @@ public class TreeFeller extends WoodcuttingProgressionSkill implements Listener 
 
         Player player = event.getPlayer();
         professionProfileManager.getObject(player.getUniqueId().toString()).ifPresent(profile -> {
-            var profession = profile.getProfessionDataMap().get("Woodcutting");
-            if (profession != null) {
-                int skillLevel = profession.getBuild().getSkillLevel(this);
-                if (skillLevel <= 0) return;
+            int skillLevel = getPlayerSkillLevel(profile);
+            if (skillLevel <= 0) return;
 
-                event.setCancelled(true);
-                fellTree(event.getChoppedLogBlock(), event, true);
-            }
+            event.setCancelled(true);
+            fellTree(event.getChoppedLogBlock(), event, true);
         });
     }
 
     public void fellTree(Block block, PlayerChopLogEvent event, boolean initialBlock) {
         if (!initialBlock && woodcuttingHandler.didPlayerPlaceBlock(block)) return;
 
-        // attempt to chop log comes before breakNaturally b/c after you break the block, it becomes air
-        // which you don't get xp from
         block.breakNaturally();
         event.setAmountChopped(event.getAmountChopped() + 1);
 

@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.progression.profession.skill.woodcutting;
 
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkill;
+import me.mykindos.betterpvp.progression.profile.ProfessionProfile;
 
 /**
  * Base class for a Woodcutting Progression Skill
@@ -19,5 +20,12 @@ public abstract class WoodcuttingProgressionSkill extends ProgressionSkill {
     @Override
     public String getProgressionTree() {
         return "Woodcutting";
+    }
+
+    protected int getPlayerSkillLevel(ProfessionProfile profile) {
+        var profession = profile.getProfessionDataMap().get("Woodcutting");
+        if (profession == null) return 0;
+
+        return profession.getBuild().getSkillLevel(this);
     }
 }
