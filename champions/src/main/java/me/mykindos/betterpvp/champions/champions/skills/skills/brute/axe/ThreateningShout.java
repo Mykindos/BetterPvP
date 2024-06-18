@@ -44,6 +44,7 @@ public class ThreateningShout extends Skill implements Listener, InteractSkill, 
     private final Map<Player, List<Location>> playerPointsMap;
     private final Map<Player, Integer> playerPointIndexMap;
     private final Map<Player, Set<LivingEntity>> playerAffectedEntitiesMap;
+    private final Map<Player, Set<LivingEntity>> playerDamagedEntitiesMap;
     private int tickDelay;
     private double damage;
     private double damageIncreasePerLevel;
@@ -55,6 +56,7 @@ public class ThreateningShout extends Skill implements Listener, InteractSkill, 
         playerPointsMap = new HashMap<>();
         playerPointIndexMap = new HashMap<>();
         playerAffectedEntitiesMap = new HashMap<>();
+        playerDamagedEntitiesMap = new HashMap<>();
     }
 
     @Override
@@ -113,7 +115,7 @@ public class ThreateningShout extends Skill implements Listener, InteractSkill, 
             Location point = start.clone().add(start.getDirection().normalize().multiply(i * 1.0));
             Block targetBlock = point.getBlock();
             if (!UtilBlock.airFoliage(targetBlock)) {
-                break;  // Stop adding points if the block is not air or foliage
+                break;
             }
             points.add(point);
         }
@@ -121,6 +123,7 @@ public class ThreateningShout extends Skill implements Listener, InteractSkill, 
         playerPointsMap.put(player, points);
         playerPointIndexMap.put(player, 0);
         playerAffectedEntitiesMap.put(player, new HashSet<>());
+        playerDamagedEntitiesMap.put(player, new HashSet<>());
     }
 
     @UpdateEvent
@@ -134,11 +137,13 @@ public class ThreateningShout extends Skill implements Listener, InteractSkill, 
             List<Location> points = entry.getValue();
             int currentPointIndex = playerPointIndexMap.get(player);
             Set<LivingEntity> affectedEntities = playerAffectedEntitiesMap.get(player);
+            Set<LivingEntity> damagedEntities = playerDamagedEntitiesMap.get(player);
 
             if (points.isEmpty() || currentPointIndex >= points.size()) {
                 iterator.remove();
                 playerPointIndexMap.remove(player);
                 playerAffectedEntitiesMap.remove(player);
+                playerDamagedEntitiesMap.remove(player);
                 continue;
             }
 
@@ -150,9 +155,8 @@ public class ThreateningShout extends Skill implements Listener, InteractSkill, 
                 for (LivingEntity target : UtilEntity.getNearbyEnemies(player, point, radius)) {
                     if (!affectedEntities.contains(target)) {
                         championsManager.getEffects().addEffect(target, EffectTypes.VULNERABILITY, vulnerabilityStrength, (long) (getDuration(level) * 1000L));
-                        UtilMessage.message(target, getName(), "<yellow>%s</yellow> gave you <white>Vulnerability " + UtilFormat.getRomanNumeral(vulnerabilityStrength) + "</white> for <green>%s</green> seconds.", player.getName(), getDuration(level));
-                        UtilMessage.message(target, getName(), "You gave <yellow>%s</yellow> <white>Vulnerability " + UtilFormat.getRomanNumeral(vulnerabilityStrength) + "</white> for <green>%s</green> seconds.", player.getName(), getDuration(level));
-
+                        UtilMessage.message(target, getName(), "<yellow>%s</yellow> gave you <white>Vulnerability</white> for <green>%s</green> seconds.", player.getName(), getDuration(level));
+                        UtilMessage.message(player, getName(), "You gave <yellow>%s</yellow> <white>Vulnerability " + UtilFormat.getRomanNumeral(vulnerabilityStrength) + "</white> for <green>%s</green> seconds.", target.getName(), getDuration(level));
                         affectedEntities.add(target);
                     }
                 }
@@ -161,9 +165,10 @@ public class ThreateningShout extends Skill implements Listener, InteractSkill, 
                     @Override
                     public void run() {
                         for (LivingEntity damageTarget : UtilEntity.getNearbyEnemies(player, point, radius)) {
-                            if (affectedEntities.contains(damageTarget)) {
+                            if (affectedEntities.contains(damageTarget) && !damagedEntities.contains(damageTarget)) {
                                 UtilDamage.doCustomDamage(new CustomDamageEvent(damageTarget, player, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, "Threatening Shout"));
-                                UtilMessage.message(damageTarget, getName(), "You hit <yellow>%s</yellow> with <green>Threatening Shout</green>", player.getName());
+                                UtilMessage.message(player, getName(), "You hit <yellow>%s</yellow> with <green>Threatening Shout</green>", damageTarget.getName());
+                                damagedEntities.add(damageTarget);
                             }
                         }
                     }
