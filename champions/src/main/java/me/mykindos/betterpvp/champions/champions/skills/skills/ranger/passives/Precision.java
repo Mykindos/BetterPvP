@@ -6,6 +6,8 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -18,7 +20,7 @@ import org.bukkit.event.EventPriority;
 
 @Singleton
 @BPvPListener
-public class Precision extends Skill implements PassiveSkill {
+public class Precision extends Skill implements PassiveSkill, DamageSkill, OffensiveSkill {
 
     private double baseDamage;
 
@@ -38,7 +40,7 @@ public class Precision extends Skill implements PassiveSkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Your arrows deal <val>" + getDamage(level) + "</val> bonus damage on hit"
+                "Your arrows deal " + getValueString(this::getDamage, level) + " bonus damage on hit"
         };
     }
 

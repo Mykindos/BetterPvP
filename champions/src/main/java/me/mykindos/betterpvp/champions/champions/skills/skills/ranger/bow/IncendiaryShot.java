@@ -6,6 +6,8 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.types.FireSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -22,7 +24,7 @@ import org.bukkit.event.entity.EntityShootBowEvent;
 
 @Singleton
 @BPvPListener
-public class IncendiaryShot extends PrepareArrowSkill {
+public class IncendiaryShot extends PrepareArrowSkill implements FireSkill, OffensiveSkill {
 
     private double baseBurnDuration;
 
@@ -45,9 +47,9 @@ public class IncendiaryShot extends PrepareArrowSkill {
                 "Left click with a Bow to prepare",
                 "",
                 "Shoot an ignited arrow that <effect>Burns</effect>",
-                "anyone hit for <val>" + getBurnDuration(level) + "</val> seconds",
+                "anyone hit for " + getValueString(this::getBurnDuration, level) + " seconds",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level)
         };
     }
 
