@@ -178,7 +178,7 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
     @Override
     public void loadWeaponConfig() {
         bonusDamage = getConfig("bonusDamage", 4.0, Double.class);
-        velocityStrength = getConfig("velocityStrength", 0.7, Double.class);
+        velocityStrength = getConfig("velocityStrength", 0.6, Double.class);
         skimmingEnergyMultiplier = getConfig("skimmingEnergyMultiplier", 3.0, Double.class);
     }
 }
