@@ -12,10 +12,8 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 import java.util.WeakHashMap;
 
@@ -53,10 +51,6 @@ public class TreeFeller extends WoodcuttingProgressionSkill implements Listener 
     }
 
 
-    /**
-     * This method handles the actual Tree Feller algorithm which triggers on
-     * a playerChopLogEvent
-     */
     @EventHandler
     public void onPlayerChopsLog(PlayerChopLogEvent event) {
 
@@ -96,7 +90,7 @@ public class TreeFeller extends WoodcuttingProgressionSkill implements Listener 
                 && nextBlock.getType().equals(initialChoppedLogType)
                 && !processedBlocks.contains(nextBlock)) {
 
-            nextBlock.breakNaturally();
+            nextBlock.breakNaturally(true);
             processedBlocks.add(nextBlock);
 
             int x = nextBlock.getX();
