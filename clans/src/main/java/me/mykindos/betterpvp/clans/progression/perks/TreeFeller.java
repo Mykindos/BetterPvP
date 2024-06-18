@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.clans.progression.perks;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -50,18 +51,21 @@ public class TreeFeller implements Listener {
 
         Player player = event.getPlayer();
         professionProfileManager.getObject(player.getUniqueId().toString()).ifPresent(profile -> {
+
             var profession = profile.getProfessionDataMap().get("Woodcutting");
             if (profession == null) return;
 
             int skillLevel = profession.getBuild().getSkillLevel(skill);
             if (skillLevel <= 0) return;
 
+            Clan playerClan = clanManager.getClanByPlayer(player).orElse(null);
+
             event.setCancelled(true);
-            fellTree(event.getChoppedLogBlock(), event, true);
+            fellTree(playerClan, event.getChoppedLogBlock(), event, true);
         });
     }
 
-    public void fellTree(Block block, PlayerChopLogEvent event, boolean initialBlock) {
+    public void fellTree(Clan playerClan, Block block, PlayerChopLogEvent event, boolean initialBlock) {
         if (!initialBlock && woodcuttingHandler.didPlayerPlaceBlock(block)) return;
 
         block.breakNaturally();
@@ -72,7 +76,12 @@ public class TreeFeller implements Listener {
                 Block targetBlock = block.getRelative(x, 1, z);
 
                 if(targetBlock.getType().name().contains("_LOG")) {
-                    fellTree(targetBlock, event, false);
+                    Optional<Clan> targetBlockLocationClanOptional = clanManager.getClanByLocation(targetBlock.getLocation());
+                    if (targetBlockLocationClanOptional.isPresent()) {
+                        if (!targetBlockLocationClanOptional.get().equals(playerClan)) continue;
+                    }
+
+                    fellTree(playerClan, targetBlock, event, false);
                 }
             }
         }
