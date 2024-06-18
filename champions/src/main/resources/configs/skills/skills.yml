@@ -272,9 +272,8 @@ skills:
       blocksMelee: true
       blocksArrow: false
       energyDecreasePerLevel: 1.0
-      internalCooldown: 1.25
-      cooldown: 1.0
-      cooldownDecreasePerLevel: 1.0
+      cooldown: 1.25
+      cooldownDecreasePerLevel: 0.0
     powerchop:
       enabled: true
       maxlevel: 5

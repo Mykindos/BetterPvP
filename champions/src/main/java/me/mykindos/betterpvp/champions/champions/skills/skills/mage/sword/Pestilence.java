@@ -7,6 +7,8 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -36,7 +38,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
 @BPvPListener
-public class Pestilence extends PrepareSkill implements CooldownSkill {
+public class Pestilence extends PrepareSkill implements CooldownSkill, OffensiveSkill, DebuffSkill {
 
     private final ConcurrentHashMap<UUID, PestilenceData> pestilenceData = new ConcurrentHashMap<>();
 
@@ -63,14 +65,27 @@ public class Pestilence extends PrepareSkill implements CooldownSkill {
                 "",
                 "Your next sword strike will inflict <effect>Pestilence</effect> on the target,",
                 "<effect>Poisoning</effect> them, and spreading to nearby enemies",
+                "up to " + getValueString(this::getCooldown, level) + "blocks away",
                 "",
                 "While enemies are infected, they",
-                "deal <stat>" + (enemyDamageReduction * 100) + "%</stat> reduced damage",
+                "deal " + getValueString(this::getEnemyDamageReduction, level, 100, "%", 0) + "</stat> reduced damage",
                 "",
-                "<effect>Pestilence</effect> lasts <stat>" + infectionDuration + "</stat> seconds",
+                "<effect>Pestilence</effect> lasts " + getValueString(this::getInfectionDuration, level) + " seconds",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level)
         };
+    }
+
+    public double getEnemyDamageReduction(int level) {
+        return enemyDamageReduction;
+    }
+
+    public double getInfectionDuration(int level) {
+        return infectionDuration;
+    }
+
+    public double getRadius(int level) {
+        return radius;
     }
 
     @Override

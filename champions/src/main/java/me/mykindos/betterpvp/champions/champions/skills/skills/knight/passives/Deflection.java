@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -25,7 +26,7 @@ import java.util.UUID;
 
 @Singleton
 @BPvPListener
-public class Deflection extends Skill implements PassiveSkill {
+public class Deflection extends Skill implements PassiveSkill, DefensiveSkill {
 
 
     private double timeBetweenCharges;
@@ -49,8 +50,8 @@ public class Deflection extends Skill implements PassiveSkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "You gain <stat>1</stat> charge every <stat>" + timeBetweenCharges + "</stat> seconds.",
-                "You can store a maximum of <val>" + (level) + "</val> charges",
+                "You gain <stat>1</stat> charge every " + getValueString(this::getTimeBetweenCharges, level) + " seconds.",
+                "You can store a maximum of " + getValueString(this::getMaxCharges, level, 0) + " charges",
                 "",
                 "When attacked, the damage you take is",
                 "reduced by the number of deflection charges",
@@ -59,6 +60,10 @@ public class Deflection extends Skill implements PassiveSkill {
 
     public int getMaxCharges(int level) {
         return baseCharges + (level - 1);
+    }
+
+    public double getTimeBetweenCharges(int level) {
+        return timeBetweenCharges;
     }
 
     @Override

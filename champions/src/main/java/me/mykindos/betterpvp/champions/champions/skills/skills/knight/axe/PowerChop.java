@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -26,7 +27,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class PowerChop extends PrepareSkill implements CooldownSkill, DamageSkill {
+public class PowerChop extends PrepareSkill implements CooldownSkill, DamageSkill, OffensiveSkill {
 
     private double timeToHit;
 

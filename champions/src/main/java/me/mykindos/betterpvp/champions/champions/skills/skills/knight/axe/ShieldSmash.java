@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.CrowdControlSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.combat.click.events.RightClickEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -39,7 +40,7 @@ import java.util.List;
 
 @Singleton
 @BPvPListener
-public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, Listener {
+public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, Listener, CrowdControlSkill {
 
     private double baseMultiplier;
 
@@ -62,9 +63,9 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
                 "Right click with an Axe to activate",
                 "",
                 "Smash your shield into an enemy,",
-                "dealing <val>" + (int) (getKnockbackMultiplier(level) * 100) + "%</val> knockback",
+                "dealing " + getValueString(this::getKnockbackMultiplier, level, 100, "%", 0) + " knockback",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level),
         };
     }
 

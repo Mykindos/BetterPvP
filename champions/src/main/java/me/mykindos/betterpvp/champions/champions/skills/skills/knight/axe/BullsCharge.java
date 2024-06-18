@@ -4,8 +4,11 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -34,7 +37,7 @@ import java.util.UUID;
 
 @Singleton
 @BPvPListener
-public class BullsCharge extends Skill implements Listener, InteractSkill, CooldownSkill {
+public class BullsCharge extends Skill implements Listener, InteractSkill, CooldownSkill, MovementSkill, DebuffSkill, BuffSkill {
 
     private final HashMap<UUID, Long> running = new HashMap<>();
 
@@ -64,11 +67,15 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
                 "Right click with an Axe to activate",
                 "",
                 "Enter a rage, gaining <effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect> for " + getValueString(this::getSpeedDuration, level) + " seconds",
-                "and giving <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> to anything you hit for " + getValueString(this::getSlowDuration, level, getMaxLevel()) + " seconds",
+                "and giving <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> to anything you hit for " + getValueString(this::getSlowDuration, level) + " seconds",
                 "",
                 "While charging, you take no knockback",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
+                "Cooldown: " + getValueString(this::getCooldown, level),
+                "",
+                EffectTypes.SPEED.getDescription(speedStrength),
+                EffectTypes.SLOWNESS.getDescription(slownessStrength),
+
         };
     }
 

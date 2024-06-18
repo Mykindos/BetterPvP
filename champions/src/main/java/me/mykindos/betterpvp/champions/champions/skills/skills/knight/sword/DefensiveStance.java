@@ -46,8 +46,6 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
 
     private double damageReductionPerLevel;
 
-    private double internalCooldown;
-
     private boolean blocksMelee;
 
     private boolean blocksArrow;
@@ -75,7 +73,9 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
                 "Players who attack you receive " + getValueString(this::getDamage, level) + " damage,",
                 "and get knocked back",
                 "",
-                "Energy / Second: " + getValueString(this::getEnergy, level)};
+                "Energy / Second: " + getValueString(this::getEnergy, level),
+                "Cooldown: " + getValueString(this::getCooldown, level, 2),
+        };
     }
 
     public double getDamage(int level) {
@@ -184,7 +184,7 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
 
     @Override
     public double getCooldown(int level) {
-        return internalCooldown;
+        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
     @Override
@@ -193,7 +193,6 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
         baseDamageReduction = getConfig("baseDamageReduction", 1.0, Double.class);
         damageReductionPerLevel = getConfig("damageReductionPerLevel", 0.0, Double.class);
-        internalCooldown = getConfig("internalCooldown", 1.25, Double.class);
         blocksMelee = getConfig("blocksMelee", true, Boolean.class);
         blocksArrow = getConfig("blocksArrow", false, Boolean.class);
     }
