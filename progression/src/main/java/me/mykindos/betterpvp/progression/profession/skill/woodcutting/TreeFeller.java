@@ -61,24 +61,25 @@ public class TreeFeller extends WoodcuttingProgressionSkill implements Listener 
                 if (skillLevel <= 0) return;
 
                 event.setCancelled(true);
-                fellTree(player, event.getChoppedLogBlock());
+                fellTree(player, event.getChoppedLogBlock(), true);
             }
         });
     }
 
-    public void fellTree(Player player, Block block) {
+    public void fellTree(Player player, Block block, boolean initialBlock) {
+        if (!initialBlock && woodcuttingHandler.didPlayerPlaceBlock(block)) return;
 
         // attempt to chop log comes before breakNaturally b/c after you break the block, it becomes air
         // which you don't get xp from
         woodcuttingHandler.attemptToChopLog(player, block, DoubleUnaryOperator.identity());
         block.breakNaturally();
 
-        for(int x = -1; x <= 1; x++) {
-            for(int z = -1; z <= 1; z++) {
+        for (int x = -1; x <= 1; x++) {
+            for (int z = -1; z <= 1; z++) {
                 Block targetBlock = block.getRelative(x, 1, z);
 
                 if(targetBlock.getType().name().contains("_LOG")) {
-                    fellTree(player, targetBlock);
+                    fellTree(player, targetBlock, false);
                 }
             }
         }

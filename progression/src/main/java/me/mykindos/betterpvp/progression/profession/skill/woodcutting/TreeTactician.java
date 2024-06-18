@@ -30,7 +30,6 @@ public class TreeTactician extends WoodcuttingProgressionSkill implements Listen
     }
 
 
-    // percentages not right here
     @Override
     public String[] getDescription(int level) {
         double numberInPercentage = getExperienceBonusForDescription(level) * 100;

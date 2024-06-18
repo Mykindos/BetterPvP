@@ -52,6 +52,10 @@ public class WoodcuttingHandler extends ProfessionHandler {
         return experiencePerWood.getOrDefault(material, 0L);
     }
 
+    public boolean didPlayerPlaceBlock(Block block) {
+        return UtilBlock.getPersistentDataContainer(block).has(CoreNamespaceKeys.PLAYER_PLACED_KEY);
+    }
+
     /**
      * This handles all the experience gaining and logging that happens when a
      * player chops a log (`block`)
@@ -72,10 +76,7 @@ public class WoodcuttingHandler extends ProfessionHandler {
         // if this is identity, it will just return 'experience'
         final double finalExperience = experienceModifier.applyAsDouble(experience);
 
-        // no xp if a player placed this block
-        final PersistentDataContainer persistentDataContainer = UtilBlock.getPersistentDataContainer(block);
-        boolean playerPlaced = persistentDataContainer.has(CoreNamespaceKeys.PLAYER_PLACED_KEY);
-        if (playerPlaced) {
+        if (didPlayerPlaceBlock(block)) {
             professionData.grantExperience(0, player);
             return;
         }
