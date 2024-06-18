@@ -100,7 +100,6 @@ public class ActionBar {
                 advComponent = display.getProvider().apply(gamer);
             }
 
-            assert (advComponent != null);
             // At this point, the `component` will not be null because we know that there is at least one element in the queue
             if (display instanceof TimedComponent timed) {
                 timed.startTime();
