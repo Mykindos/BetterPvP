@@ -4,31 +4,29 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.progression.Progression;
+import me.mykindos.betterpvp.progression.profession.woodcutting.WoodcuttingHandler;
 import me.mykindos.betterpvp.progression.profession.woodcutting.event.PlayerChopLogEvent;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
-import java.util.HashSet;
-import java.util.UUID;
-import java.util.WeakHashMap;
+import java.util.function.DoubleUnaryOperator;
 
 @Singleton
 @BPvPListener
 public class TreeFeller extends WoodcuttingProgressionSkill implements Listener {
 
-    WeakHashMap<UUID, HashSet<Block>> playerProcessedBlocksMap = new WeakHashMap<>();
     private final ProfessionProfileManager professionProfileManager;
-    final int MAX_POSSIBLE_CHOPPED_LOGS = 15;
+    private final WoodcuttingHandler woodcuttingHandler;
 
     @Inject
-    public TreeFeller(Progression progression, ProfessionProfileManager professionProfileManager) {
+    public TreeFeller(Progression progression, ProfessionProfileManager professionProfileManager, WoodcuttingHandler woodcuttingHandler) {
         super(progression);
         this.professionProfileManager = professionProfileManager;
+        this.woodcuttingHandler = woodcuttingHandler;
     }
 
     @Override
@@ -53,6 +51,7 @@ public class TreeFeller extends WoodcuttingProgressionSkill implements Listener 
 
     @EventHandler
     public void onPlayerChopsLog(PlayerChopLogEvent event) {
+        if (event.isCancelled()) return;
 
         Player player = event.getPlayer();
         professionProfileManager.getObject(player.getUniqueId().toString()).ifPresent(profile -> {
@@ -61,60 +60,27 @@ public class TreeFeller extends WoodcuttingProgressionSkill implements Listener 
                 int skillLevel = profession.getBuild().getSkillLevel(this);
                 if (skillLevel <= 0) return;
 
-                HashSet<Block> processedBlocks = new HashSet<>();
-
-                // I don't think you'll have to clear the HashMap since this will just override the player's
-                // processedBlocks everytime that they use this perk
-                playerProcessedBlocksMap.put(player.getUniqueId(), processedBlocks);
-                processBlock(player, event.getLogType(), event.getChoppedLogBlock());
+                event.setCancelled(true);
+                fellTree(player, event.getChoppedLogBlock());
             }
         });
     }
 
-    /**
-     * Recursive function that handles the tree feller algorithm
-     */
-    public void processBlock(Player player, Material initialChoppedLogType, Block currentBlock) {
-        HashSet<Block> processedBlocks = playerProcessedBlocksMap.get(player.getUniqueId());
+    public void fellTree(Player player, Block block) {
 
-        if (processedBlocks.size() >= MAX_POSSIBLE_CHOPPED_LOGS || !currentBlock.getType().equals(initialChoppedLogType)) {
-            return;
-        }
+        // attempt to chop log comes before breakNaturally b/c after you break the block, it becomes air
+        // which you don't get xp from
+        woodcuttingHandler.attemptToChopLog(player, block, DoubleUnaryOperator.identity());
+        block.breakNaturally();
 
-        if (processedBlocks.contains(currentBlock)) return;
+        for(int x = -1; x <= 1; x++) {
+            for(int z = -1; z <= 1; z++) {
+                Block targetBlock = block.getRelative(x, 1, z);
 
-        World world = player.getWorld();
-
-        Block nextBlock = currentBlock;
-        while (processedBlocks.size() < MAX_POSSIBLE_CHOPPED_LOGS
-                && nextBlock.getType().equals(initialChoppedLogType)
-                && !processedBlocks.contains(nextBlock)) {
-
-            nextBlock.breakNaturally(true);
-            processedBlocks.add(nextBlock);
-
-            int x = nextBlock.getX();
-            int y = nextBlock.getY();
-            int z = nextBlock.getZ();
-
-            Block[] adjacentBlocks = {
-                    world.getBlockAt(x + 1, y, z),
-                    world.getBlockAt(x, y, z + 1),
-                    world.getBlockAt(x + 1, y, z + 1),
-                    world.getBlockAt(x - 1, y, z),
-                    world.getBlockAt(x, y, z - 1),
-                    world.getBlockAt(x - 1, y, z - 1),
-                    world.getBlockAt(x + 1, y, z - 1),
-                    world.getBlockAt(x - 1, y, z + 1),
-            };
-
-            for (Block adjacentBlock : adjacentBlocks) {
-                if (adjacentBlock.getType().equals(initialChoppedLogType)) {
-                    processBlock(player, initialChoppedLogType, adjacentBlock);
+                if(targetBlock.getType().name().contains("_LOG")) {
+                    fellTree(player, targetBlock);
                 }
             }
-
-            nextBlock = world.getBlockAt(nextBlock.getX(), nextBlock.getY() + 1, nextBlock.getZ());
         }
     }
 }

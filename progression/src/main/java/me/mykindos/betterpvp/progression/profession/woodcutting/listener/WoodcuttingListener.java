@@ -49,6 +49,8 @@ public class WoodcuttingListener implements Listener {
         PlayerChopLogEvent chopLogEvent = UtilServer.callEvent(new PlayerChopLogEvent(event.getPlayer(), blockType,
                 choppedLogBlock));
 
+        if (chopLogEvent.isCancelled()) return;
+
         DoubleUnaryOperator experienceModifier = (xp) -> xp * chopLogEvent.getExperienceBonusModifier();
         woodcuttingHandler.attemptToChopLog(event.getPlayer(), event.getBlock(), experienceModifier);
     }
