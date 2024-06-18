@@ -13,8 +13,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
-import java.util.function.DoubleUnaryOperator;
-
 @Singleton
 @BPvPListener
 public class TreeFeller extends WoodcuttingProgressionSkill implements Listener {
@@ -61,25 +59,25 @@ public class TreeFeller extends WoodcuttingProgressionSkill implements Listener 
                 if (skillLevel <= 0) return;
 
                 event.setCancelled(true);
-                fellTree(player, event.getChoppedLogBlock(), true);
+                fellTree(event.getChoppedLogBlock(), event, true);
             }
         });
     }
 
-    public void fellTree(Player player, Block block, boolean initialBlock) {
+    public void fellTree(Block block, PlayerChopLogEvent event, boolean initialBlock) {
         if (!initialBlock && woodcuttingHandler.didPlayerPlaceBlock(block)) return;
 
         // attempt to chop log comes before breakNaturally b/c after you break the block, it becomes air
         // which you don't get xp from
-        woodcuttingHandler.attemptToChopLog(player, block, DoubleUnaryOperator.identity());
         block.breakNaturally();
+        event.setAmountChopped(event.getAmountChopped() + 1);
 
         for (int x = -1; x <= 1; x++) {
             for (int z = -1; z <= 1; z++) {
                 Block targetBlock = block.getRelative(x, 1, z);
 
                 if(targetBlock.getType().name().contains("_LOG")) {
-                    fellTree(player, targetBlock, false);
+                    fellTree(targetBlock, event, false);
                 }
             }
         }

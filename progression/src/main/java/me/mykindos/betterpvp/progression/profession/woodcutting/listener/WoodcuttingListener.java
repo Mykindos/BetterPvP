@@ -7,7 +7,6 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.progression.profession.woodcutting.WoodcuttingHandler;
 import me.mykindos.betterpvp.progression.profession.woodcutting.event.PlayerChopLogEvent;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
@@ -49,9 +48,11 @@ public class WoodcuttingListener implements Listener {
         PlayerChopLogEvent chopLogEvent = UtilServer.callEvent(new PlayerChopLogEvent(event.getPlayer(), blockType,
                 choppedLogBlock));
 
-        if (chopLogEvent.isCancelled()) return;
+        // if the player doesn't have tree feller, then add the log that was chopped manually here
+        int amountChopped = chopLogEvent.getAmountChopped() > 0 ? chopLogEvent.getAmountChopped() : 1;
 
         DoubleUnaryOperator experienceModifier = (xp) -> xp * chopLogEvent.getExperienceBonusModifier();
-        woodcuttingHandler.attemptToChopLog(event.getPlayer(), event.getBlock(), experienceModifier);
+        woodcuttingHandler.attemptToChopLog(event.getPlayer(), chopLogEvent.getLogType(), event.getBlock(), experienceModifier,
+                amountChopped);
     }
 }

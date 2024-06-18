@@ -17,12 +17,10 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
-import org.bukkit.persistence.PersistentDataContainer;
 
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.function.DoubleUnaryOperator;
-import java.util.function.LongUnaryOperator;
 
 
 /**
@@ -62,19 +60,18 @@ public class WoodcuttingHandler extends ProfessionHandler {
      * @param experienceModifier represents a higher order function that modifies
      *                           the experience gained by the player here.
      */
-    public void attemptToChopLog(Player player, Block block, DoubleUnaryOperator experienceModifier) {
+    public void attemptToChopLog(Player player, Material originalBlockType, Block block, DoubleUnaryOperator experienceModifier, int amountChopped) {
         ProfessionData professionData = getProfessionData(player.getUniqueId());
         if (professionData == null) {
             return;
         }
 
-        long experience = getExperienceFor(block.getType());
+        long experience = getExperienceFor(originalBlockType);
         if (experience <= 0) {
             return;
         }
 
-        // if this is identity, it will just return 'experience'
-        final double finalExperience = experienceModifier.applyAsDouble(experience);
+        final double finalExperience = experienceModifier.applyAsDouble(experience) * amountChopped;
 
         if (didPlayerPlaceBlock(block)) {
             professionData.grantExperience(0, player);
@@ -89,13 +86,13 @@ public class WoodcuttingHandler extends ProfessionHandler {
                 .addContext("Experience", finalExperience + "").submit();
 
         long logsChopped = (long) professionData.getProperties().getOrDefault("TOTAL_LOGS_CHOPPED", 0L);
-        professionData.getProperties().put("TOTAL_LOGS_CHOPPED", logsChopped + 1L);
+        professionData.getProperties().put("TOTAL_LOGS_CHOPPED", logsChopped + ((long) amountChopped));
 
         leaderboardManager.getObject("Total Logs Chopped").ifPresent(leaderboard -> {
             TotalLogsChoppedLeaderboard totalLogsChoppedLeaderboard = (TotalLogsChoppedLeaderboard) leaderboard;
 
             // the purpose of this line is increment the value on the leaderboard
-            totalLogsChoppedLeaderboard.add(player.getUniqueId(), 1L).whenComplete((result, throwable) -> {
+            totalLogsChoppedLeaderboard.add(player.getUniqueId(), ((long) amountChopped)).whenComplete((result, throwable) -> {
                 if (throwable != null) {
                     log.error("Failed to add chopped logs to leaderboard for player " + player.getName(), throwable).submit();
                 }

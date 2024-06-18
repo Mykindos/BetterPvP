@@ -18,6 +18,9 @@ public class PlayerChopLogEvent extends ProgressionWoodcuttingEvent {
     @Setter
     private double experienceBonusModifier = 1.0;
 
+    @Setter
+    private int amountChopped = 0;
+
     public PlayerChopLogEvent(Player player, Material logType, Block choppedLogBlock) {
         super(player);
         this.logType = logType;
