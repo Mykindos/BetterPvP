@@ -1,13 +1,17 @@
 package me.mykindos.betterpvp.core.utilities.model.display;
 
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.utilities.model.data.PriorityData;
 import me.mykindos.betterpvp.core.utilities.model.data.PriorityDataBlockingQueue;
 import net.kyori.adventure.text.Component;
+import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
+@Slf4j
 public class ActionBar {
 
     static final Component EMPTY = Component.empty();
@@ -59,7 +63,6 @@ public class ActionBar {
         synchronized (lock) {
             component = hasComponentsQueued() ?  nextComponent(gamer) : EMPTY;
         }
-
         if (component == null) {
             component = EMPTY;
         }
@@ -77,15 +80,31 @@ public class ActionBar {
                 return EMPTY;
             }
 
-            DisplayComponent display = components.peek().getRight();
+            Pair<PriorityData, DisplayComponent> peekPair = components.peek();
+            DisplayComponent display = peekPair.getRight();
             Component advComponent = display.getProvider().apply(gamer);
+
+            //peek component is not valid, try and find a valid one
+            if (advComponent == null) {
+                //components iterator/splititerator methods are not guaranteed any order, filter for one
+                Pair<PriorityData, DisplayComponent> pair = components.stream().filter(priorityDataDisplayComponentPair ->
+                        priorityDataDisplayComponentPair.getRight().getProvider().apply(gamer) != null).findFirst().orElse(null);
+
+                if (pair == null) {
+                    //there is not a valid component, return null
+                    return null;
+                }
+
+                //update display/advcomponent
+                display = pair.getRight();
+                advComponent = display.getProvider().apply(gamer);
+            }
 
             // At this point, the `component` will not be null because we know that there is at least one element in the queue
             if (display instanceof TimedComponent timed) {
                 timed.startTime();
             }
 
-            // But we don't know if its `advComponent` will be null
             return advComponent;
         }
     }
