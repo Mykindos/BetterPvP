@@ -7,7 +7,10 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.CrowdControlSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -46,7 +49,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class Grasp extends Skill implements InteractSkill, CooldownSkill, Listener {
+public class Grasp extends Skill implements InteractSkill, CooldownSkill, Listener, OffensiveSkill, CrowdControlSkill, DamageSkill {
 
     private final WeakHashMap<Player, ArrayList<LivingEntity>> cooldownJump = new WeakHashMap<>();
     private final HashMap<ArmorStand, Long> stands = new HashMap<>();
@@ -76,10 +79,10 @@ public class Grasp extends Skill implements InteractSkill, CooldownSkill, Listen
                 "Right click with a Sword to activate",
                 "",
                 "Create a wall of skulls that closes in on",
-                "you from <val>" + getDistance(level) + "</val> blocks away, dragging along",
-                "all enemies and dealing <val>" + getDamage(level) + "</val> damage",
+                "you from " + getValueString(this::getDistance, level) + " blocks away, dragging along",
+                "all enemies and dealing " + getValueString(this::getDamage, level) + " damage",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level)
 
         };
     }
