@@ -67,11 +67,14 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
         final Gamer gamer = clientManager.search().online(player).getGamer();
 
 
+        // We add 1.5f to the duration in seconds, so they can see that it expired, and it doesn't instantly disappear
         TimedComponent actionBarComponent = null;
-
-        if (actionBarCondition != null && actionBarCondition.test(gamer)) {
-            // We add 1.5f to the duration in seconds, so they can see that it expired, and it doesn't instantly disappear
+        if (actionBarCondition != null) {
             actionBarComponent = new TimedComponent(duration + 1.5, false, g -> {
+
+                if (!actionBarCondition.test(gamer)) {
+                    return null; // Skip if we should not send the action bar message;
+                }
 
                 final TextComponent cooldownName = Component.text(ability).decorate(TextDecoration.BOLD).color(NamedTextColor.WHITE);
                 final Optional<ConcurrentHashMap<String, Cooldown>> cooldowns = getObject(player.getUniqueId());
@@ -97,7 +100,6 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
                 return Component.join(JoinConfiguration.separator(Component.space()), cooldownName, bar, cooldownRemaining);
             });
         }
-
 
         var cooldownOptional = getObject(player.getUniqueId().toString()).or(() -> {
             ConcurrentHashMap<String, Cooldown> cooldowns = new ConcurrentHashMap<>();
@@ -133,7 +135,7 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
             if (!event.isCancelled()) {
                 cooldowns.put(ability, cooldown);
 
-                if(actionBarComponent != null) {
+                if (actionBarComponent != null) {
                     gamer.getActionBar().add(actionBarPriority, actionBarComponent);
                 }
                 return true;
@@ -197,7 +199,7 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
             var cooldowns = cooldownOptional.get();
             if (cooldowns.containsKey(ability)) {
                 Cooldown cooldown = cooldowns.remove(ability);
-                if(cooldown.getOnExpire() != null) {
+                if (cooldown.getOnExpire() != null) {
                     cooldown.getOnExpire().accept(cooldown);
                 }
 
@@ -221,7 +223,7 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
 
                             Client client = clientManager.search().online(player);
                             final boolean soundSetting = (boolean) client.getProperty(ClientProperty.COOLDOWN_SOUNDS_ENABLED).orElse(false);
-                            if(soundSetting){
+                            if (soundSetting) {
                                 player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.4f, 3.0f);
                             }
 
@@ -229,7 +231,7 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
                         }
                     }
 
-                    if(cd.getOnExpire() != null) {
+                    if (cd.getOnExpire() != null) {
                         cd.getOnExpire().accept(cd);
                     }
                     return true;
