@@ -6,3 +6,5 @@ skills:
   tree_feller:
     enabled: true
     maxlevel: 20
+    cooldown: 20.0
+    cooldownDecreasePerLevel: 1.0

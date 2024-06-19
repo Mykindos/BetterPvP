@@ -16,6 +16,8 @@ public class TreeFellerSkill extends WoodcuttingProgressionSkill implements Cool
 
     @Getter
     private final CooldownManager cooldownManager;
+    private double cooldown;
+    private double cooldownDecreasePerLevel;
 
     @Inject
     public TreeFellerSkill(Progression progression, CooldownManager cooldownManager) {
@@ -32,6 +34,8 @@ public class TreeFellerSkill extends WoodcuttingProgressionSkill implements Cool
     public String[] getDescription(int level) {
         return new String[]{
                 "Cut down an entire tree by chopping a single log",
+                "",
+                "Cooldown: <green>" + getCooldown(level)
         };
     }
 
@@ -47,7 +51,7 @@ public class TreeFellerSkill extends WoodcuttingProgressionSkill implements Cool
 
     @Override
     public double getCooldown(int level) {
-        return 2*level;
+        return (cooldown - (cooldownDecreasePerLevel * (level - 1)));
     }
 
     @Override
@@ -60,5 +64,12 @@ public class TreeFellerSkill extends WoodcuttingProgressionSkill implements Cool
     public void whenPlayerCantUseSkill(Player player) {
         UtilMessage.simpleMessage(player, getProgressionTree(),
                 "You must wait <alt>" + cooldownManager.getAbilityRecharge(player, getName()).getRemaining() + "</alt> seconds");
+    }
+
+    @Override
+    public void loadConfig() {
+        super.loadConfig();
+        cooldown = getConfig("cooldown", 20.0, Double.class);
+        cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 1.0, Double.class);
     }
 }

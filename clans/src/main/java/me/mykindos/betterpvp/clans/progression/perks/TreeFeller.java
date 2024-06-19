@@ -52,11 +52,6 @@ public class TreeFeller implements Listener {
 
         Player player = event.getPlayer();
 
-        if (treeFellerSkill.getCooldownManager().hasCooldown(player, treeFellerSkill.getName())) {
-            treeFellerSkill.whenPlayerCantUseSkill(player);
-            return;
-        }
-
         ProgressionSkill skill = progressionSkillOptional.get();
 
         professionProfileManager.getObject(player.getUniqueId().toString()).ifPresent(profile -> {
@@ -69,6 +64,10 @@ public class TreeFeller implements Listener {
 
             Clan playerClan = clanManager.getClanByPlayer(player).orElse(null);
 
+            if (treeFellerSkill.getCooldownManager().hasCooldown(player, treeFellerSkill.getName())) {
+                treeFellerSkill.whenPlayerCantUseSkill(player);
+                return;
+            }
 
             event.setCancelled(true);
             fellTree(playerClan, event.getChoppedLogBlock(), event, true);
