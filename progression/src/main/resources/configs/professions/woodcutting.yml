@@ -1,0 +1,8 @@
+skills:
+  tree_tactician:
+    enabled: true
+    maxlevel: 10
+    xpBonusPerLvl: 0.03
+  tree_feller:
+    enabled: true
+    maxlevel: 20
