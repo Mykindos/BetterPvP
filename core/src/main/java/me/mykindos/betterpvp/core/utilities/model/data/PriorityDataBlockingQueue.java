@@ -7,8 +7,8 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class PriorityDataBlockingQueue<T> extends PriorityBlockingQueue<Pair<PriorityData, T>> {
 
-    public PriorityDataBlockingQueue(int intialCapacity) {
-        super(intialCapacity, new PriorityPairComparator());
+    public PriorityDataBlockingQueue(int initialCapacity) {
+        super(initialCapacity, new PriorityPairComparator());
     }
 
     /**
