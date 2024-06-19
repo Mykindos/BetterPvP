@@ -17,11 +17,10 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
-import org.bukkit.persistence.PersistentDataContainer;
 
 import java.util.EnumMap;
 import java.util.Map;
-import java.util.function.LongUnaryOperator;
+import java.util.function.DoubleUnaryOperator;
 
 
 /**
@@ -51,39 +50,30 @@ public class WoodcuttingHandler extends ProfessionHandler {
         return experiencePerWood.getOrDefault(material, 0L);
     }
 
-    /**
-     * Whenever a player mines a block but there is no experience modifier (or whatever
-     * is calling this method doesn't know in what manor it needs to modify the xp),
-     * it will get passed here
-     */
-    public void attemptToChopLog(Player player, Block block) {
-        attemptToChopLog(player, block, LongUnaryOperator.identity());
+    public boolean didPlayerPlaceBlock(Block block) {
+        return UtilBlock.getPersistentDataContainer(block).has(CoreNamespaceKeys.PLAYER_PLACED_KEY);
     }
 
     /**
-     * Just like the other declaration but this one will take in LongUnaryOperator
-     * (which is just a higher order function that returns a long primitive type).
+     * This handles all the experience gaining and logging that happens when a
+     * player chops a log (`block`)
      * @param experienceModifier represents a higher order function that modifies
      *                           the experience gained by the player here.
      */
-    public void attemptToChopLog(Player player, Block block, LongUnaryOperator experienceModifier) {
+    public void attemptToChopLog(Player player, Material originalBlockType, Block block, DoubleUnaryOperator experienceModifier, int amountChopped) {
         ProfessionData professionData = getProfessionData(player.getUniqueId());
         if (professionData == null) {
             return;
         }
 
-        long experience = getExperienceFor(block.getType());
+        long experience = getExperienceFor(originalBlockType);
         if (experience <= 0) {
             return;
         }
 
-        // if this is identity, it will just return 'experience'
-        final long finalExperience = experienceModifier.applyAsLong(experience);
+        final double finalExperience = experienceModifier.applyAsDouble(experience) * amountChopped;
 
-        // no xp if a player placed
-        final PersistentDataContainer persistentDataContainer = UtilBlock.getPersistentDataContainer(block);
-        boolean playerPlaced = persistentDataContainer.has(CoreNamespaceKeys.PLAYER_PLACED_KEY);
-        if (playerPlaced) {
+        if (didPlayerPlaceBlock(block)) {
             professionData.grantExperience(0, player);
             return;
         }
@@ -96,13 +86,13 @@ public class WoodcuttingHandler extends ProfessionHandler {
                 .addContext("Experience", finalExperience + "").submit();
 
         long logsChopped = (long) professionData.getProperties().getOrDefault("TOTAL_LOGS_CHOPPED", 0L);
-        professionData.getProperties().put("TOTAL_LOGS_CHOPPED", logsChopped + 1L);
+        professionData.getProperties().put("TOTAL_LOGS_CHOPPED", logsChopped + ((long) amountChopped));
 
         leaderboardManager.getObject("Total Logs Chopped").ifPresent(leaderboard -> {
             TotalLogsChoppedLeaderboard totalLogsChoppedLeaderboard = (TotalLogsChoppedLeaderboard) leaderboard;
 
             // the purpose of this line is increment the value on the leaderboard
-            totalLogsChoppedLeaderboard.add(player.getUniqueId(), 1L).whenComplete((result, throwable) -> {
+            totalLogsChoppedLeaderboard.add(player.getUniqueId(), ((long) amountChopped)).whenComplete((result, throwable) -> {
                 if (throwable != null) {
                     log.error("Failed to add chopped logs to leaderboard for player " + player.getName(), throwable).submit();
                 }
