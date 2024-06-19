@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.skill.CooldownProgressionSkill;
+import me.mykindos.betterpvp.progression.profession.skill.PerkActivator;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
@@ -56,9 +57,15 @@ public class TreeFellerSkill extends WoodcuttingProgressionSkill implements Cool
 
     @Override
     public void whenPlayerUsesSkill(Player player, int level) {
-        if (cooldownManager.use(player, getName(), getCooldown(level), true)) {
+        if (cooldownManager.use(player, getName(), getCooldown(level), true, true,
+                false, this::shouldDisplayActionBar, getPriority())) {
             UtilMessage.simpleMessage(player, getProgressionTree(), "You used <alt>" + getName() + "</alt> " + level);
         }
+    }
+
+    @Override
+    public PerkActivator getActivator() {
+        return PerkActivator.AXE;
     }
 
     public void whenPlayerCantUseSkill(Player player) {
