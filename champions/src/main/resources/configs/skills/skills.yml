@@ -662,7 +662,8 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 12.0
-      radius: 3.0
+      damageRadius: 3.0
+      vulnerabilityRadius: 2.0
       cooldownDecreasePerLevel: 1.0
       baseDuration: 3.0
       durationIncreasePerLevel: 0.5
@@ -671,6 +672,7 @@ skills:
       damage: 5.0
       damageIncreasePerLevel: 1.0
       startDistance: 1.0
+      distance: 15
     bloodlust:
       enabled: true
       maxlevel: 3

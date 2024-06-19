@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.skills.brute.data.ThreateningShoutData;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -14,11 +15,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilBlock;
-import me.mykindos.betterpvp.core.utilities.UtilDamage;
-import me.mykindos.betterpvp.core.utilities.UtilEntity;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -37,14 +34,13 @@ import java.util.*;
 @BPvPListener
 public class ThreateningShout extends Skill implements Listener, InteractSkill, CooldownSkill {
 
-    private double radius;
+    private double damageRadius;
+    private double vulnerabilityRadius;
     private double baseDuration;
     private double durationIncreasePerLevel;
     private int vulnerabilityStrength;
-    private final Map<Player, List<Location>> playerPointsMap;
-    private final Map<Player, Integer> playerPointIndexMap;
-    private final Map<Player, Set<LivingEntity>> playerAffectedEntitiesMap;
-    private final Map<Player, Set<LivingEntity>> playerDamagedEntitiesMap;
+    private int distance;
+    private final Map<Player, ThreateningShoutData> playerDataMap;
     private int tickDelay;
     private double damage;
     private double damageIncreasePerLevel;
@@ -53,10 +49,7 @@ public class ThreateningShout extends Skill implements Listener, InteractSkill, 
     @Inject
     public ThreateningShout(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
-        playerPointsMap = new HashMap<>();
-        playerPointIndexMap = new HashMap<>();
-        playerAffectedEntitiesMap = new HashMap<>();
-        playerDamagedEntitiesMap = new HashMap<>();
+        playerDataMap = new WeakHashMap<>();
     }
 
     @Override
@@ -111,7 +104,7 @@ public class ThreateningShout extends Skill implements Listener, InteractSkill, 
         Location start = player.getEyeLocation().add(player.getEyeLocation().getDirection().normalize().multiply(startDistance));
         List<Location> points = new ArrayList<>();
 
-        for (int i = 0; i < 15; i++) {
+        for (int i = 0; i < distance; i++) {
             Location point = start.clone().add(start.getDirection().normalize().multiply(i * 1.0));
             Block targetBlock = point.getBlock();
             if (!UtilBlock.airFoliage(targetBlock)) {
@@ -120,30 +113,27 @@ public class ThreateningShout extends Skill implements Listener, InteractSkill, 
             points.add(point);
         }
 
-        playerPointsMap.put(player, points);
-        playerPointIndexMap.put(player, 0);
-        playerAffectedEntitiesMap.put(player, new HashSet<>());
-        playerDamagedEntitiesMap.put(player, new HashSet<>());
+        ThreateningShoutData data = new ThreateningShoutData(points, 0, new HashSet<>(), new HashSet<>());
+        playerDataMap.put(player, data);
     }
 
     @UpdateEvent
     public void onUpdate() {
-        Iterator<Map.Entry<Player, List<Location>>> iterator = playerPointsMap.entrySet().iterator();
+        Iterator<Map.Entry<Player, ThreateningShoutData>> iterator = playerDataMap.entrySet().iterator();
 
         while (iterator.hasNext()) {
-            Map.Entry<Player, List<Location>> entry = iterator.next();
+            Map.Entry<Player, ThreateningShoutData> entry = iterator.next();
             Player player = entry.getKey();
             int level = getLevel(player);
-            List<Location> points = entry.getValue();
-            int currentPointIndex = playerPointIndexMap.get(player);
-            Set<LivingEntity> affectedEntities = playerAffectedEntitiesMap.get(player);
-            Set<LivingEntity> damagedEntities = playerDamagedEntitiesMap.get(player);
+            ThreateningShoutData data = entry.getValue();
+
+            List<Location> points = data.getPoints();
+            int currentPointIndex = data.getPointIndex();
+            Set<LivingEntity> affectedEntities = data.getAffectedEntities();
+            Set<LivingEntity> damagedEntities = data.getDamagedEntities();
 
             if (points.isEmpty() || currentPointIndex >= points.size()) {
                 iterator.remove();
-                playerPointIndexMap.remove(player);
-                playerAffectedEntitiesMap.remove(player);
-                playerDamagedEntitiesMap.remove(player);
                 continue;
             }
 
@@ -152,7 +142,7 @@ public class ThreateningShout extends Skill implements Listener, InteractSkill, 
 
                 point.getWorld().spawnParticle(Particle.SONIC_BOOM, point, 0, 0, 0, 0, 0);
 
-                for (LivingEntity target : UtilEntity.getNearbyEnemies(player, point, radius)) {
+                for (LivingEntity target : UtilEntity.getNearbyEnemies(player, point, vulnerabilityRadius)) {
                     if (!affectedEntities.contains(target)) {
                         championsManager.getEffects().addEffect(target, EffectTypes.VULNERABILITY, vulnerabilityStrength, (long) (getDuration(level) * 1000L));
                         UtilMessage.message(target, getName(), "<yellow>%s</yellow> gave you <white>Vulnerability</white> for <green>%s</green> seconds.", player.getName(), getDuration(level));
@@ -164,8 +154,8 @@ public class ThreateningShout extends Skill implements Listener, InteractSkill, 
                 new BukkitRunnable() {
                     @Override
                     public void run() {
-                        for (LivingEntity damageTarget : UtilEntity.getNearbyEnemies(player, point, radius)) {
-                            if (affectedEntities.contains(damageTarget) && !damagedEntities.contains(damageTarget)) {
+                        for (LivingEntity damageTarget : UtilEntity.getNearbyEnemies(player, point, damageRadius)) {
+                            if (!damagedEntities.contains(damageTarget)) {
                                 UtilDamage.doCustomDamage(new CustomDamageEvent(damageTarget, player, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, "Threatening Shout"));
                                 UtilMessage.message(player, getName(), "You hit <yellow>%s</yellow> with <green>Threatening Shout</green>", damageTarget.getName());
                                 damagedEntities.add(damageTarget);
@@ -177,7 +167,7 @@ public class ThreateningShout extends Skill implements Listener, InteractSkill, 
                 currentPointIndex++;
             }
 
-            playerPointIndexMap.put(player, currentPointIndex);
+            data.setPointIndex(currentPointIndex);
         }
     }
 
@@ -188,7 +178,8 @@ public class ThreateningShout extends Skill implements Listener, InteractSkill, 
 
     @Override
     public void loadSkillConfig() {
-        radius = getConfig("radius", 3.0, Double.class);
+        damageRadius = getConfig("damageRadius", 3.0, Double.class);
+        vulnerabilityRadius = getConfig("vulnerabilityRadius", 2.0, Double.class);
         baseDuration = getConfig("baseDuration", 3.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
         vulnerabilityStrength = getConfig("vulnerabilityStrength", 3, Integer.class);
@@ -196,5 +187,6 @@ public class ThreateningShout extends Skill implements Listener, InteractSkill, 
         damage = getConfig("damage", 5.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
         startDistance = getConfig("startDistance", 1.0, Double.class);
+        distance = getConfig("distance", 15, Integer.class);
     }
 }
