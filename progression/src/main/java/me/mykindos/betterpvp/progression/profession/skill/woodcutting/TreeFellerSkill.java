@@ -8,7 +8,9 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.skill.CooldownProgressionSkill;
 import me.mykindos.betterpvp.progression.profession.skill.PerkActivator;
+import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillDependency;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 
@@ -52,13 +54,14 @@ public class TreeFellerSkill extends WoodcuttingProgressionSkill implements Cool
 
     @Override
     public double getCooldown(int level) {
-        return (cooldown - (cooldownDecreasePerLevel * (level - 1)));
+        return (cooldown - (cooldownDecreasePerLevel * level));
     }
 
     @Override
     public void whenPlayerUsesSkill(Player player, int level) {
         if (cooldownManager.use(player, getName(), getCooldown(level), true, true,
                 false, this::shouldDisplayActionBar, getPriority())) {
+            player.getWorld().playSound(player.getLocation(), Sound.ITEM_AXE_STRIP, 2.0f, 1.0f);
             UtilMessage.simpleMessage(player, getProgressionTree(), "You used <alt>" + getName() + "</alt> " + level);
         }
     }
@@ -78,5 +81,11 @@ public class TreeFellerSkill extends WoodcuttingProgressionSkill implements Cool
         super.loadConfig();
         cooldown = getConfig("cooldown", 20.0, Double.class);
         cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 1.0, Double.class);
+    }
+
+    @Override
+    public ProgressionSkillDependency getDependencies() {
+        final String[] dependencies = new String[]{"Tree Tactician"};
+        return new ProgressionSkillDependency(dependencies, 10);
     }
 }
