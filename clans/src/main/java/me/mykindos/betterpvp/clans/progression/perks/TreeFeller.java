@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkill;
 import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillManager;
+import me.mykindos.betterpvp.progression.profession.skill.woodcutting.TreeFellerSkill;
 import me.mykindos.betterpvp.progression.profession.woodcutting.WoodcuttingHandler;
 import me.mykindos.betterpvp.progression.profession.woodcutting.event.PlayerChopLogEvent;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
@@ -30,6 +31,7 @@ public class TreeFeller implements Listener {
     private final ProfessionProfileManager professionProfileManager;
     private final ProgressionSkillManager progressionSkillManager;
     private final WoodcuttingHandler woodcuttingHandler;
+    private final TreeFellerSkill treeFellerSkill;
 
     @Inject
     public TreeFeller(ClanManager clanManager) {
@@ -38,6 +40,7 @@ public class TreeFeller implements Listener {
         this.professionProfileManager = progression.getInjector().getInstance(ProfessionProfileManager.class);
         this.progressionSkillManager = progression.getInjector().getInstance(ProgressionSkillManager.class);
         this.woodcuttingHandler = progression.getInjector().getInstance(WoodcuttingHandler.class);
+        this.treeFellerSkill = progression.getInjector().getInstance(TreeFellerSkill.class);
     }
 
     @EventHandler
@@ -47,9 +50,15 @@ public class TreeFeller implements Listener {
         Optional<ProgressionSkill> progressionSkillOptional = progressionSkillManager.getSkill("Tree Feller");
         if(progressionSkillOptional.isEmpty()) return;
 
+        Player player = event.getPlayer();
+
+        if (treeFellerSkill.getCooldownManager().hasCooldown(player, treeFellerSkill.getName())) {
+            treeFellerSkill.whenPlayerCantUseSkill(player);
+            return;
+        }
+
         ProgressionSkill skill = progressionSkillOptional.get();
 
-        Player player = event.getPlayer();
         professionProfileManager.getObject(player.getUniqueId().toString()).ifPresent(profile -> {
 
             var profession = profile.getProfessionDataMap().get("Woodcutting");
@@ -60,8 +69,10 @@ public class TreeFeller implements Listener {
 
             Clan playerClan = clanManager.getClanByPlayer(player).orElse(null);
 
+
             event.setCancelled(true);
             fellTree(playerClan, event.getChoppedLogBlock(), event, true);
+            treeFellerSkill.whenPlayerUsesSkill(player, skillLevel);
         });
     }
 
