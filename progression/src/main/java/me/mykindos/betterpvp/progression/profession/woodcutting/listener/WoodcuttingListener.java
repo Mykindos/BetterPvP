@@ -34,7 +34,7 @@ public class WoodcuttingListener implements Listener {
 
     /**
      * Whenever a player breaks a block, this event will trigger and
-     * 'attemptToMineWood' will handle things like: "was it a wood log type?" or
+     * 'attemptToChopLog' will handle things like: "was it a wood log type?" or
      * "how much xp will the player get (if any)"
      */
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
