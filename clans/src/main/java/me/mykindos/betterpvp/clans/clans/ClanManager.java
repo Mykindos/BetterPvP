@@ -463,9 +463,8 @@ public class ClanManager extends Manager<Clan> {
         UtilServer.callEvent(new ClanDominanceChangeEvent(null, killer));
         UtilServer.callEvent(new ClanDominanceChangeEvent(null, killed));
 
-        // TODO include total dominance
-        killed.messageClan("You lost <red>" + dominance + "%<gray> dominance to <red>" + killer.getName(), null, true);
-        killer.messageClan("You gained <green>" + dominance + "%<gray> dominance on <red>" + killed.getName(), null, true);
+        killed.messageClan("You lost <red>" + dominance + "%<gray> dominance to <red>" + killer.getName() +  getDominanceString(killed, killer), null, true);
+        killer.messageClan("You gained <green>" + dominance + "%<gray> dominance on <red>" + killed.getName() + getDominanceString(killer, killed) , null, true);
 
         getRepository().updateDominance(killed, killedEnemy);
         getRepository().updateDominance(killer, killerEnemy);
