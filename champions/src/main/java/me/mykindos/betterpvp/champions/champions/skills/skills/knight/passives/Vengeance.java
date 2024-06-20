@@ -125,7 +125,7 @@ public class Vengeance extends Skill implements PassiveSkill, Listener {
     @Override
     public void loadSkillConfig() {
         baseDamage = getConfig("baseDamage", 1.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.5, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
         baseMaxDamage = getConfig("baseMaxDamage", 2.0, Double.class);
         maxDamageIncreasePerLevel = getConfig("maxDamageIncreasePerLevel", 1.0, Double.class);
         expirationTime = getConfig("expirationTime", 5.0, Double.class);
