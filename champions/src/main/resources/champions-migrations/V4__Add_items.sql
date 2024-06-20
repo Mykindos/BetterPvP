@@ -296,7 +296,7 @@ INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, H
     ('HONEY_BOTTLE', 'champions', 'energy_elixir', '<light_purple>Energy Elixir', 0, 0, 0);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
-    ('PUMPKIN_PIE', 'champions', 'purification_potion', '<light_purple>Purification Potion', 2, 0, 0);
+    ('COOKIE', 'champions', 'purification_potion', '<light_purple>Purification Potion', 1, 0, 0);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
     ('PUMPKIN_PIE', 'champions', 'mushroom_stew', '<light_purple>Mushroom Stew', 1, 0, 0);

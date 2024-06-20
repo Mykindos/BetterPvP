@@ -28,7 +28,6 @@ import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
-import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.data.CustomDataType;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
 import org.bukkit.Bukkit;
@@ -38,7 +37,6 @@ import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.Container;
 import org.bukkit.block.data.Openable;
-import org.bukkit.block.data.type.Gate;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FishHook;
@@ -69,7 +67,6 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.util.Vector;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -167,14 +164,6 @@ public class ClansWorldListener extends ClanListener {
         locationClanOptional.ifPresent(locationClan -> {
             if (!locationClan.equals(clan)) {
                 ClanRelation relation = clanManager.getRelation(clan, locationClan);
-
-                // TODO this stuff
-
-                //if (!(locationClan instanceof AdminClan)) {
-                //    if (FarmBlocks.isCultivation(block.getType())) {
-                //        return;
-                //    }
-                //}
 
                 if (clanManager.getPillageHandler().isPillaging(clan, locationClan)) {
                     final TerritoryInteractEvent tie = UtilServer.callEvent(new TerritoryInteractEvent(player, locationClan, block, Event.Result.DEFAULT, TerritoryInteractEvent.InteractionType.BREAK));
@@ -554,33 +543,6 @@ public class ClansWorldListener extends ClanListener {
 
     }
 
-    /**
-     * Helps against people glitching through gates, maybe this isn't an issue in 1.19 anymore
-     */
-    @EventHandler
-    public void onBreakGate(BlockBreakEvent event) {
-
-        // TODO check if this is still necessary
-        if (!event.getBlock().getType().name().contains("GATE")) return;
-        Optional<Clan> playerClanOptional = clanManager.getClanByPlayer(event.getPlayer());
-        Optional<Clan> locationClanOptional = clanManager.getClanByLocation(event.getBlock().getLocation());
-
-        Gate gate = (Gate) event.getBlock().getState().getBlockData();
-        if (gate.isOpen()) {
-            locationClanOptional.ifPresent(locationClan -> {
-                if (playerClanOptional.isEmpty() || !playerClanOptional.equals(locationClanOptional)) {
-                    if (event.getPlayer().getLocation().distance(event.getBlock().getLocation()) < 1.5) {
-
-                        Vector vec = UtilVelocity.getTrajectory(event.getPlayer().getLocation(), clanManager.closestWildernessBackwards(event.getPlayer()));
-                        VelocityData velocityData = new VelocityData(vec, 0.5, true, 0.25, 0.25, 0.25, false);
-                        UtilVelocity.velocity(event.getPlayer(), null, velocityData);
-
-                    }
-                }
-            });
-        }
-    }
-
     /*
      * Turns lapis into water when placed.
      */
@@ -768,8 +730,6 @@ public class ClansWorldListener extends ClanListener {
                     }
                     return;
                 }
-
-                // TODO check location clans farming levels
 
                 player.setGameMode(GameMode.ADVENTURE);
 
