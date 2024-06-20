@@ -52,6 +52,7 @@ public class TreeFeller implements Listener {
         if(progressionSkillOptional.isEmpty()) return;
 
         Player player = event.getPlayer();
+        if (!player.getInventory().getItemInMainHand().getType().name().contains("_AXE")) return;
 
         ProgressionSkill skill = progressionSkillOptional.get();
 
