@@ -43,7 +43,6 @@ public class WoodcuttingListener implements Listener {
 
         if (!woodcuttingHandler.getExperiencePerWood().containsKey(blockType)) return;
 
-
         Block choppedLogBlock = event.getBlock();
         PlayerChopLogEvent chopLogEvent = UtilServer.callEvent(new PlayerChopLogEvent(event.getPlayer(), blockType,
                 choppedLogBlock));

@@ -41,6 +41,7 @@ public class TreeFeller implements Listener {
         this.progressionSkillManager = progression.getInjector().getInstance(ProgressionSkillManager.class);
         this.woodcuttingHandler = progression.getInjector().getInstance(WoodcuttingHandler.class);
         this.treeFellerSkill = progression.getInjector().getInstance(TreeFellerSkill.class);
+
     }
 
     @EventHandler
@@ -66,7 +67,6 @@ public class TreeFeller implements Listener {
 
             if (treeFellerSkill.getCooldownManager().hasCooldown(player, treeFellerSkill.getName())) {
                 treeFellerSkill.whenPlayerCantUseSkill(player);
-                event.setCancelled(true);
                 return;
             }
 
