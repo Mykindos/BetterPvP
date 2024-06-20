@@ -66,6 +66,7 @@ public class TreeFeller implements Listener {
 
             if (treeFellerSkill.getCooldownManager().hasCooldown(player, treeFellerSkill.getName())) {
                 treeFellerSkill.whenPlayerCantUseSkill(player);
+                event.setCancelled(true);
                 return;
             }
 
