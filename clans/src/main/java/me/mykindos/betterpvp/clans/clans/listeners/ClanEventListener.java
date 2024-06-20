@@ -26,7 +26,6 @@ import me.mykindos.betterpvp.clans.clans.events.MemberDemoteEvent;
 import me.mykindos.betterpvp.clans.clans.events.MemberJoinClanEvent;
 import me.mykindos.betterpvp.clans.clans.events.MemberLeaveClanEvent;
 import me.mykindos.betterpvp.clans.clans.events.MemberPromoteEvent;
-import me.mykindos.betterpvp.clans.utilities.UtilClans;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
@@ -61,7 +60,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -126,41 +124,6 @@ public class ClanEventListener extends ClanListener {
         Chunk chunk = event.getChunk();
 
         String chunkString = UtilWorld.chunkToFile(chunk);
-
-        if(targetClan.getTerritory().size() > 2 && !targetClan.isAdmin()){
-            List<ClanTerritory> territoryChunks = targetClan.getTerritory();
-
-            // Logic to get the width and length of the 2d array.
-            int maxX = Integer.MIN_VALUE;
-            int maxZ = Integer.MIN_VALUE;
-            int minX = Integer.MAX_VALUE;
-            int minZ = Integer.MAX_VALUE;
-
-            for (ClanTerritory territoryChunk : territoryChunks) {
-                Chunk c = UtilWorld.stringToChunk(territoryChunk.getChunk());
-                maxX = Math.max(maxX, c.getX());
-                maxZ = Math.max(maxZ, c.getZ());
-                minX = Math.min(minX, c.getX());
-                minZ = Math.min(minZ, c.getZ());
-            }
-
-            // Logic to map out the clans territory in a 2d array.
-            int[][] territoryGrid = new int[Math.abs(maxX - minX + 1)][Math.abs(maxZ - minZ + 1)];
-
-            for (ClanTerritory territoryChunk : territoryChunks) {
-                Chunk c = UtilWorld.stringToChunk(territoryChunk.getChunk());
-                if (!(c.getX() == chunk.getX() && c.getZ() == chunk.getZ())) {
-                    territoryGrid[c.getX() - minX][c.getZ() - minZ] = 1;
-                }
-            }
-
-            // Pass territory 2d array into algorithm.
-            if(UtilClans.isClaimLegal(territoryGrid)){
-                UtilMessage.message(player, "Clans", "You cannot unclaim a chunk that splits up other chunks.");
-                event.setCancelled(true);
-                return;
-            }
-        }
 
         String chunkToPrettyString = UtilWorld.chunkToPrettyString(chunk);
         UtilMessage.simpleMessage(player, "Clans", "You unclaimed territory <alt2>" + chunkToPrettyString + "</alt2>.");

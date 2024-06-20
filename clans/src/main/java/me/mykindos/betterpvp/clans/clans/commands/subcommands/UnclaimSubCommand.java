@@ -7,15 +7,20 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
 import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
 import me.mykindos.betterpvp.clans.clans.events.ChunkUnclaimEvent;
+import me.mykindos.betterpvp.clans.utilities.UtilClans;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
+import me.mykindos.betterpvp.core.components.clans.data.ClanTerritory;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.UtilWorld;
+import org.bukkit.Chunk;
 import org.bukkit.entity.Player;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -55,7 +60,39 @@ public class UnclaimSubCommand extends ClanSubCommand {
                 UtilMessage.message(player, "Clans", "You must be an admin or above to unclaim territory");
                 return;
             }
+            if(locationClan.getTerritory().size() > 2 && !locationClan.isAdmin()){
+                List<ClanTerritory> territoryChunks = locationClan.getTerritory();
 
+                // Logic to get the width and length of the 2d array.
+                int maxX = Integer.MIN_VALUE;
+                int maxZ = Integer.MIN_VALUE;
+                int minX = Integer.MAX_VALUE;
+                int minZ = Integer.MAX_VALUE;
+
+                for (ClanTerritory territoryChunk : territoryChunks) {
+                    Chunk c = UtilWorld.stringToChunk(territoryChunk.getChunk());
+                    maxX = Math.max(maxX, c.getX());
+                    maxZ = Math.max(maxZ, c.getZ());
+                    minX = Math.min(minX, c.getX());
+                    minZ = Math.min(minZ, c.getZ());
+                }
+
+                // Logic to map out the clans territory in a 2d array.
+                int[][] territoryGrid = new int[Math.abs(maxX - minX + 1)][Math.abs(maxZ - minZ + 1)];
+
+                for (ClanTerritory territoryChunk : territoryChunks) {
+                    Chunk c = UtilWorld.stringToChunk(territoryChunk.getChunk());
+                    if (!(c.getX() == player.getChunk().getX() && c.getZ() == player.getChunk().getZ())) {
+                        territoryGrid[c.getX() - minX][c.getZ() - minZ] = 1;
+                    }
+                }
+
+                // Pass territory 2d array into algorithm.
+                if(UtilClans.isClaimLegal(territoryGrid)){
+                    UtilMessage.message(player, "Clans", "You cannot unclaim a chunk that splits up other chunks.");
+                    return;
+                }
+            }
         }else{
             if(locationClan.isAdmin()) {
                 UtilMessage.message(player, "Clans", "You cannot unclaim admin territory");
