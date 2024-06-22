@@ -1,0 +1,79 @@
+package me.mykindos.betterpvp.clans.progression.perks;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import me.mykindos.betterpvp.clans.clans.Clan;
+import me.mykindos.betterpvp.clans.clans.ClanManager;
+import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
+import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.progression.Progression;
+import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillManager;
+import me.mykindos.betterpvp.progression.profession.skill.woodcutting.ForestFlourisherSkill;
+import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.TreeType;
+import org.bukkit.block.Block;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.Objects;
+import java.util.Optional;
+
+@Singleton
+@BPvPListener
+@PluginAdapter("Progression")
+public class ForestFlourisher implements Listener {
+    private final ClanManager clanManager;
+    private final ProfessionProfileManager professionProfileManager;
+    private final ProgressionSkillManager progressionSkillManager;
+    private final ForestFlourisherSkill forestFlourisherSkill;
+
+    @Inject
+    public ForestFlourisher(ClanManager clanManager) {
+        this.clanManager = clanManager;
+        final Progression progression = Objects.requireNonNull((Progression) Bukkit.getPluginManager().getPlugin("Progression"));
+        this.professionProfileManager = progression.getInjector().getInstance(ProfessionProfileManager.class);
+        this.progressionSkillManager = progression.getInjector().getInstance(ProgressionSkillManager.class);
+        this.forestFlourisherSkill = progression.getInjector().getInstance(ForestFlourisherSkill.class);
+    }
+
+    @EventHandler
+    public void onPlayerPlantSapling(BlockPlaceEvent event) {
+        TreeType treeType = forestFlourisherSkill.getTreeType(event.getBlock());
+        if (treeType == null) return;
+
+        final int BLOCKS_AWAY_FROM_CLAIM = 8;
+        final int LOWER_BOUND = -BLOCKS_AWAY_FROM_CLAIM;
+
+        Clan playerClan = clanManager.getClanByPlayer(event.getPlayer()).orElse(null);
+
+        for (int x = LOWER_BOUND; x < BLOCKS_AWAY_FROM_CLAIM; x++) {
+            for (int z = LOWER_BOUND; z < BLOCKS_AWAY_FROM_CLAIM; z++) {
+                Block targetBlock = event.getBlockPlaced().getRelative(x, 0, z);
+
+                Optional<Clan> targetBlockLocationClanOptional = clanManager.getClanByLocation(targetBlock.getLocation());
+                if (targetBlockLocationClanOptional.isPresent()) {
+                    if (playerClan == null || !playerClan.equals(targetBlockLocationClanOptional.get())) {
+                        UtilMessage.message(event.getPlayer(), "Clans", "Saplings must be placed a minimum of 8 blocks away from foreign claims.");
+                        event.setCancelled(true);
+                        return;
+                    }
+                }
+            }
+        }
+
+        UtilServer.runTaskLater(JavaPlugin.getPlugin(Progression.class), () -> {
+            Block block = event.getBlock();
+
+            if (forestFlourisherSkill.getTreeType(block) == null) return;
+
+            block.setType(Material.AIR);
+            block.getWorld().generateTree(block.getLocation(), treeType);
+        }, 20L);
+    }
+}

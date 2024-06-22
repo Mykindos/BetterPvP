@@ -16,5 +16,9 @@ public class WoodcuttingProfessionMenu extends ProfessionMenu {
         progressionSkillManager.getSkill("Tree Feller").ifPresent(skill -> {
             setItem(22, new ProgressionSkillButton(skill, professionData, progressionSkillManager));
         });
+
+        progressionSkillManager.getSkill("Forest Flourisher").ifPresent(skill -> {
+            setItem(31, new ProgressionSkillButton(skill, professionData, progressionSkillManager));
+        });
     }
 }
