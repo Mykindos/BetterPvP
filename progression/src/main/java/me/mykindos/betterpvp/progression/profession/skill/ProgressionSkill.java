@@ -5,6 +5,7 @@ import lombok.CustomLog;
 import lombok.Data;
 import me.mykindos.betterpvp.progression.Progression;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemFlag;
 
 @Data
 @CustomLog
@@ -26,6 +27,10 @@ public abstract class ProgressionSkill implements IProgressionSkill {
     }
 
     public abstract Material getIcon();
+
+    public ItemFlag getFlag() {
+        return null;
+    }
 
     public void reload() {
         try {

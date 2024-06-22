@@ -81,7 +81,7 @@ public class WoodcuttingHandler extends ProfessionHandler {
         professionData.grantExperience(finalExperience, player);
         woodcuttingRepository.saveChoppedLog(player.getUniqueId(), block.getType(), player.getLocation());
 
-        log.info("{} chopped {} for {} experience", player.getName(), block.getType(), finalExperience)
+        log.info("{} chopped {} for {} experience", player.getName(), originalBlockType, finalExperience)
                 .addClientContext(player).addBlockContext(block).addLocationContext(block.getLocation())
                 .addContext("Experience", finalExperience + "").submit();
 
