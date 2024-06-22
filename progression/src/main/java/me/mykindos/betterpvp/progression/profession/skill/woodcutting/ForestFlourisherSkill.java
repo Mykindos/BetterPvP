@@ -13,6 +13,9 @@ import org.bukkit.block.Block;
  */
 @Singleton
 public class ForestFlourisherSkill extends WoodcuttingProgressionSkill {
+    private double baseGrowTime;
+    private double growTimeDecreasePerLvl;
+
 
     @Inject
     public ForestFlourisherSkill(Progression progression) {
@@ -27,8 +30,12 @@ public class ForestFlourisherSkill extends WoodcuttingProgressionSkill {
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Saplings you plant grow faster"
+                "Saplings you plant grow faster taking only <green>" + growTime(level) + "</green> seconds to regrow"
         };
+    }
+
+    public long growTime(int level) {
+        return (long) (baseGrowTime - (growTimeDecreasePerLvl*level));
     }
 
     @Override
@@ -43,5 +50,12 @@ public class ForestFlourisherSkill extends WoodcuttingProgressionSkill {
             case ACACIA_SAPLING -> TreeType.ACACIA;
             default -> null;
         };
+    }
+
+    @Override
+    public void loadConfig() {
+        super.loadConfig();
+        baseGrowTime = getConfig("baseGrowTime", 90.0, Double.class);
+        growTimeDecreasePerLvl = getConfig("growTimeDecreasePerLvl", 2.0, Double.class);
     }
 }

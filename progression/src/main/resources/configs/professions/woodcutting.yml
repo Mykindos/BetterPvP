@@ -10,4 +10,6 @@ skills:
     cooldownDecreasePerLevel: 1.0
   forest_flourisher:
     enabled: true
-    maxlevel: 1
+    maxlevel: 30
+    baseGrowTime: 90.0
+    growTimeDecreasePerLvl: 2.0
