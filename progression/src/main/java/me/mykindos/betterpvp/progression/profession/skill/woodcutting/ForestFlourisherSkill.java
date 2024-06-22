@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.progression.profession.skill.woodcutting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.progression.Progression;
+import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillDependency;
 import org.bukkit.Material;
 import org.bukkit.TreeType;
 import org.bukkit.block.Block;
@@ -57,5 +58,11 @@ public class ForestFlourisherSkill extends WoodcuttingProgressionSkill {
         super.loadConfig();
         baseGrowTime = getConfig("baseGrowTime", 90.0, Double.class);
         growTimeDecreasePerLvl = getConfig("growTimeDecreasePerLvl", 2.0, Double.class);
+    }
+
+    @Override
+    public ProgressionSkillDependency getDependencies() {
+        final String[] dependencies = new String[]{"Tree Feller"};
+        return new ProgressionSkillDependency(dependencies, 20);
     }
 }
