@@ -50,6 +50,7 @@ public class RandomBuild {
                     return false;
                 });
             }
+            build.takePoint();
         }
         //now, we need to update the build
         buildManager.getBuildRepository().update(build);
