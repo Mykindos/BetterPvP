@@ -49,6 +49,9 @@ public class ForestFlourisherSkill extends WoodcuttingProgressionSkill {
             case BIRCH_SAPLING -> TreeType.BIRCH;
             case DARK_OAK_SAPLING -> TreeType.DARK_OAK;
             case ACACIA_SAPLING -> TreeType.ACACIA;
+            case OAK_SAPLING -> TreeType.TREE;
+            case JUNGLE_SAPLING -> TreeType.SMALL_JUNGLE;
+            case SPRUCE_SAPLING -> TreeType.REDWOOD;
             default -> null;
         };
     }
