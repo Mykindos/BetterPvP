@@ -48,8 +48,8 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Sacrifice " + getValueString(this::getCooldown, level, 1, "%", 0) + " of your health to purge all negative",
-                "effects from yourself and allies within " + getValueString(this::getCooldown, level) + " blocks",
+                "Sacrifice " + getValueString(this::getHealthReduction, level, 100, "%", 0) + " of your health to purge all negative",
+                "effects from yourself and allies within " + getValueString(this::getRange, level) + " blocks",
                 "",
                 "You and your allies also receive an immunity against negative",
                 "effects for " + getValueString(this::getDuration, level) + " seconds",

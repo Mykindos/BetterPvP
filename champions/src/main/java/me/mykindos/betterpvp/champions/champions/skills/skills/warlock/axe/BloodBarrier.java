@@ -69,7 +69,7 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Sacrifice " + getValueString(this::getCooldown, level, 1, "%", 0) + " of your health to grant yourself and",
+                "Sacrifice " + getValueString(this::getHealthReduction, level, 100, "%", 0) + " of your health to grant yourself and",
                 "allies within " + getValueString(this::getRange, level) + " blocks a barrier which reduces the damage",
                 "of the next " + getValueString(this::numAttacksToReduce, level) + " incoming attacks by " + getValueString(this::getDamageReduction, level, 100, "%", 0),
                 "",

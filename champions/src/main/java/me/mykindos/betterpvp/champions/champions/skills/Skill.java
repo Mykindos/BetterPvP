@@ -290,10 +290,10 @@ public abstract class Skill implements IChampionsSkill {
         if (level < getMaxLevel()) {
             double difference = nextValue - currentValue;
             if (difference > 0) {
-                return valueString + " (+<green>" + UtilFormat.formatNumber(difference, decimalPlaces, true) + "</green>" + suffix + ")";
+                return valueString + " (+<green>" + UtilFormat.formatNumber(difference, decimalPlaces, true) + "</green>)";
             } else {
                 difference = Math.abs(difference);
-                return valueString + " (-<green>" + UtilFormat.formatNumber(difference, decimalPlaces, true) + "</green>" + suffix + ")";
+                return valueString + " (-<green>" + UtilFormat.formatNumber(difference, decimalPlaces, true) + "</green>)";
             }
         }
         return valueString;
