@@ -60,7 +60,7 @@ public class ExcessiveForce extends Skill implements InteractSkill, CooldownSkil
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level)
         };
-    };
+    }
 
     public double getDuration(int level) {
         return baseDuration + (level - 1) * durationIncreasePerLevel;
