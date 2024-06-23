@@ -19,6 +19,8 @@ public class DailyCommand extends Command {
     @Config(path = "daily.coinsAmount", defaultValue = "5000")
     private int coinsAmount;
 
+    public static String DAILY = "Daily";
+
     private final CooldownManager cooldownManager;
 
     @Inject
@@ -38,7 +40,7 @@ public class DailyCommand extends Command {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        if(cooldownManager.use(player, "Daily", 86400000, false, false)) {
+        if(cooldownManager.use(player, DAILY, 86400000, false, false)) {
             Gamer gamer = client.getGamer();
 
             gamer.saveProperty(GamerProperty.BALANCE, (int) gamer.getProperty(GamerProperty.BALANCE).orElse(0) + coinsAmount);
