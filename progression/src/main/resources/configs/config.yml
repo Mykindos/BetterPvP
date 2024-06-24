@@ -3,6 +3,9 @@ woodcutting:
     DARK_OAK_LOG: 10
     ACACIA_LOG: 10
     BIRCH_LOG: 10
+    OAK_LOG: 10
+    JUNGLE_LOG: 10
+    SPRUCE_LOG: 10
   enabled: true
 
 mining:
