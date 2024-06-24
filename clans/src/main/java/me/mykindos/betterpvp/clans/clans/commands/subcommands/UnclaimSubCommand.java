@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import org.bukkit.entity.Player;
 
 import java.util.Optional;
@@ -51,13 +52,13 @@ public class UnclaimSubCommand extends ClanSubCommand {
         Clan playerClan = clanManager.getClanByPlayer(player).orElseThrow();
         Clan locationClan = locationClanOptional.get();
 
-        if(playerClan.equals(locationClan)) {
-            if(!playerClan.getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.ADMIN)) {
+        if (playerClan.equals(locationClan)) {
+            if (!playerClan.getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.ADMIN)) {
                 UtilMessage.message(player, "Clans", "You must be an admin or above to unclaim territory");
                 return;
             }
 
-            if(locationClan.getTerritory().size() > 2 && !locationClan.isAdmin()){
+            if (locationClan.getTerritory().size() > 2 && !locationClan.isAdmin()){
 
                 // Pass territory 2d array into algorithm.
                 if(UtilClans.isClaimRequired(UtilClans.getClaimLayout(player, locationClan))){
@@ -65,19 +66,26 @@ public class UnclaimSubCommand extends ClanSubCommand {
                     return;
                 }
             }
-        }else{
-            if(locationClan.isAdmin()) {
+        }else {
+            if (locationClan.isAdmin() && !client.isAdministrating()) {
                 UtilMessage.message(player, "Clans", "You cannot unclaim admin territory");
                 return;
             }
 
-            if(locationClan.getTerritory().size() <= clanManager.getMaximumClaimsForClan(locationClan)) {
-                UtilMessage.simpleMessage(player, "Clans", "<yellow>%s<gray> has enough members to keep this territory.",
-                        locationClan.getName());
-                return;
+            if (!client.isAdministrating()) {
+                if (locationClan.getTerritory().size() <= clanManager.getMaximumClaimsForClan(locationClan) && !client.isAdministrating()) {
+                    UtilMessage.simpleMessage(player, "Clans", "<yellow>%s<gray> has enough members to keep this territory.",
+                            locationClan.getName());
+                    return;
+                }
+            } else {
+                clientManager.sendMessageToRank("Clans",
+                        UtilMessage.deserialize("<yellow>%s<gray> force unclaimed <yellow>%s</yellow> from <yellow>%s<gray>",
+                                player.getName(), UtilWorld.chunkToPrettyString(player.getLocation().getChunk()), locationClan.getName()), Rank.HELPER);
             }
 
-            if(UtilClans.isClaimRequired(UtilClans.getClaimLayout(player, locationClan))){
+
+            if (UtilClans.isClaimRequired(UtilClans.getClaimLayout(player, locationClan))){
                 UtilMessage.message(player, "Clans", "Unclaiming this chunk would split their territory. Please unclaim a different chunk.");
                 return;
             }
