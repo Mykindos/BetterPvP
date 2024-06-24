@@ -16,9 +16,11 @@ import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillManage
 import me.mykindos.betterpvp.progression.profession.skill.woodcutting.ForestFlourisherSkill;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.TreeType;
 import org.bukkit.block.Block;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -48,9 +50,14 @@ public class ForestFlourisher implements Listener {
     }
 
     @EventHandler
-    public void onPlayerPlantSapling(BlockPlaceEvent event) {
+     public void onPlayerPlantSapling(BlockPlaceEvent event) {
+        if (event.isCancelled()) return;
+
         TreeType treeType = forestFlourisherSkill.getTreeType(event.getBlock());
         if (treeType == null) return;
+
+        // remove before pr
+        event.getPlayer().sendMessage("you planted a sapling");
 
         Optional<ProgressionSkill> progressionSkillOptional = progressionSkillManager.getSkill("Forest Flourisher");
         if(progressionSkillOptional.isEmpty()) return;
@@ -84,6 +91,24 @@ public class ForestFlourisher implements Listener {
                         }
                     }
                 }
+            }
+
+            // purpose of the 0.5's is to center the particle
+            Location center = event.getBlock().getLocation().add(0.5, 1.5, 0.5);
+            final int particleCount = 20;
+            final double radius = 0.75;
+            final double decreaseInYLvlPerParticle = 0.05;
+
+            for (int i = 0; i < particleCount; i++) {
+                double angle = 2 * Math.PI * i / particleCount;
+                double x = center.getX() + radius * Math.cos(angle);
+                double z = center.getZ() + radius * Math.sin(angle);
+
+                Location particleLocation = new Location(center.getWorld(), x, center.getY() - i*decreaseInYLvlPerParticle, z);
+
+                UtilServer.runTaskLater(JavaPlugin.getPlugin(Progression.class), () -> {
+                    event.getBlock().getWorld().spawnParticle(Particle.CHERRY_LEAVES, particleLocation, 0, 0, -1, 0);
+                }, i);
             }
 
             UtilServer.runTaskLater(JavaPlugin.getPlugin(Progression.class), () -> {
