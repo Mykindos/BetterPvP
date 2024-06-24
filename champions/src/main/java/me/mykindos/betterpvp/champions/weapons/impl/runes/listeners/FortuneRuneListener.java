@@ -2,13 +2,12 @@ package me.mykindos.betterpvp.champions.weapons.impl.runes.listeners;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.weapons.impl.runes.Rune;
 import me.mykindos.betterpvp.champions.weapons.impl.runes.RuneNamespacedKeys;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.items.ItemHandler;
-import me.mykindos.betterpvp.progression.tree.fishing.event.PlayerCaughtFishEvent;
-import me.mykindos.betterpvp.progression.tree.fishing.fish.Fish;
+import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerCaughtFishEvent;
+import me.mykindos.betterpvp.progression.profession.fishing.fish.Fish;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -28,7 +27,7 @@ public class FortuneRuneListener implements Listener {
         this.itemHandler = itemHandler;
     }
 
-    @EventHandler (priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler (priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onCatch(PlayerCaughtFishEvent event) {
         ItemStack itemStack = event.getPlayer().getInventory().getItemInMainHand();
         ItemMeta itemMeta = itemStack.getItemMeta();
@@ -49,7 +48,7 @@ public class FortuneRuneListener implements Listener {
 
         event.setIgnoresWeight(true);
         if (event.getLoot() instanceof Fish fish) {
-            event.setLoot(new Fish(fish.getType(), (int) (fish.getWeight() * increasedWeight)));
+            fish.setWeight((int) (fish.getWeight() * increasedWeight));
         }
     }
 }

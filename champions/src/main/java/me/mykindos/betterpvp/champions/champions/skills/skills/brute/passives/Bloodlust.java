@@ -75,6 +75,8 @@ public class Bloodlust extends Skill implements PassiveSkill {
 
     @EventHandler
     public void onDeath(EntityDeathEvent event) {
+        if(event.getEntity().hasMetadata("PlayerSpawned")) return;
+
         DamageLog lastDamager = damageLogManager.getLastDamager(event.getEntity());
         if (lastDamager == null) return;
         if (!(lastDamager.getDamager() instanceof Player player)) return;
@@ -92,7 +94,7 @@ public class Bloodlust extends Skill implements PassiveSkill {
             championsManager.getEffects().addEffect(player, player, EffectTypes.STRENGTH, getName(), tempStr, (long) (getDuration(level) * 1000L), true);
             championsManager.getEffects().addEffect(player, player, EffectTypes.SPEED, getName(), tempStr, (long) (getDuration(level) * 1000), true);
             UtilPlayer.health(player, health);
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You entered bloodlust at level: <alt2>" + (tempStr + 1) + "</alt2>.");
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You entered bloodlust at level: <alt2>" + (Math.min(tempStr + 1, maxStacks)) + "</alt2>.");
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIFIED_PIGLIN_ANGRY, 2.0F, 0.6F);
         }
 
@@ -111,7 +113,7 @@ public class Bloodlust extends Skill implements PassiveSkill {
         if (System.currentTimeMillis() > time.get(player)) {
             int tempStr = str.get(player);
             str.remove(player);
-            UtilMessage.simpleMessage(player, getClassType().getName(), "Your bloodlust has ended at level: <alt2>" + (tempStr + 1) + "</alt2>.");
+            UtilMessage.simpleMessage(player, getClassType().getName(), "Your bloodlust has ended at level: <alt2>" + (Math.min(tempStr + 1, maxStacks)) + "</alt2>.");
             time.remove(player);
         }
 

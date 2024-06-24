@@ -5,6 +5,7 @@ import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
+import me.mykindos.betterpvp.core.menu.button.BackButton;
 import me.mykindos.betterpvp.core.stats.Leaderboard;
 import me.mykindos.betterpvp.core.stats.SearchOptions;
 import me.mykindos.betterpvp.core.stats.filter.FilterType;
@@ -46,6 +47,7 @@ public class LeaderboardMenu<E, T> extends AbstractGui implements Windowed {
         };
     }
 
+    private final Windowed previous;
     private final Leaderboard<E, T> leaderboard;
     private SearchOptions searchOptions;
     @Getter(AccessLevel.NONE)
@@ -53,10 +55,11 @@ public class LeaderboardMenu<E, T> extends AbstractGui implements Windowed {
     private List<LeaderboardEntryButton<E, T>> buttons = new ArrayList<>();
     private final Player player;
 
-    public LeaderboardMenu(Player player, Leaderboard<E, T> leaderboard) {
+    public LeaderboardMenu(Player player, Leaderboard<E, T> leaderboard, Windowed previous) {
         super(9, 6);
         this.leaderboard = leaderboard;
         this.player = player;
+        this.previous = previous;
         populate();
         fetch();
     }
@@ -92,6 +95,11 @@ public class LeaderboardMenu<E, T> extends AbstractGui implements Windowed {
             // Set values
             optionsBuilder.filter(button.getCurrent());
             setItem(buttonIndex, button);
+        }
+
+        // Back button
+        if (previous != null) {
+            setItem(45, new BackButton(previous));
         }
 
         // Standings

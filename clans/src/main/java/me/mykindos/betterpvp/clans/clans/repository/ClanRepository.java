@@ -3,12 +3,14 @@ package me.mykindos.betterpvp.clans.clans.repository;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanProperty;
 import me.mykindos.betterpvp.clans.clans.insurance.Insurance;
 import me.mykindos.betterpvp.clans.clans.insurance.InsuranceType;
 import me.mykindos.betterpvp.clans.clans.vault.ClanVault;
+import me.mykindos.betterpvp.clans.logging.KillClanLog;
 import me.mykindos.betterpvp.core.components.clans.IClan;
 import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
@@ -24,9 +26,15 @@ import me.mykindos.betterpvp.core.database.query.values.LongStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
 import me.mykindos.betterpvp.core.database.repository.IRepository;
+import me.mykindos.betterpvp.core.logging.CachedLog;
+import me.mykindos.betterpvp.core.logging.LogContext;
+import me.mykindos.betterpvp.core.logging.repository.LogRepository;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import me.mykindos.betterpvp.core.utilities.model.item.banner.BannerColor;
 import me.mykindos.betterpvp.core.utilities.model.item.banner.BannerWrapper;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.HoverEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -35,6 +43,7 @@ import org.bukkit.block.banner.Pattern;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.sql.rowset.CachedRowSet;
 import java.sql.SQLException;
@@ -53,13 +62,15 @@ public class ClanRepository implements IRepository<Clan> {
 
     private final Database database;
     private final PropertyMapper propertyMapper;
+    private final LogRepository logRepository;
 
     private final ConcurrentHashMap<String, Statement> queuedPropertyUpdates;
 
     @Inject
-    public ClanRepository(Database database, PropertyMapper propertyMapper) {
+    public ClanRepository(Database database, PropertyMapper propertyMapper, LogRepository logRepository) {
         this.database = database;
         this.propertyMapper = propertyMapper;
+        this.logRepository = logRepository;
         this.queuedPropertyUpdates = new ConcurrentHashMap<>();
     }
 
@@ -67,8 +78,8 @@ public class ClanRepository implements IRepository<Clan> {
     public List<Clan> getAll() {
         List<Clan> clanList = new ArrayList<>();
         String query = "SELECT * FROM clans;";
-        CachedRowSet result = database.executeQuery(new Statement(query));
-        try {
+
+        try (CachedRowSet result = database.executeQuery(new Statement(query))) {
             while (result.next()) {
                 UUID clanId = UUID.fromString(result.getString(1));
                 String name = result.getString(2);
@@ -88,7 +99,7 @@ public class ClanRepository implements IRepository<Clan> {
                     clan.setVault(ClanVault.of(clan, vault));
                 }
 
-                if(banner != null && !banner.isEmpty()) {
+                if (banner != null && !banner.isEmpty()) {
                     final ItemStack bannerItem = ItemStack.deserializeBytes(Base64.getDecoder().decode(banner));
                     final ItemMeta meta = bannerItem.getItemMeta();
                     final BannerMeta bannerMeta = (BannerMeta) meta;
@@ -104,7 +115,7 @@ public class ClanRepository implements IRepository<Clan> {
 
             }
         } catch (SQLException ex) {
-            log.error("Failed to load clans", ex);
+            log.error("Failed to load clans", ex).submit();
         }
 
 
@@ -115,9 +126,9 @@ public class ClanRepository implements IRepository<Clan> {
         String query = "SELECT Property, Value FROM clan_properties WHERE Clan = ?";
         CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId())));
         try {
-           propertyMapper.parseProperties(result, clan);
+            propertyMapper.parseProperties(result, clan);
         } catch (SQLException | ClassNotFoundException ex) {
-            log.error("Failed to load clan properties for {}", clan.getId(), ex);
+            log.error("Failed to load clan properties for {}", clan.getId(), ex).submit();
         }
 
         clan.getProperties().registerListener(clan);
@@ -141,7 +152,7 @@ public class ClanRepository implements IRepository<Clan> {
         List<Statement> statementList = statements.values().stream().toList();
         database.executeBatch(statementList, async);
 
-        log.info("Updated clan properties with {} queries", statements.size());
+        log.info("Updated clan properties with {} queries", statements.size()).submit();
     }
 
     @Override
@@ -160,11 +171,7 @@ public class ClanRepository implements IRepository<Clan> {
     }
 
     public void delete(Clan clan) {
-        String oldClanQuery = "INSERT INTO old_clans (id, Name) VALUE (?, ?)";
-        database.executeUpdateAsync(new Statement(oldClanQuery,
-                new UuidStatementValue(clan.getId()),
-                new StringStatementValue(clan.getName())));
-        
+
         String deleteMembersQuery = "DELETE FROM clan_members WHERE Clan = ?;";
         database.executeUpdateAsync(new Statement(deleteMembersQuery, new UuidStatementValue(clan.getId())));
 
@@ -235,14 +242,14 @@ public class ClanRepository implements IRepository<Clan> {
     public List<ClanTerritory> getTerritory(Clan clan) {
         List<ClanTerritory> territory = new ArrayList<>();
         String query = "SELECT * FROM clan_territory WHERE Clan = ?;";
-        CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId())));
-        try {
+
+        try (CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId())))) {
             while (result.next()) {
                 String chunk = result.getString(3);
                 territory.add(new ClanTerritory(chunk));
             }
         } catch (SQLException ex) {
-            log.error("Failed to load clan territory for {}", clan.getId(), ex);
+            log.error("Failed to load clan territory for {}", clan.getId(), ex).submit();
         }
 
         return territory;
@@ -267,15 +274,15 @@ public class ClanRepository implements IRepository<Clan> {
     public List<ClanMember> getMembers(Clan clan) {
         List<ClanMember> members = new ArrayList<>();
         String query = "SELECT * FROM clan_members WHERE Clan = ?;";
-        CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId())));
-        try {
+
+        try (CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId())))) {
             while (result.next()) {
                 String uuid = result.getString(3);
                 ClanMember.MemberRank rank = ClanMember.MemberRank.valueOf(result.getString(4));
                 members.add(new ClanMember(uuid, rank));
             }
         } catch (SQLException ex) {
-            log.error("Failed to load clan members for {}", clan.getId(), ex);
+            log.error("Failed to load clan members for {}", clan.getId(), ex).submit();
         }
 
         return members;
@@ -310,19 +317,19 @@ public class ClanRepository implements IRepository<Clan> {
     public List<ClanAlliance> getAlliances(ClanManager clanManager, Clan clan) {
         List<ClanAlliance> alliances = new ArrayList<>();
         String query = "SELECT * FROM clan_alliances WHERE Clan = ?;";
-        CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId())));
-        try {
+
+        try (CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId())))) {
             while (result.next()) {
                 var otherClan = clanManager.getClanById(UUID.fromString(result.getString(3)));
                 if (otherClan.isPresent()) {
                     boolean trusted = result.getBoolean(4);
                     alliances.add(new ClanAlliance(otherClan.get(), trusted));
                 } else {
-                    log.warn("Could not find clan with id {}", result.getInt(3));
+                    log.warn("Could not find clan with id {}", result.getInt(3)).submit();
                 }
             }
         } catch (SQLException ex) {
-            log.error("Failed to load clan alliances for {}", clan.getId(), ex);
+            log.error("Failed to load clan alliances for {}", clan.getId(), ex).submit();
         }
 
         return alliances;
@@ -364,8 +371,8 @@ public class ClanRepository implements IRepository<Clan> {
     public List<ClanEnemy> getEnemies(ClanManager clanManager, Clan clan) {
         List<ClanEnemy> enemies = new ArrayList<>();
         String query = "SELECT * FROM clan_enemies WHERE Clan = ?;";
-        CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId())));
-        try {
+
+        try (CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId())))) {
             while (result.next()) {
                 var otherClan = clanManager.getClanById(UUID.fromString(result.getString(3)));
                 if (otherClan.isPresent()) {
@@ -374,7 +381,7 @@ public class ClanRepository implements IRepository<Clan> {
                 }
             }
         } catch (SQLException ex) {
-            log.error("Failed to load clan enemies for {}", clan.getId(), ex);
+            log.error("Failed to load clan enemies for {}", clan.getId(), ex).submit();
         }
 
         return enemies;
@@ -384,13 +391,13 @@ public class ClanRepository implements IRepository<Clan> {
     public Map<Integer, Double> getDominanceScale() {
         HashMap<Integer, Double> dominanceScale = new HashMap<>();
         String query = "SELECT * FROM clans_dominance_scale;";
-        CachedRowSet result = database.executeQuery(new Statement(query));
-        try {
+
+        try (CachedRowSet result = database.executeQuery(new Statement(query))) {
             while (result.next()) {
                 dominanceScale.put(result.getInt(1), result.getDouble(2));
             }
         } catch (SQLException ex) {
-            log.error("Failed to load dominance scale", ex);
+            log.error("Failed to load dominance scale", ex).submit();
         }
 
         return dominanceScale;
@@ -423,8 +430,7 @@ public class ClanRepository implements IRepository<Clan> {
         World world = Bukkit.getWorld("world");
         List<Insurance> insurance = Collections.synchronizedList(new ArrayList<>());
         String query = "SELECT * FROM clan_insurance WHERE Clan = ? ORDER BY Time ASC";
-        CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId())));
-        try {
+        try (CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId())))) {
             while (result.next()) {
                 InsuranceType insuranceType = InsuranceType.valueOf(result.getString(2));
                 Material material = Material.valueOf(result.getString(3));
@@ -438,11 +444,79 @@ public class ClanRepository implements IRepository<Clan> {
                 insurance.add(new Insurance(time, material, blockData, insuranceType, blockLocation));
             }
         } catch (SQLException ex) {
-            log.error("Failed to load insurance for {}", clan.getId(), ex);
+            log.error("Failed to load insurance for {}", clan.getId(), ex).submit();
         }
 
         return insurance;
     }
     //endregion
+
+    public List<String> getPlayersByClan(UUID clanID) {
+        List<String> playerNames = new ArrayList<>();
+
+        List<CachedLog> logs = logRepository.getLogsWithContextAndAction(LogContext.CLAN, clanID.toString(), "CLAN_");
+        logs.removeIf(cachedLog -> !cachedLog.getAction().equalsIgnoreCase("CLAN_CREATE")
+                && !cachedLog.getAction().equalsIgnoreCase("CLAN_JOIN"));
+
+        logs.forEach(cachedLog -> {
+            String playerName = cachedLog.getContext().get(LogContext.CLIENT_NAME);
+            playerNames.add(playerName);
+        });
+
+        return playerNames;
+    }
+
+    public List<Component> getClansByPlayer(UUID playerID) {
+        List<Component> clans = new ArrayList<>();
+
+        List<CachedLog> logs = logRepository.getLogsWithContextAndAction(LogContext.CLIENT, playerID.toString(), "CLAN_");
+        logs.removeIf(cachedLog -> !cachedLog.getAction().equalsIgnoreCase("CLAN_CREATE")
+                && !cachedLog.getAction().equalsIgnoreCase("CLAN_JOIN"));
+
+        logs.forEach(cachedLog -> {
+            String clanID = cachedLog.getContext().get(LogContext.CLAN);
+            String clanName = cachedLog.getContext().get(LogContext.CLAN_NAME);
+            clans.add(Component.text(clanName).hoverEvent(HoverEvent.showText(Component.text(clanID))));
+        });
+
+        return clans;
+    }
+
+    public void addClanKill(UUID killID, Clan killerClan, Clan victimClan, double dominance) {
+        UtilServer.runTaskAsync(JavaPlugin.getPlugin(Clans.class), () -> {
+
+            String query = "INSERT INTO clans_kills (KillId, KillerClan, VictimClan, Dominance) VALUES (?, ?, ?, ?)";
+            database.executeUpdate(new Statement(query,
+                    new UuidStatementValue(killID),
+                    new UuidStatementValue(killerClan.getId()),
+                    new UuidStatementValue(victimClan.getId()),
+                    new DoubleStatementValue(dominance)
+            ));
+        });
+    }
+
+
+    public List<KillClanLog> getClanKillLogs(Clan clan) {
+        List<KillClanLog> logList = new ArrayList<>();
+        String query = "CALL GetClanKillLogs(?)";
+
+        try (CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId())))) {
+            while (result.next()) {
+
+                UUID killer = UUID.fromString(result.getString(1));
+                UUID killerClan = UUID.fromString(result.getString(2));
+                UUID victim = UUID.fromString(result.getString(3));
+                UUID victimClan = UUID.fromString(result.getString(4));
+                double dominance = result.getDouble(5);
+                long time = result.getLong(6);
+
+
+                logList.add(new KillClanLog(killer, killerClan, victim, victimClan, dominance, time));
+            }
+        } catch (SQLException ex) {
+            log.error("Failed to get ClanUUID logs", ex).submit();
+        }
+        return logList;
+    }
 
 }

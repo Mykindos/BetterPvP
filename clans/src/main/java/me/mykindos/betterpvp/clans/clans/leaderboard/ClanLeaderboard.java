@@ -1,18 +1,22 @@
 package me.mykindos.betterpvp.clans.clans.leaderboard;
 
+import com.google.inject.Inject;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.menus.ClanMenu;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.stats.Leaderboard;
+import me.mykindos.betterpvp.core.stats.LeaderboardCategory;
 import me.mykindos.betterpvp.core.stats.SearchOptions;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardEntry;
 import me.mykindos.betterpvp.core.stats.sort.SortType;
 import me.mykindos.betterpvp.core.stats.sort.Sorted;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
+import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -37,6 +41,7 @@ public class ClanLeaderboard extends Leaderboard<UUID, Clan> implements Sorted {
 
     private final ClanManager clanManager;
 
+    @Inject
     public ClanLeaderboard(Clans clans, ClanManager clanManager) {
         super(clans);
         this.clanManager = clanManager;
@@ -46,6 +51,21 @@ public class ClanLeaderboard extends Leaderboard<UUID, Clan> implements Sorted {
     @Override
     public String getName() {
         return "Clans";
+    }
+
+    @Override
+    public LeaderboardCategory getCategory() {
+        return LeaderboardCategory.CLANS;
+    }
+
+    @Override
+    public Description getDescription() {
+        return Description.builder()
+                .icon(ItemView.builder()
+                        .material(Material.IRON_DOOR)
+                        .displayName(Component.text("Clans", NamedTextColor.DARK_RED))
+                        .build())
+                .build();
     }
 
     @Override

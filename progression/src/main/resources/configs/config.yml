@@ -1,26 +1,38 @@
+woodcutting:
+  experiencePerWood:
+    DARK_OAK_LOG: 10
+    ACACIA_LOG: 10
+    BIRCH_LOG: 10
+    OAK_LOG: 10
+    JUNGLE_LOG: 10
+    SPRUCE_LOG: 10
+  enabled: true
+
 mining:
   minLeaderboardBlockXp: 45
   xpPerBlock:
-    STONE: 15
-    ANDESITE: 15
-    GRANITE: 15
-    COBBLESTONE: 15
-    REDSTONE_ORE: 50
-    DIAMOND_ORE: 50
-    GOLD_ORE: 50
-    COPPER_ORE: 50
-    IRON_ORE: 50
-    COAL_ORE: 50
-    LAPIS_ORE: 50
-    EMERALD_ORE: 50
-    DEEPSLATE_REDSTONE_ORE: 50
-    DEEPSLATE_DIAMOND_ORE: 50
-    DEEPSLATE_GOLD_ORE: 50
-    DEEPSLATE_COPPER_ORE: 50
-    DEEPSLATE_IRON_ORE: 50
-    DEEPSLATE_COAL_ORE: 50
-    DEEPSLATE_LAPIS_ORE: 50
-    DEEPSLATE_EMERALD_ORE: 50
+    STONE: 1
+    ANDESITE: 1
+    GRANITE: 1
+    COBBLESTONE: 1
+    REDSTONE_ORE: 10
+    DIAMOND_ORE: 10
+    GOLD_ORE: 10
+    COPPER_ORE: 10
+    IRON_ORE: 10
+    COAL_ORE: 10
+    LAPIS_ORE: 10
+    EMERALD_ORE: 10
+    GILDED_BLACKSTONE: 10
+    DEEPSLATE_REDSTONE_ORE: 10
+    DEEPSLATE_DIAMOND_ORE: 10
+    DEEPSLATE_GOLD_ORE: 10
+    DEEPSLATE_COPPER_ORE: 10
+    DEEPSLATE_IRON_ORE: 10
+    DEEPSLATE_COAL_ORE: 10
+    DEEPSLATE_LAPIS_ORE: 10
+    DEEPSLATE_EMERALD_ORE: 10
+  enabled: true
 
 
 fishing:
@@ -29,49 +41,151 @@ fishing:
   bait:
     speedy:
       type: speed
-      seconds: 200.0
+      seconds: 180.0
       name: Speedy Bait
       radius: 5.0
-      multiplier: 10.0
+      multiplier: 3.0
       texture: http://textures.minecraft.net/texture/eb7a8d0d7365de95f23ac375498024cb31ae4e8d6d06d12a621e43cf1b7667d6
-    test:
-      type: speed
-      seconds: 200.0
-      name: Test Bait
-      radius: 5.0
-      multiplier: 20.0
-      texture: http://textures.minecraft.net/texture/1713f2a526e9e681092dd09e2180fcc00fc9fc33d288954c52fea6b959bc4e6e
-  #    meaty:
-  #      type: weight
-  #      name: Fat Bait
-  #      seconds: 5.0
-  #      radius: 2.5
-  #      weightAdd: 100
   loot:
     scepter:
       type: treasure
       material: DIAMOND
       customModelData: 70
-      frequency: 100
+      frequency: 1
       minAmount: 1
       maxAmount: 10
     zombie:
       type: entity
-      entity: DROWNED
-      frequency: 100
+      entity: ZOMBIE
+      frequency: 500
+    trout:
+      type: fish
+      name: Trout
+      maxWeight: 50
+      minWeight: 1
+      frequency: 10000
+      modelData: 1
+    salmon:
+      type: fish
+      name: Salmon
+      maxWeight: 50
+      minWeight: 1
+      frequency: 10000
+      modelData: 2
+    bluegill:
+      type: fish
+      name: Bluegill
+      maxWeight: 50
+      minWeight: 1
+      frequency: 10000
+      modelData: 3
+    gar:
+      type: fish
+      name: Gar
+      maxWeight: 50
+      minWeight: 1
+      frequency: 10000
+      modelData: 4
+    carp:
+      type: fish
+      name: Carp
+      maxWeight: 150
+      minWeight: 1
+      frequency: 5000
+      modelData: 5
+    catfish:
+      type: fish
+      name: Catfish
+      maxWeight: 150
+      minWeight: 1
+      frequency: 5000
+      modelData: 6
+    cod:
+      type: fish
+      name: Cod
+      maxWeight: 150
+      minWeight: 1
+      frequency: 5000
+      modelData: 7
+    drum:
+      type: fish
+      name: Drum
+      maxWeight: 150
+      minWeight: 1
+      frequency: 5000
+      modelData: 8
+    sablefish:
+      type: fish
+      name: Sablefish
+      maxWeight: 150
+      minWeight: 1
+      frequency: 5000
+      modelData: 9
+    kingfish:
+      type: fish
+      name: Kingfish
+      maxWeight: 250
+      minWeight: 100
+      frequency: 2500
+      modelData: 10
+    cobia:
+      type: fish
+      name: Cobia
+      maxWeight: 250
+      minWeight: 100
+      frequency: 2500
+      modelData: 11
+    sea_bass:
+      type: fish
+      name: Sea Bass
+      maxWeight: 250
+      minWeight: 100
+      frequency: 2500
+      modelData: 12
     tuna:
       type: fish
       name: Tuna
-      maxWeight: 400
-      minWeight: 1
-      frequency: 50
-    barracuda:
+      maxWeight: 500
+      minWeight: 200
+      frequency: 500
+      modelData: 13
+    swordfish:
       type: fish
-      name: Barracuda
-      maxWeight: 401
-      minWeight: 401
-      frequency: 10000
-  xpPerPound: 0.05
+      name: Swordfish
+      maxWeight: 500
+      minWeight: 200
+      frequency: 500
+      modelData: 14
+    grouper:
+      type: fish
+      name: Grouper
+      maxWeight: 700
+      minWeight: 400
+      frequency: 300
+      modelData: 16
+    marlin:
+      type: fish
+      name: Marlin
+      maxWeight: 1500
+      minWeight: 500
+      frequency: 150
+      modelData: 15
+    sturgeon:
+      type: fish
+      name: Sturgeon
+      maxWeight: 1000
+      minWeight: 500
+      frequency: 40
+      modelData: 17
+    sunfish:
+      type: fish
+      name: Sunfish
+      maxWeight: 2000
+      minWeight: 1000
+      frequency: 20
+      modelData: 18
+  xpPerPound: 0.1
+  enabled: true
 command:
   progression:
     enabled: true
@@ -89,5 +203,11 @@ command:
       enabled: true
       requiredRank: ADMIN
   stats:
+    enabled: true
+    requiredRank: PLAYER
+  mining:
+    enabled: true
+    requiredRank: ADMIN
+  woodcutting:
     enabled: true
     requiredRank: ADMIN

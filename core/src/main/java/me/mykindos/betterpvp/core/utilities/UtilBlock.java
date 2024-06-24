@@ -10,6 +10,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.Waterlogged;
 import org.bukkit.block.data.type.Bed;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -78,7 +79,8 @@ public class UtilBlock {
      */
     public static boolean isInWater(Player player) {
         Block block = player.getLocation().getBlock();
-        return isWater(block)  || player.isSwimming();
+
+        return isWater(block) || player.isSwimming() || (block.getBlockData() instanceof Waterlogged wl && wl.isWaterlogged());
     }
 
     public static boolean isWater(Block block) {
@@ -110,6 +112,44 @@ public class UtilBlock {
         return lastBlock;
     }
 
+    public static boolean isStandingOn(Entity ent, Material material) {
+        return isStandingOn(ent, material.name());
+    }
+
+    public static boolean isStandingOn(Entity ent, String material) {
+        if (!(ent instanceof Player player)) {
+            return ent.isOnGround();
+        }
+
+        final World world = player.getWorld();
+        final BoundingBox reference = player.getBoundingBox();
+
+
+        final BoundingBox collisionBox = reference.clone().shift(0, -0.1, 0);
+        Block block = new Location(world, reference.getMinX(), reference.getMinY() - 0.1, reference.getMinZ()).getBlock();
+        if (block.getType().name().toLowerCase().contains(material.toLowerCase()) && doesBoundingBoxCollide(collisionBox, block)) {
+            return true;
+        }
+
+        block = new Location(world, reference.getMinX(), reference.getMinY() - 0.1, reference.getMaxZ()).getBlock();
+        if (block.getType().name().toLowerCase().contains(material.toLowerCase()) && doesBoundingBoxCollide(collisionBox, block)) {
+            return true;
+        }
+
+        block = new Location(world, reference.getMaxX(), reference.getMinY() - 0.1, reference.getMinZ()).getBlock();
+        if (block.getType().name().toLowerCase().contains(material.toLowerCase()) && doesBoundingBoxCollide(collisionBox, block)) {
+            return true;
+        }
+
+        block = new Location(world, reference.getMaxX(), reference.getMinY() - 0.1, reference.getMaxZ()).getBlock();
+        if (block.getType().name().toLowerCase().contains(material.toLowerCase()) && doesBoundingBoxCollide(collisionBox, block)) {
+            return true;
+        }
+
+        return false;
+
+    }
+
     /**
      * Check if an Entity is on the ground
      *
@@ -123,7 +163,7 @@ public class UtilBlock {
     /**
      * Check if an Entity is on the ground
      *
-     * @param ent The Entity
+     * @param ent       The Entity
      * @param numBlocks The number of blocks below the ent to check
      * @return Returns true if the entity is on the ground
      */
@@ -135,7 +175,7 @@ public class UtilBlock {
         final World world = player.getWorld();
         final BoundingBox reference = player.getBoundingBox();
 
-        for(int i = 0; i < numBlocks; i++) {
+        for (int i = 0; i < numBlocks; i++) {
             final BoundingBox collisionBox = reference.clone().shift(0, -0.1 - i, 0);
             Block block = new Location(world, reference.getMinX(), reference.getMinY() - 0.1 - i, reference.getMinZ()).getBlock();
             if (solid(block) && doesBoundingBoxCollide(collisionBox, block)) {
@@ -158,7 +198,6 @@ public class UtilBlock {
         final BoundingBox collisionBox = reference.clone().shift(0, -0.1, 0);
         Block block = new Location(world, reference.getMaxX(), reference.getMinY() - 0.1, reference.getMaxZ()).getBlock();
         return solid(block) && doesBoundingBoxCollide(collisionBox, block);
-
 
     }
 
@@ -368,7 +407,6 @@ public class UtilBlock {
     }
 
     /**
-     *
      * @param block Block ID to check
      * @return True if it is a Slime or Honey block
      */
@@ -456,6 +494,7 @@ public class UtilBlock {
 
     /**
      * Get the persistent data container for a block
+     *
      * @param block The block to get the container for
      * @return The persistent data container for the block
      */
@@ -467,7 +506,7 @@ public class UtilBlock {
             return chunkPdc.getAdapterContext().newPersistentDataContainer();
         }
 
-        final PersistentDataContainer [] blockData = chunkPdc.get(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, PersistentDataType.TAG_CONTAINER_ARRAY);
+        final PersistentDataContainer[] blockData = chunkPdc.get(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, PersistentDataType.TAG_CONTAINER_ARRAY);
         if (blockData == null) {
             throw new RuntimeException("Block PDC is null");
         }
@@ -486,7 +525,8 @@ public class UtilBlock {
 
     /**
      * Set the persistent data container for a block
-     * @param block The block to set the container for
+     *
+     * @param block     The block to set the container for
      * @param container The container to set
      */
     public static void setPersistentDataContainer(Block block, PersistentDataContainer container) {
@@ -501,11 +541,11 @@ public class UtilBlock {
             if (remove) {
                 return; // Don't set if we have no data and we're removing
             }
-            chunkPdc.set(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, PersistentDataType.TAG_CONTAINER_ARRAY, new PersistentDataContainer [] {container});
+            chunkPdc.set(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, PersistentDataType.TAG_CONTAINER_ARRAY, new PersistentDataContainer[]{container});
             return;
         }
 
-        final PersistentDataContainer [] blockData = chunkPdc.get(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, PersistentDataType.TAG_CONTAINER_ARRAY);
+        final PersistentDataContainer[] blockData = chunkPdc.get(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, PersistentDataType.TAG_CONTAINER_ARRAY);
         if (blockData == null) {
             throw new RuntimeException("Block PDC is null");
         }
@@ -517,7 +557,7 @@ public class UtilBlock {
             if (key == blockKey) {
                 if (remove) {
                     // If we're removing, remove the element from the array
-                    final PersistentDataContainer [] newData = new PersistentDataContainer [blockData.length - 1];
+                    final PersistentDataContainer[] newData = new PersistentDataContainer[blockData.length - 1];
                     System.arraycopy(blockData, 0, newData, 0, i);
                     System.arraycopy(blockData, i + 1, newData, i, blockData.length - i - 1);
                     chunkPdc.set(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, PersistentDataType.TAG_CONTAINER_ARRAY, newData);
@@ -531,7 +571,7 @@ public class UtilBlock {
         }
 
         // If none was found for this block, just enter it into the array
-        final PersistentDataContainer [] newData = new PersistentDataContainer [blockData.length + 1];
+        final PersistentDataContainer[] newData = new PersistentDataContainer[blockData.length + 1];
         System.arraycopy(blockData, 0, newData, 0, blockData.length);
         newData[blockData.length] = container;
         chunkPdc.set(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, PersistentDataType.TAG_CONTAINER_ARRAY, newData);
@@ -539,6 +579,7 @@ public class UtilBlock {
 
     /**
      * Get the block key for a block
+     *
      * @param block The block to get the key for
      * @return The block key
      */
@@ -559,4 +600,5 @@ public class UtilBlock {
             block = block.getRelative(facing);
         }
     }
+
 }

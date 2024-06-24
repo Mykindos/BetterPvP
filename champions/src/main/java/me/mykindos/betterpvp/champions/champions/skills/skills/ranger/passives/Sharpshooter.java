@@ -84,6 +84,7 @@ public class Sharpshooter extends Skill implements PassiveSkill {
             StackingHitData hitData = data.get(damager);
             hitData.addCharge();
             event.setDamage(event.getDamage() + (Math.min(getMaxConsecutiveHits(level), hitData.getCharge()) * getDamage(level)));
+            event.addReason("Sharpshooter");
             UtilMessage.simpleMessage(damager, getClassType().getName(), "<yellow>%d<gray> consecutive hits (<green>+%.2f damage<gray>)", hitData.getCharge(), (Math.min(getMaxConsecutiveHits(level), hitData.getCharge()) * getDamage(getLevel(damager))));
             damager.playSound(damager.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, (0.8f + (float)(hitData.getCharge() * 0.2)));
         }

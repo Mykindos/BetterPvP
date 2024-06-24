@@ -4,9 +4,9 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
-import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateLoreEvent;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateNameEvent;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDItem;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDManager;
@@ -27,6 +27,7 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,6 +65,10 @@ public class ItemHandler {
         items.forEach(item -> itemMap.put(item.getIdentifier(), item));
     }
 
+    public ItemStack updateNames(ItemStack itemStack) {
+        return updateNames(itemStack, true);
+    }
+
     /**
      * General method that updates the name of almost every item that is picked up by players
      * E.g. Names leather armour after assassins
@@ -72,7 +77,7 @@ public class ItemHandler {
      * @param itemStack ItemStack to update
      * @return An ItemStack with an updated name
      */
-    public ItemStack updateNames(ItemStack itemStack) {
+    public ItemStack updateNames(ItemStack itemStack, boolean giveUUID) {
         Material material = itemStack.getType();
         if (material == Material.AIR) {
             return itemStack;
@@ -98,7 +103,7 @@ public class ItemHandler {
 
             PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
 
-            if (item.isGiveUUID()) {
+            if (item.isGiveUUID() && giveUUID) {
                 if (!dataContainer.has(CoreNamespaceKeys.UUID_KEY)) {
                     UUID newUuid = UUID.randomUUID();
                     dataContainer.set(CoreNamespaceKeys.UUID_KEY, PersistentDataType.STRING, newUuid.toString());
@@ -182,5 +187,13 @@ public class ItemHandler {
             }
         }
         return Optional.empty();
+    }
+
+    public List<BPvPItem> getLegends() {
+        return getItems().stream().filter(LegendaryWeapon.class::isInstance).toList();
+    }
+
+    public Collection<BPvPItem> getItems() {
+        return itemMap.values();
     }
 }

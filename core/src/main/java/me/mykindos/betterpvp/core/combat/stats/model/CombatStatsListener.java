@@ -55,7 +55,7 @@ public abstract class CombatStatsListener<T extends CombatData> implements Liste
             }
 
             if (killerData == null) {
-                log.error("Failed to find killer combat data for " + killer + ". Maybe they killed the player but dealt no damage?");
+                log.error("Failed to find killer combat data for " + killer + ". Maybe they killed the player but dealt no damage?").submit();
                 return;
             }
 
@@ -77,7 +77,7 @@ public abstract class CombatStatsListener<T extends CombatData> implements Liste
             // Only announce for killer since he's the one that gained rating
             leaderboard.attemptAnnounce(killer, killerUpdate);
         }).exceptionally(throwable -> {
-            log.error("Failed to save combat data for " + victim.getName(), throwable);
+            log.error("Failed to save combat data for " + victim.getName(), throwable).submit();
             return null;
         });
     }

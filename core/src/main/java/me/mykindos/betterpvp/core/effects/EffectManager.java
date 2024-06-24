@@ -68,13 +68,16 @@ public class EffectManager extends Manager<List<Effect>> {
     }
 
     public void addEffect(LivingEntity target, Effect effect) {
-          addEffect(target, effect, false);
+        addEffect(target, effect, false);
     }
 
     public void addEffect(LivingEntity target, Effect effect, boolean overwrite) {
         EffectReceiveEvent event = UtilServer.callEvent(new EffectReceiveEvent(target, effect));
         EffectType type = effect.getEffectType();
         if (!event.isCancelled()) {
+            if (target.isDead()) {
+                return;
+            }
 
             if (!type.canStack()) {
                 if (hasEffect(target, effect.getEffectType())) {
@@ -88,7 +91,7 @@ public class EffectManager extends Manager<List<Effect>> {
                     overwriteEffect.setAmplifier(effect.getAmplifier());
                     overwriteEffect.setLength(effect.getLength() - System.currentTimeMillis());
 
-                    if(effect.getEffectType() instanceof VanillaEffectType vanillaEffectType) {
+                    if (effect.getEffectType() instanceof VanillaEffectType vanillaEffectType) {
                         vanillaEffectType.checkActive(target, effect);
                     }
 
@@ -198,7 +201,7 @@ public class EffectManager extends Manager<List<Effect>> {
     public void removeAllEffects(LivingEntity target) {
         objects.getOrDefault(target.getUniqueId().toString(), new ArrayList<>()).removeIf(effect -> {
 
-            if(!effect.isPermanent()) {
+            if (!effect.isPermanent()) {
                 UtilServer.callEvent(new EffectExpireEvent(target, effect));
                 return true;
             }
@@ -216,10 +219,24 @@ public class EffectManager extends Manager<List<Effect>> {
             }
         }
 
-        for (EffectType effect : EffectTypes.getEffectTypes()) {
-            if (!effect.isNegative()) continue;
-            removeEffect(target, effect);
+        Optional<List<Effect>> effectOptional = getObject(target.getUniqueId().toString());
+        if (effectOptional.isPresent()) {
+            List<Effect> effects = effectOptional.get();
+            effects.removeIf(effect -> {
+                if (!effect.getEffectType().isNegative()) return false;
+                if (effect.getEffectType().mustBeManuallyRemoved()) return false;
+                if (effect.getApplier() != null && effect.getApplier().equals(target)) return false;
+
+                if (effect.getEffectType() instanceof VanillaEffectType vanillaEffectType) {
+                    vanillaEffectType.onExpire(target, effect);
+                }
+
+                UtilServer.callEvent(new EffectExpireEvent(target, effect));
+
+                return true;
+            });
         }
+
 
         target.setFireTicks(0);
     }

@@ -62,6 +62,7 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
                 "You leave a trail of fire, which",
                 "ignites enemies for <stat>" + getFireTickDuration(level) + "</stat> seconds",
                 "",
+                "Uses <stat>" + getEnergyStartCost(level) + "</stat> energy on activation",
                 "Energy / Second: <val>" + getEnergy(level)
 
         };
@@ -101,7 +102,7 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
 
     @Override
     public void toggleActive(Player player) {
-        if (championsManager.getEnergy().use(player, getName(), 10, false)) {
+        if (championsManager.getEnergy().use(player, getName(), getEnergyStartCost(player.getLevel()), false)) {
             UtilMessage.simpleMessage(player, getClassType().getName(), "Immolate: <green>On");
         } else {
             cancel(player);
@@ -144,9 +145,9 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
         int level = getLevel(player);
         if (level <= 0) {
             return false;
-        } else if (!championsManager.getEnergy().use(player, getName(), getEnergy(level) / 5, true)) {
+        } else if (!championsManager.getEnergy().use(player, getName(), getEnergy(level) / 20, true)) {
             return false;
-        } else if (championsManager.getEffects().hasEffect(player, EffectTypes.SILENCE)) {
+        } else if (championsManager.getEffects().hasEffect(player, EffectTypes.SILENCE) && !canUseWhileSilenced()) {
             return false;
         } else {
             championsManager.getEffects().addEffect(player, EffectTypes.SPEED, getName(), speedStrength, 1250, true);

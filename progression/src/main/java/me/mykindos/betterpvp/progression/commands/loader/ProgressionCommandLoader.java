@@ -30,7 +30,7 @@ public class ProgressionCommandLoader extends CommandLoader {
         loadSubCommands(subCommandClasses);
 
         plugin.saveConfig();
-        log.info("Loaded {} commands for Progression", count);
+        log.info("Loaded {} commands for Progression", count).submit();
     }
 
 }

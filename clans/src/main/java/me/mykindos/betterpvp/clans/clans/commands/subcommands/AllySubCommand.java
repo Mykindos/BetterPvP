@@ -59,7 +59,7 @@ public class AllySubCommand extends ClanSubCommand {
             return;
         }
 
-        Optional<Clan> targetClanOptional = clanManager.getObject(args[0]);
+        Optional<Clan> targetClanOptional = clanManager.getClanByName(args[0]);
         if (targetClanOptional.isEmpty()) {
             UtilMessage.message(player, "Clans", "The clan you want to ally with does not exist.");
             return;
@@ -82,7 +82,7 @@ public class AllySubCommand extends ClanSubCommand {
         }
 
         int ownSquadSize = clan.getSquadCount();
-        if (ownSquadSize + targetClan.getMembers().size() >= maxClanMembers) {
+        if (ownSquadSize + targetClan.getSquadCount() > maxClanMembers) {
             UtilMessage.message(player, "Clans", "Your clan has too many members / allies to ally another clan.");
             return;
         }

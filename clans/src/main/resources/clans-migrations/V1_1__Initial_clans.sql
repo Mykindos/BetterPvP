@@ -11,19 +11,7 @@ create table if not exists clans
         primary key (id)
 );
 
-create table if not exists old_clans
-(
-    id   varchar(36) not null,
-    Name varchar(32) not null
-);
-
-create unique index clans_Name_uindex
-    on clans (Name);
-
-CREATE VIEW IF NOT EXISTS clans_names AS
-SELECT id, Name FROM clans
-UNION
-SELECT id, Name FROM old_clans;
+alter table clans add index (Name);
 
 create table if not exists clan_territory
 (
@@ -84,6 +72,7 @@ create table if not exists clans_dominance_scale
         primary key (ClanSize)
 );
 
+INSERT IGNORE INTO clans_dominance_scale VALUES (0, 3.5);
 INSERT IGNORE INTO clans_dominance_scale VALUES (1, 3.5);
 INSERT IGNORE INTO clans_dominance_scale VALUES (2, 3.5);
 INSERT IGNORE INTO clans_dominance_scale VALUES (3, 4);

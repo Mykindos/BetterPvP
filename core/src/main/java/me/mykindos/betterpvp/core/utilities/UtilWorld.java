@@ -54,14 +54,18 @@ public class UtilWorld {
     }
 
     public static Chunk stringToChunk(String string) {
+        return stringToChunk(string, true);
+    }
+
+    public static Chunk stringToChunk(String string, boolean generate) {
         try {
             String[] tokens = string.split("/ ");
             World world = Bukkit.getWorld(tokens[0]);
             if (world != null) {
-                return world.getChunkAt(Integer.parseInt(tokens[1]), Integer.parseInt(tokens[2]));
+                return world.getChunkAt(Integer.parseInt(tokens[1]), Integer.parseInt(tokens[2]), generate);
             }
         } catch (Exception ex) {
-            log.error("Error parsing chunk from string: " + string);
+            log.error("Error parsing chunk from string: " + string).submit();
         }
 
         return null;
@@ -115,12 +119,20 @@ public class UtilWorld {
      * @return Returns a string of a locations coordinates
      */
     public static String locationToString(Location location) {
-        return locationToString(location, true);
+        return locationToString(location, true, false);
     }
 
     public static String locationToString(Location location, boolean display) {
+        return locationToString(location, display, false);
+    }
+
+    public static String locationToString(Location location, boolean display, boolean includeWorld) {
         if (display) {
-            return "(" + Math.round(location.getX()) + ", " + Math.round(location.getY()) + ", " + Math.round(location.getZ()) + ")";
+            if(includeWorld) {
+                return "(" + location.getWorld().getName() + ", " + Math.round(location.getX()) + ", " + Math.round(location.getY()) + ", " + Math.round(location.getZ()) + ")";
+            } else {
+                return "(" + Math.round(location.getX()) + ", " + Math.round(location.getY()) + ", " + Math.round(location.getZ()) + ")";
+            }
         }
 
         return location.getWorld().getName() + ", " + location.getX() + ", " + location.getY() + ", " + location.getZ()

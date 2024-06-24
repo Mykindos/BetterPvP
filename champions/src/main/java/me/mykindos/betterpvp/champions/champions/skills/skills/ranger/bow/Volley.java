@@ -47,8 +47,9 @@ public class Volley extends PrepareArrowSkill {
         return new String[]{
                 "Left click with a Bow to prepare",
                 "",
-                "Your next shot is instant, and shoots a volley",
-                "of arrows in the direction you are facing",
+                "Your next shot shoots a volley",
+                "of arrows in the direction",
+                "you are facing",
                 "",
                 "Each arrow will deal <stat>" + getDamage(level) + "</stat> damage",
                 "",

@@ -21,8 +21,12 @@ import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.champions.champions.roles.events.RoleChangeEvent;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
+import me.mykindos.betterpvp.champions.properties.ChampionsProperty;
+import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.packet.play.clientbound.WrapperPlayServerEntityEquipment;
@@ -32,7 +36,6 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -57,12 +60,16 @@ public class InventorySkillListener extends PacketAdapter implements Listener {
     private final BuildManager buildManager;
     private final RoleManager roleManager;
     private final Champions champions;
+    private final ClientManager clientManager;
+    private final CooldownManager cooldownManager;
 
     @Inject
-    private InventorySkillListener(Champions champions, BuildManager buildManager, RoleManager roleManager) {
+    private InventorySkillListener(Champions champions, BuildManager buildManager, RoleManager roleManager, ClientManager clientManager, CooldownManager cooldownManager) {
         super(champions, ListenerPriority.HIGHEST,
                 PacketType.Play.Server.WINDOW_ITEMS,
                 PacketType.Play.Server.SET_SLOT);
+        this.clientManager = clientManager;
+        this.cooldownManager = cooldownManager;
         ProtocolLibrary.getProtocolManager().addPacketListener(this);
         this.champions = champions;
         this.buildManager = buildManager;
@@ -75,6 +82,18 @@ public class InventorySkillListener extends PacketAdapter implements Listener {
         final Player receiver = event.getPlayer();
 
         if(receiver.getOpenInventory().getType() != InventoryType.CRAFTING) return;
+        if(type != PacketType.Play.Server.WINDOW_ITEMS && type != PacketType.Play.Server.SET_SLOT && type != PacketType.Play.Server.ENTITY_EQUIPMENT) return;
+
+        Client client = clientManager.search().online(receiver);
+        final boolean showTooltips = (boolean) client.getProperty(ChampionsProperty.SKILL_WEAPON_TOOLTIP).orElse(false);
+        if(!showTooltips) {
+            return;
+        }
+
+        // Its pretty easy to spam these packets, so we will limit it to 1 per second. Should have no negative impact
+        if(!cooldownManager.use(receiver, "SkillWeaponTooltip", 1, false)) {
+            return;
+        }
 
         if (type == PacketType.Play.Server.WINDOW_ITEMS) {
             final WrapperPlayServerWindowItems packet = new WrapperPlayServerWindowItems(event.getPacket());
@@ -96,33 +115,34 @@ public class InventorySkillListener extends PacketAdapter implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onRoleChange(RoleChangeEvent event) {
+        updateInventory(event.getPlayer());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onSkillEquip(SkillEquipEvent event) {
+        updateInventory(event.getPlayer());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onSkillUpdate(SkillUpdateEvent event) {
+        updateInventory(event.getPlayer());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onBuildApply(ApplyBuildEvent event) {
+        updateInventory(event.getPlayer());
+    }
+    
+    private void updateInventory(Player player) {
         UtilServer.runTaskLater(champions, () -> {
-            Player player = event.getPlayer();
             if(player.getItemOnCursor().getType() == Material.AIR) {
                 player.updateInventory();
             }
         }, 2L);
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onSkillEquip(SkillEquipEvent event) {
-        Bukkit.getScheduler().runTaskLater(champions, () -> event.getPlayer().updateInventory(), 2L);
-
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onSkillUpdate(SkillUpdateEvent event) {
-        Bukkit.getScheduler().runTaskLater(champions, () -> event.getPlayer().updateInventory(), 2L);
-
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onBuildApply(ApplyBuildEvent event) {
-        Bukkit.getScheduler().runTaskLater(champions, () -> event.getPlayer().updateInventory(), 2L);
-
-    }
-
     private List<ItemStack> addLore(Collection<ItemStack> items, Player player) {
+
         final List<ItemStack> newItems = new ArrayList<>();
         for (ItemStack itemStack : items) {
             newItems.add(addLore(itemStack, player));
@@ -156,15 +176,20 @@ public class InventorySkillListener extends PacketAdapter implements Listener {
             return itemStack; // No skill
         }
 
-        final int level = buildSkill.getLevel();
+        int level = buildSkill.getLevel();
         final Skill skill = buildSkill.getSkill();
+
+        boolean boosted = SkillWeapons.isBooster(itemStack.getType());
+        if (boosted) {
+            level++;
+        }
 
         final ItemStack clone = itemStack.clone();
         final ItemMeta meta = clone.getItemMeta();
         final List<Component> lore = Objects.requireNonNullElse(meta.lore(), new ArrayList<>());
         lore.add(Component.empty());
         lore.add(UtilMessage.DIVIDER);
-        lore.add(buildSkill.getComponent().decoration(TextDecoration.ITALIC, false));
+        lore.add(buildSkill.getComponent(boosted).decoration(TextDecoration.ITALIC, false));
         lore.addAll(Arrays.stream(skill.parseDescription(level)).toList());
         lore.add(UtilMessage.DIVIDER);
         meta.lore(lore);

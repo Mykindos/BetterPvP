@@ -40,8 +40,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.WeakHashMap;
 
 @Singleton
@@ -167,23 +170,22 @@ public class Wreath extends Skill implements InteractSkill, Listener {
 
     private void processPlayerAction(Player player, int level) {
 
-        final Location startPos = player.getLocation().clone();
-        final Vector vector = player.getLocation().clone().getDirection().normalize().multiply(1);
+        final Location startPos = player.getLocation().clone().subtract(player.getLocation().clone().getDirection());
+        startPos.setY(Math.ceil(startPos.getY()));
+        final Vector vector = startPos.clone().getDirection();
         vector.setY(0);
-        final Location loc = player.getLocation().subtract(0, 1, 0).add(vector);
+        final Location loc = startPos.clone().subtract(0, 1, 0).add(vector);
+        final Set<LivingEntity> targets = new HashSet<>();
 
         final BukkitTask runnable = new BukkitRunnable() {
-
             @Override
             public void run() {
                 loc.add(vector);
-                if ((!UtilBlock.airFoliage(loc.getBlock()))
-                        && UtilBlock.solid(loc.getBlock())) {
+
+                if ((!UtilBlock.airFoliage(loc.getBlock())) && UtilBlock.solid(loc.getBlock())) {
 
                     loc.add(0.0D, 1.0D, 0.0D);
-                    if ((!UtilBlock.airFoliage(loc.getBlock()))
-                            && UtilBlock.solid(loc.getBlock())) {
-
+                    if ((!UtilBlock.airFoliage(loc.getBlock())) && UtilBlock.solid(loc.getBlock())) {
                         cancel();
                         return;
                     }
@@ -204,20 +206,23 @@ public class Wreath extends Skill implements InteractSkill, Listener {
                 }
 
                 EvokerFangs fangs = (EvokerFangs) player.getWorld().spawnEntity(loc, EntityType.EVOKER_FANGS);
-                for (LivingEntity target : UtilEntity.getNearbyEnemies(player, fangs.getLocation(), 1.5)) {
+                final List<LivingEntity> hit = UtilEntity.getNearbyEnemies(player, fangs.getLocation(), 1.5);
+                for (LivingEntity target : hit) {
+                    if (targets.contains(target)) {
+                        continue;
+                    }
+
                     CustomDamageEvent dmg = new CustomDamageEvent(target, player, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, getName());
                     UtilDamage.doCustomDamage(dmg);
                     championsManager.getEffects().addEffect(target, player, EffectTypes.SLOWNESS, slowStrength, (long) (getSlowDuration(level) * 1000));
                     UtilPlayer.health(player, getHealthPerEnemyHit(level));
                 }
+                targets.addAll(hit);
 
             }
 
         }.runTaskTimer(champions, 0, 1);
-
         UtilServer.runTaskLater(champions, runnable::cancel, 60);
-
-
     }
 
     @UpdateEvent(delay = 100)
@@ -279,7 +284,7 @@ public class Wreath extends Skill implements InteractSkill, Listener {
         baseSlowDuration = getConfig("baseSlowDuration", 2.0, Double.class);
         slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.0, Double.class);
 
-        baseDamage = getConfig("baseDamage", 4.0, Double.class);
+        baseDamage = getConfig("baseDamage", 2.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.66, Double.class);
 
         healthPerEnemyHit = getConfig("healthPerEnemyHit", 1.0, Double.class);

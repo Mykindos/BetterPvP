@@ -6,11 +6,11 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
-import me.mykindos.betterpvp.clans.clans.leveling.ClanPerkManager;
 import me.mykindos.betterpvp.clans.commands.ClansCommandLoader;
-import me.mykindos.betterpvp.clans.injector.ClansInjectorModule;
-import me.mykindos.betterpvp.clans.listener.ClansListenerLoader;
 import me.mykindos.betterpvp.clans.display.ClansSidebar;
+import me.mykindos.betterpvp.clans.injector.ClansInjectorModule;
+import me.mykindos.betterpvp.clans.leaderboards.ClansLeaderboardLoader;
+import me.mykindos.betterpvp.clans.listener.ClansListenerLoader;
 import me.mykindos.betterpvp.clans.tips.ClansTipLoader;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.Config;
@@ -21,10 +21,10 @@ import me.mykindos.betterpvp.core.framework.ModuleLoadedEvent;
 import me.mykindos.betterpvp.core.framework.adapter.Adapters;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapters;
+import me.mykindos.betterpvp.core.framework.sidebar.SidebarController;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDManager;
-import me.mykindos.betterpvp.core.framework.sidebar.SidebarController;
 import org.bukkit.Bukkit;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
@@ -82,9 +82,6 @@ public class Clans extends BPvPPlugin {
             var itemHandler = injector.getInstance(ItemHandler.class);
             itemHandler.loadItemData("clans");
 
-            var perkManager = injector.getInstance(ClanPerkManager.class);
-            perkManager.scan();
-
             var uuidManager = injector.getInstance(UUIDManager.class);
             uuidManager.loadObjectsFromNamespace("clans");
 
@@ -93,6 +90,9 @@ public class Clans extends BPvPPlugin {
             if (clansSidebar.isEnabled()) {
                 sidebarController.setDefaultProvider(gamer -> clansSidebar);
             }
+
+            var leaderboardLoader = injector.getInstance(ClansLeaderboardLoader.class);
+            leaderboardLoader.registerLeaderboards(PACKAGE);
 
             updateEventExecutor.loadPlugin(this);
 

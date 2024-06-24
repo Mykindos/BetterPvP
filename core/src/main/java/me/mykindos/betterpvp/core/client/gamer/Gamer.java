@@ -9,10 +9,11 @@ import me.mykindos.betterpvp.core.client.gamer.properties.GamerPropertyUpdateEve
 import me.mykindos.betterpvp.core.framework.adapter.Compatibility;
 import me.mykindos.betterpvp.core.framework.customtypes.IMapListener;
 import me.mykindos.betterpvp.core.framework.inviting.Invitable;
-import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.framework.sidebar.Sidebar;
+import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.Unique;
 import me.mykindos.betterpvp.core.utilities.model.display.ActionBar;
 import me.mykindos.betterpvp.core.utilities.model.display.PlayerList;
@@ -112,10 +113,10 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
 
     public void setSidebar(@Nullable Sidebar sidebar) {
         if (this.sidebar != null && this.isOnline()) {
-            this.sidebar.removeViewer(Objects.requireNonNull(getPlayer()));
+            UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> this.sidebar.removeViewer(Objects.requireNonNull(getPlayer())));
         }
         if (sidebar != null && this.isOnline()) {
-            sidebar.addViewer(Objects.requireNonNull(getPlayer()));
+            UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> sidebar.addViewer(Objects.requireNonNull(getPlayer())));
         }
         this.sidebar = sidebar;
     }
@@ -137,5 +138,9 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
     @Override
     public UUID getUniqueId() {
         return UUID.fromString(uuid);
+    }
+
+    public boolean isInCombat() {
+        return !UtilTime.elapsed(lastDamaged, 15000);
     }
 }

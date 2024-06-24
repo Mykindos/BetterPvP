@@ -94,7 +94,7 @@ public abstract class PlayerManager<T extends Unique> {
                               @Nullable final Runnable failure) {
         CompletableFuture.runAsync(() -> this.loadOnline(playerId, name, user -> {
             if (user.isEmpty()) {
-                log.warn(LOAD_ERROR_FORMAT_SERVER, name);
+                log.warn(LOAD_ERROR_FORMAT_SERVER, name).submit();
                 if (failure != null) {
                     Bukkit.getScheduler().runTask(this.plugin, failure);
                 }
@@ -103,13 +103,13 @@ public abstract class PlayerManager<T extends Unique> {
                         .ifPresent(player -> player.kick(Component.text(LOAD_ERROR_FORMAT_ENTITY)));
             } else {
                 final T entity = user.get();
-                log.info(LOAD_ENTITY_FORMAT, entity.getUniqueId());
+                log.info(LOAD_ENTITY_FORMAT, entity.getUniqueId()).submit();
                 if (success != null) {
                     Bukkit.getScheduler().runTask(this.plugin, () -> success.accept(entity));
                 }
             }
         })).exceptionally(throwable -> {
-            log.error(LOAD_ERROR_FORMAT_SERVER, name, throwable);
+            log.error(LOAD_ERROR_FORMAT_SERVER, name, throwable).submit();
             if (failure != null) {
                 failure.run();
             }

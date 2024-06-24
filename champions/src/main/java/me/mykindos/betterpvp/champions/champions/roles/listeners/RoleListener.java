@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilEffect;
+import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
@@ -29,12 +30,17 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityShootBowEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EntityEquipment;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 
@@ -83,7 +89,7 @@ public class RoleListener implements Listener {
 
         for (PotionEffect effect : player.getActivePotionEffects()) {
 
-            if(UtilEffect.isNegativePotionEffect(effect)) {
+            if (UtilEffect.isNegativePotionEffect(effect)) {
                 continue;
             }
 
@@ -179,8 +185,8 @@ public class RoleListener implements Listener {
             RoleBuild build = builds.getActiveBuilds().get(role.getName());
             if (build != null) {
                 return build.getBuildComponent();
-                }
             }
+        }
         return Component.empty();
     }
 
@@ -226,4 +232,34 @@ public class RoleListener implements Listener {
         });
     }
 
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent event) {
+        if (event.getSlotType() != InventoryType.SlotType.ARMOR) return;
+        if (!(event.getWhoClicked() instanceof Player player)) return;
+
+        Gamer gamer = clientManager.search().online(player).getGamer();
+        if (gamer.isInCombat()) {
+            final Optional<Role> role = roleManager.getObject(player.getUniqueId());
+            if (role.isPresent()) {
+                UtilMessage.message(player, "Class", "You cannot remove your class while in combat.");
+                event.setCancelled(true);
+            }
+
+        }
+    }
+
+    @EventHandler
+    public void onArmourChange(PlayerInteractEvent event) {
+        if (event.getHand() == EquipmentSlot.OFF_HAND || !event.getAction().isRightClick()) return;
+
+        ItemStack mainhand = event.getPlayer().getInventory().getItemInMainHand();
+        Player player = event.getPlayer();
+        Gamer gamer = clientManager.search().online(player).getGamer();
+        if (UtilItem.isArmour(mainhand.getType()) && gamer.isInCombat()) {
+            UtilMessage.message(player, "Class", "You cannot remove your class while in combat.");
+            event.setUseItemInHand(Event.Result.DENY);
+        }
+    }
 }
+
+

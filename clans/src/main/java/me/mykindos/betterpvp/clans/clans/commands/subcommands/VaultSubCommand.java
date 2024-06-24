@@ -14,6 +14,8 @@ import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.entity.Player;
 
+import java.util.Optional;
+
 @Singleton
 @SubCommand(ClanCommand.class)
 public class VaultSubCommand extends ClanSubCommand {
@@ -36,6 +38,13 @@ public class VaultSubCommand extends ClanSubCommand {
     @Override
     public void execute(Player player, Client client, String... args) {
         Clan clan = clanManager.getClanByPlayer(player).orElseThrow();
+
+        Optional<Clan> locationClanOptional = clanManager.getClanByLocation(player.getLocation());
+        if(locationClanOptional.isEmpty() || !locationClanOptional.get().equals(clan)) {
+            UtilMessage.simpleMessage(player, "Clans", "You must be in your clan's territory to access the vault.");
+            return;
+        }
+
         final ClanVault vault = clan.getVault();
         if (!vault.hasPermission(player)) {
             UtilMessage.message(player, "Clans", "You do not have permission to access the clan vault.");

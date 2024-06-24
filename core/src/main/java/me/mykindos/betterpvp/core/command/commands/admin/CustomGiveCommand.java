@@ -8,13 +8,11 @@ import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
+import me.mykindos.betterpvp.core.framework.annotations.WithReflection;
 import me.mykindos.betterpvp.core.items.BPvPItem;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDItem;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDManager;
-import me.mykindos.betterpvp.core.logging.type.UUIDLogType;
-import me.mykindos.betterpvp.core.logging.type.UUIDType;
-import me.mykindos.betterpvp.core.logging.type.logs.ItemLog;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -29,6 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+
+@WithReflection
 @CustomLog
 public class CustomGiveCommand extends Command {
 
@@ -104,11 +104,9 @@ public class CustomGiveCommand extends Command {
             }
         }
         if (uuidItem != null) {
-            UUID logID = log.info("{} spawned and gave ({}) to {}", player.getName(), uuidItem.getUuid(), target.getName());
-            uuidManager.getUuidRepository().getUuidLogger().addItemLog((ItemLog) new ItemLog(logID, UUIDLogType.ITEM_SPAWN, uuidItem.getUuid())
-                    .addMeta(player.getUniqueId(), UUIDType.MAINPLAYER)
-                    .addMeta(target.getUniqueId(), UUIDType.OTHERPLAYER)
-            );
+            log.info("{} spawned and gave ({}) to {}", player.getName(), uuidItem.getUuid(), target.getName())
+                    .setAction("ITEM_SPAWN").addClientContext(player).addClientContext(target, true).addItemContext(uuidItem).submit();
+
         }
         target.getInventory().addItem(itemStack);
         //todo handle items that do not fit in inventory

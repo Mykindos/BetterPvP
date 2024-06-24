@@ -55,7 +55,7 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
 
     @Override
     public String[] getDescription(int level) {
-        return new String[] {
+        return new String[]{
                 "Right click with a Sword to activate",
                 "",
                 "Dash forwards <stat>" + UtilFormat.formatNumber(getDistance(level), 1) + "</stat> blocks, dealing <val>" + UtilFormat.formatNumber(getDamage(level), 1) + "</val>",
@@ -75,7 +75,7 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
         return distance + (distanceIncreasePerLevel * (level - 1));
     }
 
-    public double getDamage(int level){
+    public double getDamage(int level) {
         return damage + (damageIncreasePerLevel * (level - 1));
     }
 
@@ -104,9 +104,10 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
                             0.5f,
                             ent -> UtilEntity.IS_ENEMY.test(player, ent))
                     .map(MultiRayTraceResult::stream)
-                    .ifPresent(stream -> stream.map(RayTraceResult::getHitEntity)
-                            .map(LivingEntity.class::cast)
-                            .forEach(hit -> hit(player, level, hit)));
+                    .ifPresentOrElse(stream -> stream.map(RayTraceResult::getHitEntity)
+                                    .map(LivingEntity.class::cast)
+                                    .forEach(hit -> hit(player, level, hit)),
+                            () -> player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 2.0F, 1.4F));
         });
     }
 
@@ -158,10 +159,10 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
     @Override
     public void loadSkillConfig() {
         damage = getConfig("damage", 2.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 2.0, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.5, Double.class);
         distance = getConfig("distance", 5.0, Double.class);
         distanceIncreasePerLevel = getConfig("distanceIncreasePerLevel", 0.0, Double.class);
-        cooldownReduction = getConfig("cooldownReduction", 4.0, Double.class);
+        cooldownReduction = getConfig("cooldownReduction", 3.0, Double.class);
         cooldownReductionPerLevel = getConfig("cooldownReductionPerLevel", 0.0, Double.class);
     }
 }

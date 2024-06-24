@@ -10,7 +10,7 @@ create table if not exists items
     Glow       tinyint      not null,
     hasUUID    tinyint      not null default 0,
     constraint items_uk
-        unique (Material, Namespace)
+        unique (Material, Namespace, ModelData)
 );
 
 create table if not exists itemdurability

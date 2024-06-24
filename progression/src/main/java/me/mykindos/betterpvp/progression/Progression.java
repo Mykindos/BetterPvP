@@ -11,10 +11,19 @@ import me.mykindos.betterpvp.core.config.ConfigInjectorModule;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.ModuleLoadedEvent;
+import me.mykindos.betterpvp.core.framework.adapter.Adapters;
+import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
+import me.mykindos.betterpvp.core.framework.adapter.PluginAdapters;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
+import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.progression.commands.loader.ProgressionCommandLoader;
 import me.mykindos.betterpvp.progression.injector.ProgressionInjectorModule;
+import me.mykindos.betterpvp.progression.leaderboards.ProgressionLeaderboardLoader;
 import me.mykindos.betterpvp.progression.listener.ProgressionListenerLoader;
+import me.mykindos.betterpvp.progression.profile.repository.ProfessionProfileRepository;
+import me.mykindos.betterpvp.progression.profession.fishing.repository.FishingRepository;
+import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillManager;
+import me.mykindos.betterpvp.progression.weapons.ProgressionWeaponManager;
 import org.bukkit.Bukkit;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
@@ -37,9 +46,6 @@ public class Progression extends BPvPPlugin {
     @Inject
     private UpdateEventExecutor updateEventExecutor;
 
-    @Getter
-    private ProgressionsManager progressionsManager;
-
     @Override
     public void onEnable() {
         saveDefaultConfig();
@@ -56,23 +62,37 @@ public class Progression extends BPvPPlugin {
 
             Bukkit.getPluginManager().callEvent(new ModuleLoadedEvent("Progression"));
 
+            var skillManager = injector.getInstance(ProgressionSkillManager.class);
+            skillManager.loadSkills();
+
+            var itemHandler = injector.getInstance(ItemHandler.class);
+            itemHandler.loadItemData("progression");
+
             var listenerLoader = injector.getInstance(ProgressionListenerLoader.class);
             listenerLoader.registerListeners(PACKAGE);
 
             var commandLoader = injector.getInstance(ProgressionCommandLoader.class);
             commandLoader.loadCommands(PACKAGE);
 
-            progressionsManager = injector.getInstance(ProgressionsManager.class);
-            progressionsManager.loadTrees();
-            progressionsManager.loadPerks();
+            var leaderboardLoader = injector.getInstance(ProgressionLeaderboardLoader.class);
+            leaderboardLoader.registerLeaderboards(PACKAGE);
 
             updateEventExecutor.loadPlugin(this);
+
+            injector.getInstance(ProgressionWeaponManager.class).load();
+
+            final Adapters adapters = new Adapters(this);
+            final Reflections reflectionAdapters = new Reflections(PACKAGE);
+            adapters.loadAdapters(reflectionAdapters.getTypesAnnotatedWith(PluginAdapter.class));
+            adapters.loadAdapters(reflectionAdapters.getTypesAnnotatedWith(PluginAdapters.class));
+
         }
     }
 
     @Override
     public void onDisable() {
-        progressionsManager.getTrees().forEach(tree -> tree.getStatsRepository().shutdown());
+        injector.getInstance(FishingRepository.class).saveAllFish(false);
+        injector.getInstance(ProfessionProfileRepository.class).processStatUpdates(false);
     }
 
 }

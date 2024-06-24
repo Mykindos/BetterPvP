@@ -10,11 +10,12 @@ import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.champions.champions.builds.menus.SkillMenu;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
+import me.mykindos.betterpvp.champions.champions.skills.types.ActiveToggleSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
 import me.mykindos.betterpvp.champions.effects.types.SkillBoostEffect;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
-import me.mykindos.betterpvp.core.components.champions.ISkill;
+import me.mykindos.betterpvp.core.components.champions.IChampionsSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.effects.Effect;
 import net.kyori.adventure.text.Component;
@@ -26,7 +27,7 @@ import java.util.Optional;
 
 @Singleton
 @CustomLog
-public abstract class Skill implements ISkill {
+public abstract class Skill implements IChampionsSkill {
 
     protected final Champions champions;
     protected final ChampionsManager championsManager;
@@ -36,7 +37,9 @@ public abstract class Skill implements ISkill {
     protected double cooldown;
     protected double cooldownDecreasePerLevel;
     protected int energy;
-    protected Double energyDecreasePerLevel;
+    protected double energyDecreasePerLevel;
+    protected double energyStartCost;
+    protected double energyStartCostDecreasePerLevel;
 
     private boolean canUseWhileSlowed;
 
@@ -104,7 +107,7 @@ public abstract class Skill implements ISkill {
         try {
             loadConfig();
         } catch (Exception ex) {
-            log.error("Something went wrong loading the skill configuration for {}", getName(), ex);
+            log.error("Something went wrong loading the skill configuration for {}", getName(), ex).submit();
         }
     }
 
@@ -147,6 +150,11 @@ public abstract class Skill implements ISkill {
         if (this instanceof EnergySkill) {
             energy = getConfig("energy", 0, Integer.class);
             energyDecreasePerLevel = getConfig("energyDecreasePerLevel", 1.0, Double.class);
+        }
+
+        if (this instanceof ActiveToggleSkill) {
+            energyStartCost = getConfig("energyStartCost", 10.0, Double.class);
+            energyStartCostDecreasePerLevel = getConfig("energyStartCostDecreasePerLevel", 0.0, Double.class);
         }
 
         canUseWhileSlowed = getConfigObject("canUseWhileSlowed", true, Boolean.class);

@@ -25,6 +25,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.potion.PotionEffect;
 
+import java.util.Iterator;
 import java.util.UUID;
 
 @BPvPListener
@@ -47,31 +48,27 @@ public class EffectListener implements Listener {
 
     @UpdateEvent(priority = 999)
     public void onUpdate() {
-        effectManager.getObjects().forEach((key, value) -> value.removeIf(effect -> {
-            Entity entity = Bukkit.getEntity(UUID.fromString(effect.getUuid()));
-            if (effect.hasExpired() && !effect.isPermanent()) {
-                if (entity instanceof LivingEntity livingEntity) {
-                    UtilServer.callEvent(new EffectExpireEvent(livingEntity, effect));
+        effectManager.getObjects().forEach((key, value) -> {
+            Iterator<Effect> iterator = value.iterator();
+            while (iterator.hasNext()) {
+                Effect effect = iterator.next();
+                Entity entity = Bukkit.getEntity(UUID.fromString(effect.getUuid()));
+                if (effect.hasExpired() && !effect.isPermanent()) {
+                    if (entity instanceof LivingEntity livingEntity) {
+                        UtilServer.callEvent(new EffectExpireEvent(livingEntity, effect));
+                    }
+                    iterator.remove();
+                } else if (entity instanceof LivingEntity livingEntity) {
+                    if (effect.getRemovalPredicate() != null && effect.getRemovalPredicate().test(livingEntity)) {
+                        UtilServer.callEvent(new EffectExpireEvent(livingEntity, effect));
+                        iterator.remove();
+                    } else if (effect.getEffectType() instanceof VanillaEffectType vanillaEffectType) {
+                        vanillaEffectType.checkActive(livingEntity, effect);
+                    }
+                    effect.getEffectType().onTick(livingEntity, effect);
                 }
-
-                return true; // We still want to remove expired effects if the player is offline
             }
-
-            if (entity instanceof LivingEntity livingEntity) {
-                if (effect.getRemovalPredicate() != null && effect.getRemovalPredicate().test(livingEntity)) {
-                    UtilServer.callEvent(new EffectExpireEvent(livingEntity, effect));
-                    return true;
-                }
-
-                if (effect.getEffectType() instanceof VanillaEffectType vanillaEffectType) {
-                    vanillaEffectType.checkActive(livingEntity, effect);
-                }
-
-                effect.getEffectType().onTick(livingEntity, effect);
-            }
-
-            return false;
-        }));
+        });
 
         effectManager.getObjects().entrySet().removeIf(entry -> entry.getValue().isEmpty());
 
@@ -109,7 +106,8 @@ public class EffectListener implements Listener {
         if(!event.isAllowed()) return;
 
         if(effectManager.hasEffect(event.getDamagee(), EffectTypes.PROTECTION)
-                || effectManager.hasEffect(event.getDamagee(), EffectTypes.INVISIBILITY)) {
+                || effectManager.hasEffect(event.getDamagee(), EffectTypes.INVISIBILITY)
+                || effectManager.hasEffect(event.getDamagee(), EffectTypes.FROZEN)) {
             event.setResult(Event.Result.DENY);
         }
     }

@@ -23,19 +23,19 @@ public class MapSettings {
     }
 
     public enum Scale {
-        CLOSEST(0),
-        CLOSE(1),
-        NORMAL(2),
-        FAR(4),
-        FARTHEST(5);
+        CLOSEST(1),
+        CLOSE(2),
+        NORMAL(4),
+        FAR(10),
+        FARTHEST(15);
 
-        private final byte value;
+        private final int value;
 
         Scale(int value) {
-            this.value = (byte)value;
+            this.value = value;
         }
 
-        public byte getValue() {
+        public int getValue() {
             return this.value;
         }
     }

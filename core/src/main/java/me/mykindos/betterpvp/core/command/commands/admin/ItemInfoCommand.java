@@ -7,6 +7,8 @@ import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.craftbukkit.v1_20_R3.persistence.CraftPersistentDataContainer;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 @Singleton
 public class ItemInfoCommand extends Command {
@@ -25,7 +27,19 @@ public class ItemInfoCommand extends Command {
     @Override
     public void execute(Player player, Client client, String... args) {
 
-        CraftPersistentDataContainer persistentData = (CraftPersistentDataContainer) player.getInventory().getItemInMainHand().getItemMeta().getPersistentDataContainer();
+        ItemStack itemInMainHand = player.getInventory().getItemInMainHand();
+        ItemMeta itemMeta = itemInMainHand.getItemMeta();
+
+        if(itemMeta == null) {
+            UtilMessage.simpleMessage(player, "Info", "<red>Item has no meta data");
+            return;
+        }
+
+        if(itemMeta.hasCustomModelData()) {
+            UtilMessage.simpleMessage(player, "Info", "<yellow>Custom Model Data: <green>%d", itemMeta.getCustomModelData());
+        }
+
+        CraftPersistentDataContainer persistentData = (CraftPersistentDataContainer) itemMeta.getPersistentDataContainer();
         if (persistentData.getKeys().isEmpty()) return;
 
         persistentData.getRaw().forEach((key, value) -> {

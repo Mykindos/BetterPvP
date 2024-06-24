@@ -24,11 +24,8 @@ public class ViewAlliancesButton extends ViewClanCollectionButton {
     private final Clan viewerClan;
 
     public ViewAlliancesButton(Clan clan, Windowed parent, Clan viewerClan) {
-        super(ItemView.builder()
-                        .material(Material.EMERALD)
-                        .build(),
-                "Alliances",
-                parent);
+        super(ItemView.builder().material(Material.PAPER).customModelData(2).build(),
+                "Alliances", parent);
         this.clan = clan;
         this.viewerClan = viewerClan;
     }

@@ -2,10 +2,13 @@ package me.mykindos.betterpvp.core.client.punishments.commands;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.punishments.Punishment;
 import me.mykindos.betterpvp.core.client.punishments.PunishmentRepository;
 import me.mykindos.betterpvp.core.client.punishments.PunishmentTypes;
+import me.mykindos.betterpvp.core.client.punishments.types.IPunishmentType;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.IConsoleCommand;
@@ -19,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Singleton
+@CustomLog
 @SubCommand(PunishCommand.class)
 public class PunishmentRemoveCommand extends Command implements IConsoleCommand {
 
@@ -59,16 +63,33 @@ public class PunishmentRemoveCommand extends Command implements IConsoleCommand 
             if (clientOptional.isPresent()) {
                 Client target = clientOptional.get();
 
-                List<Punishment> punishmentList = target.getPunishments().stream().filter(punishment -> punishment.isActive() && punishment.getType().getName().equalsIgnoreCase(args[0])).toList();
+                IPunishmentType type = PunishmentTypes.getPunishmentType(args[0]);
+
+                List<Punishment> punishmentList = target.getPunishments().stream().filter(punishment -> punishment.isActive() && punishment.getType() == type).toList();
                 if (punishmentList.isEmpty()) {
                     UtilMessage.message(sender, "Punish", "This client does not have any punishments of this type.");
                     return;
                 } else {
                     UtilMessage.message(sender, "Punish", "Removed <green>%d</green> punishments from <yellow>%s</yellow>.", punishmentList.size(), target.getName());
+                    if (sender instanceof Player player) {
+                        log.info("{} had {} {} revoked by {}", target.getName(), punishmentList.size(), type.getName(), player.getName())
+                                .setAction("PUNISH_REVOKE")
+                                .addClientContext(target, true)
+                                .addClientContext(player, false)
+                                .submit();
+                        clientManager.sendMessageToRank("Punish", UtilMessage.deserialize("<yellow>%s</yellow> revoked <green>%d</green> punishments from <yellow>%s</yellow>", player.getName(), punishmentList.size(), target.getName()), Rank.HELPER);
+                    } else {
+                        log.info("{} had {} {}s revoked", target.getName(), punishmentList.size(), type.getName())
+                                .setAction("PUNISH_REVOKE")
+                                .addClientContext(target, true)
+                                .submit();
+                    }
+
                 }
 
                 punishmentList.forEach(punishment -> {
                     punishment.setRevoked(true);
+                    punishment.getType().onExpire(target, punishment);
                     punishmentRepository.revokePunishment(punishment);
                 });
             } else {

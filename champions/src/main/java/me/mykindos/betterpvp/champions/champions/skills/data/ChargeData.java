@@ -4,7 +4,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
-import me.mykindos.betterpvp.core.components.champions.ISkill;
+import me.mykindos.betterpvp.core.components.champions.IChampionsSkill;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
@@ -115,7 +115,7 @@ public class ChargeData {
      *                      and not a copy of it.
      * @see ChargeData#getActionBar(Predicate, Function)
      */
-    public static DisplayComponent getActionBar(ISkill skill, Map<Player, ? extends ChargeData> chargeDataMap) {
+    public static DisplayComponent getActionBar(IChampionsSkill skill, Map<Player, ? extends ChargeData> chargeDataMap) {
         return getActionBar(
                 gmr -> gmr.isOnline() && chargeDataMap.containsKey(gmr.getPlayer()) && skill.isHolding(gmr.getPlayer()),
                 gmr -> chargeDataMap.get(gmr.getPlayer())
@@ -133,7 +133,7 @@ public class ChargeData {
      *                                gamer is guaranteed to be online.
      * @see ChargeData#getActionBar(Predicate, Function)
      */
-    public static DisplayComponent getActionBar(ISkill skill, Map<Player, ? extends ChargeData> chargeDataMap, Predicate<Gamer> additionalShowCondition) {
+    public static DisplayComponent getActionBar(IChampionsSkill skill, Map<Player, ? extends ChargeData> chargeDataMap, Predicate<Gamer> additionalShowCondition) {
         return getActionBar(
                 gmr -> gmr.isOnline() && chargeDataMap.containsKey(gmr.getPlayer()) && skill.isHolding(gmr.getPlayer()) && additionalShowCondition.test(gmr),
                 gmr -> chargeDataMap.get(gmr.getPlayer())

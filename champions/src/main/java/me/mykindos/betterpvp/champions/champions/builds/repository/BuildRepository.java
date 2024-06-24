@@ -6,7 +6,7 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
-import me.mykindos.betterpvp.champions.champions.skills.SkillManager;
+import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.database.Database;
@@ -31,10 +31,10 @@ import static java.util.UUID.fromString;
 public class BuildRepository implements IRepository<RoleBuild> {
 
     private final Database database;
-    private final SkillManager skillManager;
+    private final ChampionsSkillManager skillManager;
 
     @Inject
-    public BuildRepository(Database database, SkillManager skillManager) {
+    public BuildRepository(Database database, ChampionsSkillManager skillManager) {
         this.database = database;
         this.skillManager = skillManager;
     }
@@ -83,7 +83,7 @@ public class BuildRepository implements IRepository<RoleBuild> {
 
             }
         } catch (SQLException ex) {
-            log.error("Failed to load builds", ex);
+            log.error("Failed to load builds", ex).submit();
         }
 
     }

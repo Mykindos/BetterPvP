@@ -41,7 +41,7 @@ import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -61,7 +61,7 @@ public class MinimapRenderer extends MapRenderer implements Listener {
     private int maxProcess;
 
     @Inject
-    @Config(path = "clans.map.maxMapDistance", defaultValue = "640")
+    @Config(path = "clans.map.maxMapDistance", defaultValue = "645")
     private int maxDistance;
 
     private int currentInterval = 1;
@@ -135,9 +135,9 @@ public class MinimapRenderer extends MapRenderer implements Listener {
 
         final MapSettings mapSettings = mapHandler.mapSettingsMap.get(player.getUniqueId());
 
-        int scale = 1 << mapSettings.getScale().getValue();
+        int scale = mapSettings.getScale().getValue();
 
-        if (mapSettings.getScale() == MapSettings.Scale.FAR) {
+        if (mapSettings.getScale().ordinal() >= MapSettings.Scale.FAR.ordinal()) {
             centerX = 0;
             centerZ = 0;
         }
@@ -254,7 +254,7 @@ public class MinimapRenderer extends MapRenderer implements Listener {
                     continue;
                 }
             }
-            MapCursor mapCursor = new MapCursor((byte) x, (byte) z, cursor.getDirection(), cursor.getType(), cursor.isVisible());
+            MapCursor mapCursor = new MapCursor((byte) x, (byte) z, cursor.getDirection(), cursor.getType(), cursor.isVisible(), cursor.getCaption());
             cursors.addCursor(mapCursor);
         }
     }

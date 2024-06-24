@@ -5,7 +5,9 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.shops.Shops;
+import me.mykindos.betterpvp.shops.shops.events.ShopKeeperSpawnEvent;
 import me.mykindos.betterpvp.shops.shops.shopkeepers.types.IShopkeeper;
 import me.mykindos.betterpvp.shops.shops.shopkeepers.types.ParrotShopkeeper;
 import me.mykindos.betterpvp.shops.shops.shopkeepers.types.SkeletonShopkeeper;
@@ -15,7 +17,6 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.entity.LivingEntity;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -33,7 +34,7 @@ public class ShopkeeperManager extends Manager<IShopkeeper> {
 
     public void loadShopsFromConfig() {
 
-        objects.values().forEach(shopkeeper -> ((LivingEntity) shopkeeper.getEntity()).remove());
+        objects.values().forEach(shopkeeper -> shopkeeper.getEntity().remove());
         objects.clear();
 
         var configSection = shops.getConfig().getConfigurationSection("shopkeepers");
@@ -45,15 +46,24 @@ public class ShopkeeperManager extends Manager<IShopkeeper> {
             Component name = UtilMessage.getMiniMessage(rawName);
             World world = Bukkit.getWorld(Objects.requireNonNull(shops.getConfig().getString("shopkeepers." + key + ".world")));
             if(world == null) {
-                log.warn("Could not load shopkeeper {} because the world was null", key);
+                log.warn("Could not load shopkeeper {} because the world was null", key).submit();
                 return;
             }
 
             double x = shops.getConfig().getDouble("shopkeepers." + key + ".x");
             double y = shops.getConfig().getDouble("shopkeepers." + key + ".y");
             double z = shops.getConfig().getDouble("shopkeepers." + key + ".z");
+            float yaw = (float) shops.getConfig().getDouble("shopkeepers." + key + ".yaw");
+            float pitch = (float) shops.getConfig().getDouble("shopkeepers." + key + ".pitch");
             
             if(type == null) return;
+
+            if(type.startsWith("mm:")) {
+                Location location = new Location(world, x, y, z, yaw, pitch);
+                UtilServer.callEvent(new ShopKeeperSpawnEvent(type.split(":")[1], name, location));
+                location.getChunk().setForceLoaded(true);
+                return;
+            }
 
             switch (type.toUpperCase()) {
                 case "ZOMBIE" -> {
@@ -84,6 +94,8 @@ public class ShopkeeperManager extends Manager<IShopkeeper> {
         shops.getConfig().set("shopkeepers." + tag + ".x", location.getX());
         shops.getConfig().set("shopkeepers." + tag + ".y", location.getY());
         shops.getConfig().set("shopkeepers." + tag + ".z", location.getZ());
+        shops.getConfig().set("shopkeepers." + tag + ".yaw", location.getYaw());
+        shops.getConfig().set("shopkeepers." + tag + ".pitch", location.getPitch());
 
         shops.saveConfig();
     }

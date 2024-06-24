@@ -10,6 +10,6 @@ import org.bukkit.entity.Player;
 public class ClanAddExperienceEvent extends CustomEvent {
 
     private final Player player;
-    private final long experience;
+    private final double experience;
 
 }

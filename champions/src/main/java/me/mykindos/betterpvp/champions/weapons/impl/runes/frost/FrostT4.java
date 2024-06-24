@@ -14,7 +14,7 @@ public class FrostT4 extends FrostBase {
 
     @Override
     public int getTier() {
-        return 3;
+        return 4;
     }
 
 

@@ -13,12 +13,12 @@ import me.mykindos.betterpvp.core.stats.filter.Filtered;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardEntry;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardEntryComparator;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardEntryKey;
-import me.mykindos.betterpvp.core.stats.repository.LeaderboardManager;
 import me.mykindos.betterpvp.core.stats.sort.SortType;
 import me.mykindos.betterpvp.core.stats.sort.Sorted;
 import me.mykindos.betterpvp.core.stats.sort.TemporalSort;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
+import me.mykindos.betterpvp.core.utilities.model.description.Describable;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -49,7 +49,7 @@ import java.util.concurrent.TimeUnit;
  * @param <T> The type of object to be sorted in this leaderboard.
  */
 @CustomLog
-public abstract class Leaderboard<E, T> {
+public abstract class Leaderboard<E, T> implements Describable {
 
     private static final ExecutorService LEADERBOARD_UPDATER = Executors.newSingleThreadExecutor();
 
@@ -57,14 +57,12 @@ public abstract class Leaderboard<E, T> {
     private final AsyncLoadingCache<LeaderboardEntryKey<E>, T> entryCache;
     private final Database database;
     private final Collection<SearchOptions> validSearchOptions = new ArrayList<>();
-    private final BPvPPlugin plugin;
 
     @Getter
     @Setter
     private boolean viewable = true;
 
     protected Leaderboard(BPvPPlugin plugin) {
-        this.plugin = plugin;
         this.database = plugin.getInjector().getInstance(Database.class);
         this.topTen = new ConcurrentHashMap<>();
         this.entryCache = Caffeine.newBuilder()
@@ -100,8 +98,6 @@ public abstract class Leaderboard<E, T> {
 
         // Schedule updates and register with manager
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(this::forceUpdate, 0L, 10L, TimeUnit.MINUTES);
-        final LeaderboardManager manager = plugin.getInjector().getInstance(LeaderboardManager.class);
-        manager.addObject(UUID.randomUUID(), this);
     }
 
     public void forceUpdate() {
@@ -112,11 +108,11 @@ public abstract class Leaderboard<E, T> {
                 set.addAll(fetch.entrySet().stream().map(entry -> LeaderboardEntry.of(entry.getKey(), entry.getValue())).toList());
                 return set;
             }).exceptionally(ex -> {
-                log.error("Failed to fetch leaderboard data for " + options + "!", ex);
+                log.error("Failed to fetch leaderboard data for " + options + "!", ex).submit();
                 return null;
             }).whenComplete((set, ex) -> {
                 if (ex != null) {
-                    log.error("Failed to fetch leaderboard data for " + options + "!", ex);
+                    log.error("Failed to fetch leaderboard data for " + options + "!", ex).submit();
                     return;
                 }
                 topTen.put(options, set);
@@ -130,6 +126,8 @@ public abstract class Leaderboard<E, T> {
     }
 
     public abstract String getName();
+
+    public abstract LeaderboardCategory getCategory();
 
     /**
      * @return The comparator to sort the leaderboard by.
@@ -193,7 +191,10 @@ public abstract class Leaderboard<E, T> {
                     existingData = entryCache.get(LeaderboardEntryKey.of(options, entryName)).join(); // Reason for this to be async
                 }
 
-                entry.setValue(join(existingData, add));
+                if(existingData != null) {
+                    entry.setValue(join(existingData, add));
+                }
+
                 int indexBefore = list.contains(entry) ? list.indexOf(entry) + 1 : -1;
                 set.removeIf(existing -> existing.getKey().equals(entry.getKey())); // Remove entry if cloned
                 set.add(entry);
@@ -211,7 +212,7 @@ public abstract class Leaderboard<E, T> {
             }
             return types;
         }).exceptionally(ex -> {
-            log.error("Failed to add " + entryName + " to leaderboard!", ex);
+            log.error("Failed to add " + entryName + " to leaderboard!", ex).submit();
             return null;
         });
     }
@@ -289,7 +290,7 @@ public abstract class Leaderboard<E, T> {
         // Fetch the player data
         CompletableFuture<Optional<LeaderboardEntry<E, T>>> future = CompletableFuture.supplyAsync(() -> Optional.ofNullable(fetchPlayerData(player, options, database))).exceptionally(ex -> {
             if (!(ex instanceof UnsupportedOperationException)) {
-                log.error("Failed to fetch leaderboard data for " + player + "!", ex);
+                log.error("Failed to fetch leaderboard data for " + player + "!", ex).submit();
             }
             return Optional.empty();
         });

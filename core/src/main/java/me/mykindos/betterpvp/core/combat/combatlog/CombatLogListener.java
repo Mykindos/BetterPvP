@@ -7,14 +7,15 @@ import me.mykindos.betterpvp.core.client.events.ClientQuitEvent;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.combatlog.events.PlayerCombatLogEvent;
+import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -68,7 +69,7 @@ public class CombatLogListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onCombatLogInCombat(PlayerCombatLogEvent event) {
         Gamer gamer = event.getClient().getGamer();
-        if (!UtilTime.elapsed(gamer.getLastDamaged(), 15000)) {
+        if (!gamer.isInCombat()) {
             event.setSafe(false);
         }
     }
@@ -83,6 +84,14 @@ public class CombatLogListener implements Listener {
                 return;
             }
         }
+    }
+
+    @EventHandler (ignoreCancelled = true)
+    public void onCombatLogDamage(CustomDamageEvent event) {
+        if(event.getDamagee().getType() != EntityType.SHEEP) return;
+        combatLogManager.getCombatLogBySheep(event.getDamagee()).ifPresent(combatLog -> {
+            event.cancel("Combat log sheep cannot be damaged");
+        });
     }
 
     @EventHandler

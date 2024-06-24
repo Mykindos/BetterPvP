@@ -124,7 +124,7 @@ public class ToxicArrow extends PrepareArrowSkill {
 
 
     public void loadSkillConfig(){
-        baseDuration = getConfig("baseDuration", 6.0, Double.class);
+        baseDuration = getConfig("baseDuration", 4.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
         poisonStrength = getConfig("poisonStrength", 2, Integer.class);
     }

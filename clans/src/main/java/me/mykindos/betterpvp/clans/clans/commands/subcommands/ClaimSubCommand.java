@@ -12,7 +12,6 @@ import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
-import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Chunk;
@@ -29,6 +28,7 @@ public class ClaimSubCommand extends ClanSubCommand {
     @Inject
     public ClaimSubCommand(ClanManager clanManager, ClientManager clientManager) {
         super(clanManager, clientManager);
+        aliases.add("c");
     }
 
     @Override

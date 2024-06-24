@@ -51,6 +51,7 @@ public class Void extends ActiveToggleSkill implements EnergySkill {
                 "Every point of damage you take will be",
                 "reduced by <val>" + getDamageReduction(level) + "</val> and drain <val>" + getEnergyReduction(level) + "</val> energy",
                 "",
+                "Uses <stat>" + getEnergyStartCost(level) + "</stat> energy on activation",
                 "Energy / Second: <val>" + getEnergy(level)
         };
     }
@@ -82,7 +83,7 @@ public class Void extends ActiveToggleSkill implements EnergySkill {
 
     @Override
     public void toggleActive(Player player) {
-        if (championsManager.getEnergy().use(player, "Void", 5, false)) {
+        if (championsManager.getEnergy().use(player, getName(), getEnergyStartCost(getLevel(player)), false)) {
             UtilMessage.simpleMessage(player, getClassType().getName(), "Void: <green>On");
         } else {
             cancel(player);
@@ -146,7 +147,7 @@ public class Void extends ActiveToggleSkill implements EnergySkill {
     @Override
     public void loadSkillConfig() {
         baseDamageReduction = getConfig("baseDamageReduction", 2.0, Double.class);
-        damageReductionIncreasePerLevel = getConfig("damageReductionIncreasePerLevel", 0.2, Double.class);
+        damageReductionIncreasePerLevel = getConfig("damageReductionIncreasePerLevel", 0.5, Double.class);
 
         baseEnergyReduction = getConfig("baseEnergyReduction", 3.0, Double.class);
         energyReductionDecreasePerLevel = getConfig("energyReductionDecreasePerLevel", 0.5, Double.class);

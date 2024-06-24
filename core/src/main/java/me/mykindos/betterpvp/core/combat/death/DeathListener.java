@@ -6,12 +6,14 @@ import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
 import me.mykindos.betterpvp.core.combat.death.events.CustomDeathEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -21,6 +23,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
@@ -43,8 +46,6 @@ public class DeathListener implements Listener {
         event.deathMessage(null);
         DamageLog lastDamage = damageLogManager.getLastDamager(event.getPlayer());
 
-        clientManager.search().online(event.getEntity()).getGamer().setLastDamaged(0);
-
         Bukkit.getOnlinePlayers().forEach(onlinePlayer -> {
             CustomDeathEvent customDeathEvent = new CustomDeathEvent(onlinePlayer, event.getPlayer());
             if (lastDamage != null) {
@@ -54,6 +55,11 @@ public class DeathListener implements Listener {
             UtilServer.callEvent(customDeathEvent);
         });
 
+    }
+
+    @EventHandler
+    public void onRespawn(PlayerRespawnEvent event) {
+        clientManager.search().online(event.getPlayer()).getGamer().setLastDamaged(0);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -76,8 +82,22 @@ public class DeathListener implements Listener {
             if (killer instanceof Player) {
                 ItemStack item = killer.getEquipment().getItemInMainHand();
                 if (reasons.length == 0 && item.getType() != Material.AIR) {
-                    Component itemCmpt = Component.text(PlainTextComponentSerializer.plainText().serialize(item.displayName()).replaceAll("[\\[\\]]", ""), NamedTextColor.GREEN);
-                    reason = Component.text("a ", NamedTextColor.GRAY).append(itemCmpt.hoverEvent(item));
+                    TextColor color = NamedTextColor.GREEN;
+
+                    if (item.hasItemMeta() && item.getItemMeta().hasDisplayName()) {
+                        Component displayName = item.getItemMeta().displayName();
+                        if (displayName != null && displayName.color() != null) {
+                            color = displayName.color();
+                        }
+                    }
+
+                    if (color == NamedTextColor.YELLOW) {
+                        color = NamedTextColor.GREEN;
+                    }
+
+                    String namePlainText = PlainTextComponentSerializer.plainText().serialize(item.displayName()).replaceAll("[\\[\\]]", "");
+                    Component itemCmpt = Component.text(namePlainText, color);
+                    reason = Component.text(UtilFormat.getIndefiniteArticle(namePlainText) + " ", NamedTextColor.GRAY).append(itemCmpt.hoverEvent(item));
                     with = true;
                 }
             }

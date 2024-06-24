@@ -41,11 +41,11 @@ import java.util.stream.Collectors;
 @Data
 public class Clan extends PropertyContainer implements IClan, Invitable, IMapListener {
 
-    public static long getExperienceForLevel(long level) {
-        return (long) Math.pow(level, 2) - 1;
+    public static double getExperienceForLevel(long level) {
+        return Math.pow(level, 2) - 1;
     }
 
-    public static long getLevelFromExperience(long experience) {
+    public static long getLevelFromExperience(double experience) {
         return (long) Math.sqrt(experience + 1d);
     }
 
@@ -67,11 +67,11 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
     private BukkitTask tntRecoveryRunnable = null;
 
     public long getTimeCreated() {
-        return (long) getProperty(ClanProperty.TIME_CREATED).orElse(0);
+        return (long) getProperty(ClanProperty.TIME_CREATED).orElse(0L);
     }
 
     public long getLastLogin() {
-        return (long) getProperty(ClanProperty.LAST_LOGIN).orElse(0);
+        return (long) getProperty(ClanProperty.LAST_LOGIN).orElse(0L);
     }
 
     public int getEnergy() {
@@ -88,7 +88,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
      * @return The time the cooldown expires (epoch)
      */
     public long getNoDominanceCooldown() {
-        return (long) getProperty(ClanProperty.NO_DOMINANCE_COOLDOWN).orElse(0);
+        return (long) getProperty(ClanProperty.NO_DOMINANCE_COOLDOWN).orElse(0L);
     }
 
     public boolean isNoDominanceCooldownActive() {
@@ -96,7 +96,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
     }
 
     public long getLastTntedTime() {
-        return (long) getProperty(ClanProperty.LAST_TNTED).orElse(0);
+        return (long) getProperty(ClanProperty.LAST_TNTED).orElse(0L);
     }
 
     public int getBalance() {
@@ -161,16 +161,16 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
         return count;
     }
 
-    public long getExperience() {
-        return (long) getProperty(ClanProperty.EXPERIENCE).orElse(0L);
+    public double getExperience() {
+        return (double) getProperty(ClanProperty.EXPERIENCE).orElse(0d);
     }
 
-    public void grantExperience(long experience) {
+    public void grantExperience(double experience) {
         Preconditions.checkArgument(experience > 0, "Experience must be greater than 0");
         saveProperty(ClanProperty.EXPERIENCE.name(), getExperience() + experience);
     }
 
-    public void setExperience(long experience) {
+    public void setExperience(double experience) {
         saveProperty(ClanProperty.EXPERIENCE.name(), experience);
     }
 
@@ -281,6 +281,10 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
         return ClanRelation.NEUTRAL;
     }
 
+    public boolean isChunkOwnedByClan(String chunkString) {
+        return getTerritory().stream().anyMatch(claim -> claim.getChunk().equalsIgnoreCase(chunkString));
+    }
+
     @Override
     public boolean equals(Object other) {
         if (other instanceof Clan otherClan) {
@@ -308,7 +312,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
                 UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> UtilServer.callEvent(new ClanPropertyUpdateEvent(this, key, value)));
             }
         } catch (IllegalArgumentException ex) {
-            log.error("Could not find a ClanProperty named {}", key, ex);
+            log.error("Could not find a ClanProperty named {}", key, ex).submit();
         }
     }
 }

@@ -4,7 +4,7 @@ package me.mykindos.betterpvp.champions.champions.commands;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
-import me.mykindos.betterpvp.champions.champions.skills.SkillManager;
+import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -18,10 +18,10 @@ import java.util.Optional;
 
 @Singleton
 public class SkillDescription extends Command {
-    private final SkillManager skillManager;
+    private final ChampionsSkillManager skillManager;
 
     @Inject
-    public SkillDescription(SkillManager skillManager) {
+    public SkillDescription(ChampionsSkillManager skillManager) {
         this.skillManager = skillManager;
     }
 

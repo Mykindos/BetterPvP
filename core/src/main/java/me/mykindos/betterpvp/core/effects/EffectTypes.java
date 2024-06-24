@@ -4,7 +4,9 @@ import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.effects.types.negative.BleedEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.BlindnessEffect;
+import me.mykindos.betterpvp.core.effects.types.negative.ConcussedEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.DarknessEffect;
+import me.mykindos.betterpvp.core.effects.types.negative.FrozenEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.LevitationEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.NoJumpEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.NoSprintEffect;
@@ -47,6 +49,7 @@ public class EffectTypes {
     public static final EffectType POISON = createEffectType(new PoisonEffect());
     public static final EffectType NO_JUMP = createEffectType(new NoJumpEffect());
     public static final EffectType NO_SPRINT = createEffectType(new NoSprintEffect());
+    public static final EffectType CONCUSSED = createEffectType(new ConcussedEffect());
     public static final EffectType BLINDNESS = createEffectType(new BlindnessEffect());
     public static final EffectType LEVITATION = createEffectType(new LevitationEffect());
     public static final EffectType BLEED = createEffectType(new BleedEffect());
@@ -54,6 +57,7 @@ public class EffectTypes {
     public static final EffectType SHOCK = createEffectType(new ShockEffect());
     public static final EffectType WITHER = createEffectType(new WitherEffect());
     public static final EffectType DARKNESS = createEffectType(new DarknessEffect());
+    public static final EffectType FROZEN = createEffectType(new FrozenEffect());
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="Positive Effect Types">
@@ -76,7 +80,7 @@ public class EffectTypes {
     // </editor-fold>
 
     public static EffectType createEffectType(EffectType effectType) {
-        log.info("Added effect: {}", effectType.getName());
+        log.info("Added effect: {}", effectType.getName()).submit();
         effectTypes.add(effectType);
         return effectType;
     }

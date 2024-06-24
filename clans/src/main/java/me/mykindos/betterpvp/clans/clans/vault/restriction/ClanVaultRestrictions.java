@@ -61,26 +61,26 @@ public class ClanVaultRestrictions {
 
         final ExtendedYamlConfiguration config = clans.getConfig("vault-restrictions");
         if (!config.isConfigurationSection("restrictions")) {
-            log.error("'restrictions' not found");
+            log.error("'restrictions' not found").submit();
             return;
         }
 
         final ConfigurationSection section = config.getConfigurationSection("restrictions");
         if (section == null) {
-            log.error("'restrictions' not found");
+            log.error("'restrictions' not found").submit();
             return;
         }
 
         final Set<String> keys = section.getKeys(false);
         for (String restriction : keys) {
             if (!section.isConfigurationSection(restriction)) {
-                log.warn("Invalid restriction: {}", restriction);
+                log.warn("Invalid restriction: {}", restriction).submit();
                 continue;
             }
 
             final ConfigurationSection restrictionSection = section.getConfigurationSection(restriction);
             if (restrictionSection == null) {
-                log.warn("Invalid restriction section: {}", restriction);
+                log.warn("Invalid restriction section: {}", restriction).submit();
                 return;
             }
 
@@ -88,11 +88,11 @@ public class ClanVaultRestrictions {
             try {
                 addRestriction(this.parser.parse(restrictionSection));
             } catch (Exception e) {
-                log.warn("Invalid restriction: " + restriction, e);
+                log.warn("Invalid restriction: " + restriction, e).submit();
             }
         }
 
-        log.info("Loaded {} restrictions", restrictions.size());
+        log.info("Loaded {} restrictions", restrictions.size()).submit();
     }
 
     private void addRestriction(@NotNull VaultRestriction restriction) {

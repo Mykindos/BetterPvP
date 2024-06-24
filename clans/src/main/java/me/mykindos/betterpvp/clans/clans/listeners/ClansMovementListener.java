@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
+import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.components.clans.data.ClanTerritory;
 import me.mykindos.betterpvp.core.framework.delayedactions.events.ClanHomeTeleportEvent;
@@ -15,11 +16,13 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
+import me.mykindos.betterpvp.core.utilities.model.display.TitleComponent;
 import me.mykindos.betterpvp.core.world.events.SpawnTeleportEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -98,13 +101,33 @@ public class ClansMovementListener extends ClanListener {
             append = Component.text("Wilderness", NamedTextColor.GRAY);
         }
 
+        Client client = clientManager.search().online(player);
+        final boolean popupSetting = (boolean) client.getProperty(ClientProperty.TERRITORY_POPUPS_ENABLED).orElse(false);
+
         if (locationClan != null) {
             if (locationClan.getName().equalsIgnoreCase("Fields") || locationClan.getName().equalsIgnoreCase("Lake")) {
                 append = UtilMessage.deserialize("<red><bold>                    Warning! <gray> PvP Hotspot</gray></bold></red>");
             }
 
+            if(popupSetting){
+                ClanRelation relation = clanManager.getRelation(clan, locationClan);
+                TitleComponent titleComponent = new TitleComponent(0, .75, .1, true,
+                        gamer -> Component.text("", NamedTextColor.GRAY),
+                        gamer -> Component.text(locationClan.getName(), relation.getPrimary()));
+                client.getGamer().getTitleQueue().add(9, titleComponent);
+            }
+
             UtilMessage.simpleMessage(player, "Territory", component.append(append), clanManager.getClanTooltip(player, locationClan));
+
         } else {
+
+            if(popupSetting){
+                TitleComponent titleComponent = new TitleComponent(0, .75, .25, true,
+                        gamer -> Component.text("", NamedTextColor.GRAY),
+                        gamer -> Component.text("Wilderness", NamedTextColor.GRAY));
+                client.getGamer().getTitleQueue().add(9, titleComponent);
+            }
+
             UtilMessage.message(player, "Territory", component.append(append));
         }
 
@@ -122,9 +145,19 @@ public class ClansMovementListener extends ClanListener {
             return;
         }
 
+        if (!event.getPlayer().getWorld().getName().equalsIgnoreCase("world")) {
+            UtilMessage.message(player, "Clans", "You cannot teleport to your clan home from this world.");
+            event.setCancelled(true);
+            return;
+        }
+
         clanManager.getClanByLocation(player.getLocation()).ifPresentOrElse(clan -> {
             if (clan.isAdmin() && clan.isSafe()) {
-                event.setDelayInSeconds(0);
+                if (clan.getName().toLowerCase().contains("spawn")) {
+                    event.setDelayInSeconds(0);
+                } else {
+                    event.setDelayInSeconds(20);
+                }
                 return;
             }
 
@@ -158,9 +191,9 @@ public class ClansMovementListener extends ClanListener {
                 }
 
                 if (clanManager.getRelation(playerClan, clan) == ClanRelation.ENEMY) {
-                    event.setDelayInSeconds(120);
-                } else {
                     event.setDelayInSeconds(60);
+                } else {
+                    event.setDelayInSeconds(30);
                 }
 
             } else {
@@ -170,6 +203,10 @@ public class ClansMovementListener extends ClanListener {
         }, () -> {
             event.setDelayInSeconds(20);
         });
+
+        if (event.getDelayInSeconds() > 0) {
+            UtilMessage.simpleMessage(player, "Clans", "Teleporting to clan home in <green>%.1f</green> seconds, don't move!", event.getDelayInSeconds());
+        }
     }
 
 
@@ -207,6 +244,9 @@ public class ClansMovementListener extends ClanListener {
             event.setDelayInSeconds(120);
         } else {
             event.setDelayInSeconds(60);
+        }
+        if (event.getDelayInSeconds() > 0) {
+            UtilMessage.simpleMessage(player, "Clans", "Teleporting to nearest wilderness in <green>%.1f</green> seconds, don't move!", event.getDelayInSeconds());
         }
     }
 

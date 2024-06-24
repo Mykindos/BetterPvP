@@ -1,16 +1,16 @@
 package me.mykindos.betterpvp.core.utilities.model.display;
 
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.utilities.model.data.PriorityDataBlockingQueue;
 import net.kyori.adventure.text.Component;
-import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.lang.ref.WeakReference;
-import java.util.Iterator;
-import java.util.PriorityQueue;
 import java.util.UUID;
 
+@Slf4j
 public class TitleQueue {
 
     static final Component EMPTY = Component.empty();
@@ -21,7 +21,7 @@ public class TitleQueue {
      * These take priority over static components.
      * Higher priority components are shown first.
      */
-    private final PriorityQueue<Pair<Integer, TitleComponent>> components = new PriorityQueue<>((o1, o2) -> Integer.compare(o1.getLeft(), o2.getLeft()) * -1);
+    private final PriorityDataBlockingQueue<TitleComponent> components = new PriorityDataBlockingQueue<>(5);
 
     private WeakReference<TitleComponent> showing = new WeakReference<>(null);
 
@@ -36,7 +36,7 @@ public class TitleQueue {
      */
     public void add(int priority, TitleComponent component) {
         synchronized (lock) {
-            components.add(Pair.of(priority, component));
+            components.put(priority, component);
             if (!component.isWaitToExpire()) {
                 component.startTime();
             }
@@ -64,7 +64,6 @@ public class TitleQueue {
     public void show(Gamer gamer) {
         synchronized (lock) {
             cleanUp();
-
             // The component to show
             TitleComponent component = hasComponentsQueued() ? nextComponent(gamer) : null;
             if (component == null || (showing.get() == component && component.hasStarted())) {
@@ -86,19 +85,8 @@ public class TitleQueue {
                 return null;
             }
 
-            final Iterator<Pair<Integer, TitleComponent>> iterator = components.iterator();
-            TitleComponent display;
-
-            // Loop through the components until we find one that is not null
-            // If we find one that is null, skip it and move on to the next one
-            do {
-                display = iterator.next().getRight();
-            } while (iterator.hasNext());
-
-            // At this point, the `component` will not be null because we know that there is at least one element in the queue
+            TitleComponent display = components.peek().getValue();
             display.startTime();
-
-            // But we don't know if its `advComponent` will be null
             return display;
         }
     }

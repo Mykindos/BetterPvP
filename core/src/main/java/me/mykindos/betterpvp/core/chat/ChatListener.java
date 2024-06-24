@@ -53,7 +53,7 @@ public class ChatListener implements Listener {
         ChatSentEvent chatSent = new ChatSentEvent(player, Bukkit.getOnlinePlayers(), Component.text(UtilFormat.spoofNameForLunar(player.getName()) + ": "), message);
         Bukkit.getPluginManager().callEvent(chatSent);
         if (chatSent.isCancelled()) {
-            log.info("ChatSentEvent cancelled for {} - {}", chatSent.getPlayer().getName(), chatSent.getCancelReason());
+            log.info("ChatSentEvent cancelled for {} - {}", chatSent.getPlayer().getName(), chatSent.getCancelReason()).submit();
         }
 
         logChatToDiscord(event.getPlayer(), message);
@@ -92,7 +92,19 @@ public class ChatListener implements Listener {
             ChatReceivedEvent chatReceived = new ChatReceivedEvent(player, client, onlinePlayer, event.getPrefix(), event.getMessage());
             Bukkit.getPluginManager().callEvent(chatReceived);
             if (chatReceived.isCancelled()) {
-                log.info("ChatReceivedEvent cancelled for {} - {}", onlinePlayer.getName(), event.getCancelReason());
+                log.info("ChatReceivedEvent cancelled for {} - {}", onlinePlayer.getName(), event.getCancelReason()).submit();
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onChatDisabled(ChatReceivedEvent event) {
+        if (event.isCancelled()) return;
+        Client client = clientManager.search().online(event.getTarget());
+        if (!((boolean) client.getProperty(ClientProperty.CHAT_ENABLED).orElse(false))) {
+            if (!event.getClient().hasRank(Rank.HELPER)) {
+                event.setCancelled(true);
+                event.setCancelReason("Player has chat disabled");
             }
         }
     }
@@ -118,7 +130,7 @@ public class ChatListener implements Listener {
     }
 
     private void logChatToDiscord(Player player, Component message) {
-        if(!discordChatWebhook.isEmpty()){
+        if (!discordChatWebhook.isEmpty()) {
             DiscordWebhook webhook = new DiscordWebhook(discordChatWebhook);
             webhook.send(DiscordMessage.builder()
                     .username(player.getName())

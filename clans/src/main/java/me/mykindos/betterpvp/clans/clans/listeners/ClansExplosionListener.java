@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.clans.clans.ClanProperty;
 import me.mykindos.betterpvp.clans.clans.insurance.InsuranceType;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.combat.weapon.Weapon;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
@@ -83,6 +84,10 @@ public class ClansExplosionListener extends ClanListener {
     @Inject
     @Config(path = "clans.tnt.regenerationTimeInMinutes", defaultValue = "5.0")
     private double regenerationTimeInMinutes;
+
+    @Inject
+    @Config(path = "clans.pillage.protection", defaultValue = "true")
+    private boolean pillageProtection;
 
     private final Clans clans;
     private final WorldBlockHandler worldBlockHandler;
@@ -181,6 +186,7 @@ public class ClansExplosionListener extends ClanListener {
         Clan attackedClan = null;
         boolean schedulingRollback = false;
 
+        event.setYield(2.5f);
         processBlocksInRadius(event);
         doExplosion(event);
 
@@ -213,19 +219,19 @@ public class ClansExplosionListener extends ClanListener {
                 if (enemyOptional.isPresent()) {
 
                     ClanEnemy enemy = enemyOptional.get();
-                    if (enemy.getDominance() <= dominanceRequired) {
+                    if (enemy.getDominance() < dominanceRequired) {
                         attackingClan.messageClan("You cannot cannon <red>" + attackedClan.getName() + "</red> because you have less than <red>" + dominanceRequired + "%</red> dominance on them.", null, true);
                         refundCannonball(shooter);
                         break;
                     }
 
-                    if (attackedClan.isNoDominanceCooldownActive()) {
+                    if (attackedClan.isNoDominanceCooldownActive() && pillageProtection) {
                         attackingClan.messageClan("You cannot cannon <red>" + attackedClan.getName() + "</red> because they are a new clan or were raided too recently.", null, true);
                         refundCannonball(shooter);
                         break;
                     }
 
-                    if (!clanManager.getPillageHandler().isPillaging(enemy.getClan(), attackedClan)) {
+                    if (!clanManager.getPillageHandler().isPillaging(attackingClan, attackedClan)) {
                         schedulingRollback = true;
                     }
 
@@ -264,10 +270,8 @@ public class ClansExplosionListener extends ClanListener {
     private void doExplosion(EntityExplodeEvent event) {
         event.getEntity().getWorld().playSound(event.getEntity().getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 3.0f, 1.0f);
         Particle.EXPLOSION_HUGE.builder().count(1).location(event.getEntity().getLocation()).spawn();
-        event.setYield(2.5f);
 
-        final BlockExplodeEvent explodeEvent = new BlockExplodeEvent(event.getLocation().getBlock(), event.blockList(), 1.0f, null);
-        UtilServer.callEvent(explodeEvent);
+        UtilServer.callEvent(new BlockExplodeEvent(event.getLocation().getBlock(), event.blockList(), event.getYield(), null));
     }
 
     private void processBlocksInRadius(EntityExplodeEvent event) {
@@ -344,7 +348,7 @@ public class ClansExplosionListener extends ClanListener {
             }
         }
 
-        if(material.isBlock()) {
+        if(material.isBlock() && !(event.getItem() instanceof Weapon)) {
             if(event.getItem().getLore(null).isEmpty()) {
                 event.getItemLore().add(UtilMessage.deserialize("It takes <green>1</green> cannonball to destroy this block"));
             }

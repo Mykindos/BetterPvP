@@ -28,9 +28,11 @@ public class ClanDetailsButton extends ControlItem<ClanMenu> {
 
     private final Clan clan;
     private final boolean admin;
+    private final Clan viewerClan;
     private final ClanRelation viewerRelation;
 
-    public ClanDetailsButton(boolean admin, Clan clan, ClanRelation viewerRelation) {
+    public ClanDetailsButton(boolean admin, Clan clan, Clan viewerClan, ClanRelation viewerRelation) {
+        this.viewerClan = viewerClan;
         this.viewerRelation = viewerRelation;
         this.clan = clan;
         this.admin = admin;
@@ -38,7 +40,14 @@ public class ClanDetailsButton extends ControlItem<ClanMenu> {
 
     @Override
     public ItemProvider getItemProvider(ClanMenu gui) {
-        final double netDominance = clan.getEnemies().stream().mapToDouble(ClanEnemy::getDominance).sum();
+        double netDominance = clan.getEnemies().stream().mapToDouble(ClanEnemy::getDominance).sum();
+        for (ClanEnemy enemy : clan.getEnemies()) {
+            Optional<ClanEnemy> theirEnemyOptional = enemy.getClan().getEnemy(clan);
+            if (theirEnemyOptional.isPresent()) {
+                netDominance -= theirEnemyOptional.get().getDominance();
+            }
+        }
+
         String netDominanceText = String.format("%.1f%%", netDominance);
 
         Component tntProtectionCmpt;
@@ -59,9 +68,28 @@ public class ClanDetailsButton extends ControlItem<ClanMenu> {
                 .frameLore(true)
                 .flag(ItemFlag.HIDE_ITEM_SPECIFICS)
                 .displayName(Component.text(clan.getName(), viewerRelation.getSecondary()))
-                .lore(Component.text("Net Dominance: ", NamedTextColor.GRAY).append(Component.text(netDominanceText, netDominance >= 0 ? NamedTextColor.GREEN : NamedTextColor.DARK_PURPLE)))
+                .lore(Component.text("Net Dominance: ", NamedTextColor.GRAY).append(Component.text(netDominanceText, netDominance >= 0 ? NamedTextColor.GREEN : NamedTextColor.RED)))
                 .lore(Component.text("TNT Protection: ", NamedTextColor.GRAY).append(tntProtectionCmpt))
-                .lore(UtilMessage.deserialize("<gray>Online: <white>%,d</white>/<white>%,d</white>", clan.getOnlineMemberCount(), clan.getMembers().size()));
+                .lore(UtilMessage.deserialize("<gray>Online: <white>%,d</white>/<white>%,d</white>", clan.getOnlineMemberCount(), clan.getMembers().size()))
+                .lore(UtilMessage.deserialize("<gray>Squad Size: <white>%d</white>", clan.getSquadCount()));
+
+        if(viewerRelation == ClanRelation.ENEMY) {
+            double dominance;
+            Optional<ClanEnemy> enemyOptional = viewerClan.getEnemy(clan);
+            if(enemyOptional.isPresent()) {
+                dominance = enemyOptional.get().getDominance();
+
+                if(dominance == 0) {
+                    Optional<ClanEnemy> theirEnemyOptional = clan.getEnemy(viewerClan);
+                    if(theirEnemyOptional.isPresent()) {
+                        dominance = theirEnemyOptional.get().getDominance() * -1;
+                    }
+                }
+
+                builder.lore(UtilMessage.deserialize("<gray>Dominance: %s%.1f", dominance >= 0 ? "<green>" : "<red>", dominance));
+            }
+
+        }
 
         if (admin) {
             builder.action(ClickActions.ALL, Component.text("Edit Banner"));

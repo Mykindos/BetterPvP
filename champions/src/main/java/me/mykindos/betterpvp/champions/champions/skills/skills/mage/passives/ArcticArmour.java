@@ -65,6 +65,7 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill {
                 "Allies inside this area receive <effect>Resistance " + UtilFormat.getRomanNumeral(resistanceStrength) + "</effect>, and",
                 "enemies inside this area receive <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect>",
                 "",
+                "Uses <stat>" + getEnergyStartCost(level) + "</stat> energy on activation",
                 "Energy / Second: <val>" + getEnergy(level)
         };
     }
@@ -93,28 +94,25 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill {
         }
 
         if (updateCooldowns.getOrDefault("snowAura", 0L) < System.currentTimeMillis()) {
-            if (!snowAura(player)) {
-                return false;
-            }
+            snowAura(player);
             updateCooldowns.put("snowAura", System.currentTimeMillis() + 100);
         }
 
-        return true;
+        return doArcticArmour(player);
     }
 
     private void audio(Player player) {
         player.getWorld().playSound(player.getLocation(), Sound.WEATHER_RAIN, 0.3F, 0.0F);
     }
 
-    private boolean snowAura(Player player) {
-
+    private boolean doArcticArmour(Player player) {
         int level = getLevel(player);
         final int distance = getRadius(level);
         if (level <= 0) {
             return false;
         }
 
-        if (!championsManager.getEnergy().use(player, getName(), getEnergy(level) / 2, true)) {
+        if (!championsManager.getEnergy().use(player, getName(), getEnergy(level) / 20, true)) {
             return false;
         }
 
@@ -131,7 +129,13 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill {
                 championsManager.getEffects().addEffect(target, player, EffectTypes.SLOWNESS, slownessStrength, 1000);
             }
         }
+        return true;
+    }
 
+    private void snowAura(Player player) {
+
+        int level = getLevel(player);
+        final int distance = getRadius(level);
         // Apply cue effects
         // Spin particles around the player in the radius
         final int angle = (int) ((System.currentTimeMillis() / 10) % 360);
@@ -141,8 +145,6 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill {
         playEffects(player, distance, angle + 180f);
 
         convertWaterToIce(player, getDuration(level), distance);
-
-        return true;
     }
 
     private void playEffects(final Player player, float radius, float angle) {
@@ -201,12 +203,19 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill {
 
     @Override
     public void toggleActive(Player player) {
-        UtilMessage.message(player, getClassType().getName(), "Arctic Armour: <green>On");
+        if (championsManager.getEnergy().use(player, getName(), getEnergyStartCost(getLevel(player)), false)) {
+            UtilMessage.message(player, getClassType().getName(), "Arctic Armour: <green>On");
+        }
+        else
+        {
+            cancel(player);
+        }
+
     }
 
     @Override
     public void loadSkillConfig() {
-        baseRadius = getConfig("baseRadius", 2, Integer.class);
+        baseRadius = getConfig("baseRadius", 4, Integer.class);
         radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 1, Integer.class);
         baseDuration = getConfig("baseDuration", 2.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.0, Double.class);

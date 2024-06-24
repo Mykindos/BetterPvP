@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.client.punishments.commands;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.punishments.Punishment;
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Singleton
+@CustomLog
 @SubCommand(PunishCommand.class)
 public class PunishmentAddCommand extends Command implements IConsoleCommand {
 
@@ -73,8 +75,8 @@ public class PunishmentAddCommand extends Command implements IConsoleCommand {
 
     @Override
     public void execute(CommandSender sender, String[] args) {
-        if (args.length < 3) {
-            UtilMessage.message(sender, "Command", "Usage: /punish add <type> <player> <time> [unit] [reason...]");
+        if (args.length < 4) {
+            UtilMessage.message(sender, "Command", "Usage: /punish add <type> <player> <time> <unit> [reason...]");
             return;
         }
 
@@ -139,16 +141,25 @@ public class PunishmentAddCommand extends Command implements IConsoleCommand {
             } else {
                 UtilMessage.broadcast("Punish", "<yellow>%s<reset> has %s <yellow>%s<reset> for <green>%s<reset>.", punisher.getName(), type.getChatLabel(), target.getName(), formattedTime);
             }
+            log.info("{} was {} by {} for {} reason {}", target.getName(), punisher.getName(), type.getChatLabel(), formattedTime, reason)
+                    .setAction("PUNISH_ADD")
+                    .addClientContext(target, true)
+                    .addClientContext(punisher, false)
+                    .submit();
         } else {
             if (time == -1) {
                 UtilMessage.broadcast("Punish", "<yellow>%s<reset> was <green>permanently <reset>%s.", target.getName(), type.getChatLabel());
             } else {
                 UtilMessage.broadcast("Punish", "<yellow>%s<reset> was %s for <green>%s<reset>.", target.getName(), type.getChatLabel(), formattedTime);
             }
+            log.info("{} was {} for {} reason {}", target.getName(), type.getChatLabel(), formattedTime, reason)
+                    .setAction("PUNISH_ADD")
+                    .addClientContext(target, true)
+                    .submit();
         }
 
         if (!reason.isEmpty()) {
-            UtilMessage.broadcast("Punish", "<red>Reason<reset>: <reset>%s", reason);
+            clientManager.sendMessageToRank("Punish", UtilMessage.deserialize("<red>Reason<reset>: <reset>%s", reason), Rank.TRIAL_MOD);
         }
 
     }

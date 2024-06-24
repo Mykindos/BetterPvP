@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.combat.weapon.listeners;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.combat.click.events.RightClickEndEvent;
 import me.mykindos.betterpvp.core.combat.click.events.RightClickEvent;
 import me.mykindos.betterpvp.core.combat.combatlog.events.PlayerCombatLogEvent;
@@ -21,17 +22,22 @@ import me.mykindos.betterpvp.core.framework.events.items.SpecialItemDropEvent;
 import me.mykindos.betterpvp.core.items.BPvPItem;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.UtilSound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -40,7 +46,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -48,6 +53,7 @@ import java.util.UUID;
 
 @Singleton
 @BPvPListener
+@CustomLog
 public class WeaponListener implements Listener {
 
     private final WeaponManager weaponManager;
@@ -82,10 +88,13 @@ public class WeaponListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onWeaponActivate(PlayerInteractEvent event) {
-        if (event.getHand() == EquipmentSlot.OFF_HAND || !event.getAction().isRightClick() || event.useItemInHand() == Event.Result
-                .DENY) {
+        if (event.getHand() == EquipmentSlot.OFF_HAND
+                || !event.getAction().isRightClick()
+                || event.useItemInHand() == Event.Result.DENY) {
             return; // Only main hand and right click
         }
+
+        if (cooldownManager.hasCooldown(event.getPlayer(), "DoorAccess")) return;
 
         Player player = event.getPlayer();
         ItemStack item = player.getInventory().getItemInMainHand();
@@ -101,6 +110,15 @@ public class WeaponListener implements Listener {
             UtilMessage.simpleMessage(player, weapon.getSimpleName(), "This weapon is not enabled.");
             return;
         }
+
+        if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+            if (UtilBlock.usable(event.getClickedBlock())) return;
+            if (weapon.preventPlace()) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+
         if (weapon instanceof InteractWeapon interactWeapon) {
             if (!interactWeapon.canUse(player)) {
                 return;
@@ -120,7 +138,7 @@ public class WeaponListener implements Listener {
                 return;
             }
 
-            if(cooldownWeapon.showCooldownOnItem()) {
+            if (cooldownWeapon.showCooldownOnItem()) {
                 player.setCooldown(weapon.getMaterial(), (int) (cooldownWeapon.getCooldown() * 20L));
             }
         }
@@ -150,7 +168,7 @@ public class WeaponListener implements Listener {
         Optional<IWeapon> weaponOptional = weaponManager.getWeaponByItemStack(event.getItemStack());
         if (weaponOptional.isPresent()) {
             IWeapon weapon = weaponOptional.get();
-            if(!(weapon instanceof BPvPItem item)) return;
+            if (!(weapon instanceof BPvPItem item)) return;
 
             event.getItemMeta().getPersistentDataContainer().set(CoreNamespaceKeys.CUSTOM_ITEM_KEY, PersistentDataType.STRING, item.getIdentifier());
             event.setItemName(weapon.getName());
@@ -162,7 +180,7 @@ public class WeaponListener implements Listener {
         Optional<IWeapon> weaponOptional = weaponManager.getWeaponByItemStack(event.getItemStack());
         if (weaponOptional.isPresent()) {
             IWeapon weapon = weaponOptional.get();
-            if(!(weapon instanceof BPvPItem item)) return;
+            if (!(weapon instanceof BPvPItem item)) return;
 
             weapon.onInitialize(event.getItemMeta());
 
@@ -205,9 +223,28 @@ public class WeaponListener implements Listener {
         if (weaponOptional.isPresent()) {
             IWeapon weapon = weaponOptional.get();
             if (!(weapon instanceof LegendaryWeapon)) return;
-            UtilMessage.broadcast(Component.text(event.getSource(), NamedTextColor.RED)
-                    .append(Component.text(" dropped a legendary ", NamedTextColor.GRAY))
-                    .append(weapon.getName().hoverEvent(itemStack)));
+
+            if (event.getSource().equalsIgnoreCase("Fishing")) {
+
+                UtilMessage.broadcast(Component.text("A ", NamedTextColor.YELLOW).append(weapon.getName().hoverEvent(itemStack))
+                        .append(Component.text(" was caught by a fisherman!", NamedTextColor.YELLOW)));
+                log.info("A legendary weapon was caught by a fisherman! ({})", weapon.getName())
+                        .addLocationContext(event.getItem().getLocation())
+                        .addContext("Source", event.getSource()).submit();
+
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    UtilSound.playSound(player, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 1.0f, 1.0f, false);
+                }
+
+
+            } else {
+                UtilMessage.broadcast(Component.text(event.getSource(), NamedTextColor.RED)
+                        .append(Component.text(" dropped a legendary ", NamedTextColor.GRAY))
+                        .append(weapon.getName().hoverEvent(itemStack)));
+                log.info("A legendary weapon was dropped by {}! ({})", event.getSource(), weapon.getName())
+                        .addLocationContext(event.getItem().getLocation())
+                        .addContext("Source", event.getSource()).submit();
+            }
         }
     }
 
@@ -218,7 +255,7 @@ public class WeaponListener implements Listener {
             Optional<IWeapon> weaponOptional = weaponManager.getWeaponByItemStack(itemStack);
             if (weaponOptional.isPresent()) {
                 IWeapon weapon = weaponOptional.get();
-                if (!(weapon instanceof LegendaryWeapon)) return;
+                if (!(weapon instanceof LegendaryWeapon)) continue;
 
                 event.setSafe(false);
                 event.setDuration(System.currentTimeMillis()); // Permanent combat log

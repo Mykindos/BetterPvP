@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
+import me.mykindos.betterpvp.core.stats.LeaderboardCategory;
 import me.mykindos.betterpvp.core.stats.PlayerLeaderboard;
 import me.mykindos.betterpvp.core.stats.SearchOptions;
 import me.mykindos.betterpvp.core.stats.filter.FilterType;
@@ -20,7 +21,11 @@ import me.mykindos.betterpvp.core.stats.filter.Filtered;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardEntry;
 import me.mykindos.betterpvp.core.stats.sort.SortType;
 import me.mykindos.betterpvp.core.stats.sort.Sorted;
+import me.mykindos.betterpvp.core.utilities.model.description.Description;
+import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.SQLException;
@@ -52,6 +57,21 @@ public final class ChampionsCombatLeaderboard extends PlayerLeaderboard<CombatDa
     @Override
     public String getName() {
         return "Combat";
+    }
+
+    @Override
+    public LeaderboardCategory getCategory() {
+        return LeaderboardCategory.CHAMPIONS;
+    }
+
+    @Override
+    public Description getDescription() {
+        return Description.builder()
+                .icon(ItemView.builder()
+                        .material(Material.DIAMOND_SWORD)
+                        .displayName(Component.text("Combat", NamedTextColor.RED))
+                        .build())
+                .build();
     }
 
     @Override
@@ -132,16 +152,7 @@ public final class ChampionsCombatLeaderboard extends PlayerLeaderboard<CombatDa
         }
 
         final String className = Optional.ofNullable(filter.getRole()).map(Role::getName).orElse("");
-        final IntegerStatementValue top = new IntegerStatementValue(10);
-        final StringStatementValue classNameStmt = new StringStatementValue(className);
-        Statement stmt = switch (sortType) {
-            case RATING -> new Statement("CALL GetTopRatingByClass(?, ?);", top, classNameStmt);
-            case KILLS -> new Statement("CALL GetTopKillsByClass(?, ?);", top, classNameStmt);
-            case KDR -> new Statement("CALL GetTopKDRByClass(?, ?);", top, classNameStmt);
-            case KILLSTREAK -> new Statement("CALL GetTopKillstreakByClass(?, ?);", top, classNameStmt);
-            case HIGHEST_KILLSTREAK -> new Statement("CALL GetTopHighestKillstreakByClass(?, ?);", top, classNameStmt);
-            case DEATHS -> new Statement("CALL GetTopDeathsByClass(?, ?);", top, classNameStmt);
-        };
+        Statement stmt = getStatement(className, sortType);
 
         database.executeProcedure(stmt, -1, result -> {
             try {
@@ -152,9 +163,22 @@ public final class ChampionsCombatLeaderboard extends PlayerLeaderboard<CombatDa
                     map.put(gamer, data);
                 }
             } catch (SQLException e) {
-                log.error("Failed to load combat rating leaderboard for type " + sortType, e);
+                log.error("Failed to load combat rating leaderboard for type " + sortType, e).submit();
             }
         });
         return map;
+    }
+
+    private static @NotNull Statement getStatement(String className, CombatSort sortType) {
+        final IntegerStatementValue top = new IntegerStatementValue(10);
+        final StringStatementValue classNameStmt = new StringStatementValue(className);
+        return switch (sortType) {
+            case RATING -> new Statement("CALL GetTopRatingByClass(?, ?);", top, classNameStmt);
+            case KILLS -> new Statement("CALL GetTopKillsByClass(?, ?);", top, classNameStmt);
+            case KDR -> new Statement("CALL GetTopKDRByClass(?, ?);", top, classNameStmt);
+            case KILLSTREAK -> new Statement("CALL GetTopKillstreakByClass(?, ?);", top, classNameStmt);
+            case HIGHEST_KILLSTREAK -> new Statement("CALL GetTopHighestKillstreakByClass(?, ?);", top, classNameStmt);
+            case DEATHS -> new Statement("CALL GetTopDeathsByClass(?, ?);", top, classNameStmt);
+        };
     }
 }

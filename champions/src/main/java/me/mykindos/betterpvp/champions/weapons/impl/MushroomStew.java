@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
@@ -24,7 +25,11 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Singleton
 @BPvPListener
@@ -49,6 +54,13 @@ public class MushroomStew extends Weapon implements InteractWeapon, CooldownWeap
         UtilSound.playSound(player, Sound.ENTITY_PLAYER_BURP, 1f, 1f, false);
         UtilInventory.remove(player, getMaterial(), 1);
 
+    }
+
+    @Override
+    public List<Component> getLore(ItemMeta itemMeta) {
+        List<Component> lore = new ArrayList<>();
+        lore.add(UtilMessage.deserialize("<gray>Grants <white>Regeneration %s</white> for <yellow>%.1f seconds</yellow>", UtilFormat.getRomanNumeral(level), duration));
+        return lore;
     }
 
     @EventHandler (priority = EventPriority.HIGHEST)

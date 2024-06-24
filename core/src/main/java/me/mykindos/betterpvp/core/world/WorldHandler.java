@@ -66,7 +66,7 @@ public class WorldHandler {
         configSection.getKeys(false).forEach(key -> {
             Location spawnPoint = UtilWorld.stringToLocation(configSection.getString(key));
             spawnLocations.put(key, spawnPoint);
-            log.info("Loaded spawn point {} at {}", key, spawnPoint);
+            log.info("Loaded spawn point {} at {}", key, spawnPoint).submit();
         });
     }
 

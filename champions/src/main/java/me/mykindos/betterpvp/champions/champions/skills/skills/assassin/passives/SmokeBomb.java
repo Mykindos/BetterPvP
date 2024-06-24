@@ -18,6 +18,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -41,6 +42,7 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener {
     private double durationIncreasePerLevel;
     private double blindDuration;
     private double blindRadius;
+    private boolean allowPickupItems;
 
     @Inject
     public SmokeBomb(Champions champions, ChampionsManager championsManager) {
@@ -131,7 +133,7 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener {
         reappear(player);
     }
 
-    @EventHandler
+    @EventHandler (priority = EventPriority.MONITOR)
     public void onInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         if (smoked.containsKey(player.getUniqueId())) {
@@ -141,6 +143,7 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener {
 
     @EventHandler
     public void onPickup(PlayerAttemptPickupItemEvent event) {
+        if(allowPickupItems) return;
         Player player = event.getPlayer();
         if (smoked.containsKey(player.getUniqueId())) {
             interact(player);
@@ -163,8 +166,17 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener {
             reappear(player);
         }
         if (event.getDamagee() instanceof Player player && smoked.containsKey(player.getUniqueId())) {
-            smoked.remove(player.getUniqueId());
-            reappear(player);
+            if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
+                // While smoke bombed, cancel melee damage from enemies
+                event.setCancelled(true);
+            } else if (event.getCause() != EntityDamageEvent.DamageCause.POISON
+                    && !event.hasReason("Bleed")
+                    && event.getCause() != EntityDamageEvent.DamageCause.FIRE
+                    && event.getCause() != EntityDamageEvent.DamageCause.FIRE_TICK) {
+                smoked.remove(player.getUniqueId());
+                reappear(player);
+            }
+
         }
     }
 
@@ -205,11 +217,13 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener {
 
     }
 
+    @Override
     public void loadSkillConfig() {
-        baseDuration = getConfig("baseDuration", 3.0, Double.class);
+        baseDuration = getConfig("baseDuration", 4.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
         blindDuration = getConfig("blindDuration", 1.75, Double.class);
         blindRadius = getConfig("blindRadius", 4.0, Double.class);
+        allowPickupItems = getConfig("allowPickupItems", false, Boolean.class);
     }
 
 }

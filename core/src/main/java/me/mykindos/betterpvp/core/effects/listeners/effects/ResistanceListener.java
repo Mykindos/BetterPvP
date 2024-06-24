@@ -29,7 +29,7 @@ public class ResistanceListener implements Listener {
     public void resistanceReduction(CustomDamageEvent event) {
         if (event.getDamagee() instanceof Player player) {
             Optional<Effect> effectOptional = effectManager.getEffect(player, EffectTypes.RESISTANCE);
-            effectOptional.ifPresent(effect -> event.setDamage(event.getDamage() * (1.0 - (effect.getAmplifier() * 20) * 0.01)));
+            effectOptional.ifPresent(effect -> event.setDamage(event.getDamage() * (1.0 - (double) (effect.getAmplifier() * 20) / 100)));
         }
     }
 }

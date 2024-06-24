@@ -55,6 +55,8 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
                 "Activate while your back is to a wall to perform",
                 "a wall-kick, which will not affect the cooldown",
                 "",
+                "Cannot be used while <effect>Slowed</effect>",
+                "",
                 "Cooldown: <val>" + getCooldown(level)
         };
     }
@@ -180,7 +182,7 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
     public void loadSkillConfig() {
         leapStrength = getConfig("leapStrength", 1.3, Double.class);
         wallKickStrength = getConfig("wallKickStrength", 0.9, Double.class);
-        wallKickInternalCooldown = getConfig("wallKickInternalCooldown", 1.0, Double.class);
+        wallKickInternalCooldown = getConfig("wallKickInternalCooldown", 0.5, Double.class);
         fallDamageLimit = getConfig("fallDamageLimit", 8.0, Double.class);
 
     }

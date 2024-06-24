@@ -309,6 +309,7 @@ public final class BlockTossObject {
             final EntityProperty relation = nearbyEntry.getValue();
 
             if (relation != EntityProperty.FRIENDLY) {
+                if (!ent.hasLineOfSight(impactLocation)) continue;
                 // Damage anybody who is not friendly
                 damaged.add(ent);
                 Vector knockback = ent.getLocation().toVector().subtract(impactLocation.toVector());

@@ -60,10 +60,17 @@ public class MessageCommand extends Command {
             UtilMessage.simpleMessage(player, "<dark_aqua>[<aqua>You<dark_aqua> -> <aqua>" + target.getName() + "<dark_aqua>] <gray>" + message);
             UtilMessage.simpleMessage(target, "<dark_aqua>[<aqua>" + player.getName() + "<dark_aqua> -> <aqua>You<dark_aqua>] <gray>" + message);
 
+            for(Player online : Bukkit.getOnlinePlayers()) {
+                if(online.equals(target) || online.equals(player)) continue;
+                if(clientManager.search().online(online).isAdministrating()) {
+                    UtilMessage.simpleMessage(online, "<dark_green>[<green>" + player.getName() + "<dark_green> -> <green>" + target.getName() + "<dark_green>] <gray>" + message);
+                }
+            }
+
             client.putProperty(ClientProperty.LAST_MESSAGED.name(), target.getUniqueId(), true);
             targetClient.putProperty(ClientProperty.LAST_MESSAGED.name(), client.getUniqueId(), true);
 
-            log.info("{} messaged {}: {}", player.getName(), target.getName(), message);
+            log.info("{} messaged {}: {}", player.getName(), target.getName(), message).submit();
 
         } else {
             UtilMessage.simpleMessage(player, "Command", "Usage: /message <player> <message>");

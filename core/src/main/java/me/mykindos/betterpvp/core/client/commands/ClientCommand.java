@@ -8,13 +8,17 @@ import me.mykindos.betterpvp.core.client.events.ClientAdministrateEvent;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.SubCommand;
+import me.mykindos.betterpvp.core.config.Config;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Singleton
 public class ClientCommand extends Command {
@@ -73,6 +77,10 @@ public class ClientCommand extends Command {
     private static class SearchSubCommand extends Command {
 
         @Inject
+        @Config(path = "core.salt", defaultValue = "")
+        private String salt;
+
+        @Inject
         private ClientManager clientManager;
 
         @Override
@@ -96,6 +104,12 @@ public class ClientCommand extends Command {
                 // Todo: prettify and populate
                 List<Component> result = new ArrayList<>();
                 result.add(UtilMessage.deserialize("<alt2>%s</alt2> Client Details", target.getName()));
+
+                Player targetPlayer = Bukkit.getPlayer(target.getUniqueId());
+                if(targetPlayer != null) {
+                    List<String> alts = clientManager.getSqlLayer().getAlts(targetPlayer, UtilFormat.hashWithSalt(Objects.requireNonNull(targetPlayer.getAddress()).getHostName(), salt));
+                    result.add(UtilMessage.deserialize("<green>Alts: <white>%s", String.join("<gray>, <white>", alts)));
+                }
                 result.forEach(message -> UtilMessage.message(player, message));
             }, () -> UtilMessage.message(player, "Command", "Could not find a client with this name")));
         }

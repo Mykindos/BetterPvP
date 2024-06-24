@@ -42,6 +42,7 @@ public class StandardShopkeeper extends Mob implements IShopkeeper{
 
         entity.customName(name);
         entity.setCustomNameVisible(true);
+        entity.setPersistent(false);
 
         if(entity instanceof LivingEntity livingEntity) {
             livingEntity.setRemoveWhenFarAway(false);

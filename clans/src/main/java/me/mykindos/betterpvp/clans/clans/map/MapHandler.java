@@ -34,7 +34,7 @@ import java.util.UUID;
 
 /**
  * Map system by <a href="https://github.com/areeoh/">Areeoh</a>
- * Modified by Tom Hoogstra for 1.19
+ * Modified by Mykindos for 1.19+
  */
 @CustomLog
 @Singleton
@@ -65,7 +65,7 @@ public class MapHandler {
 
         int distX = Math.abs(mapData.getMapX() - player.getLocation().getBlockX());
         int distZ = Math.abs(mapData.getMapZ() - player.getLocation().getBlockZ());
-        final int scale = 1 << mapData.getScale().getValue();
+        final int scale = mapData.getScale().getValue();
         return (distX >= scale) || (distZ >= scale);
     }
 
@@ -85,13 +85,13 @@ public class MapHandler {
             File file = new File("./world/data/map_0.dat");
             if (!file.exists()) {
                 if (!file.createNewFile()) {
-                    log.error("Failed to create blank map file");
+                    log.error("Failed to create blank map file").submit();
                 }
             }
 
             World world = Bukkit.getWorld("world");
             if (world == null) {
-                log.error("Could not load map as main world does not exist");
+                log.error("Could not load map as main world does not exist").submit();
                 return;
             }
 
@@ -118,7 +118,7 @@ public class MapHandler {
             }
             loadMapData((MinimapRenderer) map.getRenderers().get(0));
         } catch (Exception ex) {
-            log.error("Failed to load map", ex);
+            log.error("Failed to load map", ex).submit();
         }
     }
 
@@ -150,9 +150,9 @@ public class MapHandler {
                     });
                 });
             } catch (IOException | ParseException e) {
-                log.error("Failed to load map data", e);
+                log.error("Failed to load map data", e).submit();
             }
-            log.info("Loaded map data in {}", UtilTime.getTime((System.currentTimeMillis() - l), 2));
+            log.info("Loaded map data in {}", UtilTime.getTime((System.currentTimeMillis() - l), 2)).submit();
         });
     }
 
@@ -164,7 +164,7 @@ public class MapHandler {
             public void run() {
                 final long l = System.currentTimeMillis();
 
-                log.info("Saving map data...");
+                log.info("Saving map data...").submit();
 
                 MapView map = Bukkit.getMap(0);
                 if (map == null) {
@@ -176,16 +176,16 @@ public class MapHandler {
                     final File file = new File("world/data/map.json");
                     if (!file.exists()) {
                         if(!file.createNewFile())  {
-                            log.error("Failed to create blank map file");
+                            log.error("Failed to create blank map file").submit();
                         }
                     }
 
                     ObjectMapper mapper = new ObjectMapper();
                     mapper.writeValue(file, minimapRenderer.getWorldCacheMap());
                 } catch (IOException e) {
-                    log.error("Failed to save map data", e);
+                    log.error("Failed to save map data", e).submit();
                 }
-                log.info("Saved map data in {}", UtilTime.getTime((System.currentTimeMillis() - l), 2));
+                log.info("Saved map data in {}", UtilTime.getTime((System.currentTimeMillis() - l), 2)).submit();
             }
         }.runTaskAsynchronously(clans);
     }

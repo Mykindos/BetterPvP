@@ -37,7 +37,7 @@ public class ShopItemRepository {
                 String shopKeeper = result.getString(2);
                 Material material = Material.valueOf(result.getString(3));
                 String itemName = result.getString(4);
-                int data = result.getInt(5);
+                int modelData = result.getInt(5);
                 int menuSlot = result.getInt(6);
                 int menuPage = result.getInt(7);
                 int amount = result.getInt(8);
@@ -64,9 +64,9 @@ public class ShopItemRepository {
                     int currentStock = dynamicPricingResult.getInt(10);
 
                     PolynomialData polynomialData = new PolynomialData(minBuyPrice, baseBuyPrice, maxBuyPrice, minSellPrice, baseSellPrice, maxSellPrice, maxStock, baseStock, currentStock);
-                    shopItem = new DynamicShopItem(id, shopKeeper, itemName, material, (byte) data, menuSlot, menuPage, amount, polynomialData);
+                    shopItem = new DynamicShopItem(id, shopKeeper, itemName, material, modelData, menuSlot, menuPage, amount, polynomialData);
                 } else {
-                    shopItem = new NormalShopItem(id, shopKeeper, itemName, material, (byte) data, menuSlot, menuPage, amount, buyPrice, sellPrice);
+                    shopItem = new NormalShopItem(id, shopKeeper, itemName, material, modelData, menuSlot, menuPage, amount, buyPrice, sellPrice);
                 }
 
                 String itemFlagQuery = "SELECT * FROM shopitems_flags WHERE shopItemId = ?";
@@ -81,7 +81,7 @@ public class ShopItemRepository {
 
             }
         } catch (Exception ex) {
-            log.error("Failed to load shop items", ex);
+            log.error("Failed to load shop items", ex).submit();
         }
 
         return shopItems;
