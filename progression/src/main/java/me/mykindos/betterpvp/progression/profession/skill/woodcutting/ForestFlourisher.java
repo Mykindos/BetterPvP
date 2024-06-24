@@ -21,10 +21,6 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.plugin.java.JavaPlugin;
 
-/**
- * Forest Flourisher is a 2-part skill with its event-handling being in the `clans`
- * plugin
- */
 @Singleton
 @BPvPListener
 public class ForestFlourisher extends WoodcuttingProgressionSkill implements Listener {
