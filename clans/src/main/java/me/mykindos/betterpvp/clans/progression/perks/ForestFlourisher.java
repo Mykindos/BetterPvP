@@ -73,25 +73,7 @@ public class ForestFlourisher implements Listener {
             int skillLevel = profession.getBuild().getSkillLevel(skill);
             if (skillLevel <= 0) return;
 
-            final int BLOCKS_AWAY_FROM_CLAIM = 8;
-            final int LOWER_BOUND = -BLOCKS_AWAY_FROM_CLAIM;
 
-            Clan playerClan = clanManager.getClanByPlayer(player).orElse(null);
-
-            for (int x = LOWER_BOUND; x < BLOCKS_AWAY_FROM_CLAIM; x++) {
-                for (int z = LOWER_BOUND; z < BLOCKS_AWAY_FROM_CLAIM; z++) {
-                    Block targetBlock = event.getBlockPlaced().getRelative(x, 0, z);
-
-                    Optional<Clan> targetBlockLocationClanOptional = clanManager.getClanByLocation(targetBlock.getLocation());
-                    if (targetBlockLocationClanOptional.isPresent()) {
-                        if (playerClan == null || !playerClan.equals(targetBlockLocationClanOptional.get())) {
-                            UtilMessage.message(player, "Clans", "Saplings must be placed a minimum of 8 blocks away from foreign claims.");
-                            event.setCancelled(true);
-                            return;
-                        }
-                    }
-                }
-            }
 
             // purpose of the 0.5's is to center the particle
             Location center = event.getBlock().getLocation().add(0.5, 1.5, 0.5);
