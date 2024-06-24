@@ -10,7 +10,7 @@ import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.ConfigAccessor;
-import me.mykindos.betterpvp.progression.profession.skill.woodcutting.ForestFlourisherSkill;
+import me.mykindos.betterpvp.progression.profession.skill.woodcutting.ForestFlourisher;
 import org.bukkit.TreeType;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -30,7 +30,7 @@ import java.util.Optional;
 public class PlantSaplingListener implements Listener, ConfigAccessor {
     private final CooldownManager cooldownManager;
     private final ClanManager clanManager;
-    private final ForestFlourisherSkill forestFlourisherSkill;
+    private final ForestFlourisher forestFlourisherSkill;
     private double saplingCooldown;
     final String COOLDOWN_NAME = "PlantSapling";
 
@@ -38,7 +38,7 @@ public class PlantSaplingListener implements Listener, ConfigAccessor {
     public PlantSaplingListener(ProgressionAdapter adapter, CooldownManager cooldownManager, ClanManager clanManager) {
         this.cooldownManager = cooldownManager;
         this.clanManager = clanManager;
-        this.forestFlourisherSkill = adapter.getProgression().getInjector().getInstance(ForestFlourisherSkill.class);
+        this.forestFlourisherSkill = adapter.getProgression().getInjector().getInstance(ForestFlourisher.class);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
