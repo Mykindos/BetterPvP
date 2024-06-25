@@ -66,6 +66,7 @@ clans:
     baseY: 60
     allowOfflineGrowing: false
     baseFarmingLevels: 5
+  saplingPlantDistance: 8
 server:
   sidebar:
     title: BetterPvP
