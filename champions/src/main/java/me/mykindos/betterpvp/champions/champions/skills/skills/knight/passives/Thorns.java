@@ -9,28 +9,35 @@ import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
-import me.mykindos.betterpvp.core.utilities.UtilTime;
+import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Queue;
 import java.util.WeakHashMap;
 
-@Singleton
 @BPvPListener
+@Singleton
 public class Thorns extends Skill implements PassiveSkill, Listener {
 
-    private final WeakHashMap<LivingEntity, Long> cd = new WeakHashMap<>();
-
-    private double internalCooldown;
+    private final Map<LivingEntity, Queue<Long>> hitTimestamps = new WeakHashMap<>();
 
     private double baseDamage;
     private double damageIncreasePerLevel;
+    private double reflectTime;
+    private int hitsToTrigger;
 
     @Inject
     public Thorns(Champions champions, ChampionsManager championsManager) {
@@ -44,17 +51,18 @@ public class Thorns extends Skill implements PassiveSkill, Listener {
 
     @Override
     public String[] getDescription(int level) {
-
         return new String[]{
-                "Enemies take <val>" + UtilFormat.formatNumber(getDamage(level)) + "</val> damage when",
-                "they hit you using a melee attack",
-                "",
-                "Internal Cooldown: <stat>" + internalCooldown
+                "If you are hit <stat>" + hitsToTrigger + "</stat> times within <stat>" + getReflectTime(level) + "</stat> seconds",
+                "you will reflect back <val>" + getDamage(level) + "</val> damage",
         };
     }
 
     public double getDamage(int level) {
         return baseDamage + ((level - 1) * damageIncreasePerLevel);
+    }
+
+    public double getReflectTime(int level) {
+        return reflectTime;
     }
 
     @Override
@@ -67,22 +75,43 @@ public class Thorns extends Skill implements PassiveSkill, Listener {
         return SkillType.PASSIVE_A;
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onDamage(CustomDamageEvent event) {
         if (event.isCancelled()) return;
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
-        if (!(event.getDamagee() instanceof Player p)) return;
+        if (!(event.getDamagee() instanceof Player player)) return;
         if (event.getDamager() == null) return;
 
-        int level = getLevel(p);
-        if (level > 0) {
-            LivingEntity damager = event.getDamager();
-            if (!cd.containsKey(damager)) {
-                cd.put(damager, System.currentTimeMillis());
-            } else {
-                if(UtilTime.elapsed(cd.get(damager), (long) (internalCooldown * 1000L))){
-                    UtilDamage.doCustomDamage(new CustomDamageEvent(damager, p, null, DamageCause.CUSTOM, getDamage(level), false, getName()));
-                    cd.put(damager, System.currentTimeMillis());
+        if (getLevel(player) < 1) return;
+
+        LivingEntity damager = event.getDamager();
+        hitTimestamps.putIfAbsent(player, new LinkedList<>());
+        Queue<Long> timestamps = hitTimestamps.get(player);
+
+        timestamps.offer(System.currentTimeMillis());
+
+        if (timestamps.size() == hitsToTrigger) {
+            player.getWorld().playSound(player.getLocation(), Sound.ENCHANT_THORNS_HIT, 1.0F, 1.0F);
+            UtilDamage.doCustomDamage(new CustomDamageEvent(damager, player, null, DamageCause.ENTITY_ATTACK, getDamage(getLevel(player)), true, getName()));
+            timestamps.clear();
+        }
+    }
+
+    @UpdateEvent
+    public void checkThornsPlayer() {
+        long currentTime = System.currentTimeMillis();
+        long expirationTime = (long)(reflectTime * 1000);
+
+        for (Map.Entry<LivingEntity, Queue<Long>> entry : hitTimestamps.entrySet()) {
+            Queue<Long> timestamps = entry.getValue();
+            Iterator<Long> iterator = timestamps.iterator();
+
+            while (iterator.hasNext()) {
+                Long timestamp = iterator.next();
+                if (currentTime - timestamp > expirationTime) {
+                    iterator.remove();
+                } else {
+                    break;
                 }
             }
         }
@@ -90,8 +119,9 @@ public class Thorns extends Skill implements PassiveSkill, Listener {
 
     @Override
     public void loadSkillConfig() {
-        internalCooldown = getConfig("internalCooldown", 2.0, Double.class);
-        baseDamage = getConfig("baseDamage", 0.8, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.8, Double.class);
+        baseDamage = getConfig("baseDamage", 3.0, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
+        reflectTime = getConfig("reflectTime", 2.0, Double.class);
+        hitsToTrigger = getConfig("hitsToTrigger", 3, Integer.class);
     }
 }
