@@ -22,6 +22,7 @@ import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
@@ -29,6 +30,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.WeakHashMap;
+import java.util.HashMap;
 
 @BPvPListener
 @Singleton
@@ -38,6 +40,8 @@ public class RightClickListener implements Listener {
     private final Core core;
     private final WeakHashMap<Player, RightClickContext> rightClickCache = new WeakHashMap<>();
     private final WeakHashMap<Player, Long> lastDrop = new WeakHashMap<>();
+    private final Map<Player, Long> lastRightClickTime = new HashMap<>();
+    private static final long debounce = 250;
 
     @Inject
     public RightClickListener(ClientManager clientManager, Core core) {
@@ -122,9 +126,27 @@ public class RightClickListener implements Listener {
         }
     }
 
-    // Handle right click events
+
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onRightClick(PlayerInteractEvent event) {
+        final Player player = event.getPlayer();
+
+        // Check if the player is holding a sword
+        final ItemStack mainHandItem = player.getInventory().getItemInMainHand();
+        final ItemStack offHandItem = player.getInventory().getItemInOffHand();
+        boolean isHoldingSword = (UtilItem.isSword(mainHandItem) || UtilItem.isSword(offHandItem)) || (mainHandItem.getType().equals(Material.SHIELD) || offHandItem.getType().equals(Material.SHIELD));
+
+
+        // Apply debounce only if holding a sword
+        if (isHoldingSword) {
+            long currentTime = System.currentTimeMillis();
+            long lastTime = lastRightClickTime.getOrDefault(player, 0L);
+            if (currentTime - lastTime < debounce) {
+                return;
+            }
+            lastRightClickTime.put(player, currentTime);
+        }
+
         if (!event.getAction().isRightClick()
                 || (event.getClickedBlock() != null && event.getClickedBlock().getType().isInteractable())
                 || event.getAction() == Action.PHYSICAL
@@ -136,7 +158,6 @@ public class RightClickListener implements Listener {
         final ItemStack item = Objects.requireNonNullElse(event.getItem(), new ItemStack(Material.AIR));
 
         // Call event
-        final Player player = event.getPlayer();
         final Gamer gamer = clientManager.search().online(player).getGamer();
         gamer.setLastBlock(System.currentTimeMillis());
         final RightClickEvent clickEvent = new RightClickEvent(player, false, 0, false, event.getHand());
@@ -151,6 +172,14 @@ public class RightClickListener implements Listener {
         UtilServer.callEvent(clickEvent);
         rightClickCache.put(player, context);
     }
+
+
+    @EventHandler
+    public void onLeave(PlayerQuitEvent event) {
+        lastRightClickTime.remove(event.getPlayer());
+    }
+
+
 
     @EventHandler
     public void onPickupShield(EntityPickupItemEvent event) {
