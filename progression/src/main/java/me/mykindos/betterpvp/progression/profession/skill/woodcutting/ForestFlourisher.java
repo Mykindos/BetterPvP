@@ -2,10 +2,11 @@ package me.mykindos.betterpvp.progression.profession.skill.woodcutting;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillDependency;
+import me.mykindos.betterpvp.progression.profile.ProfessionProfile;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -18,7 +19,10 @@ import org.bukkit.event.block.BlockPlaceEvent;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -29,16 +33,15 @@ public class ForestFlourisher extends WoodcuttingProgressionSkill implements Lis
     private final ProfessionProfileManager professionProfileManager;
 
     private final Map<UUID, Set<Block>> plantedSaplings = new HashMap<>();
+    private final Queue<Block> blocksToBeBoneMealed = new LinkedList<>();
 
     private double growFactorIncreasePerLvl;
-    private long growFactorInterval;
 
 
     @Inject
     public ForestFlourisher(Progression progression, ProfessionProfileManager professionProfileManager) {
         super(progression);
         this.professionProfileManager = professionProfileManager;
-        UtilServer.runTaskTimer(progression, this::increaseSaplingGrowthTime, 0, growFactorInterval*20L);
     }
 
     @Override
@@ -99,32 +102,45 @@ public class ForestFlourisher extends WoodcuttingProgressionSkill implements Lis
         });
     }
 
+    /**
+     * This event's purpose is to determine which blocks need to be bone-mealed and offers them to the queue
+     */
+    @UpdateEvent(delay = 5000L)
     public void increaseSaplingGrowthTime() {
         plantedSaplings.forEach((playerUUID, setOfBlocks) -> {
             setOfBlocks = setOfBlocks.stream()
                     .filter(block -> getTreeType(block) != null)
                     .collect(Collectors.toSet());
 
-            setOfBlocks.forEach(block -> {
-                professionProfileManager.getObject(playerUUID.toString()).ifPresent(profile -> {
+            Optional<ProfessionProfile> optionalProfile = professionProfileManager.getObject(playerUUID.toString());
+            int skillLevel = optionalProfile.map(this::getPlayerSkillLevel).orElse(0);
 
-                    // if a player's uuid is in the map, then we shouldn't have to check if skillLevel<=0
-                    int skillLevel = getPlayerSkillLevel(profile);
-                    if (Math.random() < growFactor(skillLevel)) {
-                        block.applyBoneMeal(BlockFace.UP);
-                    }
-                });
+            setOfBlocks.forEach(block -> {
+                if (Math.random() < growFactor(skillLevel)) {
+                    blocksToBeBoneMealed.offer(block);
+                }
             });
 
             plantedSaplings.put(playerUUID, setOfBlocks);
         });
     }
 
+    /**
+     * This event's purpose is to dequeue the sapling block in the front of the queue every tick and
+     * apply bone meal to it
+     */
+    @UpdateEvent
+    public void pollBlockToBoneMeal() {
+        Block block = blocksToBeBoneMealed.poll();
+        if (block != null && getTreeType(block) != null) {
+            block.applyBoneMeal(BlockFace.UP);
+        }
+    }
+
     @Override
     public void loadConfig() {
         super.loadConfig();
         growFactorIncreasePerLvl = getConfig("growFactorIncreasePerLvl ", 0.003, Double.class);
-        growFactorInterval = getConfig("growFactorInterval", 5L, Long.class);
     }
 
     @Override

@@ -12,4 +12,3 @@ skills:
     enabled: true
     maxlevel: 250
     growFactorIncreasePerLvl: 0.003
-    growFactorInterval: 5
