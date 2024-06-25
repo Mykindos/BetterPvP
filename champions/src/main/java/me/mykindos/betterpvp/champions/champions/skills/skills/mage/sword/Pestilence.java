@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.mage.sword;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
@@ -27,7 +28,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Slf4j
 @Singleton
 @BPvPListener
 public class Pestilence extends PrepareSkill implements CooldownSkill, OffensiveSkill, DebuffSkill {
@@ -43,9 +44,11 @@ public class Pestilence extends PrepareSkill implements CooldownSkill, Offensive
     private final ConcurrentHashMap<UUID, PestilenceData> pestilenceData = new ConcurrentHashMap<>();
 
     private double infectionDuration;
+    private double infectionDurationIncreasePerLevel;
     private double enemyDamageReduction;
-
+    private double enemyDamageReductionIncreasePerLevel;
     private double radius;
+    private double radiusIncreasePerLevel;
 
     @Inject
     public Pestilence(Champions champions, ChampionsManager championsManager) {
@@ -68,7 +71,7 @@ public class Pestilence extends PrepareSkill implements CooldownSkill, Offensive
                 "up to " + getValueString(this::getCooldown, level) + "blocks away",
                 "",
                 "While enemies are infected, they",
-                "deal " + getValueString(this::getEnemyDamageReduction, level, 100, "%", 0) + "</stat> reduced damage",
+                "deal " + getValueString(this::getEnemyDamageReduction, level, 100, "%", 0) + " reduced damage from melee attacks",
                 "",
                 "<effect>Pestilence</effect> lasts " + getValueString(this::getInfectionDuration, level) + " seconds",
                 "",
@@ -77,15 +80,15 @@ public class Pestilence extends PrepareSkill implements CooldownSkill, Offensive
     }
 
     public double getEnemyDamageReduction(int level) {
-        return enemyDamageReduction;
+        return enemyDamageReduction + ((level - 1) * enemyDamageReductionIncreasePerLevel);
     }
 
     public double getInfectionDuration(int level) {
-        return infectionDuration;
+        return infectionDuration + ((level - 1) * infectionDurationIncreasePerLevel);
     }
 
     public double getRadius(int level) {
-        return radius;
+        return radius + ((level - 1) * radiusIncreasePerLevel);
     }
 
     @Override
@@ -115,7 +118,7 @@ public class Pestilence extends PrepareSkill implements CooldownSkill, Offensive
                     }
                 }
                 for (LivingEntity target : newInfections) {
-                    entry.getValue().addInfection(championsManager, target, (long) (infectionDuration * 1000));
+                    entry.getValue().addInfection(championsManager, target);
                 }
             }
         }
@@ -159,8 +162,8 @@ public class Pestilence extends PrepareSkill implements CooldownSkill, Offensive
 
         int level = getLevel(damager);
         if (level > 0) {
-            PestilenceData data = new PestilenceData();
-            data.addInfection(championsManager, event.getDamagee(), (long) (infectionDuration * 1000));
+            PestilenceData data = new PestilenceData((long) getInfectionDuration(level) * 1000, getEnemyDamageReduction(level));
+            data.addInfection(championsManager, event.getDamagee());
             pestilenceData.put(damager.getUniqueId(), data);
             active.remove(damager.getUniqueId());
         }
@@ -171,16 +174,22 @@ public class Pestilence extends PrepareSkill implements CooldownSkill, Offensive
     public void onDamageReduction(CustomDamageEvent event) {
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
         if (event.getDamager() == null) return;
-        if (!event.getDamager().hasPotionEffect(PotionEffectType.POISON)) return;
 
-        if (isInfected(event.getDamager())) {
-            event.setDamage(event.getDamage() * (1 - enemyDamageReduction));
-        }
+        double reduction = getDamageReduction(event.getDamager());
+        event.setDamage(event.getDamage() * (1 - reduction));
 
     }
 
-    public boolean isInfected(LivingEntity entity) {
-        return pestilenceData.values().stream().anyMatch(value -> value.currentlyInfected.containsKey(entity));
+    /**
+     * Returns the damage reduction, if there are active entries that have the entity, return the highest damage reduction. Defaults to 0.
+     * @param entity the entity to get the damage reduction
+     * @return damage reduction
+     */
+    public double getDamageReduction(LivingEntity entity) {
+        return pestilenceData.values().stream()
+                .filter(value -> value.currentlyInfected.containsKey(entity))
+                .map(data -> data.currentlyInfected.get(entity).getDamageReduction())
+                .max(Double::compare).orElse(0d);
     }
 
     @EventHandler
@@ -213,8 +222,11 @@ public class Pestilence extends PrepareSkill implements CooldownSkill, Offensive
     @Override
     public void loadSkillConfig() {
         infectionDuration = getConfig("infectionDuration", 5.0, Double.class);
+        infectionDurationIncreasePerLevel = getConfig("infectionDurationIncreasePerLevel", 0.0, Double.class);
         enemyDamageReduction = getConfig("enemyDamageReduction", 0.20, Double.class);
+        enemyDamageReductionIncreasePerLevel = getConfig("enemyDamageReductionIncreasePerLevel", 0.0, Double.class);
         radius = getConfig("radius", 5.0, Double.class);
+        radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 0.0, Double.class);
     }
 
     @Data
@@ -222,10 +234,12 @@ public class Pestilence extends PrepareSkill implements CooldownSkill, Offensive
 
         private final ConcurrentHashMap<LivingEntity, DamageData> oldInfected = new ConcurrentHashMap<>();
         private final ConcurrentHashMap<LivingEntity, DamageData> currentlyInfected = new ConcurrentHashMap<>();
+        private final long length;
+        private final double damageReduction;
 
-        public void addInfection(ChampionsManager championsManager, LivingEntity entity, long length) {
+        public void addInfection(ChampionsManager championsManager, LivingEntity entity) {
             championsManager.getEffects().addEffect(entity, EffectTypes.POISON, 1, length);
-            currentlyInfected.put(entity, new DamageData(length));
+            currentlyInfected.put(entity, new DamageData(length, damageReduction));
         }
 
         public void processInfections() {
@@ -246,8 +260,10 @@ public class Pestilence extends PrepareSkill implements CooldownSkill, Offensive
 
             private final long startTime;
             private final long length;
+            private final double damageReduction;
 
-            public DamageData(long length) {
+            public DamageData(long length, double damageReduction) {
+                this.damageReduction = damageReduction;
                 this.startTime = System.currentTimeMillis();
                 this.length = length;
             }
