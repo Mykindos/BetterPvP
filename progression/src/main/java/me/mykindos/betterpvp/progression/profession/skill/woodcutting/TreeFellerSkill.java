@@ -73,7 +73,7 @@ public class TreeFellerSkill extends WoodcuttingProgressionSkill implements Cool
 
     public void whenPlayerCantUseSkill(Player player) {
         UtilMessage.simpleMessage(player, getProgressionTree(),
-                "You must wait <alt>" + cooldownManager.getAbilityRecharge(player, getName()).getRemaining() + "</alt> seconds");
+                "You cannot use <alt>" + getName() + "</alt> for <alt>" + cooldownManager.getAbilityRecharge(player, getName()).getRemaining() + "</alt> seconds");
     }
 
     @Override
