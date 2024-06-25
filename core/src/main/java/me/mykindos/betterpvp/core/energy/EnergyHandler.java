@@ -15,7 +15,6 @@ import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 
 @Singleton
-@Slf4j
 public class EnergyHandler {
 
     @Inject
