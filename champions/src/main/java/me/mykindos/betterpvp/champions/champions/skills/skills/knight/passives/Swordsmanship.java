@@ -31,13 +31,12 @@ import java.util.WeakHashMap;
 public class Swordsmanship extends Skill implements PassiveSkill, OffensiveSkill, DamageSkill {
 
     private double timeBetweenCharges;
+    private double timeBetweenChargesDecreasePerLevel;
     private double timeOutOfCombat;
-
+    private double timeOutOfCombatDecreasePerLevel;
     private double baseDamagePerCharge;
-
     private double damageIncreasePerLevel;
 
-    private double damageMultiplierPerLevelPerCharge;
 
     private final WeakHashMap<Player, Integer> charges = new WeakHashMap<>();
 
@@ -131,7 +130,9 @@ public class Swordsmanship extends Skill implements PassiveSkill, OffensiveSkill
     @Override
     public void loadSkillConfig() {
         timeBetweenCharges = getConfig("timeBetweenCharges", 2.0, Double.class);
+        timeBetweenChargesDecreasePerLevel = getConfig("timeBetweenChargesDecreasePerLevel", 0.0, Double.class);
         timeOutOfCombat = getConfig("timeOutOfCombat", 2.5, Double.class);
+        timeOutOfCombatDecreasePerLevel = getConfig("timeOutOfCombat", 0, Double.class);
         baseDamagePerCharge = getConfig("baseDamagePerCharge", 1.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
     }

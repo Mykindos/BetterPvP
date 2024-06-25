@@ -281,7 +281,7 @@ public abstract class Skill implements IChampionsSkill {
         double nextValue = method.applyAsDouble(level + 1) * multiplier;
         //if level is the same, it's a static value
         if (currentValue == nextValue) {
-            return "<yellow>" + UtilFormat.formatNumber(currentValue, decimalPlaces, true) + "</yellow>";
+            return "<yellow>" + UtilFormat.formatNumber(currentValue, decimalPlaces, true) + "</yellow>" + suffix;
         }
 
         //it is a varying value, needs to be green

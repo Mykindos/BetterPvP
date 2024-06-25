@@ -30,9 +30,13 @@ public class Deflection extends Skill implements PassiveSkill, DefensiveSkill {
 
 
     private double timeBetweenCharges;
+    private double timeBetweenChargesDecreasePerLevel;
     private double timeOutOfCombat;
-
+    private double timeOutOfCombatDecreasePerLevel;
     private int baseCharges;
+    private int chargesIncreasePerLevel;
+    private double baseDamageReduction;
+    private double damageReductionIncreasePerLevel;
 
     private final HashMap<UUID, Integer> charges = new HashMap<>();
 
@@ -54,16 +58,24 @@ public class Deflection extends Skill implements PassiveSkill, DefensiveSkill {
                 "You can store a maximum of " + getValueString(this::getMaxCharges, level, 0) + " charges",
                 "",
                 "When attacked, the damage you take is",
-                "reduced by the number of deflection charges",
+                "reduced by " + getValueString(this::getDamageReductionPerCharge, level) + " damage per charge",
         };
     }
 
     public int getMaxCharges(int level) {
-        return baseCharges + (level - 1);
+        return baseCharges + (level - 1) * chargesIncreasePerLevel;
     }
 
     public double getTimeBetweenCharges(int level) {
-        return timeBetweenCharges;
+        return timeBetweenCharges - ((level - 1) * timeBetweenChargesDecreasePerLevel);
+    }
+
+    public double getDamageReductionPerCharge(int level) {
+        return baseDamageReduction + ((level - 1) * damageReductionIncreasePerLevel);
+    }
+
+    public double getTimeOutOfCombat(int level) {
+        return timeOutOfCombat - ((level - 1) * timeOutOfCombatDecreasePerLevel);
     }
 
     @Override
@@ -100,8 +112,8 @@ public class Deflection extends Skill implements PassiveSkill, DefensiveSkill {
             if (level > 0) {
                 if (charges.containsKey(cur.getUniqueId())) {
                     Gamer gamer = championsManager.getClientManager().search().online(cur).getGamer();
-                    if (UtilTime.elapsed(gamer.getLastDamaged(), (long) timeOutOfCombat * 1000)) {
-                        if (!championsManager.getCooldowns().use(cur, getName(), timeBetweenCharges, false)) return;
+                    if (UtilTime.elapsed(gamer.getLastDamaged(), (long) getTimeOutOfCombat(level) * 1000)) {
+                        if (!championsManager.getCooldowns().use(cur, getName(), getTimeBetweenCharges(level), false)) return;
                         int charge = charges.get(cur.getUniqueId());
                         if (charge < getMaxCharges(level)) {
                             charge = Math.min(getMaxCharges(level), charge + 1);
@@ -122,8 +134,13 @@ public class Deflection extends Skill implements PassiveSkill, DefensiveSkill {
     @Override
     public void loadSkillConfig() {
         timeBetweenCharges = getConfig("timeBetweenCharges", 2.0, Double.class);
+        timeBetweenChargesDecreasePerLevel = getConfig("timeBetweenChargesDecreasePerLevel", 0.0, Double.class);
         timeOutOfCombat = getConfig("timeOutOfCombat", 2.0, Double.class);
+        timeOutOfCombatDecreasePerLevel = getConfig("timeOutOfCombatDecreasePerLevel", 0.0, Double.class);
         baseCharges = getConfig("baseCharges", 1, Integer.class);
+        chargesIncreasePerLevel = getConfig("chargesIncreasePerLevel", 1, Integer.class);
+        baseDamageReduction = getConfig("baseDamageReduction", 1.0, Double.class);
+        damageReductionIncreasePerLevel = getConfig("damageReductionIncreasePerLevel", 0.0, Double.class);
     }
 
 }
