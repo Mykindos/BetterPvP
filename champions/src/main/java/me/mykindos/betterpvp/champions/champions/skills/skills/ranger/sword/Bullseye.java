@@ -19,6 +19,7 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Arrow;
@@ -48,11 +49,13 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
 
     private double baseCurveDistance;
 
-    private double curveDistanceIncreasePerLevel;
+    private double bonusCurveDistanceIncreasePerLevel;
 
     private double baseBonusDamage;
 
-    private double bonusDamageIncreasePerLevel;
+    private double baseBonusDamageIncreasePerLevel;
+
+    private double bonusCurveDistance;
 
     @Inject
     public Bullseye(Champions champions, ChampionsManager championsManager) {
@@ -94,11 +97,15 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
     }
 
     public double getCurveDistance(int level) {
-        return baseCurveDistance + ((level - 1) * curveDistanceIncreasePerLevel);
+        return baseCurveDistance + ((level - 1) * bonusCurveDistanceIncreasePerLevel);
     }
 
     public double getBonusDamage(int level) {
-        return baseBonusDamage + ((level - 1) * bonusDamageIncreasePerLevel);
+        return baseBonusDamage + ((level - 1) * baseBonusDamageIncreasePerLevel);
+    }
+
+    public double getBonusCurveDistance(int level) {
+        return bonusCurveDistance;
     }
 
     @Override
@@ -138,11 +145,15 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
                 continue;
             }
             // Spawn particles
-            if (playerBullsEyeData.getTargetFocused() != null && playerBullsEyeData.getTarget().isValid()) {
-                playerBullsEyeData.spawnFocusingParticles();
-            }
-            // Check if they still are blocking and charge
+            if (player == null) return;
             Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
+            if (playerBullsEyeData.getTargetFocused() != null && playerBullsEyeData.getTarget().isValid()) {
+                if (player.getInventory().getItemInMainHand().getType().equals(Material.BOW) || (isHolding(player) && gamer.isHoldingRightClick())) {
+                    playerBullsEyeData.spawnFocusingParticles();
+                }
+            }
+
+            // Check if they still are blocking and charge
             if (isHolding(player) && gamer.isHoldingRightClick()) {
                 playerBullsEyeData.getCasterCharge().tick();
                 championsManager.getCooldowns().removeCooldown(player, getName(), true);
@@ -163,7 +174,7 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    Collection<LivingEntity> nearbyEntities = arrow.getLocation().getNearbyLivingEntities(getCurveDistance(getLevel(player)) * playerBullsEyeData.getTargetFocused().getCharge());
+                    Collection<LivingEntity> nearbyEntities = arrow.getLocation().getNearbyLivingEntities((getCurveDistance(getLevel(player)) * playerBullsEyeData.getTargetFocused().getCharge()) + getBonusCurveDistance(getLevel(player)));
                     if (!arrow.isValid() || playerBullsEyeData.getTarget() == null || !playerBullsEyeData.getTarget().isValid()) {
                         this.cancel();
                         return;
@@ -216,17 +227,35 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
     private void focusTarget(BullsEyeData playerBullsEyeData) {
         Player caster = playerBullsEyeData.getCaster();
         RayTraceResult result = caster.rayTraceEntities(64);
-        if (result == null || result.getHitEntity() == null) return;
-        if (!(result.getHitEntity() instanceof LivingEntity)) return;
+        if (result != null && result.getHitEntity() != null) {
+            if (!(result.getHitEntity() instanceof LivingEntity)) return;
 
-        if (!playerBullsEyeData.hasTarget()) {
-            playerBullsEyeData.setTarget((LivingEntity) result.getHitEntity());
-            playerBullsEyeData.setTargetFocused(new ChargeData((float)(0.35)));
-            bullsEyeData.put(caster.getUniqueId(), playerBullsEyeData);
+            if (!playerBullsEyeData.hasTarget()) {
+                playerBullsEyeData.setTarget((LivingEntity) result.getHitEntity());
+                playerBullsEyeData.setTargetFocused(new ChargeData((float) (0.5)));
+                bullsEyeData.put(caster.getUniqueId(), playerBullsEyeData);
+                playerBullsEyeData.getTargetFocused().tick();
+                playerBullsEyeData.getTargetFocused().tickSound(caster);
+                playerBullsEyeData.updateColor();
+            }
         }
 
         if (playerBullsEyeData.getTarget() == null || playerBullsEyeData.getTargetFocused() == null) return;
-        if (result.getHitEntity() == playerBullsEyeData.getTarget()) {
+
+        int degrees = 10;
+
+        Vector casterToEntity = playerBullsEyeData.getTarget().getLocation().toVector().subtract(caster.getLocation().toVector()).normalize();
+        Vector playerDirection = caster.getLocation().getDirection().normalize();
+
+        double dotProduct = playerDirection.dot(casterToEntity);
+        double angle = Math.acos(dotProduct);
+
+        // Convert radians to degrees
+        double angleDegrees = Math.toDegrees(angle);
+
+        // Check if angle is within the specified degrees
+        if (angleDegrees <= degrees) {
+            caster.sendMessage("You are looking towards the target");
             playerBullsEyeData.getTargetFocused().tick();
             playerBullsEyeData.getTargetFocused().tickSound(caster);
             playerBullsEyeData.updateColor();
@@ -235,10 +264,12 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
 
     @Override
     public void loadSkillConfig() {
-        baseCurveDistance = getConfig("baseCurveDistance", 2.5, Double.class);
-        curveDistanceIncreasePerLevel = getConfig("curveDistanceIncreasePerLevel", 0.5, Double.class);
+        bonusCurveDistance = getConfig("bonusCurveDistance", 2.5, Double.class);
+        bonusCurveDistanceIncreasePerLevel = getConfig("bonusCurveDistanceIncreasePerLevel", 0.5, Double.class);
 
         baseBonusDamage = getConfig("baseBonusDamage", 2.0, Double.class);
-        bonusDamageIncreasePerLevel = getConfig("bonusDamageIncreasePerLevel", 1.0, Double.class);
+        baseBonusDamageIncreasePerLevel = getConfig("baseBonusDamageIncreasePerLevel", 1.0, Double.class);
+
+        baseCurveDistance = getConfig("baseCurveDistance", 0.5, Double.class);
     }
 }
