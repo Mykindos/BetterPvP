@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.champions.champions.skills.skills.knight.data.Ripos
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
@@ -42,7 +43,7 @@ import java.util.UUID;
 
 @Singleton
 @BPvPListener
-public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkill, OffensiveSkill, DamageSkill, HealthSkill {
+public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkill, OffensiveSkill, DamageSkill, HealthSkill, DefensiveSkill {
 
     private final HashMap<UUID, Long> handRaisedTime = new HashMap<>();
     private final HashMap<UUID, RiposteData> riposteData = new HashMap<>();

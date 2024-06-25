@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.TeamSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -37,7 +38,7 @@ import java.util.ListIterator;
 
 @Singleton
 @BPvPListener
-public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill, Listener, HealthSkill, AreaOfEffectSkill, OffensiveSkill {
+public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill, Listener, HealthSkill, AreaOfEffectSkill, OffensiveSkill, TeamSkill {
 
     private final List<Torment> tormentList = new ArrayList<>();
 

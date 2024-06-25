@@ -48,12 +48,11 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener,
         return new String[]{
                 "Right click with a Sword to prepare",
                 "",
-                "Your next hit will <effect>Blind</effect> the target for " + getValueString(this::getDuration, level) + " seconds",
-                "Concussed players have their hit delay increased by <stat>25%</stat>",
+                "Your next hit will <effect>Concuss</effect> the target for " + getValueString(this::getDuration, level) + " seconds",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level),
                 "",
-                EffectTypes.BLINDNESS.getDescription(0)
+                EffectTypes.CONCUSSED.getDescription(concussionStrength)
         };
     }
 

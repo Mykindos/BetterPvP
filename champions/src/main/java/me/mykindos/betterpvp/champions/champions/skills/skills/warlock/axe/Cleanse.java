@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.TeamSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
@@ -24,7 +25,7 @@ import org.bukkit.event.block.Action;
 
 @Singleton
 @BPvPListener
-public class Cleanse extends Skill implements InteractSkill, CooldownSkill, Listener, DefensiveSkill {
+public class Cleanse extends Skill implements InteractSkill, CooldownSkill, Listener, DefensiveSkill, TeamSkill {
 
     private double baseDuration;
     private double durationIncreasePerLevel;

@@ -5,8 +5,8 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
-import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.UtilitySkill;
 import me.mykindos.betterpvp.core.combat.events.CustomEntityVelocityEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -18,7 +18,7 @@ import org.bukkit.event.EventHandler;
 
 @Singleton
 @BPvPListener
-public class Colossus extends Skill implements PassiveSkill, BuffSkill {
+public class Colossus extends Skill implements PassiveSkill, UtilitySkill {
 
     private double reductionPerLevel;
 

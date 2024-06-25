@@ -27,6 +27,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.TeamSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.ToggleSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.UtilitySkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.WorldSkill;
 import me.mykindos.betterpvp.champions.effects.types.SkillBoostEffect;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
@@ -177,6 +178,10 @@ public abstract class Skill implements IChampionsSkill {
 
         if (this instanceof WorldSkill) {
             component = component.append(Component.text("World", NamedTextColor.DARK_PURPLE).appendSpace());
+        }
+
+        if (this instanceof UtilitySkill) {
+            component = component.append(Component.text("Utility", NamedTextColor.LIGHT_PURPLE).appendSpace());
         }
 
         if (component.equals(Component.empty())) {
