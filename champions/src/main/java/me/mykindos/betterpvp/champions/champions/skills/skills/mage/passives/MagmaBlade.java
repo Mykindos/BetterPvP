@@ -42,8 +42,7 @@ public class MagmaBlade extends Skill implements PassiveSkill, FireSkill, Damage
         return new String[] {
                 "Your sword is fueled by flames,",
                 "dealing an additional " + getValueString(this::getDamage, level) + " damage",
-                "to players who are on fire but",
-                "also extinguishes them."
+                "to players who are on fire."
         };
     }
 
@@ -72,7 +71,6 @@ public class MagmaBlade extends Skill implements PassiveSkill, FireSkill, Damage
             LivingEntity ent = event.getDamagee();
             if (ent.getFireTicks() > 0) {
                 event.setDamage(event.getDamage() + getDamage(level));
-                ent.setFireTicks(0);
             }
         }
 
