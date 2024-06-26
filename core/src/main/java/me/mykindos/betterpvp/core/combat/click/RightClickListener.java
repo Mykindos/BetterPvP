@@ -129,7 +129,7 @@ public class RightClickListener implements Listener {
         if (event.getAction().isLeftClick()) {
             final Player player = event.getPlayer();
             final Gamer gamer = this.clientManager.search().online(player).getGamer();
-            final  ItemStack main = player.getInventory().getItemInMainHand();
+            final ItemStack main = player.getInventory().getItemInMainHand();
             final ItemStack off = player.getInventory().getItemInOffHand();
             final boolean sword = UtilItem.isSword(main) || UtilItem.isSword(off);
             final boolean shield = main.getType().equals(Material.SHIELD) || off.getType().equals(Material.SHIELD);
