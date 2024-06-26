@@ -67,9 +67,7 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
                 "Uses " + getValueString(this::getEnergyStartCost, level) + " energy on activation",
                 "Energy / Second: " + getValueString(this::getEnergy, level),
                 "",
-                EffectTypes.SPEED.getDescription(speedStrength),
-                EffectTypes.STRENGTH.getDescription(strengthLevel),
-                EffectTypes.FIRE_RESISTANCE.getDescription(0)
+                EffectTypes.STRENGTH.getDescription(strengthLevel)
 
         };
     }

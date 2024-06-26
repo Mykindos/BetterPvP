@@ -53,9 +53,7 @@ public class Intimidation extends Skill implements PassiveSkill, DebuffSkill {
     public String[] getDescription(int level) {
         return new String[]{
                 "Every enemy facing towards you within " + getValueString(this::getRadius, level),
-                "blocks will get <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength),
-                "",
-                EffectTypes.SLOWNESS.getDescription(slownessStrength),
+                "blocks will get <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength)
         };
     }
 

@@ -71,10 +71,7 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
                 "",
                 "While charging, you take no knockback",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
-                "",
-                EffectTypes.SPEED.getDescription(speedStrength),
-                EffectTypes.SLOWNESS.getDescription(slownessStrength),
+                "Cooldown: " + getValueString(this::getCooldown, level)
 
         };
     }

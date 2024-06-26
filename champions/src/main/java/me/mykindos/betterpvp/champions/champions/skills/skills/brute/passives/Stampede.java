@@ -69,9 +69,7 @@ public class Stampede extends Skill implements PassiveSkill, MovementSkill, Dama
                 "",
                 "Attacking during stampede deals " + getValueString(this::getDamage, level) + " bonus",
                 "bonus damage and <val>" + getValueString(this::getBonusKnockback, level, 2) + "x</val> extra knockback",
-                "per speed level",
-                "",
-                EffectTypes.SPEED.getGenericDescription()
+                "per speed level"
         };
     }
 

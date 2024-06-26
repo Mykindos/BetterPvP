@@ -89,9 +89,7 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
                 "",
                 "Taking damage cancels charge",
                 "",
-                "Cooldown: <val>" + getValueString(this::getCooldown, level),
-                "",
-                EffectTypes.SLOWNESS.getDescription(slowStrength),
+                "Cooldown: <val>" + getValueString(this::getCooldown, level)
         };
     }
 

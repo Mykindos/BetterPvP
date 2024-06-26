@@ -71,9 +71,7 @@ public class HealingShot extends PrepareArrowSkill implements HealthSkill, TeamS
                 "to allies hit for " + getValueString(this::getDuration, level) + " seconds",
                 "and cleanse them of all negative effects",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
-                "",
-                EffectTypes.REGENERATION.getDescription(regenerationStrength),
+                "Cooldown: " + getValueString(this::getCooldown, level)
         };
     }
 
