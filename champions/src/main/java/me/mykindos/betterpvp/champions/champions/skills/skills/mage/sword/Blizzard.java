@@ -6,7 +6,8 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.CrowdControlSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.EnergyChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -32,7 +33,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class Blizzard extends ChannelSkill implements InteractSkill, EnergySkill {
+public class Blizzard extends ChannelSkill implements InteractSkill, EnergyChannelSkill, CrowdControlSkill {
 
     private final WeakHashMap<Snowball, Player> snow = new WeakHashMap<>();
 
@@ -60,9 +61,9 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergySkill
                 "Hold right click with a Sword to channel.",
                 "",
                 "Release a blizzard that gives <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect>",
-                "for <stat>" + getSlowDuration(level) + "</stat> seconds and pushes enemies back",
+                "for " + getValueString(this::getSlowDuration, level) + " seconds and pushes enemies back",
                 "",
-                "Energy: <val>" + getEnergy(level)
+                "Energy: " + getValueString(this::getEnergy, level)
         };
     }
 
@@ -153,6 +154,7 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergySkill
         return SkillActions.RIGHT_CLICK;
     }
 
+    @Override
     public void loadSkillConfig() {
         baseSlowDuration = getConfig("baseSlowDuration", 2.0, Double.class);
         slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.0, Double.class);

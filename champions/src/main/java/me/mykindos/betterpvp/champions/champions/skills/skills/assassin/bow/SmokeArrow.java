@@ -6,6 +6,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -25,7 +26,7 @@ import java.util.Random;
 
 @Singleton
 @BPvPListener
-public class SmokeArrow extends PrepareArrowSkill {
+public class SmokeArrow extends PrepareArrowSkill implements DebuffSkill {
 
     private double baseDuration;
 
@@ -49,9 +50,12 @@ public class SmokeArrow extends PrepareArrowSkill {
                 "Left click with a Bow to prepare",
                 "",
                 "Your next arrow will give <effect>Blindness</effect>",
-                "and <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> to the target for <val>" + getEffectDuration(level) + "</val> seconds.",
+                "and <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> to the target for " + getValueString(this::getEffectDuration, level) + " seconds.",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level),
+                "",
+                EffectTypes.SLOWNESS.getDescription(slownessStrength),
+                EffectTypes.BLINDNESS.getDescription(0)
         };
     }
 

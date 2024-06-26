@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -28,7 +29,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class ExcessiveForce extends Skill implements InteractSkill, CooldownSkill, Listener {
+public class ExcessiveForce extends Skill implements InteractSkill, CooldownSkill, Listener, OffensiveSkill {
 
     private final WeakHashMap<Player, Long> active = new WeakHashMap<>();
 
@@ -52,12 +53,13 @@ public class ExcessiveForce extends Skill implements InteractSkill, CooldownSkil
         return new String[]{
                 "Right click with a Sword to activate",
                 "",
-                "For the next <val>" + getDuration(level) + "</val> seconds",
+                "For the next " + getValueString(this::getDuration, level) + " seconds",
                 "your attacks deal standard knockback to enemies",
                 "",
                 "Does not ignore anti-knockback abilities",
                 "",
-                "Cooldown: <val>" + getCooldown(level)};
+                "Cooldown: " + getValueString(this::getCooldown, level)
+        };
     }
 
     public double getDuration(int level) {

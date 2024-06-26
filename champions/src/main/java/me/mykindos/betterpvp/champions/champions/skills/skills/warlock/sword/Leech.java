@@ -7,6 +7,9 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -35,7 +38,7 @@ import java.util.List;
 
 @Singleton
 @BPvPListener
-public class Leech extends PrepareSkill implements CooldownSkill {
+public class Leech extends PrepareSkill implements CooldownSkill, HealthSkill, OffensiveSkill, DamageSkill {
 
     private final List<LeechData> leechData = new ArrayList<>();
     private final List<LeechData> removeList = new ArrayList<>();
@@ -63,12 +66,12 @@ public class Leech extends PrepareSkill implements CooldownSkill {
         return new String[]{
                 "Right click with a Sword to activate",
                 "",
-                "Create a soul link with your target, and up to <stat>" + getMaximumEnemies(level) + "</stat> enemies",
-                "within <stat>" + getRange(level) + "</stat> blocks of your target.",
+                "Create a soul link with your target, and up to " + getValueString(this::getMaximumEnemies, level) + " enemies",
+                "within " + getValueString(this::getRange, level) + " blocks of your target.",
                 "",
-                "Linked targets have <stat>" + getLeechedHealth(level) + "</stat> health leeched per second",
+                "Linked targets have " + getValueString(this::getLeechedHealth, level) + " health leeched per second",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level)
         };
     }
 

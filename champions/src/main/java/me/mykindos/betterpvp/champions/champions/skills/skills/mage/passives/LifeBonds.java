@@ -6,6 +6,8 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.types.ActiveToggleSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.TeamSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
@@ -28,7 +30,7 @@ import java.util.UUID;
 
 @Singleton
 @BPvPListener
-public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
+public class LifeBonds extends ActiveToggleSkill implements EnergySkill, HealthSkill, TeamSkill {
 
     private double baseRadius;
     private double radiusIncreasePerLevel;
@@ -59,13 +61,13 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill {
         return new String[]{
                 "Drop your Sword / Axe to toggle",
                 "",
-                "Connect to your allies within <val>" + getRadius(level) + "</val> blocks,",
+                "Connect to your allies within " + getValueString(this::getRadius, level) + " blocks,",
                 "causing the highest health player in the",
                 "radius to transfer their health to the",
-                "lowest health player every <stat>" + getHealCooldown(level) + "</stat> seconds",
+                "lowest health player every " + getValueString(this::getHealSpeed, level) + " seconds",
                 "",
-                "Uses <stat>" + getEnergyStartCost(level) + "</stat> energy on activation",
-                "Energy / Second: <val>" + getEnergy(level)
+                "Uses " + getValueString(this::getEnergyStartCost, level) + " energy on activation",
+                "Energy / Second: " + getValueString(this::getEnergy, level)
 
         };
     }

@@ -6,6 +6,8 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -25,7 +27,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class PowerChop extends PrepareSkill implements CooldownSkill {
+public class PowerChop extends PrepareSkill implements CooldownSkill, DamageSkill, OffensiveSkill {
 
     private double timeToHit;
 
@@ -56,17 +58,21 @@ public class PowerChop extends PrepareSkill implements CooldownSkill {
                 "",
 
                 "Your next axe attack will",
-                "deal <val>" + getBonusDamage(level) + "</val> bonus damage.",
+                "deal " + getValueString(this::getBonusDamage, level) + " bonus damage.",
                 "",
                 "The attack must be made within",
-                "<stat>" + timeToHit + "</stat> seconds of being used",
+                getValueString(this::getTimeToHit, level) + " seconds of being used",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level)
         };
     }
 
     public double getBonusDamage(int level) {
         return (Math.max(minBonusDamage, baseBonusDamage + ((level-1) * bonusDamageIncreasePerLevel)));
+    }
+
+    public double getTimeToHit(int level) {
+        return timeToHit;
     }
 
     @Override

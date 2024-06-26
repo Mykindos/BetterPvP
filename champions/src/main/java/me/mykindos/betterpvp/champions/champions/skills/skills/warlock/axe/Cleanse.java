@@ -7,13 +7,14 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.TeamSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.effects.events.EffectClearEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -24,7 +25,7 @@ import org.bukkit.event.block.Action;
 
 @Singleton
 @BPvPListener
-public class Cleanse extends Skill implements InteractSkill, CooldownSkill, Listener {
+public class Cleanse extends Skill implements InteractSkill, CooldownSkill, Listener, DefensiveSkill, TeamSkill {
 
     private double baseDuration;
     private double durationIncreasePerLevel;
@@ -48,13 +49,13 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Sacrifice <val>" + UtilMath.round(getHealthReduction(level) * 100, 2) + "%" + "</val> of your health to purge all negative",
-                "effects from yourself and allies within <val>" + getRange(level) + "</val> blocks",
+                "Sacrifice " + getValueString(this::getHealthReduction, level, 100, "%", 0) + " of your health to purge all negative",
+                "effects from yourself and allies within " + getValueString(this::getRange, level) + " blocks",
                 "",
                 "You and your allies also receive an immunity against negative",
-                "effects for <val>" + getDuration(level) + "</val> seconds",
+                "effects for " + getValueString(this::getDuration, level) + " seconds",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level)
         };
     }
 

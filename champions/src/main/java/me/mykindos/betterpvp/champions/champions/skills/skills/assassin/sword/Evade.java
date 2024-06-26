@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -18,7 +19,6 @@ import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
@@ -42,7 +42,7 @@ import java.util.UUID;
 
 @Singleton
 @BPvPListener
-public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill {
+public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill, DefensiveSkill {
 
     private final HashMap<UUID, Long> handRaisedTime = new HashMap<>();
 
@@ -72,11 +72,11 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill 
                 "",
                 "If a player hits you while Evading, you",
                 "will teleport behind the attacker and your",
-                "cooldown will be set to a minimum of <val>" + UtilFormat.formatNumber(getInternalCooldown(level), 1) + "</val> seconds ",
+                "cooldown will be set to a minimum of " + getValueString(this::getInternalCooldown, level) + " seconds ",
                 "",
                 "Hold crouch while Evading to teleport backwards",
                 "",
-                "Cooldown: <val>" + getCooldown(level) + "</val> seconds",
+                "Cooldown: " + getValueString(this::getCooldown, level),
         };
     }
 

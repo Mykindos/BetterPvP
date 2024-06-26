@@ -4,6 +4,8 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.passive
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -25,7 +27,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class ComboAttack extends Skill implements PassiveSkill, Listener {
+public class ComboAttack extends Skill implements PassiveSkill, Listener, DamageSkill, OffensiveSkill {
 
     private final WeakHashMap<Player, Double> repeat = new WeakHashMap<>();
     private final WeakHashMap<Player, Long> last = new WeakHashMap<>();
@@ -50,16 +52,24 @@ public class ComboAttack extends Skill implements PassiveSkill, Listener {
 
         return new String[]{
                 "Each time you attack, your",
-                "damage increases by <stat>" + damageIncrement + "</stat>",
+                "damage increases by " + getValueString(this::getDamageIncrement, level),
                 "",
-                "You can deal up to <val>" + getMaxDamageIncrement(level) + "</val> bonus damage",
+                "You can deal up to " + getValueString(this::getMaxDamageIncrement, level) + " bonus damage",
                 "",
-                "Not attacking for <stat>" + duration + "</stat> seconds",
+                "Not attacking for " + getValueString(this::getDuration, level) + " seconds",
                 "will reset your bonus damage"};
     }
 
     public double getMaxDamageIncrement(int level) {
         return baseDamageIncrement + (level - 1) * damageIncrement;
+    }
+
+    private double getDamageIncrement(int level) {
+        return damageIncrement;
+    }
+
+    private double getDuration(int level) {
+        return duration;
     }
 
     @Override

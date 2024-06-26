@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -29,7 +30,7 @@ import java.util.Set;
 
 @Singleton
 @BPvPListener
-public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill {
+public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill, MovementSkill {
 
     private final Set<Arrow> arrows = new HashSet<>();
     public double energyDecreasePerLevel;
@@ -53,7 +54,7 @@ public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill {
                 "For every arrow you shoot you will be",
                 "pushed backwards (unless crouching)",
                 "",
-                "Energy used per shot: <val>"+ getEnergy(level)
+                "Energy used per shot: "+ getValueString(this::getEnergy, level),
         };
     }
 

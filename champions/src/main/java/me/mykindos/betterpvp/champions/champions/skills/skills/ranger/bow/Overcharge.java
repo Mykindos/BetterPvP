@@ -8,14 +8,15 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
@@ -44,24 +45,17 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class Overcharge extends Skill implements InteractSkill, Listener {
+public class Overcharge extends Skill implements InteractSkill, Listener, DamageSkill, OffensiveSkill {
 
     private final WeakHashMap<Player, OverchargeData> data = new WeakHashMap<>();
     private final WeakHashMap<Arrow, Integer> bonus = new WeakHashMap<>();
     private final List<Arrow> arrows = new ArrayList<>();
     private final Set<UUID> charging = new HashSet<>();
-
     private double baseDamage;
-
     private double damageIncreasePerLevel;
-
     private double baseDuration;
-    
     private double durationDecreasePerLevel;
-
-
     private double baseMaxDamage;
-
     private double maxDamageIncreasePerLevel;
 
     @Inject
@@ -81,9 +75,9 @@ public class Overcharge extends Skill implements InteractSkill, Listener {
                 "Hold right click with a Bow to use",
                 "",
                 "Draw back harder on your bow, giving",
-                "<stat>" + getDamage(level) + "</stat> bonus damage per <val>" + UtilFormat.formatNumber(getDuration(level)) + "</val> seconds",
+                getValueString(this::getDamage, level) + " bonus damage per " + getValueString(this::getDuration, level) + "</val> seconds",
                 "",
-                "Maximum Damage: <val>" + getMaxDamage(level)
+                "Maximum Damage: " + getValueString(this::getMaxDamage, level)
         };
     }
 
@@ -108,7 +102,6 @@ public class Overcharge extends Skill implements InteractSkill, Listener {
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         charging.remove(event.getPlayer().getUniqueId());
-
     }
 
 

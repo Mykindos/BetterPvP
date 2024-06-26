@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -28,7 +29,7 @@ import org.bukkit.util.Vector;
 
 @Singleton
 @BPvPListener
-public class Leap extends Skill implements InteractSkill, CooldownSkill, Listener {
+public class Leap extends Skill implements InteractSkill, CooldownSkill, Listener, MovementSkill {
 
     private double leapStrength;
     private double wallKickStrength;
@@ -57,7 +58,7 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
                 "",
                 "Cannot be used while <effect>Slowed</effect>",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level)
         };
     }
 
@@ -171,11 +172,6 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
     @Override
     public Action[] getActions() {
         return SkillActions.RIGHT_CLICK;
-    }
-
-    @Override
-    public boolean canUseSlowed() {
-        return false;
     }
 
     @Override

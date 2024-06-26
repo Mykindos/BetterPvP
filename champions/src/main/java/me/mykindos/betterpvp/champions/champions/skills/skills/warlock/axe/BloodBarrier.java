@@ -7,14 +7,17 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.TeamSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Bukkit;
@@ -33,7 +36,7 @@ import java.util.UUID;
 
 @Singleton
 @BPvPListener
-public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill, Listener {
+public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill, Listener, HealthSkill, TeamSkill, BuffSkill, DefensiveSkill {
 
     private final HashMap<UUID, ShieldData> shieldDataMap = new HashMap<>();
 
@@ -41,16 +44,11 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
 
     private double durationIncreasePerLevel;
     private double baseRange;
-
     private double rangeIncreasePerLevel;
-
     private double baseDamageReduction;
     private double damageReductionPerLevel;
-
     private int baseNumAttacksToReduce;
-
     private int numAttacksToReducePerLevel;
-
     private double baseHealthReduction;
 
     private double healthReductionDecreasePerLevel;
@@ -71,13 +69,13 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Sacrifice <val>" + UtilMath.round(getHealthReduction(level) * 100, 2) + "%</val> of your health to grant yourself and",
-                "allies within <val>" + getRange(level) + "</val> blocks a barrier which reduces the damage",
-                "of the next <stat>" + numAttacksToReduce(level) + "</stat> incoming attacks by <stat>" + (getDamageReduction(level) * 100) + "%</stat>",
+                "Sacrifice " + getValueString(this::getHealthReduction, level, 100, "%", 0) + " of your health to grant yourself and",
+                "allies within " + getValueString(this::getRange, level) + " blocks a barrier which reduces the damage",
+                "of the next " + getValueString(this::numAttacksToReduce, level) + " incoming attacks by " + getValueString(this::getDamageReduction, level, 100, "%", 0),
                 "",
-                "Barrier lasts for <stat>" + getDuration(level) + "</stat>, and does not stack",
+                "Barrier lasts for " + getValueString(this::getDuration, level) + ", and does not stack",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level),
         };
     }
 

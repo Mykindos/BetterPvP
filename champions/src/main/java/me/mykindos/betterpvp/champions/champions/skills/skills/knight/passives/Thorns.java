@@ -5,13 +5,14 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -23,7 +24,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class Thorns extends Skill implements PassiveSkill, Listener {
+public class Thorns extends Skill implements PassiveSkill, Listener, DefensiveSkill, DamageSkill {
 
     private final WeakHashMap<LivingEntity, Long> cd = new WeakHashMap<>();
 
@@ -46,15 +47,19 @@ public class Thorns extends Skill implements PassiveSkill, Listener {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Enemies take <val>" + UtilFormat.formatNumber(getDamage(level)) + "</val> damage when",
+                "Enemies take " + getValueString(this::getDamage, level) + " damage when",
                 "they hit you using a melee attack",
                 "",
-                "Internal Cooldown: <stat>" + internalCooldown
+                "Internal Cooldown: " + getValueString(this::getInternalCooldown, level),
         };
     }
 
     public double getDamage(int level) {
         return baseDamage + ((level - 1) * damageIncreasePerLevel);
+    }
+
+    public double getInternalCooldown(int level) {
+        return internalCooldown;
     }
 
     @Override

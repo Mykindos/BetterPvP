@@ -23,7 +23,7 @@ public class ConcussedEffect extends VanillaEffectType {
 
     @Override
     public String getDescription(int level) {
-        return "<white>Concussion " + UtilFormat.getRomanNumeral(level) + " <reset>decreases attack speed by <stat>" + (level * 25) + "%</stat>";
+        return "<white>Concussion " + UtilFormat.getRomanNumeral(level) + " <reset>decreases attack speed by <val>" + (level * 25) + "</val>%";
     }
 
 }

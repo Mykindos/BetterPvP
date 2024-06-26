@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -16,7 +17,7 @@ import org.bukkit.event.EventPriority;
 
 @Singleton
 @BPvPListener
-public class Fortify extends Skill implements PassiveSkill {
+public class Fortify extends Skill implements PassiveSkill, DefensiveSkill {
 
     public int base;
     public int increasePerLevel;
@@ -35,8 +36,8 @@ public class Fortify extends Skill implements PassiveSkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "You take <val>" + getPercent(level) + "%</val> less damage",
-                "but you deal <val>" + getPercent(level) + "%</val> less damage as well"
+                "You take " + getValueString(this::getPercent, level, 1, "%", 0) + " less damage",
+                "but you deal " + getValueString(this::getPercent, level, 1, "%", 0) + " less damage as well"
         };
     }
 

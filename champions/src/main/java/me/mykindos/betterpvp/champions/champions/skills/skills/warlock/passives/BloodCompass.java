@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownToggleSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -33,16 +34,16 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class BloodCompass extends Skill implements CooldownToggleSkill, Listener {
+public class BloodCompass extends Skill implements CooldownToggleSkill, Listener, DebuffSkill {
 
     private int numLines;
-    public double maxDistance;
-    public int effectDuration;
-    public int numPoints;
-    public double escapeRadius;
-    public double escapeRadiusIncreasePerLevel;
-    public double maxDistanceIncreasePerLevel;
-    public int effectDurationIncreasePerLevel;
+    private double maxDistance;
+    private int effectDuration;
+    private int numPoints;
+    private double escapeRadius;
+    private double escapeRadiusIncreasePerLevel;
+    private double maxDistanceIncreasePerLevel;
+    private int effectDurationIncreasePerLevel;
 
     private final Map<Player, List<List<Location>>> playerMarkersMap = new WeakHashMap<>();
     private final Map<Player, WeakHashMap<Integer, Player>> playerLineToPlayerMap = new WeakHashMap<>();
@@ -63,13 +64,13 @@ public class BloodCompass extends Skill implements CooldownToggleSkill, Listener
         return new String[]{
                 "Drop Sword / Axe to activate",
                 "",
-                "Shoot out up to <val>" + getFinalNumLines(level) + "</val> tracking lines that will fly",
-                "towards the nearest enemies within <stat>" + maxDistance + "</stat> blocks",
+                "Shoot out up to " + getValueString(this::getFinalNumLines, level) + " tracking lines that will fly",
+                "towards the nearest enemies within " + getValueString(this::getMaxDistance, level) + " blocks",
                 "",
                 "Players hit with these blood lines will receive",
-                "<effect>Glowing</effect> for <val>" + getEffectDuration(level) + "</val> seconds",
+                "<effect>Glowing</effect> for " + getValueString(this::getEffectDuration, level) + " seconds",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level),
         };
     }
 
@@ -79,6 +80,10 @@ public class BloodCompass extends Skill implements CooldownToggleSkill, Listener
 
     public int getEffectDuration(int level){
         return effectDuration + level * effectDurationIncreasePerLevel;
+    }
+
+    public double getMaxDistance(int level) {
+        return maxDistance;
     }
 
     private void findEnemies(Player player, int level) {

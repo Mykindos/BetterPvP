@@ -5,6 +5,8 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.death.events.CustomDeathEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -29,16 +31,13 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class Longshot extends Skill implements PassiveSkill {
+public class Longshot extends Skill implements PassiveSkill, DamageSkill, OffensiveSkill {
 
     private final WeakHashMap<Arrow, Location> arrows = new WeakHashMap<>();
 
     private double baseMaxDamage;
-
     private double maxDamageIncreasePerLevel;
-
     private double baseDamage;
-
     private double damageIncreasePerLevel;
     private double deathMessageThreshold;
     private double minDamage;
@@ -59,10 +58,10 @@ public class Longshot extends Skill implements PassiveSkill {
 
         return new String[]{
                 "Your arrows now deal damage that increases",
-                "by <stat>" + getDamage(level) + "</stat> damage per block it travels",
+                "by " + getValueString(this::getDamage, level) + " damage per block it travels",
                 "",
-                "Your arrows start at <stat>" + minDamage + "</stat> damage",
-                "and cap out at <val>" + getMaxDamage(level) + "</val> damage",
+                "Your arrows start at " + getValueString(this::getMinDamage, level) + " damage",
+                "and cap out at " + getValueString(this::getMaxDamage, level) + " damage",
                 "",
                 "Cannot be used in own territory"};
     }
@@ -73,6 +72,10 @@ public class Longshot extends Skill implements PassiveSkill {
 
     public double getDamage(int level) {
         return baseDamage + (level - 1) * damageIncreasePerLevel;
+    }
+
+    public double getMinDamage(int level) {
+        return minDamage;
     }
 
     @Override
