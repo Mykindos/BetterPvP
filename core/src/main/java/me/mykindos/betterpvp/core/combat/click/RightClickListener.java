@@ -139,7 +139,7 @@ public class RightClickListener implements Listener {
 
             rightClickCache.remove(player);
             gamer.setLastBlock(-1);
-            if (UtilItem.isCosmeticShield(player.getInventory().getItemInOffHand())) {
+            if (UtilItem.isCosmeticShield(off)) {
                 player.getInventory().setItemInOffHand(null);
             }
             return;
