@@ -77,7 +77,6 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level),
                 "",
-                EffectTypes.SLOWNESS.getDescription(slowStrength),
                 EffectTypes.SHOCK.getDescription(0)
         };
     }

@@ -58,9 +58,7 @@ public class Siphon extends Skill implements PassiveSkill, MovementSkill, BuffSk
                 "Siphon energy from all enemies within " + getValueString(this::getRadius, level) + " blocks, granting",
                 "you <effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect> and sometimes a small amount of health",
                 "",
-                "Energy siphoned per second: " + getValueString(this::getEnergySiphoned, level),
-                "",
-                EffectTypes.SPEED.getDescription(speedStrength),
+                "Energy siphoned per second: " + getValueString(this::getEnergySiphoned, level)
         };
     }
 

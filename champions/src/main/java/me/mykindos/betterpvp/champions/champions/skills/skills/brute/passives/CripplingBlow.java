@@ -45,9 +45,7 @@ public class CripplingBlow extends Skill implements PassiveSkill, DebuffSkill {
 
         return new String[]{
                 "Enemies you hit with an axe don't take knockback",
-                "and receive <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> for " + getValueString(this::getDuration, level) + " seconds",
-                "",
-                EffectTypes.SLOWNESS.getDescription(slownessStrength)
+                "and receive <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> for " + getValueString(this::getDuration, level) + " seconds"
         };
     }
 

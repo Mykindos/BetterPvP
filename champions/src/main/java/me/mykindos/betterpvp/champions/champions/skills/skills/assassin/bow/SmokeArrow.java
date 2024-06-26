@@ -52,10 +52,7 @@ public class SmokeArrow extends PrepareArrowSkill implements DebuffSkill {
                 "Your next arrow will give <effect>Blindness</effect>",
                 "and <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> to the target for " + getValueString(this::getEffectDuration, level) + " seconds.",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
-                "",
-                EffectTypes.SLOWNESS.getDescription(slownessStrength),
-                EffectTypes.BLINDNESS.getDescription(0)
+                "Cooldown: " + getValueString(this::getCooldown, level)
         };
     }
 

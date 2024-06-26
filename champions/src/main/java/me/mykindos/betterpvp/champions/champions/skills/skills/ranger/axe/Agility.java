@@ -78,9 +78,7 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
                 "",
                 "Agility ends if you left click",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
-                "",
-                EffectTypes.SPEED.getDescription(speedStrength)
+                "Cooldown: " + getValueString(this::getCooldown, level)
         };
     }
 

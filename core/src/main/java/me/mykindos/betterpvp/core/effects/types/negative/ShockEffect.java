@@ -36,6 +36,6 @@ public class ShockEffect extends EffectType {
 
     @Override
     public String getDescription(int level) {
-        return "<white>" + getName() + "<white> gives screen shake";
+        return "<white>" + getName() + "</white> gives screen shake";
     }
 }

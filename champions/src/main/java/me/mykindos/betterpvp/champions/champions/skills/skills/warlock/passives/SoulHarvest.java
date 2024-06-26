@@ -59,9 +59,6 @@ public class SoulHarvest extends Skill implements PassiveSkill, BuffSkill {
                 "<effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect> and <effect>Regeneration " + UtilFormat.getRomanNumeral(regenerationStrength) + "</effect>",
                 "",
                 "Buff duration: " + getValueString(this::getBuffDuration, level) + " seconds",
-                "",
-                EffectTypes.REGENERATION.getDescription(regenerationStrength),
-                EffectTypes.SPEED.getDescription(speedStrength),
         };
     }
 

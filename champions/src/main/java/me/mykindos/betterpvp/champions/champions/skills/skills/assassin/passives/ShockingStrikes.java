@@ -50,8 +50,7 @@ public class ShockingStrikes extends Skill implements PassiveSkill, Listener, De
                 getValueString(this::getDuration, level) + " seconds, giving them <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect>",
                 "and <effect>Screen-Shake</effect>",
                 "",
-                EffectTypes.SHOCK.getDescription(0),
-                EffectTypes.SLOWNESS.getDescription(slownessStrength)
+                EffectTypes.SHOCK.getDescription(0)
         };
     }
 

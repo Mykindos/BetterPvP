@@ -69,9 +69,7 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
                 "and giving your attacker <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect> for",
                 getValueString(this::getSlowDuration, level) + " seconds",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
-                "",
-                EffectTypes.SLOWNESS.getDescription(slowStrength)
+                "Cooldown: " + getValueString(this::getCooldown, level)
         };
     }
 
