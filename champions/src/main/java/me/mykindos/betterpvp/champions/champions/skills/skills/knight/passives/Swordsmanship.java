@@ -7,6 +7,8 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
+import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -26,16 +28,15 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class Swordsmanship extends Skill implements PassiveSkill {
+public class Swordsmanship extends Skill implements PassiveSkill, OffensiveSkill, DamageSkill {
 
     private double timeBetweenCharges;
+    private double timeBetweenChargesDecreasePerLevel;
     private double timeOutOfCombat;
-
+    private double timeOutOfCombatDecreasePerLevel;
     private double baseDamagePerCharge;
-
     private double damageIncreasePerLevel;
 
-    private double damageMultiplierPerLevelPerCharge;
 
     private final WeakHashMap<Player, Integer> charges = new WeakHashMap<>();
 
@@ -53,8 +54,8 @@ public class Swordsmanship extends Skill implements PassiveSkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "You gain 1 charge every <stat>" + timeBetweenCharges + "</stat> seconds,",
-                "storing up to a maximum of <val>" + (level) + "</val> charges",
+                "You gain 1 charge every " + getValueString(this::getTimeBetweenCharges, level) + " seconds,",
+                "storing up to a maximum of " + getValueString(this::getMaxCharges, level) + " charges",
                 "",
                 "When you attack, your damage is increased",
                 "by <stat>" + getDamage(1, level) + "</stat> for each charge you have",
@@ -67,6 +68,14 @@ public class Swordsmanship extends Skill implements PassiveSkill {
         return (baseDamagePerCharge + ((level - 1) * damageIncreasePerLevel)) * charge;
     }
 
+    public double getTimeBetweenCharges(int level) {
+        return timeBetweenCharges;
+    }
+
+    public int getMaxCharges(int level) {
+        return level;
+    }
+
     @Override
     public Role getClassType() {
         return Role.KNIGHT;
@@ -76,7 +85,6 @@ public class Swordsmanship extends Skill implements PassiveSkill {
     public SkillType getType() {
         return SkillType.PASSIVE_A;
     }
-
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onDamage(CustomDamageEvent event) {
@@ -122,7 +130,9 @@ public class Swordsmanship extends Skill implements PassiveSkill {
     @Override
     public void loadSkillConfig() {
         timeBetweenCharges = getConfig("timeBetweenCharges", 2.0, Double.class);
+        timeBetweenChargesDecreasePerLevel = getConfig("timeBetweenChargesDecreasePerLevel", 0.0, Double.class);
         timeOutOfCombat = getConfig("timeOutOfCombat", 2.5, Double.class);
+        timeOutOfCombatDecreasePerLevel = getConfig("timeOutOfCombat", 0, Double.class);
         baseDamagePerCharge = getConfig("baseDamagePerCharge", 1.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
     }

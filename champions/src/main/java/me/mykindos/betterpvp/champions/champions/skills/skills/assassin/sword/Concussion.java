@@ -5,6 +5,8 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -23,7 +25,7 @@ import javax.inject.Singleton;
 
 @Singleton
 @BPvPListener
-public class Concussion extends PrepareSkill implements CooldownSkill, Listener {
+public class Concussion extends PrepareSkill implements CooldownSkill, Listener, DebuffSkill, OffensiveSkill {
 
     private double baseDuration;
 
@@ -46,10 +48,11 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener 
         return new String[]{
                 "Right click with a Sword to prepare",
                 "",
-                "Your next hit will cause the target to be <effect>Concussed</effect> for <val>" + getDuration(level) + "</val> seconds",
-                "Concussed players have their hit delay increased by <stat>25%</stat>",
+                "Your next hit will <effect>Concuss</effect> the target for " + getValueString(this::getDuration, level) + " seconds",
                 "",
-                "Cooldown: <val>" + getCooldown(level) + "</val> seconds"
+                "Cooldown: " + getValueString(this::getCooldown, level),
+                "",
+                EffectTypes.CONCUSSED.getDescription(concussionStrength)
         };
     }
 

@@ -6,6 +6,8 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
+import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.FireSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -19,11 +21,11 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 @BPvPListener
 @Singleton
-public class MagmaBlade extends Skill implements PassiveSkill {
+public class MagmaBlade extends Skill implements PassiveSkill, FireSkill, DamageSkill {
 
-    public double baseDamage;
+    private double baseDamage;
 
-    public double damageIncreasePerLevel;
+    private double damageIncreasePerLevel;
 
     @Inject
     public MagmaBlade(Champions champions, ChampionsManager championsManager) {
@@ -39,7 +41,7 @@ public class MagmaBlade extends Skill implements PassiveSkill {
     public String[] getDescription(int level) {
         return new String[] {
                 "Your sword is fueled by flames,",
-                "dealing an additional <val>" + getDamage(level) + "</val> damage",
+                "dealing an additional " + getValueString(this::getDamage, level) + " damage",
                 "to players who are on fire but",
                 "also extinguishes them."
         };

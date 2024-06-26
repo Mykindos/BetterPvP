@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -31,7 +32,7 @@ import java.util.Random;
 
 @Singleton
 @BPvPListener
-public class HoldPosition extends Skill implements InteractSkill, CooldownSkill, Listener {
+public class HoldPosition extends Skill implements InteractSkill, CooldownSkill, Listener, BuffSkill {
 
     public double baseDuration;
 

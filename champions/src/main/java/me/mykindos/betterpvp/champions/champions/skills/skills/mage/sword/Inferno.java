@@ -12,8 +12,11 @@ import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.EnergyChannelSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.FireSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableItem;
@@ -48,7 +51,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkill, EnergySkill, ThrowableListener {
+public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkill, EnergyChannelSkill, ThrowableListener, FireSkill, OffensiveSkill, DamageSkill {
     private final WeakHashMap<Player, ChargeData> charging = new WeakHashMap<>();
     private List<Item> blazePowders = new ArrayList<>();
     private final HashMap<Player, Shotgun> shotguns = new HashMap<>();
@@ -81,13 +84,13 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
         return new String[]{
                 "Hold right click with a Sword to channel",
                 "",
-                "Charges up to <val>" + getNumFlames(level) + "</val> flames",
+                "Charges up to " + getValueString(this::getNumFlames, level) + " flames",
                 "",
                 "Release to shoot a scorching blast of fire",
-                "that ignites anything it hits for <stat>" + getFireDuration(level) + "</stat> seconds",
+                "that ignites anything it hits for " + getValueString(this::getFireDuration, level) + " seconds",
                 "",
-                "Cooldown: <val>" + getCooldown(level),
-                "Energy: <val>" + getEnergyPerSecond(level)
+                "Cooldown: " + getValueString(this::getCooldown, level),
+                "Energy: " + getValueString(this::getEnergyPerSecond, level),
         };
     }
 

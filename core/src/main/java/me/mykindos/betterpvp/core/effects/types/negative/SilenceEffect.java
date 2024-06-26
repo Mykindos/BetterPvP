@@ -32,4 +32,9 @@ public class SilenceEffect extends VanillaEffectType {
         livingEntity.getWorld().playSound(livingEntity.getLocation(), Sound.ENTITY_BAT_AMBIENT, 2.0F, 1.0F);
         UtilMessage.simpleMessage(livingEntity, "Silence", "You have been silenced for <alt>%s</alt> seconds.", effect.getRawLength() / 1000d);
     }
+
+    @Override
+    public String getDescription(int level) {
+        return "<white>Silence</white> prevents the use of skills";
+    }
 }

@@ -45,6 +45,10 @@ public class SkillButton extends ControlItem<SkillMenu> {
         int displayLevel = Math.max(1, level);
 
         final ItemView.ItemViewBuilder builder = ItemView.builder();
+        if (skill.getTags() != null) {
+            builder.prelore(skill.getTags());
+        }
+
         builder.lore(Arrays.stream(skill.parseDescription(displayLevel)).toList());
 
         boolean active = roleBuild.getActiveSkills().stream().anyMatch(s -> s != null && s.equals(this.skill));

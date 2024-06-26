@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.skills.assassin.data.FlashData;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -33,7 +34,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class Flash extends Skill implements InteractSkill, Listener {
+public class Flash extends Skill implements InteractSkill, Listener, MovementSkill {
 
     private final WeakHashMap<Player, FlashData> charges = new WeakHashMap<>();
 
@@ -78,14 +79,14 @@ public class Flash extends Skill implements InteractSkill, Listener {
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Teleport <stat>" + teleportDistance + "</stat> blocks forward",
+                "Teleport " + getValueString(this::getTeleportDistance, level) + " blocks forward",
                 "in the direction you are facing",
                 "",
-                "Store up to <stat>" + getMaxCharges(level) + "</stat> charges",
+                "Store up to " + getValueString(this::getMaxCharges, level) + " charges",
                 "",
                 "Cannot be used while <effect>Slowed</effect>",
                 "",
-                "Gain a charge every: <val>" + getRechargeSeconds(level) + "</val> seconds"
+                "Gain a charge every: " + getValueString(this::getRechargeSeconds, level) + " seconds"
         };
     }
 
@@ -95,6 +96,10 @@ public class Flash extends Skill implements InteractSkill, Listener {
 
     private double getRechargeSeconds(int level) {
         return baseRechargeSeconds - ((level - 1) * rechargeReductionPerLevel);
+    }
+
+    private double getTeleportDistance(int level) {
+        return teleportDistance;
     }
 
     @Override

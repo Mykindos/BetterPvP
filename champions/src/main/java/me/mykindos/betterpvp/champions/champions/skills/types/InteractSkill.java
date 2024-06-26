@@ -10,12 +10,4 @@ public interface InteractSkill extends IChampionsSkill {
 
     Action[] getActions();
 
-    default boolean canUseSlowed() {
-        return true;
-    }
-
-    default boolean canUseLevitating() {
-        return false;
-    }
-
 }

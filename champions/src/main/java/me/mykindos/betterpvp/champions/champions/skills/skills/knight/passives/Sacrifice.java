@@ -5,6 +5,8 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -17,7 +19,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 @Singleton
 @BPvPListener
-public class Sacrifice extends Skill implements PassiveSkill {
+public class Sacrifice extends Skill implements PassiveSkill, OffensiveSkill, DamageSkill {
 
     private double basePercentage;
 
@@ -35,11 +37,9 @@ public class Sacrifice extends Skill implements PassiveSkill {
 
     @Override
     public String[] getDescription(int level) {
-
-        double percentage = getPercentage(level) * 100;
         return new String[]{
-                "Deal an extra <val>" + percentage + "%" + "</val> damage,",
-                "but you now also take <val>" + percentage + "%",
+                "Deal an extra " + getValueString(this::getPercentage, level, 100, "%", 0) + " melee damage,",
+                "but you now also take <val>" + getValueString(this::getPercentage, level, 100, "%", 0),
                 "extra damage from melee attacks"
         };
     }

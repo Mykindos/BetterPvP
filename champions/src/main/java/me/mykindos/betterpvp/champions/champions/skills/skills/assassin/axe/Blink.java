@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -35,7 +36,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class Blink extends Skill implements InteractSkill, CooldownSkill, Listener {
+public class Blink extends Skill implements InteractSkill, CooldownSkill, Listener, MovementSkill {
 
     private final WeakHashMap<Player, Location> loc = new WeakHashMap<>();
     private final WeakHashMap<Player, Long> blinkTime = new WeakHashMap<>();
@@ -61,14 +62,14 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Instantly teleport forwards <val>" + getMaxTravelDistance(level) + "</val> Blocks",
+                "Instantly teleport forwards " + getValueString(this::getMaxTravelDistance, level) + " Blocks",
                 "",
-                "Using again within <stat>" + getDeblinkTime(level) + "</stat> seconds De-Blinks,",
+                "Using again within " + getValueString(this::getDeblinkTime, level) + " seconds De-Blinks,",
                 "returning you to your original location",
                 "",
                 "Cannot be used while <effect>Slowed</effect>",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level)
         };
     }
 

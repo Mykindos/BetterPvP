@@ -5,7 +5,8 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.CrowdControlSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.EnergyChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -33,9 +34,10 @@ import java.util.UUID;
 
 @Singleton
 @BPvPListener
-public class BattleTaunt extends ChannelSkill implements InteractSkill, CooldownSkill, EnergySkill, Listener {
+public class BattleTaunt extends ChannelSkill implements InteractSkill, CooldownSkill, EnergyChannelSkill, Listener, CrowdControlSkill {
 
-    private int radius;
+    private double radius;
+    private double radiusIncreasePerLevel;
 
     @Inject
     public BattleTaunt(Champions champions, ChampionsManager championsManager) {
@@ -53,10 +55,15 @@ public class BattleTaunt extends ChannelSkill implements InteractSkill, Cooldown
         return new String[]{
                 "Hold right click with a Sword to channel",
                 "",
-                "While channelling, any enemies within <val>" + (radius + level) + "</val> blocks",
+                "While channelling, any enemies within " + getValueString(this::getRadius, level) + " blocks",
                 "get slowly pulled towards you",
                 "",
-                "Energy / Second: <val>" + getEnergy(level)};
+                "Energy / Second: " + getValueString(this::getEnergy, level),
+        };
+    }
+
+    public double getRadius(int level) {
+        return radius + ((level - 1) * radiusIncreasePerLevel);
     }
 
     @Override
@@ -92,7 +99,7 @@ public class BattleTaunt extends ChannelSkill implements InteractSkill, Cooldown
 
                         player.getWorld().playEffect(player.getLocation(), Effect.STEP_SOUND, Material.DIAMOND_BLOCK);
 
-                        for (int i = 0; i <= (radius + level); i++) {
+                        for (int i = 0; i <= getRadius(level); i++) {
                             pull(player, player.getEyeLocation().add(player.getLocation().getDirection().multiply(i)));
                         }
                     }
@@ -106,11 +113,12 @@ public class BattleTaunt extends ChannelSkill implements InteractSkill, Cooldown
     }
 
     private void pull(Player player, Location location) {
-        for (LivingEntity target : UtilEntity.getNearbyEnemies(player, location, radius)) {
+        int level = getLevel(player);
+        for (LivingEntity target : UtilEntity.getNearbyEnemies(player, location, getRadius(level))) {
             VelocityData velocityData = new VelocityData(UtilVelocity.getTrajectory(target, player), 0.3D, false, 0.0D, 0.0D, 1.0D, true);
             if (target instanceof Player) {
 
-                if (UtilMath.offset(player.getLocation(), target.getLocation()) >= radius) {
+                if (UtilMath.offset(player.getLocation(), target.getLocation()) >= getRadius(level)) {
                     UtilVelocity.velocity(target, player, velocityData);
                 }
 
@@ -149,6 +157,7 @@ public class BattleTaunt extends ChannelSkill implements InteractSkill, Cooldown
 
     @Override
     public void loadSkillConfig() {
-        radius = getConfig("radius", 2, Integer.class);
+        radius = getConfig("radius", 2.0, Double.class);
+        radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 1.0, Double.class);
     }
 }

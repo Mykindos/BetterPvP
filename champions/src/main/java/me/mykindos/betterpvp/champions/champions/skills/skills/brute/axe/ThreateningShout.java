@@ -6,9 +6,12 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.types.AreaOfEffectSkill;
 import me.mykindos.betterpvp.champions.champions.skills.skills.brute.data.ThreateningShoutData;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -41,7 +44,8 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class ThreateningShout extends Skill implements Listener, InteractSkill, CooldownSkill {
+
+public class ThreateningShout extends Skill implements Listener, InteractSkill, CooldownSkill, DebuffSkill, AreaOfEffectSkill, OffensiveSkill {
 
     private double damageRadius;
     private double vulnerabilityRadius;
@@ -81,7 +85,7 @@ public class ThreateningShout extends Skill implements Listener, InteractSkill, 
                 "After <stat>" + ((float) tickDelay / 20) + "</stat> seconds the shout will explode,",
                 "dealing <val>" + getDamage(level) + "</val> damage",
                 "",
-                "Cooldown: <val>" + getCooldown(level),
+                "Cooldown: " + getValueString(this::getCooldown, level),
                 "",
                 EffectTypes.VULNERABILITY.getDescription(vulnerabilityStrength)
         };

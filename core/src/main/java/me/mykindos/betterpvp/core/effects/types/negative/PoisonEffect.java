@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.effects.types.negative;
 
 import me.mykindos.betterpvp.core.effects.VanillaEffectType;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.bukkit.potion.PotionEffectType;
 
 public class PoisonEffect extends VanillaEffectType {
@@ -20,5 +21,9 @@ public class PoisonEffect extends VanillaEffectType {
         return PotionEffectType.POISON;
     }
 
+    @Override
+    public String getDescription(int level) {
+        return "<white>Poison " + UtilFormat.getRomanNumeral(level) + "</white> deals <val>" + level + "</val> damage every <stat>" + (25d/20d) + "</stat> seconds";
+    }
 }
 

@@ -9,7 +9,11 @@ import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.skills.knight.data.RiposteData;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -20,8 +24,6 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
-import org.bukkit.Effect;
-import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
@@ -41,7 +43,7 @@ import java.util.UUID;
 
 @Singleton
 @BPvPListener
-public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkill {
+public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkill, OffensiveSkill, DamageSkill, HealthSkill, DefensiveSkill {
 
     private final HashMap<UUID, Long> handRaisedTime = new HashMap<>();
     private final HashMap<UUID, RiposteData> riposteData = new HashMap<>();
@@ -78,11 +80,11 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
         return new String[]{
                 "Hold right click with a Sword to activate",
                 "",
-                "If an enemy hits you within <stat>" + getDuration(level) + "</stat> seconds,",
-                "You will heal <val>" + getHealing(level) + "</val> health and your next",
-                "attack will deal <val>" + getBonusDamage(level) + "</val> extra damage",
+                "If an enemy hits you within " + getValueString(this::getDuration, level) + " seconds,",
+                "You will heal " + getValueString(this::getHealing, level) + " health and your next",
+                "attack will deal " + getValueString(this::getBonusDamage, level) + " extra damage",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level)
         };
     }
 

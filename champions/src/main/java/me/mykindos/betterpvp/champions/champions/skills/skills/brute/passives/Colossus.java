@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.UtilitySkill;
 import me.mykindos.betterpvp.core.combat.events.CustomEntityVelocityEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -17,7 +18,7 @@ import org.bukkit.event.EventHandler;
 
 @Singleton
 @BPvPListener
-public class Colossus extends Skill implements PassiveSkill {
+public class Colossus extends Skill implements PassiveSkill, UtilitySkill {
 
     private double reductionPerLevel;
 
@@ -35,7 +36,7 @@ public class Colossus extends Skill implements PassiveSkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "You take <val>" + ((reductionPerLevel * 100) * level) + "%</val> reduced knockback"
+                "You take <val>" + ((reductionPerLevel * 100) * level) + "</val>% reduced knockback"
         };
     }
 

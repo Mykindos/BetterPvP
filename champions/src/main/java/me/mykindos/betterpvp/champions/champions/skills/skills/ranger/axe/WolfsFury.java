@@ -6,8 +6,10 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -29,7 +31,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Listener {
+public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Listener, OffensiveSkill, BuffSkill {
     private final WeakHashMap<Player, Long> active = new WeakHashMap<>();
     private final WeakHashMap<Player, Integer> missedSwings = new WeakHashMap<>();
     private double baseDuration;
@@ -56,15 +58,15 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
                 "Right click with an Axe to activate",
                 "",
                 "Summon the power of the wolf, gaining",
-                "<effect>Strength " + UtilFormat.getRomanNumeral(strengthLevel) + "</effect> for <val>" + getDuration(level) + "</val> seconds and giving",
+                "<effect>Strength " + UtilFormat.getRomanNumeral(strengthLevel) + "</effect> for " + getValueString(this::getDuration, level) + " seconds and giving",
                 "no knockback on your attacks",
                 "",
-                "If you miss <val>" + getMaxMissedSwings(level) + "</val> consecutive attacks",
+                "If you miss " + getValueString(this::getMaxMissedSwings, level) + " consecutive attacks",
                 "Wolfs Fury ends",
                 "",
-                "Cooldown: <val>" + getCooldown(level),
+                "Cooldown: " + getValueString(this::getCooldown, level),
                 "",
-                EffectTypes.STRENGTH.getDescription(strengthLevel)
+                EffectTypes.STRENGTH.getDescription(strengthLevel),
         };
     }
 

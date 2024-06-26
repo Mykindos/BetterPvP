@@ -8,7 +8,9 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.CrowdControlSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.WorldSkill;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableItem;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableListener;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -36,7 +38,7 @@ import java.util.List;
 @CustomLog
 @Singleton
 @BPvPListener
-public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Listener, ThrowableListener {
+public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Listener, ThrowableListener, CrowdControlSkill, WorldSkill {
 
     private final WorldBlockHandler blockHandler;
     private int sphereSize;
@@ -61,17 +63,21 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
         return new String[] {
                 "Right click with an Axe to activate",
                 "",
-                "Launches an icy orb, trapping any players within <stat>" + sphereSize  + "</stat>",
-                "blocks of it in a prison of ice for <val>" + getDuration(level) + "</val> seconds",
+                "Launches an icy orb, trapping any players within " + getValueString(this::getSphereSize, level, 0),
+                "blocks of it in a prison of ice for " + getValueString(this::getDuration, level) + " seconds",
                 "",
                 "Shift-click to destroy the prison early.",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level),
         };
     }
 
     private double getDuration(int level) {
         return baseDuration + (level - 1) * durationIncreasePerLevel;
+    }
+
+    private int getSphereSize(int level) {
+        return sphereSize;
     }
 
     @Override

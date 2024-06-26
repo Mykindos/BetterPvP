@@ -6,6 +6,8 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
+import me.mykindos.betterpvp.champions.champions.skills.types.CrowdControlSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -13,7 +15,6 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -22,7 +23,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 @Singleton
 @BPvPListener
-public class Cleave extends Skill implements PassiveSkill, Listener {
+public class Cleave extends Skill implements PassiveSkill, Listener, OffensiveSkill, CrowdControlSkill {
 
     private double baseDistance;
     private double distanceIncreasePerLevel;
@@ -45,10 +46,10 @@ public class Cleave extends Skill implements PassiveSkill, Listener {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Your attacks deal <val>" + UtilFormat.formatNumber((getPercentageOfDamage(level) * 100), 2) + "%</val> of your damage to",
-                "all enemies within <stat>" + getDistance(level) + "</stat> blocks of your target enemy.",
+                "Your attacks deal " + getValueString(this::getPercentageOfDamage, level, 100, "%", 0) + " of your damage to",
+                "all enemies within " + getValueString(this::getDistance, level) + " blocks of your target enemy.",
                 "",
-                "Max Enemies Hit: <val>" + getMaxEnemiesHit(level) + "</val>",
+                "Max Enemies Hit: <val>" + getValueString(this::getMaxEnemiesHit, level, 0) + "</val>",
                 "",
                 "Only works with axes."
         };
