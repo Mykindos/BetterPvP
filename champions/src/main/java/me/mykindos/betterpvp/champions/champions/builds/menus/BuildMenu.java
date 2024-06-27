@@ -39,7 +39,7 @@ public class BuildMenu extends AbstractGui implements Windowed {
             setItem(slot, new ApplyBuildButton(builds, role, build));
             setItem(slot + 9, new EditBuildButton(builds, role, build, buildManager, skillManager, this));
             setItem(slot + 18, new DeleteBuildButton(builds, role, build, buildManager, skillManager, this));
-            setItem(slot + 27, new RandomBuildButton(builds, role, build, buildManager, skillManager, buildManager, skillManager));
+            setItem(slot + 27, new RandomBuildButton(builds, role, build, buildManager, skillManager, buildManager, skillManager, this));
 
             slot += 2;
         }

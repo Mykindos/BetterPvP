@@ -24,11 +24,9 @@ public class RandomBuild {
         RoleBuild build = buildManager.getObject(player.getUniqueId()).orElseThrow().getBuild(role, id).orElseThrow();
         //this is a destructive option, delete the current build
         build.deleteBuild();
-
         //while we still have tokens, get a new skill
-        int tokens = 12;
 
-        for (int i = tokens; i > 0; i--) {
+        for (int i = build.getPoints(); i > 0; i--) {
             //choose an eligible skill
             Skill skill = elligibleSkills.get(UtilMath.randomInt(0, elligibleSkills.size()));
             if (build.getActiveSkills().contains(skill)) {

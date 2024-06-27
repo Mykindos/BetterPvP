@@ -8,6 +8,9 @@ import me.mykindos.betterpvp.champions.champions.builds.menus.BuildMenu;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.ApplyBuildEvent;
 import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
 import me.mykindos.betterpvp.core.components.champions.Role;
+import me.mykindos.betterpvp.core.menu.Windowed;
+import me.mykindos.betterpvp.core.menu.impl.ConfirmationMenu;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -21,6 +24,8 @@ import org.jetbrains.annotations.NotNull;
 import xyz.xenondevs.invui.item.ItemProvider;
 import xyz.xenondevs.invui.item.impl.controlitem.ControlItem;
 
+import java.util.List;
+
 public class RandomBuildButton extends ControlItem<BuildMenu> {
 
     private final GamerBuilds builds;
@@ -28,51 +33,43 @@ public class RandomBuildButton extends ControlItem<BuildMenu> {
     private final int build;
     private final BuildManager buildManager;
     private final ChampionsSkillManager championsSkillManager;
+    private final Windowed parent;
 
-    public RandomBuildButton(GamerBuilds builds, Role role, int build, BuildManager buildManager, ChampionsSkillManager championsSkillManager, BuildManager buildManager1, ChampionsSkillManager championsSkillManager1) {
+    public RandomBuildButton(GamerBuilds builds, Role role, int build, BuildManager buildManager, ChampionsSkillManager championsSkillManager, BuildManager buildManager1, ChampionsSkillManager championsSkillManager1, Windowed parent) {
         this.builds = builds;
         this.role = role;
         this.build = build;
         this.buildManager = buildManager1;
         this.championsSkillManager = championsSkillManager1;
+        this.parent = parent;
     }
 
     @Override
     public ItemProvider getItemProvider(BuildMenu gui) {
-        Material type = switch (build) {
-            case 1 -> Material.RED_DYE;
-            case 2 -> Material.ORANGE_DYE;
-            case 3 -> Material.YELLOW_DYE;
-            case 4 -> Material.LIME_DYE;
-            default -> throw new IllegalStateException("Unexpected value: " + build);
-        };
-
-        boolean selected = builds.getActiveBuilds().get(role.getName()).getId() == build;
-        Component buildName = Component.text("Apply Build " + build, NamedTextColor.GRAY);
-        if (selected) {
-            buildName = Component.text("\u00BB Build " + build + " \u00AB", NamedTextColor.GREEN);
-        }
-
-        if (selected) {
-            return ItemView.builder().displayName(buildName).material(type).glow(true).build();
-        }
-
-        return ItemView.builder().displayName(buildName).material(type).build();
+        Material type = Material.COMPARATOR;
+        Component buildName = Component.text("Random Build " + build, NamedTextColor.GRAY);
+        List<Component> lore = List.of(UtilMessage.deserialize("Delete this build and generate a random one"));
+        return ItemView.builder().displayName(buildName).lore(lore).material(type).build();
     }
 
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
-        RoleBuild randomRoleBuild = RandomBuild.getRandomBuild(player, role, build, buildManager, championsSkillManager);
-        RoleBuild activeBuild = builds.getActiveBuilds().get(role.getName());
-        activeBuild.setActive(false);
+        new ConfirmationMenu("Are you sure you want to replace this build with a random build?", success -> {
+            if (Boolean.TRUE.equals(success)) {
+                RoleBuild randomRoleBuild = RandomBuild.getRandomBuild(player, role, build, buildManager, championsSkillManager);
+                RoleBuild activeBuild = builds.getActiveBuilds().get(role.getName());
+                activeBuild.setActive(false);
 
-        randomRoleBuild.setActive(true);
-        builds.getActiveBuilds().put(role.getName(), randomRoleBuild);
+                randomRoleBuild.setActive(true);
+                builds.getActiveBuilds().put(role.getName(), randomRoleBuild);
 
-        UtilServer.callEvent(new ApplyBuildEvent(player, builds, activeBuild, randomRoleBuild));
-        notifyWindows();
-        getGui().updateControlItems();
+                UtilServer.callEvent(new ApplyBuildEvent(player, builds, activeBuild, randomRoleBuild));
+                notifyWindows();
+                getGui().updateControlItems();
 
-        SoundEffect.HIGH_PITCH_PLING.play(player);
+                SoundEffect.HIGH_PITCH_PLING.play(player);
+                new BuildMenu(builds, role, buildManager, championsSkillManager, parent).show(player);
+            }
+        }).show(player);
     }
 }
