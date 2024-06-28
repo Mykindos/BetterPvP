@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.progression.Progression;
+import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillDependency;
 import me.mykindos.betterpvp.progression.profession.woodcutting.WoodcuttingHandler;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.Material;
@@ -88,6 +89,12 @@ public class BarkBounty extends WoodcuttingProgressionSkill implements Listener 
     public void loadConfig() {
         super.loadConfig();
         barkChanceIncreasePerLvl = getConfig("barkChanceIncreasePerLvl ", 0.004, Double.class);
+    }
+
+    @Override
+    public ProgressionSkillDependency getDependencies() {
+        final String[] dependencies = new String[]{"Tree Feller"};
+        return new ProgressionSkillDependency(dependencies, 20);
     }
 
     /**
