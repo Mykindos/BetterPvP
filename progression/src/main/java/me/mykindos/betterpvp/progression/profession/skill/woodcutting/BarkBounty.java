@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.progression.profession.skill.woodcutting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillDependency;
@@ -15,8 +16,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.Arrays;
 
 /**
  * This perk grants a chance for the player to receive a <i>special item</i> when they strip a log.
@@ -34,18 +33,6 @@ public class BarkBounty extends WoodcuttingProgressionSkill implements Listener 
      * Represents the percentage, per level, that <b>Tree Bark</b> will drop when any given log is stripped
      */
     private double barkChanceIncreasePerLvl;
-
-    /**
-     * Represents the log types that can be stripped in order to obtain <b>Tree Bark</b>
-     */
-    private final Material[] validLogTypes = new Material[]{
-            Material.OAK_LOG,
-            Material.ACACIA_LOG,
-            Material.BIRCH_LOG,
-            Material.DARK_OAK_LOG,
-            Material.JUNGLE_LOG,
-            Material.SPRUCE_LOG
-    };
 
     @Inject
     public BarkBounty(Progression progression, ProfessionProfileManager professionProfileManager, WoodcuttingHandler woodcuttingHandler) {
@@ -105,7 +92,7 @@ public class BarkBounty extends WoodcuttingProgressionSkill implements Listener 
 
         Block block = event.getClickedBlock();
         if (block == null) return;
-        if (!Arrays.asList(validLogTypes).contains(block.getType())) return;
+        if (!UtilBlock.isNonStrippedLog(block.getType())) return;
 
         Player player = event.getPlayer();
         if (!UtilItem.isAxe(player.getInventory().getItemInMainHand())) return;
