@@ -120,7 +120,7 @@ public class Sever extends Skill implements CooldownSkill, Listener, OffensiveSk
         }
 
         boolean withinRange = UtilMath.offset(player, ent) <= hitDistance;
-        if (UtilPlayer.isCreativeOrSpectator(ent) || UtilEntity.getRelation(player, ent) != EntityProperty.ENEMY || !withinRange) {
+        if (UtilPlayer.isCreativeOrSpectator(ent) || UtilEntity.getRelation(player, ent) == EntityProperty.FRIENDLY || !withinRange) {
             UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s %s", getName(), level);
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SPIDER_HURT, 1.0F, 0.5F);
         } else {

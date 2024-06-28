@@ -56,7 +56,7 @@ public class UtilEntity {
     }
 
     public static final BiPredicate<Player, Entity> IS_ENEMY = (player, entity) -> {
-        if (!(entity instanceof LivingEntity) || entity.equals(player)) {
+        if (!(entity instanceof LivingEntity) || entity.equals(player) || UtilPlayer.isCreativeOrSpectator(entity)) {
             return false;
         }
 

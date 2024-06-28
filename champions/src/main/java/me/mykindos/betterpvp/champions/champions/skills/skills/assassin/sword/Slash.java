@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilLocation;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.math.VectorLine;
 import me.mykindos.betterpvp.core.utilities.model.MultiRayTraceResult;
 import org.bukkit.Location;
@@ -33,6 +34,7 @@ import org.bukkit.util.RayTraceResult;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.Collection;
 
 @Singleton
 @BPvPListener
@@ -85,19 +87,30 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
     public void activate(Player player, int level) {
         final Location originalLocation = player.getLocation();
         UtilLocation.teleportForward(player, getDistance(level), false, success -> {
-            Particle.SWEEP_ATTACK.builder().location(player.getLocation()).count(1).receivers(30).extra(0).spawn();
+            final Location lineStart = originalLocation.add(0.0, player.getHeight() / 2, 0.0);
+            Particle.SWEEP_ATTACK.builder()
+                    .location(lineStart.clone().add(player.getLocation().getDirection()))
+                    .count(1)
+                    .receivers(30)
+                    .extra(0)
+                    .spawn();
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.0F, 1.6F);
 
-            if (!success) {
+            if (Boolean.FALSE.equals(success)) {
                 return;
             }
 
             final Location teleportLocation = player.getLocation();
-            final Location lineStart = player.getLocation().add(0.0, player.getHeight() / 2, 0.0);
             final Location lineEnd = teleportLocation.clone().add(0.0, player.getHeight() / 2, 0.0);
             final VectorLine line = VectorLine.withStepSize(lineStart, lineEnd, 0.25f);
+            final Collection<Player> receivers = teleportLocation.getNearbyPlayers(30);
             for (Location point : line.toLocations()) {
-                Particle.CRIT.builder().location(point).count(2).receivers(30).extra(0).spawn();
+                Particle.CRIT.builder()
+                        .location(point)
+                        .count(2)
+                        .receivers(receivers)
+                        .extra(0)
+                        .spawn();
             }
 
             // Collision
@@ -109,7 +122,7 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
                     .ifPresentOrElse(stream -> stream.map(RayTraceResult::getHitEntity)
                                     .map(LivingEntity.class::cast)
                                     .forEach(hit -> hit(player, level, hit)),
-                            () -> player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 2.0F, 1.4F));
+                            () -> UtilMessage.message(player, getClassType().getName(), "You missed <alt>%s</alt>.", getName()));
         });
     }
 
@@ -119,8 +132,11 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
         UtilDamage.doCustomDamage(cde);
 
         if (!cde.isCancelled()) {
-            hit.getWorld().playSound(hit.getLocation().add(0, 1, 0), Sound.ENTITY_PLAYER_HURT, 0.2f, 2f);
-            hit.getWorld().playSound(hit.getLocation().add(0, 1, 0), Sound.ITEM_TRIDENT_HIT, 0.2f, 1.5f);
+            hit.getWorld().playSound(hit.getLocation().add(0, 1, 0), Sound.ENTITY_PLAYER_HURT, 0.8f, 2f);
+            hit.getWorld().playSound(hit.getLocation().add(0, 1, 0), Sound.ITEM_TRIDENT_HIT, 0.8f, 1.5f);
+
+            UtilMessage.message(caster, getClassType().getName(), "You hit <alt2>%s</alt2> with <alt>%s</alt>.", hit.getName(), getName());
+            UtilMessage.message(hit, getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s</alt>.", caster.getName(), getName());
         }
     }
 
