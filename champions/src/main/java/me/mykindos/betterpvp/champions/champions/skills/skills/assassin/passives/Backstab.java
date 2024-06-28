@@ -45,7 +45,7 @@ public class Backstab extends Skill implements PassiveSkill, Listener, DamageSki
 
         return new String[]{
                 "Hitting an enemy from behind will",
-                "increase your damage by " + getValueString(this::getDamageModifier, level, 100, "%", 0),
+                "increase your damage by " + getValueString(this::getDamageModifier, level, 1, "", 1),
         };
     }
 

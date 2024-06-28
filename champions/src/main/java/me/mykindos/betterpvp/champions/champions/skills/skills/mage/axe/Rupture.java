@@ -85,8 +85,6 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
                 "hit for " + getValueString(this::getSlowDuration, level) + " seconds",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level),
-                "",
-                EffectTypes.SLOWNESS.getDescription(slowStrength)
         };
     }
 

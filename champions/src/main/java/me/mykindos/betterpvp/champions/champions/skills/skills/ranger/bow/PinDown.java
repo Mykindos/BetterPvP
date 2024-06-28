@@ -66,9 +66,7 @@ public class PinDown extends Skill implements InteractSkill, CooldownSkill, List
                 "Quickly launch an arrow that gives enemies",
                 "<effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> for " + getValueString(this::getDuration, level) + " seconds",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
-                "",
-                EffectTypes.SLOWNESS.getDescription(slownessStrength),
+                "Cooldown: " + getValueString(this::getCooldown, level)
         };
     }
 

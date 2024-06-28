@@ -22,4 +22,5 @@ public class FireResistanceEffect extends VanillaEffectType {
     public PotionEffectType getVanillaPotionType() {
         return PotionEffectType.FIRE_RESISTANCE;
     }
+
 }

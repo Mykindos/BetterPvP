@@ -43,9 +43,7 @@ public class BarbedArrows extends Skill implements PassiveSkill, DebuffSkill, Of
     public String[] getDescription(int level) {
         return new String[] {
                 "Your arrows apply <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> to any",
-                "damageable target for " + getValueString(this::getDuration, level) + " seconds",
-                "",
-                EffectTypes.SLOWNESS.getDescription(slownessStrength)
+                "damageable target for " + getValueString(this::getDuration, level) + " seconds"
         };
     }
 

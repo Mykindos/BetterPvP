@@ -87,9 +87,7 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
                 getValueString(this::getDamage, level) + " damage for every block fissure",
                 "has travelled",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
-                "",
-                EffectTypes.SLOWNESS.getDescription(slownessLevel)
+                "Cooldown: " + getValueString(this::getCooldown, level)
         };
     }
 

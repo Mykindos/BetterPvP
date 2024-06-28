@@ -53,9 +53,7 @@ public class VitalitySpores extends Skill implements PassiveSkill, DefensiveSkil
                 "forest spores surround you, giving",
                 "you <effect>Regeneration " + UtilFormat.getRomanNumeral(regenerationStrength) + "</effect>",
                 "",
-                "You will keep the buff until you take damage",
-                "",
-                EffectTypes.REGENERATION.getDescription(regenerationStrength)
+                "You will keep the buff until you take damage"
         };
     }
 

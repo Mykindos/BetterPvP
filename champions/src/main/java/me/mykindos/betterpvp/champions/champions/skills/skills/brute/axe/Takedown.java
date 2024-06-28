@@ -80,9 +80,7 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
                 "",
                 "Cannot be used while grounded",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
-                "",
-                EffectTypes.SLOWNESS.getDescription(slownessStrength)
+                "Cooldown: " + getValueString(this::getCooldown, level)
         };
     }
 

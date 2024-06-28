@@ -72,7 +72,6 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
                 "",
                 "Cooldown: <val>" + getCooldown(level),
                 "",
-                EffectTypes.BLINDNESS.getDescription(0),
                 EffectTypes.VANISH.getDescription(0)
         };
     }

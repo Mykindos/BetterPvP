@@ -47,9 +47,7 @@ public class Bloodthirst extends Skill implements PassiveSkill, MovementSkill, B
                 "to detect nearby enemies below " + getValueString(this::getHealthPercent, level, 100, "%", 0) + " health",
                 "",
                 "While running towards weak enemies,",
-                "you receive <effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect>",
-                "",
-                EffectTypes.SPEED.getDescription(speedStrength),
+                "you receive <effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect>"
         };
     }
 
