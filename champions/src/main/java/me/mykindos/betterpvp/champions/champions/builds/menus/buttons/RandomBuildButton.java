@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.champions.champions.builds.menus.buttons;
 
 import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
-import me.mykindos.betterpvp.champions.champions.builds.RandomBuild;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.champions.champions.builds.menus.BuildMenu;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.ApplyBuildEvent;
@@ -12,7 +11,6 @@ import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.impl.ConfirmationMenu;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -35,12 +33,12 @@ public class RandomBuildButton extends ControlItem<BuildMenu> {
     private final ChampionsSkillManager championsSkillManager;
     private final Windowed parent;
 
-    public RandomBuildButton(GamerBuilds builds, Role role, int build, BuildManager buildManager, ChampionsSkillManager championsSkillManager, BuildManager buildManager1, ChampionsSkillManager championsSkillManager1, Windowed parent) {
+    public RandomBuildButton(GamerBuilds builds, Role role, int build, BuildManager buildManager, ChampionsSkillManager championsSkillManager, Windowed parent) {
         this.builds = builds;
         this.role = role;
         this.build = build;
-        this.buildManager = buildManager1;
-        this.championsSkillManager = championsSkillManager1;
+        this.buildManager = buildManager;
+        this.championsSkillManager = championsSkillManager;
         this.parent = parent;
     }
 
@@ -56,7 +54,7 @@ public class RandomBuildButton extends ControlItem<BuildMenu> {
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
         new ConfirmationMenu("Are you sure you want to replace this build with a random build?", success -> {
             if (Boolean.TRUE.equals(success)) {
-                RoleBuild randomRoleBuild = RandomBuild.getRandomBuild(player, role, build, buildManager, championsSkillManager);
+                RoleBuild randomRoleBuild = buildManager.getRandomBuild().generateRandomBuild(player, role, build);
                 RoleBuild activeBuild = builds.getActiveBuilds().get(role.getName());
                 activeBuild.setActive(false);
 
@@ -66,10 +64,8 @@ public class RandomBuildButton extends ControlItem<BuildMenu> {
                 UtilServer.callEvent(new ApplyBuildEvent(player, builds, activeBuild, randomRoleBuild));
                 notifyWindows();
                 getGui().updateControlItems();
-
-                SoundEffect.HIGH_PITCH_PLING.play(player);
-                new BuildMenu(builds, role, buildManager, championsSkillManager, parent).show(player);
             }
+            new BuildMenu(builds, role, buildManager, championsSkillManager, parent).show(player);
         }).show(player);
     }
 }

@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.builds;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -12,11 +13,25 @@ import java.util.List;
 //Generate a random build
 @Singleton
 public class RandomBuild {
+
+    private final BuildManager buildManager;
+    private final ChampionsSkillManager championsSkillManager;
+
+    @Inject
+    public RandomBuild(BuildManager buildManager, ChampionsSkillManager championsSkillManager) {
+        this.buildManager = buildManager;
+        this.championsSkillManager = championsSkillManager;
+    }
+
+
     /**
      * Generates a random build for the specified role
+     * This is a destructive option, it replaces the build for the specified Role/ID
+     * @param player the player generating the build
      * @param role the role to generate the build for
+     * @param id the id of the build to generate the build for
      */
-    public static RoleBuild getRandomBuild(Player player, Role role, int id, BuildManager buildManager, ChampionsSkillManager championsSkillManager) {
+    public RoleBuild generateRandomBuild(Player player, Role role, int id) {
         //First, generate a set of valid skills
         List<Skill> elligibleSkills = new java.util.ArrayList<>(championsSkillManager.getSkillsForRole(role).stream().filter(Skill::isEnabled).toList());
 

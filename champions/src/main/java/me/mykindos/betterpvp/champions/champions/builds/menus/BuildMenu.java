@@ -25,7 +25,7 @@ public class BuildMenu extends AbstractGui implements Windowed {
     private final Role role;
 
     public BuildMenu(GamerBuilds builds, Role role, BuildManager buildManager, ChampionsSkillManager skillManager, Windowed previous) {
-        super(9, 5);
+        super(9, 6);
         this.role = role;
 
         setItem(0, new BackButton(previous));
@@ -39,7 +39,7 @@ public class BuildMenu extends AbstractGui implements Windowed {
             setItem(slot, new ApplyBuildButton(builds, role, build));
             setItem(slot + 9, new EditBuildButton(builds, role, build, buildManager, skillManager, this));
             setItem(slot + 18, new DeleteBuildButton(builds, role, build, buildManager, skillManager, this));
-            setItem(slot + 27, new RandomBuildButton(builds, role, build, buildManager, skillManager, buildManager, skillManager, this));
+            setItem(slot + 27, new RandomBuildButton(builds, role, build, buildManager, skillManager, this));
 
             slot += 2;
         }
