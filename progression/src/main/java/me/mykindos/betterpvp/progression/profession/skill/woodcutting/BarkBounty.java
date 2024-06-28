@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.progression.profession.skill.woodcutting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillDependency;
 import me.mykindos.betterpvp.progression.profession.woodcutting.WoodcuttingHandler;
@@ -44,18 +45,6 @@ public class BarkBounty extends WoodcuttingProgressionSkill implements Listener 
             Material.DARK_OAK_LOG,
             Material.JUNGLE_LOG,
             Material.SPRUCE_LOG
-    };
-
-    /**
-     * Represents the axe types that can be used to strip logs
-     */
-    private final Material[] validAxeTypes = new Material[]{
-            Material.WOODEN_AXE,
-            Material.STONE_AXE,
-            Material.IRON_AXE,
-            Material.GOLDEN_AXE,
-            Material.DIAMOND_AXE,
-            Material.NETHERITE_AXE
     };
 
     @Inject
@@ -119,8 +108,7 @@ public class BarkBounty extends WoodcuttingProgressionSkill implements Listener 
         if (!Arrays.asList(validLogTypes).contains(block.getType())) return;
 
         Player player = event.getPlayer();
-        Material playerItemInHand = player.getInventory().getItemInMainHand().getType();
-        if (!Arrays.asList(validAxeTypes).contains(playerItemInHand)) return;
+        if (!UtilItem.isAxe(player.getInventory().getItemInMainHand())) return;
 
         if (woodcuttingHandler.didPlayerPlaceBlock(block)) return;
 
