@@ -145,7 +145,6 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
                 continue;
             }
             // Spawn particles
-            if (player == null) return;
             Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
             if (playerBullsEyeData.getTargetFocused() != null && playerBullsEyeData.getTarget().isValid()) {
                 if (player.getInventory().getItemInMainHand().getType().equals(Material.BOW) || (isHolding(player) && gamer.isHoldingRightClick())) {
@@ -227,11 +226,10 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
     private void focusTarget(BullsEyeData playerBullsEyeData) {
         Player caster = playerBullsEyeData.getCaster();
         RayTraceResult result = caster.rayTraceEntities(64);
-        if (result != null && result.getHitEntity() != null) {
-            if (!(result.getHitEntity() instanceof LivingEntity)) return;
 
+        if(result != null && result.getHitEntity() instanceof LivingEntity target) {
             if (!playerBullsEyeData.hasTarget()) {
-                playerBullsEyeData.setTarget((LivingEntity) result.getHitEntity());
+                playerBullsEyeData.setTarget(target);
                 playerBullsEyeData.setTargetFocused(new ChargeData((float) (0.5)));
                 bullsEyeData.put(caster.getUniqueId(), playerBullsEyeData);
                 playerBullsEyeData.getTargetFocused().tick();
@@ -255,7 +253,6 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
 
         // Check if angle is within the specified degrees
         if (angleDegrees <= degrees) {
-            caster.sendMessage("You are looking towards the target");
             playerBullsEyeData.getTargetFocused().tick();
             playerBullsEyeData.getTargetFocused().tickSound(caster);
             playerBullsEyeData.updateColor();
