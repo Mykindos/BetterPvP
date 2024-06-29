@@ -54,7 +54,7 @@ public class RandomBuildButton extends ControlItem<BuildMenu> {
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
         new ConfirmationMenu("Are you sure you want to replace this build with a random build?", success -> {
             if (Boolean.TRUE.equals(success)) {
-                RoleBuild randomRoleBuild = buildManager.getRandomBuild().generateRandomBuild(player, role, build);
+                RoleBuild randomRoleBuild = buildManager.generateRandomBuild(player, role, build);
                 RoleBuild activeBuild = builds.getActiveBuilds().get(role.getName());
                 activeBuild.setActive(false);
 
