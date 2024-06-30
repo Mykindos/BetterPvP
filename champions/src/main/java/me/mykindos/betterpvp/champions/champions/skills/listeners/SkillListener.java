@@ -310,8 +310,8 @@ public class SkillListener implements Listener {
         ItemStack mainHand = player.getInventory().getItemInMainHand();
         Block clickedBlock = event.getClickedBlock();
 
-        boolean isLog = clickedBlock != null && clickedBlock.getType().toString().endsWith("_LOG");
-        if (mainHand.getType().toString().endsWith("_AXE") && isLog) {
+        if (clickedBlock == null) return;
+        if (UtilItem.isAxe(mainHand) && UtilBlock.isLog(clickedBlock.getType())) {
             return;
         }
 

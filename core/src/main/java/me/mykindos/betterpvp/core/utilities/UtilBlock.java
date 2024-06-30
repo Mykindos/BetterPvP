@@ -129,6 +129,13 @@ public class UtilBlock {
         return Arrays.asList(validLogTypes).contains(material);
     }
 
+    /**
+     * Check if a material is a log (stripped or non-stripped)
+     */
+    public static boolean isLog(Material material) {
+        return material.toString().endsWith("_LOG");
+    }
+
     public static boolean isStandingOn(Entity ent, Material material) {
         return isStandingOn(ent, material.name());
     }
