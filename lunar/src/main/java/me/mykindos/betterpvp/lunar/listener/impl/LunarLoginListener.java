@@ -42,7 +42,7 @@ public class LunarLoginListener implements ApolloListener {
         final Notification notification = Notification.builder()
                 .titleComponent(Component.text("Lunar Client Support", NamedTextColor.GREEN))
                 .descriptionComponent(Component.text("You are using Lunar Client! Enhanced features are now available."))
-                .displayTime(Duration.ofSeconds(30L))
+                .displayTime(Duration.ofSeconds(10L))
                 .build();
 
         UtilServer.runTaskLater(JavaPlugin.getPlugin(Lunar.class), () -> {
