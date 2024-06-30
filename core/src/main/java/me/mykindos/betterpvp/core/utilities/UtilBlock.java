@@ -21,6 +21,7 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -110,6 +111,29 @@ public class UtilBlock {
             break;
         }
         return lastBlock;
+    }
+
+    /**
+     * Check if a material is a (non-stripped) log type
+     */
+    public static boolean isNonStrippedLog(Material material) {
+        final Material[] validLogTypes = new Material[] {
+                Material.OAK_LOG,
+                Material.ACACIA_LOG,
+                Material.BIRCH_LOG,
+                Material.DARK_OAK_LOG,
+                Material.JUNGLE_LOG,
+                Material.SPRUCE_LOG
+        };
+
+        return Arrays.asList(validLogTypes).contains(material);
+    }
+
+    /**
+     * Check if a material is a log (stripped or non-stripped)
+     */
+    public static boolean isLog(Material material) {
+        return material.toString().endsWith("_LOG");
     }
 
     public static boolean isStandingOn(Entity ent, Material material) {

@@ -22,3 +22,6 @@ INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, h
 
 -- Rod
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, hasUUID) VALUES ('FISHING_ROD', 'progression', 'fishing_rod', '<yellow>Fishing Rod', 0, 0, 0);
+
+-- Woodcutting-related
+INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, hasUUID) VALUES ('GLISTERING_MELON_SLICE', 'progression', 'tree_bark', '<aqua>Tree Bark', 1, 0, 0);
