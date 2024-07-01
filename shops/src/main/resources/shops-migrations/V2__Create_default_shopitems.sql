@@ -172,9 +172,15 @@ INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlo
 INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Farming', 'WHEAT_SEEDS', 'Seeds', 0, 4, 1, 1, 5, 1);
 
 -- Fishing
-INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Fisherman', 'COD', 'Fish', 0, 53, 1, 1, 40, 20);
-SELECT id INTO @shopItemId FROM shopitems WHERE Shopkeeper = 'Fisherman' AND Material = 'COD';
-INSERT IGNORE INTO shopitems_dynamic_pricing VALUES (@shopItemId, 10, 25, 35, 35, 40, 45, 50000, 200000, 50000);
-INSERT IGNORE INTO shopitems_flags (shopItemId, PersistentKey, PersistentValue) VALUES (@shopItemId, 'IGNORE_MODELDATA', 'true');
+INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Tradesman', 'COD', 'Fish', 0, 53, 1, 1, 40, 20);
+SELECT id INTO @codShopItemId FROM shopitems WHERE Shopkeeper = 'Tradesman' AND Material = 'COD';
+INSERT IGNORE INTO shopitems_dynamic_pricing VALUES (@codShopItemId, 10, 25, 35, 35, 40, 45, 50000, 200000, 50000);
+INSERT IGNORE INTO shopitems_flags (shopItemId, PersistentKey, PersistentValue) VALUES (@codShopItemId, 'IGNORE_MODELDATA', 'true');
 
-INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Fisherman', 'FISHING_ROD', 'Fishing Rod', 0, 21, 1, 1, 500, 0);
+INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Tradesman', 'FISHING_ROD', 'Fishing Rod', 0, 21, 1, 1, 500, 0);
+
+-- Woodcutting
+-- this is a filler item
+INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Tradesman', 'BUCKET', 'Woodcutting Diamond Axe', 0, 29, 1, 1, 4, 0);
+SELECT id INTO @diamondAxeShopItemId FROM shopitems WHERE Shopkeeper = 'Tradesman' AND Material = 'BUCKET';
+INSERT IGNORE INTO shopitems_flags (shopItemId, PersistentKey, PersistentValue) VALUES (@diamondAxeShopItemId, 'SHOP_CURRENCY', 'BARK');

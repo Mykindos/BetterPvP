@@ -53,6 +53,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -114,6 +115,15 @@ public class ShopListener implements Listener {
                 event.cancel("You have insufficient funds to purchase this item.");
                 return;
             }
+        } else if (event.getCurrency() == ShopCurrency.BARK) {
+            int barkCount = Arrays.stream(event.getPlayer().getInventory().getContents())
+                    .filter(item -> item != null && item.getType() == Material.GLISTERING_MELON_SLICE)
+                    .mapToInt(ItemStack::getAmount)
+                    .reduce(0, Integer::sum);
+            if (barkCount < cost) {
+                event.cancel("You have insufficient funds to purchase this item.");
+                return;
+            }
         }
 
         if (event.getPlayer().getInventory().firstEmpty() == -1) {
@@ -145,6 +155,30 @@ public class ShopListener implements Listener {
             event.getGamer().saveProperty(GamerProperty.BALANCE.name(), event.getGamer().getIntProperty(GamerProperty.BALANCE) - cost);
         } else if (event.getCurrency() == ShopCurrency.FRAGMENTS) {
             event.getGamer().saveProperty(GamerProperty.FRAGMENTS.name(), event.getGamer().getIntProperty(GamerProperty.FRAGMENTS) - cost);
+        } else if (event.getCurrency() == ShopCurrency.BARK) {
+            int remaining = cost;
+            Player player = event.getPlayer();
+            ItemStack[] contents = player.getInventory().getContents();
+
+            for (int i = 0; i < contents.length; i++) {
+                ItemStack item = contents[i];
+
+                if (item != null && item.getType() == Material.GLISTERING_MELON_SLICE) {
+                    int itemAmount = item.getAmount();
+
+                    if (itemAmount > remaining) {
+                        item.setAmount(itemAmount - remaining);
+                        break;
+                    }
+
+                    player.getInventory().setItem(i, null);
+                    remaining -= itemAmount;
+
+                    if (remaining <= 0) break;
+                }
+            }
+
+            player.updateInventory();
         }
 
         if (event.getShopItem() instanceof DynamicShopItem dynamicShopItem) {

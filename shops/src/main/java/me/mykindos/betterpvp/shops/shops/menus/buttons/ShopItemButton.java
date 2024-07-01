@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.menu.CooldownButton;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
+import me.mykindos.betterpvp.shops.shops.items.ShopItem;
 import me.mykindos.betterpvp.shops.shops.utilities.ShopsNamespacedKeys;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -68,6 +69,13 @@ public class ShopItemButton extends AbstractItem implements CooldownButton {
 
             itemMeta.lore(lore);
 
+            if (shopItem instanceof ShopItem castedShopItem) {
+                if (castedShopItem.getItemFlags().containsKey("SHOP_CURRENCY")) {
+                    final PersistentDataContainer pdc = itemMeta.getPersistentDataContainer();
+                    String shopCurrency = castedShopItem.getItemFlags().get("SHOP_CURRENCY");
+                    pdc.set(ShopsNamespacedKeys.SHOP_CURRENCY, PersistentDataType.STRING, shopCurrency);
+                }
+            }
         });
 
         return ItemView.of(item);
