@@ -118,8 +118,7 @@ public class Overcharge extends ChannelSkill implements InteractSkill, Listener,
         if (hasSkill(player)) {
             ChargeData overchargeData = charging.get(player);
             if (overchargeData != null) {
-                double bonusVal = overchargeData.getCharge() * getMaxDamage(getLevel(player));
-                bonusVal = Math.round(bonusVal * 10) / 10.0;
+                double bonusVal = Math.round((overchargeData.getCharge() * getMaxDamage(getLevel(player))) * 10) / 10.0;
                 bonus.put(arrow, bonusVal);
             }
         }
@@ -156,8 +155,6 @@ public class Overcharge extends ChannelSkill implements InteractSkill, Listener,
         if (!(event.getProjectile() instanceof Arrow arrow)) return;
         if (!(event.getDamager() instanceof Player)) return;
         if (bonus.containsKey(arrow)) {
-            System.out.println(event.getDamage());
-            System.out.println(bonus.get(arrow));
             event.setDamage(event.getDamage() + bonus.get(arrow));
             event.addReason(getName());
         }
