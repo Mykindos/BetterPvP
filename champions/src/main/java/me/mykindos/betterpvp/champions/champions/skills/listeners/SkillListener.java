@@ -310,9 +310,10 @@ public class SkillListener implements Listener {
         ItemStack mainHand = player.getInventory().getItemInMainHand();
         Block clickedBlock = event.getClickedBlock();
 
-        if (clickedBlock == null) return;
-        if (UtilItem.isAxe(mainHand) && UtilBlock.isLog(clickedBlock.getType())) {
-            return;
+        if (clickedBlock != null) {
+            if (UtilItem.isAxe(mainHand) && UtilBlock.isLog(clickedBlock.getType())) {
+                return;
+            }
         }
 
         SkillType skillType = SkillWeapons.getTypeFrom(mainHand);
