@@ -180,7 +180,12 @@ INSERT IGNORE INTO shopitems_flags (shopItemId, PersistentKey, PersistentValue) 
 INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Tradesman', 'FISHING_ROD', 'Fishing Rod', 0, 21, 1, 1, 500, 0);
 
 -- Woodcutting
--- this is a filler item
-INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Tradesman', 'BUCKET', 'Woodcutting Diamond Axe', 0, 29, 1, 1, 4, 0);
-SELECT id INTO @diamondAxeShopItemId FROM shopitems WHERE Shopkeeper = 'Tradesman' AND Material = 'BUCKET';
+INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Tradesman', 'DIAMOND_AXE', 'Power Axe', 0, 9, 1, 1, 16, 0);
+INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Tradesman', 'GOLDEN_AXE', 'Booster Axe', 0, 18, 1, 1, 12, 0);
+INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Tradesman', 'IRON_AXE', 'Iron Axe', 0, 27, 1, 1, 6, 0);
+SELECT id INTO @diamondAxeShopItemId FROM shopitems WHERE Shopkeeper = 'Tradesman' AND Material = 'DIAMOND_AXE';
+SELECT id INTO @goldenAxeShopItemId FROM shopitems WHERE Shopkeeper = 'Tradesman' AND Material = 'GOLDEN_AXE';
+SELECT id INTO @ironAxeShopItemId FROM shopitems WHERE Shopkeeper = 'Tradesman' AND Material = 'IRON_AXE';
 INSERT IGNORE INTO shopitems_flags (shopItemId, PersistentKey, PersistentValue) VALUES (@diamondAxeShopItemId, 'SHOP_CURRENCY', 'BARK');
+INSERT IGNORE INTO shopitems_flags (shopItemId, PersistentKey, PersistentValue) VALUES (@goldenAxeShopItemId, 'SHOP_CURRENCY', 'BARK');
+INSERT IGNORE INTO shopitems_flags (shopItemId, PersistentKey, PersistentValue) VALUES (@ironAxeShopItemId, 'SHOP_CURRENCY', 'BARK');
