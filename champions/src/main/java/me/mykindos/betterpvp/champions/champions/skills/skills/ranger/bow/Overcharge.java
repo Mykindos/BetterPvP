@@ -233,8 +233,8 @@ public class Overcharge extends ChannelSkill implements InteractSkill, Listener,
     public void loadSkillConfig() {
         baseDamage = getConfig("baseDamage", 1.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
-        baseCharge = getConfig("baseCharge", 17.5, Double.class);
-        chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 12.5, Double.class);
+        baseCharge = getConfig("baseCharge", 30, Double.class);
+        chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 10, Double.class);
 
         baseMaxDamage = getConfig("baseMaxDamage", 2.0, Double.class);
         maxDamageIncreasePerLevel = getConfig("maxDamageIncreasePerLevel", 1.0, Double.class);
