@@ -12,3 +12,7 @@ skills:
     enabled: true
     maxlevel: 250
     growFactorIncreasePerLvl: 0.003
+  bark_bounty:
+    enabled: true
+    maxlevel: 250
+    barkChanceIncreasePerLvl: 0.004
