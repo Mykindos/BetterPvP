@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
+import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerCanUseSkillEvent;
@@ -16,6 +17,7 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Arrow;
@@ -35,6 +37,10 @@ public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill, Mov
     private final Set<Arrow> arrows = new HashSet<>();
     public double energyDecreasePerLevel;
     public double basePushBack;
+    public double baseDamage;
+    public double damageIncreasePerLevel;
+    public double velocityDecreasePercentDecreasePerLevel;
+    public double velocityDecreasePercent;
 
     @Inject
     public HeavyArrows(Champions champions, ChampionsManager championsManager) {
@@ -49,7 +55,8 @@ public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill, Mov
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "The arrows you shoot are heavy",
+                "The arrows you shoot are heavy, being " + getValueString(this::getVelocityDescriptionPercent, level) + "%",
+                "slower but dealing " + getValueString(this::getDamage, level) + " extra damage",
                 "",
                 "For every arrow you shoot you will be",
                 "pushed backwards (unless crouching)",
@@ -57,6 +64,19 @@ public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill, Mov
                 "Energy used per shot: "+ getValueString(this::getEnergy, level),
         };
     }
+
+    public double getDamage(int level){
+        return baseDamage + ((level - 1) * damageIncreasePerLevel);
+    }
+
+    public double getVelocityDecreasePercent(int level){
+        return velocityDecreasePercent + ((level - 1) * velocityDecreasePercentDecreasePerLevel);
+    }
+
+    public double getVelocityDescriptionPercent(int level){
+        return (getVelocityDecreasePercent(level) * 100);
+    }
+
 
     @Override
     public Role getClassType() {
@@ -82,20 +102,26 @@ public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill, Mov
         if (!(event.getEntity() instanceof Player player)) return;
         if (!(event.getProjectile() instanceof Arrow arrow)) return;
 
-        if (UtilBlock.isInLiquid(player)
-                || championsManager.getEffects().hasEffect(player, EffectTypes.STUN)) {
-            return;
-        }
-
         int level = getLevel(player);
         if (level > 0) {
+            Vector velocity = arrow.getVelocity();
+            double reductionFactor = 1 - getVelocityDecreasePercent(level);
+
+            velocity = velocity.multiply(reductionFactor);
+            arrow.setVelocity(velocity);
+
+            if (UtilBlock.isInLiquid(player)
+                    || championsManager.getEffects().hasEffect(player, EffectTypes.STUN)) {
+                return;
+            }
+
             PlayerCanUseSkillEvent skillEvent = UtilServer.callEvent(new PlayerCanUseSkillEvent(player, this));
             if (!skillEvent.isCancelled()) {
 
                 float charge = event.getForce() / 3;
                 float scaledEnergy = getEnergy(level) * charge;
 
-                // Ensure the player isn't sneaking before using energy
+                // ensure player is not crouching and has enough energy before using energy
                 boolean hasEnoughEnergy = !player.isSneaking() && championsManager.getEnergy().use(player, getName(), scaledEnergy, false);
 
                 if (hasEnoughEnergy) {
@@ -105,6 +131,20 @@ public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill, Mov
                     player.setVelocity(pushback);
                 }
             }
+        }
+    }
+
+    @EventHandler
+    public void onArrowHit(CustomDamageEvent event) {
+        if (!(event.getProjectile() instanceof Arrow arrow)) return;
+        if (!(arrow.getShooter() instanceof Player player)) return;
+
+        int level = getLevel(player);
+        if (level > 0 && arrows.contains(arrow)) {
+            double extraDamage = getDamage(level);
+            event.setDamage(event.getDamage() + extraDamage);
+
+            arrows.remove(arrow);
         }
     }
 
@@ -119,7 +159,11 @@ public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill, Mov
     }
 
     public void loadSkillConfig(){
-        basePushBack = getConfig("basePushBack", 1.0, Double.class);
-        energyDecreasePerLevel = getConfig("energyDecreasePerLevel", 2.0, Double.class);
+        basePushBack = getConfig("basePushBack", 1.5, Double.class);
+        energyDecreasePerLevel = getConfig("energyDecreasePerLevel", 5.0, Double.class);
+        baseDamage = getConfig("baseDamage", 0.5, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.5, Double.class);
+        velocityDecreasePercent = getConfig("velocityDecreasePercent", 25.0, Double.class);
+        velocityDecreasePercentDecreasePerLevel = getConfig("velocityDecreasePercentDecreasePerLevel", 0.0, Double.class);
     }
 }

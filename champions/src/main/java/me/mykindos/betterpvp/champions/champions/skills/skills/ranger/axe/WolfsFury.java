@@ -37,8 +37,8 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
     private double baseDuration;
     private double durationIncreasePerLevel;
     private int strengthLevel;
-
     private int baseMissedSwings;
+    private int strengthLevelIncreasePerLevel;
     private double missedSwingsIncreasePerLevel;
 
     @Inject
@@ -58,7 +58,7 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
                 "Right click with an Axe to activate",
                 "",
                 "Summon the power of the wolf, gaining",
-                "<effect>Strength " + UtilFormat.getRomanNumeral(strengthLevel) + "</effect> for " + getValueString(this::getDuration, level) + " seconds and giving",
+                "<effect>Strength " + UtilFormat.getRomanNumeral(getStrengthLevel(level)) + "</effect> for " + getValueString(this::getDuration, level) + " seconds and giving",
                 "no knockback on your attacks",
                 "",
                 "If you miss " + getValueString(this::getMaxMissedSwings, level) + " consecutive attacks",
@@ -66,7 +66,7 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level),
                 "",
-                EffectTypes.STRENGTH.getDescription(strengthLevel),
+                EffectTypes.STRENGTH.getDescription(getStrengthLevel(level)),
         };
     }
 
@@ -76,6 +76,10 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
 
     public int getMaxMissedSwings(int level) {
         return (int) Math.floor(baseMissedSwings + ((level - 1) * missedSwingsIncreasePerLevel));
+    }
+
+    public int getStrengthLevel(int level){
+        return strengthLevel + ((level - 1) * strengthLevelIncreasePerLevel);
     }
 
     @Override
@@ -150,7 +154,7 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
     public void activate(Player player, int level) {
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WOLF_GROWL, 2f, 1.2f);
         active.put(player, (long) (System.currentTimeMillis() + (getDuration(level) * 1000L)));
-        championsManager.getEffects().addEffect(player, EffectTypes.STRENGTH, getName(), strengthLevel, (long) (getDuration(level) * 1000L));
+        championsManager.getEffects().addEffect(player, EffectTypes.STRENGTH, getName(), getStrengthLevel(level), (long) (getDuration(level) * 1000L));
     }
 
     public void deactivate(Player player) {
@@ -171,7 +175,8 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
         baseDuration = getConfig("baseDuration", 4.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
         baseMissedSwings = getConfig("baseMissedSwings", 2, Integer.class);
-        missedSwingsIncreasePerLevel = getConfig("missedSwingsIncreasePerLevel", 0.5, Double.class); // 1 extra swing per 2 levels
-        strengthLevel = getConfig("strengthLevel", 2, Integer.class);
+        missedSwingsIncreasePerLevel = getConfig("missedSwingsIncreasePerLevel", 0.0, Double.class);
+        strengthLevel = getConfig("strengthLevel", 3, Integer.class);
+        strengthLevelIncreasePerLevel = getConfig("strengthLevelIncreasePerLevel", 0, Integer.class);
     }
 }
