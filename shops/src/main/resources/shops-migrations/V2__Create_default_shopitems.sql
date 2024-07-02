@@ -177,12 +177,12 @@ SELECT id INTO @codShopItemId FROM shopitems WHERE Shopkeeper = 'Tradesman' AND 
 INSERT IGNORE INTO shopitems_dynamic_pricing VALUES (@codShopItemId, 10, 25, 35, 35, 40, 45, 50000, 200000, 50000);
 INSERT IGNORE INTO shopitems_flags (shopItemId, PersistentKey, PersistentValue) VALUES (@codShopItemId, 'IGNORE_MODELDATA', 'true');
 
-INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Tradesman', 'FISHING_ROD', 'Fishing Rod', 0, 21, 1, 1, 500, 0);
+INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Tradesman', 'FISHING_ROD', 'Fishing Rod', 0, 12, 1, 1, 500, 0);
 
 -- Woodcutting
-INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Tradesman', 'DIAMOND_AXE', 'Power Axe', 0, 9, 1, 1, 16, 0);
-INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Tradesman', 'GOLDEN_AXE', 'Booster Axe', 0, 18, 1, 1, 12, 0);
-INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Tradesman', 'IRON_AXE', 'Iron Axe', 0, 27, 1, 1, 6, 0);
+INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Tradesman', 'DIAMOND_AXE', 'Power Axe', 0, 14, 1, 1, 16, 0);
+INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Tradesman', 'GOLDEN_AXE', 'Booster Axe', 0, 23, 1, 1, 12, 0);
+INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Tradesman', 'IRON_AXE', 'Iron Axe', 0, 32, 1, 1, 6, 0);
 SELECT id INTO @diamondAxeShopItemId FROM shopitems WHERE Shopkeeper = 'Tradesman' AND Material = 'DIAMOND_AXE';
 SELECT id INTO @goldenAxeShopItemId FROM shopitems WHERE Shopkeeper = 'Tradesman' AND Material = 'GOLDEN_AXE';
 SELECT id INTO @ironAxeShopItemId FROM shopitems WHERE Shopkeeper = 'Tradesman' AND Material = 'IRON_AXE';
