@@ -54,6 +54,4 @@ public interface ILevelWikiable {
         return level;
     }
 
-    WikiCategory getCategory();
-
 }

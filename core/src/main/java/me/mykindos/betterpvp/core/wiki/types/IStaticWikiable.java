@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Represents a class that has functions to display static things in a menu
  */
-public interface IStaticWikiable {
+public interface IStaticWikiable extends IWikiable {
 
     /**
      * a list of mini-message formatted strings, to display in as the wiki item
@@ -42,8 +42,5 @@ public interface IStaticWikiable {
     default int getAmount() {
         return 1;
     }
-
-    WikiCategory getCategory();
-
 
 }
