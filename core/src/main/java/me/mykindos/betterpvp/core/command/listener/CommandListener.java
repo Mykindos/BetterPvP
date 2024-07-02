@@ -138,7 +138,6 @@ public class CommandListener implements Listener {
                 return !client.hasRank(command1.getRequiredRank()) && !event.getPlayer().isOp();
             }
 
-            System.out.println("removing " + command.toLowerCase());
             return true;
         });
     }
