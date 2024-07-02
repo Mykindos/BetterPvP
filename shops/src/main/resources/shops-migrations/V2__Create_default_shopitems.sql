@@ -183,9 +183,12 @@ INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlo
 INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Tradesman', 'DIAMOND_AXE', 'Power Axe', 0, 14, 1, 1, 16, 0);
 INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Tradesman', 'GOLDEN_AXE', 'Booster Axe', 0, 23, 1, 1, 12, 0);
 INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Tradesman', 'IRON_AXE', 'Iron Axe', 0, 32, 1, 1, 6, 0);
+INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Tradesman', 'MANGROVE_PROPAGULE', 'Mangrove Propagule', 0, 15, 1, 1, 3, 0);
 SELECT id INTO @diamondAxeShopItemId FROM shopitems WHERE Shopkeeper = 'Tradesman' AND Material = 'DIAMOND_AXE';
 SELECT id INTO @goldenAxeShopItemId FROM shopitems WHERE Shopkeeper = 'Tradesman' AND Material = 'GOLDEN_AXE';
 SELECT id INTO @ironAxeShopItemId FROM shopitems WHERE Shopkeeper = 'Tradesman' AND Material = 'IRON_AXE';
+SELECT id INTO @saplingShopItemId FROM shopitems WHERE Shopkeeper = 'Tradesman' AND Material = 'MANGROVE_PROPAGULE';
 INSERT IGNORE INTO shopitems_flags (shopItemId, PersistentKey, PersistentValue) VALUES (@diamondAxeShopItemId, 'SHOP_CURRENCY', 'BARK');
 INSERT IGNORE INTO shopitems_flags (shopItemId, PersistentKey, PersistentValue) VALUES (@goldenAxeShopItemId, 'SHOP_CURRENCY', 'BARK');
 INSERT IGNORE INTO shopitems_flags (shopItemId, PersistentKey, PersistentValue) VALUES (@ironAxeShopItemId, 'SHOP_CURRENCY', 'BARK');
+INSERT IGNORE INTO shopitems_flags (shopItemId, PersistentKey, PersistentValue) VALUES (@saplingShopItemId , 'SHOP_CURRENCY', 'BARK');
