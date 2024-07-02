@@ -19,10 +19,10 @@ import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import me.mykindos.betterpvp.core.utilities.model.display.TitleComponent;
 import me.mykindos.betterpvp.core.world.events.SpawnTeleportEvent;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
-import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -113,7 +113,15 @@ public class ClansMovementListener extends ClanListener {
                 ClanRelation relation = clanManager.getRelation(clan, locationClan);
                 TitleComponent titleComponent = new TitleComponent(0, .75, .1, true,
                         gamer -> Component.text("", NamedTextColor.GRAY),
-                        gamer -> Component.text(locationClan.getName(), relation.getPrimary()));
+                        gamer -> {
+                            TextComponent text = Component.text(locationClan.getName(), relation.getPrimary());
+
+                            if(locationClan.isAdmin() && locationClan.isSafe() && !client.getGamer().isInCombat()) {
+                                text = text.append(Component.text(" (", NamedTextColor.WHITE).append(Component.text("Safe", NamedTextColor.AQUA).append(Component.text(")", NamedTextColor.WHITE))));
+                            }
+
+                            return text;
+                        });
                 client.getGamer().getTitleQueue().add(9, titleComponent);
             }
 
